@@ -1,14 +1,27 @@
+'''
+Mesa Space Module
+=================================
 
+Objects used to add a spatial component to a model. 
 
-#AgentGrid
-
-#From Shell
-#self.grid = AgentGrid(height, width)
-
+'''
 
 class Grid(object):
 	'''
 	Base class for a square grid.
+
+	Grid cells are indexed by [y][x], where [0][0] is assumed to be the top-left
+	and [height-1][width-1] is the bottom-right. If a grid is toroidal, the top
+	and bottom, and left and right, edges wrap to each other
+
+	Properties:
+		width, height: The grid's width and height. 
+		torus: Boolean which determines whether to treat the grid as a torus.
+
+		grid: Internal list-of-lists which holds the grid cells themselves.
+
+	Methods:
+		get_neighbors: Returns the objects surrounding a given cell.
 	'''
 
 	width = None
@@ -70,6 +83,10 @@ class Grid(object):
 				   If False, return Von Neumann neighborhood (exclude diagonals)
 			include_center: If True, return the (x, y) cell as well. Otherwise,
 							return surrounding cells only.
+
+		Returns:
+			A list of non-None objects in the given neighborhood; at most 9 if 
+			Moore, 5 if Von-Neumann (8 and 4 if not including the center).
 		'''
 		neighbors = []
 		for dy in [-1, 0, 1]:
