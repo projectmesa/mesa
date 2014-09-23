@@ -84,6 +84,13 @@ class BaseScheduler(object):
 		self.steps += 1
 		self.time += 1
 
+	def get_agent_count(self):
+		'''
+		Returns the current number of agents in the queue.
+		'''
+
+		return len(self.agents)
+
 
 class Random_Activation(BaseScheduler):
 	'''
