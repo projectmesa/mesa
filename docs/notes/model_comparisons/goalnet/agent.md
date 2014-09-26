@@ -64,9 +64,9 @@
     wealth  #This could be the cumulative payoffs
 ```
 
-### activate(self)
+### activate(self) (aka run)
 
-Description
+** Description **
 ```
 The agent's sequence of actions each activation.
 
@@ -75,6 +75,7 @@ The sequence is:
     b. Choose an action
     c. Receive / Distribute payoffs
 ```
+** What happens **
 ```
     turns -- add to the number
 
