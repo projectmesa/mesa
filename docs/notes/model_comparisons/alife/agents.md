@@ -1,8 +1,9 @@
 
 # Agent object
 
+### __init__
+
 ```
-    __init__
         x
         y
         genone
@@ -38,8 +39,10 @@
 
         food_source
         consumption_rate
+```
 
-    run(self)
+### run(self)
+```
         fov
         avoid obstacles
 
@@ -52,7 +55,10 @@
 
         #Check for neighbors; if you see an agent of same species, come closer
         #Otherwise, RUN!
+```
 
+### Other methods
+```
     avoid_obstacles(self,fav)
         calculate obs
 
@@ -138,5 +144,4 @@
 
     hillclimb(self,x)
         """ make a small move in a direction that results in improvement in fitness"""
-
 ```
