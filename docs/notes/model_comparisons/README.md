@@ -2,5 +2,5 @@ This is a directory of a comparison of models that were written in Python withou
 
 #### Models compared
 
-* https://github.com/projectmesa/ReferenceCode/tree/master/alife_visualization(Alife)
-* https://github.com/jackiekazil/goalnet(Goalnet)
+* [Alife](https://github.com/projectmesa/ReferenceCode/tree/master/alife_visualization)
+* [Goalnet](https://github.com/jackiekazil/goalnet)
