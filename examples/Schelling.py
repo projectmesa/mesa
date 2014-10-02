@@ -2,7 +2,21 @@
 Schelling Segregation Model
 =========================================
 
+A simple implementation of a Schelling segregation model.
 
+This version demonstrates the ASCII renderer.
+To use, run this code from the command line, e.g.
+    $ ipython -i Schelling.py 
+
+viz is the visualization wrapper around 
+To print the current state of the model:
+    viz.render()
+
+To advance the model by one step and print the new state:
+    viz.step()
+
+To advance the model by e.g. 10 steps and print the new state:
+    viz.step_forward(10)
 '''
 
 from __future__ import division # We're doing this in Python 2.x, right?
@@ -11,6 +25,8 @@ import random
 from mesa import Model, Agent
 from mesa.time import Random_Activation 
 from mesa.space import Grid
+
+from mesa.visualization.TextVisualization import *
 
 class SchellingModel(Model):
     '''
@@ -53,7 +69,7 @@ class SchellingModel(Model):
                     empty_cells.append((x, y))
         return empty_cells
 
-    def go(self):
+    def step(self):
         self.happy = 0 # Reset counter of happy agents
         self.schedule.step()
         self.happy_series.append(self.happy)
@@ -86,12 +102,40 @@ class SchellingAgent(Agent):
             model.happy += 1
 
 
+class SchellingTextVisualization(TextVisualization):
+    '''
+    ASCII visualization for schelling model
+    '''
+
+    def __init__(self, model):
+        '''
+        Create new Schelling ASCII visualization.
+        '''
+        self.model = model
+
+        grid_viz = TextGrid(self.model.grid, self.ascii_agent)
+        happy_viz = TextData(self.model, 'happy')
+        self.elements = [grid_viz, happy_viz]
+
+    @staticmethod
+    def ascii_agent(a):
+        '''
+        Minority agents are X, Majority are O.
+        '''
+        if a.type == 0:
+            return 'O'
+        if a.type == 1:
+            return 'X'
+
+
 if __name__ == "__main__":
     model = SchellingModel(10, 10, 0.8, 0.2, 3)
+    viz = SchellingTextVisualization(model)
+    '''
     while model.happy < model.schedule.get_agent_count():
-        model.go()
+        model.step()
         if model.schedule.steps > 1000: break 
-    
+    '''
 
 
 
