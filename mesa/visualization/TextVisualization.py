@@ -2,7 +2,28 @@
 Text Visualization
 =======================
 
-Base class for an ASCII-only visualization of a model.
+Base classes for ASCII-only visualizations of a model.
+These are useful for quick debugging, and can readily be rendered in an IPython
+Notebook or via text alone in a browser window.
+
+Classes:
+
+TextVisualization: Class meant to wrap around a Model object and render it 
+in some way using Elements, which are stored in a list and rendered in that 
+order. Each element, in turn, renders a particular piece of information as text.
+
+TextElement: Parent class for all other ASCII elements. render() returns its 
+representative string, which can be printed via the overloaded __str__ method.
+
+TextData: Uses getattr to get the value of a particular property of a model
+and prints it, along with its name.
+
+TextGrid: Prints a grid, assuming that the value of each cell maps to exactly
+one ASCII character via a converter method. This (as opposed to a dictionary)
+is used so as to allow the method to access Agent internals, as well as to 
+potentially render a cell based on several values (e.g. an Agent grid and a 
+Patch value grid).
+
 '''
 
 class TextVisualization(object):
