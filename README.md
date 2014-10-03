@@ -14,22 +14,22 @@ Mesa is a new agent-based modeling framework being written in Python.
 
 **In-browser visualization:** GUIs are hard. Cross-platform GUIs are even harder. Nobody wants to deal with that. Everyone has a browser, and browsers (and the JavaScript that runs on them) work pretty much the same everywhere. So we're going to put the visualizations (and the visualizations only) in a web browser. However, users shouldn't have to write their own JavaScript to get a decent-looking visualization up and running. Our plan is to have a basic template, and a system which can populate it with a minimum amount of Python. If someone wants to customize their web visualization with their own fancy JS or CSS, it should be as easy as possible.
 
-**Open-source:** Not just in theory, but in practice. We want this to be a community tool, built and updated to include the features that researchers actually want and use. Ideally, this can be a way of easily sharing both best-practices and cutting-edge methodologies. 
+**Open-source:** Not just in theory, but in practice. We want this to be a community tool, built and updated to include the features that researchers actually want and use. Ideally, this can be a way of easily sharing both best-practices and cutting-edge methodologies.
 
 **A pony:** You can have one. But you have to code it yourself. And share it with everyone.
 
 ## Setting up the virtual environment
-(Jackie, correct if I'm wrong)
 
-Step -1. Install [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/)
+Step -1.
+* Install [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/)
 
-Step 0. 
-    mkvirtualenv mesa
-    pip install -r requirements.txt
-    add2virtualenv [path to ProjectMesa/mesa]
+Step 0.
+* mkvirtualenv mesa
+* pip install -r requirements.txt
+* add2virtualenv [path to ProjectMesa/mesa]
 
-
-Step -1. 
-    deactivate 
+Step 1. - Using the environment
+* workon mesa
+* deactivate
 
 
