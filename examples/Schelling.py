@@ -20,6 +20,7 @@ To advance the model by e.g. 10 steps and print the new state:
 '''
 
 from __future__ import division # For Python 2.x compatibility
+import random
 
 from mesa import Model, Agent
 from mesa.time import Random_Activation 
