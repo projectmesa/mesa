@@ -19,8 +19,7 @@ To advance the model by e.g. 10 steps and print the new state:
     viz.step_forward(10)
 '''
 
-from __future__ import division # We're doing this in Python 2.x, right?
-import random
+from __future__ import division # For Python 2.x compatibility
 
 from mesa import Model, Agent
 from mesa.time import Random_Activation 
