@@ -53,7 +53,7 @@ class TextVisualization(object):
         Render all the text elements, in order.
         '''
         for element in self.elements:
-            print element
+            print(element)
 
     def step(self):
         '''
