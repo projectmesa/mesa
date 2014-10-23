@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<head>
+	<title>{{ model_name }}(Mesa visualization)</title>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script>
+		var tick = -1; // Counts at which tick of the model we are.
+
+		// WebSocket Stuff
+		var ws = new WebSocket("ws://127.0.0.1:8888/ws");
+		ws.onopen = function() {console.log("Connection opened!"); };
+
+		ws.onmessage = function(msg) {
+			//console.log(msg);
+			data = JSON.parse(msg.data);
+			// Assumes the correct format!
+			for (var e in data) {
+				txt = data[e];
+				// Replace line-breaks with BR tags:
+				txt = txt.replace(/(?:\r\n|\r|\n)/g, '<br />')
+				$("#element_"+e).html(txt); // Replace element text with data
+			}
+		}
+
+		var reset = function() {
+			ws.send("RESET!");
+			tick = -1;
+		}
+
+		var step = function() {
+			tick += 1
+			ws.send("get_step:"+tick);
+			
+		}
+
+	</script>
+	
+</head>
+<body>
+	<h2>{{ model_name }}</h2>
+	<div id="Controls">
+		<button onclick="reset()">Reset</button>
+		<button onclick="step()">Step</button>
+	</div>
+
+	<div id="Visualization">
+		{% for element in range(element_count) %}
+			<div id="element_{{element}}"></div>
+		{% end %}
+	</div>
+
+</body>
+
+

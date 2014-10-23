@@ -26,6 +26,8 @@ from mesa import Model, Agent
 from mesa.time import Random_Activation 
 from mesa.space import Grid
 
+from mesa.visualization.TextServer import TextServer
+
 from mesa.visualization.TextVisualization import *
 
 class SchellingModel(Model):
@@ -48,6 +50,8 @@ class SchellingModel(Model):
 
         self.happy_series = []
         self.happy = 0
+
+        self.running = True
 
         # Set up agents
         for x in range(self.width):
@@ -73,6 +77,8 @@ class SchellingModel(Model):
         self.happy = 0 # Reset counter of happy agents
         self.schedule.step()
         self.happy_series.append(self.happy)
+        if self.happy == self.schedule.get_agent_count():
+            self.running = False
  
 
 class SchellingAgent(Agent):
@@ -129,13 +135,11 @@ class SchellingTextVisualization(TextVisualization):
 
 
 if __name__ == "__main__":
-    model = SchellingModel(10, 10, 0.8, 0.2, 3)
-    viz = SchellingTextVisualization(model)
-    '''
-    while model.happy < model.schedule.get_agent_count():
-        model.step()
-        if model.schedule.steps > 1000: break 
-    '''
+    server = TextServer(SchellingModel, SchellingTextVisualization, "Schelling",
+                            10, 10, 0.8, 0.2, 3)
+    server.launch()
+    #model = SchellingModel(10, 10, 0.8, 0.2, 3)
+    #viz = SchellingTextVisualization(model)
 
 
 
