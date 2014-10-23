@@ -207,17 +207,5 @@ class TextServer(object):
         while self.model.schedule.steps < self.max_steps and self.model.running:
             self.model.step()
             self.viz_states.append(self.get_viz())
-        print(self.model.schedule.steps)
-
-
-
-
-
-
-        
-
-
-
-
-
-
+        if self.verbose:
+            print("Model steps:", self.model.schedule.steps)
