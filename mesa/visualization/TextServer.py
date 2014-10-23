@@ -132,6 +132,20 @@ class TextServer(object):
     Main class for handling the visualization web app.
 
     Attributes:
+        verbose: (default True) Whether to write most events to the terminal
+        model_name: Name to display in the browser. (defaults to "Mesa Model")
+
+        model_cls: The class of the model to render.
+        text_visualization_cls: The TextVisualization subclass describing how to
+                                render the model.
+        port: (default 8888) Port to listen on.
+
+        max_steps: Maximum number of steps to pre-run the model for.
+        viz_states: List of dictionaries representing the rendering of the model
+                    at each step.
+
+        model_args: Tuple of positional arguments to pass to each new model obj.
+        model_kwargs: Dictionary of keyword arguments to pass to each new model.
 
     '''
 
@@ -151,7 +165,10 @@ class TextServer(object):
     def __init__(self, model_cls, text_visualization_cls, name="Mesa Model",
                     *args, **kwargs):
         '''
-        Create a new visualization server.
+        Create a new visualization server for a TextVisualization browser.
+
+        This server will render and control a model_cls model and render it as
+        described in an associated text_visualization_cls.
 
         Args:
             model_cls: A model class to visualize
