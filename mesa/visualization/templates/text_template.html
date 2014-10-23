@@ -1,34 +1,44 @@
 <!DOCTYPE html>
 <head>
-	<title>{{ model_name }}(Mesa visualization)</title>
+	<title>{{ model_name }} (Mesa visualization)</title>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script>
 		var tick = -1; // Counts at which tick of the model we are.
 
 		// WebSocket Stuff
-		var ws = new WebSocket("ws://127.0.0.1:8888/ws");
+		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws");
 		ws.onopen = function() {console.log("Connection opened!"); };
 
-		ws.onmessage = function(msg) {
-			//console.log(msg);
-			data = JSON.parse(msg.data);
-			// Assumes the correct format!
-			for (var e in data) {
-				txt = data[e];
-				// Replace line-breaks with BR tags:
-				txt = txt.replace(/(?:\r\n|\r|\n)/g, '<br />')
-				$("#element_"+e).html(txt); // Replace element text with data
+		ws.onmessage = function(message) {
+			msg = JSON.parse(message.data);
+			//console.log(message.data);
+			switch (msg["type"]) {
+				case "viz_state":
+					// Draw in the visualization elements
+					for (var e in msg["data"]) {
+						txt = msg["data"][e];
+						txt = txt.replace(/(?:\r\n|\r|\n)/g, '<br />'); // Replace lin breaks with BR tags
+						$("#element_"+e).html(txt); // Replace element text with data
+					}
+					break;
+				default:
+					console.log("Unexpected message.");
 			}
 		}
 
+		var send = function(message) {
+			msg = JSON.stringify(message);
+			ws.send(msg);
+		}
+
 		var reset = function() {
-			ws.send("RESET!");
-			tick = -1;
+			tick = 0;
+			send({"type": "reset"});
 		}
 
 		var step = function() {
 			tick += 1
-			ws.send("get_step:"+tick);
+			send({"type": "get_step", "step": tick});
 			
 		}
 
