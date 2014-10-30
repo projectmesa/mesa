@@ -24,8 +24,7 @@ class WolfSheepVisualization(TextVisualization):
             return " "
         if len([obj for obj in cell if isinstance(obj, Sheep)]) == len(cell):
             return "S"
-        elif len([obj for obj in cell if isinstance(obj, Wolf)]) == len(cell):
+        if len([obj for obj in cell if isinstance(obj, Wolf)]) == len(cell):
             return "W"
         else:
             return "X"
-

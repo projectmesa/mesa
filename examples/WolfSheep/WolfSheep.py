@@ -9,9 +9,7 @@ Replication of the model found in NetLogo:
     Northwestern University, Evanston, IL.
 
 TODO: Implement grass
-
 '''
-
 
 import random
 
@@ -29,6 +27,9 @@ class WolfSheepPredation(Model):
     initial_sheep = 100
     initial_wolves = 50
     sheep_gain_from_food = 4
+
+    grass = False
+
     wolf_gain_from_food = 20
     sheep_reproduce = 0.04
     wolf_reproduce = 0.05
@@ -36,11 +37,33 @@ class WolfSheepPredation(Model):
     height = 20
     width = 20
 
-    def __init__(self):
+    def __init__(self, height=20, width=20, 
+                    initial_sheep=100, initial_wolves=50, sheep_reproduce=0.04,  
+                    wolf_reproduce=0.05, wolf_gain_from_food=20, 
+                    grass=False, sheep_gain_from_food=4):
         '''
         Create a new Wolf-Sheep model with the given parameters.
+
+        Args:
+            initial_sheep: Number of sheep to start with
+            initial_wolves: Number of wolves to start with
+            sheep_reproduce: Probability of each sheep reproducing each step
+            wolf_reproduce: Probability of each wolf reproducing each step
+            wolf_gain_from_food: Energy a wolf gains from eating a sheep
+            grass: Whether to have the sheep eat grass for energy
+            sheep_gain_from_food: Energy sheep gain from grass, if enabled.
         '''
-        #TODO: Accept all other parameters
+        
+        # Set parameters
+        self.height = height
+        self.width = width
+        self.initial_sheep = initial_sheep
+        self.initial_wolves = initial_wolves
+        self.sheep_reproduce = sheep_reproduce
+        self.wolf_reproduce = wolf_reproduce
+        self.wolf_gain_from_food = wolf_gain_from_food
+        self.grass = grass
+        self.sheep_gain_from_food = sheep_gain_from_food
         
         self.schedule = Random_Activation(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
@@ -119,12 +142,3 @@ class Wolf(RandomWalker, Agent):
             self.energy = self.energy/2
             model.grid[self.y][self.x].add(cub)
             model.schedule.add(cub)
-
-
-
-
-
-
-
-
-
