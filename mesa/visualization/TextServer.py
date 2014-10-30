@@ -45,15 +45,15 @@ The websocket protocol is as follows:
 Each message is a JSON object, with a "type" property which defines the rest of
 the structure.
 
-Server -> Client
-
+Server -> Client:
+    Send over the model state to visualize:
     {
     "type": "viz_state",
-    "data": A JSON representation of the viz state text
+    "data": {1: 'X X\nXO \nXXX',
+             2: 'XCount: 6'}
     }
 
-Client -> Server
-    
+Client -> Server:
     Reset the model. 
     TODO: Allow this to come with parameters
     {
@@ -78,7 +78,6 @@ import tornado.escape
 class PageHandler(tornado.web.RequestHandler):
     def initialize(self, controller):
         self.controller = controller
-        # TODO: This is a horrible hack and there's got to be a better way.
         path = os.path.dirname(__file__) + "/templates"
         loader = tornado.template.Loader(path)
         self.template = loader.load("text_template.html")
