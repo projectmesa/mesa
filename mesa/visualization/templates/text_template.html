@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<head>
+	<title>{{ model_name }} (Mesa visualization)</title>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script>
+		var tick = -1; // Counts at which tick of the model we are.
+		var running = false; // Whether there is currently a model running
+		var player; // Variable to store the continuous player
+		var fps  = 3 ; // Frames per second
+
+		// WebSocket Stuff
+		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws");
+		ws.onopen = function() {console.log("Connection opened!"); };
+
+		ws.onmessage = function(message) {
+			msg = JSON.parse(message.data);
+			//console.log(message.data);
+			switch (msg["type"]) {
+				case "viz_state":
+					// Draw in the visualization elements
+					for (var e in msg["data"]) {
+						txt = msg["data"][e];
+						txt = txt.replace(/(?:\r\n|\r|\n)/g, '<br />'); // Replace lin breaks with BR tags
+						$("#element_"+e).html(txt); // Replace element text with data
+					}
+					break;
+				case "end":
+					running = false;
+					break;
+				default:
+					console.log("Unexpected message.");
+			}
+		}
+
+		var send = function(message) {
+			msg = JSON.stringify(message);
+			ws.send(msg);
+		}
+
+		var reset = function() {
+			tick = 0;
+			running = true;
+			send({"type": "reset"});
+		}
+
+		var step = function() {
+			if(running) {
+				tick += 1;
+				send({"type": "get_step", "step": tick});
+			}
+		}
+
+		var run = function() {
+			player = setInterval(function() {
+				if (!running) clearInterval(player);
+				step();
+			}, 1000/fps);
+		}
+
+	</script>
+	
+</head>
+<body>
+	<h2>{{ model_name }}</h2>
+	<div id="Controls">
+		<button onclick="reset()">Reset</button>
+		<button onclick="step()">Step</button>
+		<button onclick="run()">Run</button>
+
+	</div>
+
+	<div id="Visualization">
+		{% for element in range(element_count) %}
+			<div id="element_{{element}}"></div>
+		{% end %}
+	</div>
+
+</body>
