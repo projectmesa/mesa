@@ -53,6 +53,9 @@ Server -> Client:
              2: 'XCount: 6'}
     }
 
+    Informs the client that the model is over.
+    {"type": "end"}
+
 Client -> Server:
     Reset the model. 
     TODO: Allow this to come with parameters
@@ -108,8 +111,11 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
         if msg["type"] == "get_step":
             step = int(msg["step"])
-            return_message = {"type": "viz_state"}
-            return_message["data"] = self.controller.viz_states[step]
+            if step < len(self.controller.viz_states):
+                return_message = {"type": "viz_state"}
+                return_message["data"] = self.controller.viz_states[step]
+            else:
+                return_message = {"type": "end"}
             self.write_message(return_message)
 
         elif msg["type"] == "reset":

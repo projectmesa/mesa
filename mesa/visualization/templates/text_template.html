@@ -4,6 +4,7 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script>
 		var tick = -1; // Counts at which tick of the model we are.
+		var running = false; // Whether there is currently a model running
 
 		// WebSocket Stuff
 		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws");
@@ -21,6 +22,9 @@
 						$("#element_"+e).html(txt); // Replace element text with data
 					}
 					break;
+				case "end":
+					running = false;
+					break;
 				default:
 					console.log("Unexpected message.");
 			}
@@ -33,12 +37,15 @@
 
 		var reset = function() {
 			tick = 0;
+			running = true;
 			send({"type": "reset"});
 		}
 
 		var step = function() {
-			tick += 1
-			send({"type": "get_step", "step": tick});
+			if(running) {
+				tick += 1;
+				send({"type": "get_step", "step": tick});
+			}
 			
 		}
 
