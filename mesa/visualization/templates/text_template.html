@@ -5,6 +5,8 @@
 	<script>
 		var tick = -1; // Counts at which tick of the model we are.
 		var running = false; // Whether there is currently a model running
+		var player; // Variable to store the continuous player
+		var fps  = 3 ; // Frames per second
 
 		// WebSocket Stuff
 		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws");
@@ -46,7 +48,13 @@
 				tick += 1;
 				send({"type": "get_step", "step": tick});
 			}
-			
+		}
+
+		var run = function() {
+			player = setInterval(function() {
+				if (!running) clearInterval(player);
+				step();
+			}, 1000/fps);
 		}
 
 	</script>
@@ -57,6 +65,8 @@
 	<div id="Controls">
 		<button onclick="reset()">Reset</button>
 		<button onclick="step()">Step</button>
+		<button onclick="run()">Run</button>
+
 	</div>
 
 	<div id="Visualization">
