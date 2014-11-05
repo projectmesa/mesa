@@ -21,10 +21,14 @@ Mesa is a new agent-based modeling framework being written in Python.
 ## Setting up the virtual environment
 
 Step -1.
+* Install Python 3, if you don't have it yet.
 * Install [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/)
 
 Step 0.
-* mkvirtualenv mesa
+* Create the virtual environment: 
+    * (If you have Python 3 only) mkvirtualenv mesa
+    * (If you have both versions) mkvirtualenv mesa -p *path/to/python3*
+        - On OSX or Linux, you can find the Python 3 path via *which python3*
 * pip install -r requirements.txt
 * add2virtualenv [path to ProjectMesa/mesa]
 
