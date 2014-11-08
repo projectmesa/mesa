@@ -19,7 +19,7 @@ class Grid(object):
     and bottom, and left and right, edges wrap to each other
 
     Properties:
-        width, height: The grid's width and height. 
+        width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
 
         grid: Internal list-of-lists which holds the grid cells themselves.
@@ -89,7 +89,7 @@ class Grid(object):
                             return surrounding cells only.
 
         Returns:
-            A list of non-None objects in the given neighborhood; at most 9 if 
+            A list of non-None objects in the given neighborhood; at most 9 if
             Moore, 5 if Von-Neumann (8 and 4 if not including the center).
         '''
         neighbors = []
@@ -118,6 +118,7 @@ class MultiGrid(Grid):
 
     Properties:
         width, height: The grid's width and height.
+
         torus: Boolean which determines whether to treat the grid as a torus.
 
         grid: Internal list-of-lists which holds the grid cells themselves.
