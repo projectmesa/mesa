@@ -6,9 +6,9 @@ A simple implementation of a Schelling segregation model.
 
 This version demonstrates the ASCII renderer.
 To use, run this code from the command line, e.g.
-    $ ipython -i Schelling.py 
+    $ ipython -i Schelling.py
 
-viz is the visualization wrapper around 
+viz is the visualization wrapper around
 To print the current state of the model:
     viz.render()
 
@@ -22,9 +22,13 @@ To advance the model by e.g. 10 steps and print the new state:
 from __future__ import division # For Python 2.x compatibility
 import random
 
+import random
+
 from mesa import Model, Agent
-from mesa.time import Random_Activation 
+from mesa.time import Random_Activation
 from mesa.space import Grid
+
+from mesa.visualization.TextServer import TextServer
 
 from mesa.visualization.TextVisualization import *
 
@@ -48,6 +52,8 @@ class SchellingModel(Model):
 
         self.happy_series = []
         self.happy = 0
+
+        self.running = True
 
         # Set up agents
         for x in range(self.width):
@@ -73,7 +79,9 @@ class SchellingModel(Model):
         self.happy = 0 # Reset counter of happy agents
         self.schedule.step()
         self.happy_series.append(self.happy)
- 
+
+        if self.happy == self.schedule.get_agent_count():
+            self.running = False
 
 class SchellingAgent(Agent):
     '''
@@ -129,13 +137,11 @@ class SchellingTextVisualization(TextVisualization):
 
 
 if __name__ == "__main__":
-    model = SchellingModel(10, 10, 0.8, 0.2, 3)
-    viz = SchellingTextVisualization(model)
-    '''
-    while model.happy < model.schedule.get_agent_count():
-        model.step()
-        if model.schedule.steps > 1000: break 
-    '''
+    server = TextServer(SchellingModel, SchellingTextVisualization, "Schelling",
+                            10, 10, 0.8, 0.2, 3)
+    server.launch()
+    #model = SchellingModel(10, 10, 0.8, 0.2, 3)
+    #viz = SchellingTextVisualization(model)
 
 
 
