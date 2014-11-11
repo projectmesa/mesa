@@ -25,7 +25,7 @@ import random
 import random
 
 from mesa import Model, Agent
-from mesa.time import Random_Activation
+from mesa.time import RandomActivation
 from mesa.space import Grid
 
 from mesa.visualization.TextServer import TextServer
@@ -47,7 +47,7 @@ class SchellingModel(Model):
         self.minority_pc = minority_pc
         self.homophily = homophily
 
-        self.schedule = Random_Activation(self)
+        self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=True)
 
         self.happy_series = []

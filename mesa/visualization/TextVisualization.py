@@ -8,11 +8,11 @@ Notebook or via text alone in a browser window.
 
 Classes:
 
-TextVisualization: Class meant to wrap around a Model object and render it 
-in some way using Elements, which are stored in a list and rendered in that 
+TextVisualization: Class meant to wrap around a Model object and render it
+in some way using Elements, which are stored in a list and rendered in that
 order. Each element, in turn, renders a particular piece of information as text.
 
-TextElement: Parent class for all other ASCII elements. render() returns its 
+TextElement: Parent class for all other ASCII elements. render() returns its
 representative string, which can be printed via the overloaded __str__ method.
 
 TextData: Uses getattr to get the value of a particular property of a model
@@ -20,8 +20,8 @@ and prints it, along with its name.
 
 TextGrid: Prints a grid, assuming that the value of each cell maps to exactly
 one ASCII character via a converter method. This (as opposed to a dictionary)
-is used so as to allow the method to access Agent internals, as well as to 
-potentially render a cell based on several values (e.g. an Agent grid and a 
+is used so as to allow the method to access Agent internals, as well as to
+potentially render a cell based on several values (e.g. an Agent grid and a
 Patch value grid).
 
 '''
@@ -33,7 +33,7 @@ class TextVisualization(object):
     Properties:
 
         model: The underlying model object to be visualized.
-        elements: List of visualization elements, which will be rendered 
+        elements: List of visualization elements, which will be rendered
                     in the order they are adedd.
 
     '''
@@ -61,12 +61,12 @@ class TextVisualization(object):
         '''
         self.model.step()
         self.render()
-        
+
     def step_forward(self, steps):
         '''
         Advance the model by some # of steps and show the result.
         '''
-        for i in range(steps):
+        for _ in range(steps):
             self.model.step()
         self.render()
 
@@ -86,6 +86,9 @@ class TextElement(object):
         pass
 
     def render(self):
+        '''
+        Render the element as text.
+        '''
         return "Placeholder!"
 
     def __str__(self):
@@ -116,7 +119,7 @@ class TextGrid(TextElement):
 
     Properties:
         grid: The underlying grid object.
-        converter: Function which renders the contents of each cell. 
+        converter: Function which renders the contents of each cell.
     '''
 
     grid = None

@@ -15,7 +15,7 @@ import random
 
 from mesa import Model, Agent
 from mesa.space import MultiGrid
-from mesa.time import Random_Activation
+from mesa.time import RandomActivation
 
 from RandomWalk import RandomWalker
 
@@ -65,7 +65,7 @@ class WolfSheepPredation(Model):
         self.grass = grass
         self.sheep_gain_from_food = sheep_gain_from_food
         
-        self.schedule = Random_Activation(self)
+        self.schedule = RandomActivation(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
 
         # Create sheep:

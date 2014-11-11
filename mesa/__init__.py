@@ -1,17 +1,7 @@
-
-
-# Model
-
-#From schelling
-#model.grid.get_neighbors(self.x, self.y, moore=True)
 '''
-empty
-it may or may not have grid
-it may have a scheduler; you can probably assume this
+Mesa Agent-Based Modeling Framework
 
-Scheduler maintains a list of agents
-To kill and agent, you remove it from the scheduler
-Then it won't exist. (You have to explicitly)
+Core Objects: Model, and Agent.
 '''
 
 import datetime as dt
@@ -27,11 +17,11 @@ class Model(object):
 
     def __init__(self, seed=None):
         '''
-        Create a new model. Overload this method with the actual code to start 
+        Create a new model. Overload this method with the actual code to start
         the model.
         '''
         if seed is None:
-            self.seed = dt.now()
+            self.seed = dt.datetime.now()
         else:
             self.seed = seed
         random.seed(seed)
@@ -51,23 +41,6 @@ class Model(object):
         A single step. Fill in here.
         '''
         pass
-
-
-'''
-# Agent
-# What do agents have
-
-Attributes:
-    unique id
-        starting at 1 and counting up
-
-step()
-    do this when you are activated
-    this is a tick
-
-__init__()
-    set the unique id
-'''
 
 class Agent(object):
     '''

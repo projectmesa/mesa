@@ -92,7 +92,7 @@ class BaseScheduler(object):
         return len(self.agents)
 
 
-class Random_Activation(BaseScheduler):
+class RandomActivation(BaseScheduler):
     '''
     A scheduler which activates each agent once per step, in random order,
     with the order reshuffled every step.

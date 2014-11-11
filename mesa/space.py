@@ -95,8 +95,10 @@ class Grid(object):
         neighbors = []
         for dy in [-1, 0, 1]:
             for dx in [-1, 0, 1]:
-                if dx == 0 and dy == 0 and not include_center: continue
-                if not moore and dy != 0 and dx != 0: continue
+                if dx == 0 and dy == 0 and not include_center:
+                    continue
+                if not moore and dy != 0 and dx != 0:
+                    continue
                 px = self._get_x(x + dx)
                 py = self._get_y(y + dy)
                 if self.grid[py][px] is not None:
@@ -172,8 +174,10 @@ class MultiGrid(Grid):
         neighbors = []
         for dy in [-1, 0, 1]:
             for dx in [-1, 0, 1]:
-                if dx == 0 and dy == 0 and not include_center: continue
-                if not moore and dy != 0 and dx != 0: continue
+                if dx == 0 and dy == 0 and not include_center:
+                    continue
+                if not moore and dy != 0 and dx != 0:
+                    continue
                 px = self._get_x(x + dx)
                 py = self._get_y(y + dy)
                 for a in self.grid[py][px]:
