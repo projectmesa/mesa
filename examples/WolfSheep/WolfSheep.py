@@ -3,9 +3,9 @@ Wolf-Sheep Predation Model
 ================================
 
 Replication of the model found in NetLogo:
-    Wilensky, U. (1997). NetLogo Wolf Sheep Predation model. 
-    http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation. 
-    Center for Connected Learning and Computer-Based Modeling, 
+    Wilensky, U. (1997). NetLogo Wolf Sheep Predation model.
+    http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation.
+    Center for Connected Learning and Computer-Based Modeling,
     Northwestern University, Evanston, IL.
 
 TODO: Implement grass
@@ -37,10 +37,10 @@ class WolfSheepPredation(Model):
     height = 20
     width = 20
 
-    def __init__(self, height=20, width=20, 
-                    initial_sheep=100, initial_wolves=50, sheep_reproduce=0.04,  
-                    wolf_reproduce=0.05, wolf_gain_from_food=20, 
-                    grass=False, sheep_gain_from_food=4):
+    def __init__(self, height=20, width=20,
+                 initial_sheep=100, initial_wolves=50, sheep_reproduce=0.04,
+                 wolf_reproduce=0.05, wolf_gain_from_food=20,
+                 grass=False, sheep_gain_from_food=4):
         '''
         Create a new Wolf-Sheep model with the given parameters.
 
@@ -53,7 +53,7 @@ class WolfSheepPredation(Model):
             grass: Whether to have the sheep eat grass for energy
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
         '''
-        
+
         # Set parameters
         self.height = height
         self.width = width
@@ -64,7 +64,7 @@ class WolfSheepPredation(Model):
         self.wolf_gain_from_food = wolf_gain_from_food
         self.grass = grass
         self.sheep_gain_from_food = sheep_gain_from_food
-        
+  
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
 

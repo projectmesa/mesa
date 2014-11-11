@@ -6,7 +6,7 @@ import random
 
 class RandomWalker(object):
     '''
-    Class implementing random walker methods in a relatively generalized manner.
+    Class implementing random walker methods in a generalized manner.
 
     Not indended to be used on its own, but to inherit its methods to multiple
     other agents.

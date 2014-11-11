@@ -68,6 +68,9 @@ class SchellingModel(Model):
                     self.schedule.add(agent)
 
     def get_empty(self):
+        '''
+        Get a list of coordinate tuples of currently-empty cells.
+        '''
         empty_cells = []
         for x in range(self.width):
             for y in range(self.height):
@@ -76,6 +79,9 @@ class SchellingModel(Model):
         return empty_cells
 
     def step(self):
+        '''
+        Run one step of the model. If All agents are happy, halt the model.
+        '''
         self.happy = 0 # Reset counter of happy agents
         self.schedule.step()
         self.happy_series.append(self.happy)
@@ -88,6 +94,13 @@ class SchellingAgent(Agent):
     Schelling segregation agent
     '''
     def __init__(self, x, y, agent_type):
+        '''
+         Create a new Schelling agent.
+
+         Args:
+            x, y: Agent initial location.
+            agent_type: Indicator for the agent's type (minority=1, majority=0)
+        '''
         self.x = x
         self.y = y
         self.type = agent_type
@@ -138,7 +151,7 @@ class SchellingTextVisualization(TextVisualization):
 
 if __name__ == "__main__":
     server = TextServer(SchellingModel, SchellingTextVisualization, "Schelling",
-                            10, 10, 0.8, 0.2, 3)
+                        10, 10, 0.8, 0.2, 3)
     server.launch()
     #model = SchellingModel(10, 10, 0.8, 0.2, 3)
     #viz = SchellingTextVisualization(model)
