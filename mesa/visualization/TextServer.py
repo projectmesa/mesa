@@ -79,6 +79,9 @@ import tornado.web
 import tornado.websocket
 import tornado.escape
 
+# Suppress several pylint warnings for this file.
+# Attributes being defined outside of init is a Tornado feature.
+# pylint: disable=attribute-defined-outside-init
 
 class PageHandler(tornado.web.RequestHandler):
     '''

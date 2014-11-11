@@ -26,6 +26,9 @@ Patch value grid).
 
 '''
 
+# Pylint instructions: allow single-character variable names.
+# pylint: disable=invalid-name
+
 class TextVisualization(object):
     '''
     ASCII-Only visualization of a model.
