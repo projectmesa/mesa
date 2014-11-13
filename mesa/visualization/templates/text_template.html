@@ -2,11 +2,17 @@
 <head>
 	<title>{{ model_name }} (Mesa visualization)</title>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="/static/dat.gui.min.js"></script>
 	<script>
-		var tick = -1; // Counts at which tick of the model we are.
-		var running = false; // Whether there is currently a model running
+
+		var MesaVisualizationControl = function() {
+			this.tick = -1; // Counts at which tick of the model we are.
+			this.running = false; // Whether there is currently a model running
+			this.fps  = 3 ; // Frames per second
+		}
+
 		var player; // Variable to store the continuous player
-		var fps  = 3 ; // Frames per second
+		var control = new MesaVisualizationControl();
 
 		// WebSocket Stuff
 		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws");
@@ -25,7 +31,7 @@
 					}
 					break;
 				case "end":
-					running = false;
+					control.running = false;
 					break;
 				default:
 					console.log("Unexpected message.");
@@ -38,36 +44,52 @@
 		}
 
 		var reset = function() {
-			tick = 0;
-			running = true;
+			control.tick = 0;
+			control.running = true;
 			send({"type": "reset"});
 		}
 
 		var step = function() {
-			if(running) {
-				tick += 1;
-				send({"type": "get_step", "step": tick});
+			if(control.running) {
+				control.tick += 1;
+				send({"type": "get_step", "step": control.tick});
 			}
 		}
 
 		var run = function() {
 			player = setInterval(function() {
-				if (!running) clearInterval(player);
+				if (!control.running) clearInterval(player);
 				step();
-			}, 1000/fps);
+			}, 1000/control.fps);
 		}
 
+		var pause = function() {
+			clearInterval(player);
+		}
 	</script>
 	
 </head>
 <body>
-	<h2>{{ model_name }}</h2>
-	<div id="Controls">
-		<button onclick="reset()">Reset</button>
-		<button onclick="step()">Step</button>
-		<button onclick="run()">Run</button>
+	<script>
+	// Set up the GUI
+	var gui = new dat.GUI();
+	var fps_control = gui.add(control, "fps", 0, 20).step(1);
+	gui.add(this, "reset");
+	gui.add(this, "step");
+	gui.add(this, "run");
+	gui.add(this, "pause");
 
-	</div>
+	/**
+	Change the frame rate live.
+	*/
+	fps_control.onFinishChange(function(value) {
+		pause();
+		run();
+	});
+
+	</script>
+
+	<h2>{{ model_name }}</h2>
 
 	<div id="Visualization">
 		{% for element in range(element_count) %}

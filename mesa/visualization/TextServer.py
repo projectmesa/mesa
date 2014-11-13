@@ -204,8 +204,8 @@ class TextServer(object):
 
         self.application = tornado.web.Application([
             (r'/', PageHandler, {"controller": self}),
-            (r'/ws', SocketHandler, {"controller": self})
-            ])
+            (r'/ws', SocketHandler, {"controller": self})],
+            static_path=os.path.dirname(__file__) + "/templates")
 
     def launch(self, port=8888):
         '''
