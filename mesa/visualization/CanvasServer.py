@@ -57,9 +57,9 @@ Server -> Client:
     Send over the model state to visualize:
     {
     "type": "viz_state",
-    "data": [ [{"Shape": "circle", "x": 0, "y": 0, "r": 0.5,
+    "data": {0:[ {"Shape": "circle", "x": 0, "y": 0, "r": 0.5,
                 "Color": "#AAAAAA", "Filled": "true", "Layer": 1}]
-            ]
+            }
              
     }
 
