@@ -1,5 +1,5 @@
 '''
-Visualize a Schelling model via a Canvas server
+Visualize a Schelling model via a Canvas server.
 '''
 
 from Schelling import SchellingModel

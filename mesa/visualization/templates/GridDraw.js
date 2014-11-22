@@ -22,16 +22,16 @@ locations, represented by circles:
 
 {"Shape": "rect", "x": 0, "y": 0, "Color": "#00aa00", "Filled": "true", "Layer": 0}
 
-[ [	{"Shape": "rect", "x": 0, "y": 0, "w": 1, "h": 1, "Color": "#00aa00", "Filled": "true", "Layer": 0},
+{0:[{"Shape": "rect", "x": 0, "y": 0, "w": 1, "h": 1, "Color": "#00aa00", "Filled": "true", "Layer": 0},
 	{"Shape": "rect", "x": 0, "y": 0, "w": 1, "h": 1, "Color": "#00aa00", "Filled": "true", "Layer": 0},
 	{"Shape": "rect", "x": 0, "y": 0, "w": 1, "h": 1, "Color": "#00aa00", "Filled": "true", "Layer": 0},
 	{"Shape": "rect", "x": 0, "y": 0, "w": 1, "h": 1, "Color": "#00aa00", "Filled": "true", "Layer": 0} 
    ],
-   [
+ 1: [
 	{"Shape": "circle", "x": 0, "y": 0, "r": 0.5, "Color": "#AAAAAA", "Filled": "true", "Layer": 1},
 	{"Shape": "circle", "x": 1, "y": 1, "r": 0.5, "Color": "#AAAAAA", "Filled": "true", "Layer": 1}
    ]
-]
+}
 
 */
 

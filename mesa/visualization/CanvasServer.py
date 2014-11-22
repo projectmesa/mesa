@@ -2,7 +2,7 @@
 CanvasServer
 ============================================================================
 
-A simple experimental Tornado server which renders a Grid or MultiGrid via 
+A simple experimental Tornado server which renders a Grid or MultiGrid via
 HTML5 Canvas.
 
 Consists of the following classes:
@@ -14,10 +14,10 @@ CanvasServer: The overall controller class which stores and controls
             the model and visualization instance.
 
 In theory, CanvasServer does NOT need to be subclassed on a model-by-model
-basis; it should be able to create a browser visualization for any Grid or 
+basis; it should be able to create a browser visualization for any Grid or
 MultiGrid model, with the appropriate portrayal function.
 
-A CanvasServer is created using one class for the model, and a function which 
+A CanvasServer is created using one class for the model, and a function which
 maps each grid object to a Portrayal. The new CanvasServer can also accept
 arguments to pass to the first model instance. To go with the perennial
 Schelling example, the following code
@@ -35,7 +35,7 @@ Schelling example, the following code
     server = CanvasServer(SchellingModel, schelling_draw, 500, 500,
         "Schelling", 10, 10, 0.8, 0.2, 3)
 
-creates a CanvasServer visualizing a SchellingModel named "Schelling", which 
+creates a CanvasServer visualizing a SchellingModel named "Schelling", which
 draws agents as circles (majorities as red, minorities as blue), on a 500x500
 canvas, with 10, 10... , 3 as the default model parameters.
 
@@ -57,8 +57,8 @@ Server -> Client:
     Send over the model state to visualize:
     {
     "type": "viz_state",
-    "data": [ [{"Shape": "circle", "x": 0, "y": 0, "r": 0.5, 
-                "Color": "#AAAAAA", "Filled": "true", "Layer": 1}] 
+    "data": [ [{"Shape": "circle", "x": 0, "y": 0, "r": 0.5,
+                "Color": "#AAAAAA", "Filled": "true", "Layer": 1}]
             ]
              
     }
@@ -106,10 +106,10 @@ class PageHandler(tornado.web.RequestHandler):
         page = self.template.generate(
             port=self.controller.port,
             model_name=self.controller.model_name,
-            canvas_height = self.controller.canvas_height,
-            canvas_width = self.controller.canvas_width,
-            grid_height = self.controller.grid_height,
-            grid_width = self.controller.grid_width)
+            canvas_height=self.controller.canvas_height,
+            canvas_width=self.controller.canvas_width,
+            grid_height=self.controller.grid_height,
+            grid_width=self.controller.grid_width)
         self.write(page)
 
 
@@ -166,7 +166,7 @@ class CanvasServer(object):
 
         model_cls: The class of the model to render.
         portrayal_method: Method which maps each object to a portrayal.
-        
+
         port: (default 8888) Port to listen on.
         canvas_width, canvas_height: Pixels to draw the canvas on the page.
         grid_width, grid_height: Number of cells in the grid.
