@@ -102,6 +102,11 @@ class Grid(object):
                     continue
                 if not moore and dy != 0 and dx != 0:
                     continue
+                # Skip if not a torus and new coords out of bounds.
+                if not self.torus and (not (0 < dx+x < self.width) or
+                        not (0 < dy+y < self.height)):
+                    continue
+
                 px = self._get_x(x + dx)
                 py = self._get_y(y + dy)
                 if self.grid[py][px] is not None:
@@ -180,6 +185,10 @@ class MultiGrid(Grid):
                 if dx == 0 and dy == 0 and not include_center:
                     continue
                 if not moore and dy != 0 and dx != 0:
+                    continue
+                # Skip if not a torus and new coords out of bounds.
+                if not self.torus and (not (0 < dx+x < self.width) or
+                        not (0 < dy+y < self.height)):
                     continue
                 px = self._get_x(x + dx)
                 py = self._get_y(y + dy)
