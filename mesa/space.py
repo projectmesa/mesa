@@ -26,6 +26,7 @@ class Grid(object):
         torus: Boolean which determines whether to treat the grid as a torus.
 
         grid: Internal list-of-lists which holds the grid cells themselves.
+        default_val: Lambda function to populate each grid cell with None.
 
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
@@ -35,6 +36,7 @@ class Grid(object):
     height = None
     torus = False
     grid = None
+    default_val = lambda s: None
 
     def __init__(self, height, width, torus):
         '''
@@ -52,7 +54,7 @@ class Grid(object):
         for y in range(self.height):
             row = []
             for x in range(self.width):
-                row.append(None)
+                row.append(self.default_val())
             self.grid.append(row)
 
     def __getitem__(self, index):
@@ -100,6 +102,7 @@ class Grid(object):
             for dx in [-1, 0, 1]:
                 if dx == 0 and dy == 0 and not include_center:
                     continue
+                # Skip diagonals on Moore neighborhood.
                 if not moore and dy != 0 and dx != 0:
                     continue
                 # Skip if not a torus and new coords out of bounds.
@@ -109,9 +112,16 @@ class Grid(object):
 
                 px = self._get_x(x + dx)
                 py = self._get_y(y + dy)
-                if self.grid[py][px] is not None:
-                    neighbors.append(self.grid[py][px])
+                self._add_members(neighbors, px, py)
         return neighbors
+
+    def _add_members(self, target_list, x, y):
+        '''
+        Helper method to append the contents of a cell to the given list.
+        Override for other grid types.
+        '''
+        if self.grid[y][x] is not None:
+            target_list.append(self.grid[y][x])
 
 
 
@@ -132,69 +142,18 @@ class MultiGrid(Grid):
         torus: Boolean which determines whether to treat the grid as a torus.
 
         grid: Internal list-of-lists which holds the grid cells themselves.
+        default_val: Lambda function to populate grid cells with an empty set.
 
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
     '''
 
-    width = None
-    height = None
-    torus = False
-    grid = None
+    default_val = lambda s: set()
 
-    def __init__(self, height, width, torus):
+    def _add_members(self, target_list, x, y):
         '''
-        Create a new grid.
-
-        Args:
-            height, width: The height and width of the grid
-            torus: Boolean whether the grid wraps or not.
+        Helper method to add all objects in the given cell to the target_list.
         '''
-        self.height = height
-        self.width = width
-        self.torus = torus
-
-        self.grid = []
-        for y in range(self.height):
-            row = []
-            for x in range(self.width):
-                row.append(set())
-            self.grid.append(row)
-
-    def __getitem__(self, index):
-        return self.grid[index]
-
-    def get_neighbors(self, x, y, moore, include_center=False):
-        '''
-        Return a list of neighbors to a certain point.
-
-        Args:
-            x, y: Coordinates for the neighborhood to get.
-            moore: If True, return Moore neighborhood (including diagonals)
-                   If False, return Von Neumann neighborhood (exclude diagonals)
-            include_center: If True, return the (x, y) cell as well. Otherwise,
-                            return surrounding cells only.
-
-        Returns:
-            A list of non-None objects in the given neighborhood; at most 9 if
-            Moore, 5 if Von-Neumann (8 and 4 if not including the center).
-        '''
-        neighbors = []
-        for dy in [-1, 0, 1]:
-            for dx in [-1, 0, 1]:
-                if dx == 0 and dy == 0 and not include_center:
-                    continue
-                if not moore and dy != 0 and dx != 0:
-                    continue
-                # Skip if not a torus and new coords out of bounds.
-                if not self.torus and (not (0 < dx+x < self.width) or
-                        not (0 < dy+y < self.height)):
-                    continue
-                px = self._get_x(x + dx)
-                py = self._get_y(y + dy)
-                for a in self.grid[py][px]:
-                    neighbors.append(a)
-        return neighbors
-
-
+        for a in self.grid[y][x]:
+            target_list.append(a)
 
