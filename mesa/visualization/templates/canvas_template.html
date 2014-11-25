@@ -3,15 +3,12 @@
 	<title>{{ model_name }} (Mesa visualization)</title>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="/static/dat.gui.min.js"></script>
+	<script src="/static/GridDraw.js"></script>
 	<script>
 	/*
-		This is the Tornado template for the Text Visualization. The server adds one div for each 
-		visualization element, as defined in the underlying TextVisualization class. The Javascript
-		code opens a WebSocket connection to the server (the port is set via the template).
-
-		When a message comes in from the server, it is parsed in the ws.onmessage method; usually, 
-		the message will be a new visualization state, consisting of several TextElements which are
-		written into the appropriate divs on the page. 
+		This is the Tornado template for the Canvas Visualization. At the moment, there is only one
+		div, which contains the canvas. The Javascript code opens a WebSocket connection to the server 
+		(the port is set via the template). On every step, it redraws the canvas with the new inputs.
 
 		Users can reset() the model, advance it by one step(), or run() it through. reset() and 
 		step() send a message to the server, which then sends back the appropriate data. run() just
@@ -36,6 +33,7 @@
 
 		var player; // Variable to store the continuous player
 		var control = new MesaVisualizationControl();
+		var canvasDraw;
 
 		// WebSocket Stuff
 		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws"); // Open the websocket connection
@@ -49,12 +47,11 @@
 			//console.log(message.data);
 			switch (msg["type"]) {
 				case "viz_state":
-					// Draw in the visualization elements in the appropirate divs
-					for (var e in msg["data"]) {
-						txt = msg["data"][e];
-						txt = txt.replace(/(?:\r\n|\r|\n)/g, '<br />'); // Replace lin breaks with BR tags
-						$("#element_"+e).html(txt); // Replace element text with data
-					}
+					canvasDraw.resetCanvas();
+					// Draw in the grid elements
+					for (var i in msg["data"]) 
+						canvasDraw.drawLayer(msg["data"][i]);
+					canvasDraw.drawGridLines("#eee");
 					break;
 				case "end":
 					// We have reached the end of the model
@@ -111,7 +108,13 @@
 	
 </head>
 <body>
-	<script>
+	<h2>{{ model_name }}</h2> <!-- Template; put the model name as the heading -->
+
+	<div id="Visualization">
+		<canvas id="canvas" width="{{canvas_width}}" height="{{canvas_height}}" style="border:1px dotted">
+		</canvas>
+	</div>
+<script>
 	// Set up the GUI
 	var gui = new dat.GUI();
 	var fps_control = gui.add(control, "fps", 0, 20).step(1); // fps slider, 0 to 20 in 1 increments 
@@ -129,15 +132,11 @@
 		run();
 	});
 
-	</script>
+	var theCanvas = document.getElementById("canvas");
+	var context = theCanvas.getContext("2d");
+	canvasDraw = new GridVisualization({{canvas_width}}, {{canvas_height}}, 
+		{{grid_height}}, {{grid_width}}, context);
 
-	<h2>{{ model_name }}</h2> <!-- Template; put the model name as the heading -->
-
-	<div id="Visualization">
-		<!-- Template to create a div for each TextElement to be visualized -->
-		{% for element in range(element_count) %}
-			<div id="element_{{element}}"></div>
-		{% end %}
-	</div>
+</script>
 
 </body>

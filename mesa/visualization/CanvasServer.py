@@ -1,42 +1,49 @@
 '''
-TextServer
+CanvasServer
 ============================================================================
 
-A simple experimental Tornado server which renders an arbitrary ASCII
-visualization in the browser.
+A simple experimental Tornado server which renders a Grid or MultiGrid via
+HTML5 Canvas.
 
 Consists of the following classes:
 
 PageHandler: The handler for the visualization page, generated from a template.
 SocketHandler: Handles the websocket connection between the client page and
                 the server.
-TextServer: The overall controller class which stores and controls
+CanvasServer: The overall controller class which stores and controls
             the model and visualization instance.
 
-In theory, TextServer does NOT need to be subclassed on a model-by-model basis;
-it should be able to create a browser visualization for any given standard.
-TextVisualization subclass.
+In theory, CanvasServer does NOT need to be subclassed on a model-by-model
+basis; it should be able to create a browser visualization for any Grid or
+MultiGrid model, with the appropriate portrayal function.
 
-A TextServer is created using two classes: one for the model, and one for the
-associated TextVisualization child class. The new TextServer can also accept
+A CanvasServer is created using one class for the model, and a function which
+maps each grid object to a Portrayal. The new CanvasServer can also accept
 arguments to pass to the first model instance. To go with the perennial
 Schelling example, the following code
 
-    server = TextServer(SchellingModel, SchellingTextVisualization,
+    def schelling_draw(agent):
+        portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
+        portrayal["x"] = agent.x
+        portrayal["y"] = agent.y
+        if agent.type == 0:
+            portrayal["color"] = "#AA0000"
+        else:
+            portrayal["color"] = "#0000AA"
+        return portrayal
+
+    server = CanvasServer(SchellingModel, schelling_draw, 500, 500,
         "Schelling", 10, 10, 0.8, 0.2, 3)
 
-creates a TextServer visualizing a SchellingModel via the
-SchellingTextVisualization, named "Schelling", with 10, 10... , 3 as the
-default model parameters.
+creates a CanvasServer visualizing a SchellingModel named "Schelling", which
+draws agents as circles (majorities as red, minorities as blue), on a 500x500
+canvas, with 10, 10... , 3 as the default model parameters.
 
 The server is launched using the launch() method. This runs the Tornado app,
 which consists of PageHandler and SocketHandler. At the moment, the server runs
 the entire model (up to a default max_steps) prior to actually serving the
 data.
 TODO: Make the model run a coroutine.
-A dictionary associating each TextVisualization element's positional index and
-visualization text is stored in a the TextServer's viz_state list, with
-position corresponding to the step it represents.
 
 The client keeps track of what step it is showing. Clicking the Step button in
 the browser sends a message requesting the viz_state corresponding to the next
@@ -50,8 +57,10 @@ Server -> Client:
     Send over the model state to visualize:
     {
     "type": "viz_state",
-    "data": {1: 'X X\nXO \nXXX',
-             2: 'XCount: 6'}
+    "data": {0:[ {"Shape": "circle", "x": 0, "y": 0, "r": 0.5,
+                "Color": "#AAAAAA", "Filled": "true", "Layer": 1}]
+            }
+             
     }
 
     Informs the client that the model is over.
@@ -70,7 +79,7 @@ Client -> Server:
     "step:" index of the step to get.
     }
 '''
-
+from collections import defaultdict
 import os
 
 import tornado.ioloop
@@ -91,13 +100,16 @@ class PageHandler(tornado.web.RequestHandler):
         self.controller = controller
         path = os.path.dirname(__file__) + "/templates"
         loader = tornado.template.Loader(path)
-        self.template = loader.load("text_template.html")
+        self.template = loader.load("canvas_template.html")
 
     def get(self):
         page = self.template.generate(
             port=self.controller.port,
             model_name=self.controller.model_name,
-            element_count=len(self.controller.visualization.elements))
+            canvas_height=self.controller.canvas_height,
+            canvas_width=self.controller.canvas_width,
+            grid_height=self.controller.grid_height,
+            grid_width=self.controller.grid_width)
         self.write(page)
 
 
@@ -142,18 +154,23 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                 print("Unexpected message!")
 
 
-class TextServer(object):
+class CanvasServer(object):
     '''
     Main class for handling the visualization web app.
+
+    Currently assumes that the model object has a grid attribute.
 
     Attributes:
         verbose: (default True) Whether to write most events to the terminal
         model_name: Name to display in the browser. (defaults to "Mesa Model")
 
         model_cls: The class of the model to render.
-        text_visualization_cls: The TextVisualization subclass describing how to
-                                render the model.
+        portrayal_method: Method which maps each object to a portrayal.
+
         port: (default 8888) Port to listen on.
+        canvas_width, canvas_height: Pixels to draw the canvas on the page.
+        grid_width, grid_height: Number of cells in the grid.
+        multigrid: Boolean whether the grid is a MultiGrid or not.
 
         max_steps: Maximum number of steps to pre-run the model for.
         viz_states: List of dictionaries representing the rendering of the model
@@ -168,8 +185,12 @@ class TextServer(object):
 
     model_name = "Mesa Model"
     model_cls = None  # A model class
-    text_visualization_cls = None  # A visualization associated with that model
+    portrayal_method = None
     port = 8888  # Port to listen on
+    canvas_width = 500
+    canvas_height = 500
+    grid_height = 0
+    grid_width = 0
 
     max_steps = 100
     viz_states = []
@@ -177,30 +198,32 @@ class TextServer(object):
     model_args = ()
     model_kwargs = {}
 
-    def __init__(self, model_cls, text_visualization_cls, name="Mesa Model",
-                 *args, **kwargs):
+    def __init__(self, model_cls, portrayal_method, canvas_height, canvas_width,
+                 name="Mesa Model", *args, **kwargs):
         '''
-        Create a new visualization server for a TextVisualization browser.
+        Create a new canvas visualization server.
 
         This server will render and control a model_cls model and render it as
-        described in an associated text_visualization_cls.
+        described in an associated portrayal_method.
 
         Args:
             model_cls: A model class to visualize
-            text_visualization_cls: The text visualization class associated with
-                                    the model class.
+            portrayal_method: Function mapping objects to portrayals
+            canvas_height, canvas_width: Pixels for canvas width, height
             name: A name for the model.
             *args, **kwargs: Default arguments to create a model with.
         '''
         self.model_name = name
         self.model_cls = model_cls
-        self.text_visualization_cls = text_visualization_cls
+        self.portrayal_method = portrayal_method
 
         # TODO: Make this more elegant
         self.model_args = args
         self.model_kwargs = kwargs
 
         self.reset()
+        self.grid_width = self.model.grid.width
+        self.grid_height = self.model.grid.height
 
         self.application = tornado.web.Application([
             (r'/', PageHandler, {"controller": self}),
@@ -222,16 +245,19 @@ class TextServer(object):
         Resets the model by creating a new instance of it, with the given args.
         '''
         self.model = self.model_cls(*self.model_args, **self.model_kwargs)
-        self.visualization = self.text_visualization_cls(self.model)
         self.viz_states = [self.get_viz()]
 
     def get_viz(self):
         '''
         Turn the current visualization state into a text dictionary.
         '''
-        viz_state = {}
-        for i, element in enumerate(self.visualization.elements):
-            viz_state[i] = element.render()
+        viz_state = defaultdict(list)
+        for y in range(self.grid_height):
+            for x in range(self.grid_height):
+                # TODO: Have this work for multigrid
+                portrayal = self.portrayal_method(self.model.grid[y][x])
+                if portrayal:
+                    viz_state[portrayal["Layer"]].append(portrayal)
         return viz_state
 
     def run_model(self):
