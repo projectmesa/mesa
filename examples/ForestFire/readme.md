@@ -15,5 +15,7 @@ Each step of the model, trees are activated in random order, spreading the fire 
 This code defines and launches the in-browser visualization for the ForestFire model. It includes the **forestfire_draw** method, which takes a TreeCell object as an argument and turns it into a portrayal to be drawn in the browser. Each tree is drawn as a rectangle filling the entire cell, with a color based on its condition. *Fine* trees are green, *On Fire* trees red, and *Burned Out* trees are black.
 
 To launch the visualization, be sure you're in your Mesa virtual environment, then run from the terminal:
+
     $ python ForestFireVisualization.py
+
 This launches the server, with the model parameters set to a 100 x 100 grid with a density of 0.65. Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and use the interface on the right-hand side of the screen to run the model.
