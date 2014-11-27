@@ -27,6 +27,7 @@ import random
 from mesa import Model, Agent
 from mesa.time import RandomActivation
 from mesa.space import Grid
+from mesa.datacollection import DataCollector
 
 from mesa.visualization.TextServer import TextServer
 
@@ -50,8 +51,11 @@ class SchellingModel(Model):
         self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=True)
 
-        self.happy_series = []
         self.happy = 0
+        self.datacollector = DataCollector(
+            {"happy": lambda m: m.happy}, # Model-level count of happy agents
+            # For testing purposes, agent's individual x and y
+            {"x": lambda a: a.x, "y": lambda a: a.y}) 
 
         self.running = True
 
@@ -63,7 +67,8 @@ class SchellingModel(Model):
                         agent_type = 1
                     else:
                         agent_type = 0
-                    agent = SchellingAgent(x, y, agent_type)
+
+                    agent = SchellingAgent((x,y), x, y, agent_type)
                     self.grid[y][x] = agent
                     self.schedule.add(agent)
 
@@ -84,7 +89,7 @@ class SchellingModel(Model):
         '''
         self.happy = 0 # Reset counter of happy agents
         self.schedule.step()
-        self.happy_series.append(self.happy)
+        self.datacollector.collect(self)
 
         if self.happy == self.schedule.get_agent_count():
             self.running = False
@@ -93,14 +98,16 @@ class SchellingAgent(Agent):
     '''
     Schelling segregation agent
     '''
-    def __init__(self, x, y, agent_type):
+    def __init__(self, unique_id, x, y, agent_type):
         '''
          Create a new Schelling agent.
 
          Args:
+            unique_id: Unique identifier for the agent.
             x, y: Agent initial location.
             agent_type: Indicator for the agent's type (minority=1, majority=0)
         '''
+        self.unique_id = unique_id
         self.x = x
         self.y = y
         self.type = agent_type
