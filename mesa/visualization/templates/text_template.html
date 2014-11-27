@@ -2,22 +2,54 @@
 <head>
 	<title>{{ model_name }} (Mesa visualization)</title>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="/static/dat.gui.min.js"></script>
 	<script>
-		var tick = -1; // Counts at which tick of the model we are.
-		var running = false; // Whether there is currently a model running
+	/*
+		This is the Tornado template for the Text Visualization. The server adds one div for each 
+		visualization element, as defined in the underlying TextVisualization class. The Javascript
+		code opens a WebSocket connection to the server (the port is set via the template).
+
+		When a message comes in from the server, it is parsed in the ws.onmessage method; usually, 
+		the message will be a new visualization state, consisting of several TextElements which are
+		written into the appropriate divs on the page. 
+
+		Users can reset() the model, advance it by one step(), or run() it through. reset() and 
+		step() send a message to the server, which then sends back the appropriate data. run() just
+		calls the step() method at fixed intervals.
+
+		The model parameters are controlled via the MesaVisualizationControl object. The GUI is 
+		created using the dat.GUI library.
+	
+	*/
+		/**
+		Object which holds visualization parameters.
+	
+			tick: What tick of the model we're currently at
+			running: Boolean on whether we have reached the end of the current model
+			fps: Current frames per second.
+		*/
+		var MesaVisualizationControl = function() {
+			this.tick = -1; // Counts at which tick of the model we are.
+			this.running = false; // Whether there is currently a model running
+			this.fps  = 3 ; // Frames per second
+		}
+
 		var player; // Variable to store the continuous player
-		var fps  = 3 ; // Frames per second
+		var control = new MesaVisualizationControl();
 
 		// WebSocket Stuff
-		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws");
+		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws"); // Open the websocket connection
 		ws.onopen = function() {console.log("Connection opened!"); };
 
+		/**
+		Parse an incoming message
+		*/
 		ws.onmessage = function(message) {
 			msg = JSON.parse(message.data);
 			//console.log(message.data);
 			switch (msg["type"]) {
 				case "viz_state":
-					// Draw in the visualization elements
+					// Draw in the visualization elements in the appropirate divs
 					for (var e in msg["data"]) {
 						txt = msg["data"][e];
 						txt = txt.replace(/(?:\r\n|\r|\n)/g, '<br />'); // Replace lin breaks with BR tags
@@ -25,51 +57,84 @@
 					}
 					break;
 				case "end":
-					running = false;
+					// We have reached the end of the model
+					control.running = false;
 					break;
 				default:
+					// There shouldn't be any other message
 					console.log("Unexpected message.");
 			}
 		}
-
+		
+		/**
+		Turn an object into a string to send to the server, and send it.
+		*/
 		var send = function(message) {
 			msg = JSON.stringify(message);
 			ws.send(msg);
 		}
 
+		/**
+		Reset the model, and rest the appropriate local variables.
+		*/
 		var reset = function() {
-			tick = 0;
-			running = true;
+			control.tick = 0;
+			control.running = true;
 			send({"type": "reset"});
 		}
 
+		/**
+		Send a message to the server get the next visualization state.
+		*/
 		var step = function() {
-			if(running) {
-				tick += 1;
-				send({"type": "get_step", "step": tick});
+			if(control.running) {
+				control.tick += 1;
+				send({"type": "get_step", "step": control.tick});
 			}
 		}
-
+		/**
+		Call the step function at fixed intervals, until getting an end message from the server.
+		*/
 		var run = function() {
 			player = setInterval(function() {
-				if (!running) clearInterval(player);
+				if (!control.running) clearInterval(player);
 				step();
-			}, 1000/fps);
+			}, 1000/control.fps);
 		}
-
+		/**
+		Pause the run() function, but leave all other variables as they are.
+		*/
+		var pause = function() {
+			clearInterval(player);
+		}
 	</script>
 	
 </head>
 <body>
-	<h2>{{ model_name }}</h2>
-	<div id="Controls">
-		<button onclick="reset()">Reset</button>
-		<button onclick="step()">Step</button>
-		<button onclick="run()">Run</button>
+	<script>
+	// Set up the GUI
+	var gui = new dat.GUI();
+	var fps_control = gui.add(control, "fps", 0, 20).step(1); // fps slider, 0 to 20 in 1 increments 
+	// Create the buttons
+	gui.add(this, "reset"); 
+	gui.add(this, "step");
+	gui.add(this, "run");
+	gui.add(this, "pause");
 
-	</div>
+	/**
+	Called when the user releases the fps slider; pause the model and rerun, to reset the fps
+	*/
+	fps_control.onFinishChange(function(value) {
+		pause();
+		run();
+	});
+
+	</script>
+
+	<h2>{{ model_name }}</h2> <!-- Template; put the model name as the heading -->
 
 	<div id="Visualization">
+		<!-- Template to create a div for each TextElement to be visualized -->
 		{% for element in range(element_count) %}
 			<div id="element_{{element}}"></div>
 		{% end %}
