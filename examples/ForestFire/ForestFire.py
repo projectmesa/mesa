@@ -57,7 +57,7 @@ class ForestFire(Model):
         
         # Set up model objects
         self.schedule = RandomActivation(self)
-        self.grid = Grid(height, width, torus=True)
+        self.grid = Grid(height, width, torus=False)
         
         # Place a tree in each cell with Prob = density
         for x in range(self.width):
