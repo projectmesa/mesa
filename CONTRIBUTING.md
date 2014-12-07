@@ -13,7 +13,9 @@ In no particular order, examples include:
 No contribution is too small. Although, contributions can be to big, so let's discuss via the [email list](https://groups.google.com/forum/#!forum/projectmesa) OR in [an issue](https://github.com/projectmesa/mesa/issues).
 
 To submit a contribution:
-- Fork the Mesa repository off the branch you want to contribute to.
+- Create a ticket for the item that you are working on.
+- Fork the Mesa repository
+- Create a new branch if you aren't contributing to an existing branch.
 - Edit the code.
 - Use [PEP8](https://www.python.org/dev/peps/pep-0008) and the [Google Style Guide](https://google-styleguide.googlecode.com/svn/trunk/pyguide.html) as the coding standards for Python.
 - If implementing a new feature, include some documentation and ideally a working example or unit test as well.
