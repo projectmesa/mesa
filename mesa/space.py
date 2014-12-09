@@ -30,6 +30,8 @@ class Grid(object):
 
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
+        get_neighborhood: Returns the cells surrounding a given cell.
+        get_cell_list_contents: Returns the contents of a list of cells ((x,y) tuples)
     '''
 
     width = None
@@ -82,7 +84,44 @@ class Grid(object):
         else:
             return y % self.height
 
-    def get_neighbors(self, x, y, moore, include_center=False):
+    def get_neighborhood(self, x, y, moore, include_center=False, radius=1):
+        '''
+        Return a list of cells that are in the neighborhood of a certain point.
+
+        Args:
+            x, y: Coordinates for the neighborhood to get.
+            moore: If True, return Moore neighborhood (including diagonals)
+                   If False, return Von Neumann neighborhood (exclude diagonals)
+            include_center: If True, return the (x, y) cell as well. Otherwise,
+                            return surrounding cells only.
+            radius: radius, in cells, of neighborhood to get.
+
+        Returns:
+            A list of coordinate tuples representing the neighborhood; at most 9 if
+            Moore, 5 if Von Neumann (8 and 4 if not including the center).
+        '''
+        coordinates = []
+        for dy in range(-radius, radius + 1):
+            for dx in range(-radius, radius + 1):
+                if dx == 0 and dy == 0 and not include_center:
+                    continue
+                # Skip diagonals in Von Neumann neighborhood.
+                if not moore and dy != 0 and dx != 0:
+                    continue
+                # Skip diagonals in Moore neighborhood when distance > radius
+                if moore and (dy ** 2 + dx ** 2) ** .5 > radius:
+                    continue
+                # Skip if not a torus and new coords out of bounds.
+                if not self.torus and (not (0 < dx + x < self.width) or
+                                           not (0 < dy + y < self.height)):
+                    continue
+
+                px = self._get_x(x + dx)
+                py = self._get_y(y + dy)
+                coordinates.append((px, py))
+        return coordinates
+
+    def get_neighbors(self, x, y, moore, include_center=False, radius=1):
         '''
         Return a list of neighbors to a certain point.
 
@@ -92,28 +131,27 @@ class Grid(object):
                    If False, return Von Neumann neighborhood (exclude diagonals)
             include_center: If True, return the (x, y) cell as well. Otherwise,
                             return surrounding cells only.
+            radius: radius, in cells, of neighborhood to get.
 
         Returns:
             A list of non-None objects in the given neighborhood; at most 9 if
             Moore, 5 if Von-Neumann (8 and 4 if not including the center).
         '''
-        neighbors = []
-        for dy in [-1, 0, 1]:
-            for dx in [-1, 0, 1]:
-                if dx == 0 and dy == 0 and not include_center:
-                    continue
-                # Skip diagonals on Moore neighborhood.
-                if not moore and dy != 0 and dx != 0:
-                    continue
-                # Skip if not a torus and new coords out of bounds.
-                if not self.torus and (not (0 < dx+x < self.width) or
-                        not (0 < dy+y < self.height)):
-                    continue
+        neighborhood = self.get_neighborhood(x, y, moore, include_center, radius)
+        return self.get_cell_list_contents(neighborhood)
 
-                px = self._get_x(x + dx)
-                py = self._get_y(y + dy)
-                self._add_members(neighbors, px, py)
-        return neighbors
+    def get_cell_list_contents(self, cell_list):
+        '''
+        Args:
+            cell_list: Array-like of (x, y) tuples
+
+        Returns:
+            A list of the contents of the cells identified in cell_list
+        '''
+        contents = []
+        for x, y in cell_list:
+            self._add_members(contents, x, y)
+        return contents
 
     def _add_members(self, target_list, x, y):
         '''
@@ -123,7 +161,9 @@ class Grid(object):
         if self.grid[y][x] is not None:
             target_list.append(self.grid[y][x])
 
-
+    def is_cell_empty(self, coords):
+        x, y = coords
+        return True if self.grid[y][x] is None else False
 
 
 class MultiGrid(Grid):
