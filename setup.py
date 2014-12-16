@@ -6,7 +6,6 @@ requires = [
     'tornado',
     'numpy',
     'pandas',
-    'scipy',
 ]
 
 setup(
