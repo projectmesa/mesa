@@ -1,1 +1,1 @@
-Search.setIndex({objects:{},objtypes:{},envversion:43,filenames:["index"],terms:{index:0,page:0,modul:0,search:0,content:0},titles:["Welcome to Mesa&#8217;s documentation!"],objnames:{},titleterms:{indic:0,document:0,mesa:0,welcom:0,tabl:0}})
+Search.setIndex({objects:{},envversion:43,titles:["Welcome to Mesa&#8217;s documentation!"],terms:{index:0,modul:0,search:0,content:0,page:0},filenames:["index"],objtypes:{},objnames:{},titleterms:{mesa:0,tabl:0,indic:0,welcom:0,document:0}})
