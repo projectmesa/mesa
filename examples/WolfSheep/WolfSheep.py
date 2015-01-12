@@ -85,6 +85,8 @@ class WolfSheepPredation(Model):
             self.grid[y][x].add(wolf)
             self.schedule.add(wolf)
 
+        self.running = True
+
     def step(self):
         self.schedule.step()
 
