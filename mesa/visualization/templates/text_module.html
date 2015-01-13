@@ -1,0 +1,10 @@
+<div id="element_{{ index }}">
+	<script>
+		var render = function(data) {
+			txt = data;
+			$("#element_{{index}}").html(txt);
+		};
+
+		$("#element_{{ index }}").data("render", render);
+	</script>
+</div>

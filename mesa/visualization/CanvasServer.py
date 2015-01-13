@@ -257,7 +257,6 @@ class CanvasServer(object):
         viz_state = defaultdict(list)
         for y in range(self.grid_height):
             for x in range(self.grid_height):
-                # TODO: Have this work for multigrid
                 cell_objects = self.model.grid.get_cell_list_contents([(x, y)])
                 for obj in cell_objects:
                     portrayal = self.portrayal_method(obj)
