@@ -1,0 +1,18 @@
+<div id="element_{{ index }}">
+	<canvas id="canvas_{{ index }}" width="{{canvas_width}}" height="{{canvas_height}}" style="border:1px dotted">
+	</canvas>
+	<script src="/static/GridDraw.js"></script>
+	<script>
+		var canvas_{{ index }} = document.getElementById("canvas_{{ index }}");
+		var context_{{ index }} = canvas_{{ index }}.getContext("2d");
+		canvasDraw_{{index}} = new GridVisualization({{canvas_width}}, {{canvas_height}},  {{grid_height}}, {{grid_width}}, context_{{index}});
+
+		var render = function(data) {
+			canvasDraw_{{index}}.resetCanvas();
+			for (var layer in data)
+				canvasDraw_{{index}}.drawLayer(data[layer]);
+			canvasDraw_{{index}}.drawGridLines("#eee");
+		};
+		$("#element_{{ index }}").data("render", render);
+	</script>
+</div>
