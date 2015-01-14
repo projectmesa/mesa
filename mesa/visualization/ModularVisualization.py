@@ -1,10 +1,33 @@
 '''
-Modular Visualization for Mesa
+ModularServer
+=====================
 
-The idea of a modular visualization is as follows: 
+
+The concept for the modular visualization server as follows:  
+A visualization is composed of VisualizationElements, each of which defines how
+to generate some visualization from a model instance and render it on the 
+client. VisualizationElements may be anything from a simple text display to 
+a multilayered HTML5 canvas.
+
+The actual server is launched with one or more VisualizationElements; 
+it runs the model object through each of them, generating data to be sent to 
+the client. The client page is also generated based on the template provided
+by each element. 
+
+This file consists of the following classes:
+
+VisualizationElement: Parent class for all other visualization elements, with
+                      the minimal necessary options.
+VisualizationModule: Tornado UIModule, serves as a pass-through for the 
+                     VisualizationElement.
+PageHandler: The handler for the visualization page, generated from a template
+             and built from the various visualization elements.
+SocketHandler: Handles the websocket connection between the client page and
+                the server.
+ModularServer: The overall visualization application class which stores and 
+               controls the model and visualization instance.
 
 '''
-
 import os
 
 import tornado.ioloop
@@ -47,7 +70,7 @@ class VisualizationElement(object):
         Returns:
             A JSON-ready object.
         '''
-        return "<b>VisualizationElement goes here."
+        return "<b>VisualizationElement goes here</b>."
 
 # =============================================================================
 
