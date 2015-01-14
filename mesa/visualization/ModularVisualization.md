@@ -92,7 +92,7 @@ Now, if we wanted to use our new AttributeElement to add the number of happy age
 
 Note that, in this case, we only wanted to change the Python-side render method. We're still using the parent module's HTML and JavaScript template.
 
-## Creating New Modules
+## Module Internals
 
 But what if we want more than just a different Python renderer; we want to substantially change how a module displays in the browser, or create a completely new module. To do this, we need to open up the HTML template as well:
 
@@ -133,6 +133,10 @@ To help understand why it looks like this, here's a snippet of JavaScript from t
     }
 
 Data to visualize arrive over the websocket as a list. For each index of the list, the code gest the "render" function associated with the appropriate "element_" div, and then passes the list item associated with that index.
+
+Currently, module HTML templates live in the *mesa/visualization/templates* directory, as html files. Each module's Python class has a *template* attribute, with the name of the HTML template (for example, "text_module.html"). 
+
+When creating a new module, the Python and JavaScript code need to be written in synch: the module Python-side **render** method needs to output data in the exact same format that the JavaScript **render** function receives as an input.
 
 
 
