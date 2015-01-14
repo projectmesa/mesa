@@ -109,5 +109,30 @@ Let's take a look at the internals of TextElement's template. Here it is, in all
         </script>
     </div>
 
+This isn't a full HTML page, obviously -- it's a chunk of HTML code to be inserted into the proper place in the larger visualization page template. Anywhere you see {{curly_braces}} is a template -- the server will replace it with the value of the variable inside it when the page is created. If the element is being created with an argument of index=0, the div id will be element_0, for example.
+
+At the moment, the outer tag needs to stay constant. Each element is instantiated with an index, which is its order on the page. This provides a unique identifier which tells the page where to send each piece of visualization data it receives from the server. The first visualization element on the page will have id="element_0", the second one "element_1", etc.
+
+In this case, there is no other HTML code in the div. This is because it is going to hold unformatted text, and nothing else. 
+
+The next section is important: the script tag stores the code that's used to render the data. First, it creates a function called 'render': all this function does is use JQuery to replace the HTML contents of its own div with the text it gets as an input. Once the function is defined, the next command uses JQuery to associate the function with the key "render", all of which in turn is associated with the element. In Python terms, you can think of the webpage having a dictionary, which will look something like
+
+    {
+        "#element_0": 
+            {"render": render},
+        ...
+    }
+
+To help understand why it looks like this, here's a snippet of JavaScript from the overall visualization template itself, on how to handle incoming data:
+
+    elements = msg["data"]
+    for (var i in elements) {
+        var element = elements[i];
+        var render = $("#element_" + i).data("render");
+        render(element);
+    }
+
+Data to visualize arrive over the websocket as a list. For each index of the list, the code gest the "render" function associated with the appropriate "element_" div, and then passes the list item associated with that index.
+
 
 
