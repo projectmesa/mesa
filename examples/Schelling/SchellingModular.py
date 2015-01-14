@@ -36,6 +36,6 @@ canvas_element = CanvasGrid(schelling_draw, 10, 10, 500, 500)
 
 server = ModularServer(SchellingModel, [canvas_element, happy_element], 
                        "Schelling", 10, 10, 0.8, 0.2, 3)
-
-server.listen(8888)
-tornado.ioloop.IOLoop.instance().start()
+server.launch()
+#server.listen(8888)
+#tornado.ioloop.IOLoop.instance().start()

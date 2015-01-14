@@ -1,7 +1,8 @@
 '''
 ModularServer
-=====================
+============================================================================
 
+A visualization server which renders a model via one or more elements.
 
 The concept for the modular visualization server as follows:  
 A visualization is composed of VisualizationElements, each of which defines how
@@ -26,6 +27,56 @@ SocketHandler: Handles the websocket connection between the client page and
                 the server.
 ModularServer: The overall visualization application class which stores and 
                controls the model and visualization instance.
+
+
+ModularServer should *not* need to be subclassed on a model-by-model basis; it 
+should be primarily a pass-through for VisualizationElement subclasses, which
+define the actual visualization specifics. 
+
+For example, suppose we have created two visualization elements for our model,
+called canvasvis and graphvis; we would launch a server with:
+
+    server = ModularServer(MyModel, [canvasvis, graphvis], name="My Model")
+    server.launch()
+
+
+The client keeps track of what step it is showing. Clicking the Step button in
+the browser sends a message requesting the viz_state corresponding to the next
+step position, which is then sent back to the client via the websocket.
+
+The websocket protocol is as follows:
+Each message is a JSON object, with a "type" property which defines the rest of
+the structure.
+
+Server -> Client:
+    Send over the model state to visualize. 
+    Model state is a list, with each element corresponding to a div; each div 
+    is expected to have a render function associated with it, which knows how 
+    to render that particular data. The example below includes two elements:
+    the first is data for a CanvasGrid, the second for a raw text display.
+    
+    {
+    "type": "viz_state",
+    "data": [{0:[ {"Shape": "circle", "x": 0, "y": 0, "r": 0.5,
+                "Color": "#AAAAAA", "Filled": "true", "Layer": 0}]},
+            "Shape Count: 1"]
+    }
+
+    Informs the client that the model is over.
+    {"type": "end"}
+
+Client -> Server:
+    Reset the model.
+    TODO: Allow this to come with parameters
+    {
+    "type": "reset"
+    }
+
+    Get a given state.
+    {
+    "type": "get_step",
+    "step:" index of the step to get.
+    }
 
 '''
 import os
@@ -209,6 +260,14 @@ class ModularServer(tornado.web.Application):
             self.viz_states.append(self.render_model())
         if self.verbose:
             print("Model steps:", self.model.schedule.steps)
+
+    def launch(self):
+        '''
+        Run the app.
+        '''
+        self.listen(self.port)
+        tornado.ioloop.IOLoop.instance().start()
+
 
 
 
