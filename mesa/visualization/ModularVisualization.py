@@ -54,7 +54,7 @@ Server -> Client:
     is expected to have a render function associated with it, which knows how 
     to render that particular data. The example below includes two elements:
     the first is data for a CanvasGrid, the second for a raw text display.
-    
+
     {
     "type": "viz_state",
     "data": [{0:[ {"Shape": "circle", "x": 0, "y": 0, "r": 0.5,
@@ -98,7 +98,6 @@ class VisualizationElement(object):
 
     Attributes:
         template: HTML template for the visualization.
-        render_js: JavaScript code to render the data.
 
     Methods:
         render: Takes a model object, and produces JSON data which can be sent
@@ -106,6 +105,7 @@ class VisualizationElement(object):
     '''
 
     template = None
+    index = None
     render_args = {}
 
     def __init__(self):
