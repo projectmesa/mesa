@@ -40,8 +40,8 @@ class CanvasGrid(VisualizationElement):
         canvas_height, canvas_width: Size, in pixels, of the grid visualization
                                      to draw on the client.
         template: "canvas_module.html" stores the module's HTML template.
-
     '''
+
     template = "canvas_module.html"
     portrayal_method = None # Portrayal function
     canvas_height = 500
@@ -50,7 +50,14 @@ class CanvasGrid(VisualizationElement):
     def __init__(self, portrayal_method, grid_height, grid_width,
                  canvas_height=500, canvas_width=500):
         '''
-        Instantiate a new CanvasGrid
+        Instantiate a new CanvasGrid.
+
+        Args:
+            portrayal_method: function to convert each object on the grid to 
+                              a portrayal, as described above.
+            grid_height, grid_width: Size of the grid, in cells.
+            canvas_height, canvas_width: Size of the canvas to draw in the 
+                                         client, in pixels. (default: 500x500)
         '''
 
         self.portrayal_method = portrayal_method
