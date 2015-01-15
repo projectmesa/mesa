@@ -13,6 +13,12 @@
 				canvasDraw_{{index}}.drawLayer(data[layer]);
 			canvasDraw_{{index}}.drawGridLines("#eee");
 		};
+
+		var div_reset = function() {
+			canvasDraw_{{index}}.resetCanvas();
+		}
+
 		$("#element_{{ index }}").data("render", render);
+		$("#element_{{ index }}").data("reset", div_reset);
 	</script>
 </div>

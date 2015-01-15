@@ -20,7 +20,9 @@
 		}
 
 		var options_{{index}} = {
-			datasetFill: false
+			animation: false,
+			datasetFill: false,
+			pointDot: false
 		}
 
 		// Creating the chart:
@@ -30,7 +32,15 @@
 		var render = function(data) {
 			chart_{{index}}.addData(data, control.tick);
 		};
+
+		var div_reset = function() {
+			chart_{{index}}.destroy();
+			data_{{index}}.labels = [];
+			chart_{{index}} = new Chart(context_{{index}}).Line(data_{{index}}, options_{{index}});
+		};
+
 		$("#element_{{ index }}").data("render", render);
+		$("#element_{{ index }}").data("reset", div_reset);
 
 	</script>
 </div>
