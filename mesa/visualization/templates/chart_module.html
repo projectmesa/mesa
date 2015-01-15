@@ -1,0 +1,36 @@
+<div id="element_{{index}}">
+	<canvas id="canvas_{{ index }}" width="{{canvas_width}}" height="{{canvas_height}}" style="border:1px dotted">
+	</canvas>
+	<script src="/static/Chart.min.js"></script>
+	<script>
+		var canvas_{{ index }} = document.getElementById("canvas_{{ index }}");
+		var context_{{ index }} = canvas_{{ index }}.getContext("2d");
+
+		var data_{{index}} = {
+			labels: [],
+			datasets: [
+				{% for s in series %}
+					{
+						label: "{{s["Label"]}}",
+						strokeColor: "{{s["Color"]}}",
+						data: []
+					},
+				{% end %}
+			]
+		}
+
+		var options_{{index}} = {
+			datasetFill: false
+		}
+
+		// Creating the chart:
+		// TODO: Put this in a reset function
+		var chart_{{index}} = new Chart(context_{{index}}).Line(data_{{index}}, options_{{index}});
+
+		var render = function(data) {
+			chart_{{index}}.addData(data, control.tick);
+		};
+		$("#element_{{ index }}").data("render", render);
+
+	</script>
+</div>
