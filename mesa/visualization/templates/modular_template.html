@@ -77,6 +77,15 @@
 			control.tick = 0;
 			control.running = true;
 			send({"type": "reset"});
+
+			// Reset all the visualizations
+			var divs = document.getElementsByTagName("div");
+			for (var i in divs) {
+				var div = divs[i];
+				if (div.id.substring(0,8) != "element_") continue;
+				var div_reset = $("#" + div.id).data("reset");
+				div_reset();
+			}
 		}
 
 		/**

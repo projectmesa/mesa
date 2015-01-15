@@ -1,6 +1,7 @@
 from Schelling import SchellingModel
 from mesa.visualization.ModularTextVisualization import TextElement
 from mesa.visualization.ModularCanvasGridVisualization import CanvasGrid
+from mesa.visualization.ModularChartVisualization import ChartModule
 from mesa.visualization.ModularVisualization import ModularServer
 import tornado.ioloop
 
@@ -16,6 +17,7 @@ class HappyElement(TextElement):
     def render(self, model):
         return "Happy agents: " + str(model.happy)
 
+
 def schelling_draw(agent):
     '''
     Portrayal Method for canvas
@@ -23,6 +25,7 @@ def schelling_draw(agent):
     if agent is None:
         return
     portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
+
     if agent.type == 0:
         portrayal["Color"] = "Red"
     else:
@@ -30,10 +33,11 @@ def schelling_draw(agent):
     return portrayal
 
 happy_element = HappyElement()
-canvas_element = CanvasGrid(schelling_draw, 10, 10, 500, 500)
-
-server = ModularServer(SchellingModel, [canvas_element, happy_element], 
-                       "Schelling", 10, 10, 0.8, 0.2, 3)
+canvas_element = CanvasGrid(schelling_draw, 20, 20, 500, 500)
+happy_chart = ChartModule([{"Label": "happy", "Color": "Black"}])
+server = ModularServer(SchellingModel, 
+                       [canvas_element, happy_element, happy_chart], 
+                       "Schelling", 20, 20, 0.8, 0.2, 4)
 server.launch()
 #server.listen(8888)
 #tornado.ioloop.IOLoop.instance().start()
