@@ -4,7 +4,11 @@
 			txt = data;
 			$("#element_{{index}}").html(txt);
 		};
+		var div_reset = function() {
+			$("#element_{{index}}").html("");	
+		};
 
 		$("#element_{{ index }}").data("render", render);
+		$("#element_{{ index }}").data("reset", div_reset);
 	</script>
 </div>

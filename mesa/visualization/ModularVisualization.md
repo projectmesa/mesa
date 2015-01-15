@@ -104,8 +104,12 @@ Let's take a look at the internals of TextElement's template. Here it is, in all
                 txt = data;
                 $("#element_{{index}}").html(txt);
             };
+            var div_reset = function() {
+                $("#element_{{index}}").html("");   
+            };
 
             $("#element_{{ index }}").data("render", render);
+            $("#element_{{ index }}").data("reset", div_reset);
         </script>
     </div>
 
@@ -115,11 +119,18 @@ At the moment, the outer tag needs to stay constant. Each element is instantiate
 
 In this case, there is no other HTML code in the div. This is because it is going to hold unformatted text, and nothing else. 
 
-The next section is important: the script tag stores the code that's used to render the data. First, it creates a function called 'render': all this function does is use JQuery to replace the HTML contents of its own div with the text it gets as an input. Once the function is defined, the next command uses JQuery to associate the function with the key "render", all of which in turn is associated with the element. In Python terms, you can think of the webpage having a dictionary, which will look something like
+The next section is important: the script tag stores the code that's used to render the data. 
+
+First, it creates a function called 'render': all this function does is use JQuery to replace the HTML contents of its own div with the text it gets as an input. This function will be called at each step of the model, to draw the data associated with the model coming over the websocket. 
+
+The next function, 'div_reset' just replaces the contents of the div with a blank. This function will be called when the user presses the Reset button.
+
+Once the functions are defined, the next commands uses JQuery to associate them with the keys "render" and "reset", all of which in turn is associated with the element. In Python terms, you can think of the webpage having a dictionary, which will look something like
 
     {
         "#element_0": 
-            {"render": render},
+            {"render": render,
+            "reset": div_reset},
         ...
     }
 
