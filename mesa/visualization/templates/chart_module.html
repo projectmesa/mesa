@@ -3,6 +3,9 @@
 	</canvas>
 	<script src="/static/Chart.min.js"></script>
 	<script>
+		/*
+			Chart.js library from: http://www.chartjs.org/
+		*/
 		var canvas_{{ index }} = document.getElementById("canvas_{{ index }}");
 		var context_{{ index }} = canvas_{{ index }}.getContext("2d");
 
@@ -26,13 +29,19 @@
 		}
 
 		// Creating the chart:
-		// TODO: Put this in a reset function
 		var chart_{{index}} = new Chart(context_{{index}}).Line(data_{{index}}, options_{{index}});
 
+		/**
+			Add incoming data (assumed to be formatted correctly) to the chart,
+			with the current tick as the label.
+		*/
 		var render = function(data) {
 			chart_{{index}}.addData(data, control.tick);
 		};
 
+		/**
+			The reset function destroys the chart, removes the labels, and creates the chart again in order to reset it.
+		*/
 		var div_reset = function() {
 			chart_{{index}}.destroy();
 			data_{{index}}.labels = [];

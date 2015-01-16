@@ -32,11 +32,11 @@ def schelling_draw(agent):
     return portrayal
 
 happy_element = HappyElement()
-canvas_element = CanvasGrid(schelling_draw, 10, 10, 500, 500)
+canvas_element = CanvasGrid(schelling_draw, 20, 20, 500, 500)
 happy_chart = ChartModule([{"Label": "happy", "Color": "Black"}])
 server = ModularServer(SchellingModel, 
                        [canvas_element, happy_element, happy_chart], 
-                       "Schelling", 10, 10, 0.8, 0.2, 3)
+                       "Schelling", 20, 20, 0.8, 0.2, 4)
 server.launch()
 #server.listen(8888)
 #tornado.ioloop.IOLoop.instance().start()
