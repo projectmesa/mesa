@@ -255,9 +255,11 @@ class CanvasServer(object):
         for y in range(self.grid_height):
             for x in range(self.grid_height):
                 # TODO: Have this work for multigrid
-                portrayal = self.portrayal_method(self.model.grid[y][x])
-                if portrayal:
-                    viz_state[portrayal["Layer"]].append(portrayal)
+                cell_objects = self.model.grid.get_cell_list_contents([(x, y)])
+                for obj in cell_objects:
+                    portrayal = self.portrayal_method(obj)
+                    if portrayal:
+                        viz_state[portrayal["Layer"]].append(portrayal)
         return viz_state
 
     def run_model(self):
