@@ -1,4 +1,4 @@
-from .EpsteinCivilViolence import Citizen, Cop, CivilViolenceModel
+from EpsteinCivilViolence import Citizen, Cop, CivilViolenceModel
 from mesa.visualization.CanvasServer import CanvasServer
 
 COP_COLOR = "#000000"
@@ -16,7 +16,8 @@ def citizen_cop_portrayal(agent):
                  "Filled": "true"}
 
     if type(agent) is Citizen:
-        color = AGENT_QUIET_COLOR if agent.condition == "Quiescent" else AGENT_REBEL_COLOR
+        color = AGENT_QUIET_COLOR if agent.condition == "Quiescent" else \
+            AGENT_REBEL_COLOR
         color = JAIL_COLOR if agent.jail_sentence else color
         portrayal["Color"] = color
         portrayal["r"] = 0.8
@@ -31,12 +32,12 @@ def citizen_cop_portrayal(agent):
 
 server = CanvasServer(CivilViolenceModel, citizen_cop_portrayal, 500, 500,
                       "Epstein Civil Violence",
-                           height=40,
-                           width=40,
-                           citizen_density=.7,
-                           cop_density=.074,
-                           citizen_vision=7,
-                           cop_vision=7,
-                           legitimacy=.8,
-                           max_jail_term=1000)
+                      height=40,
+                      width=40,
+                      citizen_density=.7,
+                      cop_density=.074,
+                      citizen_vision=7,
+                      cop_vision=7,
+                      legitimacy=.8,
+                      max_jail_term=1000)
 server.launch()
