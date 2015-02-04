@@ -15,28 +15,40 @@ class Citizen(Agent):
     Attributes:
         unique_id: unique int
         x, y: Grid coordinates
-        hardship: Agent's 'perceived hardship (i.e., physical or economic privation).' Exogenous, drawn from U(0,1).
-        regime_legitimacy: Agent's perception of regime legitimacy, equal across agents.  Exogenous.
+        hardship: Agent's 'perceived hardship (i.e., physical or economic
+            privation).' Exogenous, drawn from U(0,1).
+        regime_legitimacy: Agent's perception of regime legitimacy, equal
+            across agents.  Exogenous.
         risk_aversion: Exogenous, drawn from U(0,1).
-        threshold: if (grievance - (risk_aversion * arrest_probability)) > threshold, go/remain Active
-        vision: number of cells in each direction (N, S, E and W) that agent can inspect
-        condition: Can be "Quiescent" or "Active;" deterministic function of greivance, perceived risk, and
-        grievance: deterministic function of hardship and regime_legitimacy; how aggrieved is agent at the regime?
-        arrest_probability: agent's assessment of arrest probability, given rebellion
+        threshold: if (grievance - (risk_aversion * arrest_probability)) >
+            threshold, go/remain Active
+        vision: number of cells in each direction (N, S, E and W) that agent
+            can inspect
+        condition: Can be "Quiescent" or "Active;" deterministic function of
+            greivance, perceived risk, and
+        grievance: deterministic function of hardship and regime_legitimacy;
+            how aggrieved is agent at the regime?
+        arrest_probability: agent's assessment of arrest probability, given
+            rebellion
 
     """
 
-    def __init__(self, unique_id, x, y, hardship, regime_legitimacy, risk_aversion, threshold, vision, model):
+    def __init__(self, unique_id, x, y, hardship, regime_legitimacy,
+                 risk_aversion, threshold, vision, model):
         """
         Create a new Citizen.
         Args:
             unique_id: unique int
             x, y: Grid coordinates
-            hardship: Agent's 'perceived hardship (i.e., physical or economic privation).' Exogenous, drawn from U(0,1).
-            regime_legitimacy: Agent's perception of regime legitimacy, equal across agents.  Exogenous.
+            hardship: Agent's 'perceived hardship (i.e., physical or economic
+                privation).' Exogenous, drawn from U(0,1).
+            regime_legitimacy: Agent's perception of regime legitimacy, equal
+                across agents.  Exogenous.
             risk_aversion: Exogenous, drawn from U(0,1).
-            threshold: if (grievance - (risk_aversion * arrest_probability)) > threshold, go/remain Active
-            vision: number of cells in each direction (N, S, E and W) that agent can inspect. Exogenous.
+            threshold: if (grievance - (risk_aversion * arrest_probability)) >
+                threshold, go/remain Active
+            vision: number of cells in each direction (N, S, E and W) that
+                agent can inspect. Exogenous.
             model: model instance
         """
         super(Citizen, self).__init__(unique_id, model)
@@ -64,9 +76,11 @@ class Citizen(Agent):
         self.update_neighbors(model)
         self.update_estimated_arrest_probability(model)
         net_risk = self.risk_aversion * self.arrest_probability
-        if self.condition == 'Quiescent' and (self.grievance - net_risk) > self.threshold:
+        if self.condition == 'Quiescent' and (
+                self.grievance - net_risk) > self.threshold:
             self.condition = 'Active'
-        elif self.condition == 'Active' and (self.grievance - net_risk) <= self.threshold:
+        elif self.condition == 'Active' and (
+                self.grievance - net_risk) <= self.threshold:
             self.condition = 'Quiescent'
         if model.movement and self.empty_neighbors:
             new_x, new_y = random.choice(self.empty_neighbors)
@@ -79,21 +93,28 @@ class Citizen(Agent):
         """
         Look around and see who my neighbors are
         """
-        self.neighborhood = model.grid.get_neighborhood(self.x, self.y, moore=False, radius=1)
+        self.neighborhood = model.grid.get_neighborhood(self.x, self.y,
+                                                        moore=False, radius=1)
         self.neighbors = model.grid.get_cell_list_contents(self.neighborhood)
-        self.empty_neighbors = [c for c in self.neighborhood if model.grid.is_cell_empty(c)]
+        self.empty_neighbors = [c for c in self.neighborhood if
+                                model.grid.is_cell_empty(c)]
 
     def update_estimated_arrest_probability(self, model):
         """
-        Based on the ratio of cops to actives in my neighborhood, estimate the p(Arrest | I go active).
+        Based on the ratio of cops to actives in my neighborhood, estimate the
+        p(Arrest | I go active).
 
         """
         cops_in_vision = len([c for c in self.neighbors if c.breed == 'cop'])
-        actives_in_vision = 1.  # citizen counts herself, asking p(arrest | I Activate)
+        actives_in_vision = 1.  # citizen counts herself
         for c in self.neighbors:
-            if c.breed == 'citizen' and c.condition == 'Active' and c.jail_sentence == 0:
+            if c.breed == 'citizen' and \
+                    c.condition == 'Active' and \
+                    c.jail_sentence == 0:
                 actives_in_vision += 1
-        self.arrest_probability = 1 - math.exp(-1 * model.arrest_prob_constant * (cops_in_vision / actives_in_vision))
+        self.arrest_probability = 1 - math.exp(
+            -1 * model.arrest_prob_constant * (
+                cops_in_vision / actives_in_vision))
 
 
 class Cop(Agent):
@@ -104,7 +125,8 @@ class Cop(Agent):
     Attributes:
         unique_id: unique int
         x, y: Grid coordinates
-        vision: number of cells in each direction (N, S, E and W) that cop is able to inspect
+        vision: number of cells in each direction (N, S, E and W) that cop is
+            able to inspect
     """
 
     def __init__(self, unique_id, x, y, vision, model):
@@ -113,7 +135,8 @@ class Cop(Agent):
         Args:
             unique_id: unique int
             x, y: Grid coordinates
-            vision: number of cells in each direction (N, S, E and W) that agent can inspect. Exogenous.
+            vision: number of cells in each direction (N, S, E and W) that
+                agent can inspect. Exogenous.
             model: model instance
         """
         super(Cop, self).__init__(unique_id, model)
@@ -124,12 +147,15 @@ class Cop(Agent):
 
     def step(self, model):
         """
-        Inspect local vision and arrest a random active agent. Move if applicable.
+        Inspect local vision and arrest a random active agent. Move if
+        applicable.
         """
         self.update_neighbors(model)
         active_neighbors = []
         for agent in self.neighbors:
-            if agent.breed == 'citizen' and agent.condition == 'Active' and agent.jail_sentence == 0:
+            if agent.breed == 'citizen' and \
+                    agent.condition == 'Active' and \
+                    agent.jail_sentence == 0:
                 active_neighbors.append(agent)
         if active_neighbors:
             arrestee = random.choice(active_neighbors)
@@ -146,33 +172,44 @@ class Cop(Agent):
         """
         Look around and see who my neighbors are.
         """
-        self.neighborhood = model.grid.get_neighborhood(self.x, self.y, moore=False, radius=1)
+        self.neighborhood = model.grid.get_neighborhood(self.x, self.y,
+                                                        moore=False, radius=1)
         self.neighbors = model.grid.get_cell_list_contents(self.neighborhood)
-        self.empty_neighbors = [c for c in self.neighborhood if model.grid.is_cell_empty(c)]
+        self.empty_neighbors = [c for c in self.neighborhood if
+                                model.grid.is_cell_empty(c)]
 
 
 class CivilViolenceModel(Model):
     """
-    Model 1 from "Modeling civil violence: An agent-based computational approach," by Joshua Epstein.
+    Model 1 from "Modeling civil violence: An agent-based computational
+    approach," by Joshua Epstein.
     http://www.pnas.org/content/99/suppl_3/7243.full
     Attributes:
         height: grid height
         width: grid width
         citizen_density: approximate % of cells occupied by citizens.
         cop_density: approximate % of calles occupied by cops.
-        citizen_vision: number of cells in each direction (N, S, E and W) that citizen can inspect
-        cop_vision: number of cells in each direction (N, S, E and W) that cop can inspect
-        legitimacy:  (L) citizens' perception of regime legitimacy, equal across all citizens
+        citizen_vision: number of cells in each direction (N, S, E and W) that
+            citizen can inspect
+        cop_vision: number of cells in each direction (N, S, E and W) that cop
+            can inspect
+        legitimacy:  (L) citizens' perception of regime legitimacy, equal
+            across all citizens
         max_jail_term: (J_max)
-        active_threshold: if (grievance - (risk_aversion * arrest_probability)) > threshold, citizen rebels
-        arrest_prob_constant: set to ensure agents make plausible arrest probability estimates
+        active_threshold: if (grievance - (risk_aversion * arrest_probability))
+            > threshold, citizen rebels
+        arrest_prob_constant: set to ensure agents make plausible arrest
+            probability estimates
         movement: binary, whether agents try to move at step end
-        max_iters: model may not have a natural stopping point, so we set a max.
+        max_iters: model may not have a natural stopping point, so we set a
+            max.
 
     """
 
-    def __init__(self, height, width, citizen_density, cop_density, citizen_vision, cop_vision, legitimacy,
-                 max_jail_term, active_threshold=.1, arrest_prob_constant=2.3, movement=True, max_iters=1000):
+    def __init__(self, height, width, citizen_density, cop_density,
+                 citizen_vision, cop_vision, legitimacy,
+                 max_jail_term, active_threshold=.1, arrest_prob_constant=2.3,
+                 movement=True, max_iters=1000):
         super(CivilViolenceModel, self).__init__()
         self.height = height
         self.width = width
@@ -190,28 +227,41 @@ class CivilViolenceModel(Model):
         self.iteration = 0
         self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=True)
-        self.dc = DataCollector(model_reporters={"Quiescent": lambda m: self.count_type_citizens(m, "Quiescent"),
-                                                 "Active": lambda m: self.count_type_citizens(m, "Active"),
-                                                 "Jailed": lambda m: self.count_jailed(m)},
-                                agent_reporters={"x": lambda a: a.x, "y": lambda a: a.y, 'breed': lambda a: a.breed,
-                                                 "jail_sentence": lambda a: getattr(a, 'jail_sentence', None),
-                                                 "condition": lambda a: getattr(a, "condition", None),
-                                                 "arrest_probability": lambda a: getattr(a, "arrest_probability", None)
-                                })
+        model_reporters = {
+            "Quiescent": lambda m: self.count_type_citizens(m, "Quiescent"),
+            "Active": lambda m: self.count_type_citizens(m, "Active"),
+            "Jailed": lambda m: self.count_jailed(m)}
+        agent_reporters = {
+            "x": lambda a: a.x,
+            "y": lambda a: a.y,
+            'breed': lambda a: a.breed,
+            "jail_sentence": lambda a: getattr(a, 'jail_sentence', None),
+            "condition": lambda a: getattr(a, "condition", None),
+            "arrest_probability": lambda a: getattr(a, "arrest_probability",
+                                                    None)
+        }
+        self.dc = DataCollector(model_reporters=model_reporters,
+                                agent_reporters=agent_reporters)
         unique_id = 0
         if self.cop_density + self.citizen_density > 1:
-            raise ValueError('Cop density + citizen density must be less than 1')
+            raise ValueError(
+                'Cop density + citizen density must be less than 1')
         for x in range(self.width):
             for y in range(self.height):
                 if random.random() < self.cop_density:
-                    cop = Cop(unique_id, x, y, vision=self.cop_vision, model=self)
+                    cop = Cop(unique_id, x, y, vision=self.cop_vision,
+                              model=self)
                     unique_id += 1
                     self.grid[y][x] = cop
                     self.schedule.add(cop)
-                elif random.random() < (self.cop_density + self.citizen_density):
-                    citizen = Citizen(unique_id, x, y, hardship=random.random(),
-                                      regime_legitimacy=self.legitimacy, risk_aversion=random.random(),
-                                      threshold=self.active_threshold, vision=self.citizen_vision, model=self)
+                elif random.random() < (
+                        self.cop_density + self.citizen_density):
+                    citizen = Citizen(unique_id, x, y,
+                                      hardship=random.random(),
+                                      regime_legitimacy=self.legitimacy,
+                                      risk_aversion=random.random(),
+                                      threshold=self.active_threshold,
+                                      vision=self.citizen_vision, model=self)
                     unique_id += 1
                     self.grid[y][x] = citizen
                     self.schedule.add(citizen)
