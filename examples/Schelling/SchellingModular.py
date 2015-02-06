@@ -25,6 +25,7 @@ def schelling_draw(agent):
     if agent is None:
         return
     portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
+
     if agent.type == 0:
         portrayal["Color"] = "Red"
     else:
