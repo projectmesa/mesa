@@ -11,6 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   getting-started
+   modindex
 
 
 Indices and tables
