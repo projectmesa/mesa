@@ -13,6 +13,9 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # good reason to use one-character variable names for x and y.
 # pylint: disable=invalid-name
 
+import itertools
+
+
 class Grid(object):
     '''
     Base class for a square grid.
@@ -34,11 +37,43 @@ class Grid(object):
         get_cell_list_contents: Returns the contents of a list of cells ((x,y) tuples)
     '''
 
-    width = None
-    height = None
-    torus = False
-    grid = None
     default_val = lambda s: None
+
+
+    class GridOccupiedIter:
+        """
+        Return just the (un)occupied cells of the grid.
+        occupied is a flag indicating if we want the occupied (True)
+            or unoccupied (occupied=False) cells
+        """
+
+        def __init__(self, grid, occupied=True):
+            self.grid = grid
+            self.x = 0
+            self.y = 0
+            self.occupied = occupied
+
+
+        def __iter__(self):
+            return self
+
+
+        def __next__(self):
+            while self.y < self.grid.height:
+                while self.x < self.grid.width:
+                    occupied = not self.grid.is_cell_empty((self.x, self.y))
+                    if occupied == self.occupied:
+                        ret = [self.grid[self.y][self.x],
+                              self.x, self.y]
+                        self.x += 1
+                        return ret
+                    else:
+                        self.x += 1
+                self.x = 0
+                self.y += 1
+            else:
+                raise StopIteration()
+
 
     def __init__(self, height, width, torus):
         '''
@@ -62,64 +97,74 @@ class Grid(object):
     def __getitem__(self, index):
         return self.grid[index]
 
-    def _get_x(self, x):
-        '''
-        Convert X coordinate, handling torus looping.
-        '''
-        if x >= 0 and x < self.width:
-            return x
-        if not self.torus:
-            raise Exception("Coordinate out of bounds.")
-        else:
-            return x % self.width
+    def __iter__(self):
+        # create an iterator that chains the
+        #  rows of grid together as if one list:
+        return itertools.chain(*self.grid)
 
-    def _get_y(self, y):
-        '''
-        Convert Y coordinate, handling torus looping.
-        '''
-        if y >= 0 and y < self.height:
-            return y
-        if not self.torus:
-            raise Exception("Coordinate out of bounds.")
-        else:
-            return y % self.height
 
-    def get_neighborhood(self, x, y, moore, include_center=False, radius=1):
-        '''
-        Return a list of cells that are in the neighborhood of a certain point.
+    def occupied_iter(self, occupied=True):
+        return Grid.GridOccupiedIter(self, occupied=occupied)
+
+    def torus_adj(self, coord, dim_len):
+        """
+        Convert coordinate, handling torus looping.
+        """
+        if self.torus:
+            coord %= dim_len
+        return coord
+
+
+    def out_of_bounds(self, x, y):
+        """
+        Is point x, y off the grid?
+        """
+        return(x < 0 or x >= self.width
+           or y < 0 or y >= self.height)
+
+
+    def get_neighborhood(self, x, y, moore,
+                         include_center=False, radius=1):
+        """
+        Return a list of cells that are in the 
+        neighborhood of a certain point.
 
         Args:
             x, y: Coordinates for the neighborhood to get.
-            moore: If True, return Moore neighborhood (including diagonals)
-                   If False, return Von Neumann neighborhood (exclude diagonals)
-            include_center: If True, return the (x, y) cell as well. Otherwise,
-                            return surrounding cells only.
+            moore: If True, return Moore neighborhood
+                        (including diagonals)
+                   If False, return Von Neumann neighborhood 
+                        (exclude diagonals)
+            include_center: If True, return the (x, y) cell as well.
+                            Otherwise, return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
 
         Returns:
-            A list of coordinate tuples representing the neighborhood; at most 9 if
-            Moore, 5 if Von Neumann (8 and 4 if not including the center).
-        '''
+            A list of coordinate tuples representing the neighborhood;
+                With radius 1, at most 9 if
+                Moore, 5 if Von Neumann
+                (8 and 4 if not including the center).
+        """
         coordinates = []
         for dy in range(-radius, radius + 1):
             for dx in range(-radius, radius + 1):
                 if dx == 0 and dy == 0 and not include_center:
                     continue
-                # Skip diagonals in Von Neumann neighborhood.
-                if not moore and dy != 0 and dx != 0:
-                    continue
-                # Skip diagonals in Moore neighborhood when distance > radius
-                if moore and (dy ** 2 + dx ** 2) ** .5 > radius:
-                    continue
-                # Skip if not a torus and new coords out of bounds.
-                if not self.torus and (not (0 < dx + x < self.width) or
-                                           not (0 < dy + y < self.height)):
+                if not moore:
+                    # Skip diagonals in Von Neumann neighborhood.
+                    if dy != 0 and dx != 0:
+                        continue
+
+                px = self.torus_adj(x + dx, self.width)
+                py = self.torus_adj(y + dy, self.height)
+
+                # Skip if new coords out of bounds.
+                if(self.out_of_bounds(px, py)):
                     continue
 
-                px = self._get_x(x + dx)
-                py = self._get_y(y + dy)
                 coordinates.append((px, py))
         return coordinates
+
 
     def get_neighbors(self, x, y, moore, include_center=False, radius=1):
         '''

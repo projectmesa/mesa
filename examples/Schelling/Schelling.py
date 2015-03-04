@@ -17,6 +17,9 @@ To advance the model by one step and print the new state:
 
 To advance the model by e.g. 10 steps and print the new state:
     viz.step_forward(10)
+
+NOTES:
+    Random seems to be imported twice.
 '''
 
 from __future__ import division # For Python 2.x compatibility
@@ -60,27 +63,26 @@ class SchellingModel(Model):
         self.running = True
 
         # Set up agents
-        for x in range(self.width):
-            for y in range(self.height):
-                if random.random() < self.density:
-                    if random.random() < self.minority_pc:
-                        agent_type = 1
-                    else:
-                        agent_type = 0
+        for empty in self.grid.occupied_iter(occupied=False):
+            x = empty[1]
+            y = empty[2]
+            if random.random() < self.density:
+                if random.random() < self.minority_pc:
+                    agent_type = 1
+                else:
+                    agent_type = 0
 
-                    agent = SchellingAgent((x,y), x, y, agent_type)
-                    self.grid[y][x] = agent
-                    self.schedule.add(agent)
+                agent = SchellingAgent((x,y), x, y, agent_type)
+                self.grid[y][x] = agent
+                self.schedule.add(agent)
 
     def get_empty(self):
         '''
         Get a list of coordinate tuples of currently-empty cells.
         '''
         empty_cells = []
-        for x in range(self.width):
-            for y in range(self.height):
-                if self.grid[y][x] is None:
-                    empty_cells.append((x, y))
+        for empty in self.grid.occupied_iter(occupied=False):
+            empty_cells.append((empty[1], empty[2]))
         return empty_cells
 
     def step(self):
