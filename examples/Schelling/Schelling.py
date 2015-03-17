@@ -58,32 +58,23 @@ class SchellingModel(Model):
         self.datacollector = DataCollector(
             {"happy": lambda m: m.happy}, # Model-level count of happy agents
             # For testing purposes, agent's individual x and y
-            {"x": lambda a: a.x, "y": lambda a: a.y}) 
+            {"x": lambda a: a.x, "y": lambda a: a.y})
 
         self.running = True
 
         # Set up agents
-        for empty in self.grid.occupied_iter(occupied=False):
-            x = empty[1]
-            y = empty[2]
+        for cell in self.grid.coord_iter():
+            x = cell[1]
+            y = cell[2]
             if random.random() < self.density:
                 if random.random() < self.minority_pc:
                     agent_type = 1
                 else:
                     agent_type = 0
 
-                agent = SchellingAgent((x,y), x, y, agent_type)
+                agent = SchellingAgent((x, y), agent_type)
                 self.grid[y][x] = agent
                 self.schedule.add(agent)
-
-    def get_empty(self):
-        '''
-        Get a list of coordinate tuples of currently-empty cells.
-        '''
-        empty_cells = []
-        for empty in self.grid.occupied_iter(occupied=False):
-            empty_cells.append((empty[1], empty[2]))
-        return empty_cells
 
     def step(self):
         '''
@@ -100,7 +91,7 @@ class SchellingAgent(Agent):
     '''
     Schelling segregation agent
     '''
-    def __init__(self, unique_id, x, y, agent_type):
+    def __init__(self, coords, agent_type):
         '''
          Create a new Schelling agent.
 
@@ -109,9 +100,8 @@ class SchellingAgent(Agent):
             x, y: Agent initial location.
             agent_type: Indicator for the agent's type (minority=1, majority=0)
         '''
-        self.unique_id = unique_id
-        self.x = x
-        self.y = y
+        self.unique_id = coords
+        self.pos = coords
         self.type = agent_type
 
     def step(self, model):
@@ -123,11 +113,7 @@ class SchellingAgent(Agent):
 
         # If unhappy, move:
         if similar < model.homophily:
-            new_x, new_y = random.choice(model.get_empty())
-            model.grid[self.y][self.x] = None
-            model.grid[new_y][new_x] = self
-            self.x = new_x
-            self.y = new_y
+            model.grid.move_to_empty(self)
         else:
             model.happy += 1
 
@@ -164,7 +150,3 @@ if __name__ == "__main__":
     server.launch()
     #model = SchellingModel(10, 10, 0.8, 0.2, 3)
     #viz = SchellingTextVisualization(model)
-
-
-
-
