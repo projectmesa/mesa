@@ -18,12 +18,9 @@ To advance the model by one step and print the new state:
 To advance the model by e.g. 10 steps and print the new state:
     viz.step_forward(10)
 
-NOTES:
-    Random seems to be imported twice.
 '''
 
-from __future__ import division # For Python 2.x compatibility
-import random
+from __future__ import division  # For Python 2.x compatibility
 
 import random
 
@@ -35,6 +32,10 @@ from mesa.datacollection import DataCollector
 from mesa.visualization.TextServer import TextServer
 
 from mesa.visualization.TextVisualization import *
+
+X = 0
+Y = 1
+
 
 class SchellingModel(Model):
     '''
@@ -56,13 +57,16 @@ class SchellingModel(Model):
 
         self.happy = 0
         self.datacollector = DataCollector(
-            {"happy": lambda m: m.happy}, # Model-level count of happy agents
+            {"happy": lambda m: m.happy},  # Model-level count of happy agents
             # For testing purposes, agent's individual x and y
-            {"x": lambda a: a.x, "y": lambda a: a.y})
+            {"x": lambda a: a.pos[X], "y": lambda a: a.pos[Y]})
 
         self.running = True
 
         # Set up agents
+        # We use a grid iterator that returns
+        # the coordinates of a cell as well as
+        # its contents. (coord_iter)
         for cell in self.grid.coord_iter():
             x = cell[1]
             y = cell[2]
@@ -73,19 +77,20 @@ class SchellingModel(Model):
                     agent_type = 0
 
                 agent = SchellingAgent((x, y), agent_type)
-                self.grid[y][x] = agent
+                self.grid.position_agent(agent, x, y)
                 self.schedule.add(agent)
 
     def step(self):
         '''
         Run one step of the model. If All agents are happy, halt the model.
         '''
-        self.happy = 0 # Reset counter of happy agents
+        self.happy = 0  # Reset counter of happy agents
         self.schedule.step()
         self.datacollector.collect(self)
 
         if self.happy == self.schedule.get_agent_count():
             self.running = False
+
 
 class SchellingAgent(Agent):
     '''
@@ -105,9 +110,8 @@ class SchellingAgent(Agent):
         self.type = agent_type
 
     def step(self, model):
-        neighbors = model.grid.get_neighbors(self.x, self.y, moore=True)
         similar = 0
-        for neighbor in neighbors:
+        for neighbor in model.grid.neighbor_iter(self.pos[X], self.pos[Y]):
             if neighbor.type == self.type:
                 similar += 1
 
@@ -148,5 +152,5 @@ if __name__ == "__main__":
     server = TextServer(SchellingModel, SchellingTextVisualization, "Schelling",
                         10, 10, 0.8, 0.2, 3)
     server.launch()
-    #model = SchellingModel(10, 10, 0.8, 0.2, 3)
-    #viz = SchellingTextVisualization(model)
+    # model = SchellingModel(10, 10, 0.8, 0.2, 3)
+    # viz = SchellingTextVisualization(model)

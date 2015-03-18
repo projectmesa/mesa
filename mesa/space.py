@@ -14,6 +14,8 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
+import random
+
 
 RANDOM = -1
 
@@ -39,7 +41,8 @@ class Grid(object):
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
         get_neighborhood: Returns the cells surrounding a given cell.
-        get_cell_list_contents: Returns the contents of a list of cells ((x,y) tuples)
+        get_cell_list_contents: Returns the contents of a list of cells
+            ((x,y) tuples)
     '''
 
     default_val = lambda s: None
@@ -100,12 +103,11 @@ class Grid(object):
         #  rows of grid together as if one list:
         return itertools.chain(*self.grid)
 
-
     def coord_iter(self):
         """
         An iterator that returns coordinates as well as cell contents.
         """
-        return GridEnv.CoordIter(self)
+        return Grid.CoordIter(self)
 
     def neighbor_iter(self, x, y, moore=True, torus=False):
         """
@@ -113,21 +115,6 @@ class Grid(object):
         """
         neighbors = self.get_neighbors(x, y, moore=moore)
         return iter(neighbors)
-
-    def torus_adj(self, coord, dim_len):
-        """
-        Convert coordinate, handling torus looping.
-        """
-        if self.torus:
-            coord %= dim_len
-        return coord
-
-    def out_of_bounds(self, x, y):
-        """
-        Is point x, y off the grid?
-        """
-        return(x < 0 or x >= self.width
-               or y < 0 or y >= self.height)
 
     def get_neighborhood(self, x, y, moore,
                          include_center=False, radius=1):
@@ -205,76 +192,12 @@ class Grid(object):
             coord %= dim_len
         return coord
 
-
     def out_of_bounds(self, x, y):
         """
         Is point x, y off the grid?
         """
         return(x < 0 or x >= self.width
-           or y < 0 or y >= self.height)
-
-
-    def get_neighborhood(self, x, y, moore,
-                         include_center=False, radius=1):
-        """
-        Return a list of cells that are in the
-        neighborhood of a certain point.
-
-        Args:
-            x, y: Coordinates for the neighborhood to get.
-            moore: If True, return Moore neighborhood
-                        (including diagonals)
-                   If False, return Von Neumann neighborhood
-                        (exclude diagonals)
-            include_center: If True, return the (x, y) cell as well.
-                            Otherwise, return surrounding cells only.
-            radius: radius, in cells, of neighborhood to get.
-
-        Returns:
-            A list of coordinate tuples representing the neighborhood;
-                With radius 1, at most 9 if
-                Moore, 5 if Von Neumann
-                (8 and 4 if not including the center).
-        """
-        coordinates = []
-        for dy in range(-radius, radius + 1):
-            for dx in range(-radius, radius + 1):
-                if dx == 0 and dy == 0 and not include_center:
-                    continue
-                if not moore:
-                    # Skip diagonals in Von Neumann neighborhood.
-                    if dy != 0 and dx != 0:
-                        continue
-
-                px = self.torus_adj(x + dx, self.width)
-                py = self.torus_adj(y + dy, self.height)
-
-                # Skip if new coords out of bounds.
-                if(self.out_of_bounds(px, py)):
-                    continue
-
-                coordinates.append((px, py))
-        return coordinates
-
-
-    def get_neighbors(self, x, y, moore, include_center=False, radius=1):
-        '''
-        Return a list of neighbors to a certain point.
-
-        Args:
-            x, y: Coordinates for the neighborhood to get.
-            moore: If True, return Moore neighborhood (including diagonals)
-                   If False, return Von Neumann neighborhood (exclude diagonals)
-            include_center: If True, return the (x, y) cell as well. Otherwise,
-                            return surrounding cells only.
-            radius: radius, in cells, of neighborhood to get.
-
-        Returns:
-            A list of non-None objects in the given neighborhood; at most 9 if
-            Moore, 5 if Von-Neumann (8 and 4 if not including the center).
-        '''
-        neighborhood = self.get_neighborhood(x, y, moore, include_center, radius)
-        return self.get_cell_list_contents(neighborhood)
+               or y < 0 or y >= self.height)
 
     def get_cell_list_contents(self, cell_list):
         '''
@@ -288,7 +211,6 @@ class Grid(object):
         for x, y in cell_list:
             self._add_members(contents, x, y)
         return contents
-
 
     def exists_empty_cells(self):
         """
@@ -309,10 +231,10 @@ class Grid(object):
         """
         Moves agent to an empty cell, vacating agent's old cell.
         """
-        coords = self.get_pos_components(agent)
+        coords = agent.pos
         new_coords = self.find_empty()
         if new_coords is None:
-            logging.ERROR("Agent could not move because no cells are empty")
+            print("ERROR: Agent could not move because no cells are empty")
         else:
             self._place_agent(new_coords, agent)
             self._make_empty(coords)
@@ -340,10 +262,11 @@ class Grid(object):
         """
         if x == RANDOM or y == RANDOM:
             coords = self.find_empty()
-        if coords is None:
-            logging.error("Grid full; "
-                          + agent.name + " not added.")
-            return
+            if coords is None:
+                print("ERROR: Grid full; %s not added." % (agent.name))
+                return
+        else:
+            coords = (x, y)
         self._place_agent(coords, agent)
 
     def _place_agent(self, coords, agent):
@@ -356,15 +279,6 @@ class Grid(object):
         agent.pos = [coords[X], coords[Y]]
         if coords in self.empties:
             self.empties.remove(coords)
-
-    def _add_members(self, target_list, x, y):
-        """
-        Helper method to append the contents of a cell
-            to the given list.
-        Override for other grid types.
-        """
-        if self.grid[y][x] is not None:
-            target_list.append(self.grid[y][x])
 
     def _add_members(self, target_list, x, y):
         '''
@@ -409,4 +323,3 @@ class MultiGrid(Grid):
         '''
         for a in self.grid[y][x]:
             target_list.append(a)
-
