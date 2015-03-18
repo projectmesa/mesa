@@ -30,7 +30,6 @@ from mesa.space import Grid
 from mesa.datacollection import DataCollector
 
 from mesa.visualization.TextServer import TextServer
-
 from mesa.visualization.TextVisualization import *
 
 X = 0
@@ -149,7 +148,8 @@ class SchellingTextVisualization(TextVisualization):
 
 
 if __name__ == "__main__":
-    server = TextServer(SchellingModel, SchellingTextVisualization, "Schelling",
+    server = TextServer(SchellingModel,
+                        SchellingTextVisualization, "Schelling",
                         10, 10, 0.8, 0.2, 3)
     server.launch()
     # model = SchellingModel(10, 10, 0.8, 0.2, 3)
