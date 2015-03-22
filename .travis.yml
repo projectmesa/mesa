@@ -1,8 +1,10 @@
 language: python
+os:
+  - linux
 python:
   - "3.4"
 install:
-  - brew install gcc
+  - sudo apt-get install gcc
   - pip install -r requirements.txt
 script:
   # ignore:
