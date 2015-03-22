@@ -73,7 +73,7 @@ class WalkerWorldViz(TextVisualization):
 
 
 if __name__ == "__main__":
-    print "Testing 10x10 world, with 50 random walkers, for 10 steps."
+    print("Testing 10x10 world, with 50 random walkers, for 10 steps.")
     model = WalkerWorld(10, 10, 50)
     viz = WalkerWorldViz(model)
     for i in range(10):
