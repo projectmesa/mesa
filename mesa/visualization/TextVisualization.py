@@ -10,7 +10,8 @@ Classes:
 
 TextVisualization: Class meant to wrap around a Model object and render it
 in some way using Elements, which are stored in a list and rendered in that
-order. Each element, in turn, renders a particular piece of information as text.
+order. Each element, in turn, renders a particular piece of information as
+text.
 
 TextElement: Parent class for all other ASCII elements. render() returns its
 representative string, which can be printed via the overloaded __str__ method.
@@ -28,6 +29,7 @@ Patch value grid).
 
 # Pylint instructions: allow single-character variable names.
 # pylint: disable=invalid-name
+
 
 class TextVisualization(object):
     '''
@@ -74,8 +76,6 @@ class TextVisualization(object):
         self.render()
 
 
-
-
 class TextElement(object):
     '''
     Base class for all TextElements to render.
@@ -96,6 +96,7 @@ class TextElement(object):
 
     def __str__(self):
         return self.render()
+
 
 class TextData(TextElement):
     '''
@@ -134,7 +135,8 @@ class TextGrid(TextElement):
 
         Args:
             grid: The underlying Grid object.
-            converter: function for converting the content of each cell to ascii
+            converter: function for converting the content of each cell
+            to ascii
         '''
         self.grid = grid
         self.converter = converter
@@ -153,8 +155,3 @@ class TextGrid(TextElement):
                     viz += self.converter(c)
             viz += '\n'
         return viz
-
-
-
-
-
