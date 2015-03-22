@@ -77,5 +77,5 @@ if __name__ == "__main__":
     model = WalkerWorld(10, 10, 50)
     viz = WalkerWorldViz(model)
     for i in range(10):
-        print "Step:", str(i)
+        print("Step:", str(i))
         viz.step()
