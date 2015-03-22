@@ -19,6 +19,7 @@ from mesa.time import RandomActivation
 
 from RandomWalk import RandomWalker
 
+
 class WolfSheepPredation(Model):
     '''
     Wolf-Sheep Predation Model
@@ -64,7 +65,7 @@ class WolfSheepPredation(Model):
         self.wolf_gain_from_food = wolf_gain_from_food
         self.grass = grass
         self.sheep_gain_from_food = sheep_gain_from_food
-  
+
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
 
@@ -72,7 +73,7 @@ class WolfSheepPredation(Model):
         for i in range(self.initial_sheep):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
-            sheep = Sheep(self.grid, x,  y, True)
+            sheep = Sheep(self.grid, x, y, True)
             self.grid[y][x].add(sheep)
             self.schedule.add(sheep)
 
@@ -81,7 +82,7 @@ class WolfSheepPredation(Model):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = random.randrange(2 * self.wolf_gain_from_food)
-            wolf = Wolf(self.grid, x,  y, True, energy)
+            wolf = Wolf(self.grid, x, y, True, energy)
             self.grid[y][x].add(wolf)
             self.schedule.add(wolf)
 
@@ -121,7 +122,6 @@ class Wolf(RandomWalker, Agent):
         super().__init__(grid, x, y, moore)
         self.energy = energy
 
-
     def step(self, model):
         self.random_move()
         self.energy -= 1
@@ -140,7 +140,7 @@ class Wolf(RandomWalker, Agent):
         # Reproduction:
         if random.random() < model.wolf_reproduce:
             # Create a new wolf cub
-            cub = Wolf(self.grid, self.x, self.y, self.moore, self.energy/2)
-            self.energy = self.energy/2
+            cub = Wolf(self.grid, self.x, self.y, self.moore, self.energy / 2)
+            self.energy = self.energy / 2
             model.grid[self.y][self.x].add(cub)
             model.schedule.add(cub)

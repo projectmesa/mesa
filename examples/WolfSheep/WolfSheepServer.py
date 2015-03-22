@@ -1,12 +1,13 @@
 from WolfSheep import Wolf, Sheep, WolfSheepPredation
 from mesa.visualization.CanvasServer import CanvasServer
 
+
 def wolf_sheep_portrayal(agent):
     if agent is None:
         return
 
-    portrayal = {"Shape": "circle", 
-                 "x": agent.x, "y": agent.y, 
+    portrayal = {"Shape": "circle",
+                 "x": agent.x, "y": agent.y,
                  "Filled": "true"}
 
     if type(agent) is Sheep:
@@ -20,9 +21,6 @@ def wolf_sheep_portrayal(agent):
         portrayal["Layer"] = 1
     return portrayal
 
-server = CanvasServer(WolfSheepPredation, wolf_sheep_portrayal, 500, 500, 
+server = CanvasServer(WolfSheepPredation, wolf_sheep_portrayal, 500, 500,
                       "WolfSheep")
 server.launch()
-
-
-
