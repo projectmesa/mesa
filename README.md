@@ -1,6 +1,6 @@
 # Project Mesa
 
-[![Coverage Status](https://coveralls.io/repos/projectmesa/mesa/badge.svg)](https://coveralls.io/r/projectmesa/mesa)[![Coverage Status](https://coveralls.io/repos/projectmesa/mesa/badge.svg)](https://coveralls.io/r/projectmesa/mesa)
+[![Coverage Status](https://coveralls.io/repos/projectmesa/mesa/badge.svg)](https://coveralls.io/r/projectmesa/mesa)
 
 ### Warning: work in progress!
 
