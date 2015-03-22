@@ -25,7 +25,7 @@ install:
   - make lapacklib
   - make clean
   - export LAPACK=~/src/lapack-*/libflapack.a
-  - cd FOLDER
+  - cd $FOLDER
   - pip install -r requirements.txt
 script:
   # ignore:
