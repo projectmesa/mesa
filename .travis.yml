@@ -4,6 +4,7 @@ os:
 python:
   - "3.4"
 install:
+  - sudo apt-get install gcc
   - sudo apt-get install libblas-dev liblapack-dev
   - pip install -r requirements.txt
 script:
