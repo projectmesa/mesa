@@ -28,6 +28,7 @@ seeds consistent and allow for replication.
 
 import random
 
+
 class BaseScheduler(object):
     '''
     Simplest scheduler; activates agents one at a time, in the order they were
@@ -73,7 +74,6 @@ class BaseScheduler(object):
         '''
         while agent in self.agents:
             self.agents.remove(agent)
-
 
     def step(self):
         '''
