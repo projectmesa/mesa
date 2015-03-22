@@ -1,5 +1,7 @@
 numpy==1.9.1
-scipy==0.15.1
-tornado==4.0.2
 pandas==0.15.2
+ipython
+scipy
+
+tornado==4.0.2
 flake8==2.4.0
