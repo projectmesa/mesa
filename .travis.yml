@@ -4,7 +4,7 @@ os:
 python:
   - "3.4"
 install:
-  - apt-get install libblas-dev liblapack-dev
+  - sudo apt-get install libblas-dev liblapack-dev
   - pip install -r requirements.txt
 script:
   # ignore:
