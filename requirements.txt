@@ -2,3 +2,5 @@ numpy
 scipy
 tornado
 pandas
+
+flake8
