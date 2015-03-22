@@ -12,7 +12,7 @@ script:
   # ignore:
   # * E501 - line length limit
   # * E123 - indentation on data structures
-  - flake8 . --ignore=F403,E501,E123 --exclude=docs/
+  - flake8 . --ignore=F403,E501,E123,E128 --exclude=docs/
 
 after_success:
   - coveralls
