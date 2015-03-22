@@ -4,7 +4,25 @@ os:
 python:
   - "3.4"
 install:
-  - sudo apt-get install gcc
+  - mkdir -p ~/src/
+  - cd ~/src/
+  - wget http://www.netlib.org/blas/blas.tgz
+  - tar xzf blas.tgz
+  - cd BLAS
+  - gfortran -O3 -std=legacy -m64 -fno-second-underscore -fPIC -c *.f
+  - ar r libfblas.a *.o
+  - ranlib libfblas.a
+  - rm -rf *.o
+  - export BLAS=~/src/BLAS/libfblas.a
+  - mkdir -p ~/src
+  - cd ~/src/
+  - wget http://www.netlib.org/lapack/lapack.tgz
+  - tar xzf lapack.tgz
+  - cd lapack-*/
+  - cp INSTALL/make.inc.gfortran make.inc
+  - make lapacklib
+  - make clean
+  - export LAPACK=~/src/lapack-*/libflapack.a
   - pip install -r requirements.txt
 script:
   # ignore:
