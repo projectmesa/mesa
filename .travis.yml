@@ -8,11 +8,12 @@ install:
   - sudo apt-get install libblas-dev liblapack-dev
   - pip install numpy==1.9.1 pandas==0.15.2 tornado==4.0.2 flake8==2.4.0 matplotlib sympy nose
   - travis_wait pip install scipy
+  - pip install coveralls
 script:
-  # ignore:
+  - coverage run --source mesa setup.py test
+
   # * E501 - line length limit
   # * E123 - indentation on data structures
   - flake8 . --ignore=F403,E501,E123,E128 --exclude=docs/
-
 after_success:
   - coveralls
