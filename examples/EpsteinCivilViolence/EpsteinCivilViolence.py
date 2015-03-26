@@ -246,25 +246,24 @@ class CivilViolenceModel(Model):
         if self.cop_density + self.citizen_density > 1:
             raise ValueError(
                 'Cop density + citizen density must be less than 1')
-        for x in range(self.width):
-            for y in range(self.height):
-                if random.random() < self.cop_density:
-                    cop = Cop(unique_id, x, y, vision=self.cop_vision,
-                              model=self)
-                    unique_id += 1
-                    self.grid[y][x] = cop
-                    self.schedule.add(cop)
-                elif random.random() < (
-                        self.cop_density + self.citizen_density):
-                    citizen = Citizen(unique_id, x, y,
-                                      hardship=random.random(),
-                                      regime_legitimacy=self.legitimacy,
-                                      risk_aversion=random.random(),
-                                      threshold=self.active_threshold,
-                                      vision=self.citizen_vision, model=self)
-                    unique_id += 1
-                    self.grid[y][x] = citizen
-                    self.schedule.add(citizen)
+        for (contents, x, y) in self.grid.coord_iter():
+            if random.random() < self.cop_density:
+                cop = Cop(unique_id, x, y, vision=self.cop_vision,
+                          model=self)
+                unique_id += 1
+                self.grid[y][x] = cop
+                self.schedule.add(cop)
+            elif random.random() < (
+                    self.cop_density + self.citizen_density):
+                citizen = Citizen(unique_id, x, y,
+                                  hardship=random.random(),
+                                  regime_legitimacy=self.legitimacy,
+                                  risk_aversion=random.random(),
+                                  threshold=self.active_threshold,
+                                  vision=self.citizen_vision, model=self)
+                unique_id += 1
+                self.grid[y][x] = citizen
+                self.schedule.add(citizen)
 
     def step(self):
         """

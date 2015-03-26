@@ -64,7 +64,7 @@ class WolfSheepPredation(Model):
         self.wolf_gain_from_food = wolf_gain_from_food
         self.grass = grass
         self.sheep_gain_from_food = sheep_gain_from_food
-  
+
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
 
