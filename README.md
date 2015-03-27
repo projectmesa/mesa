@@ -1,5 +1,7 @@
 # Project Mesa
 
+[![Coverage Status](https://coveralls.io/repos/projectmesa/mesa/badge.svg)](https://coveralls.io/r/projectmesa/mesa)
+
 ### Warning: work in progress!
 
 Mesa is a new agent-based modeling framework being written in Python.
@@ -25,7 +27,7 @@ Step -1.
 * Install [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/)
 
 Step 0.
-* Create the virtual environment: 
+* Create the virtual environment:
     * (If you have Python 3 only) mkvirtualenv mesa
     * (If you have both versions) mkvirtualenv mesa -p *path/to/python3*
         - On OSX or Linux, you can find the Python 3 path via *which python3*
