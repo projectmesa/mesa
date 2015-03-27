@@ -27,7 +27,7 @@ class Grid(object):
     '''
     Base class for a square grid.
 
-    Grid cells are indexed by [y][x], where [0][0] is assumed to be the top-left
+    Grid cells are indexed by [y][x], where [0][0] is assumed to be -- top-left
     and [height-1][width-1] is the bottom-right. If a grid is toroidal, the top
     and bottom, and left and right, edges wrap to each other
 
@@ -297,7 +297,7 @@ class MultiGrid(Grid):
     '''
     Grid where each cell can contain more than one object.
 
-    Grid cells are indexed by [y][x], where [0][0] is assumed to be the top-left
+    Grid cells are indexed by [y][x], where [0][0] is assumed to be -- top-left
     and [height-1][width-1] is the bottom-right. If a grid is toroidal, the top
     and bottom, and left and right, edges wrap to each other.
 

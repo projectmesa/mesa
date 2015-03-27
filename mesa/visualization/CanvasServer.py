@@ -60,7 +60,7 @@ Server -> Client:
     "data": {0:[ {"Shape": "circle", "x": 0, "y": 0, "r": 0.5,
                 "Color": "#AAAAAA", "Filled": "true", "Layer": 1}]
             }
-             
+
     }
 
     Informs the client that the model is over.
@@ -91,6 +91,7 @@ import tornado.escape
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
 # pylint: disable=attribute-defined-outside-init
+
 
 class PageHandler(tornado.web.RequestHandler):
     '''
@@ -173,11 +174,13 @@ class CanvasServer(object):
         multigrid: Boolean whether the grid is a MultiGrid or not.
 
         max_steps: Maximum number of steps to pre-run the model for.
-        viz_states: List of dictionaries representing the rendering of the model
-                    at each step.
+        viz_states: List of dictionaries representing the rendering of the
+            model at each step.
 
-        model_args: Tuple of positional arguments to pass to each new model obj.
-        model_kwargs: Dictionary of keyword arguments to pass to each new model.
+        model_args: Tuple of positional arguments to pass to each new
+            model obj.
+        model_kwargs: Dictionary of keyword arguments to pass to each
+            new model.
 
     '''
 
@@ -198,8 +201,8 @@ class CanvasServer(object):
     model_args = ()
     model_kwargs = {}
 
-    def __init__(self, model_cls, portrayal_method, canvas_height, canvas_width,
-                 name="Mesa Model", *args, **kwargs):
+    def __init__(self, model_cls, portrayal_method, canvas_height,
+                 canvas_width, name="Mesa Model", *args, **kwargs):
         '''
         Create a new canvas visualization server.
 
@@ -267,7 +270,9 @@ class CanvasServer(object):
         Run the model forward and store each viz state.
         #TODO: Have this run concurrently (I think) inside the event loop?
         '''
-        while self.model.schedule.steps < self.max_steps and self.model.running:
+        steps = self.model.schedule.steps
+        max_steps = self.max_steps
+        while steps < max_steps and self.model.running:
             self.model.step()
             self.viz_states.append(self.get_viz())
         if self.verbose:

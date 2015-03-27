@@ -1,6 +1,7 @@
 from itertools import product
 import pandas as pd
 
+
 class BatchRunner(object):
     '''
     Manage a batch run or parameter sweep of a given model.
@@ -37,16 +38,16 @@ class BatchRunner(object):
                     {"param_1": range(5),
                      "param_2": [1, 5, 10],
                       "const_param": 100}
-            iterations: How many times to run the model at each combination of 
+            iterations: How many times to run the model at each combination of
                 parameters.
-            max_steps: After how many steps to halt each run if it hasn't 
+            max_steps: After how many steps to halt each run if it hasn't
                 halted on its own.
             model_reporters: Dictionary of variables to collect on each run at
                 the end, with variable names mapped to a function to collect
                 them. For example:
                     {"agent_count": lambda m: m.schedule.get_agent_count()}
             agent_reporters: Like model_reporters, but each variable is now
-                collected at the level of each agent present in the model at 
+                collected at the level of each agent present in the model at
                 the end of the run.
         '''
         self.model_cls = model_cls
@@ -54,7 +55,6 @@ class BatchRunner(object):
                                  for param, vals in parameter_values.items()}
         self.iterations = iterations
         self.max_steps = max_steps
-
 
         self.model_reporters = model_reporters
         self.agent_reporters = agent_reporters
@@ -79,7 +79,7 @@ class BatchRunner(object):
                 self.run_model(model)
                 # Collect and store results:
                 if self.model_reporters:
-                    key = tuple(list(param_values)  + [run_count])
+                    key = tuple(list(param_values) + [run_count])
                     self.model_vars[key] = self.collect_model_vars(model)
                 if self.agent_reporters:
                     for agent_id, reports in self.collect_agent_vars.items():
