@@ -5,6 +5,7 @@ Visualize a Schelling model via a Canvas server.
 from Schelling import SchellingModel
 from mesa.visualization.CanvasServer import CanvasServer
 
+
 def schelling_draw(agent):
     if agent is None:
         return
@@ -18,6 +19,6 @@ def schelling_draw(agent):
     return portrayal
 
 server = CanvasServer(SchellingModel, schelling_draw, 500, 500,
-        "Schelling", 10, 10, 0.8, 0.2, 3)
+                      "Schelling", 10, 10, 0.8, 0.2, 3)
 
 server.launch()

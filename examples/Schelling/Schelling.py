@@ -30,7 +30,8 @@ from mesa.space import Grid
 from mesa.datacollection import DataCollector
 
 from mesa.visualization.TextServer import TextServer
-from mesa.visualization.TextVisualization import *
+from mesa.visualization.TextVisualization import (TextData, TextGrid,
+    TextVisualization)
 
 X = 0
 Y = 1
