@@ -83,6 +83,7 @@ import tornado.escape
 # Attributes being defined outside of init is a Tornado feature.
 # pylint: disable=attribute-defined-outside-init
 
+
 class PageHandler(tornado.web.RequestHandler):
     '''
     Handler for the HTML template which holds the visualization.
@@ -151,16 +152,18 @@ class TextServer(object):
         model_name: Name to display in the browser. (defaults to "Mesa Model")
 
         model_cls: The class of the model to render.
-        text_visualization_cls: The TextVisualization subclass describing how to
-                                render the model.
+        text_visualization_cls: The TextVisualization subclass describing
+            how to render the model.
         port: (default 8888) Port to listen on.
 
         max_steps: Maximum number of steps to pre-run the model for.
-        viz_states: List of dictionaries representing the rendering of the model
-                    at each step.
+        viz_states: List of dictionaries representing the rendering of the
+            model at each step.
 
-        model_args: Tuple of positional arguments to pass to each new model obj.
-        model_kwargs: Dictionary of keyword arguments to pass to each new model.
+        model_args: Tuple of positional arguments to pass to each new
+            model obj.
+        model_kwargs: Dictionary of keyword arguments to pass to each new
+            model.
 
     '''
 
@@ -187,8 +190,8 @@ class TextServer(object):
 
         Args:
             model_cls: A model class to visualize
-            text_visualization_cls: The text visualization class associated with
-                                    the model class.
+            text_visualization_cls: The text visualization class associated
+                with the model class.
             name: A name for the model.
             *args, **kwargs: Default arguments to create a model with.
         '''
@@ -239,7 +242,9 @@ class TextServer(object):
         Run the model forward and store each viz state.
         #TODO: Have this run concurrently (I think) inside the event loop?
         '''
-        while self.model.schedule.steps < self.max_steps and self.model.running:
+        steps = self.model.schedule.steps
+        max_steps = self.max_steps
+        while steps < max_steps and self.model.running:
             self.model.step()
             self.viz_states.append(self.get_viz())
         if self.verbose:

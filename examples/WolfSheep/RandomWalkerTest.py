@@ -1,5 +1,6 @@
 '''
-Testing the RandomWalker by having an ABM composed only of random walker agents.
+Testing the RandomWalker by having an ABM composed only of random walker
+agents.
 '''
 
 import random
@@ -7,10 +8,8 @@ import random
 from mesa import Model, Agent
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
-from mesa.visualization.TextVisualization import TextVisualization, TextData, TextGrid
-
+from mesa.visualization.TextVisualization import TextVisualization, TextGrid
 from RandomWalk import RandomWalker
-
 
 
 class WalkerAgent(RandomWalker, Agent):
@@ -20,6 +19,7 @@ class WalkerAgent(RandomWalker, Agent):
 
     def step(self, model):
         self.random_move()
+
 
 class WalkerWorld(Model):
     '''
@@ -54,7 +54,6 @@ class WalkerWorld(Model):
         self.schedule.step()
 
 
-
 class WalkerWorldViz(TextVisualization):
     '''
     ASCII Visualization for a WalkerWorld agent.
@@ -74,10 +73,9 @@ class WalkerWorldViz(TextVisualization):
 
 
 if __name__ == "__main__":
-    print "Testing 10x10 world, with 50 random walkers, for 10 steps."
+    print("Testing 10x10 world, with 50 random walkers, for 10 steps.")
     model = WalkerWorld(10, 10, 50)
     viz = WalkerWorldViz(model)
     for i in range(10):
-        print "Step:", str(i)
+        print("Step:", str(i))
         viz.step()
-

@@ -4,6 +4,7 @@ Generalized behavior for random walking, one grid cell at a time.
 
 import random
 
+
 class RandomWalker(object):
     '''
     Class implementing random walker methods in a generalized manner.
@@ -23,7 +24,7 @@ class RandomWalker(object):
         grid: The MultiGrid object in which the agent lives.
         x: The agent's current x coordinate
         y: The agent's current y coordinate
-        moore: If True, may move in all 8 directions. 
+        moore: If True, may move in all 8 directions.
                 Otherwise, only up, down, left, right.
         '''
         self.grid = grid
@@ -62,16 +63,3 @@ class RandomWalker(object):
         self.grid[new_y][new_x].add(self)
         self.x = new_x
         self.y = new_y
-        
-
-
-
-
-
-
-
-
-
-
-
-

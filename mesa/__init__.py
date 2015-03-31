@@ -7,12 +7,13 @@ Core Objects: Model, and Agent.
 import datetime as dt
 import random
 
+
 class Model(object):
     '''
     Base class for models.
     '''
-    seed = None # Seed for the random number generator
-    schedule = None # Schedule object
+    seed = None  # Seed for the random number generator
+    schedule = None  # Schedule object
     running = None
 
     def __init__(self, seed=None):
@@ -27,7 +28,6 @@ class Model(object):
         random.seed(seed)
         self.running = True
 
-
     def run_model(self):
         '''
         Run the model until the end condition is reached. Overload as needed.
@@ -35,12 +35,12 @@ class Model(object):
         while self.running:
             self.step()
 
-
     def step(self):
         '''
         A single step. Fill in here.
         '''
         pass
+
 
 class Agent(object):
     '''
@@ -61,10 +61,3 @@ class Agent(object):
         A single step of the agent.
         '''
         pass
-
-
-
-
-
-
-
