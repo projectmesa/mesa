@@ -3,6 +3,7 @@ import random
 from mesa import Model, Agent
 from mesa.time import RandomActivation
 from mesa.space import Grid
+from mesa.datacollection import DataCollector
 
 class TreeCell(Agent):
     '''
@@ -58,6 +59,10 @@ class ForestFire(Model):
         # Set up model objects
         self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=False)
+        self.datacollector = DataCollector(
+                    {"Fine": lambda m: self.count_type(m, "Fine"),
+                     "On Fire": lambda m: self.count_type(m, "On Fire"),
+                     "Burned Out": lambda m: self.count_type(m, "Burned Out")})
         
         # Place a tree in each cell with Prob = density
         for x in range(self.width):
@@ -77,6 +82,8 @@ class ForestFire(Model):
         Advance the model by one step.
         '''
         self.schedule.step()
+        self.datacollector.collect(self)
+        
         # Halt if no more fire
         if self.count_type(self, "On Fire") == 0:
             self.running = False
