@@ -16,5 +16,5 @@ def forestfire_draw(tree):
     return portrayal
 
 server = CanvasServer(ForestFire, forestfire_draw, 500, 500,
-                      "Forest Fire", 100, 100, 0.65)
+                      "Forest Fire", 100, 100, 0.45)
 server.launch()
