@@ -7,7 +7,7 @@ def wolf_sheep_portrayal(agent):
         return
 
     portrayal = {"Shape": "circle",
-                 "x": agent.x, "y": agent.y,
+                 "x": agent.pos[0], "y": agent.pos[1],
                  "Filled": "true"}
 
     if type(agent) is Sheep:

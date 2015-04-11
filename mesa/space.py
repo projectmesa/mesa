@@ -5,7 +5,7 @@ Mesa Space Module
 Objects used to add a spatial component to a model.
 
 Grid: base grid, a simple list-of-lists.
-
+SingleGrid: grid which strictly enforces one object per cell.
 MultiGrid: extension to Grid where each cell is a set of objects.
 
 '''
@@ -92,7 +92,6 @@ class Grid(object):
             row = []
             for x in range(self.width):
                 row.append(self.default_val())
-                self.empties.append((x, y))
             self.grid.append(row)
 
     def __getitem__(self, index):
@@ -138,7 +137,7 @@ class Grid(object):
                 Moore, 5 if Von Neumann
                 (8 and 4 if not including the center).
         """
-        coordinates = []
+        coordinates = set()
         for dy in range(-radius, radius + 1):
             for dx in range(-radius, radius + 1):
                 if dx == 0 and dy == 0 and not include_center:
@@ -155,8 +154,8 @@ class Grid(object):
                 if(self.out_of_bounds(px, py)):
                     continue
 
-                coordinates.append((px, py))
-        return coordinates
+                coordinates.add((px, py))
+        return list(coordinates)
 
     def get_neighbors(self, x, y, moore,
                       include_center=False, radius=1):
@@ -212,43 +211,100 @@ class Grid(object):
             self._add_members(contents, x, y)
         return contents
 
-    def exists_empty_cells(self):
-        """
-        Return True if any cells empty else False.
-        """
-        return len(self.empties) > 0
+    def move_agent(self, agent, pos):
+        '''
+        Move an agent from its current position to a new position.
 
-    def swap_pos(self, a1, a2):
-        """
-        Swap two agents in the grid.
-        """
-        c1 = self.get_pos_components(a1)
-        c2 = self.get_pos_components(a2)
-        self._place_agent(c2, a1)
-        self._place_agent(c1, a2)
+        Args:
+            agent: Agent object to move. Assumed to have its current location
+                   stored in a 'pos' tuple.
+            pos: Tuple of new position to move the agent to.
+        '''
+
+        self._place_agent(pos, agent)
+        self._remove_agent(agent.pos, agent)
+        agent.pos = pos
+
+    def place_agent(self, agent, pos):
+        '''
+        Position an agent on the grid, and set its pos variable.
+        '''
+        self._place_agent(pos, agent)
+        agent.pos = pos
+
+    def _place_agent(self, coords, agent):
+        '''
+        Place the agent at the correct location.
+        '''
+        x, y = coords
+        self.grid[y][x] = agent
+
+    def _remove_agent(self, coords, agent):
+        '''
+        Remove the agent from the given location.
+        '''
+        x, y = coords
+        self.grid[y][x] = None
+
+    def _add_members(self, target_list, x, y):
+        '''
+        Helper method to append the contents of a cell to the given list.
+        Override for other grid types.
+        '''
+        if self.grid[y][x] is not None:
+            target_list.append(self.grid[y][x])
+
+    def is_cell_empty(self, coords):
+        x, y = coords
+        return True if self.grid[y][x] == self.default_val() else False
+
+
+class SingleGrid(Grid):
+    '''
+    Grid where each cell contains exactly at most one object.
+    '''
+
+    def __init__(self, height, width, torus):
+        '''
+        Create a new single-item grid.
+
+        Args:
+            height, width: The height and width of the grid
+            torus: Boolean whether the grid wraps or not.
+        '''
+        super().__init__(height, width, torus)
+        # Add all cells to the empties list.
+        self.empties = list(itertools.product(
+                            *(range(self.width), range(self.height))))
 
     def move_to_empty(self, agent):
         """
-        Moves agent to an empty cell, vacating agent's old cell.
+        Moves agent to a random empty cell, vacating agent's old cell.
         """
         coords = agent.pos
         new_coords = self.find_empty()
         if new_coords is None:
-            print("ERROR: Agent could not move because no cells are empty")
+            raise Exception("ERROR: No empty cells")
         else:
             self._place_agent(new_coords, agent)
-            self._make_empty(coords)
-
-    def _make_empty(self, coords):
-        self.empties.append(coords)
-        self.grid[coords[Y]][coords[X]] = None
+            agent.pos = new_coords
+            self._remove_agent(coords, agent)
 
     def find_empty(self):
+        '''
+        Pick a random empty cell.
+        '''
         if self.exists_empty_cells():
             coords = random.choice(self.empties)
             return coords
         else:
             return None
+
+    def exists_empty_cells(self):
+        """
+        Return True if any cells empty else False.
+        """
+        return len(self.empties) > 0
 
     def position_agent(self, agent, x=RANDOM, y=RANDOM):
         """
@@ -263,34 +319,22 @@ class Grid(object):
         if x == RANDOM or y == RANDOM:
             coords = self.find_empty()
             if coords is None:
-                print("ERROR: Grid full; %s not added." % (agent.name))
-                return
+                raise Exception("ERROR: Grid full")
         else:
             coords = (x, y)
+        agent.pos = coords
         self._place_agent(coords, agent)
 
     def _place_agent(self, coords, agent):
-        """
-        A little function to make sure the grid's notion
-        of where the agent is and the agent's notion are
-        always in sync
-        """
-        self.grid[coords[Y]][coords[X]] = agent
-        agent.pos = [coords[X], coords[Y]]
-        if coords in self.empties:
+        if self.is_cell_empty(coords):
+            super()._place_agent(coords, agent)
             self.empties.remove(coords)
+        else:
+            raise Exception("Cell not empty")
 
-    def _add_members(self, target_list, x, y):
-        '''
-        Helper method to append the contents of a cell to the given list.
-        Override for other grid types.
-        '''
-        if self.grid[y][x] is not None:
-            target_list.append(self.grid[y][x])
-
-    def is_cell_empty(self, coords):
-        x, y = coords
-        return True if self.grid[y][x] is None else False
+    def _remove_agent(self, coords, agent):
+        super()._remove_agent(coords, agent)
+        self.empties.append(coords)
 
 
 class MultiGrid(Grid):
@@ -316,6 +360,20 @@ class MultiGrid(Grid):
     '''
 
     default_val = lambda s: set()
+
+    def _place_agent(self, coords, agent):
+        '''
+        Place the agent at the correct location.
+        '''
+        x, y = coords
+        self.grid[y][x].add(agent)
+
+    def _remove_agent(self, coords, agent):
+        '''
+        Remove the agent from the given location.
+        '''
+        x, y = coords
+        self.grid[y][x].remove(agent)
 
     def _add_members(self, target_list, x, y):
         '''
