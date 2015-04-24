@@ -270,9 +270,7 @@ class CanvasServer(object):
         Run the model forward and store each viz state.
         #TODO: Have this run concurrently (I think) inside the event loop?
         '''
-        steps = self.model.schedule.steps
-        max_steps = self.max_steps
-        while steps < max_steps and self.model.running:
+        while self.model.schedule.steps < self.max_steps and self.model.running:
             self.model.step()
             self.viz_states.append(self.get_viz())
         if self.verbose:

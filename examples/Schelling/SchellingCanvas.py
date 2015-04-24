@@ -10,8 +10,8 @@ def schelling_draw(agent):
     if agent is None:
         return
     portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
-    portrayal["x"] = agent.x
-    portrayal["y"] = agent.y
+    portrayal["x"] = agent.pos[0]
+    portrayal["y"] = agent.pos[1]
     if agent.type == 0:
         portrayal["Color"] = "#AA0000"
     else:

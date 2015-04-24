@@ -26,7 +26,7 @@ import random
 
 from mesa import Model, Agent
 from mesa.time import RandomActivation
-from mesa.space import Grid
+from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 
 from mesa.visualization.TextServer import TextServer
@@ -53,7 +53,7 @@ class SchellingModel(Model):
         self.homophily = homophily
 
         self.schedule = RandomActivation(self)
-        self.grid = Grid(height, width, torus=True)
+        self.grid = SingleGrid(height, width, torus=True)
 
         self.happy = 0
         self.datacollector = DataCollector(

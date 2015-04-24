@@ -74,7 +74,7 @@ class WolfSheepPredation(Model):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             sheep = Sheep(self.grid, x, y, True)
-            self.grid[y][x].add(sheep)
+            self.grid.place_agent(sheep, (x, y))
             self.schedule.add(sheep)
 
         # Create wolves
@@ -83,7 +83,7 @@ class WolfSheepPredation(Model):
             y = random.randrange(self.height)
             energy = random.randrange(2 * self.wolf_gain_from_food)
             wolf = Wolf(self.grid, x, y, True, energy)
-            self.grid[y][x].add(wolf)
+            self.grid.place_agent(wolf, (x, y))
             self.schedule.add(wolf)
 
         self.running = True
@@ -106,8 +106,9 @@ class Sheep(RandomWalker, Agent):
         self.random_move()
         if random.random() < model.sheep_reproduce:
             # Create a new sheep:
-            lamb = Sheep(self.grid, self.x, self.y, self.moore)
-            model.grid[self.y][self.x].add(lamb)
+            x, y = self.pos
+            lamb = Sheep(self.grid, x, y, self.moore)
+            model.grid[y][x].add(lamb)
             model.schedule.add(lamb)
 
 
@@ -127,20 +128,21 @@ class Wolf(RandomWalker, Agent):
         self.energy -= 1
 
         # If there are sheep present, eat one
-        this_cell = model.grid[self.y][self.x]
+        x, y = self.pos
+        this_cell = model.grid[y][x]
         sheep = [obj for obj in this_cell if isinstance(obj, Sheep)]
         if len(sheep) > 0:
             sheep_to_eat = random.choice(sheep)
             self.energy += model.wolf_gain_from_food
 
             # Kill the sheep
-            model.grid[self.y][self.x].remove(sheep_to_eat)
+            model.grid[y][x].remove(sheep_to_eat)
             model.schedule.remove(sheep_to_eat)
 
         # Reproduction:
         if random.random() < model.wolf_reproduce:
             # Create a new wolf cub
-            cub = Wolf(self.grid, self.x, self.y, self.moore, self.energy / 2)
+            cub = Wolf(self.grid, x, y, self.moore, self.energy / 2)
             self.energy = self.energy / 2
-            model.grid[self.y][self.x].add(cub)
+            model.grid[y][x].add(cub)
             model.schedule.add(cub)

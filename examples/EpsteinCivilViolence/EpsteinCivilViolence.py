@@ -54,8 +54,7 @@ class Citizen(Agent):
         super(Citizen, self).__init__(unique_id, model)
         self.breed = 'citizen'
         self.unique_id = unique_id
-        self.x = x
-        self.y = y
+        self.pos = (x, y)
         self.hardship = hardship
         self.regime_legitimacy = regime_legitimacy
         self.risk_aversion = risk_aversion
@@ -83,17 +82,14 @@ class Citizen(Agent):
                 self.grievance - net_risk) <= self.threshold:
             self.condition = 'Quiescent'
         if model.movement and self.empty_neighbors:
-            new_x, new_y = random.choice(self.empty_neighbors)
-            model.grid[self.y][self.x] = None
-            model.grid[new_y][new_x] = self
-            self.x = new_x
-            self.y = new_y
+            new_pos = random.choice(self.empty_neighbors)
+            model.grid.move_agent(self, new_pos)
 
     def update_neighbors(self, model):
         """
         Look around and see who my neighbors are
         """
-        self.neighborhood = model.grid.get_neighborhood(self.x, self.y,
+        self.neighborhood = model.grid.get_neighborhood(self.pos[0], self.pos[1],
                                                         moore=False, radius=1)
         self.neighbors = model.grid.get_cell_list_contents(self.neighborhood)
         self.empty_neighbors = [c for c in self.neighborhood if
@@ -108,9 +104,9 @@ class Citizen(Agent):
         cops_in_vision = len([c for c in self.neighbors if c.breed == 'cop'])
         actives_in_vision = 1.  # citizen counts herself
         for c in self.neighbors:
-            if c.breed == 'citizen' and \
-                    c.condition == 'Active' and \
-                    c.jail_sentence == 0:
+            if (c.breed == 'citizen' and
+                    c.condition == 'Active' and
+                    c.jail_sentence == 0):
                 actives_in_vision += 1
         self.arrest_probability = 1 - math.exp(
             -1 * model.arrest_prob_constant * (
@@ -141,8 +137,7 @@ class Cop(Agent):
         """
         super(Cop, self).__init__(unique_id, model)
         self.breed = 'cop'
-        self.x = x
-        self.y = y
+        self.pos = (x, y)
         self.vision = vision
 
     def step(self, model):
@@ -162,17 +157,14 @@ class Cop(Agent):
             sentence = random.randint(0, model.max_jail_term)
             arrestee.jail_sentence = sentence
         if model.movement and self.empty_neighbors:
-            new_x, new_y = random.choice(self.empty_neighbors)
-            model.grid[self.y][self.x] = None
-            model.grid[new_y][new_x] = self
-            self.x = new_x
-            self.y = new_y
+            new_pos = random.choice(self.empty_neighbors)
+            model.grid.move_agent(self, new_pos)
 
     def update_neighbors(self, model):
         """
         Look around and see who my neighbors are.
         """
-        self.neighborhood = model.grid.get_neighborhood(self.x, self.y,
+        self.neighborhood = model.grid.get_neighborhood(self.pos[0], self.pos[1],
                                                         moore=False, radius=1)
         self.neighbors = model.grid.get_cell_list_contents(self.neighborhood)
         self.empty_neighbors = [c for c in self.neighborhood if
@@ -232,8 +224,8 @@ class CivilViolenceModel(Model):
             "Active": lambda m: self.count_type_citizens(m, "Active"),
             "Jailed": lambda m: self.count_jailed(m)}
         agent_reporters = {
-            "x": lambda a: a.x,
-            "y": lambda a: a.y,
+            "x": lambda a: a.pos[0],
+            "y": lambda a: a.pos[1],
             'breed': lambda a: a.breed,
             "jail_sentence": lambda a: getattr(a, 'jail_sentence', None),
             "condition": lambda a: getattr(a, "condition", None),

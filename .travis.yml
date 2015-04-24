@@ -6,7 +6,7 @@ python:
 install:
   - sudo apt-get install gfortran
   - sudo apt-get install libblas-dev liblapack-dev
-  - pip install numpy==1.9.1 pandas==0.15.2 tornado==4.0.2 flake8==2.4.0 matplotlib sympy nose
+  - pip install numpy==1.9.1 pandas==0.15.2 tornado==4.0.2 flake8==2.4.0 matplotlib sympy nose coverage
   - travis_wait pip install scipy
   - pip install coveralls
 script:
@@ -15,5 +15,6 @@ script:
   # * E501 - line length limit
   # * E123 - indentation on data structures
   - flake8 . --ignore=F403,E501,E123,E128 --exclude=docs/
+  - nosetests --with-coverage
 after_success:
   - coveralls
