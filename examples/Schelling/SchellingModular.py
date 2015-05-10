@@ -1,8 +1,6 @@
 from Schelling import SchellingModel
-from mesa.visualization.ModularTextVisualization import TextElement
-from mesa.visualization.ModularCanvasGridVisualization import CanvasGrid
-from mesa.visualization.ModularChartVisualization import ChartModule
 from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
 
 
 class HappyElement(TextElement):

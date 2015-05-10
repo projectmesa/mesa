@@ -1,6 +1,5 @@
 from ForestFire import ForestFire
-from mesa.visualization.ModularCanvasGridVisualization import CanvasGrid
-from mesa.visualization.ModularChartVisualization import ChartModule
+from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.ModularVisualization import ModularServer
 
 
