@@ -31,6 +31,7 @@
 
 		var player; // Variable to store the continuous player
 		var control = new MesaVisualizationControl();
+		var elements = [];  // List of Element objects
 
 
 		// WebSocket Stuff
@@ -45,11 +46,9 @@
 			//console.log(message.data);
 			switch (msg["type"]) {
 				case "viz_state":
-					elements = msg["data"]
+					data = msg["data"]
 					for (var i in elements) {
-						var element = elements[i];
-						var render = $("#element_" + i).data("render");
-						render(element);
+						elements[i].render(data[i]);
 					}
 					break;
 				case "end":
@@ -79,14 +78,10 @@
 			send({"type": "reset"});
 
 			// Reset all the visualizations
-			var divs = document.getElementsByTagName("div");
-			for (var i in divs) {
-				var div = divs[i];
-				if (div.id.substring(0,8) != "element_") continue;
-				var div_reset = $("#" + div.id).data("reset");
-				div_reset();
+			for (var i in elements) {
+				elements[i].reset();
 			}
-		}
+		};
 
 		/**
 		Send a message to the server get the next visualization state.
@@ -96,7 +91,7 @@
 				control.tick += 1;
 				send({"type": "get_step", "step": control.tick});
 			}
-		}
+		};
 		/**
 		Call the step function at fixed intervals, until getting an end message from the server.
 		*/
@@ -105,23 +100,24 @@
 				if (!control.running) clearInterval(player);
 				step();
 			}, 1000/control.fps);
-		}
+		};
 		/**
 		Pause the run() function, but leave all other variables as they are.
 		*/
 		var pause = function() {
 			clearInterval(player);
-		}
+		};
 	</script>
 	
 </head>
 <body>
 	<h2>{{ model_name }}</h2> <!-- Template; put the model name as the heading -->
 
-	{% for element in elements %}
-		{%module VisualizationModule(element) %}
-	{% end %}
 
+<!-- Script includes go here -->
+	{% for file_name in includes %}
+		<script src="/static/{{ file_name }}" type="text/javascript"></script>
+	{% end %}
 <script>
 	// Set up the GUI
 	var gui = new dat.GUI();
@@ -139,6 +135,12 @@
 		pause();
 		run();
 	});
+
+	// Element-specific scripts go here:
+	// Actual script snippets go here.
+	{% for script in scripts %}
+			{% raw script %}
+	{% end %}
 
 </script>
 

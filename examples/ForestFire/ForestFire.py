@@ -65,15 +65,12 @@ class ForestFire(Model):
         # Set up model objects
         self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=False)
-<<<<<<< HEAD
 
-=======
         self.datacollector = DataCollector(
                     {"Fine": lambda m: self.count_type(m, "Fine"),
                      "On Fire": lambda m: self.count_type(m, "On Fire"),
                      "Burned Out": lambda m: self.count_type(m, "Burned Out")})
         
->>>>>>> b35f0d4... Updating ForestFire visualization
         # Place a tree in each cell with Prob = density
         for (contents, x, y) in self.grid.coord_iter():
             if random.random() < self.density:
@@ -92,7 +89,7 @@ class ForestFire(Model):
         '''
         self.schedule.step()
         self.datacollector.collect(self)
-        
+
         # Halt if no more fire
         if self.count_type(self, "On Fire") == 0:
             self.running = False

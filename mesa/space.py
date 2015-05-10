@@ -151,7 +151,6 @@ class Grid(object):
                 # Skip if not a torus and new coords out of bounds.
                 if not self.torus and (not (0 < dx + x < self.width) or
                                            not (0 < dy + y < self.height)):
->>>>>>> c1a04d1... Fixing a serious bug in Grid
                     continue
 
                 coordinates.add((px, py))
