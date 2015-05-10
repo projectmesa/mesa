@@ -12,15 +12,13 @@ a multilayered HTML5 canvas.
 
 The actual server is launched with one or more VisualizationElements;
 it runs the model object through each of them, generating data to be sent to
-the client. The client page is also generated based on the template provided
-by each element.
+the client. The client page is also generated based on the JavaScript code
+provided by each element.
 
 This file consists of the following classes:
 
 VisualizationElement: Parent class for all other visualization elements, with
                       the minimal necessary options.
-VisualizationModule: Tornado UIModule, serves as a pass-through for the
-                     VisualizationElement.
 PageHandler: The handler for the visualization page, generated from a template
              and built from the various visualization elements.
 SocketHandler: Handles the websocket connection between the client page and
@@ -38,7 +36,6 @@ called canvasvis and graphvis; we would launch a server with:
 
     server = ModularServer(MyModel, [canvasvis, graphvis], name="My Model")
     server.launch()
-
 
 The client keeps track of what step it is showing. Clicking the Step button in
 the browser sends a message requesting the viz_state corresponding to the next
@@ -129,6 +126,7 @@ class VisualizationElement(object):
 # =============================================================================
 # Actual Tornado code starts here:
 
+
 class PageHandler(tornado.web.RequestHandler):
     '''
     Handler for the HTML template which holds the visualization.
@@ -139,7 +137,7 @@ class PageHandler(tornado.web.RequestHandler):
         for i, element in enumerate(elements):
             element.index = i
         self.render("modular_template.html", port=self.application.port,
-                    model_name=self.application.model_name, 
+                    model_name=self.application.model_name,
                     includes=self.application.js_includes,
                     scripts=self.application.js_code)
 

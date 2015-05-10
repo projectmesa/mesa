@@ -1,5 +1,6 @@
 from EpsteinCivilViolence import Citizen, Cop, CivilViolenceModel
-from mesa.visualization.CanvasServer import CanvasServer
+from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization.modules import CanvasGrid
 
 COP_COLOR = "#000000"
 AGENT_QUIET_COLOR = "#0066CC"
@@ -29,8 +30,8 @@ def citizen_cop_portrayal(agent):
         portrayal["Layer"] = 1
     return portrayal
 
-
-server = CanvasServer(CivilViolenceModel, citizen_cop_portrayal, 500, 500,
+canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 500, 500)
+server = ModularServer(CivilViolenceModel, [canvas_element],
                       "Epstein Civil Violence",
                       height=40,
                       width=40,

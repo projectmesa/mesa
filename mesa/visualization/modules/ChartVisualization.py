@@ -1,6 +1,7 @@
 import json
 from mesa.visualization.ModularVisualization import VisualizationElement
 
+
 class ChartModule(VisualizationElement):
     '''
     Module for drawing live-updating line charts using Charts.js
@@ -62,10 +63,9 @@ class ChartModule(VisualizationElement):
 
         series_json = json.dumps(self.series)
         new_element = "new ChartModule({}, {},  {})"
-        new_element = new_element.format(series_json, canvas_width, 
+        new_element = new_element.format(series_json, canvas_width,
                                          canvas_height)
         self.js_code = "elements.push(" + new_element + ");"
-
 
     def render(self, model):
         current_values = []

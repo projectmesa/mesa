@@ -27,7 +27,6 @@ var ChartModule = function(series, canvas_width, canvas_height) {
 		animation: false,
 		datasetFill: false,
 		pointDot: false
-
 	};
 
 	var chart = new Chart(context).Line(data, options);
