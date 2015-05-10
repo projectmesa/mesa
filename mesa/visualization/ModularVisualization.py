@@ -80,12 +80,14 @@ Client -> Server:
 
 '''
 import os
+import datetime as dt
 
 import tornado.ioloop
 import tornado.template
 import tornado.web
 import tornado.websocket
 import tornado.escape
+import tornado.gen
 
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
@@ -205,7 +207,7 @@ class ModularServer(tornado.web.Application):
     grid_height = 0
     grid_width = 0
 
-    max_steps = 100
+    max_steps = 100000
     viz_states = []
 
     model_args = ()
@@ -251,6 +253,7 @@ class ModularServer(tornado.web.Application):
             visualization_state.append(element_state)
         return visualization_state
 
+    @tornado.gen.coroutine
     def run_model(self):
         '''
         Run the model forward and store each viz state.
@@ -259,8 +262,11 @@ class ModularServer(tornado.web.Application):
         while self.model.schedule.steps < self.max_steps and self.model.running:
             self.model.step()
             self.viz_states.append(self.render_model())
-        if self.verbose:
-            print("Model steps:", self.model.schedule.steps)
+
+            yield tornado.gen.Task(tornado.ioloop.IOLoop.current().add_timeout,
+                dt.timedelta(milliseconds=5))
+        #if self.verbose:
+        #    print("Model steps:", self.model.schedule.steps)
 
     def launch(self):
         '''
