@@ -265,8 +265,6 @@ class ModularServer(tornado.web.Application):
 
             yield tornado.gen.Task(tornado.ioloop.IOLoop.current().add_timeout,
                 dt.timedelta(milliseconds=5))
-        #if self.verbose:
-        #    print("Model steps:", self.model.schedule.steps)
 
     def launch(self):
         '''
