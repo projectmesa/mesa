@@ -4,34 +4,34 @@ ModularServer
 
 A visualization server which renders a model via one or more elements.
 
-The concept for the modular visualization server as follows:  
+The concept for the modular visualization server as follows:
 A visualization is composed of VisualizationElements, each of which defines how
-to generate some visualization from a model instance and render it on the 
-client. VisualizationElements may be anything from a simple text display to 
+to generate some visualization from a model instance and render it on the
+client. VisualizationElements may be anything from a simple text display to
 a multilayered HTML5 canvas.
 
-The actual server is launched with one or more VisualizationElements; 
-it runs the model object through each of them, generating data to be sent to 
+The actual server is launched with one or more VisualizationElements;
+it runs the model object through each of them, generating data to be sent to
 the client. The client page is also generated based on the template provided
-by each element. 
+by each element.
 
 This file consists of the following classes:
 
 VisualizationElement: Parent class for all other visualization elements, with
                       the minimal necessary options.
-VisualizationModule: Tornado UIModule, serves as a pass-through for the 
+VisualizationModule: Tornado UIModule, serves as a pass-through for the
                      VisualizationElement.
 PageHandler: The handler for the visualization page, generated from a template
              and built from the various visualization elements.
 SocketHandler: Handles the websocket connection between the client page and
                 the server.
-ModularServer: The overall visualization application class which stores and 
+ModularServer: The overall visualization application class which stores and
                controls the model and visualization instance.
 
 
-ModularServer should *not* need to be subclassed on a model-by-model basis; it 
+ModularServer should *not* need to be subclassed on a model-by-model basis; it
 should be primarily a pass-through for VisualizationElement subclasses, which
-define the actual visualization specifics. 
+define the actual visualization specifics.
 
 For example, suppose we have created two visualization elements for our model,
 called canvasvis and graphvis; we would launch a server with:
@@ -49,9 +49,9 @@ Each message is a JSON object, with a "type" property which defines the rest of
 the structure.
 
 Server -> Client:
-    Send over the model state to visualize. 
-    Model state is a list, with each element corresponding to a div; each div 
-    is expected to have a render function associated with it, which knows how 
+    Send over the model state to visualize.
+    Model state is a list, with each element corresponding to a div; each div
+    is expected to have a render function associated with it, which knows how
     to render that particular data. The example below includes two elements:
     the first is data for a CanvasGrid, the second for a raw text display.
 
@@ -125,29 +125,30 @@ class VisualizationElement(object):
 
 # =============================================================================
 
+
 class VisualizationModule(tornado.web.UIModule):
     '''
-    Basic visualization module. Takes a VisualizationElement subclass at 
+    Basic visualization module. Takes a VisualizationElement subclass at
     render-time, and uses its properties to render.
     '''
 
     def render(self, element):
-        return self.render_string(element.template, index=element.index, 
-                                  **element.render_args) 
+        return self.render_string(element.template, index=element.index,
+                                  **element.render_args)
+
 
 class PageHandler(tornado.web.RequestHandler):
     '''
     Handler for the HTML template which holds the visualization.
     '''
-    def initialize(self):
-        path = os.path.dirname(__file__) + "/templates"
 
     def get(self):
         elements = self.application.visualization_elements
         for i, element in enumerate(elements):
             element.index = i
-        self.render("modular_template.html", port=self.application.port, 
+        self.render("modular_template.html", port=self.application.port,
                     model_name=self.application.model_name, elements=elements)
+
 
 class SocketHandler(tornado.websocket.WebSocketHandler):
     '''
@@ -210,7 +211,7 @@ class ModularServer(tornado.web.Application):
     model_args = ()
     model_kwargs = {}
 
-    def __init__(self, model_cls, visualization_elements, name="Mesa Model", 
+    def __init__(self, model_cls, visualization_elements, name="Mesa Model",
                  *args, **kwargs):
         '''
         Create a new visualization server with the given elements.
@@ -248,7 +249,7 @@ class ModularServer(tornado.web.Application):
         for element in self.visualization_elements:
             element_state = element.render(self.model)
             visualization_state.append(element_state)
-        return visualization_state  
+        return visualization_state
 
     def run_model(self):
         '''
@@ -267,11 +268,3 @@ class ModularServer(tornado.web.Application):
         '''
         self.listen(self.port)
         tornado.ioloop.IOLoop.instance().start()
-
-
-
-
-
-
-
-

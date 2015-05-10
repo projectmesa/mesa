@@ -17,19 +17,11 @@ def forestfire_draw(tree):
     portrayal["Color"] = colors[tree.condition]
     return portrayal
 
-<<<<<<< HEAD
-canvas_element  = CanvasGrid(forestfire_draw, 100, 100, 500, 500)
-tree_chart = ChartModule([
-                           {"Label": "Fine", "Color": "green"},
-                           {"Label": "On Fire", "Color": "red"},
-                           {"Label": "Burned Out", "Color": "black"}
-                         ])
+canvas_element = CanvasGrid(forestfire_draw, 100, 100, 500, 500)
+tree_chart = ChartModule([{"Label": "Fine", "Color": "green"},
+                          {"Label": "On Fire", "Color": "red"},
+                          {"Label": "Burned Out", "Color": "black"}])
 
 server = ModularServer(ForestFire, [canvas_element, tree_chart], "Forest Fire",
                        100, 100, 0.65)
 server.launch()
-=======
-server = CanvasServer(ForestFire, forestfire_draw, 500, 500,
-                      "Forest Fire", 100, 100, 0.45)
-server.launch()
->>>>>>> master
