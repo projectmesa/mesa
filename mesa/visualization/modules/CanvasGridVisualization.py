@@ -67,9 +67,9 @@ class CanvasGrid(VisualizationElement):
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
 
-        new_element = "new CanvasModule({}, {}, {}, {})".format(
-                        self.canvas_width, self.canvas_height, 
-                        self.grid_width, self.grid_height)
+        new_element = ("new CanvasModule({}, {}, {}, {})"
+            .format(self.canvas_width, self.canvas_height,
+                self.grid_width, self.grid_height))
 
         self.js_code = "elements.push(" + new_element + ");"
 
