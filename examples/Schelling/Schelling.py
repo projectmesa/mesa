@@ -17,21 +17,25 @@ To advance the model by one step and print the new state:
 
 To advance the model by e.g. 10 steps and print the new state:
     viz.step_forward(10)
+
 '''
 
-from __future__ import division # For Python 2.x compatibility
-import random
+from __future__ import division  # For Python 2.x compatibility
 
 import random
 
 from mesa import Model, Agent
 from mesa.time import RandomActivation
-from mesa.space import Grid
+from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 
 from mesa.visualization.TextServer import TextServer
+from mesa.visualization.TextVisualization import (TextData, TextGrid,
+    TextVisualization)
 
-from mesa.visualization.TextVisualization import *
+X = 0
+Y = 1
+
 
 class SchellingModel(Model):
     '''
@@ -49,56 +53,50 @@ class SchellingModel(Model):
         self.homophily = homophily
 
         self.schedule = RandomActivation(self)
-        self.grid = Grid(height, width, torus=True)
+        self.grid = SingleGrid(height, width, torus=True)
 
         self.happy = 0
         self.datacollector = DataCollector(
-            {"happy": lambda m: m.happy}, # Model-level count of happy agents
+            {"happy": lambda m: m.happy},  # Model-level count of happy agents
             # For testing purposes, agent's individual x and y
-            {"x": lambda a: a.x, "y": lambda a: a.y}) 
+            {"x": lambda a: a.pos[X], "y": lambda a: a.pos[Y]})
 
         self.running = True
 
         # Set up agents
-        for x in range(self.width):
-            for y in range(self.height):
-                if random.random() < self.density:
-                    if random.random() < self.minority_pc:
-                        agent_type = 1
-                    else:
-                        agent_type = 0
+        # We use a grid iterator that returns
+        # the coordinates of a cell as well as
+        # its contents. (coord_iter)
+        for cell in self.grid.coord_iter():
+            x = cell[1]
+            y = cell[2]
+            if random.random() < self.density:
+                if random.random() < self.minority_pc:
+                    agent_type = 1
+                else:
+                    agent_type = 0
 
-                    agent = SchellingAgent((x,y), x, y, agent_type)
-                    self.grid[y][x] = agent
-                    self.schedule.add(agent)
-
-    def get_empty(self):
-        '''
-        Get a list of coordinate tuples of currently-empty cells.
-        '''
-        empty_cells = []
-        for x in range(self.width):
-            for y in range(self.height):
-                if self.grid[y][x] is None:
-                    empty_cells.append((x, y))
-        return empty_cells
+                agent = SchellingAgent((x, y), agent_type)
+                self.grid.position_agent(agent, x, y)
+                self.schedule.add(agent)
 
     def step(self):
         '''
         Run one step of the model. If All agents are happy, halt the model.
         '''
-        self.happy = 0 # Reset counter of happy agents
+        self.happy = 0  # Reset counter of happy agents
         self.schedule.step()
         self.datacollector.collect(self)
 
         if self.happy == self.schedule.get_agent_count():
             self.running = False
 
+
 class SchellingAgent(Agent):
     '''
     Schelling segregation agent
     '''
-    def __init__(self, unique_id, x, y, agent_type):
+    def __init__(self, coords, agent_type):
         '''
          Create a new Schelling agent.
 
@@ -107,25 +105,19 @@ class SchellingAgent(Agent):
             x, y: Agent initial location.
             agent_type: Indicator for the agent's type (minority=1, majority=0)
         '''
-        self.unique_id = unique_id
-        self.x = x
-        self.y = y
+        self.unique_id = coords
+        self.pos = coords
         self.type = agent_type
 
     def step(self, model):
-        neighbors = model.grid.get_neighbors(self.x, self.y, moore=True)
         similar = 0
-        for neighbor in neighbors:
+        for neighbor in model.grid.neighbor_iter(self.pos[X], self.pos[Y]):
             if neighbor.type == self.type:
                 similar += 1
 
         # If unhappy, move:
         if similar < model.homophily:
-            new_x, new_y = random.choice(model.get_empty())
-            model.grid[self.y][self.x] = None
-            model.grid[new_y][new_x] = self
-            self.x = new_x
-            self.y = new_y
+            model.grid.move_to_empty(self)
         else:
             model.happy += 1
 
@@ -157,12 +149,9 @@ class SchellingTextVisualization(TextVisualization):
 
 
 if __name__ == "__main__":
-    server = TextServer(SchellingModel, SchellingTextVisualization, "Schelling",
+    server = TextServer(SchellingModel,
+                        SchellingTextVisualization, "Schelling",
                         10, 10, 0.8, 0.2, 3)
     server.launch()
-    #model = SchellingModel(10, 10, 0.8, 0.2, 3)
-    #viz = SchellingTextVisualization(model)
-
-
-
-
+    # model = SchellingModel(10, 10, 0.8, 0.2, 3)
+    # viz = SchellingTextVisualization(model)

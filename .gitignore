@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 
+*py~
+*swp
+
 # C extensions
 *.so
 

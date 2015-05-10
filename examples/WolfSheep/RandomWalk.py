@@ -4,6 +4,7 @@ Generalized behavior for random walking, one grid cell at a time.
 
 import random
 
+
 class RandomWalker(object):
     '''
     Class implementing random walker methods in a generalized manner.
@@ -23,55 +24,22 @@ class RandomWalker(object):
         grid: The MultiGrid object in which the agent lives.
         x: The agent's current x coordinate
         y: The agent's current y coordinate
-        moore: If True, may move in all 8 directions. 
+        moore: If True, may move in all 8 directions.
                 Otherwise, only up, down, left, right.
         '''
         self.grid = grid
-        self.x = x
-        self.y = y
+        self.pos = (x, y)
         self.moore = moore
 
     def random_move(self):
         '''
         Step one cell in any allowable direction.
         '''
-
-        dx = random.choice([-1, 0, 1])
-        dy = random.choice([-1, 0, 1])
-
-        # If Von-Neumann Movement:
-        if not self.moore:
-            if random.random() < 0.5:
-                dx = 0
-            else:
-                dy = 0
-
-        # Pick the next cell, handling edges:
-        try:
-            new_x = self.grid._get_x(self.x + dx)
-        except:
-            new_x = 0
-
-        try:
-            new_y = self.grid._get_y(self.y + dy)
-        except:
-            new_y = 0
-
+        x, y = self.pos
+        # Pick the next cell from the adjacent cells.
+        next_moves = self.grid.get_neighborhood(x, y, self.moore, True)
+        next_move = random.choice(next_moves)
         # Now move:
-        self.grid[self.y][self.x].remove(self)
-        self.grid[new_y][new_x].add(self)
-        self.x = new_x
-        self.y = new_y
-        
-
-
-
-
-
-
-
-
-
-
-
-
+        self.grid._remove_agent(self.pos, self)
+        self.grid._place_agent(next_move, self)
+        self.pos = next_move

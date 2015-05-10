@@ -3,7 +3,8 @@ Visualization for the Wolf-Sheep Predation
 '''
 
 from WolfSheep import Wolf, Sheep
-from mesa.visualization.TextVisualization import TextVisualization, TextData, TextGrid
+from mesa.visualization.TextVisualization import TextVisualization, TextGrid
+
 
 class WolfSheepVisualization(TextVisualization):
     '''
