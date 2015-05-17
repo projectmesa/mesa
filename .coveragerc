@@ -1,3 +1,7 @@
 [report]
-omit =
+omit = 
+    bin/*
+    develop-eggs/*
+    eggs/*
+    */site-packages/*
     mesa/tests/*
