@@ -4,4 +4,5 @@ omit =
     develop-eggs/*
     eggs/*
     */site-packages/*
-    mesa/tests/*
+   	*/python3.4/distutils/*
+    tests/*
