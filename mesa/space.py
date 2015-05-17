@@ -396,7 +396,7 @@ class ContinuousSpace(object):
 
     _grid = None
 
-    def __init__(self, x_max, y_max, torus, x_min=0, y_min=0, 
+    def __init__(self, x_max, y_max, torus, x_min=0, y_min=0,
                  grid_width=100, grid_height=100):
         '''
         Create a new continuous space.
@@ -452,7 +452,7 @@ class ContinuousSpace(object):
         scale = max(self.cell_width, self.cell_height)
         cell_radius = math.ceil(radius / scale)
         cell_x, cell_y = self._point_to_cell((x, y))
-        possible_objs = self._grid.get_neighbors(cell_x, cell_y, 
+        possible_objs = self._grid.get_neighbors(cell_x, cell_y,
                                               True, True, cell_radius)
         neighbors = []
         # Iterate over candidates and check actual distance.
@@ -476,7 +476,7 @@ class ContinuousSpace(object):
             d_y = abs(y1 - y2)
             dx = min(d_x, self.width - d_x)
             dy = min(d_y, self.height - d_y)
-        return math.sqrt(dx**2 + dy**2)
+        return math.sqrt(dx ** 2 + dy ** 2)
 
     def torus_adj(self, pos):
         '''
@@ -490,7 +490,6 @@ class ContinuousSpace(object):
             x = self.x_min + ((pos[0] - self.x_min) % self.width)
             y = self.y_min + ((pos[1] - self.y_min) % self.height)
             return (x, y)
-
 
     def _point_to_cell(self, pos):
         '''

@@ -5,6 +5,7 @@ from test_grid import MockAgent
 
 TEST_AGENTS = [(-20, -20), (-20, -20.05), (65, 18)]
 
+
 class TestContinuousSpace(unittest.TestCase):
     '''
     Testing a toroidal continuous space.
