@@ -15,6 +15,7 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 
 import itertools
 import random
+import math
 
 
 RANDOM = -1
@@ -86,7 +87,6 @@ class Grid(object):
         self.torus = torus
 
         self.grid = []
-        self.empties = []
 
         for y in range(self.height):
             row = []
@@ -263,6 +263,7 @@ class SingleGrid(Grid):
     '''
     Grid where each cell contains exactly at most one object.
     '''
+    empties = []
 
     def __init__(self, height, width, torus):
         '''
@@ -381,3 +382,132 @@ class MultiGrid(Grid):
         '''
         for a in self.grid[y][x]:
             target_list.append(a)
+
+
+class ContinuousSpace(object):
+    '''
+    Continuous space where each agent can have an arbitrary position.
+
+    Assumes that all agents are point objects, and have a pos property.
+
+    Uses a MultiGrid as a cheapo spatial database, storing agents in cells
+    based on their coordinates.
+    '''
+
+    _grid = None
+
+    def __init__(self, x_max, y_max, torus, x_min=0, y_min=0, 
+                 grid_width=100, grid_height=100):
+        '''
+        Create a new continuous space.
+        '''
+        self.x_min = x_min
+        self.x_max = x_max
+        self.width = x_max - x_min
+        self.y_min = y_min
+        self.y_max = y_max
+        self.height = y_max - y_min
+        self.torus = torus
+
+        self.cell_width = (self.x_max - self.x_min) / grid_width
+        self.cell_height = (self.y_max - self.y_min) / grid_height
+
+        self._grid = MultiGrid(grid_height, grid_width, torus)
+
+    def place_agent(self, agent, pos):
+        '''
+        Place an agent in the space, and set its pos variable.
+        '''
+        pos = self.torus_adj(pos)
+        self._place_agent(pos, agent)
+        agent.pos = pos
+
+    def move_agent(self, agent, pos):
+        '''
+        Move an agent from its current position to a new position.
+        '''
+        self._place_agent(pos, agent)
+        self._remove_agent(agent.pos, agent)
+        agent.pos = pos
+
+    def _place_agent(self, pos, agent):
+        '''
+        Place an agent at a given point
+        '''
+        cell = self._point_to_cell(pos)
+        self._grid._place_agent(cell, agent)
+
+    def _remove_agent(self, pos, agent):
+        '''
+        Remove an agent at a given point
+        '''
+        cell = self._point_to_cell(pos)
+        self._grid._remove_agent(cell, agent)
+
+    def get_neighbors(self, x, y, radius):
+        '''
+        Get all objects within a certain radius.
+        '''
+        # Get candidate objects
+        scale = max(self.cell_width, self.cell_height)
+        cell_radius = math.ceil(radius / scale)
+        cell_x, cell_y = self._point_to_cell((x, y))
+        possible_objs = self._grid.get_neighbors(cell_x, cell_y, 
+                                              True, True, cell_radius)
+        neighbors = []
+        # Iterate over candidates and check actual distance.
+        for obj in possible_objs:
+            dist = self.get_distance((x, y), obj.pos)
+            if dist <= radius:
+                neighbors.append(obj)
+        return neighbors
+
+    def get_distance(self, pos_1, pos_2):
+        '''
+        Get the distance between two point, accounting for toroidal space.
+        '''
+        x1, y1 = pos_1
+        x2, y2 = pos_2
+        if not self.torus:
+            dx = x1 - x2
+            dy = y1 - y2
+        else:
+            d_x = abs(x1 - x2)
+            d_y = abs(y1 - y2)
+            dx = min(d_x, self.width - d_x)
+            dy = min(d_y, self.height - d_y)
+        return math.sqrt(dx**2 + dy**2)
+
+    def torus_adj(self, pos):
+        '''
+        Convert a coordinate to handle torus looping.
+        '''
+        if not self.out_of_bounds(pos):
+            return pos
+        elif not self.torus:
+            raise Exception("Point out of bounds, and space non-toroidal.")
+        else:
+            x = self.x_min + ((pos[0] - self.x_min) % self.width)
+            y = self.y_min + ((pos[1] - self.y_min) % self.height)
+            return (x, y)
+
+
+    def _point_to_cell(self, pos):
+        '''
+        Get the cell coordinates that a given x,y point falls in.
+        '''
+        if self.out_of_bounds(pos):
+            raise Exception("Point out of bounds.")
+
+        x, y = pos
+        cell_x = math.floor((x - self.x_min) / self.cell_width)
+        cell_y = math.floor((y - self.y_min) / self.cell_height)
+        return (cell_x, cell_y)
+
+    def out_of_bounds(self, pos):
+        '''
+        Check if a point is out of bounds.
+        '''
+        x, y = pos
+        return (x < self.x_min or x > self.x_max
+            or y < self.y_min or y > self.y_max)
