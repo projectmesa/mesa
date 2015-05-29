@@ -1,11 +1,38 @@
 '''
 Mesa Agent-Based Modeling Framework
 
-Core Objects: Model, and Agent.
+Core Objects: Agent and Model.
 '''
+
+# Import submodules
+from . import batchrunner
+from . import datacollection
+from . import space
+from . import time
 
 import datetime as dt
 import random
+
+
+class Agent(object):
+    '''
+    Base class for a model agent.
+    '''
+
+    model = None
+    unique_id = None
+
+    def __init__(self, unique_id, model):
+        '''
+        Create a new agent.
+        '''
+        self.model = model
+
+    def step(self, model):
+        '''
+        A single step of the agent.
+        '''
+        pass
 
 
 class Model(object):
@@ -38,26 +65,5 @@ class Model(object):
     def step(self):
         '''
         A single step. Fill in here.
-        '''
-        pass
-
-
-class Agent(object):
-    '''
-    Base class for a model agent.
-    '''
-
-    model = None
-    unique_id = None
-
-    def __init__(self, unique_id, model):
-        '''
-        Create a new agent.
-        '''
-        self.model = model
-
-    def step(self, model):
-        '''
-        A single step of the agent.
         '''
         pass
