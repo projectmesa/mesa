@@ -67,10 +67,10 @@ class ForestFire(Model):
         self.grid = Grid(height, width, torus=False)
 
         self.datacollector = DataCollector(
-                    {"Fine": lambda m: self.count_type(m, "Fine"),
-                     "On Fire": lambda m: self.count_type(m, "On Fire"),
-                     "Burned Out": lambda m: self.count_type(m, "Burned Out")})
-        
+            {"Fine": lambda m: self.count_type(m, "Fine"),
+             "On Fire": lambda m: self.count_type(m, "On Fire"),
+             "Burned Out": lambda m: self.count_type(m, "Burned Out")})
+
         # Place a tree in each cell with Prob = density
         for (contents, x, y) in self.grid.coord_iter():
             if random.random() < self.density:

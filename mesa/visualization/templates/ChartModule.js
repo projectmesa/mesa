@@ -26,7 +26,8 @@ var ChartModule = function(series, canvas_width, canvas_height) {
 	var options = {
 		animation: false,
 		datasetFill: false,
-		pointDot: false
+		pointDot: false,
+		bezierCurve : false
 	};
 
 	var chart = new Chart(context).Line(data, options);

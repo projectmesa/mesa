@@ -37,7 +37,7 @@ class ChartModule(VisualizationElement):
         the same way that "Color" is currently.
     '''
 
-    js_includes = ["Chart.min.js", "ChartModule.js"]
+    package_includes = ["Chart.min.js", "ChartModule.js"]
     series = []
     canvas_width = 500
     canvas_height = 200

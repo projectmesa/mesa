@@ -96,7 +96,10 @@ class VisualizationElement(object):
     Defines an element of the visualization.
 
     Attributes:
-        js_include: A list of external JavaScript files to include.
+        package_includes: A list of external JavaScript files to include that
+                          are part of the Mesa packages.
+        local_includes: A list of JavaScript files that are local to the
+                        directory that the server is being run in.
         js_code: A JavaScript code string to instantiate the element.
 
     Methods:
@@ -104,7 +107,8 @@ class VisualizationElement(object):
                 to the client.
     '''
 
-    js_includes = []
+    package_includes = []
+    local_includes = []
     js_code = ''
     render_args = {}
 
@@ -138,7 +142,8 @@ class PageHandler(tornado.web.RequestHandler):
             element.index = i
         self.render("modular_template.html", port=self.application.port,
                     model_name=self.application.model_name,
-                    includes=self.application.js_includes,
+                    package_includes=self.application.package_includes,
+                    local_includes=self.application.local_includes,
                     scripts=self.application.js_code)
 
 
@@ -203,6 +208,19 @@ class ModularServer(tornado.web.Application):
     model_args = ()
     model_kwargs = {}
 
+    # Handlers and other globals:
+    page_handler = (r'/', PageHandler)
+    socket_handler = (r'/ws', SocketHandler)
+    static_handler = (r'/static/(.*)', tornado.web.StaticFileHandler,
+                      {"path": os.path.dirname(__file__) + "/templates"})
+    local_handler = (r'/local/(.*)', tornado.web.StaticFileHandler,
+                     {"path": ''})
+
+    handlers = [page_handler, socket_handler, static_handler, local_handler]
+
+    settings = {"debug": True,
+                "template_path": os.path.dirname(__file__) + "/templates"}
+
     def __init__(self, model_cls, visualization_elements, name="Mesa Model",
                  *args, **kwargs):
         '''
@@ -210,11 +228,14 @@ class ModularServer(tornado.web.Application):
         '''
         # Prep visualization elements:
         self.visualization_elements = visualization_elements
-        self.js_includes = set()
+        self.package_includes = set()
+        self.local_includes = set()
         self.js_code = []
         for element in self.visualization_elements:
-            for include_file in element.js_includes:
-                self.js_includes.add(include_file)
+            for include_file in element.package_includes:
+                self.package_includes.add(include_file)
+            for include_file in element.local_includes:
+                self.local_includes.add(include_file)
             self.js_code.append(element.js_code)
 
         # Initializing the model
@@ -226,11 +247,7 @@ class ModularServer(tornado.web.Application):
         self.reset_model()
 
         # Initializing the application itself:
-        page_handler = (r'/', PageHandler)
-        socket_handler = (r'/ws', SocketHandler)
-        settings = {"template_path": os.path.dirname(__file__) + "/templates",
-                    "static_path": os.path.dirname(__file__) + "/templates"}
-        super().__init__([page_handler, socket_handler], **settings)
+        super().__init__(self.handlers, **self.settings)
 
     def reset_model(self):
         '''

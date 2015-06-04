@@ -43,7 +43,7 @@ class CanvasGrid(VisualizationElement):
         template: "canvas_module.html" stores the module's HTML template.
     '''
 
-    js_includes = ["GridDraw.js", "CanvasModule.js"]
+    package_includes = ["GridDraw.js", "CanvasModule.js"]
     portrayal_method = None  # Portrayal function
     canvas_height = 500
     canvas_width = 500
