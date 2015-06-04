@@ -115,8 +115,11 @@
 
 
 <!-- Script includes go here -->
-	{% for file_name in includes %}
+	{% for file_name in package_includes %}
 		<script src="/static/{{ file_name }}" type="text/javascript"></script>
+	{% end %}
+	{% for file_name in local_includes %}
+		<script src="/local/{{ file_name }}" type="text/javascript"></script>
 	{% end %}
 <script>
 	// Set up the GUI
