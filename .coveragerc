@@ -5,5 +5,5 @@ omit =
     develop-eggs/*
     eggs/*
     */site-packages/*
-       */python3.4/distutils/*
+    */python3.4/distutils/*
     tests/*
