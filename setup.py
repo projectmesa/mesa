@@ -24,7 +24,7 @@ description = """
 
 setup(
     name='Mesa',
-    version='0.5.2',
+    version='0.5.2.1',
     description=description,
     author='Project Mesa Team',
     author_email='projectmesa@googlegroups.com',
@@ -34,9 +34,7 @@ setup(
     package_dir={'mesa': 'mesa'},
     include_package_data=True,
     install_requires=requires,
-    keywords=['agent-based modeling', 'ABM',
-              'simulation', 'individual-based models',
-              'complex systems', 'complexity theory'],
+    keywords='agent based modeling model ABM simulation multi-agent',
     license='MIT',
     zip_safe=False,
     classifiers=[
