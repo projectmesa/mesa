@@ -1,3 +1,9 @@
 [report]
 omit =
     mesa/tests/*
+    bin/*
+    develop-eggs/*
+    eggs/*
+    */site-packages/*
+    */python3.4/distutils/*
+    tests/*
