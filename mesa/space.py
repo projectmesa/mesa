@@ -220,9 +220,8 @@ class Grid(object):
                    stored in a 'pos' tuple.
             pos: Tuple of new position to move the agent to.
         '''
-
-        self._place_agent(pos, agent)
         self._remove_agent(agent.pos, agent)
+        self._place_agent(pos, agent)
         agent.pos = pos
 
     def place_agent(self, agent, pos):
