@@ -1,5 +1,6 @@
 from WolfSheep import Wolf, Sheep, WolfSheepPredation
-from mesa.visualization.CanvasServer import CanvasServer
+from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization.modules import CanvasGrid
 
 
 def wolf_sheep_portrayal(agent):
@@ -21,6 +22,8 @@ def wolf_sheep_portrayal(agent):
         portrayal["Layer"] = 1
     return portrayal
 
-server = CanvasServer(WolfSheepPredation, wolf_sheep_portrayal, 500, 500,
+canvas_element = CanvasGrid(wolf_sheep_portrayal, 20, 20, 500, 500)
+
+server = ModularServer(WolfSheepPredation, [canvas_element],
                       "WolfSheep")
 server.launch()
