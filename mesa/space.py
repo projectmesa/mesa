@@ -464,7 +464,7 @@ class ContinuousSpace(object):
         # Iterate over candidates and check actual distance.
         for obj in possible_objs:
             dist = self.get_distance((x, y), obj.pos)
-            if dist <= radius and (include_center or dist>0):
+            if dist <= radius and (include_center or dist > 0):
                 neighbors.append(obj)
         return neighbors
 

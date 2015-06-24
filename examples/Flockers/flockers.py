@@ -13,16 +13,17 @@ from mesa import Model, Agent
 from mesa.space import ContinuousSpace
 from mesa.time import RandomActivation
 
+
 class Boid(Agent):
     '''
     A Boid-style flocker agent.
 
     The agent follows three behaviors to flock:
         - Cohesion: steering towards neighboring agents
-        - Separation:  
+        - Separation:
     '''
-    def __init__(self, unique_id, pos, speed=5, heading=None, 
-        vision=5, separation=1):
+    def __init__(self, unique_id, pos, speed=5, heading=None,
+            vision=5, separation=1):
         '''
         Create a new Boid flocker agent.
         '''
@@ -48,7 +49,7 @@ class Boid(Agent):
 
     def separate(self, neighbors):
         my_pos = np.array(self.pos)
-        sep_vector = np.array([0,0])
+        sep_vector = np.array([0, 0])
         for neighbor in neighbors:
             their_pos = np.array(neighbor.pos)
             dist = np.linalg.norm(my_pos - their_pos)
@@ -69,12 +70,13 @@ class Boid(Agent):
             cohere_vector = self.cohere(neighbors)
             separate_vector = self.separate(neighbors)
             match_heading_vector = self.match_heading(neighbors)
-            self.heading += (cohere_vector + separate_vector 
+            self.heading += (cohere_vector + separate_vector
                 + match_heading_vector)
             self.heading /= np.linalg.norm(self.heading)
         new_pos = np.array(self.pos) + self.heading * self.speed
         new_x, new_y = new_pos
         model.space.move_agent(self, (new_x, new_y))
+
 
 class BoidModel(Model):
     N = 100
@@ -90,19 +92,18 @@ class BoidModel(Model):
         self.space = ContinuousSpace(width, height, True,
             grid_width=10, grid_height=10)
         self.make_agents()
+        self.running = True
 
     def make_agents(self):
         for i in range(self.N):
             x = random.random() * self.space.x_max
             y = random.random() * self.space.y_max
             pos = (x, y)
-            heading = np.random.random(2)
+            heading = np.random.random(2) * 2 - np.array((1, 1))
             heading /= np.linalg.norm(heading)
             boid = Boid(i, pos, self.speed, heading, self.vision, self.separation)
-            self.space.place_agent(boid,  pos)
+            self.space.place_agent(boid, pos)
             self.schedule.add(boid)
 
     def step(self):
         self.schedule.step()
-
-
