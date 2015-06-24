@@ -431,8 +431,9 @@ class ContinuousSpace(object):
         '''
         Move an agent from its current position to a new position.
         '''
-        self._place_agent(pos, agent)
+        pos = self.torus_adj(pos)
         self._remove_agent(agent.pos, agent)
+        self._place_agent(pos, agent)
         agent.pos = pos
 
     def _place_agent(self, pos, agent):
@@ -449,7 +450,7 @@ class ContinuousSpace(object):
         cell = self._point_to_cell(pos)
         self._grid._remove_agent(cell, agent)
 
-    def get_neighbors(self, x, y, radius):
+    def get_neighbors(self, x, y, radius, include_center=True):
         '''
         Get all objects within a certain radius.
         '''
@@ -463,7 +464,7 @@ class ContinuousSpace(object):
         # Iterate over candidates and check actual distance.
         for obj in possible_objs:
             dist = self.get_distance((x, y), obj.pos)
-            if dist <= radius:
+            if dist <= radius and (include_center or dist>0):
                 neighbors.append(obj)
         return neighbors
 
