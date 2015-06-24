@@ -80,6 +80,9 @@ class DataCollector(object):
 
         self.model_reporters = {}
         self.agent_reporters = {}
+
+        self.model_vars = {}
+        self.agent_vars = {}
         self.tables = {}
 
         for name, func in model_reporters.items():

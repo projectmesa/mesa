@@ -29,7 +29,6 @@ from mesa.time import RandomActivation
 from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 
-from mesa.visualization.TextServer import TextServer
 from mesa.visualization.TextVisualization import (TextData, TextGrid,
     TextVisualization)
 
@@ -146,12 +145,3 @@ class SchellingTextVisualization(TextVisualization):
             return 'O'
         if a.type == 1:
             return 'X'
-
-
-if __name__ == "__main__":
-    server = TextServer(SchellingModel,
-                        SchellingTextVisualization, "Schelling",
-                        10, 10, 0.8, 0.2, 3)
-    server.launch()
-    # model = SchellingModel(10, 10, 0.8, 0.2, 3)
-    # viz = SchellingTextVisualization(model)

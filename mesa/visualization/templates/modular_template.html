@@ -5,13 +5,8 @@
 	<script src="/static/dat.gui.min.js"></script>
 	<script>
 	/*
-		This is the Tornado template for the Text Visualization. The server adds one div for each 
-		visualization element, as defined in the underlying TextVisualization class. The Javascript
-		code opens a WebSocket connection to the server (the port is set via the template).
-
-		When a message comes in from the server, it is parsed in the ws.onmessage method; usually, 
-		the message will be a new visualization state, consisting of several TextElements which are
-		written into the appropriate divs on the page. 
+		This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to the server 
+		(the port is set via the template). On every step, it receives inputs, one per module, and sends them to the associated function to render
 
 		Users can reset() the model, advance it by one step(), or run() it through. reset() and 
 		step() send a message to the server, which then sends back the appropriate data. run() just
@@ -36,6 +31,8 @@
 
 		var player; // Variable to store the continuous player
 		var control = new MesaVisualizationControl();
+		var elements = [];  // List of Element objects
+
 
 		// WebSocket Stuff
 		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws"); // Open the websocket connection
@@ -49,11 +46,9 @@
 			//console.log(message.data);
 			switch (msg["type"]) {
 				case "viz_state":
-					// Draw in the visualization elements in the appropirate divs
-					for (var e in msg["data"]) {
-						txt = msg["data"][e];
-						txt = txt.replace(/(?:\r\n|\r|\n)/g, '<br />'); // Replace lin breaks with BR tags
-						$("#element_"+e).html(txt); // Replace element text with data
+					data = msg["data"]
+					for (var i in elements) {
+						elements[i].render(data[i]);
 					}
 					break;
 				case "end":
@@ -81,7 +76,12 @@
 			control.tick = 0;
 			control.running = true;
 			send({"type": "reset"});
-		}
+
+			// Reset all the visualizations
+			for (var i in elements) {
+				elements[i].reset();
+			}
+		};
 
 		/**
 		Send a message to the server get the next visualization state.
@@ -91,7 +91,7 @@
 				control.tick += 1;
 				send({"type": "get_step", "step": control.tick});
 			}
-		}
+		};
 		/**
 		Call the step function at fixed intervals, until getting an end message from the server.
 		*/
@@ -100,18 +100,28 @@
 				if (!control.running) clearInterval(player);
 				step();
 			}, 1000/control.fps);
-		}
+		};
 		/**
 		Pause the run() function, but leave all other variables as they are.
 		*/
 		var pause = function() {
 			clearInterval(player);
-		}
+		};
 	</script>
 	
 </head>
 <body>
-	<script>
+	<h2>{{ model_name }}</h2> <!-- Template; put the model name as the heading -->
+
+
+<!-- Script includes go here -->
+	{% for file_name in package_includes %}
+		<script src="/static/{{ file_name }}" type="text/javascript"></script>
+	{% end %}
+	{% for file_name in local_includes %}
+		<script src="/local/{{ file_name }}" type="text/javascript"></script>
+	{% end %}
+<script>
 	// Set up the GUI
 	var gui = new dat.GUI();
 	var fps_control = gui.add(control, "fps", 0, 20).step(1); // fps slider, 0 to 20 in 1 increments 
@@ -129,15 +139,12 @@
 		run();
 	});
 
-	</script>
+	// Element-specific scripts go here:
+	// Actual script snippets go here.
+	{% for script in scripts %}
+			{% raw script %}
+	{% end %}
 
-	<h2>{{ model_name }}</h2> <!-- Template; put the model name as the heading -->
-
-	<div id="Visualization">
-		<!-- Template to create a div for each TextElement to be visualized -->
-		{% for element in range(element_count) %}
-			<div id="element_{{element}}"></div>
-		{% end %}
-	</div>
+</script>
 
 </body>

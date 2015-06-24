@@ -142,10 +142,16 @@ class Grid(object):
             for dx in range(-radius, radius + 1):
                 if dx == 0 and dy == 0 and not include_center:
                     continue
-                if not moore:
-                    # Skip diagonals in Von Neumann neighborhood.
-                    if dy != 0 and dx != 0:
-                        continue
+                # Skip diagonals in Von Neumann neighborhood.
+                if not moore and dy != 0 and dx != 0:
+                    continue
+                # Skip diagonals in Moore neighborhood when distance > radius
+                if moore and radius > 1 and (dy ** 2 + dx ** 2) ** .5 > radius:
+                    continue
+                # Skip if not a torus and new coords out of bounds.
+                if not self.torus and (not (0 <= dx + x < self.width) or
+                        not (0 <= dy + y < self.height)):
+                    continue
 
                 px = self.torus_adj(x + dx, self.width)
                 py = self.torus_adj(y + dy, self.height)
@@ -220,9 +226,8 @@ class Grid(object):
                    stored in a 'pos' tuple.
             pos: Tuple of new position to move the agent to.
         '''
-
-        self._place_agent(pos, agent)
         self._remove_agent(agent.pos, agent)
+        self._place_agent(pos, agent)
         agent.pos = pos
 
     def place_agent(self, agent, pos):
