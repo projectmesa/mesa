@@ -393,10 +393,9 @@ class ContinuousSpace(object):
     '''
     Continuous space where each agent can have an arbitrary position.
 
-    Assumes that all agents are point objects, and have a pos property.
-
-    Uses a MultiGrid as a cheapo spatial database, storing agents in cells
-    based on their coordinates.
+    Assumes that all agents are point objects, and have a pos property storing
+    their position as an (x, y) tuple. This class uses a MultiGrid internally
+    to store agent objects, to speed up neighborhood lookups.
     '''
 
     _grid = None
@@ -405,6 +404,18 @@ class ContinuousSpace(object):
                  grid_width=100, grid_height=100):
         '''
         Create a new continuous space.
+
+        Args:
+            x_max, y_max: Maximum x and y coordinates for the space.
+            torus: Boolean for whether the edges loop around.
+            x_min, y_min: (default 0) If provided, set the minimum x and y
+                          coordinates for the space. Below them, values loop to
+                          the other edge (if torus=True) or raise an exception.
+            grid_width, _height: (default 100) Determine the size of the
+                                 internal storage grid. More cells will slow
+                                 down movement, but speed up neighbor lookup.
+                                 Probably only fiddle with this if one or the
+                                 other is impacting your model's performance.
         '''
         self.x_min = x_min
         self.x_max = x_max
@@ -421,7 +432,11 @@ class ContinuousSpace(object):
 
     def place_agent(self, agent, pos):
         '''
-        Place an agent in the space, and set its pos variable.
+        Place a new agent in the space.
+
+        Args:
+            agent: Agent object to place.
+            pos: Coordinate tuple for where to place the agent.
         '''
         pos = self.torus_adj(pos)
         self._place_agent(pos, agent)
@@ -430,6 +445,10 @@ class ContinuousSpace(object):
     def move_agent(self, agent, pos):
         '''
         Move an agent from its current position to a new position.
+
+        Args:
+            agent: The agent object to move.
+            pos: Coordinate tuple to move the agent to.
         '''
         pos = self.torus_adj(pos)
         self._remove_agent(agent.pos, agent)
@@ -438,14 +457,14 @@ class ContinuousSpace(object):
 
     def _place_agent(self, pos, agent):
         '''
-        Place an agent at a given point
+        Place an agent at a given point, and update the internal grid.
         '''
         cell = self._point_to_cell(pos)
         self._grid._place_agent(cell, agent)
 
     def _remove_agent(self, pos, agent):
         '''
-        Remove an agent at a given point
+        Remove an agent at a given point, and update the internal grid.
         '''
         cell = self._point_to_cell(pos)
         self._grid._remove_agent(cell, agent)
@@ -453,6 +472,14 @@ class ContinuousSpace(object):
     def get_neighbors(self, x, y, radius, include_center=True):
         '''
         Get all objects within a certain radius.
+
+        Args:
+            x, y: Coordinates to center the search at.
+            radius: Get all the objects within this distance of the center.
+            include_center: If True, include an object at the *exact* provided
+                            coordinates. i.e. if you are searching for the
+                            neighbors of a given agent, True will include that
+                            agent in the results.
         '''
         # Get candidate objects
         scale = max(self.cell_width, self.cell_height)
@@ -471,6 +498,9 @@ class ContinuousSpace(object):
     def get_distance(self, pos_1, pos_2):
         '''
         Get the distance between two point, accounting for toroidal space.
+
+        Args:
+            pos_1, pos_2: Coordinate tuples for both points.
         '''
         x1, y1 = pos_1
         x2, y2 = pos_2
@@ -486,7 +516,14 @@ class ContinuousSpace(object):
 
     def torus_adj(self, pos):
         '''
-        Convert a coordinate to handle torus looping.
+        Adjust coordinates to handle torus looping.
+
+        If the coordinate is out-of-bounds and the space is toroidal, return
+        the corresponding point within the space. If the space is not toroidal,
+        raise an exception.
+
+        Args:
+            pos: Coordinate tuple to convert.
         '''
         if not self.out_of_bounds(pos):
             return pos
