@@ -1,6 +1,6 @@
 '''
 Flockers
-===============
+=============================================================
 A Mesa implementation of Craig Reynolds's Boids flocker model.
 Uses numpy arrays to represent vectors.
 '''
@@ -19,13 +19,27 @@ class Boid(Agent):
     A Boid-style flocker agent.
 
     The agent follows three behaviors to flock:
-        - Cohesion: steering towards neighboring agents
-        - Separation:
+        - Cohesion: steering towards neighboring agents.
+        - Separation: avoiding getting too close to any other agent.
+        - Alignment: try to fly in the same direction as the neighbors.
+
+    Boids have a vision that defines the radius in which they look for their
+    neighbors to flock with. Their speed (a scalar) and heading (a unit vector)
+    define their movement. Separation is their desired minimum distance from
+    any other Boid.
     '''
     def __init__(self, unique_id, pos, speed=5, heading=None,
             vision=5, separation=1):
         '''
         Create a new Boid flocker agent.
+
+        Args:
+            unique_id: Unique agent identifyer.
+            pos: Starting position
+            speed: Distance to move per step.
+            heading: numpy vector for the Boid's direction of movement.
+            vision: Radius to look around for nearby Boids.
+            separation: Minimum distance to maintain from other Boids.
         '''
         self.unique_id = unique_id
         self.pos = pos
@@ -48,6 +62,9 @@ class Boid(Agent):
         return center / len(neighbors)
 
     def separate(self, neighbors):
+        '''
+        Return a vector away from any neighbors closer than separation dist.
+        '''
         my_pos = np.array(self.pos)
         sep_vector = np.array([0, 0])
         for neighbor in neighbors:
@@ -58,12 +75,18 @@ class Boid(Agent):
         return sep_vector
 
     def match_heading(self, neighbors):
+        '''
+        Return a vector of the neighbors' average heading.
+        '''
         mean_heading = np.array([0, 0])
         for neighbor in neighbors:
             mean_heading += neighbor.heading
         return mean_heading / len(neighbors)
 
     def step(self, model):
+        '''
+        Get the Boid's neighbors, compute the new vector, and move accordingly.
+        '''
         x, y = self.pos
         neighbors = model.space.get_neighbors(x, y, self.vision, False)
         if len(neighbors) > 0:
@@ -79,11 +102,25 @@ class Boid(Agent):
 
 
 class BoidModel(Model):
+    '''
+    Flocker model class. Handles agent creation, placement and scheduling.
+    '''
     N = 100
     width = 100
     height = 100
 
     def __init__(self, N, width, height, speed, vision, separation):
+        '''
+        Create a new Flockers model.
+
+        Args:
+            N: Number of Boids
+            width, height: Size of the space.
+            speed: How fast should the Boids move.
+            vision: How far around should each Boid look for its neighbors
+            separtion: What's the minimum distance each Boid will attempt to
+                       keep from any other
+        '''
         self.N = N
         self.vision = vision
         self.speed = speed
@@ -95,6 +132,9 @@ class BoidModel(Model):
         self.running = True
 
     def make_agents(self):
+        '''
+        Create N agents, with random positions and starting headings.
+        '''
         for i in range(self.N):
             x = random.random() * self.space.x_max
             y = random.random() * self.space.y_max
