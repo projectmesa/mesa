@@ -24,7 +24,7 @@ description = """
 
 setup(
     name='Mesa',
-    version='0.6.0',
+    version='0.6.1',
     description=description,
     author='Project Mesa Team',
     author_email='projectmesa@googlegroups.com',
@@ -35,7 +35,7 @@ setup(
     include_package_data=True,
     install_requires=requires,
     keywords='agent based modeling model ABM simulation multi-agent',
-    license='MIT',
+    license='Apache 2.0',
     zip_safe=False,
     classifiers=[
         'Topic :: Scientific/Engineering',
