@@ -38,6 +38,16 @@ Testing
 
 We are continually working to improve our testing. At the moment, we've been testing features by implementing them in simple models. This is useful since it also expands the library of sample models.
 
+We are continually working to improve our testing. At the moment, we've been testing features by implementing them in simple models. This is useful since it also expands the library of sample models. We also have several traditional unit tests in the tests/ folder.
+
+If you're changing previous Mesa features, please make sure of the following:
+
+- Your changes pass the current tests.
+- Your changes don't break the models or that your changes include updated models.
+- Additional features or rewrites of current features are accompanied by tests.
+- New features are demostrated in a model, so folks can understand more easily.
+
+
 Licensing
 --------
 
