@@ -6,7 +6,11 @@ Release History
 Next release
 ++++++++++++++++++
 
-* (Add changes here - preceed w/ 'Bug Fix or Improvement')
+* Improvement: Adding continuous space.
+* Improvement: Adding a simultaneous activation scheduler.
+* New models:
+	- Flockers
+	- Spatial Demographic Prisoner's Dilemma (PD_Grid)
 
 0.6.1 (2015-06-27)
 ++++++++++++++++++
