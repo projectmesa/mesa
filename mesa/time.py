@@ -113,3 +113,23 @@ class RandomActivation(BaseScheduler):
             agent.step(self.model)
         self.steps += 1
         self.time += 1
+
+
+class SimultaneousActivation(BaseScheduler):
+    '''
+    A scheduler to simulate the simultaneous activation of all the agents.
+
+    This scheduler requires that each agent have two methods: step and advance.
+    step(model) activates the agent and stages any necessary changes, but does
+    not apply them yet. advance(model) then applies the changes.
+    '''
+    def step(self):
+        '''
+        Step all agents, then advance them.
+        '''
+        for agent in self.agents:
+            agent.step(self.model)
+        for agent in self.agents:
+            agent.advance(self.model)
+        self.steps += 1
+        self.time += 1
