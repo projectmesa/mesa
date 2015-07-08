@@ -13,7 +13,7 @@ Mesa: Agent-based modeling in Python 3+
 .. image:: https://coveralls.io/repos/projectmesa/mesa/badge.svg
     :target: https://coveralls.io/r/projectmesa/mesa
 
-`Mesa`_ is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
+`Mesa`_ is an Apache2 licensed agent-based modeling (or ABM) framework in Python 3+.
 
 It allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. It's goal is to be the Python 3-based alternative to NetLogo, Repast, or MASON.
 
@@ -26,6 +26,8 @@ It allows users to quickly create agent-based models using built-in core compone
 *Above: A Mesa implementation of the Schelling segregation model,
 being visualized in a browser window and analyzed in an IPython
 notebook.*
+
+
 
 .. _`Mesa` : https://github.com/projectmesa/mesa/
 
@@ -74,7 +76,7 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
 .. _`Github` : https://github.com/projectmesa/mesa/
 
 
-** Table of Contents **
+**Table of Contents**
 
 .. toctree::
    :maxdepth: 1
