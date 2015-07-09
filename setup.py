@@ -24,7 +24,7 @@ description = """
 
 setup(
     name='Mesa',
-    version='0.6.1',
+    version='0.6.2',
     description=description,
     author='Project Mesa Team',
     author_email='projectmesa@googlegroups.com',

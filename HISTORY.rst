@@ -6,6 +6,11 @@ Release History
 Next release
 ++++++++++++++++++
 
+* ???
+
+0.6.2 (2015-07-09)
+++++++++++++++++++
+
 * Improvement: Adding continuous space.
 * Improvement: Adding a simultaneous activation scheduler.
 * New models:
