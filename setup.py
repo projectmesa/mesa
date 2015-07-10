@@ -2,12 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup
+from codecs import open
 
 requires = [
     'tornado',
     'numpy',
     'pandas',
 ]
+
+with open('README.rst', 'r', encoding='utf-8') as f:
+    readme = f.read()
 
 # TODO: Rewrite Readme and pull that it instead.
 description = """
@@ -17,20 +21,18 @@ description = """
     implementations; visualize them using a browser-based interface; and
     analyze their results using Python's data analysis tools. It's goal is
     to be the Python 3-based alternative to NetLogo, Repast, or MASON.
-
-    Mesa is being developed by a group of modeling practitioners with
-    experience in academia, government, and the private sector.
 """
 
 setup(
     name='Mesa',
     version='0.6.2',
-    description=description,
+    description="Mesa: Agent-based modeling in Python 3+",
+    long_description=readme,
     author='Project Mesa Team',
     author_email='projectmesa@googlegroups.com',
     url='https://github.com/projectmesa/mesa',
     packages=['mesa'],
-    package_data={'': ['LICENSE.md', ], },
+    package_data={'': ['LICENSE', ], },
     package_dir={'mesa': 'mesa'},
     include_package_data=True,
     install_requires=requires,
