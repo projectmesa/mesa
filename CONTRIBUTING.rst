@@ -11,18 +11,18 @@ In no particular order, examples include:
 - Documentation improvements
 - Tutorials
 
-No contribution is too small. Although, contributions can be to big, so let's discuss via the `email list`_ OR `an issue`_.
+No contribution is too small. Although, contributions can be too big, so let's discuss via the `email list`_ OR `an issue`_.
 
 **To submit a contribution**
 
 - Create a ticket for the item that you are working on.
-- Fork the Mesa repository
+- Fork the Mesa repository.
 - Create a new branch if you aren't contributing to an existing branch.
 - Edit the code.
 - Use `PEP8`_ and the `Google Style Guide`_ as the coding standards for Python.
 - If implementing a new feature, include some documentation and ideally a working example or unit test as well.
-- Submit as pull requests
-- Describe the change w/ ticket number(s) that the code fixes
+- Submit as pull requests.
+- Describe the change w/ ticket number(s) that the code fixes.
 
 .. _`email list` : https://groups.google.com/forum/#!forum/projectmesa
 .. _`an issue` : https://github.com/projectmesa/mesa/issues
@@ -36,16 +36,14 @@ Testing
 .. image:: https://coveralls.io/repos/projectmesa/mesa/badge.svg
     :target: https://coveralls.io/r/projectmesa/mesa
 
-We are continually working to improve our testing. At the moment, we've been testing features by implementing them in simple models. This is useful since it also expands the library of sample models.
-
 We are continually working to improve our testing. At the moment, we've been testing features by implementing them in simple models. This is useful since it also expands the library of sample models. We also have several traditional unit tests in the tests/ folder.
 
 If you're changing previous Mesa features, please make sure of the following:
 
 - Your changes pass the current tests.
-- Your changes don't break the models or that your changes include updated models.
+- Your changes don't break the models or your changes include updated models.
 - Additional features or rewrites of current features are accompanied by tests.
-- New features are demostrated in a model, so folks can understand more easily.
+- New features are demonstrated in a model, so folks can understand more easily.
 
 
 Licensing
