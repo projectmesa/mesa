@@ -58,26 +58,26 @@ class TestBaseGrid(unittest.TestCase):
         Test the base neighborhood methods on the non-toroid.
         '''
 
-        neighborhood = self.grid.get_neighborhood(1, 1, moore=True)
+        neighborhood = self.grid.get_neighborhood((1, 1), moore=True)
         assert len(neighborhood) == 8
 
-        neighborhood = self.grid.get_neighborhood(4, 1, moore=True)
+        neighborhood = self.grid.get_neighborhood((4, 1), moore=True)
         assert len(neighborhood) == 5
 
-        neighborhood = self.grid.get_neighborhood(0, 0, moore=False)
+        neighborhood = self.grid.get_neighborhood((0, 0), moore=False)
         assert len(neighborhood) == 2
 
-        neighbors = self.grid.get_neighbors(4, 1, moore=False)
+        neighbors = self.grid.get_neighbors((4, 1), moore=False)
         assert len(neighbors) == 0
 
-        neighbors = self.grid.get_neighbors(4, 1, moore=True)
+        neighbors = self.grid.get_neighbors((4, 1), moore=True)
         assert len(neighbors) == 2
 
-        neighbors = self.grid.get_neighbors(1, 1, moore=False,
+        neighbors = self.grid.get_neighbors((1, 1), moore=False,
                                             include_center=True)
         assert len(neighbors) == 3
 
-        neighbors = self.grid.get_neighbors(3, 1, moore=False, radius=2)
+        neighbors = self.grid.get_neighbors((3, 1), moore=False, radius=2)
         assert len(neighbors) == 4
 
 
@@ -93,26 +93,26 @@ class TestBaseGridTorus(TestBaseGrid):
         Test the toroidal neighborhood methods.
         '''
 
-        neighborhood = self.grid.get_neighborhood(1, 1, moore=True)
+        neighborhood = self.grid.get_neighborhood((1, 1), moore=True)
         assert len(neighborhood) == 8
 
-        neighborhood = self.grid.get_neighborhood(4, 1, moore=True)
+        neighborhood = self.grid.get_neighborhood((4, 1), moore=True)
         assert len(neighborhood) == 8
 
-        neighborhood = self.grid.get_neighborhood(0, 0, moore=False)
+        neighborhood = self.grid.get_neighborhood((0, 0), moore=False)
         assert len(neighborhood) == 4
 
-        neighbors = self.grid.get_neighbors(4, 1, moore=False)
+        neighbors = self.grid.get_neighbors((4, 1), moore=False)
         assert len(neighbors) == 0
 
-        neighbors = self.grid.get_neighbors(4, 1, moore=True)
+        neighbors = self.grid.get_neighbors((4, 1), moore=True)
         assert len(neighbors) == 2
 
-        neighbors = self.grid.get_neighbors(1, 1, moore=False,
+        neighbors = self.grid.get_neighbors((1, 1), moore=False,
                                             include_center=True)
         assert len(neighbors) == 3
 
-        neighbors = self.grid.get_neighbors(3, 1, moore=False, radius=2)
+        neighbors = self.grid.get_neighbors((3, 1), moore=False, radius=2)
         assert len(neighbors) == 4
 
 
@@ -213,24 +213,24 @@ class TestMultiGrid(unittest.TestCase):
         Test the toroidal MultiGrid neighborhood methods.
         '''
 
-        neighborhood = self.grid.get_neighborhood(1, 1, moore=True)
+        neighborhood = self.grid.get_neighborhood((1, 1), moore=True)
         assert len(neighborhood) == 8
 
-        neighborhood = self.grid.get_neighborhood(4, 1, moore=True)
+        neighborhood = self.grid.get_neighborhood((4, 1), moore=True)
         assert len(neighborhood) == 8
 
-        neighborhood = self.grid.get_neighborhood(0, 0, moore=False)
+        neighborhood = self.grid.get_neighborhood((0, 0), moore=False)
         assert len(neighborhood) == 4
 
-        neighbors = self.grid.get_neighbors(4, 1, moore=False)
+        neighbors = self.grid.get_neighbors((4, 1), moore=False)
         assert len(neighbors) == 0
 
-        neighbors = self.grid.get_neighbors(4, 1, moore=True)
+        neighbors = self.grid.get_neighbors((4, 1), moore=True)
         assert len(neighbors) == 5
 
-        neighbors = self.grid.get_neighbors(1, 1, moore=False,
+        neighbors = self.grid.get_neighbors((1, 1), moore=False,
                                             include_center=True)
         assert len(neighbors) == 7
 
-        neighbors = self.grid.get_neighbors(3, 1, moore=False, radius=2)
+        neighbors = self.grid.get_neighbors((3, 1), moore=False, radius=2)
         assert len(neighbors) == 11

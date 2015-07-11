@@ -112,21 +112,27 @@ class Grid(object):
         """
         return Grid.CoordIter(self)
 
-    def neighbor_iter(self, x, y, moore=True, torus=False):
+    def neighbor_iter(self, pos, moore=True, torus=False):
         """
-        Iterate over our neighbors.
+        Iterate over position neighbors.
+
+        Args:
+            pos: (x,y) coords tuple for the position to get the neighbors of.
+            moore: Boolean for whether to use Moore neighborhood (including
+                   diagonals) or Von Neumann (only up/down/left/right).
+            torus: Boolean for whether edges wrap around.
         """
-        neighbors = self.get_neighbors(x, y, moore=moore)
+        neighbors = self.get_neighbors(pos, moore=moore)
         return iter(neighbors)
 
-    def get_neighborhood(self, x, y, moore,
+    def get_neighborhood(self, pos, moore,
                          include_center=False, radius=1):
         """
         Return a list of cells that are in the
         neighborhood of a certain point.
 
         Args:
-            x, y: Coordinates for the neighborhood to get.
+            pos: Coordinate tuple for the neighborhood to get.
             moore: If True, return Moore neighborhood
                         (including diagonals)
                    If False, return Von Neumann neighborhood
@@ -141,6 +147,7 @@ class Grid(object):
                 Moore, 5 if Von Neumann
                 (8 and 4 if not including the center).
         """
+        x, y = pos
         coordinates = set()
         for dy in range(-radius, radius + 1):
             for dx in range(-radius, radius + 1):
@@ -161,19 +168,19 @@ class Grid(object):
                 py = self.torus_adj(y + dy, self.height)
 
                 # Skip if new coords out of bounds.
-                if(self.out_of_bounds(px, py)):
+                if(self.out_of_bounds((px, py))):
                     continue
 
                 coordinates.add((px, py))
         return list(coordinates)
 
-    def get_neighbors(self, x, y, moore,
+    def get_neighbors(self, pos, moore,
                       include_center=False, radius=1):
         """
         Return a list of neighbors to a certain point.
 
         Args:
-            x, y: Coordinates for the neighborhood to get.
+            pos: Coordinate tuple for the neighborhood to get.
             moore: If True, return Moore neighborhood
                     (including diagonals)
                    If False, return Von Neumann neighborhood
@@ -188,7 +195,7 @@ class Grid(object):
             at most 9 if Moore, 5 if Von-Neumann
             (8 and 4 if not including the center).
         """
-        neighborhood = self.get_neighborhood(x, y, moore,
+        neighborhood = self.get_neighborhood(pos, moore,
                                              include_center,
                                              radius)
         return self.get_cell_list_contents(neighborhood)
@@ -201,10 +208,11 @@ class Grid(object):
             coord %= dim_len
         return coord
 
-    def out_of_bounds(self, x, y):
+    def out_of_bounds(self, pos):
         """
-        Is point x, y off the grid?
+        Is pos off the grid?
         """
+        x, y = pos
         return x < 0 or x >= self.width or y < 0 or y >= self.height
 
     def get_cell_list_contents(self, cell_list):
@@ -217,7 +225,7 @@ class Grid(object):
         '''
         contents = []
         for x, y in cell_list:
-            self._add_members(contents, x, y)
+            self._add_members(contents, (x, y))
         return contents
 
     def move_agent(self, agent, pos):
@@ -240,30 +248,31 @@ class Grid(object):
         self._place_agent(pos, agent)
         agent.pos = pos
 
-    def _place_agent(self, coords, agent):
+    def _place_agent(self, pos, agent):
         '''
         Place the agent at the correct location.
         '''
-        x, y = coords
+        x, y = pos
         self.grid[y][x] = agent
 
-    def _remove_agent(self, coords, agent):
+    def _remove_agent(self, pos, agent):
         '''
         Remove the agent from the given location.
         '''
-        x, y = coords
+        x, y = pos
         self.grid[y][x] = None
 
-    def _add_members(self, target_list, x, y):
+    def _add_members(self, target_list, pos):
         '''
         Helper method to append the contents of a cell to the given list.
         Override for other grid types.
         '''
+        x, y = pos
         if self.grid[y][x] is not None:
             target_list.append(self.grid[y][x])
 
-    def is_cell_empty(self, coords):
-        x, y = coords
+    def is_cell_empty(self, pos):
+        x, y = pos
         return True if self.grid[y][x] == self.default_val() else False
 
 
@@ -290,22 +299,22 @@ class SingleGrid(Grid):
         """
         Moves agent to a random empty cell, vacating agent's old cell.
         """
-        coords = agent.pos
-        new_coords = self.find_empty()
-        if new_coords is None:
+        pos = agent.pos
+        new_pos = self.find_empty()
+        if new_pos is None:
             raise Exception("ERROR: No empty cells")
         else:
-            self._place_agent(new_coords, agent)
-            agent.pos = new_coords
-            self._remove_agent(coords, agent)
+            self._place_agent(new_pos, agent)
+            agent.pos = new_pos
+            self._remove_agent(pos, agent)
 
     def find_empty(self):
         '''
         Pick a random empty cell.
         '''
         if self.exists_empty_cells():
-            coords = random.choice(self.empties)
-            return coords
+            pos = random.choice(self.empties)
+            return pos
         else:
             return None
 
@@ -334,16 +343,16 @@ class SingleGrid(Grid):
         agent.pos = coords
         self._place_agent(coords, agent)
 
-    def _place_agent(self, coords, agent):
-        if self.is_cell_empty(coords):
-            super()._place_agent(coords, agent)
-            self.empties.remove(coords)
+    def _place_agent(self, pos, agent):
+        if self.is_cell_empty(pos):
+            super()._place_agent(pos, agent)
+            self.empties.remove(pos)
         else:
             raise Exception("Cell not empty")
 
-    def _remove_agent(self, coords, agent):
-        super()._remove_agent(coords, agent)
-        self.empties.append(coords)
+    def _remove_agent(self, pos, agent):
+        super()._remove_agent(pos, agent)
+        self.empties.append(pos)
 
 
 class MultiGrid(Grid):
@@ -373,24 +382,25 @@ class MultiGrid(Grid):
         """
         return set()
 
-    def _place_agent(self, coords, agent):
+    def _place_agent(self, pos, agent):
         '''
         Place the agent at the correct location.
         '''
-        x, y = coords
+        x, y = pos
         self.grid[y][x].add(agent)
 
-    def _remove_agent(self, coords, agent):
+    def _remove_agent(self, pos, agent):
         '''
         Remove the agent from the given location.
         '''
-        x, y = coords
+        x, y = pos
         self.grid[y][x].remove(agent)
 
-    def _add_members(self, target_list, x, y):
+    def _add_members(self, target_list, pos):
         '''
         Helper method to add all objects in the given cell to the target_list.
         '''
+        x, y = pos
         for a in self.grid[y][x]:
             target_list.append(a)
 
@@ -475,12 +485,12 @@ class ContinuousSpace(object):
         cell = self._point_to_cell(pos)
         self._grid._remove_agent(cell, agent)
 
-    def get_neighbors(self, x, y, radius, include_center=True):
+    def get_neighbors(self, pos, radius, include_center=True):
         '''
         Get all objects within a certain radius.
 
         Args:
-            x, y: Coordinates to center the search at.
+            pos: (x,y) coordinate tuple to center the search at.
             radius: Get all the objects within this distance of the center.
             include_center: If True, include an object at the *exact* provided
                             coordinates. i.e. if you are searching for the
@@ -490,13 +500,13 @@ class ContinuousSpace(object):
         # Get candidate objects
         scale = max(self.cell_width, self.cell_height)
         cell_radius = math.ceil(radius / scale)
-        cell_x, cell_y = self._point_to_cell((x, y))
-        possible_objs = self._grid.get_neighbors(cell_x, cell_y,
+        cell_pos = self._point_to_cell(pos)
+        possible_objs = self._grid.get_neighbors(cell_pos,
                                               True, True, cell_radius)
         neighbors = []
         # Iterate over candidates and check actual distance.
         for obj in possible_objs:
-            dist = self.get_distance((x, y), obj.pos)
+            dist = self.get_distance(pos, obj.pos)
             if dist <= radius and (include_center or dist > 0):
                 neighbors.append(obj)
         return neighbors

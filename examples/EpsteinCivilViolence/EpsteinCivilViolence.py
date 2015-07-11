@@ -33,7 +33,7 @@ class Citizen(Agent):
 
     """
 
-    def __init__(self, unique_id, x, y, hardship, regime_legitimacy,
+    def __init__(self, unique_id, pos, hardship, regime_legitimacy,
                  risk_aversion, threshold, vision, model):
         """
         Create a new Citizen.
@@ -54,7 +54,7 @@ class Citizen(Agent):
         super(Citizen, self).__init__(unique_id, model)
         self.breed = 'citizen'
         self.unique_id = unique_id
-        self.pos = (x, y)
+        self.pos = pos
         self.hardship = hardship
         self.regime_legitimacy = regime_legitimacy
         self.risk_aversion = risk_aversion
@@ -89,7 +89,7 @@ class Citizen(Agent):
         """
         Look around and see who my neighbors are
         """
-        self.neighborhood = model.grid.get_neighborhood(self.pos[0], self.pos[1],
+        self.neighborhood = model.grid.get_neighborhood(self.pos,
                                                         moore=False, radius=1)
         self.neighbors = model.grid.get_cell_list_contents(self.neighborhood)
         self.empty_neighbors = [c for c in self.neighborhood if
@@ -125,7 +125,7 @@ class Cop(Agent):
             able to inspect
     """
 
-    def __init__(self, unique_id, x, y, vision, model):
+    def __init__(self, unique_id, pos, vision, model):
         """
         Create a new Cop.
         Args:
@@ -137,7 +137,7 @@ class Cop(Agent):
         """
         super(Cop, self).__init__(unique_id, model)
         self.breed = 'cop'
-        self.pos = (x, y)
+        self.pos = pos
         self.vision = vision
 
     def step(self, model):
@@ -164,7 +164,7 @@ class Cop(Agent):
         """
         Look around and see who my neighbors are.
         """
-        self.neighborhood = model.grid.get_neighborhood(self.pos[0], self.pos[1],
+        self.neighborhood = model.grid.get_neighborhood(self.pos,
                                                         moore=False, radius=1)
         self.neighbors = model.grid.get_cell_list_contents(self.neighborhood)
         self.empty_neighbors = [c for c in self.neighborhood if
@@ -240,14 +240,14 @@ class CivilViolenceModel(Model):
                 'Cop density + citizen density must be less than 1')
         for (contents, x, y) in self.grid.coord_iter():
             if random.random() < self.cop_density:
-                cop = Cop(unique_id, x, y, vision=self.cop_vision,
+                cop = Cop(unique_id, (x, y), vision=self.cop_vision,
                           model=self)
                 unique_id += 1
                 self.grid[y][x] = cop
                 self.schedule.add(cop)
             elif random.random() < (
                     self.cop_density + self.citizen_density):
-                citizen = Citizen(unique_id, x, y,
+                citizen = Citizen(unique_id, (x, y),
                                   hardship=random.random(),
                                   regime_legitimacy=self.legitimacy,
                                   risk_aversion=random.random(),

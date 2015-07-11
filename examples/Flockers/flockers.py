@@ -87,8 +87,8 @@ class Boid(Agent):
         '''
         Get the Boid's neighbors, compute the new vector, and move accordingly.
         '''
-        x, y = self.pos
-        neighbors = model.space.get_neighbors(x, y, self.vision, False)
+
+        neighbors = model.space.get_neighbors(self.pos, self.vision, False)
         if len(neighbors) > 0:
             cohere_vector = self.cohere(neighbors)
             separate_vector = self.separate(neighbors)
