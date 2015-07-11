@@ -6,7 +6,22 @@ Release History
 Next release
 ++++++++++++++++++
 
-* ???
+
+0.6.5 (2015-07-11)
+++++++++++++++++++
+
+* Edits
+    * Additions to tutorial doc
+    * Minor edits to README & Intro
+    * Minor edits / clean up to setup.py
+    * Removing .ipynb_checkpoints
+    * Removing out-of-date planning documentation.
+* Bug fix: Use setuptools' find_packages function to get the list of packages to install, fixes #141
+* Improvements
+    * Use package_data for include the web files
+    * Use a MANIFEST.in file to include the LICENSE file in source distributions
+    * Using conda on Travis allows much faster builds and test runs
+
 
 0.6.2 (2015-07-09)
 ++++++++++++++++++
