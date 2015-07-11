@@ -73,7 +73,7 @@ class WolfSheepPredation(Model):
         for i in range(self.initial_sheep):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
-            sheep = Sheep(self.grid, x, y, True)
+            sheep = Sheep(self.grid, (x, y), True)
             self.grid.place_agent(sheep, (x, y))
             self.schedule.add(sheep)
 
@@ -82,7 +82,7 @@ class WolfSheepPredation(Model):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = random.randrange(2 * self.wolf_gain_from_food)
-            wolf = Wolf(self.grid, x, y, True, energy)
+            wolf = Wolf(self.grid, (x, y), True, energy)
             self.grid.place_agent(wolf, (x, y))
             self.schedule.add(wolf)
 
@@ -107,7 +107,7 @@ class Sheep(RandomWalker, Agent):
         if random.random() < model.sheep_reproduce:
             # Create a new sheep:
             x, y = self.pos
-            lamb = Sheep(self.grid, x, y, self.moore)
+            lamb = Sheep(self.grid, self.pos, self.moore)
             model.grid[y][x].add(lamb)
             model.schedule.add(lamb)
 
@@ -119,8 +119,8 @@ class Wolf(RandomWalker, Agent):
 
     energy = None
 
-    def __init__(self, grid, x, y, moore, energy):
-        super().__init__(grid, x, y, moore)
+    def __init__(self, grid, pos, moore, energy):
+        super().__init__(grid, pos, moore)
         self.energy = energy
 
     def step(self, model):
@@ -142,7 +142,7 @@ class Wolf(RandomWalker, Agent):
         # Reproduction:
         if random.random() < model.wolf_reproduce:
             # Create a new wolf cub
-            cub = Wolf(self.grid, x, y, self.moore, self.energy / 2)
+            cub = Wolf(self.grid, self.pos, self.moore, self.energy / 2)
             self.energy = self.energy / 2
             model.grid[y][x].add(cub)
             model.schedule.add(cub)

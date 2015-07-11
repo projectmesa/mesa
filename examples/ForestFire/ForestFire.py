@@ -5,9 +5,6 @@ from mesa.time import RandomActivation
 from mesa.space import Grid
 from mesa.datacollection import DataCollector
 
-X = 0
-Y = 1
-
 
 class TreeCell(Agent):
     '''
@@ -21,14 +18,14 @@ class TreeCell(Agent):
     unique_id isn't strictly necessary here, but it's good
     practice to give one to each agent anyway.
     '''
-    def __init__(self, x, y):
+    def __init__(self, pos):
         '''
         Create a new tree.
         Args:
-            x, y: The tree's coordinates on the grid.
+            pos: The tree's coordinates on the grid.
         '''
-        self.pos = (x, y)
-        self.unique_id = (x, y)
+        self.pos = pos
+        self.unique_id = pos
         self.condition = "Fine"
 
     def step(self, model):
@@ -36,7 +33,7 @@ class TreeCell(Agent):
         If the tree is on fire, spread it to fine trees nearby.
         '''
         if self.condition == "On Fire":
-            for neighbor in model.grid.neighbor_iter(self.pos[X], self.pos[Y]):
+            for neighbor in model.grid.neighbor_iter(self.pos):
                 if neighbor.condition == "Fine":
                     neighbor.condition = "On Fire"
             self.condition = "Burned Out"
@@ -75,7 +72,7 @@ class ForestFire(Model):
         for (contents, x, y) in self.grid.coord_iter():
             if random.random() < self.density:
                 # Create a tree
-                new_tree = TreeCell(x, y)
+                new_tree = TreeCell((x, y))
                 # Set all trees in the first column on fire.
                 if x == 0:
                     new_tree.condition = "On Fire"

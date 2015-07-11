@@ -45,13 +45,13 @@ class TestSpaceToroidal(unittest.TestCase):
         '''
         Test neighborhood retrieval
         '''
-        neighbors_1 = self.space.get_neighbors(-20, -20, 1)
+        neighbors_1 = self.space.get_neighbors((-20, -20), 1)
         assert len(neighbors_1) == 2
 
-        neighbors_2 = self.space.get_neighbors(40, -10, 10)
+        neighbors_2 = self.space.get_neighbors((40, -10), 10)
         assert len(neighbors_2) == 0
 
-        neighbors_3 = self.space.get_neighbors(-30, -30, 10)
+        neighbors_3 = self.space.get_neighbors((-30, -30), 10)
         assert len(neighbors_3) == 1
 
 
@@ -92,11 +92,11 @@ class TestSpaceNonToroidal(unittest.TestCase):
         '''
         Test neighborhood retrieval
         '''
-        neighbors_1 = self.space.get_neighbors(-20, -20, 1)
+        neighbors_1 = self.space.get_neighbors((-20, -20), 1)
         assert len(neighbors_1) == 2
 
-        neighbors_2 = self.space.get_neighbors(40, -10, 10)
+        neighbors_2 = self.space.get_neighbors((40, -10), 10)
         assert len(neighbors_2) == 0
 
-        neighbors_3 = self.space.get_neighbors(-30, -30, 10)
+        neighbors_3 = self.space.get_neighbors((-30, -30), 10)
         assert len(neighbors_3) == 0

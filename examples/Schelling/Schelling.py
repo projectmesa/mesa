@@ -32,9 +32,6 @@ from mesa.datacollection import DataCollector
 from mesa.visualization.TextVisualization import (TextData, TextGrid,
     TextVisualization)
 
-X = 0
-Y = 1
-
 
 class SchellingModel(Model):
     '''
@@ -58,7 +55,7 @@ class SchellingModel(Model):
         self.datacollector = DataCollector(
             {"happy": lambda m: m.happy},  # Model-level count of happy agents
             # For testing purposes, agent's individual x and y
-            {"x": lambda a: a.pos[X], "y": lambda a: a.pos[Y]})
+            {"x": lambda a: a.pos[0], "y": lambda a: a.pos[1]})
 
         self.running = True
 
@@ -76,7 +73,7 @@ class SchellingModel(Model):
                     agent_type = 0
 
                 agent = SchellingAgent((x, y), agent_type)
-                self.grid.position_agent(agent, x, y)
+                self.grid.position_agent(agent, (x, y))
                 self.schedule.add(agent)
 
     def step(self):
@@ -95,7 +92,7 @@ class SchellingAgent(Agent):
     '''
     Schelling segregation agent
     '''
-    def __init__(self, coords, agent_type):
+    def __init__(self, pos, agent_type):
         '''
          Create a new Schelling agent.
 
@@ -104,13 +101,13 @@ class SchellingAgent(Agent):
             x, y: Agent initial location.
             agent_type: Indicator for the agent's type (minority=1, majority=0)
         '''
-        self.unique_id = coords
-        self.pos = coords
+        self.unique_id = pos
+        self.pos = pos
         self.type = agent_type
 
     def step(self, model):
         similar = 0
-        for neighbor in model.grid.neighbor_iter(self.pos[X], self.pos[Y]):
+        for neighbor in model.grid.neighbor_iter(self.pos):
             if neighbor.type == self.type:
                 similar += 1
 
