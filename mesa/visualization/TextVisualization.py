@@ -123,11 +123,9 @@ class TextGrid(TextElement):
 
     Properties:
         grid: The underlying grid object.
-        converter: Function which renders the contents of each cell.
     '''
 
     grid = None
-    converter = lambda x: 'X'
 
     def __init__(self, grid, converter):
         '''
@@ -139,7 +137,13 @@ class TextGrid(TextElement):
             to ascii
         '''
         self.grid = grid
-        self.converter = converter
+
+    @staticmethod
+    def converter(x):
+        """
+        Text content of cells.
+        """
+        return 'X'
 
     def render(self):
         '''

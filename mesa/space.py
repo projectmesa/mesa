@@ -37,7 +37,6 @@ class Grid(object):
         torus: Boolean which determines whether to treat the grid as a torus.
 
         grid: Internal list-of-lists which holds the grid cells themselves.
-        default_val: Lambda function to populate each grid cell with None.
 
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
@@ -45,8 +44,6 @@ class Grid(object):
         get_cell_list_contents: Returns the contents of a list of cells
             ((x,y) tuples)
     '''
-
-    default_val = lambda s: None
 
     class CoordIter:
         """
@@ -93,6 +90,13 @@ class Grid(object):
             for x in range(self.width):
                 row.append(self.default_val())
             self.grid.append(row)
+
+    @staticmethod
+    def default_val():
+        """
+        Default value for new cell elements.
+        """
+        return None
 
     def __getitem__(self, index):
         return self.grid[index]
@@ -358,13 +362,16 @@ class MultiGrid(Grid):
         torus: Boolean which determines whether to treat the grid as a torus.
 
         grid: Internal list-of-lists which holds the grid cells themselves.
-        default_val: Lambda function to populate grid cells with an empty set.
 
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
     '''
-
-    default_val = lambda s: set()
+    @staticmethod
+    def default_val():
+        """
+        Default value for new cell elements.
+        """
+        return set()
 
     def _place_agent(self, coords, agent):
         '''
