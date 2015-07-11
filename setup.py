@@ -21,7 +21,7 @@ with open('README.rst', 'r', encoding='utf-8') as f:
 
 setup(
     name='Mesa',
-    version='0.6.5',
+    version=version,
     description="Mesa: Agent-based modeling in Python 3+",
     long_description=readme,
     author='Project Mesa Team',

@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-Next release
+0.6.5.1 (2015-07-11)
 ++++++++++++++++++
 
 Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
@@ -11,7 +11,8 @@ Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 * Improvements
     * Adding version, license, copyright, title to __init__.py
     * Auto updating version in setup.py
-* Bug fix: Updating MANIFEST.in to include visualization templates taht were missing.
+* Bug fix
+    * Updating MANIFEST.in to include visualization templates taht were missing.
 
 
 0.6.5 (2015-07-11)
@@ -25,7 +26,8 @@ Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
     * Minor edits / clean up to setup.py
     * Removing .ipynb_checkpoints
     * Removing out-of-date planning documentation.
-* Bug fix: Use setuptools' find_packages function to get the list of packages to install, fixes #141
+* Bug fix
+    * Use setuptools' find_packages function to get the list of packages to install, fixes #141
 * Improvements
     * Use package_data for include the web files
     * Use a MANIFEST.in file to include the LICENSE file in source distributions
