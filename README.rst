@@ -40,6 +40,12 @@ Getting started quickly:
 
     $ pip install mesa
 
+You can also use `pip` to install the github version:
+
+.. code-block:: bash
+
+    $ pip install git+https://github.com/projectmesa/mesa
+
 For more help on using Mesa, check out the following resources:
 
 * `Intro to Mesa Tutorial`_
