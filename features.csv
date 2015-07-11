@@ -1,5 +1,0 @@
-Description	Implemented?
-Store random seeds used throughout model	N
-Ensure that model objects + all that goes with them can be easily pickled	N
-Easily create a web based visualization of a model	N
-Ability to load shapefiles and place agents on them (a-la GeoMASON)  hahaha N
