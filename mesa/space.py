@@ -201,8 +201,7 @@ class Grid(object):
         """
         Is point x, y off the grid?
         """
-        return(x < 0 or x >= self.width
-               or y < 0 or y >= self.height)
+        return x < 0 or x >= self.width or y < 0 or y >= self.height
 
     def get_cell_list_contents(self, cell_list):
         '''
@@ -551,5 +550,5 @@ class ContinuousSpace(object):
         Check if a point is out of bounds.
         '''
         x, y = pos
-        return (x < self.x_min or x > self.x_max
-            or y < self.y_min or y > self.y_max)
+        return (x < self.x_min or x > self.x_max or
+                y < self.y_min or y > self.y_max)
