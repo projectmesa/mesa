@@ -4,14 +4,13 @@ Mesa Agent-Based Modeling Framework
 Core Objects: Model, and Agent.
 '''
 
+import datetime as dt
+import random
+
 __title__ = 'mesa'
 __version__ = '0.6.5'
 __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright 2015 Project Mesa Team'
-
-
-import datetime as dt
-import random
 
 
 class Model(object):
