@@ -32,7 +32,7 @@ setup(
     author_email='projectmesa@googlegroups.com',
     url='https://github.com/projectmesa/mesa',
     packages=find_packages(),
-    package_data={'': ['LICENSE', ], },
+    package_data={'mesa': ['visualization/templates/*']},
     include_package_data=True,
     install_requires=requires,
     keywords='agent based modeling model ABM simulation multi-agent',
