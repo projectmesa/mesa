@@ -1,1 +1,6 @@
-LICENSE
+include MANIFEST.in
+include LICENSE
+include HISTORY.rst
+include README.rst
+include setup.py
+include mesa/visualization/templates/*
