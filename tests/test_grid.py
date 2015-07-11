@@ -80,6 +80,22 @@ class TestBaseGrid(unittest.TestCase):
         neighbors = self.grid.get_neighbors((3, 1), moore=False, radius=2)
         assert len(neighbors) == 4
 
+    def test_coord_iter(self):
+        ci = self.grid.coord_iter()
+
+        # no agent in first space
+        first = next(ci)
+        assert first[0] is None
+        assert first[1] == 0
+        assert first[2] == 0
+
+        # first agent in the second space
+        second = next(ci)
+        assert second[0].unique_id == 1
+        assert second[0].pos == (1, 0)
+        assert second[1] == 1
+        assert second[2] == 0
+
 
 class TestBaseGridTorus(TestBaseGrid):
     '''

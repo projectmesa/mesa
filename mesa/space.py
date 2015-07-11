@@ -44,33 +44,6 @@ class Grid(object):
         get_cell_list_contents: Returns the contents of a list of cells
             ((x,y) tuples)
     '''
-
-    class CoordIter:
-        """
-        An iterator that returns the coordinates of a cell along with its
-        contents.
-        """
-
-        def __init__(self, grid):
-            self.grid = grid
-            self.x = 0
-            self.y = 0
-
-        def __iter__(self):
-            return self
-
-        def __next__(self):
-            while self.y < self.grid.height:
-                while self.x < self.grid.width:
-                    ret = [self.grid[self.y][self.x],
-                           self.x, self.y]
-                    self.x += 1
-                    return ret
-                self.x = 0
-                self.y += 1
-            else:
-                raise StopIteration()
-
     def __init__(self, height, width, torus):
         '''
         Create a new grid.
@@ -110,7 +83,9 @@ class Grid(object):
         """
         An iterator that returns coordinates as well as cell contents.
         """
-        return Grid.CoordIter(self)
+        for row in range(self.height):
+            for col in range(self.width):
+                yield self.grid[row][col], col, row  # agent, x, y
 
     def neighbor_iter(self, pos, moore=True, torus=False):
         """
