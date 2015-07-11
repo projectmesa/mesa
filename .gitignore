@@ -56,4 +56,4 @@ docs/_build/
 # PyBuilder
 target/
 
-.ipynb_checkpoints/Testing-checkpoint.ipynb
+*.ipynb_checkpoints
