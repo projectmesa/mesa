@@ -37,9 +37,10 @@ setup(
     classifiers=[
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Life',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
         'Intended Audience :: Science/Research',
         'Programming Language :: Python :: 3 :: Only',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Development Status :: 3 - Alpha',
         'Natural Language :: English',
