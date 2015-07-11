@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import re
 
 from setuptools import setup, find_packages
 from codecs import open
@@ -9,6 +10,11 @@ requires = [
     'numpy',
     'pandas',
 ]
+
+version = ''
+with open('mesa/__init__.py', 'r') as fd:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                        fd.read(), re.MULTILINE).group(1)
 
 with open('README.rst', 'r', encoding='utf-8') as f:
     readme = f.read()

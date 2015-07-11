@@ -6,7 +6,10 @@ Release History
 Next release
 ++++++++++++++++++
 
-* ???
+* Improvements
+    * Adding version, license, copyright, title to __init__.py
+    * Auto updating version in setup.py
+
 
 0.6.5 (2015-07-11)
 ++++++++++++++++++
