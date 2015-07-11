@@ -6,9 +6,12 @@ Release History
 Next release
 ++++++++++++++++++
 
+Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
+
 * Improvements
     * Adding version, license, copyright, title to __init__.py
     * Auto updating version in setup.py
+* Bug fix: Updating MANIFEST.in to include visualization templates that were missing.
 
 
 0.6.5 (2015-07-11)
