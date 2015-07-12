@@ -6,6 +6,12 @@ Release History
 Next release
 ++++++++++++++++++
 
+* ???
+
+
+0.6.6 (2015-07-11)
+++++++++++++++++++
+
 Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 
 * Improvements
