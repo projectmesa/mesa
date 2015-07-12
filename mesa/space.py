@@ -87,7 +87,7 @@ class Grid(object):
             for col in range(self.width):
                 yield self.grid[row][col], col, row  # agent, x, y
 
-    def neighbor_iter(self, pos, moore=True, torus=False):
+    def neighbor_iter(self, pos, moore=True):
         """
         Iterate over position neighbors.
 
@@ -95,7 +95,6 @@ class Grid(object):
             pos: (x,y) coords tuple for the position to get the neighbors of.
             moore: Boolean for whether to use Moore neighborhood (including
                    diagonals) or Von Neumann (only up/down/left/right).
-            torus: Boolean for whether edges wrap around.
         """
         neighborhood = self.iter_neighborhood(pos, moore=moore)
         return self.iter_cell_list_contents(neighborhood)
