@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+Next release
+++++++++++++++++++
+
+Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
+
+* Improvements
+    * Standardizes the arguments passed to spatial functions to only tuples, not separate x and y coordinates. (Breaks backwards compatibility)
+
+
 0.6.5.1 (2015-07-11)
 ++++++++++++++++++
 
