@@ -46,7 +46,7 @@ class WalkerWorld(Model):
         for i in range(self.agent_count):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
-            a = WalkerAgent(self.grid, x, y, True)
+            a = WalkerAgent(self.grid, (x, y), True)
             self.schedule.add(a)
             self.grid[y][x].add(a)
 

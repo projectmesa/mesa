@@ -37,8 +37,8 @@ class PD_Agent(Agent):
         '''
         Get the neighbors' moves, and change own move accordingly.
         '''
-        x, y = self.pos
-        neighbors = model.grid.get_neighbors(x, y, True, include_center=True)
+        neighbors = model.grid.get_neighbors(self.pos, True,
+            include_center=True)
         best_neighbor = max(neighbors, key=lambda a: a.score)
         self.next_move = best_neighbor.move
 
@@ -50,8 +50,7 @@ class PD_Agent(Agent):
         self.score += self.increment_score(model)
 
     def increment_score(self, model):
-        x, y = self.pos
-        neighbors = model.grid.get_neighbors(self.pos[0], self.pos[1], True)
+        neighbors = model.grid.get_neighbors(self.pos, True)
         if model.schedule_type == "Simultaneous":
             moves = [neighbor.next_move for neighbor in neighbors]
         else:
