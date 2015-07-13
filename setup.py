@@ -22,7 +22,7 @@ with open('README.rst', 'r', encoding='utf-8') as f:
 setup(
     name='Mesa',
     version=version,
-    description="Mesa: Agent-based modeling in Python 3+",
+    description="Agent-based modeling (ABM) in Python 3+",
     long_description=readme,
     author='Project Mesa Team',
     author_email='projectmesa@googlegroups.com',
