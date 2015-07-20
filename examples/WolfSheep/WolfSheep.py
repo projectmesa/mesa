@@ -15,7 +15,7 @@ import random
 
 from mesa import Model, Agent
 from mesa.space import MultiGrid
-from mesa.time import RandomActivation
+from mesa.time import BaseScheduler
 
 from RandomWalk import RandomWalker
 
@@ -25,23 +25,26 @@ class WolfSheepPredation(Model):
     Wolf-Sheep Predation Model
     '''
 
-    initial_sheep = 100
-    initial_wolves = 50
-    sheep_gain_from_food = 4
-
-    grass = False
-
-    wolf_gain_from_food = 20
-    sheep_reproduce = 0.04
-    wolf_reproduce = 0.05
-
     height = 20
     width = 20
 
+    initial_sheep = 100
+    initial_wolves = 50
+
+    sheep_reproduce = 0.04
+    wolf_reproduce = 0.05
+
+    wolf_gain_from_food = 20
+
+    grass = False
+    grass_regrowth_time = 30
+    sheep_gain_from_food = 4
+
     def __init__(self, height=20, width=20,
-                 initial_sheep=100, initial_wolves=50, sheep_reproduce=0.04,
-                 wolf_reproduce=0.05, wolf_gain_from_food=20,
-                 grass=False, sheep_gain_from_food=4):
+                 initial_sheep=100, initial_wolves=50,
+                 sheep_reproduce=0.04, wolf_reproduce=0.05,
+                 wolf_gain_from_food=20,
+                 grass=False, grass_regrowth_time=30, sheep_gain_from_food=4):
         '''
         Create a new Wolf-Sheep model with the given parameters.
 
@@ -52,6 +55,7 @@ class WolfSheepPredation(Model):
             wolf_reproduce: Probability of each wolf reproducing each step
             wolf_gain_from_food: Energy a wolf gains from eating a sheep
             grass: Whether to have the sheep eat grass for energy
+            grass_regrowth_time: How long it takes for a grass patch to regrow once it is eaten
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
         '''
 
@@ -64,16 +68,18 @@ class WolfSheepPredation(Model):
         self.wolf_reproduce = wolf_reproduce
         self.wolf_gain_from_food = wolf_gain_from_food
         self.grass = grass
+        self.grass_regrowth_time = grass_regrowth_time
         self.sheep_gain_from_food = sheep_gain_from_food
 
-        self.schedule = RandomActivation(self)
+        self.schedule = RandomActivationByBreed(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
 
         # Create sheep:
         for i in range(self.initial_sheep):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
-            sheep = Sheep(self.grid, (x, y), True)
+            energy = random.randrange(2 * self.sheep_gain_from_food)
+            sheep = Sheep(self.grid, (x, y), True, energy)
             self.grid.place_agent(sheep, (x, y))
             self.schedule.add(sheep)
 
@@ -86,11 +92,41 @@ class WolfSheepPredation(Model):
             self.grid.place_agent(wolf, (x, y))
             self.schedule.add(wolf)
 
+        # Create grass patches
+        if self.grass:
+            for agent, x, y in self.grid.coord_iter():
+
+                fully_grown = random.choice([True, False])
+
+                if fully_grown:
+                    countdown = self.grass_regrowth_time
+                else:
+                    countdown = random.randrange(self.grass_regrowth_time)
+
+                patch = GrassPatch(fully_grown, countdown)
+                self.grid.place_agent(patch, (x, y))
+                self.schedule.add(patch)
+
         self.running = True
 
     def step(self):
         self.schedule.step()
+        print([self.schedule.time,
+               self.schedule.get_breed_count(Wolf),
+               self.schedule.get_breed_count(Sheep)])
 
+    def run_model(self):
+
+        print('Initial number wolves: ', self.schedule.get_breed_count(Wolf))
+        print('Initial number sheep: ', self.schedule.get_breed_count(Sheep))
+
+        for i in range(200):
+            self.step()
+
+        print('')
+
+        print('Final number wolves: ', self.schedule.get_breed_count(Wolf))
+        print('Final number sheep: ', self.schedule.get_breed_count(Sheep))
 
 class Sheep(RandomWalker, Agent):
     '''
@@ -99,15 +135,42 @@ class Sheep(RandomWalker, Agent):
     The init is the same as the RandomWalker.
     '''
 
+    energy = None
+
+    def __init__(self, grid, pos, moore, energy=None):
+        super().__init__(grid, pos, moore)
+        self.energy = energy
+
     def step(self, model):
         '''
         A model step. Move, then eat grass and reproduce.
         '''
         self.random_move()
-        if random.random() < model.sheep_reproduce:
+        x, y = self.pos
+        living = True
+
+        if model.grass:
+            # Reduce energy
+            self.energy -= 1
+
+            # If there is grass available, eat it
+            this_cell = model.grid[y][x]
+            grass_patch = [obj for obj in this_cell if isinstance(obj, GrassPatch)][0]
+            if grass_patch.fully_grown:
+                self.energy += model.sheep_gain_from_food
+                grass_patch.fully_grown = False
+
+            # Death
+            if self.energy < 0:
+                model.grid[y][x].remove(self)
+                model.schedule.remove(self)
+                living = False
+
+        if living and random.random() < model.sheep_reproduce:
             # Create a new sheep:
-            x, y = self.pos
-            lamb = Sheep(self.grid, self.pos, self.moore)
+            if model.grass:
+                self.energy /= 2
+            lamb = Sheep(self.grid, self.pos, self.moore, self.energy)
             model.grid[y][x].add(lamb)
             model.schedule.add(lamb)
 
@@ -139,10 +202,91 @@ class Wolf(RandomWalker, Agent):
             model.grid[y][x].remove(sheep_to_eat)
             model.schedule.remove(sheep_to_eat)
 
-        # Reproduction:
-        if random.random() < model.wolf_reproduce:
-            # Create a new wolf cub
-            cub = Wolf(self.grid, self.pos, self.moore, self.energy / 2)
-            self.energy = self.energy / 2
-            model.grid[y][x].add(cub)
-            model.schedule.add(cub)
+        # Death or reproduction
+        if self.energy < 0:
+            model.grid[y][x].remove(self)
+            model.schedule.remove(self)
+        else:
+            if random.random() < model.wolf_reproduce:
+                # Create a new wolf cub
+                self.energy /= 2
+                cub = Wolf(self.grid, self.pos, self.moore, self.energy)
+                model.grid[y][x].add(cub)
+                model.schedule.add(cub)
+
+
+class GrassPatch(Agent):
+    '''
+    A patch of grass that grows at a fixed rate and it is eaten by sheep
+    '''
+
+    def __init__(self, fully_grown, countdown):
+        '''
+        Creates a new patch of grass
+
+        Args:
+            grown: (boolean) Whether the patch of grass is fully grown or not
+            countdown: Time for the patch of grass to be fully grown again
+        '''
+        self.fully_grown = fully_grown
+        self.countdown = countdown
+
+    def step(self, model):
+        if not self.fully_grown:
+            if self.countdown <= 0:
+                # Set as fully grown
+                self.fully_grown = True
+                self.countdown = model.grass_regrowth_time
+            else:
+                self.countdown -= 1
+
+
+class RandomActivationByBreed(BaseScheduler):
+    '''
+    A scheduler which activates each bread of agent once per step, in random order,
+    with the order reshuffled every step.
+
+    This is equivalent to the NetLogo 'ask breed...' and is generally the
+    default behavior for an ABM.
+
+    Assumes that all agents have a step(model) method.
+    '''
+
+    def step(self):
+        '''
+        Executes the step of each agent breed, one at a time, in random order.
+        '''
+        sheep = [obj for obj in self.agents if isinstance(obj, Sheep)]
+        wolves = [obj for obj in self.agents if isinstance(obj, Wolf)]
+        grass_patches = [obj for obj in self.agents if isinstance(obj, GrassPatch)]
+
+        random.shuffle(sheep)
+        random.shuffle(wolves)
+        random.shuffle(grass_patches)
+
+        if len(sheep) > 0:
+            for agent in sheep:
+                agent.step(self.model)
+
+        if len(wolves) > 0:
+            for agent in wolves:
+                agent.step(self.model)
+
+        if len(grass_patches) > 0:
+            for agent in grass_patches:
+                agent.step(self.model)
+
+        self.steps += 1
+        self.time += 1
+
+    def get_breed_count(self, breed_class):
+        '''
+        Returns the current number of agents of certain breed in the queue.
+        '''
+
+        count = 0
+        for agent in self.agents:
+            if isinstance(agent, breed_class):
+                count += 1
+
+        return count
