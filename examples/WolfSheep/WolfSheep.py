@@ -7,8 +7,6 @@ Replication of the model found in NetLogo:
     http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation.
     Center for Connected Learning and Computer-Based Modeling,
     Northwestern University, Evanston, IL.
-
-TODO: Implement grass
 '''
 
 import random
@@ -17,6 +15,7 @@ from collections import defaultdict
 from mesa import Model, Agent
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
+from mesa.datacollection import DataCollector
 
 from RandomWalk import RandomWalker
 
@@ -77,6 +76,9 @@ class WolfSheepPredation(Model):
 
         self.schedule = RandomActivationByBreed(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
+        self.datacollector = DataCollector(
+            {"Wolves": lambda m: m.schedule.get_breed_count(Wolf),
+            "Sheep": lambda m: m.schedule.get_breed_count(Sheep)})
 
         # Create sheep:
         for i in range(self.initial_sheep):
@@ -115,6 +117,7 @@ class WolfSheepPredation(Model):
 
     def step(self):
         self.schedule.step()
+        self.datacollector.collect(self)
         if self.verbose:
             print([self.schedule.time,
                 self.schedule.get_breed_count(Wolf),
@@ -156,7 +159,6 @@ class Sheep(RandomWalker, Agent):
         A model step. Move, then eat grass and reproduce.
         '''
         self.random_move()
-        x, y = self.pos
         living = True
 
         if model.grass:
@@ -164,15 +166,16 @@ class Sheep(RandomWalker, Agent):
             self.energy -= 1
 
             # If there is grass available, eat it
-            this_cell = model.grid[y][x]
-            grass_patch = [obj for obj in this_cell if isinstance(obj, GrassPatch)][0]
+            this_cell = model.grid.get_cell_list_contents([self.pos])
+            grass_patch = [obj for obj in this_cell 
+                           if isinstance(obj, GrassPatch)][0]
             if grass_patch.fully_grown:
                 self.energy += model.sheep_gain_from_food
                 grass_patch.fully_grown = False
 
             # Death
             if self.energy < 0:
-                model.grid[y][x].remove(self)
+                model.grid._remove_agent(self.pos, self)
                 model.schedule.remove(self)
                 living = False
 
@@ -181,7 +184,7 @@ class Sheep(RandomWalker, Agent):
             if model.grass:
                 self.energy /= 2
             lamb = Sheep(self.grid, self.pos, self.moore, self.energy)
-            model.grid[y][x].add(lamb)
+            model.grid.place_agent(lamb, self.pos)
             model.schedule.add(lamb)
 
 
@@ -202,26 +205,26 @@ class Wolf(RandomWalker, Agent):
 
         # If there are sheep present, eat one
         x, y = self.pos
-        this_cell = model.grid[y][x]
+        this_cell = model.grid.get_cell_list_contents([self.pos])
         sheep = [obj for obj in this_cell if isinstance(obj, Sheep)]
         if len(sheep) > 0:
             sheep_to_eat = random.choice(sheep)
             self.energy += model.wolf_gain_from_food
 
             # Kill the sheep
-            model.grid[y][x].remove(sheep_to_eat)
+            model.grid._remove_agent(self.pos, sheep_to_eat)
             model.schedule.remove(sheep_to_eat)
 
         # Death or reproduction
         if self.energy < 0:
-            model.grid[y][x].remove(self)
+            model.grid._remove_agent(self.pos, self)
             model.schedule.remove(self)
         else:
             if random.random() < model.wolf_reproduce:
                 # Create a new wolf cub
                 self.energy /= 2
                 cub = Wolf(self.grid, self.pos, self.moore, self.energy)
-                model.grid[y][x].add(cub)
+                model.grid.place_agent(cub, cub.pos)
                 model.schedule.add(cub)
 
 
