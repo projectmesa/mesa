@@ -63,5 +63,3 @@ class TestStagedActivation(unittest.TestCase):
             assert output in model.log[:2]
         for output in self.expected_output[2:]:
             assert output in model.log[2:]
-
-
