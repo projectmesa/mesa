@@ -41,7 +41,7 @@ Go ahead and create a folder, and either launch a Notebook or create a new Pytho
 Setting up the model
 ~~~~~~~~~~~~~~~~~~~~~
 
-Now it's time to start writing the code. The model is going to need two core classes: one for the overall model, the other for the agents. The model class holds the model-level parameters, manages the agents, and generally handle the global level of our model. Each instantiation of the model class will be a specific model run. Each model will contain multiple agents, all of which are instantiations of the agent class. Both the model and agent classes are child classes of Mesa's generic Model and Agent classes.
+Now it's time to start writing the code. The model is going to need two core classes: one for the overall model, the other for the agents. The model class holds the model-level parameters, manages the agents, and generally handle the global level of our model. Each instantiation of the model class will be a specific model run. Each model will contain multiple agents, all of which are instantiations of the agent class. Both the model and agent classes are child classes of Mesa's generic ``Model`` and ``Agent`` classes.
 
 Each agent has only one variable: how much wealth it currently has. It's also good practice to give agents a unique identifier (i.e. a name), stored in the ``unique_id`` variable.
 
@@ -121,6 +121,34 @@ Agent step
 ~~~~~~~~~~
 
 Now we just need to have the agents do what we intend for them to do: check their wealth, and if they have the money, give one unit of it away to another random agent.
+
+To pick an agent at random, we need a list of all agents. Notice that there isn't such a list explicitly in the model. The scheduler, however, does have an internal list of all the agents it is scheduled to activate. 
+
+With that in mind, we rewrite the agent's ``step`` method, like this:
+
+.. code-block:: python
+
+    class MoneyAgent(Agent):
+      # ...
+      def step(self, model):
+          if self.wealth == 0:
+              return
+          other_agent = random.choice(model.schedule.agents)
+          other_agent.wealth += 1
+          self.wealth -= 1
+
+
+Running your first model
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With that last piece in hand, it's time for the first rudimentary run of the model. Let's create a model with 10 agents, and run it for 10 steps.
+
+.. code-block:: python
+
+    model = MoneyModel(10)
+    for i in range(10):
+        model.step()
+
 
 
 ** THIS DOC IS IN PROGRESS **
