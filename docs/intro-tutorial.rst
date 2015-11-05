@@ -168,6 +168,7 @@ You'll probably see something like the distribution shown below. Yours will almo
 To get a better idea of how a model behaves, we can create multiple model runs, and see the distribution that emerges from all of them. We can do this with a nested for loop:
 
 .. code-block:: python
+
     all_wealth = []
     for j in range(100):
         # Run the model
@@ -218,7 +219,128 @@ We instantiate a grid with height and width parameters, and a boolean as to whet
 
 Under the hood, each agent's position is stored in two ways: the agent is contained in the grid in the cell it is currently in, and the agent has a ``pos`` variable with an (x, y) coordinate tuple. The ``place_agent`` method adds the coordinate to the agent automatically.
 
-Now we need to add to the agents' behaviors, letting them move around and only give money to their cell-mates (as it were).
+Now we need to add to the agents' behaviors, letting them move around and only give money to their cell-mates (as it were). 
+
+First let's handle movement, and have the agents move to a neighboring cell. The grid object provides a ``move_agent`` method, which like you'd imagine, moves an agent to a given cell. That still leaves us to get the possible neighboring cells to move to. There are a couple ways to do this. One is to use the current coordinates, and loop over all coordinates +/- 1 away from it. For example:
+
+.. code-block:: python
+
+    neighbors = []
+    x, y = self.pos
+    for dx in [-1, 0, 1]:
+        for dy in [-1, 0, 1]:
+            neighbors.append((x+dx, y+dy))
+
+But there's an even simpler way, using the grid's built-in ``get_neighborhood`` method, which returns all the neighbors of a given cell. This method can get two types of cell neighborhoods: Moore (including diagonals), and Von Neumann (only up/down/left/right). It also needs an argument as to whether to include the center cell itself as one of the neighbors.
+
+With that in mind, the agent's ``move`` method looks like this:
+
+.. code-block:: python
+
+    class MoneyAgent(Agent):
+        #...
+        def move(self, model):
+            possible_steps = model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
+            new_position = random.choice(possible_steps)
+            model.grid.move_agent(self, new_position)
+
+
+Next, we need to get all the other agents present in a cell, and give one of them some money. We can get the contents of one or more cells using the grid's ``get_cell_list_contents`` method, or by accessing a cell directly. The method currently requires a list of cells (TODO: someone should probably fix that...), even if we only care about one cell. 
+
+
+.. code-block:: python
+
+    class MoneyAgent(Agent):
+        #...
+        def give_money(self, model):
+            cellmates = model.grid.get_cell_list_contents([self.pos])
+            if len(cellmates) > 1:
+                other = random.choice(cellmates)
+                other.wealth += 1
+                self.wealth -= 1
+
+And with those two methods, the agent's ``step`` method becomes:
+
+.. code-block:: python
+
+    class MoneyAgent(Agent):
+        def step(self, model):
+            self.move(model)
+            if self.wealth > 0:
+                self.give_money(model)
+
+Now, putting that all together should look like this:
+
+.. code-block:: python
+
+    class MoneyModel(Model):
+        """A model with some number of agents."""
+        def __init__(self, N, width, height):
+            self.num_agents = N
+            self.grid = MultiGrid(height, width, True)
+            self.schedule = RandomActivation(self)
+            # Create agents
+            for i in range(self.num_agents):
+                a = MoneyAgent(i)
+                self.schedule.add(a)
+                # Add the agent to a random grid cell
+                x = random.randrange(self.grid.width)
+                y = random.randrange(self.grid.height)
+                self.grid.place_agent(a, (x, y))
+
+        def step(self):
+            self.schedule.step()
+
+    class MoneyAgent(Agent):
+        """ An agent with fixed initial wealth."""
+        def __init__(self, unique_id):
+            self.unique_id = unique_id
+            self.wealth = 1
+        
+        def move(self, model):
+            possible_steps = model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
+            new_position = random.choice(possible_steps)
+            model.grid.move_agent(self, new_position)
+
+        def give_money(self, model):
+            cellmates = model.grid.get_cell_list_contents([self.pos])
+            if len(cellmates) > 1:
+                other = random.choice(cellmates)
+                other.wealth += 1
+                self.wealth -= 1
+
+        def step(self, model):
+            self.move(model)
+            if self.wealth > 0:
+                self.give_money(model)
+
+
+
+Let's create a model with 50 agents on a 10x10 grid, and run it for 20 steps.
+
+.. code-block:: python
+
+    model = MoneyModel(50, 10, 10)
+    for i in range(20):
+        model.step()
+
+Now let's use matplotlib and numpy to visualize the number of agents residing in each cell. To do that, we create a numpy array of the same size as the grid, filled with zeros. Then we use the grid object's ``coord_iter()`` feature, which lets us loop over every cell in the grid, giving us each cell's coordinates and contents in turn.
+
+.. code-block:: python
+
+    wealth_grid = np.zeros((model.grid.width, model.grid.height))
+    for cell in model.grid.coord_iter():
+        cell_content, x, y = cell
+        #cell_wealth = sum(a.wealth for a in cell_content) 
+        cell_wealth = len(cell_content)
+        wealth_grid[y][x] = cell_wealth
+    plt.imshow(wealth_grid, interpolation='nearest')
+    plt.colorbar()
+
+
+Collecting Data
+~~~~~~~~~~~~~~~~~
+
 
 
 ** THIS DOC IS IN PROGRESS **
