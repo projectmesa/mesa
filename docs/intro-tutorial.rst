@@ -97,18 +97,24 @@ With that in mind, the model code with the scheduler added looks like this:
    class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N):
-             self.num_agents = N
-             self.schedule = RandomActivation(self)
-             # Create agents
-             for i in range(self.num_agents):
+            self.num_agents = N
+            self.schedule = RandomActivation(self)
+            # Create agents
+            for i in range(self.num_agents):
                 a = MoneyAgent(i)
-                self.schedule.add(self)
+                self.schedule.add(a)
 
         def step(self):
             '''Advance the model by one step.'''
             self.schedule.step()
 
-At this point, we have a model which runs -- it just doesn't do anything. You can see for yourself with a few easy lines:
+At this point, we have a model which runs -- it just doesn't do anything. You can see for yourself with a few easy lines. If you've been working in an interactive session, you can create a model object directly. Otherwise, you need to open an interactive session in the same directory as your source code file, and import the classes. For example, if your code is in ``MoneyModel.py``:
+
+.. code-block::python
+
+    from MoneyModel import MoneyModel
+
+Then create the model object, and run it for one step:
 
 .. code-block:: python
 
@@ -141,7 +147,7 @@ With that in mind, we rewrite the agent's ``step`` method, like this:
 Running your first model
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-With that last piece in hand, it's time for the first rudimentary run of the model. Let's create a model with 10 agents, and run it for 10 steps.
+With that last piece in hand, it's time for the first rudimentary run of the model. Let's create a model with 10 agents, and run it for 10 steps. 
 
 .. code-block:: python
 
@@ -149,6 +155,70 @@ With that last piece in hand, it's time for the first rudimentary run of the mod
     for i in range(10):
         model.step()
 
+Now we need to get some data out of the model. Specifically, we want to see the distribution of the agent's wealth. We can get the wealth values with list comprehension, and then use matplotlib (or the graphics library of your choice) to visualize a histogram.
+
+.. code-block:: python
+
+    agent_wealth = [a.wealth for a in model.schedule.agents]
+    plt.hist(agent_wealth)
+
+
+You'll probably see something like the distribution shown below. Yours will almost certainly look at least slightly different, since each run of the model is random, after all. 
+
+To get a better idea of how a model behaves, we can create multiple model runs, and see the distribution that emerges from all of them. We can do this with a nested for loop:
+
+.. code-block:: python
+    all_wealth = []
+    for j in range(100):
+        # Run the model
+        model = MoneyModel(10)
+        for i in range(10):
+            model.step()
+        # Store the results
+        for agent in model.schedule.agents:
+            all_wealth.append(agent.wealth)
+
+    plt.hist(all_wealth, bins=range(max(all_wealth)+1))
+
+This runs 100 instantiations of the model, and runs each for 10 steps. (Notice that we set the histogram bins to be integers, since agents can only have whole numbers of wealth). This distribution looks a lot smoother. By running the model 100 times, we smooth out some of the 'noise' of randomness, and get to the model's overall expected behavior.
+
+This outcome might be surprising. Despite the fact that all agents, on average, give and receive one unit of money every step, the model converges to a state where most agents have a small amount of money and a small number have a lot of money.
+
+Adding space
+~~~~~~~~~~~~~
+
+Many ABMs have a spatial element, with agents moving around and interacting with nearby neighbors. Mesa currently supports two overall kinds of spaces: grid, and continuous. Grids are divided into cells, and agents can only be on a particular cell, like pieces on a chess board. Continuous space, in contrast, allows agents to have any arbitrary position. Both grids and continuous spaces are frequently toroidal, meaning that the edges wrap around, with cells on the right edge connected to those on the left edge, and the top to the bottom. This prevents some cells having fewer neighbors than others, or agents being able to go off the edge of the environment.
+
+Let's add a simple spatial element to our model: we'll have the agents live on a grid and walk around at random. Instead of giving their unit of money to any random agent, they'll give it to an agent on the same cell.
+
+Mesa has two main types of grids: ``SingleGrid`` and ``MultiGrid``. ``SingleGrid`` enforces at most one agent per cell; ``MultiGrid`` allows multiple agents to be in the same cell. Since we want agents to be able to share a cell, we use ``MultiGrid``.
+
+.. code-block:: python
+
+    from mesa.space import MultiGrid
+
+We instantiate a grid with height and width parameters, and a boolean as to whether the grid is toriodal. Let's make width and height model parameters, in addition to the number of agents, and have the grid always be toriodal. We can place agents on a grid with the grid's ``place_agent`` method, which takes an agent and an (x, y) tuple of the coordinates to place the agent.
+
+.. code-block:: python
+
+   class MoneyModel(Model):
+        """A model with some number of agents."""
+        def __init__(self, N, width, height):
+            self.num_agents = N
+            self.grid = MultiGrid(height, width, True)
+            self.schedule = RandomActivation(self)
+            # Create agents
+            for i in range(self.num_agents):
+                a = MoneyAgent(i)
+                self.schedule.add(a)
+                # Add the agent to a random grid cell
+                x = random.randrange(self.grid.width)
+                y = random.randrange(self.grid.height)
+                self.grid.place_agent(a, (x, y))
+
+Under the hood, each agent's position is stored in two ways: the agent is contained in the grid in the cell it is currently in, and the agent has a ``pos`` variable with an (x, y) coordinate tuple. The ``place_agent`` method adds the coordinate to the agent automatically.
+
+Now we need to add to the agents' behaviors, letting them move around and only give money to their cell-mates (as it were).
 
 
 ** THIS DOC IS IN PROGRESS **
