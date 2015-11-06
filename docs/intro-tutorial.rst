@@ -169,6 +169,7 @@ You'll probably see something like the distribution shown below. Yours will almo
    :width: 100%
    :scale: 100%
    :alt: Histogram of agent wealths after 10 steps.
+   :aligh: center
 
 
 To get a better idea of how a model behaves, we can create multiple model runs, and see the distribution that emerges from all of them. We can do this with a nested for loop:
@@ -186,6 +187,13 @@ To get a better idea of how a model behaves, we can create multiple model runs, 
             all_wealth.append(agent.wealth)
 
     plt.hist(all_wealth, bins=range(max(all_wealth)+1))
+
+.. image:: images/tutorial/multirun_hist.png
+   :width: 100%
+   :scale: 100%
+   :alt: Histogram of agent wealths after 10 steps, from 100 model runs.
+   :aligh: center
+
 
 This runs 100 instantiations of the model, and runs each for 10 steps. (Notice that we set the histogram bins to be integers, since agents can only have whole numbers of wealth). This distribution looks a lot smoother. By running the model 100 times, we smooth out some of the 'noise' of randomness, and get to the model's overall expected behavior.
 
@@ -337,11 +345,16 @@ Now let's use matplotlib and numpy to visualize the number of agents residing in
     wealth_grid = np.zeros((model.grid.width, model.grid.height))
     for cell in model.grid.coord_iter():
         cell_content, x, y = cell
-        #cell_wealth = sum(a.wealth for a in cell_content) 
         cell_wealth = len(cell_content)
         wealth_grid[y][x] = cell_wealth
     plt.imshow(wealth_grid, interpolation='nearest')
     plt.colorbar()
+
+.. image:: images/tutorial/numpy_grid.png
+   :width: 100%
+   :scale: 100%
+   :alt: Agents per cell
+   :aligh: center
 
 
 Collecting Data
@@ -394,13 +407,19 @@ To get the series of Gini coefficients as a pandas DataFrame:
     gini = model.datacollector.get_model_vars_dataframe()
     gini.plot()
 
+.. image:: images/tutorial/dc_gini.png
+   :width: 100%
+   :scale: 100%
+   :alt: Model-level variable collected
+   :aligh: center
+
+
 Similarly, we can get the agent-wealth data:
 
 .. code-block:: python
 
     agent_wealth = model.datacollector.get_agent_vars_dataframe()
     agent_wealth.head()
-
 
 You'll see that the DataFrame's index is pairs of model step and agent ID. You can analyze it the way you would any other DataFrame. For example, to get a histogram of agent wealth at the model's end:
 
@@ -416,6 +435,17 @@ Or to plot the wealth of a given agent (in this example, agent 14):
 
     one_agent_wealth = agent_wealth.xs(14, level="AgentID")
     one_agent_wealth.Wealth.plot()
+
+
+.. image:: images/tutorial/dc_endwealth.png
+   :width: 50%
+   :alt: Model-level variable collected
+   :aligh: center
+
+.. image:: images/tutorial/dc_oneagent.png
+   :width: 50%
+   :alt: Model-level variable collected
+   :aligh: center
 
 Batch Run
 ~~~~~~~~~~~
