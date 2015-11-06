@@ -51,7 +51,7 @@ The beginning of both classes looks like this:
 
 .. code-block:: python
 
-   from mesa import Agent, Model
+    from mesa import Agent, Model
 
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
@@ -59,12 +59,12 @@ The beginning of both classes looks like this:
             self.unique_id = unique_id
             self.wealth = 1
 
-   class MoneyModel(Model):
+    class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N):
-             self.num_agents = N
-             # Create agents
-             for i in range(self.num_agents):
+            self.num_agents = N
+            # Create agents
+            for i in range(self.num_agents):
                 a = MoneyAgent(i)
                 # Now what? See below.
 
