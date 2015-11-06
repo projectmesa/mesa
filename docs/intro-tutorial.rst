@@ -169,7 +169,7 @@ You'll probably see something like the distribution shown below. Yours will almo
    :width: 100%
    :scale: 100%
    :alt: Histogram of agent wealths after 10 steps.
-   :aligh: center
+   :align: center
 
 
 To get a better idea of how a model behaves, we can create multiple model runs, and see the distribution that emerges from all of them. We can do this with a nested for loop:
@@ -192,7 +192,7 @@ To get a better idea of how a model behaves, we can create multiple model runs, 
    :width: 100%
    :scale: 100%
    :alt: Histogram of agent wealths after 10 steps, from 100 model runs.
-   :aligh: center
+   :align: center
 
 
 This runs 100 instantiations of the model, and runs each for 10 steps. (Notice that we set the histogram bins to be integers, since agents can only have whole numbers of wealth). This distribution looks a lot smoother. By running the model 100 times, we smooth out some of the 'noise' of randomness, and get to the model's overall expected behavior.
@@ -354,7 +354,7 @@ Now let's use matplotlib and numpy to visualize the number of agents residing in
    :width: 100%
    :scale: 100%
    :alt: Agents per cell
-   :aligh: center
+   :align: center
 
 
 Collecting Data
@@ -411,7 +411,7 @@ To get the series of Gini coefficients as a pandas DataFrame:
    :width: 100%
    :scale: 100%
    :alt: Model-level variable collected
-   :aligh: center
+   :align: center
 
 
 Similarly, we can get the agent-wealth data:
@@ -440,12 +440,12 @@ Or to plot the wealth of a given agent (in this example, agent 14):
 .. image:: images/tutorial/dc_endwealth.png
    :width: 50%
    :alt: Model-level variable collected
-   :aligh: center
+   :align: center
 
 .. image:: images/tutorial/dc_oneagent.png
    :width: 50%
    :alt: Model-level variable collected
-   :aligh: center
+   :align: center
 
 Batch Run
 ~~~~~~~~~~~
