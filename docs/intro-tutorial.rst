@@ -409,7 +409,7 @@ To get the series of Gini coefficients as a pandas DataFrame:
 
 .. image:: images/tutorial/dc_gini.png
    :width: 100%
-   :scale: 50%
+   :scale: 100%
    :alt: Model-level variable collected
    :align: center
 
@@ -428,6 +428,11 @@ You'll see that the DataFrame's index is pairs of model step and agent ID. You c
     end_wealth = agent_wealth.xs(19, level="Step")["Wealth"]
     end_wealth.hist(bins=range(agent_wealth.Wealth.max()+1))
 
+.. image:: images/tutorial/dc_endwealth.png
+   :width: 50%
+   :scale: 50%
+   :alt: Model-level variable collected
+   :align: center
 
 Or to plot the wealth of a given agent (in this example, agent 14):
 
@@ -435,13 +440,6 @@ Or to plot the wealth of a given agent (in this example, agent 14):
 
     one_agent_wealth = agent_wealth.xs(14, level="AgentID")
     one_agent_wealth.Wealth.plot()
-
-.. image:: images/tutorial/dc_endwealth.png
-   :width: 50%
-   :scale: 50%
-   :alt: Model-level variable collected
-   :align: center
-
 
 .. image:: images/tutorial/dc_oneagent.png
    :width: 50%
@@ -481,6 +479,11 @@ Now, we can set up and run the BatchRunner:
 
 Like the DataCollector, we can extract the data we collected as a DataFrame. Notice that each row is a model run, and gives us the parameter values associated with that run. We can use  this data to view a scatter-plot comparing the number of agents to the final Gini.
 
+.. image:: images/tutorial/bc_ginis.png
+   :width: 100%
+   :scale: 100%
+   :alt: Model-level variable collected
+   :align: center
 
 
 
