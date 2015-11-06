@@ -81,8 +81,8 @@ With that in mind, the model code with the scheduler added looks like this:
 
 .. code-block:: python
 
-   from mesa import Agent, Model
-   from mesa.time import RandomActivation
+    from mesa import Agent, Model
+    from mesa.time import RandomActivation
 
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
@@ -94,7 +94,7 @@ With that in mind, the model code with the scheduler added looks like this:
             # The agent's step will go here.
             pass
 
-   class MoneyModel(Model):
+    class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N):
             self.num_agents = N
@@ -107,6 +107,7 @@ With that in mind, the model code with the scheduler added looks like this:
         def step(self):
             '''Advance the model by one step.'''
             self.schedule.step()
+
 
 At this point, we have a model which runs -- it just doesn't do anything. You can see for yourself with a few easy lines. If you've been working in an interactive session, you can create a model object directly. Otherwise, you need to open an interactive session in the same directory as your source code file, and import the classes. For example, if your code is in ``MoneyModel.py``:
 
@@ -126,7 +127,11 @@ Then create the model object, and run it for one step:
 Agent step
 ~~~~~~~~~~
 
-Now we just need to have the agents do what we intend for them to do: check their wealth, and if they have the money, give one unit of it away to another random agent.
+Now we just need to have the agents do what we intend for them to do: check their wealth, and if they have the money, give one unit of it away to another random agent. Since we want to use randomness, don't forget to import Python's ``random`` library:
+
+.. code-block:: python
+
+    import random
 
 To pick an agent at random, we need a list of all agents. Notice that there isn't such a list explicitly in the model. The scheduler, however, does have an internal list of all the agents it is scheduled to activate. 
 
@@ -135,13 +140,13 @@ With that in mind, we rewrite the agent's ``step`` method, like this:
 .. code-block:: python
 
     class MoneyAgent(Agent):
-      # ...
-      def step(self, model):
-          if self.wealth == 0:
-              return
-          other_agent = random.choice(model.schedule.agents)
-          other_agent.wealth += 1
-          self.wealth -= 1
+        # ...
+        def step(self, model):
+            if self.wealth == 0:
+                return
+            other_agent = random.choice(model.schedule.agents)
+            other_agent.wealth += 1
+            self.wealth -= 1
 
 
 Running your first model
@@ -216,7 +221,7 @@ We instantiate a grid with height and width parameters, and a boolean as to whet
 
 .. code-block:: python
 
-   class MoneyModel(Model):
+    class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N, width, height):
             self.num_agents = N
@@ -278,6 +283,7 @@ And with those two methods, the agent's ``step`` method becomes:
 .. code-block:: python
 
     class MoneyAgent(Agent):
+        # ...
         def step(self, model):
             self.move(model)
             if self.wealth > 0:
@@ -477,7 +483,15 @@ Now, we can set up and run the BatchRunner:
                model_reporters={"Gini": compute_gini})
     batch_run.run_all()
 
-Like the DataCollector, we can extract the data we collected as a DataFrame. Notice that each row is a model run, and gives us the parameter values associated with that run. We can use  this data to view a scatter-plot comparing the number of agents to the final Gini.
+Like the DataCollector, we can extract the data we collected as a DataFrame. 
+
+.. code-block:: python
+    run_data = batch_run.get_model_vars_dataframe()
+    run_data.head()
+    plt.scatter(run_data.N, run_data.Gini)
+
+
+Notice that each row is a model run, and gives us the parameter values associated with that run. We can use  this data to view a scatter-plot comparing the number of agents to the final Gini.
 
 .. image:: images/tutorial/br_ginis.png
    :width: 100%
