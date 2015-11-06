@@ -486,6 +486,7 @@ Now, we can set up and run the BatchRunner:
 Like the DataCollector, we can extract the data we collected as a DataFrame. 
 
 .. code-block:: python
+
     run_data = batch_run.get_model_vars_dataframe()
     run_data.head()
     plt.scatter(run_data.N, run_data.Gini)
