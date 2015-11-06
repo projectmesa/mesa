@@ -341,6 +341,77 @@ Now let's use matplotlib and numpy to visualize the number of agents residing in
 Collecting Data
 ~~~~~~~~~~~~~~~~~
 
+So far, at the end of every model run, we've had to go and write our own code to get the data out of the model. This works, but has two problems: it isn't very efficient, and it only gives us end results. If we wanted to know the wealth of each agent at each step, for example, we'd have to add that to the loop of executing steps, and figure out some way to store the data. 
+
+Since one of the main goals of agent-based modeling is generating data for analysis, Mesa provides a  class which can handle data collection and storage for us and make it easier to analyze.
+
+The data collector stores three categories of data: model-level variables, agent-level variables, and tables (which are a catch-all for everything else). Model- and agent-level variables are added to the data collector along with a function for collecting them. Model-level collection functions take a model object as an input, while agent-level collection functions take an agent object as an input. Both then return a value computed from the model or each agent at their current state. When the data collector’s ``collect`` method is called, with a model object as its argument, it applies each model-level collection function to the model, and stores the results in a dictionary, associating the current value with the current step of the model. Similarly, the method applies each agent-level collection function to each agent currently in the schedule, associating the resulting value with the step of the model, and the agent’s ``unique_id``.
+
+Let's add a DataCollector to the model, and collect two variables. At the agent level, we want to collect every agent's wealth at every step. At the model level, let's measure the model's `Gini Coefficient <https://en.wikipedia.org/wiki/Gini_coefficient>`_, a measure of wealth inequality. 
+
+.. code-block:: python
+
+    from mesa.datacollection import DataCollector
+
+    def compute_gini(model):
+        agent_wealths = [agent.wealth for agent in model.schedule.agents]
+        x = sorted(agent_wealths)
+        N = model.num_agents
+        B = sum( xi * (N-i) for i,xi in enumerate(x) ) / (N*sum(x))
+        return (1 + (1/N) - 2*B)
+
+    # ...
+    class MoneyModel(Model):
+        def __init__(self, N, width, height):
+            # ...
+            self.datacollector = DataCollector(model_reporters={"Gini": compute_gini},
+                agent_reporters={"Wealth": lambda a: a.wealth})
+
+        def step(self):
+            self.datacollector.collect(self)
+            self.schedule.step()
+
+At every step of the model, the datacollector will collect and store the model-level current Gini coefficient, as well as each agent's wealth, associating each with the current step. 
+
+We run the model just as we did above. Now is when an interactive session, especially via a Notebook, comes in handy: the DataCollector can export the data it's collected as a pandas DataFrame, for easy interactive analysis.
+
+.. code-block:: python
+
+    model = MoneyModel(50, 10, 10)
+    for i in range(100):
+        model.step()
+
+To get the series of Gini coefficients as a pandas DataFrame:
+
+.. code-block:: python
+    
+    gini = model.datacollector.get_model_vars_dataframe()
+    gini.plot()
+
+Similarly, we can get the agent-wealth data:
+
+.. code-block:: python
+
+    agent_wealth = model.datacollector.get_agent_vars_dataframe()
+    agent_wealth.head()
+
+
+You'll see that the DataFrame's index is pairs of model step and agent ID. You can analyze it the way you would any other DataFrame. For example, to get a histogram of agent wealth at the model's end:
+
+.. code-block:: python
+    
+    end_wealth = agent_wealth.xs(19, level="Step")["Wealth"]
+    end_wealth.hist(bins=range(agent_wealth.Wealth.max()+1))
+
+
+Or to plot the wealth of a given agent (in this example, agent 14):
+
+.. code-block:: python
+
+    one_agent_wealth = agent_wealth.xs(14, level="AgentID")
+    one_agent_wealth.Wealth.plot()
+
+
 
 
 ** THIS DOC IS IN PROGRESS **
