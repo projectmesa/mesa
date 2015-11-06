@@ -479,7 +479,7 @@ Now, we can set up and run the BatchRunner:
 
 Like the DataCollector, we can extract the data we collected as a DataFrame. Notice that each row is a model run, and gives us the parameter values associated with that run. We can use  this data to view a scatter-plot comparing the number of agents to the final Gini.
 
-.. image:: images/tutorial/bc_ginis.png
+.. image:: images/tutorial/br_ginis.png
    :width: 100%
    :scale: 100%
    :alt: Model-level variable collected
