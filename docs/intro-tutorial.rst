@@ -1,9 +1,9 @@
 Introduction to Mesa - Tutorial
 ================================
 
-Getting started with Mesa is easy. In this doc, we will present Mesa’s architecture and core features. To illustrate them, we'll walk you through building a simple agent-based model, drawn from econophysics and presenting a statistical mechanics approach to wealth distribution [Dragulescu2002]_.
+Getting started with Mesa is easy. In this doc, we will walk through creating a simple model which will illustrate Mesa's core features. We'll start from a very simple model of agents exchanging money; then add space and allow the agents to walk around. Next, we'll cover two of Mesa's analytic tools: the data collector and batch runner classes. Finally we'll cover how to set up an interactive visualization, and (for advanced users) how to create a new interactive visualization module.
 
-The rules of our tutorial model:
+The tutorial model is a very simple simulated agent-based economy, drawn from econophysics and presenting a statistical mechanics approach to wealth distribution [Dragulescu2002]_. The rules of our tutorial model:
 
 - There are some number of agents.
 - All agents begin with 1 unit of money.
