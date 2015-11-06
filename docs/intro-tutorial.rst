@@ -409,7 +409,7 @@ To get the series of Gini coefficients as a pandas DataFrame:
 
 .. image:: images/tutorial/dc_gini.png
    :width: 100%
-   :scale: 100%
+   :scale: 50%
    :alt: Model-level variable collected
    :align: center
 
