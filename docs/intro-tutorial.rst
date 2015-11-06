@@ -165,6 +165,12 @@ Now we need to get some data out of the model. Specifically, we want to see the 
 
 You'll probably see something like the distribution shown below. Yours will almost certainly look at least slightly different, since each run of the model is random, after all. 
 
+.. image:: images/tutorial/first_hist.png
+   :width: 100%
+   :scale: 100%
+   :alt: Histogram of agent wealths after 10 steps.
+
+
 To get a better idea of how a model behaves, we can create multiple model runs, and see the distribution that emerges from all of them. We can do this with a nested for loop:
 
 .. code-block:: python
@@ -411,7 +417,44 @@ Or to plot the wealth of a given agent (in this example, agent 14):
     one_agent_wealth = agent_wealth.xs(14, level="AgentID")
     one_agent_wealth.Wealth.plot()
 
+Batch Run
+~~~~~~~~~~~
 
+Like we mentioned above, you usually won't run a model only once, but multiple times: with fixed parameters to find the overall distributions the model generates, and with varying parameters to analyze how they drive the model's outputs and behaviors. Instead of needing to write nested for-loops for each model, Mesa provides a BatchRunner class which automates it for you.
+
+.. code-block:: python
+
+    from mesa.batchrunner import BatchRunner
+
+We instantiate a BatchRunner with a model class to run, and a dictionary mapping parameters to values for them to take. If any of these parameters are assigned more than one value, as a list or an iterator, the BatchRunner will know to run all the combinations of these values and the other ones. The BatchRunner also takes an argument for how many model instantiations to create and run at each combination of parameter values, and how many steps to run each instantiation for. Finally, like the DataCollector, it takes dictionaries of model- and agent-level reporters to collect. Unlike the DataCollector, it won't collect the data every step of the model, but only at the end of each run.
+
+In the following example, we hold the height and width fixed, and vary the number of agents. We tell the BatchRunner to run 5 instantiations of the model with each number of agents, and to run each for 100 steps. We have it collect the final Gini coefficient value.
+
+One more thing: batch runners need a way to tell if the model hits some end conditions before the maximum number of steps is reached. To do that, it uses the model's ``running`` variable. In this case, the model has no termination condition, so just add a line to the ``MoneyModel`` constructor:
+
+.. code-block:: python
+
+    self.running = True
+
+
+Now, we can set up and run the BatchRunner:
+
+.. code-block:: python
+
+    parameters = {"height": 10, "width": 10, "N": range(10, 500, 10)}
+
+    batch_run = BatchRunner(MoneyModel, parameters, iterations=5, max_steps=100, 
+               model_reporters={"Gini": compute_gini})
+    batch_run.run_all()
+
+Like the DataCollector, we can extract the data we collected as a DataFrame. Notice that each row is a model run, and gives us the parameter values associated with that run. We can use  this data to view a scatter-plot comparing the number of agents to the final Gini.
+
+
+
+
+
+Adding visualization
+---------------------------
 
 
 ** THIS DOC IS IN PROGRESS **
