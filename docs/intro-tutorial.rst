@@ -436,14 +436,16 @@ Or to plot the wealth of a given agent (in this example, agent 14):
     one_agent_wealth = agent_wealth.xs(14, level="AgentID")
     one_agent_wealth.Wealth.plot()
 
-
 .. image:: images/tutorial/dc_endwealth.png
    :width: 50%
+   :scale: 50%
    :alt: Model-level variable collected
    :align: center
 
+
 .. image:: images/tutorial/dc_oneagent.png
    :width: 50%
+   :scale: 50%
    :alt: Model-level variable collected
    :align: center
 
