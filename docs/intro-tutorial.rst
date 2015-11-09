@@ -171,7 +171,7 @@ Now we need to get some data out of the model. Specifically, we want to see the 
 You'll probably see something like the distribution shown below. Yours will almost certainly look at least slightly different, since each run of the model is random, after all. 
 
 .. image:: images/tutorial/first_hist.png
-   :width: 100%
+   :width: 50%
    :scale: 100%
    :alt: Histogram of agent wealths after 10 steps.
    :align: center
@@ -194,7 +194,7 @@ To get a better idea of how a model behaves, we can create multiple model runs, 
     plt.hist(all_wealth, bins=range(max(all_wealth)+1))
 
 .. image:: images/tutorial/multirun_hist.png
-   :width: 100%
+   :width: 50%
    :scale: 100%
    :alt: Histogram of agent wealths after 10 steps, from 100 model runs.
    :align: center
@@ -357,7 +357,7 @@ Now let's use matplotlib and numpy to visualize the number of agents residing in
     plt.colorbar()
 
 .. image:: images/tutorial/numpy_grid.png
-   :width: 100%
+   :width: 50%
    :scale: 100%
    :alt: Agents per cell
    :align: center
@@ -414,7 +414,7 @@ To get the series of Gini coefficients as a pandas DataFrame:
     gini.plot()
 
 .. image:: images/tutorial/dc_gini.png
-   :width: 100%
+   :width: 50%
    :scale: 100%
    :alt: Model-level variable collected
    :align: center
@@ -436,7 +436,7 @@ You'll see that the DataFrame's index is pairs of model step and agent ID. You c
 
 .. image:: images/tutorial/dc_endwealth.png
    :width: 50%
-   :scale: 50%
+   :scale: 100%
    :alt: Model-level variable collected
    :align: center
 
@@ -449,7 +449,7 @@ Or to plot the wealth of a given agent (in this example, agent 14):
 
 .. image:: images/tutorial/dc_oneagent.png
    :width: 50%
-   :scale: 50%
+   :scale: 100%
    :alt: Model-level variable collected
    :align: center
 
@@ -495,16 +495,172 @@ Like the DataCollector, we can extract the data we collected as a DataFrame.
 Notice that each row is a model run, and gives us the parameter values associated with that run. We can use  this data to view a scatter-plot comparing the number of agents to the final Gini.
 
 .. image:: images/tutorial/br_ginis.png
-   :width: 100%
+   :width: 50%
+   :scale: 100%
+   :alt: Model-level variable collected
+   :align: center
+
+Adding visualization
+---------------------------
+
+So far, we've built a model, run it, and analyzed some output afterwards. However, one of the advantages of agent-based models is that we can often watch them run step by step, potentially spotting unexpected patterns, behaviors or bugs, or developing new intuitions, hypotheses, or insights. Other times, watching a model run can explain it to an unfamiliar audience better than static explanations. Like many ABM frameworks, Mesa allows you to create an interactive visualization of the model. In this section we'll walk through creating a visualization using built-in components, and (for advanced users) how to create a new visualization element.
+
+First, a quick explanation of how Mesa's interactive visualization works. Visualization is done in a browser window, using JavaScript to draw the different things being visualized at each step of the model. To do this, Mesa launches a small web server, which runs the model, turns each step into a JSON object (essentially, structured plain text) and sends those steps to the browser.
+
+A visualization is built up of a few different modules: for example, a module for drawing agents on a grid, and another one for drawing a chart of some variable. Each module has a Python part, which runs on the server and turns a model state into JSON data; and a JavaScript side, which takes that JSON data and draws it in the browser window. Mesa comes with a few modules built in, and let you add your own as well.
+
+Grid Visualization
+~~~~~~~~~~~~~~~~~~~
+
+To start with, let's have a visualization where we can watch the agents moving around the grid.For this, you will need to put your model code in a separate Python source file; for example, ``MoneyModel.py``. Next, either in the same file or in a new one (e.g. ``MoneyModel_Viz.py``) import the server class and the Canvas Grid class (so-called because it uses HTML5 canvas to draw a grid). If you're in a new file, you'll also need to import the actual model object.
+
+.. code-block:: python
+    
+    from mesa.visualization.modules import CanvasGrid
+    from mesa.visualization.ModularVisualization import ModularServer
+
+    from MoneyModel import MoneyModel # If MoneyModel.py is where your code is.
+
+``CanvasGrid`` works by looping over every cell in a grid, and generating a portrayal for every agent it finds. A portrayal is a dictionary (which can easily be turned into a JSON object) which tells the JavaScript side how to draw it. The only thing we need to provide is a function which takes an agent, and returns a portrayal object. Here's the simplest one: it'll draw each agent as a red, filled circle which fills half of each cell.
+
+.. code-block:: python
+
+    def agent_portrayal(agent):
+        portrayal = {"Shape": "circle",
+                     "Color": "red",
+                     "Filled": "true",
+                     "Layer": 0,
+                     "r": 0.5}
+        return portrayal
+
+
+In addition to the portrayal method, we instantiate a canvas grid with its width and height in cells, and in pixels. In this case, let's create a 10x10 grid, drawn in 500 x 500 pixels.
+
+.. code-block:: python
+
+    grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+
+Now we create and launch the actual server. We do this with the following arguments:
+    - The model class we're running and visualizing; in this case, ``MoneyModel``.
+    - A list of module objects to include in the visualization; here, just ``[grid]``
+    - The title of the model: "Money Model"
+    - Any inputs or arguments for the model itself. In this case, 100 agents, and height and width of 10.
+
+One we create the server, we set the port for it to listen on (you can treat this as just a piece of the URL you'll open in the browser). Finally, when you're ready to run the visualization, use the server's ``launch()`` method. 
+
+.. code-block:: python
+    
+    server = ModularServer(MoneyModel, [grid], "Money Model", 100, 10, 10)
+    server.port = 8889
+    server.launch()
+
+The full code should now look like:
+
+.. code-block:: python
+
+    from MoneyModel import *
+    from mesa.visualization.modules import CanvasGrid
+    from mesa.visualization.ModularVisualization import ModularServer
+
+
+    def agent_portrayal(agent):
+        portrayal = {"Shape": "circle",
+                     "Filled": "true",
+                     "Layer": 0,
+                     "Color": "red",
+                     "r": 0.5}
+        return portrayal
+
+    grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+    server = ModularServer(MoneyModel, [grid], "Money Model", 100, 10, 10)
+    server.port = 8889
+    server.launch()
+
+
+Now run this file; this should launch the interactive visualization server. Open your web browser of choice, and enter `127.0.0.1:8889 <127.0.0.1:8889>`_. 
+
+You should see something like the figure below: the model title, an empty space where the grid will be, and a control panel off to the right. 
+
+.. image:: images/tutorial/viz_empty.png
+   :width: 50%
+   :scale: 100%
+   :alt: Model-level variable collected
+   :align: center
+
+Click the 'reset' button on the control panel, and you should see the grid fill up with red circles, representing agents. 
+
+.. image:: images/tutorial/viz_redcircles.png
+   :width: 50%
    :scale: 100%
    :alt: Model-level variable collected
    :align: center
 
 
+Click 'step' to advance the model by one step, and the agents will move around. Click 'run' and the agents will keep moving around, at the rate set by the 'fps' (frames per second) slider at the top. Try moving it around and see how the speed of the model changes. Pressing 'pause' will (as you'd expect) pause the model; presing 'run' again will restart it. Finally, 'reset' will start a new instantiation of the model.
 
+To stop the visualization server, go back to the terminal where you launched it, and press Control+c. 
 
-Adding visualization
----------------------------
+Changing the agents
+~~~~~~~~~~~~~~~~~~~
+
+In the visualization above, all we could see is the agents moving around -- but not how much money they had, or anything else of interest. Let's change it so that agents who are broke (wealth 0) are drawn in grey, smaller, and above agents who still have money. 
+
+To do this, we go back to our ``agent_portrayal`` code and add some code to change the portrayal based on the agent properties.
+
+.. code-block:: python
+
+    def agent_portrayal(agent):
+        portrayal = {"Shape": "circle",
+                     "Filled": "true",
+                     "r": 0.5}
+
+        if agent.wealth > 0:
+            portrayal["Color"] = "red"
+            portrayal["Layer"] = 0
+        else:
+            portrayal["Color"] = "grey"
+            portrayal["Layer"] = 1
+            portrayal["r"] = 0.2
+        return portrayal
+
+Now launch the server again, open or refresh your browser page, and hit 'reset'. Initially it looks the same, but advance the model and smaller grey circles start to appear. Note that since the zero-wealth agents have a higher layer number, they are drawn on top of the red agents.
+
+.. image:: images/tutorial/viz_greycircles.png
+   :width: 50%
+   :scale: 100%
+   :alt: Model-level variable collected
+   :align: center
+
+Adding a chart
+~~~~~~~~~~~~~~~
+
+Next, let's add another element to the visualization: a chart, tracking the model's Gini Coefficient. This is another built-in element that Mesa provides. 
+
+.. code-block:: python
+
+    from mesa.visualization.modules import ChartModule
+
+The basic chart pulls data from the model's DataCollector, and draws it as a line graph using the `Charts.js <http://www.chartjs.org/>`_ JavaScript libraries. We instantiate a chart element with a list of series for the chart to track. Each series is defined in a dictionary, and has a ``Label`` (which must match the name of a model-level variable collected by the DataCollector) and a ``Color`` name. We can also give the chart the name of the DataCollector object in the model. 
+
+Finally, we add the chart to the list of elements in the server. The elements are added to the visualization in the order they appear, so the chart will appear underneath the grid. 
+
+.. code-block:: python
+
+    chart = ChartModule([{"Label": "Gini", "Color": "Black"}], 
+                                data_collector_name='datacollector')
+
+    server = ModularServer(MoneyModel, [grid, chart], "Money Model", 100, 10, 10)
+
+Launch the visualization and start a model run, and you'll see a line chart underneath the grid. Every step of the model, the line chart updates along with the grid. Reset the model, and the chart resets too. 
+
+.. image:: images/tutorial/viz_chart.png
+   :width: 50%
+   :scale: 100%
+   :alt: Model-level variable collected
+   :align: center
+
+**Note:** You might notice that the chart line only starts after a couple of steps; this is due to a bug in Charts.js which will hopefully be fixed soon.
+
 
 
 ** THIS DOC IS IN PROGRESS **
