@@ -662,6 +662,35 @@ Launch the visualization and start a model run, and you'll see a line chart unde
 **Note:** You might notice that the chart line only starts after a couple of steps; this is due to a bug in Charts.js which will hopefully be fixed soon.
 
 
+Building your own visualization component
+-------------------------------------------
+
+**Note:** This section is for users who have a basic familiarity with JavaScript. If that's not you, don't worry! 
+
+If the visualization elements provided by Mesa aren't enough for you, you can build your own and plug them into the model server. 
+
+First, you need to understand how the visualization works under the hood. Remember that each visualization module has two sides: a Python object that runs on the server and generates JSON data from the model state (the server side), and a JavaScript object that runs in the browser and turns the JSON into something it renders on the screen (the client side). 
+
+Obviously, the two sides of each visualization must be designed in tandem. They result in one Python class, and one JavaScript ``.js`` file. The path to the JavaScript file is a property of the Python class. 
+
+For this example, let's build a simple histogram visualization, which can count the number of agents with each value of wealth. We'll use the `Charts.js <http://www.chartjs.org/>`_ JavaScript library, which is already included with Mesa. If you go and look at its documentation, you'll see that it had no histogram functionality, which means we have to build our own out of a bar chart. We'll keep the histogram as simple as possible, giving it a fixed number of integer bins. If you were designing a more general histogram to add to the Mesa repository for everyone to use across different models, obviously you'd want something more general.
+
+Client-Side Code
+~~~~~~~~~~~~~~~~~
+
+In general, the server- and client-side are written in tandem. However, if you're like me and more comfortable with Python than JavaScript, it makes sense to figure out how to get the JavaScript working first, and then write the Python to be compatible with that.
+
+In the same directory as your model, create a new file called `HistogramModule.js`. This will store the JavaScript code for the client side of the new module.
+
+JavaScript classes can look alien to people coming from other languages -- specifically, they can look like functions. (The Mozilla `Introduction to Object-Oriented JavaScript <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Introduction_to_Object-Oriented_JavaScript>`_ is a good starting point). In `HistogramModule.js`, start by creating the class itself:
+
+.. code-block:: javascript
+
+    var HistogramModule = function(bins, canvas_width, canvas_height) {
+        // The actual code will go here.
+    };
+
+Note that our object is instantiated with three arguments: the number of integer bins, and the width and height (in pixels) the chart will take up in the visualizatio window.
 
 ** THIS DOC IS IN PROGRESS **
 
