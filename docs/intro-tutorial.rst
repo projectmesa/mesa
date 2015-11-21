@@ -665,7 +665,7 @@ Launch the visualization and start a model run, and you'll see a line chart unde
 Building your own visualization component
 -------------------------------------------
 
-**Note:** This section is for users who have a basic familiarity with JavaScript. If that's not you, don't worry! 
+**Note:** This section is for users who have a basic familiarity with JavaScript. If that's not you, don't worry! (If you're an advanced JavaScript coder and find things that we've done wrong or inefficiently here, please `let us know <https://github.com/projectmesa/mesa/issues>`_!)
 
 If the visualization elements provided by Mesa aren't enough for you, you can build your own and plug them into the model server. 
 
@@ -680,7 +680,7 @@ Client-Side Code
 
 In general, the server- and client-side are written in tandem. However, if you're like me and more comfortable with Python than JavaScript, it makes sense to figure out how to get the JavaScript working first, and then write the Python to be compatible with that.
 
-In the same directory as your model, create a new file called `HistogramModule.js`. This will store the JavaScript code for the client side of the new module.
+In the same directory as your model, create a new file called ``HistogramModule.js``. This will store the JavaScript code for the client side of the new module.
 
 JavaScript classes can look alien to people coming from other languages -- specifically, they can look like functions. (The Mozilla `Introduction to Object-Oriented JavaScript <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Introduction_to_Object-Oriented_JavaScript>`_ is a good starting point). In `HistogramModule.js`, start by creating the class itself:
 
@@ -690,7 +690,101 @@ JavaScript classes can look alien to people coming from other languages -- speci
         // The actual code will go here.
     };
 
-Note that our object is instantiated with three arguments: the number of integer bins, and the width and height (in pixels) the chart will take up in the visualizatio window.
+Note that our object is instantiated with three arguments: the number of integer bins, and the width and height (in pixels) the chart will take up in the visualization window.
+
+When the visualization object is instantiated, the first thing it needs to do is prepare to draw on the current page. To do so, it adds a `canvas <https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API>`_ tag to the page, using `JQuery <https://jquery.com/>`_ 's dollar-sign syntax (JQuery is already included with Mesa). It also gets the canvas's context, which is required for doing anything with it.
+
+.. code-block:: javascript
+
+    var HistogramModule = function(bins, canvas_width, canvas_height) {
+        
+        // Create the tag:
+        var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
+        canvas_tag += "style='border:1px dotted'></canvas>";
+        // Append it to body:
+        var canvas = $(canvas_tag)[0];
+        $("body").append(canvas);
+        // Create the context and the drawing controller:
+        var context = canvas.getContext("2d");
+    };
+
+
+Look at the Charts.js `bar chart documentation <http://www.chartjs.org/docs/#bar-chart-introduction>`_; you'll see some of the boilerplate needed to get a chart set up. Especially important is the `data` object, which includes the datasets, labels, and color options. In this case, we want just one dataset (we'll keep things simple and name it "Data"); it has `bins` for categories, and the value of each category starts out at zero. Finally, using these boilerplate objects and the canvas context we created, we can create the chart object.
+
+.. code-block:: javascript
+
+    var HistogramModule = function(bins, canvas_width, canvas_height) {
+        // Create the elements
+        
+        // Create the tag:
+        var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
+        canvas_tag += "style='border:1px dotted'></canvas>";
+        // Append it to body:
+        var canvas = $(canvas_tag)[0];
+        $("body").append(canvas);
+        // Create the context and the drawing controller:
+        var context = canvas.getContext("2d");
+
+        // Prep the chart properties and series:
+        var datasets = [{
+            label: "Data",
+            fillColor: "rgba(151,187,205,0.5)",
+            strokeColor: "rgba(151,187,205,0.8)",
+            highlightFill: "rgba(151,187,205,0.75)",
+            highlightStroke: "rgba(151,187,205,1)",
+            data: []
+        }];
+
+        // Add a zero value for each bin
+        for (var i in bins)
+            datasets[0].data.push(0);
+
+        var data = {
+            labels: bins,
+            datasets: datasets
+        };
+
+        var options = {
+            scaleBeginsAtZero: true
+        };
+
+        // Create the chart object
+        var chart = new Chart(context).Bar(data, options);
+
+        // Now what?
+    };
+
+There are two methods every client-side visualization class must implement to be able to work: ``render(data)`` to render the incoming data, and ``reset()`` which is called to clear the visualization when the user hits the reset button and starts a new model run. 
+
+In this case, the easiest way to pass data to the histogram is as an array, one value for each bin. We can then just loop over the array and update the values in the chart's dataset.
+
+There are a few ways to reset the chart, but the easiest is probably to destroy it and create a new chart object in its place. 
+
+With that in mind, we can add these two methods to the class:
+
+.. code-block:: javascript
+
+    var HistogramModule = function(bins, canvas_width, canvas_height) {
+
+        // ...Everything from above...
+
+        this.render = function(data) {
+            for (var i in data)
+                chart.datasets[0].bars[i].value = data[i];
+            chart.update();
+        };
+
+        this.reset = function() {
+            chart.destroy();
+            chart = new Chart(context).Bar(data, options);
+        };
+};
+
+Note the ``this.`` before the method names. This makes them public and ensures that they are accessible outside of the object itself. All the other variables inside the class are only accessible inside the object itself, but not outside of it.
+
+Server-Side Code
+~~~~~~~~~~~~~~~~~
+
 
 ** THIS DOC IS IN PROGRESS **
 
