@@ -1,5 +1,5 @@
 Introduction to Mesa - Tutorial
-================================
+*********************************
 
 Getting started with Mesa is easy. In this tutorial, we will walk through creating a simple model which will illustrate Mesa's core features. 
 
