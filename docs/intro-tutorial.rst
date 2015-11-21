@@ -1,27 +1,29 @@
 Introduction to Mesa - Tutorial
 ================================
 
-Getting started with Mesa is easy. In this tutorial, we will walk through creating a simple model which will illustrate Mesa's core features. The tutorial is organized as follows:
+Getting started with Mesa is easy. In this tutorial, we will walk through creating a simple model which will illustrate Mesa's core features. 
 
-.. contents::
+We'll start from a very simple model of agents exchanging money; then add space and allow the agents to walk around. Next, we'll cover two of Mesa's analytic tools: the data collector and batch runner classes. Then we'll add an interactive visualization which lets us watch the model as it runs. Finally, for users who are comfortable with JavaScript, we go over how to write your own visualization module.
 
-We'll start from a very simple model of agents exchanging money; then add space and allow the agents to walk around. Next, we'll cover two of Mesa's analytic tools: the data collector and batch runner classes. Finally we'll cover how to set up an interactive visualization, and (for advanced users) how to create a new interactive visualization module.
+.. contents:: Tutorial Contents
+
+Sample Model Description
+------------------------
 
 The tutorial model is a very simple simulated agent-based economy, drawn from econophysics and presenting a statistical mechanics approach to wealth distribution [Dragulescu2002]_. The rules of our tutorial model:
 
-- There are some number of agents.
-- All agents begin with 1 unit of money.
-- Every step of the model, an agent gives 1 unit of money (if they have it) to some other agent.
+1. There are some number of agents.
+2. All agents begin with 1 unit of money.
+3. Every step of the model, an agent gives 1 unit of money (if they have it) to some other agent.
 
 Despite its simplicity, this model yields results that are often unexpected to those not familiar with it. For our purposes, it also easily demonstrates Mesa's core features.
 
 Let's get started.
 
-
 Installation
 ------------
 
-The first thing you need to do is to install Mesa. We recommend doing this in a `virtual environment <https://virtualenvwrapper.readthedocs.org/en/stable/>`_, but make sure your environment is set up with Python 3. Mesa requires Python3 and does not work in < Python 2 environments.
+The first thing you need to do is to install Mesa, if you haven't already. We recommend doing this in a `virtual environment <https://virtualenvwrapper.readthedocs.org/en/stable/>`_, but make sure your environment is set up with Python 3. Mesa requires Python3 and does not work in < Python 2 environments.
 
 To install Mesa, simply:
 
