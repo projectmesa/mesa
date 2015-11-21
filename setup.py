@@ -7,7 +7,7 @@ from codecs import open
 
 requires = [
     'tornado',
-    #'numpy',
+    'numpy',
     'pandas',
 ]
 
