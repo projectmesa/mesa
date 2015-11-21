@@ -785,6 +785,69 @@ Note the ``this.`` before the method names. This makes them public and ensures t
 Server-Side Code
 ~~~~~~~~~~~~~~~~~
 
+Can we get back to Python? Please? Yo.
+
+Every JavaScript visualization element has an equal and opposite server-side Python element. The Python class needs to also have a ``render`` method, to get data out of the model object and into a JSON-ready format. It also needs to point towards the code where the relevant JavaScript lives, and add the JavaScript object to the model page.
+
+In a Python file (either its own, or in the same file as your visualization code), import the ``VisualizationElement`` class we'll inherit from, and create the new visualization class.
+
+.. code-block:: python
+
+    from mesa.visualization.ModularVisualization import VisualizationElement
+
+    class HistogramModule(VisualizationElement):
+
+        package_includes = ["Chart.min.js"]
+        local_includes = ["HistogramModule.js"]
+
+        def __init__(self, bins, canvas_height, canvas_width):
+            self.canvas_height = canvas_height
+            self.canvas_width = canvas_width
+            self.bins = [0]*bins
+            new_element = "new HistogramModule({}, {}, {})"
+            new_element = new_element.format(bins, canvas_width, canvas_height)
+            self.js_code = "elements.push(" + new_element + ");"
+
+There are a few things going on here. ``package_includes`` is a list of JavaScript files that are part of Mesa itself that the visualization element relies on. You can see the included files in `mesa/visualization/templates/ <https://github.com/projectmesa/mesa/tree/tutorial_update/mesa/visualization/templates>`_. Similarly, ``local_includes`` is a list of JavaScript files in the same directory as the class code itself. Note that both of these are class variables, not object variables -- they hold for all particular objects.
+
+Next, look at the ``__init__`` method. It takes three arguments: the number of bins, and the width and height for the histogram. It then uses these values to populate the ``js_code`` property; this is code that the server will insert into the visualization page, which will run when the page loads. In this case, it creates a new HistogramModule (the class we created in JavaScript in the step above) with the desired bins, width and height; it then appends  (``push``es) this object to ``elements``, the list of visualization elements that the visualization page itself maintains. 
+
+Now, the last thing we need is the ``render`` method. If we were making a general-purpose visualization module we'd want this to be more general, but in this case we can hard-code it to our model.
+
+.. code-block:: python
+
+    import numpy as np
+
+    class HistogramModule(VisualizationElement):
+
+        # ... Everything from above...
+
+        def render(self, model):
+            wealth_vals = [agent.wealth for agent in model.schedule.agents]
+            hist = np.histogram(wealth_vals, bins=self.bins)[0]
+            return [int(x) for x in hist]
+
+Every time the render method is called (with a model object as the argument) it uses numpy to generate counts of agents with each wealth value in the bins, and then returns a list of these values. Note that the ``render`` method doesn't return a JSON string -- just an object that can be turned into JSON, in this case a Python list (with Python integers as the values; the ``json`` library doesn't like dealing with numpy's integer type).
+
+Now, you can create your new HistogramModule and add it to the server:
+
+.. code-block:: python
+    
+    histogram = HistogramModule(list(range(10)), 200, 500)
+    server = ModularServer(MoneyModel, [grid, histogram, chart], "Money Model", 100, 10, 10)
+    server.launch()
+
+Run this code, and you should see your brand-new histogram added to the visualization and updating along with the model!
+
+.. image:: images/tutorial/viz_histogram.png
+   :width: 50%
+   :scale: 100%
+   :alt: Model-level variable collected
+   :align: center
+
+If you've felt comfortable with this section, it might be instructive to read the code for the `ModularServer <https://github.com/projectmesa/mesa/blob/master/mesa/visualization/ModularVisualization.py#L259>`_ and the `modular_template <https://github.com/projectmesa/mesa/blob/master/mesa/visualization/templates/modular_template.html>`_ to get a better idea of how all the pieces fit together. 
+
+**Happy modeling!**
 
 ** THIS DOC IS IN PROGRESS **
 
