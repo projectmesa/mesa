@@ -3,6 +3,8 @@ Introduction to Mesa - Tutorial
 
 Getting started with Mesa is easy. In this tutorial, we will walk through creating a simple model which will illustrate Mesa's core features. 
 
+**Note:** This tutorial is a work-in-progress. If you find any errors or bugs, or just find something unclear or confusing, `let us know <https://github.com/projectmesa/mesa/issues>`_!
+
 We'll start from a very simple model of agents exchanging money; then add space and allow the agents to walk around. Next, we'll cover two of Mesa's analytic tools: the data collector and batch runner classes. Then we'll add an interactive visualization which lets us watch the model as it runs. Finally, for users who are comfortable with JavaScript, we go over how to write your own visualization module.
 
 .. contents:: Tutorial Contents
@@ -223,7 +225,7 @@ Mesa has two main types of grids: ``SingleGrid`` and ``MultiGrid``. ``SingleGrid
 
     from mesa.space import MultiGrid
 
-We instantiate a grid with height and width parameters, and a boolean as to whether the grid is toriodal. Let's make width and height model parameters, in addition to the number of agents, and have the grid always be toriodal. We can place agents on a grid with the grid's ``place_agent`` method, which takes an agent and an (x, y) tuple of the coordinates to place the agent.
+We instantiate a grid with height and width parameters, and a boolean as to whether the grid is toroidal. Let's make width and height model parameters, in addition to the number of agents, and have the grid always be toroidal. We can place agents on a grid with the grid's ``place_agent`` method, which takes an agent and an (x, y) tuple of the coordinates to place the agent.
 
 .. code-block:: python
 
