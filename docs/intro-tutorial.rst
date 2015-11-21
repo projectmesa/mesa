@@ -1,7 +1,11 @@
 Introduction to Mesa - Tutorial
 ================================
 
-Getting started with Mesa is easy. In this doc, we will walk through creating a simple model which will illustrate Mesa's core features. We'll start from a very simple model of agents exchanging money; then add space and allow the agents to walk around. Next, we'll cover two of Mesa's analytic tools: the data collector and batch runner classes. Finally we'll cover how to set up an interactive visualization, and (for advanced users) how to create a new interactive visualization module.
+Getting started with Mesa is easy. In this tutorial, we will walk through creating a simple model which will illustrate Mesa's core features. The tutorial is organized as follows:
+
+.. contents::
+
+We'll start from a very simple model of agents exchanging money; then add space and allow the agents to walk around. Next, we'll cover two of Mesa's analytic tools: the data collector and batch runner classes. Finally we'll cover how to set up an interactive visualization, and (for advanced users) how to create a new interactive visualization module.
 
 The tutorial model is a very simple simulated agent-based economy, drawn from econophysics and presenting a statistical mechanics approach to wealth distribution [Dragulescu2002]_. The rules of our tutorial model:
 
@@ -785,7 +789,7 @@ Note the ``this.`` before the method names. This makes them public and ensures t
 Server-Side Code
 ~~~~~~~~~~~~~~~~~
 
-Can we get back to Python? Please? Yo.
+Can we get back to Python code? Please? Yo.
 
 Every JavaScript visualization element has an equal and opposite server-side Python element. The Python class needs to also have a ``render`` method, to get data out of the model object and into a JSON-ready format. It also needs to point towards the code where the relevant JavaScript lives, and add the JavaScript object to the model page.
 
