@@ -1,6 +1,7 @@
 Introduction to Mesa - Tutorial
 *********************************
 
+`Mesa <https://github.com/projectmesa/mesa>`_ is a Python framework for `agent-based modeling <https://en.wikipedia.org/wiki/Agent-based_model>`_.
 Getting started with Mesa is easy. In this tutorial, we will walk through creating a simple model which will illustrate Mesa's core features. 
 
 **Note:** This tutorial is a work-in-progress. If you find any errors or bugs, or just find something unclear or confusing, `let us know <https://github.com/projectmesa/mesa/issues>`_!
@@ -74,7 +75,8 @@ The beginning of both classes looks like this:
             # Create agents
             for i in range(self.num_agents):
                 a = MoneyAgent(i)
-                # Now what? See below.
+                # What do we do with the agent once it's been created?
+                # See the next section, below.
 
 Adding the scheduler
 ~~~~~~~~~~~~~~~~~~~~~
