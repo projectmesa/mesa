@@ -23,6 +23,7 @@ RANDOM = -1
 X = 0
 Y = 1
 
+
 def accept_tuple_argument(wrapped_function):
     '''
     Decorator to allow grid methods that take a list of (x, y) position tuples
@@ -35,6 +36,7 @@ def accept_tuple_argument(wrapped_function):
         else:
             return wrapped_function(*args)
     return wrapper
+
 
 class Grid(object):
     '''
