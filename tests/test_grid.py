@@ -53,6 +53,43 @@ class TestBaseGrid(unittest.TestCase):
             x, y = agent.pos
             assert self.grid[y][x] == agent
 
+    def test_cell_agent_reporting(self):
+        '''
+        Ensure that if an agent is in a cell, get_cell_list_contents accurately
+        reports that fact.
+        '''
+        for agent in self.agents:
+            x, y = agent.pos
+            assert agent in self.grid.get_cell_list_contents([(x, y)])
+
+    def test_listfree_cell_agent_reporting(self):
+        '''
+        Ensure that if an agent is in a cell, get_cell_list_contents accurately
+        reports that fact, even when single position is not wrapped in a list.
+        '''
+        for agent in self.agents:
+            x, y = agent.pos
+            assert agent in self.grid.get_cell_list_contents((x, y))
+
+    def test_iter_cell_agent_reporting(self):
+        '''
+        Ensure that if an agent is in a cell, iter_cell_list_contents accurately
+        reports that fact.
+        '''
+        for agent in self.agents:
+            x, y = agent.pos
+            assert agent in self.grid.iter_cell_list_contents([(x, y)])
+
+    def test_listfree_iter_cell_agent_reporting(self):
+        '''
+        Ensure that if an agent is in a cell, iter_cell_list_contents accurately
+        reports that fact, even when single position is not wrapped in a list.
+        '''
+        for agent in self.agents:
+            x, y = agent.pos
+            assert agent in self.grid.iter_cell_list_contents((x, y))
+
+
     def test_neighbors(self):
         '''
         Test the base neighborhood methods on the non-toroid.

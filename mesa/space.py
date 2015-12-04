@@ -23,6 +23,18 @@ RANDOM = -1
 X = 0
 Y = 1
 
+def accept_tuple_argument(wrapped_function):
+    '''
+    Decorator to allow grid methods that take a list of (x, y) position tuples
+    to also handle a single position, by automatically wrapping tuple in
+    single-item list rather than forcing user to do it.
+    '''
+    def wrapper(*args):
+        if isinstance(args[1], tuple) and len(args[1]) == 2:
+            return wrapped_function(args[0], [args[1]])
+        else:
+            return wrapped_function(*args)
+    return wrapper
 
 class Grid(object):
     '''
@@ -238,10 +250,11 @@ class Grid(object):
         x, y = pos
         return x < 0 or x >= self.width or y < 0 or y >= self.height
 
+    @accept_tuple_argument
     def iter_cell_list_contents(self, cell_list):
         '''
         Args:
-            cell_list: Array-like of (x, y) tuples
+            cell_list: Array-like of (x, y) tuples, or single tuple.
 
         Returns:
             A iterator of the contents of the cells identified in cell_list
@@ -249,10 +262,11 @@ class Grid(object):
         return (
             self[y][x] for x, y in cell_list if not self.is_cell_empty((x, y)))
 
+    @accept_tuple_argument
     def get_cell_list_contents(self, cell_list):
         '''
         Args:
-            cell_list: Array-like of (x, y) tuples
+            cell_list: Array-like of (x, y) tuples, or single tuple.
 
         Returns:
             A list of the contents of the cells identified in cell_list
@@ -418,10 +432,11 @@ class MultiGrid(Grid):
         x, y = pos
         self.grid[y][x].remove(agent)
 
+    @accept_tuple_argument
     def iter_cell_list_contents(self, cell_list):
         '''
         Args:
-            cell_list: Array-like of (x, y) tuples
+            cell_list: Array-like of (x, y) tuples, or single tuple.
 
         Returns:
             A iterator of the contents of the cells identified in cell_list
