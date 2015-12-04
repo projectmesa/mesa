@@ -83,7 +83,7 @@ class TestBaseGrid(unittest.TestCase):
     def test_listfree_iter_cell_agent_reporting(self):
         '''
         Ensure that if an agent is in a cell, iter_cell_list_contents
-        accuratelyreports that fact, even when single position is not
+        accurately reports that fact, even when single position is not
         wrapped in a list.
         '''
         for agent in self.agents:
