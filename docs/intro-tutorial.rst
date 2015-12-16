@@ -17,7 +17,7 @@ The tutorial model is a very simple simulated agent-based economy, drawn from ec
 
 1. There are some number of agents.
 2. All agents begin with 1 unit of money.
-3. Every step of the model, an agent gives 1 unit of money (if they have it) to some other agent.
+3. At every step of the model, an agent gives 1 unit of money (if they have it) to some other agent.
 
 Despite its simplicity, this model yields results that are often unexpected to those not familiar with it. For our purposes, it also easily demonstrates Mesa's core features.
 
@@ -26,7 +26,7 @@ Let's get started.
 Installation
 ------------
 
-The first thing you need to do is to install Mesa, if you haven't already. We recommend doing this in a `virtual environment <https://virtualenvwrapper.readthedocs.org/en/stable/>`_, but make sure your environment is set up with Python 3. Mesa requires Python3 and does not work in < Python 2 environments.
+The first thing you need to do is to install Mesa, if you haven't already. We recommend doing this in a `virtual environment <https://virtualenvwrapper.readthedocs.org/en/stable/>`_, but make sure your environment is set up with Python 3. Mesa requires Python3 and does not work in Python 2 environments.
 
 To install Mesa, simply:
 
@@ -44,15 +44,15 @@ With Mesa all installed, let's go ahead and start building our model. There are 
 
 Either way, it's good practice to put your model in its own folder -- especially if the project will end up consisting of multiple files (for example, Python files for the model and the visualization,  a Notebook for analysis, and a Readme with some documentation and discussion). 
 
-Go ahead and create a folder, and either launch a Notebook or create a new Python source file.
+Go ahead and create a folder, and either launch a Notebook or create a new Python source file.  We will use the name ``MoneyModel.py`` here.
 
 
 Setting up the model
 ~~~~~~~~~~~~~~~~~~~~~
 
-Now it's time to start writing the code. The model is going to need two core classes: one for the overall model, the other for the agents. The model class holds the model-level parameters, manages the agents, and generally handle the global level of our model. Each instantiation of the model class will be a specific model run. Each model will contain multiple agents, all of which are instantiations of the agent class. Both the model and agent classes are child classes of Mesa's generic ``Model`` and ``Agent`` classes.
+Now it's time to start writing the code. The model is going to need two core classes: one for the overall model, the other for the agents. The model class holds the model-level attributes, manages the agents, and generally handles the global level of our model. Each instantiation of the model class will be a specific model run. Each model will contain multiple agents, all of which are instantiations of the agent class. Both the model and agent classes are child classes of Mesa's generic ``Model`` and ``Agent`` classes.
 
-Each agent has only one variable: how much wealth it currently has. It's also good practice to give agents a unique identifier (i.e. a name), stored in the ``unique_id`` variable.
+Each agent has only one variable: how much wealth it currently has. (Each agent will also have a unique identifier (i.e., a name), stored in the ``unique_id`` variable. Giving each agent a unique id is a good practice when doing agent-based modeling.)
 
 There is only one model-level parameter: how many agents the model contains. When a new model is started, we want it to populate itself with the given number of agents.
 
@@ -63,7 +63,7 @@ The beginning of both classes looks like this:
     from mesa import Agent, Model
 
     class MoneyAgent(Agent):
-        """ An agent with fixed initial wealth."""
+        """An agent with fixed initial wealth."""
         def __init__(self, unique_id):
             self.unique_id = unique_id
             self.wealth = 1
@@ -81,7 +81,7 @@ The beginning of both classes looks like this:
 Adding the scheduler
 ~~~~~~~~~~~~~~~~~~~~~
 
-Time in most agent-based models moves in steps, sometimes also called ticks. Each step of the model, one or more of the agents -- usually all of them -- are activated and take their own step, changing internally and/or interacting with one another or the environment. 
+Time in most agent-based models moves in steps, sometimes also called ticks. At each step of the model, one or more of the agents -- usually all of them -- are activated and take their own step, changing internally and/or interacting with one another or the environment. 
 
 The ``scheduler`` is a special model component which controls the order in which agents are activated. For example, all the agents may activate in the same order every step; their order might be shuffled; we may try to simulate all the agents acting at the same time; and more. Mesa offers a few different built-in scheduler classes, with a common interface. That makes it easy to change the activation regime a given model uses, and see whether it changes the model behavior.
 
@@ -173,10 +173,17 @@ With that last piece in hand, it's time for the first rudimentary run of the mod
 Now we need to get some data out of the model. Specifically, we want to see the distribution of the agent's wealth. We can get the wealth values with list comprehension, and then use matplotlib (or the graphics library of your choice) to visualize a histogram.
 
 .. code-block:: python
+    # Put this import at the top of the file
+    import matplotlib.pyplot as plt
 
     agent_wealth = [a.wealth for a in model.schedule.agents]
     plt.hist(agent_wealth)
 
+If you are running from a text editor or IDE, you'll also need to add this line, to make the graph appear.
+
+.. code-block:: python
+
+    plt.show()
 
 You'll probably see something like the distribution shown below. Yours will almost certainly look at least slightly different, since each run of the model is random, after all. 
 
@@ -358,6 +365,9 @@ Now let's use matplotlib and numpy to visualize the number of agents residing in
 
 .. code-block:: python
 
+    # At the top of your file, import numpy
+    import numpy as np
+
     wealth_grid = np.zeros((model.grid.width, model.grid.height))
     for cell in model.grid.coord_iter():
         cell_content, x, y = cell
@@ -365,6 +375,8 @@ Now let's use matplotlib and numpy to visualize the number of agents residing in
         wealth_grid[y][x] = cell_wealth
     plt.imshow(wealth_grid, interpolation='nearest')
     plt.colorbar()
+    # If running from a text editor or IDE, uncomment this line.
+    # plt.show()
 
 .. image:: images/tutorial/numpy_grid.png
    :width: 50%
