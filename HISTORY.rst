@@ -6,8 +6,16 @@ Release History
 Next release
 ++++++++++++++++++
 
-* Improvements:
-    * Added iterable grid neighborhood methods.
+(See current PR list)
+#170 Adding multi-stage activation
+#169 Wolf-Sheep Cleanup
+
+
+0.6.7 (2015-07-11)
+++++++++++++++++++
+
+* Improvements
+    * Allow cell_list_content methods in Grids to accept single tuples in addition to lists
 
 
 0.6.6 (2015-07-11)
