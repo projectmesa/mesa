@@ -19,7 +19,7 @@ class Model(object):
     '''
     seed = None  # Seed for the random number generator
     schedule = None  # Schedule object
-    running = None
+    running = True
 
     def __init__(self, seed=None):
         '''
