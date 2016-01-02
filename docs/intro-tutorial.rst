@@ -54,7 +54,7 @@ Now it's time to start writing the code. The model is going to need two core cla
 
 Each agent has only one variable: how much wealth it currently has. (Each agent will also have a unique identifier (i.e., a name), stored in the ``unique_id`` variable. Giving each agent a unique id is a good practice when doing agent-based modeling.)
 
-There is only one model-level parameter: how many agents the model contains. When a new model is started, we want it to populate itself with the given number of agents.
+There is only one model-level parameter: how many agents the model contains. When a new model is started, we want it to populate itself with the given number of agents. We also set the model's ``running`` property to True; this should be set by default, then changed to False if the model reaches an end condition.
 
 The beginning of both classes looks like this:
 
@@ -71,6 +71,7 @@ The beginning of both classes looks like this:
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N):
+            self.running = True
             self.num_agents = N
             # Create agents
             for i in range(self.num_agents):
