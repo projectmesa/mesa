@@ -156,6 +156,9 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         if self.application.verbose:
             print("Socket opened!")
 
+    def check_origin(self, origin):
+        return True
+
     def on_message(self, message):
         '''
         Receiving a message from the websocket, parse, and act accordingly.
