@@ -10,4 +10,11 @@ Another ABM standard. Wolf and sheep wander around the grid randomly and reprodu
  - Dynamically adding and removing agents from the schedule
  - (Eventually) visualizing a layered grid, with a grass layer, a wolf layer and a sheep layer.
 
+### To run this example
 
+* Launch the model
+```python
+python WolfSheepServer.py
+```
+* Visit your browser: http://127.0.0.1:8888/
+* In your browser hit *reset*, then *run*
