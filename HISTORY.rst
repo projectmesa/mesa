@@ -6,9 +6,9 @@ Release History
 Next release
 ++++++++++++++++++
 
-(See current PR list)
-#170 Adding multi-stage activation
-#169 Wolf-Sheep Cleanup
+* #170 Adding multi-stage activation
+* #169 Wolf-Sheep Cleanup
+* Updates requirements to latest libraries
 
 
 0.6.7 (2015-07-11)
