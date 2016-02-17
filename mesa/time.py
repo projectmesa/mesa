@@ -133,3 +133,58 @@ class SimultaneousActivation(BaseScheduler):
             agent.advance(self.model)
         self.steps += 1
         self.time += 1
+
+
+class StagedActivation(BaseScheduler):
+    '''
+    A scheduler which allows agent activation to be divided into several stages
+    instead of a single `step` method. All agents execute one stage before
+    moving on to the next.
+
+    Agents must have all the stage methods implemented. Stage methods take a
+    model object as their only argument.
+
+    This schedule tracks steps and time separately. Time advances in fractional
+    increments of 1 / (# of stages), meaning that 1 step = 1 unit of time.
+    '''
+
+    stage_list = []
+    shuffle = False
+    shuffle_between_stages = False
+    stage_time = 1
+
+    def __init__(self, model, stage_list=["step"], shuffle=False,
+            shuffle_between_stages=False):
+        '''
+        Create an empty Staged Activation schedule.
+
+        Args:
+            model: Model object associated with the schedule.
+            stage_list: List of strings of names of stages to run, in the
+                         order to run them in.
+            shuffle: If True, shuffle the order of agents each step.
+            shuffle_between_stages: If True, shuffle the agents after each
+                                    stage; otherwise, only shuffle at the start
+                                    of each step.
+        '''
+        super().__init__(model)
+        self.stage_list = stage_list
+        self.shuffle = shuffle
+        self.shuffle_between_stages = shuffle_between_stages
+        self.stage_time = 1 / len(self.stage_list)
+
+    def step(self):
+        '''
+        Executes all the stages of all agents.
+        '''
+
+        if self.shuffle:
+            random.shuffle(self.agents)
+        for stage in self.stage_list:
+            for agent in self.agents:
+                getattr(agent, stage)(self.model)  # Run stage
+            if self.shuffle_between_stages:
+                random.shuffle(self.agents)
+            self.time += self.stage_time
+
+        self.steps += 1
