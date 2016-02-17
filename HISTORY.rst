@@ -6,6 +6,11 @@ Release History
 Next release
 ++++++++++++++++++
 
+* ???
+
+0.6.8 (2016-02-16)
+++++++++++++++++++
+
 * #170 Adding multi-stage activation
 * #169 Wolf-Sheep Cleanup
 * Updates requirements to latest libraries
