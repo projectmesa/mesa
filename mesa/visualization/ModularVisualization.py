@@ -286,5 +286,6 @@ class ModularServer(tornado.web.Application):
         '''
         Run the app.
         '''
+        print('Interface starting at http://127.0.0.1:{PORT}'.format(PORT=self.port))
         self.listen(self.port)
         tornado.ioloop.IOLoop.instance().start()
