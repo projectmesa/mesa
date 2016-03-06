@@ -6,11 +6,14 @@ Release History
 Next release
 ++++++++++++++++++
 
-* #184 Adding terminal echo for server launch to signal person running the model
-* #183 Adding Conway's Game of Life simulation to the examples.
 * ???
 
-0.6.8 (2016-02-16)
+0.7.0 (2016-03-06)
+++++++++++++++++++
+* #184 Adding terminal echo for server launch to signal person running the model
+* #183 Adding Conway's Game of Life simulation to the examples.
+
+0.6.9 (2016-02-16)
 ++++++++++++++++++
 
 * #170 Adding multi-stage activation
