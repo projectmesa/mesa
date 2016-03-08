@@ -71,7 +71,7 @@ class Boid(Agent):
             their_pos = np.array(neighbor.pos)
             dist = np.linalg.norm(my_pos - their_pos)
             if dist < self.separation:
-                sep_vector -= their_pos - my_pos
+                sep_vector -= np.int64(their_pos - my_pos)
         return sep_vector
 
     def match_heading(self, neighbors):
@@ -80,7 +80,7 @@ class Boid(Agent):
         '''
         mean_heading = np.array([0, 0])
         for neighbor in neighbors:
-            mean_heading += neighbor.heading
+            mean_heading += np.int64(neighbor.heading)
         return mean_heading / len(neighbors)
 
     def step(self, model):
