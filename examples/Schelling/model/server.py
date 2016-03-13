@@ -6,7 +6,6 @@ from mesa.visualization.TextVisualization import (TextData, TextGrid,
 from world import SchellingModel
 
 
-
 class SchellingTextVisualization(TextVisualization):
     '''
     ASCII visualization for schelling model
