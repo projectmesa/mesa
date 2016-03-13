@@ -1,6 +1,6 @@
 numpy==1.10.4
 pandas==0.17.1
-ipython==4.1.1
+jupyter==1.0.0
 
 tornado==4.0.2
 flake8==2.5.2
