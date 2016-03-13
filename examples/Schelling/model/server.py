@@ -1,6 +1,11 @@
-from Schelling import SchellingModel
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
+from mesa.visualization.TextVisualization import (TextData, TextGrid,
+    TextVisualization)
+
+from world import SchellingModel
+
+
 
 class SchellingTextVisualization(TextVisualization):
     '''
