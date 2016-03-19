@@ -1,5 +1,7 @@
 ## Epstein Civil Violence Model
 
+Model 1 from "[Modeling civil violence](http://www.pnas.org/content/99/suppl_3/7243.full): An agent-based computational
+    approach," by Joshua Epstein.
 
 
 ### To run this example
