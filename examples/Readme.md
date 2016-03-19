@@ -24,7 +24,7 @@ Grid-based demographic prisoner's dilemma model, demonstrating how simple mimici
 Simple implementation of the classic Schelling segregation model.
 (needs readme)
 
-### Tutorial Bollzmann Wealth Model 
+### Tutorial Bolzmann Wealth Model 
 Simple agent-based model, drawn from econophysics and presenting a statistical mechanics approach to wealth distribution [Dragulescu and Yakovenko](http://arxiv.org/pdf/cond-mat/0211175v1.pdf)
 (needs readme)
 
