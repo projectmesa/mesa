@@ -6,15 +6,20 @@ At each time step, an agent's opinion is influenced by that of its neighbors, an
 As an agent adapts its thinking to that of its neighbors, the cell color changes.
 
 
-### Options you can play with:
+### Parameters you can play with (you must change the code at this stage):
 * Vary the number of opinions.
 * Vary the size of the grid
 * Change the grid from fixed borders to a torus continuum
 
 
+### Observe
+* how groups of like minded agents form and evolve
+* how sometimes a single opinion prevails
+* how some minority or fragmented opinions rapidly disappear
+
+
 [Inspired from](http://www.cs.sjsu.edu/~pearce/modules/lectures/abs/as/ca.htm)
 Other similar models: [Schelling Segregation Model](https://github.com/projectmesa/mesa/tree/master/examples/Schelling)
-
 
 
 ### To run this example
