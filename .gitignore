@@ -56,4 +56,8 @@ docs/_build/
 # PyBuilder
 target/
 
+# Jupyter and iPython notebook checkpoints
 *.ipynb_checkpoints
+
+# Spyder app workspace config file
+.spyderworkspace
