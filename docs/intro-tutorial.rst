@@ -40,7 +40,7 @@ When you do that, it will install Mesa itself, as well as any dependencies that 
 Building a sample model
 ------------------------
 
-With Mesa all installed, let's go ahead and start building our model. There are two ways to go about it: you can write the code in its own file with your favorite text editor or IDE, or interactively in Jupyter Notebook cells. 
+With Mesa all installed, let's go ahead and start building our model. There are two ways to go about it: you can write the code in its own file with your favorite text editor or IDE, or interactively in `Jupyter Notebook <http://jupyter.org/>`_ cells. 
 
 Either way, it's good practice to put your model in its own folder -- especially if the project will end up consisting of multiple files (for example, Python files for the model and the visualization,  a Notebook for analysis, and a Readme with some documentation and discussion). 
 
@@ -163,7 +163,15 @@ With that in mind, we rewrite the agent's ``step`` method, like this:
 Running your first model
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-With that last piece in hand, it's time for the first rudimentary run of the model. Let's create a model with 10 agents, and run it for 10 steps. 
+With that last piece in hand, it's time for the first rudimentary run of the model.
+
+If you've written the code in its own file (``MoneyModel.py`` or a different name), launch an interpreter in the same directory as the file (either the plain Python command-line interpreter, or the IPython interpreter), or launch a Jupyter Notebook there. Then import the classes you created. (If you wrote the code in a Notebook, obviously this step isn't necessary).
+
+.. code-block:: python
+
+    from MoneyModel import *    
+
+Now let's create a model with 10 agents, and run it for 10 steps. 
 
 .. code-block:: python
 
@@ -171,7 +179,7 @@ With that last piece in hand, it's time for the first rudimentary run of the mod
     for i in range(10):
         model.step()
 
-Now we need to get some data out of the model. Specifically, we want to see the distribution of the agent's wealth. We can get the wealth values with list comprehension, and then use matplotlib (or the graphics library of your choice) to visualize a histogram.
+Next, we need to get some data out of the model. Specifically, we want to see the distribution of the agent's wealth. We can get the wealth values with list comprehension, and then use matplotlib (or the graphics library of your choice) to visualize a histogram.
 
 .. code-block:: python
     # Put this import at the top of the file
