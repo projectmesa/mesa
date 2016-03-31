@@ -6,8 +6,27 @@ Release History
 Next release
 ++++++++++++++++++
 
-* Improvements:
-    * Added iterable grid neighborhood methods.
+* Adds np.int64() functions around some variables to get rid error caused by numpy update #188
+* Made examples Readme.md more readable #189
+
+0.7.0 (2016-03-06)
+++++++++++++++++++
+* #184 Adding terminal echo for server launch to signal person running the model
+* #183 Adding Conway's Game of Life simulation to the examples.
+
+0.6.9 (2016-02-16)
+++++++++++++++++++
+
+* #170 Adding multi-stage activation
+* #169 Wolf-Sheep Cleanup
+* Updates requirements to latest libraries
+
+
+0.6.7 (2015-07-11)
+++++++++++++++++++
+
+* Improvements
+    * Allow cell_list_content methods in Grids to accept single tuples in addition to lists
 
 
 0.6.6 (2015-07-11)

@@ -1,13 +1,7 @@
-numpy
-pandas
-ipython
-tornado
-flake8
+numpy==1.10.4
+pandas==0.17.1
+ipython==4.1.1
 
-#numpy==1.9.1
-#pandas==0.15.2
-#ipython==3.0.0
-
-#tornado==4.0.2
-#flake8==2.4.0
-#scipy==0.15.1
+tornado==4.0.2
+flake8==2.5.2
+scipy==0.17.0

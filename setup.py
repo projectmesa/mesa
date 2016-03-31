@@ -16,7 +16,7 @@ with open('mesa/__init__.py', 'r') as fd:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
                         fd.read(), re.MULTILINE).group(1)
 
-with open('README.rst', 'r', encoding='utf-8') as f:
+with open('README.rst', 'rb', encoding='utf-8') as f:
     readme = f.read()
 
 setup(
@@ -34,7 +34,7 @@ setup(
     keywords='agent based modeling model ABM simulation multi-agent',
     license='Apache 2.0',
     zip_safe=False,
-    classifiers=[
+    classifiers=(
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Life',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
@@ -44,5 +44,5 @@ setup(
         'Operating System :: OS Independent',
         'Development Status :: 3 - Alpha',
         'Natural Language :: English',
-    ],
+    ),
 )
