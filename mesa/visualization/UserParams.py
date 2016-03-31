@@ -35,8 +35,8 @@ class UserParam:
         '''
         Update the current value, only if it is valid.
         '''
-        if ((self.min_value <= new_value <= self.max_value) and 
-                ((new_value - self.min_value) % self.step == 0)):
+        if (self.min_value <= new_value <= self.max_value):
+            # Removing step validation for now because of floating point issues
             self.current_value = new_value
         else:
             raise Exception("Incorrect input value")
