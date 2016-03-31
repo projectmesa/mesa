@@ -75,7 +75,15 @@
 		var reset = function() {
 			control.tick = 0;
 			control.running = true;
-			send({"type": "reset"});
+			msg = {"type": "reset"};
+			if (typeof params != "undefined") {
+				var current_params = {};
+				for(key in params) {
+					current_params[key] = params[key];
+				}
+				msg["current_params"] = current_params;
+			}
+			send(msg);
 
 			// Reset all the visualizations
 			for (var i in elements) {

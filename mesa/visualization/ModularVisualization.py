@@ -179,6 +179,10 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             self.write_message(return_message)
 
         elif msg["type"] == "reset":
+            if "current_params" in msg:
+                for param, value in msg["current_params"].items():
+                    self.application.model_params[param].update_value(value)
+
             self.application.reset_model()
             return_message = {"type": "viz_state"}
             return_message["data"] = self.application.viz_states[0]
