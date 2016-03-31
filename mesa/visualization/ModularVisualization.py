@@ -86,6 +86,7 @@ import tornado.websocket
 import tornado.escape
 import tornado.gen
 
+from mesa.visualization.UserParams import UserParam
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
 # pylint: disable=attribute-defined-outside-init
@@ -144,7 +145,8 @@ class PageHandler(tornado.web.RequestHandler):
                     model_name=self.application.model_name,
                     package_includes=self.application.package_includes,
                     local_includes=self.application.local_includes,
-                    scripts=self.application.js_code)
+                    scripts=self.application.js_code,
+                    user_params=self.application.user_params)
 
 
 class SocketHandler(tornado.websocket.WebSocketHandler):
@@ -195,6 +197,7 @@ class ModularServer(tornado.web.Application):
     '''
 
     verbose = True
+    LAUNCH_ECHO = 'Interface starting at http://127.0.0.1:{PORT}'
 
     model_name = "Mesa Model"
     model_cls = None  # A model class
@@ -208,8 +211,7 @@ class ModularServer(tornado.web.Application):
     max_steps = 100000
     viz_states = []
 
-    model_args = ()
-    model_kwargs = {}
+    model_params = {}
 
     # Handlers and other globals:
     page_handler = (r'/', PageHandler)
@@ -225,7 +227,7 @@ class ModularServer(tornado.web.Application):
                 "template_path": os.path.dirname(__file__) + "/templates"}
 
     def __init__(self, model_cls, visualization_elements, name="Mesa Model",
-                 *args, **kwargs):
+                 model_params={}):
         '''
         Create a new visualization server with the given elements.
         '''
@@ -245,8 +247,9 @@ class ModularServer(tornado.web.Application):
         self.model_name = name
         self.model_cls = model_cls
 
-        self.model_args = args
-        self.model_kwargs = kwargs
+        self.model_params = model_params
+        self.user_params = [param for param in model_params.values() 
+                            if type(param) is UserParam]
         self.reset_model()
 
         # Initializing the application itself:
@@ -256,7 +259,14 @@ class ModularServer(tornado.web.Application):
         '''
         Reinstantiate the model object, using the current parameters.
         '''
-        self.model = self.model_cls(*self.model_args, **self.model_kwargs)
+
+        model_params = {}
+        for param, value in self.model_params.items():
+            if type(value) is UserParam:
+                model_params[param] = value.get_value()
+            else:
+                model_params[param] = value
+        self.model = self.model_cls(**model_params)
         self.viz_states = [self.render_model()]
 
     def render_model(self):
@@ -286,6 +296,7 @@ class ModularServer(tornado.web.Application):
         '''
         Run the app.
         '''
-        print('Interface starting at http://127.0.0.1:{PORT}'.format(PORT=self.port))
+
+        print(self.LAUNCH_ECHO.format(PORT=self.port))
         self.listen(self.port)
         tornado.ioloop.IOLoop.instance().start()

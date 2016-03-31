@@ -1,7 +1,7 @@
 from Schelling import SchellingModel
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
-
+from mesa.visualization.UserParams import UserParam
 
 class HappyElement(TextElement):
     '''
@@ -31,7 +31,10 @@ def schelling_draw(agent):
 happy_element = HappyElement()
 canvas_element = CanvasGrid(schelling_draw, 20, 20, 500, 500)
 happy_chart = ChartModule([{"Label": "happy", "Color": "Black"}])
+model_params = {"height": 20, "width": 20, "density": 0.8, 
+                "minority_pc": 0.2, 
+                "homophily": UserParam("homophily", 4, 1, 8, 1)}
 server = ModularServer(SchellingModel,
                        [canvas_element, happy_element, happy_chart],
-                       "Schelling", 20, 20, 0.8, 0.2, 4)
+                       "Schelling", model_params)
 server.launch()

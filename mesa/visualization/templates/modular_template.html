@@ -131,6 +131,21 @@
 	gui.add(this, "run");
 	gui.add(this, "pause");
 
+	// Add sliders for user parameters.
+	{% if len(user_params)>0 %}
+		var param_folder = gui.addFolder("Parameters")
+		var UserParams = function() {
+			{% for param in user_params %}
+			this.{{ param.name }} = {{ param.get_value() }};
+			{% end %}		
+		};
+		var params = new UserParams();
+		{% for param in user_params %}
+			param_folder.add(params, "{{ param.name }}").min({{ param.min_value }}).max({{ param.max_value }}).step({{ param.step }});
+		{% end %}
+		param_folder.open();
+	{% end %}
+
 	/**
 	Called when the user releases the fps slider; pause the model and rerun, to reset the fps
 	*/
