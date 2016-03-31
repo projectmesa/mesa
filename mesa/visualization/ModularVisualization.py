@@ -254,7 +254,7 @@ class ModularServer(tornado.web.Application):
         self.model_params = model_params
         self.user_params = []
         for param, value in self.model_params.items():
-            if type(value) is UserParam:
+            if isinstance(value, UserParam):
                 value.set_name(param)
                 self.user_params.append(value)
         self.reset_model()
@@ -269,7 +269,7 @@ class ModularServer(tornado.web.Application):
 
         model_params = {}
         for param, value in self.model_params.items():
-            if type(value) is UserParam:
+            if isinstance(value, UserParam):
                 model_params[param] = value.get_value()
             else:
                 model_params[param] = value

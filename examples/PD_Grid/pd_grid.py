@@ -25,6 +25,7 @@ class PD_Agent(Agent):
             starting_move: If provided, determines the agent's initial state:
                            C(ooperating) or D(efecting). Otherwise, random.
         '''
+        self.running = True
         self.pos = pos
         self.score = 0
         if starting_move:
