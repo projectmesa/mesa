@@ -252,8 +252,11 @@ class ModularServer(tornado.web.Application):
         self.model_cls = model_cls
 
         self.model_params = model_params
-        self.user_params = [param for param in model_params.values() 
-                            if type(param) is UserParam]
+        self.user_params = []
+        for param, value in self.model_params.items():
+            if type(value) is UserParam:
+                value.set_name(param)
+                self.user_params.append(value)
         self.reset_model()
 
         # Initializing the application itself:

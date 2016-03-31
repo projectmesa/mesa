@@ -14,16 +14,26 @@ class UserParam:
     numeric.
     '''
 
-    def __init__(self, name, starting_value, min_value, max_value, step=1):
+    def __init__(self, start_value, min_value, max_value, step=1, label=None):
         '''
         Create a new numeric user-settable parameter.
+
         '''
 
-        self.name = name
+        self.name = None
+        self.label = label
         self.min_value = min_value
         self.max_value = max_value
         self.step = step
-        self.current_value = starting_value
+        self.current_value = start_value
+
+    def set_name(self, name):
+        '''
+        Update the name, which is tied to the model parameter keyword.
+        '''
+        self.name = name
+        if self.label is None:
+            self.label = name
 
     def get_value(self):
         '''

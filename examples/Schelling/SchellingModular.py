@@ -33,8 +33,8 @@ canvas_element = CanvasGrid(schelling_draw, 20, 20, 500, 500)
 happy_chart = ChartModule([{"Label": "happy", "Color": "Black"}])
 model_params = {"height": 20, "width": 20, "density": 0.8, 
                 #"minority_pc": 0.2, 
-                "minority_pc": UserParam("minority_pc", 0.2, 0, 1.0, 0.1), 
-                "homophily": UserParam("homophily", 4, 1, 8, 1)}
+                "minority_pc": UserParam(0.2, 0, 1.0, 0.1), 
+                "homophily": UserParam(4, 1, 8, 1)}
 server = ModularServer(SchellingModel,
                        [canvas_element, happy_element, happy_chart],
                        "Schelling", model_params)
