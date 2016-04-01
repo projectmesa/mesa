@@ -38,5 +38,5 @@ chart_element = ChartModule([{"Label": "Wolves", "Color": "#AA0000"},
     {"Label": "Sheep", "Color": "#666666"}])
 
 server = ModularServer(WolfSheepPredation, [canvas_element, chart_element],
-                      "WolfSheep", grass=True)
+                      "WolfSheep", {"grass":True})
 server.launch()

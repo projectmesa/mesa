@@ -43,8 +43,10 @@ CANVAS_ELEMENT = CanvasGrid(color_patch_draw,
                             GRID_COLS, GRID_ROWS,
                             CANVAS_HEIGHT, CANVAS_WIDTH)
 
+PARAMS = {"height": GRID_ROWS, "width": GRID_COLS}
+
 SERVER = ModularServer(ColorPatchModel,
                        [CANVAS_ELEMENT], "Color Patches",
-                       GRID_ROWS, GRID_COLS)
+                       PARAMS)
 
 SERVER.launch()

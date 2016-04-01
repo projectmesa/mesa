@@ -21,6 +21,7 @@ tree_chart = ChartModule([{"Label": "Fine", "Color": "green"},
                           {"Label": "On Fire", "Color": "red"},
                           {"Label": "Burned Out", "Color": "black"}])
 
+model_params = {"height": 100, "width": 100, "density": 0.65}
 server = ModularServer(ForestFire, [canvas_element, tree_chart], "Forest Fire",
-                       100, 100, 0.65)
+                       model_params)
 server.launch()

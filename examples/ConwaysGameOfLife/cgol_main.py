@@ -24,6 +24,7 @@ def cgol_draw(cell):
 # Make a world that is 50x50, on a 250x250 display.
 canvas_element = CanvasGrid(cgol_draw, 50, 50, 250, 250)
 
-server = ModularServer(CGoLModel, [canvas_element], "Game of Life",
-                       50, 50)
+parameters = {"width": 50, "height": 50}
+
+server = ModularServer(CGoLModel, [canvas_element], "Game of Life", parameters)
 server.launch()
