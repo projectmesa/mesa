@@ -108,6 +108,7 @@ With that in mind, the model code with the scheduler added looks like this:
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N):
+            self.running = True
             self.num_agents = N
             self.schedule = RandomActivation(self)
             # Create agents
@@ -250,6 +251,7 @@ We instantiate a grid with height and width parameters, and a boolean as to whet
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N, width, height):
+            self.running = True
             self.num_agents = N
             self.grid = MultiGrid(height, width, True)
             self.schedule = RandomActivation(self)
@@ -322,6 +324,7 @@ Now, putting that all together should look like this:
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N, width, height):
+            self.running = True
             self.num_agents = N
             self.grid = MultiGrid(height, width, True)
             self.schedule = RandomActivation(self)
@@ -377,12 +380,12 @@ Now let's use matplotlib and numpy to visualize the number of agents residing in
     # At the top of your file, import numpy
     import numpy as np
 
-    wealth_grid = np.zeros((model.grid.width, model.grid.height))
+    agent_counts = np.zeros((model.grid.width, model.grid.height))
     for cell in model.grid.coord_iter():
         cell_content, x, y = cell
-        cell_wealth = len(cell_content)
-        wealth_grid[y][x] = cell_wealth
-    plt.imshow(wealth_grid, interpolation='nearest')
+        agent_count = len(cell_content)
+        agent_counts[y][x] = agent_count
+    plt.imshow(agent_counts, interpolation='nearest')
     plt.colorbar()
     # If running from a text editor or IDE, uncomment this line.
     # plt.show()
@@ -462,7 +465,7 @@ You'll see that the DataFrame's index is pairs of model step and agent ID. You c
 
 .. code-block:: python
     
-    end_wealth = agent_wealth.xs(19, level="Step")["Wealth"]
+    end_wealth = agent_wealth.xs(99, level="Step")["Wealth"]
     end_wealth.hist(bins=range(agent_wealth.Wealth.max()+1))
 
 .. image:: images/tutorial/dc_endwealth.png
