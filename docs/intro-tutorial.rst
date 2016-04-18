@@ -2,11 +2,11 @@ Introduction to Mesa - Tutorial
 *********************************
 
 `Mesa <https://github.com/projectmesa/mesa>`_ is a Python framework for `agent-based modeling <https://en.wikipedia.org/wiki/Agent-based_model>`_.
-Getting started with Mesa is easy. In this tutorial, we will walk through creating a simple model which will illustrate Mesa's core features. 
+Getting started with Mesa is easy. In this tutorial, we will walk through creating a simple model and progressively add functionality which will illustrate Mesa's core features.
 
-**Note:** This tutorial is a work-in-progress. If you find any errors or bugs, or just find something unclear or confusing, `let us know <https://github.com/projectmesa/mesa/issues>`_!
+**Note:** *This tutorial is a work-in-progress. If you find any errors or bugs, or just find something unclear or confusing, `let us know <https://github.com/projectmesa/mesa/issues>`_!*
 
-We'll start from a very simple model of agents exchanging money; then add space and allow the agents to walk around. Next, we'll cover two of Mesa's analytic tools: the data collector and batch runner classes. Then we'll add an interactive visualization which lets us watch the model as it runs. Finally, for users who are comfortable with JavaScript, we go over how to write your own visualization module.
+The base for this tutorial is a very simple model of agents exchanging money. Next, we add *space* to allow agents move. Then, we'll cover two of Mesa's analytic tools: the *data collector* and *batch runner*. After that, we'll add an *interactive visualization* which lets us watch the model as it runs. Finally, we go over how to write your own visualization module, for users who are comfortable with JavaScript.
 
 .. contents:: Tutorial Contents
 
@@ -26,7 +26,7 @@ Let's get started.
 Installation
 ------------
 
-The first thing you need to do is to install Mesa, if you haven't already. We recommend doing this in a `virtual environment <https://virtualenvwrapper.readthedocs.org/en/stable/>`_, but make sure your environment is set up with Python 3. Mesa requires Python3 and does not work in Python 2 environments.
+To start, install Mesa. We recommend doing this in a `virtual environment <https://virtualenvwrapper.readthedocs.org/en/stable/>`_, but make sure your environment is set up with Python 3. Mesa requires Python3 and does not work in Python 2 environments.
 
 To install Mesa, simply:
 
@@ -40,17 +40,20 @@ When you do that, it will install Mesa itself, as well as any dependencies that 
 Building a sample model
 ------------------------
 
-With Mesa all installed, let's go ahead and start building our model. There are two ways to go about it: you can write the code in its own file with your favorite text editor or IDE, or interactively in `Jupyter Notebook <http://jupyter.org/>`_ cells. 
+Once Mesa is installed, you can start building our model. You can write models in two different ways:
 
-Either way, it's good practice to put your model in its own folder -- especially if the project will end up consisting of multiple files (for example, Python files for the model and the visualization,  a Notebook for analysis, and a Readme with some documentation and discussion). 
+1. Write the code in its own file with your favorite text editor, or
+2. Write the model interactively in `Jupyter Notebook <http://jupyter.org/>`_ cells.
 
-Go ahead and create a folder, and either launch a Notebook or create a new Python source file.  We will use the name ``MoneyModel.py`` here.
+Either way, it's good practice to put your model in its own folder -- especially if the project will end up consisting of multiple files (for example, Python files for the model and the visualization,  a Notebook for analysis, and a Readme with some documentation and discussion).
+
+Begin by creating a folder, and either launch a Notebook or create a new Python source file.  We will use the name ``MoneyModel.py`` here.
 
 
 Setting up the model
 ~~~~~~~~~~~~~~~~~~~~~
 
-Now it's time to start writing the code. The model is going to need two core classes: one for the overall model, the other for the agents. The model class holds the model-level attributes, manages the agents, and generally handles the global level of our model. Each instantiation of the model class will be a specific model run. Each model will contain multiple agents, all of which are instantiations of the agent class. Both the model and agent classes are child classes of Mesa's generic ``Model`` and ``Agent`` classes.
+To begin writing the model code, we start with two core classes: one for the overall model, the other for the agents. The model class holds the model-level attributes, manages the agents, and generally handles the global level of our model. Each instantiation of the model class will be a specific model run. Each model will contain multiple agents, all of which are instantiations of the agent class. Both the model and agent classes are child classes of Mesa's generic ``Model`` and ``Agent`` classes.
 
 Each agent has only one variable: how much wealth it currently has. (Each agent will also have a unique identifier (i.e., a name), stored in the ``unique_id`` variable. Giving each agent a unique id is a good practice when doing agent-based modeling.)
 
@@ -76,19 +79,18 @@ The beginning of both classes looks like this:
             # Create agents
             for i in range(self.num_agents):
                 a = MoneyAgent(i)
-                # What do we do with the agent once it's been created?
-                # See the next section, below.
+
 
 Adding the scheduler
 ~~~~~~~~~~~~~~~~~~~~~
 
-Time in most agent-based models moves in steps, sometimes also called ticks. At each step of the model, one or more of the agents -- usually all of them -- are activated and take their own step, changing internally and/or interacting with one another or the environment. 
+Time in most agent-based models moves in steps, sometimes also called ticks. At each step of the model, one or more of the agents -- usually all of them -- are activated and take their own step, changing internally and/or interacting with one another or the environment.
 
 The ``scheduler`` is a special model component which controls the order in which agents are activated. For example, all the agents may activate in the same order every step; their order might be shuffled; we may try to simulate all the agents acting at the same time; and more. Mesa offers a few different built-in scheduler classes, with a common interface. That makes it easy to change the activation regime a given model uses, and see whether it changes the model behavior.
 
 For now, let's use one of the simplest ones: ``RandomActivation``, which activates all the agents once per step, in random order. Every agent is expected to have a ``step`` method, which takes a model object as its only argument -- this is the agent's action when it is activated. We add an agent to the schedule using the ``add`` method; when we call the schedule's ``step`` method, it shuffles the order of the agents, then activates them all, one at a time.
 
-With that in mind, the model code with the scheduler added looks like this: 
+With that in mind, the model code with the scheduler added looks like this:
 
 .. code-block:: python
 
@@ -145,7 +147,7 @@ Now we just need to have the agents do what we intend for them to do: check thei
 
     import random
 
-To pick an agent at random, we need a list of all agents. Notice that there isn't such a list explicitly in the model. The scheduler, however, does have an internal list of all the agents it is scheduled to activate. 
+To pick an agent at random, we need a list of all agents. Notice that there isn't such a list explicitly in the model. The scheduler, however, does have an internal list of all the agents it is scheduled to activate.
 
 With that in mind, we rewrite the agent's ``step`` method, like this:
 
@@ -170,9 +172,9 @@ If you've written the code in its own file (``MoneyModel.py`` or a different nam
 
 .. code-block:: python
 
-    from MoneyModel import *    
+    from MoneyModel import *
 
-Now let's create a model with 10 agents, and run it for 10 steps. 
+Now let's create a model with 10 agents, and run it for 10 steps.
 
 .. code-block:: python
 
@@ -195,7 +197,7 @@ If you are running from a text editor or IDE, you'll also need to add this line,
 
     plt.show()
 
-You'll probably see something like the distribution shown below. Yours will almost certainly look at least slightly different, since each run of the model is random, after all. 
+You'll probably see something like the distribution shown below. Yours will almost certainly look at least slightly different, since each run of the model is random, after all.
 
 .. image:: images/tutorial/first_hist.png
    :width: 50%
@@ -266,7 +268,7 @@ We instantiate a grid with height and width parameters, and a boolean as to whet
 
 Under the hood, each agent's position is stored in two ways: the agent is contained in the grid in the cell it is currently in, and the agent has a ``pos`` variable with an (x, y) coordinate tuple. The ``place_agent`` method adds the coordinate to the agent automatically.
 
-Now we need to add to the agents' behaviors, letting them move around and only give money to their cell-mates (as it were). 
+Now we need to add to the agents' behaviors, letting them move around and only give money to their cell-mates (as it were).
 
 First let's handle movement, and have the agents move to a neighboring cell. The grid object provides a ``move_agent`` method, which like you'd imagine, moves an agent to a given cell. That still leaves us to get the possible neighboring cells to move to. There are a couple ways to do this. One is to use the current coordinates, and loop over all coordinates +/- 1 away from it. For example:
 
@@ -292,7 +294,7 @@ With that in mind, the agent's ``move`` method looks like this:
             model.grid.move_agent(self, new_position)
 
 
-Next, we need to get all the other agents present in a cell, and give one of them some money. We can get the contents of one or more cells using the grid's ``get_cell_list_contents`` method, or by accessing a cell directly. The method currently requires a list of cells (TODO: someone should probably fix that...), even if we only care about one cell. 
+Next, we need to get all the other agents present in a cell, and give one of them some money. We can get the contents of one or more cells using the grid's ``get_cell_list_contents`` method, or by accessing a cell directly. The method currently requires a list of cells (TODO: someone should probably fix that...), even if we only care about one cell.
 
 
 .. code-block:: python
@@ -345,7 +347,7 @@ Now, putting that all together should look like this:
         def __init__(self, unique_id):
             self.unique_id = unique_id
             self.wealth = 1
-        
+
         def move(self, model):
             possible_steps = model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
             new_position = random.choice(possible_steps)
@@ -400,13 +402,13 @@ Now let's use matplotlib and numpy to visualize the number of agents residing in
 Collecting Data
 ~~~~~~~~~~~~~~~~~
 
-So far, at the end of every model run, we've had to go and write our own code to get the data out of the model. This works, but has two problems: it isn't very efficient, and it only gives us end results. If we wanted to know the wealth of each agent at each step, for example, we'd have to add that to the loop of executing steps, and figure out some way to store the data. 
+So far, at the end of every model run, we've had to go and write our own code to get the data out of the model. This works, but has two problems: it isn't very efficient, and it only gives us end results. If we wanted to know the wealth of each agent at each step, for example, we'd have to add that to the loop of executing steps, and figure out some way to store the data.
 
 Since one of the main goals of agent-based modeling is generating data for analysis, Mesa provides a  class which can handle data collection and storage for us and make it easier to analyze.
 
 The data collector stores three categories of data: model-level variables, agent-level variables, and tables (which are a catch-all for everything else). Model- and agent-level variables are added to the data collector along with a function for collecting them. Model-level collection functions take a model object as an input, while agent-level collection functions take an agent object as an input. Both then return a value computed from the model or each agent at their current state. When the data collector’s ``collect`` method is called, with a model object as its argument, it applies each model-level collection function to the model, and stores the results in a dictionary, associating the current value with the current step of the model. Similarly, the method applies each agent-level collection function to each agent currently in the schedule, associating the resulting value with the step of the model, and the agent’s ``unique_id``.
 
-Let's add a DataCollector to the model, and collect two variables. At the agent level, we want to collect every agent's wealth at every step. At the model level, let's measure the model's `Gini Coefficient <https://en.wikipedia.org/wiki/Gini_coefficient>`_, a measure of wealth inequality. 
+Let's add a DataCollector to the model, and collect two variables. At the agent level, we want to collect every agent's wealth at every step. At the model level, let's measure the model's `Gini Coefficient <https://en.wikipedia.org/wiki/Gini_coefficient>`_, a measure of wealth inequality.
 
 .. code-block:: python
 
@@ -430,7 +432,7 @@ Let's add a DataCollector to the model, and collect two variables. At the agent 
             self.datacollector.collect(self)
             self.schedule.step()
 
-At every step of the model, the datacollector will collect and store the model-level current Gini coefficient, as well as each agent's wealth, associating each with the current step. 
+At every step of the model, the datacollector will collect and store the model-level current Gini coefficient, as well as each agent's wealth, associating each with the current step.
 
 We run the model just as we did above. Now is when an interactive session, especially via a Notebook, comes in handy: the DataCollector can export the data it's collected as a pandas DataFrame, for easy interactive analysis.
 
@@ -443,7 +445,7 @@ We run the model just as we did above. Now is when an interactive session, espec
 To get the series of Gini coefficients as a pandas DataFrame:
 
 .. code-block:: python
-    
+
     gini = model.datacollector.get_model_vars_dataframe()
     gini.plot()
 
@@ -461,10 +463,10 @@ Similarly, we can get the agent-wealth data:
     agent_wealth = model.datacollector.get_agent_vars_dataframe()
     agent_wealth.head()
 
-You'll see that the DataFrame's index is pairs of model step and agent ID. You can analyze it the way you would any other DataFrame. For example, to get a histogram of agent wealth at the model's end:
+You'll see that the DataFrame's index is pairings of model step and agent ID. You can analyze it the way you would any other DataFrame. For example, to get a histogram of agent wealth at the model's end:
 
 .. code-block:: python
-    
+
     end_wealth = agent_wealth.xs(99, level="Step")["Wealth"]
     end_wealth.hist(bins=range(agent_wealth.Wealth.max()+1))
 
@@ -513,11 +515,11 @@ Now, we can set up and run the BatchRunner:
 
     parameters = {"height": 10, "width": 10, "N": range(10, 500, 10)}
 
-    batch_run = BatchRunner(MoneyModel, parameters, iterations=5, max_steps=100, 
+    batch_run = BatchRunner(MoneyModel, parameters, iterations=5, max_steps=100,
                model_reporters={"Gini": compute_gini})
     batch_run.run_all()
 
-Like the DataCollector, we can extract the data we collected as a DataFrame. 
+Like the DataCollector, we can extract the data we collected as a DataFrame.
 
 .. code-block:: python
 
@@ -549,7 +551,7 @@ Grid Visualization
 To start with, let's have a visualization where we can watch the agents moving around the grid.For this, you will need to put your model code in a separate Python source file; for example, ``MoneyModel.py``. Next, either in the same file or in a new one (e.g. ``MoneyModel_Viz.py``) import the server class and the Canvas Grid class (so-called because it uses HTML5 canvas to draw a grid). If you're in a new file, you'll also need to import the actual model object.
 
 .. code-block:: python
-    
+
     from mesa.visualization.modules import CanvasGrid
     from mesa.visualization.ModularVisualization import ModularServer
 
@@ -580,10 +582,10 @@ Now we create and launch the actual server. We do this with the following argume
     - The title of the model: "Money Model"
     - Any inputs or arguments for the model itself. In this case, 100 agents, and height and width of 10.
 
-One we create the server, we set the port for it to listen on (you can treat this as just a piece of the URL you'll open in the browser). Finally, when you're ready to run the visualization, use the server's ``launch()`` method. 
+One we create the server, we set the port for it to listen on (you can treat this as just a piece of the URL you'll open in the browser). Finally, when you're ready to run the visualization, use the server's ``launch()`` method.
 
 .. code-block:: python
-    
+
     server = ModularServer(MoneyModel, [grid], "Money Model", 100, 10, 10)
     server.port = 8889
     server.launch()
@@ -611,9 +613,9 @@ The full code should now look like:
     server.launch()
 
 
-Now run this file; this should launch the interactive visualization server. Open your web browser of choice, and enter `127.0.0.1:8889 <127.0.0.1:8889>`_. 
+Now run this file; this should launch the interactive visualization server. Open your web browser of choice, and enter `127.0.0.1:8889 <127.0.0.1:8889>`_.
 
-You should see something like the figure below: the model title, an empty space where the grid will be, and a control panel off to the right. 
+You should see something like the figure below: the model title, an empty space where the grid will be, and a control panel off to the right.
 
 .. image:: images/tutorial/viz_empty.png
    :width: 50%
@@ -621,7 +623,7 @@ You should see something like the figure below: the model title, an empty space 
    :alt: Model-level variable collected
    :align: center
 
-Click the 'reset' button on the control panel, and you should see the grid fill up with red circles, representing agents. 
+Click the 'reset' button on the control panel, and you should see the grid fill up with red circles, representing agents.
 
 .. image:: images/tutorial/viz_redcircles.png
    :width: 50%
@@ -632,12 +634,12 @@ Click the 'reset' button on the control panel, and you should see the grid fill 
 
 Click 'step' to advance the model by one step, and the agents will move around. Click 'run' and the agents will keep moving around, at the rate set by the 'fps' (frames per second) slider at the top. Try moving it around and see how the speed of the model changes. Pressing 'pause' will (as you'd expect) pause the model; presing 'run' again will restart it. Finally, 'reset' will start a new instantiation of the model.
 
-To stop the visualization server, go back to the terminal where you launched it, and press Control+c. 
+To stop the visualization server, go back to the terminal where you launched it, and press Control+c.
 
 Changing the agents
 ~~~~~~~~~~~~~~~~~~~
 
-In the visualization above, all we could see is the agents moving around -- but not how much money they had, or anything else of interest. Let's change it so that agents who are broke (wealth 0) are drawn in grey, smaller, and above agents who still have money. 
+In the visualization above, all we could see is the agents moving around -- but not how much money they had, or anything else of interest. Let's change it so that agents who are broke (wealth 0) are drawn in grey, smaller, and above agents who still have money.
 
 To do this, we go back to our ``agent_portrayal`` code and add some code to change the portrayal based on the agent properties.
 
@@ -668,24 +670,24 @@ Now launch the server again, open or refresh your browser page, and hit 'reset'.
 Adding a chart
 ~~~~~~~~~~~~~~~
 
-Next, let's add another element to the visualization: a chart, tracking the model's Gini Coefficient. This is another built-in element that Mesa provides. 
+Next, let's add another element to the visualization: a chart, tracking the model's Gini Coefficient. This is another built-in element that Mesa provides.
 
 .. code-block:: python
 
     from mesa.visualization.modules import ChartModule
 
-The basic chart pulls data from the model's DataCollector, and draws it as a line graph using the `Charts.js <http://www.chartjs.org/>`_ JavaScript libraries. We instantiate a chart element with a list of series for the chart to track. Each series is defined in a dictionary, and has a ``Label`` (which must match the name of a model-level variable collected by the DataCollector) and a ``Color`` name. We can also give the chart the name of the DataCollector object in the model. 
+The basic chart pulls data from the model's DataCollector, and draws it as a line graph using the `Charts.js <http://www.chartjs.org/>`_ JavaScript libraries. We instantiate a chart element with a list of series for the chart to track. Each series is defined in a dictionary, and has a ``Label`` (which must match the name of a model-level variable collected by the DataCollector) and a ``Color`` name. We can also give the chart the name of the DataCollector object in the model.
 
-Finally, we add the chart to the list of elements in the server. The elements are added to the visualization in the order they appear, so the chart will appear underneath the grid. 
+Finally, we add the chart to the list of elements in the server. The elements are added to the visualization in the order they appear, so the chart will appear underneath the grid.
 
 .. code-block:: python
 
-    chart = ChartModule([{"Label": "Gini", "Color": "Black"}], 
+    chart = ChartModule([{"Label": "Gini", "Color": "Black"}],
                                 data_collector_name='datacollector')
 
     server = ModularServer(MoneyModel, [grid, chart], "Money Model", 100, 10, 10)
 
-Launch the visualization and start a model run, and you'll see a line chart underneath the grid. Every step of the model, the line chart updates along with the grid. Reset the model, and the chart resets too. 
+Launch the visualization and start a model run, and you'll see a line chart underneath the grid. Every step of the model, the line chart updates along with the grid. Reset the model, and the chart resets too.
 
 .. image:: images/tutorial/viz_chart.png
    :width: 50%
@@ -701,11 +703,11 @@ Building your own visualization component
 
 **Note:** This section is for users who have a basic familiarity with JavaScript. If that's not you, don't worry! (If you're an advanced JavaScript coder and find things that we've done wrong or inefficiently here, please `let us know <https://github.com/projectmesa/mesa/issues>`_!)
 
-If the visualization elements provided by Mesa aren't enough for you, you can build your own and plug them into the model server. 
+If the visualization elements provided by Mesa aren't enough for you, you can build your own and plug them into the model server.
 
-First, you need to understand how the visualization works under the hood. Remember that each visualization module has two sides: a Python object that runs on the server and generates JSON data from the model state (the server side), and a JavaScript object that runs in the browser and turns the JSON into something it renders on the screen (the client side). 
+First, you need to understand how the visualization works under the hood. Remember that each visualization module has two sides: a Python object that runs on the server and generates JSON data from the model state (the server side), and a JavaScript object that runs in the browser and turns the JSON into something it renders on the screen (the client side).
 
-Obviously, the two sides of each visualization must be designed in tandem. They result in one Python class, and one JavaScript ``.js`` file. The path to the JavaScript file is a property of the Python class. 
+Obviously, the two sides of each visualization must be designed in tandem. They result in one Python class, and one JavaScript ``.js`` file. The path to the JavaScript file is a property of the Python class.
 
 For this example, let's build a simple histogram visualization, which can count the number of agents with each value of wealth. We'll use the `Charts.js <http://www.chartjs.org/>`_ JavaScript library, which is already included with Mesa. If you go and look at its documentation, you'll see that it had no histogram functionality, which means we have to build our own out of a bar chart. We'll keep the histogram as simple as possible, giving it a fixed number of integer bins. If you were designing a more general histogram to add to the Mesa repository for everyone to use across different models, obviously you'd want something more general.
 
@@ -731,7 +733,7 @@ When the visualization object is instantiated, the first thing it needs to do is
 .. code-block:: javascript
 
     var HistogramModule = function(bins, canvas_width, canvas_height) {
-        
+
         // Create the tag:
         var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
         canvas_tag += "style='border:1px dotted'></canvas>";
@@ -749,7 +751,7 @@ Look at the Charts.js `bar chart documentation <http://www.chartjs.org/docs/#bar
 
     var HistogramModule = function(bins, canvas_width, canvas_height) {
         // Create the elements
-        
+
         // Create the tag:
         var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
         canvas_tag += "style='border:1px dotted'></canvas>";
@@ -788,11 +790,11 @@ Look at the Charts.js `bar chart documentation <http://www.chartjs.org/docs/#bar
         // Now what?
     };
 
-There are two methods every client-side visualization class must implement to be able to work: ``render(data)`` to render the incoming data, and ``reset()`` which is called to clear the visualization when the user hits the reset button and starts a new model run. 
+There are two methods every client-side visualization class must implement to be able to work: ``render(data)`` to render the incoming data, and ``reset()`` which is called to clear the visualization when the user hits the reset button and starts a new model run.
 
 In this case, the easiest way to pass data to the histogram is as an array, one value for each bin. We can then just loop over the array and update the values in the chart's dataset.
 
-There are a few ways to reset the chart, but the easiest is probably to destroy it and create a new chart object in its place. 
+There are a few ways to reset the chart, but the easiest is probably to destroy it and create a new chart object in its place.
 
 With that in mind, we can add these two methods to the class:
 
@@ -844,7 +846,7 @@ In a Python file (either its own, or in the same file as your visualization code
 
 There are a few things going on here. ``package_includes`` is a list of JavaScript files that are part of Mesa itself that the visualization element relies on. You can see the included files in `mesa/visualization/templates/ <https://github.com/projectmesa/mesa/tree/tutorial_update/mesa/visualization/templates>`_. Similarly, ``local_includes`` is a list of JavaScript files in the same directory as the class code itself. Note that both of these are class variables, not object variables -- they hold for all particular objects.
 
-Next, look at the ``__init__`` method. It takes three arguments: the number of bins, and the width and height for the histogram. It then uses these values to populate the ``js_code`` property; this is code that the server will insert into the visualization page, which will run when the page loads. In this case, it creates a new HistogramModule (the class we created in JavaScript in the step above) with the desired bins, width and height; it then appends  (``push``es) this object to ``elements``, the list of visualization elements that the visualization page itself maintains. 
+Next, look at the ``__init__`` method. It takes three arguments: the number of bins, and the width and height for the histogram. It then uses these values to populate the ``js_code`` property; this is code that the server will insert into the visualization page, which will run when the page loads. In this case, it creates a new HistogramModule (the class we created in JavaScript in the step above) with the desired bins, width and height; it then appends  (``push``es) this object to ``elements``, the list of visualization elements that the visualization page itself maintains.
 
 Now, the last thing we need is the ``render`` method. If we were making a general-purpose visualization module we'd want this to be more general, but in this case we can hard-code it to our model.
 
@@ -866,7 +868,7 @@ Every time the render method is called (with a model object as the argument) it 
 Now, you can create your new HistogramModule and add it to the server:
 
 .. code-block:: python
-    
+
     histogram = HistogramModule(list(range(10)), 200, 500)
     server = ModularServer(MoneyModel, [grid, histogram, chart], "Money Model", 100, 10, 10)
     server.launch()
@@ -879,7 +881,7 @@ Run this code, and you should see your brand-new histogram added to the visualiz
    :alt: Model-level variable collected
    :align: center
 
-If you've felt comfortable with this section, it might be instructive to read the code for the `ModularServer <https://github.com/projectmesa/mesa/blob/master/mesa/visualization/ModularVisualization.py#L259>`_ and the `modular_template <https://github.com/projectmesa/mesa/blob/master/mesa/visualization/templates/modular_template.html>`_ to get a better idea of how all the pieces fit together. 
+If you've felt comfortable with this section, it might be instructive to read the code for the `ModularServer <https://github.com/projectmesa/mesa/blob/master/mesa/visualization/ModularVisualization.py#L259>`_ and the `modular_template <https://github.com/projectmesa/mesa/blob/master/mesa/visualization/templates/modular_template.html>`_ to get a better idea of how all the pieces fit together.
 
 **Happy modeling!**
 
