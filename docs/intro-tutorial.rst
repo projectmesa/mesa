@@ -8,6 +8,8 @@ Getting started with Mesa is easy. In this tutorial, we will walk through creati
 
 The base for this tutorial is a very simple model of agents exchanging money. Next, we add *space* to allow agents move. Then, we'll cover two of Mesa's analytic tools: the *data collector* and *batch runner*. After that, we'll add an *interactive visualization* which lets us watch the model as it runs. Finally, we go over how to write your own visualization module, for users who are comfortable with JavaScript.
 
+You can also find all the code this tutorial describes in the **examples/Tutorial-Boltzmann_Wealth_Model** directory of the Mesa repository.
+
 .. contents:: Tutorial Contents
 
 Sample Model Description
@@ -185,6 +187,7 @@ Now let's create a model with 10 agents, and run it for 10 steps.
 Next, we need to get some data out of the model. Specifically, we want to see the distribution of the agent's wealth. We can get the wealth values with list comprehension, and then use matplotlib (or the graphics library of your choice) to visualize a histogram.
 
 .. code-block:: python
+
     # Put this import at the top of the file
     import matplotlib.pyplot as plt
 
