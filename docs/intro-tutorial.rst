@@ -405,7 +405,7 @@ Now let's use matplotlib and numpy to visualize the number of agents residing in
 Collecting Data
 ~~~~~~~~~~~~~~~~~
 
-So far, at the end of every model run, we've had to go and write our own code to get the data out of the model. This works, but has two problems: it isn't very efficient, and it only gives us end results. If we wanted to know the wealth of each agent at each step, for example, we'd have to add that to the loop of executing steps, and figure out some way to store the data.
+So far, at the end of every model run, we've had to go and write our own code to get the data out of the model. This has two problems: it isn't very efficient, and it only gives us end results. If we wanted to know the wealth of each agent at each step, we'd have to add that to the loop of executing steps, and figure out some way to store the data.
 
 Since one of the main goals of agent-based modeling is generating data for analysis, Mesa provides a  class which can handle data collection and storage for us and make it easier to analyze.
 
