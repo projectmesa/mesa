@@ -184,7 +184,7 @@ Now let's create a model with 10 agents, and run it for 10 steps.
     for i in range(10):
         model.step()
 
-Next, we need to get some data out of the model. Specifically, we want to see the distribution of the agent's wealth. We can get the wealth values with list comprehension, and then use matplotlib (or the graphics library of your choice) to visualize a histogram.
+Next, we need to get some data out of the model. Specifically, we want to see the distribution of the agent's wealth. We can get the wealth values with list comprehension, and then use matplotlib (or another graphics library) to visualize the data in a histogram.
 
 .. code-block:: python
 
