@@ -209,7 +209,7 @@ You'll probably see something like the distribution shown below. Yours will almo
    :align: center
 
 
-To get a better idea of how a model behaves, we can create multiple model runs, and see the distribution that emerges from all of them. We can do this with a nested for loop:
+To get a better idea of how a model behaves, we can create multiple model runs and see the distribution that emerges from all of them. We can do this with a nested for loop:
 
 .. code-block:: python
 
@@ -239,9 +239,9 @@ This outcome might be surprising. Despite the fact that all agents, on average, 
 Adding space
 ~~~~~~~~~~~~~
 
-Many ABMs have a spatial element, with agents moving around and interacting with nearby neighbors. Mesa currently supports two overall kinds of spaces: grid, and continuous. Grids are divided into cells, and agents can only be on a particular cell, like pieces on a chess board. Continuous space, in contrast, allows agents to have any arbitrary position. Both grids and continuous spaces are frequently toroidal, meaning that the edges wrap around, with cells on the right edge connected to those on the left edge, and the top to the bottom. This prevents some cells having fewer neighbors than others, or agents being able to go off the edge of the environment.
+Many ABMs have a spatial element, with agents moving around and interacting with nearby neighbors. Mesa currently supports two overall kinds of spaces: grid, and continuous. Grids are divided into cells, and agents can only be on a particular cell, like pieces on a chess board. Continuous space, in contrast, allows agents to have any arbitrary position. Both grids and continuous spaces are frequently `toroidalhttps://en.wikipedia.org/wiki/Toroidal_graph`_, meaning that the edges wrap around, with cells on the right edge connected to those on the left edge, and the top to the bottom. This prevents some cells having fewer neighbors than others, or agents being able to go off the edge of the environment.
 
-Let's add a simple spatial element to our model: we'll have the agents live on a grid and walk around at random. Instead of giving their unit of money to any random agent, they'll give it to an agent on the same cell.
+Let's add a simple spatial element to our model by putting our agents on a grid and make them walk around at random. Instead of giving their unit of money to any random agent, they'll give it to an agent on the same cell.
 
 Mesa has two main types of grids: ``SingleGrid`` and ``MultiGrid``. ``SingleGrid`` enforces at most one agent per cell; ``MultiGrid`` allows multiple agents to be in the same cell. Since we want agents to be able to share a cell, we use ``MultiGrid``.
 
@@ -271,7 +271,7 @@ We instantiate a grid with height and width parameters, and a boolean as to whet
 
 Under the hood, each agent's position is stored in two ways: the agent is contained in the grid in the cell it is currently in, and the agent has a ``pos`` variable with an (x, y) coordinate tuple. The ``place_agent`` method adds the coordinate to the agent automatically.
 
-Now we need to add to the agents' behaviors, letting them move around and only give money to their cell-mates (as it were).
+Now we need to add to the agents' behaviors, letting them move around and only give money to other agents in the same cell.
 
 First let's handle movement, and have the agents move to a neighboring cell. The grid object provides a ``move_agent`` method, which like you'd imagine, moves an agent to a given cell. That still leaves us to get the possible neighboring cells to move to. There are a couple ways to do this. One is to use the current coordinates, and loop over all coordinates +/- 1 away from it. For example:
 
