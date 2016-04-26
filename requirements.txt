@@ -1,5 +1,5 @@
-numpy==1.11
-scipy==0.17
+numpy
+scipy
 pandas==0.17.1
 ipython==4.1.1
 
