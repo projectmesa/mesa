@@ -1,6 +1,9 @@
 # Schelling Segregation Model
 =========================================
 
+
+TODO -- update text
+
 A simple implementation of a Schelling segregation model.
 
 This version demonstrates the ASCII renderer.
