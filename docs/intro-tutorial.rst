@@ -495,7 +495,7 @@ Or to plot the wealth of a given agent (in this example, agent 14):
 Batch Run
 ~~~~~~~~~~~
 
-Like we mentioned above, you usually won't run a model only once, but multiple times: with fixed parameters to find the overall distributions the model generates, and with varying parameters to analyze how they drive the model's outputs and behaviors. Instead of needing to write nested for-loops for each model, Mesa provides a BatchRunner class which automates it for you.
+Like we mentioned above, you usually won't run a model only once, but multiple times, with fixed parameters to find the overall distributions the model generates, and with varying parameters to analyze how they drive the model's outputs and behaviors. Instead of needing to write nested for-loops for each model, Mesa provides a BatchRunner class which automates it for you.
 
 .. code-block:: python
 
@@ -551,7 +551,7 @@ A visualization is built up of a few different modules: for example, a module fo
 Grid Visualization
 ~~~~~~~~~~~~~~~~~~~
 
-To start with, let's have a visualization where we can watch the agents moving around the grid.For this, you will need to put your model code in a separate Python source file; for example, ``MoneyModel.py``. Next, either in the same file or in a new one (e.g. ``MoneyModel_Viz.py``) import the server class and the Canvas Grid class (so-called because it uses HTML5 canvas to draw a grid). If you're in a new file, you'll also need to import the actual model object.
+To start with, let's have a visualization where we can watch the agents moving around the grid. For this, you will need to put your model code in a separate Python source file; for example, ``MoneyModel.py``. Next, either in the same file or in a new one (e.g. ``MoneyModel_Viz.py``) import the server class and the Canvas Grid class (so-called because it uses HTML5 canvas to draw a grid). If you're in a new file, you'll also need to import the actual model object.
 
 .. code-block:: python
 
@@ -580,6 +580,7 @@ In addition to the portrayal method, we instantiate a canvas grid with its width
     grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
 
 Now we create and launch the actual server. We do this with the following arguments:
+
     - The model class we're running and visualizing; in this case, ``MoneyModel``.
     - A list of module objects to include in the visualization; here, just ``[grid]``
     - The title of the model: "Money Model"
