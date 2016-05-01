@@ -1,10 +1,17 @@
 # Schelling Segregation Model
 =========================================
+A simple implementation of a Schelling segregation model.
+
+To run this model in the browser:
+    `$ python run.py`
+
+To review the analysis in jupyter notebook:
+    `$ jupyter notebook`
+
+
 
 
 TODO -- update text
-
-A simple implementation of a Schelling segregation model.
 
 This version demonstrates the ASCII renderer.
 To use, run this code from the command line, e.g.
