@@ -7,7 +7,7 @@ from mesa.time import RandomActivation
 from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 
-from agents import SchellingAgent
+from model.agents import SchellingAgent
 
 
 class SchellingModel(Model):
