@@ -1,0 +1,14 @@
+## Flockers : An implementation of Craig Reynolds's Boids flocker model.
+
+Uses numpy arrays to represent vectors.
+
+
+
+### To run this example
+
+* Launch the model
+```python
+python flockers.py
+```
+* Visit your browser: http://127.0.0.1:8888/
+* In your browser hit *reset*, then *run*
