@@ -4,7 +4,7 @@ Introduction to Mesa - Tutorial
 `Mesa <https://github.com/projectmesa/mesa>`_ is a Python framework for `agent-based modeling <https://en.wikipedia.org/wiki/Agent-based_model>`_.
 Getting started with Mesa is easy. In this tutorial, we will walk through creating a simple model and progressively add functionality which will illustrate Mesa's core features.
 
-**Note:** *This tutorial is a work-in-progress. If you find any errors or bugs, or just find something unclear or confusing, `let us know <https://github.com/projectmesa/mesa/issues>`_ !*
+**Note:** This tutorial is a work-in-progress. If you find any errors or bugs, or just find something unclear or confusing, `let us know <https://github.com/projectmesa/mesa/issues>`_!
 
 The base for this tutorial is a very simple model of agents exchanging money. Next, we add *space* to allow agents move. Then, we'll cover two of Mesa's analytic tools: the *data collector* and *batch runner*. After that, we'll add an *interactive visualization* which lets us watch the model as it runs. Finally, we go over how to write your own visualization module, for users who are comfortable with JavaScript.
 
