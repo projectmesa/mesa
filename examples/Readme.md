@@ -2,19 +2,16 @@
 
 This directory contains example models meant to test and demonstrate Mesa's features, and provide demonstrations for how to build and analyze agent-based models. For more information on each model, see its own Readme and documentation.
 
+
+### Color Patches
+A cellular automaton model where agents opinions are influenced by that of their neighbors. As the model evolves, color patches representing the prevailing opinion in a given area expand, contract, and sometimes disappear.
+
 ### ConwaysGameOfLife
 
 Implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life), a cellular automata where simple rules can give rise to complex patterns.
 
 ### EpsteinCivilViolence
-
-### Color Patches
-A cellular automaton model where agents opinions are influenced by that of their neighbors. As the model evolves, color patches representing the prevailing opinion in a given area expand, contract, and sometimes disappear.
-
-### Conway's Game Of Life
-An implementation of the Famous Pr. Conway's Game Of Life
-
-### Epstein Civil Violence Model
+Joshua Epstein's [model](http://www.uvm.edu/~pdodds/files/papers/others/2002/epstein2002a.pdf) of how a decentralized uprising can be suppressed or reach a critical mass of support.
 
 ### Flockers
 [Boids](https://en.wikipedia.org/wiki/Boids)-style flocking model, demonstrating the use of agents moving through a continuous space following direction vectors.
