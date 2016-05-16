@@ -1,4 +1,4 @@
-from WolfSheep import Wolf, Sheep, GrassPatch, WolfSheepPredation
+from model import Wolf, Sheep, GrassPatch, WolfSheepPredation
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 

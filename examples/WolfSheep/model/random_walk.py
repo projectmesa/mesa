@@ -3,7 +3,7 @@ Generalized behavior for random walking, one grid cell at a time.
 '''
 
 import random
-
+from mesa import Agent
 
 class RandomWalker(object):
     '''
