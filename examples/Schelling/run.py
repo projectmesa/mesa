@@ -1,3 +1,3 @@
-from model.server import server
+from server import server
 
 server.launch()

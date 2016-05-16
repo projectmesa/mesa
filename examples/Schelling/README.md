@@ -14,18 +14,16 @@ To run the model interactively, run ``run.py`` in this directory. e.g.
     $ python run.py
 ``` 
 
-Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and press Reset, then Run.
+Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and press Reset, then Run. 
 
-To view and run some example model analyses, launch the IPython Notebook and open ``analysis.ipynb``. 
+To view and run some example model analyses, launch the IPython Notebook and open ``analysis.ipynb``. Visualizing the analysis also requires [matplotlib](http://matplotlib.org/).
 
 ## Files
 
 * ``run.py``: Launches a model visualization server.
-* ``model/world.py``: Contains the overall model class.
-* ``model/agents.py``: Contains the class that defines the model agents.
-* ``model/server.py``: Defines classes for visualizing the model, both as text and using the Mesa modular server.
+* ``schelling.py``: Contains the agent class, and the overall model class.
+* ``server.py``: Defines classes for visualizing the model in the browser via Mesa's modular server, and instantiates a visualization server.
 * ``analysis.ipybn``: Notebook demonstrating how to run experiments and parameter sweeps on the model.
-* ``requirements.txt``: Defines additional external requirements for running the model; in this case, it's just matplotlib, for the interactive analysis in the IPython Notebook.
 
 ## Further Reading
 
