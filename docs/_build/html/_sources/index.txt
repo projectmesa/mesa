@@ -74,7 +74,7 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
 .. toctree::
    :maxdepth: 1
 
-   Mesa overview <index>
+   Mesa overview <overview>
    intro-tutorial
 
 

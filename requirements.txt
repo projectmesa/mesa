@@ -1,7 +1,7 @@
-numpy==1.10.4
+numpy
+scipy
 pandas==0.17.1
 jupyter==1.0.0
 
 tornado==4.0.2
 flake8==2.5.2
-scipy==0.17.0

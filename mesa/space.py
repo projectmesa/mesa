@@ -173,9 +173,9 @@ class Grid(object):
         Args:
             pos: Coordinate tuple for the neighborhood to get.
             moore: If True, return Moore neighborhood
-                        (including diagonals)
+                   (including diagonals)
                    If False, return Von Neumann neighborhood
-                        (exclude diagonals)
+                   (exclude diagonals)
             include_center: If True, return the (x, y) cell as well.
                             Otherwise, return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.

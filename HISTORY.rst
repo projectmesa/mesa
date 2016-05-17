@@ -6,6 +6,7 @@ Release History
 Next release
 ++++++++++++++++++
 
+* Update of tutorial files and docs #176, #172
 * Adds np.int64() functions around some variables to get rid error caused by numpy update #188
 * Made examples Readme.md more readable #189
 
