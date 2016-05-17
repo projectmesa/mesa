@@ -32,3 +32,12 @@ Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and p
 * ``wolf_sheep/model.py``: Defines the Wolf-Sheep Predation model itself
 * ``wolf_sheep/server.py``: Sets up the interactive visualization server
 * ``run.py``: Launches a model visualization server.
+
+## Further Reading
+
+This model is closely based on the NetLogo Wolf-Sheep Predation Model:
+
+Wilensky, U. (1997). NetLogo Wolf Sheep Predation model. http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+
+See also the [Lotka–Volterra equations
+](https://en.wikipedia.org/wiki/Lotka%E2%80%93Volterra_equations) for the closed-form version of the model.
