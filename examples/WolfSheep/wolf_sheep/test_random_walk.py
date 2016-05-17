@@ -9,10 +9,11 @@ from mesa import Model, Agent
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.visualization.TextVisualization import TextVisualization, TextGrid
-from RandomWalk import RandomWalker
+
+from random_walk import RandomWalker
 
 
-class WalkerAgent(RandomWalker, Agent):
+class WalkerAgent(RandomWalker):
     '''
     Agent which only walks around.
     '''
@@ -48,7 +49,7 @@ class WalkerWorld(Model):
             y = random.randrange(self.height)
             a = WalkerAgent(self.grid, (x, y), True)
             self.schedule.add(a)
-            self.grid[y][x].add(a)
+            self.grid.place_agent(a, (x, y))
 
     def step(self):
         self.schedule.step()
@@ -68,7 +69,8 @@ class WalkerWorldViz(TextVisualization):
             model: An instance of a WalkerWorld model.
         '''
         self.model = model
-        grid_viz = TextGrid(self.model.grid, lambda x: str(len(x)))
+        grid_viz = TextGrid(self.model.grid, None) 
+        grid_viz.converter = lambda x: str(len(x))
         self.elements = [grid_viz]
 
 

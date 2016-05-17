@@ -3,9 +3,9 @@ Generalized behavior for random walking, one grid cell at a time.
 '''
 
 import random
+from mesa import Agent
 
-
-class RandomWalker(object):
+class RandomWalker(Agent):
     '''
     Class implementing random walker methods in a generalized manner.
 
@@ -39,6 +39,4 @@ class RandomWalker(object):
         next_moves = self.grid.get_neighborhood(self.pos, self.moore, True)
         next_move = random.choice(next_moves)
         # Now move:
-        self.grid._remove_agent(self.pos, self)
-        self.grid._place_agent(next_move, self)
-        self.pos = next_move
+        self.grid.move_agent(self, next_move)
