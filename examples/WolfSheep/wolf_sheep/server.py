@@ -1,4 +1,5 @@
-from model import Wolf, Sheep, GrassPatch, WolfSheepPredation
+from wolf_sheep.agents import Wolf, Sheep, GrassPatch
+from wolf_sheep.model import WolfSheepPredation
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
@@ -39,4 +40,4 @@ chart_element = ChartModule([{"Label": "Wolves", "Color": "#AA0000"},
 
 server = ModularServer(WolfSheepPredation, [canvas_element, chart_element],
                       "WolfSheep", grass=True)
-server.launch()
+#server.launch()
