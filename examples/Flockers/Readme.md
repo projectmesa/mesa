@@ -1,14 +1,24 @@
-## Flockers : An implementation of Craig Reynolds's Boids flocker model.
+# Flockers 
 
-Uses numpy arrays to represent vectors.
+An implementation of Craig Reynolds's Boids flocker model. Agents (simulated birds) try to fly towards the average position of their neighbors and in the same direction as them, while maintaining a minimum distance. This produces flocking behavior.
 
+This model tests Mesa's continuous space feature, and uses numpy arrays to represent vectors. It also demonstrates how to create custom visualization components.
 
+## How to Run
 
-### To run this example
-
-* Launch the model
-```python
-python flockers.py
+Launch the model:
 ```
-* Visit your browser: http://127.0.0.1:8888/
-* In your browser hit *reset*, then *run*
+    $ python Flocker_Server.py
+```
+Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and press Reset, then Run. 
+
+## Files
+
+* ``flockers.py``: Core model file; includes the Boid agent class, and the BoidModel class.
+* ``Flocker_Server.py``: Sets up the visualization; uses the SimpleCanvas element, defined in the files below:
+* ``SimpleContinuousModule.py``: Defines ``SimpleCanvas``, the Python side of a custom visualization module for drawing agents with continuous positions.
+* ``simple_continuous_canvas.js``: JavaScript side of the ``SimpleCanvas`` visualization module; takes the output genereated by the Python ``SimpleCanvas`` element and draws it in the browser window via HTML5 canvas.
+* ``Flocker Test.ipynb``: Tests the model in a Jupyter notebook.
+
+## Further Reading
+
