@@ -15,7 +15,7 @@ install:
   - >
     conda create -q -n test-environment
     python=$TRAVIS_PYTHON_VERSION
-    coverage flake8 matplotlib nose numpy pandas pip scipy sympy tornado
+    coverage flake8 matplotlib nose numpy pandas pip tornado
   - source activate test-environment
   - pip install coveralls
   - pip install .
