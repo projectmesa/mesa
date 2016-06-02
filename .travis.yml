@@ -7,18 +7,7 @@ python:
   - "3.5"
   - "nightly"
 install:
-  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda info -a
-  - >
-    conda create -q -n test-environment
-    python=$TRAVIS_PYTHON_VERSION
-    coverage flake8 matplotlib nose numpy pandas pip tornado
-  - source activate test-environment
+  - pip install -r requirements.txt
   - pip install coveralls
   - pip install .
 script:
