@@ -3,7 +3,7 @@ from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
 from mesa.visualization.TextVisualization import (TextData, TextGrid,
     TextVisualization)
 
-from model.world import SchellingModel
+from model import SchellingModel
 
 
 class SchellingTextVisualization(TextVisualization):
