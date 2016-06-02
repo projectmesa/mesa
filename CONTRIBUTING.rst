@@ -27,7 +27,7 @@ No contribution is too small. Although, contributions can be too big, so let's d
 .. _`email list` : https://groups.google.com/forum/#!forum/projectmesa
 .. _`an issue` : https://github.com/projectmesa/mesa/issues
 .. _`PEP8` : https://www.python.org/dev/peps/pep-0008
-.. _`Google Style Guide` : https://google-styleguide.googlecode.com/svn/trunk/pyguide.html
+.. _`Google Style Guide` : https://google.github.io/styleguide/pyguide.html
 
 
 Testing

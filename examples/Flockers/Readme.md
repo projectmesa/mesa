@@ -1,4 +1,4 @@
-# Flockers 
+# Flockers
 
 An implementation of Craig Reynolds's Boids flocker model. Agents (simulated birds) try to fly towards the average position of their neighbors and in the same direction as them, while maintaining a minimum distance. This produces flocking behavior.
 
@@ -10,7 +10,8 @@ Launch the model:
 ```
     $ python Flocker_Server.py
 ```
-Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and press Reset, then Run. 
+
+Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and press Reset, then Run.
 
 ## Files
 
@@ -22,3 +23,10 @@ Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and p
 
 ## Further Reading
 
+=======
+* Launch the visualization
+```python
+python Flocker_Server.py
+```
+* Visit your browser: http://127.0.0.1:8888/
+* In your browser hit *run*

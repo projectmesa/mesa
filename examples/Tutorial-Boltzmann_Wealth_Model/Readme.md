@@ -4,19 +4,19 @@
 
 A simple model of agents exchanging wealth. All agents start with the same amount of money. Every step, each agent with one unit of money or more gives one unit of wealth to another random agent. This is the model described in the [Intro Tutorial](http://mesa.readthedocs.io/en/latest/intro-tutorial.html).
 
-As the model runs, the distribution of wealth among agents goes from being perfectly uniform (all agents have the same starting wealth), to highly skewed -- a small number have high wealth, more have none at all. 
+As the model runs, the distribution of wealth among agents goes from being perfectly uniform (all agents have the same starting wealth), to highly skewed -- a small number have high wealth, more have none at all.
 
 ## How to Run
 
 To follow the tutorial examples, launch the Jupyter Notebook and run the code in ``Introduction to Mesa Tutorial Code.ipynb``.
 
-To launch the interactive server, as described in the [last section of the tutorial](http://mesa.readthedocs.io/en/latest/intro-tutorial.html#adding-visualization), run: 
+To launch the interactive server, as described in the [last section of the tutorial](http://mesa.readthedocs.io/en/latest/intro-tutorial.html#adding-visualization), run:
 
 ```
     $ python Viz_MoneyModel.py
 ```
 
-Then open your browser to [http://127.0.0.1:8889/](http://127.0.0.1:8889/) and press Reset, then Run. 
+Then open your browser to [http://127.0.0.1:8889/](http://127.0.0.1:8889/) and press Reset, then Run.
 
 
 ## Files
@@ -37,3 +37,5 @@ Distribution. February, 2001.](https://editorialexpress.com/cgi-bin/conference/d
 
 [Dragulescu, A and Yakovenko, V. Statistical Mechanics of Money, Income, and
 Wealth: A Short Survey. November, 2002](http://arxiv.org/pdf/cond-mat/0211175v1.pdf)
+=======
+You will need to open the file as a Jupyter (aka iPython) notebook with an iPython 3 kernel. Required dependencies are listed in the provided `requirements.txt` file which can be installed by running `pip install -r requirements.txt`
