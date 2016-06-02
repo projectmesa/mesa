@@ -10,5 +10,9 @@ Uses numpy arrays to represent vectors.
 ```python
 python flockers.py
 ```
+* Launch the visualization
+```python
+python Flocker_Server.py
+```
 * Visit your browser: http://127.0.0.1:8888/
-* In your browser hit *reset*, then *run*
+* In your browser hit *run*
