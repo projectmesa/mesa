@@ -36,7 +36,10 @@
 
 		// WebSocket Stuff
 		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws"); // Open the websocket connection
-		ws.onopen = function() {console.log("Connection opened!"); };
+                ws.onopen = function() {
+                    console.log("Connection opened!");
+                    reset();
+                };
 
 		/**
 		Parse an incoming message
