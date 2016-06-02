@@ -18,19 +18,19 @@ An agent's state represents its "opinion" and is shown by the color of the cell 
 
 ## How to Run
 
-To run the model interactively, run ``color_patches.py`` in this directory. e.g.
+To run the model interactively, run ``run.py`` in this directory. e.g.
 
 ```
-    $ python color_patches.py
+    $ python run.py
 ``` 
 
 Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and press Reset, then Run. 
 
 ## Files
 
-* ``color_cell.py``: Defines the cell class, which governs each cell's behavior.
-* ``color_patch_model.py``: Defines the model class itself, and in particular the lattice on which the cells live and interact.
-* ``color_patches.py``: Defines and launches an interactive visualization.
+* ``color_patches/model.py``: Defines the cell and model classes. The cell class governs each cell's behavior. The model class itself controls the lattice on which the cells live and interact.
+* ``color_patches/server.py``: Defines an interactive visualization.
+* ``run.py``: Launches an interactive visualization
 
 ## Further Reading
 
