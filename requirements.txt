@@ -1,5 +1,8 @@
 numpy
 pandas==0.17.1
 ipython==4.1.1
+
+coverage==4.1
+nose==1.3.7
 tornado==4.0.2
 flake8==2.5.2
