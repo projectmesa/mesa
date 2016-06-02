@@ -130,7 +130,7 @@ With that in mind, the model code with the scheduler added looks like this:
 
 At this point, we have a model which runs -- it just doesn't do anything. You can see for yourself with a few easy lines. If you've been working in an interactive session, you can create a model object directly. Otherwise, you need to open an interactive session in the same directory as your source code file, and import the classes. For example, if your code is in ``MoneyModel.py``:
 
-.. code-block::python
+.. code-block:: python
 
     from MoneyModel import MoneyModel
 
