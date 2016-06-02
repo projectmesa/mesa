@@ -1,10 +1,3 @@
-'''
-Schelling Segregation Model
-=========================================
-
-A simple implementation of a Schelling segregation model.
-'''
-
 from __future__ import division  # For Python 2.x compatibility
 
 import random
@@ -14,8 +7,34 @@ from mesa.time import RandomActivation
 from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 
-from mesa.visualization.TextVisualization import (TextData, TextGrid,
-    TextVisualization)
+class SchellingAgent(Agent):
+    '''
+    Schelling segregation agent
+    '''
+    def __init__(self, pos, agent_type):
+        '''
+         Create a new Schelling agent.
+
+         Args:
+            unique_id: Unique identifier for the agent.
+            x, y: Agent initial location.
+            agent_type: Indicator for the agent's type (minority=1, majority=0)
+        '''
+        self.unique_id = pos
+        self.pos = pos
+        self.type = agent_type
+
+    def step(self, model):
+        similar = 0
+        for neighbor in model.grid.neighbor_iter(self.pos):
+            if neighbor.type == self.type:
+                similar += 1
+
+        # If unhappy, move:
+        if similar < model.homophily:
+            model.grid.move_to_empty(self)
+        else:
+            model.happy += 1
 
 
 class SchellingModel(Model):
@@ -72,58 +91,3 @@ class SchellingModel(Model):
         if self.happy == self.schedule.get_agent_count():
             self.running = False
 
-
-class SchellingAgent(Agent):
-    '''
-    Schelling segregation agent
-    '''
-    def __init__(self, pos, agent_type):
-        '''
-         Create a new Schelling agent.
-
-         Args:
-            unique_id: Unique identifier for the agent.
-            x, y: Agent initial location.
-            agent_type: Indicator for the agent's type (minority=1, majority=0)
-        '''
-        self.unique_id = pos
-        self.pos = pos
-        self.type = agent_type
-
-    def step(self, model):
-        similar = 0
-        for neighbor in model.grid.neighbor_iter(self.pos):
-            if neighbor.type == self.type:
-                similar += 1
-
-        # If unhappy, move:
-        if similar < model.homophily:
-            model.grid.move_to_empty(self)
-        else:
-            model.happy += 1
-
-
-class SchellingTextVisualization(TextVisualization):
-    '''
-    ASCII visualization for schelling model
-    '''
-
-    def __init__(self, model):
-        '''
-        Create new Schelling ASCII visualization.
-        '''
-        self.model = model
-
-        grid_viz = TextGrid(self.model.grid, self.ascii_agent)
-        happy_viz = TextData(self.model, 'happy')
-        self.elements = [grid_viz, happy_viz]
-
-    @staticmethod
-    def ascii_agent(a):
-        '''
-        Minority agents are X, Majority are O.
-        '''
-        if a.type == 0:
-            return 'O'
-        if a.type == 1:
-            return 'X'
