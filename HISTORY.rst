@@ -12,6 +12,7 @@ Next release
     * Made examples Readme.md more readable #189
 
 * From PyCon Sprints
+    * Updating model example readmes #207
     * Added nose to requirements #208
     * Updated link on style google style guide #209
     * Reset visualization when websocket connection is opened #210
