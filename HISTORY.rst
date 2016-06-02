@@ -9,6 +9,9 @@ Next release
 * Update of tutorial files and docs #176, #172
 * Adds np.int64() functions around some variables to get rid error caused by numpy update #188
 * Made examples Readme.md more readable #189
+* Added nose to requirements PR #208 (Pycon Sprints)
+* Updated link on style google style guide PR #209 (Pycon Sprints)
+
 
 0.7.0 (2016-03-06)
 ++++++++++++++++++
