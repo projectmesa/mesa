@@ -1,5 +1,4 @@
 numpy
-scipy
 pandas==0.17.1
 jupyter==1.0.0
 
