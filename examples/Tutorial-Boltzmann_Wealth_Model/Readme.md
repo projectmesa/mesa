@@ -8,4 +8,4 @@ This model is a tutorial contained in a Jupyter notebook
 
 ### To run this example
 
-You will need to open the file as a Jupyter (aka iPython) notebook with an iPython 3 kernel
+You will need to open the file as a Jupyter (aka iPython) notebook with an iPython 3 kernel. Required dependencies are listed in the provided `requirements.txt` file which can be installed by running `pip install -r requirements.txt`

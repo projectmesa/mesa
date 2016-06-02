@@ -36,7 +36,12 @@ To install Mesa, simply:
 
     $ pip install mesa
 
-When you do that, it will install Mesa itself, as well as any dependencies that aren't in your setup yet.
+When you do that, it will install Mesa itself, as well as any dependencies that aren't in your setup yet. Additional dependencies required by this tutorial can be found in the **examples/Tutorial-Boltzmann_Wealth_Model/requirements.txt** file, which can be installed by running:
+
+.. code-block:: bash
+
+    $ pip install -r requirements.txt
+
 
 
 Building a sample model
