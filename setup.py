@@ -28,12 +28,16 @@ setup(
     author_email='projectmesa@googlegroups.com',
     url='https://github.com/projectmesa/mesa',
     packages=find_packages(),
-    package_data={'mesa': ['visualization/templates/*']},
+    package_data={'mesa': ['visualization/templates/*'],
+                  'cookiecutter-mesa': ['cookiecutter-mesa/*']},
     include_package_data=True,
     install_requires=requires,
     keywords='agent based modeling model ABM simulation multi-agent',
     license='Apache 2.0',
     zip_safe=False,
+    entry_points={'console_scripts': [
+        'mesa-init=mesa.scripts.mesa_init:main',
+    ]},
     classifiers=(
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Life',
