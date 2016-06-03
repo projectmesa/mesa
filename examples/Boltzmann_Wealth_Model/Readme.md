@@ -32,10 +32,8 @@ http://mesa.readthedocs.io/en/latest/intro-tutorial.html
 
 This model is drawn from econophysics and presents a statistical mechanics approach to wealth distribution. Some examples of further reading on the topic can be found at:
 
-[Milakovic, M. A Statistical Equilibrium Model of Wealth
-Distribution. February, 2001.](https://editorialexpress.com/cgi-bin/conference/download.cgi?db_name=SCE2001&paper_id=214)
+[Milakovic, M. A Statistical Equilibrium Model of Wealth Distribution. February, 2001.](https://editorialexpress.com/cgi-bin/conference/download.cgi?db_name=SCE2001&paper_id=214)
 
-[Dragulescu, A and Yakovenko, V. Statistical Mechanics of Money, Income, and
-Wealth: A Short Survey. November, 2002](http://arxiv.org/pdf/cond-mat/0211175v1.pdf)
-=======
+[Dragulescu, A and Yakovenko, V. Statistical Mechanics of Money, Income, and Wealth: A Short Survey. November, 2002](http://arxiv.org/pdf/cond-mat/0211175v1.pdf)
+____
 You will need to open the file as a Jupyter (aka iPython) notebook with an iPython 3 kernel. Required dependencies are listed in the provided `requirements.txt` file which can be installed by running `pip install -r requirements.txt`
