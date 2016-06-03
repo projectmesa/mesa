@@ -82,7 +82,8 @@ class BatchRunner(object):
                     key = tuple(list(param_values) + [run_count])
                     self.model_vars[key] = self.collect_model_vars(model)
                 if self.agent_reporters:
-                    for agent_id, reports in self.collect_agent_vars.items():
+                    agent_vars = self.collect_agent_vars(model)
+                    for agent_id, reports in agent_vars.items():
                         key = tuple(list(param_values) + [run_count, agent_id])
                         self.agent_vars[key] = reports
                 run_count += 1
