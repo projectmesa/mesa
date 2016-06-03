@@ -1,0 +1,5 @@
+Time
+----
+
+.. automodule:: time
+   :members:

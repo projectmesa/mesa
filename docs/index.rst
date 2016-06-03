@@ -42,12 +42,14 @@ Getting started quickly:
 
 For more help on using Mesa, check out the following resources:
 
-* `Intro to Mesa Tutorial`_
+* `Mesa Introductory Tutorial`_
+* `Mesa Advanced Tutorial`_
 * `Docs`_
 * `Email list`_
 * `PyPI`_
 
-.. _`Intro to Mesa Tutorial` : http://mesa.readthedocs.org/en/latest/intro-tutorial.html
+.. _`Mesa Introductory Tutorial` : http://mesa.readthedocs.org/en/latest/intro_tutorial.html
+.. _`Mesa Advanced Tutorial` : http://mesa.readthedocs.org/en/latest/adv_tutorial.html
 .. _`Docs` : http://mesa.readthedocs.org/en/latest/
 .. _`Email list` : https://groups.google.com/d/forum/projectmesa
 .. _`PyPI` : https://pypi.python.org/pypi/Mesa/
@@ -67,9 +69,21 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
 .. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/master/CONTRIBUTING.rst
 .. _`Github` : https://github.com/projectmesa/mesa/
 
+API Documentation
+-----------------
 
+.. toctree::
+   :maxdepth 1
 
-**Table of Contents**
+   init
+   batchrunner
+   datacollection
+   space
+   time
+   visualization
+
+Table of Contents
+-----------------
 
 .. toctree::
    :maxdepth: 1
@@ -83,5 +97,4 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-.. * :ref:`search`
-
+* :ref:`search`
