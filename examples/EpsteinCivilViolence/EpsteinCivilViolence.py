@@ -51,7 +51,7 @@ class Citizen(Agent):
                 agent can inspect. Exogenous.
             model: model instance
         """
-        super(Citizen, self).__init__(unique_id, model)
+        super().__init__(unique_id, model)
         self.breed = 'citizen'
         self.pos = pos
         self.hardship = hardship
@@ -134,7 +134,7 @@ class Cop(Agent):
                 agent can inspect. Exogenous.
             model: model instance
         """
-        super(Cop, self).__init__(unique_id, model)
+        super().__init__(unique_id, model)
         self.breed = 'cop'
         self.pos = pos
         self.vision = vision
@@ -201,7 +201,7 @@ class CivilViolenceModel(Model):
                  citizen_vision, cop_vision, legitimacy,
                  max_jail_term, active_threshold=.1, arrest_prob_constant=2.3,
                  movement=True, max_iters=1000):
-        super(CivilViolenceModel, self).__init__()
+        super().__init__()
         self.height = height
         self.width = width
         self.citizen_density = citizen_density
