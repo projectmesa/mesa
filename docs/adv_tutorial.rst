@@ -1,9 +1,6 @@
 
-Introduction to Mesa
-====================
-
 Advanced Tutorial
------------------
+=================
 
 Adding visualization
 ~~~~~~~~~~~~~~~~~~~~
