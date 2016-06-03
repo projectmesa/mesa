@@ -65,3 +65,5 @@ target/
 # PyCharm environment files
 .idea/
 
+# Apple OSX
+*.DS_Store

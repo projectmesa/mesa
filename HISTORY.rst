@@ -28,6 +28,10 @@ Next release
     * add a requirements.txt for Schelling. #224
     * Refactor color patches example #227
     * Ignored _build sphinx docs still in repo #228
+    * Intro Tut completely in ipynb #230
+    * pass optional port parameter to ModularServer.launch #231
+    * open vis immediately when running color patches #232
+    * Adds .DS_store to .gitignore #237
 
 
 0.7.0 (2016-03-06)
