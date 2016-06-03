@@ -17,7 +17,7 @@ import sys
 import os
 
 
-Adding mock imports to see if this builds
+# Adding mock imports to see if this builds
 from unittest.mock import MagicMock
 
 class Mock(MagicMock):
@@ -34,7 +34,9 @@ sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, "../examples")
 sys.path.insert(0, "../mesa")
+
 
 # -- General configuration ------------------------------------------------
 
@@ -123,7 +125,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -187,7 +189,7 @@ html_static_path = ['_static']
 #html_show_sourcelink = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = False
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 #html_show_copyright = True

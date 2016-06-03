@@ -25,14 +25,14 @@ notebook.*
 
 
 Features
-------------
+--------
 
 * Modular components
 * Browser-based visualization
 * Built-in tools for analysis
 
 Using Mesa
-------------
+----------
 
 Getting started quickly:
 
@@ -55,7 +55,7 @@ For more help on using Mesa, check out the following resources:
 .. _`PyPI` : https://pypi.python.org/pypi/Mesa/
 
 Contributing back to Mesa
-----------------------------
+-------------------------
 
 If you run into an issue, please file a `ticket`_ for us to discuss. If possible, follow up with a pull request.
 
@@ -69,21 +69,8 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
 .. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/master/CONTRIBUTING.rst
 .. _`Github` : https://github.com/projectmesa/mesa/
 
-API Documentation
------------------
-
-.. toctree::
-   :maxdepth 1
-
-   init
-   batchrunner
-   datacollection
-   space
-   time
-   visualization
-
-Table of Contents
------------------
+General Documentation
+---------------------
 
 .. toctree::
    :maxdepth: 1
@@ -91,6 +78,19 @@ Table of Contents
    Mesa overview <overview>
    intro_tutorial
    adv_tutorial
+
+API Documentation
+-----------------
+
+.. toctree::
+   :maxdepth: 1
+
+   Base Classes <init>
+   batchrunner
+   datacollection
+   space
+   time
+   visualization
 
 Indices and tables
 ==================

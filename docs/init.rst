@@ -1,4 +1,4 @@
-Base
+init
 ----
 
 .. automodule:: __init__
