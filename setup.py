@@ -6,19 +6,20 @@ from setuptools import setup, find_packages
 from codecs import open
 
 requires = [
-    'tornado',
+    'click',
+    'cookiecutter',
+    'jupyter',
     'networkx',
     'numpy',
     'pandas',
-    'jupyter',
+    'tornado >= 4.2, < 5.0.0',
     'tqdm',
-    'click',
 ]
 
 extras_require = {
     'dev': [
-        'flake8',
         'coverage',
+        'flake8',
         'nose',
         'sphinx',
     ],
@@ -45,7 +46,8 @@ setup(
     url='https://github.com/projectmesa/mesa',
     packages=find_packages(),
     package_data={'mesa': ['visualization/templates/*.html', 'visualization/templates/css/*',
-                           'visualization/templates/fonts/*', 'visualization/templates/js/*']},
+                           'visualization/templates/fonts/*', 'visualization/templates/js/*'],
+                  'cookiecutter-mesa': ['cookiecutter-mesa/*']},
     include_package_data=True,
     install_requires=requires,
     extras_require=extras_require,

@@ -40,11 +40,11 @@ Getting started quickly:
 
     $ pip install mesa
 
-To launch an example model, clone the `repository <https://github.com/projectmesa/mesa>`_ folder and invoke ``mesa run`` for one of the ``examples/`` subdirectories:
+To launch an example model, clone the `repository <https://github.com/projectmesa/mesa>`_ folder and invoke ``mesa runserver`` for one of the ``examples/`` subdirectories:
 
 .. code-block:: bash
 
-    schelling $ mesa run examples/wolf_sheep
+    schelling $ mesa runserver examples/wolf_sheep
 
 For more help on using Mesa, check out the following resources:
 

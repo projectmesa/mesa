@@ -28,7 +28,7 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 =======
 * Launch the visualization
 ```
-$ mesa run
+$ mesa runserver
 ```
 * Visit your browser: http://127.0.0.1:8521/
 * In your browser hit *run*

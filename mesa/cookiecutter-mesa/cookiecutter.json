@@ -1,0 +1,8 @@
+{
+    "project": "Example Project",
+    "snake": "{{ cookiecutter.project.lower().replace(' ', '_') }}",
+    "camel": "{{ cookiecutter.project.title().replace(' ', '') }}",
+    "agent": "{{ cookiecutter.camel + 'Agent'}}",
+    "model": "{{ cookiecutter.camel + 'Model'}}",
+    "description": "Example short description of the project"
+}
