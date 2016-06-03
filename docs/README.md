@@ -9,6 +9,14 @@ This folder contains the docs that build the docs for the core mesa code on read
 
 Updating docs can be confusing. Here are the basic setups.
 
+####Create the rST files from ipynb files
+1. Change to the appropriate directory (usually docs/tutorials)
+  * ```cd tutorials```
+1. Create rST files using nbconvert
+  * ```juypter nbconvert --to rST *.ipynb```
+1. Move the rst files to the docs directory
+  * ```mv *.rst ../```
+
 #####Submit a pull request with updates
 1. Create branch (either via branching or fork of repo) -- try to use a descriptive name.
  * ```git checkout -b doc-updates```
