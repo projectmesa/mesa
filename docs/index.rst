@@ -75,8 +75,8 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
    :maxdepth: 1
 
    Mesa overview <overview>
-   intro-tutorial
-
+   intro_tutorial
+   adv_tutorial
 
 Indices and tables
 ==================
