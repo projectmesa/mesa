@@ -4,10 +4,10 @@ the drawing of the model representation on the canvas
 """
 
 
-from color_patch_model import ColorPatchModel
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 
+from .model import ColorPatchModel
 
 _COLORS = ['Aqua', 'Blue', 'Fuchsia', 'Gray', 'Green',
            'Lime', 'Maroon', 'Navy', 'Olive', 'Orange', 'Purple',
@@ -43,8 +43,6 @@ CANVAS_ELEMENT = CanvasGrid(color_patch_draw,
                             GRID_COLS, GRID_ROWS,
                             CANVAS_HEIGHT, CANVAS_WIDTH)
 
-SERVER = ModularServer(ColorPatchModel,
+server = ModularServer(ColorPatchModel,
                        [CANVAS_ELEMENT], "Color Patches",
                        GRID_ROWS, GRID_COLS)
-
-SERVER.launch()

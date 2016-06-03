@@ -26,6 +26,8 @@ Next release
     * add more test coverage to time #221
     * add a requirements.txt for WolfSheep. #222
     * add a requirements.txt for Schelling. #224
+    * Refactor color patches example #227
+    * Ignored _build sphinx docs still in repo #228
 
 
 0.7.0 (2016-03-06)
