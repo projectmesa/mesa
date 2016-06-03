@@ -31,6 +31,7 @@ Next release
     * Intro Tut completely in ipynb #230
     * pass optional port parameter to ModularServer.launch #231
     * open vis immediately when running color patches #232
+    * Adds .DS_store to .gitignore #237
 
 
 0.7.0 (2016-03-06)
