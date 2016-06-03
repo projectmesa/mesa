@@ -59,6 +59,7 @@ class Agent(object):
         '''
         Create a new agent.
         '''
+        self.unique_id = unique_id
         self.model = model
 
     def step(self, model):

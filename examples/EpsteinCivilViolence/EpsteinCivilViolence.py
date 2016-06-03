@@ -53,7 +53,6 @@ class Citizen(Agent):
         """
         super(Citizen, self).__init__(unique_id, model)
         self.breed = 'citizen'
-        self.unique_id = unique_id
         self.pos = pos
         self.hardship = hardship
         self.regime_legitimacy = regime_legitimacy
