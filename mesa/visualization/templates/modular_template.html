@@ -77,7 +77,6 @@
 		*/
 		var reset = function() {
 			control.tick = 0;
-			control.running = true;
 			send({"type": "reset"});
 
 			// Reset all the visualizations
@@ -89,26 +88,29 @@
 		/**
 		Send a message to the server get the next visualization state.
 		*/
+
+		var single_step = function() {
+			control.tick += 1;
+			send({"type": "get_step", "step": control.tick});
+		};
 		var step = function() {
-			if(control.running) {
-				control.tick += 1;
-				send({"type": "get_step", "step": control.tick});
-			}
+			if (!control.running) single_step();
 		};
 		/**
 		Call the step function at fixed intervals, until getting an end message from the server.
 		*/
 		var run = function() {
-			player = setInterval(function() {
-				if (!control.running) clearInterval(player);
-				step();
-			}, 1000/control.fps);
-		};
-		/**
-		Pause the run() function, but leave all other variables as they are.
-		*/
-		var pause = function() {
-			clearInterval(player);
+			if (control.running) {
+				control.running = false;
+				if (player) {
+					clearInterval(player);
+					player = null;
+				}
+			}
+			else {
+				control.running = true;
+				player = setInterval(single_step, 1000/control.fps);
+			}
 		};
 	</script>
 	
@@ -132,14 +134,16 @@
 	gui.add(this, "reset"); 
 	gui.add(this, "step");
 	gui.add(this, "run");
-	gui.add(this, "pause");
 
 	/**
-	Called when the user releases the fps slider; pause the model and rerun, to reset the fps
+	Called when the user releases the fps slider; if already running, stop and
+    start again to reset the fps
 	*/
 	fps_control.onFinishChange(function(value) {
-		pause();
-		run();
+		if (control.running) {
+			run();
+			run();
+		}
 	});
 
 	// Element-specific scripts go here:
