@@ -6,15 +6,23 @@ The Schelling segregation model is a classic agent-based model, demonstrating ho
 
 By default, the number of similar neighbors the agents need to be happy is set to 3. That means the agents would be perfectly happy with a majority of their neighbors being of a different color (e.g. a Blue agent would be happy with five Red neighbors and three Blue ones). Despite this, the model consistently leads to a high degree of segregation, with most agents ending up with no neighbors of a different color.
 
+## Installation
+
+To install the dependencies use pip and the requirements.txt in this directory. e.g.
+
+```
+    $ pip install -r requirements.txt
+```
+
 ## How to Run
 
 To run the model interactively, run ``run.py`` in this directory. e.g.
 
 ```
     $ python run.py
-``` 
+```
 
-Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and press Reset, then Run. 
+Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and press Reset, then Run.
 
 To view and run some example model analyses, launch the IPython Notebook and open ``analysis.ipynb``. Visualizing the analysis also requires [matplotlib](http://matplotlib.org/).
 

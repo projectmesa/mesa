@@ -6,11 +6,26 @@ Release History
 Next release
 ++++++++++++++++++
 
-* Update of tutorial files and docs #176, #172
-* Adds np.int64() functions around some variables to get rid error caused by numpy update #188
-* Made examples Readme.md more readable #189
-* Added nose to requirements PR #208 (Pycon Sprints)
-* Updated link on style google style guide PR #209 (Pycon Sprints)
+* Pre-sprints
+    * Update of tutorial files and docs #176, #172
+    * Adds np.int64() functions around some variables to get rid error caused by numpy update #188
+    * Made examples Readme.md more readable #189
+
+* From PyCon Sprints
+    * Updating model example readmes #207
+    * Added nose to requirements #208
+    * Updated link on style google style guide #209
+    * Reset visualization when websocket connection is opened #210
+    * Remove unused scipy dependency #211
+    * Introduce a requirements.txt for the tutorial. #212
+    * Remove references to running in tutorial #213
+    * Simplify travis.yml; add python versions #215
+    * Update Flocker Readme.md #216
+    * Syntax error in .rst was swallowing a code block #217
+    * Fixup HistogramModule in the tutorial. #218
+    * add more test coverage to time #221
+    * add a requirements.txt for WolfSheep. #222
+    * add a requirements.txt for Schelling. #224
 
 
 0.7.0 (2016-03-06)
