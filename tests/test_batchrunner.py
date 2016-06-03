@@ -5,7 +5,6 @@ import unittest
 
 from mesa import Agent, Model
 from mesa.batchrunner import BatchRunner
-from mesa.datacollection import DataCollector
 from mesa.time import BaseScheduler
 
 NUM_AGENTS = 7
@@ -73,15 +72,14 @@ class TestBatchRunner(unittest.TestCase):
             agent_reporters=self.agent_reporter)
         self.batch.run_all()
 
-
     def test_model_level_vars(self):
         """
         Test that model-level variable collection is of the correct size
         """
         model_vars = self.batch.get_model_vars_dataframe()
         rows = len(self.params['model_param']) * \
-                len(self.params['agent_param']) * \
-                self.iterations
+            len(self.params['agent_param']) * \
+            self.iterations
         assert model_vars.shape == (rows, 4)
 
     def test_agent_level_vars(self):
@@ -90,7 +88,7 @@ class TestBatchRunner(unittest.TestCase):
         """
         agent_vars = self.batch.get_agent_vars_dataframe()
         rows = NUM_AGENTS * \
-                len(self.params['agent_param']) * \
-                len(self.params['model_param']) * \
-                self.iterations
+            len(self.params['agent_param']) * \
+            len(self.params['model_param']) * \
+            self.iterations
         assert agent_vars.shape == (rows, 6)

@@ -16,16 +16,6 @@ class BatchRunner(object):
     run. To get step by step data, simply have a reporter store the model's
     entire DataCollector object.
     '''
-    model_cls = None
-    parameter_values = {}
-    iterations = 1
-
-    model_reporters = {}
-    agent_reporters = {}
-
-    model_vars = {}
-    agent_vars = {}
-
     def __init__(self, model_cls, parameter_values, iterations=1,
                  max_steps=1000, model_reporters=None, agent_reporters=None):
         '''
@@ -152,7 +142,7 @@ class BatchRunner(object):
         '''
         Helper method to ensure a value is a non-string iterable.
         '''
-        if hasattr(val, "__iter__") and type(val) is not str:
+        if hasattr(val, "__iter__") and not isinstance(val, str):
             return val
         else:
             return [val]
