@@ -1,0 +1,8 @@
+{
+    "project_name": "Name of the project",
+    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_') }}",
+    "title": "{{ cookiecutter.project_name.title().replace(' ', '') }}",
+    "agent": "{{ cookiecutter.title + 'Agent'}}",
+    "model": "{{ cookiecutter.title + 'Model'}}",
+    "project_short_description": "A short description of the project"
+}
