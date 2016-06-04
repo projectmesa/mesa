@@ -16,7 +16,7 @@ import random
 
 class PD_Agent(Agent):
 
-    def __init__(self, pos, starting_move=None):
+    def __init__(self, pos, model, starting_move=None):
         '''
         Create a new Prisoner's Dilemma agent.
 
@@ -25,6 +25,7 @@ class PD_Agent(Agent):
             starting_move: If provided, determines the agent's initial state:
                            C(ooperating) or D(efecting). Otherwise, random.
         '''
+        super().__init__(pos, model)
         self.pos = pos
         self.score = 0
         if starting_move:
@@ -33,29 +34,29 @@ class PD_Agent(Agent):
             self.move = random.choice(["C", "D"])
         self.next_move = None
 
-    def step(self, model):
+    def step(self):
         '''
         Get the neighbors' moves, and change own move accordingly.
         '''
-        neighbors = model.grid.get_neighbors(self.pos, True,
+        neighbors = self.model.grid.get_neighbors(self.pos, True,
             include_center=True)
         best_neighbor = max(neighbors, key=lambda a: a.score)
         self.next_move = best_neighbor.move
 
-        if model.schedule_type != "Simultaneous":
-            self.advance(model)
+        if self.model.schedule_type != "Simultaneous":
+            self.advance()
 
-    def advance(self, model):
+    def advance(self):
         self.move = self.next_move
-        self.score += self.increment_score(model)
+        self.score += self.increment_score()
 
-    def increment_score(self, model):
-        neighbors = model.grid.get_neighbors(self.pos, True)
-        if model.schedule_type == "Simultaneous":
+    def increment_score(self):
+        neighbors = self.model.grid.get_neighbors(self.pos, True)
+        if self.model.schedule_type == "Simultaneous":
             moves = [neighbor.next_move for neighbor in neighbors]
         else:
             moves = [neighbor.move for neighbor in neighbors]
-        return sum(model.payoff[(self.move, move)] for move in moves)
+        return sum(self.model.payoff[(self.move, move)] for move in moves)
 
 
 class PD_Model(Model):
@@ -93,7 +94,7 @@ class PD_Model(Model):
         # Create agents
         for x in range(width):
             for y in range(height):
-                agent = PD_Agent((x, y))
+                agent = PD_Agent((x, y), self)
                 self.grid.place_agent(agent, (x, y))
                 self.schedule.add(agent)
 

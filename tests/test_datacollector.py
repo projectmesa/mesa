@@ -12,22 +12,22 @@ class MockAgent(Agent):
     '''
     Minimalistic agent for testing purposes.
     '''
-    def __init__(self, unique_id, val):
-        self.unique_id = unique_id
+    def __init__(self, unique_id, model, val=0):
+        super().__init__(unique_id, model)
         self.val = val
 
-    def step(self, model):
+    def step(self):
         '''
         Increment val by 1.
         '''
         self.val += 1
 
-    def write_final_values(self, model):
+    def write_final_values(self):
         '''
         Write the final value to the appropriate table.
         '''
         row = {"agent_id": self.unique_id, "final_value": self.val}
-        model.datacollector.add_table_row("Final_Values", row)
+        self.model.datacollector.add_table_row("Final_Values", row)
 
 
 class MockModel(Model):
@@ -40,7 +40,7 @@ class MockModel(Model):
     def __init__(self):
         self.schedule = BaseScheduler(self)
         for i in range(10):
-            a = MockAgent(i, i)
+            a = MockAgent(i, self, val=i)
             self.schedule.add(a)
         self.datacollector = DataCollector(
             {"total_agents": lambda m: m.schedule.get_agent_count()},
@@ -62,7 +62,7 @@ class TestDataCollector(unittest.TestCase):
             self.model.step()
         # Write to table:
         for agent in self.model.schedule.agents:
-            agent.write_final_values(self.model)
+            agent.write_final_values()
 
     def test_model_vars(self):
         '''

@@ -11,7 +11,7 @@ class SchellingAgent(Agent):
     '''
     Schelling segregation agent
     '''
-    def __init__(self, pos, agent_type):
+    def __init__(self, pos, model, agent_type):
         '''
          Create a new Schelling agent.
 
@@ -20,21 +20,21 @@ class SchellingAgent(Agent):
             x, y: Agent initial location.
             agent_type: Indicator for the agent's type (minority=1, majority=0)
         '''
-        self.unique_id = pos
+        super().__init__(pos, model)
         self.pos = pos
         self.type = agent_type
 
-    def step(self, model):
+    def step(self):
         similar = 0
-        for neighbor in model.grid.neighbor_iter(self.pos):
+        for neighbor in self.model.grid.neighbor_iter(self.pos):
             if neighbor.type == self.type:
                 similar += 1
 
         # If unhappy, move:
-        if similar < model.homophily:
-            model.grid.move_to_empty(self)
+        if similar < self.model.homophily:
+            self.model.grid.move_to_empty(self)
         else:
-            model.happy += 1
+            self.model.happy += 1
 
 
 class SchellingModel(Model):
@@ -76,7 +76,7 @@ class SchellingModel(Model):
                 else:
                     agent_type = 0
 
-                agent = SchellingAgent((x, y), agent_type)
+                agent = SchellingAgent((x, y), self, agent_type)
                 self.grid.position_agent(agent, (x, y))
                 self.schedule.add(agent)
 
