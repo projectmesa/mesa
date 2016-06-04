@@ -1,5 +1,5 @@
 Modular Visualization - An In-Depth Look
-=================================================================
+========================================
 
 Modular visualization is (well, will be) one of Mesa's core features. Mesa does (will) include a (wide -- some day) range of predefined visualization modules, which can be easily subclassed for your needs, and mixed-and-matched to visualize your particular model. It should also be fairly straightforward to create new visualization modules. In this document, I will attempt to provide an overview of how to do both.
 
