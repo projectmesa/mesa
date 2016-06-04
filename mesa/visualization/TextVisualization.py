@@ -39,13 +39,8 @@ class TextVisualization(object):
 
         model: The underlying model object to be visualized.
         elements: List of visualization elements, which will be rendered
-                    in the order they are adedd.
-
+                    in the order they are added.
     '''
-
-    model = None
-    elements = []
-
     def __init__(self, model):
         '''
         Create a new Text Visualization object.
@@ -65,14 +60,6 @@ class TextVisualization(object):
         Advance the model by a step and print the results.
         '''
         self.model.step()
-        self.render()
-
-    def step_forward(self, steps):
-        '''
-        Advance the model by some # of steps and show the result.
-        '''
-        for _ in range(steps):
-            self.model.step()
         self.render()
 
 
