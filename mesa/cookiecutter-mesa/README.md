@@ -1,16 +1,12 @@
-Mesa
+cookicutter-mesa
 ====
 
-agent-based modeling in Python
+A cookiecutter template for Mesa, an agent-based modeling library in Python
 
 Requirements
 ------------
-Install `cookiecutter` command line: `pip install cookiecutter`    
+Install `cookiecutter` command line: `pip install cookiecutter`
 
 Usage
 -----
-Generate a new Cookiecutter template layout: `cookiecutter gh:Your github username/cookiecutter-mesa`    
-
-License
--------
-This project is licensed under the terms of the [MIT License](/LICENSE)
+Generate a new Cookiecutter template layout: `cookiecutter path/to/cookiecutter-mesa`
