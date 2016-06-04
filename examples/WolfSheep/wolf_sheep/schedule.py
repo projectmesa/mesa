@@ -11,7 +11,7 @@ class RandomActivationByBreed(RandomActivation):
     This is equivalent to the NetLogo 'ask breed...' and is generally the
     default behavior for an ABM.
 
-    Assumes that all agents have a step(model) method.
+    Assumes that all agents have a step() method.
     '''
     agents_by_breed = defaultdict(list)
 
@@ -69,7 +69,7 @@ class RandomActivationByBreed(RandomActivation):
         agents = self.agents_by_breed[breed]
         random.shuffle(agents)
         for agent in agents:
-            agent.step(self.model)
+            agent.step()
 
     def get_breed_count(self, breed_class):
         '''

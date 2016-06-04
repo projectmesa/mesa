@@ -40,7 +40,7 @@ class ColorCell(Agent):
         '''Return the current state (OPINION) of this cell.'''
         return self._state
 
-    def step(self, model):
+    def step(self):
         '''
         Determines the agent opinion for the next step by polling its neighbors
         The opinion is determined by the majority of the 8 neighbors' opinion
@@ -48,7 +48,7 @@ class ColorCell(Agent):
         The next state is stored until all cells have been polled
         '''
         neighbors_opinion = Counter(n.get_state() \
-                            for n in model.grid.neighbor_iter((self._col, self._row), True))
+                            for n in self.model.grid.neighbor_iter((self._col, self._row), True))
         polled_opinions = neighbors_opinion.most_common()  #a tuple (attribute, occurrences)
         tied_opinions = []
         for neighbor in polled_opinions:
@@ -58,8 +58,7 @@ class ColorCell(Agent):
         self._next_state = random.choice(tied_opinions)[0]
 
 
-    # model argument is unused
-    def advance(self, model):
+    def advance(self):
         '''
         Set the state of the agent to the next state
         '''

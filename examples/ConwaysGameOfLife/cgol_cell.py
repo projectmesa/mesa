@@ -26,7 +26,7 @@ class CGoLCell(Agent):
         '''Return the current state (ALIVE or DEAD) of this cell.'''
         return self._state
 
-    def step(self, model):
+    def step(self):
         '''
         Compute if the cell will be dead or alive at the next tick.  This is
         based on the number of alive or dead neighbors.  The state is not
@@ -36,7 +36,7 @@ class CGoLCell(Agent):
         # Get the neighbors and apply the rules on whether to be alive or dead
         # at the next tick.
         live_neighbors = 0
-        for n in model.grid.neighbor_iter( (self._x, self._y), True):  # all 8 neighbors
+        for n in self.model.grid.neighbor_iter( (self._x, self._y), True):  # all 8 neighbors
             if n.getState() == CGoLCell.ALIVE:
                 live_neighbors += 1
 
@@ -54,7 +54,7 @@ class CGoLCell(Agent):
         # we change any of them.
         
 
-    def advance(self, model):
+    def advance(self):
         '''
         Set the state to the new computed state -- computed in step().
         '''

@@ -83,7 +83,7 @@ class WolfSheepPredation(Model):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = random.randrange(2 * self.sheep_gain_from_food)
-            sheep = Sheep(self.grid, (x, y), True, energy)
+            sheep = Sheep((x, y), self, True, energy)
             self.grid.place_agent(sheep, (x, y))
             self.schedule.add(sheep)
 
@@ -92,7 +92,7 @@ class WolfSheepPredation(Model):
             x = random.randrange(self.width)
             y = random.randrange(self.height)
             energy = random.randrange(2 * self.wolf_gain_from_food)
-            wolf = Wolf(self.grid, (x, y), True, energy)
+            wolf = Wolf((x, y), self, True, energy)
             self.grid.place_agent(wolf, (x, y))
             self.schedule.add(wolf)
 
@@ -107,7 +107,7 @@ class WolfSheepPredation(Model):
                 else:
                     countdown = random.randrange(self.grass_regrowth_time)
 
-                patch = GrassPatch(fully_grown, countdown)
+                patch = GrassPatch((x,y), self, fully_grown, countdown)
                 self.grid.place_agent(patch, (x, y))
                 self.schedule.add(patch)
 
