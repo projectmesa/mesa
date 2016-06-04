@@ -14,8 +14,7 @@ Updating docs can be confusing. Here are the basic setups.
   * ```cd tutorials```
 1. Create rST files using nbconvert
   * ```juypter nbconvert --to rST *.ipynb```
-1. Move the rst files to the docs directory
-  * ```mv *.rst ../```
+  * **note** This requires jupyter, all its dependencies and pandoc be installed.
 
 #####Submit a pull request with updates
 1. Create branch (either via branching or fork of repo) -- try to use a descriptive name.
@@ -41,9 +40,3 @@ From this point, you will need to find someone that has access to readthedocs. C
  * ```make html```
 * Autogenerate / update sphninx from docstrings (replace your name as the author:
  * ```sphinx-apidoc -A "Jackie Kazil" -F -o docs mesa/```
-
-
-
-
-
-

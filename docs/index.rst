@@ -69,28 +69,15 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
 .. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/master/CONTRIBUTING.rst
 .. _`Github` : https://github.com/projectmesa/mesa/
 
-General Documentation
----------------------
 
 .. toctree::
+   :hidden:
    :maxdepth: 1
 
-   Mesa overview <overview>
-   intro_tutorial
-   adv_tutorial
-
-API Documentation
------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   Base Classes <init>
-   batchrunner
-   datacollection
-   space
-   time
-   visualization
+   Mesa Overview <overview>
+   tutorials/intro_tutorial
+   tutorials/adv_tutorial
+   API Documentation <apis/api_main.rst>
 
 Indices and tables
 ==================
