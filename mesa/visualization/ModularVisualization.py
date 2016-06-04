@@ -199,7 +199,7 @@ class ModularServer(tornado.web.Application):
     model_name = "Mesa Model"
     model_cls = None  # A model class
     portrayal_method = None
-    port = 8888  # Port to listen on
+    port = 8888  # Default port to listen on
     canvas_width = 500
     canvas_height = 500
     grid_height = 0
@@ -282,10 +282,12 @@ class ModularServer(tornado.web.Application):
             yield tornado.gen.Task(tornado.ioloop.IOLoop.current().add_timeout,
                 dt.timedelta(milliseconds=5))
 
-    def launch(self):
+    def launch(self, port=None):
         '''
         Run the app.
         '''
+        if port is not None:
+            self.port = port
         print('Interface starting at http://127.0.0.1:{PORT}'.format(PORT=self.port))
         self.listen(self.port)
         tornado.ioloop.IOLoop.instance().start()

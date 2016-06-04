@@ -26,6 +26,16 @@ Next release
     * add more test coverage to time #221
     * add a requirements.txt for WolfSheep. #222
     * add a requirements.txt for Schelling. #224
+    * Refactor color patches example #227
+    * Ignored _build sphinx docs still in repo #228
+    * Intro Tut completely in ipynb #230
+    * pass optional port parameter to ModularServer.launch #231
+    * open vis immediately when running color patches #232
+    * Adds .DS_store to .gitignore #237
+    * Documentation Update #240
+    * Small fix for reading links #241
+    * Test batchrunner #243
+    * clean up TextVisualization #245
 
 
 0.7.0 (2016-03-06)

@@ -17,14 +17,17 @@ class Model(object):
     '''
     Base class for models.
     '''
-    seed = None  # Seed for the random number generator
-    schedule = None  # Schedule object
-    running = True
-
     def __init__(self, seed=None):
         '''
         Create a new model. Overload this method with the actual code to start
         the model.
+
+        Args:
+            seed: seed for the random number generator
+
+        Attributes:
+            schedule: schedule object
+            running: a bool indicating if the model should continue running
         '''
         if seed is None:
             self.seed = dt.datetime.now()
@@ -32,6 +35,7 @@ class Model(object):
             self.seed = seed
         random.seed(seed)
         self.running = True
+        self.schedule = None
 
     def run_model(self):
         '''
@@ -51,14 +55,11 @@ class Agent(object):
     '''
     Base class for a model agent.
     '''
-
-    model = None
-    unique_id = None
-
     def __init__(self, unique_id, model):
         '''
         Create a new agent.
         '''
+        self.unique_id = unique_id
         self.model = model
 
     def step(self, model):
