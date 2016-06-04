@@ -21,9 +21,9 @@ appropriate dictionary object for a table row.
 
 The DataCollector then stores the data it collects in dictionaries:
     * model_vars maps each reporter to a list of its values
-    * agent_vars maps each reporter to a list of lists, where each nested list 
+    * agent_vars maps each reporter to a list of lists, where each nested list
       stores (agent_id, value) pairs.
-    * tables maps each table to a dictionary, with each column as a key with a 
+    * tables maps each table to a dictionary, with each column as a key with a
       list as its value.
 
 Finally, DataCollector can create a pandas DataFrame from each collection.
@@ -45,7 +45,7 @@ class DataCollector(object):
     agent-level variables to collect, associated with functions which actually
     collect them. When the collect(...) method is called, it executes these
     functions one by one and stores the results.
-    
+
     """
     model_reporters = {}
     agent_reporters = {}
