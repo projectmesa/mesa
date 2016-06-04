@@ -1,9 +1,9 @@
 
-Introduction to Mesa
-====================
-
 Introductory Tutorial
----------------------
+=====================
+
+Tutorial Description
+--------------------
 
 `Mesa <https://github.com/projectmesa/mesa>`__ is a Python framework for
 `agent-based
