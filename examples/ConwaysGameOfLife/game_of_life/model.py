@@ -1,12 +1,11 @@
 from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import Grid
-from cgol_cell import CGoLCell
-import random
+from game_of_life.cell import Cell
+from random import random
 
 
-
-class CGoLModel(Model):
+class GameOfLife(Model):
     '''
     Represents the 2-dimensional array of cells in Conway's
     Game of Life.
@@ -31,21 +30,15 @@ class CGoLModel(Model):
         # Place a cell at each location, with some initialized to
         # ALIVE and some to DEAD.
         for (contents, x, y) in self.grid.coord_iter():
-            pos = (x, y)
-            init_state = CGoLCell.DEAD
-            # Initially, make 10% of the cells ALIVE.
-            if random.random() < 0.1:
-                init_state = CGoLCell.ALIVE
-            cell = CGoLCell(pos, self, init_state)
-            # Put this cell in the grid at position (x, y)
-            self.grid.place_agent(cell, pos)
-            # Add this cell to the scheduler.
+            cell = Cell((x, y), self)
+            if random() < .1:
+                cell.state = cell.ALIVE
+            self.grid.place_agent(cell, (x, y))
             self.schedule.add(cell)
         self.running = True
 
     def step(self):
         '''
-        Advance the model by one step.
+        Have the scheduler advance each cell by one step
         '''
         self.schedule.step()
-
