@@ -15,18 +15,20 @@ Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and p
 
 ## Files
 
-* ``flockers.py``: Core model file; includes the Boid agent class, and the BoidModel class.
-* ``Flocker_Server.py``: Sets up the visualization; uses the SimpleCanvas element, defined in the files below:
-* ``SimpleContinuousModule.py``: Defines ``SimpleCanvas``, the Python side of a custom visualization module for drawing agents with continuous positions.
-* ``simple_continuous_canvas.js``: JavaScript side of the ``SimpleCanvas`` visualization module; takes the output genereated by the Python ``SimpleCanvas`` element and draws it in the browser window via HTML5 canvas.
-* ``Flocker Test.ipynb``: Tests the model in a Jupyter notebook.
+* [flockers/model.py](flockers/model.py): Core model file; contains the BoidModel class.
+* [flockers/boid.py](flockers/boid.py): The Boid agent class.
+* [flockers/SimpleContinuousModule.py](flockers/SimpleContinuousModule.py): Defines ``SimpleCanvas``, the Python side of a custom visualization module for drawing agents with continuous positions.
+* [flockers/simple_continuous_canvas.js](flockers/simple_continuous_canvas.js): JavaScript side of the ``SimpleCanvas`` visualization module; takes the output genereated by the Python ``SimpleCanvas`` element and draws it in the browser window via HTML5 canvas.
+* [flockers/server.py](flockers/server.py): Sets up the visualization; uses the SimpleCanvas element defined above
+* [run.py](run.py) Launches the visualization.
+* [Flocker Test.ipynb](Flocker Test.ipynb): Tests the model in a Jupyter notebook.
 
 ## Further Reading
 
 =======
 * Launch the visualization
-```python
-python Flocker_Server.py
+```
+$ python run.py
 ```
 * Visit your browser: http://127.0.0.1:8888/
 * In your browser hit *run*
