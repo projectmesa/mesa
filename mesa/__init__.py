@@ -14,7 +14,7 @@ __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright 2015 Project Mesa Team'
 
 
-class Model(object):
+class Model:
     """ Base class for models. """
     def __init__(self, seed=None):
         """ Create a new model. Overload this method with the actual code to
@@ -49,7 +49,7 @@ class Model(object):
         pass
 
 
-class Agent(object):
+class Agent:
     """ Base class for a model agent. """
     def __init__(self, unique_id, model):
         """ Create a new agent. """

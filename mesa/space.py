@@ -38,7 +38,7 @@ def accept_tuple_argument(wrapped_function):
     return wrapper
 
 
-class Grid(object):
+class Grid:
     """ Base class for a square grid.
 
     Grid cells are indexed by [y][x], where [0][0] is assumed to be -- top-left
@@ -421,7 +421,7 @@ class MultiGrid(Grid):
             self[y][x] for x, y in cell_list if not self.is_cell_empty((x, y)))
 
 
-class ContinuousSpace(object):
+class ContinuousSpace:
     """ Continuous space where each agent can have an arbitrary position.
 
     Assumes that all agents are point objects, and have a pos property storing

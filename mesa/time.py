@@ -29,7 +29,7 @@ seeds consistent and allow for replication.
 import random
 
 
-class BaseScheduler(object):
+class BaseScheduler:
     """ Simplest scheduler; activates agents one at a time, in the order
     they were added.
 
