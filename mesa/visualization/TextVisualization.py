@@ -31,7 +31,7 @@ Patch value grid).
 # pylint: disable=invalid-name
 
 
-class TextVisualization(object):
+class TextVisualization:
     """ ASCII-Only visualization of a model.
 
     Properties:
@@ -57,7 +57,7 @@ class TextVisualization(object):
         self.render()
 
 
-class TextElement(object):
+class TextElement:
     """ Base class for all TextElements to render.
 
     Methods:

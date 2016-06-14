@@ -10,7 +10,7 @@ from itertools import product
 import pandas as pd
 
 
-class BatchRunner(object):
+class BatchRunner:
     """ This class is instantiated with a model class, and model parameters
     associated with one or more values. It is also instantiated with model- and
     agent-level reporters, dictionaries mapping a variable name to a function

@@ -92,7 +92,7 @@ import tornado.gen
 # pylint: disable=attribute-defined-outside-init
 
 
-class VisualizationElement(object):
+class VisualizationElement:
     """
     Defines an element of the visualization.
 

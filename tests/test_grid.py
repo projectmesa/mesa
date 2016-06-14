@@ -12,7 +12,7 @@ TEST_GRID = [[0, 1, 0, 1, 0],   # Y
              [0, 0, 0, 1, 0]]   # V
 
 
-class MockAgent(object):
+class MockAgent:
     '''
     Minimalistic agent for testing purposes.
     '''
