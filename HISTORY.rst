@@ -40,6 +40,7 @@ Next release
     * Update Game of Life example to new format #253
     * Update Flockers example to new format #254
     * Update Epstein model to new layout #255
+    * Subclassing object is unnecessary in Python 3 #258
 
 
 0.7.0 (2016-03-06)
