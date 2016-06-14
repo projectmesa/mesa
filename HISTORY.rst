@@ -36,6 +36,10 @@ Next release
     * Small fix for reading links #241
     * Test batchrunner #243
     * clean up TextVisualization #245
+    * Documentation Update #250
+    * Update Game of Life example to new format #253
+    * Update Flockers example to new format #254
+    * Update Epstein model to new layout #255
 
 
 0.7.0 (2016-03-06)
