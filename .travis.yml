@@ -5,7 +5,8 @@ os:
 python:
   - "3.4"
   - "3.5"
-  - "nightly"
+  # - "3.6"
+  # - "nightly"
 install:
   - pip install -r requirements.txt
   - pip install coveralls

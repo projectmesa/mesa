@@ -1,9 +1,10 @@
-'''
+# -*- coding: utf-8 -*-
+"""
 Mesa Agent-Based Modeling Framework
 
 Core Objects: Model, and Agent.
-'''
 
+"""
 import datetime as dt
 import random
 
@@ -13,14 +14,11 @@ __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright 2015 Project Mesa Team'
 
 
-class Model(object):
-    '''
-    Base class for models.
-    '''
+class Model:
+    """ Base class for models. """
     def __init__(self, seed=None):
-        '''
-        Create a new model. Overload this method with the actual code to start
-        the model.
+        """ Create a new model. Overload this method with the actual code to
+        start the model.
 
         Args:
             seed: seed for the random number generator
@@ -28,7 +26,8 @@ class Model(object):
         Attributes:
             schedule: schedule object
             running: a bool indicating if the model should continue running
-        '''
+
+        """
         if seed is None:
             self.seed = dt.datetime.now()
         else:
@@ -38,32 +37,25 @@ class Model(object):
         self.schedule = None
 
     def run_model(self):
-        '''
-        Run the model until the end condition is reached. Overload as needed.
-        '''
+        """ Run the model until the end condition is reached. Overload as
+        needed.
+
+        """
         while self.running:
             self.step()
 
     def step(self):
-        '''
-        A single step. Fill in here.
-        '''
+        """ A single step. Fill in here. """
         pass
 
 
-class Agent(object):
-    '''
-    Base class for a model agent.
-    '''
+class Agent:
+    """ Base class for a model agent. """
     def __init__(self, unique_id, model):
-        '''
-        Create a new agent.
-        '''
+        """ Create a new agent. """
         self.unique_id = unique_id
         self.model = model
 
     def step(self, model):
-        '''
-        A single step of the agent.
-        '''
+        """ A single step of the agent. """
         pass

@@ -1,4 +1,5 @@
-from EpsteinCivilViolence import Citizen, Cop, CivilViolenceModel
+from .model import CivilViolenceModel
+from .agent import Citizen, Cop
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid
 
@@ -41,4 +42,3 @@ server = ModularServer(CivilViolenceModel, [canvas_element],
                       cop_vision=7,
                       legitimacy=.8,
                       max_jail_term=1000)
-server.launch()

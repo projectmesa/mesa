@@ -1,7 +1,5 @@
-
-
 Overview of Modules
----------------------
+-------------------
 
 Mesa is modular, meaning that There are three module types in Mesa.
 
@@ -13,7 +11,7 @@ TODO: Insert image
 
 
 Modeling modules
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 To build a model, you need the following:
 
@@ -27,7 +25,7 @@ To build a model, you need the following:
 
 
 Analysis modules
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 Not every model *needs* these modules, but they provide useful tools for getting data out of your model runs to study more systematically.
 
@@ -36,7 +34,7 @@ Not every model *needs* these modules, but they provide useful tools for getting
 
 
 Visualization modules
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 A visualization lets you directly observe model runs, seeing the dynamics that emerge from it and making sure that it's behaving in the way you want it to. Mesa handles visualizations in a browser window, using JavaScript. It provides a set of pre-built components, which can be instantiated for a particular model in Python and automatically generate the corresponding objects in the browser window. It's also easy to write your own components with some basic JavaScript knowledge.
 
