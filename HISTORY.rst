@@ -42,6 +42,9 @@ Next release
     * Update Epstein model to new layout #255
     * Subclassing object is unnecessary in Python 3 #258
 
+* Post PyCon Sprints
+    * Adds a copy of jquery directly into the code. #261
+
 
 0.7.0 (2016-03-06)
 ++++++++++++++++++
