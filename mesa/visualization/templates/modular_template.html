@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <head>
 	<title>{{ model_name }} (Mesa visualization)</title>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  {% comment 
+  The jquery.min.js supplied with this version of mesa  is downloaded from
+  "ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" Re-test mesa
+  visulaizations when upgrading jquery to a newer version.
+  %}
+	<script src="/static/jquery.min.js"></script>
 	<script src="/static/dat.gui.min.js"></script>
 	<script>
 	/*
