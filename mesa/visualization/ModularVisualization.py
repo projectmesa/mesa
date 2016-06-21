@@ -56,7 +56,8 @@ Server -> Client:
     {
     "type": "viz_state",
     "data": [{0:[ {"Shape": "circle", "x": 0, "y": 0, "r": 0.5,
-                "Color": "#AAAAAA", "Filled": "true", "Layer": 0}]},
+                "Color": "#AAAAAA", "Filled": "true", "Layer": 0,
+                "text": 'A', "text_color": "white" }]},
             "Shape Count: 1"]
     }
 
