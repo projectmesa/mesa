@@ -92,10 +92,10 @@ var GridVisualization = function(height, width, gridHeight, gridWidth, context) 
                 
                 // This part draws the text inside the Circle
                 if (text !== undefined) {
-                        context.fillStyle = text_color 
-                        context.textAlign = 'center'
-                        context.textBaseline= 'middle'
-                        context.fillText(text, cx, cy)
+                        context.fillStyle = text_color;
+                        context.textAlign = 'center';
+                        context.textBaseline= 'middle';
+                        context.fillText(text, cx, cy);
                 }
 
 	};
@@ -127,12 +127,12 @@ var GridVisualization = function(height, width, gridHeight, gridWidth, context) 
 
                 // This part draws the text inside the Rectangle
                 if (text !== undefined) {
-        		var cx = (x + 0.5) * cellWidth;
-                  	var cy = (y + 0.5) * cellHeight;
-                        context.fillStyle = text_color 
-                        context.textAlign = 'center'
-                        context.textBaseline= 'middle'
-                        context.fillText(text, cx, cy)
+                        var cx = (x + 0.5) * cellWidth;
+                        var cy = (y + 0.5) * cellHeight;
+                        context.fillStyle = text_color;
+                        context.textAlign = 'center';
+                        context.textBaseline= 'middle';
+                        context.fillText(text, cx, cy);
                 }
 	};
 
