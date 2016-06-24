@@ -20,6 +20,9 @@ def wolf_sheep_portrayal(agent):
         portrayal["Color"] = "#AA0000"
         portrayal["r"] = 0.5
         portrayal["Layer"] = 2
+        portrayal["text"] = round(agent.energy, 1)
+        portrayal["text_color"] = "Yellow" 
+        
 
     elif type(agent) is GrassPatch:
         if agent.fully_grown:
