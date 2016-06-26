@@ -9,7 +9,7 @@ import datetime as dt
 import random
 
 __title__ = 'mesa'
-__version__ = '0.7.0'
+__version__ = '0.7.5'
 __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright 2015 Project Mesa Team'
 
