@@ -6,6 +6,13 @@ Release History
 Next release
 ++++++++++++++++++
 
+* Fix link to intro tutorial. #267
+* Provides support for text overlay on Circle and Rectangle shapes. #265
+
+
+0.7.5 (2016-06-20)
+++++++++++++++++++
+
 * Pre-sprints
     * Update of tutorial files and docs #176, #172
     * Adds np.int64() functions around some variables to get rid error caused by numpy update #188
