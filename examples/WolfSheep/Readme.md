@@ -9,6 +9,7 @@ If wolves and sheep have enough energy, they reproduce, creating a new wolf or s
 The model is tests and demonstrates several Mesa concepts and features:
  - MultiGrid
  - Multiple agent types (wolves, sheep, grass)
+ - Overlay arbitrary text (wolf's energy) on agent's shapes while drawing on CanvasGrid
  - Agents inheriting a behavior (random movement) from an abstract parent
  - Writing a model composed of multiple files.
  - Dynamically adding and removing agents from the schedule

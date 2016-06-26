@@ -35,6 +35,11 @@ class CanvasGrid(VisualizationElement):
                   filled or not.
         "Layer": Layer number of 0 or above; higher-numbered layers are drawn
                  above lower-numbered layers.
+        "text": The text to be inscribed inside the Shape. Normally useful for
+                showing the unique_id of the agent.
+        "text_color": The color to draw the inscribed text. Should be given in
+                      conjunction of "text" property.
+
 
     Attributes:
         portrayal_method: Function which generates portrayals from objects, as
