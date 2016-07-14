@@ -41,9 +41,9 @@ def accept_tuple_argument(wrapped_function):
 class Grid:
     """ Base class for a square grid.
 
-    Grid cells are indexed by [y][x], where [0][0] is assumed to be -- top-left
-    and [height-1][width-1] is the bottom-right. If a grid is toroidal, the top
-    and bottom, and left and right, edges wrap to each other
+    Grid cells are indexed by [x][y], where [0][0] is assumed to be the
+    bottom-left and [width-1][height-1] is the top-right. If a grid is
+    toroidal, the top and bottom, and left and right, edges wrap to each other
 
     Properties:
         width, height: The grid's width and height.
@@ -57,11 +57,11 @@ class Grid:
             ((x,y) tuples)
 
     """
-    def __init__(self, height, width, torus):
+    def __init__(self, width, height, torus):
         """ Create a new grid.
 
         Args:
-            height, width: The height and width of the grid
+            width, height: The width and height of the grid
             torus: Boolean whether the grid wraps or not.
 
         """
@@ -71,11 +71,11 @@ class Grid:
 
         self.grid = []
 
-        for y in range(self.height):
-            row = []
-            for x in range(self.width):
-                row.append(self.default_val())
-            self.grid.append(row)
+        for x in range(self.width):
+            col = []
+            for y in range(self.height):
+                col.append(self.default_val())
+            self.grid.append(col)
 
     @staticmethod
     def default_val():
@@ -92,9 +92,9 @@ class Grid:
 
     def coord_iter(self):
         """ An iterator that returns coordinates as well as cell contents. """
-        for row in range(self.height):
-            for col in range(self.width):
-                yield self.grid[row][col], col, row  # agent, x, y
+        for row in range(self.width):
+            for col in range(self.height):
+                yield self.grid[row][col], row, col    # agent, x, y
 
     def neighbor_iter(self, pos, moore=True):
         """ Iterate over position neighbors.
@@ -124,10 +124,10 @@ class Grid:
             radius: radius, in cells, of neighborhood to get.
 
         Returns:
-            A list of coordinate tuples representing the neighborhood;
-                With radius 1, at most 9 if
-                Moore, 5 if Von Neumann
-                (8 and 4 if not including the center).
+            A list of coordinate tuples representing the neighborhood. For
+            example with radius 1, it will return list with number of elements
+            equals at most 9 (8) if Moore, 5 (4) if Von Neumann (if not
+            including the center).
 
         """
         x, y = pos
@@ -144,7 +144,7 @@ class Grid:
                     continue
                 # Skip if not a torus and new coords out of bounds.
                 if not self.torus and (not (0 <= dx + x < self.width) or
-                        not (0 <= dy + y < self.height)):
+                                       not (0 <= dy + y < self.height)):
                     continue
 
                 px = self.torus_adj(x + dx, self.width)
@@ -253,7 +253,7 @@ class Grid:
 
         """
         return (
-            self[y][x] for x, y in cell_list if not self.is_cell_empty((x, y)))
+            self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
 
     @accept_tuple_argument
     def get_cell_list_contents(self, cell_list):
@@ -289,32 +289,32 @@ class Grid:
     def _place_agent(self, pos, agent):
         """ Place the agent at the correct location. """
         x, y = pos
-        self.grid[y][x] = agent
+        self.grid[x][y] = agent
 
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
         x, y = pos
-        self.grid[y][x] = None
+        self.grid[x][y] = None
 
     def is_cell_empty(self, pos):
         """ Returns a bool of the contents of a cell. """
         x, y = pos
-        return True if self.grid[y][x] == self.default_val() else False
+        return True if self.grid[x][y] == self.default_val() else False
 
 
 class SingleGrid(Grid):
     """ Grid where each cell contains exactly at most one object. """
     empties = []
 
-    def __init__(self, height, width, torus):
+    def __init__(self, width, height, torus):
         """ Create a new single-item grid.
 
         Args:
-            height, width: The height and width of the grid
+            width, height: The width and width of the grid
             torus: Boolean whether the grid wraps or not.
 
         """
-        super().__init__(height, width, torus)
+        super().__init__(width, height, torus)
         # Add all cells to the empties list.
         self.empties = list(itertools.product(
                             *(range(self.width), range(self.height))))
@@ -400,7 +400,7 @@ class MultiGrid(Grid):
     def _place_agent(self, pos, agent):
         """ Place the agent at the correct location. """
         x, y = pos
-        self.grid[y][x].add(agent)
+        self.grid[x][y].add(agent)
 
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
@@ -418,7 +418,7 @@ class MultiGrid(Grid):
 
         """
         return itertools.chain.from_iterable(
-            self[y][x] for x, y in cell_list if not self.is_cell_empty((x, y)))
+            self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
 
 
 class ContinuousSpace:
@@ -459,7 +459,7 @@ class ContinuousSpace:
         self.cell_width = (self.x_max - self.x_min) / grid_width
         self.cell_height = (self.y_max - self.y_min) / grid_height
 
-        self._grid = MultiGrid(grid_height, grid_width, torus)
+        self._grid = MultiGrid(grid_width, grid_height, torus)
 
     def place_agent(self, agent, pos):
         """ Place a new agent in the space.
@@ -513,7 +513,7 @@ class ContinuousSpace:
         cell_radius = math.ceil(radius / scale)
         cell_pos = self._point_to_cell(pos)
         possible_objs = self._grid.get_neighbors(cell_pos,
-                                              True, True, cell_radius)
+                                                 True, True, cell_radius)
         neighbors = []
         # Iterate over candidates and check actual distance.
         for obj in possible_objs:
