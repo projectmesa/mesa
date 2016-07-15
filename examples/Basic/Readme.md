@@ -13,7 +13,7 @@ Showcases following features:
 #### How to Run
 
 ```
-    $ python shapes_run.py
+    $ python shapes_viz.py
 ```
 
 Then open your browser to [http://127.0.0.1:8889/](http://127.0.0.1:8889/) and
