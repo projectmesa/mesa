@@ -17,6 +17,7 @@ Then you will be able to view the elements in your browser at http://127.0.0.1:8
     server.launch(8887)
 ```
 Under the hood, each visualization module consists of two parts:
+
 1. **Data rending** - Python code which can take a model object and renders it into some data describing the visualization.
 2. **Browser rendering** - JavaScript object which in turn receives data from the Python render (via the ModularServer) and actually draws it in the browser.
 
@@ -119,6 +120,7 @@ Let's take a look at the internals of **TextModule.js**, the  JavaScript for the
 ```
 
 This code is the JavaScript equivalent of defining a class. When instantiated, a TextModule object will create a new paragraph tag and append it to the parent HTML page's *body*. The object will have two methods attached:
+
 1. *render(data)* -- uses JQuery to replace the HTML contents of the paragraph with the text it gets as an input. This function will be called at each step of the model, to draw the data associated with the model coming over the websocket.
 2. *reset* -- replaces the contents of the div with a blank. This function will be called when the user presses the Reset button.
 
