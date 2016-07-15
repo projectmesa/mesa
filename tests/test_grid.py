@@ -2,7 +2,6 @@
 Test the Grid objects.
 '''
 import unittest
-import numpy as np
 
 from mesa.space import Grid, SingleGrid, MultiGrid
 

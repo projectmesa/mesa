@@ -376,9 +376,9 @@ class SingleGrid(Grid):
 class MultiGrid(Grid):
     """ Grid where each cell can contain more than one object.
 
-    Grid cells are indexed by [y][x], where [0][0] is assumed to be -- top-left
-    and [height-1][width-1] is the bottom-right. If a grid is toroidal, the top
-    and bottom, and left and right, edges wrap to each other.
+    Grid cells are indexed by [x][y], where [0][0] is assumed to be at
+    bottom-left and [width-1][height-1] is the top-right. If a grid is
+    toroidal, the top and bottom, and left and right, edges wrap to each other.
 
     Each grid cell holds a set object.
 
@@ -405,7 +405,7 @@ class MultiGrid(Grid):
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
         x, y = pos
-        self.grid[y][x].remove(agent)
+        self.grid[x][y].remove(agent)
 
     @accept_tuple_argument
     def iter_cell_list_contents(self, cell_list):
