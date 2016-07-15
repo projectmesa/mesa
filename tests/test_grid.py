@@ -15,10 +15,10 @@ from mesa.space import Grid, SingleGrid, MultiGrid
 #   0 0 1
 # -------------------
 TEST_GRID = [
-        [0, 1, 0, 1, 0],
-        [0, 0, 1, 1, 0],
-        [1, 1, 0, 0, 0]
-        ]
+    [0, 1, 0, 1, 0],
+    [0, 0, 1, 1, 0],
+    [1, 1, 0, 0, 0]
+    ]
 
 
 class MockAgent:
