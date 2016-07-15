@@ -35,25 +35,24 @@ locations, represented by circles:
 
 */
 
-var GridVisualization = function(height, width, gridHeight, gridWidth, context) {
-	var height = height;
+var GridVisualization = function(width, height, gridWidth, gridHeight, context) {
 	var width = width;
-	var gridHeight = gridHeight;
+	var height = height;
 	var gridWidth = gridWidth;
+	var gridHeight = gridHeight;
 	var context = context;
 
 	// Find cell size:
-	var cellHeight = Math.floor(height / gridHeight);
 	var cellWidth = Math.floor(width / gridWidth);
+	var cellHeight = Math.floor(height / gridHeight);
 
 	var maxR = Math.min(cellHeight, cellWidth)/2 - 1;
-
 
 	this.drawLayer = function(portrayalLayer) {
 		for (var i in portrayalLayer) {
 			var p = portrayalLayer[i];
 			if (p.Shape == "rect")
-				this.drawRectange(p.x, p.y, p.w, p.h, p.Color, p.Filled, p.text, p.text_color);
+				this.drawRectangle(p.x, p.y, p.w, p.h, p.Color, p.Filled, p.text, p.text_color);
 			if (p.Shape == "circle")
 				this.drawCircle(p.x, p.y, p.r, p.Color, p.Filled, p.text, p.text_color);
 		}
@@ -109,7 +108,8 @@ var GridVisualization = function(height, width, gridHeight, gridWidth, context) 
                 text: Inscribed text in rectangle.
                 text_color: Color of the inscribed text.
 	*/
-	this.drawRectange = function(x, y, w, h, color, fill, text, text_color) {
+	this.drawRectangle = function(x, y, w, h, color, fill, text, text_color) {
+		y = gridHeight - y - 1;
 		context.beginPath();
 		var dx = w * cellWidth;
 		var dy = h * cellHeight;
