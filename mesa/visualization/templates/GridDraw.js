@@ -248,7 +248,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
 	};
 
 	this.resetCanvas = function() {
-		context.clearRect(0, 0, height, width);
+		context.clearRect(0, 0, width, height);
 		context.beginPath();
 	};
 
