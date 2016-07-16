@@ -23,7 +23,7 @@ Under the hood, each visualization module consists of two parts:
 
 ## Using Pre-Built Modules
 
-Part of the Mesa library are pre-built modules. Using the built-ins allow you to build a visualization without worrying about the HTML and javascript. Consult the documention for a variety of modules.
+Mesa already comes with some pre-built modules. Using the built-ins allow you to build a visualization without worrying about the HTML and javascript. Consult the documention for a variety of modules.
 
 One built-in module is **CanvasGrid**, which you can use to visualize objects located on grid cells. The CanvasGrid will cover a majority of agent-based models, particularly the simpler ones.
 
