@@ -2,9 +2,6 @@
 
 This directory contains example models meant to test and demonstrate Mesa's features, and provide demonstrations for how to build and analyze agent-based models. For more information on each model, see its own Readme and documentation.
 
-### Basic
-Examples of basic funcionality of Mesa. 
-
 ### Color Patches
 A cellular automaton model where agents opinions are influenced by that of their neighbors. As the model evolves, color patches representing the prevailing opinion in a given area expand, contract, and sometimes disappear.
 
@@ -32,3 +29,6 @@ Completed code to go along with the [tutorial]() on making a simple model of how
 
 ### WolfSheep
 Implementation of an ecological model of predation and reproduction, based on the NetLogo [Wolf Sheep Predation model](http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation).
+
+### Basic
+Example of grid display and direction showing agents in the form of arrow-head shape. 

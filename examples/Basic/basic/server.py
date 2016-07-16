@@ -1,5 +1,5 @@
 import random
-from shapes_model import Walker, ShapesModel
+from basic.model import Walker, ShapesModel
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 
@@ -25,19 +25,19 @@ def agent_draw(agent):
                      }
     return portrayal
 
-def main():
+def launch_basic():
     width = 15
     height = 10
     num_agents = 2
     pixel_ratio = 50
     grid = CanvasGrid(agent_draw, width, height,
             width*pixel_ratio, height*pixel_ratio)
-    server = ModularServer(ShapesModel, [grid], "Shapes Examples",
+    server = ModularServer(ShapesModel, [grid], "Basic Example",
             num_agents, width, height)
     server.max_steps = 0
-    server.port = 8889
+    server.port = 8888
     server.launch()
 
 if __name__ == "__main__":
     random.seed(3)
-    main()
+    launch_basic()
