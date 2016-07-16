@@ -66,7 +66,7 @@ Then, to launch a server with this grid as the only visualization element:
 ```
 ## Sub-Classing Modules
 
-If you want to tweak the internals of an existing visualization module, try subclassing it.
+In some cases, you may want to customize the internals of an existing visualization module. The best way to do this is to create a subclass of it.
 
 For example, the TextElement module provides an HTML template to render raw text, but nothing else. To use it, we need to create our own subclass, which implements a **render** method to get visualization-ready data (in this case, just a text string) out of a model object.
 
@@ -81,6 +81,8 @@ Suppose we want a module which can get an arbitrary variable out of a model, and
 
             Args:
                 attr_name: The name of the attribute to extract from the model.
+
+            Example return: "happy: 10"
             '''
             self.attr_name = attr_name
 
