@@ -71,7 +71,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Mesa'
-copyright = '2015, Project Mesa Team'
+copyright = '2016, Project Mesa Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

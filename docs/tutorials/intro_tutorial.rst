@@ -298,7 +298,7 @@ graphics library) to visualize the data in a histogram.
 
 
 
-.. image:: output_19_1.png
+.. image:: intro_tutorial_files/intro_tutorial_19_1.png
 
 
 If you are running from a text editor or IDE, you'll also need to add
@@ -343,7 +343,7 @@ can do this with a nested for loop:
 
 
 
-.. image:: output_21_1.png
+.. image:: intro_tutorial_files/intro_tutorial_21_1.png
 
 
 This runs 100 instantiations of the model, and runs each for 10 steps.
@@ -572,7 +572,7 @@ grid, giving us each cell's coordinates and contents in turn.
 
 
 
-.. image:: output_32_1.png
+.. image:: intro_tutorial_files/intro_tutorial_32_1.png
 
 
 Collecting Data
@@ -702,7 +702,7 @@ To get the series of Gini coefficients as a pandas DataFrame:
 
 
 
-.. image:: output_38_1.png
+.. image:: intro_tutorial_files/intro_tutorial_38_1.png
 
 
 Similarly, we can get the agent-wealth data:
@@ -778,7 +778,7 @@ example, to get a histogram of agent wealth at the model's end:
 
 
 
-.. image:: output_42_1.png
+.. image:: intro_tutorial_files/intro_tutorial_42_1.png
 
 
 Or to plot the wealth of a given agent (in this example, agent 14):
@@ -798,7 +798,7 @@ Or to plot the wealth of a given agent (in this example, agent 14):
 
 
 
-.. image:: output_44_1.png
+.. image:: intro_tutorial_files/intro_tutorial_44_1.png
 
 
 Batch Run
@@ -897,7 +897,7 @@ DataFrame.
 
 
 
-.. image:: output_52_1.png
+.. image:: intro_tutorial_files/intro_tutorial_52_1.png
 
 
 Notice that each row is a model run, and gives us the parameter values
