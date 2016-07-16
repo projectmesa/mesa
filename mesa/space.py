@@ -55,8 +55,20 @@ class Grid:
         get_neighborhood: Returns the cells surrounding a given cell.
         get_cell_list_contents: Returns the contents of a list of cells
             ((x,y) tuples)
-
+        neighbor_iter: Iterates over position neightbors.
+        coord_iter: Returns coordinates as well as cell contents.
+        place_agent: Positions an agent on the grid, and set its pos variable. 
+        move_agent: Moves an agent from its current position to a new position.
+        iter_neighborhood: Returns an iterator over cell coordinates that are in the
+        neighborhood of a certain point.
+        torus_adj: Converts coordinate, handles torus looping.
+        out_of_bounds: Determines whether position is off the grid, returns the out of bounds coordinate.
+        iter_cell_list_contents: Returns an iterator of the contents of the cells identified in cell_list.
+        get_cell_list_contents: Returns a list of the contents of the cells identified in cell_list.
+        remove_agent: Removes an agent from the grid.
+        is_cell_empty: Returns a bool of the contents of a cell. 
     """
+
     def __init__(self, height, width, torus):
         """ Create a new grid.
 
@@ -238,7 +250,7 @@ class Grid:
         return coord
 
     def out_of_bounds(self, pos):
-        """ Is pos off the grid? """
+        """ Determines whether position is off the grid, returns the out of bounds coordinate."""
         x, y = pos
         return x < 0 or x >= self.width or y < 0 or y >= self.height
 
@@ -249,7 +261,7 @@ class Grid:
             cell_list: Array-like of (x, y) tuples, or single tuple.
 
         Returns:
-            A iterator of the contents of the cells identified in cell_list
+            An iterator of the contents of the cells identified in cell_list
 
         """
         return (
