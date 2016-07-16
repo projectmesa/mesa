@@ -291,14 +291,14 @@ graphics library) to visualize the data in a histogram.
 
 .. parsed-literal::
 
-    (array([ 4.,  0.,  0.,  3.,  0.,  0.,  2.,  0.,  0.,  1.]),
-     array([ 0. ,  0.3,  0.6,  0.9,  1.2,  1.5,  1.8,  2.1,  2.4,  2.7,  3. ]),
+    (array([ 4.,  0.,  0.,  0.,  0.,  2.,  0.,  0.,  0.,  4.]),
+     array([ 0. ,  0.2,  0.4,  0.6,  0.8,  1. ,  1.2,  1.4,  1.6,  1.8,  2. ]),
      <a list of 10 Patch objects>)
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_19_1.png
+.. image:: output_19_1.png
 
 
 If you are running from a text editor or IDE, you'll also need to add
@@ -336,14 +336,14 @@ can do this with a nested for loop:
 
 .. parsed-literal::
 
-    (array([ 423.,  313.,  157.,   68.,   27.,   12.]),
-     array([0, 1, 2, 3, 4, 5, 6]),
-     <a list of 6 Patch objects>)
+    (array([ 437.,  303.,  144.,   75.,   28.,    9.,    4.]),
+     array([0, 1, 2, 3, 4, 5, 6, 7]),
+     <a list of 7 Patch objects>)
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_21_1.png
+.. image:: output_21_1.png
 
 
 This runs 100 instantiations of the model, and runs each for 10 steps.
@@ -567,12 +567,12 @@ grid, giving us each cell's coordinates and contents in turn.
 
 .. parsed-literal::
 
-    <matplotlib.colorbar.Colorbar at 0x7ff6c7096ef0>
+    <matplotlib.colorbar.Colorbar at 0x10fb446a0>
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_32_1.png
+.. image:: output_32_1.png
 
 
 Collecting Data
@@ -697,12 +697,12 @@ To get the series of Gini coefficients as a pandas DataFrame:
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7ff6c71218d0>
+    <matplotlib.axes._subplots.AxesSubplot at 0x10fa4b278>
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_38_1.png
+.. image:: output_38_1.png
 
 
 Similarly, we can get the agent-wealth data:
@@ -773,12 +773,12 @@ example, to get a histogram of agent wealth at the model's end:
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7ff6bfa98fd0>
+    <matplotlib.axes._subplots.AxesSubplot at 0x10fa5a978>
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_42_1.png
+.. image:: output_42_1.png
 
 
 Or to plot the wealth of a given agent (in this example, agent 14):
@@ -793,12 +793,12 @@ Or to plot the wealth of a given agent (in this example, agent 14):
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x7ff6bfa459e8>
+    <matplotlib.axes._subplots.AxesSubplot at 0x10f311438>
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_44_1.png
+.. image:: output_44_1.png
 
 
 Batch Run
@@ -814,6 +814,38 @@ automates it for you.
 .. code:: python
 
     from mesa.batchrunner import BatchRunner
+
+The BatchRunner also requires an additional variable running for the
+MoneyModel class. This variable enables conditional shut off of the
+model once a condition is met. In this example it will be set as True
+indefinitely.
+
+.. code:: python
+
+    class MoneyModel(Model):
+        """A model with some number of agents."""
+        def __init__(self, N, width, height):
+            self.num_agents = N
+            self.grid = MultiGrid(height, width, True)
+            self.schedule = RandomActivation(self)
+            self.running = True
+            
+            # Create agents
+            for i in range(self.num_agents):
+                a = MoneyAgent(i)
+                self.schedule.add(a)
+                # Add the agent to a random grid cell
+                x = random.randrange(self.grid.width)
+                y = random.randrange(self.grid.height)
+                self.grid.place_agent(a, (x, y))
+            
+            self.datacollector = DataCollector(
+                model_reporters={"Gini": compute_gini},
+                agent_reporters={"Wealth": lambda a: a.wealth})
+    
+        def step(self):
+            self.datacollector.collect(self)
+            self.schedule.step()
 
 We instantiate a BatchRunner with a model class to run, and a dictionary
 mapping parameters to values for them to take. If any of these
@@ -860,12 +892,12 @@ DataFrame.
 
 .. parsed-literal::
 
-    <matplotlib.collections.PathCollection at 0x7ff6bcb3bb38>
+    <matplotlib.collections.PathCollection at 0x114ab80f0>
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_50_1.png
+.. image:: output_52_1.png
 
 
 Notice that each row is a model run, and gives us the parameter values
