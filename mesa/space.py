@@ -57,7 +57,7 @@ class Grid:
             ((x,y) tuples)
         neighbor_iter: Iterates over position neightbors.
         coord_iter: Returns coordinates as well as cell contents.
-        place_agent: Positions an agent on the grid, and set its pos variable. 
+        place_agent: Positions an agent on the grid, and set its pos variable.
         move_agent: Moves an agent from its current position to a new position.
         iter_neighborhood: Returns an iterator over cell coordinates that are in the
         neighborhood of a certain point.
@@ -66,9 +66,9 @@ class Grid:
         iter_cell_list_contents: Returns an iterator of the contents of the cells identified in cell_list.
         get_cell_list_contents: Returns a list of the contents of the cells identified in cell_list.
         remove_agent: Removes an agent from the grid.
-        is_cell_empty: Returns a bool of the contents of a cell. 
-    """
+        is_cell_empty: Returns a bool of the contents of a cell.
 
+    """
     def __init__(self, height, width, torus):
         """ Create a new grid.
 
