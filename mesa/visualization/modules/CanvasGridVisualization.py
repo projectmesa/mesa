@@ -52,26 +52,26 @@ class CanvasGrid(VisualizationElement):
     """
     package_includes = ["GridDraw.js", "CanvasModule.js"]
     portrayal_method = None  # Portrayal function
-    canvas_height = 500
     canvas_width = 500
+    canvas_height = 500
 
-    def __init__(self, portrayal_method, grid_height, grid_width,
-                 canvas_height=500, canvas_width=500):
+    def __init__(self, portrayal_method, grid_width, grid_height,
+                 canvas_width=500, canvas_height=500):
         """ Instantiate a new CanvasGrid.
 
         Args:
             portrayal_method: function to convert each object on the grid to
                               a portrayal, as described above.
-            grid_height, grid_width: Size of the grid, in cells.
+            grid_width, grid_height: Size of the grid, in cells.
             canvas_height, canvas_width: Size of the canvas to draw in the
                                          client, in pixels. (default: 500x500)
 
         """
         self.portrayal_method = portrayal_method
-        self.grid_height = grid_height
         self.grid_width = grid_width
-        self.canvas_height = canvas_height
+        self.grid_height = grid_height
         self.canvas_width = canvas_width
+        self.canvas_height = canvas_height
 
         new_element = ("new CanvasModule({}, {}, {}, {})"
             .format(self.canvas_width, self.canvas_height,
@@ -81,8 +81,8 @@ class CanvasGrid(VisualizationElement):
 
     def render(self, model):
         grid_state = defaultdict(list)
-        for y in range(model.grid.height):
-            for x in range(model.grid.width):
+        for x in range(model.grid.width):
+            for y in range(model.grid.height):
                 cell_objects = model.grid.get_cell_list_contents([(x, y)])
                 for obj in cell_objects:
                     portrayal = self.portrayal_method(obj)

@@ -142,7 +142,7 @@ class StagedActivation(BaseScheduler):
     stage_time = 1
 
     def __init__(self, model, stage_list=["step"], shuffle=False,
-            shuffle_between_stages=False):
+                 shuffle_between_stages=False):
         """ Create an empty Staged Activation schedule.
 
         Args:
