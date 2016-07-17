@@ -28,15 +28,21 @@ Mesa already comes with some pre-built modules. Using the built-ins allow you to
 One built-in module is **CanvasGrid**, which you can use to visualize objects located on grid cells. The CanvasGrid will cover a majority of agent-based models, particularly the simpler ones.
 
 CanvasGrid iterates over every object in every cell of your model's grid (it assumes that your model has a grid named **grid**) and converts it into a dictionary which defines how it will be drawn. It does this via a **portrayal_method**: a function which the user defines, which takes an object as an input and outputs a dictionary with the following keys:
-    "Shape": Can be either "circle" or "rect"
+    "Shape": Can be "circle", "rect" or "arrowHead"
         For Circles:
             "r": The radius, defined as a fraction of cell size. r=1 will fill the entire cell.
         For rectangles:
             "w", "h": The width and height of the rectangle, which are in fractions of cell width and height.
+        For arrowHead:
+            "scale": Proportion scaling as a fraction of cell size. shape=0.5 will fit the arrowHead into half of the cell.
+            "heading0": represents x direction unit vector.
+            "heading1": represents y direction unit vector.
     "Color": The color to draw the shape in; needs to be a valid HTML color, e.g."Red" or "#AA08F8"
     "Filled": either "true" or "false", and determines whether the shape is filled or not.
     "Layer": Layer number of 0 or above; higher-numbered layers are drawn above lower-numbered layers.
-    (Shapes also have "x" and "x" coordinates, for the x and y of the grid cell in which it is, but CanvasGrid adds those automatically).
+    "text": Text to overlay on top of the shape. Normally, agent's unique_id is used .
+    "text_color": Color of the text overlay.
+    (Shapes also have "x" and "y" coordinates, for the x and y of the grid cell in which it is, but CanvasGrid adds those automatically).
 
 For example, suppose for a Schelling model, we want to draw all agents as circles; red ones for the majority (agent type=0), and blue ones for the minority (agent type=1). The function to do this might look like this:
 
@@ -150,6 +156,3 @@ Data to visualize arrive over the websocket as a list. For each index of the lis
 Currently, module JavaScript files live in the *mesa/visualization/templates* directory, and the Python files live in *mesa/visualization/modules*.
 
 When creating a new module, the Python and JavaScript code need to be written in synch: the module Python-side **render** method needs to output data in the exact same format that the JavaScript **render** function receives as an input.
-
-
-
