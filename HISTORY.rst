@@ -6,8 +6,27 @@ Release History
 Next release
 ++++++++++++++++++
 
-* Fix link to intro tutorial. #267
+Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
+
+**Feature adds**
+* Feature adds
+* Add new shapes & direction indication in CanvasGrid #285
 * Provides support for text overlay on Circle and Rectangle shapes. #265
+
+**Improvements**
+* Fixes Parameters of CanvasGrid(): row, col, height, width inverted #285
+* Fixes 'coordinates on grid are used inconsistently throughout the code' #285
+* Moves Agent and Model class outside of  __init__.py #285
+* Minor pep updates to boltzmann. #269
+* Fix link to intro tutorial. #267
+* Updating template text visualization/ModularVisualization.md #273
+* Update intro_notebook and documents to include self.running = True in MoneyModel #275
+* Update .rst file location to make sure ReadTheDocs works correctly #276
+* Remove Mock code causing recursion and preventing build of docs. #281
+* MultiGrid docstring missing methods #282
+* No Docstring for model.grid.get_cell_list_contents #282
+* Refactor forest fire example #223 #288
+* Updating kernel version on forest fire model. #290
 
 
 0.7.5 (2016-06-20)
