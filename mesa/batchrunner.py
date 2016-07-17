@@ -12,7 +12,7 @@ import pandas as pd
 
 class BatchRunner:
     """ This class is instantiated with a model class, and model parameters
-    associated with one or more values. It is also instantiated with model- and
+    associated with one or more values. It is also instantiated with model and
     agent-level reporters, dictionaries mapping a variable name to a function
     which collects some data from the model or its agents at the end of the run
     and stores it.
@@ -34,11 +34,11 @@ class BatchRunner:
                     {"param_1": range(5),
                      "param_2": [1, 5, 10],
                       "const_param": 100}
-            iterations: How many times to run the model at each combination of
-                parameters.
-            max_steps: After how many steps to halt each run if it hasn't
-                halted on its own.
-            model_reporters: Dictionary of variables to collect on each run at
+            iterations: The total number of times to run the model for each 
+                combination of parameters.
+            max_steps: The upper limit of steps above which each run will be 
+                halted if it hasn't halted on its own.
+            model_reporters: The dictionary of variables to collect on each run at
                 the end, with variable names mapped to a function to collect
                 them. For example:
                     {"agent_count": lambda m: m.schedule.get_agent_count()}
@@ -111,8 +111,7 @@ class BatchRunner:
         return agent_vars
 
     def get_model_vars_dataframe(self):
-        """ Generate a pandas DataFrame from the model-level collected
-        variables.
+        """ Generate a pandas DataFrame from the model-level variables collected.
 
         """
         index_col_names = list(self.parameter_values.keys())
