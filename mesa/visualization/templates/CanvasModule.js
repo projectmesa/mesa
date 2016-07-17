@@ -11,7 +11,7 @@ var CanvasModule = function(canvas_width, canvas_height, grid_width, grid_height
 
 	// Create the context and the drawing controller:
 	var context = canvas.getContext("2d");
-	var canvasDraw = new GridVisualization(canvas_width, canvas_height, grid_height, grid_width, context);
+	var canvasDraw = new GridVisualization(canvas_width, canvas_height, grid_width, grid_height, context);
 
 	this.render = function(data) {
 		canvasDraw.resetCanvas();

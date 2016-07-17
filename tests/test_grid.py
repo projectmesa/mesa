@@ -6,10 +6,19 @@ import unittest
 from mesa.space import Grid, SingleGrid, MultiGrid
 
 # Initial agent positions for testing
-#              X ---- >
-TEST_GRID = [[0, 1, 0, 1, 0],   # Y
-             [0, 1, 1, 0, 0],   # |
-             [0, 0, 0, 1, 0]]   # V
+#
+# --- visual aid ----
+#   0 0 0
+#   1 1 0
+#   0 1 0
+#   1 0 1
+#   0 0 1
+# -------------------
+TEST_GRID = [
+    [0, 1, 0, 1, 0],
+    [0, 0, 1, 1, 0],
+    [1, 1, 0, 0, 0]
+    ]
 
 
 class MockAgent:
@@ -32,12 +41,14 @@ class TestBaseGrid(unittest.TestCase):
         '''
         Create a test non-toroidal grid and populate it with Mock Agents
         '''
-        self.grid = Grid(3, 5, self.torus)
+        width = 3    # width of grid
+        height = 5    # height of grid
+        self.grid = Grid(width, height, self.torus)
         self.agents = []
         counter = 0
-        for y in range(3):
-            for x in range(5):
-                if TEST_GRID[y][x] == 0:
+        for x in range(width):
+            for y in range(height):
+                if TEST_GRID[x][y] == 0:
                     continue
                 counter += 1
                 # Create and place the mock agent
@@ -51,7 +62,7 @@ class TestBaseGrid(unittest.TestCase):
         '''
         for agent in self.agents:
             x, y = agent.pos
-            assert self.grid[y][x] == agent
+            assert self.grid[x][y] == agent
 
     def test_cell_agent_reporting(self):
         '''
@@ -98,7 +109,10 @@ class TestBaseGrid(unittest.TestCase):
         neighborhood = self.grid.get_neighborhood((1, 1), moore=True)
         assert len(neighborhood) == 8
 
-        neighborhood = self.grid.get_neighborhood((4, 1), moore=True)
+        neighborhood = self.grid.get_neighborhood((1, 4), moore=False)
+        assert len(neighborhood) == 3
+
+        neighborhood = self.grid.get_neighborhood((1, 4), moore=True)
         assert len(neighborhood) == 5
 
         neighborhood = self.grid.get_neighborhood((0, 0), moore=False)
@@ -108,14 +122,14 @@ class TestBaseGrid(unittest.TestCase):
         assert len(neighbors) == 0
 
         neighbors = self.grid.get_neighbors((4, 1), moore=True)
-        assert len(neighbors) == 2
+        assert len(neighbors) == 0
 
         neighbors = self.grid.get_neighbors((1, 1), moore=False,
                                             include_center=True)
         assert len(neighbors) == 3
 
-        neighbors = self.grid.get_neighbors((3, 1), moore=False, radius=2)
-        assert len(neighbors) == 4
+        neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
+        assert len(neighbors) == 2
 
     def test_coord_iter(self):
         ci = self.grid.coord_iter()
@@ -129,9 +143,9 @@ class TestBaseGrid(unittest.TestCase):
         # first agent in the second space
         second = next(ci)
         assert second[0].unique_id == 1
-        assert second[0].pos == (1, 0)
-        assert second[1] == 1
-        assert second[2] == 0
+        assert second[0].pos == (0, 1)
+        assert second[1] == 0
+        assert second[2] == 1
 
 
 class TestBaseGridTorus(TestBaseGrid):
@@ -149,24 +163,24 @@ class TestBaseGridTorus(TestBaseGrid):
         neighborhood = self.grid.get_neighborhood((1, 1), moore=True)
         assert len(neighborhood) == 8
 
-        neighborhood = self.grid.get_neighborhood((4, 1), moore=True)
+        neighborhood = self.grid.get_neighborhood((1, 4), moore=True)
         assert len(neighborhood) == 8
 
         neighborhood = self.grid.get_neighborhood((0, 0), moore=False)
         assert len(neighborhood) == 4
 
-        neighbors = self.grid.get_neighbors((4, 1), moore=False)
-        assert len(neighbors) == 0
+        neighbors = self.grid.get_neighbors((1, 4), moore=False)
+        assert len(neighbors) == 1
 
-        neighbors = self.grid.get_neighbors((4, 1), moore=True)
-        assert len(neighbors) == 2
+        neighbors = self.grid.get_neighbors((1, 4), moore=True)
+        assert len(neighbors) == 3
 
         neighbors = self.grid.get_neighbors((1, 1), moore=False,
                                             include_center=True)
         assert len(neighbors) == 3
 
-        neighbors = self.grid.get_neighbors((3, 1), moore=False, radius=2)
-        assert len(neighbors) == 4
+        neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
+        assert len(neighbors) == 2
 
 
 class TestSingleGrid(unittest.TestCase):
@@ -181,12 +195,14 @@ class TestSingleGrid(unittest.TestCase):
         '''
         Create a test non-toroidal grid and populate it with Mock Agents
         '''
-        self.grid = SingleGrid(3, 5, True)
+        width = 3
+        height = 5
+        self.grid = SingleGrid(width, height, True)
         self.agents = []
         counter = 0
-        for y in range(3):
-            for x in range(5):
-                if TEST_GRID[y][x] == 0:
+        for x in range(width):
+            for y in range(height):
+                if TEST_GRID[x][y] == 0:
                     continue
                 counter += 1
                 # Create and place the mock agent
@@ -199,21 +215,23 @@ class TestSingleGrid(unittest.TestCase):
         Test the SingleGrid empty count and enforcement.
         '''
 
-        assert len(self.grid.empties) == 10
+        assert len(self.grid.empties) == 9
         a = MockAgent(100, None)
         with self.assertRaises(Exception):
-            self.grid._place_agent((1, 0), a)
+            self.grid._place_agent((0, 1), a)
 
         # Place the agent in an empty cell
         self.grid.position_agent(a)
+        # Test whether after placing, the empty cells are reduced by 1
         assert a.pos not in self.grid.empties
-        assert len(self.grid.empties) == 9
+        assert len(self.grid.empties) == 8
         for i in range(10):
             self.grid.move_to_empty(a)
-        assert len(self.grid.empties) == 9
+        assert len(self.grid.empties) == 8
 
         # Place agents until the grid is full
-        for i in range(9):
+        empty_cells = len(self.grid.empties)
+        for i in range(empty_cells):
             a = MockAgent(101 + i, None)
             self.grid.position_agent(a)
         assert len(self.grid.empties) == 0
@@ -224,7 +242,17 @@ class TestSingleGrid(unittest.TestCase):
         with self.assertRaises(Exception):
             self.move_to_empty(self.agents[0])
 
+
 # Number of agents at each position for testing
+# Initial agent positions for testing
+#
+# --- visual aid ----
+#   0 0 0
+#   2 0 3
+#   0 5 0
+#   1 1 0
+#   0 0 0
+# -------------------
 TEST_MULTIGRID = [[0, 1, 0, 2, 0],
                   [0, 1, 5, 0, 0],
                   [0, 0, 0, 3, 0]]
@@ -241,12 +269,14 @@ class TestMultiGrid(unittest.TestCase):
         '''
         Create a test non-toroidal grid and populate it with Mock Agents
         '''
-        self.grid = MultiGrid(3, 5, self.torus)
+        width = 3
+        height = 5
+        self.grid = MultiGrid(width, height, self.torus)
         self.agents = []
         counter = 0
-        for y in range(3):
-            for x in range(5):
-                for i in range(TEST_MULTIGRID[y][x]):
+        for x in range(width):
+            for y in range(height):
+                for i in range(TEST_MULTIGRID[x][y]):
                     counter += 1
                     # Create and place the mock agent
                     a = MockAgent(counter, None)
@@ -259,7 +289,7 @@ class TestMultiGrid(unittest.TestCase):
         '''
         for agent in self.agents:
             x, y = agent.pos
-            assert agent in self.grid[y][x]
+            assert agent in self.grid[x][y]
 
     def test_neighbors(self):
         '''
@@ -269,21 +299,21 @@ class TestMultiGrid(unittest.TestCase):
         neighborhood = self.grid.get_neighborhood((1, 1), moore=True)
         assert len(neighborhood) == 8
 
-        neighborhood = self.grid.get_neighborhood((4, 1), moore=True)
+        neighborhood = self.grid.get_neighborhood((1, 4), moore=True)
         assert len(neighborhood) == 8
 
         neighborhood = self.grid.get_neighborhood((0, 0), moore=False)
         assert len(neighborhood) == 4
 
-        neighbors = self.grid.get_neighbors((4, 1), moore=False)
+        neighbors = self.grid.get_neighbors((1, 4), moore=False)
         assert len(neighbors) == 0
 
-        neighbors = self.grid.get_neighbors((4, 1), moore=True)
+        neighbors = self.grid.get_neighbors((1, 4), moore=True)
         assert len(neighbors) == 5
 
         neighbors = self.grid.get_neighbors((1, 1), moore=False,
                                             include_center=True)
         assert len(neighbors) == 7
 
-        neighbors = self.grid.get_neighbors((3, 1), moore=False, radius=2)
+        neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
         assert len(neighbors) == 11
