@@ -1,59 +1,24 @@
 import random
 
-from mesa import Model, Agent
-from mesa.time import RandomActivation
-from mesa.space import Grid
+from examples.ForestFire.forest_fire.agent import TreeCell
+from mesa import Model
 from mesa.datacollection import DataCollector
-
-
-class TreeCell(Agent):
-    '''
-    A tree cell.
-
-    Attributes:
-        x, y: Grid coordinates
-        condition: Can be "Fine", "On Fire", or "Burned Out"
-        unique_id: (x,y) tuple.
-
-    unique_id isn't strictly necessary here, but it's good
-    practice to give one to each agent anyway.
-    '''
-    def __init__(self, pos):
-        '''
-        Create a new tree.
-        Args:
-            pos: The tree's coordinates on the grid.
-        '''
-        self.pos = pos
-        self.unique_id = pos
-        self.condition = "Fine"
-
-    def step(self, model):
-        '''
-        If the tree is on fire, spread it to fine trees nearby.
-        '''
-        if self.condition == "On Fire":
-            for neighbor in model.grid.neighbor_iter(self.pos):
-                if neighbor.condition == "Fine":
-                    neighbor.condition = "On Fire"
-            self.condition = "Burned Out"
-
-    def get_pos(self):
-        return self.pos
+from mesa.space import Grid
+from mesa.time import RandomActivation
 
 
 class ForestFire(Model):
-    '''
+    """
     Simple Forest Fire model.
-    '''
+    """
     def __init__(self, height, width, density):
-        '''
+        """
         Create a new forest fire model.
 
         Args:
             height, width: The size of the grid to model
             density: What fraction of grid cells have a tree in them.
-        '''
+        """
         # Initialize model parameters
         self.height = height
         self.width = width
@@ -81,9 +46,9 @@ class ForestFire(Model):
         self.running = True
 
     def step(self):
-        '''
+        """
         Advance the model by one step.
-        '''
+        """
         self.schedule.step()
         self.datacollector.collect(self)
 
@@ -93,9 +58,9 @@ class ForestFire(Model):
 
     @staticmethod
     def count_type(model, tree_condition):
-        '''
+        """
         Helper method to count trees in a given condition in a given model.
-        '''
+        """
         count = 0
         for tree in model.schedule.agents:
             if tree.condition == tree_condition:
