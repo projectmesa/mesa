@@ -34,10 +34,10 @@ class BatchRunner:
                     {"param_1": range(5),
                      "param_2": [1, 5, 10],
                       "const_param": 100}
-            iterations: The total number of times to run the model for each 
+            iterations: The total number of times to run the model for each
                 combination of parameters.
-            max_steps: The upper limit of steps above which each run will be 
-                halted if it hasn't halted on its own.
+            max_steps: The upper limit of steps above which each run will be halted
+                if it hasn't halted on its own.
             model_reporters: The dictionary of variables to collect on each run at
                 the end, with variable names mapped to a function to collect
                 them. For example:
