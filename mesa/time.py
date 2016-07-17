@@ -8,7 +8,7 @@ contains Schedulers, which handle agent activation. A Scheduler is an object
 which controls when agents are called upon to act, and when.
 
 The activation order can have a serious impact on model behavior, so it's
-important to specify it explicity. Example simple activation regimes include
+important to specify it explicitly. Example simple activation regimes include
 activating all agents in the same order every step, shuffling the activation
 order every time, activating each agent *on average* once per step, and more.
 
@@ -162,7 +162,7 @@ class StagedActivation(BaseScheduler):
         self.stage_time = 1 / len(self.stage_list)
 
     def step(self):
-        """ Executes all the stages of all agents. """
+        """ Executes all the stages for all agents. """
         if self.shuffle:
             random.shuffle(self.agents)
         for stage in self.stage_list:
