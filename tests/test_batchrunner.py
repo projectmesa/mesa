@@ -61,7 +61,7 @@ class TestBatchRunner(unittest.TestCase):
         self.params = {
             'model_param': range(3),
             'agent_param': [1, 8],
-            }
+        }
         self.iterations = 17
         self.batch = BatchRunner(
             MockModel,

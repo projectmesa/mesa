@@ -5,7 +5,8 @@ Test the advanced schedulers.
 from unittest import TestCase
 from unittest.mock import patch
 from mesa import Model, Agent
-from mesa.time import BaseScheduler, StagedActivation, RandomActivation, SimultaneousActivation
+from mesa.time import (BaseScheduler, StagedActivation, RandomActivation,
+                       SimultaneousActivation)
 
 RANDOM = 'random'
 STAGED = 'staged'
@@ -37,13 +38,14 @@ class MockModel(Model):
         Creates a Model instance with a schedule
 
         Args:
-            shuffle (Bool): whether or not to instantiate a scheduler with
-                            shuffling.
-                            This option is only used for StagedActivation schedulers.
+            shuffle (Bool): whether or not to instantiate a scheduler
+                            with shuffling.
+                            This option is only used for
+                            StagedActivation schedulers.
 
             activation (str): which kind of scheduler to use.
-                              'random' will create a RandomActivation scheduler.
-                              'staged' will create a StagedActivation scheduler.
+                              'random' creates a RandomActivation scheduler.
+                              'staged' creates a StagedActivation scheduler.
                               The default scheduler is a BaseScheduler.
         '''
         self.log = []
@@ -51,7 +53,8 @@ class MockModel(Model):
         # Make scheduler
         if activation == STAGED:
             model_stages = ["stage_one", "stage_two"]
-            self.schedule = StagedActivation(self, model_stages, shuffle=shuffle)
+            self.schedule = StagedActivation(self, model_stages,
+                                             shuffle=shuffle)
         elif activation == RANDOM:
             self.schedule = RandomActivation(self)
         elif activation == SIMULTANEOUS:

@@ -13,14 +13,17 @@ Updating docs can be confusing. Here are the basic setups.
 1. Change to the appropriate directory (usually docs/tutorials)
   * ```cd tutorials```
 1. Create rST files using nbconvert
-  * ```juypter nbconvert --to rST *.ipynb```
-  * **note** This requires jupyter, all its dependencies and pandoc be installed.
+  * ```jupyter nbconvert --to rST *.ipynb```
+  * **Requires**
+    * jupyter: `pip install jupyter`
+    * [pandoc](http://pandoc.org/installing.html)
 
 #####Submit a pull request with updates
 1. Create branch (either via branching or fork of repo) -- try to use a descriptive name.
  * ```git checkout -b doc-updates```
 1. Update the docs. Save.
 1. Build the docs, from the inside of the docs folder.
+ * **Requires** sphinx: `pip install sphinx`
  * ```make html```
 1. Commit the changes. If there are new files, you will have to explicit add them.
  * ```git commit -am "Updating docs."```
