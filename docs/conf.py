@@ -17,19 +17,6 @@ import sys
 import os
 
 
-# Adding mock imports to see if this builds
-from unittest.mock import MagicMock
-
-class Mock(MagicMock):
-    @classmethod
-    def __getattr__(cls, name):
-            return Mock()
-
-MOCK_MODULES = ['numpy', 'pandas']
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
-# End of mock
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -71,7 +58,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Mesa'
-copyright = '2015, Project Mesa Team'
+copyright = '2016, Project Mesa Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
