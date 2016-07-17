@@ -10,13 +10,13 @@ Replication of the model found in NetLogo:
 '''
 
 import random
-from collections import defaultdict
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 
 from wolf_sheep.agents import Sheep, Wolf, GrassPatch
 from wolf_sheep.schedule import RandomActivationByBreed
+
 
 class WolfSheepPredation(Model):
     '''
@@ -38,7 +38,7 @@ class WolfSheepPredation(Model):
     grass_regrowth_time = 30
     sheep_gain_from_food = 4
 
-    verbose = False # Print-monitoring
+    verbose = False  # Print-monitoring
 
     def __init__(self, height=20, width=20,
                  initial_sheep=100, initial_wolves=50,
@@ -76,7 +76,7 @@ class WolfSheepPredation(Model):
         self.grid = MultiGrid(self.height, self.width, torus=True)
         self.datacollector = DataCollector(
             {"Wolves": lambda m: m.schedule.get_breed_count(Wolf),
-            "Sheep": lambda m: m.schedule.get_breed_count(Sheep)})
+             "Sheep": lambda m: m.schedule.get_breed_count(Sheep)})
 
         # Create sheep:
         for i in range(self.initial_sheep):
@@ -118,24 +118,23 @@ class WolfSheepPredation(Model):
         self.datacollector.collect(self)
         if self.verbose:
             print([self.schedule.time,
-                self.schedule.get_breed_count(Wolf),
-                self.schedule.get_breed_count(Sheep)])
+                   self.schedule.get_breed_count(Wolf),
+                   self.schedule.get_breed_count(Sheep)])
 
     def run_model(self, step_count=200):
 
         if self.verbose:
-            print('Initial number wolves: ', 
-                self.schedule.get_breed_count(Wolf))
-            print('Initial number sheep: ', 
-                self.schedule.get_breed_count(Sheep))
+            print('Initial number wolves: ',
+                  self.schedule.get_breed_count(Wolf))
+            print('Initial number sheep: ',
+                  self.schedule.get_breed_count(Sheep))
 
         for i in range(step_count):
             self.step()
 
         if self.verbose:
             print('')
-            print('Final number wolves: ', 
-                self.schedule.get_breed_count(Wolf))
+            print('Final number wolves: ',
+                  self.schedule.get_breed_count(Wolf))
             print('Final number sheep: ',
-                self.schedule.get_breed_count(Sheep))
-
+                  self.schedule.get_breed_count(Sheep))

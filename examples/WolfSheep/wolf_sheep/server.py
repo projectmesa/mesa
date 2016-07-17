@@ -21,8 +21,7 @@ def wolf_sheep_portrayal(agent):
         portrayal["r"] = 0.5
         portrayal["Layer"] = 2
         portrayal["text"] = round(agent.energy, 1)
-        portrayal["text_color"] = "Yellow" 
-        
+        portrayal["text_color"] = "Yellow"
 
     elif type(agent) is GrassPatch:
         if agent.fully_grown:
@@ -34,13 +33,12 @@ def wolf_sheep_portrayal(agent):
         portrayal["w"] = 1
         portrayal["h"] = 1
 
-
     return portrayal
 
 canvas_element = CanvasGrid(wolf_sheep_portrayal, 20, 20, 500, 500)
 chart_element = ChartModule([{"Label": "Wolves", "Color": "#AA0000"},
-    {"Label": "Sheep", "Color": "#666666"}])
+                             {"Label": "Sheep", "Color": "#666666"}])
 
 server = ModularServer(WolfSheepPredation, [canvas_element, chart_element],
-                      "WolfSheep", grass=True)
-#server.launch()
+                       "WolfSheep", grass=True)
+# server.launch()

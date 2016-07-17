@@ -47,16 +47,15 @@ class ColorCell(Agent):
         A choice is made at random in case of a tie
         The next state is stored until all cells have been polled
         '''
-        neighbors_opinion = Counter(n.get_state() \
-                            for n in model.grid.neighbor_iter((self._col, self._row), True))
-        polled_opinions = neighbors_opinion.most_common()  #a tuple (attribute, occurrences)
+        neighbors_opinion = Counter(n.get_state() for n in
+                                    model.grid.neighbor_iter((self._col, self._row), True))
+        polled_opinions = neighbors_opinion.most_common()  # a tuple (attribute, occurrences)
         tied_opinions = []
         for neighbor in polled_opinions:
             if neighbor[1] == polled_opinions[0][1]:
                 tied_opinions.append(neighbor)
 
         self._next_state = random.choice(tied_opinions)[0]
-
 
     # model argument is unused
     def advance(self, model):
@@ -97,8 +96,6 @@ class ColorPatchModel(Model):
         Advance the model one step.
         '''
         self._schedule.step()
-
-
 
     # the following is a temporary fix for the framework classes accessing model
     # attributes directly
