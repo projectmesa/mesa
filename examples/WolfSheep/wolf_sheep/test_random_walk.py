@@ -5,7 +5,7 @@ agents.
 
 import random
 
-from mesa import Model, Agent
+from mesa import Model
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.visualization.TextVisualization import TextVisualization, TextGrid
@@ -69,7 +69,7 @@ class WalkerWorldViz(TextVisualization):
             model: An instance of a WalkerWorld model.
         '''
         self.model = model
-        grid_viz = TextGrid(self.model.grid, None) 
+        grid_viz = TextGrid(self.model.grid, None)
         grid_viz.converter = lambda x: str(len(x))
         self.elements = [grid_viz]
 

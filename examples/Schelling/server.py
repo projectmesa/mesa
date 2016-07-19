@@ -1,7 +1,8 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
-from mesa.visualization.TextVisualization import (TextData, TextGrid,
-    TextVisualization)
+from mesa.visualization.TextVisualization import (
+    TextData, TextGrid, TextVisualization
+)
 
 from model import SchellingModel
 

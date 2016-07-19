@@ -33,7 +33,7 @@ def launch_basic():
     num_agents = 2
     pixel_ratio = 50
     grid = CanvasGrid(agent_draw, width, height,
-                      width*pixel_ratio, height*pixel_ratio)
+                      width * pixel_ratio, height * pixel_ratio)
     server = ModularServer(ShapesModel, [grid], "Basic Example",
                            num_agents, width, height)
     server.max_steps = 0

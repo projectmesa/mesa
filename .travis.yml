@@ -14,7 +14,7 @@ install:
 script:
   # * E501 - line length limit
   # * E123 - indentation on data structures
-  - flake8 . --ignore=F403,E501,E123,E128 --exclude=docs,examples,build
+  - flake8 . --ignore=F403,E501,E123,E128 --exclude=docs,build
   - nosetests --with-coverage --cover-package=mesa
 after_success:
   - coveralls

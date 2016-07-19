@@ -17,7 +17,7 @@ class Boid(Agent):
     any other Boid.
     '''
     def __init__(self, unique_id, pos, speed=5, heading=None,
-            vision=5, separation=1):
+                 vision=5, separation=1):
         '''
         Create a new Boid flocker agent.
 
@@ -81,8 +81,7 @@ class Boid(Agent):
             cohere_vector = self.cohere(neighbors)
             separate_vector = self.separate(neighbors)
             match_heading_vector = self.match_heading(neighbors)
-            self.heading += (cohere_vector + separate_vector
-                + match_heading_vector)
+            self.heading += (cohere_vector + separate_vector + match_heading_vector)
             self.heading /= np.linalg.norm(self.heading)
         new_pos = np.array(self.pos) + self.heading * self.speed
         new_x, new_y = new_pos

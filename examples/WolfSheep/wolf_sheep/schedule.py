@@ -3,9 +3,10 @@ from collections import defaultdict
 
 from mesa.time import RandomActivation
 
+
 class RandomActivationByBreed(RandomActivation):
     '''
-    A scheduler which activates each type of agent once per step, in random 
+    A scheduler which activates each type of agent once per step, in random
     order, with the order reshuffled every step.
 
     This is equivalent to the NetLogo 'ask breed...' and is generally the
@@ -52,7 +53,7 @@ class RandomActivationByBreed(RandomActivation):
                       the next one.
         '''
         if by_breed:
-            for agent_class in  self.agents_by_breed:
+            for agent_class in self.agents_by_breed:
                 self.step_breed(agent_class)
             self.steps += 1
             self.time += 1

@@ -38,7 +38,7 @@ class PD_Agent(Agent):
         Get the neighbors' moves, and change own move accordingly.
         '''
         neighbors = model.grid.get_neighbors(self.pos, True,
-            include_center=True)
+                                             include_center=True)
         best_neighbor = max(neighbors, key=lambda a: a.score)
         self.next_move = best_neighbor.move
 
@@ -97,8 +97,10 @@ class PD_Model(Model):
                 self.grid.place_agent(agent, (x, y))
                 self.schedule.add(agent)
 
-        self.datacollector = DataCollector({"Cooperating_Agents":
-            lambda m: len([a for a in m.schedule.agents if a.move == "C"])})
+        self.datacollector = DataCollector({
+            "Cooperating_Agents":
+            lambda m: len([a for a in m.schedule.agents if a.move == "C"])
+        })
 
     def step(self):
         self.datacollector.collect(self)

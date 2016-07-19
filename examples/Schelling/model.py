@@ -7,6 +7,7 @@ from mesa.time import RandomActivation
 from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 
+
 class SchellingAgent(Agent):
     '''
     Schelling segregation agent
@@ -90,4 +91,3 @@ class SchellingModel(Model):
 
         if self.happy == self.schedule.get_agent_count():
             self.running = False
-
