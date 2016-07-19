@@ -7,11 +7,12 @@ with all of their neighbors simultaneously; an agent can either be Cooperating
 or Defecting.
 '''
 
+import random
+
 from mesa import Agent, Model
 from mesa.datacollection import DataCollector
 from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
 from mesa.space import SingleGrid
-import random
 
 
 class PD_Agent(Agent):

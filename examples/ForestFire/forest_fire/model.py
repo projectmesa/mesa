@@ -1,10 +1,11 @@
 import random
 
-from examples.ForestFire.forest_fire.agent import TreeCell
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.space import Grid
 from mesa.time import RandomActivation
+
+from examples.ForestFire.forest_fire.agent import TreeCell
 
 
 class ForestFire(Model):

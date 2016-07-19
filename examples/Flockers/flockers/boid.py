@@ -1,5 +1,6 @@
-from mesa import Agent
 import numpy as np
+
+from mesa import Agent
 
 
 class Boid(Agent):
@@ -81,7 +82,9 @@ class Boid(Agent):
             cohere_vector = self.cohere(neighbors)
             separate_vector = self.separate(neighbors)
             match_heading_vector = self.match_heading(neighbors)
-            self.heading += (cohere_vector + separate_vector + match_heading_vector)
+            self.heading += (cohere_vector +
+                             separate_vector +
+                             match_heading_vector)
             self.heading /= np.linalg.norm(self.heading)
         new_pos = np.array(self.pos) + self.heading * self.speed
         new_x, new_y = new_pos

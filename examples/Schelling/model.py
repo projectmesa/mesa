@@ -1,5 +1,3 @@
-from __future__ import division  # For Python 2.x compatibility
-
 import random
 
 from mesa import Model, Agent

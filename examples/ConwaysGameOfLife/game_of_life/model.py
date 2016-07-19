@@ -1,8 +1,10 @@
+from random import random
+
 from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import Grid
+
 from game_of_life.cell import Cell
-from random import random
 
 
 class GameOfLife(Model):

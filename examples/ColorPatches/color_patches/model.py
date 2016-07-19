@@ -47,9 +47,10 @@ class ColorCell(Agent):
         A choice is made at random in case of a tie
         The next state is stored until all cells have been polled
         '''
-        neighbors_opinion = Counter(n.get_state() for n in
-                                    model.grid.neighbor_iter((self._col, self._row), True))
-        polled_opinions = neighbors_opinion.most_common()  # a tuple (attribute, occurrences)
+        neighbor_iter_ = model.grid.neighbor_iter((self._col, self._row), True)
+        neighbors_opinion = Counter(n.get_state() for n in neighbor_iter_)
+        # Following is a a tuple (attribute, occurrences)
+        polled_opinions = neighbors_opinion.most_common()
         tied_opinions = []
         for neighbor in polled_opinions:
             if neighbor[1] == polled_opinions[0][1]:
@@ -85,7 +86,8 @@ class ColorPatchModel(Model):
         # for (contents, col, row) in self._grid.coord_iter():
         # replaced content with _ to appease linter
         for (_, col, row) in self._grid.coord_iter():
-            cell = ColorCell((col, row), self, ColorCell.OPINIONS[random.randrange(0, 16)])
+            cell = ColorCell((col, row), self,
+                             ColorCell.OPINIONS[random.randrange(0, 16)])
             self._grid.place_agent(cell, (col, row))
             self._schedule.add(cell)
 
@@ -97,8 +99,8 @@ class ColorPatchModel(Model):
         '''
         self._schedule.step()
 
-    # the following is a temporary fix for the framework classes accessing model
-    # attributes directly
+    # the following is a temporary fix for the framework classes accessing
+    # model attributes directly
     # I don't think it should
     #   --> it imposes upon the model builder to use the attributes names that
     #       the framework expects.

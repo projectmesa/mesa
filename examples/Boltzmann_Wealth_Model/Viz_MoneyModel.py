@@ -1,7 +1,8 @@
-from MoneyModel import *
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.modules import ChartModule
 from mesa.visualization.ModularVisualization import ModularServer
+
+from MoneyModel import MoneyModel
 
 
 def agent_portrayal(agent):
@@ -25,5 +26,5 @@ chart = ChartModule([
 )
 
 server = ModularServer(MoneyModel, [grid, chart], "Money Model", 100, 10, 10)
-server.port = 8889
+server.port = 8888
 server.launch()

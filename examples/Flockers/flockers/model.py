@@ -6,8 +6,8 @@ Uses numpy arrays to represent vectors.
 '''
 
 
-import numpy as np
 import random
+import numpy as np
 
 from mesa import Model
 from mesa.space import ContinuousSpace
@@ -53,7 +53,8 @@ class BoidModel(Model):
             pos = (x, y)
             heading = np.random.random(2) * 2 - np.array((1, 1))
             heading /= np.linalg.norm(heading)
-            boid = Boid(i, pos, self.speed, heading, self.vision, self.separation)
+            boid = Boid(i, pos, self.speed, heading,
+                        self.vision, self.separation)
             self.space.place_agent(boid, pos)
             self.schedule.add(boid)
 

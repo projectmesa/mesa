@@ -28,7 +28,7 @@ e.g.
 To run the model interactively, run ``run.py`` in this directory. e.g.
 
 ```
-    $ python shapes_viz.py
+    $ python run.py
 ```
 
 Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and
@@ -36,6 +36,6 @@ press Reset, then Run.
 
 ## Files
 
-* ``basic/model.py: Defines the Basic model and agents.
+* ``basic/model.py``: Defines the Basic model and agents.
 * ``basic/server.py``: Sets up the interactive visualization server.
 * ``run.py``: Launches a model visualization server.

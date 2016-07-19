@@ -2,7 +2,7 @@
 handles the definition of the canvas parameters and
 the drawing of the model representation on the canvas
 """
-import webbrowser
+# import webbrowser
 
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
@@ -47,4 +47,4 @@ server = ModularServer(ColorPatchModel,
                        [CANVAS_ELEMENT], "Color Patches",
                        GRID_ROWS, GRID_COLS)
 
-webbrowser.open('http://127.0.0.1:8888')  # TODO: make this configurable
+# webbrowser.open('http://127.0.0.1:8888')  # TODO: make this configurable
