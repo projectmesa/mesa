@@ -57,6 +57,10 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
         this.drawLayer = function(portrayalLayer) {
 		for (var i in portrayalLayer) {
 			var p = portrayalLayer[i];
+                        // Does the inversion of y positioning because of html5
+                        // canvas y direction is from top to bottom. But we
+                        // normally keep y-axis in plots from bottom to top.
+                        p.y = gridHeight - p.y - 1;
 			if (p.Shape == "rect")
 				this.drawRectangle(p.x, p.y, p.w, p.h, p.Color, p.Filled, p.text, p.text_color);
 			else if (p.Shape == "circle")
@@ -115,7 +119,6 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
         text_color: Color of the inscribed text.
 	*/
 	this.drawRectangle = function(x, y, w, h, color, fill, text, text_color) {
-		y = gridHeight - y - 1;
 		context.beginPath();
 		var dx = w * cellWidth;
 		var dy = h * cellHeight;
@@ -152,7 +155,6 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
         text_color: Color of the inscribed text.
 	*/
         this.drawArrowHead = function(x, y, heading0, heading1, scale, color, fill, text, text_color) {
-                y = gridHeight - y -1;
                 arrowR = maxR * scale;
 		var cx = (x + 0.5) * cellWidth;
 		var cy = (y + 0.5) * cellHeight;
