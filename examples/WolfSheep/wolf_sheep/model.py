@@ -10,6 +10,7 @@ Replication of the model found in NetLogo:
 '''
 
 import random
+
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector

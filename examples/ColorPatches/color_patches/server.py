@@ -2,7 +2,7 @@
 handles the definition of the canvas parameters and
 the drawing of the model representation on the canvas
 """
-import webbrowser
+# import webbrowser
 
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
@@ -14,11 +14,11 @@ _COLORS = ['Aqua', 'Blue', 'Fuchsia', 'Gray', 'Green',
            'Red', 'Silver', 'Teal', 'White', 'Yellow']
 
 
-GRID_ROWS = 25
-GRID_COLS = 50
+GRID_ROWS = 50
+GRID_COLS = 25
 CELL_SIZE = 10
-CANVAS_HEIGHT = GRID_ROWS * CELL_SIZE
-CANVAS_WIDTH = GRID_COLS * CELL_SIZE
+CANVAS_WIDTH = GRID_ROWS * CELL_SIZE
+CANVAS_HEIGHT = GRID_COLS * CELL_SIZE
 
 
 def color_patch_draw(cell):
@@ -33,18 +33,18 @@ def color_patch_draw(cell):
     '''
     assert cell is not None
     portrayal = {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Layer": 0}
-    portrayal["x"] = cell.get_col()
-    portrayal["y"] = cell.get_row()
+    portrayal["x"] = cell.get_row()
+    portrayal["y"] = cell.get_col()
     portrayal["Color"] = _COLORS[cell.get_state()]
     return portrayal
 
 
 CANVAS_ELEMENT = CanvasGrid(color_patch_draw,
-                            GRID_COLS, GRID_ROWS,
-                            CANVAS_HEIGHT, CANVAS_WIDTH)
+                            GRID_ROWS, GRID_COLS,
+                            CANVAS_WIDTH, CANVAS_HEIGHT)
 
 server = ModularServer(ColorPatchModel,
                        [CANVAS_ELEMENT], "Color Patches",
                        GRID_ROWS, GRID_COLS)
 
-webbrowser.open('http://127.0.0.1:8888')  # TODO: make this configurable
+# webbrowser.open('http://127.0.0.1:8888')  # TODO: make this configurable

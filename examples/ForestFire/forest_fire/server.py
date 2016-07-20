@@ -1,6 +1,7 @@
-from forest_fire.model import ForestFire
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.ModularVisualization import ModularServer
+
+from forest_fire.model import ForestFire
 
 
 def forest_fire_portrayal(tree):

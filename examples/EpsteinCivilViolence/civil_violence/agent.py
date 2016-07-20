@@ -1,6 +1,7 @@
-from mesa import Agent
 import random
 import math
+
+from mesa import Agent
 
 
 class Citizen(Agent):

@@ -1,8 +1,9 @@
 import random
 
-from basic.model import Walker, ShapesModel
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
+
+from basic.model import Walker, ShapesModel
 
 
 def agent_draw(agent):

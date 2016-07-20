@@ -23,8 +23,8 @@ class ColorCell(Agent):
         Create a cell, in the given state, at the given row, col position.
         '''
         Agent.__init__(self, pos, model)
-        self._row = pos[1]
-        self._col = pos[0]
+        self._row = pos[0]
+        self._col = pos[1]
         self._state = initial_state
         self._next_state = None
 
@@ -47,9 +47,10 @@ class ColorCell(Agent):
         A choice is made at random in case of a tie
         The next state is stored until all cells have been polled
         '''
-        neighbors_opinion = Counter(n.get_state() for n in
-                                    model.grid.neighbor_iter((self._col, self._row), True))
-        polled_opinions = neighbors_opinion.most_common()  # a tuple (attribute, occurrences)
+        neighbor_iter_ = model.grid.neighbor_iter((self._row, self._col), True)
+        neighbors_opinion = Counter(n.get_state() for n in neighbor_iter_)
+        # Following is a a tuple (attribute, occurrences)
+        polled_opinions = neighbors_opinion.most_common()
         tied_opinions = []
         for neighbor in polled_opinions:
             if neighbor[1] == polled_opinions[0][1]:
@@ -70,13 +71,13 @@ class ColorPatchModel(Model):
     represents a 2D lattice where agents live
     '''
 
-    def __init__(self, height, width):
+    def __init__(self, width, height):
         '''
         Create a 2D lattice with strict borders where agents live
         The agents next state is first determined before updating the grid
         '''
 
-        self._grid = Grid(height, width, torus=False)
+        self._grid = Grid(width, height, torus=False)
         self._schedule = SimultaneousActivation(self)
 
         # self._grid.coord_iter()
@@ -84,9 +85,10 @@ class ColorPatchModel(Model):
         #  -->but only col & row
         # for (contents, col, row) in self._grid.coord_iter():
         # replaced content with _ to appease linter
-        for (_, col, row) in self._grid.coord_iter():
-            cell = ColorCell((col, row), self, ColorCell.OPINIONS[random.randrange(0, 16)])
-            self._grid.place_agent(cell, (col, row))
+        for (_, row, col) in self._grid.coord_iter():
+            cell = ColorCell((row, col), self,
+                             ColorCell.OPINIONS[random.randrange(0, 16)])
+            self._grid.place_agent(cell, (row, col))
             self._schedule.add(cell)
 
         self.running = True
@@ -97,8 +99,8 @@ class ColorPatchModel(Model):
         '''
         self._schedule.step()
 
-    # the following is a temporary fix for the framework classes accessing model
-    # attributes directly
+    # the following is a temporary fix for the framework classes accessing
+    # model attributes directly
     # I don't think it should
     #   --> it imposes upon the model builder to use the attributes names that
     #       the framework expects.

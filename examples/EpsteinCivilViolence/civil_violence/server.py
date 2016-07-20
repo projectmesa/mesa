@@ -1,7 +1,9 @@
-from .model import CivilViolenceModel
-from .agent import Citizen, Cop
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid
+
+from .model import CivilViolenceModel
+from .agent import Citizen, Cop
+
 
 COP_COLOR = "#000000"
 AGENT_QUIET_COLOR = "#0066CC"
