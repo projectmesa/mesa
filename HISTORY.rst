@@ -9,7 +9,6 @@ Next release
 Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
 
 **Feature adds**
-* Feature adds
 * Add new shapes & direction indication in CanvasGrid #285
 * Provides support for text overlay on Circle and Rectangle shapes. #265
 
@@ -27,6 +26,8 @@ Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
 * No Docstring for model.grid.get_cell_list_contents #282
 * Refactor forest fire example #223 #288
 * Updating kernel version on forest fire model. #290
+* Making examples pep complaint. fixes #270 #291
+* Fixed pep8 examples and #292 #294
 
 
 0.7.5 (2016-06-20)
