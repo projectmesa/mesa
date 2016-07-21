@@ -9,10 +9,12 @@ Next release
 Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
 
 **Feature adds**
+
 * Add new shapes & direction indication in CanvasGrid #285
 * Provides support for text overlay on Circle and Rectangle shapes. #265
 
 **Improvements**
+
 * Fixes Parameters of CanvasGrid(): row, col, height, width inverted #285
 * Fixes 'coordinates on grid are used inconsistently throughout the code' #285
 * Moves Agent and Model class outside of  __init__.py #285
