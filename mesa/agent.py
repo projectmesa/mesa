@@ -14,6 +14,6 @@ class Agent:
         self.unique_id = unique_id
         self.model = model
 
-    def step(self, model):
+    def step(self):
         """ A single step of the agent. """
         pass

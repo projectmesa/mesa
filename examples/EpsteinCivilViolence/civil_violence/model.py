@@ -77,19 +77,18 @@ class CivilViolenceModel(Model):
                 'Cop density + citizen density must be less than 1')
         for (contents, x, y) in self.grid.coord_iter():
             if random.random() < self.cop_density:
-                cop = Cop(unique_id, (x, y), vision=self.cop_vision,
-                          model=self)
+                cop = Cop(unique_id, self, (x, y), vision=self.cop_vision)
                 unique_id += 1
                 self.grid[y][x] = cop
                 self.schedule.add(cop)
             elif random.random() < (
                     self.cop_density + self.citizen_density):
-                citizen = Citizen(unique_id, (x, y),
+                citizen = Citizen(unique_id, self, (x, y),
                                   hardship=random.random(),
                                   regime_legitimacy=self.legitimacy,
                                   risk_aversion=random.random(),
                                   threshold=self.active_threshold,
-                                  vision=self.citizen_vision, model=self)
+                                  vision=self.citizen_vision)
                 unique_id += 1
                 self.grid[y][x] = citizen
                 self.schedule.add(citizen)

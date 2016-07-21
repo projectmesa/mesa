@@ -17,7 +17,7 @@ class Boid(Agent):
     define their movement. Separation is their desired minimum distance from
     any other Boid.
     '''
-    def __init__(self, unique_id, pos, speed=5, heading=None,
+    def __init__(self, unique_id, model, pos, speed=5, heading=None,
                  vision=5, separation=1):
         '''
         Create a new Boid flocker agent.
@@ -30,7 +30,7 @@ class Boid(Agent):
             vision: Radius to look around for nearby Boids.
             separation: Minimum distance to maintain from other Boids.
         '''
-        self.unique_id = unique_id
+        super().__init__(unique_id, model)
         self.pos = pos
         self.speed = speed
         if heading is not None:
@@ -72,12 +72,12 @@ class Boid(Agent):
             mean_heading += np.int64(neighbor.heading)
         return mean_heading / len(neighbors)
 
-    def step(self, model):
+    def step(self):
         '''
         Get the Boid's neighbors, compute the new vector, and move accordingly.
         '''
 
-        neighbors = model.space.get_neighbors(self.pos, self.vision, False)
+        neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
         if len(neighbors) > 0:
             cohere_vector = self.cohere(neighbors)
             separate_vector = self.separate(neighbors)
@@ -88,4 +88,4 @@ class Boid(Agent):
             self.heading /= np.linalg.norm(self.heading)
         new_pos = np.array(self.pos) + self.heading * self.speed
         new_x, new_y = new_pos
-        model.space.move_agent(self, (new_x, new_y))
+        self.model.space.move_agent(self, (new_x, new_y))

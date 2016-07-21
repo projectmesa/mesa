@@ -53,8 +53,8 @@ class BoidModel(Model):
             pos = (x, y)
             heading = np.random.random(2) * 2 - np.array((1, 1))
             heading /= np.linalg.norm(heading)
-            boid = Boid(i, pos, self.speed, heading,
-                        self.vision, self.separation)
+            boid = Boid(i, self, pos, self.speed, heading, self.vision,
+                        self.separation)
             self.space.place_agent(boid, pos)
             self.schedule.add(boid)
 
