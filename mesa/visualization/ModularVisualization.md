@@ -28,6 +28,7 @@ Mesa already comes with some pre-built modules. Using the built-ins allow you to
 One built-in module is **CanvasGrid**, which you can use to visualize objects located on grid cells. The CanvasGrid will cover a majority of agent-based models, particularly the simpler ones.
 
 CanvasGrid iterates over every object in every cell of your model's grid (it assumes that your model has a grid named **grid**) and converts it into a dictionary which defines how it will be drawn. It does this via a **portrayal_method**: a function which the user defines, which takes an object as an input and outputs a dictionary with the following keys:
+
     "Shape": Can be "circle", "rect" or "arrowHead"
         For Circles:
             "r": The radius, defined as a fraction of cell size. r=1 will fill the entire cell.
