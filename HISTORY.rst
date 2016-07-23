@@ -31,6 +31,7 @@ Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
 * Making examples pep complaint. fixes #270 #291
 * Fixed pep8 examples and #292 #294
 * Fixes #283 - Fixes formatting on viz readme #299
+* Have Agent use self.model instead of passing it around #297
 
 
 0.7.5 (2016-06-20)
