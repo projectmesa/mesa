@@ -33,8 +33,7 @@ class BaseScheduler:
     """ Simplest scheduler; activates agents one at a time, in the order
     they were added.
 
-    Assumes that each agent added has a *step* method, which accepts a model
-    object as its single argument.
+    Assumes that each agent added has a *step* method which takes no arguments.
 
     (This is explicitly meant to replicate the scheduler in MASON).
 
@@ -56,7 +55,7 @@ class BaseScheduler:
 
         Args:
             agent: An Agent to be added to the schedule. NOTE: The agent must
-            have a step(model) method.
+            have a step() method.
 
         """
         self.agents.append(agent)
@@ -74,7 +73,7 @@ class BaseScheduler:
     def step(self):
         """ Execute the step of all the agents, one at a time. """
         for agent in self.agents:
-            agent.step(self.model)
+            agent.step()
         self.steps += 1
         self.time += 1
 
@@ -99,9 +98,8 @@ class RandomActivation(BaseScheduler):
 
         """
         random.shuffle(self.agents)
-
         for agent in self.agents:
-            agent.step(self.model)
+            agent.step()
         self.steps += 1
         self.time += 1
 
@@ -110,16 +108,16 @@ class SimultaneousActivation(BaseScheduler):
     """ A scheduler to simulate the simultaneous activation of all the agents.
 
     This scheduler requires that each agent have two methods: step and advance.
-    step(model) activates the agent and stages any necessary changes, but does
-    not apply them yet. advance(model) then applies the changes.
+    step() activates the agent and stages any necessary changes, but does not
+    apply them yet. advance() then applies the changes.
 
     """
     def step(self):
         """ Step all agents, then advance them. """
         for agent in self.agents:
-            agent.step(self.model)
+            agent.step()
         for agent in self.agents:
-            agent.advance(self.model)
+            agent.advance()
         self.steps += 1
         self.time += 1
 
@@ -167,7 +165,7 @@ class StagedActivation(BaseScheduler):
             random.shuffle(self.agents)
         for stage in self.stage_list:
             for agent in self.agents:
-                getattr(agent, stage)(self.model)  # Run stage
+                getattr(agent, stage)()  # Run stage
             if self.shuffle_between_stages:
                 random.shuffle(self.agents)
             self.time += self.stage_time

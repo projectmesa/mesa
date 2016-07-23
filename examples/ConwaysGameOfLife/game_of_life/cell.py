@@ -11,7 +11,7 @@ class Cell(Agent):
         '''
         Create a cell, in the given state, at the given x, y position.
         '''
-        Agent.__init__(self, pos, model)
+        super().__init__(pos, model)
         self.x, self.y = pos
         self.state = init_state
         self._nextState = None
@@ -24,7 +24,7 @@ class Cell(Agent):
     def neighbors(self):
         return self.model.grid.neighbor_iter((self.x, self.y), True)
 
-    def step(self, model):
+    def step(self):
         '''
         Compute if the cell will be dead or alive at the next tick.  This is
         based on the number of alive or dead neighbors.  The state is not
@@ -46,7 +46,7 @@ class Cell(Agent):
             if live_neighbors == 3:
                 self._nextState = self.ALIVE
 
-    def advance(self, model):
+    def advance(self):
         '''
         Set the state to the new computed state -- computed in step().
         '''

@@ -116,8 +116,8 @@ The beginning of both classes looks like this:
     
     class MoneyAgent(Agent):
         """An agent with fixed initial wealth."""
-        def __init__(self, unique_id):
-            self.unique_id = unique_id
+        def __init__(self, unique_id, model):
+            super().__init__(unique_id, model)
             self.wealth = 1
     
     class MoneyModel(Model):
@@ -126,7 +126,7 @@ The beginning of both classes looks like this:
             self.num_agents = N
             # Create agents
             for i in range(self.num_agents):
-                a = MoneyAgent(i)
+                a = MoneyAgent(i, self)
 
 Adding the scheduler
 ~~~~~~~~~~~~~~~~~~~~
@@ -164,11 +164,11 @@ this:
     
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
-        def __init__(self, unique_id):
-            self.unique_id = unique_id
+        def __init__(self, unique_id, model):
+            super().__init__(unique_id, model)
             self.wealth = 1
     
-        def step(self, model):
+        def step(self):
             # The agent's step will go here.
             pass
     
@@ -179,7 +179,7 @@ this:
             self.schedule = RandomActivation(self)
             # Create agents
             for i in range(self.num_agents):
-                a = MoneyAgent(i)
+                a = MoneyAgent(i, self)
                 self.schedule.add(a)
     
         def step(self):
@@ -234,14 +234,14 @@ With that in mind, we rewrite the agent's ``step`` method, like this:
 
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
-        def __init__(self, unique_id):
-            self.unique_id = unique_id
+        def __init__(self, unique_id, model):
+            super().__init__(unique_id, model)
             self.wealth = 1
     
-        def step(self, model):
+        def step(self):
             if self.wealth == 0:
                 return
-            other_agent = random.choice(model.schedule.agents)
+            other_agent = random.choice(self.model.schedule.agents)
             other_agent.wealth += 1
             self.wealth -= 1
 
@@ -404,7 +404,7 @@ coordinates to place the agent.
             
             # Create agents
             for i in range(self.num_agents):
-                a = MoneyAgent(i)
+                a = MoneyAgent(i, self)
                 self.schedule.add(a)
                 
                 # Add the agent to a random grid cell
@@ -448,13 +448,13 @@ With that in mind, the agent's ``move`` method looks like this:
 
     class MoneyAgent(Agent):
        #...
-        def move(self, model):
-            possible_steps = model.grid.get_neighborhood(
+        def move(self):
+            possible_steps = self.model.grid.get_neighborhood(
                 self.pos, 
                 moore=True,
                 include_center=False)
             new_position = random.choice(possible_steps)
-            model.grid.move_agent(self, new_position)
+            self.model.grid.move_agent(self, new_position)
 
 Next, we need to get all the other agents present in a cell, and give
 one of them some money. We can get the contents of one or more cells
@@ -466,8 +466,8 @@ single tuple if we only care about one cell.
 
     class MoneyAgent(Agent):
         #...
-        def give_money(self, model):
-            cellmates = model.grid.get_cell_list_contents([self.pos])
+        def give_money(self):
+            cellmates = self.model.grid.get_cell_list_contents([self.pos])
             if len(cellmates) > 1:
                 other = random.choice(cellmates)
                 other.wealth += 1
@@ -479,10 +479,10 @@ And with those two methods, the agent's ``step`` method becomes:
 
     class MoneyAgent(Agent):
         # ...
-        def step(self, model):
-            self.move(model)
+        def step(self):
+            self.move()
             if self.wealth > 0:
-                self.give_money(model)
+                self.give_money()
 
 Now, putting that all together should look like this:
 
@@ -496,7 +496,7 @@ Now, putting that all together should look like this:
             self.schedule = RandomActivation(self)
             # Create agents
             for i in range(self.num_agents):
-                a = MoneyAgent(i)
+                a = MoneyAgent(i, self)
                 self.schedule.add(a)
                 # Add the agent to a random grid cell
                 x = random.randrange(self.grid.width)
@@ -508,29 +508,29 @@ Now, putting that all together should look like this:
     
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
-        def __init__(self, unique_id):
-            self.unique_id = unique_id
+        def __init__(self, unique_id, model):
+            super().__init__(unique_id, model)
             self.wealth = 1
     
-        def move(self, model):
-            possible_steps = model.grid.get_neighborhood(
+        def move(self):
+            possible_steps = self.model.grid.get_neighborhood(
                 self.pos, 
                 moore=True, 
                 include_center=False)
             new_position = random.choice(possible_steps)
-            model.grid.move_agent(self, new_position)
+            self.model.grid.move_agent(self, new_position)
     
-        def give_money(self, model):
-            cellmates = model.grid.get_cell_list_contents([self.pos])
+        def give_money(self):
+            cellmates = self.model.grid.get_cell_list_contents([self.pos])
             if len(cellmates) > 1:
                 other = random.choice(cellmates)
                 other.wealth += 1
                 self.wealth -= 1
     
-        def step(self, model):
-            self.move(model)
+        def step(self):
+            self.move()
             if self.wealth > 0:
-                self.give_money(model)
+                self.give_money()
 
 Let's create a model with 50 agents on a 10x10 grid, and run it for 20
 steps.
@@ -622,29 +622,29 @@ measure of wealth inequality.
     
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
-        def __init__(self, unique_id):
-            self.unique_id = unique_id
+        def __init__(self, unique_id, model):
+            super().__init__(unique_id, model)
             self.wealth = 1
     
-        def move(self, model):
-            possible_steps = model.grid.get_neighborhood(
+        def move(self):
+            possible_steps = self.model.grid.get_neighborhood(
                 self.pos, 
                 moore=True, 
                 include_center=False)
             new_position = random.choice(possible_steps)
-            model.grid.move_agent(self, new_position)
+            self.model.grid.move_agent(self, new_position)
     
-        def give_money(self, model):
-            cellmates = model.grid.get_cell_list_contents([self.pos])
+        def give_money(self):
+            cellmates = self.model.grid.get_cell_list_contents([self.pos])
             if len(cellmates) > 1:
                 other = random.choice(cellmates)
                 other.wealth += 1
                 self.wealth -= 1
     
-        def step(self, model):
-            self.move(model)
+        def step(self):
+            self.move()
             if self.wealth > 0:
-                self.give_money(model)
+                self.give_money()
     
     class MoneyModel(Model):
         """A model with some number of agents."""
@@ -655,7 +655,7 @@ measure of wealth inequality.
             
             # Create agents
             for i in range(self.num_agents):
-                a = MoneyAgent(i)
+                a = MoneyAgent(i, self)
                 self.schedule.add(a)
                 # Add the agent to a random grid cell
                 x = random.randrange(self.grid.width)
@@ -832,7 +832,7 @@ indefinitely.
             
             # Create agents
             for i in range(self.num_agents):
-                a = MoneyAgent(i)
+                a = MoneyAgent(i, self)
                 self.schedule.add(a)
                 # Add the agent to a random grid cell
                 x = random.randrange(self.grid.width)

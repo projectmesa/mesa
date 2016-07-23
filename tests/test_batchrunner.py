@@ -18,7 +18,7 @@ class MockAgent(Agent):
         self.unique_id = unique_id
         self.val = val
 
-    def step(self, model):
+    def step(self):
         """
         increment val by 1
         """

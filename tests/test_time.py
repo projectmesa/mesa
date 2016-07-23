@@ -18,16 +18,13 @@ class MockAgent(Agent):
     Minimalistic agent for testing purposes.
     '''
 
-    def __init__(self, name):
-        self.unique_id = name
+    def stage_one(self):
+        self.model.log.append(self.unique_id + "_1")
 
-    def stage_one(self, model):
-        model.log.append(self.unique_id + "_1")
+    def stage_two(self):
+        self.model.log.append(self.unique_id + "_2")
 
-    def stage_two(self, model):
-        model.log.append(self.unique_id + "_2")
-
-    def advance(self, model):
+    def advance(self):
         pass
 
 
@@ -64,7 +61,7 @@ class MockModel(Model):
 
         # Make agents
         for name in ["A", "B"]:
-            agent = MockAgent(name)
+            agent = MockAgent(name, self)
             self.schedule.add(agent)
 
     def step(self):

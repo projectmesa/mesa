@@ -22,7 +22,7 @@ class ColorCell(Agent):
         '''
         Create a cell, in the given state, at the given row, col position.
         '''
-        Agent.__init__(self, pos, model)
+        super().__init__(pos, model)
         self._row = pos[0]
         self._col = pos[1]
         self._state = initial_state
@@ -40,14 +40,14 @@ class ColorCell(Agent):
         '''Return the current state (OPINION) of this cell.'''
         return self._state
 
-    def step(self, model):
+    def step(self):
         '''
         Determines the agent opinion for the next step by polling its neighbors
         The opinion is determined by the majority of the 8 neighbors' opinion
         A choice is made at random in case of a tie
         The next state is stored until all cells have been polled
         '''
-        neighbor_iter_ = model.grid.neighbor_iter((self._row, self._col), True)
+        neighbor_iter_ = self.model.grid.neighbor_iter((self._row, self._col), True)
         neighbors_opinion = Counter(n.get_state() for n in neighbor_iter_)
         # Following is a a tuple (attribute, occurrences)
         polled_opinions = neighbors_opinion.most_common()
@@ -58,8 +58,7 @@ class ColorCell(Agent):
 
         self._next_state = random.choice(tied_opinions)[0]
 
-    # model argument is unused
-    def advance(self, model):
+    def advance(self):
         '''
         Set the state of the agent to the next state
         '''

@@ -21,7 +21,7 @@ class RandomWalker(Agent):
     y = None
     moore = True
 
-    def __init__(self, grid, pos, moore=True):
+    def __init__(self, pos, model, moore=True):
         '''
         grid: The MultiGrid object in which the agent lives.
         x: The agent's current x coordinate
@@ -29,7 +29,7 @@ class RandomWalker(Agent):
         moore: If True, may move in all 8 directions.
                 Otherwise, only up, down, left, right.
         '''
-        self.grid = grid
+        super().__init__(pos, model)
         self.pos = pos
         self.moore = moore
 
@@ -38,7 +38,7 @@ class RandomWalker(Agent):
         Step one cell in any allowable direction.
         '''
         # Pick the next cell from the adjacent cells.
-        next_moves = self.grid.get_neighborhood(self.pos, self.moore, True)
+        next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
         next_move = random.choice(next_moves)
         # Now move:
-        self.grid.move_agent(self, next_move)
+        self.model.grid.move_agent(self, next_move)

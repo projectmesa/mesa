@@ -30,8 +30,8 @@ class Citizen(Agent):
 
     """
 
-    def __init__(self, unique_id, pos, hardship, regime_legitimacy,
-                 risk_aversion, threshold, vision, model):
+    def __init__(self, unique_id, model, pos, hardship, regime_legitimacy,
+                 risk_aversion, threshold, vision):
         """
         Create a new Citizen.
         Args:
@@ -61,15 +61,15 @@ class Citizen(Agent):
         self.grievance = self.hardship * (1 - self.regime_legitimacy)
         self.arrest_probability = None
 
-    def step(self, model):
+    def step(self):
         """
         Decide whether to activate, then move if applicable.
         """
         if self.jail_sentence:
             self.jail_sentence -= 1
             return  # no other changes or movements if agent is in jail.
-        self.update_neighbors(model)
-        self.update_estimated_arrest_probability(model)
+        self.update_neighbors()
+        self.update_estimated_arrest_probability()
         net_risk = self.risk_aversion * self.arrest_probability
         if self.condition == 'Quiescent' and (
                 self.grievance - net_risk) > self.threshold:
@@ -77,21 +77,21 @@ class Citizen(Agent):
         elif self.condition == 'Active' and (
                 self.grievance - net_risk) <= self.threshold:
             self.condition = 'Quiescent'
-        if model.movement and self.empty_neighbors:
+        if self.model.movement and self.empty_neighbors:
             new_pos = random.choice(self.empty_neighbors)
-            model.grid.move_agent(self, new_pos)
+            self.model.grid.move_agent(self, new_pos)
 
-    def update_neighbors(self, model):
+    def update_neighbors(self):
         """
         Look around and see who my neighbors are
         """
-        self.neighborhood = model.grid.get_neighborhood(self.pos,
+        self.neighborhood = self.model.grid.get_neighborhood(self.pos,
                                                         moore=False, radius=1)
-        self.neighbors = model.grid.get_cell_list_contents(self.neighborhood)
+        self.neighbors = self.model.grid.get_cell_list_contents(self.neighborhood)
         self.empty_neighbors = [c for c in self.neighborhood if
-                                model.grid.is_cell_empty(c)]
+                                self.model.grid.is_cell_empty(c)]
 
-    def update_estimated_arrest_probability(self, model):
+    def update_estimated_arrest_probability(self):
         """
         Based on the ratio of cops to actives in my neighborhood, estimate the
         p(Arrest | I go active).
@@ -105,7 +105,7 @@ class Citizen(Agent):
                     c.jail_sentence == 0):
                 actives_in_vision += 1
         self.arrest_probability = 1 - math.exp(
-            -1 * model.arrest_prob_constant * (
+            -1 * self.model.arrest_prob_constant * (
                 cops_in_vision / actives_in_vision))
 
 
@@ -121,7 +121,7 @@ class Cop(Agent):
             able to inspect
     """
 
-    def __init__(self, unique_id, pos, vision, model):
+    def __init__(self, unique_id, model, pos, vision):
         """
         Create a new Cop.
         Args:
@@ -136,12 +136,12 @@ class Cop(Agent):
         self.pos = pos
         self.vision = vision
 
-    def step(self, model):
+    def step(self):
         """
         Inspect local vision and arrest a random active agent. Move if
         applicable.
         """
-        self.update_neighbors(model)
+        self.update_neighbors()
         active_neighbors = []
         for agent in self.neighbors:
             if agent.breed == 'citizen' and \
@@ -150,18 +150,18 @@ class Cop(Agent):
                 active_neighbors.append(agent)
         if active_neighbors:
             arrestee = random.choice(active_neighbors)
-            sentence = random.randint(0, model.max_jail_term)
+            sentence = random.randint(0, self.model.max_jail_term)
             arrestee.jail_sentence = sentence
-        if model.movement and self.empty_neighbors:
+        if self.model.movement and self.empty_neighbors:
             new_pos = random.choice(self.empty_neighbors)
-            model.grid.move_agent(self, new_pos)
+            self.model.grid.move_agent(self, new_pos)
 
-    def update_neighbors(self, model):
+    def update_neighbors(self):
         """
         Look around and see who my neighbors are.
         """
-        self.neighborhood = model.grid.get_neighborhood(self.pos,
+        self.neighborhood = self.model.grid.get_neighborhood(self.pos,
                                                         moore=False, radius=1)
-        self.neighbors = model.grid.get_cell_list_contents(self.neighborhood)
+        self.neighbors = self.model.grid.get_cell_list_contents(self.neighborhood)
         self.empty_neighbors = [c for c in self.neighborhood if
-                                model.grid.is_cell_empty(c)]
+                                self.model.grid.is_cell_empty(c)]
