@@ -30,6 +30,7 @@ Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
 * Updating kernel version on forest fire model. #290
 * Making examples pep complaint. fixes #270 #291
 * Fixed pep8 examples and #292 #294
+* Fixes #283 - Fixes formatting on viz readme #299
 
 
 0.7.5 (2016-06-20)
