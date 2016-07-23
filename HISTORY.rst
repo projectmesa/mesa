@@ -36,44 +36,47 @@ Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
 0.7.5 (2016-06-20)
 ++++++++++++++++++
 
-* Pre-sprints
-    * Update of tutorial files and docs #176, #172
-    * Adds np.int64() functions around some variables to get rid error caused by numpy update #188
-    * Made examples Readme.md more readable #189
+**Pre-sprints**
 
-* From PyCon Sprints
-    * Updating model example readmes #207
-    * Added nose to requirements #208
-    * Updated link on style google style guide #209
-    * Reset visualization when websocket connection is opened #210
-    * Remove unused scipy dependency #211
-    * Introduce a requirements.txt for the tutorial. #212
-    * Remove references to running in tutorial #213
-    * Simplify travis.yml; add python versions #215
-    * Update Flocker Readme.md #216
-    * Syntax error in .rst was swallowing a code block #217
-    * Fixup HistogramModule in the tutorial. #218
-    * add more test coverage to time #221
-    * add a requirements.txt for WolfSheep. #222
-    * add a requirements.txt for Schelling. #224
-    * Refactor color patches example #227
-    * Ignored _build sphinx docs still in repo #228
-    * Intro Tut completely in ipynb #230
-    * pass optional port parameter to ModularServer.launch #231
-    * open vis immediately when running color patches #232
-    * Adds .DS_store to .gitignore #237
-    * Documentation Update #240
-    * Small fix for reading links #241
-    * Test batchrunner #243
-    * clean up TextVisualization #245
-    * Documentation Update #250
-    * Update Game of Life example to new format #253
-    * Update Flockers example to new format #254
-    * Update Epstein model to new layout #255
-    * Subclassing object is unnecessary in Python 3 #258
+* Update of tutorial files and docs #176, #172
+* Adds np.int64() functions around some variables to get rid error caused by numpy update #188
+* Made examples Readme.md more readable #189
 
-* Post PyCon Sprints
-    * Adds a copy of jquery directly into the code. #261
+**From PyCon Sprints**
+
+* Updating model example readmes #207
+* Added nose to requirements #208
+* Updated link on style google style guide #209
+* Reset visualization when websocket connection is opened #210
+* Remove unused scipy dependency #211
+* Introduce a requirements.txt for the tutorial. #212
+* Remove references to running in tutorial #213
+* Simplify travis.yml; add python versions #215
+* Update Flocker Readme.md #216
+* Syntax error in .rst was swallowing a code block #217
+* Fixup HistogramModule in the tutorial. #218
+* add more test coverage to time #221
+* add a requirements.txt for WolfSheep. #222
+* add a requirements.txt for Schelling. #224
+* Refactor color patches example #227
+* Ignored _build sphinx docs still in repo #228
+* Intro Tut completely in ipynb #230
+* pass optional port parameter to ModularServer.launch #231
+* open vis immediately when running color patches #232
+* Adds .DS_store to .gitignore #237
+* Documentation Update #240
+* Small fix for reading links #241
+* Test batchrunner #243
+* clean up TextVisualization #245
+* Documentation Update #250
+* Update Game of Life example to new format #253
+* Update Flockers example to new format #254
+* Update Epstein model to new layout #255
+* Subclassing object is unnecessary in Python 3 #258
+
+**Post PyCon Sprints**
+
+* Adds a copy of jquery directly into the code. #261
 
 
 0.7.0 (2016-03-06)
@@ -92,8 +95,9 @@ Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
 0.6.7 (2015-07-11)
 ++++++++++++++++++
 
-* Improvements
-    * Allow cell_list_content methods in Grids to accept single tuples in addition to lists
+**Improvements**
+   
+* Allow cell_list_content methods in Grids to accept single tuples in addition to lists
 
 
 0.6.6 (2015-07-11)
@@ -101,8 +105,9 @@ Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
 
 Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 
-* Improvements
-    * Standardizes the arguments passed to spatial functions to only tuples, not separate x and y coordinates. (Breaks backwards compatibility)
+**Improvements**
+
+* Standardizes the arguments passed to spatial functions to only tuples, not separate x and y coordinates. (Breaks backwards compatibility)
 
 
 0.6.5.1 (2015-07-11)
@@ -110,11 +115,14 @@ Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 
 Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 
-* Improvements
-    * Adding version, license, copyright, title to __init__.py
-    * Auto updating version in setup.py
-* Bug fix
-    * Updating MANIFEST.in to include visualization templates that were missing.
+**Improvements**
+
+* Adding version, license, copyright, title to __init__.py
+* Auto updating version in setup.py
+
+**Fixes**
+
+* Updating MANIFEST.in to include visualization templates that were missing.
 
 
 0.6.5 (2015-07-11)
@@ -122,18 +130,23 @@ Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 
 Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 
-* Edits
-    * Additions to tutorial doc
-    * Minor edits to README & Intro
-    * Minor edits / clean up to setup.py
-    * Removing .ipynb_checkpoints
-    * Removing out-of-date planning documentation.
-* Bug fix
-    * Use setuptools' find_packages function to get the list of packages to install, fixes #141
-* Improvements
-    * Use package_data for include the web files
-    * Use a MANIFEST.in file to include the LICENSE file in source distributions
-    * Using conda on Travis allows much faster builds and test runs
+**Edits**
+
+* Additions to tutorial doc
+* Minor edits to README & Intro
+* Minor edits / clean up to setup.py
+* Removing .ipynb_checkpoints
+* Removing out-of-date planning documentation.
+
+**Fixes**
+
+* Use setuptools' find_packages function to get the list of packages to install, fixes #141
+
+**Improvements**
+
+* Use package_data for include the web files
+* Use a MANIFEST.in file to include the LICENSE file in source distributions
+* Using conda on Travis allows much faster builds and test runs
 
 
 0.6.2 (2015-07-09)
@@ -148,7 +161,7 @@ Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 0.6.1 (2015-06-27)
 ++++++++++++++++++
 
-* Bug Fix: Order of operations reversed: agent is removed first and then it is placed.
+* Fixes: Order of operations reversed: agent is removed first and then it is placed.
 * Improvement: `LICENSE`_ was updates from MIT to Apache 2.0.
 
 .. _`LICENSE` : https://github.com/projectmesa/mesa/blob/master/LICENSE
