@@ -32,7 +32,7 @@ other agent locations, represented by circles:
  1:[
 	{"Shape": "circle", "x": 0, "y": 0, "r": 0.5, "Color": "#AAAAAA", "Filled": "true", "Layer": 1, "text": 'A', "text_color": "white"},
 	{"Shape": "circle", "x": 1, "y": 1, "r": 0.5, "Color": "#AAAAAA", "Filled": "true", "Layer": 1, "text": 'B', "text_color": "white"}
-	{"Shape": "arrowHead", "x": 1, "y": 0, "heading0": -1, heading1: 0, "scale": 0.5, "Color": "green", "Filled": "true", "Layer": 1, "text": 'C', "text_color": "white"}
+	{"Shape": "arrowHead", "x": 1, "y": 0, "heading_x": -1, heading_y: 0, "scale": 0.5, "Color": "green", "Filled": "true", "Layer": 1, "text": 'C', "text_color": "white"}
    ]
 }
 
@@ -66,7 +66,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
 			else if (p.Shape == "circle")
 				this.drawCircle(p.x, p.y, p.r, p.Color, p.Filled, p.text, p.text_color);
                         else if (p.Shape == "arrowHead")
-				this.drawArrowHead(p.x, p.y, p.heading0, p.heading1, p.scale, p.Color, p.Filled, p.text, p.text_color);
+				this.drawArrowHead(p.x, p.y, p.heading_x, p.heading_y, p.scale, p.Color, p.Filled, p.text, p.text_color);
 		}
 	};
 
@@ -154,11 +154,11 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
         text: Inscribed text in shape.
         text_color: Color of the inscribed text.
 	*/
-        this.drawArrowHead = function(x, y, heading0, heading1, scale, color, fill, text, text_color) {
+        this.drawArrowHead = function(x, y, heading_x, heading_y, scale, color, fill, text, text_color) {
                 arrowR = maxR * scale;
 		var cx = (x + 0.5) * cellWidth;
 		var cy = (y + 0.5) * cellHeight;
-                if (heading0 === 0 && heading1 === 1) {
+                if (heading_x === 0 && heading_y === 1) {
                         p1_x = cx;
                         p1_y = cy - arrowR;
                         p2_x = cx - arrowR;
@@ -168,7 +168,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
                         p4_x = cx + arrowR;
                         p4_y = cy + arrowR;
                 }
-                else if (heading0 === 1 && heading1 === 0) {
+                else if (heading_x === 1 && heading_y === 0) {
                         p1_x = cx + arrowR;
                         p1_y = cy;
                         p2_x = cx - arrowR;
@@ -178,7 +178,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
                         p4_x = cx - arrowR;
                         p4_y = cy + arrowR;
                 }
-                else if (heading0 === 0 && heading1 === (-1)) {
+                else if (heading_x === 0 && heading_y === (-1)) {
                         p1_x = cx;
                         p1_y = cy + arrowR;
                         p2_x = cx - arrowR;
@@ -188,7 +188,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
                         p4_x = cx + arrowR;
                         p4_y = cy - arrowR;
                 }
-                else if (heading0 === (-1) && heading1 === 0) {
+                else if (heading_x === (-1) && heading_y === 0) {
                         p1_x = cx - arrowR;
                         p1_y = cy;
                         p2_x = cx + arrowR;
