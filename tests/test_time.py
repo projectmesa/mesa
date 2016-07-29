@@ -22,7 +22,7 @@ class MockAgent(Agent):
         super().__init__(unique_id, model)
         self.steps = 0
         self.advances = 0
-    
+
     def stage_one(self):
         self.model.log.append(self.unique_id + "_1")
 
@@ -34,6 +34,7 @@ class MockAgent(Agent):
 
     def step(self):
         self.steps += 1
+
 
 class MockModel(Model):
 
@@ -89,7 +90,7 @@ class TestStagedActivation(TestCase):
         model = MockModel(shuffle=False)
         model.step()
         model.step()
-        assert all([i==j for i,j in zip(model.log[:4], model.log[4:])])
+        assert all([i == j for i, j in zip(model.log[:4], model.log[4:])])
 
     def test_shuffle(self):
         '''
@@ -166,8 +167,6 @@ class TestSimultaneousActivation(TestCase):
         '''
         Test the simultaneous activation step causes each agent to step
         '''
-
-        
         model = MockModel(activation=SIMULTANEOUS)
         model.step()
         # one step for each of 2 agents
