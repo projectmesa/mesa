@@ -88,7 +88,8 @@ class TestStagedActivation(TestCase):
         '''
         model = MockModel(shuffle=False)
         model.step()
-        assert model.log == self.expected_output
+        model.step()
+        assert all([i==j for i,j in zip(model.log[:4], model.log[4:])])
 
     def test_shuffle(self):
         '''
