@@ -54,18 +54,19 @@ class FiniteLifeAgent(Agent):
         super().__init__(unique_id, model)
         self.remaining_life = lifetime
         self.steps = 0
+        self.model = model
 
-    def step(self, model):
-        inactivated = self.inactivate(model)
+    def step(self):
+        inactivated = self.inactivate()
         if not inactivated:
             self.steps += 1 # keep track of how many ticks are seen
             if np.random.binomial(1,0.1) is not 0: # 10% chance of dying
-                model.schedule.remove(self)
+                self.model.schedule.remove(self)
             
-    def inactivate(self, model):
+    def inactivate(self):
         self.remaining_life -= 1
         if self.remaining_life < 0:
-            model.schedule.remove(self)
+            self.model.schedule.remove(self)
             return True
         return False
 
