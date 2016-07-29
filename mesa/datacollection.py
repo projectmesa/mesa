@@ -136,7 +136,7 @@ class DataCollector:
         if self.agent_reporters:
             for var, reporter in self.agent_reporters.items():
                 agent_records = []
-                for agent in model.schedule.agents:
+                for agent in model.schedule.agents.values():
                     agent_records.append((agent.unique_id, reporter(agent)))
                 self.agent_vars[var].append(agent_records)
 

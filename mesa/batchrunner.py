@@ -154,7 +154,7 @@ class BatchRunner:
     def collect_agent_vars(self, model):
         """ Run reporters and collect agent-level variables. """
         agent_vars = {}
-        for agent in model.schedule.agents:
+        for agent in model.schedule.agents.values():
             agent_record = {}
             for var, reporter in self.agent_reporters.items():
                 agent_record[var] = reporter(agent)
