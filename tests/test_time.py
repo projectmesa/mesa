@@ -2,6 +2,7 @@
 Test the advanced schedulers.
 '''
 
+import unittest
 from unittest import TestCase
 from unittest.mock import patch
 from mesa import Model, Agent
@@ -17,7 +18,11 @@ class MockAgent(Agent):
     '''
     Minimalistic agent for testing purposes.
     '''
-
+    def __init__(self, unique_id, model):
+        super().__init__(unique_id, model)
+        self.steps = 0
+        self.advances = 0
+    
     def stage_one(self):
         self.model.log.append(self.unique_id + "_1")
 
@@ -25,8 +30,10 @@ class MockAgent(Agent):
         self.model.log.append(self.unique_id + "_2")
 
     def advance(self):
-        pass
+        self.advances += 1
 
+    def step(self):
+        self.steps += 1
 
 class MockModel(Model):
 
@@ -106,8 +113,9 @@ class TestStagedActivation(TestCase):
         Test staged activation can remove an agent
         '''
         model = MockModel(shuffle=True)
-        agent = model.schedule.agents[0]
-        model.schedule.remove(model.schedule.agents[0])
+        agent_keys = list(model.schedule.agents.keys())
+        agent = model.schedule.agents[agent_keys[0]]
+        model.schedule.remove(agent)
         assert agent not in model.schedule.agents
 
 
@@ -141,11 +149,11 @@ class TestRandomActivation(TestCase):
         Test the random activation step causes each agent to step
         '''
 
-        with patch('test_time.MockAgent.step') as mock_agent_step:
-            model = MockModel(activation=RANDOM)
-            model.step()
-            # one step for each of 2 agents
-            assert mock_agent_step.call_count == 2
+        model = MockModel(activation=RANDOM)
+        model.step()
+        agent_steps = [i.steps for i in model.schedule.agents.values()]
+        # one step for each of 2 agents
+        assert all(map(lambda x: x == 1, agent_steps))
 
 
 class TestSimultaneousActivation(TestCase):
@@ -158,10 +166,14 @@ class TestSimultaneousActivation(TestCase):
         Test the simultaneous activation step causes each agent to step
         '''
 
-        with patch('test_time.MockAgent.step') as mock_agent_step,\
-                patch('test_time.MockAgent.advance') as mock_agent_advance:
-            model = MockModel(activation=SIMULTANEOUS)
-            model.step()
-            # one step for each of 2 agents
-            assert mock_agent_step.call_count == 2
-            assert mock_agent_advance.call_count == 2
+        
+        model = MockModel(activation=SIMULTANEOUS)
+        model.step()
+        # one step for each of 2 agents
+        agent_steps = [i.steps for i in model.schedule.agents.values()]
+        agent_advances = [i.advances for i in model.schedule.agents.values()]
+        assert all(map(lambda x: x == 1, agent_steps))
+        assert all(map(lambda x: x == 1, agent_advances))
+
+if __name__ == '__main__':
+    unittest.main()
