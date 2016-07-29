@@ -73,7 +73,7 @@ class BaseScheduler:
         """ Execute the step of all the agents, one at a time. """
         agent_keys = list(self.agents.keys())
         for agent_key in agent_keys:
-            self.agents[agent_key].step(self.model)
+            self.agents[agent_key].step()
         self.steps += 1
         self.time += 1
 
@@ -101,7 +101,7 @@ class RandomActivation(BaseScheduler):
         random.shuffle(agent_keys)
         
         for agent_key in agent_keys:
-            self.agents[agent_key].step(self.model)
+            self.agents[agent_key].step()
         self.steps += 1
         self.time += 1
 
@@ -118,9 +118,9 @@ class SimultaneousActivation(BaseScheduler):
         """ Step all agents, then advance them. """
         agent_keys = list(self.agents.keys())
         for agent_key in agent_keys:
-            self.agents[agent_key].step(self.model)
+            self.agents[agent_key].step()
         for agent_key in agent_keys:
-            self.agents[agent_key].advance(self.model)
+            self.agents[agent_key].advance()
         self.steps += 1
         self.time += 1
 
