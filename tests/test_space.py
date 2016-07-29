@@ -100,3 +100,6 @@ class TestSpaceNonToroidal(unittest.TestCase):
 
         neighbors_3 = self.space.get_neighbors((-30, -30), 10)
         assert len(neighbors_3) == 0
+
+if __name__ == '__main__':
+    unittest.main()
