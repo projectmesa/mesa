@@ -101,7 +101,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
 		context.stroke();
 
 		if (fill) {
-            var grd=context.createRadialGradient(cx, cy, r, cx, cy, 0);
+            var grd=context.createRadialGradient(cx, cy, radius, cx, cy, 0);
 
             for (i = 0; i < colors.length; i++) {
                 grd.addColorStop(i/colors.length, colors[i]);
