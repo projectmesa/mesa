@@ -99,7 +99,7 @@ class RandomActivation(BaseScheduler):
         """
         agent_keys = list(self.agents.keys())
         random.shuffle(agent_keys)
-        
+
         for agent_key in agent_keys:
             self.agents[agent_key].step()
         self.steps += 1
