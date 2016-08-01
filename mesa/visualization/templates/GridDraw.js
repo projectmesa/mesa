@@ -104,7 +104,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
             var grd=context.createRadialGradient(cx, cy, r, cx, cy, 0);
 
             for (i = 0; i < colors.length; i++) {
-                grd.addColorStop(i, colors[i]);
+                grd.addColorStop(i/colors.length, colors[i]);
             }
 
             // Fill with gradient
@@ -149,7 +149,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
             var grd=context.createRadialGradient(x0+cellWidth/2, y0+cellHeight/2, cellHeight/2, x0+cellWidth/2, y0+cellHeight/2, 0);
 
             for (i = 0; i < colors.length; i++) {
-                grd.addColorStop(i, colors[i]);
+                grd.addColorStop(i/colors.length, colors[i]);
             }
 
             // Fill with gradient
@@ -242,7 +242,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
             var grd=context.createRadialGradient(cx, cy, arrowR*0.8, cx, cy, 0);
 
             for (i = 0; i < colors.length; i++) {
-                grd.addColorStop(i, colors[i]);
+                grd.addColorStop(i/colors.length, colors[i]);
             }
 
             // Fill with gradient
