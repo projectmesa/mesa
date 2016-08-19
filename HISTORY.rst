@@ -5,7 +5,9 @@ Release History
 
 Next release
 ++++++++++++++++++
-* ... 
+* Fixes - variable name heading0/1 in ArrowHead shape is not intuitive. #295 #301
+* Fixes - ArrowHead shape is not reflecting in the docs of api #300 #301
+* Fixes - Documentation is not reflecting latest changes wrt width-height argument order in Grid() #296 #301
 
 
 0.7.6 (2016-08-13)
