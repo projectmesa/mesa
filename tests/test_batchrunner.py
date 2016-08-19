@@ -114,7 +114,8 @@ class TestBatchRunner(unittest.TestCase):
         # This test is a little bit cumbersome b/c it ignores setUp() call
         # and creates runner from scratch.
 
-        params = {'dict_model_param': {'width': 10, 'height': 10},
+        params = {'dict_model_param': [{'width': 10, 'height': 10},
+                                       {'width': 25, 'height': 15}],
                   'agent_param': [10, 100, 1000]}
         batch = self.create_batch_runner(params, DictionaryMockModel)
 
@@ -123,9 +124,11 @@ class TestBatchRunner(unittest.TestCase):
         agent_vars = batch.get_agent_vars_dataframe()
 
         assert "dict_model_param" in model_vars.columns
-        assert len(model_vars.dict_model_param.unique()) == 1
+        assert len(model_vars.dict_model_param.unique()) == 2
         assert "dict_model_param" in agent_vars.columns
-        assert len(agent_vars.dict_model_param.unique()) == 1
+        assert len(agent_vars.dict_model_param.unique()) == 2
         expected = params['dict_model_param']
-        actual = dict(model_vars.dict_model_param.unique()[0])
-        assert actual == expected
+        actual = [dict(p) for p in model_vars.dict_model_param.unique()]
+        for param in expected:
+            assert param in actual
+
