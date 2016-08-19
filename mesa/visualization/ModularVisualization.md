@@ -35,9 +35,9 @@ CanvasGrid iterates over every object in every cell of your model's grid (it ass
         For rectangles:
             "w", "h": The width and height of the rectangle, which are in fractions of cell width and height.
         For arrowHead:
-            "scale": Proportion scaling as a fraction of cell size. shape=0.5 will fit the arrowHead into half of the cell.
-            "heading0": represents x direction unit vector.
-            "heading1": represents y direction unit vector.
+            "scale": Proportion scaling as a fraction of cell size.
+            "heading_x": represents x direction unit vector.
+            "heading_y": represents y direction unit vector.
     "Color": The color to draw the shape in; needs to be a valid HTML color, e.g."Red" or "#AA08F8"
     "Filled": either "true" or "false", and determines whether the shape is filled or not.
     "Layer": Layer number of 0 or above; higher-numbered layers are drawn above lower-numbered layers.

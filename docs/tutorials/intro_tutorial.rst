@@ -386,7 +386,7 @@ to share a cell, we use ``MultiGrid``.
 
     from mesa.space import MultiGrid
 
-We instantiate a grid with height and width parameters, and a boolean as
+We instantiate a grid with width and height parameters, and a boolean as
 to whether the grid is toroidal. Let's make width and height model
 parameters, in addition to the number of agents, and have the grid
 always be toroidal. We can place agents on a grid with the grid's
@@ -399,7 +399,7 @@ coordinates to place the agent.
         """A model with some number of agents."""
         def __init__(self, N, width, height):
             self.num_agents = N
-            self.grid = MultiGrid(height, width, True)
+            self.grid = MultiGrid(width, height, True)
             self.schedule = RandomActivation(self)
             
             # Create agents
@@ -492,7 +492,7 @@ Now, putting that all together should look like this:
         """A model with some number of agents."""
         def __init__(self, N, width, height):
             self.num_agents = N
-            self.grid = MultiGrid(height, width, True)
+            self.grid = MultiGrid(width, height, True)
             self.schedule = RandomActivation(self)
             # Create agents
             for i in range(self.num_agents):
@@ -650,7 +650,7 @@ measure of wealth inequality.
         """A model with some number of agents."""
         def __init__(self, N, width, height):
             self.num_agents = N
-            self.grid = MultiGrid(height, width, True)
+            self.grid = MultiGrid(width, height, True)
             self.schedule = RandomActivation(self)
             
             # Create agents
@@ -826,7 +826,7 @@ indefinitely.
         """A model with some number of agents."""
         def __init__(self, N, width, height):
             self.num_agents = N
-            self.grid = MultiGrid(height, width, True)
+            self.grid = MultiGrid(width, height, True)
             self.schedule = RandomActivation(self)
             self.running = True
             
@@ -867,8 +867,8 @@ Now, we can set up and run the BatchRunner:
 
 .. code:: python
 
-    parameters = {"height": 10, 
-                  "width": 10, 
+    parameters = {"width": 10,
+                  "height": 10,  
                   "N": range(10, 500, 10)}
     
     batch_run = BatchRunner(MoneyModel, 
