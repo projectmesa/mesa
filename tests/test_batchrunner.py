@@ -46,6 +46,12 @@ class MockModel(Model):
         self.schedule.step()
 
 
+class DictionaryMockModel(MockModel):
+
+    def __init__(self, dict_model_param, agent_param):
+        super().__init__(dict_model_param, agent_param)
+
+
 class TestBatchRunner(unittest.TestCase):
     """
     Test that BatchRunner is running batches
@@ -54,23 +60,30 @@ class TestBatchRunner(unittest.TestCase):
         """
         Create the model and run it for some steps
         """
-        self.model_reporter = {"model": lambda m: m.model_param}
-        self.agent_reporter = {
-            "agent_id": lambda a: a.unique_id,
-            "agent_val": lambda a: a.val}
         self.params = {
             'model_param': range(3),
             'agent_param': [1, 8],
         }
+        self.batch = self.create_batch_runner(self.params, MockModel)
+        self.batch.run_all()
+
+    def create_batch_runner(self, runner_params, model):
+        """
+        Helper method to create runner with specific parameters.
+        """
+        self.model_reporter = {"model": lambda m: m.model_param}
+        self.agent_reporter = {
+            "agent_id": lambda a: a.unique_id,
+            "agent_val": lambda a: a.val}
         self.iterations = 17
-        self.batch = BatchRunner(
-            MockModel,
-            self.params,
+        batch = BatchRunner(
+            model,
+            runner_params,
             iterations=self.iterations,
             max_steps=3,
             model_reporters=self.model_reporter,
             agent_reporters=self.agent_reporter)
-        self.batch.run_all()
+        return batch
 
     def test_model_level_vars(self):
         """
@@ -92,3 +105,27 @@ class TestBatchRunner(unittest.TestCase):
             len(self.params['model_param']) * \
             self.iterations
         assert agent_vars.shape == (rows, 6)
+
+    def test_passing_dictionary_argument_into_batch_runner(self):
+        """
+        Tests that batch runner properly processes arguments of
+        dictionary type.
+        """
+        # This test is a little bit cumbersome b/c it ignores setUp() call
+        # and creates runner from scratch.
+
+        params = {'dict_model_param': {'width': 10, 'height': 10},
+                  'agent_param': [10, 100, 1000]}
+        batch = self.create_batch_runner(params, DictionaryMockModel)
+
+        batch.run_all()
+        model_vars = batch.get_model_vars_dataframe()
+        agent_vars = batch.get_agent_vars_dataframe()
+
+        assert "dict_model_param" in model_vars.columns
+        assert len(model_vars.dict_model_param.unique()) == 1
+        assert "dict_model_param" in agent_vars.columns
+        assert len(agent_vars.dict_model_param.unique()) == 1
+        expected = params['dict_model_param']
+        actual = dict(model_vars.dict_model_param.unique()[0])
+        assert actual == expected

@@ -6,8 +6,18 @@ Batchrunner
 A single class to manage a batch run or parameter sweep of a given model.
 
 """
+from collections import Mapping
 from itertools import product
 import pandas as pd
+
+
+def combinations(*items):
+    """
+    A small fix to handle dictionary type parameters in cartesian product.
+    """
+    prepared = [(item,) if isinstance(item, Mapping) else item
+                for item in items]
+    yield from (param for param in product(*prepared))
 
 
 class BatchRunner:
@@ -64,22 +74,30 @@ class BatchRunner:
 
     def run_all(self):
         """ Run the model at all parameter combinations and store results. """
+
+        def make_key(elements):
+            return tuple(
+                frozenset(e.items()) if isinstance(e, Mapping) else e
+                for e in elements)
+
         params = self.parameter_values.keys()
         param_ranges = self.parameter_values.values()
         run_count = 0
-        for param_values in list(product(*param_ranges)):
+        # for param_values in list(product(*param_ranges)):
+        for param_values in combinations(*param_ranges):
             kwargs = dict(zip(params, param_values))
             for _ in range(self.iterations):
                 model = self.model_cls(**kwargs)
                 self.run_model(model)
                 # Collect and store results:
                 if self.model_reporters:
-                    key = tuple(list(param_values) + [run_count])
+                    key = make_key(list(param_values) + [run_count])
                     self.model_vars[key] = self.collect_model_vars(model)
                 if self.agent_reporters:
                     agent_vars = self.collect_agent_vars(model)
                     for agent_id, reports in agent_vars.items():
-                        key = tuple(list(param_values) + [run_count, agent_id])
+                        key = make_key(
+                            list(param_values) + [run_count, agent_id])
                         self.agent_vars[key] = reports
                 run_count += 1
 
