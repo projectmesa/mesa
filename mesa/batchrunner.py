@@ -67,15 +67,14 @@ class BatchRunner:
 
         self.display_progress = display_progress
 
-
     def run_all(self):
         """ Run the model at all parameter combinations and store results. """
         params = self.parameter_values.keys()
         param_ranges = self.parameter_values.values()
         run_count = 0
 
-        if self.display_progress :
-            pbar = tqdm (total = len(list(product(*param_ranges))) * self.iterations)
+        if self.display_progress:
+            pbar = tqdm(total=len(list(product(*param_ranges))) * self.iterations)
 
         for param_values in list(product(*param_ranges)):
             kwargs = dict(zip(params, param_values))
@@ -91,12 +90,12 @@ class BatchRunner:
                     for agent_id, reports in agent_vars.items():
                         key = tuple(list(param_values) + [run_count, agent_id])
                         self.agent_vars[key] = reports
-                if self.display_progress :
+                if self.display_progress:
                     pbar.update()
 
                 run_count += 1
 
-        if self.display_progress :
+        if self.display_progress:
             pbar.close()
 
     def run_model(self, model):
