@@ -24,11 +24,13 @@ Grid-based demographic prisoner's dilemma model, demonstrating how simple mimici
 ### Schelling
 Mesa implementation of the classic [Schelling segregation model](http://nifty.stanford.edu/2014/mccown-schelling-model-segregation/). 
 
+### Shape Example
+Example of grid display and direction showing agents in the form of arrow-head shape. 
+
 ### Tutorial-Boltzmann_Wealth_Model
 Completed code to go along with the [tutorial]() on making a simple model of how a highly-skewed wealth distribution can emerge from simple rules.
 
 ### WolfSheep
 Implementation of an ecological model of predation and reproduction, based on the NetLogo [Wolf Sheep Predation model](http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation).
 
-### Basic
-Example of grid display and direction showing agents in the form of arrow-head shape. 
+

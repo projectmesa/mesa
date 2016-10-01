@@ -1,4 +1,4 @@
-# Basic Grid with two agents
+# Shape Model -- Basic Grid with two agents
 
 ## Summary
 
@@ -36,6 +36,6 @@ press Reset, then Run.
 
 ## Files
 
-* ``basic/model.py``: Defines the Basic model and agents.
-* ``basic/server.py``: Sets up the interactive visualization server.
+* ``shape_model/model.py``: Defines the basic shape model and agents.
+* ``shape_model/server.py``: Sets up the interactive visualization server.
 * ``run.py``: Launches a model visualization server.
