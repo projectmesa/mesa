@@ -9,6 +9,7 @@ requires = [
     'tornado',
     'numpy',
     'pandas',
+    'tqdm',
 ]
 
 version = ''

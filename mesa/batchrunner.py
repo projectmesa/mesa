@@ -8,6 +8,7 @@ A single class to manage a batch run or parameter sweep of a given model.
 """
 from itertools import product
 import pandas as pd
+from tqdm import tqdm
 
 
 class BatchRunner:
@@ -23,7 +24,8 @@ class BatchRunner:
 
     """
     def __init__(self, model_cls, parameter_values, iterations=1,
-                 max_steps=1000, model_reporters=None, agent_reporters=None):
+                 max_steps=1000, model_reporters=None, agent_reporters=None,
+                 display_progress=True):
         """ Create a new BatchRunner for a given model with the given
         parameters.
 
@@ -45,6 +47,7 @@ class BatchRunner:
             agent_reporters: Like model_reporters, but each variable is now
                 collected at the level of each agent present in the model at
                 the end of the run.
+            display_progress: Display progresss bar with time estimation?
 
         """
         self.model_cls = model_cls
@@ -62,11 +65,17 @@ class BatchRunner:
         if self.agent_reporters:
             self.agent_vars = {}
 
+        self.display_progress = display_progress
+
     def run_all(self):
         """ Run the model at all parameter combinations and store results. """
         params = self.parameter_values.keys()
         param_ranges = self.parameter_values.values()
         run_count = 0
+
+        if self.display_progress:
+            pbar = tqdm(total=len(list(product(*param_ranges))) * self.iterations)
+
         for param_values in list(product(*param_ranges)):
             kwargs = dict(zip(params, param_values))
             for _ in range(self.iterations):
@@ -81,7 +90,13 @@ class BatchRunner:
                     for agent_id, reports in agent_vars.items():
                         key = tuple(list(param_values) + [run_count, agent_id])
                         self.agent_vars[key] = reports
+                if self.display_progress:
+                    pbar.update()
+
                 run_count += 1
+
+        if self.display_progress:
+            pbar.close()
 
     def run_model(self, model):
         """ Run a model object to completion, or until reaching max steps.
