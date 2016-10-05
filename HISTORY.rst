@@ -5,7 +5,7 @@ Release History
 
 Next release
 ++++++++++++++++++
-* ... 
+* Update ForestFire example notebook to new API, and rename Basic to Shape Example. #318
 
 
 0.7.7 (2016-08-18)
