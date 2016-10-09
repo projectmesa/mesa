@@ -79,7 +79,6 @@ Client -> Server:
 
 """
 import os
-import datetime as dt
 
 import tornado.ioloop
 import tornado.template
@@ -166,21 +165,14 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(message)
 
         if msg["type"] == "get_step":
-            step = int(msg["step"])
-            if step < len(self.application.viz_states):
-                return_message = {"type": "viz_state"}
-                return_message["data"] = self.application.viz_states[step]
-            else:
-                return_message = {"type": "end"}
-            self.write_message(return_message)
+            self.application.model.step()
+            self.write_message({"type": "viz_state",
+                    "data": self.application.render_model()})
 
         elif msg["type"] == "reset":
             self.application.reset_model()
-            return_message = {"type": "viz_state"}
-            return_message["data"] = self.application.viz_states[0]
-
-            self.write_message(return_message)
-            self.application.run_model()
+            self.write_message({"type": "viz_state",
+                    "data": self.application.render_model()})
 
         else:
             if self.application.verbose:
@@ -201,7 +193,6 @@ class ModularServer(tornado.web.Application):
     grid_width = 0
 
     max_steps = 100000
-    viz_states = []
 
     model_args = ()
     model_kwargs = {}
@@ -248,7 +239,6 @@ class ModularServer(tornado.web.Application):
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
         self.model = self.model_cls(*self.model_args, **self.model_kwargs)
-        self.viz_states = [self.render_model()]
 
     def render_model(self):
         """ Turn the current state of the model into a dictionary of
@@ -260,20 +250,6 @@ class ModularServer(tornado.web.Application):
             element_state = element.render(self.model)
             visualization_state.append(element_state)
         return visualization_state
-
-    @tornado.gen.coroutine
-    def run_model(self):
-        """ Run the model forward and store each viz state.
-
-        #TODO: Have this run concurrently (I think) inside the event loop?
-
-        """
-        while self.model.schedule.steps < self.max_steps and self.model.running:
-            self.model.step()
-            self.viz_states.append(self.render_model())
-
-            yield tornado.gen.Task(tornado.ioloop.IOLoop.current().add_timeout,
-                dt.timedelta(milliseconds=5))
 
     def launch(self, port=None):
         """ Run the app. """
