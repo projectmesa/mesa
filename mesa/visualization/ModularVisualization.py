@@ -187,7 +187,7 @@ class ModularServer(tornado.web.Application):
     model_name = "Mesa Model"
     model_cls = None  # A model class
     portrayal_method = None
-    port = 8888  # Default port to listen on
+    port = 8000  # Default port to listen on
     canvas_width = 500
     canvas_height = 500
     grid_height = 0

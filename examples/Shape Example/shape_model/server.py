@@ -38,7 +38,7 @@ def launch_shape_model():
     server = ModularServer(ShapesModel, [grid], "Shape Model Example",
                            num_agents, width, height)
     server.max_steps = 0
-    server.port = 8888
+    server.port = 8000
     server.launch()
 
 if __name__ == "__main__":
