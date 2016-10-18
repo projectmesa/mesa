@@ -81,11 +81,12 @@ Client -> Server:
 import os
 
 import tornado.ioloop
-import tornado.template
 import tornado.web
 import tornado.websocket
 import tornado.escape
 import tornado.gen
+
+import webbrowser
 
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
@@ -255,6 +256,8 @@ class ModularServer(tornado.web.Application):
         """ Run the app. """
         if port is not None:
             self.port = port
-        print('Interface starting at http://127.0.0.1:{PORT}'.format(PORT=self.port))
+        url = 'http://127.0.0.1:{PORT}'.format(PORT=self.port)
+        print('Interface starting at {url}'.format(url=url))
         self.listen(self.port)
+        webbrowser.open(url)
         tornado.ioloop.IOLoop.instance().start()
