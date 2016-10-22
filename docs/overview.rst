@@ -135,7 +135,7 @@ To quickly spin up a model visualization, you might do something like:
     from mesa.visualization.modules import CanvasGrid
     from mesa.visualization.ModularVisualization import ModularServer
 
-	 def agent_portrayal(agent):
+    def agent_portrayal(agent):
         portrayal = {"Shape": "circle",
                      "Filled": "true",
                      "Layer": 0,
