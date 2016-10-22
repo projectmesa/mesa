@@ -317,3 +317,6 @@ class TestMultiGrid(unittest.TestCase):
 
         neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
         assert len(neighbors) == 11
+
+if __name__ == '__main__':
+    unittest.main()

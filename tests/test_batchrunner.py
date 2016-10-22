@@ -92,3 +92,6 @@ class TestBatchRunner(unittest.TestCase):
             len(self.params['model_param']) * \
             self.iterations
         assert agent_vars.shape == (rows, 6)
+
+if __name__ == '__main__':
+    unittest.main()
