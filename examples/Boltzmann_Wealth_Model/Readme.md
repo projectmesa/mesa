@@ -13,7 +13,7 @@ To follow the tutorial examples, launch the Jupyter Notebook and run the code in
 To launch the interactive server, as described in the [last section of the tutorial](http://mesa.readthedocs.io/en/latest/intro-tutorial.html#adding-visualization), run:
 
 ```
-    $ python Viz_MoneyModel.py
+    $ python viz_money_model.py
 ```
 
 Then open your browser to [http://127.0.0.1:8889/](http://127.0.0.1:8889/) and press Reset, then Run.
@@ -22,8 +22,8 @@ Then open your browser to [http://127.0.0.1:8889/](http://127.0.0.1:8889/) and p
 ## Files
 
 * ``Introduction to Mesa Tutorial Code.ipynb``: Jupyter Notebook with all the steps as described in the tutorial.
-* ``MoneyModel.py``: Final version of the model.
-* ``Viz_MoneyModel.py``: Creates and launches interactive visualization.
+* ``money_model.py``: Final version of the model.
+* ``viz_money_model.py``: Creates and launches interactive visualization.
 
 ## Further Reading
 

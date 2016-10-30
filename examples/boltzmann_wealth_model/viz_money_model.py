@@ -2,7 +2,7 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.modules import ChartModule
 from mesa.visualization.ModularVisualization import ModularServer
 
-from MoneyModel import MoneyModel
+from money_model import MoneyModel
 
 
 def agent_portrayal(agent):
