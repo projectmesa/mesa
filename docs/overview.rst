@@ -35,32 +35,32 @@ The skeleton of a model might look like this:
     from mesa.space import MultiGrid
 
     class MyAgent(Agent):
-    	def __init__(self, name, model):
-    		super().__init__(name, model)
+        def __init__(self, name, model):
+            super().__init__(name, model)
 
-    	def step(self):
-    		print("{} activated".format(self.name))
-    		# Whatever else the agent does when activated
+        def step(self):
+            print("{} activated".format(self.name))
+            # Whatever else the agent does when activated
 
     class MyModel(Model):
-    	def __init__(self, n_agents):
-    		self.schedule = RandomActivation(self)
-    		self.grid = MultiGrid(10, 10, torus=True)
-    		for i in range(n_agents):
-    			a = MyAgent(i, self)
-    			self.schedule.add(a)
-    			coords = (random.randrange(0, 10), random.randrange(0, 10))
-    			self.grid.place_agent(a, coords)
+        def __init__(self, n_agents):
+            self.schedule = RandomActivation(self)
+            self.grid = MultiGrid(10, 10, torus=True)
+            for i in range(n_agents):
+                a = MyAgent(i, self)
+                self.schedule.add(a)
+                coords = (random.randrange(0, 10), random.randrange(0, 10))
+                self.grid.place_agent(a, coords)
 
-    	def step(self):
-    		self.schedule.step()
+        def step(self):
+            self.schedule.step()
 
 If you instantiate a model and run it for one step, like so:
 
 .. code:: python
 
-	model = MyModel(5)
- 	model.step()
+    model = MyModel(5)
+    model.step()
 
 You should see agents 0-4, activated in random order. See the `tutorial <tutorials/intro_tutorial.html>`_ or API documentation for more detail on how to add model functionality.
 
@@ -77,29 +77,30 @@ You'd add a data collector to the model like this:
 
 .. code:: python
 
-	from mesa.datacollection import DataCollector
+    from mesa.datacollection import DataCollector
 
-	# ...
+    # ...
 
-	class MyModel(Model):
-		def __init__(self, n_agents):
-			# ...
-			self.dc = DataCollector(model_reporters={"agent_count": lambda m: m.schedule.get_agent_count()},
-			agent_reporters={"name": lambda a: a.name})
+    class MyModel(Model):
+        def __init__(self, n_agents):
+            # ...
+            self.dc = DataCollector(model_reporters={"agent_count": 
+                                        lambda m: m.schedule.get_agent_count()},
+                                    agent_reporters={"name": lambda a: a.name})
 
-		def step(self):
-			self.schedule.step()
-			self.dc.collect(self)
+        def step(self):
+            self.schedule.step()
+            self.dc.collect(self)
 
 The data collector will collect the specified model- and agent-level data at each step of the model. After you're done running it, you can extract the data as a `pandas <http://pandas.pydata.org/>`_ DataFrame:
 
 .. code:: python
 
-	model = MyModel(5)
-	for t in range(10):
- 		model.step()
- 	model_df = model.dc.get_model_vars_dataframe()
- 	agent_df = model.dc.get_agent_vars_dataframe()
+    model = MyModel(5)
+    for t in range(10):
+        model.step()
+    model_df = model.dc.get_model_vars_dataframe()
+    agent_df = model.dc.get_agent_vars_dataframe()
 
 
 To batch-run the model while varying, for example, the n_agents parameter, you'd use the batchrunner:
@@ -110,14 +111,15 @@ To batch-run the model while varying, for example, the n_agents parameter, you'd
 
     parameters = {"n_agents": range(1, 20)}
     batch_run = BatchRunner(MyModel, parameters, max_steps=10,
-    						model_reporters={"n_agents": lambda m: m.schedule.get_agent_count()})
+                            model_reporters={"n_agents": lambda m: m.schedule.get_agent_count()})
     batch_run.run_all()
 
- As with the data collector, once the runs are all over, you can extract the data as a data frame.
+
+As with the data collector, once the runs are all over, you can extract the data as a data frame.
 
 .. code:: python
 
-	batch_df = batch_run.get_model_vars_dataframe()
+    batch_df = batch_run.get_model_vars_dataframe()
 
 
 Visualization modules
