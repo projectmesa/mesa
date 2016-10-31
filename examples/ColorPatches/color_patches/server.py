@@ -47,4 +47,4 @@ server = ModularServer(ColorPatchModel,
                        [CANVAS_ELEMENT], "Color Patches",
                        GRID_ROWS, GRID_COLS)
 
-# webbrowser.open('http://127.0.0.1:8888')  # TODO: make this configurable
+# webbrowser.open('http://127.0.0.1:8521')  # TODO: make this configurable

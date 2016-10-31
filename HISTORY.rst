@@ -5,7 +5,11 @@ Release History
 
 Next release
 ++++++++++++++++++
-* ... 
+* Changing to port 8521, fixes #320. #321
+* Opens a browser window when launching the server #323
+* Minor bug fixes - Update ForestFire example notebook to new API, and rename Basic to Shape Example. #318
+* Ticket #314 - added progress bar to BatchRunner #316
+* On-demand model stepping rather than an endless buffer #310
 
 
 0.7.7 (2016-08-18)

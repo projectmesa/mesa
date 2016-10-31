@@ -79,14 +79,14 @@ Client -> Server:
 
 """
 import os
-import datetime as dt
 
 import tornado.ioloop
-import tornado.template
 import tornado.web
 import tornado.websocket
 import tornado.escape
 import tornado.gen
+
+import webbrowser
 
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
@@ -166,21 +166,14 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(message)
 
         if msg["type"] == "get_step":
-            step = int(msg["step"])
-            if step < len(self.application.viz_states):
-                return_message = {"type": "viz_state"}
-                return_message["data"] = self.application.viz_states[step]
-            else:
-                return_message = {"type": "end"}
-            self.write_message(return_message)
+            self.application.model.step()
+            self.write_message({"type": "viz_state",
+                    "data": self.application.render_model()})
 
         elif msg["type"] == "reset":
             self.application.reset_model()
-            return_message = {"type": "viz_state"}
-            return_message["data"] = self.application.viz_states[0]
-
-            self.write_message(return_message)
-            self.application.run_model()
+            self.write_message({"type": "viz_state",
+                    "data": self.application.render_model()})
 
         else:
             if self.application.verbose:
@@ -194,14 +187,13 @@ class ModularServer(tornado.web.Application):
     model_name = "Mesa Model"
     model_cls = None  # A model class
     portrayal_method = None
-    port = 8888  # Default port to listen on
+    port = 8521  # Default port to listen on
     canvas_width = 500
     canvas_height = 500
     grid_height = 0
     grid_width = 0
 
     max_steps = 100000
-    viz_states = []
 
     model_args = ()
     model_kwargs = {}
@@ -248,7 +240,6 @@ class ModularServer(tornado.web.Application):
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
         self.model = self.model_cls(*self.model_args, **self.model_kwargs)
-        self.viz_states = [self.render_model()]
 
     def render_model(self):
         """ Turn the current state of the model into a dictionary of
@@ -261,24 +252,12 @@ class ModularServer(tornado.web.Application):
             visualization_state.append(element_state)
         return visualization_state
 
-    @tornado.gen.coroutine
-    def run_model(self):
-        """ Run the model forward and store each viz state.
-
-        #TODO: Have this run concurrently (I think) inside the event loop?
-
-        """
-        while self.model.schedule.steps < self.max_steps and self.model.running:
-            self.model.step()
-            self.viz_states.append(self.render_model())
-
-            yield tornado.gen.Task(tornado.ioloop.IOLoop.current().add_timeout,
-                dt.timedelta(milliseconds=5))
-
     def launch(self, port=None):
         """ Run the app. """
         if port is not None:
             self.port = port
-        print('Interface starting at http://127.0.0.1:{PORT}'.format(PORT=self.port))
+        url = 'http://127.0.0.1:{PORT}'.format(PORT=self.port)
+        print('Interface starting at {url}'.format(url=url))
         self.listen(self.port)
+        webbrowser.open(url)
         tornado.ioloop.IOLoop.instance().start()

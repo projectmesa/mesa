@@ -1,4 +1,4 @@
-# Basic Grid with two agents
+# Shape Model -- Basic Grid with two agents
 
 ## Summary
 
@@ -31,11 +31,11 @@ To run the model interactively, run ``run.py`` in this directory. e.g.
     $ python run.py
 ```
 
-Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and
+Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and
 press Reset, then Run.
 
 ## Files
 
-* ``basic/model.py``: Defines the Basic model and agents.
-* ``basic/server.py``: Sets up the interactive visualization server.
+* ``shape_model/model.py``: Defines the basic shape model and agents.
+* ``shape_model/server.py``: Sets up the interactive visualization server.
 * ``run.py``: Launches a model visualization server.

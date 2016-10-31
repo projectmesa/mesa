@@ -26,5 +26,5 @@ chart = ChartModule([
 )
 
 server = ModularServer(MoneyModel, [grid, chart], "Money Model", 100, 10, 10)
-server.port = 8888
+server.port = 8521
 server.launch()

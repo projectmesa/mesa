@@ -12,7 +12,7 @@ For example, if you have a model `MyModel`, and two elements, *canvas_vis* and *
     server = ModularServer(MyModel, [canvas_vis, graph_vis])
     server.launch()
 ```
-Then you will be able to view the elements in your browser at http://127.0.0.1:8888/. If you prefer a different port, for example 8887, you can pass it to the server as an argument.
+Then you will be able to view the elements in your browser at http://127.0.0.1:8521/. If you prefer a different port, for example 8887, you can pass it to the server as an argument.
 ```python
     server.launch(8887)
 ```
