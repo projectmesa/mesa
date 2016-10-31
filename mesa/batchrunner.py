@@ -8,6 +8,7 @@ A single class to manage a batch run or parameter sweep of a given model.
 """
 from collections import Mapping
 from itertools import product
+from copy import deepcopy
 import pandas as pd
 from tqdm import tqdm
 
@@ -33,15 +34,15 @@ class BatchRunner:
     entire DataCollector object.
 
     """
-    def __init__(self, model_cls, parameter_values, iterations=1,
-                 max_steps=1000, model_reporters=None, agent_reporters=None,
-                 display_progress=True):
+    def __init__(self, model_cls, variable_parameters, fixed_parameters=None,
+                 iterations=1, max_steps=1000, model_reporters=None,
+                 agent_reporters=None, display_progress=True):
         """ Create a new BatchRunner for a given model with the given
         parameters.
 
         Args:
             model_cls: The class of model to batch-run.
-            parameter_values: Dictionary of parameters to their values or
+            variable_parameters: Dictionary of parameters to their values or
                 ranges of values. For example:
                     {"param_1": range(5),
                      "param_2": [1, 5, 10],
@@ -62,7 +63,8 @@ class BatchRunner:
         """
         self.model_cls = model_cls
         self.parameter_values = {param: self.make_iterable(vals)
-                                 for param, vals in parameter_values.items()}
+                                 for param, vals in variable_parameters.items()}
+        self.fixed_values = fixed_parameters or {}
         self.iterations = iterations
         self.max_steps = max_steps
 
@@ -95,8 +97,9 @@ class BatchRunner:
         # for param_values in list(product(*param_ranges)):
         for param_values in combinations(*param_ranges):
             kwargs = dict(zip(params, param_values))
+            model = self._try_to_init_model(kwargs)
+
             for _ in range(self.iterations):
-                model = self.model_cls(**kwargs)
                 self.run_model(model)
                 # Collect and store results:
                 if self.model_reporters:
@@ -179,3 +182,33 @@ class BatchRunner:
             return val
         else:
             return [val]
+
+    def _try_to_init_model(self, variable_params):
+        """
+        Attempts to instantiate a model with specific variable parameters set
+        and additional fixed parameters if any,
+
+        Args:
+            variable_params: A mapping of a specific set of variable parameters.
+        """
+        if not self.fixed_values:
+            return self.model_cls(**variable_params)
+
+        try:
+            kv = deepcopy(variable_params)
+            kv.update(self.fixed_values)
+            return self.model_cls(**kv)
+
+        except TypeError:
+            import inspect
+            sig = inspect.signature(self.model_cls.__init__)
+            last_arg = list(sig.parameters.values())[-1]
+            valid_types = (last_arg.POSITIONAL_OR_KEYWORD,
+                           last_arg.VAR_POSITIONAL)
+            if last_arg.kind in valid_types:
+                variable_params[last_arg.name] = self.fixed_values
+                return self.model_cls(**variable_params)
+
+        msg = ('Cannot configure model with variable '
+               'params {} and fixed params {}')
+        raise ValueError(msg.format(variable_params, self.fixed_values))
