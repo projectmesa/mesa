@@ -5,6 +5,7 @@ Mesa Agent-Based Modeling Framework
 Core Objects: Model, and Agent.
 
 """
+import datetime
 
 from .model import Model
 from .agent import Agent
@@ -15,4 +16,4 @@ __all__ = ["Model", "Agent"]
 __title__ = 'mesa'
 __version__ = '0.7.7'
 __license__ = 'Apache 2.0'
-__copyright__ = 'Copyright 2015 Project Mesa Team'
+__copyright__ = 'Copyright %s Project Mesa Team' % datetime.date.today().year
