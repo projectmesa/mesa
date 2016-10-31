@@ -19,9 +19,14 @@ No contribution is too small. Although, contributions can be too big, so let's d
 - Fork the Mesa repository.
 - Create a new branch if you aren't contributing to an existing branch.
 - Edit the code.
-- Use `PEP8`_ and the `Google Style Guide`_ as the coding standards for Python.
-- If implementing a new feature, include some documentation and ideally a working example or unit test as well.
-- Submit as pull requests.
+- Use `PEP8`_ and the `Google Style Guide`_ as the coding standards for Python
+- If implementing a new feature, include some documentation.
+- Make sure that you contribution will pass Travis build by having flake8 come back with no errors and make sure test coverage has not decreased.
+
+    - Install libraries to review: ``pip install flake8 nose``
+    - To run flake8: ``flake8 . --ignore=F403,E501,E123,E128 --exclude=docs,build``
+    - To see test coverage: ``nosetests --with-coverage --cover-package=mesa``
+- Submit as a pull request.
 - Describe the change w/ ticket number(s) that the code fixes.
 
 .. _`email list` : https://groups.google.com/forum/#!forum/projectmesa
