@@ -3,9 +3,11 @@
 Release History
 ---------------
 
-Next release
+Next release - Edgar
 ++++++++++++++++++
-* ...
+
+* Auto update year for copyright. #329 
+* Updating contribution to prevent future travis breaks #330
 
 
 0.7.8.1 (2016-11-02) Duncan
