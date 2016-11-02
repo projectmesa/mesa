@@ -13,6 +13,6 @@ from .agent import Agent
 __all__ = ["Model", "Agent"]
 
 __title__ = 'mesa'
-__version__ = '0.7.7'
+__version__ = '0.7.8'
 __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright 2015 Project Mesa Team'
