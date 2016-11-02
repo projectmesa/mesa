@@ -8,13 +8,19 @@ Next release
 * ...
 
 
-0.7.8 (2016-11-02) Duncan
+0.7.8.1 (2016-11-02) Duncan
 ++++++++++++++++++
+
+**Improvements**
+
 * Fixes #324 -- renames all examples to be the pythonic format of naming #328
 * Changing to port 8521, fixes #320. #321
 * Opens a browser window when launching the server #323
-* Minor bug fixes - Update ForestFire example notebook to new API, and rename Basic to Shape Example. #318
 * Ticket #314 - added progress bar to BatchRunner #316
+
+**Fixes**
+
+* Minor bug fixes - Update ForestFire example notebook to new API, and rename Basic to Shape Example. #318
 * On-demand model stepping rather than an endless buffer #310
 
 
