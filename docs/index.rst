@@ -48,8 +48,8 @@ For more help on using Mesa, check out the following resources:
 * `Email list`_
 * `PyPI`_
 
-.. _`Mesa Introductory Tutorial` : http://mesa.readthedocs.org/en/latest/intro_tutorial.html
-.. _`Mesa Advanced Tutorial` : http://mesa.readthedocs.org/en/latest/adv_tutorial.html
+.. _`Mesa Introductory Tutorial` : http://mesa.readthedocs.org/en/latest/tutorials/intro_tutorial.html
+.. _`Mesa Advanced Tutorial` : http://mesa.readthedocs.org/en/latest/tutorials/adv_tutorial.html
 .. _`Docs` : http://mesa.readthedocs.org/en/latest/
 .. _`Email list` : https://groups.google.com/d/forum/projectmesa
 .. _`PyPI` : https://pypi.python.org/pypi/Mesa/
