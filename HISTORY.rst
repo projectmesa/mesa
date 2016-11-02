@@ -5,9 +5,7 @@ Release History
 
 Next release - Edgar
 ++++++++++++++++++
-
-* Auto update year for copyright. #329 
-* Updating contribution to prevent future travis breaks #330
+....
 
 
 0.7.8.1 (2016-11-02) Duncan
@@ -19,11 +17,14 @@ Next release - Edgar
 * Changing to port 8521, fixes #320. #321
 * Opens a browser window when launching the server #323
 * Ticket #314 - added progress bar to BatchRunner #316
+* Auto update year for copyright. #329 
 
 **Fixes**
 
 * Minor bug fixes - Update ForestFire example notebook to new API, and rename Basic to Shape Example. #318
 * On-demand model stepping rather than an endless buffer #310
+* Updating contribution to prevent future travis breaks #330
+
 
 
 0.7.7 (2016-08-18)
