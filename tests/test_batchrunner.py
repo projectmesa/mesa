@@ -49,6 +49,20 @@ class MockModel(Model):
         self.schedule.step()
 
 
+class MockDictionaryModel(Model):
+
+    def __init__(self, variable_param, fixed_params):
+        super().__init__()
+        self.variable_param = variable_param
+        self.fixed_name = fixed_params.get('fixed_name', None)
+        self.running = True
+        self.schedule = BaseScheduler(None)
+        self.schedule.add(MockAgent(1, self, 0))
+
+    def step(self):
+        self.schedule.step()
+
+
 class TestBatchRunner(unittest.TestCase):
     """
     Test that BatchRunner is running batches
@@ -115,9 +129,10 @@ class TestBatchRunner(unittest.TestCase):
 
         assert agent_vars.shape == (self.model_runs * NUM_AGENTS, expected_cols)
 
-    def test_model_with_fixed_parameters(self):
+    def test_model_with_fixed_parameters_as_kwargs(self):
         """
-        Test that model with fixed parameters and kwargs is properly handled
+        Test that model with fixed parameters passed like kwargs is
+        properly handled
         """
         self.fixed_params = {'fixed_model_param': 'Fixed', 'n_agents': 1}
         batch = self.launch_batch_processing()
@@ -127,3 +142,20 @@ class TestBatchRunner(unittest.TestCase):
         assert len(model_vars) == len(agent_vars)
         assert len(model_vars) == self.model_runs
         assert model_vars['reported_fixed_value'].unique() == ['Fixed']
+
+    def test_model_with_fixed_parameters_as_dict(self):
+        self.mock_model = MockDictionaryModel
+        self.model_reporters = {'reported_fixed_param': lambda m: m.fixed_name}
+        self.agent_reporters = {}
+        self.fixed_params = {'fixed_name': 'DictModel'}
+        self.variable_params = {'variable_param': [1, 2, 3]}
+
+        batch = self.launch_batch_processing()
+        model_vars = batch.get_model_vars_dataframe()
+        expected_cols = (len(self.variable_params) +
+                         len(self.model_reporters) +
+                         1)
+
+        assert model_vars.shape == (self.model_runs, expected_cols)
+        assert (model_vars['reported_fixed_param'].iloc[0] ==
+                self.fixed_params['fixed_name'])
