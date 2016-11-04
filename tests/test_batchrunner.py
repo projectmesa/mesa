@@ -112,9 +112,9 @@ class TestBatchRunner(unittest.TestCase):
         self.batch = launch_batch_processing(self)
 
         model_vars = self.batch.get_model_vars_dataframe()
-        rows = len(self.variable_params['model_param']) * \
-               len(self.variable_params['agent_param']) * \
-               self.iterations
+        rows = (len(self.variable_params['model_param']) *
+                len(self.variable_params['agent_param']) *
+                self.iterations)
         assert model_vars.shape == (rows, 4)
 
     def test_agent_level_vars(self):
@@ -124,10 +124,10 @@ class TestBatchRunner(unittest.TestCase):
         self.batch = launch_batch_processing(self)
 
         agent_vars = self.batch.get_agent_vars_dataframe()
-        rows = NUM_AGENTS * \
-               len(self.variable_params['agent_param']) * \
-               len(self.variable_params['model_param']) * \
-               self.iterations
+        rows = (NUM_AGENTS *
+                len(self.variable_params['agent_param']) *
+                len(self.variable_params['model_param']) *
+                self.iterations)
         assert agent_vars.shape == (rows, 6)
 
     # TODO: going to add more extensive testing, just basic sanity checks now
@@ -138,10 +138,10 @@ class TestBatchRunner(unittest.TestCase):
         self.batch = launch_batch_processing(self)
 
         agent_vars = self.batch.get_agent_vars_dataframe()
-        rows = NUM_AGENTS * \
-               len(self.variable_params['agent_param']) * \
-               len(self.variable_params['model_param']) * \
-               self.iterations
+        rows = (NUM_AGENTS *
+                len(self.variable_params['agent_param']) *
+                len(self.variable_params['model_param']) *
+                self.iterations)
         assert agent_vars.shape == (rows, 6)
 
     def test_kwargs_init_model(self):
@@ -153,9 +153,9 @@ class TestBatchRunner(unittest.TestCase):
         self.batch = launch_batch_processing(self)
 
         agent_vars = self.batch.get_agent_vars_dataframe()
-        rows = NUM_AGENTS * \
-               len(self.variable_params['agent_param']) * \
-               len(self.variable_params['model_param']) * \
-               len(self.variable_params['variable_value']) * \
-               self.iterations
+        rows = (NUM_AGENTS *
+                len(self.variable_params['agent_param']) *
+                len(self.variable_params['model_param']) *
+                len(self.variable_params['variable_value']) *
+                self.iterations)
         assert agent_vars.shape == (rows, 7)
