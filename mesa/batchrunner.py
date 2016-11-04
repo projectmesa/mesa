@@ -6,9 +6,9 @@ Batchrunner
 A single class to manage a batch run or parameter sweep of a given model.
 
 """
-from collections import Mapping
 from itertools import product
 import copy
+
 import pandas as pd
 from tqdm import tqdm
 
