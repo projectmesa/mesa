@@ -139,7 +139,7 @@ class StagedActivation(BaseScheduler):
     shuffle_between_stages = False
     stage_time = 1
 
-    def __init__(self, model, stage_list=["step"], shuffle=False,
+    def __init__(self, model, stage_list=None, shuffle=False,
                  shuffle_between_stages=False):
         """ Create an empty Staged Activation schedule.
 
@@ -154,7 +154,7 @@ class StagedActivation(BaseScheduler):
 
         """
         super().__init__(model)
-        self.stage_list = stage_list
+        self.stage_list = stage_list or ["step"]
         self.shuffle = shuffle
         self.shuffle_between_stages = shuffle_between_stages
         self.stage_time = 1 / len(self.stage_list)
