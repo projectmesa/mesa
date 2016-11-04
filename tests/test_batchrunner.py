@@ -1,18 +1,21 @@
 """
 Test the BatchRunner
 """
+from functools import reduce
+from operator import mul
 import unittest
 
 from mesa import Agent, Model
-from mesa.batchrunner import BatchRunner
 from mesa.time import BaseScheduler
+from mesa.batchrunner import BatchRunner
+
 
 NUM_AGENTS = 7
 
 
 class MockAgent(Agent):
     """
-    Minimalistic model for testing purposes
+    Minimalistic agent implementation for testing purposes
     """
     def __init__(self, unique_id, model, val):
         super().__init__(unique_id, model)
@@ -20,9 +23,6 @@ class MockAgent(Agent):
         self.val = val
 
     def step(self):
-        """
-        increment val by 1
-        """
         self.val += 1
 
 
@@ -30,28 +30,23 @@ class MockModel(Model):
     """
     Minimalistic model for testing purposes
     """
-    def __init__(self, model_param, agent_param):
-        """
-        Args:
-            model_param (any): parameter specific to the model
-            agent_param (int): parameter specific to the agent
-        """
+    def __init__(self, variable_model_param, variable_agent_param,
+                 fixed_model_param=None, schedule=None, **kwargs):
         super().__init__()
-        self.schedule = BaseScheduler(None)
-        self.model_param = model_param
+        self.schedule = BaseScheduler(None) if schedule is None else schedule
+        self.variable_model_param = variable_model_param
+        self.variable_agent_param = variable_agent_param
+        self.fixed_model_param = fixed_model_param
+        self.n_agents = kwargs.get('n_agents', NUM_AGENTS)
         self.running = True
-        for i in range(NUM_AGENTS):
-            a = MockAgent(i, self, agent_param)
-            self.schedule.add(a)
+        self.init_agents()
+
+    def init_agents(self):
+        for i in range(self.n_agents):
+            self.schedule.add(MockAgent(i, self, self.variable_agent_param))
 
     def step(self):
         self.schedule.step()
-
-
-class DictionaryMockModel(MockModel):
-
-    def __init__(self, dict_model_param, agent_param):
-        super().__init__(dict_model_param, agent_param)
 
 
 class TestBatchRunner(unittest.TestCase):
@@ -59,118 +54,76 @@ class TestBatchRunner(unittest.TestCase):
     Test that BatchRunner is running batches
     """
     def setUp(self):
-        """
-        Create the model and run it for some steps
-        """
-        self.params = {
-            'model_param': range(3),
-            'agent_param': [1, 8],
-        }
-        self.batch = self.create_batch_runner(self.params, MockModel)
-        self.batch.run_all()
-
-    def create_batch_runner(self, runner_params, model):
-        """
-        Helper method to create runner with specific parameters.
-        """
-        self.model_reporter = {"model": lambda m: m.model_param}
-        self.agent_reporter = {
-            "agent_id": lambda a: a.unique_id,
-            "agent_val": lambda a: a.val}
-        self.iterations = 17
-        batch = BatchRunner(
-            model,
-            runner_params,
-            iterations=self.iterations,
-            max_steps=3,
-            model_reporters=self.model_reporter,
-            agent_reporters=self.agent_reporter)
         self.mock_model = MockModel
+        self.model_reporters = {
+            "reported_variable_value": lambda m: m.variable_model_param,
+            "reported_fixed_value": lambda m: m.fixed_model_param
+        }
+        self.agent_reporters = {
+            "agent_id": lambda a: a.unique_id,
+            "agent_val": lambda a: a.val
+        }
         self.variable_params = {
-            'model_param': range(3),
-            'agent_param': [1, 8],
+            "variable_model_param": range(3),
+            "variable_agent_param": [1, 8]
         }
         self.fixed_params = None
+        self.iterations = 17
         self.max_steps = 3
+
+    def launch_batch_processing(self):
+        batch = BatchRunner(
+            self.mock_model,
+            variable_parameters=self.variable_params,
+            fixed_parameters=self.fixed_params,
+            iterations=self.iterations,
+            max_steps=self.max_steps,
+            model_reporters=self.model_reporters,
+            agent_reporters=self.agent_reporters)
+        batch.run_all()
         return batch
+
+    @property
+    def model_runs(self):
+        """
+        Returns total number of batch runner's iterations.
+        """
+        return (reduce(mul, map(len, self.variable_params.values())) *
+                self.iterations)
 
     def test_model_level_vars(self):
         """
         Test that model-level variable collection is of the correct size
         """
-        self.batch = launch_batch_processing(self)
+        batch = self.launch_batch_processing()
+        model_vars = batch.get_model_vars_dataframe()
+        expected_cols = (len(self.variable_params) +
+                         len(self.model_reporters) +
+                         1)  # extra column with run index
 
-        model_vars = self.batch.get_model_vars_dataframe()
-        rows = (len(self.variable_params['model_param']) *
-                len(self.variable_params['agent_param']) *
-                self.iterations)
-        assert model_vars.shape == (rows, 4)
+        assert model_vars.shape == (self.model_runs, expected_cols)
 
     def test_agent_level_vars(self):
         """
         Test that agent-level variable collection is of the correct size
         """
-        self.batch = launch_batch_processing(self)
+        batch = self.launch_batch_processing()
+        agent_vars = batch.get_agent_vars_dataframe()
+        expected_cols = (len(self.variable_params) +
+                         len(self.agent_reporters) +
+                         1)  # extra column with run index
 
-        agent_vars = self.batch.get_agent_vars_dataframe()
-        rows = (NUM_AGENTS *
-                len(self.variable_params['agent_param']) *
-                len(self.variable_params['model_param']) *
-                self.iterations)
-        assert agent_vars.shape == (rows, 6)
+        assert agent_vars.shape == (self.model_runs * NUM_AGENTS, expected_cols)
 
-    # TODO: going to add more extensive testing, just basic sanity checks now
-
-    def test_dictionary_init_model(self):
-        self.mock_model = DictionaryMockModel
-        self.fixed_params = {'fixed_scalar': 1, 'fixed_dictionary': {'x': 42}}
-        self.batch = launch_batch_processing(self)
-
-        agent_vars = self.batch.get_agent_vars_dataframe()
-        rows = (NUM_AGENTS *
-                len(self.variable_params['agent_param']) *
-                len(self.variable_params['model_param']) *
-                self.iterations)
-        assert agent_vars.shape == (rows, 6)
-
-    def test_passing_dictionary_argument_into_batch_runner(self):
+    def test_model_with_fixed_parameters(self):
         """
-        Tests that batch runner properly processes arguments of
-        dictionary type.
+        Test that model with fixed parameters and kwargs is properly handled
         """
-        # This test is a little bit cumbersome b/c it ignores setUp() call
-        # and creates runner from scratch.
-
-        params = {'dict_model_param': [{'width': 10, 'height': 10},
-                                       {'width': 25, 'height': 15}],
-                  'agent_param': [10, 100, 1000]}
-        batch = self.create_batch_runner(params, DictionaryMockModel)
-
-        batch.run_all()
+        self.fixed_params = {'fixed_model_param': 'Fixed', 'n_agents': 1}
+        batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
         agent_vars = batch.get_agent_vars_dataframe()
 
-        assert "dict_model_param" in model_vars.columns
-        assert len(model_vars.dict_model_param.unique()) == 2
-        assert "dict_model_param" in agent_vars.columns
-        assert len(agent_vars.dict_model_param.unique()) == 2
-        expected = params['dict_model_param']
-        actual = [dict(p) for p in model_vars.dict_model_param.unique()]
-        for param in expected:
-            assert param in actual
-
-    def test_kwargs_init_model(self):
-        self.mock_model = VarArgsMockModel
-        old_params = self.variable_params.copy()
-        old_params['variable_value'] = [1, 2, 3]
-        self.variable_params = old_params
-        self.fixed_params = {'fixed_value': 1}
-        self.batch = launch_batch_processing(self)
-
-        agent_vars = self.batch.get_agent_vars_dataframe()
-        rows = (NUM_AGENTS *
-                len(self.variable_params['agent_param']) *
-                len(self.variable_params['model_param']) *
-                len(self.variable_params['variable_value']) *
-                self.iterations)
-        assert agent_vars.shape == (rows, 7)
+        assert len(model_vars) == len(agent_vars)
+        assert len(model_vars) == self.model_runs
+        assert model_vars['reported_fixed_value'].unique() == ['Fixed']

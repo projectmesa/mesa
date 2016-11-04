@@ -6,9 +6,9 @@ Batchrunner
 A single class to manage a batch run or parameter sweep of a given model.
 
 """
-from collections import Mapping
 from itertools import product
-from copy import deepcopy
+import copy
+
 import pandas as pd
 from tqdm import tqdm
 
@@ -47,6 +47,8 @@ class BatchRunner:
                     {"param_1": range(5),
                      "param_2": [1, 5, 10],
                       "const_param": 100}
+            fixed_parameters: Dictionary of parameters that stay same through
+                all batch runs.
             iterations: The total number of times to run the model for each
                 combination of parameters.
             max_steps: The upper limit of steps above which each run will be halted
@@ -81,12 +83,6 @@ class BatchRunner:
 
     def run_all(self):
         """ Run the model at all parameter combinations and store results. """
-
-        def make_key(elements):
-            return tuple(
-                frozenset(e.items()) if isinstance(e, Mapping) else e
-                for e in elements)
-
         params = self.parameter_values.keys()
         param_ranges = self.parameter_values.values()
         run_count = 0
@@ -103,12 +99,12 @@ class BatchRunner:
                 self.run_model(model)
                 # Collect and store results:
                 if self.model_reporters:
-                    key = make_key(list(param_values) + [run_count])
+                    key = tuple(list(param_values) + [run_count])
                     self.model_vars[key] = self.collect_model_vars(model)
                 if self.agent_reporters:
                     agent_vars = self.collect_agent_vars(model)
                     for agent_id, reports in agent_vars.items():
-                        key = make_key(
+                        key = tuple(
                             list(param_values) + [run_count, agent_id])
                         self.agent_vars[key] = reports
                 if self.display_progress:
@@ -147,33 +143,37 @@ class BatchRunner:
         return agent_vars
 
     def get_model_vars_dataframe(self):
-        """ Generate a pandas DataFrame from the model-level variables collected.
+        """ Generate a pandas DataFrame from the model-level variables
+        collected.
 
         """
-        index_col_names = list(self.parameter_values.keys())
-        index_col_names.append("Run")
-        records = []
-        for key, val in self.model_vars.items():
-            record = dict(zip(index_col_names, key))
-            for k, v in val.items():
-                record[k] = v
-            records.append(record)
-        return pd.DataFrame(records)
+        return self._prepare_report_table(self.model_vars)
 
     def get_agent_vars_dataframe(self):
         """ Generate a pandas DataFrame from the agent-level variables
         collected.
 
         """
-        index_col_names = list(self.parameter_values.keys())
-        index_col_names += ["Run", "AgentID"]
+        return self._prepare_report_table(self.agent_vars)
+
+    def _prepare_report_table(self, vars_dict):
+        """
+        Creates a dataframe from collected records and sorts it using 'Run'
+        column as a key.
+        """
+        index_cols = list(self.parameter_values.keys()) + ['Run']
+
         records = []
-        for key, val in self.agent_vars.items():
-            record = dict(zip(index_col_names, key))
-            for k, v in val.items():
-                record[k] = v
+        for k, v in vars_dict.items():
+            record = dict(zip(index_cols, k))
+            record.update(v)
             records.append(record)
-        return pd.DataFrame(records)
+
+        df = pd.DataFrame(records)
+        rest_cols = set(df.columns) - set(index_cols)
+        ordered = df[index_cols + list(sorted(rest_cols))]
+        ordered.sort_values(by='Run', inplace=True)
+        return ordered
 
     @staticmethod
     def make_iterable(val):
@@ -186,7 +186,7 @@ class BatchRunner:
     def _try_to_init_model(self, variable_params):
         """
         Attempts to instantiate a model with specific variable parameters set
-        and additional fixed parameters if any,
+        and additional fixed parameters if any.
 
         Args:
             variable_params: A mapping of a specific set of variable parameters.
@@ -195,7 +195,7 @@ class BatchRunner:
             return self.model_cls(**variable_params)
 
         try:
-            kv = deepcopy(variable_params)
+            kv = copy.deepcopy(variable_params)
             kv.update(self.fixed_values)
             return self.model_cls(**kv)
 
