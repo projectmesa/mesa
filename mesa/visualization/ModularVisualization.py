@@ -80,6 +80,7 @@ Client -> Server:
 """
 import os
 
+import tornado.autoreload
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
@@ -209,6 +210,7 @@ class ModularServer(tornado.web.Application):
     handlers = [page_handler, socket_handler, static_handler, local_handler]
 
     settings = {"debug": True,
+                "autoreload": False,
                 "template_path": os.path.dirname(__file__) + "/templates"}
 
     def __init__(self, model_cls, visualization_elements, name="Mesa Model",
@@ -254,10 +256,13 @@ class ModularServer(tornado.web.Application):
 
     def launch(self, port=None):
         """ Run the app. """
+        startLoop = not tornado.ioloop.IOLoop.initialized()
         if port is not None:
             self.port = port
         url = 'http://127.0.0.1:{PORT}'.format(PORT=self.port)
         print('Interface starting at {url}'.format(url=url))
         self.listen(self.port)
         webbrowser.open(url)
-        tornado.ioloop.IOLoop.instance().start()
+        tornado.autoreload.start()
+        if startLoop:
+            tornado.ioloop.IOLoop.instance().start()
