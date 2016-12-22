@@ -167,9 +167,12 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(message)
 
         if msg["type"] == "get_step":
-            self.application.model.step()
-            self.write_message({"type": "viz_state",
-                    "data": self.application.render_model()})
+            if not self.application.ui_model.running:
+                self.write_message({"type": "end"})
+            else:
+                self.application.model.step()
+                self.write_message({"type": "viz_state",
+                        "data": self.application.render_model()})
 
         elif msg["type"] == "reset":
             self.application.reset_model()
