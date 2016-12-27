@@ -167,7 +167,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(message)
 
         if msg["type"] == "get_step":
-            if not self.application.ui_model.running:
+            if not self.application.model.running:
                 self.write_message({"type": "end"})
             else:
                 self.application.model.step()

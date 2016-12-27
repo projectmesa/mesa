@@ -97,10 +97,8 @@
 		*/
 
 		var single_step = function() {
-			if (control.running) {
-				control.tick += 1;
-				send({"type": "get_step", "step": control.tick});
-			}
+			control.tick += 1;
+			send({"type": "get_step", "step": control.tick});
 		};
 		var step = function() {
 			if (!control.running) {single_step()}
