@@ -92,6 +92,10 @@ class Grid:
                 col.append(self.default_val())
             self.grid.append(col)
 
+        # Add all cells to the empties list.
+        self.empties = list(itertools.product(
+                            *(range(self.width), range(self.height))))
+
     @staticmethod
     def default_val():
         """ Default value for new cell elements. """
@@ -308,34 +312,24 @@ class Grid:
         """ Place the agent at the correct location. """
         x, y = pos
         self.grid[x][y] = agent
+        if pos in self.empties:
+            self.empties.remove(pos)
+
+    def remove_agent(self, agent):
+        pos = agent.pos
+        self._remove_agent(pos, agent)
+        agent.pos = None
 
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
         x, y = pos
         self.grid[x][y] = None
+        self.empties.append(pos)
 
     def is_cell_empty(self, pos):
         """ Returns a bool of the contents of a cell. """
         x, y = pos
         return True if self.grid[x][y] == self.default_val() else False
-
-
-class SingleGrid(Grid):
-    """ Grid where each cell contains exactly at most one object. """
-    empties = []
-
-    def __init__(self, width, height, torus):
-        """ Create a new single-item grid.
-
-        Args:
-            width, height: The width and width of the grid
-            torus: Boolean whether the grid wraps or not.
-
-        """
-        super().__init__(width, height, torus)
-        # Add all cells to the empties list.
-        self.empties = list(itertools.product(
-                            *(range(self.width), range(self.height))))
 
     def move_to_empty(self, agent):
         """ Moves agent to a random empty cell, vacating agent's old cell. """
@@ -360,6 +354,21 @@ class SingleGrid(Grid):
         """ Return True if any cells empty else False. """
         return len(self.empties) > 0
 
+
+class SingleGrid(Grid):
+    """ Grid where each cell contains exactly at most one object. """
+    empties = []
+
+    def __init__(self, width, height, torus):
+        """ Create a new single-item grid.
+
+        Args:
+            width, height: The width and width of the grid
+            torus: Boolean whether the grid wraps or not.
+
+        """
+        super().__init__(width, height, torus)
+
     def position_agent(self, agent, x=RANDOM, y=RANDOM):
         """ Position an agent on the grid.
         This is used when first placing agents! Use 'move_to_empty()'
@@ -382,13 +391,8 @@ class SingleGrid(Grid):
     def _place_agent(self, pos, agent):
         if self.is_cell_empty(pos):
             super()._place_agent(pos, agent)
-            self.empties.remove(pos)
         else:
             raise Exception("Cell not empty")
-
-    def _remove_agent(self, pos, agent):
-        super()._remove_agent(pos, agent)
-        self.empties.append(pos)
 
 
 class MultiGrid(Grid):
@@ -419,11 +423,15 @@ class MultiGrid(Grid):
         """ Place the agent at the correct location. """
         x, y = pos
         self.grid[x][y].add(agent)
+        if pos in self.empties:
+            self.empties.remove(pos)
 
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
         x, y = pos
         self.grid[x][y].remove(agent)
+        if self.is_cell_empty(pos):
+            self.empties.append(pos)
 
     @accept_tuple_argument
     def iter_cell_list_contents(self, cell_list):
