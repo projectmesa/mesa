@@ -18,11 +18,6 @@ import itertools
 import random
 import math
 
-# TODO: fix the global variables, they shouldn't be needed.
-RANDOM = -1
-X = 0
-Y = 1
-
 
 def accept_tuple_argument(wrapped_function):
     """ Decorator to allow grid methods that take a list of (x, y) position tuples
@@ -369,17 +364,17 @@ class SingleGrid(Grid):
         """
         super().__init__(width, height, torus)
 
-    def position_agent(self, agent, x=RANDOM, y=RANDOM):
+    def position_agent(self, agent, x="random", y="random"):
         """ Position an agent on the grid.
         This is used when first placing agents! Use 'move_to_empty()'
         when you want agents to jump to an empty cell.
         Use 'swap_pos()' to swap agents positions.
-        If x or y are positive, they are used, but if RANDOM,
+        If x or y are positive, they are used, but if "random",
         we get a random position.
         Ensure this random position is not occupied (in Grid).
 
         """
-        if x == RANDOM or y == RANDOM:
+        if x == "random" or y == "random":
             coords = self.find_empty()
             if coords is None:
                 raise Exception("ERROR: Grid full")
