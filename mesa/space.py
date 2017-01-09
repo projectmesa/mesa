@@ -311,6 +311,7 @@ class Grid:
             self.empties.remove(pos)
 
     def remove_agent(self, agent):
+        """ Remove the agent from the grid and set its pos variable to None. """
         pos = agent.pos
         self._remove_agent(pos, agent)
         agent.pos = None
