@@ -15,15 +15,15 @@ Next release - XXXXXX
 
 **Improvements**
 
-* Updating contribution file to prevent future travis breaks [#336](https://github.com/projectmesa/mesa/pull/336)
-* Updating Travis svg to target #master, not branches. [#343](https://github.com/projectmesa/mesa/pull/343)
-* implement "end" message in visualization [#346](https://github.com/projectmesa/mesa/pull/346)
-* Move empty-cell functions to baseclass Grid [#349](https://github.com/projectmesa/mesa/pull/349)
+* Updating contribution file to prevent future travis breaks #336
+* Updating Travis svg to target #master, not branches. #343
+* implement "end" message in visualization #346
+* Move empty-cell functions to baseclass Grid #349
 
 **Fixes**
 
-* Only start tornado ioloop if necessary [#339](https://github.com/projectmesa/mesa/pull/339)
-* fix boundaries of ContinousSpace [#345](https://github.com/projectmesa/mesa/pull/345)
+* Only start tornado ioloop if necessary #339
+* fix boundaries of ContinousSpace #345
 
 
 0.7.8.1 (2016-11-02) Duncan
