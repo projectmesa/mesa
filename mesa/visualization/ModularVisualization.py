@@ -1,6 +1,7 @@
-'''
+# -*- coding: utf-8 -*-
+"""
 ModularServer
-============================================================================
+=============
 
 A visualization server which renders a model via one or more elements.
 
@@ -55,7 +56,8 @@ Server -> Client:
     {
     "type": "viz_state",
     "data": [{0:[ {"Shape": "circle", "x": 0, "y": 0, "r": 0.5,
-                "Color": "#AAAAAA", "Filled": "true", "Layer": 0}]},
+                "Color": "#AAAAAA", "Filled": "true", "Layer": 0,
+                "text": 'A', "text_color": "white" }]},
             "Shape Count: 1"]
     }
 
@@ -75,25 +77,25 @@ Client -> Server:
     "step:" index of the step to get.
     }
 
-'''
+"""
 import os
-import datetime as dt
 
+import tornado.autoreload
 import tornado.ioloop
-import tornado.template
 import tornado.web
 import tornado.websocket
 import tornado.escape
 import tornado.gen
 
-from mesa.visualization.UserParams import UserParam
+import webbrowser
+
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
 # pylint: disable=attribute-defined-outside-init
 
 
-class VisualizationElement(object):
-    '''
+class VisualizationElement:
+    """
     Defines an element of the visualization.
 
     Attributes:
@@ -106,7 +108,8 @@ class VisualizationElement(object):
     Methods:
         render: Takes a model object, and produces JSON data which can be sent
                 to the client.
-    '''
+
+    """
 
     package_includes = []
     local_includes = []
@@ -117,15 +120,15 @@ class VisualizationElement(object):
         pass
 
     def render(self, model):
-        '''
-        Build visualization data from a model object.
+        """ Build visualization data from a model object.
 
         Args:
             model: A model object
 
         Returns:
             A JSON-ready object.
-        '''
+
+        """
         return "<b>VisualizationElement goes here</b>."
 
 # =============================================================================
@@ -133,9 +136,7 @@ class VisualizationElement(object):
 
 
 class PageHandler(tornado.web.RequestHandler):
-    '''
-    Handler for the HTML template which holds the visualization.
-    '''
+    """ Handler for the HTML template which holds the visualization. """
 
     def get(self):
         elements = self.application.visualization_elements
@@ -150,10 +151,7 @@ class PageHandler(tornado.web.RequestHandler):
 
 
 class SocketHandler(tornado.websocket.WebSocketHandler):
-    '''
-    Handler for websocket.
-    '''
-
+    """ Handler for websocket. """
     def open(self):
         if self.application.verbose:
             print("Socket opened!")
@@ -162,21 +160,20 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         return True
 
     def on_message(self, message):
-        '''
-        Receiving a message from the websocket, parse, and act accordingly.
-        '''
+        """ Receiving a message from the websocket, parse, and act accordingly.
+
+        """
         if self.application.verbose:
             print(message)
         msg = tornado.escape.json_decode(message)
 
         if msg["type"] == "get_step":
-            step = int(msg["step"])
-            if step < len(self.application.viz_states):
-                return_message = {"type": "viz_state"}
-                return_message["data"] = self.application.viz_states[step]
+            if not self.application.model.running:
+                self.write_message({"type": "end"})
             else:
-                return_message = {"type": "end"}
-            self.write_message(return_message)
+                self.application.model.step()
+                self.write_message({"type": "viz_state",
+                        "data": self.application.render_model()})
 
         elif msg["type"] == "reset":
             if "current_params" in msg:
@@ -184,11 +181,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                     self.application.model_params[param].update_value(value)
 
             self.application.reset_model()
-            return_message = {"type": "viz_state"}
-            return_message["data"] = self.application.viz_states[0]
-
-            self.write_message(return_message)
-            self.application.run_model()
+            self.write_message({"type": "viz_state",
+                    "data": self.application.render_model()})
 
         else:
             if self.application.verbose:
@@ -196,17 +190,13 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
 
 class ModularServer(tornado.web.Application):
-    '''
-    Main visualization application.
-    '''
-
+    """ Main visualization application. """
     verbose = True
-    LAUNCH_ECHO = 'Interface starting at http://127.0.0.1:{PORT}'
 
     model_name = "Mesa Model"
     model_cls = None  # A model class
     portrayal_method = None
-    port = 8888  # Port to listen on
+    port = 8521  # Default port to listen on
     canvas_width = 500
     canvas_height = 500
     grid_height = 0
@@ -228,13 +218,12 @@ class ModularServer(tornado.web.Application):
     handlers = [page_handler, socket_handler, static_handler, local_handler]
 
     settings = {"debug": True,
+                "autoreload": False,
                 "template_path": os.path.dirname(__file__) + "/templates"}
 
     def __init__(self, model_cls, visualization_elements, name="Mesa Model",
                  model_params={}):
-        '''
-        Create a new visualization server with the given elements.
-        '''
+        """ Create a new visualization server with the given elements. """
         # Prep visualization elements:
         self.visualization_elements = visualization_elements
         self.package_includes = set()
@@ -263,9 +252,7 @@ class ModularServer(tornado.web.Application):
         super().__init__(self.handlers, **self.settings)
 
     def reset_model(self):
-        '''
-        Reinstantiate the model object, using the current parameters.
-        '''
+        """ Reinstantiate the model object, using the current parameters. """
 
         model_params = {}
         for param, value in self.model_params.items():
@@ -277,33 +264,25 @@ class ModularServer(tornado.web.Application):
         self.viz_states = [self.render_model()]
 
     def render_model(self):
-        '''
-        Turn the current state of the model into a dictionary of visualizations
-        '''
+        """ Turn the current state of the model into a dictionary of
+        visualizations
+
+        """
         visualization_state = []
         for element in self.visualization_elements:
             element_state = element.render(self.model)
             visualization_state.append(element_state)
         return visualization_state
 
-    @tornado.gen.coroutine
-    def run_model(self):
-        '''
-        Run the model forward and store each viz state.
-        #TODO: Have this run concurrently (I think) inside the event loop?
-        '''
-        while self.model.schedule.steps < self.max_steps and self.model.running:
-            self.model.step()
-            self.viz_states.append(self.render_model())
-
-            yield tornado.gen.Task(tornado.ioloop.IOLoop.current().add_timeout,
-                dt.timedelta(milliseconds=5))
-
-    def launch(self):
-        '''
-        Run the app.
-        '''
-
-        print(self.LAUNCH_ECHO.format(PORT=self.port))
+    def launch(self, port=None):
+        """ Run the app. """
+        startLoop = not tornado.ioloop.IOLoop.initialized()
+        if port is not None:
+            self.port = port
+        url = 'http://127.0.0.1:{PORT}'.format(PORT=self.port)
+        print('Interface starting at {url}'.format(url=url))
         self.listen(self.port)
-        tornado.ioloop.IOLoop.instance().start()
+        webbrowser.open(url)
+        tornado.autoreload.start()
+        if startLoop:
+            tornado.ioloop.IOLoop.instance().start()
