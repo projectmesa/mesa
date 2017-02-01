@@ -3,9 +3,27 @@
 Release History
 ---------------
 
-Next release - Edgar
+
+Next release - XXXXXX
 ++++++++++++++++++
-....
+
+*
+
+
+0.8.0 (2017-01-29) - Edgar
+++++++++++++++++++
+
+**Improvements**
+
+* Updating contribution file to prevent future travis breaks #336
+* Updating Travis svg to target #master, not branches. #343
+* implement "end" message in visualization #346
+* Move empty-cell functions to baseclass Grid #349
+
+**Fixes**
+
+* Only start tornado ioloop if necessary #339
+* fix boundaries of ContinousSpace #345
 
 
 0.7.8.1 (2016-11-02) Duncan
@@ -17,7 +35,7 @@ Next release - Edgar
 * Changing to port 8521, fixes #320. #321
 * Opens a browser window when launching the server #323
 * Ticket #314 - added progress bar to BatchRunner #316
-* Auto update year for copyright. #329 
+* Auto update year for copyright. #329
 
 **Fixes**
 
