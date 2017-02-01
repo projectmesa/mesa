@@ -1,4 +1,3 @@
-from flockers import BoidModel
 from mesa.visualization.ModularVisualization import ModularServer
 
 from .model import BoidModel
