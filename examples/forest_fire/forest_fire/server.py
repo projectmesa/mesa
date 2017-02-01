@@ -17,6 +17,7 @@ def forest_fire_portrayal(tree):
     portrayal["Color"] = colors[tree.condition]
     return portrayal
 
+
 canvas_element = CanvasGrid(forest_fire_portrayal, 100, 100, 500, 500)
 tree_chart = ChartModule([{"Label": "Fine", "Color": "green"},
                           {"Label": "On Fire", "Color": "red"},

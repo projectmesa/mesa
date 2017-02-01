@@ -33,6 +33,7 @@ def citizen_cop_portrayal(agent):
         portrayal["Layer"] = 1
     return portrayal
 
+
 canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 500, 500)
 
 model_params = dict(height=40,
@@ -45,5 +46,5 @@ model_params = dict(height=40,
                     max_jail_term=1000)
 
 server = ModularServer(CivilViolenceModel, [canvas_element],
-                      "Epstein Civil Violence", model_params)
+                       "Epstein Civil Violence", model_params)
 server.launch()

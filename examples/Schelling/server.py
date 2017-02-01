@@ -59,12 +59,12 @@ def schelling_draw(agent):
         portrayal["Color"] = "Blue"
     return portrayal
 
+
 happy_element = HappyElement()
 canvas_element = CanvasGrid(schelling_draw, 20, 20, 500, 500)
 happy_chart = ChartModule([{"Label": "happy", "Color": "Black"}])
-model_params = {"height": 20, "width": 20, "density": 0.8, 
-                #"minority_pc": 0.2, 
-                "minority_pc": UserParam(0.2, 0, 1.0, 0.1), 
+model_params = {"height": 20, "width": 20, "density": 0.8,
+                "minority_pc": UserParam(0.2, 0, 1.0, 0.1),
                 "homophily": UserParam(4, 1, 8, 1)}
 server = ModularServer(SchellingModel,
                        [canvas_element, happy_element, happy_chart],

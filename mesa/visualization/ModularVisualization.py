@@ -89,6 +89,7 @@ import tornado.gen
 
 import webbrowser
 
+from mesa.visualization.UserParams import UserParam
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
 # pylint: disable=attribute-defined-outside-init
@@ -173,7 +174,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             else:
                 self.application.model.step()
                 self.write_message({"type": "viz_state",
-                        "data": self.application.render_model()})
+                                    "data": self.application.render_model()})
 
         elif msg["type"] == "reset":
             if "current_params" in msg:
@@ -182,7 +183,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
             self.application.reset_model()
             self.write_message({"type": "viz_state",
-                    "data": self.application.render_model()})
+                                "data": self.application.render_model()})
 
         else:
             if self.application.verbose:
