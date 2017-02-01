@@ -61,3 +61,9 @@ target/
 
 # Spyder app workspace config file
 .spyderworkspace
+
+# PyCharm environment files
+.idea/
+
+# Apple OSX
+*.DS_Store

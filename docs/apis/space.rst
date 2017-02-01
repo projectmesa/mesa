@@ -1,0 +1,2 @@
+.. automodule:: space
+   :members:

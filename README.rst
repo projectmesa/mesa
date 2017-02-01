@@ -1,7 +1,7 @@
 Mesa: Agent-based modeling in Python 3+
 =========================================
 
-.. image:: https://api.travis-ci.org/projectmesa/mesa.svg
+.. image:: https://api.travis-ci.org/projectmesa/mesa.svg?branch=master
         :target: https://travis-ci.org/projectmesa/mesa
 
 .. image:: https://coveralls.io/repos/projectmesa/mesa/badge.svg
@@ -46,6 +46,8 @@ You can also use `pip` to install the github version:
 
     $ pip install git+https://github.com/projectmesa/mesa
 
+
+
 For more help on using Mesa, check out the following resources:
 
 * `Intro to Mesa Tutorial`_
@@ -53,7 +55,7 @@ For more help on using Mesa, check out the following resources:
 * `Email list`_
 * `PyPI`_
 
-.. _`Intro to Mesa Tutorial` : http://mesa.readthedocs.org/en/latest/intro-tutorial.html
+.. _`Intro to Mesa Tutorial` : http://mesa.readthedocs.org/en/latest/tutorials/intro_tutorial.html
 .. _`Docs` : http://mesa.readthedocs.org/en/latest/
 .. _`Email list` : https://groups.google.com/d/forum/projectmesa
 .. _`PyPI` : https://pypi.python.org/pypi/Mesa/

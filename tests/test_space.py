@@ -4,6 +4,7 @@ from mesa.space import ContinuousSpace
 from test_grid import MockAgent
 
 TEST_AGENTS = [(-20, -20), (-20, -20.05), (65, 18)]
+OUTSIDE_POSITIONS = [(70, 10), (30, 20), (100, 10)]
 
 
 class TestSpaceToroidal(unittest.TestCase):
@@ -54,6 +55,25 @@ class TestSpaceToroidal(unittest.TestCase):
         neighbors_3 = self.space.get_neighbors((-30, -30), 10)
         assert len(neighbors_3) == 1
 
+    def test_bounds(self):
+        '''
+        Test positions outside of boundary
+        '''
+        boundary_agents = []
+        for i, pos in enumerate(OUTSIDE_POSITIONS):
+            a = MockAgent(len(self.agents) + i, None)
+            boundary_agents.append(a)
+            self.space.place_agent(a, pos)
+
+        for a, pos in zip(boundary_agents, OUTSIDE_POSITIONS):
+            adj_pos = self.space.torus_adj(pos)
+            assert a.pos == adj_pos
+
+        a = self.agents[0]
+        for pos in OUTSIDE_POSITIONS:
+            assert self.space.out_of_bounds(pos)
+            self.space.move_agent(a, pos)
+
 
 class TestSpaceNonToroidal(unittest.TestCase):
     '''
@@ -100,3 +120,18 @@ class TestSpaceNonToroidal(unittest.TestCase):
 
         neighbors_3 = self.space.get_neighbors((-30, -30), 10)
         assert len(neighbors_3) == 0
+
+    def test_bounds(self):
+        '''
+        Test positions outside of boundary
+        '''
+        for i, pos in enumerate(OUTSIDE_POSITIONS):
+            a = MockAgent(len(self.agents) + i, None)
+            with self.assertRaises(Exception):
+                self.space.place_agent(a, pos)
+
+        a = self.agents[0]
+        for pos in OUTSIDE_POSITIONS:
+            assert self.space.out_of_bounds(pos)
+            with self.assertRaises(Exception):
+                self.space.move_agent(a, pos)

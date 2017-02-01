@@ -1,9 +1,10 @@
-Demographic Prisoner's Dilemma on a Grid
-===============================================
+# Demographic Prisoner's Dilemma on a Grid
 
-The Demographic Prisoner's Dilemma is a family of variants on the classic two-player [Prisoner's Dilemma](https://en.wikipedia.org/wiki/Prisoner's_dilemma), first developed by [Joshua Epstein](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.8.8629&rep=rep1&type=pdf). The model consists of agents, each with a strategy of either Cooperate or Defect. Each agent's payoff is based on its strategy and the strategies of its spatial neighbors. After each step of the model, the agents adopt the strategy of their neighbor with the highest total score. 
+## Summary
 
-The specific variant presented here is adapted from the [Evolutionary Prisoner's Dilemma](http://ccl.northwestern.edu/netlogo/models/PDBasicEvolutionary) model included with NetLogo. Its payoff table is a slight variant of the traditional PD payoff table:
+The Demographic Prisoner's Dilemma is a family of variants on the classic two-player [Prisoner's Dilemma]. The model consists of agents, each with a strategy of either Cooperate or Defect. Each agent's payoff is based on its strategy and the strategies of its spatial neighbors. After each step of the model, the agents adopt the strategy of their neighbor with the highest total score. 
+
+The model payoff table is:
 
              | Cooperate | Defect|
 ------------:|:---------:|:-----:|
@@ -14,6 +15,21 @@ Where *D* is the defection bonus, generally set higher than 1. In these runs, th
 
 The Demographic Prisoner's Dilemma demonstrates how simple rules can lead to the emergence of widespread cooperation, despite the Defection strategy dominiating each individual interaction game. However, it is also interesting for another reason: it is known to be sensitive to the activation regime employed in it.
 
-**pd_grid.py** has the model and agent classes; the model takes a schedule_type string as an argument, which determines what schedule type the model uses: Sequential, Random or Simultaneous. 
+## How to Run
 
-The **Demographic Prisoner's Dilemma Activation Schedule.ipynb** IPython Notebook runs the model three times, one for each activation type, and demonstrates how the activation regime drives the model to different outcomes.
+Launch the ``Demographic Prisoner's Dilemma Activation Schedule.ipynb`` notebook and run the code.
+
+## Files
+
+* ``pd_grid.py``: has the model and agent classes; the model takes a schedule_type string as an argument, which determines what schedule type the model uses: Sequential, Random or Simultaneous. 
+* ``Demographic Prisoner's Dilemma Activation Schedule.ipynb``: Jupyter Notebook for running the scheduling experiment. This runs the model three times, one for each activation type, and demonstrates how the activation regime drives the model to different outcomes.
+
+## Further Reading
+
+This model is adapted from:
+
+Wilensky, U. (2002). NetLogo PD Basic Evolutionary model. http://ccl.northwestern.edu/netlogo/models/PDBasicEvolutionary. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+
+The Demographic Prisoner's Dilemma originates from:
+
+[Epstein, J. Zones of Cooperation in Demographic Prisoner's Dilemma. 1998.](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.8.8629&rep=rep1&type=pdf)

@@ -1,6 +1,7 @@
-'''
+# -*- coding: utf-8 -*-
+"""
 Text Visualization
-=======================
+==================
 
 Base classes for ASCII-only visualizations of a model.
 These are useful for quick debugging, and can readily be rendered in an IPython
@@ -25,73 +26,50 @@ is used so as to allow the method to access Agent internals, as well as to
 potentially render a cell based on several values (e.g. an Agent grid and a
 Patch value grid).
 
-'''
-
+"""
 # Pylint instructions: allow single-character variable names.
 # pylint: disable=invalid-name
 
 
-class TextVisualization(object):
-    '''
-    ASCII-Only visualization of a model.
+class TextVisualization:
+    """ ASCII-Only visualization of a model.
 
     Properties:
 
         model: The underlying model object to be visualized.
         elements: List of visualization elements, which will be rendered
-                    in the order they are adedd.
+                    in the order they are added.
 
-    '''
-
-    model = None
-    elements = []
-
+    """
     def __init__(self, model):
-        '''
-        Create a new Text Visualization object.
-        '''
+        """ Create a new Text Visualization object. """
         self.model = model
         self.elements = []
 
     def render(self):
-        '''
-        Render all the text elements, in order.
-        '''
+        """ Render all the text elements, in order. """
         for element in self.elements:
             print(element)
 
     def step(self):
-        '''
-        Advance the model by a step and print the results.
-        '''
+        """ Advance the model by a step and print the results. """
         self.model.step()
         self.render()
 
-    def step_forward(self, steps):
-        '''
-        Advance the model by some # of steps and show the result.
-        '''
-        for _ in range(steps):
-            self.model.step()
-        self.render()
 
-
-class TextElement(object):
-    '''
-    Base class for all TextElements to render.
+class TextElement:
+    """ Base class for all TextElements to render.
 
     Methods:
         render: 'Renders' some data into ASCII and returns.
         __str__: Displays render() by default.
-    '''
+    """
 
     def __init__(self):
         pass
 
     def render(self):
-        '''
-        Render the element as text.
-        '''
+        """ Render the element as text. """
         return "Placeholder!"
 
     def __str__(self):
@@ -99,13 +77,9 @@ class TextElement(object):
 
 
 class TextData(TextElement):
-    '''
-    Prints the value of one particular variable from the base model.
-    '''
+    """ Prints the value of one particular variable from the base model. """
     def __init__(self, model, var_name):
-        '''
-        Create a new data renderer.
-        '''
+        """ Create a new data renderer. """
         self.model = model
         self.var_name = var_name
 
@@ -114,8 +88,7 @@ class TextData(TextElement):
 
 
 class TextGrid(TextElement):
-    '''
-    Class for creating an ASCII visualization of a basic grid object.
+    """ Class for creating an ASCII visualization of a basic grid object.
 
     By default, assume that each cell is represented by one character, and
     that empty cells are rendered as ' ' characters. When printed, the TextGrid
@@ -123,32 +96,27 @@ class TextGrid(TextElement):
 
     Properties:
         grid: The underlying grid object.
-    '''
 
+    """
     grid = None
 
     def __init__(self, grid, converter):
-        '''
-        Create a new ASCII grid visualization.
+        """ Create a new ASCII grid visualization.
 
         Args:
             grid: The underlying Grid object.
             converter: function for converting the content of each cell
             to ascii
-        '''
+        """
         self.grid = grid
 
     @staticmethod
     def converter(x):
-        """
-        Text content of cells.
-        """
+        """ Text content of cells. """
         return 'X'
 
     def render(self):
-        '''
-        What to show when printed.
-        '''
+        """ What to show when printed. """
         viz = ""
         for y in range(self.grid.height):
             for x in range(self.grid.width):
