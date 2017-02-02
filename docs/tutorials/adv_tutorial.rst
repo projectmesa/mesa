@@ -45,7 +45,7 @@ need to import the actual model object.
 
     from mesa.visualization.modules import CanvasGrid
     from mesa.visualization.ModularVisualization import ModularServer
-    
+
     # If MoneyModel.py is where your code is:
     # from MoneyModel import MoneyModel
 
@@ -75,6 +75,12 @@ a 10x10 grid, drawn in 500 x 500 pixels.
 
     grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
 
+Now we just need to define the model parameters as a dictionary
+
+.. code:: python
+
+    model_params = {'N': 100, 'width':10, 'height':10}
+
 Now we create and launch the actual server. We do this with the
 following arguments:
 
@@ -93,10 +99,10 @@ Finally, when you're ready to run the visualization, use the server's
 
 .. code:: python
 
-    server = ModularServer(MoneyModel, 
-                           [grid], 
-                           "Money Model", 
-                           100, 10, 10)
+    server = ModularServer(MoneyModel,
+                           [grid],
+                           "Money Model",
+                           model_params)
     server.port = 8889
     server.launch()
 
@@ -117,11 +123,13 @@ The full code should now look like:
                      "r": 0.5}
         return portrayal
 
+    model_params = {'N': 100, 'height': 10, 'width': 10}
+
     grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-    server = ModularServer(MoneyModel, 
-                           [grid], 
-                           "Money Model", 
-                           100, 10, 10)
+    server = ModularServer(MoneyModel,
+                           [grid],
+                           "Money Model",
+                           model_params)
     server.port = 8889
     server.launch()
 
@@ -218,14 +226,14 @@ chart will appear underneath the grid.
 
 .. code:: python
 
-    chart = ChartModule([{"Label": "Gini", 
+    chart = ChartModule([{"Label": "Gini",
                           "Color": "Black"}],
                         data_collector_name='datacollector')
 
-    server = ModularServer(MoneyModel, 
-                           [grid, chart], 
-                           "Money Model", 
-                           100, 10, 10)
+    server = ModularServer(MoneyModel,
+                           [grid, chart],
+                           "Money Model",
+                           model_params)
 
 Launch the visualization and start a model run, and you'll see a line
 chart underneath the grid. Every step of the model, the line chart
@@ -239,6 +247,40 @@ updates along with the grid. Reset the model, and the chart resets too.
 **Note:** You might notice that the chart line only starts after a
 couple of steps; this is due to a bug in Charts.js which will hopefully
 be fixed soon.
+
+Interactively change user parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+So far we have predifined our model parameters. But what if we want to change the initial number of agents without rewriting our code every time? We can do this with user parameters. First, we import the UserParam module
+
+.. code:: python
+
+    from mesa.visualization.UserParams import UserParam
+
+UserParam needs four inputs:
+- A starting value
+- A minimum value
+- A maximum value
+- A step by which to increase
+
+To include user parameters, just assign them directly in the model_params dictionary instead of a fixed value.
+
+.. code:: python
+
+    model_params = {'width': 10, 'height': 10,
+                    'N': UserParam(50, 0, 100, 1)}
+                    
+    server = ModularServer(MoneyModel,
+                           [grid, chart],
+                           "Money Model",
+                           model_params)
+
+You can now change the number of agents without changing your visualization code!
+
+.. figure:: files/viz_UserParam.png
+   :alt: UserParam Visualization
+
+   UserParam
 
 Building your own visualization component
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -439,8 +481,8 @@ inherit from, and create the new visualization class.
                 self.canvas_width = canvas_width
                 self.bins = bins
                 new_element = "new HistogramModule({}, {}, {})"
-                new_element = new_element.format(bins, 
-                                                 canvas_width, 
+                new_element = new_element.format(bins,
+                                                 canvas_width,
                                                  canvas_height)
                 self.js_code = "elements.push(" + new_element + ");"
 
@@ -491,10 +533,10 @@ Now, you can create your new HistogramModule and add it to the server:
 .. code:: python
 
         histogram = HistogramModule(list(range(10)), 200, 500)
-        server = ModularServer(MoneyModel, 
-                               [grid, histogram, chart], 
-                               "Money Model", 
-                               100, 10, 10)
+        server = ModularServer(MoneyModel,
+                               [grid, histogram, chart],
+                               "Money Model",
+                               model_params)
         server.launch()
 
 Run this code, and you should see your brand-new histogram added to the

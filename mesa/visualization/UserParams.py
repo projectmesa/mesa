@@ -11,11 +11,12 @@ the model.
 '''
 import tornado.escape
 
+
 class UserParam:
     '''
     Base class for a user-settable numeric parameter.
     '''
-    JS_CODE = 'add(params, "{name}").min({min}).max({max}).step({step});' 
+    JS_CODE = 'add(params, "{name}").min({min}).max({max}).step({step});'
 
     def __init__(self, start_value, min_value, max_value, step=1, label=None):
         '''
@@ -45,7 +46,7 @@ class UserParam:
         code = self.JS_CODE.format(name=self.name, min=self.min_value,
                                    max=self.max_value, step=self.step)
         return code
-        #return tornado.escape.xhtml_unescape(code)
+        # return tornado.escape.xhtml_unescape(code)
 
     def get_value(self):
         '''
@@ -68,7 +69,6 @@ class UserParam:
             self.current_value = new_value
         else:
             raise Exception("Incorrect input value")
-
 
 
 class UserOption(UserParam):
@@ -111,5 +111,3 @@ class UserOption(UserParam):
             self.current_value = new_value
         else:
             raise Exception("Incorrect input value")
-
-

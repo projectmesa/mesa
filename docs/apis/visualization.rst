@@ -24,3 +24,6 @@ Modules
 
 .. automodule:: visualization.modules.TextVisualization
    :members:
+
+.. automodule:: visualization.modules.UserParams
+   :members:
