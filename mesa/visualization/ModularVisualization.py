@@ -185,6 +185,11 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             self.write_message({"type": "viz_state",
                                 "data": self.application.render_model()})
 
+        elif msg["type"] == "update_params":
+            for param, value in msg["current_params"].items():
+                self.application.model_params[param].update_value(value)
+            self.application.update_model()
+
         else:
             if self.application.verbose:
                 print("Unexpected message!")
@@ -263,6 +268,13 @@ class ModularServer(tornado.web.Application):
                 model_params[param] = value
         self.model = self.model_cls(**model_params)
         self.viz_states = [self.render_model()]
+
+    def update_model(self):
+        """ Update the model with current user parameters. """
+
+        for param, value in self.model_params.items():
+            if isinstance(value, UserParam):
+                setattr(self.model, param, value.get_value())
 
     def render_model(self):
         """ Turn the current state of the model into a dictionary of
