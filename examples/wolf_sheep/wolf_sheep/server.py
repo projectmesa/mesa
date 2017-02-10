@@ -9,20 +9,21 @@ def wolf_sheep_portrayal(agent):
     if agent is None:
         return
 
-    portrayal = {"Shape": "circle",
-                 "Filled": "true"}
+    portrayal = {}
 
     if type(agent) is Sheep:
-        portrayal["Color"] = "#666666"
-        portrayal["r"] = 0.8
+        portrayal["Shape"] = "sheep.png"
+        # https://icons8.com/web-app/433/sheep
+        portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
 
     elif type(agent) is Wolf:
-        portrayal["Color"] = "#AA0000"
-        portrayal["r"] = 0.5
+        portrayal["Shape"] = "wolf.png"
+        # https://icons8.com/web-app/36821/German-Shepherd
+        portrayal["scale"] = 0.9
         portrayal["Layer"] = 2
         portrayal["text"] = round(agent.energy, 1)
-        portrayal["text_color"] = "Yellow"
+        portrayal["text_color"] = "White"
 
     elif type(agent) is GrassPatch:
         if agent.fully_grown:
@@ -30,6 +31,7 @@ def wolf_sheep_portrayal(agent):
         else:
             portrayal["Color"] = "#D6F5D6"
         portrayal["Shape"] = "rect"
+        portrayal["Filled"] = "true"
         portrayal["Layer"] = 0
         portrayal["w"] = 1
         portrayal["h"] = 1
