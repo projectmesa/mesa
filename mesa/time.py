@@ -72,7 +72,7 @@ class BaseScheduler:
 
     def step(self):
         """ Execute the step of all the agents, one at a time. """
-        for agent in self.agents:
+        for agent in self.agents[:]:
             agent.step()
         self.steps += 1
         self.time += 1
@@ -98,7 +98,7 @@ class RandomActivation(BaseScheduler):
 
         """
         random.shuffle(self.agents)
-        for agent in self.agents:
+        for agent in self.agents[:]:
             agent.step()
         self.steps += 1
         self.time += 1
@@ -114,9 +114,9 @@ class SimultaneousActivation(BaseScheduler):
     """
     def step(self):
         """ Step all agents, then advance them. """
-        for agent in self.agents:
+        for agent in self.agents[:]:
             agent.step()
-        for agent in self.agents:
+        for agent in self.agents[:]:
             agent.advance()
         self.steps += 1
         self.time += 1
@@ -164,7 +164,7 @@ class StagedActivation(BaseScheduler):
         if self.shuffle:
             random.shuffle(self.agents)
         for stage in self.stage_list:
-            for agent in self.agents:
+            for agent in self.agents[:]:
                 getattr(agent, stage)()  # Run stage
             if self.shuffle_between_stages:
                 random.shuffle(self.agents)
