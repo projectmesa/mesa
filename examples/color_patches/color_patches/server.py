@@ -43,8 +43,10 @@ CANVAS_ELEMENT = CanvasGrid(color_patch_draw,
                             GRID_ROWS, GRID_COLS,
                             CANVAS_WIDTH, CANVAS_HEIGHT)
 
-server = ModularServer(ColorPatchModel,
+PARAMS = {"height": GRID_ROWS, "width": GRID_COLS}
+
+SERVER = ModularServer(ColorPatchModel,
                        [CANVAS_ELEMENT], "Color Patches",
-                       GRID_ROWS, GRID_COLS)
+                       PARAMS)
 
 # webbrowser.open('http://127.0.0.1:8521')  # TODO: make this configurable

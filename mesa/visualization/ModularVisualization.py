@@ -89,6 +89,7 @@ import tornado.gen
 
 import webbrowser
 
+from mesa.visualization.UserParams import UserParam
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
 # pylint: disable=attribute-defined-outside-init
@@ -146,7 +147,8 @@ class PageHandler(tornado.web.RequestHandler):
                     model_name=self.application.model_name,
                     package_includes=self.application.package_includes,
                     local_includes=self.application.local_includes,
-                    scripts=self.application.js_code)
+                    scripts=self.application.js_code,
+                    user_params=self.application.user_params)
 
 
 class SocketHandler(tornado.websocket.WebSocketHandler):
@@ -172,12 +174,21 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             else:
                 self.application.model.step()
                 self.write_message({"type": "viz_state",
-                        "data": self.application.render_model()})
+                                    "data": self.application.render_model()})
 
         elif msg["type"] == "reset":
+            if "current_params" in msg:
+                for param, value in msg["current_params"].items():
+                    self.application.model_params[param].update_value(value)
+
             self.application.reset_model()
             self.write_message({"type": "viz_state",
-                    "data": self.application.render_model()})
+                                "data": self.application.render_model()})
+
+        elif msg["type"] == "update_params":
+            for param, value in msg["current_params"].items():
+                self.application.model_params[param].update_value(value)
+            self.application.update_model()
 
         else:
             if self.application.verbose:
@@ -198,9 +209,9 @@ class ModularServer(tornado.web.Application):
     grid_width = 0
 
     max_steps = 100000
+    viz_states = []
 
-    model_args = ()
-    model_kwargs = {}
+    model_params = {}
 
     # Handlers and other globals:
     page_handler = (r'/', PageHandler)
@@ -217,7 +228,7 @@ class ModularServer(tornado.web.Application):
                 "template_path": os.path.dirname(__file__) + "/templates"}
 
     def __init__(self, model_cls, visualization_elements, name="Mesa Model",
-                 *args, **kwargs):
+                 model_params={}):
         """ Create a new visualization server with the given elements. """
         # Prep visualization elements:
         self.visualization_elements = visualization_elements
@@ -235,8 +246,12 @@ class ModularServer(tornado.web.Application):
         self.model_name = name
         self.model_cls = model_cls
 
-        self.model_args = args
-        self.model_kwargs = kwargs
+        self.model_params = model_params
+        self.user_params = []
+        for param, value in self.model_params.items():
+            if isinstance(value, UserParam):
+                value.set_name(param)
+                self.user_params.append(value)
         self.reset_model()
 
         # Initializing the application itself:
@@ -244,7 +259,22 @@ class ModularServer(tornado.web.Application):
 
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
-        self.model = self.model_cls(*self.model_args, **self.model_kwargs)
+
+        model_params = {}
+        for param, value in self.model_params.items():
+            if isinstance(value, UserParam):
+                model_params[param] = value.get_value()
+            else:
+                model_params[param] = value
+        self.model = self.model_cls(**model_params)
+        self.viz_states = [self.render_model()]
+
+    def update_model(self):
+        """ Update the model with current user parameters. """
+
+        for param, value in self.model_params.items():
+            if isinstance(value, UserParam):
+                setattr(self.model, param, value.get_value())
 
     def render_model(self):
         """ Turn the current state of the model into a dictionary of

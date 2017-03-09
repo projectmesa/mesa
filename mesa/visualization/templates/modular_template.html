@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <head>
 	<title>{{ model_name }} (Mesa visualization)</title>
-  {% comment 
-  The jquery.min.js supplied with this version of mesa  is downloaded from
-  "ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" Re-test mesa
-  visulaizations when upgrading jquery to a newer version.
-  %}
+	{% comment ...
+	The jquery.min.js supplied with this version of mesa  is downloaded from
+	"ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" Re-test mesa
+	visulaizations when upgrading jquery to a newer version.
+	%}
 	<script src="/static/jquery.min.js"></script>
 	<script src="/static/dat.gui.min.js"></script>
 	<script>
 	/*
-		This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to the server 
+		This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to the server
 		(the port is set via the template). On every step, it receives inputs, one per module, and sends them to the associated function to render
 
-		Users can reset() the model, advance it by one step(), or run() it through. reset() and 
+		Users can reset() the model, advance it by one step(), or run() it through. reset() and
 		step() send a message to the server, which then sends back the appropriate data. run() just
 		calls the step() method at fixed intervals.
 
-		The model parameters are controlled via the MesaVisualizationControl object. The GUI is 
+		The model parameters are controlled via the MesaVisualizationControl object. The GUI is
 		created using the dat.GUI library.
-	
+
 	*/
 		/**
 		Object which holds visualization parameters.
-	
+
 			tick: What tick of the model we're currently at
 			running: Boolean on whether we have reached the end of the current model
 			fps: Current frames per second.
@@ -70,7 +70,7 @@
 					console.log("Unexpected message.");
 			}
 		}
-		
+
 		/**
 		Turn an object into a string to send to the server, and send it.
 		*/
@@ -84,13 +84,38 @@
 		*/
 		var reset = function() {
 			control.tick = 0;
-			send({"type": "reset"});
+			control.running = true;
+			msg = {"type": "reset"};
+			if (typeof params != "undefined") {
+				var current_params = {};
+				for(key in params) {
+					current_params[key] = params[key];
+				}
+				msg["current_params"] = current_params;
+			}
+			send(msg);
 
 			// Reset all the visualizations
 			for (var i in elements) {
 				elements[i].reset();
 			}
 		};
+
+		var autoupdate = true
+
+		var update_params = function() {
+			if (autoupdate) {
+				msg = {"type": "update_params"}
+				if (typeof params != "undefined") {
+					var current_params = {};
+					for(key in params) {
+						current_params[key] = params[key];
+					}
+					msg["current_params"] = current_params;
+				}
+				send(msg);
+			}
+		}
 
 		/**
 		Send a message to the server get the next visualization state.
@@ -123,7 +148,7 @@
 			}
 		};
 	</script>
-	
+
 </head>
 <body>
 	<h2>{{ model_name }}</h2> <!-- Template; put the model name as the heading -->
@@ -139,11 +164,29 @@
 <script>
 	// Set up the GUI
 	var gui = new dat.GUI();
-	var fps_control = gui.add(control, "fps", 0, 20).step(1); // fps slider, 0 to 20 in 1 increments 
+	var fps_control = gui.add(control, "fps", 0, 30).step(1); // fps slider, 0 to 20 in 1 increments
 	// Create the buttons
-	gui.add(this, "reset"); 
+	gui.add(this, "reset");
 	gui.add(this, "step");
 	var runController = gui.add(this, "run");
+
+	// Add sliders for user parameters.
+	{% if len(user_params)>0 %}
+		var param_folder = gui.addFolder("Parameters")
+		param_folder.add(this, "autoupdate")
+		var UserParams = function() {
+			{% for param in user_params %}
+			this.{{ param.name }} = {% raw param.get_js_value() %};
+			{% end %}
+		};
+		var params = new UserParams();
+		param_list = []
+		{% for param in user_params %}
+			var {% raw param.name %} = param_folder.{% raw param.get_code() %}
+			param_list.push({% raw param.name %})
+		{% end %}
+		param_folder.open();
+	{% end %}
 
 	/**
 	Called when the user releases the fps slider; if already running, stop and
@@ -155,6 +198,14 @@
 			run();
 		}
 	});
+
+	if (autoupdate) {
+		for (var i = 0; i < param_list.length; i++) {
+			param_list[i].onFinishChange(function(value) {
+				update_params()
+			})
+		}
+	}
 
 	// Element-specific scripts go here:
 	// Actual script snippets go here.
