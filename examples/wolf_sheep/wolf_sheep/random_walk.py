@@ -4,10 +4,10 @@ Generalized behavior for random walking, one grid cell at a time.
 
 import random
 
-from mesa import Agent
+from mesa.EvoAgent import *
 
 
-class RandomWalker(Agent):
+class RandomWalker(EvoAgent):
     '''
     Class implementing random walker methods in a generalized manner.
 
@@ -21,7 +21,7 @@ class RandomWalker(Agent):
     y = None
     moore = True
 
-    def __init__(self, pos, model, moore=True):
+    def __init__(self, unique_id,model,moore=True,gain=1,**kwargs):
         '''
         grid: The MultiGrid object in which the agent lives.
         x: The agent's current x coordinate
@@ -29,9 +29,13 @@ class RandomWalker(Agent):
         moore: If True, may move in all 8 directions.
                 Otherwise, only up, down, left, right.
         '''
-        super().__init__(pos, model)
-        self.pos = pos
+        x = random.randrange(model.width)
+        y = random.randrange(model.height)
         self.moore = moore
+        self.pos = (x,y)
+        self.gain_from_food=gain
+        energy=random.randrange(2 * self.gain_from_food)
+        super().__init__(unique_id, model,energy=energy,**kwargs)
 
     def random_move(self):
         '''
@@ -42,3 +46,9 @@ class RandomWalker(Agent):
         next_move = random.choice(next_moves)
         # Now move:
         self.model.grid.move_agent(self, next_move)
+
+    def duplicate(self):
+        dup=super().duplicate()
+        dup.pos=self.pos
+        dup.moore=self.moore
+        return dup
