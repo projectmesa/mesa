@@ -83,7 +83,7 @@ class BatchRunner:
                 self.run_model(model)
                 # Collect and store results:
                 if self.model_reporters:
-                    key = tuple(list(param_values) + [run_count])
+                    key = tuple([str(p) for p in param_values] + [run_count])
                     self.model_vars[key] = self.collect_model_vars(model)
                 if self.agent_reporters:
                     agent_vars = self.collect_agent_vars(model)
