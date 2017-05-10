@@ -16,7 +16,7 @@ To launch the interactive server, as described in the [last section of the tutor
     $ python viz_money_model.py
 ```
 
-Then open your browser to [http://127.0.0.1:8889/](http://127.0.0.1:8889/) and press Reset, then Run.
+If your browser doesn't open automatically, point it to [http://127.0.0.1:8521/](http://127.0.0.1:8521/). When the visualization loads, press Reset, then Run.
 
 
 ## Files

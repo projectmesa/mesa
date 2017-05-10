@@ -97,7 +97,7 @@ Finally, when you're ready to run the visualization, use the server's
                            [grid], 
                            "Money Model", 
                            100, 10, 10)
-    server.port = 8889
+    server.port = 8521 # The default
     server.launch()
 
 The full code should now look like:
@@ -122,12 +122,14 @@ The full code should now look like:
                            [grid], 
                            "Money Model", 
                            100, 10, 10)
-    server.port = 8889
+    server.port = 8521 # The default
     server.launch()
 
 Now run this file; this should launch the interactive visualization
-server. Open your web browser of choice, and enter
-`127.0.0.1:8889 <127.0.0.1:8889>`__.
+server and open your web browser automatically. (If the browser doesn't
+open automatically, try pointing it at http://127.0.0.1:8521 manually.
+If this doesn't show you the visualization, something may have gone
+wrong with the server launch.)
 
 You should see something like the figure below: the model title, an
 empty space where the grid will be, and a control panel off to the
@@ -183,10 +185,11 @@ to change the portrayal based on the agent properties.
             portrayal["r"] = 0.2
         return portrayal
 
-Now launch the server again, open or refresh your browser page, and hit
-'reset'. Initially it looks the same, but advance the model and smaller
-grey circles start to appear. Note that since the zero-wealth agents
-have a higher layer number, they are drawn on top of the red agents.
+Now launch the server again - this will open a new browser window
+pointed at the updated visualization. Initially it looks the same, but
+advance the model and smaller grey circles start to appear. Note that
+since the zero-wealth agents have a higher layer number, they are drawn
+on top of the red agents.
 
 .. figure:: files/viz_greycircles.png
    :alt: Greycircles Visualization
