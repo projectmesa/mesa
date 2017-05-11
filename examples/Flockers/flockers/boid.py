@@ -13,12 +13,12 @@ class Boid(Agent):
         - Alignment: try to fly in the same direction as the neighbors.
 
     Boids have a vision that defines the radius in which they look for their
-    neighbors to flock with. Their speed (a scalar) and heading (a unit vector)
+    neighbors to flock with. Their speed (a scalar) and velocity (a vector)
     define their movement. Separation is their desired minimum distance from
     any other Boid.
     '''
-    def __init__(self, unique_id, model, pos, speed=5, heading=None,
-                 vision=5, separation=1):
+    def __init__(self, unique_id, model, pos, speed, velocity, vision,
+            separation, cohere=0.025, separate=0.25, match=0.04):
         '''
         Create a new Boid flocker agent.
 
@@ -29,48 +29,54 @@ class Boid(Agent):
             heading: numpy vector for the Boid's direction of movement.
             vision: Radius to look around for nearby Boids.
             separation: Minimum distance to maintain from other Boids.
+            cohere: the relative importance of matching neighbors' positions
+            separate: the relative importance of avoiding close neighbors
+            match: the relative importance of matching neighbors' headings
+
         '''
         super().__init__(unique_id, model)
-        self.pos = pos
+        self.pos = np.array(pos)
         self.speed = speed
-        if heading is not None:
-            self.heading = heading
-        else:
-            self.heading = np.random.random(2)
-            self.heading /= np.linalg.norm(self.heading)
+        self.velocity = velocity
         self.vision = vision
         self.separation = separation
+        self.cohere_factor = cohere
+        self.separate_factor = separate
+        self.match_factor = match
 
     def cohere(self, neighbors):
         '''
         Return the vector toward the center of mass of the local neighbors.
         '''
-        center = np.array([0.0, 0.0])
-        for neighbor in neighbors:
-            center += np.array(neighbor.pos)
-        return center / len(neighbors)
+        cohere = np.zeros(2)
+        if neighbors:
+            for neighbor in neighbors:
+                cohere += self.model.space.get_heading(self.pos, neighbor.pos)
+            cohere /= len(neighbors)
+        return cohere
 
     def separate(self, neighbors):
         '''
         Return a vector away from any neighbors closer than separation dist.
         '''
-        my_pos = np.array(self.pos)
-        sep_vector = np.array([0, 0])
-        for neighbor in neighbors:
-            their_pos = np.array(neighbor.pos)
-            dist = np.linalg.norm(my_pos - their_pos)
-            if dist < self.separation:
-                sep_vector -= np.int64(their_pos - my_pos)
-        return sep_vector
+        me = self.pos
+        them = (n.pos for n in neighbors)
+        separation_vector = np.zeros(2)
+        for other in them:
+            if self.model.space.get_distance(me, other) < self.separation:
+                separation_vector -= self.model.space.get_heading(me, other)
+        return separation_vector
 
     def match_heading(self, neighbors):
         '''
         Return a vector of the neighbors' average heading.
         '''
-        mean_heading = np.array([0, 0])
-        for neighbor in neighbors:
-            mean_heading += np.int64(neighbor.heading)
-        return mean_heading / len(neighbors)
+        match_vector = np.zeros(2)
+        if neighbors:
+            for neighbor in neighbors:
+                match_vector += neighbor.velocity
+            match_vector /= len(neighbors)
+        return match_vector
 
     def step(self):
         '''
@@ -78,14 +84,9 @@ class Boid(Agent):
         '''
 
         neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
-        if len(neighbors) > 0:
-            cohere_vector = self.cohere(neighbors)
-            separate_vector = self.separate(neighbors)
-            match_heading_vector = self.match_heading(neighbors)
-            self.heading += (cohere_vector +
-                             separate_vector +
-                             match_heading_vector)
-            self.heading /= np.linalg.norm(self.heading)
-        new_pos = np.array(self.pos) + self.heading * self.speed
-        new_x, new_y = new_pos
-        self.model.space.move_agent(self, (new_x, new_y))
+        self.velocity += (self.cohere(neighbors) * self.cohere_factor +
+                          self.separate(neighbors) * self.separate_factor +
+                          self.match_heading(neighbors) * self.match_factor) / 2
+        self.velocity /= np.linalg.norm(self.velocity)
+        new_pos = self.pos + self.velocity * self.speed
+        self.model.space.move_agent(self, new_pos)
