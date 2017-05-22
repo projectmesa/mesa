@@ -9,6 +9,7 @@ Next release - 0.8.1 (2017-05-?) Flagstaff (PyCon Sprints)
 
 **Improvements**
 
+* Add best-practices document and describe models. #371
 * Added function to use local images as shapes in GridDraw
 * Added drawImage function to GridDraw
     * Enables to draw a local imagefile as shape for agents
