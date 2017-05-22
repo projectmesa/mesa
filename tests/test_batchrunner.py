@@ -49,12 +49,12 @@ class MockModel(Model):
         self.schedule.step()
 
 
-class MockDictionaryModel(Model):
+class MockMixedModel(Model):
 
-    def __init__(self, variable_param, fixed_params):
+    def __init__(self, **other_params):
         super().__init__()
-        self.variable_param = variable_param
-        self.fixed_name = fixed_params.get('fixed_name', None)
+        self.variable_name = other_params.get('variable_name', 42)
+        self.fixed_name = other_params.get('fixed_name')
         self.running = True
         self.schedule = BaseScheduler(None)
         self.schedule.add(MockAgent(1, self, 0))
@@ -115,7 +115,7 @@ class TestBatchRunner(unittest.TestCase):
                          len(self.model_reporters) +
                          1)  # extra column with run index
 
-        assert model_vars.shape == (self.model_runs, expected_cols)
+        self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
 
     def test_agent_level_vars(self):
         """
@@ -125,9 +125,10 @@ class TestBatchRunner(unittest.TestCase):
         agent_vars = batch.get_agent_vars_dataframe()
         expected_cols = (len(self.variable_params) +
                          len(self.agent_reporters) +
-                         1)  # extra column with run index
+                         2)  # extra columns with run index and agentId
 
-        assert agent_vars.shape == (self.model_runs * NUM_AGENTS, expected_cols)
+        self.assertEqual(agent_vars.shape,
+             (self.model_runs * NUM_AGENTS, expected_cols))
 
     def test_model_with_fixed_parameters_as_kwargs(self):
         """
@@ -139,23 +140,23 @@ class TestBatchRunner(unittest.TestCase):
         model_vars = batch.get_model_vars_dataframe()
         agent_vars = batch.get_agent_vars_dataframe()
 
-        assert len(model_vars) == len(agent_vars)
-        assert len(model_vars) == self.model_runs
-        assert model_vars['reported_fixed_value'].unique() == ['Fixed']
+        self.assertEqual(len(model_vars), len(agent_vars))
+        self.assertEqual(len(model_vars), self.model_runs)
+        self.assertEqual(model_vars['reported_fixed_value'].unique(), ['Fixed'])
 
-    def test_model_with_fixed_parameters_as_dict(self):
-        self.mock_model = MockDictionaryModel
-        self.model_reporters = {'reported_fixed_param': lambda m: m.fixed_name}
-        self.agent_reporters = {}
-        self.fixed_params = {'fixed_name': 'DictModel'}
-        self.variable_params = {'variable_param': [1, 2, 3]}
-
+    def test_model_with_variable_and_fixed_kwargs(self):
+        self.mock_model = MockMixedModel
+        self.model_reporters = {
+            'reported_fixed_param': lambda m: m.fixed_name,
+            'reported_variable_param': lambda m: m.variable_name
+        }
+        self.fixed_params = {'fixed_name': 'Fixed'}
+        self.variable_params = {'variable_name': [1, 2, 3]}
         batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
         expected_cols = (len(self.variable_params) +
                          len(self.model_reporters) +
                          1)
-
-        assert model_vars.shape == (self.model_runs, expected_cols)
-        assert (model_vars['reported_fixed_param'].iloc[0] ==
+        self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
+        self.assertEqual(model_vars['reported_fixed_param'].iloc[0],
                 self.fixed_params['fixed_name'])
