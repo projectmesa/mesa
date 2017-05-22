@@ -17,7 +17,10 @@ underscores, such as ``thunder_cats``. Within that directory:
 
 * ``model.py`` should contain the model class.  If the file gets large, it may
   make sense to move the complex bits into other files, but this is the first
-  place readers will look to figure out how the model lworks.
+  place readers will look to figure out how the model works.
+
+* ``server.py`` should contain the visualization support, including the server
+  class.
 
 * ``run.py`` is a Python script that will run the model when invoked as
   ``python run.py``.
