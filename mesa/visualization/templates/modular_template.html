@@ -65,7 +65,8 @@
 					clearInterval(player);
 					runController.name("run");
 					break;
-				case "viz_params":
+				case "model_params":
+					console.log(msg["params"]);
 					model_params = msg["params"]
 					add_params();
 					break;
@@ -157,6 +158,7 @@
 			param_folder.add(model_params, param).onChange(function(e) {
 				if (!control.running) {
 					send({"type":"submit_params","param": param, "value": e});
+					reset();
 				}
 			})
 		}

@@ -63,6 +63,12 @@ Server -> Client:
 
     Informs the client that the model is over.
     {"type": "end"}
+    
+    Informs the client of the current model's parameters
+    {
+    "type": "model_params",
+    "params": 'dict' of model params, (i.e. {arg_1: val_1, ...})
+    }
 
 Client -> Server:
     Reset the model.
@@ -76,9 +82,22 @@ Client -> Server:
     "type": "get_step",
     "step:" index of the step to get.
     }
+    
+    Submit model parameter updates
+    {
+    "type": "submit_params",
+    "param": name of model parameter
+    "value": new value for 'param'
+    }
+    
+    Get the model's parameters
+    {
+    "type": "get_params"
+    }
 
 """
 import os
+import inspect
 
 import tornado.autoreload
 import tornado.ioloop
@@ -158,6 +177,13 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @property
+    def viz_state_message(self):
+        return {
+            "type": "viz_state",
+            "data": self.application.render_model()
+        }
+
     def on_message(self, message):
         """ Receiving a message from the websocket, parse, and act accordingly.
 
@@ -171,28 +197,25 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                 self.write_message({"type": "end"})
             else:
                 self.application.model.step()
-                self.write_message({"type": "viz_state",
-                        "data": self.application.render_model()})
+                self.write_message(self.viz_state_message)
 
         elif msg["type"] == "reset":
             self.application.reset_model()
-            self.write_message({"type": "viz_state",
-                    "data": self.application.render_model()})
+            self.write_message(self.viz_state_message)
 
         elif msg["type"] == "submit_params":
-            print(msg["value"])
-            print(msg["param"])
-            # Todo - update model args + kwargs params
-            self.application.reset_model()
+            param = msg["param"]
+            value = msg["value"]
+            if param in self.application.model_params:
+                if param in self.application.model_kwargs:
+                    self.application.model_kwargs[param] = value
+                elif param in [a[0] for a in self.application.model_args]:
+                    pass    # Todo - handle non-keyword arg updates
 
         elif msg["type"] == "get_params":
             self.write_message({
-                "type": "viz_params",
-                "params": { # Todo - get params from model
-                    "x": 1,
-                    "y": 2,
-                    "z": 3
-                }
+                "type": "model_params",
+                "params": self.application.model_params
             })
 
         else:
@@ -251,12 +274,28 @@ class ModularServer(tornado.web.Application):
         self.model_name = name
         self.model_cls = model_cls
 
+        # Infer args and kwargs from the model cls' constructor, use args/kwargs provide to override the default
+        # model's default args/kwargs, and then capture the resulting model args/kwargs to be used when resetting model
+        sig = inspect.signature(model_cls.__init__)
+        for a in sig.parameters:
+            if a in ['self']:   # Todo - param include_list/exclude list?
+                continue
+
+            # Todo - handle non-keyword args
+
+            elif a not in kwargs and a not in args and sig.parameters[a].default is not inspect._empty:
+                kwargs[a] = sig.parameters[a].default
+
         self.model_args = args
         self.model_kwargs = kwargs
         self.reset_model()
 
         # Initializing the application itself:
         super().__init__(self.handlers, **self.settings)
+
+    @property
+    def model_params(self):
+        return {**{a[0]: a[1] for a in self.model_args}, **self.model_kwargs}
 
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
