@@ -83,6 +83,7 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
    Mesa Overview <overview>
    tutorials/intro_tutorial
    tutorials/adv_tutorial
+   Best Practices <best-practices>
    API Documentation <apis/api_main.rst>
 
 Indices and tables
