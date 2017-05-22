@@ -179,6 +179,22 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             self.write_message({"type": "viz_state",
                     "data": self.application.render_model()})
 
+        elif msg["type"] == "submit_params":
+            print(msg["value"])
+            print(msg["param"])
+            # Todo - update model args + kwargs params
+            self.application.reset_model()
+
+        elif msg["type"] == "get_params":
+            self.write_message({
+                "type": "viz_params",
+                "params": { # Todo - get params from model
+                    "x": 1,
+                    "y": 2,
+                    "z": 3
+                }
+            })
+
         else:
             if self.application.verbose:
                 print("Unexpected message!")
