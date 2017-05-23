@@ -17,10 +17,12 @@ The Demographic Prisoner's Dilemma demonstrates how simple rules can lead to the
 
 ## How to Run
 
-* Web based model simulation
+##### Web based model simulation
+
 Run ``python run.py``.
 
-* Jupyter Notebook
+##### Jupyter Notebook
+
 Launch the ``Demographic Prisoner's Dilemma Activation Schedule.ipynb`` notebook and run the code.
 
 ## Files
