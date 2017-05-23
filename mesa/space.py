@@ -532,7 +532,7 @@ class ContinuousSpace:
         """
         # Get candidate objects
         scale = max(self.cell_width, self.cell_height)
-        cell_radius = math.ceil(radius / scale)
+        cell_radius = int(math.ceil(radius / scale))
         cell_pos = self._point_to_cell(pos)
         possible_objs = self._grid.get_neighbors(cell_pos,
                                                  True, True, cell_radius)
