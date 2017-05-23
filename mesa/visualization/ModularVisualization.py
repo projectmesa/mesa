@@ -63,7 +63,7 @@ Server -> Client:
 
     Informs the client that the model is over.
     {"type": "end"}
-    
+
     Informs the client of the current model's parameters
     {
     "type": "model_params",
@@ -82,14 +82,14 @@ Client -> Server:
     "type": "get_step",
     "step:" index of the step to get.
     }
-    
+
     Submit model parameter updates
     {
     "type": "submit_params",
     "param": name of model parameter
     "value": new value for 'param'
     }
-    
+
     Get the model's parameters
     {
     "type": "get_params"
@@ -298,7 +298,7 @@ class ModularServer(tornado.web.Application):
         for a in sig.parameters:
             if sig.parameters[a].default is inspect._empty and a != 'self':
                 if a in self.exclude_list:
-                    _args[a] = args[list(sig.parameters).index(a)-1]
+                    _args[a] = args[list(sig.parameters).index(a) - 1]
                 else:
                     _args[a] = None
 
