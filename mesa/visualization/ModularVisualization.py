@@ -310,7 +310,7 @@ class ModularServer(tornado.web.Application):
 
             # Handle model args
             elif a in _args and i <= len(args):
-                _args[a] = args[i-1]    # always skip 'self' param in args
+                _args[a] = args[i - 1]    # always skip 'self' param in args
 
             # Handle model kwargs
             elif a not in kwargs and a not in _args and sig.parameters[a].default is not inspect._empty:
