@@ -32,3 +32,29 @@ an ``images`` directory.
 The `Schelling
 <https://github.com/projectmesa/mesa/tree/master/examples/Schelling>`_ model is
 a good example of a small well-packaged model.
+
+Randomization
+-------------
+
+If your model involves some random choice, you can use either ``random``
+(Python's built-in random number generator) or ``numpy.random`` (the generator
+included with Numpy).
+
+The constructor for the ``Model`` class automatically "seeds" these random
+number generators using the current time, so each run will produce different
+random numbers. For testing purposes, it can be helpful to use the same
+random-number seed for multiple runs. To accomplish this, pass a value to the
+Model constructor:
+
+.. code:: python
+
+    class AwesomeModel(Model):
+        def __init__(self, seed=None):
+            super().__init__(seed)
+            # ...
+
+    model = AwesomeModel(seed=1234)
+    # ...
+
+This approach will cause ``RandomActivation`` to activate agents in a
+repeatable fashion.
