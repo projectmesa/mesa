@@ -158,7 +158,6 @@
 			param_folder.add(model_params, param).onChange(function(e) {
 				if (!control.running) {
 					send({"type":"submit_params","param": param, "value": e});
-					reset();
 				}
 			})
 		}
