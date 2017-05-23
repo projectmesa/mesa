@@ -1,5 +1,5 @@
 from mesa.visualization.ModularVisualization import ModularServer
-from .money_model import MoneyModel
+from .model import MoneyModel
 
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.modules import ChartModule
