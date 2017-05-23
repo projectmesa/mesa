@@ -1,0 +1,1 @@
+from .money_model import MoneyModel
