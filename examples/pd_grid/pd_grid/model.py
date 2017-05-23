@@ -1,5 +1,3 @@
-import random
-
 from mesa import Model
 from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
 from mesa.space import SingleGrid
