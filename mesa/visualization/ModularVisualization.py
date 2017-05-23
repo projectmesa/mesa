@@ -298,7 +298,7 @@ class ModularServer(tornado.web.Application):
         for a in sig.parameters:
             if sig.parameters[a].default is inspect._empty and a != 'self':
                 if a in self.exclude_list:
-                    _args[a] = args[list(sig.parameters).index(a)]
+                    _args[a] = args[list(sig.parameters).index(a)-1]
                 else:
                     _args[a] = None
 
