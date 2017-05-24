@@ -64,6 +64,12 @@ Server -> Client:
     Informs the client that the model is over.
     {"type": "end"}
 
+    Informs the client of the current model's parameters
+    {
+    "type": "model_params",
+    "params": 'dict' of model params, (i.e. {arg_1: val_1, ...})
+    }
+
 Client -> Server:
     Reset the model.
     TODO: Allow this to come with parameters
@@ -77,8 +83,22 @@ Client -> Server:
     "step:" index of the step to get.
     }
 
+    Submit model parameter updates
+    {
+    "type": "submit_params",
+    "param": name of model parameter
+    "value": new value for 'param'
+    }
+
+    Get the model's parameters
+    {
+    "type": "get_params"
+    }
+
 """
 import os
+import inspect
+from collections import OrderedDict
 
 import tornado.autoreload
 import tornado.ioloop
@@ -158,6 +178,13 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @property
+    def viz_state_message(self):
+        return {
+            "type": "viz_state",
+            "data": self.application.render_model()
+        }
+
     def on_message(self, message):
         """ Receiving a message from the websocket, parse, and act accordingly.
 
@@ -171,13 +198,32 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                 self.write_message({"type": "end"})
             else:
                 self.application.model.step()
-                self.write_message({"type": "viz_state",
-                        "data": self.application.render_model()})
+                self.write_message(self.viz_state_message)
 
         elif msg["type"] == "reset":
             self.application.reset_model()
-            self.write_message({"type": "viz_state",
-                    "data": self.application.render_model()})
+            self.write_message(self.viz_state_message)
+
+        elif msg["type"] == "submit_params":
+            param = msg["param"]
+            value = msg["value"]
+
+            # Is the param editable?
+            if param in self.application.user_params:
+
+                # Handle model args
+                if param in self.application.model_args:
+                    self.application.model_args[param] = value
+
+                # Handle model kwargs
+                elif param in self.application.model_kwargs:
+                    self.application.model_kwargs[param] = value
+
+        elif msg["type"] == "get_params":
+            self.write_message({
+                "type": "model_params",
+                "params": self.application.user_params
+            })
 
         else:
             if self.application.verbose:
@@ -216,6 +262,8 @@ class ModularServer(tornado.web.Application):
                 "autoreload": False,
                 "template_path": os.path.dirname(__file__) + "/templates"}
 
+    EXCLUDE_LIST = ('width', 'height',)
+
     def __init__(self, model_cls, visualization_elements, name="Mesa Model",
                  *args, **kwargs):
         """ Create a new visualization server with the given elements. """
@@ -235,16 +283,55 @@ class ModularServer(tornado.web.Application):
         self.model_name = name
         self.model_cls = model_cls
 
-        self.model_args = args
+        # Determine current parameter exclude list
+        if 'exclude_list' in kwargs:
+            self.exclude_list = kwargs.pop('exclude_list')
+        else:
+            self.exclude_list = self.EXCLUDE_LIST
+
+        # Infer args and kwargs from the model cls' constructor, use args/kwargs provide to override the default
+        # model's default args/kwargs, and then capture the resulting model args/kwargs to be used when resetting model
+        sig = inspect.signature(model_cls.__init__)
+
+        # Determine non-keyword arguments for the model
+        _args = OrderedDict()
+        for a in sig.parameters:
+            if sig.parameters[a].default is inspect._empty and a != 'self':
+                if a in self.exclude_list:
+                    _args[a] = args[list(sig.parameters).index(a) - 1]
+                else:
+                    _args[a] = None
+
+        for i, a in enumerate(sig.parameters):
+
+            # Determine which arguments not to allow to be editable?
+            if a in ['self']:
+                continue
+
+            # Handle model args
+            elif a in _args and i <= len(args):
+                _args[a] = args[i - 1]    # always skip 'self' param in args
+
+            # Handle model kwargs
+            elif a not in kwargs and a not in _args and sig.parameters[a].default is not inspect._empty:
+                kwargs[a] = sig.parameters[a].default
+
+        self.model_args = _args
         self.model_kwargs = kwargs
         self.reset_model()
 
         # Initializing the application itself:
         super().__init__(self.handlers, **self.settings)
 
+    @property
+    def user_params(self):
+        result = {a: self.model_args[a] for a in self.model_args if a not in self.exclude_list}
+        result.update({k: self.model_kwargs[k] for k in self.model_kwargs if k not in self.exclude_list})
+        return result
+
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
-        self.model = self.model_cls(*self.model_args, **self.model_kwargs)
+        self.model = self.model_cls(*(tuple(self.model_args.values())), **self.model_kwargs)
 
     def render_model(self):
         """ Turn the current state of the model into a dictionary of

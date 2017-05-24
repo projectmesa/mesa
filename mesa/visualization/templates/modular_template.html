@@ -37,12 +37,13 @@
 		var player; // Variable to store the continuous player
 		var control = new MesaVisualizationControl();
 		var elements = [];  // List of Element objects
-
+		var model_params = {};
 
 		// WebSocket Stuff
 		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws"); // Open the websocket connection
                 ws.onopen = function() {
                     console.log("Connection opened!");
+               		send({"type": "get_params"}); // Request model parameters when websocket is ready
                     reset();
                 };
 
@@ -51,7 +52,6 @@
 		*/
 		ws.onmessage = function(message) {
 			msg = JSON.parse(message.data);
-			//console.log(message.data);
 			switch (msg["type"]) {
 				case "viz_state":
 					data = msg["data"]
@@ -64,6 +64,11 @@
 					control.running = false;
 					clearInterval(player);
 					runController.name("run");
+					break;
+				case "model_params":
+					console.log(msg["params"]);
+					model_params = msg["params"]
+					add_params();
 					break;
 				default:
 					// There shouldn't be any other message
@@ -139,11 +144,28 @@
 <script>
 	// Set up the GUI
 	var gui = new dat.GUI();
+
 	var fps_control = gui.add(control, "fps", 0, 20).step(1); // fps slider, 0 to 20 in 1 increments 
 	// Create the buttons
 	gui.add(this, "reset"); 
 	gui.add(this, "step");
 	var runController = gui.add(this, "run");
+
+	// Add model parameters that can be edited prior to a model run
+	var param_folder = gui.addFolder("Model Parameters", "a");
+	var add_params = function() {
+		var add_one_param = function(param) {
+			param_folder.add(model_params, param).onChange(function(e) {
+				if (!control.running) {
+					send({"type":"submit_params","param": param, "value": e});
+				}
+			})
+		}
+
+		for (var opt in model_params) {
+			add_one_param(String(opt));
+		}
+	}
 
 	/**
 	Called when the user releases the fps slider; if already running, stop and
@@ -161,6 +183,7 @@
 	{% for script in scripts %}
 			{% raw script %}
 	{% end %}
+
 
 </script>
 
