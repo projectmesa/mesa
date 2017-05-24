@@ -326,7 +326,7 @@ class ModularServer(tornado.web.Application):
     @property
     def user_params(self):
         result = {a: self.model_args[a] for a in self.model_args if a not in self.exclude_list}
-        result.update(self.model_kwargs)
+        result.update({k: self.model_kwargs[k] for k in self.model_kwargs if k not in self.exclude_list})
         return result
 
     def reset_model(self):
