@@ -50,7 +50,8 @@ class TestModularServer(TestCase):
 
         self.keyword_params = {
             'key1': 201,
-            'key2': 202
+            'key2': 202,
+            'exclude_list': ['key2', 'height', 'width']
         }
 
         self.viz_elements = [
@@ -60,8 +61,7 @@ class TestModularServer(TestCase):
             #              {"Label": "Sheep", "Color": "#666666"}])
         ]
 
-        self.server = ModularServer(MockModel, self.viz_elements, "Test Model", 1, 1, **self.keyword_params,
-                                    exclude_list=['key2', 'height', 'width'])
+        self.server = ModularServer(MockModel, self.viz_elements, "Test Model", 1, 1, **self.keyword_params)
 
     def test_user_params(self):
         assert self.server.user_params != {'key1': 201, 'key2': 202}    # ensure exclude list takes affect
