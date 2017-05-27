@@ -1,29 +1,27 @@
 <!DOCTYPE html>
 <head>
 	<title>{{ model_name }} (Mesa visualization)</title>
-  {% comment 
-  The jquery.min.js supplied with this version of mesa  is downloaded from
-  "ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" Re-test mesa
-  visulaizations when upgrading jquery to a newer version.
-  %}
+    <link href="/static/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <link href="/static/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
 	<script src="/static/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
 	<script src="/static/dat.gui.min.js"></script>
 	<script>
 	/*
-		This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to the server 
+		This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to the server
 		(the port is set via the template). On every step, it receives inputs, one per module, and sends them to the associated function to render
 
-		Users can reset() the model, advance it by one step(), or run() it through. reset() and 
+		Users can reset() the model, advance it by one step(), or run() it through. reset() and
 		step() send a message to the server, which then sends back the appropriate data. run() just
 		calls the step() method at fixed intervals.
 
-		The model parameters are controlled via the MesaVisualizationControl object. The GUI is 
+		The model parameters are controlled via the MesaVisualizationControl object. The GUI is
 		created using the dat.GUI library.
-	
+
 	*/
 		/**
 		Object which holds visualization parameters.
-	
+
 			tick: What tick of the model we're currently at
 			running: Boolean on whether we have reached the end of the current model
 			fps: Current frames per second.
@@ -75,7 +73,7 @@
 					console.log("Unexpected message.");
 			}
 		}
-		
+
 		/**
 		Turn an object into a string to send to the server, and send it.
 		*/
@@ -128,7 +126,7 @@
 			}
 		};
 	</script>
-	
+
 </head>
 <body>
 	<h2>{{ model_name }}</h2> <!-- Template; put the model name as the heading -->
@@ -145,9 +143,9 @@
 	// Set up the GUI
 	var gui = new dat.GUI();
 
-	var fps_control = gui.add(control, "fps", 0, 20).step(1); // fps slider, 0 to 20 in 1 increments 
+	var fps_control = gui.add(control, "fps", 0, 20).step(1); // fps slider, 0 to 20 in 1 increments
 	// Create the buttons
-	gui.add(this, "reset"); 
+	gui.add(this, "reset");
 	gui.add(this, "step");
 	var runController = gui.add(this, "run");
 
