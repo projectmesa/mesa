@@ -34,20 +34,19 @@ Grid Visualization
 ^^^^^^^^^^^^^^^^^^
 
 To start with, let's have a visualization where we can watch the agents
-moving around the grid. For this, you will need to put your model code
-in a separate Python source file; for example, ``MoneyModel.py``. Next,
-either in the same file or in a new one (e.g. ``MoneyModel_Viz.py``)
-import the server class and the Canvas Grid class (so-called because it
-uses HTML5 canvas to draw a grid). If you're in a new file, you'll also
-need to import the actual model object.
+moving around the grid. For this, you will need to create a server that
+will support visualization in a web browser.  Set that up in ``server.py``.
+
+Import the server class and the Canvas Grid class (so-called because it uses
+HTML5 canvas to draw a grid). If you're in a new file, you'll also need to
+import the actual model object.
 
 .. code:: python
 
+    # server.py
     from mesa.visualization.modules import CanvasGrid
     from mesa.visualization.ModularVisualization import ModularServer
-    
-    # If MoneyModel.py is where your code is:
-    # from MoneyModel import MoneyModel
+    from model import MoneyModel
 
 ``CanvasGrid`` works by looping over every cell in a grid, and
 generating a portrayal for every agent it finds. A portrayal is a
@@ -59,6 +58,7 @@ fills half of each cell.
 
 .. code:: python
 
+    # server.py
     def agent_portrayal(agent):
         portrayal = {"Shape": "circle",
                      "Color": "red",
@@ -88,15 +88,23 @@ following arguments:
 
 Once we create the server, we set the port for it to listen on (you can
 treat this as just a piece of the URL you'll open in the browser).
-Finally, when you're ready to run the visualization, use the server's
-``launch()`` method.
 
 .. code:: python
 
+    # server.py
     server = ModularServer(MoneyModel, 
                            [grid], 
                            "Money Model", 
                            100, 10, 10)
+
+Finally, when you're ready to run the visualization, use the server's
+``launch()`` method, in ``run.py``. In this arrangmenet, ``run.py`` is
+very short!
+
+.. code:: python
+
+    # run.py
+    from server import server
     server.port = 8521 # The default
     server.launch()
 
@@ -104,10 +112,10 @@ The full code should now look like:
 
 .. code:: python
 
-    from MoneyModel import *
+    # server.py
     from mesa.visualization.modules import CanvasGrid
     from mesa.visualization.ModularVisualization import ModularServer
-
+    from model import MoneyModel
 
     def agent_portrayal(agent):
         portrayal = {"Shape": "circle",
@@ -122,8 +130,6 @@ The full code should now look like:
                            [grid], 
                            "Money Model", 
                            100, 10, 10)
-    server.port = 8521 # The default
-    server.launch()
 
 Now run this file; this should launch the interactive visualization
 server and open your web browser automatically. (If the browser doesn't
@@ -171,6 +177,7 @@ to change the portrayal based on the agent properties.
 
 .. code:: python
 
+    # server.py
     def agent_portrayal(agent):
         portrayal = {"Shape": "circle",
                      "Filled": "true",
@@ -205,6 +212,7 @@ provides.
 
 .. code:: python
 
+    # server.py
     from mesa.visualization.modules import ChartModule
 
 The basic chart pulls data from the model's DataCollector, and draws it
@@ -221,6 +229,7 @@ chart will appear underneath the grid.
 
 .. code:: python
 
+    # server.py
     chart = ChartModule([{"Label": "Gini", 
                           "Color": "Black"}],
                         data_collector_name='datacollector')
@@ -297,6 +306,7 @@ the class itself:
 
 .. code:: javascript
 
+    // HistogramModule.js
     var HistogramModule = function(bins, canvas_width, canvas_height) {
         // The actual code will go here.
     };
@@ -314,6 +324,7 @@ context, which is required for doing anything with it.
 
 .. code:: javascript
 
+    // HistogramModule.js
     var HistogramModule = function(bins, canvas_width, canvas_height) {
         // Create the tag:
         var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
@@ -337,6 +348,7 @@ created, we can create the chart object.
 
 .. code:: javascript
 
+    // HistogramModule.js
     var HistogramModule = function(bins, canvas_width, canvas_height) {
         // Create the elements
 
@@ -394,6 +406,7 @@ With that in mind, we can add these two methods to the class:
 
 .. code:: javascript
 
+    // HistogramModule.js
     var HistogramModule = function(bins, canvas_width, canvas_height) {
         // ...Everything from above...
         this.render = function(data) {
@@ -431,21 +444,22 @@ inherit from, and create the new visualization class.
 
 .. code:: python
 
-        from mesa.visualization.ModularVisualization import VisualizationElement
+    # server.py
+    from mesa.visualization.ModularVisualization import VisualizationElement
 
-        class HistogramModule(VisualizationElement):
-            package_includes = ["Chart.min.js"]
-            local_includes = ["HistogramModule.js"]
+    class HistogramModule(VisualizationElement):
+        package_includes = ["Chart.min.js"]
+        local_includes = ["HistogramModule.js"]
 
-            def __init__(self, bins, canvas_height, canvas_width):
-                self.canvas_height = canvas_height
-                self.canvas_width = canvas_width
-                self.bins = bins
-                new_element = "new HistogramModule({}, {}, {})"
-                new_element = new_element.format(bins, 
-                                                 canvas_width, 
-                                                 canvas_height)
-                self.js_code = "elements.push(" + new_element + ");"
+        def __init__(self, bins, canvas_height, canvas_width):
+            self.canvas_height = canvas_height
+            self.canvas_width = canvas_width
+            self.bins = bins
+            new_element = "new HistogramModule({}, {}, {})"
+            new_element = new_element.format(bins,
+                                             canvas_width,
+                                             canvas_height)
+            self.js_code = "elements.push(" + new_element + ");"
 
 There are a few things going on here. ``package_includes`` is a list of
 JavaScript files that are part of Mesa itself that the visualization
@@ -471,6 +485,7 @@ general, but in this case we can hard-code it to our model.
 
 .. code:: python
 
+    # server.py
     import numpy as np
 
     class HistogramModule(VisualizationElement):
@@ -493,12 +508,12 @@ Now, you can create your new HistogramModule and add it to the server:
 
 .. code:: python
 
-        histogram = HistogramModule(list(range(10)), 200, 500)
-        server = ModularServer(MoneyModel, 
-                               [grid, histogram, chart], 
-                               "Money Model", 
-                               100, 10, 10)
-        server.launch()
+    # server.py
+    histogram = HistogramModule(list(range(10)), 200, 500)
+    server = ModularServer(MoneyModel,
+                           [grid, histogram, chart],
+                           "Money Model",
+                           100, 10, 10)
 
 Run this code, and you should see your brand-new histogram added to the
 visualization and updating along with the model!
