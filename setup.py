@@ -29,7 +29,7 @@ setup(
     author_email='projectmesa@googlegroups.com',
     url='https://github.com/projectmesa/mesa',
     packages=find_packages(),
-    package_data={'mesa': ['visualization/templates/*', 'visualization/templates/css/*',
+    package_data={'mesa': ['visualization/templates/*.html', 'visualization/templates/css/*',
                            'visualization/templates/fonts/*', 'visualization/templates/js/*']},
     include_package_data=True,
     install_requires=requires,
