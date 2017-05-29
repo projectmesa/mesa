@@ -3,4 +3,4 @@ include LICENSE
 include HISTORY.rst
 include README.rst
 include setup.py
-include mesa/visualization/templates/*
+recursive-include mesa/visualization/templates/*
