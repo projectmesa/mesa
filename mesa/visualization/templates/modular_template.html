@@ -4,9 +4,7 @@
     <link href="/static/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
     <link href="/static/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
     <link href="/static/css/bootstrap-switch.min.css" type="text/css" rel="stylesheet" />
-	<script src="/static/js/jquery.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/bootstrap-switch.min.js"></script>
+
 	<!-- This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to
 	the server (the port is set via the template). On every step, it receives inputs, one per module, and sends
 	them to the associated function to render. -->
@@ -35,6 +33,11 @@
         </div>
     </nav>
 
+    <!-- Bottom-load all JavaScript dependencies -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap-switch.min.js"></script>
+
     <!-- Script includes go here -->
 	{% for file_name in package_includes %}
 		<script src="/static/js/{{ file_name }}" type="text/javascript"></script>
@@ -42,21 +45,17 @@
 	{% for file_name in local_includes %}
 		<script src="/local/{{ file_name }}" type="text/javascript"></script>
 	{% end %}
+
+    <!-- template-specific code snippets here -->
     <script>
         var port = {{ port }};
     </script>
     <script src="/static/js/runcontrol.js"></script>
-<script>
 
-
-
-	// Element-specific scripts go here:
-	// Actual script snippets go here.
-	{% for script in scripts %}
+    <!-- Element-specific scripts go here -->
+    <script>
+	    {% for script in scripts %}
 			{% raw script %}
-	{% end %}
-
-
-</script>
-
+	    {% end %}
+    </script>
 </body>

@@ -38,13 +38,10 @@ ws.onopen = function() {
     reset();
 };
 
-
 // Add model parameters that can be edited prior to a model run
 var add_params = function() {
 
     var add_one_param = function(param) {
-
-        console.log(model_params);
         // Todo - Implement sliders for min,max and default values
         // Todo - Implement toggles for boolean options
         // Todo - Implement dropdowns for lists
@@ -52,7 +49,6 @@ var add_params = function() {
         // See next line for example, "value" should be handled by the backend visualization element
         // E.x. --> send({"type":"submit_params","param": param_name, "value": value});
         // Todo - implement switch for handling different types
-
     };
 
     for (var option in model_params) {
