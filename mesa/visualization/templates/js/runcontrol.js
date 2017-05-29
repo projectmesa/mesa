@@ -25,10 +25,13 @@ var control = new MesaVisualizationControl();
 var elements = [];  // List of Element objects
 var model_params = {};
 
+// Playback buttons
 var playPauseButton = $('#play-pause');
 var stepButton = $('#step');
 var resetButton = $('#reset');
 
+// Sidebar dom access
+var sidebar = $("#sidebar");
 
 // WebSocket Stuff
 var ws = new WebSocket("ws://127.0.0.1:" + port + "/ws"); // Open the websocket connection
@@ -39,20 +42,54 @@ ws.onopen = function() {
 };
 
 // Add model parameters that can be edited prior to a model run
-var add_params = function() {
+var initGUI = function() {
 
-    var add_one_param = function(param) {
-        // Todo - Implement sliders for min,max and default values
-        // Todo - Implement toggles for boolean options
-        // Todo - Implement dropdowns for lists
-        // Controls should implement a 'submit' routine that sends a message with the parameter name and value.
-        // See next line for example, "value" should be handled by the backend visualization element
-        // E.x. --> send({"type":"submit_params","param": param_name, "value": value});
-        // Todo - implement switch for handling different types
+    var onSubmitCallback = function(param_name, value) {
+        send({"type": "submit_params", "param": param_name, "value": value});
+    };
+
+    var addBooleanInput = function(param, default_value) {
+        var dom_id = param + '_id';
+        var label = $("<p>" + param + "</p>")[0];
+        var checkbox = $("<input class='model-parameter' id='" + dom_id + "' type='checkbox'/>")[0];
+        sidebar.append(label);
+        sidebar.append(checkbox);
+        $(checkbox).bootstrapSwitch({
+            'state': default_value,
+            'onSwitchChange': function(e, state) {
+                onSubmitCallback(param, state);
+            }
+        });
+    };
+
+    var addNumberInput = function(param, default_value) {
+        var dom_id = param + '_id';
+        var label = $("<p>" + param + "</p>")[0];
+        var number_input = $("<input class='model-parameter' id='" + dom_id + "' type='number'/>")[0];
+        sidebar.append(label);
+        sidebar.append(number_input);
+        $(number_input).val(default_value);
+        $(number_input).on('change', function() {
+            onSubmitCallback(param, Number($(this).val()));
+        })
     };
 
     for (var option in model_params) {
-        add_one_param(String(option));
+
+        var type = typeof(model_params[option]);
+        var param_str = String(option);
+
+        switch (type) {
+            case "boolean":
+                addBooleanInput(param_str, model_params[option]);   // Add switch
+                break;
+            case "number":
+                addNumberInput(param_str, model_params[option]);
+                break;
+            case "object":
+                // Todo - Determine the type of object that it is (slider? dropdown? etc.
+                break;
+        }
     }
 };
 
@@ -73,8 +110,8 @@ ws.onmessage = function(message) {
             break;
         case "model_params":
             console.log(msg["params"]);
-            model_params = msg["params"]
-            add_params();
+            model_params = msg["params"];
+            initGUI();
             break;
         default:
             // There shouldn't be any other message

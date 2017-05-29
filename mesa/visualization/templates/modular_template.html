@@ -4,6 +4,7 @@
     <link href="/static/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
     <link href="/static/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
     <link href="/static/css/bootstrap-switch.min.css" type="text/css" rel="stylesheet" />
+    <link href="/static/css/visualization.css" type="text/css" rel="stylesheet" />
 
 	<!-- This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to
 	the server (the port is set via the template). On every step, it receives inputs, one per module, and sends
@@ -12,7 +13,7 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-default navbar-static-top">
+    <nav class="navbar navbar-inverse navbar-static-top">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -32,6 +33,10 @@
             </div><!--/.nav-collapse -->
         </div>
     </nav>
+    <div class="container">
+        <div class="col-lg-2 col-md-2 col-sm-2" id="sidebar"></div>
+        <div class="col-lg-10 col-md-10 col-sm-10" id="elements" style="text-align: right;"></div>
+    </div>
 
     <!-- Bottom-load all JavaScript dependencies -->
     <script src="/static/js/jquery.min.js"></script>
