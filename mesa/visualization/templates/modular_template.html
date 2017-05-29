@@ -3,9 +3,10 @@
 	<title>{{ model_name }} (Mesa visualization)</title>
     <link href="/static/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
     <link href="/static/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
-	<script src="/static/jquery.min.js"></script>
-    <script src="/static/js/bootstrap.js"></script>
-	<script src="/static/dat.gui.min.js"></script>
+    <link href="/static/css/bootstrap-switch.min.css" type="text/css" rel="stylesheet" />
+	<script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap-switch.min.js"></script>
 	<!-- This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to
 	the server (the port is set via the template). On every step, it receives inputs, one per module, and sends
 	them to the associated function to render. -->
@@ -36,7 +37,7 @@
 
     <!-- Script includes go here -->
 	{% for file_name in package_includes %}
-		<script src="/static/{{ file_name }}" type="text/javascript"></script>
+		<script src="/static/js/{{ file_name }}" type="text/javascript"></script>
 	{% end %}
 	{% for file_name in local_includes %}
 		<script src="/local/{{ file_name }}" type="text/javascript"></script>
@@ -44,7 +45,7 @@
     <script>
         var port = {{ port }};
     </script>
-    <script src="/static/runcontrol.js"></script>
+    <script src="/static/js/runcontrol.js"></script>
 <script>
 
 

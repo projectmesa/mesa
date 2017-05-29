@@ -43,6 +43,8 @@ ws.onopen = function() {
 var add_params = function() {
 
     var add_one_param = function(param) {
+
+        console.log(model_params);
         // Todo - Implement sliders for min,max and default values
         // Todo - Implement toggles for boolean options
         // Todo - Implement dropdowns for lists
