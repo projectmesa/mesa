@@ -1,0 +1,65 @@
+
+class Option:
+    """ A class for providing options to a visualization for a given parameter """
+
+    NONE = 'none'
+    NUMBER = 'number'
+    CHECKBOX = 'checkbox'
+    CHOICE = 'choice'
+    SLIDER = 'slider'
+
+    TYPES = (NONE, NUMBER, CHECKBOX, CHOICE, SLIDER)
+
+    _ERROR_MESSAGE = "Missing or malformed inputs for '{}' Option '{}'"
+
+    def __init__(
+        self, option_type=NONE, name='', value=None, min_value=None, max_value=None,
+            step=1, labels=list()
+    ):
+        if option_type not in self.TYPES:
+            raise ValueError("{} is not a valid Option type".format(option_type))
+        self.option_type = option_type
+        self.name = name
+        self._value = value
+        self.min_value = min_value
+        self.max_value = max_value
+        self.step = step
+        self.labels = labels
+
+        # Validate option types to make sure values are supplied properly
+        msg = self._ERROR_MESSAGE.format(self.option_type, name)
+        valid = True
+
+        if self.option_type == self.NUMBER:
+            valid = not (self.value is None)
+
+        elif self.option_type == self.SLIDER:
+            valid = not (self.value is None or self.min_value is None or self.max_value is None)
+
+        elif self.option_type == self.CHOICE:
+            valid = not (self.value is None or not len(self.labels))
+
+        elif self.option_type == self.CHECKBOX:
+            valid = isinstance(self.value, bool)
+
+        if not valid:
+            raise ValueError(msg)
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
+        if self.option_type in [self.NUMBER, self.SLIDER]:
+            if self._value < self.min_value:
+                self._value = self.min_value
+            elif self._value > self.max_value:
+                self._value = self.max_value
+
+    @property
+    def json(self):
+        result = self.__dict__.copy()
+        result['value'] = result.pop('_value')  # Return _value as value, lvalue is the same
+        return result

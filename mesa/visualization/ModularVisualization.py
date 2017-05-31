@@ -109,6 +109,8 @@ import tornado.gen
 
 import webbrowser
 
+from mesa.visualization.option import Option
+
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
 # pylint: disable=attribute-defined-outside-init
@@ -213,11 +215,17 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
                 # Handle model args
                 if param in self.application.model_args:
-                    self.application.model_args[param] = value
+                    if isinstance(self.application.model_args[param], Option):
+                        self.application.model_args[param].value = value
+                    else:
+                        self.application.model_args[param] = value
 
                 # Handle model kwargs
                 elif param in self.application.model_kwargs:
-                    self.application.model_kwargs[param] = value
+                    if isinstance(self.application.model_kwargs[param], Option):
+                        self.application.model_kwargs[param].value = value
+                    else:
+                        self.application.model_kwargs[param] = value
 
         elif msg["type"] == "get_params":
             self.write_message({
@@ -327,11 +335,25 @@ class ModularServer(tornado.web.Application):
     def user_params(self):
         result = {a: self.model_args[a] for a in self.model_args if a not in self.exclude_list}
         result.update({k: self.model_kwargs[k] for k in self.model_kwargs if k not in self.exclude_list})
+
+        for a in result:
+            if isinstance(result[a], Option):
+                result[a] = result[a].json
+
         return result
 
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
-        self.model = self.model_cls(*(tuple(self.model_args.values())), **self.model_kwargs)
+        args = self.model_args.copy()
+        kwargs = self.model_kwargs.copy()
+
+        # Extract parameter values from those built using Option class
+        for arg_dict in [args, kwargs]:
+            for a in arg_dict:
+                if isinstance(arg_dict[a], Option):
+                    arg_dict[a] = arg_dict[a].value
+
+        self.model = self.model_cls(*(tuple(args.values())), **kwargs)
 
     def render_model(self):
         """ Turn the current state of the model into a dictionary of

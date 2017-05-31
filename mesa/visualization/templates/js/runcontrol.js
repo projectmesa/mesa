@@ -53,7 +53,7 @@ var initGUI = function() {
         send({"type": "submit_params", "param": param_name, "value": value});
     };
 
-    var addBooleanInput = function(param, default_value) {
+    var addBooleanInput = function(param, value) {
         var dom_id = param + '_id';
         var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + param + "</label></p>")[0];
         var checkbox = $("<input class='model-parameter' id='" + dom_id + "' type='checkbox'/>")[0];
@@ -62,7 +62,7 @@ var initGUI = function() {
         input_group.append(label);
         input_group.append(checkbox);
         $(checkbox).bootstrapSwitch({
-            'state': default_value,
+            'state': value,
             'size': 'small',
             'onSwitchChange': function(e, state) {
                 onSubmitCallback(param, state);
@@ -70,7 +70,7 @@ var initGUI = function() {
         });
     };
 
-    var addNumberInput = function(param, default_value) {
+    var addNumberInput = function(param, value) {
         var dom_id = param + '_id';
         var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + param + "</label></p>")[0];
         var number_input = $("<input class='model-parameter' id='" + dom_id + "' type='number'/>")[0];
@@ -78,14 +78,53 @@ var initGUI = function() {
         sidebar.append(input_group);
         input_group.append(label);
         input_group.append(number_input);
-        $(number_input).val(default_value);
+        $(number_input).val(value);
         $(number_input).on('change', function() {
             onSubmitCallback(param, Number($(this).val()));
         })
     };
 
+    var addSliderInput = function(param, obj) {
+        var dom_id = param + '_id';
+        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + param + "</label></p>")[0];
+        var slider_input = $("<input id='" + dom_id + "' type='text' />")[0];
+        var input_group = $("<div class='input-group input-group-lg'></div>")[0];
+        sidebar.append(input_group);
+        input_group.append(label);
+        input_group.append(slider_input);
+        $(slider_input).slider({
+            min: obj.min_value,
+            max: obj.max_value,
+            value: obj.value,
+            step: obj.step,
+            ticks: [obj.min_value, obj.max_value],
+            ticks_labels: [obj.min_value, obj.max_value],
+            ticks_positions: [0, 100]
+        });
+        $(slider_input).on('change', function() {
+            onSubmitCallback(param, Number($(this).val()));
+        })
+    };
+
     var addOptionInput = function(param, option) {
-        // Todo - handle each type from Option.TYPES in mesa.visualization.option
+        var value = option['value'];
+        switch (option['option_type']) {
+            case 'checkbox':
+                addBooleanInput(param, value);
+                break;
+
+            case 'slider':
+                addSliderInput(param, option);
+                break;
+
+            case 'choice':
+                console.log('choice inputs not yet supported.');    // Todo - implement dropdown
+                break;
+
+            case 'number':
+                addNumberInput(param, value);   // Behaves the same as just a simple number
+                break;
+        }
     };
 
     for (var option in model_params) {
