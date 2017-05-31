@@ -29,7 +29,11 @@ var model_params = {};
 var playPauseButton = $('#play-pause');
 var stepButton = $('#step');
 var resetButton = $('#reset');
-var fpsControl = $('#fps');
+var fpsControl = $('#fps').slider({
+    max: 20,
+    min: 0,
+    value: 3
+});
 
 // Sidebar dom access
 var sidebar = $("#sidebar");
@@ -80,6 +84,10 @@ var initGUI = function() {
         })
     };
 
+    var addOptionInput = function(param, option) {
+        // Todo - handle each type from Option.TYPES in mesa.visualization.option
+    };
+
     for (var option in model_params) {
 
         var type = typeof(model_params[option]);
@@ -93,7 +101,7 @@ var initGUI = function() {
                 addNumberInput(param_str, model_params[option]);
                 break;
             case "object":
-                // Todo - Determine the type of object that it is (slider? dropdown? etc.)
+                addOptionInput(param_str, model_params[option]);
                 break;
         }
     }
@@ -174,7 +182,10 @@ var run = function() {
 
 var updateFPS = function() {
     control.fps = Number(fpsControl.val());
-    console.log(control.fps);
+    if (control.running) {
+        run();
+        run();
+    }
 };
 
 // Initilaize buttons on top bar
