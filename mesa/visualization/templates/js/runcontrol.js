@@ -32,7 +32,10 @@ var resetButton = $('#reset');
 var fpsControl = $('#fps').slider({
     max: 20,
     min: 0,
-    value: 3
+    value: 3,
+    ticks: [0, 20],
+    ticks_labels: [0, 20],
+    ticks_position: [0, 100]
 });
 
 // Sidebar dom access
@@ -53,16 +56,16 @@ var initGUI = function() {
         send({"type": "submit_params", "param": param_name, "value": value});
     };
 
-    var addBooleanInput = function(param, value) {
+    var addBooleanInput = function(param, obj) {
         var dom_id = param + '_id';
-        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + param + "</label></p>")[0];
+        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + obj.name + "</label></p>")[0];
         var checkbox = $("<input class='model-parameter' id='" + dom_id + "' type='checkbox'/>")[0];
         var input_group = $("<div class='input-group input-group-lg'></div>")[0];
         sidebar.append(input_group);
         input_group.append(label);
         input_group.append(checkbox);
         $(checkbox).bootstrapSwitch({
-            'state': value,
+            'state': obj.value,
             'size': 'small',
             'onSwitchChange': function(e, state) {
                 onSubmitCallback(param, state);
@@ -70,15 +73,15 @@ var initGUI = function() {
         });
     };
 
-    var addNumberInput = function(param, value) {
+    var addNumberInput = function(param, obj) {
         var dom_id = param + '_id';
-        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + param + "</label></p>")[0];
+        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + obj.name + "</label></p>")[0];
         var number_input = $("<input class='model-parameter' id='" + dom_id + "' type='number'/>")[0];
         var input_group = $("<div class='input-group input-group-lg'></div>")[0];
         sidebar.append(input_group);
         input_group.append(label);
         input_group.append(number_input);
-        $(number_input).val(value);
+        $(number_input).val(obj.value);
         $(number_input).on('change', function() {
             onSubmitCallback(param, Number($(this).val()));
         })
@@ -86,7 +89,7 @@ var initGUI = function() {
 
     var addSliderInput = function(param, obj) {
         var dom_id = param + '_id';
-        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + param + "</label></p>")[0];
+        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + obj.name + "</label></p>")[0];
         var slider_input = $("<input id='" + dom_id + "' type='text' />")[0];
         var input_group = $("<div class='input-group input-group-lg'></div>")[0];
         sidebar.append(input_group);
@@ -107,10 +110,9 @@ var initGUI = function() {
     };
 
     var addOptionInput = function(param, option) {
-        var value = option['value'];
         switch (option['option_type']) {
             case 'checkbox':
-                addBooleanInput(param, value);
+                addBooleanInput(param, option);
                 break;
 
             case 'slider':
@@ -122,7 +124,7 @@ var initGUI = function() {
                 break;
 
             case 'number':
-                addNumberInput(param, value);   // Behaves the same as just a simple number
+                addNumberInput(param, option);   // Behaves the same as just a simple number
                 break;
         }
     };
@@ -134,13 +136,13 @@ var initGUI = function() {
 
         switch (type) {
             case "boolean":
-                addBooleanInput(param_str, model_params[option]);   // Add switch
+                addBooleanInput(param_str, {'value': model_params[option], 'name': param_str});
                 break;
             case "number":
-                addNumberInput(param_str, model_params[option]);
+                addNumberInput(param_str, {'value': model_params[option], 'name': param_str});
                 break;
             case "object":
-                addOptionInput(param_str, model_params[option]);
+                addOptionInput(param_str, model_params[option]);    // catch-all for params that use Option class
                 break;
         }
     }

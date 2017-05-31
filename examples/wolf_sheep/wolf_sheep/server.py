@@ -45,9 +45,9 @@ chart_element = ChartModule([{"Label": "Wolves", "Color": "#AA0000"},
 
 server = ModularServer(WolfSheepPredation, [canvas_element, chart_element],
                        "Wolf Sheep Predation",
-                       grass=Option('checkbox', 'grass', True),
-                       initial_sheep=Option('slider', 'initial_sheep', 100, 10, 300),
-                       sheep_reproduce=Option('slider', 'sheep_reproduce', 0.04, 0.01, 1.0, 0.01),
-                       initial_wolves=Option('slider', 'initial_wolves', 50, 10, 300)
+                       grass=Option('checkbox', 'Grass Enabled', True),
+                       initial_sheep=Option('slider', 'Initial Sheep Population', 100, 10, 300),
+                       sheep_reproduce=Option('slider', 'Sheep Reproduction Rate', 0.04, 0.01, 1.0, 0.01),
+                       initial_wolves=Option('slider', 'Initial Wolf Population', 50, 10, 300)
                        )
 # server.launch()
