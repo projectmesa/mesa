@@ -34,8 +34,15 @@
         </div>
     </nav>
     <div class="container">
-        <div class="col-lg-2 col-md-2 col-sm-2" id="sidebar"></div>
-        <div class="col-lg-10 col-md-10 col-sm-10" id="elements" style="text-align: right;"></div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-3" id="sidebar"></div>
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-9" id="elements">
+            <div id="elements-topbar">
+                <div class="input-group input-group-lg">
+                    <label class="label label-primary" for="fps">Frames Per Second</label>
+                    <input id="fps" type="number" value="3" min="1" max="20" />
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Bottom-load all JavaScript dependencies -->

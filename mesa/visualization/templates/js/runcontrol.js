@@ -29,6 +29,7 @@ var model_params = {};
 var playPauseButton = $('#play-pause');
 var stepButton = $('#step');
 var resetButton = $('#reset');
+var fpsControl = $('#fps');
 
 // Sidebar dom access
 var sidebar = $("#sidebar");
@@ -50,12 +51,15 @@ var initGUI = function() {
 
     var addBooleanInput = function(param, default_value) {
         var dom_id = param + '_id';
-        var label = $("<p>" + param + "</p>")[0];
+        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + param + "</label></p>")[0];
         var checkbox = $("<input class='model-parameter' id='" + dom_id + "' type='checkbox'/>")[0];
-        sidebar.append(label);
-        sidebar.append(checkbox);
+        var input_group = $("<div class='input-group input-group-lg'></div>")[0];
+        sidebar.append(input_group);
+        input_group.append(label);
+        input_group.append(checkbox);
         $(checkbox).bootstrapSwitch({
             'state': default_value,
+            'size': 'small',
             'onSwitchChange': function(e, state) {
                 onSubmitCallback(param, state);
             }
@@ -64,10 +68,12 @@ var initGUI = function() {
 
     var addNumberInput = function(param, default_value) {
         var dom_id = param + '_id';
-        var label = $("<p>" + param + "</p>")[0];
+        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + param + "</label></p>")[0];
         var number_input = $("<input class='model-parameter' id='" + dom_id + "' type='number'/>")[0];
-        sidebar.append(label);
-        sidebar.append(number_input);
+        var input_group = $("<div class='input-group input-group-lg'></div>")[0];
+        sidebar.append(input_group);
+        input_group.append(label);
+        input_group.append(number_input);
         $(number_input).val(default_value);
         $(number_input).on('change', function() {
             onSubmitCallback(param, Number($(this).val()));
@@ -87,7 +93,7 @@ var initGUI = function() {
                 addNumberInput(param_str, model_params[option]);
                 break;
             case "object":
-                // Todo - Determine the type of object that it is (slider? dropdown? etc.
+                // Todo - Determine the type of object that it is (slider? dropdown? etc.)
                 break;
         }
     }
@@ -166,9 +172,13 @@ var run = function() {
     }
 };
 
-// TODO - implement FPS slider
+var updateFPS = function() {
+    control.fps = Number(fpsControl.val());
+    console.log(control.fps);
+};
 
 // Initilaize buttons on top bar
 playPauseButton.on('click', run);
 stepButton.on('click', step);
 resetButton.on('click', reset);
+fpsControl.on('change', updateFPS);
