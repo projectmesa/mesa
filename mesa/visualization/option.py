@@ -1,6 +1,18 @@
 
 class Option:
-    """ A class for providing options to a visualization for a given parameter """
+    """ A class for providing options to a visualization for a given parameter.
+        Validation of correctly-specified options happens are startup.
+        Each Option is handled individually in the UI and sends callback events
+        to the server when an option is updated. That option is then re-validated,
+        in the `value.setter` property method, to ensure input is correct from UI
+        to model resets.
+
+        Option types include:
+            - 'number' - simple numerical input.
+            - 'checkbox' - boolean input
+            - 'choice' - String-based dropdown input
+
+     """
 
     NUMBER = 'number'
     CHECKBOX = 'checkbox'
@@ -24,7 +36,7 @@ class Option:
         self.max_value = max_value
         self.step = step
         self.choices = choices
-        print(self.choices)
+
         # Validate option types to make sure values are supplied properly
         msg = self._ERROR_MESSAGE.format(self.option_type, name)
         valid = True
@@ -58,7 +70,7 @@ class Option:
                 self._value = self.max_value
         elif self.option_type == self.CHOICE:
             if self._value not in self.choices:
-                print("Selected choice value not in available choices, selected first choice from list")
+                print("Selected choice value not in available choices, selected first choice from 'choices' list")
                 self._value = self.choices[0]
 
     @property
