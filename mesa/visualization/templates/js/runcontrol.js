@@ -109,6 +109,34 @@ var initGUI = function() {
         })
     };
 
+    var addChoiceInput = function(param, obj) {
+        var dom_id = param + '_id';
+        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + obj.name + "</label></p>")[0];
+        sidebar.append(label);
+
+        var dropdown = $("<div class='dropdown'></div>")[0];
+        var button = $("<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'></button>")[0];
+        var span = $("<span class='caret'></span>")[0];
+        $(button).text(obj.value + " ");
+        $(button).id = dom_id;
+        $(button).append(span);
+        var choice_container = $("<ul class='dropdown-menu' role='menu' aria-labelledby='" + dom_id + "'></ul>")[0];
+        for (var i = 0; i < obj.choices.length; i++) {
+            var choice = $("<li role='presentation'><a role='menuitem' tabindex='-1' href='#'>" + obj.choices[i] + "</a></li>")[0];
+            $(choice).on('click', function() {
+                var value = $(this).children()[0].text;
+                console.log(value);
+               $(button).text(value + ' ');
+               onSubmitCallback(param, value);
+            });
+            choice_container.append(choice);
+        }
+
+        dropdown.append(button);
+        dropdown.append(choice_container);
+        sidebar.append(dropdown);
+    };
+
     var addOptionInput = function(param, option) {
         switch (option['option_type']) {
             case 'checkbox':
@@ -120,7 +148,7 @@ var initGUI = function() {
                 break;
 
             case 'choice':
-                console.log('choice inputs not yet supported.');    // Todo - implement dropdown
+                addChoiceInput(param, option);
                 break;
 
             case 'number':

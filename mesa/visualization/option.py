@@ -48,7 +48,7 @@ class Option:
             valid = not (self.value is None or self.min_value is None or self.max_value is None)
 
         elif self.option_type == self.CHOICE:
-            valid = not (self.value is None or not len(self.choices))
+            valid = not (self.value is None or len(self.choices) == 0)
 
         elif self.option_type == self.CHECKBOX:
             valid = isinstance(self.value, bool)
