@@ -7,11 +7,28 @@ class Option:
         in the `value.setter` property method, to ensure input is correct from UI
         to model resets.
 
+        Options can be used instead of keyword arguments when specifying model parameters in a `ModularServer` instance.
+
         Option types include:
-            - 'number' - simple numerical input.
+            - 'number' - simple numerical input
             - 'checkbox' - boolean input
             - 'choice' - String-based dropdown input
+            - 'slider' - A number-based slider input
 
+        Examples:
+
+        # Simple number input
+        number_option = Option('number', 'My Number', value=123)
+
+        # Checkbox input
+        boolean_option = Option('checkbox', 'My Boolean', value=True)
+
+        # Choice input
+        choice_option = Option('choice', 'My Choice', value='Default choice',
+                               choices=['Default Choice', 'Alternate Choice'])
+
+        # Slider input
+        slider_option = Option('slider', 'My Slider', value=123, min_value=10, max_value=200, step=0.1)
      """
 
     NUMBER = 'number'
