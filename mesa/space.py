@@ -15,6 +15,7 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
+import numpy as np
 import random
 import math
 
@@ -476,6 +477,8 @@ class ContinuousSpace:
         self.y_min = y_min
         self.y_max = y_max
         self.height = y_max - y_min
+        self.center = np.array(((x_max + x_min) / 2, (y_max + y_min) / 2))
+        self.size = np.array((self.width, self.height))
         self.torus = torus
 
         self.cell_width = (self.x_max - self.x_min) / grid_width
@@ -544,6 +547,17 @@ class ContinuousSpace:
                 neighbors.append(obj)
         return neighbors
 
+    def get_heading(self, pos_1, pos_2):
+        one = np.array(pos_1)
+        two = np.array(pos_2)
+        if self.torus:
+            one = (one - self.center) % self.size
+            two = (two - self.center) % self.size
+        heading = two - one
+        if isinstance(pos_1, tuple):
+            heading = tuple(heading)
+        return heading
+
     def get_distance(self, pos_1, pos_2):
         """ Get the distance between two point, accounting for toroidal space.
 
@@ -551,17 +565,12 @@ class ContinuousSpace:
             pos_1, pos_2: Coordinate tuples for both points.
 
         """
-        x1, y1 = pos_1
-        x2, y2 = pos_2
-        if not self.torus:
-            dx = x1 - x2
-            dy = y1 - y2
-        else:
-            d_x = abs(x1 - x2)
-            d_y = abs(y1 - y2)
-            dx = min(d_x, self.width - d_x)
-            dy = min(d_y, self.height - d_y)
-        return math.sqrt(dx ** 2 + dy ** 2)
+        pos_1 = np.array(pos_1)
+        pos_2 = np.array(pos_2)
+        if self.torus:
+            pos_1 = (pos_1 - self.center) % self.size
+            pos_2 = (pos_2 - self.center) % self.size
+        return np.linalg.norm(pos_1 - pos_2)
 
     def torus_adj(self, pos):
         """ Adjust coordinates to handle torus looping.
@@ -581,7 +590,10 @@ class ContinuousSpace:
         else:
             x = self.x_min + ((pos[0] - self.x_min) % self.width)
             y = self.y_min + ((pos[1] - self.y_min) % self.height)
-            return (x, y)
+            if isinstance(pos, tuple):
+                return (x, y)
+            else:
+                return np.array((x, y))
 
     def _point_to_cell(self, pos):
         """ Get the cell coordinates that a given x,y point falls in. """
