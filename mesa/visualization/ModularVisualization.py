@@ -212,20 +212,10 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
             # Is the param editable?
             if param in self.application.user_params:
-
-                # Handle model args
-                if param in self.application.model_args:
-                    if isinstance(self.application.model_args[param], Option):
-                        self.application.model_args[param].value = value
-                    else:
-                        self.application.model_args[param] = value
-
-                # Handle model kwargs
-                elif param in self.application.model_kwargs:
-                    if isinstance(self.application.model_kwargs[param], Option):
-                        self.application.model_kwargs[param].value = value
-                    else:
-                        self.application.model_kwargs[param] = value
+                if isinstance(self.application.model_kwargs[param], Option):
+                    self.application.model_kwargs[param].value = value
+                else:
+                    self.application.model_kwargs[param] = value
 
         elif msg["type"] == "get_params":
             self.write_message({
@@ -273,7 +263,7 @@ class ModularServer(tornado.web.Application):
     EXCLUDE_LIST = ('width', 'height',)
 
     def __init__(self, model_cls, visualization_elements, name="Mesa Model",
-                 *args, **kwargs):
+                 model_params={}):
         """ Create a new visualization server with the given elements. """
         # Prep visualization elements:
         self.visualization_elements = visualization_elements
@@ -291,41 +281,7 @@ class ModularServer(tornado.web.Application):
         self.model_name = name
         self.model_cls = model_cls
 
-        # Determine current parameter exclude list
-        if 'exclude_list' in kwargs:
-            self.exclude_list = kwargs.pop('exclude_list')
-        else:
-            self.exclude_list = self.EXCLUDE_LIST
-
-        # Infer args and kwargs from the model cls' constructor, use args/kwargs provide to override the default
-        # model's default args/kwargs, and then capture the resulting model args/kwargs to be used when resetting model
-        sig = inspect.signature(model_cls.__init__)
-
-        # Determine non-keyword arguments for the model
-        _args = OrderedDict()
-        for a in sig.parameters:
-            if sig.parameters[a].default is inspect._empty and a != 'self':
-                if a in self.exclude_list:
-                    _args[a] = args[list(sig.parameters).index(a) - 1]
-                else:
-                    _args[a] = None
-
-        for i, a in enumerate(sig.parameters):
-
-            # Determine which arguments not to allow to be editable?
-            if a in ['self']:
-                continue
-
-            # Handle model args
-            elif a in _args and i <= len(args):
-                _args[a] = args[i - 1]    # always skip 'self' param in args
-
-            # Handle model kwargs
-            elif a not in kwargs and a not in _args and sig.parameters[a].default is not inspect._empty:
-                kwargs[a] = sig.parameters[a].default
-
-        self.model_args = _args
-        self.model_kwargs = kwargs
+        self.model_kwargs = model_params
         self.reset_model()
 
         # Initializing the application itself:
@@ -333,8 +289,7 @@ class ModularServer(tornado.web.Application):
 
     @property
     def user_params(self):
-        result = {a: self.model_args[a] for a in self.model_args if a not in self.exclude_list}
-        result.update({k: self.model_kwargs[k] for k in self.model_kwargs if k not in self.exclude_list})
+        result = self.model_kwargs.copy()
 
         for a in result:
             if isinstance(result[a], Option):
@@ -344,16 +299,15 @@ class ModularServer(tornado.web.Application):
 
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
-        args = self.model_args.copy()
-        kwargs = self.model_kwargs.copy()
+        
+        model_params = {}
+        for key, val in self.model_kwargs.items():
+            if isinstance(val, Option):
+                model_params[key] = val.value
+            else:
+                model_params[key] = val
 
-        # Extract parameter values from those built using Option class
-        for arg_dict in [args, kwargs]:
-            for a in arg_dict:
-                if isinstance(arg_dict[a], Option):
-                    arg_dict[a] = arg_dict[a].value
-
-        self.model = self.model_cls(*(tuple(args.values())), **kwargs)
+        self.model = self.model_cls(**model_params)
 
     def render_model(self):
         """ Turn the current state of the model into a dictionary of
