@@ -289,11 +289,11 @@ class ModularServer(tornado.web.Application):
 
     @property
     def user_params(self):
-        result = self.model_kwargs.copy()
-
-        for a in result:
-            if isinstance(result[a], Option):
-                result[a] = result[a].json
+        #result = self.model_kwargs.copy()
+        result = {}
+        for param, val in self.model_kwargs.items():
+            if isinstance(val, Option):
+                result[param] = val.json
 
         return result
 
