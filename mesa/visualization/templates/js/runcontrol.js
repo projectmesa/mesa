@@ -17,6 +17,7 @@
 var MesaVisualizationControl = function() {
     this.tick = -1; // Counts at which tick of the model we are.
     this.running = false; // Whether there is currently a model running
+    this.done = false;
     this.fps = 3; // Frames per second
 };
 
@@ -189,7 +190,10 @@ ws.onmessage = function(message) {
         case "end":
             // We have reached the end of the model
             control.running = false;
+            control.done = true;
+            console.log("Done!");
             clearInterval(player);
+            $(playPauseButton.children()[0]).text("Done");
             break;
         case "model_params":
             console.log(msg["params"]);
@@ -217,6 +221,9 @@ var reset = function() {
     for (var i in elements) {
         elements[i].reset();
     }
+    control.done = false;
+    if (!control.running)
+        $(playPauseButton.children()[0]).text("Start");
 };
 
 /** Send a message to the server get the next visualization state. */
@@ -227,8 +234,8 @@ var single_step = function() {
 
 /** Step the model forward. */
 var step = function() {
-    if (!control.running) {single_step()}
-    else {run()};
+    if (!control.running & !control.done) {single_step()}
+    else if (!control.done) {run()};
 };
 
 /** Call the step function at fixed intervals, until getting an end message from the server. */
@@ -242,7 +249,7 @@ var run = function() {
         }
         anchor.text("Start");
     }
-    else {
+    else if (!control.done) {
         control.running = true;
         player = setInterval(single_step, 1000/control.fps);
         anchor.text("Stop");
