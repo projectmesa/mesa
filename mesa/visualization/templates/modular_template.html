@@ -26,6 +26,13 @@
             <a class="navbar-brand" href="#">{{ model_name }}</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#about" data-title="About" data-content="#about-content">
+                            About
+                        </a>
+                    </li>
+                </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li id="play-pause"><a href="#">Start</a></li>
                     <li id="step"><a href="#">Step</a></li>
@@ -41,6 +48,23 @@
                 <div class="input-group input-group-lg">
                     <label class="label label-primary" for="fps" style="margin-right: 15px">Frames Per Second</label>
                     <input id="fps" data-slider-id='fps' type="text" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About modal -->
+    <div id="about" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">About {{ model_name }}</h4>
+                </div>
+                <div class="modal-body">
+                    <div>{{ description }}</div>
+                    <div>&nbsp;</div>
+                    <div style="clear: both;"></div>
                 </div>
             </div>
         </div>

@@ -162,6 +162,7 @@ class PageHandler(tornado.web.RequestHandler):
             element.index = i
         self.render("modular_template.html", port=self.application.port,
                     model_name=self.application.model_name,
+                    description=self.application.description,
                     package_includes=self.application.package_includes,
                     local_includes=self.application.local_includes,
                     scripts=self.application.js_code)
@@ -276,6 +277,7 @@ class ModularServer(tornado.web.Application):
         # Initializing the model
         self.model_name = name
         self.model_cls = model_cls
+        self.description = model_cls.description if hasattr(model_cls, 'description') else 'No description available'
 
         self.model_kwargs = model_params
         self.reset_model()
