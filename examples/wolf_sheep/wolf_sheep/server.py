@@ -51,7 +51,8 @@ server = ModularServer(WolfSheepPredation, [canvas_element, chart_element],
                            initial_sheep=Option('slider', 'Initial Sheep Population', 100, 10, 300),
                            sheep_reproduce=Option('slider', 'Sheep Reproduction Rate', 0.04, 0.01, 1.0, 0.01),
                            initial_wolves=Option('slider', 'Initial Wolf Population', 50, 10, 300),
-                           wolf_reproduce=Option('slider', 'Wolf Reproduction Rate', 0.05, 0.01, 1.0, 0.01),
+                           wolf_reproduce=Option('slider', 'Wolf Reproduction Rate', 0.05, 0.01, 1.0, 0.01,
+                                                 description="The rate at which wolf agents reproduce."),
                            wolf_gain_from_food=Option('slider', 'Wolf Gain From Food Rate', 20, 1, 50),
                            sheep_gain_from_food=Option('slider', 'Sheep Gain From Food', 4, 1, 10)
                            )

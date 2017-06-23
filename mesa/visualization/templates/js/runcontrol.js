@@ -90,7 +90,15 @@ var initGUI = function() {
 
     var addSliderInput = function(param, obj) {
         var dom_id = param + '_id';
-        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + obj.name + "</label></p>")[0];
+        var label = $("<p></p>")[0];
+        var tooltip = $("<a data-toggle='tooltip' data-placement='top' class='label label-primary'>" + obj.name + "</a>")[0];
+        if (obj.description !== null) {
+            $(tooltip).tooltip({
+                title: obj.description,
+                placement: 'right'
+            });
+        }
+        label.append(tooltip);
         var slider_input = $("<input id='" + dom_id + "' type='text' />")[0];
         var input_group = $("<div class='input-group input-group-lg'></div>")[0];
         sidebar.append(input_group);

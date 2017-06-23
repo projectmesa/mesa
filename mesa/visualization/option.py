@@ -42,7 +42,7 @@ class Option:
 
     def __init__(
         self, option_type=None, name='', value=None, min_value=None, max_value=None,
-            step=1, choices=list()
+            step=1, choices=list(), description=None
     ):
         if option_type not in self.TYPES:
             raise ValueError("{} is not a valid Option type".format(option_type))
@@ -53,6 +53,7 @@ class Option:
         self.max_value = max_value
         self.step = step
         self.choices = choices
+        self.description = description
 
         # Validate option types to make sure values are supplied properly
         msg = self._ERROR_MESSAGE.format(self.option_type, name)
