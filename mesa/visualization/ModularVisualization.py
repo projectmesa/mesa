@@ -300,6 +300,8 @@ class ModularServer(tornado.web.Application):
         model_params = {}
         for key, val in self.model_kwargs.items():
             if isinstance(val, Option):
+                if val.option_type == 'static_text':    # static_text is never used for setting params
+                    continue
                 model_params[key] = val.value
             else:
                 model_params[key] = val

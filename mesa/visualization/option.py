@@ -14,6 +14,7 @@ class Option:
             - 'checkbox' - boolean input
             - 'choice' - String-based dropdown input
             - 'slider' - A number-based slider input
+            - 'static_text' - A non-input for displaying model info in a textbox
 
         Examples:
 
@@ -29,14 +30,18 @@ class Option:
 
         # Slider input
         slider_option = Option('slider', 'My Slider', value=123, min_value=10, max_value=200, step=0.1)
+
+        # Textbox
+        static_text = Option('static_text', value="This is a descriptive textbox")
      """
 
     NUMBER = 'number'
     CHECKBOX = 'checkbox'
     CHOICE = 'choice'
     SLIDER = 'slider'
+    STATIC_TEXT = 'static_text'
 
-    TYPES = (NUMBER, CHECKBOX, CHOICE, SLIDER)
+    TYPES = (NUMBER, CHECKBOX, CHOICE, SLIDER, STATIC_TEXT)
 
     _ERROR_MESSAGE = "Missing or malformed inputs for '{}' Option '{}'"
 
@@ -70,6 +75,9 @@ class Option:
 
         elif self.option_type == self.CHECKBOX:
             valid = isinstance(self.value, bool)
+
+        elif self.option_type == self.STATIC_TEXT:
+            valid = isinstance(self.value, str)
 
         if not valid:
             raise ValueError(msg)

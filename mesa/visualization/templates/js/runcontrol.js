@@ -146,6 +146,11 @@ var initGUI = function() {
         sidebar.append(dropdown);
     };
 
+    var addTextBox = function(param, obj) {
+        var well = $('<div class="well">' + obj.value + '</div>')[0];
+        sidebar.append(well);
+    };
+
     var addOptionInput = function(param, option) {
         switch (option['option_type']) {
             case 'checkbox':
@@ -162,6 +167,10 @@ var initGUI = function() {
 
             case 'number':
                 addNumberInput(param, option);   // Behaves the same as just a simple number
+                break;
+
+            case 'static_text':
+                addTextBox(param, option);
                 break;
         }
     };
