@@ -6,6 +6,7 @@ from mesa.space import Grid
 from mesa.time import SimultaneousActivation
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, TextElement
+from mesa.visualization.option import Option
 
 from test_batchrunner import MockAgent
 
@@ -48,10 +49,11 @@ class TestModularServer(TestCase):
 
     def setUp(self):
 
-        self.keyword_params = {
-            'key1': 201,
-            'key2': 202,
-            'exclude_list': ['key2', 'height', 'width']
+        self.user_params = {
+            'width': 1,
+            'height': 1,
+            'key1': Option('number', "Test Parameter", 101),
+            'key2': Option('slider', "Test Parameter", 200, 0, 300, 10)
         }
 
         self.viz_elements = [
@@ -61,11 +63,7 @@ class TestModularServer(TestCase):
             #              {"Label": "Sheep", "Color": "#666666"}])
         ]
 
-        self.server = ModularServer(MockModel, self.viz_elements, "Test Model", 1, 1, **self.keyword_params)
-
-    def test_user_params(self):
-        assert self.server.user_params != {'key1': 201, 'key2': 202}    # ensure exclude list takes affect
-        assert self.server.user_params == {'key1': 201}
+        self.server = ModularServer(MockModel, self.viz_elements, "Test Model", model_params=self.user_params)
 
     def test_canvas_render_model_state(self):
 
@@ -80,10 +78,9 @@ class TestModularServer(TestCase):
         state = self.server.render_model()
         assert state[1] == '<b>VisualizationElement goes here</b>.'
 
-    def test_reset_model(self):
-        self.server.model_kwargs['key1'] = 301
-        self.server.reset_model()
-        assert self.server.user_params == {'key1': 301}
-
-    def test_exclude_list(self):
-        assert self.server.exclude_list == ['key2', 'height', 'width']
+    def test_user_params(self):
+        print(self.server.user_params)
+        assert self.server.user_params == {
+            'key1': Option('number', "Test Parameter", 101).json,
+            'key2': Option('slider', "Test Parameter", 200, 0, 300, 10).json
+        }

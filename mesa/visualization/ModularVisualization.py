@@ -97,16 +97,12 @@ Client -> Server:
 
 """
 import os
-import inspect
-from collections import OrderedDict
-
 import tornado.autoreload
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import tornado.escape
 import tornado.gen
-
 import webbrowser
 
 from mesa.visualization.option import Option
@@ -289,7 +285,6 @@ class ModularServer(tornado.web.Application):
 
     @property
     def user_params(self):
-        #result = self.model_kwargs.copy()
         result = {}
         for param, val in self.model_kwargs.items():
             if isinstance(val, Option):
@@ -299,7 +294,7 @@ class ModularServer(tornado.web.Application):
 
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
-        
+
         model_params = {}
         for key, val in self.model_kwargs.items():
             if isinstance(val, Option):
