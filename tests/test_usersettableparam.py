@@ -1,15 +1,15 @@
 from unittest import TestCase
-from mesa.visualization.option import Option
+from mesa.visualization.UserParam import UserSettableParameter
 
 
 class TestOption(TestCase):
 
     def setUp(self):
-        self.number_option = Option('number', value=123)
-        self.checkbox_option = Option('checkbox', value=True)
-        self.choice_option = Option('choice', value='I am your default choice', choices=['I am your default choice',
+        self.number_option = UserSettableParameter('number', value=123)
+        self.checkbox_option = UserSettableParameter('checkbox', value=True)
+        self.choice_option = UserSettableParameter('choice', value='I am your default choice', choices=['I am your default choice',
                                                                                          'I am your other choice'])
-        self.slider_option = Option('slider', value=123, min_value=100, max_value=200)
+        self.slider_option = UserSettableParameter('slider', value=123, min_value=100, max_value=200)
 
     def test_number(self):
         assert self.number_option.value == 123

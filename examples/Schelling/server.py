@@ -1,6 +1,6 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
-from mesa.visualization.option import Option
+from mesa.visualization.UserParam import UserSettableParameter
 
 from mesa.visualization.TextVisualization import (
     TextData, TextGrid, TextVisualization
@@ -67,9 +67,9 @@ happy_chart = ChartModule([{"Label": "happy", "Color": "Black"}])
 model_params = {
     "height": 20,
     "width": 20,
-    "density": Option("slider", "Agent density", 0.8, 0.1, 1.0, 0.1),
-    "minority_pc": Option("slider", "Fraction minority", 0.2, 0.00, 1.0, 0.05),
-    "homophily": Option("slider", "Homophily", 3, 0, 8, 1)
+    "density": UserSettableParameter("slider", "Agent density", 0.8, 0.1, 1.0, 0.1),
+    "minority_pc": UserSettableParameter("slider", "Fraction minority", 0.2, 0.00, 1.0, 0.05),
+    "homophily": UserSettableParameter("slider", "Homophily", 3, 0, 8, 1)
 }
 
 server = ModularServer(SchellingModel,

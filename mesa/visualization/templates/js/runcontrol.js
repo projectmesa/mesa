@@ -151,8 +151,8 @@ var initGUI = function() {
         sidebar.append(well);
     };
 
-    var addOptionInput = function(param, option) {
-        switch (option['option_type']) {
+    var addParamInput = function(param, option) {
+        switch (option['param_type']) {
             case 'checkbox':
                 addBooleanInput(param, option);
                 break;
@@ -188,7 +188,7 @@ var initGUI = function() {
                 addNumberInput(param_str, {'value': model_params[option], 'name': param_str});
                 break;
             case "object":
-                addOptionInput(param_str, model_params[option]);    // catch-all for params that use Option class
+                addParamInput(param_str, model_params[option]);    // catch-all for params that use Option class
                 break;
         }
     }

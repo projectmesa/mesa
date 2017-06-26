@@ -3,7 +3,7 @@ from .model import MoneyModel
 
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.modules import ChartModule
-from mesa.visualization.option import Option
+from mesa.visualization.UserParam import UserSettableParameter
 
 
 def agent_portrayal(agent):
@@ -27,8 +27,8 @@ chart = ChartModule([
 )
 
 model_params = {
-    "N": Option('slider', "Number of agents", 100, 2, 200, 1,
-                description="Choose how many agents to include in the model"),
+    "N": UserSettableParameter('slider', "Number of agents", 100, 2, 200, 1,
+                               description="Choose how many agents to include in the model"),
     "width": 10,
     "height": 10
 }

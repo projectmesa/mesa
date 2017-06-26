@@ -105,7 +105,7 @@ import tornado.escape
 import tornado.gen
 import webbrowser
 
-from mesa.visualization.option import Option
+from mesa.visualization.UserParam import UserSettableParameter
 
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
@@ -209,7 +209,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
             # Is the param editable?
             if param in self.application.user_params:
-                if isinstance(self.application.model_kwargs[param], Option):
+                if isinstance(self.application.model_kwargs[param], UserSettableParameter):
                     self.application.model_kwargs[param].value = value
                 else:
                     self.application.model_kwargs[param] = value
@@ -293,7 +293,7 @@ class ModularServer(tornado.web.Application):
     def user_params(self):
         result = {}
         for param, val in self.model_kwargs.items():
-            if isinstance(val, Option):
+            if isinstance(val, UserSettableParameter):
                 result[param] = val.json
 
         return result
@@ -303,8 +303,8 @@ class ModularServer(tornado.web.Application):
 
         model_params = {}
         for key, val in self.model_kwargs.items():
-            if isinstance(val, Option):
-                if val.option_type == 'static_text':    # static_text is never used for setting params
+            if isinstance(val, UserSettableParameter):
+                if val.param_type == 'static_text':    # static_text is never used for setting params
                     continue
                 model_params[key] = val.value
             else:
