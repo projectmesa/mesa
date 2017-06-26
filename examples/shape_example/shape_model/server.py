@@ -36,7 +36,7 @@ def launch_shape_model():
     grid = CanvasGrid(agent_draw, width, height,
                       width * pixel_ratio, height * pixel_ratio)
     server = ModularServer(ShapesModel, [grid], "Shape Model Example",
-                           num_agents, width, height)
+                           {"N": num_agents, "width": width, "height": height})
     server.max_steps = 0
     server.port = 8521
     server.launch()
