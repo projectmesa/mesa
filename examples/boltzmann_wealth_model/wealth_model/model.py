@@ -18,7 +18,7 @@ class MoneyModel(Model):
     """A simple model of an economy where agents exchange currency at random.
 
     All the agents begin with one unit of currency, and each time step can give
-    a unit of currency to another agent. Note how, over time, this produces a 
+    a unit of currency to another agent. Note how, over time, this produces a
     highly skewed distribution of wealth.
     """
 

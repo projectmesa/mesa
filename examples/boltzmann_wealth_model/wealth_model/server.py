@@ -6,7 +6,6 @@ from mesa.visualization.modules import ChartModule
 from mesa.visualization.option import Option
 
 
-
 def agent_portrayal(agent):
     portrayal = {"Shape": "circle",
                  "Filled": "true",
@@ -28,8 +27,8 @@ chart = ChartModule([
 )
 
 model_params = {
-    "N": Option('slider', "Number of agents", 100, 2, 200, 1, 
-                 description="Choose how many agents to include in the model"),
+    "N": Option('slider', "Number of agents", 100, 2, 200, 1,
+                description="Choose how many agents to include in the model"),
     "width": 10,
     "height": 10
 }
