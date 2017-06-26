@@ -26,9 +26,9 @@ tree_chart = ChartModule([{"Label": "Fine", "Color": "green"},
 
 
 model_params = {
-  "height": 100,
-  "width": 100,
-  "density": Option("slider", "Tree density", 0.65, 0.01, 1.0, 0.01)
+    "height": 100,
+    "width": 100,
+    "density": Option("slider", "Tree density", 0.65, 0.01, 1.0, 0.01)
 }
 server = ModularServer(ForestFire, [canvas_element, tree_chart], "Forest Fire",
                        model_params)

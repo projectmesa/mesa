@@ -13,7 +13,7 @@ model_params = {
     "height": 50,
     "width": 50,
     "schedule_type": Option("choice", "Scheduler type", value="Random",
-                             choices=list(PDModel.schedule_types.keys()))
+                            choices=list(PDModel.schedule_types.keys()))
 }
 
 server = ModularServer(PDModel, [canvas_element], "Prisoner's Dilemma",

@@ -278,7 +278,7 @@ class ModularServer(tornado.web.Application):
         self.model_name = name
         self.model_cls = model_cls
         self.description = 'No description available'
-        if  hasattr(model_cls, 'description'):
+        if hasattr(model_cls, 'description'):
             self.description = model_cls.description
         elif model_cls.__doc__ is not None:
             self.description = model_cls.__doc__
