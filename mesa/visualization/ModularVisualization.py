@@ -277,7 +277,11 @@ class ModularServer(tornado.web.Application):
         # Initializing the model
         self.model_name = name
         self.model_cls = model_cls
-        self.description = model_cls.description if hasattr(model_cls, 'description') else 'No description available'
+        self.description = 'No description available'
+        if  hasattr(model_cls, 'description'):
+            self.description = model_cls.description
+        elif model_cls.__doc__ is not None:
+            self.description = model_cls.__doc__
 
         self.model_kwargs = model_params
         self.reset_model()
