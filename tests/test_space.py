@@ -42,6 +42,15 @@ class TestSpaceToroidal(unittest.TestCase):
         pos_3 = (-30, -20)
         assert self.space.get_distance(pos_1, pos_3) == 10
 
+    def test_heading(self):
+        pos_1 = (-30, -30)
+        pos_2 = (70, 20)
+        self.assertEqual((0, 0), self.space.get_heading(pos_1, pos_2))
+
+        pos_1 = (65, -25)
+        pos_2 = (-25, -25)
+        self.assertEqual((10, 0), self.space.get_heading(pos_1, pos_2))
+
     def test_neighborhood_retrieval(self):
         '''
         Test neighborhood retrieval
@@ -107,6 +116,15 @@ class TestSpaceNonToroidal(unittest.TestCase):
         pos_2 = (70, 20)
         pos_3 = (-30, -20)
         assert self.space.get_distance(pos_2, pos_3) == 107.70329614269008
+
+    def test_heading(self):
+        pos_1 = (-30, -30)
+        pos_2 = (70, 20)
+        self.assertEqual((100, 50), self.space.get_heading(pos_1, pos_2))
+
+        pos_1 = (65, -25)
+        pos_2 = (-25, -25)
+        self.assertEqual((-90, 0), self.space.get_heading(pos_1, pos_2))
 
     def test_neighborhood_retrieval(self):
         '''
