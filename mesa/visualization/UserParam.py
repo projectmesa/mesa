@@ -32,7 +32,7 @@ class UserSettableParameter:
         # Slider input
         slider_option = UserSettableParameter('slider', 'My Slider', value=123, min_value=10, max_value=200, step=0.1)
 
-        # Textbox
+        # Static text
         static_text = UserSettableParameter('static_text', value="This is a descriptive textbox")
      """
 
