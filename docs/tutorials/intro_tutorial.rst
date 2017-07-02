@@ -804,16 +804,15 @@ indefinitely in ``__init__``.
             self.running = True
             # ...
 
-We instantiate a BatchRunner with a model class to run, and a dictionary
-mapping parameters to values for them to take. If any of these
-parameters are assigned more than one value, as a list or an iterator,
-the BatchRunner will know to run all the combinations of these values
-and the other ones. The BatchRunner also takes an argument for how many
-model instantiations to create and run at each combination of parameter
-values, and how many steps to run each instantiation for. Finally, like
-the DataCollector, it takes dictionaries of model- and agent-level
-reporters to collect. Unlike the DataCollector, it won't collect the
-data every step of the model, but only at the end of each run.
+We instantiate a BatchRunner with a model class to run, and two dictionaries: 
+one of the fixed parameters (mapping model arguments to values) and one of
+varying parameters (mapping each parameter name to a sequence of values for it
+to take). The BatchRunner also takes an argument for how many model
+instantiations to create and run at each combination of parameter values, and 
+how many steps to run each instantiation for. Finally, like the DataCollector, 
+it takes dictionaries of model- and agent-level reporters to collect. Unlike
+the DataCollector, it won't collect the data every step of the model, but only 
+at the end of each run.
 
 In the following example, we hold the height and width fixed, and vary
 the number of agents. We tell the BatchRunner to run 5 instantiations of
@@ -827,12 +826,13 @@ Now, we can set up and run the BatchRunner:
     # run.py
     from mesa.batchrunner import BatchRunner
 
-    parameters = {"width": 10,
-                  "height": 10,  
-                  "N": range(10, 500, 10)}
+    fixed_params = {"width": 10,
+                    "height": 10}  
+    variable_params = {"N": range(10, 500, 10)}
     
     batch_run = BatchRunner(MoneyModel, 
-                            parameters, 
+                            fixed_parameters=fixed_params,
+                            variable_parameters=variable_params, 
                             iterations=5, 
                             max_steps=100,
                             model_reporters={"Gini": compute_gini})
