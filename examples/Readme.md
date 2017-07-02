@@ -33,4 +33,6 @@ Completed code to go along with the [tutorial]() on making a simple model of how
 ### WolfSheep
 Implementation of an ecological model of predation and reproduction, based on the NetLogo [Wolf Sheep Predation model](http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation).
 
-
+### Sugarscape CG
+Implementation of Sugarscape 2 Constant Growback model, based on the Netlogo
+[Sugarscape 2 Constant Growback](http://ccl.northwestern.edu/netlogo/models/Sugarscape2ConstantGrowback)
