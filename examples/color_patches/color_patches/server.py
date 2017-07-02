@@ -14,11 +14,11 @@ _COLORS = ['Aqua', 'Blue', 'Fuchsia', 'Gray', 'Green',
            'Red', 'Silver', 'Teal', 'White', 'Yellow']
 
 
-GRID_ROWS = 50
-GRID_COLS = 25
-CELL_SIZE = 10
-CANVAS_WIDTH = GRID_ROWS * CELL_SIZE
-CANVAS_HEIGHT = GRID_COLS * CELL_SIZE
+grid_rows = 50
+grid_cols = 25
+cell_size = 10
+canvas_width = grid_rows * cell_size
+canvas_height = grid_cols * cell_size
 
 
 def color_patch_draw(cell):
@@ -39,12 +39,12 @@ def color_patch_draw(cell):
     return portrayal
 
 
-CANVAS_ELEMENT = CanvasGrid(color_patch_draw,
-                            GRID_ROWS, GRID_COLS,
-                            CANVAS_WIDTH, CANVAS_HEIGHT)
+canvas_element = CanvasGrid(color_patch_draw,
+                            grid_rows, grid_cols,
+                            canvas_width, canvas_height)
 
 server = ModularServer(ColorPatchModel,
-                       [CANVAS_ELEMENT], "Color Patches",
-                       GRID_ROWS, GRID_COLS)
+                       [canvas_element], "Color Patches",
+                       {"width": canvas_width, "height": canvas_height})
 
 # webbrowser.open('http://127.0.0.1:8521')  # TODO: make this configurable

@@ -6,7 +6,8 @@ var ChartModule = function(series, canvas_width, canvas_height) {
 	canvas_tag += "style='border:1px dotted'></canvas>";
 	// Append it to body:
 	var canvas = $(canvas_tag)[0];
-	$("body").append(canvas);
+	//$("body").append(canvas);
+	$("#elements").append(canvas);
 	// Create the context and the drawing controller:
 	var context = canvas.getContext("2d");
 

@@ -41,6 +41,8 @@ class WolfSheepPredation(Model):
 
     verbose = False  # Print-monitoring
 
+    description = 'A model for simulating wolf and sheep (predator-prey) ecosystem modelling.'
+
     def __init__(self, height=20, width=20,
                  initial_sheep=100, initial_wolves=50,
                  sheep_reproduce=0.04, wolf_reproduce=0.05,

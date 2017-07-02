@@ -33,14 +33,16 @@ def citizen_cop_portrayal(agent):
         portrayal["Layer"] = 1
     return portrayal
 
+
+model_params = dict(height=40,
+                    width=40,
+                    citizen_density=.7,
+                    cop_density=.074,
+                    citizen_vision=7,
+                    cop_vision=7,
+                    legitimacy=.8,
+                    max_jail_term=1000)
+
 canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 500, 500)
 server = ModularServer(CivilViolenceModel, [canvas_element],
-                       "Epstein Civil Violence",
-                       height=40,
-                       width=40,
-                       citizen_density=.7,
-                       cop_density=.074,
-                       citizen_vision=7,
-                       cop_vision=7,
-                       legitimacy=.8,
-                       max_jail_term=1000)
+                       "Epstein Civil Violence", model_params)

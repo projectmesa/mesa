@@ -64,6 +64,12 @@ Server -> Client:
     Informs the client that the model is over.
     {"type": "end"}
 
+    Informs the client of the current model's parameters
+    {
+    "type": "model_params",
+    "params": 'dict' of model params, (i.e. {arg_1: val_1, ...})
+    }
+
 Client -> Server:
     Reset the model.
     TODO: Allow this to come with parameters
@@ -77,17 +83,29 @@ Client -> Server:
     "step:" index of the step to get.
     }
 
+    Submit model parameter updates
+    {
+    "type": "submit_params",
+    "param": name of model parameter
+    "value": new value for 'param'
+    }
+
+    Get the model's parameters
+    {
+    "type": "get_params"
+    }
+
 """
 import os
-
 import tornado.autoreload
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import tornado.escape
 import tornado.gen
-
 import webbrowser
+
+from mesa.visualization.UserParam import UserSettableParameter
 
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
@@ -144,6 +162,7 @@ class PageHandler(tornado.web.RequestHandler):
             element.index = i
         self.render("modular_template.html", port=self.application.port,
                     model_name=self.application.model_name,
+                    description=self.application.description,
                     package_includes=self.application.package_includes,
                     local_includes=self.application.local_includes,
                     scripts=self.application.js_code)
@@ -158,6 +177,13 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @property
+    def viz_state_message(self):
+        return {
+            "type": "viz_state",
+            "data": self.application.render_model()
+        }
+
     def on_message(self, message):
         """ Receiving a message from the websocket, parse, and act accordingly.
 
@@ -171,13 +197,28 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                 self.write_message({"type": "end"})
             else:
                 self.application.model.step()
-                self.write_message({"type": "viz_state",
-                        "data": self.application.render_model()})
+                self.write_message(self.viz_state_message)
 
         elif msg["type"] == "reset":
             self.application.reset_model()
-            self.write_message({"type": "viz_state",
-                    "data": self.application.render_model()})
+            self.write_message(self.viz_state_message)
+
+        elif msg["type"] == "submit_params":
+            param = msg["param"]
+            value = msg["value"]
+
+            # Is the param editable?
+            if param in self.application.user_params:
+                if isinstance(self.application.model_kwargs[param], UserSettableParameter):
+                    self.application.model_kwargs[param].value = value
+                else:
+                    self.application.model_kwargs[param] = value
+
+        elif msg["type"] == "get_params":
+            self.write_message({
+                "type": "model_params",
+                "params": self.application.user_params
+            })
 
         else:
             if self.application.verbose:
@@ -216,8 +257,10 @@ class ModularServer(tornado.web.Application):
                 "autoreload": False,
                 "template_path": os.path.dirname(__file__) + "/templates"}
 
+    EXCLUDE_LIST = ('width', 'height',)
+
     def __init__(self, model_cls, visualization_elements, name="Mesa Model",
-                 *args, **kwargs):
+                 model_params={}):
         """ Create a new visualization server with the given elements. """
         # Prep visualization elements:
         self.visualization_elements = visualization_elements
@@ -234,17 +277,40 @@ class ModularServer(tornado.web.Application):
         # Initializing the model
         self.model_name = name
         self.model_cls = model_cls
+        self.description = 'No description available'
+        if hasattr(model_cls, 'description'):
+            self.description = model_cls.description
+        elif model_cls.__doc__ is not None:
+            self.description = model_cls.__doc__
 
-        self.model_args = args
-        self.model_kwargs = kwargs
+        self.model_kwargs = model_params
         self.reset_model()
 
         # Initializing the application itself:
         super().__init__(self.handlers, **self.settings)
 
+    @property
+    def user_params(self):
+        result = {}
+        for param, val in self.model_kwargs.items():
+            if isinstance(val, UserSettableParameter):
+                result[param] = val.json
+
+        return result
+
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
-        self.model = self.model_cls(*self.model_args, **self.model_kwargs)
+
+        model_params = {}
+        for key, val in self.model_kwargs.items():
+            if isinstance(val, UserSettableParameter):
+                if val.param_type == 'static_text':    # static_text is never used for setting params
+                    continue
+                model_params[key] = val.value
+            else:
+                model_params[key] = val
+
+        self.model = self.model_cls(**model_params)
 
     def render_model(self):
         """ Turn the current state of the model into a dictionary of

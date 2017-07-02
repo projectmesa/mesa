@@ -1,5 +1,7 @@
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization.UserParam import UserSettableParameter
+
 
 from forest_fire.model import ForestFire
 
@@ -22,5 +24,11 @@ tree_chart = ChartModule([{"Label": "Fine", "Color": "green"},
                           {"Label": "On Fire", "Color": "red"},
                           {"Label": "Burned Out", "Color": "black"}])
 
+
+model_params = {
+    "height": 100,
+    "width": 100,
+    "density": UserSettableParameter("slider", "Tree density", 0.65, 0.01, 1.0, 0.01)
+}
 server = ModularServer(ForestFire, [canvas_element, tree_chart], "Forest Fire",
-                       100, 100, 0.65)
+                       model_params)
