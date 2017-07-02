@@ -100,7 +100,7 @@ class BatchRunner:
         bad_names = []
         for name, values in params.items():
             if (isinstance(values, str) or
-                    not isinstance(values, collections.Sequence)):
+                    not hasattr(values, "__iter__")):
                 bad_names.append(name)
         if bad_names:
             raise VariableParameterError(bad_names)
