@@ -3,6 +3,7 @@ from .model import MoneyModel
 
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.modules import ChartModule
+from mesa.visualization.UserParam import UserSettableParameter
 
 
 def agent_portrayal(agent):
@@ -25,5 +26,12 @@ chart = ChartModule([
     data_collector_name='datacollector'
 )
 
-server = ModularServer(MoneyModel, [grid, chart], "Money Model", 100, 10, 10)
+model_params = {
+    "N": UserSettableParameter('slider', "Number of agents", 100, 2, 200, 1,
+                               description="Choose how many agents to include in the model"),
+    "width": 10,
+    "height": 10
+}
+
+server = ModularServer(MoneyModel, [grid, chart], "Money Model", model_params)
 server.port = 8521
