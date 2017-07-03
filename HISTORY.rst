@@ -3,8 +3,8 @@
 Release History
 ---------------
 
-Next release - 0.8.2 (2017-06-?) Flagstaff (PyCon Sprints & then some)
-++++++++++++++++++
+Next release - 0.8.2 (2017-07-?) Gila Bend
++++++++++++++++++++++++++++++++++++++++++++
 
 **Improvements**
 * None
@@ -13,11 +13,13 @@ Next release - 0.8.2 (2017-06-?) Flagstaff (PyCon Sprints & then some)
 * None
 
 
-0.8.1 (2017-07-03) Flagstaff (PyCon Sprints & then some)
-++++++++++++++++++
+0.8.1 (2017-07-??) Flagstaff (PyCon Sprints & then some)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 **Improvements**
 
+* Bootstrap UI starter #383
+* Add Sugarscape Constant Growback example #385
 * Add best-practices document and describe models. #371
 * Refactored & model standards related:
     * Prisoner's Dilemma refactor to meet new model standard format. #377
@@ -27,7 +29,6 @@ Next release - 0.8.2 (2017-06-?) Flagstaff (PyCon Sprints & then some)
     * Add best-practices document and describe models. #371
 * Modified loop over agents in schedule step method #356
 * Added function to use local images as shapes in GridDraw #355
-
 
 **Fixes**
 
@@ -41,7 +42,7 @@ Next release - 0.8.2 (2017-06-?) Flagstaff (PyCon Sprints & then some)
 
 
 0.8.0 (2017-01-29) - Edgar
-++++++++++++++++++
++++++++++++++++++++++++++++
 
 **Improvements**
 
@@ -57,7 +58,7 @@ Next release - 0.8.2 (2017-06-?) Flagstaff (PyCon Sprints & then some)
 
 
 0.7.8.1 (2016-11-02) Duncan
-++++++++++++++++++
+++++++++++++++++++++++++++++
 
 **Improvements**
 
