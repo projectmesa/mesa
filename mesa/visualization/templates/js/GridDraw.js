@@ -39,11 +39,6 @@ other agent locations, represented by circles:
 */
 
 var GridVisualization = function(width, height, gridWidth, gridHeight, context) {
-	var width = width;
-	var height = height;
-	var gridWidth = gridWidth;
-	var gridHeight = gridHeight;
-	var context = context;
 
 	// Find cell size:
 	var cellWidth = Math.floor(width / gridWidth);

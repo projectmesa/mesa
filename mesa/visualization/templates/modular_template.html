@@ -1,167 +1,99 @@
 <!DOCTYPE html>
 <head>
 	<title>{{ model_name }} (Mesa visualization)</title>
-  {% comment 
-  The jquery.min.js supplied with this version of mesa  is downloaded from
-  "ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" Re-test mesa
-  visulaizations when upgrading jquery to a newer version.
-  %}
-	<script src="/static/jquery.min.js"></script>
-	<script src="/static/dat.gui.min.js"></script>
-	<script>
-	/*
-		This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to the server 
-		(the port is set via the template). On every step, it receives inputs, one per module, and sends them to the associated function to render
+    <link href="/static/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <link href="/static/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
+    <link href="/static/css/bootstrap-switch.min.css" type="text/css" rel="stylesheet" />
+    <link href="/static/css/bootstrap-slider.min.css" type="text/css" rel="stylesheet" />
+    <link href="/static/css/visualization.css" type="text/css" rel="stylesheet" />
 
-		Users can reset() the model, advance it by one step(), or run() it through. reset() and 
-		step() send a message to the server, which then sends back the appropriate data. run() just
-		calls the step() method at fixed intervals.
-
-		The model parameters are controlled via the MesaVisualizationControl object. The GUI is 
-		created using the dat.GUI library.
-	
-	*/
-		/**
-		Object which holds visualization parameters.
-	
-			tick: What tick of the model we're currently at
-			running: Boolean on whether we have reached the end of the current model
-			fps: Current frames per second.
-		*/
-		var MesaVisualizationControl = function() {
-			this.tick = -1; // Counts at which tick of the model we are.
-			this.running = false; // Whether there is currently a model running
-			this.fps  = 3 ; // Frames per second
-		}
-
-		var player; // Variable to store the continuous player
-		var control = new MesaVisualizationControl();
-		var elements = [];  // List of Element objects
-
-
-		// WebSocket Stuff
-		var ws = new WebSocket("ws://127.0.0.1:{{ port }}/ws"); // Open the websocket connection
-                ws.onopen = function() {
-                    console.log("Connection opened!");
-                    reset();
-                };
-
-		/**
-		Parse an incoming message
-		*/
-		ws.onmessage = function(message) {
-			msg = JSON.parse(message.data);
-			//console.log(message.data);
-			switch (msg["type"]) {
-				case "viz_state":
-					data = msg["data"]
-					for (var i in elements) {
-						elements[i].render(data[i]);
-					}
-					break;
-				case "end":
-					// We have reached the end of the model
-					control.running = false;
-					clearInterval(player);
-					runController.name("run");
-					break;
-				default:
-					// There shouldn't be any other message
-					console.log("Unexpected message.");
-			}
-		}
-		
-		/**
-		Turn an object into a string to send to the server, and send it.
-		*/
-		var send = function(message) {
-			msg = JSON.stringify(message);
-			ws.send(msg);
-		}
-
-		/**
-		Reset the model, and rest the appropriate local variables.
-		*/
-		var reset = function() {
-			control.tick = 0;
-			send({"type": "reset"});
-
-			// Reset all the visualizations
-			for (var i in elements) {
-				elements[i].reset();
-			}
-		};
-
-		/**
-		Send a message to the server get the next visualization state.
-		*/
-
-		var single_step = function() {
-			control.tick += 1;
-			send({"type": "get_step", "step": control.tick});
-		};
-		var step = function() {
-			if (!control.running) {single_step()}
-			else {run()};
-		};
-		/**
-		Call the step function at fixed intervals, until getting an end message from the server.
-		*/
-		var run = function() {
-			if (control.running) {
-				control.running = false;
-				runController.name("run");
-				if (player) {
-					clearInterval(player);
-					player = null;
-				}
-			}
-			else {
-				control.running = true;
-				runController.name("stop");
-				player = setInterval(single_step, 1000/control.fps);
-			}
-		};
-	</script>
-	
+	<!-- This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to
+	the server (the port is set via the template). On every step, it receives inputs, one per module, and sends
+	them to the associated function to render. -->
 </head>
 <body>
-	<h2>{{ model_name }}</h2> <!-- Template; put the model name as the heading -->
 
+    <!-- Navbar -->
+    <nav class="navbar navbar-inverse navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            <a class="navbar-brand" href="#">{{ model_name }}</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#about" data-title="About" data-content="#about-content">
+                            About
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li id="play-pause"><a href="#">Start</a></li>
+                    <li id="step"><a href="#">Step</a></li>
+                    <li id="reset"><a href="#">Reset</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+    <div class="container">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-3" id="sidebar"></div>
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-9" id="elements">
+            <div id="elements-topbar">
+                <div class="input-group input-group-lg">
+                    <label class="label label-primary" for="fps" style="margin-right: 15px">Frames Per Second</label>
+                    <input id="fps" data-slider-id='fps' type="text" />
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- Script includes go here -->
+    <!-- About modal -->
+    <div id="about" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">About {{ model_name }}</h4>
+                </div>
+                <div class="modal-body">
+                    <div>{{ description }}</div>
+                    <div>&nbsp;</div>
+                    <div style="clear: both;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom-load all JavaScript dependencies -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap-switch.min.js"></script>
+    <script src="/static/js/bootstrap-slider.min.js"></script>
+
+    <!-- Script includes go here -->
 	{% for file_name in package_includes %}
-		<script src="/static/{{ file_name }}" type="text/javascript"></script>
+		<script src="/static/js/{{ file_name }}" type="text/javascript"></script>
 	{% end %}
 	{% for file_name in local_includes %}
 		<script src="/local/{{ file_name }}" type="text/javascript"></script>
 	{% end %}
-<script>
-	// Set up the GUI
-	var gui = new dat.GUI();
-	var fps_control = gui.add(control, "fps", 0, 20).step(1); // fps slider, 0 to 20 in 1 increments 
-	// Create the buttons
-	gui.add(this, "reset"); 
-	gui.add(this, "step");
-	var runController = gui.add(this, "run");
 
-	/**
-	Called when the user releases the fps slider; if already running, stop and
-    start again to reset the fps
-	*/
-	fps_control.onFinishChange(function(value) {
-		if (control.running) {
-			run();
-			run();
-		}
-	});
+    <!-- template-specific code snippets here -->
+    <script>
+        var port = {{ port }};
+    </script>
+    <script src="/static/js/runcontrol.js"></script>
 
-	// Element-specific scripts go here:
-	// Actual script snippets go here.
-	{% for script in scripts %}
+    <!-- Element-specific scripts go here -->
+    <script>
+	    {% for script in scripts %}
 			{% raw script %}
-	{% end %}
-
-</script>
-
+	    {% end %}
+    </script>
 </body>
