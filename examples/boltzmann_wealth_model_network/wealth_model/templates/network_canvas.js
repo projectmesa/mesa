@@ -3,9 +3,9 @@ var Network_Module = function(canvas_width, canvas_height) {
     var div_tag = "<div id='graph-container' style='border: 1px dotted; width: " +
         canvas_width + "px; height: " + canvas_height + "px;'></div>";
 
-    // Append it to body:
+    // Append it to #elements:
     var div = $(div_tag)[0];
-    $("body").append(div);
+    $("#elements").append(div);
 
     var s = {
         container: 'graph-container',

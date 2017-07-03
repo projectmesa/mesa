@@ -22,7 +22,8 @@ class MoneyModel(Model):
     def __init__(self, num_agents, num_nodes):
 
         self.num_agents = num_agents
-        self.G = nx.complete_graph(num_nodes)
+        self.num_nodes = num_nodes if num_nodes >= self.num_agents else self.num_agents
+        self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=0.5)
         self.running = True
         self.grid = NetworkGrid(self.G)
         self.schedule = RandomActivation(self)
@@ -67,7 +68,7 @@ class MoneyAgent(Agent):
 
         neighbors_nodes = self.model.grid.get_neighbors(self.pos, include_center=False)
         neighbors = self.model.grid.get_cell_list_contents(neighbors_nodes)
-        if len(neighbors) > 1:
+        if len(neighbors) > 0:
             other = random.choice(neighbors)
             other.wealth += 1
             self.wealth -= 1
