@@ -13,7 +13,7 @@ Next release - 0.8.2 (2017-07-?) Gila Bend
 * None
 
 
-0.8.1 (2017-07-??) Flagstaff (PyCon Sprints & then some)
+0.8.1 (2017-07-03) Flagstaff (PyCon Sprints & then some)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 **Improvements**
