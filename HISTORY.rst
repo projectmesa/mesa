@@ -7,9 +7,11 @@ Next release - 0.8.2 (2017-07-?) Gila Bend
 +++++++++++++++++++++++++++++++++++++++++++
 
 **Improvements**
+
 * None
 
 **Fixes**
+
 * None
 
 
