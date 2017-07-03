@@ -352,7 +352,7 @@ var loadParamCallback = function(data) {
     reset();
 };
 
-var paramLoader = new JSONloader('load-params-input', loadParamCallback);
+var paramLoader = new JSONLoader('load-params-input', loadParamCallback);
 
 /* Save user params to JSON file */
 var saveUserParamsButton = $('#save-user-params');
