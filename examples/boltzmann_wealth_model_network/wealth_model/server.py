@@ -34,10 +34,11 @@ chart = ChartModule([
 )
 
 model_params = {
-    "num_agents": UserSettableParameter('slider', "Number of agents", 7, 7, 10, 1,
+    "num_agents": UserSettableParameter('slider', "Number of agents", 7, 2, 10, 1,
                                         description="Choose how many agents to include in the model"),
-    "num_nodes": UserSettableParameter('slider', "Number of nodes", 10, 10, 12, 1,
-                                       description="Choose how many nodes to include in the model")
+    "num_nodes": UserSettableParameter('slider', "Number of nodes", 10, 3, 12, 1,
+                                       description="Choose how many nodes to include in the model, with at "
+                                                   "least the same number of agents")
 }
 
 server = ModularServer(MoneyModel, [grid, chart], "Money Model", model_params)
