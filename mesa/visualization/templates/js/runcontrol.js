@@ -357,6 +357,12 @@ var loadParamCallback = function(data) {
 /** Allow this <input> tag to load user parameters. */
 var paramLoader = new JSONLoader('load-params-input', loadParamCallback);
 
+/** Enable the file loader 'browse' button to write the filename correctly */
+$(document).on('click', '.browse', function(){
+  var file = $(this).parent().parent().parent().find('.file');
+  file.trigger('click');
+});
+
 /** Save user params to JSON file */
 var saveUserParamsButton = $('#save-user-params');
 var saveUserParamsFilename = $('#save-user-params-filename');

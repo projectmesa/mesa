@@ -88,7 +88,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
-                    <h4 class="modal-title">Download Parameter Settings</h4>
+                    <h4 class="modal-title">Save Parameter Settings</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -110,9 +110,15 @@
                     <h4 class="modal-title">Load Parameter Settings</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="input-group">
-                        <input id="load-params-input"  type="file">
+                    <div class="form-group">
+                    <input id="load-params-input" style="display: none;" type="file" class="file">
+                    <div class="input-group col-xs-12">
+                        <input type="text" class="form-control" disabled placeholder="Saved user parameters (e.g. params.json)">
+                        <span class="input-group-btn">
+                            <button class="browse btn btn-primary" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                        </span>
                     </div>
+                  </div>
                 </div>
             </div>
         </div>
