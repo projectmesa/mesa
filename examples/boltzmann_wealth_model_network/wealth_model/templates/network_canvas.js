@@ -1,6 +1,6 @@
 var Network_Module = function(canvas_width, canvas_height) {
 
-    var div_tag = "<div id='graph-container' width='1000' height='400' style='border: 1px dotted; width: " +
+    var div_tag = "<div id='graph-container' style='border: 1px dotted; width: " +
         canvas_width + "px; height: " + canvas_height + "px;'></div>";
 
     // Append it to body:
@@ -15,7 +15,7 @@ var Network_Module = function(canvas_width, canvas_height) {
     };
 
     this.render = function(data) {
-        var graph = JSON.parse(JSON.stringify(data[0]));
+        var graph = JSON.parse(JSON.stringify(data));
 
         // Update the instance's graph:
         if (s instanceof sigma) {
