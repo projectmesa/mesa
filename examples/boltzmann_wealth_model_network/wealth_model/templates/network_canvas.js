@@ -1,6 +1,6 @@
 var Network_Module = function(canvas_width, canvas_height) {
 
-    var div_tag = "<div id='graph-container' style='border: 1px dotted; width: " +
+    var div_tag = "<div id='graph-container' style='width: " +
         canvas_width + "px; height: " + canvas_height + "px;'></div>";
 
     // Append it to #elements:

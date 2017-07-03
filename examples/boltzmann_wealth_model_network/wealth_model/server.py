@@ -11,7 +11,7 @@ def network_portrayal(G):
     portrayal['nodes'] = [{'id': n_id,
                            'agent_id': None if n['agent'] is None else n['agent'].unique_id,
                            'size': 1 if n['agent'] is None else 3,
-                           'color': 'red' if n['agent'] is None or n['agent'].wealth == 0 else 'green',
+                           'color': '#CC0000' if n['agent'] is None or n['agent'].wealth == 0 else '#007959',
                            'label': None if n['agent'] is None else 'Agent:{} Wealth:{}'.format(n['agent'].unique_id,
                                                                                                 n['agent'].wealth),
                            }
@@ -20,6 +20,7 @@ def network_portrayal(G):
     portrayal['edges'] = [{'id': i,
                            'source': source,
                            'target': target,
+                           'color': '#000000',
                            }
                           for i, (source, target, d) in enumerate(G.edges(data=True))]
 
