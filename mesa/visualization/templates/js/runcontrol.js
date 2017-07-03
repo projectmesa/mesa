@@ -306,20 +306,22 @@ var updateFPS = function() {
     }
 };
 
-/* Load user params from JSON file */
+/** Load user params from JSON object when user loads a JSON file */
 var loadParamCallback = function(data) {
 
-    // Check if param's 'param_type' matches loaded 'param_type', skip if it is not and warn the user as such
+    // Check that each param's 'param_type' matches the loaded 'param_type', and if not, alert user and skip it
     for (var param in model_params) {
         param = String(param);
-        console.log(param);
         var current = model_params[param];
         var err_string = "Could not load {0} from saved file.".replace("{0}", param);
-        var loaded = null;
         try {
-            loaded = data[param];
+            var loaded = data[param];
             if (loaded.param_type === current.param_type) {
+
+                // Update local model_params
                 model_params[param].value = loaded.value;
+
+                // Now update UI controls and server. Some may automatically send a param change, others may not
                 switch (current.param_type) {
                     case 'checkbox':
                         gui_inputs[param].bootstrapSwitch('state', loaded.value);
@@ -336,7 +338,7 @@ var loadParamCallback = function(data) {
                         break;
                 }
             } else {
-                alert("Could not load {param}, mismatched parameter types {a} and {b}"
+                alert("Could not load {param}, mismatched parameter types {a} and {b}. {param} will use current value."
                     .replace("{param}", param)
                     .replace("{a}", current.param_type)
                     .replace("{b}", loaded.param_type)
@@ -349,15 +351,17 @@ var loadParamCallback = function(data) {
     }
 
     $('#load-params-modal').modal('hide');
-    reset();
+    reset();    // Reset the model on server and UI visualization elements.
 };
 
+/** Allow this <input> tag to load user parameters. */
 var paramLoader = new JSONLoader('load-params-input', loadParamCallback);
 
-/* Save user params to JSON file */
+/** Save user params to JSON file */
 var saveUserParamsButton = $('#save-user-params');
 var saveUserParamsFilename = $('#save-user-params-filename');
 
+/** Create a "downloaded" JSON file from a stringified JavaScript object */
 var download = function(data, filename, type) {
     var a = document.createElement("a");
     var file = new Blob([data], {type: type});
@@ -366,19 +370,23 @@ var download = function(data, filename, type) {
     a.click();
 };
 
+/** Initiate callbacks for saving user parameters to file */
 var saveUserParams = function() {
     var filename = saveUserParamsFilename.val();
     var parts = filename.split('.');
-    if (parts[parts.length - 1] == 'json') {
-        download(JSON.stringify(model_params), filename, "application/json");
-        $('#save-params-modal').modal('hide');
-    }
-    else {
-        alert("File extension is not 'json'");
+    if (parts.length > 0) {
+        var ext = parts[parts.length - 1];
+        if (parts.length > 1 && ext === 'json') {
+            download(JSON.stringify(model_params), filename, "application/json");
+            $('#save-params-modal').modal('hide');
+        }
+        else {
+            alert("File extension is not 'json'.");
+        }
     }
 };
 
-// Initialize buttons on top bar
+/** Initialize buttons in navbar */
 playPauseButton.on('click', run);
 stepButton.on('click', step);
 resetButton.on('click', reset);
