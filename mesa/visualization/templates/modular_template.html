@@ -37,6 +37,18 @@
                     <li id="play-pause"><a href="#">Start</a></li>
                     <li id="step"><a href="#">Step</a></li>
                     <li id="reset"><a href="#">Reset</a></li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Options<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#save-params-modal" data-title="Save User Parameters" data-content="#save-params-modal-content">Save User Parameters</a>
+                            </li>
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#load-params-modal" data-title="Load User Parameters" data-content="#load-params-modal-content">Load User Parameters</a>
+                            </li>
+                            <!-- li id="save-data"><a href="#">Save Data To File</a></li -->
+                        </ul>
+                    </li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div>
@@ -70,6 +82,42 @@
         </div>
     </div>
 
+    <!-- Save User Params Modal -->
+    <div id="save-params-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+                    <h4 class="modal-title">Download Parameter Settings</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input placeholder="Filename (e.g. params.json)" type="text" class="form-control" id="save-user-params-filename">
+                        <div style="clear: both;">&nbsp;</div>
+                        <button class="btn btn-primary btn-block" id="save-user-params">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load User Params Modal -->
+    <div id="load-params-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+                    <h4 class="modal-title">Load Parameter Settings</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <input id="load-params-input"  type="file">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bottom-load all JavaScript dependencies -->
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
@@ -88,6 +136,7 @@
     <script>
         var port = {{ port }};
     </script>
+    <script src="/static/js/jsonloader.js"></script>
     <script src="/static/js/runcontrol.js"></script>
 
     <!-- Element-specific scripts go here -->

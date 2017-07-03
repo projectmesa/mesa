@@ -25,6 +25,7 @@ var player; // Variable to store the continuous player
 var control = new MesaVisualizationControl();
 var elements = [];  // List of Element objects
 var model_params = {};
+var gui_inputs = {};
 
 // Playback buttons
 var playPauseButton = $('#play-pause');
@@ -57,6 +58,7 @@ var initGUI = function() {
 
     var onSubmitCallback = function(param_name, value) {
         send({"type": "submit_params", "param": param_name, "value": value});
+        model_params[param_name].value = value;
     };
 
     var addBooleanInput = function(param, obj) {
@@ -74,6 +76,7 @@ var initGUI = function() {
                 onSubmitCallback(param, state);
             }
         });
+        gui_inputs[param] = $(checkbox);
     };
 
     var addNumberInput = function(param, obj) {
@@ -88,7 +91,8 @@ var initGUI = function() {
         numberInput.val(obj.value);
         numberInput.on('change', function() {
             onSubmitCallback(param, Number($(this).val()));
-        })
+        });
+        gui_inputs[param] = $(number_input);
     };
 
     var addSliderInput = function(param, obj) {
@@ -126,7 +130,8 @@ var initGUI = function() {
         });
         sliderInput.on('change', function() {
             onSubmitCallback(param, Number($(this).val()));
-        })
+        });
+        gui_inputs[param] = slider;
     };
 
     var addChoiceInput = function(param, obj) {
@@ -168,6 +173,7 @@ var initGUI = function() {
     var addTextBox = function(param, obj) {
         var well = $('<div class="well">' + obj.value + '</div>')[0];
         sidebar.append(well);
+        gui_inputs[param] = $(well);
     };
 
     var addParamInput = function(param, option) {
@@ -300,8 +306,81 @@ var updateFPS = function() {
     }
 };
 
-// Initilaize buttons on top bar
+/* Load user params from JSON file */
+var loadParamCallback = function(data) {
+
+    // Check if param's 'param_type' matches loaded 'param_type', skip if it is not and warn the user as such
+    for (var param in model_params) {
+        param = String(param);
+        console.log(param);
+        var current = model_params[param];
+        var err_string = "Could not load {0} from saved file.".replace("{0}", param);
+        var loaded = null;
+        try {
+            loaded = data[param];
+            if (loaded.param_type === current.param_type) {
+                model_params[param].value = loaded.value;
+                switch (current.param_type) {
+                    case 'checkbox':
+                        gui_inputs[param].bootstrapSwitch('state', loaded.value);
+                        break;
+                    case 'slider':
+                        gui_inputs[param].bootstrapSlider('setValue', loaded.value);
+                        send({"type": "submit_params", "param": param, "value": loaded.value});
+                        break;
+                    case 'choice':
+                        // Todo - choices
+                        break;
+                    case 'number':
+                        // Todo - numbers
+                        break;
+                }
+            } else {
+                alert("Could not load {param}, mismatched parameter types {a} and {b}"
+                    .replace("{param}", param)
+                    .replace("{a}", current.param_type)
+                    .replace("{b}", loaded.param_type)
+                )
+            }
+
+        } catch(err) {
+            console.log(err_string);
+        }
+    }
+
+    $('#load-params-modal').modal('hide');
+    reset();
+};
+
+var paramLoader = new JSONloader('load-params-input', loadParamCallback);
+
+/* Save user params to JSON file */
+var saveUserParamsButton = $('#save-user-params');
+var saveUserParamsFilename = $('#save-user-params-filename');
+
+var download = function(data, filename, type) {
+    var a = document.createElement("a");
+    var file = new Blob([data], {type: type});
+    a.href = URL.createObjectURL(file);
+    a.download = filename;
+    a.click();
+};
+
+var saveUserParams = function() {
+    var filename = saveUserParamsFilename.val();
+    var parts = filename.split('.');
+    if (parts[parts.length - 1] == 'json') {
+        download(JSON.stringify(model_params), filename, "application/json");
+        $('#save-params-modal').modal('hide');
+    }
+    else {
+        alert("File extension is not 'json'");
+    }
+};
+
+// Initialize buttons on top bar
 playPauseButton.on('click', run);
 stepButton.on('click', step);
 resetButton.on('click', reset);
 fpsControl.on('change', updateFPS);
+saveUserParamsButton.on('click', saveUserParams);
