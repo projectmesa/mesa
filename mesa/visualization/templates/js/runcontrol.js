@@ -276,7 +276,7 @@ var single_step = function() {
 
 /** Step the model forward. */
 var step = function() {
-    if (!control.running & !control.done) {single_step()}
+    if (!control.running && !control.done) {single_step()}
     else if (!control.done) {run()};
 };
 
@@ -321,30 +321,32 @@ var loadParamCallback = function(data) {
                 // Update local model_params
                 model_params[param].value = loaded.value;
 
-                // Now update UI controls and server. Some may automatically send a param change, others may not
+                // Now update UI controls and server.
                 switch (current.param_type) {
                     case 'checkbox':
-                        gui_inputs[param].bootstrapSwitch('state', loaded.value);
+                        gui_inputs[param].bootstrapSwitch('state', loaded.value);   // Automatically executes `send`
                         break;
                     case 'slider':
                         gui_inputs[param].bootstrapSlider('setValue', loaded.value);
                         send({"type": "submit_params", "param": param, "value": loaded.value});
                         break;
                     case 'choice':
-                        // Todo - choices
+                        gui_inputs[param].text(loaded.value + ' ');
+                        send({"type": "submit_params", "param": param, "value": loaded.value});
                         break;
                     case 'number':
-                        // Todo - numbers
+                        gui_inputs[param].val(loaded.value);
+                        send({"type": "submit_params", "param": param, "value": loaded.value});
                         break;
                 }
             } else {
-                alert("Could not load {param}, mismatched parameter types {a} and {b}. {param} will use current value."
-                    .replace("{param}", param)
+                alert("Could not load {param}, mismatched parameter types {a} and {b}. {param} will use current value, {current}."
+                    .replace("{param}", param).replace("{param}", param)
                     .replace("{a}", current.param_type)
                     .replace("{b}", loaded.param_type)
+                    .replace("{current}", model_params[param].value)
                 )
             }
-
         } catch(err) {
             console.log(err_string);
         }
@@ -357,10 +359,9 @@ var loadParamCallback = function(data) {
 /** Allow this <input> tag to load user parameters. */
 var paramLoader = new JSONLoader('load-params-input', loadParamCallback);
 
-/** Enable the file loader 'browse' button to write the filename correctly */
-$(document).on('click', '.browse', function(){
-  var file = $(this).parent().parent().parent().find('.file');
-  file.trigger('click');
+/** Enable the file loader 'browse' button to trigger 'open file' dialog correctly */
+$('#browse').on('click', function(){
+    $('#load-params-input').trigger('click');
 });
 
 /** Save user params to JSON file */
@@ -377,7 +378,14 @@ var download = function(data, filename, type) {
 };
 
 /** Initiate callbacks for saving user parameters to file */
-var saveUserParams = function() {
+var saveUserParams = function(e) {
+
+    if (e.type === 'keypress') {    // Listen for 'enter' key. If not 'enter', return.
+        if (e.which !== 13) {
+            return;
+        }
+    }
+
     var filename = saveUserParamsFilename.val();
     var parts = filename.split('.');
     if (parts.length > 0) {
@@ -385,6 +393,7 @@ var saveUserParams = function() {
         if (parts.length > 1 && ext === 'json') {
             download(JSON.stringify(model_params), filename, "application/json");
             $('#save-params-modal').modal('hide');
+            saveUserParamsFilename.val('')
         }
         else {
             alert("File extension is not 'json'.");
@@ -398,3 +407,4 @@ stepButton.on('click', step);
 resetButton.on('click', reset);
 fpsControl.on('change', updateFPS);
 saveUserParamsButton.on('click', saveUserParams);
+saveUserParamsFilename.on('keypress', saveUserParams);

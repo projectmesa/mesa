@@ -103,7 +103,7 @@
 
     <!-- Load User Params Modal -->
     <div id="load-params-modal" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
@@ -111,14 +111,9 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                    <input id="load-params-input" style="display: none;" type="file" class="file">
-                    <div class="input-group col-xs-12">
-                        <input type="text" class="form-control" disabled placeholder="Saved user parameters (e.g. params.json)">
-                        <span class="input-group-btn">
-                            <button class="browse btn btn-primary" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
-                        </span>
+                        <input id="load-params-input" style="display: none;" type="file" class="file">
+                        <button id="browse" class="btn btn-block btn-primary" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
                     </div>
-                  </div>
                 </div>
             </div>
         </div>
