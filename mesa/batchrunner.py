@@ -17,9 +17,10 @@ def combinations(*items):
     """
     A small fix to handle dictionary type parameters in cartesian product.
     """
-    prepared = [(item,) if isinstance(item, Mapping) else item
+    prepared = [(item,) if isinstance(item, collections.Mapping) else item
                 for item in items]
     yield from (param for param in product(*prepared))
+
 
 class VariableParameterError(TypeError):
     MESSAGE = ('variable_parameters must map a name to a sequence of values. '
