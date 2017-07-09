@@ -855,8 +855,6 @@ DataFrame.
     <matplotlib.collections.PathCollection at 0x114ab80f0>
 
 
-
-
 .. image:: intro_tutorial_files/intro_tutorial_52_1.png
 
 
