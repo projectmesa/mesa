@@ -104,6 +104,8 @@ class DataCollector:
                                given a model instance.
 
         """
+        if type(reporter_function) is str:
+            reporter_function = self._make_attribute_collector(reporter_function)
         self.model_reporters[reporter_name] = reporter_function
         self.model_vars[reporter_name] = []
 
@@ -116,6 +118,8 @@ class DataCollector:
                                given an agent object.
 
         """
+        if type(reporter_function) is str:
+            reporter_function = self._make_attribute_collector(reporter_function)
         self.agent_reporters[reporter_name] = reporter_function
         self.agent_vars[reporter_name] = []
 
@@ -163,6 +167,19 @@ class DataCollector:
                 self.tables[table_name][column].append(None)
             else:
                 raise Exception("Could not insert row with missing column")
+
+    @staticmethod
+    def _make_attribute_collector(attr):
+        '''
+        Create a function which collects the value of a named attribute
+        '''
+
+        def attr_collector(obj):
+            return getattr(obj, attr)
+
+        return attr_collector
+
+    @staticmethod
 
     def get_model_vars_dataframe(self):
         """ Create a pandas DataFrame from the model variables.
