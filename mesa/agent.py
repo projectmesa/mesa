@@ -13,6 +13,7 @@ class Agent:
         """ Create a new agent. """
         self.unique_id = unique_id
         self.model = model
+        self.pos = None
 
     def step(self):
         """ A single step of the agent. """
