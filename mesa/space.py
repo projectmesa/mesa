@@ -15,9 +15,9 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
-import numpy as np
 import random
 import math
+import numpy as np
 
 
 def accept_tuple_argument(wrapped_function):
@@ -29,8 +29,7 @@ def accept_tuple_argument(wrapped_function):
     def wrapper(*args):
         if isinstance(args[1], tuple) and len(args[1]) == 2:
             return wrapped_function(args[0], [args[1]])
-        else:
-            return wrapped_function(*args)
+        return wrapped_function(*args)
     return wrapper
 
 
@@ -82,15 +81,15 @@ class Grid:
 
         self.grid = []
 
-        for x in range(self.width):
+        for _ in range(self.width):
             col = []
-            for y in range(self.height):
+            for __ in range(self.height):
                 col.append(self.default_val())
             self.grid.append(col)
 
         # Add all cells to the empties list.
         self.empties = list(itertools.product(
-                            *(range(self.width), range(self.height))))
+            *(range(self.width), range(self.height))))
 
     @staticmethod
     def default_val():
@@ -166,7 +165,7 @@ class Grid:
                 py = self.torus_adj(y + dy, self.height)
 
                 # Skip if new coords out of bounds.
-                if(self.out_of_bounds((px, py))):
+                if self.out_of_bounds((px, py)):
                     continue
 
                 coords = (px, py)
@@ -344,8 +343,7 @@ class Grid:
         if self.exists_empty_cells():
             pos = random.choice(self.empties)
             return pos
-        else:
-            return None
+        return None
 
     def exists_empty_cells(self):
         """ Return True if any cells empty else False. """
@@ -592,8 +590,7 @@ class ContinuousSpace:
             y = self.y_min + ((pos[1] - self.y_min) % self.height)
             if isinstance(pos, tuple):
                 return (x, y)
-            else:
-                return np.array((x, y))
+            return np.array((x, y))
 
     def _point_to_cell(self, pos):
         """ Get the cell coordinates that a given x,y point falls in. """
