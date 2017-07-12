@@ -1,9 +1,9 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
+from mesa.visualization.modules import NetworkModule
 
 from .model import MoneyModel
-from .NetworkVisualization import NetworkElement
 
 
 def network_portrayal(G):
@@ -22,12 +22,12 @@ def network_portrayal(G):
                            'target': target,
                            'color': '#000000',
                            }
-                          for i, (source, target, d) in enumerate(G.edges(data=True))]
+                          for i, (source, target, _) in enumerate(G.edges(data=True))]
 
     return portrayal
 
 
-grid = NetworkElement(network_portrayal, 500, 500)
+grid = NetworkModule(network_portrayal, 500, 500)
 chart = ChartModule([
     {"Label": "Gini", "Color": "Black"}],
     data_collector_name='datacollector'

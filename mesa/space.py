@@ -18,6 +18,7 @@ import itertools
 import numpy as np
 import random
 import math
+import networkx as nx
 
 
 def accept_tuple_argument(wrapped_function):
@@ -26,11 +27,13 @@ def accept_tuple_argument(wrapped_function):
     single-item list rather than forcing user to do it.
 
     """
+
     def wrapper(*args):
         if isinstance(args[1], tuple) and len(args[1]) == 2:
             return wrapped_function(args[0], [args[1]])
         else:
             return wrapped_function(*args)
+
     return wrapper
 
 
@@ -68,6 +71,7 @@ class Grid:
         is_cell_empty: Returns a bool of the contents of a cell.
 
     """
+
     def __init__(self, width, height, torus):
         """ Create a new grid.
 
@@ -90,7 +94,7 @@ class Grid:
 
         # Add all cells to the empties list.
         self.empties = list(itertools.product(
-                            *(range(self.width), range(self.height))))
+            *(range(self.width), range(self.height))))
 
     @staticmethod
     def default_val():
@@ -109,7 +113,7 @@ class Grid:
         """ An iterator that returns coordinates as well as cell contents. """
         for row in range(self.width):
             for col in range(self.height):
-                yield self.grid[row][col], row, col    # agent, x, y
+                yield self.grid[row][col], row, col  # agent, x, y
 
     def neighbor_iter(self, pos, moore=True):
         """ Iterate over position neighbors.
@@ -155,18 +159,17 @@ class Grid:
                 if not moore and dy != 0 and dx != 0:
                     continue
                 # Skip diagonals in Moore neighborhood when distance > radius
-                if moore and radius > 1 and (dy ** 2 + dx ** 2) ** .5 > radius:
+                if moore and (dy ** 2 + dx ** 2) ** .5 > radius > 1:
                     continue
                 # Skip if not a torus and new coords out of bounds.
-                if not self.torus and (not (0 <= dx + x < self.width) or
-                                       not (0 <= dy + y < self.height)):
+                if not self.torus and (not (0 <= dx + x < self.width) or not (0 <= dy + y < self.height)):
                     continue
 
                 px = self.torus_adj(x + dx, self.width)
                 py = self.torus_adj(y + dy, self.height)
 
                 # Skip if new coords out of bounds.
-                if(self.out_of_bounds((px, py))):
+                if self.out_of_bounds((px, py)):
                     continue
 
                 coords = (px, py)
@@ -411,6 +414,7 @@ class MultiGrid(Grid):
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
     """
+
     @staticmethod
     def default_val():
         """ Default value for new cell elements. """
@@ -610,3 +614,56 @@ class ContinuousSpace:
         x, y = pos
         return (x < self.x_min or x >= self.x_max or
                 y < self.y_min or y >= self.y_max)
+
+
+class NetworkGrid:
+    """ Network Grid where each node contains one agente. """
+
+    def __init__(self, G):
+        self.G = G
+        nx.set_node_attributes(self.G, 'agent', None)
+
+    def place_agent(self, agent, node_id):
+        """ Place a new agent in the space. """
+
+        self._place_agent(agent, node_id)
+        agent.pos = node_id
+
+    def get_neighbors(self, node_id, include_center=False):
+        """ Get all adjacent nodes """
+
+        neighbors = self.G.neighbors(node_id)
+        if include_center:
+            neighbors.append(node_id)
+
+        return neighbors
+
+    def move_agent(self, agent, node_id):
+        """ Move an agent from its current node to a new node. """
+
+        self._remove_agent(agent, agent.pos)
+        self._place_agent(agent, node_id)
+        agent.pos = node_id
+
+    def _place_agent(self, agent, node_id):
+        """ Place the agent at the correct node. """
+
+        self.G.node[node_id]['agent'] = agent
+
+    def _remove_agent(self, agent, node_id):
+        """ Remove an agent at a given point, and update the internal grid. """
+
+        self.G.node[node_id]['agent'] = None
+
+    def is_cell_empty(self, node_id):
+        """ Returns a bool of the contents of a cell. """
+        return True if self.G.node[node_id]['agent'] is None else False
+
+    def get_cell_list_contents(self, cell_list):
+        return list(self.iter_cell_list_contents(cell_list))
+
+    def get_all_cell_contents(self):
+        return list(self.iter_cell_list_contents(self.G.nodes()))
+
+    def iter_cell_list_contents(self, cell_list):
+        return [self.G.node[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]

@@ -5,7 +5,7 @@ from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 import networkx as nx
 
-from .NetworkGrid import NetworkGrid
+from mesa.space import NetworkGrid
 
 
 def compute_gini(model):
@@ -29,7 +29,7 @@ class MoneyModel(Model):
         self.schedule = RandomActivation(self)
         self.datacollector = DataCollector(
             model_reporters={"Gini": compute_gini},
-            agent_reporters={"Wealth": lambda a: a.wealth}
+            agent_reporters={"Wealth": lambda _: _.wealth}
         )
 
         list_of_random_nodes = random.sample(self.G.nodes(), self.num_agents)
@@ -42,8 +42,8 @@ class MoneyModel(Model):
             self.grid.place_agent(a, list_of_random_nodes[i])
 
     def step(self):
-        self.datacollector.collect(self)
         self.schedule.step()
+        self.datacollector.collect(self)
 
     def run_model(self, n):
         for i in range(n):

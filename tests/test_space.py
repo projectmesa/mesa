@@ -1,9 +1,13 @@
 import unittest
 
+import networkx as nx
+
 from mesa.space import ContinuousSpace
+from mesa.space import NetworkGrid
 from test_grid import MockAgent
 
 TEST_AGENTS = [(-20, -20), (-20, -20.05), (65, 18)]
+TEST_AGENTS_NETWORK = [0, 1, 2]
 OUTSIDE_POSITIONS = [(70, 10), (30, 20), (100, 10)]
 
 
@@ -153,3 +157,45 @@ class TestSpaceNonToroidal(unittest.TestCase):
             assert self.space.out_of_bounds(pos)
             with self.assertRaises(Exception):
                 self.space.move_agent(a, pos)
+
+
+class TestNetworkGrid(unittest.TestCase):
+    def setUp(self):
+        '''
+        Create a test network grid and populate with Mock Agents.
+        '''
+        G = nx.complete_graph(10)
+        self.space = NetworkGrid(G)
+        self.agents = []
+        for i, pos in enumerate(TEST_AGENTS_NETWORK):
+            a = MockAgent(i, None)
+            self.agents.append(a)
+            self.space.place_agent(a, pos)
+
+    def test_agent_positions(self):
+        '''
+        Ensure that the agents are all placed properly.
+        '''
+        for i, pos in enumerate(TEST_AGENTS_NETWORK):
+            a = self.agents[i]
+            assert a.pos == pos
+
+    def test_get_neighbors(self):
+        assert len(self.space.get_neighbors(0, include_center=True)) == 10
+        assert len(self.space.get_neighbors(0, include_center=False)) == 9
+
+    def test_move_agent(self):
+        assert self.agents[1].pos == 1
+        assert self.space.G.node[1]['agent'] == self.agents[1]
+        self.space.move_agent(self.agents[1], 9)
+        assert self.agents[1].pos == 9
+        assert self.space.G.node[1]['agent'] is None
+        assert self.space.G.node[9]['agent'] == self.agents[1]
+
+    def test_is_cell_empty(self):
+        assert not self.space.is_cell_empty(0)
+        assert self.space.is_cell_empty(8)
+
+    def test_get_cell_list_contents(self):
+        assert self.space.get_cell_list_contents([0]) == [self.agents[0]]
+        assert self.space.get_cell_list_contents([0, 1, 2, 3, 4, 5]) == [self.agents[0], self.agents[1], self.agents[2]]
