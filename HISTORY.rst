@@ -3,28 +3,48 @@
 Release History
 ---------------
 
-
-Next release - 0.8.1 (2017-05-?) Flagstaff (PyCon Sprints)
-++++++++++++++++++
+Next release - 0.8.2 (2017-07-?) Gila Bend
++++++++++++++++++++++++++++++++++++++++++++
 
 **Improvements**
 
-* Add best-practices document and describe models. #371
-* Added function to use local images as shapes in GridDraw
-* Added drawImage function to GridDraw
-    * Enables to draw a local imagefile as shape for agents
+* None
 
 **Fixes**
 
-* Modified loop over agents in schedule step method
-  * If agents are deleted while looping over agents list in the model schedule,
-    looping becomes unpredictable and agents step methods for some agents may not be called for a given model step
+* None
+
+
+0.8.1 (2017-07-03) Flagstaff (PyCon Sprints & then some)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Bootstrap UI starter #383
+* Add Sugarscape Constant Growback example #385
+* Add best-practices document and describe models. #371
+* Refactored & model standards related:
+    * Prisoner's Dilemma refactor to meet new model standard format. #377
+    * refactored boltzmann wealth model to new layout #376
+    * Update tutorial to follow new model standards #370
+    * Moving wolf sheep pngs to sub-folder for better organization #372
+    * Add best-practices document and describe models. #371
+* Modified loop over agents in schedule step method #356
+* Added function to use local images as shapes in GridDraw #355
+
+**Fixes**
+
+* Fix math problems in flockers; use numpy in space #378
+* Seed both global random number generators #373, #368
+* Dictionary parameters fix #309
 * Downgrade setuptools to fix #353
-* Fix tutorial and example readme for port change
+* Minor forest fire fix #338, #346
+* Allow fixed seed for replication #107
+* Fix tutorial and example readme for port change 8b57aa
 
 
 0.8.0 (2017-01-29) - Edgar
-++++++++++++++++++
++++++++++++++++++++++++++++
 
 **Improvements**
 
@@ -40,7 +60,7 @@ Next release - 0.8.1 (2017-05-?) Flagstaff (PyCon Sprints)
 
 
 0.7.8.1 (2016-11-02) Duncan
-++++++++++++++++++
+++++++++++++++++++++++++++++
 
 **Improvements**
 
