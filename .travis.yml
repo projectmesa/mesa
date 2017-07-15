@@ -16,5 +16,6 @@ script:
   # * E123 - indentation on data structures
   - flake8 . --ignore=F403,E501,E123,E128 --exclude=docs,build
   - nosetests --with-coverage --cover-package=mesa
+  - ./tests/test_end_to_end_viz.sh
 after_success:
   - coveralls
