@@ -43,10 +43,6 @@ class ChartModule(VisualizationElement):
 
     """
     package_includes = ["Chart.min.js", "ChartModule.js"]
-    series = []
-    canvas_width = 500
-    canvas_height = 200
-    data_collector_name = "datacollector"
 
     def __init__(self, series, canvas_height=200, canvas_width=500,
                  data_collector_name="datacollector"):

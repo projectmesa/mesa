@@ -229,19 +229,8 @@ class ModularServer(tornado.web.Application):
     """ Main visualization application. """
     verbose = True
 
-    model_name = "Mesa Model"
-    model_cls = None  # A model class
-    portrayal_method = None
     port = 8521  # Default port to listen on
-    canvas_width = 500
-    canvas_height = 500
-    grid_height = 0
-    grid_width = 0
-
     max_steps = 100000
-
-    model_args = ()
-    model_kwargs = {}
 
     # Handlers and other globals:
     page_handler = (r'/', PageHandler)
