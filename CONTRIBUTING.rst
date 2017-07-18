@@ -11,7 +11,7 @@ In no particular order, examples include:
 - Documentation improvements
 - Tutorials
 
-No contribution is too small. Although, contributions can be too big, so let's discuss via the `email list`_ OR `an issue`_.
+No contribution is too small. Although, contributions can be too big, so let's discuss via the `dev email list`_ OR `an issue`_.
 
 **To submit a contribution**
 
@@ -24,7 +24,7 @@ No contribution is too small. Although, contributions can be too big, so let's d
 - Submit as a pull request.
 - Describe the change w/ ticket number(s) that the code fixes.
 
-.. _`email list` : https://groups.google.com/forum/#!forum/projectmesa
+.. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
 .. _`an issue` : https://github.com/projectmesa/mesa/issues
 .. _`Travis build` : https://travis-ci.org/projectmesa/mesa
 
