@@ -9,7 +9,7 @@ def boid_draw(agent):
 
 boid_canvas = SimpleCanvas(boid_draw, 500, 500)
 model_params = {
-    "N": 100,
+    "population": 100,
     "width": 100,
     "height": 100,
     "speed": 5,
