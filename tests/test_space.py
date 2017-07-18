@@ -3,10 +3,12 @@ import unittest
 import networkx as nx
 
 from mesa.space import ContinuousSpace
+from mesa.space import SingleGrid
 from mesa.space import NetworkGrid
 from test_grid import MockAgent
 
 TEST_AGENTS = [(-20, -20), (-20, -20.05), (65, 18)]
+TEST_AGENTS_GRID = [(1, 1), (10, 0), (10, 10)]
 TEST_AGENTS_NETWORK = [0, 1, 2]
 OUTSIDE_POSITIONS = [(70, 10), (30, 20), (100, 10)]
 
@@ -159,12 +161,56 @@ class TestSpaceNonToroidal(unittest.TestCase):
                 self.space.move_agent(a, pos)
 
 
+class TestSingleGrid(unittest.TestCase):
+    def setUp(self):
+        self.space = SingleGrid(50, 50, False)
+        self.agents = []
+        for i, pos in enumerate(TEST_AGENTS_GRID):
+            a = MockAgent(i, None)
+            self.agents.append(a)
+            self.space.place_agent(a, pos)
+
+    def test_agent_positions(self):
+        '''
+        Ensure that the agents are all placed properly.
+        '''
+        for i, pos in enumerate(TEST_AGENTS_GRID):
+            a = self.agents[i]
+            assert a.pos == pos
+
+    def test_remove_agent(self):
+        for i, pos in enumerate(TEST_AGENTS_GRID):
+            a = self.agents[i]
+            assert a.pos == pos
+            assert self.space.grid[pos[0]][pos[1]] == a
+            self.space.remove_agent(a)
+            assert a.pos is None
+            assert self.space.grid[pos[0]][pos[1]] is None
+
+    def move_agent(self):
+        agent_number = 0
+        initial_pos = TEST_AGENTS_GRID[agent_number]
+        final_pos = (7, 7)
+
+        _agent = self.agents[agent_number]
+
+        assert _agent.pos == initial_pos
+        assert self.space.grid[initial_pos[0]][initial_pos[1]] == _agent
+        assert self.space.grid[final_pos[0]][final_pos[1]] is None
+        self.space.move_agent(_agent, final_pos)
+        assert _agent.pos == final_pos
+        assert self.space.grid[initial_pos[0]][initial_pos[1]] is None
+        assert self.space.grid[final_pos[0]][final_pos[1]] == _agent
+
+
 class TestNetworkGrid(unittest.TestCase):
+    GRAPH_SIZE = 10
+
     def setUp(self):
         '''
         Create a test network grid and populate with Mock Agents.
         '''
-        G = nx.complete_graph(10)
+        G = nx.complete_graph(TestNetworkGrid.GRAPH_SIZE)
         self.space = NetworkGrid(G)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS_NETWORK):
@@ -181,21 +227,35 @@ class TestNetworkGrid(unittest.TestCase):
             assert a.pos == pos
 
     def test_get_neighbors(self):
-        assert len(self.space.get_neighbors(0, include_center=True)) == 10
-        assert len(self.space.get_neighbors(0, include_center=False)) == 9
+        assert len(self.space.get_neighbors(0, include_center=True)) == TestNetworkGrid.GRAPH_SIZE
+        assert len(self.space.get_neighbors(0, include_center=False)) == TestNetworkGrid.GRAPH_SIZE - 1
 
     def test_move_agent(self):
-        assert self.agents[1].pos == 1
-        assert self.space.G.node[1]['agent'] == self.agents[1]
-        self.space.move_agent(self.agents[1], 9)
-        assert self.agents[1].pos == 9
-        assert self.space.G.node[1]['agent'] is None
-        assert self.space.G.node[9]['agent'] == self.agents[1]
+        initial_pos = 1
+        agent_number = 1
+        final_pos = TestNetworkGrid.GRAPH_SIZE - 1
+
+        _agent = self.agents[agent_number]
+
+        assert _agent.pos == initial_pos
+        assert self.space.G.node[initial_pos]['agent'] == _agent
+        assert self.space.G.node[final_pos]['agent'] is None
+        self.space.move_agent(_agent, final_pos)
+        assert _agent.pos == final_pos
+        assert self.space.G.node[initial_pos]['agent'] is None
+        assert self.space.G.node[final_pos]['agent'] == _agent
 
     def test_is_cell_empty(self):
         assert not self.space.is_cell_empty(0)
-        assert self.space.is_cell_empty(8)
+        assert self.space.is_cell_empty(TestNetworkGrid.GRAPH_SIZE - 1)
 
     def test_get_cell_list_contents(self):
         assert self.space.get_cell_list_contents([0]) == [self.agents[0]]
-        assert self.space.get_cell_list_contents([0, 1, 2, 3, 4, 5]) == [self.agents[0], self.agents[1], self.agents[2]]
+        assert self.space.get_cell_list_contents(list(range(TestNetworkGrid.GRAPH_SIZE))) == [self.agents[0],
+                                                                                              self.agents[1],
+                                                                                              self.agents[2]]
+
+    def test_get_all_cell_contents(self):
+        assert self.space.get_all_cell_contents() == [self.agents[0],
+                                                      self.agents[1],
+                                                      self.agents[2]]
