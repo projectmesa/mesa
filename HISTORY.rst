@@ -4,10 +4,23 @@ Release History
 ---------------
 
 
-Next release - XXXXXX
+Next release - 0.8.1 (2017-05-?) Flagstaff (PyCon Sprints)
 ++++++++++++++++++
 
-*
+**Improvements**
+
+* Add best-practices document and describe models. #371
+* Added function to use local images as shapes in GridDraw
+* Added drawImage function to GridDraw
+    * Enables to draw a local imagefile as shape for agents
+
+**Fixes**
+
+* Modified loop over agents in schedule step method
+  * If agents are deleted while looping over agents list in the model schedule,
+    looping becomes unpredictable and agents step methods for some agents may not be called for a given model step
+* Downgrade setuptools to fix #353
+* Fix tutorial and example readme for port change
 
 
 0.8.0 (2017-01-29) - Edgar

@@ -2,7 +2,7 @@
 
 ## Summary
 
-The Demographic Prisoner's Dilemma is a family of variants on the classic two-player [Prisoner's Dilemma]. The model consists of agents, each with a strategy of either Cooperate or Defect. Each agent's payoff is based on its strategy and the strategies of its spatial neighbors. After each step of the model, the agents adopt the strategy of their neighbor with the highest total score. 
+The Demographic Prisoner's Dilemma is a family of variants on the classic two-player [Prisoner's Dilemma]. The model consists of agents, each with a strategy of either Cooperate or Defect. Each agent's payoff is based on its strategy and the strategies of its spatial neighbors. After each step of the model, the agents adopt the strategy of their neighbor with the highest total score.
 
 The model payoff table is:
 
@@ -13,15 +13,22 @@ The model payoff table is:
 
 Where *D* is the defection bonus, generally set higher than 1. In these runs, the defection bonus is set to $D=1.6$.
 
-The Demographic Prisoner's Dilemma demonstrates how simple rules can lead to the emergence of widespread cooperation, despite the Defection strategy dominiating each individual interaction game. However, it is also interesting for another reason: it is known to be sensitive to the activation regime employed in it.
+The Demographic Prisoner's Dilemma demonstrates how simple rules can lead to the emergence of widespread cooperation, despite the Defection strategy dominating each individual interaction game. However, it is also interesting for another reason: it is known to be sensitive to the activation regime employed in it.
 
 ## How to Run
+
+##### Web based model simulation
+
+Run ``python run.py``.
+
+##### Jupyter Notebook
 
 Launch the ``Demographic Prisoner's Dilemma Activation Schedule.ipynb`` notebook and run the code.
 
 ## Files
 
-* ``pd_grid.py``: has the model and agent classes; the model takes a schedule_type string as an argument, which determines what schedule type the model uses: Sequential, Random or Simultaneous. 
+* ``run.py`` is the entry point for the font-end simulations.
+* ``pd_grid/``: contains the model and agent classes; the model takes a ``schedule_type`` string as an argument, which determines what schedule type the model uses: Sequential, Random or Simultaneous.
 * ``Demographic Prisoner's Dilemma Activation Schedule.ipynb``: Jupyter Notebook for running the scheduling experiment. This runs the model three times, one for each activation type, and demonstrates how the activation regime drives the model to different outcomes.
 
 ## Further Reading
