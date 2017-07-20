@@ -1,46 +1,84 @@
+import math
+
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
+from mesa.visualization.modules import TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import NetworkModule
 
-from .model import VirusModel
+from .model import VirusModel, State
+
+
+class RatioElement(TextElement):
+    def render(self, model):
+        ratio = model.resistant_susceptible_ratio()
+        ratio_text = '&infin;' if ratio is math.inf else '{0:.2f}'.format(ratio)
+        return 'Resistant/Susceptible Ratio: ' + ratio_text
 
 
 def network_portrayal(G):
+    def node_color(agent):
+        if agent.state is State.INFECTED:
+            return '#FF0000'
+        elif agent.state is State.SUSCEPTIBLE:
+            return '#008000'
+        else:
+            return '#808080'
+
+    def edge_color(agent1, agent2):
+        if agent1.state is State.RESISTANT or agent2.state is State.RESISTANT:
+            return '#000000'
+        return '#e8e8e8'
+
+    def edge_width(agent1, agent2):
+        if agent1.state is State.RESISTANT or agent2.state is State.RESISTANT:
+            return 3
+        return 2
+
     portrayal = dict()
     portrayal['nodes'] = [{'id': n_id,
                            'agent_id': n['agent'].unique_id,
                            'size': 2,
-                           'color': '#CC0000' if n['agent'].infected is True else '#007959',
+                           'color': node_color(n['agent']),
                            }
                           for n_id, n in G.nodes(data=True)]
 
-    portrayal['edges'] = [{'id': i,
+    portrayal['links'] = [{'id': i,
                            'source': source,
                            'target': target,
-                           'color': '#000000',
+                           'color': edge_color(G.node[source]['agent'], G.node[target]['agent']),
+                           'width': edge_width(G.node[source]['agent'], G.node[target]['agent']),
                            }
                           for i, (source, target, _) in enumerate(G.edges(data=True))]
 
     return portrayal
 
 
-grid = NetworkModule(network_portrayal, 500, 500)
-chart = ChartModule([
-    {"Label": "Nodes_Infected", "Color": "Black"}],
-    data_collector_name='datacollector'
-)
+network = NetworkModule(network_portrayal, 500, 500, library='d3')
+chart = ChartModule([{'Label': 'Infected', 'Color': '#FF0000'},
+                     {'Label': 'Susceptible', 'Color': '#008000'},
+                     {'Label': 'Resistant', 'Color': '#808080'}])
+
+text = RatioElement()
 
 model_params = {
-    "num_nodes": UserSettableParameter('slider', "Number of agents", 10, 10, 100, 1,
-                                       description="Choose how many agents to include in the model"),
-    "avg_node_degree": UserSettableParameter('slider', "Avg Node Degree", 3, 3, 8, 1,
-                                             description="Avg Node Degree"),
-    "initial_outbreak_size": UserSettableParameter('slider', "Initial Outbreak Size", 1, 1, 3, 1,
-                                                   description="Initial Outbreak Size"),
-    "spread_probability": UserSettableParameter('slider', "Spread Probability", 0.3, 0.0, 1.0, 0.1,
-                                                description="Spread Probability"),
+    'num_nodes': UserSettableParameter('slider', 'Number of agents', 10, 10, 100, 1,
+                                       description='Choose how many agents to include in the model'),
+    'avg_node_degree': UserSettableParameter('slider', 'Avg Node Degree', 3, 3, 8, 1,
+                                             description='Avg Node Degree'),
+    'initial_outbreak_size': UserSettableParameter('slider', 'Initial Outbreak Size', 1, 1, 3, 1,
+                                                   description='Initial Outbreak Size'),
+    'virus_spread_chance': UserSettableParameter('slider', 'Virus Spread Chance', 0.4, 0.0, 1.0, 0.1,
+                                                 description='Probability that susceptible neighbor will be infected'),
+    'virus_check_frequency': UserSettableParameter('slider', 'Virus Check Frequency', 0.4, 0.0, 1.0, 0.1,
+                                                   description='Frequency the nodes check whether they are infected by '
+                                                               'a virus'),
+    'recovery_chance': UserSettableParameter('slider', 'Recovery Chance', 0.3, 0.0, 1.0, 0.1,
+                                             description='Probability that the virus will be removed'),
+    'gain_resistance_chance': UserSettableParameter('slider', 'Gain Resistance Chance', 0.5, 0.0, 1.0, 0.1,
+                                                    description='Probability that a recovered agent will become '
+                                                                'resistant to this virus in the future'),
 }
 
-server = ModularServer(VirusModel, [grid, chart], "Virus Model", model_params)
+server = ModularServer(VirusModel, [network, chart, text], 'Virus Model', model_params)
 server.port = 8521

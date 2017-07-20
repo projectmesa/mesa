@@ -27,7 +27,7 @@ def network_portrayal(G):
     return portrayal
 
 
-grid = NetworkModule(network_portrayal, 500, 500)
+grid = NetworkModule(network_portrayal, 500, 500, library='sigma')
 chart = ChartModule([
     {"Label": "Gini", "Color": "Black"}],
     data_collector_name='datacollector'

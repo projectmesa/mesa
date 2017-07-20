@@ -1,4 +1,4 @@
-var NetworkModule = function(canvas_width, canvas_height, forceAtlas) {
+var NetworkModule = function(canvas_width, canvas_height) {
 
     var div_tag = "<div id='graph-container' style='width: " +
         canvas_width + "px; height: " + canvas_height + "px;'></div>";
@@ -10,7 +10,9 @@ var NetworkModule = function(canvas_width, canvas_height, forceAtlas) {
     var s = {
         container: 'graph-container',
         settings: {
-            defaultNodeColor: 'black'
+            defaultNodeColor: 'black',
+            minEdgeSize: 1,
+            maxEdgeSize: 5
         }
     };
 
@@ -41,7 +43,6 @@ var NetworkModule = function(canvas_width, canvas_height, forceAtlas) {
     this.reset = function() {
         if (s instanceof sigma) {
             s.graph.clear();
-            s.graph.read(graph);
             s.refresh();
         }
     };
