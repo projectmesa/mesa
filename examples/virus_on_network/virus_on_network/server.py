@@ -6,14 +6,7 @@ from mesa.visualization.modules import TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import NetworkModule
 
-from .model import VirusModel, State
-
-
-class RatioElement(TextElement):
-    def render(self, model):
-        ratio = model.resistant_susceptible_ratio()
-        ratio_text = '&infin;' if ratio is math.inf else '{0:.2f}'.format(ratio)
-        return 'Resistant/Susceptible Ratio: ' + ratio_text
+from .model import VirusModel, State, number_infected
 
 
 def network_portrayal(G):
@@ -59,14 +52,28 @@ chart = ChartModule([{'Label': 'Infected', 'Color': '#FF0000'},
                      {'Label': 'Susceptible', 'Color': '#008000'},
                      {'Label': 'Resistant', 'Color': '#808080'}])
 
-text = RatioElement()
+
+class RatioElement(TextElement):
+    def render(self, model):
+        ratio = model.resistant_susceptible_ratio()
+        ratio_text = '&infin;' if ratio is math.inf else '{0:.2f}'.format(ratio)
+        return 'Resistant/Susceptible Ratio: ' + ratio_text
+
+
+class InfectedRemainingElement(TextElement):
+    def render(self, model):
+        infected = number_infected(model)
+        return 'Infected Remaining: ' + str(infected)
+
+
+text = RatioElement(), InfectedRemainingElement()
 
 model_params = {
     'num_nodes': UserSettableParameter('slider', 'Number of agents', 10, 10, 100, 1,
                                        description='Choose how many agents to include in the model'),
     'avg_node_degree': UserSettableParameter('slider', 'Avg Node Degree', 3, 3, 8, 1,
                                              description='Avg Node Degree'),
-    'initial_outbreak_size': UserSettableParameter('slider', 'Initial Outbreak Size', 1, 1, 3, 1,
+    'initial_outbreak_size': UserSettableParameter('slider', 'Initial Outbreak Size', 1, 1, 10, 1,
                                                    description='Initial Outbreak Size'),
     'virus_spread_chance': UserSettableParameter('slider', 'Virus Spread Chance', 0.4, 0.0, 1.0, 0.1,
                                                  description='Probability that susceptible neighbor will be infected'),
@@ -80,5 +87,5 @@ model_params = {
                                                                 'resistant to this virus in the future'),
 }
 
-server = ModularServer(VirusModel, [network, chart, text], 'Virus Model', model_params)
+server = ModularServer(VirusModel, [network, chart, *text], 'Virus Model', model_params)
 server.port = 8521
