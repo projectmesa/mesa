@@ -4,79 +4,52 @@ var NetworkModule = function(svg_width, svg_height) {
     var svg_tag = "<svg width='" + svg_width + "' height='" + svg_height + "' " +
         "style='border:1px dotted'></svg>";
 
-    //Create the style:
-    var style_tag = "<style>" +
-        ".links line {" +
-        "  stroke-opacity: 0.6;" +
-        "}" +
-        ".nodes circle {" +
-        "  stroke: #fff;" +
-        "  stroke-width: 1.5px;" +
-        "}" +
-        "</style>"
-
-    // Append style to body:
-    $("body").append($(style_tag)[0]);
-
     // Append svg to #elements:
-    $("#elements").append($(svg_tag)[0]);
+    $("#elements")
+        .append($(svg_tag)[0]);
 
     var svg = d3.select("svg"),
         width = +svg.attr("width"),
-        height = +svg.attr("height");
+        height = +svg.attr("height"),
+        g = svg.append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().id(function(d) {
-            return d.id;
-        }))
-        .force("charge", d3.forceManyBody())
-        .force("center", d3.forceCenter(width / 2, height / 2));
-
-    var g_links = svg.append("g").attr("class", "links");
-    var g_nodes = svg.append("g").attr("class", "nodes");
+    svg.call(d3.zoom()
+        .on("zoom", function() {
+            g.attr("transform", d3.event.transform);
+        }));
 
     this.render = function(data) {
         var graph = JSON.parse(JSON.stringify(data));
 
-        simulation.alphaTarget(0.3).restart();
+        var simulation = d3.forceSimulation(graph.nodes)
+            .force("charge", d3.forceManyBody()
+                .strength(-80)
+                .distanceMin(6))
+            .force("link", d3.forceLink(graph.links))
+            .force("center", d3.forceCenter())
+            .stop();
 
-        var link = g_links.selectAll("line").data(graph.links);
-        link.attr("stroke-width", function(d) {
-                return d.width;
-            })
-            .attr("stroke", function(d) {
-                return d.color;
-            });
-        link.exit().remove();
-        link.enter().append("line");
+        var loading = svg.append("text")
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "middle")
+            .attr("font-family", "sans-serif")
+            .attr("font-size", 10)
+            .text("Simulating. One moment please…");
 
+        // Use a timeout to allow the rest of the page to load first.
+        d3.timeout(function() {
+            loading.remove();
 
-        var node = g_nodes.selectAll("circle").data(graph.nodes);
-        node.attr("fill", function(d) {
-                return d.color;
-            })
-            .attr("r", 6)
-            .call(d3.drag()
-                .on("start", dragstarted)
-                .on("drag", dragged)
-                .on("end", dragended))
-            .append("title")
-            .text(function(d) {
-                return d.id;
-            });
-        node.exit().remove();
-        node.enter().append("circle");
+            for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
+                simulation.tick();
+            }
 
-        simulation
-            .nodes(graph.nodes)
-            .on("tick", ticked);
-
-        simulation
-            .force("link")
-            .links(graph.links);
-
-        function ticked() {
-            link
+            var links = g.append("g")
+                .selectAll("line")
+                .data(graph.links);
+            links.enter()
+                .append("line")
                 .attr("x1", function(d) {
                     return d.source.x;
                 })
@@ -88,38 +61,54 @@ var NetworkModule = function(svg_width, svg_height) {
                 })
                 .attr("y2", function(d) {
                     return d.target.y;
+                })
+                .attr("stroke-width", function(d) {
+                    return d.width;
+                })
+                .attr("stroke", function(d) {
+                    return d.color;
                 });
 
-            node
+            links.exit()
+                .remove();
+
+            var nodes = g.append("g")
+                .selectAll("circle")
+                .data(graph.nodes);
+            nodes.enter()
+                .append("circle")
                 .attr("cx", function(d) {
                     return d.x;
                 })
                 .attr("cy", function(d) {
                     return d.y;
+                })
+                .attr("r", 6)
+                .attr("fill", function(d) {
+                    return d.color;
+                })
+                .text(function(d) {
+                    return d.id;
                 });
-        }
+
+            nodes.exit()
+                .remove();
+        });
     };
 
     this.reset = function() {
-        d3.select("svg").selectAll("g").remove();
-        g_links = d3.select("svg").append("g").attr("class", "links");
-        g_nodes = d3.select("svg").append("g").attr("class", "nodes");
+        reset();
     };
 
-    function dragstarted(d) {
-        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x;
-        d.fy = d.y;
-    }
+    function reset() {
+        svg.selectAll("g")
+            .remove();
+        g = svg.append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    function dragged(d) {
-        d.fx = d3.event.x;
-        d.fy = d3.event.y;
-    }
-
-    function dragended(d) {
-        if (!d3.event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
+        svg.call(d3.zoom()
+            .on("zoom", function() {
+                g.attr("transform", d3.event.transform);
+            }));
     }
 };
