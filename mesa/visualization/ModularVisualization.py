@@ -253,14 +253,16 @@ class ModularServer(tornado.web.Application):
         """ Create a new visualization server with the given elements. """
         # Prep visualization elements:
         self.visualization_elements = visualization_elements
-        self.package_includes = set()
-        self.local_includes = set()
+        self.package_includes = []
+        self.local_includes = []
         self.js_code = []
         for element in self.visualization_elements:
             for include_file in element.package_includes:
-                self.package_includes.add(include_file)
+                if include_file not in self.package_includes:
+                    self.package_includes.append(include_file)
             for include_file in element.local_includes:
-                self.local_includes.add(include_file)
+                if include_file not in self.local_includes:
+                    self.local_includes.append(include_file)
             self.js_code.append(element.js_code)
 
         # Initializing the model
