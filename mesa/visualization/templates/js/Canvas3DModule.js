@@ -1,4 +1,4 @@
-var Canvas3DModule = function(canvas_width, canvas_height, grid_width, grid_height) {
+var Canvas3DModule = function(canvas_width, canvas_height, grid_width, grid_height, flip_y) {
 
     // TODO - determine how to allow grass patches to be grown in the base layer, instead of as cubes.
     // Perhaps allow it to be determined by the portrayal method, 'cube' vs 'plane'?
@@ -11,6 +11,7 @@ var Canvas3DModule = function(canvas_width, canvas_height, grid_width, grid_heig
     this.bottom = grid_height / 2;
     this.top = grid_height / 2 * -1;
     this.offset = 0.1;
+    this.flip_y = flip_y;
 
     var self = this;
 
@@ -34,7 +35,7 @@ var Canvas3DModule = function(canvas_width, canvas_height, grid_width, grid_heig
     var material = new THREE.MeshBasicMaterial({color: 'white', side: THREE.DoubleSide});
     var mesh = new THREE.Mesh( colorPlane, material );
     scene.add( mesh );
-    camera.position.z = 10;
+    camera.position.z = (grid_height + grid_width) / 2;
 
     var animate = function () {
         requestAnimationFrame( animate );
@@ -84,8 +85,12 @@ var Canvas3DModule = function(canvas_width, canvas_height, grid_width, grid_heig
             mesh.userData = data;
             group.add(mesh);
             mesh.position.copy(
-                new THREE.Vector3( -self.width/2 + data.x + 0.5, -self.height / 2 + data.y + .5, 0.5 + self.offset)
+                new THREE.Vector3( -self.width/2 + data.x, -self.height / 2 + data.y, 0.5 + self.offset)
             );
+            if (self.flip_y) {
+                mesh.position.y = self.height / 2 - data.y;
+            }
+            console.log(data.x, data.y);
             mesh.updateMatrix();
         };
 
@@ -115,6 +120,8 @@ var Canvas3DModule = function(canvas_width, canvas_height, grid_width, grid_heig
 	};
 
     this.reset = function() {
-        // Do nothing, the render call that occurs will cleanup as necessary.
+        // Reset camera position
+        camera.position.copy(new THREE.Vector3(0, 0, (grid_width + grid_height) / 2));
+        camera.matrix.needsUpdate();
     }
 };
