@@ -1,5 +1,3 @@
-from random import random
-
 from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import HexGrid
@@ -34,7 +32,7 @@ class HexSnowflake(Model):
             self.grid.place_agent(cell, (x, y))
             self.schedule.add(cell)
 
-        #activate the center(ish) cell.
+        # activate the center(ish) cell.
         centerishCell = self.grid[width // 2][height // 2]
 
         centerishCell.state = 1

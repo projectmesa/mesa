@@ -27,7 +27,7 @@ class Cell(Agent):
 
     @property
     def considered(self):
-        return self.isConsidered == True
+        return self.isConsidered is True
 
     def step(self):
         '''
@@ -38,19 +38,19 @@ class Cell(Agent):
         to calculate their next state.
         When a cell is made alive, its neighbors are able to be considered in the next step. Only cells that are considered check their neighbors for performance reasons.
         '''
-        #assume no state change
+        # assume no state change
         self._nextState = self.state
 
         if not self.isAlive and self.isConsidered:
             # Get the neighbors and apply the rules on whether to be alive or dead
             # at the next tick.
-            live_neighbors = sum(neighbor.isAlive for neighbor in self.neighbors)
+            live_neighbors = sum(
+                neighbor.isAlive for neighbor in self.neighbors)
 
             if live_neighbors == 1:
                 self._nextState = self.ALIVE
                 for a in self.neighbors:
                     a.isConsidered = True
-
 
     def advance(self):
         '''
