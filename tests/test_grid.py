@@ -25,6 +25,7 @@ class MockAgent:
     '''
     Minimalistic agent for testing purposes.
     '''
+
     def __init__(self, unique_id, pos):
         self.unique_id = unique_id
         self.pos = pos
@@ -318,6 +319,7 @@ class TestMultiGrid(unittest.TestCase):
         neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
         assert len(neighbors) == 11
 
+
 class TestHexGrid(unittest.TestCase):
     '''
     Testing a hexagonal grid.
@@ -342,34 +344,31 @@ class TestHexGrid(unittest.TestCase):
                 self.agents.append(a)
                 self.grid.place_agent(a, (x, y))
 
-
-
     def test_neighbors(self):
         '''
         Test the hexagonal neighborhood methods on the non-toroid.
         '''
 
-        neighborhood = self.grid.get_neighborhood((1,1))
+        neighborhood = self.grid.get_neighborhood((1, 1))
         assert len(neighborhood) == 6
 
-        neighborhood = self.grid.get_neighborhood((0,2))
+        neighborhood = self.grid.get_neighborhood((0, 2))
         assert len(neighborhood) == 4
 
-        neighborhood = self.grid.get_neighborhood((1,0))
+        neighborhood = self.grid.get_neighborhood((1, 0))
         assert len(neighborhood) == 3
 
-        neighborhood = self.grid.get_neighborhood((1,4))
+        neighborhood = self.grid.get_neighborhood((1, 4))
         assert len(neighborhood) == 5
 
-        neighborhood = self.grid.get_neighborhood((0,4))
+        neighborhood = self.grid.get_neighborhood((0, 4))
         assert len(neighborhood) == 2
 
-        neighborhood = self.grid.get_neighborhood((0,0))
+        neighborhood = self.grid.get_neighborhood((0, 0))
         assert len(neighborhood) == 3
 
-        neighborhood = self.grid.get_neighborhood((1,1), include_center=True)
+        neighborhood = self.grid.get_neighborhood((1, 1), include_center=True)
         assert len(neighborhood) == 7
-
 
 
 class TestHexGridTorus(TestBaseGrid):
@@ -396,20 +395,19 @@ class TestHexGridTorus(TestBaseGrid):
                 self.agents.append(a)
                 self.grid.place_agent(a, (x, y))
 
-
     def test_neighbors(self):
         '''
         Test the hexagonal neighborhood methods on the toroid.
         '''
 
-        neighborhood = self.grid.get_neighborhood((1,1))
+        neighborhood = self.grid.get_neighborhood((1, 1))
         assert len(neighborhood) == 6
 
-        neighborhood = self.grid.get_neighborhood((1,1), include_center=True)
+        neighborhood = self.grid.get_neighborhood((1, 1), include_center=True)
         assert len(neighborhood) == 7
 
-        neighborhood = self.grid.get_neighborhood((0,0))
+        neighborhood = self.grid.get_neighborhood((0, 0))
         assert len(neighborhood) == 6
 
-        neighborhood = self.grid.get_neighborhood((2,4))
+        neighborhood = self.grid.get_neighborhood((2, 4))
         assert len(neighborhood) == 6
