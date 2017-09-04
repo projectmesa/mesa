@@ -35,7 +35,11 @@ class HexSnowflake(Model):
             self.schedule.add(cell)
 
         #activate the center(ish) cell.
-        self.grid[width // 2][height // 2].state = 1
+        centerishCell = self.grid[width // 2][height // 2]
+
+        centerishCell.state = 1
+        for a in centerishCell.neighbors:
+            a.isConsidered = True
 
         self.running = True
 

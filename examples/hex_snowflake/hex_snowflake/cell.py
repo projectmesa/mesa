@@ -15,6 +15,7 @@ class Cell(Agent):
         self.x, self.y = pos
         self.state = init_state
         self._nextState = None
+        self.isConsidered = False
 
     @property
     def isAlive(self):
@@ -24,6 +25,10 @@ class Cell(Agent):
     def neighbors(self):
         return self.model.grid.neighbor_iter((self.x, self.y))
 
+    @property
+    def considered(self):
+        return self.isConsidered == True
+
     def step(self):
         '''
         Compute if the cell will be dead or alive at the next tick. A dead
@@ -31,18 +36,21 @@ class Cell(Agent):
         changed here, but is just computed and stored in self._nextState,
         because our current state may still be necessary for our neighbors
         to calculate their next state.
+        When a cell is made alive, its neighbors are able to be considered in the next step. Only cells that are considered check their neighbors for performance reasons.
         '''
-
-        # Get the neighbors and apply the rules on whether to be alive or dead
-        # at the next tick.
-        live_neighbors = sum(neighbor.isAlive for neighbor in self.neighbors)
-
-        # Assume nextState is unchanged, unless changed below.
+        #assume no state change
         self._nextState = self.state
 
-        if not self.isAlive:
+        if not self.isAlive and self.isConsidered:
+            # Get the neighbors and apply the rules on whether to be alive or dead
+            # at the next tick.
+            live_neighbors = sum(neighbor.isAlive for neighbor in self.neighbors)
+
             if live_neighbors == 1:
                 self._nextState = self.ALIVE
+                for a in self.neighbors:
+                    a.isConsidered = True
+
 
     def advance(self):
         '''
