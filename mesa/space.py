@@ -492,8 +492,9 @@ class HexGrid(Grid):
 
             """
             Both: (0,-), (0,+)
-            Even Col: (-,-), (+,-), (-,0), (+,0)
-            Odd Col:  (-,0), (+,0), (-,+), (+,+)
+
+            Even: (-,+), (-,0), (+,+), (+,0)
+            Odd:  (-,0), (-,-), (+,0), (+,-)
             """
             adjacent = [(x, y - 1), (x, y + 1)]
 
@@ -501,11 +502,12 @@ class HexGrid(Grid):
                 adjacent.append(pos)
 
             if x % 2 == 0:
-                adjacent += [(x - 1, y - 1), (x + 1, y - 1),
-                             (x - 1, y), (x + 1, y)]
+                adjacent += [(x - 1, y + 1), (x - 1, y),
+                             (x + 1, y + 1), (x + 1, y)]
             else:
-                adjacent += [(x - 1, y), (x + 1, y),
-                             (x - 1, x + 1), (x + 1, y + 1)]
+                adjacent += [(x - 1, y), (x - 1, y - 1),
+                             (x + 1, y), (x + 1, y - 1)]
+
 
             if self.torus is False:
                 adjacent = list(
