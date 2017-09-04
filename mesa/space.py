@@ -508,7 +508,6 @@ class HexGrid(Grid):
                 adjacent += [(x - 1, y), (x - 1, y - 1),
                              (x + 1, y), (x + 1, y - 1)]
 
-
             if self.torus is False:
                 adjacent = list(
                     filter(lambda coords: not self.out_of_bounds(coords), adjacent))
