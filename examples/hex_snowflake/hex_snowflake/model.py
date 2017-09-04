@@ -4,10 +4,10 @@ from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import HexGrid
 
-from game_of_life.cell import Cell
+from hex_snowflake.cell import Cell
 
 
-class GameOfLife(Model):
+class HexSnowflake(Model):
     '''
     Represents the hex grid of cells. The grid is represented by a 2-dimensional array of cells with adjacency rules specific to hexagons.
     '''

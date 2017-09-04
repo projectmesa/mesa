@@ -1,3 +1,3 @@
-from game_of_life.server import server
+from hex_snowflake.server import server
 
 server.launch()

@@ -7,9 +7,8 @@ def portrayCell(cell):
     '''
     assert cell is not None
     return {
-        "Shape": "rect",
-        "w": 1,
-        "h": 1,
+        "Shape": "hex",
+        "r" : 1,
         "Filled": "true",
         "Layer": 0,
         "x": cell.x,
