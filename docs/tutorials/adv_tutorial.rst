@@ -287,6 +287,38 @@ take effect until you reset the model.
    User-Settable Parameter Slider
 
 
+Saving and loading parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Once you have found a suitable parameter configuration for you model, you can
+save it. This means that if you continue to tune the parameters and are unhappy
+with it, you can load up your saved configuration and resume testing!
+
+.. figure:: files/param_options.png
+   :alt: Parameter Options
+
+   Parameter Options
+
+
+To save your model parameters, click the 'Options' dropdown, and then click
+'Save User Parameters'. This will prompt you to give your configuration a name 
+(e.g. params.json):
+
+.. figure:: files/save_params.png
+   :alt: Save User Parameters
+
+   Save User Parameters
+
+
+To load your saved model parameters, click the 'Options' dropdown, and then click
+'Load User Parameters'. This will prompt you to browse for your saved file.
+
+.. figure:: files/load_params.png
+   :alt: Load User Parameters
+
+   Load User Parameters
+
+
 Building your own visualization component
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
