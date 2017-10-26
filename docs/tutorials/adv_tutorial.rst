@@ -83,8 +83,7 @@ following arguments:
 -  A list of module objects to include in the visualization; here, just
    ``[grid]``
 -  The title of the model: "Money Model"
--  Any inputs or arguments for the model itself. In this case, 100
-   agents, and height and width of 10.
+-  A dictionary of arguments for the model itself. In this case, ``{"N": 100, "width": 10, "height": 10}``
 
 Once we create the server, we set the port for it to listen on (you can
 treat this as just a piece of the URL you'll open in the browser).
@@ -95,7 +94,7 @@ treat this as just a piece of the URL you'll open in the browser).
     server = ModularServer(MoneyModel, 
                            [grid], 
                            "Money Model", 
-                           100, 10, 10)
+                           {"N": 100, "width": 10, "height": 10})
 
 Finally, when you're ready to run the visualization, use the server's
 ``launch()`` method, in ``run.py``. In this arrangmenet, ``run.py`` is
@@ -129,7 +128,7 @@ The full code should now look like:
     server = ModularServer(MoneyModel, 
                            [grid], 
                            "Money Model", 
-                           100, 10, 10)
+                           {"N": 100, "width": 10, "height": 10})
 
 Now run this file; this should launch the interactive visualization
 server and open your web browser automatically. (If the browser doesn't
@@ -137,17 +136,8 @@ open automatically, try pointing it at http://127.0.0.1:8521 manually.
 If this doesn't show you the visualization, something may have gone
 wrong with the server launch.)
 
-You should see something like the figure below: the model title, an
-empty space where the grid will be, and a control panel off to the
-right.
-
-.. figure:: files/viz_empty.png
-   :alt: Empty Visualization
-
-   Empty Visualization
-
-Click the 'reset' button on the control panel, and you should see the
-grid fill up with red circles, representing agents.
+You should see something like the figure below: the model title, a grid with
+red circles respresenting the agents, and the model controls at the top.
 
 .. figure:: files/viz_redcircles.png
    :alt: Redcircles Visualization
@@ -237,7 +227,7 @@ chart will appear underneath the grid.
     server = ModularServer(MoneyModel, 
                            [grid, chart], 
                            "Money Model", 
-                           100, 10, 10)
+                           {"N": 100, "width": 10, "height": 10})
 
 Launch the visualization and start a model run, and you'll see a line
 chart underneath the grid. Every step of the model, the line chart
@@ -248,9 +238,54 @@ updates along with the grid. Reset the model, and the chart resets too.
 
    Chart Visualization
 
-**Note:** You might notice that the chart line only starts after a
-couple of steps; this is due to a bug in Charts.js which will hopefully
-be fixed soon.
+
+Making a parameter interactive
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+One of the reasons we want to be able to watch a model run is to conduct ad-hoc
+experiments -- for example, to get an idea of how the model changes with
+different parameter values. Having to stop the simulation, edit a parameter
+value, and relaunch isn't an ideal way to go about it. That's why Mesa lets you
+set any parameter to be interactive, using the ``UserSettableParameter`` class. 
+
+For this example, we'll add a slider that controls how ``N``, many agents there
+are in the model. To do this, we need to choose the starting value (let's keep 
+this at 100); the minimum parameter value we'll allow (let's do 2, since one 
+agent alone will have nobody to trade with) and the maximum (we'll say 200); 
+and the increment the slider will go in (set this to 1, since there's no such 
+thing as a fraction of an agent). This looks like this:
+
+.. code:: python
+
+    from mesa.visualization.UserParam import UserSettableParameter
+
+    n_slider = UserSettableParameter('slider', "Number of Agents", 100, 2, 200, 1)
+
+To incorporate it into the model visualization interface, we make the slider 
+one of the model inputs, replacing the static parameter: 
+
+.. code:: python
+
+    # server.py
+    chart = ChartModule([{"Label": "Gini", 
+                          "Color": "Black"}],
+                        data_collector_name='datacollector')
+
+    server = ModularServer(MoneyModel, 
+                           [grid, chart], 
+                           "Money Model", 
+                           {"N": n_slider, "width": 10, "height": 10})
+
+When you launch the model, you'll see a slider, labeled "Number of Agents", on
+the left side of the interface. Try moving the slider around, then press Reset
+to restart the model with the number of agents you set. Parameter changes don't
+take effect until you reset the model.
+
+.. figure:: files/viz_slider.png
+   :alt: User-settable slider for parameter
+
+   User-Settable Parameter Slider
+
 
 Building your own visualization component
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -513,7 +548,7 @@ Now, you can create your new HistogramModule and add it to the server:
     server = ModularServer(MoneyModel,
                            [grid, histogram, chart],
                            "Money Model",
-                           100, 10, 10)
+                           {"N": n_slider, "width": 10, "height": 10})
 
 Run this code, and you should see your brand-new histogram added to the
 visualization and updating along with the model!

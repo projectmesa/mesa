@@ -15,7 +15,12 @@ def compute_gini(model):
 
 
 class MoneyModel(Model):
-    """A model with some number of agents."""
+    """A simple model of an economy where agents exchange currency at random.
+
+    All the agents begin with one unit of currency, and each time step can give
+    a unit of currency to another agent. Note how, over time, this produces a
+    highly skewed distribution of wealth.
+    """
 
     def __init__(self, N, width, height):
         self.num_agents = N

@@ -9,4 +9,4 @@ from game_of_life.model import GameOfLife
 canvas_element = CanvasGrid(portrayCell, 50, 50, 250, 250)
 
 server = ModularServer(GameOfLife, [canvas_element], "Game of Life",
-                       50, 50)
+                       {"height": 50, "width": 50})

@@ -47,12 +47,6 @@ class DataCollector:
     functions one by one and stores the results.
 
     """
-    model_reporters = {}
-    agent_reporters = {}
-
-    model_vars = {}
-    agent_vars = {}
-    tables = {}
 
     model = None
 
