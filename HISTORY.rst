@@ -16,6 +16,8 @@ Release History
 * Flockers: fix param naming #398
 * Remove unused class parameters. #400
 * [hotfix!] Disable e2e viz test for now. #414
+* Fixing bug in release process. [6a8ecb6]
+    * See https://github.com/pypa/pypi-legacy/issues/670.
 
 
 0.8.1 (2017-07-03) Flagstaff (PyCon Sprints & then some)
