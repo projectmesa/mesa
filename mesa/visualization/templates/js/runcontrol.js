@@ -43,7 +43,15 @@ var fpsControl = $('#fps').slider({
 var sidebar = $("#sidebar");
 
 // WebSocket Stuff
-var ws = new WebSocket("ws://127.0.0.1:" + port + "/ws"); // Open the websocket connection
+// Support TLS-specific URLs, when appropriate
+if (window.location.protocol == "https:") {
+    var ws_scheme = "wss://";
+} else {
+    var ws_scheme = "ws://"
+};
+
+
+var ws = new WebSocket(ws_scheme + location.host + "/ws"); // Open the websocket connection
 ws.onopen = function() {
     console.log("Connection opened!");
     send({"type": "get_params"}); // Request model parameters when websocket is ready
