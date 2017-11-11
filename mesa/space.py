@@ -562,15 +562,18 @@ class ContinuousSpace:
         """ Get the distance between two point, accounting for toroidal space.
 
         Args:
-            pos_1, pos_2: Coordinate tuples for both points.
+          pos_1, pos_2: Coordinate tuples for both points.
 
         """
         pos_1 = np.array(pos_1)
         pos_2 = np.array(pos_2)
+        dist_1 = np.linalg.norm(pos_1 - pos_2)
         if self.torus:
             pos_1 = (pos_1 - self.center) % self.size
             pos_2 = (pos_2 - self.center) % self.size
-        return np.linalg.norm(pos_1 - pos_2)
+        dist_2 = np.linalg.norm(pos_1 - pos_2)
+
+        return min(dist_1, dist_2)
 
     def torus_adj(self, pos):
         """ Adjust coordinates to handle torus looping.
