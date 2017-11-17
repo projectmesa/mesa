@@ -617,7 +617,7 @@ class ContinuousSpace:
 
 
 class NetworkGrid:
-    """ Network Grid where each node contains one agente. """
+    """ Network Grid where each node contains zero or one agent. """
 
     def __init__(self, G):
         self.G = G

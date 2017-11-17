@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Network Visualization Module
+============
+
+Module for rendering the network, using [sigma.js](http://sigmajs.org/) or [d3.js](https://d3js.org/) frameworks.
+
+"""
 from mesa.visualization.ModularVisualization import VisualizationElement
 
 
