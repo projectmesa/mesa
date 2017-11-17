@@ -621,7 +621,7 @@ class NetworkGrid:
 
     def __init__(self, G):
         self.G = G
-        nx.set_node_attributes(self.G, 'agent', None)
+        nx.set_node_attributes(self.G, None, 'agent')
 
     def place_agent(self, agent, node_id):
         """ Place a new agent in the space. """
@@ -632,7 +632,7 @@ class NetworkGrid:
     def get_neighbors(self, node_id, include_center=False):
         """ Get all adjacent nodes """
 
-        neighbors = self.G.neighbors(node_id)
+        neighbors = list(self.G.neighbors(node_id))
         if include_center:
             neighbors.append(node_id)
 
