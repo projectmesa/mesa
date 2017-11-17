@@ -4,7 +4,9 @@
 
 This model is based on the netlogo model "Virus on Network".
 
-For more information about this model, read the netlogo's webpage: http://ccl.northwestern.edu/netlogo/models/VirusonaNetwork
+For more information about this model, read the netlogo's webpage: http://ccl.northwestern.edu/netlogo/models/VirusonaNetwork.
+
+JavaScript library used in this example to render the network: [d3.js](https://d3js.org/).
 
 ## Installation
 

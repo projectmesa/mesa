@@ -18,7 +18,6 @@ import itertools
 import numpy as np
 import random
 import math
-import networkx as nx
 
 
 def accept_tuple_argument(wrapped_function):
@@ -607,7 +606,7 @@ class ContinuousSpace:
         x, y = pos
         cell_x = math.floor((x - self.x_min) / self.cell_width)
         cell_y = math.floor((y - self.y_min) / self.cell_height)
-        return (cell_x, cell_y)
+        return cell_x, cell_y
 
     def out_of_bounds(self, pos):
         """ Check if a point is out of bounds. """
@@ -617,14 +616,15 @@ class ContinuousSpace:
 
 
 class NetworkGrid:
-    """ Network Grid where each node contains zero or one agent. """
+    """ Network Grid where each node contains zero or more agents. """
 
     def __init__(self, G):
         self.G = G
-        nx.set_node_attributes(self.G, None, 'agent')
+        for node_id in self.G.nodes:
+            G.nodes[node_id]['agent'] = list()
 
     def place_agent(self, agent, node_id):
-        """ Place a new agent in the space. """
+        """ Place a agent in a node. """
 
         self._place_agent(agent, node_id)
         agent.pos = node_id
@@ -648,16 +648,16 @@ class NetworkGrid:
     def _place_agent(self, agent, node_id):
         """ Place the agent at the correct node. """
 
-        self.G.node[node_id]['agent'] = agent
+        self.G.node[node_id]['agent'].append(agent)
 
     def _remove_agent(self, agent, node_id):
-        """ Remove an agent at a given point, and update the internal grid. """
+        """ Remove an agent from a node. """
 
-        self.G.node[node_id]['agent'] = None
+        self.G.node[node_id]['agent'].remove(agent)
 
     def is_cell_empty(self, node_id):
         """ Returns a bool of the contents of a cell. """
-        return True if self.G.node[node_id]['agent'] is None else False
+        return False if self.G.node[node_id]['agent'] else True
 
     def get_cell_list_contents(self, cell_list):
         return list(self.iter_cell_list_contents(cell_list))
@@ -666,4 +666,5 @@ class NetworkGrid:
         return list(self.iter_cell_list_contents(self.G.nodes()))
 
     def iter_cell_list_contents(self, cell_list):
-        return [self.G.node[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
+        list_of_lists = [self.G.node[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
+        return [item for sublist in list_of_lists for item in sublist]

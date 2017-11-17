@@ -7,13 +7,15 @@ from .model import MoneyModel
 
 
 def network_portrayal(G):
+    # The model ensures there is 0 or 1 agent per node
+
     portrayal = dict()
     portrayal['nodes'] = [{'id': n_id,
-                           'agent_id': None if n['agent'] is None else n['agent'].unique_id,
-                           'size': 1 if n['agent'] is None else 3,
-                           'color': '#CC0000' if n['agent'] is None or n['agent'].wealth == 0 else '#007959',
-                           'label': None if n['agent'] is None else 'Agent:{} Wealth:{}'.format(n['agent'].unique_id,
-                                                                                                n['agent'].wealth),
+                           'agent_id': None if not n['agent'] else n['agent'][0].unique_id,
+                           'size': 3 if n['agent'] else 1,
+                           'color': '#CC0000' if not n['agent'] or n['agent'][0].wealth == 0 else '#007959',
+                           'label': None if not n['agent'] else 'Agent:{} Wealth:{}'.format(n['agent'][0].unique_id,
+                                                                                            n['agent'][0].wealth),
                            }
                           for n_id, n in G.nodes(data=True)]
 

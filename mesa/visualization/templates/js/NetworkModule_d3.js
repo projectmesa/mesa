@@ -26,7 +26,7 @@ var NetworkModule = function(svg_width, svg_height) {
             .force("charge", d3.forceManyBody()
                 .strength(-80)
                 .distanceMin(6))
-            .force("link", d3.forceLink(graph.links))
+            .force("link", d3.forceLink(graph.edges))
             .force("center", d3.forceCenter())
             .stop();
 
@@ -47,7 +47,7 @@ var NetworkModule = function(svg_width, svg_height) {
 
             var links = g.append("g")
                 .selectAll("line")
-                .data(graph.links);
+                .data(graph.edges);
             links.enter()
                 .append("line")
                 .attr("x1", function(d) {

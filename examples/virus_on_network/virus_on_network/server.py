@@ -10,6 +10,8 @@ from .model import VirusModel, State, number_infected
 
 
 def network_portrayal(G):
+    # The model ensures there is always 1 agent per node
+
     def node_color(agent):
         if agent.state is State.INFECTED:
             return '#FF0000'
@@ -30,17 +32,17 @@ def network_portrayal(G):
 
     portrayal = dict()
     portrayal['nodes'] = [{'id': n_id,
-                           'agent_id': n['agent'].unique_id,
+                           'agent_id': n['agent'][0].unique_id,
                            'size': 2,
-                           'color': node_color(n['agent']),
+                           'color': node_color(n['agent'][0]),
                            }
                           for n_id, n in G.nodes(data=True)]
 
-    portrayal['links'] = [{'id': i,
+    portrayal['edges'] = [{'id': i,
                            'source': source,
                            'target': target,
-                           'color': edge_color(G.node[source]['agent'], G.node[target]['agent']),
-                           'width': edge_width(G.node[source]['agent'], G.node[target]['agent']),
+                           'color': edge_color(G.node[source]['agent'][0], G.node[target]['agent'][0]),
+                           'width': edge_width(G.node[source]['agent'][0], G.node[target]['agent'][0]),
                            }
                           for i, (source, target, _) in enumerate(G.edges(data=True))]
 
