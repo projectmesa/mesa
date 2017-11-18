@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov  2 14:05:26 2017
-
-@author: charlie roe
-"""
-
 import random
 from mesa import Agent
 from bank_reserves.random_walk import RandomWalker
