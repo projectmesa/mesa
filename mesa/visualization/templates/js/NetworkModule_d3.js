@@ -14,6 +14,10 @@ var NetworkModule = function(svg_width, svg_height) {
         g = svg.append("g")
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
+    var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
     svg.call(d3.zoom()
         .on("zoom", function() {
             g.attr("transform", d3.event.transform);
@@ -36,6 +40,8 @@ var NetworkModule = function(svg_width, svg_height) {
             .attr("font-family", "sans-serif")
             .attr("font-size", 10)
             .text("Simulating. One moment please…");
+
+
 
         // Use a timeout to allow the rest of the page to load first.
         d3.timeout(function() {
@@ -87,8 +93,18 @@ var NetworkModule = function(svg_width, svg_height) {
                 .attr("fill", function(d) {
                     return d.color;
                 })
-                .text(function(d) {
-                    return d.id;
+                .on("mouseover", function(d) {
+                    tooltip.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    tooltip.html("id: " + d.id)
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY) + "px");
+                })
+                .on("mouseout", function(d) {
+                    tooltip.transition()
+                        .duration(500)
+                        .style("opacity", 0);
                 });
 
             nodes.exit()
