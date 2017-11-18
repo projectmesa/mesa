@@ -4,12 +4,13 @@
 
 A highly abstracted, simplified model of an economy, with only one type of agent and a single bank representing all banks in an economy. People (represented by circles) move randomly within the grid. If two or more people are on the same grid location, there is a 50% chance that they will trade with each other. If they trade, there is an equal chance of giving the other agent $5 or $2. A positive trade balance will be deposited in the bank as savings. If trading results in a negative balance, the agent will try to withdraw from its savings. If it does not have enough savings to cover the negative balance, it will take out a loan from the bank to cover the difference. The bank is required to keep a certain percentage of deposits as reserves. If run.py is used to run the model, then the percent of deposits the bank is required to retain is a user settable parameter. The amount the bank is able to loan at any given time is a function of the amount of deposits, its reserves, and its current total outstanding loan amount. 
 
-The model is tests and demonstrates several Mesa concepts and features:
- - MultiGrid
- - Overlay arbitrary text (wolf's energy) on agent's shapes while drawing on CanvasGrid
- - Agents inheriting a behavior (random movement) from an abstract parent
- - Writing a model composed of multiple files.
- - Dynamically adding and removing agents from the schedule
+The model demonstrates the following Mesa features:
+ - MultiGrid for creating shareable space for agents
+ - DataCollector for collecting data on individual model runs
+ - UserSettableParameters for adjusting initial model parameters
+ - ModularServer for visualization of agent interaction
+ - Agent object inheritance
+ - Using a BatchRunner to collect data on multiple combinations of model parameters
 
 ## Installation
 
@@ -19,7 +20,7 @@ To install the dependencies use pip and the requirements.txt in this directory. 
     $ pip install -r requirements.txt
 ```
 
-## How to Run
+## Interactive Model Run
 
 To run the model interactively, run ``run.py`` in this directory. e.g.
 
@@ -29,22 +30,29 @@ To run the model interactively, run ``run.py`` in this directory. e.g.
 
 Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
 
+## Batch Run
+
+To run the model as a batch run to collect data on multiple combinations of model parameters, run "batch_run.py" in this directory. 
+
+```
+    $ python batch_run.py
+```
+A progress status bar will display.
+
+To update the parameters to test other parameter sweeps, edit the list of parameters in the dictionary named "br_params" in "batch_run.py".
+
 ## Files
 
-* ``wolf_sheep/random_walker.py``: This defines the ``RandomWalker`` agent, which implements the behavior of moving randomly across a grid, one cell at a time. Both the Wolf and Sheep agents will inherit from it.
-* ``wolf_sheep/test_random_walk.py``: Defines a simple model and a text-only visualization intended to make sure the RandomWalk class was working as expected. This doesn't actually model anything, but serves as an ad-hoc unit test. To run it, ``cd`` into the ``wolf_sheep`` directory and run ``python test_random_walk.py``. You'll see a series of ASCII grids, one per model step, with each cell showing a count of the number of agents in it.
-* ``wolf_sheep/agents.py``: Defines the Wolf, Sheep, and GrassPatch agent classes.
-* ``wolf_sheep/schedule.py``: Defines a custom variant on the RandomActivation scheduler, where all agents of one class are activated (in random order) before the next class goes -- e.g. all the wolves go, then all the sheep, then all the grass.
-* ``wolf_sheep/model.py``: Defines the Wolf-Sheep Predation model itself
-* ``wolf_sheep/server.py``: Sets up the interactive visualization server
+* ``bank_reserves/random_walker.py``: This defines a class that inherits from the Mesa Agent class. The main purpose is to provide a method for agents to move randomly one cell at a time.
+* ``bank_reserves/agents.py``: Defines the People and Bank classes.
+* ``bank_reserves/model.py``: Defines the Bank Reserves model and the DataCollector functions.
+* ``bank_reserves/server.py``: Sets up the interactive visualization server.
 * ``run.py``: Launches a model visualization server.
+* ``batch_run.py``: Basically the same as model.py, but includes a Mesa BatchRunner. The result of the batch run will be a .csv file with the data from every step of every run. 
 
 ## Further Reading
 
-This model is closely based on the NetLogo Wolf-Sheep Predation Model:
+This model is a Mesa implementation of the Bank Reserves model from NetLogo:
 
-Wilensky, U. (1997). NetLogo Wolf Sheep Predation model. http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-See also the [Lotka–Volterra equations
-](https://en.wikipedia.org/wiki/Lotka%E2%80%93Volterra_equations) for an example of a classic differential-equation model with similar dynamics.
+Wilensky, U. (1998). NetLogo Bank Reserves model. http://ccl.northwestern.edu/netlogo/models/BankReserves. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
