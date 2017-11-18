@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov  2 15:15:04 2017
-
-@author: charlie roe
-"""
-
 from bank_reserves.agents import Bank, Person
 import itertools
 from mesa import Model
