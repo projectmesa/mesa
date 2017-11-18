@@ -2,13 +2,10 @@
 
 ## Summary
 
-A highly abstracted, simplified model of an economy, with only one type of agent and a single bank representing all banks in an economy. People (represented by circles) move randomly within the grid. If two or more people are on the same grid location, there is a 50% chance that they will trade with each other. If they trade, there is an equal chance of giving the other agent $5 or $2. A positive trade balance will be deposited in the bank as savings. If trading results in a negative balance, the agent will try to withdraw from its savings. If it does not have enough savings to cover the negative balance, it will take out a loan from the bank. Wolves and sheep both expend energy moving around, and replenish it by eating. Sheep eat grass, and wolves eat sheep if they end up on the same grid cell.
-
-If wolves and sheep have enough energy, they reproduce, creating a new wolf or sheep (in this simplified model, only one parent is needed for reproduction). The grass on each cell regrows at a constant rate. If any wolves and sheep run out of energy, they die.
+A highly abstracted, simplified model of an economy, with only one type of agent and a single bank representing all banks in an economy. People (represented by circles) move randomly within the grid. If two or more people are on the same grid location, there is a 50% chance that they will trade with each other. If they trade, there is an equal chance of giving the other agent $5 or $2. A positive trade balance will be deposited in the bank as savings. If trading results in a negative balance, the agent will try to withdraw from its savings. If it does not have enough savings to cover the negative balance, it will take out a loan from the bank to cover the difference. The bank is required to keep a certain percentage of deposits as reserves. If run.py is used to run the model, then the percent of deposits the bank is required to retain is a user settable parameter. The amount the bank is able to loan at any given time is a function of the amount of deposits, its reserves, and its current total outstanding loan amount. 
 
 The model is tests and demonstrates several Mesa concepts and features:
  - MultiGrid
- - Multiple agent types (wolves, sheep, grass)
  - Overlay arbitrary text (wolf's energy) on agent's shapes while drawing on CanvasGrid
  - Agents inheriting a behavior (random movement) from an abstract parent
  - Writing a model composed of multiple files.
