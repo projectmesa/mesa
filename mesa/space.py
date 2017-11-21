@@ -15,13 +15,9 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
+import numpy as np
 import random
 import math
-
-# TODO: fix the global variables, they shouldn't be needed.
-RANDOM = -1
-X = 0
-Y = 1
 
 
 def accept_tuple_argument(wrapped_function):
@@ -91,6 +87,10 @@ class Grid:
             for y in range(self.height):
                 col.append(self.default_val())
             self.grid.append(col)
+
+        # Add all cells to the empties list.
+        self.empties = list(itertools.product(
+                            *(range(self.width), range(self.height))))
 
     @staticmethod
     def default_val():
@@ -308,34 +308,25 @@ class Grid:
         """ Place the agent at the correct location. """
         x, y = pos
         self.grid[x][y] = agent
+        if pos in self.empties:
+            self.empties.remove(pos)
+
+    def remove_agent(self, agent):
+        """ Remove the agent from the grid and set its pos variable to None. """
+        pos = agent.pos
+        self._remove_agent(pos, agent)
+        agent.pos = None
 
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
         x, y = pos
         self.grid[x][y] = None
+        self.empties.append(pos)
 
     def is_cell_empty(self, pos):
         """ Returns a bool of the contents of a cell. """
         x, y = pos
         return True if self.grid[x][y] == self.default_val() else False
-
-
-class SingleGrid(Grid):
-    """ Grid where each cell contains exactly at most one object. """
-    empties = []
-
-    def __init__(self, width, height, torus):
-        """ Create a new single-item grid.
-
-        Args:
-            width, height: The width and width of the grid
-            torus: Boolean whether the grid wraps or not.
-
-        """
-        super().__init__(width, height, torus)
-        # Add all cells to the empties list.
-        self.empties = list(itertools.product(
-                            *(range(self.width), range(self.height))))
 
     def move_to_empty(self, agent):
         """ Moves agent to a random empty cell, vacating agent's old cell. """
@@ -360,17 +351,32 @@ class SingleGrid(Grid):
         """ Return True if any cells empty else False. """
         return len(self.empties) > 0
 
-    def position_agent(self, agent, x=RANDOM, y=RANDOM):
+
+class SingleGrid(Grid):
+    """ Grid where each cell contains exactly at most one object. """
+    empties = []
+
+    def __init__(self, width, height, torus):
+        """ Create a new single-item grid.
+
+        Args:
+            width, height: The width and width of the grid
+            torus: Boolean whether the grid wraps or not.
+
+        """
+        super().__init__(width, height, torus)
+
+    def position_agent(self, agent, x="random", y="random"):
         """ Position an agent on the grid.
         This is used when first placing agents! Use 'move_to_empty()'
         when you want agents to jump to an empty cell.
         Use 'swap_pos()' to swap agents positions.
-        If x or y are positive, they are used, but if RANDOM,
+        If x or y are positive, they are used, but if "random",
         we get a random position.
         Ensure this random position is not occupied (in Grid).
 
         """
-        if x == RANDOM or y == RANDOM:
+        if x == "random" or y == "random":
             coords = self.find_empty()
             if coords is None:
                 raise Exception("ERROR: Grid full")
@@ -382,13 +388,8 @@ class SingleGrid(Grid):
     def _place_agent(self, pos, agent):
         if self.is_cell_empty(pos):
             super()._place_agent(pos, agent)
-            self.empties.remove(pos)
         else:
             raise Exception("Cell not empty")
-
-    def _remove_agent(self, pos, agent):
-        super()._remove_agent(pos, agent)
-        self.empties.append(pos)
 
 
 class MultiGrid(Grid):
@@ -419,11 +420,15 @@ class MultiGrid(Grid):
         """ Place the agent at the correct location. """
         x, y = pos
         self.grid[x][y].add(agent)
+        if pos in self.empties:
+            self.empties.remove(pos)
 
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
         x, y = pos
         self.grid[x][y].remove(agent)
+        if self.is_cell_empty(pos):
+            self.empties.append(pos)
 
     @accept_tuple_argument
     def iter_cell_list_contents(self, cell_list):
@@ -472,6 +477,8 @@ class ContinuousSpace:
         self.y_min = y_min
         self.y_max = y_max
         self.height = y_max - y_min
+        self.center = np.array(((x_max + x_min) / 2, (y_max + y_min) / 2))
+        self.size = np.array((self.width, self.height))
         self.torus = torus
 
         self.cell_width = (self.x_max - self.x_min) / grid_width
@@ -540,6 +547,17 @@ class ContinuousSpace:
                 neighbors.append(obj)
         return neighbors
 
+    def get_heading(self, pos_1, pos_2):
+        one = np.array(pos_1)
+        two = np.array(pos_2)
+        if self.torus:
+            one = (one - self.center) % self.size
+            two = (two - self.center) % self.size
+        heading = two - one
+        if isinstance(pos_1, tuple):
+            heading = tuple(heading)
+        return heading
+
     def get_distance(self, pos_1, pos_2):
         """ Get the distance between two point, accounting for toroidal space.
 
@@ -547,17 +565,12 @@ class ContinuousSpace:
             pos_1, pos_2: Coordinate tuples for both points.
 
         """
-        x1, y1 = pos_1
-        x2, y2 = pos_2
-        if not self.torus:
-            dx = x1 - x2
-            dy = y1 - y2
-        else:
-            d_x = abs(x1 - x2)
-            d_y = abs(y1 - y2)
-            dx = min(d_x, self.width - d_x)
-            dy = min(d_y, self.height - d_y)
-        return math.sqrt(dx ** 2 + dy ** 2)
+        pos_1 = np.array(pos_1)
+        pos_2 = np.array(pos_2)
+        if self.torus:
+            pos_1 = (pos_1 - self.center) % self.size
+            pos_2 = (pos_2 - self.center) % self.size
+        return np.linalg.norm(pos_1 - pos_2)
 
     def torus_adj(self, pos):
         """ Adjust coordinates to handle torus looping.
@@ -577,7 +590,10 @@ class ContinuousSpace:
         else:
             x = self.x_min + ((pos[0] - self.x_min) % self.width)
             y = self.y_min + ((pos[1] - self.y_min) % self.height)
-            return (x, y)
+            if isinstance(pos, tuple):
+                return (x, y)
+            else:
+                return np.array((x, y))
 
     def _point_to_cell(self, pos):
         """ Get the cell coordinates that a given x,y point falls in. """
@@ -592,5 +608,5 @@ class ContinuousSpace:
     def out_of_bounds(self, pos):
         """ Check if a point is out of bounds. """
         x, y = pos
-        return (x < self.x_min or x > self.x_max or
-                y < self.y_min or y > self.y_max)
+        return (x < self.x_min or x >= self.x_max or
+                y < self.y_min or y >= self.y_max)

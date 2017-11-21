@@ -64,6 +64,12 @@ Server -> Client:
     Informs the client that the model is over.
     {"type": "end"}
 
+    Informs the client of the current model's parameters
+    {
+    "type": "model_params",
+    "params": 'dict' of model params, (i.e. {arg_1: val_1, ...})
+    }
+
 Client -> Server:
     Reset the model.
     TODO: Allow this to come with parameters
@@ -77,16 +83,29 @@ Client -> Server:
     "step:" index of the step to get.
     }
 
+    Submit model parameter updates
+    {
+    "type": "submit_params",
+    "param": name of model parameter
+    "value": new value for 'param'
+    }
+
+    Get the model's parameters
+    {
+    "type": "get_params"
+    }
+
 """
 import os
-import datetime as dt
-
+import tornado.autoreload
 import tornado.ioloop
-import tornado.template
 import tornado.web
 import tornado.websocket
 import tornado.escape
 import tornado.gen
+import webbrowser
+
+from mesa.visualization.UserParam import UserSettableParameter
 
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
@@ -143,6 +162,7 @@ class PageHandler(tornado.web.RequestHandler):
             element.index = i
         self.render("modular_template.html", port=self.application.port,
                     model_name=self.application.model_name,
+                    description=self.application.description,
                     package_includes=self.application.package_includes,
                     local_includes=self.application.local_includes,
                     scripts=self.application.js_code)
@@ -157,6 +177,13 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @property
+    def viz_state_message(self):
+        return {
+            "type": "viz_state",
+            "data": self.application.render_model()
+        }
+
     def on_message(self, message):
         """ Receiving a message from the websocket, parse, and act accordingly.
 
@@ -166,21 +193,32 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(message)
 
         if msg["type"] == "get_step":
-            step = int(msg["step"])
-            if step < len(self.application.viz_states):
-                return_message = {"type": "viz_state"}
-                return_message["data"] = self.application.viz_states[step]
+            if not self.application.model.running:
+                self.write_message({"type": "end"})
             else:
-                return_message = {"type": "end"}
-            self.write_message(return_message)
+                self.application.model.step()
+                self.write_message(self.viz_state_message)
 
         elif msg["type"] == "reset":
             self.application.reset_model()
-            return_message = {"type": "viz_state"}
-            return_message["data"] = self.application.viz_states[0]
+            self.write_message(self.viz_state_message)
 
-            self.write_message(return_message)
-            self.application.run_model()
+        elif msg["type"] == "submit_params":
+            param = msg["param"]
+            value = msg["value"]
+
+            # Is the param editable?
+            if param in self.application.user_params:
+                if isinstance(self.application.model_kwargs[param], UserSettableParameter):
+                    self.application.model_kwargs[param].value = value
+                else:
+                    self.application.model_kwargs[param] = value
+
+        elif msg["type"] == "get_params":
+            self.write_message({
+                "type": "model_params",
+                "params": self.application.user_params
+            })
 
         else:
             if self.application.verbose:
@@ -191,20 +229,8 @@ class ModularServer(tornado.web.Application):
     """ Main visualization application. """
     verbose = True
 
-    model_name = "Mesa Model"
-    model_cls = None  # A model class
-    portrayal_method = None
-    port = 8888  # Default port to listen on
-    canvas_width = 500
-    canvas_height = 500
-    grid_height = 0
-    grid_width = 0
-
+    port = 8521  # Default port to listen on
     max_steps = 100000
-    viz_states = []
-
-    model_args = ()
-    model_kwargs = {}
 
     # Handlers and other globals:
     page_handler = (r'/', PageHandler)
@@ -217,10 +243,13 @@ class ModularServer(tornado.web.Application):
     handlers = [page_handler, socket_handler, static_handler, local_handler]
 
     settings = {"debug": True,
+                "autoreload": False,
                 "template_path": os.path.dirname(__file__) + "/templates"}
 
+    EXCLUDE_LIST = ('width', 'height',)
+
     def __init__(self, model_cls, visualization_elements, name="Mesa Model",
-                 *args, **kwargs):
+                 model_params={}):
         """ Create a new visualization server with the given elements. """
         # Prep visualization elements:
         self.visualization_elements = visualization_elements
@@ -237,18 +266,40 @@ class ModularServer(tornado.web.Application):
         # Initializing the model
         self.model_name = name
         self.model_cls = model_cls
+        self.description = 'No description available'
+        if hasattr(model_cls, 'description'):
+            self.description = model_cls.description
+        elif model_cls.__doc__ is not None:
+            self.description = model_cls.__doc__
 
-        self.model_args = args
-        self.model_kwargs = kwargs
+        self.model_kwargs = model_params
         self.reset_model()
 
         # Initializing the application itself:
         super().__init__(self.handlers, **self.settings)
 
+    @property
+    def user_params(self):
+        result = {}
+        for param, val in self.model_kwargs.items():
+            if isinstance(val, UserSettableParameter):
+                result[param] = val.json
+
+        return result
+
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
-        self.model = self.model_cls(*self.model_args, **self.model_kwargs)
-        self.viz_states = [self.render_model()]
+
+        model_params = {}
+        for key, val in self.model_kwargs.items():
+            if isinstance(val, UserSettableParameter):
+                if val.param_type == 'static_text':    # static_text is never used for setting params
+                    continue
+                model_params[key] = val.value
+            else:
+                model_params[key] = val
+
+        self.model = self.model_cls(**model_params)
 
     def render_model(self):
         """ Turn the current state of the model into a dictionary of
@@ -261,24 +312,15 @@ class ModularServer(tornado.web.Application):
             visualization_state.append(element_state)
         return visualization_state
 
-    @tornado.gen.coroutine
-    def run_model(self):
-        """ Run the model forward and store each viz state.
-
-        #TODO: Have this run concurrently (I think) inside the event loop?
-
-        """
-        while self.model.schedule.steps < self.max_steps and self.model.running:
-            self.model.step()
-            self.viz_states.append(self.render_model())
-
-            yield tornado.gen.Task(tornado.ioloop.IOLoop.current().add_timeout,
-                dt.timedelta(milliseconds=5))
-
     def launch(self, port=None):
         """ Run the app. """
+        startLoop = not tornado.ioloop.IOLoop.initialized()
         if port is not None:
             self.port = port
-        print('Interface starting at http://127.0.0.1:{PORT}'.format(PORT=self.port))
+        url = 'http://127.0.0.1:{PORT}'.format(PORT=self.port)
+        print('Interface starting at {url}'.format(url=url))
         self.listen(self.port)
-        tornado.ioloop.IOLoop.instance().start()
+        webbrowser.open(url)
+        tornado.autoreload.start()
+        if startLoop:
+            tornado.ioloop.IOLoop.instance().start()

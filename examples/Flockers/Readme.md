@@ -11,7 +11,7 @@ Launch the model:
     $ python Flocker_Server.py
 ```
 
-Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and press Reset, then Run.
+Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
 
 ## Files
 
@@ -30,5 +30,5 @@ Then open your browser to [http://127.0.0.1:8888/](http://127.0.0.1:8888/) and p
 ```
 $ python run.py
 ```
-* Visit your browser: http://127.0.0.1:8888/
+* Visit your browser: http://127.0.0.1:8521/
 * In your browser hit *run*

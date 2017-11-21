@@ -38,11 +38,6 @@ class BaseScheduler:
     (This is explicitly meant to replicate the scheduler in MASON).
 
     """
-    model = None
-    steps = 0
-    time = 0
-    agents = []
-
     def __init__(self, model):
         """ Create a new, empty BaseScheduler. """
         self.model = model
@@ -72,7 +67,7 @@ class BaseScheduler:
 
     def step(self):
         """ Execute the step of all the agents, one at a time. """
-        for agent in self.agents:
+        for agent in self.agents[:]:
             agent.step()
         self.steps += 1
         self.time += 1
@@ -98,7 +93,7 @@ class RandomActivation(BaseScheduler):
 
         """
         random.shuffle(self.agents)
-        for agent in self.agents:
+        for agent in self.agents[:]:
             agent.step()
         self.steps += 1
         self.time += 1
@@ -114,9 +109,9 @@ class SimultaneousActivation(BaseScheduler):
     """
     def step(self):
         """ Step all agents, then advance them. """
-        for agent in self.agents:
+        for agent in self.agents[:]:
             agent.step()
-        for agent in self.agents:
+        for agent in self.agents[:]:
             agent.advance()
         self.steps += 1
         self.time += 1
@@ -134,12 +129,7 @@ class StagedActivation(BaseScheduler):
     increments of 1 / (# of stages), meaning that 1 step = 1 unit of time.
 
     """
-    stage_list = []
-    shuffle = False
-    shuffle_between_stages = False
-    stage_time = 1
-
-    def __init__(self, model, stage_list=["step"], shuffle=False,
+    def __init__(self, model, stage_list=None, shuffle=False,
                  shuffle_between_stages=False):
         """ Create an empty Staged Activation schedule.
 
@@ -154,7 +144,7 @@ class StagedActivation(BaseScheduler):
 
         """
         super().__init__(model)
-        self.stage_list = stage_list
+        self.stage_list = ["step"] if not stage_list else stage_list
         self.shuffle = shuffle
         self.shuffle_between_stages = shuffle_between_stages
         self.stage_time = 1 / len(self.stage_list)
@@ -164,7 +154,7 @@ class StagedActivation(BaseScheduler):
         if self.shuffle:
             random.shuffle(self.agents)
         for stage in self.stage_list:
-            for agent in self.agents:
+            for agent in self.agents[:]:
                 getattr(agent, stage)()  # Run stage
             if self.shuffle_between_stages:
                 random.shuffle(self.agents)

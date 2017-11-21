@@ -1,5 +1,2 @@
-Time
-----
-
-.. automodule:: time
+.. automodule:: mesa.time
    :members:

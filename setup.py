@@ -9,6 +9,7 @@ requires = [
     'tornado',
     'numpy',
     'pandas',
+    'tqdm',
 ]
 
 version = ''
@@ -28,13 +29,14 @@ setup(
     author_email='projectmesa@googlegroups.com',
     url='https://github.com/projectmesa/mesa',
     packages=find_packages(),
-    package_data={'mesa': ['visualization/templates/*']},
+    package_data={'mesa': ['visualization/templates/*.html', 'visualization/templates/css/*',
+                           'visualization/templates/fonts/*', 'visualization/templates/js/*']},
     include_package_data=True,
     install_requires=requires,
     keywords='agent based modeling model ABM simulation multi-agent',
     license='Apache 2.0',
     zip_safe=False,
-    classifiers=(
+    classifiers=[
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Life',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
@@ -44,5 +46,5 @@ setup(
         'Operating System :: OS Independent',
         'Development Status :: 3 - Alpha',
         'Natural Language :: English',
-    ),
+    ],
 )

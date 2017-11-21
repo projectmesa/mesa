@@ -3,10 +3,101 @@
 Release History
 ---------------
 
-Next release
+0.8.2 (2017-11-01) Gila Bend
++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Split parameter_values into fixed & variable parameters in batchrunner #393
+
+**Fixes**
+
+* Updating License year to 2017 -- very minor update #391
+* Flockers: fix param naming #398
+* Remove unused class parameters. #400
+* [hotfix!] Disable e2e viz test for now. #414
+* Fixing bug in release process. [6a8ecb6]
+    * See https://github.com/pypa/pypi-legacy/issues/670.
+
+
+0.8.1 (2017-07-03) Flagstaff (PyCon Sprints & then some)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Bootstrap UI starter #383
+* Add Sugarscape Constant Growback example #385
+* Add best-practices document and describe models. #371
+* Refactored & model standards related:
+    * Prisoner's Dilemma refactor to meet new model standard format. #377
+    * refactored boltzmann wealth model to new layout #376
+    * Update tutorial to follow new model standards #370
+    * Moving wolf sheep pngs to sub-folder for better organization #372
+    * Add best-practices document and describe models. #371
+* Modified loop over agents in schedule step method #356
+* Added function to use local images as shapes in GridDraw #355
+
+**Fixes**
+
+* Fix math problems in flockers; use numpy in space #378
+* Seed both global random number generators #373, #368
+* Dictionary parameters fix #309
+* Downgrade setuptools to fix #353
+* Minor forest fire fix #338, #346
+* Allow fixed seed for replication #107
+* Fix tutorial and example readme for port change 8b57aa
+
+
+0.8.0 (2017-01-29) - Edgar
++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Updating contribution file to prevent future travis breaks #336
+* Updating Travis svg to target #master, not branches. #343
+* implement "end" message in visualization #346
+* Move empty-cell functions to baseclass Grid #349
+
+**Fixes**
+
+* Only start tornado ioloop if necessary #339
+* fix boundaries of ContinousSpace #345
+
+
+0.7.8.1 (2016-11-02) Duncan
+++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Fixes #324 -- renames all examples to be the pythonic format of naming #328
+* Changing to port 8521, fixes #320. #321
+* Opens a browser window when launching the server #323
+* Ticket #314 - added progress bar to BatchRunner #316
+* Auto update year for copyright. #329
+
+**Fixes**
+
+* Minor bug fixes - Update ForestFire example notebook to new API, and rename Basic to Shape Example. #318
+* On-demand model stepping rather than an endless buffer #310
+* Updating contribution to prevent future travis breaks #330
+
+
+
+0.7.7 (2016-08-18)
+++++++++++++++++++
+
+**Improvements**
+
+* Fixes - variable name heading0/1 in ArrowHead shape is not intuitive. #295 #301
+* Fixes - ArrowHead shape is not reflecting in the docs of api #300 #301
+* Fixes - Documentation is not reflecting latest changes wrt width-height argument order in Grid() #296 #301
+
+
+0.7.6 (2016-08-13)
 ++++++++++++++++++
 
 Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
+& Then some.
 
 **Feature adds**
 
@@ -97,7 +188,7 @@ Theme: Scipy Sprints 2016 ( ‘-’)人(ﾟ_ﾟ )
 ++++++++++++++++++
 
 **Improvements**
-   
+
 * Allow cell_list_content methods in Grids to accept single tuples in addition to lists
 
 
