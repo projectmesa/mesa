@@ -50,7 +50,7 @@ class DataCollector:
 
     model = None
 
-    def __init__(self, model_reporters={}, agent_reporters={}, tables={}):
+    def __init__(self, model_reporters=None, agent_reporters=None, tables=None):
         """ Instantiate a DataCollector with lists of model and agent reporters.
 
         Both model_reporters and agent_reporters accept a dictionary mapping a
@@ -80,14 +80,17 @@ class DataCollector:
         self.agent_vars = {}
         self.tables = {}
 
-        for name, func in model_reporters.items():
-            self._new_model_reporter(name, func)
+        if isinstance(model_reporters, dict):
+            for name, func in model_reporters.items():
+                self._new_model_reporter(name, func)
 
-        for name, func in agent_reporters.items():
-            self._new_agent_reporter(name, func)
+        if isinstance(agent_reporters, dict):
+            for name, func in agent_reporters.items():
+                self._new_agent_reporter(name, func)
 
-        for name, columns in tables.items():
-            self._new_table(name, columns)
+        if isinstance(tables, dict):
+            for name, columns in tables.items():
+                self._new_table(name, columns)
 
     def _new_model_reporter(self, reporter_name, reporter_function):
         """ Add a new model-level reporter to collect.
