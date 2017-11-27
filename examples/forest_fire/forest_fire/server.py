@@ -2,7 +2,6 @@ from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
 
-
 from forest_fire.model import ForestFire
 
 
@@ -19,11 +18,11 @@ def forest_fire_portrayal(tree):
     portrayal["Color"] = colors[tree.condition]
     return portrayal
 
+
 canvas_element = CanvasGrid(forest_fire_portrayal, 100, 100, 500, 500)
 tree_chart = ChartModule([{"Label": "Fine", "Color": "green"},
                           {"Label": "On Fire", "Color": "red"},
                           {"Label": "Burned Out", "Color": "black"}])
-
 
 model_params = {
     "height": 100,
