@@ -80,15 +80,15 @@ class DataCollector:
         self.agent_vars = {}
         self.tables = {}
 
-        if isinstance(model_reporters, dict):
+        if model_reporters is not None:
             for name, func in model_reporters.items():
                 self._new_model_reporter(name, func)
 
-        if isinstance(agent_reporters, dict):
+        if agent_reporters is not None:
             for name, func in agent_reporters.items():
                 self._new_agent_reporter(name, func)
 
-        if isinstance(tables, dict):
+        if tables is not None:
             for name, columns in tables.items():
                 self._new_table(name, columns)
 
