@@ -17,10 +17,10 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 
 ## Files
 
-* ``game_of_life/cell.py``: Defines the behavior of an individual cell, which can be in two states: DEAD or ALIVE.
-* ``game_of_life/model.py``: Defines the model itself, initialized with one alive cell at the center.
-* ``game_of_life/portrayal.py``: Describes for the front end how to render a cell.
-* ``game_of_live/server.py``: Defines an interactive visualization.
+* ``hex_snowflake/cell.py``: Defines the behavior of an individual cell, which can be in two states: DEAD or ALIVE.
+* ``hex_snowflake/model.py``: Defines the model itself, initialized with one alive cell at the center.
+* ``hex_snowflake/portrayal.py``: Describes for the front end how to render a cell.
+* ``hex_snowflake/server.py``: Defines an interactive visualization.
 * ``run.py``: Launches the visualization
 
 ## Further Reading
