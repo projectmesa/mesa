@@ -44,8 +44,7 @@ var sidebar = $("#sidebar");
 
 // WebSocket Stuff
 // Open the websocket connection; support TLS-specific URLs when appropriate
-var ws = new WebSocket((window.location.protocol == "https:" ? "wss://" : "ws://") + 
-    location.host + "/ws");
+var ws = new WebSocket((window.location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
 
 ws.onopen = function() {
     console.log("Connection opened!");
