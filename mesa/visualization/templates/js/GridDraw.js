@@ -32,7 +32,7 @@ other agent locations, represented by circles:
  1:[
         {"Shape": "circle", "x": 0, "y": 0, "r": 0.5, "Color": ["#00aa00", "#aa00aa"], "stroke_color": "red", "Filled": "true", "Layer": 1, "text": 'A', "text_color": "white"},
         {"Shape": "circle", "x": 1, "y": 1, "r": 0.5, "Color": ["#00aa00", "#aa00aa"], "stroke_color": "red", "Filled": "true", "Layer": 1, "text": 'B', "text_color": "white"}
-        {"Shape": "arrowHead", "x": 1, "y": 0, "heading0": -1, heading1: 0, "scale": 0.5, "Color": ["#00aa00", "#aa00aa"], "stroke_color": "red", "Filled": "true", "Layer": 1, "text": 'C', "text_color": "white"}
+        {"Shape": "arrowHead", "x": 1, "y": 0, "heading_x": -1, heading_y: 0, "scale": 0.5, "Color": ["#00aa00", "#aa00aa"], "stroke_color": "red", "Filled": "true", "Layer": 1, "text": 'C', "text_color": "white"}
    ]
 }
 
