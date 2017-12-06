@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from bank_reserves.agents import Bank, Person
 from mesa import Model
 from mesa.space import MultiGrid
@@ -22,9 +25,8 @@ If you want to perform a parameter sweep, call batch_run.py instead of run.py.
 For details see batch_run.py in the same directory as run.py.
 """
 
-# Start of datacollector functions
 
-
+# Start of DataCollector functions
 def get_num_rich_agents(model):
     # list of rich agents
     rich_agents = [a for a in model.schedule.agents if a.savings > model.rich_threshold]
@@ -130,6 +132,10 @@ class BankReservesModel(Model):
         self.datacollector.collect(self)
         # tell all the agents in the model to run their step function
         self.schedule.step()
+        # if the step count is in the list then create a data file of model state
+        if self.schedule.steps in [100, 500, 1000]:
+            model_data = self.datacollector.get_model_vars_dataframe()
+            model_data.to_csv("BankReservesModel_Step_Data_Single_Run" + str(self.schedule.steps) + ".csv")
 
     def run_model(self):
         for i in range(self.run_time):
