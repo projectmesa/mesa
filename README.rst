@@ -52,12 +52,12 @@ For more help on using Mesa, check out the following resources:
 
 * `Intro to Mesa Tutorial`_
 * `Docs`_
-* `Email list`_
+* `Email list for users`_
 * `PyPI`_
 
 .. _`Intro to Mesa Tutorial` : http://mesa.readthedocs.org/en/latest/tutorials/intro_tutorial.html
 .. _`Docs` : http://mesa.readthedocs.org/en/latest/
-.. _`Email list` : https://groups.google.com/d/forum/projectmesa
+.. _`Email list for users` : https://groups.google.com/d/forum/projectmesa
 .. _`PyPI` : https://pypi.python.org/pypi/Mesa/
 
 Contributing back to Mesa
@@ -65,12 +65,12 @@ Contributing back to Mesa
 
 If you run into an issue, please file a `ticket`_ for us to discuss. If possible, follow up with a pull request.
 
-If you would like to add a feature, please reach out via `ticket`_ or the `email list`_ for discussion. A feature is most likely to be added if you build it!
+If you would like to add a feature, please reach out via `ticket`_ or the `dev email list`_ for discussion. A feature is most likely to be added if you build it!
 
 * `Contributors guide`_
 * `Github`_
 
 .. _`ticket` : https://github.com/projectmesa/mesa/issues
-.. _`email list` : https://groups.google.com/d/forum/projectmesa
+.. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
 .. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/master/CONTRIBUTING.rst
 .. _`Github` : https://github.com/projectmesa/mesa/

@@ -164,8 +164,7 @@ class Grid:
                 if not self.torus and (not (0 <= dx + x < self.width) or not (0 <= dy + y < self.height)):
                     continue
 
-                px = self.torus_adj(x + dx, self.width)
-                py = self.torus_adj(y + dy, self.height)
+                px, py = self.torus_adj((x + dx, y + dy))
 
                 # Skip if new coords out of bounds.
                 if self.out_of_bounds((px, py)):
@@ -248,11 +247,15 @@ class Grid:
         return list(self.iter_neighbors(
             pos, moore, include_center, radius))
 
-    def torus_adj(self, coord, dim_len):
+    def torus_adj(self, pos):
         """ Convert coordinate, handling torus looping. """
-        if self.torus:
-            coord %= dim_len
-        return coord
+        if not self.out_of_bounds(pos):
+            return pos
+        elif not self.torus:
+            raise Exception("Point out of bounds, and space non-toroidal.")
+        else:
+            x, y = pos[0] % self.width, pos[1] % self.height
+        return x, y
 
     def out_of_bounds(self, pos):
         """
@@ -297,6 +300,7 @@ class Grid:
             pos: Tuple of new position to move the agent to.
 
         """
+        pos = self.torus_adj(pos)
         self._remove_agent(agent.pos, agent)
         self._place_agent(pos, agent)
         agent.pos = pos
