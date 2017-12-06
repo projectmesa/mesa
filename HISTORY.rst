@@ -3,16 +3,21 @@
 Release History
 ---------------
 
-Next release - 0.8.2 (2017-07-?) Gila Bend
+0.8.2 (2017-11-01) Gila Bend
 +++++++++++++++++++++++++++++++++++++++++++
 
 **Improvements**
 
-* None
+* Split parameter_values into fixed & variable parameters in batchrunner #393
 
 **Fixes**
 
-* None
+* Updating License year to 2017 -- very minor update #391
+* Flockers: fix param naming #398
+* Remove unused class parameters. #400
+* [hotfix!] Disable e2e viz test for now. #414
+* Fixing bug in release process. [6a8ecb6]
+    * See https://github.com/pypa/pypi-legacy/issues/670.
 
 
 0.8.1 (2017-07-03) Flagstaff (PyCon Sprints & then some)
