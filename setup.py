@@ -36,7 +36,7 @@ setup(
     keywords='agent based modeling model ABM simulation multi-agent',
     license='Apache 2.0',
     zip_safe=False,
-    classifiers=(
+    classifiers=[
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Life',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
@@ -46,5 +46,5 @@ setup(
         'Operating System :: OS Independent',
         'Development Status :: 3 - Alpha',
         'Natural Language :: English',
-    ),
+    ],
 )

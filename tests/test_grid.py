@@ -148,6 +148,30 @@ class TestBaseGrid(unittest.TestCase):
         assert second[1] == 0
         assert second[2] == 1
 
+    def test_agent_move(self):
+        # get the agent at [0, 1]
+        agent = self.agents[0]
+        self.grid.move_agent(agent, (1, 1))
+        assert agent.pos == (1, 1)
+        # move it off the torus and check for the exception
+        if not self.torus:
+            with self.assertRaises(Exception):
+                self.grid.move_agent(agent, [-1, 1])
+            with self.assertRaises(Exception):
+                self.grid.move_agent(agent, [1, self.grid.height + 1])
+        else:
+            self.grid.move_agent(agent, [-1, 1])
+            assert agent.pos == (self.grid.width - 1, 1)
+            self.grid.move_agent(agent, [1, self.grid.height + 1])
+            assert agent.pos == (1, 1)
+
+    def test_agent_remove(self):
+        agent = self.agents[0]
+        x, y = agent.pos
+        self.grid.remove_agent(agent)
+        assert agent.pos is None
+        assert self.grid.grid[x][y] is None
+
 
 class TestBaseGridTorus(TestBaseGrid):
     '''
