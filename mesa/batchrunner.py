@@ -82,6 +82,7 @@ class BatchRunner:
         self.model_cls = model_cls
         self.variable_parameters = self._process_parameters(variable_parameters)
         self.fixed_parameters = fixed_parameters or {}
+        self._include_fixed = len(self.fixed_parameters.keys()) > 0
         self.iterations = iterations
         self.max_steps = max_steps
 
@@ -160,15 +161,12 @@ class BatchRunner:
             agent_vars[agent.unique_id] = agent_record
         return agent_vars
 
-    def get_model_vars_dataframe(self, include_fixed=False):
+    def get_model_vars_dataframe(self):
         """ Generate a pandas DataFrame from the model-level variables
         collected.
 
-        Args:
-            include_fixed: Set True to include fixed parameters
         """
-        return self._prepare_report_table(self.model_vars,
-                                          include_fixed=include_fixed)
+        return self._prepare_report_table(self.model_vars)
 
     def get_agent_vars_dataframe(self):
         """ Generate a pandas DataFrame from the agent-level variables
@@ -178,8 +176,7 @@ class BatchRunner:
         return self._prepare_report_table(self.agent_vars,
                 extra_cols=['AgentId'])
 
-    def _prepare_report_table(self, vars_dict, extra_cols=None,
-                              include_fixed=False):
+    def _prepare_report_table(self, vars_dict, extra_cols=None):
         """
         Creates a dataframe from collected records and sorts it using 'Run'
         column as a key.
@@ -197,7 +194,7 @@ class BatchRunner:
         rest_cols = set(df.columns) - set(index_cols)
         ordered = df[index_cols + list(sorted(rest_cols))]
         ordered.sort_values(by='Run', inplace=True)
-        if include_fixed:
+        if self._include_fixed:
             for param in self.fixed_parameters.keys():
                 ordered[param] = self.fixed_parameters[param]
         return ordered
