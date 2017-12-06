@@ -24,7 +24,7 @@ class TestSpaceToroidal(unittest.TestCase):
         '''
         Create a test space and populate with Mock Agents.
         '''
-        self.space = ContinuousSpace(70, 20, True, -30, -30, 100, 100)
+        self.space = ContinuousSpace(70, 20, True, -30, -30)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS):
             a = MockAgent(i, None)
@@ -57,6 +57,10 @@ class TestSpaceToroidal(unittest.TestCase):
 
         pos_3 = (-30, -20)
         assert self.space.get_distance(pos_1, pos_3) == 10
+
+        pos_4 = (20, -5)
+        pos_5 = (20, -15)
+        assert self.space.get_distance(pos_4, pos_5) == 10
 
     def test_heading(self):
         pos_1 = (-30, -30)
@@ -109,7 +113,7 @@ class TestSpaceNonToroidal(unittest.TestCase):
         '''
         Create a test space and populate with Mock Agents.
         '''
-        self.space = ContinuousSpace(70, 20, False, -30, -30, 100, 100)
+        self.space = ContinuousSpace(70, 20, False, -30, -30)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS):
             a = MockAgent(i, None)
@@ -188,7 +192,7 @@ class TestSpaceAgentMapping(unittest.TestCase):
         '''
         Create a test space and populate with Mock Agents.
         '''
-        self.space = ContinuousSpace(70, 50, False, -30, -30, 100, 100)
+        self.space = ContinuousSpace(70, 50, False, -30, -30)
         self.agents = []
         for i, pos in enumerate(REMOVAL_TEST_AGENTS):
             a = MockAgent(i, None)

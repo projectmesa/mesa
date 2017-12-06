@@ -459,7 +459,7 @@ class ContinuousSpace:
     """
     _grid = None
 
-    def __init__(self, x_max, y_max, torus, x_min=0, y_min=0, *args, **kwargs):
+    def __init__(self, x_max, y_max, torus, x_min=0, y_min=0):
         """ Create a new continuous space.
 
         Args:
@@ -548,13 +548,11 @@ class ContinuousSpace:
                             agent in the results.
 
         """
-        if not self.torus:
-            delta = self._agent_points - np.array(pos)
-        else:
-            pos1 = np.mod(np.array(pos) - self.center, self.size)
-            pos2 = np.mod(self._agent_points - self.center, self.size)
-            delta = pos2 - pos1
-        dists = delta[:, 0] ** 2 + delta[:, 1] ** 2
+        deltas = np.abs(self._agent_points - np.array(pos))
+        if self.torus:
+            deltas = np.minimum(deltas, self.size - deltas)
+        dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
+
         idxs, = np.where(dists <= radius**2)
         neighbors = [self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0]
         return neighbors
