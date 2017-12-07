@@ -49,6 +49,10 @@ class TestSpaceToroidal(unittest.TestCase):
         pos_3 = (-30, -20)
         assert self.space.get_distance(pos_1, pos_3) == 10
 
+        pos_4 = (20, -5)
+        pos_5 = (20, -15)
+        assert self.space.get_distance(pos_4, pos_5) == 10
+
     def test_heading(self):
         pos_1 = (-30, -30)
         pos_2 = (70, 20)
