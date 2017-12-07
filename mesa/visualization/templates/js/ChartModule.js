@@ -84,7 +84,7 @@ var ChartModule = function(series, canvas_width, canvas_height) {
 
     this.reset = function() {
         while (chart.data.labels.length) { chart.data.labels.pop(); }
-        chart.data.datasets.forEach((dataset) => {
+        chart.data.datasets.forEach(function(dataset) {
             while (dataset.data.length) { dataset.data.pop(); }
         });
         chart.update();
