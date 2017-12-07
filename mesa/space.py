@@ -25,13 +25,11 @@ def accept_tuple_argument(wrapped_function):
     single-item list rather than forcing user to do it.
 
     """
-
     def wrapper(*args):
         if isinstance(args[1], tuple) and len(args[1]) == 2:
             return wrapped_function(args[0], [args[1]])
         else:
             return wrapped_function(*args)
-
     return wrapper
 
 
@@ -69,7 +67,6 @@ class Grid:
         is_cell_empty: Returns a bool of the contents of a cell.
 
     """
-
     def __init__(self, width, height, torus):
         """ Create a new grid.
 
@@ -468,6 +465,11 @@ class ContinuousSpace:
             x_min, y_min: (default 0) If provided, set the minimum x and y
                           coordinates for the space. Below them, values loop to
                           the other edge (if torus=True) or raise an exception.
+            grid_width, _height: (default 100) Determine the size of the
+                                 internal storage grid. More cells will slow
+                                 down movement, but speed up neighbor lookup.
+                                 Probably only fiddle with this if one or the
+                                 other is impacting your model's performance.
 
         """
         self.x_min = x_min
