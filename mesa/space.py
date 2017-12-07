@@ -17,7 +17,6 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 import itertools
 import numpy as np
 import random
-import math
 
 
 def accept_tuple_argument(wrapped_function):
@@ -26,13 +25,11 @@ def accept_tuple_argument(wrapped_function):
     single-item list rather than forcing user to do it.
 
     """
-
     def wrapper(*args):
         if isinstance(args[1], tuple) and len(args[1]) == 2:
             return wrapped_function(args[0], [args[1]])
         else:
             return wrapped_function(*args)
-
     return wrapper
 
 
@@ -70,7 +67,6 @@ class Grid:
         is_cell_empty: Returns a bool of the contents of a cell.
 
     """
-
     def __init__(self, width, height, torus):
         """ Create a new grid.
 
@@ -417,7 +413,6 @@ class MultiGrid(Grid):
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
     """
-
     @staticmethod
     def default_val():
         """ Default value for new cell elements. """
@@ -461,8 +456,7 @@ class ContinuousSpace:
     """
     _grid = None
 
-    def __init__(self, x_max, y_max, torus, x_min=0, y_min=0,
-                 grid_width=100, grid_height=100):
+    def __init__(self, x_max, y_max, torus, x_min=0, y_min=0):
         """ Create a new continuous space.
 
         Args:
@@ -488,10 +482,9 @@ class ContinuousSpace:
         self.size = np.array((self.width, self.height))
         self.torus = torus
 
-        self.cell_width = (self.x_max - self.x_min) / grid_width
-        self.cell_height = (self.y_max - self.y_min) / grid_height
-
-        self._grid = MultiGrid(grid_width, grid_height, torus)
+        self._agent_points = None
+        self._index_to_agent = {}
+        self._agent_to_index = {}
 
     def place_agent(self, agent, pos):
         """ Place a new agent in the space.
@@ -502,7 +495,12 @@ class ContinuousSpace:
 
         """
         pos = self.torus_adj(pos)
-        self._place_agent(pos, agent)
+        if self._agent_points is None:
+            self._agent_points = np.array([pos])
+        else:
+            self._agent_points = np.append(self._agent_points, np.array([pos]), axis=0)
+        self._index_to_agent[self._agent_points.shape[0] - 1] = agent
+        self._agent_to_index[agent] = self._agent_points.shape[0] - 1
         agent.pos = pos
 
     def move_agent(self, agent, pos):
@@ -514,19 +512,31 @@ class ContinuousSpace:
 
         """
         pos = self.torus_adj(pos)
-        self._remove_agent(agent.pos, agent)
-        self._place_agent(pos, agent)
+        idx = self._agent_to_index[agent]
+        self._agent_points[idx, 0] = pos[0]
+        self._agent_points[idx, 1] = pos[1]
         agent.pos = pos
 
-    def _place_agent(self, pos, agent):
-        """ Place an agent at a given point, and update the internal grid. """
-        cell = self._point_to_cell(pos)
-        self._grid._place_agent(cell, agent)
+    def remove_agent(self, agent):
+        """ Remove an agent from the simulation.
 
-    def _remove_agent(self, pos, agent):
-        """ Remove an agent at a given point, and update the internal grid. """
-        cell = self._point_to_cell(pos)
-        self._grid._remove_agent(cell, agent)
+        Args:
+            agent: The agent object to remove
+            """
+        if agent not in self._agent_to_index:
+            raise Exception("Agent does not exist in the space")
+        idx = self._agent_to_index[agent]
+        del self._agent_to_index[agent]
+        max_idx = max(self._index_to_agent.keys())
+        # Delete the agent's position and decrement the index/agent mapping
+        self._agent_points = np.delete(self._agent_points, idx, axis=0)
+        for a, index in self._agent_to_index.items():
+            if index > idx:
+                self._agent_to_index[a] = index - 1
+                self._index_to_agent[index - 1] = a
+        # The largest index is now redundant
+        del self._index_to_agent[max_idx]
+        agent.pos = None
 
     def get_neighbors(self, pos, radius, include_center=True):
         """ Get all objects within a certain radius.
@@ -540,21 +550,21 @@ class ContinuousSpace:
                             agent in the results.
 
         """
-        # Get candidate objects
-        scale = max(self.cell_width, self.cell_height)
-        cell_radius = math.ceil(radius / scale)
-        cell_pos = self._point_to_cell(pos)
-        possible_objs = self._grid.get_neighbors(cell_pos,
-                                                 True, True, cell_radius)
-        neighbors = []
-        # Iterate over candidates and check actual distance.
-        for obj in possible_objs:
-            dist = self.get_distance(pos, obj.pos)
-            if dist <= radius and (include_center or dist > 0):
-                neighbors.append(obj)
+        deltas = np.abs(self._agent_points - np.array(pos))
+        if self.torus:
+            deltas = np.minimum(deltas, self.size - deltas)
+        dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
+
+        idxs, = np.where(dists <= radius**2)
+        neighbors = [self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0]
         return neighbors
 
     def get_heading(self, pos_1, pos_2):
+        """ Get the heading angle between two points, accounting for toroidal space.
+
+        Args:
+            pos_1, pos_2: Coordinate tuples for both points.
+        """
         one = np.array(pos_1)
         two = np.array(pos_2)
         if self.torus:
@@ -601,16 +611,6 @@ class ContinuousSpace:
                 return (x, y)
             else:
                 return np.array((x, y))
-
-    def _point_to_cell(self, pos):
-        """ Get the cell coordinates that a given x,y point falls in. """
-        if self.out_of_bounds(pos):
-            raise Exception("Point out of bounds.")
-
-        x, y = pos
-        cell_x = math.floor((x - self.x_min) / self.cell_width)
-        cell_y = math.floor((y - self.y_min) / self.cell_height)
-        return cell_x, cell_y
 
     def out_of_bounds(self, pos):
         """ Check if a point is out of bounds. """
