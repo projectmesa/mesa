@@ -69,8 +69,8 @@ class CivilViolenceModel(Model):
             "arrest_probability": lambda a: getattr(a, "arrest_probability",
                                                     None)
         }
-        self.dc = DataCollector(model_reporters=model_reporters,
-                                agent_reporters=agent_reporters)
+        self.datacollector = DataCollector(model_reporters=model_reporters,
+                                           agent_reporters=agent_reporters)
         unique_id = 0
         if self.cop_density + self.citizen_density > 1:
             raise ValueError(
@@ -93,12 +93,16 @@ class CivilViolenceModel(Model):
                 self.grid[y][x] = citizen
                 self.schedule.add(citizen)
 
+        # collect initial data
+        self.datacollector.collect(self)
+
     def step(self):
         """
         Advance the model by one step and collect data.
         """
         self.schedule.step()
-        self.dc.collect(self)
+        # collect data
+        self.datacollector.collect(self)
         self.iteration += 1
         if self.iteration > self.max_iters:
             self.running = False

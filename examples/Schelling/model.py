@@ -78,6 +78,8 @@ class SchellingModel(Model):
                 agent = SchellingAgent((x, y), self, agent_type)
                 self.grid.position_agent(agent, (x, y))
                 self.schedule.add(agent)
+        # collect initial data
+        self.datacollector.collect(self)
 
     def step(self):
         '''
@@ -85,6 +87,7 @@ class SchellingModel(Model):
         '''
         self.happy = 0  # Reset counter of happy agents
         self.schedule.step()
+        # collect data
         self.datacollector.collect(self)
 
         if self.happy == self.schedule.get_agent_count():

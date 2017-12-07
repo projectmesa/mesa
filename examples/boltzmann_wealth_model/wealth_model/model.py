@@ -40,9 +40,13 @@ class MoneyModel(Model):
             y = random.randrange(self.grid.height)
             self.grid.place_agent(a, (x, y))
 
-    def step(self):
+        # collect initial data
         self.datacollector.collect(self)
+
+    def step(self):
         self.schedule.step()
+        # collect data
+        self.datacollector.collect(self)
 
     def run_model(self, n):
         for i in range(n):

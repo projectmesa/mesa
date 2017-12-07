@@ -41,8 +41,12 @@ class MoneyModel(Model):
             # Add the agent to a random node
             self.grid.place_agent(a, list_of_random_nodes[i])
 
+        # collect initial data
+        self.datacollector.collect(self)
+
     def step(self):
         self.schedule.step()
+        # collect data
         self.datacollector.collect(self)
 
     def run_model(self, n):

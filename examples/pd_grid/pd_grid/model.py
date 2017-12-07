@@ -47,10 +47,13 @@ class PDModel(Model):
             "Cooperating_Agents":
             lambda m: len([a for a in m.schedule.agents if a.move == "C"])
         })
+        # collect initial data
+        self.datacollector.collect(self)
 
     def step(self):
-        self.datacollector.collect(self)
         self.schedule.step()
+        # collect initial data
+        self.datacollector.collect(self)
 
     def run(self, n):
         ''' Run the model for n steps. '''

@@ -66,6 +66,9 @@ class VirusModel(Model):
         for a in self.grid.get_cell_list_contents(infected_nodes):
             a.state = State.INFECTED
 
+        # collect initial data
+        self.datacollector.collect(self)
+
     def resistant_susceptible_ratio(self):
         try:
             return number_state(self, State.RESISTANT) / number_state(self, State.SUSCEPTIBLE)
@@ -74,6 +77,7 @@ class VirusModel(Model):
 
     def step(self):
         self.schedule.step()
+        # collect data
         self.datacollector.collect(self)
 
     def run_model(self, n):
