@@ -52,7 +52,7 @@ class PDModel(Model):
 
     def step(self):
         self.schedule.step()
-        # collect initial data
+        # collect data
         self.datacollector.collect(self)
 
     def run(self, n):
