@@ -115,7 +115,6 @@ class WolfSheepPredation(Model):
                 self.schedule.add(patch)
 
         self.running = True
-        # collect initial data
         self.datacollector.collect(self)
 
     def step(self):
