@@ -51,7 +51,6 @@ class CivilViolenceModel(Model):
         self.active_threshold = active_threshold
         self.arrest_prob_constant = arrest_prob_constant
         self.movement = movement
-        self.running = True
         self.max_iters = max_iters
         self.iteration = 0
         self.schedule = RandomActivation(self)
@@ -93,7 +92,7 @@ class CivilViolenceModel(Model):
                 self.grid[y][x] = citizen
                 self.schedule.add(citizen)
 
-        # collect initial data
+        self.running = True
         self.datacollector.collect(self)
 
     def step(self):

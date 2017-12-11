@@ -24,7 +24,6 @@ class MoneyModel(Model):
         self.num_agents = num_agents
         self.num_nodes = num_nodes if num_nodes >= self.num_agents else self.num_agents
         self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=0.5)
-        self.running = True
         self.grid = NetworkGrid(self.G)
         self.schedule = RandomActivation(self)
         self.datacollector = DataCollector(
@@ -41,7 +40,7 @@ class MoneyModel(Model):
             # Add the agent to a random node
             self.grid.place_agent(a, list_of_random_nodes[i])
 
-        # collect initial data
+        self.running = True
         self.datacollector.collect(self)
 
     def step(self):

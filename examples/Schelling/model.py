@@ -60,8 +60,6 @@ class SchellingModel(Model):
             # For testing purposes, agent's individual x and y
             {"x": lambda a: a.pos[0], "y": lambda a: a.pos[1]})
 
-        self.running = True
-
         # Set up agents
         # We use a grid iterator that returns
         # the coordinates of a cell as well as
@@ -78,7 +76,8 @@ class SchellingModel(Model):
                 agent = SchellingAgent((x, y), self, agent_type)
                 self.grid.position_agent(agent, (x, y))
                 self.schedule.add(agent)
-        # collect initial data
+
+        self.running = True
         self.datacollector.collect(self)
 
     def step(self):

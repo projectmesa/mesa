@@ -124,7 +124,6 @@ class BankReservesModel(Model):
             self.schedule.add(p)
 
         self.running = True
-        # collect initial data
         self.datacollector.collect(self)
 
     def step(self):
