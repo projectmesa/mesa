@@ -25,11 +25,13 @@ def accept_tuple_argument(wrapped_function):
     single-item list rather than forcing user to do it.
 
     """
+
     def wrapper(*args):
         if isinstance(args[1], tuple) and len(args[1]) == 2:
             return wrapped_function(args[0], [args[1]])
         else:
             return wrapped_function(*args)
+
     return wrapper
 
 
@@ -67,6 +69,7 @@ class Grid:
         is_cell_empty: Returns a bool of the contents of a cell.
 
     """
+
     def __init__(self, width, height, torus):
         """ Create a new grid.
 
@@ -413,6 +416,7 @@ class MultiGrid(Grid):
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
     """
+
     @staticmethod
     def default_val():
         """ Default value for new cell elements. """
