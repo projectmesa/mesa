@@ -572,12 +572,15 @@ class ContinuousSpace:
             pos_1, pos_2: Coordinate tuples for both points.
 
         """
-        pos_1 = np.array(pos_1)
-        pos_2 = np.array(pos_2)
+        x1, y1 = pos_1
+        x2, y2 = pos_2
+
+        dx = np.abs(x1 - x2)
+        dy = np.abs(y1 - y2)
         if self.torus:
-            pos_1 = (pos_1 - self.center) % self.size
-            pos_2 = (pos_2 - self.center) % self.size
-        return np.linalg.norm(pos_1 - pos_2)
+            dx = min(dx, self.width - dx)
+            dy = min(dy, self.height - dy)
+        return np.sqrt(dx * dx + dy * dy)
 
     def torus_adj(self, pos):
         """ Adjust coordinates to handle torus looping.
