@@ -1,6 +1,7 @@
 import unittest
 
 import networkx as nx
+import numpy as np
 
 from mesa.space import ContinuousSpace
 from mesa.space import SingleGrid
@@ -61,6 +62,10 @@ class TestSpaceToroidal(unittest.TestCase):
         pos_4 = (20, -5)
         pos_5 = (20, -15)
         assert self.space.get_distance(pos_4, pos_5) == 10
+
+        pos_6 = (-30, -29)
+        pos_7 = (21, -5)
+        assert self.space.get_distance(pos_6, pos_7) == np.sqrt(49 ** 2 + 24 ** 2)
 
     def test_heading(self):
         pos_1 = (-30, -30)
