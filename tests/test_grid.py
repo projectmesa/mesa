@@ -400,6 +400,8 @@ class TestHexGridTorus(TestBaseGrid):
     Testing a hexagonal toroidal grid.
     '''
 
+    torus = True
+
     def setUp(self):
         '''
         Create a test non-toroidal grid and populate it with Mock Agents
