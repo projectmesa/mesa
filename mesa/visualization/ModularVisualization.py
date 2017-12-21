@@ -220,6 +220,23 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                 "params": self.application.user_params
             })
 
+        elif msg["type"] == "get_reporters":
+            reporters = []
+            for reporter in self.application.model.datacollector.model_vars.keys():
+                reporters.append(reporter)
+
+            self.write_message({
+                "type": "model_reporters",
+                "reporters": reporters
+            })
+
+        elif msg["type"] == "create_chart":
+            label = msg["label"]
+            chart = ChartModule([{"Label": str(label), "Color": "Black"}])
+            self.application.visualization_elements.append(chart)
+            self.application.js_code.append(chart.js_code)
+            self.application.package_includes.update(chart.package_includes)
+
         else:
             if self.application.verbose:
                 print("Unexpected message!")
@@ -324,3 +341,5 @@ class ModularServer(tornado.web.Application):
         tornado.autoreload.start()
         if startLoop:
             tornado.ioloop.IOLoop.instance().start()
+
+from mesa.visualization.modules import ChartModule

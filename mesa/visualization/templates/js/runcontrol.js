@@ -25,6 +25,7 @@ var player; // Variable to store the continuous player
 var control = new MesaVisualizationControl();
 var elements = [];  // List of Element objects
 var model_params = {};
+var reporters = [];
 
 // Playback buttons
 var playPauseButton = $('#play-pause');
@@ -44,11 +45,13 @@ var sidebar = $("#sidebar");
 
 // WebSocket Stuff
 // Open the websocket connection; support TLS-specific URLs when appropriate
+
 var ws = new WebSocket((window.location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
 
 ws.onopen = function() {
     console.log("Connection opened!");
     send({"type": "get_params"}); // Request model parameters when websocket is ready
+    send({"type": "get_reporters"});
     reset();
 };
 
@@ -211,17 +214,49 @@ var initGUI = function() {
                 break;
         }
     }
+
+    var addReporter = function(reporters) {
+
+        sidebar.append(
+          "<h3>Model Reporters</h3>"
+        )
+
+        var select = $("<select class='custom-select' id='reporter-selector'></select>")
+        var option_selected = $("<option selected>Select reporter</option>")
+        select.append(option_selected)
+        for (var i =0; i < reporters.length; i++) {
+          var option = $("<option value='" + i + "'>" + reporters[i] + "</option>")
+          select.append(option)
+        }
+        sidebar.append(select)
+    }
+
+
+    addReporter(reporters)
+    var chartButton = $('<button type="button" class="btn btn-secondary" onclick="createChart()">Create chart</button>')
+    sidebar.append(chartButton)
+
+    sortable(document.getElementById('elements'))
 };
+
+var createChart = function() {
+    var e = $("#reporter-selector")[0];
+    var label = e.options[e.selectedIndex].text;
+    send({"type": "create_chart", "label": label})
+    setTimeout(location.reload.bind(location), 100);
+}
 
 /** Parse and handle an incoming message on the WebSocket connection. */
 ws.onmessage = function(message) {
     var msg = JSON.parse(message.data);
+    console.log(msg)
     switch (msg["type"]) {
         case "viz_state":
             var data = msg["data"];
             for (var i in elements) {
                 elements[i].render(data[i]);
             }
+            console.log(data)
             break;
         case "end":
             // We have reached the end of the model
@@ -234,6 +269,10 @@ ws.onmessage = function(message) {
         case "model_params":
             console.log(msg["params"]);
             model_params = msg["params"];
+            break;
+        case "model_reporters":
+            console.log(msg["reporters"])
+            reporters = msg["reporters"]
             initGUI();
             break;
         default:
@@ -305,3 +344,50 @@ playPauseButton.on('click', run);
 stepButton.on('click', step);
 resetButton.on('click', reset);
 fpsControl.on('change', updateFPS);
+
+function sortable(rootEl) {
+   var dragEl;
+   var target
+
+   // Making all siblings movable
+   [].slice.call(rootEl.children).forEach(function (itemEl) {
+       itemEl.draggable = true;
+       itemEl.addEventListener('dragstart', onDragStart, false)
+       itemEl.addEventListener('dragover', onDragOver, false);
+       itemEl.addEventListener('dragend', onDragEnd, false);
+       itemEl.addEventListener('dragenter', handleDragEnter, false);
+       itemEl.addEventListener('dragleave', handleDragLeave, false);
+   });
+
+   function onDragStart(evt){
+       dragEl = evt.target; // Remembering an element that will be moved
+
+       // Limiting the movement type
+       evt.dataTransfer.effectAllowed = 'move';
+       evt.dataTransfer.setData('Text', dragEl.id);
+   }
+
+   // Function responsible for sorting
+   function onDragOver(evt) {
+       evt.preventDefault();
+       evt.dataTransfer.dropEffect = 'move';
+   }
+
+   function handleDragEnter(e) {
+     // this / e.target is the current hover target.
+     this.classList.add('over');
+     target = e.target
+   }
+
+   function handleDragLeave(e) {
+     this.classList.remove('over');  // this / e.target is previous target element.
+   }
+
+
+   // End of sorting
+   function onDragEnd(evt){
+       evt.preventDefault();
+       target.classList.remove('over');
+       rootEl.insertBefore(dragEl, target)
+   }
+}
