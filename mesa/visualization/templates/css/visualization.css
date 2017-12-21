@@ -14,3 +14,11 @@ div.tooltip {
     border-radius: 8px;
     pointer-events: none;
 }
+
+canvas {
+  border: 1px dotted;
+}
+
+.over {
+  border-top: 2px dashed;
+}
