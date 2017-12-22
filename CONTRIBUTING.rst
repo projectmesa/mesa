@@ -67,11 +67,10 @@ With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_.
 .. _`Google Style Guide` : https://google.github.io/styleguide/pyguide.html
 
 
-Licensing
+Licensing of contributions
 --------
 
-The License of this project is located in `LICENSE`_. By submitting a contribution to this project, you are agreeing that your contributions under this license and
-with this waiver of copyright interest.
+The License of this project is located in `LICENSE`_. By submitting a contribution to this project, you are agreeing that your contributions are under this license and with this you waiver of copyright interest.
 
 .. _`LICENSE` : https://github.com/projectmesa/mesa/blob/master/LICENSE
 
