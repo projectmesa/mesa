@@ -4,8 +4,8 @@ from mesa.space import MultiGrid
 
 import random
 
-class MoneyAgent(Agent):
-    """ An agent with fixed intial wealth """
+class SwarmAgent(Agent):
+    """ An minimalistic swarm agent """
     def __init__(self, unique_id, model):
         super().__init__(unique_id,model)
         self.wealth = 1
@@ -34,15 +34,16 @@ class MoneyAgent(Agent):
             other.wealth += 1
             self.wealth -= 1
 
-class MoneyModel(Model):
-    """ A model with some number of agents """
+class EnvironmentModel(Model):
+    """ A environemnt to model swarms """
     def __init__(self, N, width, height):
         self.num_agents = N
         self.grid = MultiGrid (width, height, True)
         self.schedule = SimultaneousActivation(self)
-        #self.schedule = RandomActivation(self)        
+        #self.schedule = RandomActivation(self)  
+
         for i in range(self.num_agents):
-            a = MoneyAgent(i, self) 
+            a = SwarmAgent(i, self) 
             self.schedule.add(a)
 
             # Add the agent to a random grid cell
@@ -55,12 +56,13 @@ class MoneyModel(Model):
 
 
 def main():
-    empty_model = MoneyModel(10,10,10)
+    env = EnvironmentModel(10, 10, 10)
+
     for i in range(1000):
-        empty_model.step()
+        env.step()
 
-    for agent in empty_model.schedule.agents:
-        print (agent.unique_id,agent.wealth)
+    for agent in env.schedule.agents:
+        print (agent.unique_id, agent.wealth)
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#   main()
