@@ -4,8 +4,8 @@ from swarms.agent import SwarmAgent
 import argparse
 
 ## Global variables for width and height
-width = 500
-height = 500
+width = 50
+height = 50
 
 def main():
     

@@ -1,38 +1,9 @@
 from mesa import Agent, Model
 from mesa.time import SimultaneousActivation, RandomActivation
 from mesa.space import MultiGrid
+from swarms.agent import SwarmAgent
 
 import random
-
-class SwarmAgent(Agent):
-    """ An minimalistic swarm agent """
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id,model)
-        self.wealth = 1
-
-    def step(self):
-        self.move()
-        if self.wealth > 0:
-            self.give_money()
-
-    def advance(self):
-        pass
-
-    def move(self):
-        possible_steps = self.model.grid.get_neighborhood(
-            self.pos,
-            moore = True,
-            include_center = False
-        )
-        new_position = random.choice(possible_steps)
-        self.model.grid.move_agent(self, new_position)
-
-    def give_money(self):
-        cellmates = self.model.grid.get_cell_list_contents([self.pos])
-        if len(cellmates) > 1:
-            other = random.choice (cellmates)
-            other.wealth += 1
-            self.wealth -= 1
 
 class EnvironmentModel(Model):
     """ A environemnt to model swarms """
@@ -55,14 +26,6 @@ class EnvironmentModel(Model):
         self.schedule.step()
 
 
-def main():
-    env = EnvironmentModel(10, 10, 10)
-
-    for i in range(1000):
-        env.step()
-
-    for agent in env.schedule.agents:
-        print (agent.unique_id, agent.wealth)
 
 #if __name__ == '__main__':
 #   main()

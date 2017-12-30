@@ -1,5 +1,5 @@
 from mesa import Agent
-
+import random 
 
 class SwarmAgent(Agent):
     """ An minimalistic swarm agent """
