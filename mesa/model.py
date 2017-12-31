@@ -6,7 +6,6 @@ Core Objects: Model
 
 """
 import datetime as dt
-import random
 import numpy
 
 
@@ -24,13 +23,13 @@ class Model:
             running: a bool indicating if the model should continue running
 
         """
-        # seed both the numpy and Python random number generators
+        # seed both the numpy random number generators
         if seed is None:
-            self.seed = dt.datetime.now()
+            self.seed = int(dt.datetime.timestamp(dt.datetime.now())) % 39916801
         else:
             self.seed = seed
-        random.seed(seed)
-        numpy.random.seed(seed)
+
+        self.random = numpy.random.RandomState(seed)
 
         self.running = True
         self.schedule = None
