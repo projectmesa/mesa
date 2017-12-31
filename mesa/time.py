@@ -23,11 +23,9 @@ Key concepts:
 
 
 TODO: Have the schedulers use the model's randomizer, to keep random number
-seeds consistent and allow for replication.
+seeds consistent and allow for replication. # Done
 
 """
-import random
-
 
 class BaseScheduler:
     """ Simplest scheduler; activates agents one at a time, in the order
@@ -92,7 +90,7 @@ class RandomActivation(BaseScheduler):
         random order.
 
         """
-        random.shuffle(self.agents)
+        self.model.random.shuffle(self.agents)
         for agent in self.agents[:]:
             agent.step()
         self.steps += 1
@@ -152,12 +150,12 @@ class StagedActivation(BaseScheduler):
     def step(self):
         """ Executes all the stages for all agents. """
         if self.shuffle:
-            random.shuffle(self.agents)
+            self.model.random.shuffle(self.agents)
         for stage in self.stage_list:
             for agent in self.agents[:]:
                 getattr(agent, stage)()  # Run stage
             if self.shuffle_between_stages:
-                random.shuffle(self.agents)
+                self.model.random.shuffle(self.agents)
             self.time += self.stage_time
 
         self.steps += 1
