@@ -29,7 +29,7 @@ class MoneyModel(Model):
         self.schedule = RandomActivation(self)
         self.datacollector = DataCollector(
             model_reporters={"Gini": compute_gini},
-            agent_reporters={"Wealth": lambda a: a.wealth}
+            agent_reporters={"Wealth": "wealth"}
         )
         # Create agents
         for i in range(self.num_agents):

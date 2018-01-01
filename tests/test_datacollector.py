@@ -15,12 +15,14 @@ class MockAgent(Agent):
     def __init__(self, unique_id, model, val=0):
         super().__init__(unique_id, model)
         self.val = val
+        self.val2 = val
 
     def step(self):
         '''
-        Increment val by 1.
+        Increment vals by 1.
         '''
         self.val += 1
+        self.val2 += 1
 
     def write_final_values(self):
         '''
@@ -39,12 +41,15 @@ class MockModel(Model):
 
     def __init__(self):
         self.schedule = BaseScheduler(self)
+        self.model_val = 100
+
         for i in range(10):
             a = MockAgent(i, self, val=i)
             self.schedule.add(a)
         self.datacollector = DataCollector(
-            {"total_agents": lambda m: m.schedule.get_agent_count()},
-            {"value": lambda a: a.val},
+            {"total_agents": lambda m: m.schedule.get_agent_count(),
+             "model_value": "model_val"},
+            {"value": lambda a: a.val, "value2": "val2"},
             {"Final_Values": ["agent_id", "final_value"]})
 
     def step(self):
@@ -70,9 +75,13 @@ class TestDataCollector(unittest.TestCase):
         '''
         data_collector = self.model.datacollector
         assert "total_agents" in data_collector.model_vars
+        assert "model_value" in data_collector.model_vars
         assert len(data_collector.model_vars["total_agents"]) == 7
+        assert len(data_collector.model_vars["model_value"]) == 7
         for element in data_collector.model_vars["total_agents"]:
             assert element == 10
+        for element in data_collector.model_vars["model_value"]:
+            assert element == 100
 
     def test_agent_vars(self):
         '''
@@ -80,10 +89,12 @@ class TestDataCollector(unittest.TestCase):
         '''
         data_collector = self.model.datacollector
         assert len(data_collector.agent_vars["value"]) == 7
-        for step in data_collector.agent_vars["value"]:
-            assert len(step) == 10
-            for record in step:
-                assert len(record) == 2
+        assert len(data_collector.agent_vars["value2"]) == 7
+        for var in ["value", "value2"]:
+            for step in data_collector.agent_vars[var]:
+                assert len(step) == 10
+                for record in step:
+                    assert len(record) == 2
 
     def test_table_rows(self):
         '''
@@ -111,8 +122,8 @@ class TestDataCollector(unittest.TestCase):
         agent_vars = data_collector.get_agent_vars_dataframe()
         table_df = data_collector.get_table_dataframe("Final_Values")
 
-        assert model_vars.shape == (7, 1)
-        assert agent_vars.shape == (70, 1)
+        assert model_vars.shape == (7, 2)
+        assert agent_vars.shape == (70, 2)
         assert table_df.shape == (10, 2)
 
         with self.assertRaises(Exception):
