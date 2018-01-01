@@ -3,7 +3,7 @@ Test the Grid objects.
 '''
 import unittest
 
-from mesa.space import Grid, SingleGrid, MultiGrid
+from mesa.space import Grid, SingleGrid, MultiGrid, HexGrid
 
 # Initial agent positions for testing
 #
@@ -25,6 +25,7 @@ class MockAgent:
     '''
     Minimalistic agent for testing purposes.
     '''
+
     def __init__(self, unique_id, pos):
         self.unique_id = unique_id
         self.pos = pos
@@ -146,6 +147,30 @@ class TestBaseGrid(unittest.TestCase):
         assert second[0].pos == (0, 1)
         assert second[1] == 0
         assert second[2] == 1
+
+    def test_agent_move(self):
+        # get the agent at [0, 1]
+        agent = self.agents[0]
+        self.grid.move_agent(agent, (1, 1))
+        assert agent.pos == (1, 1)
+        # move it off the torus and check for the exception
+        if not self.torus:
+            with self.assertRaises(Exception):
+                self.grid.move_agent(agent, [-1, 1])
+            with self.assertRaises(Exception):
+                self.grid.move_agent(agent, [1, self.grid.height + 1])
+        else:
+            self.grid.move_agent(agent, [-1, 1])
+            assert agent.pos == (self.grid.width - 1, 1)
+            self.grid.move_agent(agent, [1, self.grid.height + 1])
+            assert agent.pos == (1, 1)
+
+    def test_agent_remove(self):
+        agent = self.agents[0]
+        x, y = agent.pos
+        self.grid.remove_agent(agent)
+        assert agent.pos is None
+        assert self.grid.grid[x][y] is None
 
 
 class TestBaseGridTorus(TestBaseGrid):
@@ -317,3 +342,98 @@ class TestMultiGrid(unittest.TestCase):
 
         neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
         assert len(neighbors) == 11
+
+
+class TestHexGrid(unittest.TestCase):
+    '''
+    Testing a hexagonal grid.
+    '''
+
+    def setUp(self):
+        '''
+        Create a test non-toroidal grid and populate it with Mock Agents
+        '''
+        width = 3
+        height = 5
+        self.grid = HexGrid(width, height, torus=False)
+        self.agents = []
+        counter = 0
+        for x in range(width):
+            for y in range(height):
+                if TEST_GRID[x][y] == 0:
+                    continue
+                counter += 1
+                # Create and place the mock agent
+                a = MockAgent(counter, None)
+                self.agents.append(a)
+                self.grid.place_agent(a, (x, y))
+
+    def test_neighbors(self):
+        '''
+        Test the hexagonal neighborhood methods on the non-toroid.
+        '''
+
+        neighborhood = self.grid.get_neighborhood((1, 1))
+        assert len(neighborhood) == 6
+
+        neighborhood = self.grid.get_neighborhood((0, 2))
+        assert len(neighborhood) == 4
+
+        neighborhood = self.grid.get_neighborhood((1, 0))
+        assert len(neighborhood) == 3
+
+        neighborhood = self.grid.get_neighborhood((1, 4))
+        assert len(neighborhood) == 5
+
+        neighborhood = self.grid.get_neighborhood((0, 4))
+        assert len(neighborhood) == 2
+
+        neighborhood = self.grid.get_neighborhood((0, 0))
+        assert len(neighborhood) == 3
+
+        neighborhood = self.grid.get_neighborhood((1, 1), include_center=True)
+        assert len(neighborhood) == 7
+
+
+class TestHexGridTorus(TestBaseGrid):
+    '''
+    Testing a hexagonal toroidal grid.
+    '''
+
+    torus = True
+
+    def setUp(self):
+        '''
+        Create a test non-toroidal grid and populate it with Mock Agents
+        '''
+        width = 3
+        height = 5
+        self.grid = HexGrid(width, height, torus=True)
+        self.agents = []
+        counter = 0
+        for x in range(width):
+            for y in range(height):
+                if TEST_GRID[x][y] == 0:
+                    continue
+                counter += 1
+                # Create and place the mock agent
+                a = MockAgent(counter, None)
+                self.agents.append(a)
+                self.grid.place_agent(a, (x, y))
+
+    def test_neighbors(self):
+        '''
+        Test the hexagonal neighborhood methods on the toroid.
+        '''
+
+        neighborhood = self.grid.get_neighborhood((1, 1))
+        assert len(neighborhood) == 6
+
+        neighborhood = self.grid.get_neighborhood((1, 1), include_center=True)
+        assert len(neighborhood) == 7
+
+        neighborhood = self.grid.get_neighborhood((0, 0))
+        assert len(neighborhood) == 6
+
+        neighborhood = self.grid.get_neighborhood((2, 4))
+        assert len(neighborhood) == 6

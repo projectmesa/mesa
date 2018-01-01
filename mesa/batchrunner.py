@@ -82,6 +82,7 @@ class BatchRunner:
         self.model_cls = model_cls
         self.variable_parameters = self._process_parameters(variable_parameters)
         self.fixed_parameters = fixed_parameters or {}
+        self._include_fixed = len(self.fixed_parameters.keys()) > 0
         self.iterations = iterations
         self.max_steps = max_steps
 
@@ -193,4 +194,7 @@ class BatchRunner:
         rest_cols = set(df.columns) - set(index_cols)
         ordered = df[index_cols + list(sorted(rest_cols))]
         ordered.sort_values(by='Run', inplace=True)
+        if self._include_fixed:
+            for param in self.fixed_parameters.keys():
+                ordered[param] = self.fixed_parameters[param]
         return ordered

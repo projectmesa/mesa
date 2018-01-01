@@ -1,7 +1,9 @@
 var TextModule = function() {
-	var tag = "<p></p>";
+	var tag = "<p class='lead'></p>";
 	var text = $(tag)[0];
-	$("body").append(text);
+
+	// Append text tag to #elements:
+    $("#elements").append(text);
 
 	this.render = function(data) {
 		$(text).html(data);

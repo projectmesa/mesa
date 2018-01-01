@@ -43,7 +43,9 @@ var fpsControl = $('#fps').slider({
 var sidebar = $("#sidebar");
 
 // WebSocket Stuff
-var ws = new WebSocket("ws://127.0.0.1:" + port + "/ws"); // Open the websocket connection
+// Open the websocket connection; support TLS-specific URLs when appropriate
+var ws = new WebSocket((window.location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
+
 ws.onopen = function() {
     console.log("Connection opened!");
     send({"type": "get_params"}); // Request model parameters when websocket is ready
@@ -58,14 +60,14 @@ var initGUI = function() {
     };
 
     var addBooleanInput = function(param, obj) {
-        var dom_id = param + '_id';
-        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + obj.name + "</label></p>")[0];
-        var checkbox = $("<input class='model-parameter' id='" + dom_id + "' type='checkbox'/>")[0];
-        var input_group = $("<div class='input-group input-group-lg'></div>")[0];
-        sidebar.append(input_group);
-        input_group.append(label);
-        input_group.append(checkbox);
-        $(checkbox).bootstrapSwitch({
+        var domID = param + '_id';
+        sidebar.append([
+            "<div class='input-group input-group-lg'>",
+            "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
+            "<input class='model-parameter' id='" + domID + "' type='checkbox'/>",
+            "</div>"
+        ].join(''));
+        $('#' + domID).bootstrapSwitch({
             'state': obj.value,
             'size': 'small',
             'onSwitchChange': function(e, state) {
@@ -75,36 +77,45 @@ var initGUI = function() {
     };
 
     var addNumberInput = function(param, obj) {
-        var dom_id = param + '_id';
-        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + obj.name + "</label></p>")[0];
-        var number_input = $("<input class='model-parameter' id='" + dom_id + "' type='number'/>")[0];
-        var input_group = $("<div class='input-group input-group-lg'></div>")[0];
-        sidebar.append(input_group);
-        input_group.append(label);
-        input_group.append(number_input);
-        $(number_input).val(obj.value);
-        $(number_input).on('change', function() {
+        var domID = param + '_id';
+        sidebar.append([
+            "<div class='input-group input-group-lg'>",
+            "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
+            "<input class='model-parameter' id='" + domID + "' type='number'/>",
+            "</div>"
+        ].join(''));
+        var numberInput = $('#' + domID);
+        numberInput.val(obj.value);
+        numberInput.on('change', function() {
             onSubmitCallback(param, Number($(this).val()));
         })
     };
 
     var addSliderInput = function(param, obj) {
-        var dom_id = param + '_id';
-        var label = $("<p></p>")[0];
-        var tooltip = $("<a data-toggle='tooltip' data-placement='top' class='label label-primary'>" + obj.name + "</a>")[0];
+        var domID = param + '_id';
+        var tooltipID = domID + "_tooltip";
+        sidebar.append([
+            "<div class='input-group input-group-lg'>",
+            "<p>",
+            "<a id='" + tooltipID + "' data-toggle='tooltip' data-placement='top' class='label label-primary'>",
+            obj.name,
+            "</a>",
+            "</p>",
+            "<input id='" + domID + "' type='text' />",
+            "</div>"
+        ].join(''));
+
+        // Enable tooltip label
         if (obj.description !== null) {
-            $(tooltip).tooltip({
+            $(tooltipID).tooltip({
                 title: obj.description,
                 placement: 'right'
             });
         }
-        label.append(tooltip);
-        var slider_input = $("<input id='" + dom_id + "' type='text' />")[0];
-        var input_group = $("<div class='input-group input-group-lg'></div>")[0];
-        sidebar.append(input_group);
-        input_group.append(label);
-        input_group.append(slider_input);
-        $(slider_input).slider({
+
+        // Setup slider
+        var sliderInput = $("#" + domID);
+        sliderInput.slider({
             min: obj.min_value,
             max: obj.max_value,
             value: obj.value,
@@ -113,37 +124,45 @@ var initGUI = function() {
             ticks_labels: [obj.min_value, obj.max_value],
             ticks_positions: [0, 100]
         });
-        $(slider_input).on('change', function() {
+        sliderInput.on('change', function() {
             onSubmitCallback(param, Number($(this).val()));
         })
     };
 
     var addChoiceInput = function(param, obj) {
-        var dom_id = param + '_id';
-        var label = $("<p><label for='" + dom_id + "' class='label label-primary'>" + obj.name + "</label></p>")[0];
-        sidebar.append(label);
-
-        var dropdown = $("<div class='dropdown'></div>")[0];
-        var button = $("<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'></button>")[0];
-        var span = $("<span class='caret'></span>")[0];
-        $(button).text(obj.value + " ");
-        $(button).id = dom_id;
-        $(button).append(span);
-        var choice_container = $("<ul class='dropdown-menu' role='menu' aria-labelledby='" + dom_id + "'></ul>")[0];
+        var domID = param + '_id';
+        var span = "<span class='caret'></span>";
+        var template = [
+            "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
+            "<div class='dropdown'>",
+            "<button id='" + domID + "' class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>" +
+            obj.value + " " + span,
+            "</button>",
+            "<ul class='dropdown-menu' role='menu' aria-labelledby='" + domID + "'>"
+        ];
+        var choiceIdentifiers = [];
         for (var i = 0; i < obj.choices.length; i++) {
-            var choice = $("<li role='presentation'><a role='menuitem' tabindex='-1' href='#'>" + obj.choices[i] + "</a></li>")[0];
-            $(choice).on('click', function() {
-                var value = $(this).children()[0].text;
-                console.log(value);
-               $(button).text(value + ' ');
-               onSubmitCallback(param, value);
-            });
-            choice_container.append(choice);
+            var choiceID = domID + '_choice_' + i;
+            choiceIdentifiers.push(choiceID);
+            template.push(
+                "<li role='presentation'><a class='pick-choice' id='" + choiceID + "' role='menuitem' tabindex='-1' href='#'>",
+                obj.choices[i],
+                "</a></li>"
+            );
         }
 
-        dropdown.append(button);
-        dropdown.append(choice_container);
-        sidebar.append(dropdown);
+        // Close the dropdown options
+        template.push("</ul>", "</div>");
+
+        // Finally render the dropdown and activate choice listeners
+        sidebar.append(template.join(''));
+        choiceIdentifiers.forEach(function (id) {
+            $('#' + id).on('click', function () {
+                var value = $(this).text();
+                $('#' + domID).html(value + ' ' + span);
+                onSubmitCallback(param, value);
+            });
+        });
     };
 
     var addTextBox = function(param, obj) {
