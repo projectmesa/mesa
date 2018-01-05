@@ -27,6 +27,9 @@ seeds consistent and allow for replication. # Done
 
 """
 
+
+import random 
+
 class BaseScheduler:
     """ Simplest scheduler; activates agents one at a time, in the order
     they were added.

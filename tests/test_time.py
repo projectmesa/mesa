@@ -47,6 +47,9 @@ class MockModel(Model):
         '''
         self.log = []
 
+        # Initilize the super class.
+        super().__init__()
+        
         # Make scheduler
         if activation == STAGED:
             model_stages = ["stage_one", "stage_two"]
