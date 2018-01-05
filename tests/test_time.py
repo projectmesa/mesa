@@ -49,7 +49,7 @@ class MockModel(Model):
 
         # Initilize the super class.
         super().__init__()
-        
+
         # Make scheduler
         if activation == STAGED:
             model_stages = ["stage_one", "stage_two"]
@@ -124,7 +124,7 @@ class TestRandomActivation(TestCase):
         Test the random activation step
         '''
         model = MockModel(activation=RANDOM)
-        with patch('mesa.time.random.shuffle') as mock_shuffle:
+        with patch('mesa.model.numpy.random.shuffle') as mock_shuffle:
             model.schedule.step()
             assert mock_shuffle.call_count == 1
 
