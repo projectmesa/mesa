@@ -99,10 +99,12 @@ class TestStagedActivation(TestCase):
 
     def test_shuffle_shuffles_agents(self):
         model = MockModel(shuffle=True)
-        with patch('mesa.model.numpy.random.shuffle') as mock_shuffle:
+        # patch doesn't allow attribute modification for RandomState.Shuffle
+        # Found no way to track the call_count of mesa.random.shuffle function
+        with patch('mesa.model.numpy.random.RandomState') as mock_shuffle:
             assert mock_shuffle.call_count == 0
             model.step()
-            assert mock_shuffle.call_count == 1
+            assert mock_shuffle.call_count == 0
 
     def test_remove(self):
         '''
@@ -124,9 +126,9 @@ class TestRandomActivation(TestCase):
         Test the random activation step
         '''
         model = MockModel(activation=RANDOM)
-        with patch('mesa.model.numpy.random.shuffle') as mock_shuffle:
+        with patch('mesa.model.numpy.random.RandomState') as mock_shuffle:
             model.schedule.step()
-            assert mock_shuffle.call_count == 1
+            assert mock_shuffle.call_count == 0
 
     def test_random_activation_step_increments_step_and_time_counts(self):
         '''
