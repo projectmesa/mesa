@@ -99,7 +99,7 @@ class TestStagedActivation(TestCase):
 
     def test_shuffle_shuffles_agents(self):
         model = MockModel(shuffle=True)
-        with patch('mesa.time.random.shuffle') as mock_shuffle:
+        with patch('mesa.model.numpy.random.shuffle') as mock_shuffle:
             assert mock_shuffle.call_count == 0
             model.step()
             assert mock_shuffle.call_count == 1
