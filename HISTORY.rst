@@ -16,6 +16,7 @@ Release History
 * Extended Grid to support hexagonal grids #409
 
 **Fixes**
+
 * Updating license year to 2018 #450
 * Removed mutable defaults from DataCollector constructor #434
 * [BUGFIX] Torus adjustment in Grid class #429
