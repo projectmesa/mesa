@@ -8,6 +8,7 @@ Release History
 
 **Improvements**
 
+* Datacollector fix #445
 * A first network grid model with visualization, using NetworkX and sigma.js #388
 * Cache pip packages for Travis setup #427
 * Remove localhost hardcoding + allow secure sockets #421
