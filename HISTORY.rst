@@ -17,6 +17,7 @@ Release History
 
 **Fixes**
 
+* Faster ContinuousSpace neighbor search #439
 * Updating license year to 2018 #450
 * Updating language on license in contributing file #446
 * Updating license year to 2018 #450
