@@ -70,8 +70,7 @@ With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_.
 Licensing
 --------
 
-The License of this project is located in `LICENSE`_. By submitting a contribution to this project, you are agreeing that your contributions under this license and
-with this waiver of copyright interest.
+The license of this project is located in `LICENSE`_.  By submitting a contribution to this project, you are agreeing that your contribution will be released under the terms of this license.
 
 .. _`LICENSE` : https://github.com/projectmesa/mesa/blob/master/LICENSE
 
