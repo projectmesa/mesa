@@ -13,6 +13,7 @@ TEST_AGENTS_GRID = [(1, 1), (10, 0), (10, 10)]
 TEST_AGENTS_NETWORK_SINGLE = [0, 1, 5]
 TEST_AGENTS_NETWORK_MULTIPLE = [0, 1, 1]
 OUTSIDE_POSITIONS = [(70, 10), (30, 20), (100, 10)]
+REMOVAL_TEST_AGENTS = [(-20, -20), (-20, -20.05), (65, 18), (0, -11), (20, 20), (31, 41), (55, 32)]
 
 
 class TestSpaceToroidal(unittest.TestCase):
@@ -24,7 +25,7 @@ class TestSpaceToroidal(unittest.TestCase):
         '''
         Create a test space and populate with Mock Agents.
         '''
-        self.space = ContinuousSpace(70, 20, True, -30, -30, 100, 100)
+        self.space = ContinuousSpace(70, 20, True, -30, -30)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS):
             a = MockAgent(i, None)
@@ -38,6 +39,14 @@ class TestSpaceToroidal(unittest.TestCase):
         for i, pos in enumerate(TEST_AGENTS):
             a = self.agents[i]
             assert a.pos == pos
+
+    def test_agent_matching(self):
+        '''
+        Ensure that the agents are all placed and indexed properly.
+        '''
+        for i, agent in self.space._index_to_agent.items():
+            assert agent.pos == tuple(self.space._agent_points[i, :])
+            assert i == self.space._agent_to_index[agent]
 
     def test_distance_calculations(self):
         '''
@@ -109,7 +118,7 @@ class TestSpaceNonToroidal(unittest.TestCase):
         '''
         Create a test space and populate with Mock Agents.
         '''
-        self.space = ContinuousSpace(70, 20, False, -30, -30, 100, 100)
+        self.space = ContinuousSpace(70, 20, False, -30, -30)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS):
             a = MockAgent(i, None)
@@ -123,6 +132,14 @@ class TestSpaceNonToroidal(unittest.TestCase):
         for i, pos in enumerate(TEST_AGENTS):
             a = self.agents[i]
             assert a.pos == pos
+
+    def test_agent_matching(self):
+        '''
+        Ensure that the agents are all placed and indexed properly.
+        '''
+        for i, agent in self.space._index_to_agent.items():
+            assert agent.pos == tuple(self.space._agent_points[i, :])
+            assert i == self.space._agent_to_index[agent]
 
     def test_distance_calculations(self):
         '''
@@ -169,6 +186,65 @@ class TestSpaceNonToroidal(unittest.TestCase):
             assert self.space.out_of_bounds(pos)
             with self.assertRaises(Exception):
                 self.space.move_agent(a, pos)
+
+
+class TestSpaceAgentMapping(unittest.TestCase):
+    '''
+    Testing a continuous space for agent mapping during removal.
+    '''
+
+    def setUp(self):
+        '''
+        Create a test space and populate with Mock Agents.
+        '''
+        self.space = ContinuousSpace(70, 50, False, -30, -30)
+        self.agents = []
+        for i, pos in enumerate(REMOVAL_TEST_AGENTS):
+            a = MockAgent(i, None)
+            self.agents.append(a)
+            self.space.place_agent(a, pos)
+
+    def test_remove_first(self):
+        '''
+        Test removing the first entry
+        '''
+        agent_to_remove = self.agents[0]
+        self.space.remove_agent(agent_to_remove)
+        for i, agent in self.space._index_to_agent.items():
+            assert agent.pos == tuple(self.space._agent_points[i, :])
+            assert i == self.space._agent_to_index[agent]
+        assert agent_to_remove not in self.space._agent_to_index
+        assert agent_to_remove.pos is None
+        with self.assertRaises(Exception):
+            self.space.remove_agent(agent_to_remove)
+
+    def test_remove_last(self):
+        '''
+        Test removing the last entry
+        '''
+        agent_to_remove = self.agents[-1]
+        self.space.remove_agent(agent_to_remove)
+        for i, agent in self.space._index_to_agent.items():
+            assert agent.pos == tuple(self.space._agent_points[i, :])
+            assert i == self.space._agent_to_index[agent]
+        assert agent_to_remove not in self.space._agent_to_index
+        assert agent_to_remove.pos is None
+        with self.assertRaises(Exception):
+            self.space.remove_agent(agent_to_remove)
+
+    def test_remove_middle(self):
+        '''
+        Test removing a middle entry
+        '''
+        agent_to_remove = self.agents[3]
+        self.space.remove_agent(agent_to_remove)
+        for i, agent in self.space._index_to_agent.items():
+            assert agent.pos == tuple(self.space._agent_points[i, :])
+            assert i == self.space._agent_to_index[agent]
+        assert agent_to_remove not in self.space._agent_to_index
+        assert agent_to_remove.pos is None
+        with self.assertRaises(Exception):
+            self.space.remove_agent(agent_to_remove)
 
 
 class TestSingleGrid(unittest.TestCase):
