@@ -18,6 +18,8 @@ Release History
 **Fixes**
 
 * Updating license year to 2018 #450
+* Updating language on license in contributing file #446
+* Updating license year to 2018 #450
 * Removed mutable defaults from DataCollector constructor #434
 * [BUGFIX] Torus adjustment in Grid class #429
 * Batchrunfixedparameters #423
