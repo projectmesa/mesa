@@ -25,7 +25,7 @@ var player; // Variable to store the continuous player
 var control = new MesaVisualizationControl();
 var elements = [];  // List of Element objects
 var model_params = {};
-var gui_inputs = {};
+var guiInputControlMap = {};
 
 // Playback buttons
 var playPauseButton = $('#play-pause');
@@ -76,7 +76,7 @@ var initGUI = function() {
                 onSubmitCallback(param, state);
             }
         });
-        gui_inputs[param] = $(checkbox);
+        guiInputControlMap[param] = "#" + domID;
     };
 
     var addNumberInput = function(param, obj) {
@@ -92,7 +92,7 @@ var initGUI = function() {
         numberInput.on('change', function() {
             onSubmitCallback(param, Number($(this).val()));
         });
-        gui_inputs[param] = $(number_input);
+        guiInputControlMap[param] = "#" + domID;
     };
 
     var addSliderInput = function(param, obj) {
@@ -131,7 +131,7 @@ var initGUI = function() {
         sliderInput.on('change', function() {
             onSubmitCallback(param, Number($(this).val()));
         });
-        gui_inputs[param] = slider;
+        guiInputControlMap[param] = "#" + domID;
     };
 
     var addChoiceInput = function(param, obj) {
@@ -168,12 +168,12 @@ var initGUI = function() {
                 onSubmitCallback(param, value);
             });
         });
+        // guiInputControlMap[param] = "#" + domID; // TODO - how should dropdowns be reloaded?
     };
 
     var addTextBox = function(param, obj) {
         var well = $('<div class="well">' + obj.value + '</div>')[0];
         sidebar.append(well);
-        gui_inputs[param] = $(well);
     };
 
     var addParamInput = function(param, option) {
@@ -320,22 +320,23 @@ var loadParamCallback = function(data) {
 
                 // Update local model_params
                 model_params[param].value = loaded.value;
+                var guiInputElement = $(guiInputControlMap[param]);
 
                 // Now update UI controls and server.
                 switch (current.param_type) {
                     case 'checkbox':
-                        gui_inputs[param].bootstrapSwitch('state', loaded.value);   // Automatically executes `send`
+                        guiInputElement.bootstrapSwitch('state', loaded.value);   // Automatically executes `send`
                         break;
                     case 'slider':
-                        gui_inputs[param].bootstrapSlider('setValue', loaded.value);
+                        guiInputElement.bootstrapSlider('setValue', loaded.value);
                         send({"type": "submit_params", "param": param, "value": loaded.value});
                         break;
                     case 'choice':
-                        gui_inputs[param].text(loaded.value + ' ');
+                        guiInputElement.text(loaded.value + ' ');
                         send({"type": "submit_params", "param": param, "value": loaded.value});
                         break;
                     case 'number':
-                        gui_inputs[param].val(loaded.value);
+                        guiInputElement.val(loaded.value);
                         send({"type": "submit_params", "param": param, "value": loaded.value});
                         break;
                 }
@@ -369,10 +370,10 @@ var saveUserParamsButton = $('#save-user-params');
 var saveUserParamsFilename = $('#save-user-params-filename');
 
 /** Create a "downloaded" JSON file from a stringified JavaScript object */
-var download = function(data, filename, type) {
+var download = function(dataObj, filename) {
+    var dataStr = "data:application/json;base64," + window.btoa(JSON.stringify(dataObj));
     var a = document.createElement("a");
-    var file = new Blob([data], {type: type});
-    a.href = URL.createObjectURL(file);
+    a.href = dataStr;
     a.download = filename;
     a.click();
 };
@@ -391,7 +392,7 @@ var saveUserParams = function(e) {
     if (parts.length > 0) {
         var ext = parts[parts.length - 1];
         if (parts.length > 1 && ext === 'json') {
-            download(JSON.stringify(model_params), filename, "application/json");
+            download(model_params, filename);
             $('#save-params-modal').modal('hide');
             saveUserParamsFilename.val('')
         }

@@ -24,7 +24,7 @@ function JSONLoader(input, callback) {
             if (el.files && el.files[0]) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
-                    var data = JSON.parse(window.atob(e.target.result.replace('data:;base64,', '')));
+                    var data = JSON.parse(window.atob(e.target.result.replace('data:application/json;base64,', '')));
                     callback(data);
                     self.data = data;
                 };
