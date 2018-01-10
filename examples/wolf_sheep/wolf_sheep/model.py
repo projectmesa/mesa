@@ -63,6 +63,8 @@ class WolfSheepPredation(Model):
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
         '''
 
+        super().__init__()
+
         # Set parameters
         self.height = height
         self.width = width

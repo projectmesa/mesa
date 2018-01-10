@@ -21,6 +21,7 @@ class MoneyModel(Model):
 
     def __init__(self, num_agents, num_nodes):
 
+        super().__init__()
         self.num_agents = num_agents
         self.num_nodes = num_nodes if num_nodes >= self.num_agents else self.num_agents
         self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=0.5)

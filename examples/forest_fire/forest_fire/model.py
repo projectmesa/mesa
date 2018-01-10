@@ -21,6 +21,7 @@ class ForestFire(Model):
             density: What fraction of grid cells have a tree in them.
         """
         # Initialize model parameters
+        super().__init__()
         self.height = height
         self.width = width
         self.density = density
