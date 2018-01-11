@@ -17,6 +17,7 @@ class GameOfLife(Model):
         '''
         Create a new playing area of (height, width) cells.
         '''
+        super().__init__()
 
         # Set up the grid and schedule.
 

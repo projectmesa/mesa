@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Mesa Agent-Based Modeling Framework
-
 Core Objects: Model, and Agent.
-
 """
 import datetime
 

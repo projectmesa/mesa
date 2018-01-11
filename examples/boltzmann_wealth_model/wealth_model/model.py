@@ -23,6 +23,8 @@ class MoneyModel(Model):
     """
 
     def __init__(self, N, width, height):
+
+        super().__init__()
         self.num_agents = N
         self.running = True
         self.grid = MultiGrid(height, width, True)

@@ -37,6 +37,7 @@ class VirusModel(Model):
     def __init__(self, num_nodes, avg_node_degree, initial_outbreak_size, virus_spread_chance, virus_check_frequency,
                  recovery_chance, gain_resistance_chance):
 
+        super().__init__()
         self.num_nodes = num_nodes
         prob = avg_node_degree / self.num_nodes
         self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=prob)

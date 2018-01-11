@@ -31,6 +31,8 @@ class PDModel(Model):
                            Determines the agent activation regime.
             payoffs: (optional) Dictionary of (move, neighbor_move) payoffs.
         '''
+        super().__init__()
+
         self.running = True
         self.grid = SingleGrid(height, width, torus=True)
         self.schedule_type = schedule_type

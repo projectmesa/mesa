@@ -14,8 +14,8 @@ _COLORS = ['Aqua', 'Blue', 'Fuchsia', 'Gray', 'Green',
            'Red', 'Silver', 'Teal', 'White', 'Yellow']
 
 
-grid_rows = 50
-grid_cols = 25
+grid_rows = 90
+grid_cols = 90
 cell_size = 10
 canvas_width = grid_rows * cell_size
 canvas_height = grid_cols * cell_size

@@ -45,6 +45,7 @@ class SchellingModel(Model):
         '''
         '''
 
+        super().__init__()
         self.height = height
         self.width = width
         self.density = density

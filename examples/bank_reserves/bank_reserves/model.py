@@ -88,6 +88,8 @@ class BankReservesModel(Model):
        are all UserSettableParameters"""
     def __init__(self, height=grid_h, width=grid_w, init_people=2, rich_threshold=10,
                  reserve_percent=50,):
+
+        super().__init__()
         self.height = height
         self.width = width
         self.init_people = init_people

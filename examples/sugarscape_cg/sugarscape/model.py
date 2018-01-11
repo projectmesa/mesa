@@ -35,6 +35,8 @@ class Sugarscape2ConstantGrowback(Model):
             initial_population: Number of population to start with
         '''
 
+        super().__init__()
+
         # Set parameters
         self.height = height
         self.width = width

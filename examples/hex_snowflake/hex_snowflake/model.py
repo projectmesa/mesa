@@ -15,6 +15,7 @@ class HexSnowflake(Model):
         Create a new playing area of (height, width) cells.
         '''
 
+        super().__init__()
         # Set up the grid and schedule.
 
         # Use SimultaneousActivation which simulates all the cells
