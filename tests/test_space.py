@@ -1,10 +1,19 @@
 import unittest
 
+import networkx as nx
+import numpy as np
+
 from mesa.space import ContinuousSpace
+from mesa.space import SingleGrid
+from mesa.space import NetworkGrid
 from test_grid import MockAgent
 
 TEST_AGENTS = [(-20, -20), (-20, -20.05), (65, 18)]
+TEST_AGENTS_GRID = [(1, 1), (10, 0), (10, 10)]
+TEST_AGENTS_NETWORK_SINGLE = [0, 1, 5]
+TEST_AGENTS_NETWORK_MULTIPLE = [0, 1, 1]
 OUTSIDE_POSITIONS = [(70, 10), (30, 20), (100, 10)]
+REMOVAL_TEST_AGENTS = [(-20, -20), (-20, -20.05), (65, 18), (0, -11), (20, 20), (31, 41), (55, 32)]
 
 
 class TestSpaceToroidal(unittest.TestCase):
@@ -16,7 +25,7 @@ class TestSpaceToroidal(unittest.TestCase):
         '''
         Create a test space and populate with Mock Agents.
         '''
-        self.space = ContinuousSpace(70, 20, True, -30, -30, 100, 100)
+        self.space = ContinuousSpace(70, 20, True, -30, -30)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS):
             a = MockAgent(i, None)
@@ -31,6 +40,14 @@ class TestSpaceToroidal(unittest.TestCase):
             a = self.agents[i]
             assert a.pos == pos
 
+    def test_agent_matching(self):
+        '''
+        Ensure that the agents are all placed and indexed properly.
+        '''
+        for i, agent in self.space._index_to_agent.items():
+            assert agent.pos == tuple(self.space._agent_points[i, :])
+            assert i == self.space._agent_to_index[agent]
+
     def test_distance_calculations(self):
         '''
         Test toroidal distance calculations.
@@ -41,6 +58,14 @@ class TestSpaceToroidal(unittest.TestCase):
 
         pos_3 = (-30, -20)
         assert self.space.get_distance(pos_1, pos_3) == 10
+
+        pos_4 = (20, -5)
+        pos_5 = (20, -15)
+        assert self.space.get_distance(pos_4, pos_5) == 10
+
+        pos_6 = (-30, -29)
+        pos_7 = (21, -5)
+        assert self.space.get_distance(pos_6, pos_7) == np.sqrt(49 ** 2 + 24 ** 2)
 
     def test_heading(self):
         pos_1 = (-30, -30)
@@ -93,7 +118,7 @@ class TestSpaceNonToroidal(unittest.TestCase):
         '''
         Create a test space and populate with Mock Agents.
         '''
-        self.space = ContinuousSpace(70, 20, False, -30, -30, 100, 100)
+        self.space = ContinuousSpace(70, 20, False, -30, -30)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS):
             a = MockAgent(i, None)
@@ -107,6 +132,14 @@ class TestSpaceNonToroidal(unittest.TestCase):
         for i, pos in enumerate(TEST_AGENTS):
             a = self.agents[i]
             assert a.pos == pos
+
+    def test_agent_matching(self):
+        '''
+        Ensure that the agents are all placed and indexed properly.
+        '''
+        for i, agent in self.space._index_to_agent.items():
+            assert agent.pos == tuple(self.space._agent_points[i, :])
+            assert i == self.space._agent_to_index[agent]
 
     def test_distance_calculations(self):
         '''
@@ -153,3 +186,228 @@ class TestSpaceNonToroidal(unittest.TestCase):
             assert self.space.out_of_bounds(pos)
             with self.assertRaises(Exception):
                 self.space.move_agent(a, pos)
+
+
+class TestSpaceAgentMapping(unittest.TestCase):
+    '''
+    Testing a continuous space for agent mapping during removal.
+    '''
+
+    def setUp(self):
+        '''
+        Create a test space and populate with Mock Agents.
+        '''
+        self.space = ContinuousSpace(70, 50, False, -30, -30)
+        self.agents = []
+        for i, pos in enumerate(REMOVAL_TEST_AGENTS):
+            a = MockAgent(i, None)
+            self.agents.append(a)
+            self.space.place_agent(a, pos)
+
+    def test_remove_first(self):
+        '''
+        Test removing the first entry
+        '''
+        agent_to_remove = self.agents[0]
+        self.space.remove_agent(agent_to_remove)
+        for i, agent in self.space._index_to_agent.items():
+            assert agent.pos == tuple(self.space._agent_points[i, :])
+            assert i == self.space._agent_to_index[agent]
+        assert agent_to_remove not in self.space._agent_to_index
+        assert agent_to_remove.pos is None
+        with self.assertRaises(Exception):
+            self.space.remove_agent(agent_to_remove)
+
+    def test_remove_last(self):
+        '''
+        Test removing the last entry
+        '''
+        agent_to_remove = self.agents[-1]
+        self.space.remove_agent(agent_to_remove)
+        for i, agent in self.space._index_to_agent.items():
+            assert agent.pos == tuple(self.space._agent_points[i, :])
+            assert i == self.space._agent_to_index[agent]
+        assert agent_to_remove not in self.space._agent_to_index
+        assert agent_to_remove.pos is None
+        with self.assertRaises(Exception):
+            self.space.remove_agent(agent_to_remove)
+
+    def test_remove_middle(self):
+        '''
+        Test removing a middle entry
+        '''
+        agent_to_remove = self.agents[3]
+        self.space.remove_agent(agent_to_remove)
+        for i, agent in self.space._index_to_agent.items():
+            assert agent.pos == tuple(self.space._agent_points[i, :])
+            assert i == self.space._agent_to_index[agent]
+        assert agent_to_remove not in self.space._agent_to_index
+        assert agent_to_remove.pos is None
+        with self.assertRaises(Exception):
+            self.space.remove_agent(agent_to_remove)
+
+
+class TestSingleGrid(unittest.TestCase):
+    def setUp(self):
+        self.space = SingleGrid(50, 50, False)
+        self.agents = []
+        for i, pos in enumerate(TEST_AGENTS_GRID):
+            a = MockAgent(i, None)
+            self.agents.append(a)
+            self.space.place_agent(a, pos)
+
+    def test_agent_positions(self):
+        '''
+        Ensure that the agents are all placed properly.
+        '''
+        for i, pos in enumerate(TEST_AGENTS_GRID):
+            a = self.agents[i]
+            assert a.pos == pos
+
+    def test_remove_agent(self):
+        for i, pos in enumerate(TEST_AGENTS_GRID):
+            a = self.agents[i]
+            assert a.pos == pos
+            assert self.space.grid[pos[0]][pos[1]] == a
+            self.space.remove_agent(a)
+            assert a.pos is None
+            assert self.space.grid[pos[0]][pos[1]] is None
+
+    def move_agent(self):
+        agent_number = 0
+        initial_pos = TEST_AGENTS_GRID[agent_number]
+        final_pos = (7, 7)
+
+        _agent = self.agents[agent_number]
+
+        assert _agent.pos == initial_pos
+        assert self.space.grid[initial_pos[0]][initial_pos[1]] == _agent
+        assert self.space.grid[final_pos[0]][final_pos[1]] is None
+        self.space.move_agent(_agent, final_pos)
+        assert _agent.pos == final_pos
+        assert self.space.grid[initial_pos[0]][initial_pos[1]] is None
+        assert self.space.grid[final_pos[0]][final_pos[1]] == _agent
+
+
+class TestSingleNetworkGrid(unittest.TestCase):
+    GRAPH_SIZE = 10
+
+    def setUp(self):
+        '''
+        Create a test network grid and populate with Mock Agents.
+        '''
+        G = nx.complete_graph(TestSingleNetworkGrid.GRAPH_SIZE)
+        self.space = NetworkGrid(G)
+        self.agents = []
+        for i, pos in enumerate(TEST_AGENTS_NETWORK_SINGLE):
+            a = MockAgent(i, None)
+            self.agents.append(a)
+            self.space.place_agent(a, pos)
+
+    def test_agent_positions(self):
+        '''
+        Ensure that the agents are all placed properly.
+        '''
+        for i, pos in enumerate(TEST_AGENTS_NETWORK_SINGLE):
+            a = self.agents[i]
+            assert a.pos == pos
+
+    def test_get_neighbors(self):
+        assert len(self.space.get_neighbors(0, include_center=True)) == TestSingleNetworkGrid.GRAPH_SIZE
+        assert len(self.space.get_neighbors(0, include_center=False)) == TestSingleNetworkGrid.GRAPH_SIZE - 1
+
+    def test_move_agent(self):
+        initial_pos = 1
+        agent_number = 1
+        final_pos = TestSingleNetworkGrid.GRAPH_SIZE - 1
+
+        _agent = self.agents[agent_number]
+
+        assert _agent.pos == initial_pos
+        assert _agent in self.space.G.node[initial_pos]['agent']
+        assert _agent not in self.space.G.node[final_pos]['agent']
+        self.space.move_agent(_agent, final_pos)
+        assert _agent.pos == final_pos
+        assert _agent not in self.space.G.node[initial_pos]['agent']
+        assert _agent in self.space.G.node[final_pos]['agent']
+
+    def test_is_cell_empty(self):
+        assert not self.space.is_cell_empty(0)
+        assert self.space.is_cell_empty(TestSingleNetworkGrid.GRAPH_SIZE - 1)
+
+    def test_get_cell_list_contents(self):
+        assert self.space.get_cell_list_contents([0]) == [self.agents[0]]
+        assert self.space.get_cell_list_contents(list(range(TestSingleNetworkGrid.GRAPH_SIZE))) == [self.agents[0],
+                                                                                                    self.agents[1],
+                                                                                                    self.agents[2]]
+
+    def test_get_all_cell_contents(self):
+        assert self.space.get_all_cell_contents() == [self.agents[0],
+                                                      self.agents[1],
+                                                      self.agents[2]]
+
+
+class TestMultipleNetworkGrid(unittest.TestCase):
+    GRAPH_SIZE = 3
+
+    def setUp(self):
+        '''
+        Create a test network grid and populate with Mock Agents.
+        '''
+        G = nx.complete_graph(TestMultipleNetworkGrid.GRAPH_SIZE)
+        self.space = NetworkGrid(G)
+        self.agents = []
+        for i, pos in enumerate(TEST_AGENTS_NETWORK_MULTIPLE):
+            a = MockAgent(i, None)
+            self.agents.append(a)
+            self.space.place_agent(a, pos)
+
+    def test_agent_positions(self):
+        '''
+        Ensure that the agents are all placed properly.
+        '''
+        for i, pos in enumerate(TEST_AGENTS_NETWORK_MULTIPLE):
+            a = self.agents[i]
+            assert a.pos == pos
+
+    def test_get_neighbors(self):
+        assert len(self.space.get_neighbors(0, include_center=True)) == TestMultipleNetworkGrid.GRAPH_SIZE
+        assert len(self.space.get_neighbors(0, include_center=False)) == TestMultipleNetworkGrid.GRAPH_SIZE - 1
+
+    def test_move_agent(self):
+        initial_pos = 1
+        agent_number = 1
+        final_pos = 0
+
+        _agent = self.agents[agent_number]
+
+        assert _agent.pos == initial_pos
+        assert _agent in self.space.G.node[initial_pos]['agent']
+        assert _agent not in self.space.G.node[final_pos]['agent']
+        assert len(self.space.G.node[initial_pos]['agent']) == 2
+        assert len(self.space.G.node[final_pos]['agent']) == 1
+
+        self.space.move_agent(_agent, final_pos)
+
+        assert _agent.pos == final_pos
+        assert _agent not in self.space.G.node[initial_pos]['agent']
+        assert _agent in self.space.G.node[final_pos]['agent']
+        assert len(self.space.G.node[initial_pos]['agent']) == 1
+        assert len(self.space.G.node[final_pos]['agent']) == 2
+
+    def test_is_cell_empty(self):
+        assert not self.space.is_cell_empty(0)
+        assert not self.space.is_cell_empty(1)
+        assert self.space.is_cell_empty(2)
+
+    def test_get_cell_list_contents(self):
+        assert self.space.get_cell_list_contents([0]) == [self.agents[0]]
+        assert self.space.get_cell_list_contents([1]) == [self.agents[1], self.agents[2]]
+        assert self.space.get_cell_list_contents(list(range(TestMultipleNetworkGrid.GRAPH_SIZE))) == [self.agents[0],
+                                                                                                      self.agents[1],
+                                                                                                      self.agents[2]]
+
+    def test_get_all_cell_contents(self):
+        assert self.space.get_all_cell_contents() == [self.agents[0],
+                                                      self.agents[1],
+                                                      self.agents[2]]

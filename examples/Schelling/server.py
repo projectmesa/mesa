@@ -39,6 +39,7 @@ class HappyElement(TextElement):
     '''
     Display a text count of how many happy agents there are.
     '''
+
     def __init__(self):
         pass
 
@@ -59,6 +60,7 @@ def schelling_draw(agent):
     else:
         portrayal["Color"] = "Blue"
     return portrayal
+
 
 happy_element = HappyElement()
 canvas_element = CanvasGrid(schelling_draw, 20, 20, 500, 500)

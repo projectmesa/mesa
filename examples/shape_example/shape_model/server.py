@@ -41,6 +41,7 @@ def launch_shape_model():
     server.port = 8521
     server.launch()
 
+
 if __name__ == "__main__":
     random.seed(3)
     launch_shape_model()

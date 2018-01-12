@@ -11,7 +11,7 @@ In no particular order, examples include:
 - Documentation improvements
 - Tutorials
 
-No contribution is too small. Although, contributions can be too big, so let's discuss via the `email list`_ OR `an issue`_.
+No contribution is too small. Although, contributions can be too big, so let's discuss via the `dev email list`_ OR `an issue`_.
 
 **To submit a contribution**
 
@@ -24,7 +24,7 @@ No contribution is too small. Although, contributions can be too big, so let's d
 - Submit as a pull request.
 - Describe the change w/ ticket number(s) that the code fixes.
 
-.. _`email list` : https://groups.google.com/forum/#!forum/projectmesa
+.. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
 .. _`an issue` : https://github.com/projectmesa/mesa/issues
 .. _`Travis build` : https://travis-ci.org/projectmesa/mesa
 
@@ -70,8 +70,7 @@ With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_.
 Licensing
 --------
 
-The License of this project is located in `LICENSE`_. By submitting a contribution to this project, you are agreeing that your contributions under this license and
-with this waiver of copyright interest.
+The license of this project is located in `LICENSE`_.  By submitting a contribution to this project, you are agreeing that your contribution will be released under the terms of this license.
 
 .. _`LICENSE` : https://github.com/projectmesa/mesa/blob/master/LICENSE
 

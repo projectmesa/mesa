@@ -1,0 +1,4 @@
+itertools
+mesa
+numpy
+pandas

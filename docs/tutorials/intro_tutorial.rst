@@ -590,7 +590,8 @@ storage for us and make it easier to analyze.
 The data collector stores three categories of data: model-level
 variables, agent-level variables, and tables (which are a catch-all for
 everything else). Model- and agent-level variables are added to the data
-collector along with a function for collecting them. Model-level
+collector along with either the name of an attribute that the agents or
+models have, or a function for collecting some data. Model-level
 collection functions take a model object as an input, while agent-level
 collection functions take an agent object as an input. Both then return
 a value computed from the model or each agent at their current state.
@@ -640,8 +641,8 @@ measure of wealth inequality.
                 self.grid.place_agent(a, (x, y))
             
             self.datacollector = DataCollector(
-                model_reporters={"Gini": compute_gini},
-                agent_reporters={"Wealth": lambda a: a.wealth})
+                model_reporters={"Gini": compute_gini},  # A function to call
+                agent_reporters={"Wealth": "wealth"})  # An agent attribute
     
         def step(self):
             self.datacollector.collect(self)
