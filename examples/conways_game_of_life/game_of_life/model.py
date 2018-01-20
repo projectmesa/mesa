@@ -37,6 +37,7 @@ class GameOfLife(Model):
                 cell.state = cell.ALIVE
             self.grid.place_agent(cell, (x, y))
             self.schedule.add(cell)
+
         self.running = True
 
     def step(self):
