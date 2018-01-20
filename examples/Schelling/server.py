@@ -56,9 +56,11 @@ def schelling_draw(agent):
     portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
 
     if agent.type == 0:
-        portrayal["Color"] = "Red"
+        portrayal["Color"] = ["#FF0000", "#FF9999"]
+        portrayal["stroke_color"] = "#00FF00"
     else:
-        portrayal["Color"] = "Blue"
+        portrayal["Color"] = ["#0000FF", "#9999FF"]
+        portrayal["stroke_color"] = "#000000"
     return portrayal
 
 

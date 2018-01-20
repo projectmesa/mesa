@@ -28,9 +28,9 @@ def wolf_sheep_portrayal(agent):
 
     elif type(agent) is GrassPatch:
         if agent.fully_grown:
-            portrayal["Color"] = "#00AA00"
+            portrayal["Color"] = ["#00FF00", "#00CC00", "#009900"]
         else:
-            portrayal["Color"] = "#D6F5D6"
+            portrayal["Color"] = ["#84e184", "#adebad", "#d6f5d6"]
         portrayal["Shape"] = "rect"
         portrayal["Filled"] = "true"
         portrayal["Layer"] = 0
