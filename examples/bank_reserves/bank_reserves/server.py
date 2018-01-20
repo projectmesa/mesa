@@ -13,11 +13,11 @@ Author of original code: Taylor Mutch
 """
 
 # Green
-RICH_COLOR = "46FF33"
+RICH_COLOR = "#46FF33"
 # Red
-POOR_COLOR = "FF3C33"
+POOR_COLOR = "#FF3C33"
 # Blue
-MID_COLOR = "3349FF"
+MID_COLOR = "#3349FF"
 
 
 def person_portrayal(agent):

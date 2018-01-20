@@ -115,9 +115,11 @@ class WolfSheepPredation(Model):
                 self.schedule.add(patch)
 
         self.running = True
+        self.datacollector.collect(self)
 
     def step(self):
         self.schedule.step()
+        # collect data
         self.datacollector.collect(self)
         if self.verbose:
             print([self.schedule.time,

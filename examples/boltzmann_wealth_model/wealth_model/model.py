@@ -24,7 +24,6 @@ class MoneyModel(Model):
 
     def __init__(self, N, width, height):
         self.num_agents = N
-        self.running = True
         self.grid = MultiGrid(height, width, True)
         self.schedule = RandomActivation(self)
         self.datacollector = DataCollector(
@@ -40,9 +39,13 @@ class MoneyModel(Model):
             y = random.randrange(self.grid.height)
             self.grid.place_agent(a, (x, y))
 
-    def step(self):
+        self.running = True
         self.datacollector.collect(self)
+
+    def step(self):
         self.schedule.step()
+        # collect data
+        self.datacollector.collect(self)
 
     def run_model(self, n):
         for i in range(n):

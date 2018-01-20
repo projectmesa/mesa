@@ -44,13 +44,16 @@ class ForestFire(Model):
                     new_tree.condition = "On Fire"
                 self.grid._place_agent((x, y), new_tree)
                 self.schedule.add(new_tree)
+
         self.running = True
+        self.datacollector.collect(self)
 
     def step(self):
         """
         Advance the model by one step.
         """
         self.schedule.step()
+        # collect data
         self.datacollector.collect(self)
 
         # Halt if no more fire

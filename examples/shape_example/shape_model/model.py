@@ -15,12 +15,12 @@ class Walker(Agent):
 
 class ShapesModel(Model):
     def __init__(self, N, width=20, height=10):
-        self.running = True
         self.N = N    # num of agents
         self.headings = ((1, 0), (0, 1), (-1, 0), (0, -1))  # tuples are fast
         self.grid = SingleGrid(width, height, torus=False)
         self.schedule = RandomActivation(self)
         self.make_walker_agents()
+        self.running = True
 
     def make_walker_agents(self):
         unique_id = 0

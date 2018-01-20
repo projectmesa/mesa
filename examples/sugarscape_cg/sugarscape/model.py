@@ -65,9 +65,11 @@ class Sugarscape2ConstantGrowback(Model):
             self.schedule.add(ssa)
 
         self.running = True
+        self.datacollector.collect(self)
 
     def step(self):
         self.schedule.step()
+        # collect data
         self.datacollector.collect(self)
         if self.verbose:
             print([self.schedule.time,

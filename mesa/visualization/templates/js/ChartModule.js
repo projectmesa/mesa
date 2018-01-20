@@ -43,7 +43,7 @@ var ChartModule = function(series, canvas_width, canvas_height) {
         responsive: true,
         tooltips: {
             mode: 'index',
-            intersect: false,
+            intersect: false
         },
         hover: {
             mode: 'nearest',
@@ -53,13 +53,16 @@ var ChartModule = function(series, canvas_width, canvas_height) {
             xAxes: [{
                 display: true,
                 scaleLabel: {
-                    display: true,
+                    display: true
+                },
+                ticks: {
+                    maxTicksLimit: 11
                 }
             }],
             yAxes: [{
                 display: true,
                 scaleLabel: {
-                    display: true,
+                    display: true
                 }
             }]
         }
@@ -80,12 +83,10 @@ var ChartModule = function(series, canvas_width, canvas_height) {
     };
 
     this.reset = function() {
-        chart.destroy();
-        chartData.labels = [];
-        chart = new Chart(context, {
-            type: 'line',
-            data: chartData,
-            options: chartOptions
+        while (chart.data.labels.length) { chart.data.labels.pop(); }
+        chart.data.datasets.forEach(function(dataset) {
+            while (dataset.data.length) { dataset.data.pop(); }
         });
+        chart.update();
     };
 };
