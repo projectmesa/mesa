@@ -153,7 +153,7 @@ class Grid:
             for dx in range(-radius, radius + 1):
                 if dx == 0 and dy == 0 and not include_center:
                     continue
-                # Skip diagonals in Von Neumann neighborhood.
+                # Skip coordinates that are outside manhattan distance
                 if not moore and abs(dx) + abs(dy) > radius:
                     continue
                 # Skip if not a torus and new coords out of bounds.
