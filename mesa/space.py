@@ -15,8 +15,9 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
-import numpy as np
 import random
+
+import numpy as np
 
 
 def accept_tuple_argument(wrapped_function):
@@ -704,7 +705,7 @@ class ContinuousSpace:
             deltas = np.minimum(deltas, self.size - deltas)
         dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
 
-        idxs, = np.where(dists <= radius**2)
+        idxs, = np.where(dists <= radius ** 2)
         neighbors = [self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0]
         return neighbors
 
@@ -819,7 +820,7 @@ class NetworkGrid:
         return list(self.iter_cell_list_contents(cell_list))
 
     def get_all_cell_contents(self):
-        return list(self.iter_cell_list_contents(self.G.nodes()))
+        return list(self.iter_cell_list_contents(self.G))
 
     def iter_cell_list_contents(self, cell_list):
         list_of_lists = [self.G.node[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
