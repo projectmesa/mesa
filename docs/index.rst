@@ -76,15 +76,23 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
 .. _`Github` : https://github.com/projectmesa/mesa/
 
 
+Sharing you Agent Based Model Packages
+--------------------------------------
+
+If you have an agent behavior, landscape feature, analysis tool or other module fellow reserchers can benefit from when building their ABM, please share!
+
+Learn more at  :ref:`Mesa-Packages`
+
 .. toctree::
    :hidden:
-   :maxdepth: 1
+   :maxdepth: 6
 
    Mesa Overview <overview>
    tutorials/intro_tutorial
    tutorials/adv_tutorial
    Best Practices <best-practices>
    API Documentation <apis/api_main.rst>
+   Mesa Packages <packages/package_main.rst>
 
 Indices and tables
 ==================
