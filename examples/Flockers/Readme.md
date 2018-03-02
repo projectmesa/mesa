@@ -1,14 +1,14 @@
 # Flockers
 
-An implementation of Craig Reynolds's Boids flocker model. Agents (simulated birds) try to fly towards the average position of their neighbors and in the same direction as them, while maintaining a minimum distance. This produces flocking behavior.
+This is an implementation of Craig Reynolds's Boids flocker model. Agents (simulated birds) try to fly towards the average position of their neighbors and in the same direction as them, while maintaining a minimum distance. This produces flocking behavior.
 
-This model tests Mesa's continuous space feature, and uses numpy arrays to represent vectors. It also demonstrates how to create custom visualization components.
+This model tests Mesa's continuous space feature and uses numpy arrays to represent vectors. It also demonstrates how to create custom visualization components.
 
 ## How to Run
 
 Launch the model:
 ```
-    $ python Flocker_Server.py
+    $ python run.py
 ```
 
 Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
@@ -25,10 +25,4 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 
 ## Further Reading
 
-=======
-* Launch the visualization
-```
-$ python run.py
-```
-* Visit your browser: http://127.0.0.1:8521/
-* In your browser hit *run*
+*none*
