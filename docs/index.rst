@@ -91,8 +91,8 @@ Learn more at  :ref:`Mesa-Packages`
    tutorials/intro_tutorial
    tutorials/adv_tutorial
    Best Practices <best-practices>
-   API Documentation <apis/api_main.rst>
-   Mesa Packages <packages/package_main.rst>
+   API Documentation <apis/api_main>
+   Mesa Packages <packages/package_main>
 
 Indices and tables
 ==================
