@@ -51,7 +51,7 @@ Package Development Checklist (basic): Sharing your package in seven steps
 
       - `MESA Wiki Page <https://github.com/projectmesa/mesa/wiki>`_  
    
-You want to do even more. The authoritative guide for python package development is through the `Python Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting you package on the Python Package Index.
+You want to do even more. The authoritative guide for python package development is through the `Python Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting your package on the Python Package Index.
 
 
 

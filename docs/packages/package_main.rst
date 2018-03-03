@@ -17,7 +17,7 @@ The Mesa core functionality is just a subset of what we believe researchers crea
 
 The purpose of this guide is to support new programmers by providing detailed guides on "How to" build and share a package. Let's get started!
 
-	You want add to create your package but have never done it before -- start here: :ref:`package-development`
+	You want create and share your package but have never done it before -- start here: :ref:`package-development`
 
 	You want to incorporate a package from a MESA user but don't know how--- try this: :ref:`user-guide`
 
