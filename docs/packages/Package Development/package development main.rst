@@ -3,20 +3,18 @@
 Package Development: A "How-to Guide" for Developing Packages for Others to Use
 ================================================================================
 
-The purpose of this page is to get your mesa package sharing as quickly as possible. The authoritative guide for python package development is through the `Python 
-Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting you package on the Python Package Index.
+The purpose of this page is to get your mesa package sharing as quickly as possible. 
 
 This "How-to Guide" uses GitHub to walk you through the process. However, other repositories will be able to provide similar services.
 
-
-Package Development Checklist (basic): Sharing your modules in seven steps
+Package Development Checklist (basic): Sharing your package in seven steps
 ----------------------------------------------------------------------------
 
-**1. Take your module(s) from your ABM and make sure it is callable from Mesa in a simple, easy to understand way**
+**1. Take your package from your ABM and make sure it is callable from Mesa in a simple, easy to understand way**
    
 **2. Think about the structure of your package**
 
-We recommend `Hitchhiker's Guide to Python <http://docs.python-guide.org/en/latest/writing/structure/>`_
+   Not sure what this means, see a discussion on package struture at `Hitchhiker's Guide to Python <http://docs.python-guide.org/en/latest/writing/structure/>`_
 
 **3. Using GitHub, create a new repository**
 
@@ -49,11 +47,14 @@ We recommend `Hitchhiker's Guide to Python <http://docs.python-guide.org/en/late
 
       Don't forgot to follow a good `structure <http://docs.python-guide.org/en/latest/writing/structure/>`_
 
-**7. Add a page to Mesa Packages WIKI page**
+**7. Let people know about your package on the MESA wiki page**
 
-      - `Build your package page <https://github.com/projectmesa/mesa/wiki>`_  
-      - Edit the Mesa Packages wiki page to add your package name
+      - `MESA Wiki Page <https://github.com/projectmesa/mesa/wiki>`_  
    
+You want to do even more. The authoritative guide for python package development is through the `Python Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting you package on the Python Package Index.
+
+
+
 .. toctree::
    :hidden:
    :maxdepth: 1
