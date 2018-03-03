@@ -76,12 +76,16 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
 .. _`Github` : https://github.com/projectmesa/mesa/
 
 
-Sharing you Agent Based Model Packages
+MESA Packages
 --------------------------------------
+
+`See a list of packages users have shared from their MESA ABMs <https://github.com/projectmesa/mesa/wiki>`_
 
 If you have an agent behavior, landscape feature, analysis tool or other module fellow reserchers can benefit from when building their ABM, please share!
 
 Learn more at  :ref:`Mesa-Packages`
+
+
 
 .. toctree::
    :hidden:
