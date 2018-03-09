@@ -76,14 +76,13 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
 .. _`Github` : https://github.com/projectmesa/mesa/
 
 
-MESA Packages
+Mesa Packages
 --------------------------------------
 
-`See a list of packages users have shared from their MESA ABMs <https://github.com/projectmesa/mesa/wiki>`_
+ABM features users have shared that you may want to use in your model 
 
-If you have an agent behavior, landscape feature, analysis tool or other module fellow reserchers can benefit from when building their ABM, please share!
-
-Learn more at  :ref:`Mesa-Packages`
+* `See the Packages <https://github.com/projectmesa/mesa/wiki>`_
+* :ref:`Mesa-Packages` 
 
 
 
