@@ -1,7 +1,7 @@
 .. _Mesa-Packages: 
 
-Mesa Packages 
-==============
+"How To" Mesa Packages 
+======================
 
 		*Bottom up models are virtual laboratories where controlled experiments distinguish noise from signal in the systems organization....
 		This approach may change our whole notion of scientific theory, which until now has been based on the theories of physics. Theories of
@@ -13,17 +13,16 @@ Mesa Packages
 
 
 
-The Mesa core functionality is just a subset of what we believe researchers creating Agent Based Models (ABMs) will use. We designed Mesa to be extensible, so that individuals from various domains can build and maintain their own Mesa packages in pursuit of "unifying algorithmic theories of the relation between adaptive behavior and system complexity."
+The Mesa core functionality is just a subset of what we believe researchers creating Agent Based Models (ABMs) will use. We designed Mesa to be extensible, so that individuals from various domains can build and maintain their own Mesa packages in pursuit of "unifying algorithmic theories of the relation between adaptive behavior and system complexity." (Volker Grimm et al 2005)
 
 The purpose of this guide is to support new programmers by providing detailed guides on "How to" build and share a package. Let's get started!
 
-	You want create and share your package but have never done it before -- start here: :ref:`package-development`
+Choose your adventure:
+---------------------- 
 
-	You want to incorporate a package from a MESA user but don't know how--- try this: :ref:`user-guide`
+* Learn how to create and share your package -- :ref:`package-development`
 
-	`See links to shared Mesa packages <https://github.com/projectmesa/mesa/wiki>`_
-
-
+* Learn how to incorporate a package from a Mesa user into your model -- :ref:`user-guide`
 
 
 
