@@ -3,11 +3,11 @@
 Package Development: A "How-to Guide" for Developing Packages for Others to Use
 ================================================================================
 
-The purpose of this page is to get your mesa package sharing as quickly as possible. 
+The purpose of this page is help you set up and distribute your Mesa package as quickly as possible.
 
-This "How-to Guide" uses GitHub to walk you through the process. However, other repositories will be able to provide similar services.
+This "How-to Guide" uses GitHub to walk you through the process. However, other repositories (e.g. Mecurial, Bitbucket, Beanstalk) will be able to provide similar services.
 
-Package Development Checklist (basic): Sharing your package in seven steps
+Package Development Checklist: Sharing your package in seven steps
 ----------------------------------------------------------------------------
 
 **1. Take your package from your ABM and make sure it is callable from Mesa in a simple, easy to understand way**
@@ -18,25 +18,26 @@ Package Development Checklist (basic): Sharing your package in seven steps
 
 **3. Using GitHub, create a new repository**
 
-   A. Name your repository
-   B. Select a license (not sure-- click the blue 'i' next to the i for a great run down of licenses) 
-   C. Create a readme.md file (this contains a description of the package) see an example: `Bilateral Shapley <https://github.com/tpike3/bilateralshapley/blob/master/README.md>`_
+A. Name your repository
+B. Select a license (not sure-- click the blue 'i' next to the i for a great run down of licenses) 
+C. Create a readme.md file (this contains a description of the package) see an example: `Bilateral Shapley <https://github.com/tpike3/bilateralshapley/blob/master/README.md>`_
 
       
 **4. COMMIT a requirements.txt to the repository**
 
-   - This can be created automatically from your python environment using the command: 
+- This can be created automatically from your python environment using the command: 
          
-.. code:: bash
+   .. code:: bash
           
-               pip freeze > requirements.txt
+      pip freeze > requirements.txt
 
+- If using Anaconda install pip first
+    
+   .. code:: bash
+            
+      conda install pip
 
-               #if using Anaconda install pip first
-               conda install pip
-
-. 
-   - For more information on environments see the user guide: :ref:`user-guide` 
+- For more information on environments see the user guide: :ref:`user-guide` 
 
 **5. COMMIT a setup.py file**
 
@@ -49,9 +50,16 @@ Package Development Checklist (basic): Sharing your package in seven steps
 
 **7. Let people know about your package on the MESA wiki page**
 
-      - `MESA Wiki Page <https://github.com/projectmesa/mesa/wiki>`_  
+      `MESA Wiki Page <https://github.com/projectmesa/mesa/wiki>`_  
    
+Take Your Package to the Next Level
+-----------------------------------
+
 You want to do even more. The authoritative guide for python package development is through the `Python Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting your package on the Python Package Index.
+
+The `Python Package Index <https://pypi.org>`_ is the main repository of software for Python Packages and following this guide will ensure your code and documentation meets the standards for distribution across the Python community. 
+
+
 
 
 

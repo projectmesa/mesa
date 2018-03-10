@@ -17,9 +17,9 @@ This "How-To" Guide is based on packages loaded into GitHub
 
 2. Install the package(s) into your environment via pip and github
 
-.. code:: bash
+	.. code:: bash
 
-	pip install git+https://<enter your clone url from git here>
+		pip install git+https://<enter your clone url from git here>
 
 
    
