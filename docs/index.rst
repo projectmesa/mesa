@@ -95,7 +95,7 @@ ABM features users have shared that you may want to use in your model
    tutorials/adv_tutorial
    Best Practices <best-practices>
    API Documentation <apis/api_main>
-   Mesa Packages <packages/package_main>
+   Mesa Packages <package_main>
 
 Indices and tables
 ==================
