@@ -1,6 +1,6 @@
 .. _package-development:
 
-Package Development: A "How-to Guide" for Developing Packages for Others to Use
+Package Development: A "How-to Guide"
 ================================================================================
 
 The purpose of this page is help you set up and distribute your Mesa package as quickly as possible.
