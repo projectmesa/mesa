@@ -119,9 +119,10 @@ class BatchRunner:
             for param_values in product(*param_ranges):
                 kwargs = dict(zip(param_names, param_values))
                 kwargs.update(self.fixed_parameters)
-                model = self.model_cls(**kwargs)
 
                 for _ in range(self.iterations):
+                    kwargscopy = copy.deepcopy(kwargs)
+                    model = self.model_cls(**kwargscopy)
                     self.run_model(model)
                     # Collect and store results:
                     model_key = param_values + (next(run_count),)
