@@ -195,7 +195,12 @@ class BatchRunner:
         rest_cols = set(df.columns) - set(index_cols)
         ordered = df[index_cols + list(sorted(rest_cols))]
         ordered.sort_values(by='Run', inplace=True)
+        print(ordered)
         if self._include_fixed:
             for param in self.fixed_parameters.keys():
-                ordered[param] = self.fixed_parameters[param]
+                val = self.fixed_parameters[param]
+
+                # avoid error when val is an iterable
+                vallist = [val for i in range(ordered.shape[0])]
+                ordered[param] = vallist
         return ordered
