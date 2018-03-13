@@ -195,7 +195,7 @@ class BatchRunner:
         rest_cols = set(df.columns) - set(index_cols)
         ordered = df[index_cols + list(sorted(rest_cols))]
         ordered.sort_values(by='Run', inplace=True)
-        print(ordered)
+
         if self._include_fixed:
             for param in self.fixed_parameters.keys():
                 val = self.fixed_parameters[param]
