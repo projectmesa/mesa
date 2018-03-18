@@ -119,9 +119,10 @@ class BatchRunner:
             for param_values in product(*param_ranges):
                 kwargs = dict(zip(param_names, param_values))
                 kwargs.update(self.fixed_parameters)
-                model = self.model_cls(**kwargs)
 
                 for _ in range(self.iterations):
+                    kwargscopy = copy.deepcopy(kwargs)
+                    model = self.model_cls(**kwargscopy)
                     self.run_model(model)
                     # Collect and store results:
                     model_key = param_values + (next(run_count),)
@@ -194,7 +195,12 @@ class BatchRunner:
         rest_cols = set(df.columns) - set(index_cols)
         ordered = df[index_cols + list(sorted(rest_cols))]
         ordered.sort_values(by='Run', inplace=True)
+
         if self._include_fixed:
             for param in self.fixed_parameters.keys():
-                ordered[param] = self.fixed_parameters[param]
+                val = self.fixed_parameters[param]
+
+                # avoid error when val is an iterable
+                vallist = [val for i in range(ordered.shape[0])]
+                ordered[param] = vallist
         return ordered
