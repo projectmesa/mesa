@@ -134,7 +134,6 @@ class BatchRunner:
                 for _ in range(self.iterations):
                     self.run_iteration(kwargs, param_values, run_count)
                     pbar.update()
-                   
 
     def run_iteration(self, kwargs, param_values, run_count):
         kwargscopy = copy.deepcopy(kwargs)
@@ -154,8 +153,6 @@ class BatchRunner:
             for agent_id, reports in agent_vars.items():
                 agent_key = model_key + (agent_id,)
                 self.agent_vars[agent_key] = reports
-
-
 
     def run_model(self, model):
         """ Run a model object to completion, or until reaching max steps.
