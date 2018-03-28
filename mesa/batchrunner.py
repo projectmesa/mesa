@@ -130,8 +130,10 @@ class BatchRunner:
             kwargs = self.fixed_parameters
             param_values = None
 
-            for _ in range(self.iterations):
-                self.run_iteration(kwargs, param_values, run_count)
+            with tqdm(total_iterations, disable=not self.display_progress) as pbar:
+                for _ in range(self.iterations):
+                    self.run_iteration(kwargs, param_values, run_count)
+                    pbar.update()
                    
 
     def run_iteration(self, kwargs, param_values, run_count):
