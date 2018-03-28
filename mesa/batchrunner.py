@@ -98,9 +98,6 @@ class BatchRunner:
         self.display_progress = display_progress
 
     def _process_parameters(self, params):
-        if params is None:
-             return None
-
         params = copy.deepcopy(params)
         bad_names = []
         for name, values in params.items():
@@ -128,20 +125,6 @@ class BatchRunner:
 
                     for _ in range(self.iterations):
                         self.run_iteration(kwargs, param_values, run_count)
-                        '''
-                        kwargscopy = copy.deepcopy(kwargs)
-                        model = self.model_cls(**kwargscopy)
-                        self.run_model(model)
-                        # Collect and store results:
-                        model_key = param_values + (next(run_count),)
-                        if self.model_reporters:
-                            self.model_vars[model_key] = self.collect_model_vars(model)
-                        if self.agent_reporters:
-                            agent_vars = self.collect_agent_vars(model)
-                            for agent_id, reports in agent_vars.items():
-                                agent_key = model_key + (agent_id,)
-                                self.agent_vars[agent_key] = reports
-                        '''
                         pbar.update()
         else:
             kwargs = self.fixed_parameters
@@ -149,24 +132,6 @@ class BatchRunner:
 
             for _ in range(self.iterations):
                 self.run_iteration(kwargs, param_values, run_count)
-
-                '''
-                kwargscopy = copy.deepcopy(kwargs)
-                model = self.model_cls(**kwargscopy)
-                self.run_model(model)
-                # Collect and store results:
-                if param_values is not None:
-                    model_key = param_values + (next(run_count),)
-                else:
-                    model_key = (next(run_count),)
-                if self.model_reporters:
-                    self.model_vars[model_key] = self.collect_model_vars(model)
-                if self.agent_reporters:
-                    agent_vars = self.collect_agent_vars(model)
-                    for agent_id, reports in agent_vars.items():
-                        agent_key = model_key + (agent_id,)
-                        self.agent_vars[agent_key] = reports
-                '''
                    
 
     def run_iteration(self, kwargs, param_values, run_count):
