@@ -94,12 +94,3 @@ The `Python Package Index <https://pypi.org>`_ is the main repository of softwar
 
 
 
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
