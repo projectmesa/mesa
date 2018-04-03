@@ -1,6 +1,6 @@
-.. _Mesa-Packages:
+.. _Mesa-Packages: 
 
-"How To" Mesa Packages
+"How To" Mesa Packages 
 ======================
 
 The Mesa core functionality is just a subset of what we believe researchers creating Agent Based Models (ABMs) will use. We designed Mesa to be extensible, so that individuals from various domains can build and maintain their own Mesa packages in pursuit of "unifying algorithmic theories of the relation between adaptive behavior and system complexity." (Volker Grimm et al 2005)
@@ -19,9 +19,9 @@ Use a Package in two Steps
 
 This "How-To" Guide is based on packages loaded into GitHub
 
-1. Create a virtual environment for the ABM you are building.
+1. Create a virtual environment for the ABM you are building. 
 
-	- `Why a virtual environment <https://realpython.com/blog/python/python-virtual-environments-a-primer/#why-the-need-for-virtual-environments>`_
+	- `Why a virtual environment <https://realpython.com/blog/python/python-virtual-environments-a-primer/#why-the-need-for-virtual-environments>`_ 
 	- `How to create a python virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/#make-sure-you-ve-got-python-pip>`_
  	- `Creating a virtual environment with Anaconda <https://conda.io/docs/user-guide/tasks/manage-environments.html>`_
 
@@ -44,7 +44,7 @@ Package Development Checklist: Sharing your package in seven steps
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Take your package from your ABM and make sure it is callable from Mesa in a simple, easy to understand way
-
+   
 2. Think about the structure of your package
 
    Not sure what this means, see a discussion on package struture at `Hitchhiker's Guide to Python <http://docs.python-guide.org/en/latest/writing/structure/>`_
@@ -52,25 +52,25 @@ Package Development Checklist: Sharing your package in seven steps
 3. Using GitHub, create a new repository
 
 A. Name your repository
-B. Select a license (not sure-- click the blue 'i' next to the i for a great run down of licenses)
+B. Select a license (not sure-- click the blue 'i' next to the i for a great run down of licenses) 
 C. Create a readme.md file (this contains a description of the package) see an example: `Bilateral Shapley <https://github.com/tpike3/bilateralshapley/blob/master/README.md>`_
 
-
+      
 4. COMMIT a requirements.txt to the repository
 
-- This can be created automatically from your python environment using the command:
-
+- This can be created automatically from your python environment using the command: 
+         
    .. code:: bash
-
+          
       pip freeze > requirements.txt
 
 - If using Anaconda install pip first
-
+    
    .. code:: bash
-
+            
       conda install pip
 
-- For more information on environments see the user guide: :ref:`user-guide`
+- For more information on environments see the user guide: :ref:`user-guide` 
 
 5. COMMIT a setup.py file
 
@@ -83,18 +83,18 @@ C. Create a readme.md file (this contains a description of the package) see an e
 
 7. Let people know about your package on the MESA wiki page
 
-      `MESA Wiki Page <https://github.com/projectmesa/mesa/wiki>`_
-
+      `MESA Wiki Page <https://github.com/projectmesa/mesa/wiki>`_  
+   
 Take Your Package to the Next Level
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You want to do even more. The authoritative guide for python package development is through the `Python Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting your package on the Python Package Index.
 
-The `Python Package Index <https://pypi.org>`_ is the main repository of software for Python Packages and following this guide will ensure your code and documentation meets the standards for distribution across the Python community.
+The `Python Package Index <https://pypi.org>`_ is the main repository of software for Python Packages and following this guide will ensure your code and documentation meets the standards for distribution across the Python community. 
 
 
-
-
+   
+      
 
 
 Indices and tables
