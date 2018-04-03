@@ -79,11 +79,10 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
 Mesa Packages
 --------------------------------------
 
-ABM features users have shared that you may want to use in your model 
+ABM features users have shared that you may want to use in your model
 
 * `See the Packages <https://github.com/projectmesa/mesa/wiki>`_
-* :ref:`Mesa-Packages` 
-
+* :ref:`Mesa-Packages`
 
 
 .. toctree::
@@ -95,7 +94,7 @@ ABM features users have shared that you may want to use in your model
    tutorials/adv_tutorial
    Best Practices <best-practices>
    API Documentation <apis/api_main>
-   Mesa Packages <package_main>
+   Mesa Packages <packages>
 
 Indices and tables
 ==================
@@ -103,3 +102,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
