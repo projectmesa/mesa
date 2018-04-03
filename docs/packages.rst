@@ -1,5 +1,3 @@
-.. _Mesa-Packages:
-
 "How To" Mesa Packages
 ======================
 
