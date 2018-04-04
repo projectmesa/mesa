@@ -1,7 +1,29 @@
 "How To" Mesa Packages
 ======================
 
-The Mesa core functionality is just a subset of what we believe researchers creating Agent Based Models (ABMs) will use. We designed Mesa to be extensible, so that individuals from various domains can build and maintain their own Mesa packages in pursuit of "unifying algorithmic theories of the relation between adaptive behavior and system complexity." (Volker Grimm et al 2005)
+The Mesa core functionality is just a subset of what we believe researchers creating Agent Based Models (ABMs) will use. We designed Mesa to be extensible, so that individuals from various domains can build, maintain, and share their own packages that work with Mesa in pursuit of "unifying algorithmic theories of the relation between adaptive behavior and system complexity (Volker Grimm et al 2005)."
+
+**DRY Principal**
+
+This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the  `DRY prinicipal (or don't repeat yourself.) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_. The creators of Mesa designed Mesa in order for this principal to be exercised in the Mesa community. For example, a group health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
+
+**Benefits to Scientists**
+
+Besides a best practice of the software engineering community, there are other benefits for the scientific community.
+
+1. **Reproducibility.** Decoupled shared packages also allows for reproduciblility. Having a package that is shared allows others to test the methods that lead to the model results that the researcher arrived at.
+
+2. **Accepted truths.** Once results are reproduced, a library could be considered an accepted truth, meaning that the community agrees that the library does what the library intends to do and that the library can be trusted to do this.
+
+2. **Building blocks.** Think of libraries like legos. The researcher can borrow a piece from here or there to pull together the base of their model, so they can focus on the value add. For example, someone might pull from a human interactions library and a decision making library and combine the two to look at how human cognitive function effects the physical spread of disease.
+
+**Mesa and Mesa Packages**
+
+Because of the possibilities of nuanced libraries, few things will actually make it into core Mesa. Mesa is intended to only include core functionality that everyone uses. It is not impossible that something written on the outside is brought into core at a later date if the value to everyone is proven through adoption.
+
+An example that is analogous to Mesa and Mesa packages is `Django <https://www.djangoproject.com/>`_ and `Django Packages <https://djangopackages.org/>`_. Django is a web framework that allows you to build a website in Python, but there are lots of things besides a basic website that you might want. For example, you might want authentication functionality. It would be inefficient for everyone to write their own authentication functionality, so one person writes and many share it.
+
+This process isn't perfect. Just because you write something doesn't mean people are going to use it. Sometimes two different packages will be created that do similar things, but one of them does it better or is easier to use. That is the one that will get more adoption. In the world of academia, often researchers hold on to their content until they are ready to release. In the world of open source software, this can backfire. The sooner you open source something the more likely it will be a success, because you will build consensus and engagement. Another thing that can happen is that while you are working on perfecting it, someone else is building in the open and establishes the audience you were looking for.
 
 The purpose of this guide is to support new programmers by providing detailed guides on "How to" build and share a package. Let's get started!
 
@@ -9,26 +31,32 @@ The purpose of this guide is to support new programmers by providing detailed gu
 User Guide
 -------------------------
 
-**MESA does not endorse or verify any of the code shared through MESA packages**
+* Note: MESA does not endorse or verify any of the code shared through MESA packages. This is left to the domain experts of the community that created the code.*
 
+**Step 1: Establish an envrionment**
 
-Use a Package in two Steps
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Create a virtual environment for the ABM you are building. The purpose of a virtual environment is to isolate the packages for your project from other projects. This is helpful when you need to use two different versions of a package or if you are running one version in production, but want to test out another version. You can do with with either virtualenv or Anaconda.
 
-This "How-To" Guide is based on packages loaded into GitHub
+   - `Why a virtual environment <https://realpython.com/blog/python/python-virtual-environments-a-primer/#why-the-need-for-virtual-environments>`_
+   - `Virtualenv and Virtualenv Wrapper <http://docs.python-guide.org/en/latest/#python-development-environments>`_
+   - `Creating a virtual environment with Anaconda <https://conda.io/docs/user-guide/tasks/manage-environments.html>`_
 
-1. Create a virtual environment for the ABM you are building.
+**Step 2: Install the packages**
 
-	- `Why a virtual environment <https://realpython.com/blog/python/python-virtual-environments-a-primer/#why-the-need-for-virtual-environments>`_
-	- `How to create a python virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/#make-sure-you-ve-got-python-pip>`_
- 	- `Creating a virtual environment with Anaconda <https://conda.io/docs/user-guide/tasks/manage-environments.html>`_
+Install the package(s) into your environment via pip/conda or github. If the package is a mature package that is hosted in the Python package repository, then you can install it just like you did Mesa:
 
-2. Install the package(s) into your environment via pip and github
+   .. code:: bash
+
+      pip install package_name
+
+However, sometimes it takes a little bit for projects to reach that level of maturity. In that case to use the library, you would install from github (or other code repository) with something like the following:
+
 
 	.. code:: bash
 
-		pip install git+https://<enter your clone url from git here>
+		pip install https://github.com/<path to project>
 
+The commands above should also work with Anaconda, just replace the `pip` with `conda`.
 
 
 Package Development: A "How-to Guide"
