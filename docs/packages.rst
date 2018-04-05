@@ -64,54 +64,41 @@ The commands above should also work with Anaconda, just replace the `pip` with `
 Package Development: A "How-to Guide"
 ------------------------------------------------
 
-The purpose of this page is help you set up and distribute your Mesa package as quickly as possible.
+The purpose of this section is help you understand, setup, and distribute your Mesa package as quickly as possible. A Mesa package is just a Python package or repo. We just call it a Mesa package, because we are talking about a Python package in the context of Mesa. These instructions assume that you are a little familiar with development, but that you have little knowledge of the packaging process.
 
-This "How-to Guide" uses GitHub to walk you through the process. However, other repositories (e.g. Mercurial, Bitbucket, Beanstalk) will be able to provide similar services.
+There are two ways to share a package:
 
-Package Development Checklist: Sharing your package in seven steps
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   1. Via GitHub or other service (e.g. GitLab, Bitbucket, etc)
+   2. Via PyPI, the Python package manager
 
-1. Take your package from your ABM and make sure it is callable from Mesa in a simple, easy to understand way
+Sharing a package via PyPI make it easier easier to install for users, but is more overhead for whomever is maintaining it. However, if you are truly intending for a wider/longer-term adoption, then PyPI should be your goal.
 
-2. Think about the structure of your package
+Most likely you created an ABM that has the code that you want to share in it, which is what the steps below describe.
 
-   Not sure what this means, see a discussion on package structure at `Hitchhiker's Guide to Python <http://docs.python-guide.org/en/latest/writing/structure/>`_
+Sharing your package in eight steps
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. Using GitHub, create a new repository
+   1. Layout a new file structure to move the code into and then make sure it is callable from Mesa, in a simple, easy to understand way. For example, ``from example_package import foo``.  See `Creating the Scaffolding <https://python-packaging.readthedocs.io/en/latest/minimal.html#creating-the-scaffolding>`_.
 
-A. Name your repository
-B. Select a license (not sure-- click the blue 'i' next to the i for a great run down of licenses)
-C. Create a readme.md file (this contains a description of the package) see an example: `Bilateral Shapley <https://github.com/tpike3/bilateralshapley/blob/master/README.md>`_
+   1. `Pick a name <https://python-packaging.readthedocs.io/en/latest/minimal.html#picking-a-name>`_.
 
+   1. `Create a repo on Github <https://help.github.com/articles/create-a-repo/>`_.
 
-4. COMMIT a requirements.txt to the repository
+      * Enter the name of the repo.
+      * Select a license (not sure-- click the blue 'i' next to the i for a great run down of licenses). We recommend something permissive Apache 2.0, BSD, or MIT so that others can freely adopt it. The more permissive the more likely it will gain followers and adoption. If you do not include a license, it is our belief that you will retain all rights, which means that people can't use your project, but it should be noted that we are also not lawyers.
+      * Create a readme.md file (this contains a description of the package) see an example: `Bilateral Shapley <https://github.com/tpike3/bilateralshapley/blob/master/README.md>`_
 
-- This can be created automatically from your python environment using the command:
+   1. `Clone the repo to your computer <https://help.github.com/articles/cloning-a-repository/#platform-linux>`_.
 
-   .. code:: bash
+   1. Copy your code directory into the repo that you cloned one your computer.
 
-      pip freeze > requirements.txt
+   1. Add a requirements.txt file, which lets people know which external Python packages are needed to run the code in your repo. To create a file, run: ``pip freeze > requirements.txt``. Note, if you are running Anaconda, you will need to install pip first: ``conda install pip``.
 
-- If using Anaconda install pip first
+   1. ``git add`` all the files to the repo, which means the repo starts to track the files. Then ``git commit`` the files with a meaningful message. To learn more about this see: `Saving changes <https://www.atlassian.com/git/tutorials/saving-changes>`_. Finally, you will want to ``git push`` all your changes to GitHub, see: `Git Push <https://help.github.com/articles/pushing-to-a-remote/>`_.
 
-   .. code:: bash
+   1. Let people know about your package on the `MESA Wiki Page <https://github.com/projectmesa/mesa/wiki>`_ and share it on the `email list <https://groups.google.com/forum/#!forum/projectmesa>`_. In the future, we will create more of a directory, but at this point we are not there yet.
 
-      conda install pip
-
-- For more information on environments see the user guide: :ref:`user-guide`
-
-5. COMMIT a setup.py file
-
-      Python Package Authority Setup `Example <https://github.com/pypa/sampleproject/blob/master/setup.py>`_
-      or start with a set up file from a package you like
-
-6. COMMIT the module(s) or folder(s) to the GitHub repository
-
-      Don't forgot to follow a good `structure <http://docs.python-guide.org/en/latest/writing/structure/>`_
-
-7. Let people know about your package on the MESA wiki page
-
-      `MESA Wiki Page <https://github.com/projectmesa/mesa/wiki>`_
+From this point, someone can clone your repo and then add your repo to their Python path and use it in their project. However, if you want to take your package to the next level, you will want to add more structure to your package and share it on PyPI.
 
 Take Your Package to the Next Level
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -119,4 +106,5 @@ Take Your Package to the Next Level
 You want to do even more. The authoritative guide for python package development is through the `Python Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting your package on the Python Package Index.
 
 The `Python Package Index <https://pypi.org>`_ is the main repository of software for Python Packages and following this guide will ensure your code and documentation meets the standards for distribution across the Python community.
+
 
