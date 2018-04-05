@@ -76,8 +76,8 @@ Sharing a package via PyPI make it easier to install for users but is more overh
 Most likely you created an ABM that has the code that you want to share in it, which is what the steps below describe.
 
 
-Sharing your package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Sharing your package**
+
 
    1. Layout a new file structure to move the code into and then make sure it is callable from Mesa, in a simple, easy to understand way. For example, ``from example_package import foo``.  See `Creating the Scaffolding <https://python-packaging.readthedocs.io/en/latest/minimal.html#creating-the-scaffolding>`_.
 
@@ -102,8 +102,8 @@ Sharing your package
 From this point, someone can clone your repo and then add your repo to their Python path and use it in their project. However, if you want to take your package to the next level, you will want to add more structure to your package and share it on PyPI.
 
 
-Next Level: PyPI
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Next Level: PyPI**
+
 
 You want to do even more. The authoritative guide for python package development is through the `Python Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting your package on the Python Package Index.
 
