@@ -5,7 +5,7 @@ The Mesa core functionality is just a subset of what we believe researchers crea
 
 **DRY Principal**
 
-This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the `DRY principal (or don't repeat yourself.) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_. The creators of Mesa designed Mesa in order for this principal to be exercised in the Mesa community. For example, a group health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
+This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the `DRY principal (or don't repeat yourself.) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_. The creators of Mesa designed Mesa in order for this principal to be exercised in the development of agent-based models (ABMs). For example, a group health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
 
 **Benefits to Scientists**
 
@@ -13,19 +13,21 @@ Besides a best practice of the software engineering community, there are other b
 
 1. **Reproducibility.** Decoupled shared packages also allows for reproducibility. Having a package that is shared allows others to test the methods that lead to the model results that the researcher arrived at.
 
-2. **Accepted truths.** Once results are reproduced, a library could be considered an accepted truth, meaning that the community agrees that the library does what the library intends to do and that the library can be trusted to do this.
+2. **Accepted truths.** Once results are reproduced, a library could be considered an accepted truth, meaning that the community agrees that the library does what the library intends to do and that the library can be trusted to do this. Part of the idea behind 'accepted truths' is that subject matter experts are the ones that write and maintain the library.
 
-2. **Building blocks.** Think of libraries like Legos. The researcher can borrow a piece from here or there to pull together the base of their model, so they can focus on the value add. For example, someone might pull from a human interactions library and a decision-making library and combine the two to look at how human cognitive function effects the physical spread of disease.
+2. **Building blocks.** Think of libraries like Legos. The researcher can borrow a piece from here or there to pull together the base of their model, so they can focus on the value add that they bring. For example, someone might pull from a human interactions library and a decision-making library and combine the two to look at how human cognitive function effects the physical spread of disease.
 
 **Mesa and Mesa Packages**
 
-Because of the possibilities of nuanced libraries, few things will actually make it into core Mesa. Mesa is intended to only include core functionality that everyone uses. It is not impossible that something written on the outside is brought into core at a later date if the value to everyone is proven through adoption.
+Because of the possibilities of nuanced libraries, few things will actually make it into core Mesa. Mesa is intended to only include core functionality that everyone uses. However, it is not impossible that something written on the outside is brought into core at a later date if the value to everyone is proven through adoption.
 
-An example that is analogous to Mesa and Mesa packages is `Django <https://www.djangoproject.com/>`_ and `Django Packages <https://djangopackages.org/>`_. Django is a web framework that allows you to build a website in Python, but there are lots of things besides a basic website that you might want. For example, you might want authentication functionality. It would be inefficient for everyone to write their own authentication functionality, so one person writes and many share it.
+An example that is analogous to Mesa and Mesa packages is `Django <https://www.djangoproject.com/>`_ and `Django Packages <https://djangopackages.org/>`_. Django is a web framework that allows you to build a website in Python, but there are lots of things besides a basic website that you might want. For example, you might want authentication functionality. It would be inefficient for everyone to write their own authentication functionality, so one person writes it (or a group of people). They share it with the world and then many people can use it.
 
-This process isn't perfect. Just because you write something doesn't mean people are going to use it. Sometimes two different packages will be created that do similar things, but one of them does it better or is easier to use. That is the one that will get more adoption. In the world of academia, often researchers hold on to their content until they are ready to release. In the world of open source software, this can backfire. The sooner you open source something the more likely it will be a success, because you will build consensus and engagement. Another thing that can happen is that while you are working on perfecting it, someone else is building in the open and establishes the audience you were looking for.
+This process isn't perfect. Just because you write something doesn't mean people are going to use it. Sometimes two different packages will be created that do similar things, but one of them does it better or is easier to use. That is the one that will get more adoption. In the world of academia, often researchers hold on to their content until they are ready to publish it. In the world of open source software, this can backfire. The sooner you open source something the more likely it will be a success, because you will build consensus and engagement. Another thing that can happen is that while you are working on perfecting it, someone else is building in the open and establishes the audience you were looking for. So, don't be afraid to start working directly out in the open and then release it to the world.
 
-The purpose of this guide is to support new programmers by providing detailed guides on "How to" build and share a package. Let's get started!
+**What is in this doc**
+
+There are two sections in this documention. The first is the User Guide, which is aimed at users of packages. The section is a package development guide, which is aimed at those who want to develop packages. Without further ado, let's get started!
 
 
 User Guide
