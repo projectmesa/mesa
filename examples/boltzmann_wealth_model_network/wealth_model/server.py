@@ -1,8 +1,7 @@
 from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.modules import ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
+from mesa.visualization.modules import ChartModule
 from mesa.visualization.modules import NetworkModule
-
 from .model import MoneyModel
 
 
@@ -10,21 +9,20 @@ def network_portrayal(G):
     # The model ensures there is 0 or 1 agent per node
 
     portrayal = dict()
-    portrayal['nodes'] = [{'id': n_id,
-                           'agent_id': None if not n['agent'] else n['agent'][0].unique_id,
-                           'size': 3 if n['agent'] else 1,
-                           'color': '#CC0000' if not n['agent'] or n['agent'][0].wealth == 0 else '#007959',
-                           'label': None if not n['agent'] else 'Agent:{} Wealth:{}'.format(n['agent'][0].unique_id,
-                                                                                            n['agent'][0].wealth),
+    portrayal['nodes'] = [{'id': node_id,
+                           'size': 3 if agents else 1,
+                           'color': '#CC0000' if not agents or agents[0].wealth == 0 else '#007959',
+                           'label': None if not agents else 'Agent:{} Wealth:{}'.format(agents[0].unique_id,
+                                                                                        agents[0].wealth),
                            }
-                          for n_id, n in G.nodes(data=True)]
+                          for (node_id, agents) in G.nodes.data('agent')]
 
-    portrayal['edges'] = [{'id': i,
+    portrayal['edges'] = [{'id': edge_id,
                            'source': source,
                            'target': target,
                            'color': '#000000',
                            }
-                          for i, (source, target, _) in enumerate(G.edges(data=True))]
+                          for edge_id, (source, target) in enumerate(G.edges)]
 
     return portrayal
 
