@@ -1,21 +1,18 @@
-"How To" Mesa Packages
-======================
-
 The Mesa core functionality is just a subset of what we believe researchers creating Agent Based Models (ABMs) will use. We designed Mesa to be extensible, so that individuals from various domains can build, maintain, and share their own packages that work with Mesa in pursuit of "unifying algorithmic theories of the relation between adaptive behavior and system complexity (Volker Grimm et al 2005)."
 
 **DRY Principal**
 
-This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the  `DRY prinicipal (or don't repeat yourself.) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_. The creators of Mesa designed Mesa in order for this principal to be exercised in the Mesa community. For example, a group health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
+This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the `DRY principal (or don't repeat yourself.) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_. The creators of Mesa designed Mesa in order for this principal to be exercised in the Mesa community. For example, a group health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
 
 **Benefits to Scientists**
 
 Besides a best practice of the software engineering community, there are other benefits for the scientific community.
 
-1. **Reproducibility.** Decoupled shared packages also allows for reproduciblility. Having a package that is shared allows others to test the methods that lead to the model results that the researcher arrived at.
+1. **Reproducibility.** Decoupled shared packages also allows for reproducibility. Having a package that is shared allows others to test the methods that lead to the model results that the researcher arrived at.
 
 2. **Accepted truths.** Once results are reproduced, a library could be considered an accepted truth, meaning that the community agrees that the library does what the library intends to do and that the library can be trusted to do this.
 
-2. **Building blocks.** Think of libraries like legos. The researcher can borrow a piece from here or there to pull together the base of their model, so they can focus on the value add. For example, someone might pull from a human interactions library and a decision making library and combine the two to look at how human cognitive function effects the physical spread of disease.
+2. **Building blocks.** Think of libraries like Legos. The researcher can borrow a piece from here or there to pull together the base of their model, so they can focus on the value add. For example, someone might pull from a human interactions library and a decision-making library and combine the two to look at how human cognitive function effects the physical spread of disease.
 
 **Mesa and Mesa Packages**
 
@@ -33,9 +30,9 @@ User Guide
 
 * Note: MESA does not endorse or verify any of the code shared through MESA packages. This is left to the domain experts of the community that created the code.*
 
-**Step 1: Establish an envrionment**
+**Step 1: Establish an environment**
 
-Create a virtual environment for the ABM you are building. The purpose of a virtual environment is to isolate the packages for your project from other projects. This is helpful when you need to use two different versions of a package or if you are running one version in production, but want to test out another version. You can do with with either virtualenv or Anaconda.
+Create a virtual environment for the ABM you are building. The purpose of a virtual environment is to isolate the packages for your project from other projects. This is helpful when you need to use two different versions of a package or if you are running one version in production but want to test out another version. You can do with either virtualenv or Anaconda.
 
    - `Why a virtual environment <https://realpython.com/blog/python/python-virtual-environments-a-primer/#why-the-need-for-virtual-environments>`_
    - `Virtualenv and Virtualenv Wrapper <http://docs.python-guide.org/en/latest/#python-development-environments>`_
@@ -43,18 +40,18 @@ Create a virtual environment for the ABM you are building. The purpose of a virt
 
 **Step 2: Install the packages**
 
-Install the package(s) into your environment via pip/conda or github. If the package is a mature package that is hosted in the Python package repository, then you can install it just like you did Mesa:
+Install the package(s) into your environment via pip/conda or GitHub. If the package is a mature package that is hosted in the Python package repository, then you can install it just like you did Mesa:
 
    .. code:: bash
 
       pip install package_name
 
-However, sometimes it takes a little bit for projects to reach that level of maturity. In that case to use the library, you would install from github (or other code repository) with something like the following:
+However, sometimes it takes a little bit for projects to reach that level of maturity. In that case to use the library, you would install from GitHub (or other code repository) with something like the following:
 
 
-	.. code:: bash
+   .. code:: bash
 
-		pip install https://github.com/<path to project>
+      pip install https://github.com/<path to project>
 
 The commands above should also work with Anaconda, just replace the `pip` with `conda`.
 
@@ -64,7 +61,7 @@ Package Development: A "How-to Guide"
 
 The purpose of this page is help you set up and distribute your Mesa package as quickly as possible.
 
-This "How-to Guide" uses GitHub to walk you through the process. However, other repositories (e.g. Mecurial, Bitbucket, Beanstalk) will be able to provide similar services.
+This "How-to Guide" uses GitHub to walk you through the process. However, other repositories (e.g. Mercurial, Bitbucket, Beanstalk) will be able to provide similar services.
 
 Package Development Checklist: Sharing your package in seven steps
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -73,7 +70,7 @@ Package Development Checklist: Sharing your package in seven steps
 
 2. Think about the structure of your package
 
-   Not sure what this means, see a discussion on package struture at `Hitchhiker's Guide to Python <http://docs.python-guide.org/en/latest/writing/structure/>`_
+   Not sure what this means, see a discussion on package structure at `Hitchhiker's Guide to Python <http://docs.python-guide.org/en/latest/writing/structure/>`_
 
 3. Using GitHub, create a new repository
 
@@ -103,7 +100,7 @@ C. Create a readme.md file (this contains a description of the package) see an e
       Python Package Authority Setup `Example <https://github.com/pypa/sampleproject/blob/master/setup.py>`_
       or start with a set up file from a package you like
 
-6. COMMIT the module(s) or folder(s) to the git hub repository
+6. COMMIT the module(s) or folder(s) to the GitHub repository
 
       Don't forgot to follow a good `structure <http://docs.python-guide.org/en/latest/writing/structure/>`_
 
@@ -117,6 +114,4 @@ Take Your Package to the Next Level
 You want to do even more. The authoritative guide for python package development is through the `Python Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting your package on the Python Package Index.
 
 The `Python Package Index <https://pypi.org>`_ is the main repository of software for Python Packages and following this guide will ensure your code and documentation meets the standards for distribution across the Python community.
-
-
 
