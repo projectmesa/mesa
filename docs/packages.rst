@@ -68,10 +68,10 @@ The purpose of this section is help you understand, setup, and distribute your M
 
 There are two ways to share a package:
 
-   1. Via GitHub or other service (e.g. GitLab, Bitbucket, etc)
+   1. Via GitHub or other service (e.g. GitLab, Bitbucket, etc.)
    2. Via PyPI, the Python package manager
 
-Sharing a package via PyPI make it easier easier to install for users, but is more overhead for whomever is maintaining it. However, if you are truly intending for a wider/longer-term adoption, then PyPI should be your goal.
+Sharing a package via PyPI make it easier to install for users but is more overhead for whomever is maintaining it. However, if you are truly intending for a wider/longer-term adoption, then PyPI should be your goal.
 
 Most likely you created an ABM that has the code that you want to share in it, which is what the steps below describe.
 
@@ -82,7 +82,7 @@ Sharing your package in eight steps
 
    1. `Pick a name <https://python-packaging.readthedocs.io/en/latest/minimal.html#picking-a-name>`_.
 
-   1. `Create a repo on Github <https://help.github.com/articles/create-a-repo/>`_.
+   1. `Create a repo on GitHub <https://help.github.com/articles/create-a-repo/>`_.
 
       * Enter the name of the repo.
       * Select a license (not sure-- click the blue 'i' next to the i for a great run down of licenses). We recommend something permissive Apache 2.0, BSD, or MIT so that others can freely adopt it. The more permissive the more likely it will gain followers and adoption. If you do not include a license, it is our belief that you will retain all rights, which means that people can't use your project, but it should be noted that we are also not lawyers.
@@ -106,5 +106,3 @@ Take Your Package to the Next Level
 You want to do even more. The authoritative guide for python package development is through the `Python Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting your package on the Python Package Index.
 
 The `Python Package Index <https://pypi.org>`_ is the main repository of software for Python Packages and following this guide will ensure your code and documentation meets the standards for distribution across the Python community.
-
-
