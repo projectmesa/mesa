@@ -5,17 +5,17 @@ The Mesa core functionality is just a subset of what we believe researchers crea
 
 **DRY Principal**
 
-This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the `DRY principal (or don't repeat yourself.) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_. The creators of Mesa designed Mesa in order for this principal to be exercised in the development of agent-based models (ABMs). For example, a group health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
+This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the `DRY principal (or don't repeat yourself) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ (Hunt and Thomas 2010). The creators of Mesa designed Mesa in order for this principal to be exercised in the development of agent-based models (ABMs). For example, a group health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
 
 **Benefits to Scientists**
 
 Besides a best practice of the software engineering community, there are other benefits for the scientific community.
 
-1. **Reproducibility.** Decoupled shared packages also allows for reproducibility. Having a package that is shared allows others to test the methods that lead to the model results that the researcher arrived at.
+1. **Reproducibility and Replicability.** Decoupled shared packages also allows for reproducibility and replicability. Having a package that is shared allows others to reproduce the model results. It also allows others to apply the model to similar phenomenon and replicate the results over a diversity of data. Both are essential part of the scientific method (Leek and Peng 2015).
 
-2. **Accepted truths.** Once results are reproduced, a library could be considered an accepted truth, meaning that the community agrees that the library does what the library intends to do and that the library can be trusted to do this. Part of the idea behind 'accepted truths' is that subject matter experts are the ones that write and maintain the library.
+2. **Accepted truths.** Once results are reproduced and replicated, a library could be considered an accepted truth, meaning that the community agrees the library does what the library intends to do and  the library can be trusted to do this. Part of the idea behind 'accepted truths' is that subject matter experts are the ones that write and maintain the library.
 
-2. **Building blocks.** Think of libraries like Legos. The researcher can borrow a piece from here or there to pull together the base of their model, so they can focus on the value add that they bring. For example, someone might pull from a human interactions library and a decision-making library and combine the two to look at how human cognitive function effects the physical spread of disease.
+3. **Building blocks.** Think of libraries like Legos. The researcher can borrow a piece from here or there to pull together the base of their model, so they can focus on the value add that they bring. For example, someone might pull from a human interactions library and a decision-making library and combine the two to look at how human cognitive function effects the physical spread of disease.
 
 **Mesa and Mesa Packages**
 
@@ -35,7 +35,11 @@ User Guide
 
 * Note: MESA does not endorse or verify any of the code shared through MESA packages. This is left to the domain experts of the community that created the code.*
 
-**Step 1: Establish an environment**
+**Step 1: Select a package**
+
+Currently, a central list of compatible packages is located on the `Mesa Wiki Packages Page <https://github.com/projectmesa/mesa/wiki/Mesa-Packages>`_. 
+
+**Step 2: Establish an environment**
 
 Create a virtual environment for the ABM you are building. The purpose of a virtual environment is to isolate the packages for your project from other projects. This is helpful when you need to use two different versions of a package or if you are running one version in production but want to test out another version. You can do with either virtualenv or Anaconda.
 
@@ -43,7 +47,7 @@ Create a virtual environment for the ABM you are building. The purpose of a virt
    - `Virtualenv and Virtualenv Wrapper <http://docs.python-guide.org/en/latest/#python-development-environments>`_
    - `Creating a virtual environment with Anaconda <https://conda.io/docs/user-guide/tasks/manage-environments.html>`_
 
-**Step 2: Install the packages**
+**Step 3: Install the packages**
 
 Install the package(s) into your environment via pip/conda or GitHub. If the package is a mature package that is hosted in the Python package repository, then you can install it just like you did Mesa:
 
@@ -108,3 +112,15 @@ From this point, someone can clone your repo and then add your repo to their Pyt
 You want to do even more. The authoritative guide for python package development is through the `Python Packaging User Guide <https://packaging.python.org/>`_. This will take you through the entire process necessary for getting your package on the Python Package Index.
 
 The `Python Package Index <https://pypi.org>`_ is the main repository of software for Python Packages and following this guide will ensure your code and documentation meets the standards for distribution across the Python community.
+
+
+
+References
+===========
+
+Grimm, Volker, Eloy Revilla, Uta Berger, Florian Jeltsch, Wolf M. Mooij, Steven F. Railsback, Hans-Hermann Thulke, Jacob Weiner, Thorsten Wiegand, and Donald L. DeAngelis. 2005. “Pattern-Oriented Modeling of Agent Based Complex Systems: Lessons from Ecology.” American Association for the Advancement of Science 310 (5750): 987–91. doi:10.1126/science.1116681.
+
+Hunt, Andrew, and David Thomas. 2010. The Pragmatic Progammer: From Journeyman to Master. Reading, Massachusetts: Addison-Wesley.
+
+Leek, Jeffrey T., and Roger D. Peng. 2015. “Reproducible Research Can Still Be Wrong: Adopting a Prevention Approach.” Proceedings of the National Academy of Sciences 112 (6): 1645–46. doi:10.1073/pnas.1421412111.
+
