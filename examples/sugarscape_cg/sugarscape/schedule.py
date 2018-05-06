@@ -1,5 +1,5 @@
 import random
-from collections import defaultdict
+from collections import OrderedDict
 
 from mesa.time import RandomActivation
 
@@ -14,11 +14,11 @@ class RandomActivationByBreed(RandomActivation):
 
     Assumes that all agents have a step() method.
     '''
-    agents_by_breed = defaultdict(list)
+    agents_by_breed = OrderedDict(dict)
 
     def __init__(self, model):
         super().__init__(model)
-        self.agents_by_breed = defaultdict(list)
+        self.agents_by_breed = OrderedDict(dict)
 
     def add(self, agent):
         '''

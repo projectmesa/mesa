@@ -66,7 +66,7 @@ class TestDataCollector(unittest.TestCase):
         for i in range(7):
             self.model.step()
         # Write to table:
-        for agent in self.model.schedule.agents:
+        for agent in self.model.schedule.agents.values():
             agent.write_final_values()
 
     def test_model_vars(self):
@@ -128,3 +128,6 @@ class TestDataCollector(unittest.TestCase):
 
         with self.assertRaises(Exception):
             table_df = data_collector.get_table_dataframe("not a real table")
+
+if __name__ == '__main__':
+    unittest.main()

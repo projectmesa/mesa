@@ -161,3 +161,6 @@ class TestBatchRunner(unittest.TestCase):
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(model_vars['reported_fixed_param'].iloc[0],
                 self.fixed_params['fixed_name'])
+
+if __name__ == '__main__':
+    unittest.main()
