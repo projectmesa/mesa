@@ -1,5 +1,5 @@
 import random
-from collections import OrderedDict
+from collections import defaultdict
 
 from mesa.time import RandomActivation
 
@@ -14,11 +14,10 @@ class RandomActivationByBreed(RandomActivation):
 
     Assumes that all agents have a step() method.
     '''
-    agents_by_breed = OrderedDict(dict)
 
     def __init__(self, model):
         super().__init__(model)
-        self.agents_by_breed = OrderedDict(dict)
+        self.agents_by_breed = defaultdict(dict)
 
     def add(self, agent):
         '''
@@ -28,7 +27,7 @@ class RandomActivationByBreed(RandomActivation):
             agent: An Agent to be added to the schedule.
         '''
 
-        self.agents[agent.unique_id] = agent
+        self._agents[agent.unique_id] = agent
         agent_class = type(agent)
         self.agents_by_breed[agent_class][agent.unique_id] = agent
 
@@ -37,7 +36,7 @@ class RandomActivationByBreed(RandomActivation):
         Remove all instances of a given agent from the schedule.
         '''
 
-        del self.agents[agent.unique_id]
+        del self._agents[agent.unique_id]
 
         agent_class = type(agent)
         del self.agents_by_breed[agent_class][agent.unique_id]
