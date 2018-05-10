@@ -114,8 +114,8 @@ class TestStagedActivation(TestCase):
         Test staged activation can remove an agent
         '''
         model = MockModel(shuffle=True)
-        agent_keys = list(model.schedule.agents.keys())
-        agent = model.schedule.agents[agent_keys[0]]
+        agent_keys = list(model.schedule._agents.keys())
+        agent = model.schedule._agents[agent_keys[0]]
         model.schedule.remove(agent)
         assert agent not in model.schedule.agents
 
@@ -152,7 +152,7 @@ class TestRandomActivation(TestCase):
 
         model = MockModel(activation=RANDOM)
         model.step()
-        agent_steps = [i.steps for i in model.schedule.agents.values()]
+        agent_steps = [i.steps for i in model.schedule.agents]
         # one step for each of 2 agents
         assert all(map(lambda x: x == 1, agent_steps))
 
@@ -169,8 +169,8 @@ class TestSimultaneousActivation(TestCase):
         model = MockModel(activation=SIMULTANEOUS)
         model.step()
         # one step for each of 2 agents
-        agent_steps = [i.steps for i in model.schedule.agents.values()]
-        agent_advances = [i.advances for i in model.schedule.agents.values()]
+        agent_steps = [i.steps for i in model.schedule.agents]
+        agent_advances = [i.advances for i in model.schedule.agents]
         assert all(map(lambda x: x == 1, agent_steps))
         assert all(map(lambda x: x == 1, agent_advances))
 

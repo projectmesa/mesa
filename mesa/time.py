@@ -29,6 +29,7 @@ seeds consistent and allow for replication.
 import random
 from collections import OrderedDict
 
+
 class BaseScheduler:
     """ Simplest scheduler; activates agents one at a time, in the order
     they were added.
