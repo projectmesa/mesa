@@ -58,12 +58,6 @@ class TestExamples(unittest.TestCase):
                 model = Model()
                 (model.step() for _ in range(100))
 
-    def test_shape_example(self):
-        with self.active_example_dir('shape_example'):
-            from shape_model.model import ShapesModel
-            model = ShapesModel(100, 100, 100)
-            (model.step() for _ in range(100))
-
     def test_sugarscape_cg(self):
         with self.active_example_dir('sugarscape_cg'):
             from sugarscape.model import Sugarscape2ConstantGrowback
