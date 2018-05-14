@@ -16,7 +16,7 @@ from mesa.time import RandomActivation
 from .boid import Boid
 
 
-class BoidModel(Model):
+class BoidFlockers(Model):
     '''
     Flocker model class. Handles agent creation, placement and scheduling.
     '''

@@ -58,18 +58,6 @@ class TestExamples(unittest.TestCase):
                 model = Model()
                 (model.step() for _ in range(100))
 
-    def test_bank_reserves(self):
-        with self.active_example_dir('bank_reserves'):
-            from bank_reserves.model import BankReservesModel
-            model = BankReservesModel()
-            (model.step() for _ in range(100))
-
-    def test_boid_flockers(self):
-        with self.active_example_dir('boid-flockers'):
-            from boidflockers.model import BoidModel
-            model = BoidModel()
-            (model.step() for _ in range(100))
-
     def test_boltzmann_wealth_model(self):
         with self.active_example_dir('boltzmann_wealth_model'):
             from wealth_model.model import MoneyModel

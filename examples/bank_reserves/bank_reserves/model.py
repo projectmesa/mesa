@@ -77,7 +77,7 @@ def get_total_loans(model):
     return np.sum(agent_loans)
 
 
-class BankReservesModel(Model):
+class BankReserves(Model):
 
     # grid height
     grid_h = 20
