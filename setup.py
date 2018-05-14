@@ -7,6 +7,7 @@ from codecs import open
 
 requires = [
     'tornado >= 4.2, < 5.0.0',
+    'networkx',
     'numpy',
     'pandas',
     'tqdm',
