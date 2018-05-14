@@ -19,7 +19,7 @@ from wolf_sheep.agents import Sheep, Wolf, GrassPatch
 from wolf_sheep.schedule import RandomActivationByBreed
 
 
-class WolfSheepPredation(Model):
+class WolfSheep(Model):
     '''
     Wolf-Sheep Predation Model
     '''
