@@ -3,6 +3,11 @@ import sys
 import os.path
 import unittest
 import contextlib
+import importlib
+
+
+def classcase(name):
+    return ''.join(x.capitalize() for x in name.replace('-', '_').split('_'))
 
 
 class TestExamples(unittest.TestCase):
@@ -33,15 +38,25 @@ class TestExamples(unittest.TestCase):
             sys.modules.update(old_sys_modules)
             sys.path[:] = old_sys_path
 
-    def test_missed_examples(self):
+    def test_examples(self):
         for example in os.listdir(self.EXAMPLES):
-            print(example)
-            missing = []
-            if os.path.isdir(os.path.join(self.EXAMPLES, example)):
-                if not hasattr(self, 'test_{}'.format(example.replace('-', '_'))):
-                    missing.append(example)
-            if missing:
-                raise AssertionError('no tests for examples {}'.format(missing))
+            if not os.path.isdir(os.path.join(self.EXAMPLES, example)):
+                continue
+            if hasattr(self, 'test_{}'.format(example.replace('-', '_'))):
+                # non-standard example; tested below
+                continue
+
+            print("testing example {!r}".format(example))
+            with self.active_example_dir(example):
+                try:
+                    # model.py at the top level
+                    mod = importlib.import_module('model'.format(example))
+                except ImportError:
+                    # <example>/model.py
+                    mod = importlib.import_module('{}.model'.format(example.replace('-', '_')))
+                Model = getattr(mod, classcase(example))
+                model = Model()
+                (model.step() for _ in range(100))
 
     def test_Schelling(self):
         with self.active_example_dir('Schelling'):
@@ -98,12 +113,6 @@ class TestExamples(unittest.TestCase):
                 cop_vision=7,
                 legitimacy=.8,
                 max_jail_term=1000)
-            (model.step() for _ in range(100))
-
-    def test_forest_fire(self):
-        with self.active_example_dir('forest_fire'):
-            from forest_fire.model import ForestFire
-            model = ForestFire(100, 100, 0.65)
             (model.step() for _ in range(100))
 
     def test_hex_snowflake(self):
