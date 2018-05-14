@@ -12,13 +12,15 @@ class TestExamples(unittest.TestCase):
     details of each example's model.
     '''
 
+    EXAMPLES = os.path.abspath(os.path.join(os.path.dirname(__file__), '../examples'))
+
     @contextlib.contextmanager
     def active_example_dir(self, example):
         'save and restore sys.path and sys.modules'
         old_sys_path = sys.path[:]
         old_sys_modules = sys.modules.copy()
         old_cwd = os.getcwd()
-        example_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../examples', example))
+        example_path = os.path.abspath(os.path.join(self.EXAMPLES, example))
         try:
             sys.path.insert(0, example_path)
             os.chdir(example_path)
@@ -31,7 +33,17 @@ class TestExamples(unittest.TestCase):
             sys.modules.update(old_sys_modules)
             sys.path[:] = old_sys_path
 
-    def test_schelling(self):
+    def test_missed_examples(self):
+        for example in os.listdir(self.EXAMPLES):
+            print(example)
+            missing = []
+            if os.path.isdir(os.path.join(self.EXAMPLES, example)):
+                if not hasattr(self, 'test_{}'.format(example.replace('-', '_'))):
+                    missing.append(example)
+            if missing:
+                raise AssertionError('no tests for examples {}'.format(missing))
+
+    def test_Schelling(self):
         with self.active_example_dir('Schelling'):
             from model import SchellingModel
             model = SchellingModel(height=20, width=20, density=0.8,
