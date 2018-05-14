@@ -58,20 +58,6 @@ class TestExamples(unittest.TestCase):
                 model = Model()
                 (model.step() for _ in range(100))
 
-    def test_epstein_civil_violence(self):
-        with self.active_example_dir('epstein_civil_violence'):
-            from civil_violence.model import CivilViolenceModel
-            model = CivilViolenceModel(
-                height=40,
-                width=40,
-                citizen_density=.7,
-                cop_density=.074,
-                citizen_vision=7,
-                cop_vision=7,
-                legitimacy=.8,
-                max_jail_term=1000)
-            (model.step() for _ in range(100))
-
     def test_hex_snowflake(self):
         with self.active_example_dir('hex_snowflake'):
             from hex_snowflake.model import HexSnowflake

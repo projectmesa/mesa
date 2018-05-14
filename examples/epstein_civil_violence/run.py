@@ -1,3 +1,3 @@
-from civil_violence.server import server
+from epstein_civil_violence.server import server
 
 server.launch()
