@@ -58,18 +58,6 @@ class TestExamples(unittest.TestCase):
                 model = Model()
                 (model.step() for _ in range(100))
 
-    def test_hex_snowflake(self):
-        with self.active_example_dir('hex_snowflake'):
-            from hex_snowflake.model import HexSnowflake
-            model = HexSnowflake(100, 100)
-            (model.step() for _ in range(100))
-
-    def test_pd_grid(self):
-        with self.active_example_dir('pd_grid'):
-            from pd_grid.model import PDModel
-            model = PDModel(100, 100, "Random")
-            (model.step() for _ in range(100))
-
     def test_shape_example(self):
         with self.active_example_dir('shape_example'):
             from shape_model.model import ShapesModel

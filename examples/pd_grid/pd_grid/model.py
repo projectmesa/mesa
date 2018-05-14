@@ -6,7 +6,7 @@ from mesa.datacollection import DataCollector
 from .agent import PDAgent
 
 
-class PDModel(Model):
+class PdGrid(Model):
     ''' Model class for iterated, spatial prisoner's dilemma model. '''
 
     schedule_types = {"Sequential": BaseScheduler,
@@ -21,7 +21,7 @@ class PDModel(Model):
               ("D", "C"): 1.6,
               ("D", "D"): 0}
 
-    def __init__(self, height, width, schedule_type, payoffs=None):
+    def __init__(self, height=50, width=50, schedule_type="Random", payoffs=None):
         '''
         Create a new Spatial Prisoners' Dilemma Model.
 
