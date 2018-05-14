@@ -9,5 +9,5 @@ tornado==4.5.3
 flake8==2.5.2
 tqdm
 networkx==2.1
-
+click==6.7
 
