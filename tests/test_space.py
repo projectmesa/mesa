@@ -411,3 +411,6 @@ class TestMultipleNetworkGrid(unittest.TestCase):
         assert self.space.get_all_cell_contents() == [self.agents[0],
                                                       self.agents[1],
                                                       self.agents[2]]
+
+if __name__ == '__main__':
+    unittest.main()
