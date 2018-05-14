@@ -57,22 +57,3 @@ class TestExamples(unittest.TestCase):
                 Model = getattr(mod, classcase(example))
                 model = Model()
                 (model.step() for _ in range(100))
-
-    def test_virus_on_network(self):
-        with self.active_example_dir('virus_on_network'):
-            from virus_on_network.model import VirusModel
-            model = VirusModel(
-                num_nodes=10,
-                avg_node_degree=3,
-                initial_outbreak_size=1,
-                virus_spread_chance=0.4,
-                virus_check_frequency=0.4,
-                recovery_chance=0.3,
-                gain_resistance_chance=0.5)
-            (model.step() for _ in range(100))
-
-    def test_wolf_sheep(self):
-        with self.active_example_dir('wolf_sheep'):
-            from wolf_sheep.model import WolfSheepPredation
-            model = WolfSheepPredation()
-            (model.step() for _ in range(100))
