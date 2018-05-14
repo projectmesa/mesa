@@ -58,12 +58,6 @@ class TestExamples(unittest.TestCase):
                 model = Model()
                 (model.step() for _ in range(100))
 
-    def test_sugarscape_cg(self):
-        with self.active_example_dir('sugarscape_cg'):
-            from sugarscape.model import Sugarscape2ConstantGrowback
-            model = Sugarscape2ConstantGrowback()
-            (model.step() for _ in range(100))
-
     def test_virus_on_network(self):
         with self.active_example_dir('virus_on_network'):
             from virus_on_network.model import VirusModel

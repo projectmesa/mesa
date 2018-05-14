@@ -15,11 +15,11 @@ from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 
-from sugarscape.agents import SsAgent, Sugar
-from sugarscape.schedule import RandomActivationByBreed
+from .agents import SsAgent, Sugar
+from .schedule import RandomActivationByBreed
 
 
-class Sugarscape2ConstantGrowback(Model):
+class SugarscapeCg(Model):
     '''
     Sugarscape 2 Constant Growback
     '''
@@ -46,7 +46,7 @@ class Sugarscape2ConstantGrowback(Model):
 
         # Create sugar
         import numpy as np
-        sugar_distribution = np.genfromtxt("sugarscape/sugar-map.txt")
+        sugar_distribution = np.genfromtxt("sugarscape_cg/sugar-map.txt")
         for _, x, y in self.grid.coord_iter():
             max_sugar = sugar_distribution[x, y]
             sugar = Sugar((x, y), self, max_sugar)
