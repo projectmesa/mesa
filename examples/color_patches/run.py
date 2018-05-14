@@ -1,3 +1,4 @@
 from color_patches.server import server
 
-server.launch()
+if __name__ == "__main__":
+    server.launch()

@@ -10,6 +10,7 @@ requires = [
     'numpy',
     'pandas',
     'tqdm',
+    'click',
 ]
 
 version = ''
@@ -47,4 +48,8 @@ setup(
         'Development Status :: 3 - Alpha',
         'Natural Language :: English',
     ],
+    entry_points='''
+        [console_scripts]
+        mesa=mesa.main:cli
+    ''',
 )
