@@ -9,10 +9,10 @@ The "game" is a zero-player game, meaning that its evolution is determined by it
 
 ## How to Run
 
-To run the model interactively, run ``run.py`` in this directory:
+To run the model interactively, run ``mesa run`` in this directory. e.g.
 
 ```
-    $ python run.py
+    $ mesa run
 ``` 
 
 Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press ``run``. 

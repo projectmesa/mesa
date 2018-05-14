@@ -19,7 +19,7 @@ The Demographic Prisoner's Dilemma demonstrates how simple rules can lead to the
 
 ##### Web based model simulation
 
-Run ``python run.py``.
+To run the model interactively, run ``mesa run`` in this directory.
 
 ##### Jupyter Notebook
 
