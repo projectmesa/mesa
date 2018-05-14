@@ -22,8 +22,8 @@ underscores, such as ``thunder_cats``. Within that directory:
 * ``server.py`` should contain the visualization support, including the server
   class.
 
-* ``run.py`` is a Python script that will run the model when invoked as
-  ``python run.py``.
+* ``run.py`` is a Python script that will run the model when invoked via
+  ``mesa run``.
 
 After the number of files grows beyond a half-dozen, try to use sub-folders to
 organize them. For example, if the visualization uses image files, put those in

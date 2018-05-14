@@ -22,10 +22,10 @@ To install the dependencies use pip and the requirements.txt in this directory. 
 
 ## Interactive Model Run
 
-To run the model interactively, run ``run.py`` in this directory. e.g.
+To run the model interactively, use `mesa run` in this directory:
 
 ```
-    $ python run.py
+    $ mesa run
 ```
 
 Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/), select the model parameters, press Reset, then Start.

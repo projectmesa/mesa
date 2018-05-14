@@ -6,10 +6,10 @@ The [forest fire model](http://en.wikipedia.org/wiki/Forest-fire_model) is a sim
 
 ## How to Run
 
-Launch an interactive server by Running ``run.py``:
+To run the model interactively, run ``mesa run`` in this directory. e.g.
 
 ```
-    $ python run.py
+    $ mesa run
 ```
 
 Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run. 

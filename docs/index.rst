@@ -40,11 +40,11 @@ Getting started quickly:
 
     $ pip install mesa
 
-To launch an example model, open any of the directories in the `examples <https://github.com/projectmesa/mesa/tree/master/examples>`_ folder and launch the ``run.py`` file there, e.g.:
+To launch an example model, clone the `repository <https://github.com/projectmesa/mesa>`_ folder and invoke ``mesa run`` for one of the ``examples/`` subdirectories:
 
 .. code-block:: bash
 
-    schelling $ python run.py
+    schelling $ mesa run examples/wolf_sheep
 
 For more help on using Mesa, check out the following resources:
 
