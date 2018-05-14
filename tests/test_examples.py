@@ -58,12 +58,6 @@ class TestExamples(unittest.TestCase):
                 model = Model()
                 (model.step() for _ in range(100))
 
-    def test_conways_game_of_life(self):
-        with self.active_example_dir('conways_game_of_life'):
-            from game_of_life.model import GameOfLife
-            model = GameOfLife(100, 100)
-            (model.step() for _ in range(100))
-
     def test_epstein_civil_violence(self):
         with self.active_example_dir('epstein_civil_violence'):
             from civil_violence.model import CivilViolenceModel

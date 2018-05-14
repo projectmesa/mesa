@@ -4,16 +4,16 @@ from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import Grid
 
-from game_of_life.cell import Cell
+from .cell import Cell
 
 
-class GameOfLife(Model):
+class ConwaysGameOfLife(Model):
     '''
     Represents the 2-dimensional array of cells in Conway's
     Game of Life.
     '''
 
-    def __init__(self, height, width):
+    def __init__(self, height=50, width=50):
         '''
         Create a new playing area of (height, width) cells.
         '''
