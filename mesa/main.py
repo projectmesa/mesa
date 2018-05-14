@@ -1,6 +1,5 @@
 import sys
 import os
-import importlib
 import click
 
 PROJECT_PATH = click.Path(exists=True, file_okay=False, dir_okay=True, resolve_path=True)
@@ -21,5 +20,7 @@ def run(project):
     '''
     sys.path.insert(0, project)
     os.chdir(project)
-    run = importlib.import_module('run')
-    run.server.launch()
+
+    with open("run.py") as f:
+        code = compile(f.read(), "run.py", 'exec')
+        exec(code, {}, {})
