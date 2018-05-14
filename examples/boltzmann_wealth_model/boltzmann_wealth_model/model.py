@@ -14,7 +14,7 @@ def compute_gini(model):
     return (1 + (1 / N) - 2 * B)
 
 
-class MoneyModel(Model):
+class BoltzmannWealthModel(Model):
     """A simple model of an economy where agents exchange currency at random.
 
     All the agents begin with one unit of currency, and each time step can give
@@ -22,7 +22,7 @@ class MoneyModel(Model):
     highly skewed distribution of wealth.
     """
 
-    def __init__(self, N, width, height):
+    def __init__(self, N=100, width=10, height=10):
         self.num_agents = N
         self.grid = MultiGrid(height, width, True)
         self.schedule = RandomActivation(self)
