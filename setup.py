@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 from codecs import open
 
 requires = [
-    'tornado',
+    'tornado >= 4.2, < 5.0.0',
     'numpy',
     'pandas',
     'tqdm',
