@@ -58,13 +58,6 @@ class TestExamples(unittest.TestCase):
                 model = Model()
                 (model.step() for _ in range(100))
 
-    def test_Schelling(self):
-        with self.active_example_dir('Schelling'):
-            from model import SchellingModel
-            model = SchellingModel(height=20, width=20, density=0.8,
-                minority_pc=0.2, homophily=3)
-            (model.step() for _ in range(100))
-
     def test_bank_reserves(self):
         with self.active_example_dir('bank_reserves'):
             from bank_reserves.model import BankReservesModel
