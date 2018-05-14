@@ -117,7 +117,6 @@ class BatchRunner:
     def run_all(self):
         """ Run the model at all parameter combinations and store results. """
         param_names, param_ranges = zip(*self.variable_parameters.items())
-        run_count = count()
         total_iterations = self.iterations
         for param_range in param_ranges:
             total_iterations *= len(param_range)
@@ -137,7 +136,6 @@ class BatchRunner:
                         for agent_key, reports in agent_vars.items():
                             self.agent_vars[agent_key] = reports
                     pbar.update()
-
 
     def _run_single_model(self, param_values, run_count, kwargs):
         """
@@ -160,7 +158,6 @@ class BatchRunner:
                 self.agent_vars[agent_key] = reports
 
         return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None))
-
 
     def run_model(self, model):
         """ Run a model object to completion, or until reaching max steps.
