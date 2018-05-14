@@ -58,12 +58,6 @@ class TestExamples(unittest.TestCase):
                 model = Model()
                 (model.step() for _ in range(100))
 
-    def test_color_patches(self):
-        with self.active_example_dir('color_patches'):
-            from color_patches.model import ColorPatchModel
-            model = ColorPatchModel(100, 100)
-            (model.step() for _ in range(100))
-
     def test_conways_game_of_life(self):
         with self.active_example_dir('conways_game_of_life'):
             from game_of_life.model import GameOfLife
