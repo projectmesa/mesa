@@ -58,12 +58,6 @@ class TestExamples(unittest.TestCase):
                 model = Model()
                 (model.step() for _ in range(100))
 
-    def test_boltzmann_wealth_model_network(self):
-        with self.active_example_dir('boltzmann_wealth_model_network'):
-            from wealth_model.model import MoneyModel
-            model = MoneyModel(100, 100)
-            (model.step() for _ in range(100))
-
     def test_color_patches(self):
         with self.active_example_dir('color_patches'):
             from color_patches.model import ColorPatchModel
