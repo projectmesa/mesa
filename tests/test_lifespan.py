@@ -81,9 +81,8 @@ class TestAgentLifespan(unittest.TestCase):
         assert self.df.steps.max() == 1
 
     def test_agent_lifetime(self):
-        lifetimes = self.df.groupby(["AgentID"]).Step.agg({"Step":
-                                                           lambda x: len(x)})
-        assert lifetimes.Step.max() == 2
+        lifetimes = self.df.groupby(["AgentID"]).Step.agg(len)
+        assert lifetimes.max() == 2
 
 
 if __name__ == '__main__':
