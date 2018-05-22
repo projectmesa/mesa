@@ -43,6 +43,6 @@ model_params = dict(height=40,
                     legitimacy=.8,
                     max_jail_term=1000)
 
-canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 500, 500)
+canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 480, 480)
 server = ModularServer(CivilViolenceModel, [canvas_element],
                        "Epstein Civil Violence", model_params)
