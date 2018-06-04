@@ -3,6 +3,31 @@
 Release History
 ---------------
 
+0.8.4 (2018-06-?) Jerome
++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Mesa Packages docs created (#464, #480, #484, #503, #504)
+* Change size and tooltip text of nodes in D3 network visualization #468
+* Multiprocessing BatchRunner with pathos #506
+* Schedule.agent.dict - Implement tracking the agents in the scheduler via OrderedDict #510
+* Use click and add `mesa run` #522
+* Add a code of conduct #530 
+
+**Fixes**
+
+* iter_neighborhood() now gives correct neighborhoods for both von Neumann and Moore #459 
+* fix typo #461
+* Flockers update & subsequent "F" versus "f" fix on Unix/Mac - #477, #518, #525, #500 
+* Fixing date on release. #453
+* Batchrunner fixes: properly initialize models with correct parameters during subsequent runs. #486
+* Tornado Version Bug Fixes (upgrading #489, downgrading #497, adding to setup.py #527)
+* fix minor flake8 issues #519 
+* align required dependencies between setup.py and requirements.txt #523, #528, #535
+* Fixes #499 grid size issue. #539 
+
+
 0.8.3 (2018-01-14) Hayden
 +++++++++++++++++++++++++++++++++++++++++++
 
