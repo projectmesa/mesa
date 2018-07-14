@@ -412,5 +412,6 @@ class TestMultipleNetworkGrid(unittest.TestCase):
                                                       self.agents[1],
                                                       self.agents[2]]
 
+
 if __name__ == '__main__':
     unittest.main()

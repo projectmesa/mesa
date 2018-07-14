@@ -74,9 +74,6 @@ class ChartModule(VisualizationElement):
 
         for s in self.series:
             name = s["Label"]
-            try:
-                val = data_collector.model_vars[name][-1]  # Latest value
-            except:
-                val = 0
+            val = data_collector.model_vars[name][-1]  # Latest value
             current_values.append(val)
         return current_values
