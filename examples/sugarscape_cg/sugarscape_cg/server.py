@@ -17,7 +17,7 @@ def SsAgent_portrayal(agent):
     portrayal = {}
 
     if type(agent) is SsAgent:
-        portrayal["Shape"] = "sugarscape/resources/ant.png"
+        portrayal["Shape"] = "sugarscape_cg/resources/ant.png"
         portrayal["scale"] = 0.9
         portrayal["Layer"] = 1
 
