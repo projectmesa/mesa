@@ -74,8 +74,8 @@ class TestBatchRunner(unittest.TestCase):
             "reported_fixed_value": lambda m: m.fixed_model_param
         }
         self.agent_reporters = {
-            "agent_id": lambda a: a.unique_id,
-            "agent_val": lambda a: a.val
+            "agent_id": "unique_id",
+            "agent_val": "val"
         }
         self.variable_params = {
             "variable_model_param": range(3),

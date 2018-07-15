@@ -182,7 +182,7 @@ class BatchRunner:
         for agent in model.schedule._agents.values():
             agent_record = {}
             for var, reporter in self.agent_reporters.items():
-                agent_record[var] = reporter(agent)
+                agent_record[var] = getattr(agent, reporter)
             agent_vars[agent.unique_id] = agent_record
         return agent_vars
 
