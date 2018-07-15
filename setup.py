@@ -6,13 +6,26 @@ from setuptools import setup, find_packages
 from codecs import open
 
 requires = [
-    'tornado >= 4.2, < 5.0.0',
+    'tornado',
     'networkx',
     'numpy',
     'pandas',
+    'jupyter',
     'tqdm',
     'click',
 ]
+
+extras_require = {
+    'dev': [
+        'flake8',
+        'coverage',
+        'nose',
+        'sphinx',
+    ],
+    'docs': [
+        'sphinx',
+    ]
+}
 
 version = ''
 with open('mesa/__init__.py', 'r') as fd:
@@ -35,6 +48,7 @@ setup(
                            'visualization/templates/fonts/*', 'visualization/templates/js/*']},
     include_package_data=True,
     install_requires=requires,
+    extras_require=extras_require,
     keywords='agent based modeling model ABM simulation multi-agent',
     license='Apache 2.0',
     zip_safe=False,
