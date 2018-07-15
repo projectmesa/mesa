@@ -13,11 +13,14 @@ In no particular order, examples include:
 
 No contribution is too small. Although, contributions can be too big, so let's discuss via the `dev email list`_ OR `an issue`_.
 
+.. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
+.. _`an issue` : https://github.com/projectmesa/mesa/issues
+
 **To submit a contribution**
 
 - Create a ticket for the item that you are working on.
 - Fork the Mesa repository.
-- [Clone your respository](https://help.github.com/articles/cloning-a-repository/) from Github to your machine.
+- `Clone your repository`_ from Github to your machine.
 - Create a new branch in your fork: `git checkout -b BRANCH_NAME`
 - Install an editable version with developer requirements locally: `pip install -e .[dev]`
 - Edit the code. Save. 
@@ -26,12 +29,12 @@ No contribution is too small. Although, contributions can be too big, so let's d
 - If implementing a new feature, include some documentation in docs folder.
 - Make sure that your submission passes the `Travis build`_. See "Testing and Standards below" to be able to run these locally.
 - Push your changed to your fork on Github: `git push origin NAME_OF_BRANCH`. 
-- [Create a pull request](https://help.github.com/articles/creating-a-pull-request/).
+- `Create a pull request`_.
 - Describe the change w/ ticket number(s) that the code fixes.
 
-.. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
-.. _`an issue` : https://github.com/projectmesa/mesa/issues
+.. _`Clone your repository` : https://help.github.com/articles/cloning-a-repository/
 .. _`Travis build` : https://travis-ci.org/projectmesa/mesa
+.. _`Create a pull request` : https://help.github.com/articles/creating-a-pull-request/
 
 
 
