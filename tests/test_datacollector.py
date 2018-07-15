@@ -129,5 +129,6 @@ class TestDataCollector(unittest.TestCase):
         with self.assertRaises(Exception):
             table_df = data_collector.get_table_dataframe("not a real table")
 
+
 if __name__ == '__main__':
     unittest.main()

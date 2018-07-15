@@ -74,8 +74,8 @@ class TestBatchRunner(unittest.TestCase):
             "reported_fixed_value": lambda m: m.fixed_model_param
         }
         self.agent_reporters = {
-            "agent_id": lambda a: a.unique_id,
-            "agent_val": lambda a: a.val
+            "agent_id": "unique_id",
+            "agent_val": "val"
         }
         self.variable_params = {
             "variable_model_param": range(3),
@@ -161,6 +161,7 @@ class TestBatchRunner(unittest.TestCase):
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(model_vars['reported_fixed_param'].iloc[0],
                 self.fixed_params['fixed_name'])
+
 
 if __name__ == '__main__':
     unittest.main()
