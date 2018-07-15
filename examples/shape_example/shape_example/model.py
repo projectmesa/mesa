@@ -13,8 +13,8 @@ class Walker(Agent):
         self.headings = {(1, 0), (0, 1), (-1, 0), (0, -1)}
 
 
-class ShapesModel(Model):
-    def __init__(self, N, width=20, height=10):
+class ShapeExample(Model):
+    def __init__(self, N=2, width=20, height=10):
         self.N = N    # num of agents
         self.headings = ((1, 0), (0, 1), (-1, 0), (0, -1))  # tuples are fast
         self.grid = SingleGrid(width, height, torus=False)

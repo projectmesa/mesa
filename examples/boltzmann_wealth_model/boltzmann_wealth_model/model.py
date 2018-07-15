@@ -2,10 +2,8 @@ import random
 
 from mesa import Agent, Model
 from mesa.time import RandomActivation
+from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
-import networkx as nx
-
-from mesa.space import NetworkGrid
 
 
 def compute_gini(model):
@@ -13,32 +11,33 @@ def compute_gini(model):
     x = sorted(agent_wealths)
     N = model.num_agents
     B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * sum(x))
-    return 1 + (1 / N) - 2 * B
+    return (1 + (1 / N) - 2 * B)
 
 
-class MoneyModel(Model):
-    """A model with some number of agents."""
+class BoltzmannWealthModel(Model):
+    """A simple model of an economy where agents exchange currency at random.
 
-    def __init__(self, num_agents, num_nodes):
+    All the agents begin with one unit of currency, and each time step can give
+    a unit of currency to another agent. Note how, over time, this produces a
+    highly skewed distribution of wealth.
+    """
 
-        self.num_agents = num_agents
-        self.num_nodes = num_nodes if num_nodes >= self.num_agents else self.num_agents
-        self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=0.5)
-        self.grid = NetworkGrid(self.G)
+    def __init__(self, N=100, width=10, height=10):
+        self.num_agents = N
+        self.grid = MultiGrid(height, width, True)
         self.schedule = RandomActivation(self)
         self.datacollector = DataCollector(
             model_reporters={"Gini": compute_gini},
-            agent_reporters={"Wealth": lambda _: _.wealth}
+            agent_reporters={"Wealth": "wealth"}
         )
-
-        list_of_random_nodes = random.sample(self.G.nodes(), self.num_agents)
-
         # Create agents
         for i in range(self.num_agents):
             a = MoneyAgent(i, self)
             self.schedule.add(a)
-            # Add the agent to a random node
-            self.grid.place_agent(a, list_of_random_nodes[i])
+            # Add the agent to a random grid cell
+            x = random.randrange(self.grid.width)
+            y = random.randrange(self.grid.height)
+            self.grid.place_agent(a, (x, y))
 
         self.running = True
         self.datacollector.collect(self)
@@ -55,24 +54,21 @@ class MoneyModel(Model):
 
 class MoneyAgent(Agent):
     """ An agent with fixed initial wealth."""
-
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.wealth = 1
 
     def move(self):
-        possible_steps = [node for node in self.model.grid.get_neighbors(self.pos, include_center=False) if
-                          self.model.grid.is_cell_empty(node)]
-        if len(possible_steps) > 0:
-            new_position = random.choice(possible_steps)
-            self.model.grid.move_agent(self, new_position)
+        possible_steps = self.model.grid.get_neighborhood(
+            self.pos, moore=True, include_center=False
+        )
+        new_position = random.choice(possible_steps)
+        self.model.grid.move_agent(self, new_position)
 
     def give_money(self):
-
-        neighbors_nodes = self.model.grid.get_neighbors(self.pos, include_center=False)
-        neighbors = self.model.grid.get_cell_list_contents(neighbors_nodes)
-        if len(neighbors) > 0:
-            other = random.choice(neighbors)
+        cellmates = self.model.grid.get_cell_list_contents([self.pos])
+        if len(cellmates) > 1:
+            other = random.choice(cellmates)
             other.wealth += 1
             self.wealth -= 1
 

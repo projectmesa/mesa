@@ -3,7 +3,7 @@ import random
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 
-from shape_model.model import Walker, ShapesModel
+from .model import Walker, ShapeExample
 
 
 def agent_draw(agent):
@@ -36,7 +36,7 @@ def launch_shape_model():
     pixel_ratio = 50
     grid = CanvasGrid(agent_draw, width, height,
                       width * pixel_ratio, height * pixel_ratio)
-    server = ModularServer(ShapesModel, [grid], "Shape Model Example",
+    server = ModularServer(ShapeExample, [grid], "Shape Model Example",
                            {"N": num_agents, "width": width, "height": height})
     server.max_steps = 0
     server.port = 8521

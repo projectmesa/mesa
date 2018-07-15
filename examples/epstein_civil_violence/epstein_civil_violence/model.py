@@ -8,7 +8,7 @@ from mesa.datacollection import DataCollector
 from .agent import Cop, Citizen
 
 
-class CivilViolenceModel(Model):
+class EpsteinCivilViolence(Model):
     """
     Model 1 from "Modeling civil violence: An agent-based computational
     approach," by Joshua Epstein.
@@ -35,9 +35,9 @@ class CivilViolenceModel(Model):
 
     """
 
-    def __init__(self, height, width, citizen_density, cop_density,
-                 citizen_vision, cop_vision, legitimacy,
-                 max_jail_term, active_threshold=.1, arrest_prob_constant=2.3,
+    def __init__(self, height=40, width=40, citizen_density=0.7, cop_density=0.074,
+                 citizen_vision=7, cop_vision=7, legitimacy=0.8,
+                 max_jail_term=1000, active_threshold=.1, arrest_prob_constant=2.3,
                  movement=True, max_iters=1000):
         super().__init__()
         self.height = height

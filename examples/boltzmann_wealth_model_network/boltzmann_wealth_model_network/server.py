@@ -2,7 +2,7 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import ChartModule
 from mesa.visualization.modules import NetworkModule
-from .model import MoneyModel
+from .model import BoltzmannWealthModelNetwork
 
 
 def network_portrayal(G):
@@ -41,5 +41,5 @@ model_params = {
                                                    "least the same number of agents")
 }
 
-server = ModularServer(MoneyModel, [grid, chart], "Money Model", model_params)
+server = ModularServer(BoltzmannWealthModelNetwork, [grid, chart], "Money Model", model_params)
 server.port = 8521

@@ -3,7 +3,7 @@ from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 
 from wolf_sheep.agents import Wolf, Sheep, GrassPatch
-from wolf_sheep.model import WolfSheepPredation
+from wolf_sheep.model import WolfSheep
 
 
 def wolf_sheep_portrayal(agent):
@@ -56,5 +56,5 @@ model_params = {"grass": UserSettableParameter('checkbox', 'Grass Enabled', True
                 "wolf_gain_from_food": UserSettableParameter('slider', 'Wolf Gain From Food Rate', 20, 1, 50),
                 "sheep_gain_from_food": UserSettableParameter('slider', 'Sheep Gain From Food', 4, 1, 10)}
 
-server = ModularServer(WolfSheepPredation, [canvas_element, chart_element], "Wolf Sheep Predation", model_params)
+server = ModularServer(WolfSheep, [canvas_element, chart_element], "Wolf Sheep Predation", model_params)
 server.port = 8521
