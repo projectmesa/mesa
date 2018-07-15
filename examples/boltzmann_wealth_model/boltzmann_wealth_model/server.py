@@ -1,5 +1,5 @@
 from mesa.visualization.ModularVisualization import ModularServer
-from .model import MoneyModel
+from .model import BoltzmannWealthModel
 
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.modules import ChartModule
@@ -34,5 +34,5 @@ model_params = {
     "height": 10
 }
 
-server = ModularServer(MoneyModel, [grid, chart], "Money Model", model_params)
+server = ModularServer(BoltzmannWealthModel, [grid, chart], "Money Model", model_params)
 server.port = 8521
