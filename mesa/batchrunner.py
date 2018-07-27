@@ -11,6 +11,12 @@ import copy
 from itertools import product, count
 import pandas as pd
 from tqdm import tqdm
+try:
+    from pathos.multiprocessing import ProcessPool
+except ImportError:
+    pathos_support = False
+else:
+    pathos_support = True
 
 
 def combinations(*items):
@@ -111,7 +117,6 @@ class BatchRunner:
     def run_all(self):
         """ Run the model at all parameter combinations and store results. """
         param_names, param_ranges = zip(*self.variable_parameters.items())
-        run_count = count()
         total_iterations = self.iterations
         for param_range in param_ranges:
             total_iterations *= len(param_range)
@@ -119,20 +124,40 @@ class BatchRunner:
             for param_values in product(*param_ranges):
                 kwargs = dict(zip(param_names, param_values))
                 kwargs.update(self.fixed_parameters)
-                model = self.model_cls(**kwargs)
 
-                for _ in range(self.iterations):
-                    self.run_model(model)
-                    # Collect and store results:
-                    model_key = param_values + (next(run_count),)
+                for i in range(self.iterations):
+                    kwargscopy = copy.deepcopy(kwargs)
+                    model_vars, agent_vars = self._run_single_model(param_values, i, kwargscopy)
+
                     if self.model_reporters:
-                        self.model_vars[model_key] = self.collect_model_vars(model)
+                        for model_key, model_val in model_vars.items():
+                            self.model_vars[model_key] = model_val
                     if self.agent_reporters:
-                        agent_vars = self.collect_agent_vars(model)
-                        for agent_id, reports in agent_vars.items():
-                            agent_key = model_key + (agent_id,)
+                        for agent_key, reports in agent_vars.items():
                             self.agent_vars[agent_key] = reports
                     pbar.update()
+
+    def _run_single_model(self, param_values, run_count, kwargs):
+        """
+        Run a single model for one parameter combination and one iteration,
+        returning a tuple of the model vars and agent vars.
+        """
+        model = self.model_cls(**kwargs)
+
+        # run the model
+        self.run_model(model)
+
+        # Collect and store results:
+        model_key = param_values + (run_count, )
+        if self.model_reporters:
+            self.model_vars[model_key] = self.collect_model_vars(model)
+        if self.agent_reporters:
+            agent_vars = self.collect_agent_vars(model)
+            for agent_id, reports in agent_vars.items():
+                agent_key = model_key + (agent_id,)
+                self.agent_vars[agent_key] = reports
+
+        return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None))
 
     def run_model(self, model):
         """ Run a model object to completion, or until reaching max steps.
@@ -154,10 +179,10 @@ class BatchRunner:
     def collect_agent_vars(self, model):
         """ Run reporters and collect agent-level variables. """
         agent_vars = {}
-        for agent in model.schedule.agents:
+        for agent in model.schedule._agents.values():
             agent_record = {}
             for var, reporter in self.agent_reporters.items():
-                agent_record[var] = reporter(agent)
+                agent_record[var] = getattr(agent, reporter)
             agent_vars[agent.unique_id] = agent_record
         return agent_vars
 
@@ -196,5 +221,75 @@ class BatchRunner:
         ordered.sort_values(by='Run', inplace=True)
         if self._include_fixed:
             for param in self.fixed_parameters.keys():
-                ordered[param] = self.fixed_parameters[param]
+                val = self.fixed_parameters[param]
+
+                # avoid error when val is an iterable
+                vallist = [val for i in range(ordered.shape[0])]
+                ordered[param] = vallist
         return ordered
+
+
+class MPSupport(Exception):
+    def __str__(self):
+        return "The BatchRunnerMP depends on pathos, which is either not installed, " \
+               "or the path can not be found. "
+
+
+class BatchRunnerMP(BatchRunner):
+    """ Child class of BatchRunner, extended with multiprocessing support. """
+
+    def __init__(self, model_cls, nr_processes=2, **kwargs):
+        """ Create a new BatchRunnerMP for a given model with the given
+        parameters.
+
+        Args:
+            model_cls: The class of model to batch-run.
+            nr_processes: the number of separate processes the BatchRunner
+                should start, all running in parallel.
+            kwargs: the kwargs required for the parent BatchRunner class
+        """
+        if not pathos_support:
+            raise MPSupport
+        super().__init__(model_cls, **kwargs)
+        self.pool = ProcessPool(nodes=nr_processes)
+
+    def run_all(self):
+        """
+        Run the model at all parameter combinations and store results,
+        overrides run_all from BatchRunner.
+        """
+        # register the process pool and init a queue
+        job_queue = []
+
+        param_names, param_ranges = zip(*self.variable_parameters.items())
+        run_count = count()
+        total_iterations = self.iterations
+        for param_range in param_ranges:
+            total_iterations *= len(param_range)
+        with tqdm(total_iterations, disable=not self.display_progress) as pbar:
+            for param_values in product(*param_ranges):
+                kwargs = dict(zip(param_names, param_values))
+                kwargs.update(self.fixed_parameters)
+
+                # make a new process and add it to the queue
+                for i in range(self.iterations):
+                    job_queue.append(self.pool.uimap(self._run_single_model,
+                                                     (param_values,),
+                                                     (next(run_count),),
+                                                     (kwargs,)))
+
+            # empty the queue
+            results = []
+            for task in job_queue:
+                for model_vars, agent_vars in list(task):
+                    results.append((model_vars, agent_vars))
+                pbar.update()
+
+            # store the results
+            for model_vars, agent_vars in results:
+                if self.model_reporters:
+                    for model_key, model_val in model_vars.items():
+                        self.model_vars[model_key] = model_val
+                if self.agent_reporters:
+                    for agent_key, reports in agent_vars.items():
+                        self.agent_vars[agent_key] = reports

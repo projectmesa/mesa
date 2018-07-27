@@ -34,6 +34,7 @@ class Model:
 
         self.running = True
         self.schedule = None
+        self.current_id = 0
 
     def run_model(self):
         """ Run the model until the end condition is reached. Overload as
@@ -46,3 +47,8 @@ class Model:
     def step(self):
         """ A single step. Fill in here. """
         pass
+
+    def next_id(self):
+        """ Return the next unique ID for agents, increment current_id"""
+        self.current_id += 1
+        return self.current_id

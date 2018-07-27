@@ -76,7 +76,7 @@ class ChartModule(VisualizationElement):
             name = s["Label"]
             try:
                 val = data_collector.model_vars[name][-1]  # Latest value
-            except:
+            except (IndexError, KeyError) as e:
                 val = 0
             current_values.append(val)
         return current_values

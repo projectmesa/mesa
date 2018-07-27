@@ -6,7 +6,7 @@ from mesa.visualization.TextVisualization import (
     TextData, TextGrid, TextVisualization
 )
 
-from model import SchellingModel
+from model import Schelling
 
 
 class SchellingTextVisualization(TextVisualization):
@@ -76,7 +76,7 @@ model_params = {
     "homophily": UserSettableParameter("slider", "Homophily", 3, 0, 8, 1)
 }
 
-server = ModularServer(SchellingModel,
+server = ModularServer(Schelling,
                        [canvas_element, happy_element, happy_chart],
                        "Schelling", model_params)
 server.launch()

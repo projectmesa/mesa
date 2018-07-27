@@ -7,10 +7,10 @@ In this model, each dead cell will become alive if it has exactly one neighbor. 
 
 ## How to Run
 
-To run the model interactively, run ``run.py`` in this directory:
+To run the model interactively, run ``mesa runserver`` in this directory. e.g.
 
 ```
-    $ python run.py
+    $ mesa runserver
 ```
 
 Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press ``run``.

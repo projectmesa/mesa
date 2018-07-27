@@ -437,3 +437,7 @@ class TestHexGridTorus(TestBaseGrid):
 
         neighborhood = self.grid.get_neighborhood((2, 4))
         assert len(neighborhood) == 6
+
+
+if __name__ == '__main__':
+    unittest.main()

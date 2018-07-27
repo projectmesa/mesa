@@ -27,6 +27,7 @@ seeds consistent and allow for replication.
 
 """
 import random
+from collections import OrderedDict
 
 
 class BaseScheduler:
@@ -43,7 +44,7 @@ class BaseScheduler:
         self.model = model
         self.steps = 0
         self.time = 0
-        self.agents = []
+        self._agents = OrderedDict()
 
     def add(self, agent):
         """ Add an Agent object to the schedule.
@@ -53,7 +54,7 @@ class BaseScheduler:
             have a step() method.
 
         """
-        self.agents.append(agent)
+        self._agents[agent.unique_id] = agent
 
     def remove(self, agent):
         """ Remove all instances of a given agent from the schedule.
@@ -62,19 +63,23 @@ class BaseScheduler:
             agent: An agent object.
 
         """
-        while agent in self.agents:
-            self.agents.remove(agent)
+        del self._agents[agent.unique_id]
 
     def step(self):
         """ Execute the step of all the agents, one at a time. """
-        for agent in self.agents[:]:
-            agent.step()
+        agent_keys = list(self._agents.keys())
+        for agent_key in agent_keys:
+            self._agents[agent_key].step()
         self.steps += 1
         self.time += 1
 
     def get_agent_count(self):
         """ Returns the current number of agents in the queue. """
-        return len(self.agents)
+        return len(self._agents.keys())
+
+    @property
+    def agents(self):
+        return list(self._agents.values())
 
 
 class RandomActivation(BaseScheduler):
@@ -92,9 +97,11 @@ class RandomActivation(BaseScheduler):
         random order.
 
         """
-        random.shuffle(self.agents)
-        for agent in self.agents[:]:
-            agent.step()
+        agent_keys = list(self._agents.keys())
+        random.shuffle(agent_keys)
+
+        for agent_key in agent_keys:
+            self._agents[agent_key].step()
         self.steps += 1
         self.time += 1
 
@@ -109,10 +116,11 @@ class SimultaneousActivation(BaseScheduler):
     """
     def step(self):
         """ Step all agents, then advance them. """
-        for agent in self.agents[:]:
-            agent.step()
-        for agent in self.agents[:]:
-            agent.advance()
+        agent_keys = list(self._agents.keys())
+        for agent_key in agent_keys:
+            self._agents[agent_key].step()
+        for agent_key in agent_keys:
+            self._agents[agent_key].advance()
         self.steps += 1
         self.time += 1
 
@@ -151,13 +159,14 @@ class StagedActivation(BaseScheduler):
 
     def step(self):
         """ Executes all the stages for all agents. """
+        agent_keys = list(self._agents.keys())
         if self.shuffle:
-            random.shuffle(self.agents)
+            random.shuffle(agent_keys)
         for stage in self.stage_list:
-            for agent in self.agents[:]:
-                getattr(agent, stage)()  # Run stage
+            for agent_key in agent_keys:
+                getattr(self._agents[agent_key], stage)()  # Run stage
             if self.shuffle_between_stages:
-                random.shuffle(self.agents)
+                random.shuffle(agent_keys)
             self.time += self.stage_time
 
         self.steps += 1

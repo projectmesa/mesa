@@ -36,12 +36,12 @@ class SchellingAgent(Agent):
             self.model.happy += 1
 
 
-class SchellingModel(Model):
+class Schelling(Model):
     '''
     Model class for the Schelling segregation model.
     '''
 
-    def __init__(self, height, width, density, minority_pc, homophily):
+    def __init__(self, height=20, width=20, density=0.8, minority_pc=0.2, homophily=3):
         '''
         '''
 
