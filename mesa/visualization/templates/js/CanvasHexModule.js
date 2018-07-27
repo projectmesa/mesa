@@ -3,7 +3,7 @@ var CanvasHexModule = function(canvas_width, canvas_height, grid_width, grid_hei
 	// ------------------
 
 	// Create the tag with absolute positioning :
-	var canvas_tag = `<canvas width="${canvas_width}" height="${canvas_height}" style="position:absolute; top:100px; left:0;border:1px dotted"/>`
+	var canvas_tag = `<canvas width="${canvas_width}" height="${canvas_height}" class="world-grid"/>`
 	// Append it to body:
 	var canvas = $(canvas_tag)[0];
 	var interaction_canvas = $(canvas_tag)[0];

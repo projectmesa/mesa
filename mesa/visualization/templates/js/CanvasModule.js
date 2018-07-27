@@ -3,7 +3,7 @@ var CanvasModule = function(canvas_width, canvas_height, grid_width, grid_height
 	// ------------------
 
 	// Create the tag with absolute positioning :
-	var canvas_tag = `<canvas width="${canvas_width}" height="${canvas_height}" style="position:absolute; top:100px; left:0;border:1px dotted"/>`
+	var canvas_tag = `<canvas width="${canvas_width}" height="${canvas_height}" class="world-grid"/>`
 
 
 	// Append it to body:
