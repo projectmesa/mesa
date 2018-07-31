@@ -8,6 +8,7 @@ from codecs import open
 requires = [
     'click',
     'cookiecutter',
+    'importlib_resources',
     'jupyter',
     'networkx',
     'numpy',
