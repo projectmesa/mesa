@@ -55,7 +55,7 @@ def startproject(no_input):
 @click.pass_context
 def examples(ctx, copy, run, copyall, model):
     """Copy or run a mesa example MODEL.
-    
+
     Run without MODEL to list availabe example models"""
     if copyall:
         with importlib_resources.path('mesa', 'examples') as ex:
