@@ -600,7 +600,7 @@ class ContinuousSpace:
     """ Continuous space where each agent can have an arbitrary position.
 
     Assumes that all agents are point objects, and have a pos property storing
-    their position as an (x, y) tuple. This class uses a MultiGrid internally
+    their position as an (x, y) tuple. This class uses a numpy array internally
     to store agent objects, to speed up neighborhood lookups.
 
     """
@@ -615,11 +615,6 @@ class ContinuousSpace:
             x_min, y_min: (default 0) If provided, set the minimum x and y
                           coordinates for the space. Below them, values loop to
                           the other edge (if torus=True) or raise an exception.
-            grid_width, _height: (default 100) Determine the size of the
-                                 internal storage grid. More cells will slow
-                                 down movement, but speed up neighbor lookup.
-                                 Probably only fiddle with this if one or the
-                                 other is impacting your model's performance.
 
         """
         self.x_min = x_min
