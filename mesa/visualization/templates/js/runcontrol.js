@@ -156,9 +156,9 @@ var initGUI = function() {
 
         // Finally render the dropdown and activate choice listeners
         sidebar.append(template.join(''));
-        choiceIdentifiers.forEach(function (id) {
+        choiceIdentifiers.forEach(function (id,idx) {
             $('#' + id).on('click', function () {
-                var value = $(this).text();
+                var value = obj.choices[idx];
                 $('#' + domID).html(value + ' ' + span);
                 onSubmitCallback(param, value);
             });
