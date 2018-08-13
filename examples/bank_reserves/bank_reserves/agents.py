@@ -52,7 +52,7 @@ class Person(RandomWalker):
         self.loans = 0
         """start everyone off with a random amount in their wallet from 1 to a
            user settable rich threshold amount"""
-        self.wallet = random.randint(1, rich_threshold + 1)
+        self.wallet = self.random.randint(1, rich_threshold + 1)
         # savings minus loans, see balance_books() below
         self.wealth = 0
         # person to trade with, see do_business() below
@@ -73,11 +73,11 @@ class Person(RandomWalker):
                 while customer == self:
                     """select a random person from the people at my location
                        to trade with"""
-                    customer = random.choice(my_cell)
+                    customer = self.random.choice(my_cell)
                 # 50% chance of trading with customer
-                if random.randint(0, 1) == 0:
+                if self.random.randint(0, 1) == 0:
                     # 50% chance of trading $5
-                    if random.randint(0, 1) == 0:
+                    if self.random.randint(0, 1) == 0:
                         # give customer $5 from my wallet (may result in negative wallet)
                         customer.wallet += 5
                         self.wallet -= 5

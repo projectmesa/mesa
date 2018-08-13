@@ -113,10 +113,9 @@ class BankReserves(Model):
 
         # create people for the model according to number of people set by user
         for i in range(self.init_people):
-            # set x coordinate as a random number within the width of the grid
-            x = random.randrange(self.width)
-            # set y coordinate as a random number within the height of the grid
-            y = random.randrange(self.height)
+            # set x, y coords randomly within the grid
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
             p = Person(i, (x, y), self, True, self.bank, self.rich_threshold)
             # place the Person object on the grid at coordinates (x, y)
             self.grid.place_agent(p, (x, y))

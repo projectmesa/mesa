@@ -15,7 +15,7 @@ def compute_gini(model):
 
 
 class BoltzmannWealthModel(Model):
-    """A simple model of an economy where agents exchange currency at random.
+    """A simple model of an economy where agents exchange currency at self.random.
 
     All the agents begin with one unit of currency, and each time step can give
     a unit of currency to another agent. Note how, over time, this produces a
@@ -35,8 +35,8 @@ class BoltzmannWealthModel(Model):
             a = MoneyAgent(i, self)
             self.schedule.add(a)
             # Add the agent to a random grid cell
-            x = random.randrange(self.grid.width)
-            y = random.randrange(self.grid.height)
+            x = self.random.randrange(self.grid.width)
+            y = self.random.randrange(self.grid.height)
             self.grid.place_agent(a, (x, y))
 
         self.running = True
@@ -62,13 +62,13 @@ class MoneyAgent(Agent):
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=False
         )
-        new_position = random.choice(possible_steps)
+        new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
 
     def give_money(self):
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         if len(cellmates) > 1:
-            other = random.choice(cellmates)
+            other = self.random.choice(cellmates)
             other.wealth += 1
             self.wealth -= 1
 
