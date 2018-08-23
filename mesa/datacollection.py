@@ -37,6 +37,7 @@ The default DataCollector here makes several assumptions:
 
 """
 from collections import defaultdict
+from operator import attrgetter
 import pandas as pd
 
 
@@ -91,8 +92,14 @@ class DataCollector:
                 self._new_model_reporter(name, reporter)
 
         if agent_reporters is not None:
-            for name, reporter in agent_reporters.items():
-                self._new_agent_reporter(name, reporter)
+            if all([type(rep) is str for rep in agent_reporters.values()]):
+                self.fast_collect = True
+                for name, reporter in agent_reporters.items():
+                    self.agent_reporters[name] = reporter
+            else:
+                self.fast_collect = False
+                for name, reporter in agent_reporters.items():
+                    self._new_agent_reporter(name, reporter)
 
         if tables is not None:
             for name, columns in tables.items():
@@ -123,7 +130,6 @@ class DataCollector:
         if type(reporter) is str:
             reporter = self._make_attribute_collector(reporter)
         self.agent_reporters[name] = reporter
-        self.agent_vars[name] = []
 
     def _new_table(self, table_name, table_columns):
         """ Add a new table that objects can write to.
@@ -143,11 +149,16 @@ class DataCollector:
                 self.model_vars[var].append(reporter(model))
 
         if self.agent_reporters:
-            for var, reporter in self.agent_reporters.items():
-                agent_records = []
+            if self.fast_collect:
+                f = attrgetter(*self.agent_reporters.values())
+                agent_records = {
+                    agent.unique_id: f(agent) for agent
+                    in model.schedule.agents}
+            else:
+                agent_records = {}
                 for agent in model.schedule.agents:
-                    agent_records.append((agent.unique_id, reporter(agent)))
-                self.agent_vars[var].append(agent_records)
+                    agent_records[agent.unique_id] = tuple(rep(agent) for rep in self.agent_reporters.values())
+            self.agent_vars[model.schedule.steps] = agent_records
 
     def add_table_row(self, table_name, row, ignore_missing=False):
         """ Add a row dictionary to a specific table.
@@ -198,11 +209,10 @@ class DataCollector:
 
         """
         data = defaultdict(dict)
-        for var, records in self.agent_vars.items():
-            for step, entries in enumerate(records):
-                for entry in entries:
-                    agent_id = entry[0]
-                    val = entry[1]
+        for step, records in self.agent_vars.items():
+            for agent_id, vals in records.items():
+                for i, val in enumerate(vals):
+                    var = list(self.agent_reporters)[i]
                     data[(step, agent_id)][var] = val
         df = pd.DataFrame.from_dict(data, orient="index")
         df.index.names = ["Step", "AgentID"]
