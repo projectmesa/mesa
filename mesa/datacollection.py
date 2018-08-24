@@ -92,8 +92,8 @@ class DataCollector:
                 self._new_model_reporter(name, reporter)
 
         if agent_reporters is not None:
-                for name, reporter in agent_reporters.items():
-                    self._new_agent_reporter(name, reporter)
+            for name, reporter in agent_reporters.items():
+                self._new_agent_reporter(name, reporter)
 
         if tables is not None:
             for name, columns in tables.items():
@@ -146,7 +146,9 @@ class DataCollector:
         """
         if all([rep.__name__ == 'attr_collector' for rep in reporters]):
             # Fast path if all reporters are attribute collecters
-            report = attrgetter(*[rep.attribute_name for rep in reporters])
+            def report(agent):
+                f = attrgetter(*[rep.attribute_name for rep in reporters])
+                return (agent.unique_id, ) + f(agent)
         else:
             def report(agent):
                 return (agent.unique_id, ) + tuple(
