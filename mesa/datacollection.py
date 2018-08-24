@@ -84,7 +84,7 @@ class DataCollector:
         self.agent_reporters = {}
 
         self.model_vars = {}
-        self.agent_vars = {}
+        self._agent_records = {}
         self.tables = {}
 
         if model_reporters is not None:
@@ -92,12 +92,6 @@ class DataCollector:
                 self._new_model_reporter(name, reporter)
 
         if agent_reporters is not None:
-            if all([type(rep) is str for rep in agent_reporters.values()]):
-                self.fast_collect = True
-                for name, reporter in agent_reporters.items():
-                    self.agent_reporters[name] = reporter
-            else:
-                self.fast_collect = False
                 for name, reporter in agent_reporters.items():
                     self._new_agent_reporter(name, reporter)
 
@@ -142,6 +136,23 @@ class DataCollector:
         new_table = {column: [] for column in table_columns}
         self.tables[table_name] = new_table
 
+    @staticmethod
+    def _repgetter(reporters):
+        """ Get reports from a list of agents.
+
+        Args:
+            reporters: List of reporter functions.
+
+        """
+        if all([rep.__name__ == 'attr_collector' for rep in reporters]):
+            # Fast path if all reporters are attribute collecters
+            report = attrgetter(*[rep.attribute_name for rep in reporters])
+        else:
+            def report(agent):
+                return (agent.unique_id, ) + tuple(
+                    get_report(rep, agent) for rep in reporters)
+        return report
+
     def collect(self, model):
         """ Collect all the data for the given model object. """
         if self.model_reporters:
@@ -149,16 +160,9 @@ class DataCollector:
                 self.model_vars[var].append(reporter(model))
 
         if self.agent_reporters:
-            if self.fast_collect:
-                f = attrgetter(*self.agent_reporters.values())
-                agent_records = {
-                    agent.unique_id: f(agent) for agent
-                    in model.schedule.agents}
-            else:
-                agent_records = {}
-                for agent in model.schedule.agents:
-                    agent_records[agent.unique_id] = tuple(rep(agent) for rep in self.agent_reporters.values())
-            self.agent_vars[model.schedule.steps] = agent_records
+            f = self._repgetter(self.agent_reporters.values())
+            agent_records = map(f, model.schedule.agents)
+            self._agent_records[model.schedule.steps] = agent_records
 
     def add_table_row(self, table_name, row, ignore_missing=False):
         """ Add a row dictionary to a specific table.
@@ -187,6 +191,14 @@ class DataCollector:
         Create a function which collects the value of a named attribute
         '''
 
+        def attribute_name(attr):
+            """Decorator to add attribute name as a function attribute."""
+            def wrapper(func):
+                func.attribute_name = attr
+                return func
+            return wrapper
+
+        @attribute_name(attr)
         def attr_collector(obj):
             return getattr(obj, attr)
 
@@ -209,11 +221,12 @@ class DataCollector:
 
         """
         data = defaultdict(dict)
-        for step, records in self.agent_vars.items():
-            for agent_id, vals in records.items():
-                for i, val in enumerate(vals):
+        for step, records in self._agent_records.items():
+            for record in records:
+                agent_id = record[0]
+                for i, value in enumerate(record[1:]):
                     var = list(self.agent_reporters)[i]
-                    data[(step, agent_id)][var] = val
+                    data[(step, agent_id)][var] = value
         df = pd.DataFrame.from_dict(data, orient="index")
         df.index.names = ["Step", "AgentID"]
         return df
@@ -228,3 +241,8 @@ class DataCollector:
         if table_name not in self.tables:
             raise Exception("No such table.")
         return pd.DataFrame(self.tables[table_name])
+
+
+def get_report(rep, agent):
+    """ Get a report from an agent."""
+    return rep(agent)
