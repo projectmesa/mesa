@@ -1,7 +1,4 @@
-import random
-
 from mesa import Agent
-
 from wolf_sheep.random_walk import RandomWalker
 
 
@@ -43,7 +40,7 @@ class Sheep(RandomWalker):
                 self.model.schedule.remove(self)
                 living = False
 
-        if living and random.random() < self.model.sheep_reproduce:
+        if living and self.random.random() < self.model.sheep_reproduce:
             # Create a new sheep:
             if self.model.grass:
                 self.energy /= 2
@@ -73,7 +70,7 @@ class Wolf(RandomWalker):
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         sheep = [obj for obj in this_cell if isinstance(obj, Sheep)]
         if len(sheep) > 0:
-            sheep_to_eat = random.choice(sheep)
+            sheep_to_eat = self.random.choice(sheep)
             self.energy += self.model.wolf_gain_from_food
 
             # Kill the sheep
@@ -85,7 +82,7 @@ class Wolf(RandomWalker):
             self.model.grid._remove_agent(self.pos, self)
             self.model.schedule.remove(self)
         else:
-            if random.random() < self.model.wolf_reproduce:
+            if self.random.random() < self.model.wolf_reproduce:
                 # Create a new wolf cub
                 self.energy /= 2
                 cub = Wolf(self.model.next_id(), self.pos, self.model,
