@@ -90,10 +90,9 @@ class TestDataCollector(unittest.TestCase):
         data_collector = self.model.datacollector
         assert len(data_collector._agent_records) == 7
         for step, records in data_collector._agent_records.items():
-            records = list(records)
             assert len(records) == 10
             for values in records:
-                assert len(values) == 3
+                assert len(values) == 4
 
     def test_table_rows(self):
         '''
