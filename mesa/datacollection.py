@@ -136,6 +136,21 @@ class DataCollector:
         new_table = {column: [] for column in table_columns}
         self.tables[table_name] = new_table
 
+    def _record_agents(self, model):
+        """ Record agents data in a mapping of functions and agents. """
+        rep_funcs = self.agent_reporters.values()
+        if all([rep.__name__ == 'attr_collector' for rep in rep_funcs]):
+            prefix = ['model.schedule.steps', 'unique_id']
+            attributes = [func.attribute_name for func in rep_funcs]
+            get_reports = attrgetter(*prefix + attributes)
+        else:
+            def get_reports(agent):
+                prefix = (agent.model.schedule.steps, agent.unique_id)
+                reports = tuple(rep(agent) for rep in rep_funcs)
+                return prefix + reports
+        agent_records = map(get_reports, model.schedule.agents)
+        return agent_records
+
     def collect(self, model):
         """ Collect all the data for the given model object. """
         if self.model_reporters:
@@ -143,18 +158,8 @@ class DataCollector:
                 self.model_vars[var].append(reporter(model))
 
         if self.agent_reporters:
-            rep_funcs = self.agent_reporters.values()
-            if all([rep.__name__ == 'attr_collector' for rep in rep_funcs]):
-                attributes = [func.attribute_name for func in rep_funcs]
-                get_reports = attrgetter(
-                    *['model.schedule.steps', 'unique_id'] + attributes)
-            else:
-                def get_reports(agent):
-                    return (
-                        agent.model.schedule.steps, agent.unique_id) + tuple(
-                            rep(agent) for rep in rep_funcs)
-            agent_records = [*map(get_reports, model.schedule.agents)]
-            self._agent_records[model.schedule.steps] = agent_records
+            agent_records = self._record_agents(model)
+            self._agent_records[model.schedule.steps] = list(agent_records)
 
     def add_table_row(self, table_name, row, ignore_missing=False):
         """ Add a row dictionary to a specific table.
