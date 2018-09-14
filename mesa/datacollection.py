@@ -37,6 +37,7 @@ The default DataCollector here makes several assumptions:
 
 """
 from collections import defaultdict
+from functools import partial
 import pandas as pd
 
 
@@ -107,7 +108,7 @@ class DataCollector:
                       variable when given a model instance.
         """
         if type(reporter) is str:
-            reporter = self._make_attribute_collector(reporter)
+            reporter = partial(self._getattr, reporter)
         self.model_reporters[name] = reporter
         self.model_vars[name] = []
 
@@ -121,7 +122,7 @@ class DataCollector:
 
         """
         if type(reporter) is str:
-            reporter = self._make_attribute_collector(reporter)
+            reporter = partial(self._getattr, reporter)
         self.agent_reporters[name] = reporter
         self.agent_vars[name] = []
 
@@ -171,15 +172,9 @@ class DataCollector:
                 raise Exception("Could not insert row with missing column")
 
     @staticmethod
-    def _make_attribute_collector(attr):
-        '''
-        Create a function which collects the value of a named attribute
-        '''
-
-        def attr_collector(obj):
-            return getattr(obj, attr)
-
-        return attr_collector
+    def _getattr(name, object):
+        """ Turn around arguments of getattr to make it partially callable."""
+        return getattr(object, name, None)
 
     def get_model_vars_dataframe(self):
         """ Create a pandas DataFrame from the model variables.
