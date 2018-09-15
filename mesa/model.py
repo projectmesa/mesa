@@ -18,6 +18,8 @@ class Model:
 
         model = object.__new__(cls) # This only works in Python 3.3 and above
         model._seed = time.time()
+        if "seed" in kwargs and kwargs["seed"] is not None:
+            model._seed = kwargs["seed"]
         model.random = random.Random(model._seed)
         return model
 

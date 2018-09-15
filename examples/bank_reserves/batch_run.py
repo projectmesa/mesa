@@ -1,14 +1,3 @@
-from bank_reserves.agents import Bank, Person
-import itertools
-from mesa import Model
-from mesa.batchrunner import BatchRunner
-from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
-from mesa.time import RandomActivation
-import numpy as np
-import pandas as pd
-import random
-
 """
 The following code was adapted from the Bank Reserves model included in Netlogo
 Model information can be found at: http://ccl.northwestern.edu/netlogo/models/BankReserves
@@ -18,11 +7,7 @@ Author of NetLogo code:
     http://ccl.northwestern.edu/netlogo/models/BankReserves.
     Center for Connected Learning and Computer-Based Modeling,
     Northwestern University, Evanston, IL.
-"""
 
-###############################################################################
-
-"""
 This version of the model has a BatchRunner at the bottom. This
 is for collecting data on parameter sweeps. It is not meant to
 be run with run.py, since run.py starts up a server for visualization, which
@@ -38,8 +23,17 @@ directory from which Python was run. The csv file will contain the data from
 every step of every run.
 """
 
-# Start of datacollector functions
+from bank_reserves.agents import Bank, Person
+import itertools
+from mesa import Model
+from mesa.batchrunner import BatchRunner
+from mesa.space import MultiGrid
+from mesa.datacollection import DataCollector
+from mesa.time import RandomActivation
+import numpy as np
+import pandas as pd
 
+# Start of datacollector functions
 
 def get_num_rich_agents(model):
     # list of rich agents
@@ -145,9 +139,9 @@ class BankReservesModel(Model):
         # create people for the model according to number of people set by user
         for i in range(self.init_people):
             # set x coordinate as a random number within the width of the grid
-            x = random.randrange(self.width)
+            x = self.random.randrange(self.width)
             # set y coordinate as a random number within the height of the grid
-            y = random.randrange(self.height)
+            y = self.random.randrange(self.height)
             p = Person(i, (x, y), self, True, self.bank, self.rich_threshold)
             # place the Person object on the grid at coordinates (x, y)
             self.grid.place_agent(p, (x, y))

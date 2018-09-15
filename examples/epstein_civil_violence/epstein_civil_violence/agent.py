@@ -1,8 +1,6 @@
-import random
 import math
 
 from mesa import Agent
-
 
 class Citizen(Agent):
     """
@@ -78,7 +76,7 @@ class Citizen(Agent):
                 self.grievance - net_risk) <= self.threshold:
             self.condition = 'Quiescent'
         if self.model.movement and self.empty_neighbors:
-            new_pos = random.choice(self.empty_neighbors)
+            new_pos = self.random.choice(self.empty_neighbors)
             self.model.grid.move_agent(self, new_pos)
 
     def update_neighbors(self):
@@ -149,11 +147,11 @@ class Cop(Agent):
                     agent.jail_sentence == 0:
                 active_neighbors.append(agent)
         if active_neighbors:
-            arrestee = random.choice(active_neighbors)
-            sentence = random.randint(0, self.model.max_jail_term)
+            arrestee =self.random.choice(active_neighbors)
+            sentence = self.random.randint(0, self.model.max_jail_term)
             arrestee.jail_sentence = sentence
         if self.model.movement and self.empty_neighbors:
-            new_pos = random.choice(self.empty_neighbors)
+            new_pos = self.random.choice(self.empty_neighbors)
             self.model.grid.move_agent(self, new_pos)
 
     def update_neighbors(self):

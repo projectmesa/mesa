@@ -1,8 +1,3 @@
-import random
-from mesa import Agent
-from bank_reserves.random_walk import RandomWalker
-
-
 """
 The following code was adapted from the Bank Reserves model included in Netlogo
 Model information can be found at: http://ccl.northwestern.edu/netlogo/models/BankReserves
@@ -14,8 +9,8 @@ Author of NetLogo code:
     Northwestern University, Evanston, IL.
 """
 
-# subclass of Mesa Agent class
-
+from mesa import Agent
+from bank_reserves.random_walk import RandomWalker
 
 class Bank(Agent):
     def __init__(self, unique_id, model, reserve_percent=50):

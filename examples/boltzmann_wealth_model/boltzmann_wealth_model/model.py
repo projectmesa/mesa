@@ -1,5 +1,3 @@
-import random
-
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
@@ -15,7 +13,7 @@ def compute_gini(model):
 
 
 class BoltzmannWealthModel(Model):
-    """A simple model of an economy where agents exchange currency at self.random.
+    """A simple model of an economy where agents exchange currency at random.
 
     All the agents begin with one unit of currency, and each time step can give
     a unit of currency to another agent. Note how, over time, this produces a

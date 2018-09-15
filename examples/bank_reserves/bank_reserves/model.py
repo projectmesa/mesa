@@ -1,11 +1,3 @@
-from bank_reserves.agents import Bank, Person
-from mesa import Model
-from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
-from mesa.time import RandomActivation
-import numpy as np
-import random
-
 """
 The following code was adapted from the Bank Reserves model included in Netlogo
 Model information can be found at: http://ccl.northwestern.edu/netlogo/models/BankReserves
@@ -17,13 +9,20 @@ Author of NetLogo code:
     Northwestern University, Evanston, IL.
 """
 
+from bank_reserves.agents import Bank, Person
+from mesa import Model
+from mesa.space import MultiGrid
+from mesa.datacollection import DataCollector
+from mesa.time import RandomActivation
+import numpy as np
+
+
 """
 If you want to perform a parameter sweep, call batch_run.py instead of run.py.
 For details see batch_run.py in the same directory as run.py.
 """
 
 # Start of datacollector functions
-
 
 def get_num_rich_agents(model):
     # list of rich agents

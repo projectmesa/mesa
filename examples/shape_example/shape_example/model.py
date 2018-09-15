@@ -1,5 +1,3 @@
-import random
-
 from mesa import Model, Agent
 from mesa.space import SingleGrid
 from mesa.time import RandomActivation
@@ -27,10 +25,10 @@ class ShapeExample(Model):
         while True:
             if unique_id == self.N:
                 break
-            x = random.randrange(self.grid.width)
-            y = random.randrange(self.grid.height)
+            x = self.random.randrange(self.grid.width)
+            y = self.random.randrange(self.grid.height)
             pos = (x, y)
-            heading = random.choice(self.headings)
+            heading = self.random.choice(self.headings)
             # heading = (1, 0)
             if self.grid.is_cell_empty(pos):
                 print("Creating agent {2} at ({0}, {1})"
