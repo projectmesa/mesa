@@ -26,7 +26,7 @@ TODO: Have the schedulers use the model's randomizer, to keep random number
 seeds consistent and allow for replication.
 
 """
-import random
+
 from collections import OrderedDict
 
 

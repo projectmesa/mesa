@@ -7,7 +7,6 @@ Core Objects: Model
 """
 import time
 import random
-import numpy
 
 
 class Model:
@@ -16,7 +15,7 @@ class Model:
     def __new__(cls, *args, **kwargs):
         """Create a new model object and instantiate its RNG automatically."""
 
-        model = object.__new__(cls) # This only works in Python 3.3 and above
+        model = object.__new__(cls)  # This only works in Python 3.3 and above
         model._seed = time.time()
         if "seed" in kwargs and kwargs["seed"] is not None:
             model._seed = kwargs["seed"]
@@ -65,5 +64,3 @@ class Model:
             seed = self._seed
         self.random.seed(seed)
         self._seed = seed
-
-

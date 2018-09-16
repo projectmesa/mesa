@@ -2,6 +2,7 @@ import math
 
 from mesa import Agent
 
+
 class Citizen(Agent):
     """
     A member of the general population, may or may not be in active rebellion.
@@ -147,7 +148,7 @@ class Cop(Agent):
                     agent.jail_sentence == 0:
                 active_neighbors.append(agent)
         if active_neighbors:
-            arrestee =self.random.choice(active_neighbors)
+            arrestee = self.random.choice(active_neighbors)
             sentence = self.random.randint(0, self.model.max_jail_term)
             arrestee.jail_sentence = sentence
         if self.model.movement and self.empty_neighbors:

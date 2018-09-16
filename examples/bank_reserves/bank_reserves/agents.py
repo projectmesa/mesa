@@ -12,6 +12,7 @@ Author of NetLogo code:
 from mesa import Agent
 from bank_reserves.random_walk import RandomWalker
 
+
 class Bank(Agent):
     def __init__(self, unique_id, model, reserve_percent=50):
         # initialize the parent class with required parameters
