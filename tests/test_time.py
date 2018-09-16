@@ -3,8 +3,7 @@ Test the advanced schedulers.
 '''
 
 import unittest
-from unittest import TestCase
-from unittest.mock import patch
+from unittest import TestCase, mock
 from mesa import Model, Agent
 from mesa.time import (BaseScheduler, StagedActivation, RandomActivation,
                        SimultaneousActivation)
@@ -104,10 +103,10 @@ class TestStagedActivation(TestCase):
 
     def test_shuffle_shuffles_agents(self):
         model = MockModel(shuffle=True)
-        with patch('mesa.time.model.random.shuffle') as mock_shuffle:
-            assert mock_shuffle.call_count == 0
-            model.step()
-            assert mock_shuffle.call_count == 1
+        model.random = mock.Mock()
+        assert model.random.shuffle.call_count == 0
+        model.step()
+        assert model.random.shuffle.call_count == 1
 
     def test_remove(self):
         '''
@@ -130,9 +129,9 @@ class TestRandomActivation(TestCase):
         Test the random activation step
         '''
         model = MockModel(activation=RANDOM)
-        with patch('mesa.time.model.random.shuffle') as mock_shuffle:
-            model.schedule.step()
-            assert mock_shuffle.call_count == 1
+        model.random = mock.Mock()
+        model.schedule.step()
+        assert model.random.shuffle.call_count == 1
 
     def test_random_activation_step_increments_step_and_time_counts(self):
         '''
