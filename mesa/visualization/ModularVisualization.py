@@ -181,7 +181,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def viz_state_message(self):
         return {
             "type": "viz_state",
-            "data": self.application.render_model()
+            "data": [self.application.render_model(0), self.application.render_model(1)]
         }
 
     def on_message(self, message):
@@ -193,10 +193,11 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(message)
 
         if msg["type"] == "get_step":
-            if not self.application.model.running:
+            if not self.application.models[0].running:
                 self.write_message({"type": "end"})
             else:
-                self.application.model.step()
+                self.application.models[0].step()
+                self.application.models[1].step()
                 self.write_message(self.viz_state_message)
 
         elif msg["type"] == "reset":
@@ -261,7 +262,9 @@ class ModularServer(tornado.web.Application):
                 self.package_includes.add(include_file)
             for include_file in element.local_includes:
                 self.local_includes.add(include_file)
-            self.js_code.append(element.js_code)
+            js_code = "elements.push(" + element.js_element + "0));"
+            js_code += "elements2.push(" + element.js_element + "1));"
+            self.js_code.append(js_code)
 
         # Initializing the model
         self.model_name = name
@@ -299,16 +302,16 @@ class ModularServer(tornado.web.Application):
             else:
                 model_params[key] = val
 
-        self.model = self.model_cls(**model_params)
+        self.models = [self.model_cls(**model_params), self.model_cls(**model_params)]
 
-    def render_model(self):
+    def render_model(self, n):
         """ Turn the current state of the model into a dictionary of
         visualizations
 
         """
         visualization_state = []
         for element in self.visualization_elements:
-            element_state = element.render(self.model)
+            element_state = element.render(self.models[n])
             visualization_state.append(element_state)
         return visualization_state
 

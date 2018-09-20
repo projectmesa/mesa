@@ -77,6 +77,6 @@ model_params = {
 }
 
 server = ModularServer(Schelling,
-                       [canvas_element, happy_element, happy_chart],
+                       [canvas_element],
                        "Schelling", model_params)
 server.launch()

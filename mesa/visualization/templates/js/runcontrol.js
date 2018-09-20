@@ -14,7 +14,7 @@
  running: Boolean on whether we have reached the end of the current model
  * fps: Current frames per second.
  */
-var MesaVisualizationControl = function() {
+var MesaVisualizationControl = function () {
     this.tick = -1; // Counts at which tick of the model we are.
     this.running = false; // Whether there is currently a model running
     this.done = false;
@@ -24,6 +24,7 @@ var MesaVisualizationControl = function() {
 var player; // Variable to store the continuous player
 var control = new MesaVisualizationControl();
 var elements = [];  // List of Element objects
+var elements2 = [];
 var model_params = {};
 
 // Playback buttons
@@ -46,20 +47,20 @@ var sidebar = $("#sidebar");
 // Open the websocket connection; support TLS-specific URLs when appropriate
 var ws = new WebSocket((window.location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
 
-ws.onopen = function() {
+ws.onopen = function () {
     console.log("Connection opened!");
-    send({"type": "get_params"}); // Request model parameters when websocket is ready
+    send({ "type": "get_params" }); // Request model parameters when websocket is ready
     reset();
 };
 
 // Add model parameters that can be edited prior to a model run
-var initGUI = function() {
+var initGUI = function () {
 
-    var onSubmitCallback = function(param_name, value) {
-        send({"type": "submit_params", "param": param_name, "value": value});
+    var onSubmitCallback = function (param_name, value) {
+        send({ "type": "submit_params", "param": param_name, "value": value });
     };
 
-    var addBooleanInput = function(param, obj) {
+    var addBooleanInput = function (param, obj) {
         var domID = param + '_id';
         sidebar.append([
             "<div class='input-group input-group-lg'>",
@@ -70,13 +71,13 @@ var initGUI = function() {
         $('#' + domID).bootstrapSwitch({
             'state': obj.value,
             'size': 'small',
-            'onSwitchChange': function(e, state) {
+            'onSwitchChange': function (e, state) {
                 onSubmitCallback(param, state);
             }
         });
     };
 
-    var addNumberInput = function(param, obj) {
+    var addNumberInput = function (param, obj) {
         var domID = param + '_id';
         sidebar.append([
             "<div class='input-group input-group-lg'>",
@@ -86,12 +87,12 @@ var initGUI = function() {
         ].join(''));
         var numberInput = $('#' + domID);
         numberInput.val(obj.value);
-        numberInput.on('change', function() {
+        numberInput.on('change', function () {
             onSubmitCallback(param, Number($(this).val()));
         })
     };
 
-    var addSliderInput = function(param, obj) {
+    var addSliderInput = function (param, obj) {
         var domID = param + '_id';
         var tooltipID = domID + "_tooltip";
         sidebar.append([
@@ -124,12 +125,12 @@ var initGUI = function() {
             ticks_labels: [obj.min_value, obj.max_value],
             ticks_positions: [0, 100]
         });
-        sliderInput.on('change', function() {
+        sliderInput.on('change', function () {
             onSubmitCallback(param, Number($(this).val()));
         })
     };
 
-    var addChoiceInput = function(param, obj) {
+    var addChoiceInput = function (param, obj) {
         var domID = param + '_id';
         var span = "<span class='caret'></span>";
         var template = [
@@ -165,12 +166,12 @@ var initGUI = function() {
         });
     };
 
-    var addTextBox = function(param, obj) {
+    var addTextBox = function (param, obj) {
         var well = $('<div class="well">' + obj.value + '</div>')[0];
         sidebar.append(well);
     };
 
-    var addParamInput = function(param, option) {
+    var addParamInput = function (param, option) {
         switch (option['param_type']) {
             case 'checkbox':
                 addBooleanInput(param, option);
@@ -196,15 +197,15 @@ var initGUI = function() {
 
     for (var option in model_params) {
 
-        var type = typeof(model_params[option]);
+        var type = typeof (model_params[option]);
         var param_str = String(option);
 
         switch (type) {
             case "boolean":
-                addBooleanInput(param_str, {'value': model_params[option], 'name': param_str});
+                addBooleanInput(param_str, { 'value': model_params[option], 'name': param_str });
                 break;
             case "number":
-                addNumberInput(param_str, {'value': model_params[option], 'name': param_str});
+                addNumberInput(param_str, { 'value': model_params[option], 'name': param_str });
                 break;
             case "object":
                 addParamInput(param_str, model_params[option]);    // catch-all for params that use Option class
@@ -214,13 +215,20 @@ var initGUI = function() {
 };
 
 /** Parse and handle an incoming message on the WebSocket connection. */
-ws.onmessage = function(message) {
+ws.onmessage = function (message) {
     var msg = JSON.parse(message.data);
     switch (msg["type"]) {
         case "viz_state":
-            var data = msg["data"];
+            console.log(msg)
+            var data1 = msg["data"]["0"];
+            var data2 = msg["data"]["1"];
+            console.log(data1)
+            console.log(data2)
             for (var i in elements) {
-                elements[i].render(data[i]);
+                    elements[i].render(data1[i]);
+            }
+            for (var i in elements2) {
+                elements2[i].render(data2[i]);
             }
             break;
         case "end":
@@ -243,19 +251,22 @@ ws.onmessage = function(message) {
 };
 
 /**	 Turn an object into a string to send to the server, and send it. v*/
-var send = function(message) {
+var send = function (message) {
     msg = JSON.stringify(message);
     ws.send(msg);
 };
 
 /** Reset the model, and rest the appropriate local variables. */
-var reset = function() {
+var reset = function () {
     control.tick = 0;
-    send({"type": "reset"});
+    send({ "type": "reset" });
 
     // Reset all the visualizations
     for (var i in elements) {
         elements[i].reset();
+    }
+        for (var i in elements2) {
+        elements2[i].reset();
     }
     control.done = false;
     if (!control.running)
@@ -263,19 +274,19 @@ var reset = function() {
 };
 
 /** Send a message to the server get the next visualization state. */
-var single_step = function() {
+var single_step = function () {
     control.tick += 1;
-    send({"type": "get_step", "step": control.tick});
+    send({ "type": "get_step", "step": control.tick });
 };
 
 /** Step the model forward. */
-var step = function() {
-    if (!control.running & !control.done) {single_step()}
-    else if (!control.done) {run()};
+var step = function () {
+    if (!control.running & !control.done) { single_step() }
+    else if (!control.done) { run() };
 };
 
 /** Call the step function at fixed intervals, until getting an end message from the server. */
-var run = function() {
+var run = function () {
     var anchor = $(playPauseButton.children()[0]);
     if (control.running) {
         control.running = false;
@@ -287,12 +298,12 @@ var run = function() {
     }
     else if (!control.done) {
         control.running = true;
-        player = setInterval(single_step, 1000/control.fps);
+        player = setInterval(single_step, 1000 / control.fps);
         anchor.text("Stop");
     }
 };
 
-var updateFPS = function() {
+var updateFPS = function () {
     control.fps = Number(fpsControl.val());
     if (control.running) {
         run();
