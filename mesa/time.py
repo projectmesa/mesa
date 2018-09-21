@@ -30,6 +30,18 @@ import random
 from collections import OrderedDict
 
 
+def agent_buffer(agents, shuffled=False):
+    """
+    Simple generator that let's the user remove or add agents during stepping
+    """
+    agent_keys = list(agents.keys())
+    if shuffled:
+        random.shuffle(agent_keys)
+
+    for key in agent_keys:
+        if key in agents:
+            yield agents[key]
+
 class BaseScheduler:
     """ Simplest scheduler; activates agents one at a time, in the order
     they were added.
@@ -67,9 +79,8 @@ class BaseScheduler:
 
     def step(self):
         """ Execute the step of all the agents, one at a time. """
-        agent_keys = list(self._agents.keys())
-        for agent_key in agent_keys:
-            self._agents[agent_key].step()
+        for agent in agent_buffer(self._agents):
+            agent.step()
         self.steps += 1
         self.time += 1
 
@@ -97,11 +108,8 @@ class RandomActivation(BaseScheduler):
         random order.
 
         """
-        agent_keys = list(self._agents.keys())
-        random.shuffle(agent_keys)
-
-        for agent_key in agent_keys:
-            self._agents[agent_key].step()
+        for agent in agent_buffer(self._agents, shuffled=True):
+            agent.step()
         self.steps += 1
         self.time += 1
 
