@@ -48,14 +48,16 @@ def get_num_mid_agents(model):
 
 
 def get_total_savings(model):
-    """list of amounts of all agents' savings"""
+    """sum of all agents' savings"""
+
     agent_savings = [a.savings for a in model.schedule.agents]
     # return the sum of agents' savings
     return np.sum(agent_savings)
 
 
 def get_total_wallets(model):
-    """list of amounts of all agents' wallets"""
+    """sum of amounts of all agents' wallets"""
+
     agent_wallets = [a.wallet for a in model.schedule.agents]
     # return the sum of all agents' wallets
     return np.sum(agent_wallets)

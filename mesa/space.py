@@ -15,13 +15,12 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
-import random
 
 import numpy as np
 
 
 def accept_tuple_argument(wrapped_function):
-    """ Decorator to allow grid methods that take a list of (x, y) position tuples
+    """ Decorator to allow grid methods that take a list of (x, y) coord tuples
     to also handle a single position, by automatically wrapping tuple in
     single-item list rather than forcing user to do it.
 
@@ -334,21 +333,12 @@ class Grid:
     def move_to_empty(self, agent):
         """ Moves agent to a random empty cell, vacating agent's old cell. """
         pos = agent.pos
-        new_pos = self.find_empty()
-        if new_pos is None:
+        if len(self.empties) == 0:
             raise Exception("ERROR: No empty cells")
-        else:
-            self._place_agent(new_pos, agent)
-            agent.pos = new_pos
-            self._remove_agent(pos, agent)
-
-    def find_empty(self):
-        """ Pick a random empty cell. """
-        if self.exists_empty_cells():
-            pos = random.choice(self.empties)
-            return pos
-        else:
-            return None
+        new_pos = agent.random.choice(self.empties)
+        self._place_agent(new_pos, agent)
+        agent.pos = new_pos
+        self._remove_agent(pos, agent)
 
     def exists_empty_cells(self):
         """ Return True if any cells empty else False. """
@@ -380,9 +370,9 @@ class SingleGrid(Grid):
 
         """
         if x == "random" or y == "random":
-            coords = self.find_empty()
-            if coords is None:
+            if len(self.empties) == 0:
                 raise Exception("ERROR: Grid full")
+            coords = agent.random.choice(self.empties)
         else:
             coords = (x, y)
         agent.pos = coords
@@ -451,7 +441,8 @@ class MultiGrid(Grid):
 class HexGrid(Grid):
     """ Hexagonal Grid: Extends Grid to handle hexagonal neighbors.
 
-    Functions according to odd-q rules. See http://www.redblobgames.com/grids/hexagons/#coordinates for more
+    Functions according to odd-q rules.
+    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
 
     Properties:
         width, height: The grid's width and height.
@@ -513,7 +504,8 @@ class HexGrid(Grid):
 
             if self.torus is False:
                 adjacent = list(
-                    filter(lambda coords: not self.out_of_bounds(coords), adjacent))
+                    filter(lambda coords:
+                           not self.out_of_bounds(coords), adjacent))
             else:
                 adjacent = [torus_adj_2d(coord) for coord in adjacent]
 

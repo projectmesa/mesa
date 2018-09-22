@@ -35,25 +35,50 @@ It's easy to create a cookiecutter mesa model by running ``mesa startproject``
 Randomization
 -------------
 
-If your model involves some random choice, you can use either ``random``
-(Python's built-in random number generator) or ``numpy.random`` (the generator
-included with Numpy).
-
-The constructor for the ``Model`` class automatically "seeds" these random
-number generators using the current time, so each run will produce different
-random numbers. For testing purposes, it can be helpful to use the same
-random-number seed for multiple runs. To accomplish this, pass a value to the
-Model constructor:
+If your model involves some random choice, you can use the build-in ``random``
+property that Mesa ``Model`` and ``Agent`` objects have. This works exactly
+like the built-in ``random`` library.
 
 .. code:: python
 
-    class AwesomeModel(Model):
-        def __init__(self, seed=None):
-            super().__init__(seed)
-            # ...
-
-    model = AwesomeModel(seed=1234)
+   class AwesomeModel(Model):
     # ...
 
-This approach will cause ``RandomActivation`` to activate agents in a
-repeatable fashion.
+    def cool_method(self):
+      interesting_number = self.random.random()
+      print(interesting_number)
+   
+   class AwesomeAgent(Agent):
+    # ...
+
+    def my_method(self):
+      random_number = self.random.randint(0, 100)
+
+(The agent's random property is just a reference to its parent model's 
+``random`` property). 
+
+When a model object is created, its random property is automatically seeded
+with the current time. The seed determines the sequence of random numbers; if 
+you instantiate a model with the same seed, you will get the same results.
+To allow you to set the seed, make sure your model as a ``seed`` argument in its
+constructor.
+
+.. code:: python
+
+   class AwesomeModel(Model):
+    
+    def __init__(self, seed=None):
+      pass
+
+    def cool_method(self):
+      interesting_number = self.random.random()
+      print(interesting_number)
+    
+    >>> model0 = AwesomeModel(seed=0)
+    >>> model0._seed
+    0
+    >>> model0.cool_method()
+    0.8444218515250481
+    >>> model1 = AwesomeModel(seed=0)
+    >>> model1.cool_method()
+    0.8444218515250481
