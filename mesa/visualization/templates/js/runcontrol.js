@@ -23,7 +23,7 @@ var MesaVisualizationControl = function () {
 
 var player; // Variable to store the continuous player
 var control = new MesaVisualizationControl();
-var viz_elements = [[], [], [], [], []];  // List of Element objects
+var viz_elements = [];  // List of Element objects
 var model_params = {};
 var simulations = 1;
 
@@ -215,11 +215,6 @@ var initGUI = function () {
                 break;
         }
     }
-
-    for (i=0; i < simulations; i++) {
-        elements.append(
-            "<div class='col-lg-3 col-md-3 col-sm-3 col-xs-3' id=sim_" + i + "></div><div></div>");
-    }
 };
 
 /** Parse and handle an incoming message on the WebSocket connection. */
@@ -229,12 +224,12 @@ ws.onmessage = function (message) {
     switch (msg["type"]) {
         case "viz_state":
             var data = msg["data"];
-            for (var i in viz_elements) {
-                element = viz_elements[i];
-                for (var j in element) {
-                    element[j].render(data[i][j])
-                    }
+            for (sims=0; sims <simulations; sims++) {
+                console.log(sims)
+                for (var i in viz_elements) {
+                    viz_elements[i].render(data[sims][i], sims)
                 }
+            }
             break;
         case "end":
             // We have reached the end of the model
@@ -271,7 +266,7 @@ var reset = function () {
     for (i in viz_elements) {
         element = viz_elements[i];
         for (var j in element) {
-            element[j].reset();
+            // element[j].reset();
         }
     }
     control.done = false;

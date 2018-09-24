@@ -69,16 +69,12 @@ class CanvasGrid(VisualizationElement):
 
         """
         self.portrayal_method = portrayal_method
-        self.grid_width = grid_width
-        self.grid_height = grid_height
-        self.canvas_width = canvas_width
-        self.canvas_height = canvas_height
 
-        new_element = ("new CanvasModule({}, {}, {}, {}, {{}})"
-            .format(self.canvas_width, self.canvas_height,
-                self.grid_width, self.grid_height))
+        new_element = ("new CanvasModule({}, {}, {}, {}, n_sims)"
+            .format(canvas_width, canvas_height,
+                grid_width, grid_height))
 
-        self.js_code = "viz_elements[{}].push(" + new_element + ");"
+        self.js_code = "viz_elements.push(" + new_element + ");"
 
     def render(self, model):
         grid_state = defaultdict(list)

@@ -181,7 +181,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def viz_state_message(self):
         return {
             "type": "viz_state",
-            "data": [self.application.render_model(i) for i in range(self.application.n_simulations)]
+            "data": {i: self.application.render_model(i) for i in range(self.application.n_simulations)}
         }
 
     def on_message(self, message):
@@ -208,11 +208,11 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         elif msg["type"] == "submit_params":
             param = msg["param"]
             value = msg["value"]
-            model = msg["model"]
+            simulation = msg["simulation"]
 
             # Is the param editable?
             if param in self.application.user_params:
-                model_kwargs = self.application.model_kwargs[model]
+                model_kwargs = self.application.model_kwargs[simulation]
                 if isinstance(model_kwargs[param], UserSettableParameter):
                     model_kwargs[param].value = value
                 else:
@@ -268,8 +268,7 @@ class ModularServer(tornado.web.Application):
                 self.package_includes.add(include_file)
             for include_file in element.local_includes:
                 self.local_includes.add(include_file)
-            for n in range(n_simulations):
-                self.js_code.append(element.js_code.format(n, n))
+            self.js_code.append(element.js_code.replace("n_sims", str(n_simulations)))
 
         # Initializing the model
         self.model_name = name

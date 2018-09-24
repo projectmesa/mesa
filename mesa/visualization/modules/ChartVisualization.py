@@ -63,7 +63,7 @@ class ChartModule(VisualizationElement):
         self.data_collector_name = data_collector_name
 
         series_json = json.dumps(self.series)
-        new_element = "new ChartModule({}, {},  {})"
+        new_element = "new ChartModule({}, {}, {}, n_sims)"
         new_element = new_element.format(series_json, canvas_width,
                                          canvas_height)
         self.js_code = "elements.push(" + new_element + ");"
@@ -72,11 +72,11 @@ class ChartModule(VisualizationElement):
         current_values = []
         data_collector = getattr(model, self.data_collector_name)
 
-        for s in self.series:
+        """for s in self.series:
             name = s["Label"]
             try:
                 val = data_collector.model_vars[name][-1]  # Latest value
             except (IndexError, KeyError) as e:
                 val = 0
             current_values.append(val)
-        return current_values
+        return current_values"""
