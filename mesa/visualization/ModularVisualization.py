@@ -181,7 +181,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def viz_state_message(self):
         return {
             "type": "viz_state",
-            "data": [self.application.render_model(0), self.application.render_model(1)]
+            "data": [self.application.render_model(i) for i in range(self.application.n_simulations)]
         }
 
     def on_message(self, message):
@@ -193,32 +193,36 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(message)
 
         if msg["type"] == "get_step":
-            if not self.application.models[0].running:
+            running = [model.running for model in self.application.models]
+            if not all(running):
                 self.write_message({"type": "end"})
             else:
-                self.application.models[0].step()
-                self.application.models[1].step()
+                for model in self.application.models:
+                    model.step()
                 self.write_message(self.viz_state_message)
 
         elif msg["type"] == "reset":
-            self.application.reset_model()
+            self.application.reset_models()
             self.write_message(self.viz_state_message)
 
         elif msg["type"] == "submit_params":
             param = msg["param"]
             value = msg["value"]
+            model = msg["model"]
 
             # Is the param editable?
             if param in self.application.user_params:
-                if isinstance(self.application.model_kwargs[param], UserSettableParameter):
-                    self.application.model_kwargs[param].value = value
+                model_kwargs = self.application.model_kwargs[model]
+                if isinstance(model_kwargs[param], UserSettableParameter):
+                    model_kwargs[param].value = value
                 else:
-                    self.application.model_kwargs[param] = value
+                    model_kwargs = value
 
         elif msg["type"] == "get_params":
             self.write_message({
                 "type": "model_params",
-                "params": self.application.user_params
+                "params": self.application.user_params,
+                "simulations": self.application.n_simulations
             })
 
         else:
@@ -250,21 +254,22 @@ class ModularServer(tornado.web.Application):
     EXCLUDE_LIST = ('width', 'height',)
 
     def __init__(self, model_cls, visualization_elements, name="Mesa Model",
-                 model_params={}):
+                 model_params={}, n_simulations=1):
         """ Create a new visualization server with the given elements. """
         # Prep visualization elements:
         self.visualization_elements = visualization_elements
         self.package_includes = set()
         self.local_includes = set()
         self.js_code = []
+        self.n_simulations = n_simulations
+        self.models = []
         for element in self.visualization_elements:
             for include_file in element.package_includes:
                 self.package_includes.add(include_file)
             for include_file in element.local_includes:
                 self.local_includes.add(include_file)
-            js_code = "elements.push(" + element.js_element + "0));"
-            js_code += "elements2.push(" + element.js_element + "1));"
-            self.js_code.append(js_code)
+            for n in range(n_simulations):
+                self.js_code.append(element.js_code.format(n, n))
 
         # Initializing the model
         self.model_name = name
@@ -275,8 +280,8 @@ class ModularServer(tornado.web.Application):
         elif model_cls.__doc__ is not None:
             self.description = model_cls.__doc__
 
-        self.model_kwargs = model_params
-        self.reset_model()
+        self.model_kwargs = [model_params] * self.n_simulations
+        self.reset_models()
 
         # Initializing the application itself:
         super().__init__(self.handlers, **self.settings)
@@ -284,25 +289,27 @@ class ModularServer(tornado.web.Application):
     @property
     def user_params(self):
         result = {}
-        for param, val in self.model_kwargs.items():
+        for param, val in self.model_kwargs[0].items():
             if isinstance(val, UserSettableParameter):
                 result[param] = val.json
 
         return result
 
-    def reset_model(self):
+    def reset_models(self):
         """ Reinstantiate the model object, using the current parameters. """
 
-        model_params = {}
-        for key, val in self.model_kwargs.items():
-            if isinstance(val, UserSettableParameter):
-                if val.param_type == 'static_text':    # static_text is never used for setting params
-                    continue
-                model_params[key] = val.value
-            else:
-                model_params[key] = val
+        model_params = [{}] * self.n_simulations
+        self.models = []
+        for i in range(self.n_simulations):
+            for key, val in self.model_kwargs[i].items():
+                if isinstance(val, UserSettableParameter):
+                    if val.param_type == 'static_text':    # static_text is never used for setting params
+                        continue
+                    model_params[i][key] = val.value
+                else:
+                    model_params[i][key] = val
 
-        self.models = [self.model_cls(**model_params), self.model_cls(**model_params)]
+            self.models.append(self.model_cls(**model_params[i]))
 
     def render_model(self, n):
         """ Turn the current state of the model into a dictionary of

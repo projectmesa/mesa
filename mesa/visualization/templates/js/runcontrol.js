@@ -23,9 +23,9 @@ var MesaVisualizationControl = function () {
 
 var player; // Variable to store the continuous player
 var control = new MesaVisualizationControl();
-var elements = [];  // List of Element objects
-var elements2 = [];
+var viz_elements = [[], [], [], [], []];  // List of Element objects
 var model_params = {};
+var simulations = 1;
 
 // Playback buttons
 var playPauseButton = $('#play-pause');
@@ -42,6 +42,7 @@ var fpsControl = $('#fps').slider({
 
 // Sidebar dom access
 var sidebar = $("#sidebar");
+var elements = $("#elements")
 
 // WebSocket Stuff
 // Open the websocket connection; support TLS-specific URLs when appropriate
@@ -57,7 +58,9 @@ ws.onopen = function () {
 var initGUI = function () {
 
     var onSubmitCallback = function (param_name, value) {
-        send({ "type": "submit_params", "param": param_name, "value": value });
+        for (i = 0; i < simulations; i++) {
+            send({ "type": "submit_params", "param": param_name, "value": value, "model": i });
+        }
     };
 
     var addBooleanInput = function (param, obj) {
@@ -212,24 +215,26 @@ var initGUI = function () {
                 break;
         }
     }
+
+    for (i=0; i < simulations; i++) {
+        elements.append(
+            "<div class='col-lg-3 col-md-3 col-sm-3 col-xs-3' id=sim_" + i + "></div><div></div>");
+    }
 };
 
 /** Parse and handle an incoming message on the WebSocket connection. */
 ws.onmessage = function (message) {
     var msg = JSON.parse(message.data);
+    console.log(msg)
     switch (msg["type"]) {
         case "viz_state":
-            console.log(msg)
-            var data1 = msg["data"]["0"];
-            var data2 = msg["data"]["1"];
-            console.log(data1)
-            console.log(data2)
-            for (var i in elements) {
-                    elements[i].render(data1[i]);
-            }
-            for (var i in elements2) {
-                elements2[i].render(data2[i]);
-            }
+            var data = msg["data"];
+            for (var i in viz_elements) {
+                element = viz_elements[i];
+                for (var j in element) {
+                    element[j].render(data[i][j])
+                    }
+                }
             break;
         case "end":
             // We have reached the end of the model
@@ -242,6 +247,7 @@ ws.onmessage = function (message) {
         case "model_params":
             console.log(msg["params"]);
             model_params = msg["params"];
+            simulations = msg["simulations"]
             initGUI();
             break;
         default:
@@ -262,11 +268,11 @@ var reset = function () {
     send({ "type": "reset" });
 
     // Reset all the visualizations
-    for (var i in elements) {
-        elements[i].reset();
-    }
-        for (var i in elements2) {
-        elements2[i].reset();
+    for (i in viz_elements) {
+        element = viz_elements[i];
+        for (var j in element) {
+            element[j].reset();
+        }
     }
     control.done = false;
     if (!control.running)

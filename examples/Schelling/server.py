@@ -65,7 +65,7 @@ def schelling_draw(agent):
 
 
 happy_element = HappyElement()
-canvas_element = CanvasGrid(schelling_draw, 20, 20, 500, 500)
+canvas_element = CanvasGrid(schelling_draw, 20, 20, 300, 300)
 happy_chart = ChartModule([{"Label": "happy", "Color": "Black"}])
 
 model_params = {
@@ -78,5 +78,6 @@ model_params = {
 
 server = ModularServer(Schelling,
                        [canvas_element],
-                       "Schelling", model_params)
+                       "Schelling", model_params,
+                       n_simulations=4)
 server.launch()
