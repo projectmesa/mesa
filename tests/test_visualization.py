@@ -71,11 +71,11 @@ class TestModularServer(TestCase):
         test_grid_state = defaultdict(list)
         test_grid_state[test_portrayal['Layer']].append(test_portrayal)
 
-        state = self.server.render_model()
+        state = self.server.render_model(0)
         assert state[0] == test_grid_state
 
     def test_text_render_model_state(self):
-        state = self.server.render_model()
+        state = self.server.render_model(0)
         assert state[1] == '<b>VisualizationElement goes here</b>.'
 
     def test_user_params(self):

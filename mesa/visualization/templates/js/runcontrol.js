@@ -24,6 +24,7 @@ var MesaVisualizationControl = function () {
 var player; // Variable to store the continuous player
 var control = new MesaVisualizationControl();
 var viz_elements = [];  // List of Element objects
+var elements = viz_elements
 var model_params = {};
 var simulations = 1;
 
@@ -42,7 +43,7 @@ var fpsControl = $('#fps').slider({
 
 // Sidebar dom access
 var sidebar = $("#sidebar");
-var elements = $("#elements")
+//var elements = $("#elements")
 
 // WebSocket Stuff
 // Open the websocket connection; support TLS-specific URLs when appropriate

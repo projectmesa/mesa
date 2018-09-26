@@ -87,7 +87,7 @@ class Schelling(Model):
                     similar += 1
 
             if similar > self.homophily:
-                self.happy +=1
+                self.happy += 1
 
         self.datacollector.collect(self)
 
