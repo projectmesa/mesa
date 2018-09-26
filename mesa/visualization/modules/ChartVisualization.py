@@ -66,17 +66,35 @@ class ChartModule(VisualizationElement):
         new_element = "new ChartModule({}, {}, {}, n_sims)"
         new_element = new_element.format(series_json, canvas_width,
                                          canvas_height)
-        self.js_code = "elements.push(" + new_element + ");"
+        self.js_code = "viz_elements.push(" + new_element + ");"
 
     def render(self, model):
         current_values = []
         data_collector = getattr(model, self.data_collector_name)
 
-        """for s in self.series:
+        for s in self.series:
             name = s["Label"]
             try:
                 val = data_collector.model_vars[name][-1]  # Latest value
             except (IndexError, KeyError) as e:
                 val = 0
             current_values.append(val)
-        return current_values"""
+        return current_values
+
+
+class MultiChartModule(VisualizationElement):
+    package_includes = ["Chart.min.js", "MultiChartModule.js"]
+
+    def __init__(self, model_attribute):
+        self.model_attribute = model_attribute
+
+        new_element = "new MultiChartModule('{}', n_sims)".format(model_attribute)
+        self.js_code = "viz_elements.push(" + new_element + ");"
+
+    def render(self, model):
+        try:
+            val = getattr(model, self.model_attribute)
+        except (IndexError, KeyError) as e:
+            val = 0
+        print(val)
+        return val

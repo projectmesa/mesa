@@ -17,3 +17,7 @@ canvas {
     width: 100%;
     height: auto;
   }
+  
+.slider.slider-horizontal {
+    width: 100%;
+}

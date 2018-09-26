@@ -78,6 +78,17 @@ class Schelling(Model):
                 self.schedule.add(agent)
 
         self.running = True
+
+        # Calculate initial happiness
+        for agent in self.schedule.agents:
+            similar = 0
+            for neighbor in self.grid.neighbor_iter(agent.pos):
+                if neighbor.type == agent.type:
+                    similar += 1
+
+            if similar > self.homophily:
+                self.happy +=1
+
         self.datacollector.collect(self)
 
     def step(self):

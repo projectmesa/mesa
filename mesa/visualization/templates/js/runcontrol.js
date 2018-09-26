@@ -225,7 +225,6 @@ ws.onmessage = function (message) {
         case "viz_state":
             var data = msg["data"];
             for (sims=0; sims <simulations; sims++) {
-                console.log(sims)
                 for (var i in viz_elements) {
                     viz_elements[i].render(data[sims][i], sims)
                 }
@@ -260,15 +259,12 @@ var send = function (message) {
 /** Reset the model, and rest the appropriate local variables. */
 var reset = function () {
     control.tick = 0;
-    send({ "type": "reset" });
 
     // Reset all the visualizations
-    for (i in viz_elements) {
-        element = viz_elements[i];
-        for (var j in element) {
-            // element[j].reset();
-        }
+    for (element of viz_elements) {
+        element.reset()
     }
+    send({ "type": "reset" });
     control.done = false;
     if (!control.running)
         $(playPauseButton.children()[0]).text("Start");

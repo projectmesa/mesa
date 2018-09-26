@@ -1,5 +1,5 @@
 from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
+from mesa.visualization.modules import CanvasGrid, MultiChartModule, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 
 from mesa.visualization.TextVisualization import (
@@ -66,7 +66,7 @@ def schelling_draw(agent):
 
 happy_element = HappyElement()
 canvas_element = CanvasGrid(schelling_draw, 20, 20, 300, 300)
-happy_chart = ChartModule([{"Label": "happy", "Color": "Black"}])
+happy_chart = MultiChartModule("happy")
 
 model_params = {
     "height": 20,
