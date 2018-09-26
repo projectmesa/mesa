@@ -15,7 +15,12 @@ div.tooltip {
 
 canvas.world-grid {
     position:absolute; 
-    top:345px; 
+    top:50px; 
     left:15px;
     border:1px dotted    
+}
+
+canvas.chartjs-render-monitor {
+    position: absolute;
+    top: 560px;
 }
