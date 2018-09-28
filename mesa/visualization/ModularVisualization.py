@@ -96,6 +96,7 @@ Client -> Server:
     }
 
 """
+import copy
 import os
 import tornado.autoreload
 import tornado.ioloop
@@ -194,7 +195,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
         if msg["type"] == "get_step":
             running = [model.running for model in self.application.models]
-            if not all(running):
+            if not any(running):
                 self.write_message({"type": "end"})
             else:
                 for model in self.application.models:
@@ -209,6 +210,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             param = msg["param"]
             value = msg["value"]
             simulation = msg["simulation"]
+            print(value)
 
             # Is the param editable?
             if param in self.application.user_params:
@@ -279,7 +281,9 @@ class ModularServer(tornado.web.Application):
         elif model_cls.__doc__ is not None:
             self.description = model_cls.__doc__
 
-        self.model_kwargs = [model_params] * self.n_simulations
+        self.model_kwargs = []
+        for i in range(n_simulations):
+            self.model_kwargs.append(copy.deepcopy(model_params))
         self.reset_models()
 
         # Initializing the application itself:
@@ -307,7 +311,7 @@ class ModularServer(tornado.web.Application):
                     model_params[i][key] = val.value
                 else:
                     model_params[i][key] = val
-
+            print(model_params)
             self.models.append(self.model_cls(**model_params[i]))
 
     def render_model(self, n):

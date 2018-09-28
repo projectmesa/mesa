@@ -43,7 +43,6 @@ var fpsControl = $('#fps').slider({
 
 // Sidebar dom access
 var sidebar = $("#sidebar");
-//var elements = $("#elements")
 
 // WebSocket Stuff
 // Open the websocket connection; support TLS-specific URLs when appropriate
@@ -58,10 +57,8 @@ ws.onopen = function () {
 // Add model parameters that can be edited prior to a model run
 var initGUI = function () {
 
-    var onSubmitCallback = function (param_name, value) {
-        for (i = 0; i < simulations; i++) {
-            send({ "type": "submit_params", "param": param_name, "value": value, "model": i });
-        }
+    var onSubmitCallback = function (param_name, value, sim) {
+        send({ "type": "submit_params", "param": param_name, "value": value, "simulation": sim });
     };
 
     var addBooleanInput = function (param, obj) {
@@ -117,21 +114,26 @@ var initGUI = function () {
                 placement: 'right'
             });
         }
+        for (i = 0; i < simulations; i++) {
+            console.log(i)
+            // Setup slider
+            var sliderInput = $("#" + domID);
+            sliderInput.slider({
+                id: i,
+                min: obj.min_value,
+                max: obj.max_value,
+                value: obj.value,
+                step: obj.step,
+                ticks: [obj.min_value, obj.max_value],
+                ticks_labels: [obj.min_value, obj.max_value],
+                ticks_positions: [0, 100]
+            });
 
-        // Setup slider
-        var sliderInput = $("#" + domID);
-        sliderInput.slider({
-            min: obj.min_value,
-            max: obj.max_value,
-            value: obj.value,
-            step: obj.step,
-            ticks: [obj.min_value, obj.max_value],
-            ticks_labels: [obj.min_value, obj.max_value],
-            ticks_positions: [0, 100]
-        });
-        sliderInput.on('change', function () {
-            onSubmitCallback(param, Number($(this).val()));
-        })
+            sliderInput.on('change', function () {
+                console.log(this)
+                onSubmitCallback(param, Number(this.value), 0);
+            })
+        }
     };
 
     var addChoiceInput = function (param, obj) {
@@ -225,7 +227,7 @@ ws.onmessage = function (message) {
     switch (msg["type"]) {
         case "viz_state":
             var data = msg["data"];
-            for (sims=0; sims <simulations; sims++) {
+            for (sims = 0; sims < simulations; sims++) {
                 for (var i in viz_elements) {
                     viz_elements[i].render(data[sims][i], sims)
                 }
