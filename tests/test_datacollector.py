@@ -83,18 +83,16 @@ class TestDataCollector(unittest.TestCase):
         for element in data_collector.model_vars["model_value"]:
             assert element == 100
 
-    def test_agent_vars(self):
+    def test_agent_records(self):
         '''
         Test agent-level variable collection.
         '''
         data_collector = self.model.datacollector
-        assert len(data_collector.agent_vars["value"]) == 7
-        assert len(data_collector.agent_vars["value2"]) == 7
-        for var in ["value", "value2"]:
-            for step in data_collector.agent_vars[var]:
-                assert len(step) == 10
-                for record in step:
-                    assert len(record) == 2
+        assert len(data_collector._agent_records) == 7
+        for step, records in data_collector._agent_records.items():
+            assert len(records) == 10
+            for values in records:
+                assert len(values) == 4
 
     def test_table_rows(self):
         '''
