@@ -41,15 +41,18 @@ like the built-in ``random`` library.
 
 .. code:: python
 
-   class AwesomeModel(Model):
+  class AwesomeModel(Model):
     # ...
 
     def cool_method(self):
       interesting_number = self.random.random()
       print(interesting_number)
    
-   class AwesomeAgent(Agent):
+  class AwesomeAgent(Agent):
     # ...
+    def __init__(self, unique_id, model, ...):
+      super().__init__(unique_id, model)
+      # ...
 
     def my_method(self):
       random_number = self.random.randint(0, 100)
@@ -65,7 +68,7 @@ constructor.
 
 .. code:: python
 
-   class AwesomeModel(Model):
+  class AwesomeModel(Model):
     
     def __init__(self, seed=None):
       pass
@@ -74,11 +77,11 @@ constructor.
       interesting_number = self.random.random()
       print(interesting_number)
     
-    >>> model0 = AwesomeModel(seed=0)
-    >>> model0._seed
-    0
-    >>> model0.cool_method()
-    0.8444218515250481
-    >>> model1 = AwesomeModel(seed=0)
-    >>> model1.cool_method()
-    0.8444218515250481
+  >>> model0 = AwesomeModel(seed=0)
+  >>> model0._seed
+  0
+  >>> model0.cool_method()
+  0.8444218515250481
+  >>> model1 = AwesomeModel(seed=0)
+  >>> model1.cool_method()
+  0.8444218515250481
