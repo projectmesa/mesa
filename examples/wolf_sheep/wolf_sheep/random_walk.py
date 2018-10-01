@@ -2,8 +2,6 @@
 Generalized behavior for random walking, one grid cell at a time.
 '''
 
-import random
-
 from mesa import Agent
 
 
@@ -39,6 +37,6 @@ class RandomWalker(Agent):
         '''
         # Pick the next cell from the adjacent cells.
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
-        next_move = random.choice(next_moves)
+        next_move = self.random.choice(next_moves)
         # Now move:
         self.model.grid.move_agent(self, next_move)
