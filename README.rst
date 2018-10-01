@@ -18,7 +18,7 @@ It allows users to quickly create agent-based models using built-in core compone
    :alt: A screenshot of the Schelling Model in Mesa
 
 *Above: A Mesa implementation of the Schelling segregation model,
-being visualized in a browser window and analyzed in a Jupyter
+being visualized in a browser window and analyzed in an IPython
 notebook.*
 
 .. _`Mesa` : https://github.com/projectmesa/mesa/
@@ -30,7 +30,6 @@ Features
 * Modular components
 * Browser-based visualization
 * Built-in tools for analysis
-* Example model library
 
 Using Mesa
 ------------
@@ -45,9 +44,9 @@ You can also use `pip` to install the github version:
 
 .. code-block:: bash
 
-    $ pip install -e git+https://github.com/projectmesa/mesa
+    $ pip install git+https://github.com/projectmesa/mesa
 
-Take a look at the `examples <https://github.com/projectmesa/mesa/tree/master/examples>`_ folder for sample models demonstrating Mesa features.
+
 
 For more help on using Mesa, check out the following resources:
 

@@ -15,12 +15,13 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
+import random
 
 import numpy as np
 
 
 def accept_tuple_argument(wrapped_function):
-    """ Decorator to allow grid methods that take a list of (x, y) coord tuples
+    """ Decorator to allow grid methods that take a list of (x, y) position tuples
     to also handle a single position, by automatically wrapping tuple in
     single-item list rather than forcing user to do it.
 
@@ -333,24 +334,16 @@ class Grid:
     def move_to_empty(self, agent):
         """ Moves agent to a random empty cell, vacating agent's old cell. """
         pos = agent.pos
-        if len(self.empties) == 0:
+        new_pos = self.find_empty()
+        if new_pos is None:
             raise Exception("ERROR: No empty cells")
-        new_pos = agent.random.choice(self.empties)
-        self._place_agent(new_pos, agent)
-        agent.pos = new_pos
-        self._remove_agent(pos, agent)
+        else:
+            self._place_agent(new_pos, agent)
+            agent.pos = new_pos
+            self._remove_agent(pos, agent)
 
     def find_empty(self):
         """ Pick a random empty cell. """
-        from warnings import warn
-        import random
-
-        warn(("`find_empty` is being phased out since it uses the global "
-              "`random` instead of the model-level random-number generator. "
-              "Consider replacing it with having a model or agent object "
-              "explicitly pick one of the grid's list of empty cells."),
-            DeprecationWarning)
-
         if self.exists_empty_cells():
             pos = random.choice(self.empties)
             return pos
@@ -387,9 +380,9 @@ class SingleGrid(Grid):
 
         """
         if x == "random" or y == "random":
-            if len(self.empties) == 0:
+            coords = self.find_empty()
+            if coords is None:
                 raise Exception("ERROR: Grid full")
-            coords = agent.random.choice(self.empties)
         else:
             coords = (x, y)
         agent.pos = coords
@@ -458,8 +451,7 @@ class MultiGrid(Grid):
 class HexGrid(Grid):
     """ Hexagonal Grid: Extends Grid to handle hexagonal neighbors.
 
-    Functions according to odd-q rules.
-    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+    Functions according to odd-q rules. See http://www.redblobgames.com/grids/hexagons/#coordinates for more
 
     Properties:
         width, height: The grid's width and height.
@@ -521,8 +513,7 @@ class HexGrid(Grid):
 
             if self.torus is False:
                 adjacent = list(
-                    filter(lambda coords:
-                           not self.out_of_bounds(coords), adjacent))
+                    filter(lambda coords: not self.out_of_bounds(coords), adjacent))
             else:
                 adjacent = [torus_adj_2d(coord) for coord in adjacent]
 
@@ -609,7 +600,7 @@ class ContinuousSpace:
     """ Continuous space where each agent can have an arbitrary position.
 
     Assumes that all agents are point objects, and have a pos property storing
-    their position as an (x, y) tuple. This class uses a numpy array internally
+    their position as an (x, y) tuple. This class uses a MultiGrid internally
     to store agent objects, to speed up neighborhood lookups.
 
     """
@@ -624,6 +615,11 @@ class ContinuousSpace:
             x_min, y_min: (default 0) If provided, set the minimum x and y
                           coordinates for the space. Below them, values loop to
                           the other edge (if torus=True) or raise an exception.
+            grid_width, _height: (default 100) Determine the size of the
+                                 internal storage grid. More cells will slow
+                                 down movement, but speed up neighbor lookup.
+                                 Probably only fiddle with this if one or the
+                                 other is impacting your model's performance.
 
         """
         self.x_min = x_min

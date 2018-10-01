@@ -1,16 +1,21 @@
+import random
+from mesa import Agent
+
 """
 Citation:
 The following code is a copy from random_walk.py at
 https://github.com/projectmesa/mesa/blob/master/examples/wolf_sheep/wolf_sheep/random_walk.py
 Accessed on: November 2, 2017
 Original Author: Jackie Kazil
-
-Generalized behavior for random walking, one grid cell at a time.
 """
 
-from mesa import Agent
+
+'''
+Generalized behavior for random walking, one grid cell at a time.
+'''
 
 
+# subclass of Mesa Agent, which serves as parent class to Person in agents.py
 class RandomWalker(Agent):
     '''
     Class implementing random walker methods in a generalized manner.
@@ -21,7 +26,7 @@ class RandomWalker(Agent):
     grid = None
     x = None
     y = None
-    # use a Moore neighborhood
+    # use a moore neighborhood
     moore = True
 
     def __init__(self, unique_id, pos, model, moore=True):
@@ -42,6 +47,6 @@ class RandomWalker(Agent):
         '''
         # Pick the next cell from the adjacent cells.
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
-        next_move = self.random.choice(next_moves)
+        next_move = random.choice(next_moves)
         # Now move:
         self.model.grid.move_agent(self, next_move)

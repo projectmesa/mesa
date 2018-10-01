@@ -1,3 +1,5 @@
+import random
+
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
@@ -45,8 +47,8 @@ class {{cookiecutter.model}}(Model):
             agent = {{cookiecutter.agent}}(i, self)
             self.schedule.add(agent)
 
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
+            x = random.randrange(self.grid.width)
+            y = random.randrange(self.grid.height)
             self.grid.place_agent(agent, (x, y))
 
         # example data collector

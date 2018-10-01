@@ -36,6 +36,7 @@ The default DataCollector here makes several assumptions:
     * For collecting agent-level variables, agents must have a unique_id
 
 """
+from functools import partial
 import itertools
 from operator import attrgetter
 import pandas as pd
@@ -108,7 +109,7 @@ class DataCollector:
                       variable when given a model instance.
         """
         if type(reporter) is str:
-            reporter = self._make_attribute_collector(reporter)
+            reporter = partial(self._getattr, reporter)
         self.model_reporters[name] = reporter
         self.model_vars[name] = []
 
@@ -122,7 +123,9 @@ class DataCollector:
 
         """
         if type(reporter) is str:
-            reporter = self._make_attribute_collector(reporter)
+            attribute_name = reporter
+            reporter = partial(self._getattr, reporter)
+            reporter.attribute_name = attribute_name
         self.agent_reporters[name] = reporter
 
     def _new_table(self, table_name, table_columns):
@@ -139,7 +142,7 @@ class DataCollector:
     def _record_agents(self, model):
         """ Record agents data in a mapping of functions and agents. """
         rep_funcs = self.agent_reporters.values()
-        if all([rep.__name__ == 'attr_collector' for rep in rep_funcs]):
+        if all([hasattr(rep, 'attribute_name') for rep in rep_funcs]):
             prefix = ['model.schedule.steps', 'unique_id']
             attributes = [func.attribute_name for func in rep_funcs]
             get_reports = attrgetter(*prefix + attributes)
@@ -183,23 +186,9 @@ class DataCollector:
                 raise Exception("Could not insert row with missing column")
 
     @staticmethod
-    def _make_attribute_collector(attr):
-        '''
-        Create a function which collects the value of a named attribute
-        '''
-
-        def attribute_name(attr):
-            """Decorator to add attribute name as a function attribute."""
-            def wrapper(func):
-                func.attribute_name = attr
-                return func
-            return wrapper
-
-        @attribute_name(attr)
-        def attr_collector(obj):
-            return getattr(obj, attr)
-
-        return attr_collector
+    def _getattr(name, object):
+        """ Turn around arguments of getattr to make it partially callable."""
+        return getattr(object, name, None)
 
     def get_model_vars_dataframe(self):
         """ Create a pandas DataFrame from the model variables.
@@ -224,7 +213,7 @@ class DataCollector:
         df = pd.DataFrame.from_records(
             data=all_records,
             columns=["Step", "AgentID"] + rep_names,
-            )
+        )
         df = df.set_index(["Step", "AgentID"])
         return df
 

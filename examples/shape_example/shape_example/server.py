@@ -1,3 +1,5 @@
+import random
+
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 
@@ -42,4 +44,5 @@ def launch_shape_model():
 
 
 if __name__ == "__main__":
+    random.seed(3)
     launch_shape_model()

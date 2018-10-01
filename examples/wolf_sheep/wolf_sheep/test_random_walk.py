@@ -3,6 +3,8 @@ Testing the RandomWalker by having an ABM composed only of random walker
 agents.
 '''
 
+import random
+
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
@@ -43,8 +45,8 @@ class WalkerWorld(Model):
         self.schedule = RandomActivation(self)
         # Create agents
         for i in range(self.agent_count):
-            x = self.random.randrange(self.width)
-            y = self.random.randrange(self.height)
+            x = random.randrange(self.width)
+            y = random.randrange(self.height)
             a = WalkerAgent((x, y), self, True)
             self.schedule.add(a)
             self.grid.place_agent(a, (x, y))

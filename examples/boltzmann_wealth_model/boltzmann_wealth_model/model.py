@@ -1,3 +1,5 @@
+import random
+
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
@@ -33,8 +35,8 @@ class BoltzmannWealthModel(Model):
             a = MoneyAgent(i, self)
             self.schedule.add(a)
             # Add the agent to a random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
+            x = random.randrange(self.grid.width)
+            y = random.randrange(self.grid.height)
             self.grid.place_agent(a, (x, y))
 
         self.running = True
@@ -60,13 +62,13 @@ class MoneyAgent(Agent):
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=False
         )
-        new_position = self.random.choice(possible_steps)
+        new_position = random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
 
     def give_money(self):
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         if len(cellmates) > 1:
-            other = self.random.choice(cellmates)
+            other = random.choice(cellmates)
             other.wealth += 1
             self.wealth -= 1
 

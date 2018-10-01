@@ -1,8 +1,8 @@
 '''
 Test the Grid objects.
 '''
-import random
 import unittest
+
 from mesa.space import Grid, SingleGrid, MultiGrid, HexGrid
 
 # Initial agent positions for testing
@@ -27,7 +27,6 @@ class MockAgent:
     '''
 
     def __init__(self, unique_id, pos):
-        self.random = random.Random(0)
         self.unique_id = unique_id
         self.pos = pos
 

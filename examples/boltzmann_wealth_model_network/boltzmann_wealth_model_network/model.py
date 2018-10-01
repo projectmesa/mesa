@@ -1,3 +1,5 @@
+import random
+
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
@@ -29,7 +31,7 @@ class BoltzmannWealthModelNetwork(Model):
             agent_reporters={"Wealth": lambda _: _.wealth}
         )
 
-        list_of_random_nodes = self.random.sample(self.G.nodes(), self.num_agents)
+        list_of_random_nodes = random.sample(self.G.nodes(), self.num_agents)
 
         # Create agents
         for i in range(self.num_agents):
@@ -62,7 +64,7 @@ class MoneyAgent(Agent):
         possible_steps = [node for node in self.model.grid.get_neighbors(self.pos, include_center=False) if
                           self.model.grid.is_cell_empty(node)]
         if len(possible_steps) > 0:
-            new_position = self.random.choice(possible_steps)
+            new_position = random.choice(possible_steps)
             self.model.grid.move_agent(self, new_position)
 
     def give_money(self):
@@ -70,7 +72,7 @@ class MoneyAgent(Agent):
         neighbors_nodes = self.model.grid.get_neighbors(self.pos, include_center=False)
         neighbors = self.model.grid.get_cell_list_contents(neighbors_nodes)
         if len(neighbors) > 0:
-            other = self.random.choice(neighbors)
+            other = random.choice(neighbors)
             other.wealth += 1
             self.wealth -= 1
 

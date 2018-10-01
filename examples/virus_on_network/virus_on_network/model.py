@@ -1,3 +1,4 @@
+import random
 import math
 from enum import Enum
 import networkx as nx
@@ -60,7 +61,7 @@ class VirusOnNetwork(Model):
             self.grid.place_agent(a, node)
 
         # Infect some nodes
-        infected_nodes = self.random.sample(self.G.nodes(), self.initial_outbreak_size)
+        infected_nodes = random.sample(self.G.nodes(), self.initial_outbreak_size)
         for a in self.grid.get_cell_list_contents(infected_nodes):
             a.state = State.INFECTED
 
@@ -100,16 +101,16 @@ class VirusAgent(Agent):
         susceptible_neighbors = [agent for agent in self.model.grid.get_cell_list_contents(neighbors_nodes) if
                                  agent.state is State.SUSCEPTIBLE]
         for a in susceptible_neighbors:
-            if self.random.random() < self.virus_spread_chance:
+            if random.random() < self.virus_spread_chance:
                 a.state = State.INFECTED
 
     def try_gain_resistance(self):
-        if self.random.random() < self.gain_resistance_chance:
+        if random.random() < self.gain_resistance_chance:
             self.state = State.RESISTANT
 
     def try_remove_infection(self):
         # Try to remove
-        if self.random.random() < self.recovery_chance:
+        if random.random() < self.recovery_chance:
             # Success
             self.state = State.SUSCEPTIBLE
             self.try_gain_resistance()
@@ -118,7 +119,7 @@ class VirusAgent(Agent):
             self.state = State.INFECTED
 
     def try_check_situation(self):
-        if self.random.random() < self.virus_check_frequency:
+        if random.random() < self.virus_check_frequency:
             # Checking...
             if self.state is State.INFECTED:
                 self.try_remove_infection()

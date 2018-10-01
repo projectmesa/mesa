@@ -1,3 +1,5 @@
+from random import random
+
 from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import Grid
@@ -31,7 +33,7 @@ class ConwaysGameOfLife(Model):
         # ALIVE and some to DEAD.
         for (contents, x, y) in self.grid.coord_iter():
             cell = Cell((x, y), self)
-            if self.random.random() < 0.1:
+            if random() < .1:
                 cell.state = cell.ALIVE
             self.grid.place_agent(cell, (x, y))
             self.schedule.add(cell)

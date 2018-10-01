@@ -1,3 +1,4 @@
+import random
 import math
 
 from mesa import Agent
@@ -49,7 +50,7 @@ class SsAgent(Agent):
         min_dist = min([get_distance(self.pos, pos) for pos in candidates])
         final_candidates = [pos for pos in candidates if get_distance(self.pos,
             pos) == min_dist]
-        self.random.shuffle(final_candidates)
+        random.shuffle(final_candidates)
         self.model.grid.move_agent(self, final_candidates[0])
 
     def eat(self):

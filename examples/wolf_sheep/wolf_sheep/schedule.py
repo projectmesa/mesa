@@ -1,3 +1,4 @@
+import random
 from collections import defaultdict
 
 from mesa.time import RandomActivation
@@ -64,7 +65,7 @@ class RandomActivationByBreed(RandomActivation):
             breed: Class object of the breed to run.
         '''
         agent_keys = list(self.agents_by_breed[breed].keys())
-        self.model.random.shuffle(agent_keys)
+        random.shuffle(agent_keys)
         for agent_key in agent_keys:
             self.agents_by_breed[breed][agent_key].step()
 

@@ -17,7 +17,3 @@ class Agent:
     def step(self):
         """ A single step of the agent. """
         pass
-
-    @property
-    def random(self):
-        return self.model.random

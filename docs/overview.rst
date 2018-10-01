@@ -29,6 +29,7 @@ The skeleton of a model might look like this:
 
 .. code:: python
 
+    import random
     from mesa import Agent, Model
     from mesa.time import RandomActivation
     from mesa.space import MultiGrid
@@ -48,7 +49,7 @@ The skeleton of a model might look like this:
             for i in range(n_agents):
                 a = MyAgent(i, self)
                 self.schedule.add(a)
-                coords = (self.random.randrange(0, 10), self.random.randrange(0, 10))
+                coords = (random.randrange(0, 10), random.randrange(0, 10))
                 self.grid.place_agent(a, coords)
 
         def step(self):
