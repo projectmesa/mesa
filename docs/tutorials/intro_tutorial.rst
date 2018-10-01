@@ -218,13 +218,10 @@ Agent Step
 
 Now we just need to have the agents do what we intend for them to do:
 check their wealth, and if they have the money, give one unit of it away
-to another random agent. Since we want to use randomness, don't forget
-to import Python's ``random`` library:
-
-.. code:: python
-
-    # model.py
-    import random
+to another random agent. To allow the agent to choose another agent at random,
+we use the ``model.random`` random-number generator. This works just like
+Python's ``random`` module, but with a fixed seed set when the model is
+instantiated, that can be used to replicate a specific model run later. 
 
 To pick an agent at random, we need a list of all agents. Notice that
 there isn't such a list explicitly in the model. The scheduler, however,
@@ -245,7 +242,7 @@ With that in mind, we rewrite the agent's ``step`` method, like this:
         def step(self):
             if self.wealth == 0:
                 return
-            other_agent = random.choice(self.model.schedule.agents)
+            other_agent = self.random.choice(self.model.schedule.agents)
             other_agent.wealth += 1
             self.wealth -= 1
 
@@ -397,8 +394,8 @@ coordinates to place the agent.
                 self.schedule.add(a)
                 
                 # Add the agent to a random grid cell
-                x = random.randrange(self.grid.width)
-                y = random.randrange(self.grid.height)
+                x = self.random.randrange(self.grid.width)
+                y = self.random.randrange(self.grid.height)
                 self.grid.place_agent(a, (x, y))
 
 Under the hood, each agent's position is stored in two ways: the agent
@@ -443,7 +440,7 @@ With that in mind, the agent's ``move`` method looks like this:
                 self.pos, 
                 moore=True,
                 include_center=False)
-            new_position = random.choice(possible_steps)
+            new_position = self.random.choice(possible_steps)
             self.model.grid.move_agent(self, new_position)
 
 Next, we need to get all the other agents present in a cell, and give
@@ -460,7 +457,7 @@ single tuple if we only care about one cell.
         def give_money(self):
             cellmates = self.model.grid.get_cell_list_contents([self.pos])
             if len(cellmates) > 1:
-                other = random.choice(cellmates)
+                other = self.random.choice(cellmates)
                 other.wealth += 1
                 self.wealth -= 1
 
@@ -496,8 +493,8 @@ Now, putting that all together should look like this:
                 a = MoneyAgent(i, self)
                 self.schedule.add(a)
                 # Add the agent to a random grid cell
-                x = random.randrange(self.grid.width)
-                y = random.randrange(self.grid.height)
+                x = self.random.randrange(self.grid.width)
+                y = self.random.randrange(self.grid.height)
                 self.grid.place_agent(a, (x, y))
     
         def step(self):
@@ -514,13 +511,13 @@ Now, putting that all together should look like this:
                 self.pos, 
                 moore=True, 
                 include_center=False)
-            new_position = random.choice(possible_steps)
+            new_position = self.random.choice(possible_steps)
             self.model.grid.move_agent(self, new_position)
     
         def give_money(self):
             cellmates = self.model.grid.get_cell_list_contents([self.pos])
             if len(cellmates) > 1:
-                other = random.choice(cellmates)
+                other = self.random.choice(cellmates)
                 other.wealth += 1
                 self.wealth -= 1
     
@@ -636,8 +633,8 @@ measure of wealth inequality.
                 a = MoneyAgent(i, self)
                 self.schedule.add(a)
                 # Add the agent to a random grid cell
-                x = random.randrange(self.grid.width)
-                y = random.randrange(self.grid.height)
+                x = self.random.randrange(self.grid.width)
+                y = self.random.randrange(self.grid.height)
                 self.grid.place_agent(a, (x, y))
             
             self.datacollector = DataCollector(

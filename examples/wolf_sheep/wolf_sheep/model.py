@@ -9,8 +9,6 @@ Replication of the model found in NetLogo:
     Northwestern University, Evanston, IL.
 '''
 
-import random
-
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
@@ -83,18 +81,18 @@ class WolfSheep(Model):
 
         # Create sheep:
         for i in range(self.initial_sheep):
-            x = random.randrange(self.width)
-            y = random.randrange(self.height)
-            energy = random.randrange(2 * self.sheep_gain_from_food)
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
+            energy = self.random.randrange(2 * self.sheep_gain_from_food)
             sheep = Sheep(self.next_id(), (x, y), self, True, energy)
             self.grid.place_agent(sheep, (x, y))
             self.schedule.add(sheep)
 
         # Create wolves
         for i in range(self.initial_wolves):
-            x = random.randrange(self.width)
-            y = random.randrange(self.height)
-            energy = random.randrange(2 * self.wolf_gain_from_food)
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
+            energy = self.random.randrange(2 * self.wolf_gain_from_food)
             wolf = Wolf(self.next_id(), (x, y), self, True, energy)
             self.grid.place_agent(wolf, (x, y))
             self.schedule.add(wolf)
@@ -103,12 +101,12 @@ class WolfSheep(Model):
         if self.grass:
             for agent, x, y in self.grid.coord_iter():
 
-                fully_grown = random.choice([True, False])
+                fully_grown = self.random.choice([True, False])
 
                 if fully_grown:
                     countdown = self.grass_regrowth_time
                 else:
-                    countdown = random.randrange(self.grass_regrowth_time)
+                    countdown = self.random.randrange(self.grass_regrowth_time)
 
                 patch = GrassPatch(self.next_id(), (x, y), self,
                                    fully_grown, countdown)

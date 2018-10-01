@@ -21,7 +21,7 @@ class PdGrid(Model):
               ("D", "C"): 1.6,
               ("D", "D"): 0}
 
-    def __init__(self, height=50, width=50, schedule_type="Random", payoffs=None):
+    def __init__(self, height=50, width=50, schedule_type="Random", payoffs=None, seed=None):
         '''
         Create a new Spatial Prisoners' Dilemma Model.
 
