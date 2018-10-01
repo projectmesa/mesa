@@ -5,8 +5,6 @@ A Mesa implementation of Craig Reynolds's Boids flocker model.
 Uses numpy arrays to represent vectors.
 '''
 
-
-import random
 import numpy as np
 
 from mesa import Model
@@ -58,8 +56,8 @@ class BoidFlockers(Model):
         Create self.population agents, with random positions and starting headings.
         '''
         for i in range(self.population):
-            x = random.random() * self.space.x_max
-            y = random.random() * self.space.y_max
+            x = self.random.random() * self.space.x_max
+            y = self.random.random() * self.space.y_max
             pos = np.array((x, y))
             velocity = np.random.random(2) * 2 - 1
             boid = Boid(i, self, pos, self.speed, velocity, self.vision,

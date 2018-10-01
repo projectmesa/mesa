@@ -26,7 +26,7 @@ TODO: Have the schedulers use the model's randomizer, to keep random number
 seeds consistent and allow for replication.
 
 """
-import random
+
 from collections import OrderedDict
 
 
@@ -170,12 +170,12 @@ class StagedActivation(BaseScheduler):
         """ Executes all the stages for all agents. """
         agent_keys = list(self._agents.keys())
         if self.shuffle:
-            random.shuffle(agent_keys)
+            self.model.random.shuffle(agent_keys)
         for stage in self.stage_list:
             for agent_key in agent_keys:
                 getattr(self._agents[agent_key], stage)()  # Run stage
             if self.shuffle_between_stages:
-                random.shuffle(agent_keys)
+                self.model.random.random.shuffle(agent_keys)
             self.time += self.stage_time
 
         self.steps += 1

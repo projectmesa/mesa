@@ -1,5 +1,3 @@
-import random
-
 from mesa import Model, Agent
 from mesa.time import RandomActivation
 from mesa.space import SingleGrid
@@ -67,8 +65,8 @@ class Schelling(Model):
         for cell in self.grid.coord_iter():
             x = cell[1]
             y = cell[2]
-            if random.random() < self.density:
-                if random.random() < self.minority_pc:
+            if self.random.random() < self.density:
+                if self.random.random() < self.minority_pc:
                     agent_type = 1
                 else:
                     agent_type = 0

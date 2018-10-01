@@ -9,8 +9,6 @@ Center for Connected Learning and Computer-Based Modeling,
 Northwestern University, Evanston, IL.
 '''
 
-import random
-
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
@@ -55,11 +53,11 @@ class SugarscapeCg(Model):
 
         # Create agent:
         for i in range(self.initial_population):
-            x = random.randrange(self.width)
-            y = random.randrange(self.height)
-            sugar = random.randrange(6, 25)
-            metabolism = random.randrange(2, 4)
-            vision = random.randrange(1, 6)
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
+            sugar = self.random.randrange(6, 25)
+            metabolism = self.random.randrange(2, 4)
+            vision = self.random.randrange(1, 6)
             ssa = SsAgent((x, y), self, False, sugar, metabolism, vision)
             self.grid.place_agent(ssa, (x, y))
             self.schedule.add(ssa)
