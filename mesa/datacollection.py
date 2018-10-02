@@ -68,7 +68,7 @@ class DataCollector:
             {"energy": "energy"}
         or like this:
             {"energy": lambda a: a.energy}
-         
+
         The tables arg accepts a dictionary mapping names of tables to lists of
         columns. For example, if we want to allow agents to write their age
         when they are destroyed (to keep track of lifespans), it might look
@@ -80,7 +80,7 @@ class DataCollector:
             agent_reporters: Dictionary of reporter names and attributes/funcs.
             tables: Dictionary of table names to lists of column names.
 
-        Notes: 
+        Notes:
             If you want to pickle your model you must not use lambda functions.
             If your model includes a large number of agents, you should *only*
             use attribute names for the agent reporter, it will be much faster.
