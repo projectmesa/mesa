@@ -1,5 +1,5 @@
 from mesa.visualization.ModularVisualization import ModularServer
-from .model import MoneyModel
+from .model import BoltzmannWealthModel
 
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.modules import ChartModule
@@ -23,7 +23,7 @@ def agent_portrayal(agent):
 
 grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
 chart = ChartModule([
-    {"Label": "Gini", "Color": "Black"}],
+    {"Label": "Gini", "Color": "#0000FF"}],
     data_collector_name='datacollector'
 )
 
@@ -34,5 +34,5 @@ model_params = {
     "height": 10
 }
 
-server = ModularServer(MoneyModel, [grid, chart], "Money Model", model_params)
+server = ModularServer(BoltzmannWealthModel, [grid, chart], "Money Model", model_params)
 server.port = 8521

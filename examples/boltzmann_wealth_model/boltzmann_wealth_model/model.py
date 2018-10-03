@@ -1,5 +1,3 @@
-import random
-
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
@@ -14,7 +12,7 @@ def compute_gini(model):
     return (1 + (1 / N) - 2 * B)
 
 
-class MoneyModel(Model):
+class BoltzmannWealthModel(Model):
     """A simple model of an economy where agents exchange currency at random.
 
     All the agents begin with one unit of currency, and each time step can give
@@ -22,27 +20,30 @@ class MoneyModel(Model):
     highly skewed distribution of wealth.
     """
 
-    def __init__(self, N, width, height):
+    def __init__(self, N=100, width=10, height=10):
         self.num_agents = N
-        self.running = True
         self.grid = MultiGrid(height, width, True)
         self.schedule = RandomActivation(self)
         self.datacollector = DataCollector(
             model_reporters={"Gini": compute_gini},
-            agent_reporters={"Wealth": lambda a: a.wealth}
+            agent_reporters={"Wealth": "wealth"}
         )
         # Create agents
         for i in range(self.num_agents):
             a = MoneyAgent(i, self)
             self.schedule.add(a)
             # Add the agent to a random grid cell
-            x = random.randrange(self.grid.width)
-            y = random.randrange(self.grid.height)
+            x = self.random.randrange(self.grid.width)
+            y = self.random.randrange(self.grid.height)
             self.grid.place_agent(a, (x, y))
 
-    def step(self):
+        self.running = True
         self.datacollector.collect(self)
+
+    def step(self):
         self.schedule.step()
+        # collect data
+        self.datacollector.collect(self)
 
     def run_model(self, n):
         for i in range(n):
@@ -59,13 +60,13 @@ class MoneyAgent(Agent):
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=False
         )
-        new_position = random.choice(possible_steps)
+        new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
 
     def give_money(self):
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         if len(cellmates) > 1:
-            other = random.choice(cellmates)
+            other = self.random.choice(cellmates)
             other.wealth += 1
             self.wealth -= 1
 
