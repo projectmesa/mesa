@@ -1,5 +1,5 @@
 Mesa Overview
-=========================================
+=============
 
 Mesa is a modular framework for building, analyzing and visualizing agent-based models.
 
@@ -7,7 +7,7 @@ Mesa is a modular framework for building, analyzing and visualizing agent-based 
 
 
 Mesa Modules
--------------------
+------------
 
 Mesa is modular, meaning that its modeling, analysis and visualization components are kept separate but intended to work together. The modules are grouped into three categories:
 
@@ -29,7 +29,6 @@ The skeleton of a model might look like this:
 
 .. code:: python
 
-    import random
     from mesa import Agent, Model
     from mesa.time import RandomActivation
     from mesa.space import MultiGrid
@@ -49,7 +48,7 @@ The skeleton of a model might look like this:
             for i in range(n_agents):
                 a = MyAgent(i, self)
                 self.schedule.add(a)
-                coords = (random.randrange(0, 10), random.randrange(0, 10))
+                coords = (self.random.randrange(0, 10), self.random.randrange(0, 10))
                 self.grid.place_agent(a, coords)
 
         def step(self):
@@ -64,6 +63,7 @@ If you instantiate a model and run it for one step, like so:
 
 You should see agents 0-4, activated in random order. See the `tutorial <tutorials/intro_tutorial.html>`_ or API documentation for more detail on how to add model functionality.
 
+To bootstrap a new model install mesa and run ``mesa startproject``
 
 Analysis modules
 ~~~~~~~~~~~~~~~~

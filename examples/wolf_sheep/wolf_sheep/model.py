@@ -9,8 +9,6 @@ Replication of the model found in NetLogo:
     Northwestern University, Evanston, IL.
 '''
 
-import random
-
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
@@ -19,7 +17,7 @@ from wolf_sheep.agents import Sheep, Wolf, GrassPatch
 from wolf_sheep.schedule import RandomActivationByBreed
 
 
-class WolfSheepPredation(Model):
+class WolfSheep(Model):
     '''
     Wolf-Sheep Predation Model
     '''
@@ -62,7 +60,7 @@ class WolfSheepPredation(Model):
                                  once it is eaten
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
         '''
-
+        super().__init__()
         # Set parameters
         self.height = height
         self.width = width
@@ -83,19 +81,19 @@ class WolfSheepPredation(Model):
 
         # Create sheep:
         for i in range(self.initial_sheep):
-            x = random.randrange(self.width)
-            y = random.randrange(self.height)
-            energy = random.randrange(2 * self.sheep_gain_from_food)
-            sheep = Sheep((x, y), self, True, energy)
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
+            energy = self.random.randrange(2 * self.sheep_gain_from_food)
+            sheep = Sheep(self.next_id(), (x, y), self, True, energy)
             self.grid.place_agent(sheep, (x, y))
             self.schedule.add(sheep)
 
         # Create wolves
         for i in range(self.initial_wolves):
-            x = random.randrange(self.width)
-            y = random.randrange(self.height)
-            energy = random.randrange(2 * self.wolf_gain_from_food)
-            wolf = Wolf((x, y), self, True, energy)
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
+            energy = self.random.randrange(2 * self.wolf_gain_from_food)
+            wolf = Wolf(self.next_id(), (x, y), self, True, energy)
             self.grid.place_agent(wolf, (x, y))
             self.schedule.add(wolf)
 
@@ -103,21 +101,24 @@ class WolfSheepPredation(Model):
         if self.grass:
             for agent, x, y in self.grid.coord_iter():
 
-                fully_grown = random.choice([True, False])
+                fully_grown = self.random.choice([True, False])
 
                 if fully_grown:
                     countdown = self.grass_regrowth_time
                 else:
-                    countdown = random.randrange(self.grass_regrowth_time)
+                    countdown = self.random.randrange(self.grass_regrowth_time)
 
-                patch = GrassPatch((x, y), self, fully_grown, countdown)
+                patch = GrassPatch(self.next_id(), (x, y), self,
+                                   fully_grown, countdown)
                 self.grid.place_agent(patch, (x, y))
                 self.schedule.add(patch)
 
         self.running = True
+        self.datacollector.collect(self)
 
     def step(self):
         self.schedule.step()
+        # collect data
         self.datacollector.collect(self)
         if self.verbose:
             print([self.schedule.time,

@@ -6,11 +6,27 @@ from setuptools import setup, find_packages
 from codecs import open
 
 requires = [
-    'tornado',
+    'click',
+    'cookiecutter',
+    'jupyter',
+    'networkx',
     'numpy',
     'pandas',
+    'tornado >= 4.2, < 5.0.0',
     'tqdm',
 ]
+
+extras_require = {
+    'dev': [
+        'coverage',
+        'flake8',
+        'nose',
+        'sphinx',
+    ],
+    'docs': [
+        'sphinx',
+    ]
+}
 
 version = ''
 with open('mesa/__init__.py', 'r') as fd:
@@ -30,9 +46,11 @@ setup(
     url='https://github.com/projectmesa/mesa',
     packages=find_packages(),
     package_data={'mesa': ['visualization/templates/*.html', 'visualization/templates/css/*',
-                           'visualization/templates/fonts/*', 'visualization/templates/js/*']},
+                           'visualization/templates/fonts/*', 'visualization/templates/js/*'],
+                  'cookiecutter-mesa': ['cookiecutter-mesa/*']},
     include_package_data=True,
     install_requires=requires,
+    extras_require=extras_require,
     keywords='agent based modeling model ABM simulation multi-agent',
     license='Apache 2.0',
     zip_safe=False,
@@ -47,4 +65,8 @@ setup(
         'Development Status :: 3 - Alpha',
         'Natural Language :: English',
     ],
+    entry_points='''
+        [console_scripts]
+        mesa=mesa.main:cli
+    ''',
 )

@@ -1,4 +1,3 @@
-import random
 import math
 from enum import Enum
 import networkx as nx
@@ -31,11 +30,11 @@ def number_resistant(model):
     return number_state(model, State.RESISTANT)
 
 
-class VirusModel(Model):
+class VirusOnNetwork(Model):
     """A virus model with some number of agents"""
 
-    def __init__(self, num_nodes, avg_node_degree, initial_outbreak_size, virus_spread_chance, virus_check_frequency,
-                 recovery_chance, gain_resistance_chance):
+    def __init__(self, num_nodes=10, avg_node_degree=3, initial_outbreak_size=1, virus_spread_chance=0.4,
+                virus_check_frequency=0.4, recovery_chance=0.3, gain_resistance_chance=0.5):
 
         self.num_nodes = num_nodes
         prob = avg_node_degree / self.num_nodes
@@ -47,7 +46,6 @@ class VirusModel(Model):
         self.virus_check_frequency = virus_check_frequency
         self.recovery_chance = recovery_chance
         self.gain_resistance_chance = gain_resistance_chance
-        self.running = True
 
         self.datacollector = DataCollector({"Infected": number_infected,
                                             "Susceptible": number_susceptible,
@@ -62,9 +60,12 @@ class VirusModel(Model):
             self.grid.place_agent(a, node)
 
         # Infect some nodes
-        infected_nodes = random.sample(self.G.nodes(), self.initial_outbreak_size)
+        infected_nodes = self.random.sample(self.G.nodes(), self.initial_outbreak_size)
         for a in self.grid.get_cell_list_contents(infected_nodes):
             a.state = State.INFECTED
+
+        self.running = True
+        self.datacollector.collect(self)
 
     def resistant_susceptible_ratio(self):
         try:
@@ -74,6 +75,7 @@ class VirusModel(Model):
 
     def step(self):
         self.schedule.step()
+        # collect data
         self.datacollector.collect(self)
 
     def run_model(self, n):
@@ -98,16 +100,16 @@ class VirusAgent(Agent):
         susceptible_neighbors = [agent for agent in self.model.grid.get_cell_list_contents(neighbors_nodes) if
                                  agent.state is State.SUSCEPTIBLE]
         for a in susceptible_neighbors:
-            if random.random() < self.virus_spread_chance:
+            if self.random.random() < self.virus_spread_chance:
                 a.state = State.INFECTED
 
     def try_gain_resistance(self):
-        if random.random() < self.gain_resistance_chance:
+        if self.random.random() < self.gain_resistance_chance:
             self.state = State.RESISTANT
 
     def try_remove_infection(self):
         # Try to remove
-        if random.random() < self.recovery_chance:
+        if self.random.random() < self.recovery_chance:
             # Success
             self.state = State.SUSCEPTIBLE
             self.try_gain_resistance()
@@ -116,7 +118,7 @@ class VirusAgent(Agent):
             self.state = State.INFECTED
 
     def try_check_situation(self):
-        if random.random() < self.virus_check_frequency:
+        if self.random.random() < self.virus_check_frequency:
             # Checking...
             if self.state is State.INFECTED:
                 self.try_remove_infection()

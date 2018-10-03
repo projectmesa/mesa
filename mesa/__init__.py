@@ -14,6 +14,6 @@ from .agent import Agent
 __all__ = ["Model", "Agent"]
 
 __title__ = 'mesa'
-__version__ = '0.8.2'
+__version__ = '0.8.4'
 __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright %s Project Mesa Team' % datetime.date.today().year

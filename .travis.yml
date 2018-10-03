@@ -7,12 +7,11 @@ cache:
 python:
   - "3.4"
   - "3.5"
-  # - "3.6"
+  - "3.6"
   # - "nightly"
 install:
-  - pip install -r requirements.txt
   - pip install coveralls
-  - pip install .
+  - pip install .[dev]
 script:
   # * E501 - line length limit
   # * E123 - indentation on data structures

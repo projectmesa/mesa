@@ -1,5 +1,3 @@
-import random
-
 from mesa import Model, Agent
 from mesa.time import RandomActivation
 from mesa.space import SingleGrid
@@ -36,12 +34,12 @@ class SchellingAgent(Agent):
             self.model.happy += 1
 
 
-class SchellingModel(Model):
+class Schelling(Model):
     '''
     Model class for the Schelling segregation model.
     '''
 
-    def __init__(self, height, width, density, minority_pc, homophily):
+    def __init__(self, height=20, width=20, density=0.8, minority_pc=0.2, homophily=3):
         '''
         '''
 
@@ -56,11 +54,9 @@ class SchellingModel(Model):
 
         self.happy = 0
         self.datacollector = DataCollector(
-            {"happy": lambda m: m.happy},  # Model-level count of happy agents
+            {"happy": "happy"},  # Model-level count of happy agents
             # For testing purposes, agent's individual x and y
             {"x": lambda a: a.pos[0], "y": lambda a: a.pos[1]})
-
-        self.running = True
 
         # Set up agents
         # We use a grid iterator that returns
@@ -69,8 +65,8 @@ class SchellingModel(Model):
         for cell in self.grid.coord_iter():
             x = cell[1]
             y = cell[2]
-            if random.random() < self.density:
-                if random.random() < self.minority_pc:
+            if self.random.random() < self.density:
+                if self.random.random() < self.minority_pc:
                     agent_type = 1
                 else:
                     agent_type = 0
@@ -79,12 +75,16 @@ class SchellingModel(Model):
                 self.grid.position_agent(agent, (x, y))
                 self.schedule.add(agent)
 
+        self.running = True
+        self.datacollector.collect(self)
+
     def step(self):
         '''
         Run one step of the model. If All agents are happy, halt the model.
         '''
         self.happy = 0  # Reset counter of happy agents
         self.schedule.step()
+        # collect data
         self.datacollector.collect(self)
 
         if self.happy == self.schedule.get_agent_count():

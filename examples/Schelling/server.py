@@ -6,7 +6,7 @@ from mesa.visualization.TextVisualization import (
     TextData, TextGrid, TextVisualization
 )
 
-from model import SchellingModel
+from model import Schelling
 
 
 class SchellingTextVisualization(TextVisualization):
@@ -56,9 +56,11 @@ def schelling_draw(agent):
     portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
 
     if agent.type == 0:
-        portrayal["Color"] = "Red"
+        portrayal["Color"] = ["#FF0000", "#FF9999"]
+        portrayal["stroke_color"] = "#00FF00"
     else:
-        portrayal["Color"] = "Blue"
+        portrayal["Color"] = ["#0000FF", "#9999FF"]
+        portrayal["stroke_color"] = "#000000"
     return portrayal
 
 
@@ -74,7 +76,7 @@ model_params = {
     "homophily": UserSettableParameter("slider", "Homophily", 3, 0, 8, 1)
 }
 
-server = ModularServer(SchellingModel,
+server = ModularServer(Schelling,
                        [canvas_element, happy_element, happy_chart],
                        "Schelling", model_params)
 server.launch()

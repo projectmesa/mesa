@@ -2,8 +2,6 @@
 Generalized behavior for random walking, one grid cell at a time.
 '''
 
-import random
-
 from mesa import Agent
 
 
@@ -21,7 +19,7 @@ class RandomWalker(Agent):
     y = None
     moore = True
 
-    def __init__(self, pos, model, moore=True):
+    def __init__(self, unique_id, pos, model, moore=True):
         '''
         grid: The MultiGrid object in which the agent lives.
         x: The agent's current x coordinate
@@ -29,7 +27,7 @@ class RandomWalker(Agent):
         moore: If True, may move in all 8 directions.
                 Otherwise, only up, down, left, right.
         '''
-        super().__init__(pos, model)
+        super().__init__(unique_id, model)
         self.pos = pos
         self.moore = moore
 
@@ -39,6 +37,6 @@ class RandomWalker(Agent):
         '''
         # Pick the next cell from the adjacent cells.
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
-        next_move = random.choice(next_moves)
+        next_move = self.random.choice(next_moves)
         # Now move:
         self.model.grid.move_agent(self, next_move)

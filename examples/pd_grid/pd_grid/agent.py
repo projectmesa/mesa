@@ -1,5 +1,3 @@
-import random
-
 from mesa import Agent
 
 
@@ -22,7 +20,7 @@ class PDAgent(Agent):
         if starting_move:
             self.move = starting_move
         else:
-            self.move = random.choice(["C", "D"])
+            self.move = self.random.choice(["C", "D"])
         self.next_move = None
 
     @property

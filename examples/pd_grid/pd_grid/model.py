@@ -6,7 +6,7 @@ from mesa.datacollection import DataCollector
 from .agent import PDAgent
 
 
-class PDModel(Model):
+class PdGrid(Model):
     ''' Model class for iterated, spatial prisoner's dilemma model. '''
 
     schedule_types = {"Sequential": BaseScheduler,
@@ -21,7 +21,7 @@ class PDModel(Model):
               ("D", "C"): 1.6,
               ("D", "D"): 0}
 
-    def __init__(self, height, width, schedule_type, payoffs=None):
+    def __init__(self, height=50, width=50, schedule_type="Random", payoffs=None, seed=None):
         '''
         Create a new Spatial Prisoners' Dilemma Model.
 
@@ -31,7 +31,6 @@ class PDModel(Model):
                            Determines the agent activation regime.
             payoffs: (optional) Dictionary of (move, neighbor_move) payoffs.
         '''
-        self.running = True
         self.grid = SingleGrid(height, width, torus=True)
         self.schedule_type = schedule_type
         self.schedule = self.schedule_types[self.schedule_type](self)
@@ -48,9 +47,13 @@ class PDModel(Model):
             lambda m: len([a for a in m.schedule.agents if a.move == "C"])
         })
 
-    def step(self):
+        self.running = True
         self.datacollector.collect(self)
+
+    def step(self):
         self.schedule.step()
+        # collect data
+        self.datacollector.collect(self)
 
     def run(self, n):
         ''' Run the model for n steps. '''

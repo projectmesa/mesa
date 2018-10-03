@@ -2,8 +2,6 @@
 The model - a 2D lattice where agents live and have an opinion
 """
 
-
-import random
 from collections import Counter
 
 from mesa import Model, Agent
@@ -56,7 +54,7 @@ class ColorCell(Agent):
             if neighbor[1] == polled_opinions[0][1]:
                 tied_opinions.append(neighbor)
 
-        self._next_state = random.choice(tied_opinions)[0]
+        self._next_state = self.random.choice(tied_opinions)[0]
 
     def advance(self):
         '''
@@ -65,12 +63,12 @@ class ColorCell(Agent):
         self._state = self._next_state
 
 
-class ColorPatchModel(Model):
+class ColorPatches(Model):
     '''
     represents a 2D lattice where agents live
     '''
 
-    def __init__(self, width, height):
+    def __init__(self, width=20, height=20):
         '''
         Create a 2D lattice with strict borders where agents live
         The agents next state is first determined before updating the grid
@@ -86,7 +84,7 @@ class ColorPatchModel(Model):
         # replaced content with _ to appease linter
         for (_, row, col) in self._grid.coord_iter():
             cell = ColorCell((row, col), self,
-                             ColorCell.OPINIONS[random.randrange(0, 16)])
+                             ColorCell.OPINIONS[self.random.randrange(0, 16)])
             self._grid.place_agent(cell, (row, col))
             self._schedule.add(cell)
 
@@ -117,7 +115,7 @@ class ColorPatchModel(Model):
              79             for x in range(model.grid.width):
              80                 cell_objects = model.grid.get_cell_list_contents([(x, y)])
 
-        AttributeError: 'ColorPatchModel' object has no attribute 'grid'
+        AttributeError: 'ColorPatches' object has no attribute 'grid'
         """
         return self._grid
 

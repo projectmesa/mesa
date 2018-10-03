@@ -16,10 +16,10 @@ To install the dependencies use pip and the requirements.txt in this directory. 
 
 ## How to Run
 
-To run the model interactively, run ``run.py`` in this directory. e.g.
+To run the model interactively, run ``mesa runserver`` in this directory. e.g.
 
 ```
-    $ python run.py
+    $ mesa runserver
 ```
 
 Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
@@ -31,7 +31,7 @@ To view and run some example model analyses, launch the IPython Notebook and ope
 * ``run.py``: Launches a model visualization server.
 * ``schelling.py``: Contains the agent class, and the overall model class.
 * ``server.py``: Defines classes for visualizing the model in the browser via Mesa's modular server, and instantiates a visualization server.
-* ``analysis.ipybn``: Notebook demonstrating how to run experiments and parameter sweeps on the model.
+* ``analysis.ipynb``: Notebook demonstrating how to run experiments and parameter sweeps on the model.
 
 ## Further Reading
 
