@@ -94,28 +94,27 @@ var initGUI = function () {
     };
 
     var addSliderInput = function (param, obj) {
-        var domID = param + '_id';
-        var tooltipID = domID + "_tooltip";
-        sidebar.append([
-            "<div class='input-group input-group-lg'>",
-            "<p>",
-            "<a id='" + tooltipID + "' data-toggle='tooltip' data-placement='top' class='label label-primary'>",
-            obj.name,
-            "</a>",
-            "</p>",
-            "<input id='" + domID + "' type='text' />",
-            "</div>"
-        ].join(''));
-
-        // Enable tooltip label
-        if (obj.description !== null) {
-            $(tooltipID).tooltip({
-                title: obj.description,
-                placement: 'right'
-            });
-        }
         for (i = 0; i < simulations; i++) {
-            console.log(i)
+            var domID = param + '_sim_' + i;
+            var tooltipID = domID + "_tooltip";
+            sidebar.append([
+                "<div class='input-group input-group-lg'>",
+                "<p>",
+                "<a id='" + tooltipID + "' data-toggle='tooltip' data-placement='top' class='label label-primary'>",
+                obj.name,
+                "</a>",
+                "</p>",
+                "<input id='" + domID + "' type='text' />",
+                "</div>"
+            ].join(''));
+
+            // Enable tooltip label
+            if (obj.description !== null) {
+                $(tooltipID).tooltip({
+                    title: obj.description,
+                    placement: 'right'
+                });
+            }
             // Setup slider
             var sliderInput = $("#" + domID);
             sliderInput.slider({
@@ -130,8 +129,7 @@ var initGUI = function () {
             });
 
             sliderInput.on('change', function () {
-                console.log(this)
-                onSubmitCallback(param, Number(this.value), 0);
+                onSubmitCallback(param, Number(this.value), Number(this.id[this.id.length - 1]));
             })
         }
     };
