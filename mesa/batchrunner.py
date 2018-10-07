@@ -51,7 +51,7 @@ class BatchRunner:
     entire DataCollector object.
 
     """
-    def __init__(self, model_cls, variable_parameters=None,
+    def __init__(self, model_cls, variable_parameters={},
             fixed_parameters=None, iterations=1, max_steps=1000,
             model_reporters=None, agent_reporters=None, display_progress=True):
         """ Create a new BatchRunner for a given model with the given
@@ -116,39 +116,42 @@ class BatchRunner:
 
     def run_all(self):
         """ Run the model at all parameter combinations and store results. """
-        param_names, param_ranges = zip(*self.variable_parameters.items())
+        run_count = count()
         total_iterations = self.iterations
-        for param_range in param_ranges:
-            total_iterations *= len(param_range)
-        with tqdm(total_iterations, disable=not self.display_progress) as pbar:
-            for param_values in product(*param_ranges):
-                kwargs = dict(zip(param_names, param_values))
-                kwargs.update(self.fixed_parameters)
 
-                for i in range(self.iterations):
-                    kwargscopy = copy.deepcopy(kwargs)
-                    model_vars, agent_vars = self._run_single_model(param_values, i, kwargscopy)
+        if len(self.variable_parameters.keys()) > 0:
+            param_names, param_ranges = zip(*self.variable_parameters.items())
+            for param_range in param_ranges:
+                total_iterations *= len(param_range)
 
-                    if self.model_reporters:
-                        for model_key, model_val in model_vars.items():
-                            self.model_vars[model_key] = model_val
-                    if self.agent_reporters:
-                        for agent_key, reports in agent_vars.items():
-                            self.agent_vars[agent_key] = reports
+            with tqdm(total_iterations, disable=not self.display_progress) as pbar:
+                for param_values in product(*param_ranges):
+                    kwargs = dict(zip(param_names, param_values))
+                    kwargs.update(self.fixed_parameters)
+
+                    for _ in range(self.iterations):
+                        self.run_iteration(kwargs, param_values, run_count)
+                        pbar.update()
+        else:
+            kwargs = self.fixed_parameters
+            param_values = None
+
+            with tqdm(total_iterations, disable=not self.display_progress) as pbar:
+                for _ in range(self.iterations):
+                    self.run_iteration(kwargs, param_values, run_count)
                     pbar.update()
 
-    def _run_single_model(self, param_values, run_count, kwargs):
-        """
-        Run a single model for one parameter combination and one iteration,
-        returning a tuple of the model vars and agent vars.
-        """
-        model = self.model_cls(**kwargs)
-
-        # run the model
+    def run_iteration(self, kwargs, param_values, run_count):
+        kwargscopy = copy.deepcopy(kwargs)
+        model = self.model_cls(**kwargscopy)
         self.run_model(model)
 
         # Collect and store results:
-        model_key = param_values + (run_count, )
+        if param_values is not None:
+            model_key = param_values + (next(run_count),)
+        else:
+            model_key = (next(run_count),)
+
         if self.model_reporters:
             self.model_vars[model_key] = self.collect_model_vars(model)
         if self.agent_reporters:
@@ -156,8 +159,6 @@ class BatchRunner:
             for agent_id, reports in agent_vars.items():
                 agent_key = model_key + (agent_id,)
                 self.agent_vars[agent_key] = reports
-
-        return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None))
 
     def run_model(self, model):
         """ Run a model object to completion, or until reaching max steps.
