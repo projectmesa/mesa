@@ -51,7 +51,7 @@ class BatchRunner:
     entire DataCollector object.
 
     """
-    def __init__(self, model_cls, variable_parameters={},
+    def __init__(self, model_cls, variable_parameters=None,
             fixed_parameters=None, iterations=1, max_steps=1000,
             model_reporters=None, agent_reporters=None, display_progress=True):
         """ Create a new BatchRunner for a given model with the given
@@ -86,6 +86,8 @@ class BatchRunner:
 
         """
         self.model_cls = model_cls
+        if variable_parameters is None:
+            variable_parameters = {}
         self.variable_parameters = self._process_parameters(variable_parameters)
         self.fixed_parameters = fixed_parameters or {}
         self._include_fixed = len(self.fixed_parameters.keys()) > 0
@@ -130,7 +132,7 @@ class BatchRunner:
                     kwargs.update(self.fixed_parameters)
 
                     for _ in range(self.iterations):
-                        self.run_iteration(kwargs, param_values, run_count)
+                        self.run_iteration(kwargs, param_values, next(run_count))
                         pbar.update()
         else:
             kwargs = self.fixed_parameters
@@ -148,9 +150,10 @@ class BatchRunner:
 
         # Collect and store results:
         if param_values is not None:
-            model_key = param_values + (next(run_count),)
+            #model_key = param_values + (next(run_count),)
+            model_key = param_values + (run_count,)
         else:
-            model_key = (next(run_count),)
+            model_key = (run_count,)
 
         if self.model_reporters:
             self.model_vars[model_key] = self.collect_model_vars(model)
@@ -159,6 +162,7 @@ class BatchRunner:
             for agent_id, reports in agent_vars.items():
                 agent_key = model_key + (agent_id,)
                 self.agent_vars[agent_key] = reports
+        return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None))
 
     def run_model(self, model):
         """ Run a model object to completion, or until reaching max steps.
@@ -274,10 +278,10 @@ class BatchRunnerMP(BatchRunner):
 
                 # make a new process and add it to the queue
                 for i in range(self.iterations):
-                    job_queue.append(self.pool.uimap(self._run_single_model,
+                    job_queue.append(self.pool.uimap(self.run_iteration,
+                                                     (kwargs,),
                                                      (param_values,),
-                                                     (next(run_count),),
-                                                     (kwargs,)))
+                                                     (next(run_count),)))
 
             # empty the queue
             results = []
