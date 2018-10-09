@@ -116,31 +116,45 @@ class BatchRunner:
             raise VariableParameterError(bad_names)
         return params
 
-    def run_all(self):
-        """ Run the model at all parameter combinations and store results. """
-        run_count = count()
-        total_iterations = self.iterations
+    def _make_model_args(self):
+        """Prepare all combinations of parameter values for `run_all`
 
-        if len(self.variable_parameters.keys()) > 0:
+        Returns:
+            Tuple with the form:
+            (total_iterations, all_kwargs, all_param_values)
+        """
+        total_iterations = self.iterations
+        all_kwargs = []
+        all_param_values = []
+
+        if len(self.variable_parameters) > 0:
             param_names, param_ranges = zip(*self.variable_parameters.items())
             for param_range in param_ranges:
                 total_iterations *= len(param_range)
 
-            with tqdm(total_iterations, disable=not self.display_progress) as pbar:
-                for param_values in product(*param_ranges):
-                    kwargs = dict(zip(param_names, param_values))
-                    kwargs.update(self.fixed_parameters)
-
-                    for _ in range(self.iterations):
-                        self.run_iteration(kwargs, param_values, next(run_count))
-                        pbar.update()
+            for param_values in product(*param_ranges):
+                kwargs = dict(zip(param_names, param_values))
+                kwargs.update(self.fixed_parameters)
+                all_kwargs.append(kwargs)
+                all_param_values.append(param_values)
         else:
             kwargs = self.fixed_parameters
             param_values = None
+            all_kwargs = [kwargs]
+            all_param_values = [None]
 
-            with tqdm(total_iterations, disable=not self.display_progress) as pbar:
+        return (total_iterations, all_kwargs, all_param_values)
+
+    def run_all(self):
+        """ Run the model at all parameter combinations and store results. """
+        run_count = count()
+        total_iterations, all_kwargs, all_param_values = self._make_model_args()
+
+        with tqdm(total_iterations, disable=not self.display_progress) as pbar:
+            for i, kwargs in enumerate(all_kwargs):
+                param_values = all_param_values[i]
                 for _ in range(self.iterations):
-                    self.run_iteration(kwargs, param_values, run_count)
+                    self.run_iteration(kwargs, param_values, next(run_count))
                     pbar.update()
 
     def run_iteration(self, kwargs, param_values, run_count):
@@ -150,7 +164,6 @@ class BatchRunner:
 
         # Collect and store results:
         if param_values is not None:
-            #model_key = param_values + (next(run_count),)
             model_key = param_values + (run_count,)
         else:
             model_key = (run_count,)
@@ -236,8 +249,8 @@ class BatchRunner:
 
 class MPSupport(Exception):
     def __str__(self):
-        return "The BatchRunnerMP depends on pathos, which is either not installed, " \
-               "or the path can not be found. "
+        return ("BatchRunnerMP depends on pathos, which is either not "
+               "installed, or the path can not be found. ")
 
 
 class BatchRunnerMP(BatchRunner):
@@ -263,26 +276,20 @@ class BatchRunnerMP(BatchRunner):
         Run the model at all parameter combinations and store results,
         overrides run_all from BatchRunner.
         """
+        run_count = count()
+        total_iterations, all_kwargs, all_param_values = self._make_model_args()
+
         # register the process pool and init a queue
         job_queue = []
-
-        param_names, param_ranges = zip(*self.variable_parameters.items())
-        run_count = count()
-        total_iterations = self.iterations
-        for param_range in param_ranges:
-            total_iterations *= len(param_range)
         with tqdm(total_iterations, disable=not self.display_progress) as pbar:
-            for param_values in product(*param_ranges):
-                kwargs = dict(zip(param_names, param_values))
-                kwargs.update(self.fixed_parameters)
-
-                # make a new process and add it to the queue
-                for i in range(self.iterations):
+            for i, kwargs in enumerate(all_kwargs):
+                param_values = all_param_values[i]
+                for _ in range(self.iterations):
+                    # make a new process and add it to the queue
                     job_queue.append(self.pool.uimap(self.run_iteration,
                                                      (kwargs,),
                                                      (param_values,),
                                                      (next(run_count),)))
-
             # empty the queue
             results = []
             for task in job_queue:
