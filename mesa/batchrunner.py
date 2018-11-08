@@ -6,7 +6,6 @@ Batchrunner
 A single class to manage a batch run or parameter sweep of a given model.
 
 """
-import collections
 import copy
 from itertools import product, count
 import pandas as pd
@@ -19,18 +18,9 @@ else:
     pathos_support = True
 
 
-def combinations(*items):
-    """
-    A small fix to handle dictionary type parameters in cartesian product.
-    """
-    prepared = [(item,) if isinstance(item, collections.Mapping) else item
-                for item in items]
-    yield from (param for param in product(*prepared))
-
-
 class VariableParameterError(TypeError):
     MESSAGE = ('variable_parameters must map a name to a sequence of values. '
-            'These parameters were given with non-sequence values: {}')
+               'These parameters were given with non-sequence values: {}')
 
     def __init__(self, bad_names):
         self.bad_names = bad_names
@@ -52,15 +42,16 @@ class BatchRunner:
 
     """
     def __init__(self, model_cls, variable_parameters=None,
-            fixed_parameters=None, iterations=1, max_steps=1000,
-            model_reporters=None, agent_reporters=None, display_progress=True):
+                 fixed_parameters=None, iterations=1, max_steps=1000,
+                 model_reporters=None, agent_reporters=None,
+                 display_progress=True):
         """ Create a new BatchRunner for a given model with the given
         parameters.
 
         Args:
             model_cls: The class of model to batch-run.
             variable_parameters: Dictionary of parameters to lists of values.
-                The model will be run with every combination of these paramters.
+                The model will be run with every combo of these paramters.
                 For example, given variable_parameters of
                     {"param_1": range(5),
                      "param_2": [1, 5, 10]}
@@ -73,10 +64,10 @@ class BatchRunner:
                 as a kwarg.
             iterations: The total number of times to run the model for each
                 combination of parameters.
-            max_steps: The upper limit of steps above which each run will be halted
+            max_steps: Upper limit of steps above which each run will be halted
                 if it hasn't halted on its own.
-            model_reporters: The dictionary of variables to collect on each run at
-                the end, with variable names mapped to a function to collect
+            model_reporters: The dictionary of variables to collect on each run
+                at the end, with variable names mapped to a function to collect
                 them. For example:
                     {"agent_count": lambda m: m.schedule.get_agent_count()}
             agent_reporters: Like model_reporters, but each variable is now
@@ -86,7 +77,8 @@ class BatchRunner:
 
         """
         self.model_cls = model_cls
-        self.variable_parameters = self._process_parameters(variable_parameters)
+        self.variable_parameters = self._process_parameters(
+            variable_parameters)
         self.fixed_parameters = fixed_parameters or {}
         self._include_fixed = len(self.fixed_parameters.keys()) > 0
         self.iterations = iterations
@@ -107,8 +99,7 @@ class BatchRunner:
         params = copy.deepcopy(params)
         bad_names = []
         for name, values in params.items():
-            if (isinstance(values, str) or
-                    not hasattr(values, "__iter__")):
+            if (isinstance(values, str) or not hasattr(values, "__iter__")):
                 bad_names.append(name)
         if bad_names:
             raise VariableParameterError(bad_names)
@@ -127,7 +118,8 @@ class BatchRunner:
 
                 for i in range(self.iterations):
                     kwargscopy = copy.deepcopy(kwargs)
-                    model_vars, agent_vars = self._run_single_model(param_values, i, kwargscopy)
+                    model_vars, agent_vars = self._run_single_model(
+                        param_values, i, kwargscopy)
 
                     if self.model_reporters:
                         for model_key, model_val in model_vars.items():
@@ -157,7 +149,8 @@ class BatchRunner:
                 agent_key = model_key + (agent_id,)
                 self.agent_vars[agent_key] = reports
 
-        return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None))
+        return (getattr(self, "model_vars", None),
+                getattr(self, "agent_vars", None))
 
     def run_model(self, model):
         """ Run a model object to completion, or until reaching max steps.
@@ -199,7 +192,7 @@ class BatchRunner:
 
         """
         return self._prepare_report_table(self.agent_vars,
-                extra_cols=['AgentId'])
+                                          extra_cols=['AgentId'])
 
     def _prepare_report_table(self, vars_dict, extra_cols=None):
         """
@@ -231,8 +224,8 @@ class BatchRunner:
 
 class MPSupport(Exception):
     def __str__(self):
-        return "The BatchRunnerMP depends on pathos, which is either not installed, " \
-               "or the path can not be found. "
+        return """The BatchRunnerMP depends on pathos, which is either
+                not installed or the path can not be found."""
 
 
 class BatchRunnerMP(BatchRunner):
