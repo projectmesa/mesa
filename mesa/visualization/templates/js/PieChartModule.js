@@ -1,7 +1,8 @@
+'use strict';
 //Note: This pie chart is based off the example found here:
 //https://bl.ocks.org/mbostock/3887235
 
-var PieChartModule = function(fields, canvas_width, canvas_height, x_padding) {
+var PieChartModule = function(fields, canvas_width, canvas_height) {
     // Create the tag:
     var svg_tag = "<svg width='" + canvas_width + "' height='" + canvas_height + "' ";
     svg_tag += "style='border:1px dotted'></svg>";
@@ -15,7 +16,8 @@ var PieChartModule = function(fields, canvas_width, canvas_height, x_padding) {
     $("#elements").append(legend_element);
 
     var legend = d3.select(legend_element)
-        .attr("style","display:block;width:500px;text-align:center")
+        .attr("style","display:block;width:"
+            + canvas_width + "px;text-align:center")
 
     legend.selectAll("span")
         .data(fields)
@@ -29,10 +31,10 @@ var PieChartModule = function(fields, canvas_width, canvas_height, x_padding) {
 
     // setup the d3 svg selection
     var svg = d3.select(svg_element)
-    width = +svg.attr("width")
-    height = +svg.attr("height")
-    maxRadius = Math.min(width, height) / 2
-    g = svg.append("g").attr("transform",
+    var width = +svg.attr("width")
+    var height = +svg.attr("height")
+    var maxRadius = Math.min(width, height) / 2
+    var g = svg.append("g").attr("transform",
     "translate(" + width / 2 + "," + height / 2 + ")");
 
     // Create the base chart and helper methods
@@ -70,7 +72,6 @@ var PieChartModule = function(fields, canvas_width, canvas_height, x_padding) {
                 / (Math.PI * 2)).toFixed(2)
                 + "%"
             })
-            .attr("void",function(d){console.log(d);return 0})
     }
 
     this.reset = function() {
