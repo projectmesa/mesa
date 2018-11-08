@@ -38,7 +38,7 @@ other agent locations, represented by circles:
 
 */
 
-var HexVisualization = function(width, height, gridWidth, gridHeight, context) {
+var HexVisualization = function(width, height, gridWidth, gridHeight, context, interactionHandler) {
 
 	// Find cell size:
 	var cellWidth = Math.floor(width / gridWidth);
@@ -48,14 +48,23 @@ var HexVisualization = function(width, height, gridWidth, gridHeight, context) {
         // cell of the grid.
 	var maxR = Math.min(cellHeight, cellWidth)/2 - 1;
 
+	// Configure the interaction handler to use a hex coordinate mapper
+  (interactionHandler) ? interactionHandler.setCoordinateMapper("hex") : null;
+
 	// Calls the appropriate shape(agent)
         this.drawLayer = function(portrayalLayer) {
+	        // Re-initialize the lookup table
+	        (interactionHandler) ? interactionHandler.mouseoverLookupTable.init() : null
 		for (var i in portrayalLayer) {
 			var p = portrayalLayer[i];
                         // Does the inversion of y positioning because of html5
                         // canvas y direction is from top to bottom. But we
                         // normally keep y-axis in plots from bottom to top.
                         p.y = gridHeight - p.y - 1;
+
+                        // if a handler exists, add coordinates for the portrayalLayer index
+                        (interactionHandler) ? interactionHandler.mouseoverLookupTable.set(p.x, p.y, i) : null;
+
 			if (p.Shape == "hex")
 				this.drawHex(p.x, p.y, p.r, p.Color, p.Filled, p.text, p.text_color);
 			else if (p.Shape == "circle")
@@ -65,6 +74,8 @@ var HexVisualization = function(width, height, gridWidth, gridHeight, context) {
 			else
 				this.drawCustomImage(p.Shape, p.x, p.y, p.scale, p.text, p.text_color)
 		}
+		// if a handler exists, update its mouse listeners with the new data
+		(interactionHandler) ? interactionHandler.updateMouseListeners(portrayalLayer): null;
 	};
 
 	// DRAWING METHODS
@@ -202,21 +213,31 @@ var HexVisualization = function(width, height, gridWidth, gridHeight, context) {
         Draw Grid lines in the full gird
         */
 
-	this.drawGridLines = function() {
+	this.drawGridLines = function(strokeColor) {
 		context.beginPath();
-		context.strokeStyle = "#eee";
-		maxX = cellWidth * gridWidth;
-		maxY = cellHeight * gridHeight;
+		context.strokeStyle = strokeColor || "#eee";
+		const maxX = cellWidth * gridWidth;
+		const maxY = cellHeight * gridHeight;
 
-		// Draw horizontal grid lines:
-		for(var y=0; y<=maxY; y+=cellHeight) {
-			context.moveTo(0, y+0.5);
-			context.lineTo(maxX, y+0.5);
-		}
+		const xStep = cellWidth * 0.33;
+		const yStep = cellHeight * 0.5;
 
-		for(var x=0; x<=maxX; x+= cellWidth) {
-			context.moveTo(x+0.5, 0);
-			context.lineTo(x+0.5, maxY);
+		var yStart = yStep;
+		for(var x=cellWidth/2; x<=maxX; x+= cellWidth) {
+				for(var y=yStart; y<=maxY; y+=cellHeight) {
+
+					context.moveTo(x - 2 * xStep, y);
+
+					context.lineTo(x - xStep, y - yStep)
+					context.lineTo(x + xStep, y - yStep)
+					context.lineTo(x + 2 * xStep, y )
+
+					context.lineTo(x + xStep, y + yStep )
+					context.lineTo(x - xStep, y + yStep )
+					context.lineTo(x - 2 * xStep, y)
+
+				}
+			yStart = (yStart === 0) ? yStep: 0;
 		}
 
 		context.stroke();
