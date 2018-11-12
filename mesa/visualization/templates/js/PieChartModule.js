@@ -39,20 +39,16 @@ var PieChartModule = function(fields, canvas_width, canvas_height) {
 
     // Create the base chart and helper methods
     var color = d3.scaleOrdinal(fields.map(field => field["Color"]));
-
     var pie = d3.pie()
         .sort(null)
         .value(function(d) { return d; });
-
     var path = d3.arc()
         .outerRadius(maxRadius)
         .innerRadius(0);
-
     var arc = g.selectAll(".arc")
-        .data(pie(fields.map(field => 0)))
+        .data(pie(fields.map(field => 0)))//Initialize the pie chart with dummy data
         .enter().append("g")
         .attr("class", "arc")
-
 
     arc.append("path")
         .attr("d", path)

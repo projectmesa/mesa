@@ -33,106 +33,113 @@ var BarChartModule = function(fields, canvas_width, canvas_height, sorting, sort
     var margin = {top: 20, right: 20, bottom: 30, left: 40}
     var width = +svg.attr("width") - margin.left - margin.right
     var height = +svg.attr("height") - margin.top - margin.bottom
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // Setup the bar chart
-
     var x0 = d3.scaleBand()
-    .rangeRound([0, width])
-    .paddingInner(0.1);
-
+        .rangeRound([0, width])
+        .paddingInner(0.1);
     var x1 = d3.scaleBand()
         .padding(0.05);
-
     var y = d3.scaleLinear()
         .rangeRound([height, 0]);
-
     var colorScale = d3.scaleOrdinal(fields.map(field => field["Color"]));
-
     var keys = fields.map(f => f['Label'])
-
     var chart = g.append("g")
-
     var axisBottom = g.append("g")
+    var axisLeft = g.append("g")
 
     axisBottom
         .attr("class", "axis")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x0));
 
-    var axisLeft = g.append("g")
-
     axisLeft
         .attr("class", "axis")
         .call(d3.axisLeft(y).ticks(null, "s"))
 
 
+    //Render step
     this.render = function(data){
-
+        //Axes
         var minY = d3.min(data, function(d){
             return d3.min(keys, function(key){
                 return d[key];
             })
         })
+        if(minY > 0){
+            minY = 0;
+        }
         var maxY = d3.max(data, function(d){
             return d3.max(keys, function(key){
                 return d[key];
             })
         })
 
-
         x0.domain(data.map(function(d, i) { return i }));
         x1.domain(keys).rangeRound([0, x0.bandwidth()]);
         y.domain([minY,maxY]).nice();
 
-        chart
-            .selectAll("g")
-            .data(data)
-            .enter().append("g")
-                .attr("transform", function(d, i) { return "translate(" + x0(i) + ",0)"; })
-            .selectAll("rect")
-            .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
-            .enter()
-                .append("rect")
-                    .attr("x", function(d) { return x1(d.key); })
-                    .attr("y", function(d) { return y(d.value); })
-                    .attr("width", x1.bandwidth())
-                    .attr("height", function(d) { return height - y(d.value); })
-                    .attr("fill", function(d) { return colorScale(d.key); })
-                .append("title")
-                    .text(function (d) { return d.value; })
-            .exit()
+        if(data.length > 1){
+            axisBottom
+                .attr("transform", "translate(0," + y(0) + ")")
+                .call(d3.axisBottom(x0))
+        }
 
-
-        axisBottom.call(d3.axisBottom(x0))
         axisLeft.call(d3.axisLeft(y).ticks(null, "s"))
 
+        //Sorting
         if(sorting != "none"){
             if(sorting == "ascending"){
                 data.sort((a, b) => b[sortingKey] - a[sortingKey]);
             } else if (sorting == "decending") {
                 data.sort((a, b) => a[sortingKey] - b[sortingKey]);
             }
-
         }
 
-        // Update step
+        //Draw Chart
+        var rects = chart
+            .selectAll("g")
+            .data(data)
+            .enter().append("g")
+                .attr("transform", function(d, i) { return "translate(" + x0(i) + ",0)"; })
+            .selectAll("rect")
+
+        rects
+            .data(function(d) {
+                return keys.map(function(key) {
+                    return {key: key, value: d[key]};
+                });
+            })
+            .enter()
+                .append("rect")
+                    .attr("x", function(d) { return x1(d.key); })
+                    .attr("width", x1.bandwidth())
+                    .attr("fill", function(d) { return colorScale(d.key); })
+                    .attr("y", function(d) { return Math.min(y(d.value),y(0)); })
+                    .attr("height", function(d) { return Math.abs(y(d.value) - y(0)); })
+                .append("title")
+                    .text(function (d) { return d.value; })
+
+        //Update chart
         chart
-            .attr("class", "bar_chart")
             .selectAll("g")
             .data(data)
             .selectAll("rect")
-            .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
-                .attr("y", function(d) { return y(d.value); })
-                .attr("height", function(d) { return height - y(d.value); })
-                .select("title")
-                    .text(function (d) { return d.value; })
+            .data(function(d) {
+                return keys.map(function(key) {
+                    return {key: key, value: d[key]};
+                });
+            })
+            .attr("y", function(d) { return Math.min(y(d.value),y(0)); })
+            .attr("height", function(d) { return Math.abs(y(d.value) - y(0)); })
+            .select("title")
+                .text(function (d) { return d.value; })
 
 
     }
 
     this.reset = function(){
-
         chart.selectAll("g")
             .data([])
             .exit().remove();
