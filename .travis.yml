@@ -13,6 +13,7 @@ install:
   - pip install coveralls
   - pip install .[dev]
 script:
+  - export PYTHONPATH=$PYTHONPATH:$(pwd)
   # * E501 - line length limit
   # * E123 - indentation on data structures
   # * W504 - line break after binary operator
