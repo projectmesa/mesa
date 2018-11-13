@@ -23,12 +23,12 @@ No contribution is too small. Although, contributions can be too big, so let's d
 - `Clone your repository`_ from Github to your machine.
 - Create a new branch in your fork: ``git checkout -b BRANCH_NAME``
 - Install an editable version with developer requirements locally: ``pip install -e .[dev]``
-- Edit the code. Save. 
+- Edit the code. Save.
 - Git add the new files and files with changes: ``git add FILE_NAME``
 - Git commit your changes with a meaningful message: ``git commit -m "Fixes X issue."``
 - If implementing a new feature, include some documentation in docs folder.
 - Make sure that your submission passes the `Travis build`_. See "Testing and Standards below" to be able to run these locally.
-- Push your changed to your fork on Github: ``git push origin NAME_OF_BRANCH``. 
+- Push your changed to your fork on Github: ``git push origin NAME_OF_BRANCH``.
 - `Create a pull request`_.
 - Describe the change w/ ticket number(s) that the code fixes.
 
@@ -70,7 +70,7 @@ With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_.
 
 .. code-block:: bash
 
-    flake8 . --ignore=F403,E501,E123,E128 --exclude=docs,build
+    flake8 . --ignore=F403,E501,E123,E128,W504 --exclude=docs,build
 
 .. _`PEP8` : https://www.python.org/dev/peps/pep-0008
 .. _`Google Style Guide` : https://google.github.io/styleguide/pyguide.html
