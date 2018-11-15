@@ -2,17 +2,22 @@
 // Note: This grouped bar chart is based off the example found here:
 // https://bl.ocks.org/mbostock/3887051
 var BarChartModule = function(fields, canvas_width, canvas_height, sorting, sortingKey) {
+    // Create the overall chart div
+    var chart_div_tag = "<div class='bar chart' width='" + canvas_width + "'></div>";
+    var chart_div = $(chart_div_tag)[0];
+    $("#elements").append(chart_div);
+
     // Create the tag:
     var svg_tag = "<svg width='" + canvas_width + "' height='" + canvas_height + "' ";
     svg_tag += "style='border:1px dotted'></svg>";
     // Append it to #elements
     var svg_element = $(svg_tag)[0];
-    $("#elements").append(svg_element);
+    chart_div.append(svg_element);
 
     //create the legend
     var legend_tag = "<div class='legend'></div>";
     var legend_element = $(legend_tag)[0];
-    $("#elements").append(legend_element);
+    chart_div.append(legend_element);
 
     var legend = d3.select(legend_element)
         .attr("style","display:block;width:"
