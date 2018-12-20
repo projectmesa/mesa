@@ -1,6 +1,7 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
+from mesa.visualization.modules import VegaVisualization
 
 from mesa.visualization.TextVisualization import (
     TextData, TextGrid, TextVisualization
@@ -8,6 +9,9 @@ from mesa.visualization.TextVisualization import (
 
 from model import Schelling
 
+
+grid_spec = VegaVisualization.GridSpec(size=(20, 20))
+vega_viz = VegaVisualization.VegaVisualization(grid_spec)
 
 class SchellingTextVisualization(TextVisualization):
     '''
@@ -77,6 +81,6 @@ model_params = {
 }
 
 server = ModularServer(Schelling,
-                       [canvas_element, happy_element, happy_chart],
+                       [vega_viz],
                        "Schelling", model_params)
 server.launch()

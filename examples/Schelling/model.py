@@ -56,7 +56,7 @@ class Schelling(Model):
         self.datacollector = DataCollector(
             {"happy": "happy"},  # Model-level count of happy agents
             # For testing purposes, agent's individual x and y
-            {"x": lambda a: a.pos[0], "y": lambda a: a.pos[1]})
+            {"x": lambda a: a.pos[0], "y": lambda a: a.pos[1], "atype": "type"})
 
         # Set up agents
         # We use a grid iterator that returns
