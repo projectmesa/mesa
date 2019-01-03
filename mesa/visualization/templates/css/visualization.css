@@ -12,3 +12,15 @@ div.tooltip {
     border-radius: 8px;
     pointer-events: none;
 }
+
+canvas.world-grid {
+    position:absolute; 
+    top:50px; 
+    left:15px;
+    border:1px dotted    
+}
+
+canvas.chartjs-render-monitor {
+    position: absolute;
+    top: 560px;
+}

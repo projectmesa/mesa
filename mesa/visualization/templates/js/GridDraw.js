@@ -38,7 +38,7 @@ other agent locations, represented by circles:
 
 */
 
-var GridVisualization = function(width, height, gridWidth, gridHeight, context) {
+var GridVisualization = function(width, height, gridWidth, gridHeight, context, interactionHandler) {
 
         // Find cell size:
         var cellWidth = Math.floor(width / gridWidth);
@@ -50,6 +50,9 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
 
         // Calls the appropriate shape(agent)
         this.drawLayer = function(portrayalLayer) {
+                // Re-initialize the lookup table
+                (interactionHandler) ? interactionHandler.mouseoverLookupTable.init() : null
+
                 for (var i in portrayalLayer) {
                         var p = portrayalLayer[i];
 
@@ -62,6 +65,9 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
                         // canvas y direction is from top to bottom. But we
                         // normally keep y-axis in plots from bottom to top.
                         p.y = gridHeight - p.y - 1;
+
+                        // if a handler exists, add coordinates for the portrayalLayer index
+                        (interactionHandler) ? interactionHandler.mouseoverLookupTable.set(p.x, p.y, i) : null;
 
                         // If the stroke color is not defined, then the first color in the colors array is the stroke color.
                         if (!p.stroke_color)
@@ -76,6 +82,8 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context) 
                         else
                                 this.drawCustomImage(p.Shape, p.x, p.y, p.scale, p.text, p.text_color)
                 }
+                // if a handler exists, update its mouse listeners with the new data
+                (interactionHandler) ? interactionHandler.updateMouseListeners(portrayalLayer): null;
         };
 
         // DRAWING METHODS

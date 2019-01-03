@@ -20,7 +20,8 @@ extras_require = {
     'dev': [
         'coverage',
         'flake8',
-        'nose',
+        'pytest',
+        'pytest-cov',
         'sphinx',
     ],
     'docs': [

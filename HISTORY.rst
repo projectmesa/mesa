@@ -3,6 +3,38 @@
 Release History
 ---------------
 
+0.8.5 (2018-11-26) Kearny
++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Added mouse interactionHandler to close #457, fixed hexgrid drawLines #465
+* Run examples as part of the tests #529, #564
+* Add a github issue template. #560
+* Changes nose to pytest #561
+* Update and clean up cookiecutter layout #563
+* Updating setup to move requirements to setup.py. #566
+* Fixes #570 removed and updated stale comments in space.py #571
+* Adding model random number generator with __new__ #572
+* Faster agent attribute collection #576
+* Update install command to be edible #578
+* Adding read the docs yml. #579
+* agents can be removed and added during Scheduler.step() #584
+* Adding a description to bank_reserves. #587
+* F8 cleanup #600
+
+**Fixes**
+
+* Fixes #543 (User Settable Parameters fail to work for non-string datatype #543) #544
+* Adding missing requirements files to examples. #550
+* Fixes issue #548, flockers visualization not showing up #548
+* updated BatchRunner (throwing error when passing in agent reporters) #556
+* Removing version numbers and fixing flake8 issues. #562
+* Fix issue #548 (Flockers visualization is not working) #566
+* Fixes code formatting in readmes. #577
+* Batchrunner.fix (BatchRunner's "variable parameters" is not strictly optional) #596
+
+
 0.8.4 (2018-06-17) Jerome
 +++++++++++++++++++++++++++++++++++++++++++
 
@@ -13,19 +45,19 @@ Release History
 * Multiprocessing BatchRunner with pathos #506
 * Schedule.agent.dict - Implement tracking the agents in the scheduler via OrderedDict #510
 * Use click and add `mesa run` #522
-* Add a code of conduct #530 
+* Add a code of conduct #530
 
 **Fixes**
 
-* iter_neighborhood() now gives correct neighborhoods for both von Neumann and Moore #459 
+* iter_neighborhood() now gives correct neighborhoods for both von Neumann and Moore #459
 * fix typo #461
-* Flockers update & subsequent "F" versus "f" fix on Unix/Mac - #477, #518, #525, #500 
+* Flockers update & subsequent "F" versus "f" fix on Unix/Mac - #477, #518, #525, #500
 * Fixing date on release. #453
 * Batchrunner fixes: properly initialize models with correct parameters during subsequent runs. #486
 * Tornado Version Bug Fixes (upgrading #489, downgrading #497, adding to setup.py #527)
-* fix minor flake8 issues #519 
+* fix minor flake8 issues #519
 * align required dependencies between setup.py and requirements.txt #523, #528, #535
-* Fixes #499 grid size issue. #539 
+* Fixes #499 grid size issue. #539
 
 
 0.8.3 (2018-01-14) Hayden

@@ -39,7 +39,7 @@ class CanvasHexGrid(VisualizationElement):
         template: "canvas_module.html" stores the module's HTML template.
 
     """
-    package_includes = ["HexDraw.js", "CanvasHexModule.js"]
+    package_includes = ["HexDraw.js", "CanvasHexModule.js", "InteractionHandler.js"]
     portrayal_method = None  # Portrayal function
     canvas_width = 500
     canvas_height = 500
