@@ -2,6 +2,8 @@ import unittest
 
 import networkx as nx
 import numpy as np
+import pytest
+from random import choice, randint
 
 from mesa.space import ContinuousSpace
 from mesa.space import SingleGrid
@@ -411,6 +413,202 @@ class TestMultipleNetworkGrid(unittest.TestCase):
         assert self.space.get_all_cell_contents() == [self.agents[0],
                                                       self.agents[1],
                                                       self.agents[2]]
+
+
+class TestNetworkXWrappers(unittest.TestCase):
+    GRAPH_SIZE = 10
+    SINGLE_NODE = "node"
+    MULTI_NODE = [i for i in range(1, 10)]
+
+    def test_init(self):
+        """
+        Create a grid with a graph generator and populate with Mock Agents.
+        """
+        self.space = NetworkGrid(generator="Graph")
+        assert nx.is_isomorphic(self.space.G, nx.Graph())
+
+        self.space = NetworkGrid(generator="scale_free_graph", args=(10))
+        assert self.space.G.number_of_nodes() == 10
+        for node in list(self.space.G.nodes):
+            assert type(self.space.G.nodes[node]['agent']) is list
+
+    def setUp(self):
+        """
+        Create a test network grid and populate with Mock Agents
+        """
+        G = nx.complete_graph(TestNetworkXWrappers.GRAPH_SIZE)
+        self.space = NetworkGrid(G)
+        self.agents = []
+        for i, pos in enumerate(TEST_AGENTS_NETWORK_MULTIPLE):
+            a = MockAgent(i, None)
+            self.agents.append(a)
+            self.space.place_agent(a, pos)
+
+    def test_add_nodes(self):
+        """
+        Check that nodes are added to the graph and initialised
+        """
+        # Add 1 node
+        self.space.add_nodes(TestNetworkXWrappers.SINGLE_NODE)
+        assert TestNetworkXWrappers.SINGLE_NODE in self.space.G
+        assert type(self.space.G.nodes[TestNetworkXWrappers.SINGLE_NODE]['agent']) is list
+
+        # Add multiple nodes
+        self.space.add_nodes(TestNetworkXWrappers.MULTI_NODE)
+        for node in TestNetworkXWrappers.MULTI_NODE:
+            assert node in self.space.G
+            assert type(self.space.G.nodes[node]['agent']) is list
+
+    def test_add_edges(self):
+        """
+        Check that edges are added, existing nodes agents aren't overwritten
+        """
+        # Add one edge
+        node1 = choice(list(self.space.G.nodes()))
+        node2 = choice(list(self.space.G.nodes()))
+        a = MockAgent(len(self.agents) + 1, None)
+        self.agents.append(a)
+        self.space.place_agent(a, node1)
+        edge = (node1, node2)
+        self.space.add_edges(edge)
+        assert self.space.G.has_edge(node1, node2)
+        assert a in self.space.G.nodes[node1]['agent']
+
+        # Add multiple edges
+        nodes = []
+        for i in range(0, 4):
+            unique = False
+            while not unique:
+                chosen = choice(list(self.space.G.nodes()))
+                if chosen not in nodes:
+                    nodes.append(chosen)
+                    unique = True
+        a = MockAgent(len(self.agents) + 1, None)
+        self.space.place_agent(a, nodes[0])
+
+        self.space.add_edges([(nodes[0], nodes[1]), (nodes[2], nodes[3])])
+        assert self.space.G.has_edge(nodes[0], nodes[1])
+        assert self.space.G.has_edge(nodes[2], nodes[3])
+        assert a in self.space.G.nodes[nodes[0]]['agent']
+
+        # Try to add not an edge
+        with pytest.raises(Exception):
+            self.space.add_edges("strings are not a valid edge")
+
+    def test_remove_nodes(self):
+        """
+        Check that node is removed and all agents on node are returned for
+        redeployment
+        """
+        # remove one node
+        node = choice(list(self.space.G.nodes()))
+        a = MockAgent(len(self.agents) + 1, None)
+        self.agents.append(a)
+        self.space.place_agent(a, node)
+        ays = self.space.G.nodes[node]['agent']
+        agents = self.space.remove_nodes(node)
+        assert agents == ays
+        assert node not in self.space.G
+
+        # Remove multiple nodes
+        nodes = [choice(list(self.space.G.nodes())),
+                 choice(list(self.space.G.nodes()))]
+        a = [MockAgent(len(self.agents) + 1, None), MockAgent(len(self.agents) + 2, None)]
+        self.agents.extend(a)
+        ays = []
+        for i, ag in enumerate(a):
+            self.space.place_agent(ag, nodes[i])
+            ays.extend(self.space.G.nodes[nodes[i]]['agent'])
+        agents = self.space.remove_nodes(nodes)
+        assert len(agents) == len(ays)
+        for ag in a:
+            assert ag not in self.space.G
+
+        # Try to remove a node that isn't there
+        present = True
+        while present:
+            chosen = randint(0, 1000)
+            if chosen not in self.space.G:
+                present = False
+                with pytest.raises(Exception):
+                    agents = self.space.remove_nodes(chosen)
+
+    def test_remove_edges(self):
+        """
+        Check that correct edges are removed
+        """
+        # remove one edge
+        edge = (choice(list(self.space.G.nodes())),
+                choice(list(self.space.G.nodes())))
+        if not self.space.G.has_edge(*edge):
+            self.space.add_edges(edge)
+        self.space.remove_edges(edge)
+        assert self.space.G.has_edge(*edge) is False
+
+        # remove multiple edges
+        edges = []
+        for i in range(0, 4):
+            edges.append((choice(list(self.space.G.nodes())),
+                choice(list(self.space.G.nodes()))))
+            if not self.space.G.has_edge(*edges[i]):
+                self.space.add_edges(edges[i])
+
+        self.space.remove_edges(edges)
+        for edge in edges:
+            assert self.space.G.has_edge(*edge) is False
+
+        # try to remove not an edge
+        edge = "strings are not valid edges"
+        with pytest.raises(Exception):
+            self.space.remove_edges(edge)
+
+    def test_label_edge(self):
+        """
+        Check that edge is labeled and apply different values to label
+        """
+        # label an edge
+        edge = (choice(list(self.space.G.nodes())),
+                choice(list(self.space.G.nodes())))
+        self.space.add_edges(edge)
+        self.space.label_edge(edge, "some attribute")
+        assert "some attribute" in self.space.G[edge[0]][edge[1]]
+
+        # label an edge with a value
+        edge = (choice(list(self.space.G.nodes())),
+                choice(list(self.space.G.nodes())))
+        self.space.add_edges(edge)
+        self.space.label_edge(edge, "attribute", "value")
+        assert "attribute" in self.space.G[edge[0]][edge[1]]
+        assert self.space.G[edge[0]][edge[1]]['attribute'] == "value"
+
+        # try to label an edge that's not there
+        edge = (choice(list(self.space.G.nodes())),
+                choice(list(self.space.G.nodes())))
+        if self.space.G.has_edge(*edge):
+            self.space.remove_edges(edge)
+        with pytest.raises(Exception):
+            self.space.label_edge(edge)
+
+    def test_label_node(self):
+        """
+        Check that node is labeled and apply different values
+        """
+        # label a node
+        node = choice(list(self.space.G.nodes()))
+        self.space.label_node(node, "attribute")
+        assert "attribute" in self.space.G.nodes[node]
+
+        # label a node with a value
+        node = choice(list(self.space.G.nodes()))
+        self.space.label_node(node, "attribute", "value")
+        assert "attribute" in self.space.G.nodes[node]
+        assert self.space.G.nodes[node]["attribute"] == "value"
+
+        # try to label a node that isn't there
+        node = choice(list(self.space.G.nodes()))
+        self.space.remove_nodes(node)
+        with pytest.raises(Exception):
+            self.space.label_node(node, "attribute")
 
 
 if __name__ == '__main__':

@@ -15,7 +15,7 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
-
+import networkx
 import numpy as np
 
 
@@ -778,11 +778,120 @@ class ContinuousSpace:
 
 class NetworkGrid:
     """ Network Grid where each node contains zero or more agents. """
+    def __init__(self, G=None, generator="Graph", args=()):
+        """Default values create empty graph"""
+        if G is not None:
+            self.G = G
+        elif generator is not None:
+            if type(args) is tuple:
+                self.G = getattr(networkx, generator)(*args)
+            else:
+                self.G = getattr(networkx, generator)(args)
 
-    def __init__(self, G):
-        self.G = G
         for node_id in self.G.nodes:
-            G.nodes[node_id]['agent'] = list()
+            self.G.nodes[node_id]['agent'] = list()
+
+    def add_nodes(self, node_ids):
+        """adds nodes to the graph"""
+        if type(node_ids) is list:
+            for node_id in node_ids:
+                self._add_node(node_id)
+        else:
+            self._add_node(node_ids)
+
+    def _add_edge(self, edge):
+        """adds an edge to the graph and initialises the agent list in any new nodes"""
+        self.G.add_edge(*edge)
+        for node_id in edge:
+            if type(self.G.nodes[node_id]['agent']) is not list:
+                self.G.nodes[node_id]['agent'] = list()
+
+    def _add_node(self, node_id):
+        """adds a node to the graph and initialises the agent list"""
+
+        self.G.add_node(node_id)
+        self.G.nodes[node_id]['agent'] = list()
+
+    def _remove_node(self, node_id):
+        """removes a node from the graph and returns a list of it's agents"""
+        if self.G.has_node(node_id):
+            agents = self.G.nodes[node_id]['agent']
+            self.G.remove_node(node_id)
+            return agents
+        else:
+            raise ValueError(str(node_id) + ": node not found")
+
+    def _remove_edge(self, node_ids):
+        """removes an edge between nodes on the graph"""
+
+        if self.G.has_edge(*node_ids):
+            self.G.remove_edge(*node_ids)
+        else:
+            raise ValueError(str(node_ids) + ": edge not found")
+
+    def add_edges(self, node_ids):
+        """adds edges between each node_ids tuple to the graph"""
+
+        if type(node_ids) is list:
+            for edge in node_ids:
+                if type(edge) is not tuple:
+                    raise TypeError("node_ids must be a list of tuples or a tuple")
+                else:
+                    self._add_edge(edge)
+
+        elif type(node_ids) is tuple:
+            self._add_edge(node_ids)
+        else:
+            raise TypeError("node_ids must be a list of tuples or a tuple")
+
+    def remove_nodes(self, node_ids):
+        """removes the nodes from node_ids from the graph and returns their agents"""
+        agents = []
+        if type(node_ids) is list:
+            for node_id in node_ids:
+                agents.extend(self._remove_node(node_id))
+        else:
+            agents.extend(self._remove_node(node_ids))
+
+        return agents
+
+    def remove_edges(self, node_ids):
+        """removes the edges between the node_ids tuples from the graph"""
+        if type(node_ids) is list:
+            for edge in node_ids:
+                if type(edge) is not tuple:
+                    raise TypeError("node_ids must be a list of tuples or a tuple")
+                else:
+                    if self.G.has_edge(*edge):
+                        self._remove_edge(edge)
+                    else:
+                        raise ValueError("Edge not found")
+
+        elif type(node_ids) is tuple:
+            if self.G.has_edge(*node_ids):
+                self._remove_edge(node_ids)
+            else:
+                raise ValueError("Edge not found")
+        else:
+            raise TypeError("node_ids must be a list of tuples or a tuple")
+
+    def label_edge(self, node_ids, label, value=""):
+        """Adds a label to an edge which can also have a value (i.e. for weight, colour)"""
+
+        if type(node_ids) is not tuple:
+            raise TypeError("node_ids must be a tuple")
+        else:
+            if self.G.has_edge(*node_ids):
+                self.G[node_ids[0]][node_ids[1]][label] = value
+            else:
+                raise ValueError("edge not found")
+
+    def label_node(self, node_id, label, value=""):
+        """Adds a label to a node which can also have a value"""
+        if(node_id in self.G):
+            self.G.node[node_id][label] = value
+        else:
+            raise ValueError("node not found")
 
     def place_agent(self, agent, node_id):
         """ Place a agent in a node. """
