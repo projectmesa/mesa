@@ -4,12 +4,18 @@ var CanvasHexModule = function(canvas_width, canvas_height, grid_width, grid_hei
 
 	// Create the tag with absolute positioning :
 	var canvas_tag = `<canvas width="${canvas_width}" height="${canvas_height}" class="world-grid"/>`
+
+	var parent_div_tag = '<div style="height:' + canvas_height + 'px;" class="world-grid-parent"></div>'
+
 	// Append it to body:
 	var canvas = $(canvas_tag)[0];
 	var interaction_canvas = $(canvas_tag)[0];
+	var parent = $(parent_div_tag)[0];
+
 	//$("body").append(canvas);
-	$("#elements").append(canvas);
-	$("#elements").append(interaction_canvas);
+	$("#elements").append(parent);
+	parent.append(canvas);
+	parent.append(interaction_canvas);
 
 	// Create the context and the drawing controller:
 	var context = canvas.getContext("2d");
