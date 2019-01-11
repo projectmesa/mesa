@@ -20,7 +20,7 @@ extras_require = {
     'dev': [
         'coverage',
         'flake8',
-        'pytest',
+        'pytest >= 3.6',
         'pytest-cov',
         'sphinx',
     ],
