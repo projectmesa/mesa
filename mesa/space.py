@@ -376,7 +376,7 @@ class SingleGrid(Grid):
         """
         super().__init__(width, height, torus)
 
-    def position_agent(self, agent, pos=("random, random")):
+    def position_agent(self, agent, pos=("random", "random")):
         """ Position an agent on the grid.
         This is used when first placing agents! Use 'move_to_empty()'
         when you want agents to jump to an empty cell.
@@ -385,6 +385,7 @@ class SingleGrid(Grid):
         we get a random position.
         Ensure this random position is not occupied (in Grid).
         """
+
         if len(self.empties) == 0:
             raise Exception("ERROR: Grid full")
 
