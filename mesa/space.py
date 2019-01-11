@@ -349,7 +349,7 @@ class Grid:
               "`random` instead of the model-level random-number generator. "
               "Consider replacing it with having a model or agent object "
               "explicitly pick one of the grid's list of empty cells."),
-            DeprecationWarning)
+             DeprecationWarning)
 
         if self.exists_empty_cells():
             pos = random.choice(self.empties)
@@ -376,7 +376,7 @@ class SingleGrid(Grid):
         """
         super().__init__(width, height, torus)
 
-    def position_agent(self, agent, x="random", y="random"):
+    def position_agent(self, agent, pos=("random, random")):
         """ Position an agent on the grid.
         This is used when first placing agents! Use 'move_to_empty()'
         when you want agents to jump to an empty cell.
@@ -384,14 +384,23 @@ class SingleGrid(Grid):
         If x or y are positive, they are used, but if "random",
         we get a random position.
         Ensure this random position is not occupied (in Grid).
-
         """
-        if x == "random" or y == "random":
-            if len(self.empties) == 0:
-                raise Exception("ERROR: Grid full")
+        if len(self.empties) == 0:
+            raise Exception("ERROR: Grid full")
+
+        if pos[0] == "random" and pos[1] == "random":
             coords = agent.random.choice(self.empties)
+        elif pos[0] == "random":
+            cells_with_same_y = set([(x, pos[1]) for x in range(self.width)])
+            candidates = set(self.empties).intersection(cells_with_same_y)
+            coords = agent.random.choice(list(candidates))
+        elif pos[1] == "random":
+            cells_with_same_x = set([(pos[0], y) for y in range(self.height)])
+            candidates = set(self.empties).intersection(cells_with_same_x)
+            coords = agent.random.choice(list(candidates))
         else:
-            coords = (x, y)
+            coords = pos
+
         agent.pos = coords
         self._place_agent(coords, agent)
 
@@ -652,7 +661,8 @@ class ContinuousSpace:
         if self._agent_points is None:
             self._agent_points = np.array([pos])
         else:
-            self._agent_points = np.append(self._agent_points, np.array([pos]), axis=0)
+            self._agent_points = np.append(
+                self._agent_points, np.array([pos]), axis=0)
         self._index_to_agent[self._agent_points.shape[0] - 1] = agent
         self._agent_to_index[agent] = self._agent_points.shape[0] - 1
         agent.pos = pos
@@ -710,7 +720,8 @@ class ContinuousSpace:
         dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
 
         idxs, = np.where(dists <= radius ** 2)
-        neighbors = [self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0]
+        neighbors = [self._index_to_agent[x]
+                     for x in idxs if include_center or dists[x] > 0]
         return neighbors
 
     def get_heading(self, pos_1, pos_2):
@@ -827,5 +838,6 @@ class NetworkGrid:
         return list(self.iter_cell_list_contents(self.G))
 
     def iter_cell_list_contents(self, cell_list):
-        list_of_lists = [self.G.node[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
+        list_of_lists = [self.G.node[node_id]['agent']
+                         for node_id in cell_list if not self.is_cell_empty(node_id)]
         return [item for sublist in list_of_lists for item in sublist]
