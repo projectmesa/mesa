@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 from codecs import open
 
 requires = [
-    'altair'
+    'altair',
     'click',
     'cookiecutter',
     'jupyter',
@@ -21,7 +21,8 @@ extras_require = {
     'dev': [
         'coverage',
         'flake8',
-        'nose',
+        'pytest >= 3.6',
+        'pytest-cov',
         'sphinx',
     ],
     'docs': [
