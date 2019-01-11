@@ -322,7 +322,7 @@ class Grid:
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
         x, y = pos
-        self.grid[x][y] = None
+        self.grid[x][y] = self.default_val()
         self.empties.append(pos)
 
     def is_cell_empty(self, pos):
@@ -349,7 +349,7 @@ class Grid:
               "`random` instead of the model-level random-number generator. "
               "Consider replacing it with having a model or agent object "
               "explicitly pick one of the grid's list of empty cells."),
-            DeprecationWarning)
+             DeprecationWarning)
 
         if self.exists_empty_cells():
             pos = random.choice(self.empties)
@@ -652,7 +652,8 @@ class ContinuousSpace:
         if self._agent_points is None:
             self._agent_points = np.array([pos])
         else:
-            self._agent_points = np.append(self._agent_points, np.array([pos]), axis=0)
+            self._agent_points = np.append(
+                self._agent_points, np.array([pos]), axis=0)
         self._index_to_agent[self._agent_points.shape[0] - 1] = agent
         self._agent_to_index[agent] = self._agent_points.shape[0] - 1
         agent.pos = pos
@@ -710,7 +711,8 @@ class ContinuousSpace:
         dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
 
         idxs, = np.where(dists <= radius ** 2)
-        neighbors = [self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0]
+        neighbors = [self._index_to_agent[x]
+                     for x in idxs if include_center or dists[x] > 0]
         return neighbors
 
     def get_heading(self, pos_1, pos_2):
@@ -827,5 +829,6 @@ class NetworkGrid:
         return list(self.iter_cell_list_contents(self.G))
 
     def iter_cell_list_contents(self, cell_list):
-        list_of_lists = [self.G.node[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
+        list_of_lists = [self.G.node[node_id]['agent']
+                         for node_id in cell_list if not self.is_cell_empty(node_id)]
         return [item for sublist in list_of_lists for item in sublist]
