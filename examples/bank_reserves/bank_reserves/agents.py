@@ -1,8 +1,3 @@
-import random
-from mesa import Agent
-from bank_reserves.random_walk import RandomWalker
-
-
 """
 The following code was adapted from the Bank Reserves model included in Netlogo
 Model information can be found at: http://ccl.northwestern.edu/netlogo/models/BankReserves
@@ -14,7 +9,8 @@ Author of NetLogo code:
     Northwestern University, Evanston, IL.
 """
 
-# subclass of Mesa Agent class
+from mesa import Agent
+from bank_reserves.random_walk import RandomWalker
 
 
 class Bank(Agent):
@@ -52,7 +48,7 @@ class Person(RandomWalker):
         self.loans = 0
         """start everyone off with a random amount in their wallet from 1 to a
            user settable rich threshold amount"""
-        self.wallet = random.randint(1, rich_threshold + 1)
+        self.wallet = self.random.randint(1, rich_threshold + 1)
         # savings minus loans, see balance_books() below
         self.wealth = 0
         # person to trade with, see do_business() below
@@ -73,11 +69,11 @@ class Person(RandomWalker):
                 while customer == self:
                     """select a random person from the people at my location
                        to trade with"""
-                    customer = random.choice(my_cell)
+                    customer = self.random.choice(my_cell)
                 # 50% chance of trading with customer
-                if random.randint(0, 1) == 0:
+                if self.random.randint(0, 1) == 0:
                     # 50% chance of trading $5
-                    if random.randint(0, 1) == 0:
+                    if self.random.randint(0, 1) == 0:
                         # give customer $5 from my wallet (may result in negative wallet)
                         customer.wallet += 5
                         self.wallet -= 5

@@ -1,11 +1,3 @@
-from bank_reserves.agents import Bank, Person
-from mesa import Model
-from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
-from mesa.time import RandomActivation
-import numpy as np
-import random
-
 """
 The following code was adapted from the Bank Reserves model included in Netlogo
 Model information can be found at: http://ccl.northwestern.edu/netlogo/models/BankReserves
@@ -17,6 +9,14 @@ Author of NetLogo code:
     Northwestern University, Evanston, IL.
 """
 
+from bank_reserves.agents import Bank, Person
+from mesa import Model
+from mesa.space import MultiGrid
+from mesa.datacollection import DataCollector
+from mesa.time import RandomActivation
+import numpy as np
+
+
 """
 If you want to perform a parameter sweep, call batch_run.py instead of run.py.
 For details see batch_run.py in the same directory as run.py.
@@ -26,36 +26,38 @@ For details see batch_run.py in the same directory as run.py.
 
 
 def get_num_rich_agents(model):
-    # list of rich agents
+    """ return number of rich agents"""
+
     rich_agents = [a for a in model.schedule.agents if a.savings > model.rich_threshold]
-    # return number of rich agents
     return len(rich_agents)
 
 
 def get_num_poor_agents(model):
-    # list of poor agents
+    """return number of poor agents"""
+
     poor_agents = [a for a in model.schedule.agents if a.loans > 10]
-    # return number of poor agents
     return len(poor_agents)
 
 
 def get_num_mid_agents(model):
-    # list of middle class agents
+    """return number of middle class agents"""
+
     mid_agents = [a for a in model.schedule.agents if
                   a.loans < 10 and a.savings < model.rich_threshold]
-    # return number of middle class agents
     return len(mid_agents)
 
 
 def get_total_savings(model):
-    # list of amounts of all agents' savings
+    """sum of all agents' savings"""
+
     agent_savings = [a.savings for a in model.schedule.agents]
     # return the sum of agents' savings
     return np.sum(agent_savings)
 
 
 def get_total_wallets(model):
-    # list of amounts of all agents' wallets
+    """sum of amounts of all agents' wallets"""
+
     agent_wallets = [a.wallet for a in model.schedule.agents]
     # return the sum of all agents' wallets
     return np.sum(agent_wallets)
@@ -78,6 +80,22 @@ def get_total_loans(model):
 
 
 class BankReserves(Model):
+    """
+    This model is a Mesa implementation of the Bank Reserves model from NetLogo.
+    It is a highly abstracted, simplified model of an economy, with only one
+    type of agent and a single bank representing all banks in an economy. People
+    (represented by circles) move randomly within the grid. If two or more people
+    are on the same grid location, there is a 50% chance that they will trade with
+    each other. If they trade, there is an equal chance of giving the other agent
+    $5 or $2. A positive trade balance will be deposited in the bank as savings.
+    If trading results in a negative balance, the agent will try to withdraw from
+    its savings to cover the balance. If it does not have enough savings to cover
+    the negative balance, it will take out a loan from the bank to cover the
+    difference. The bank is required to keep a certain percentage of deposits as
+    reserves and the bank's ability to loan at any given time is a function of
+    the amount of deposits, its reserves, and its current total outstanding loan
+    amount.
+    """
 
     # grid height
     grid_h = 20
@@ -113,10 +131,9 @@ class BankReserves(Model):
 
         # create people for the model according to number of people set by user
         for i in range(self.init_people):
-            # set x coordinate as a random number within the width of the grid
-            x = random.randrange(self.width)
-            # set y coordinate as a random number within the height of the grid
-            y = random.randrange(self.height)
+            # set x, y coords randomly within the grid
+            x = self.random.randrange(self.width)
+            y = self.random.randrange(self.height)
             p = Person(i, (x, y), self, True, self.bank, self.rich_threshold)
             # place the Person object on the grid at coordinates (x, y)
             self.grid.place_agent(p, (x, y))

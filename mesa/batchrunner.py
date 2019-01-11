@@ -6,7 +6,6 @@ Batchrunner
 A single class to manage a batch run or parameter sweep of a given model.
 
 """
-import collections
 import copy
 from itertools import product, count
 import pandas as pd
@@ -19,18 +18,9 @@ else:
     pathos_support = True
 
 
-def combinations(*items):
-    """
-    A small fix to handle dictionary type parameters in cartesian product.
-    """
-    prepared = [(item,) if isinstance(item, collections.Mapping) else item
-                for item in items]
-    yield from (param for param in product(*prepared))
-
-
 class VariableParameterError(TypeError):
     MESSAGE = ('variable_parameters must map a name to a sequence of values. '
-            'These parameters were given with non-sequence values: {}')
+               'These parameters were given with non-sequence values: {}')
 
     def __init__(self, bad_names):
         self.bad_names = bad_names
@@ -52,15 +42,16 @@ class BatchRunner:
 
     """
     def __init__(self, model_cls, variable_parameters=None,
-            fixed_parameters=None, iterations=1, max_steps=1000,
-            model_reporters=None, agent_reporters=None, display_progress=True):
+                 fixed_parameters=None, iterations=1, max_steps=1000,
+                 model_reporters=None, agent_reporters=None,
+                 display_progress=True):
         """ Create a new BatchRunner for a given model with the given
         parameters.
 
         Args:
             model_cls: The class of model to batch-run.
             variable_parameters: Dictionary of parameters to lists of values.
-                The model will be run with every combination of these paramters.
+                The model will be run with every combo of these paramters.
                 For example, given variable_parameters of
                     {"param_1": range(5),
                      "param_2": [1, 5, 10]}
@@ -73,10 +64,10 @@ class BatchRunner:
                 as a kwarg.
             iterations: The total number of times to run the model for each
                 combination of parameters.
-            max_steps: The upper limit of steps above which each run will be halted
+            max_steps: Upper limit of steps above which each run will be halted
                 if it hasn't halted on its own.
-            model_reporters: The dictionary of variables to collect on each run at
-                the end, with variable names mapped to a function to collect
+            model_reporters: The dictionary of variables to collect on each run
+                at the end, with variable names mapped to a function to collect
                 them. For example:
                     {"agent_count": lambda m: m.schedule.get_agent_count()}
             agent_reporters: Like model_reporters, but each variable is now
@@ -86,6 +77,8 @@ class BatchRunner:
 
         """
         self.model_cls = model_cls
+        if variable_parameters is None:
+            variable_parameters = {}
         self.variable_parameters = self._process_parameters(variable_parameters)
         self.fixed_parameters = fixed_parameters or {}
         self._include_fixed = len(self.fixed_parameters.keys()) > 0
@@ -107,48 +100,64 @@ class BatchRunner:
         params = copy.deepcopy(params)
         bad_names = []
         for name, values in params.items():
-            if (isinstance(values, str) or
-                    not hasattr(values, "__iter__")):
+            if (isinstance(values, str) or not hasattr(values, "__iter__")):
                 bad_names.append(name)
         if bad_names:
             raise VariableParameterError(bad_names)
         return params
 
-    def run_all(self):
-        """ Run the model at all parameter combinations and store results. """
-        param_names, param_ranges = zip(*self.variable_parameters.items())
+    def _make_model_args(self):
+        """Prepare all combinations of parameter values for `run_all`
+
+        Returns:
+            Tuple with the form:
+            (total_iterations, all_kwargs, all_param_values)
+        """
         total_iterations = self.iterations
-        for param_range in param_ranges:
-            total_iterations *= len(param_range)
-        with tqdm(total_iterations, disable=not self.display_progress) as pbar:
+        all_kwargs = []
+        all_param_values = []
+
+        if len(self.variable_parameters) > 0:
+            param_names, param_ranges = zip(*self.variable_parameters.items())
+            for param_range in param_ranges:
+                total_iterations *= len(param_range)
+
             for param_values in product(*param_ranges):
                 kwargs = dict(zip(param_names, param_values))
                 kwargs.update(self.fixed_parameters)
+                all_kwargs.append(kwargs)
+                all_param_values.append(param_values)
+        else:
+            kwargs = self.fixed_parameters
+            param_values = None
+            all_kwargs = [kwargs]
+            all_param_values = [None]
 
-                for i in range(self.iterations):
-                    kwargscopy = copy.deepcopy(kwargs)
-                    model_vars, agent_vars = self._run_single_model(param_values, i, kwargscopy)
+        return (total_iterations, all_kwargs, all_param_values)
 
-                    if self.model_reporters:
-                        for model_key, model_val in model_vars.items():
-                            self.model_vars[model_key] = model_val
-                    if self.agent_reporters:
-                        for agent_key, reports in agent_vars.items():
-                            self.agent_vars[agent_key] = reports
+    def run_all(self):
+        """ Run the model at all parameter combinations and store results. """
+        run_count = count()
+        total_iterations, all_kwargs, all_param_values = self._make_model_args()
+
+        with tqdm(total_iterations, disable=not self.display_progress) as pbar:
+            for i, kwargs in enumerate(all_kwargs):
+                param_values = all_param_values[i]
+                for _ in range(self.iterations):
+                    self.run_iteration(kwargs, param_values, next(run_count))
                     pbar.update()
 
-    def _run_single_model(self, param_values, run_count, kwargs):
-        """
-        Run a single model for one parameter combination and one iteration,
-        returning a tuple of the model vars and agent vars.
-        """
-        model = self.model_cls(**kwargs)
-
-        # run the model
+    def run_iteration(self, kwargs, param_values, run_count):
+        kwargscopy = copy.deepcopy(kwargs)
+        model = self.model_cls(**kwargscopy)
         self.run_model(model)
 
         # Collect and store results:
-        model_key = param_values + (run_count, )
+        if param_values is not None:
+            model_key = param_values + (run_count,)
+        else:
+            model_key = (run_count,)
+
         if self.model_reporters:
             self.model_vars[model_key] = self.collect_model_vars(model)
         if self.agent_reporters:
@@ -156,7 +165,6 @@ class BatchRunner:
             for agent_id, reports in agent_vars.items():
                 agent_key = model_key + (agent_id,)
                 self.agent_vars[agent_key] = reports
-
         return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None))
 
     def run_model(self, model):
@@ -199,7 +207,7 @@ class BatchRunner:
 
         """
         return self._prepare_report_table(self.agent_vars,
-                extra_cols=['AgentId'])
+                                          extra_cols=['AgentId'])
 
     def _prepare_report_table(self, vars_dict, extra_cols=None):
         """
@@ -231,8 +239,8 @@ class BatchRunner:
 
 class MPSupport(Exception):
     def __str__(self):
-        return "The BatchRunnerMP depends on pathos, which is either not installed, " \
-               "or the path can not be found. "
+        return ("BatchRunnerMP depends on pathos, which is either not "
+               "installed, or the path can not be found. ")
 
 
 class BatchRunnerMP(BatchRunner):
@@ -258,26 +266,20 @@ class BatchRunnerMP(BatchRunner):
         Run the model at all parameter combinations and store results,
         overrides run_all from BatchRunner.
         """
+        run_count = count()
+        total_iterations, all_kwargs, all_param_values = self._make_model_args()
+
         # register the process pool and init a queue
         job_queue = []
-
-        param_names, param_ranges = zip(*self.variable_parameters.items())
-        run_count = count()
-        total_iterations = self.iterations
-        for param_range in param_ranges:
-            total_iterations *= len(param_range)
         with tqdm(total_iterations, disable=not self.display_progress) as pbar:
-            for param_values in product(*param_ranges):
-                kwargs = dict(zip(param_names, param_values))
-                kwargs.update(self.fixed_parameters)
-
-                # make a new process and add it to the queue
-                for i in range(self.iterations):
-                    job_queue.append(self.pool.uimap(self._run_single_model,
+            for i, kwargs in enumerate(all_kwargs):
+                param_values = all_param_values[i]
+                for _ in range(self.iterations):
+                    # make a new process and add it to the queue
+                    job_queue.append(self.pool.uimap(self.run_iteration,
+                                                     (kwargs,),
                                                      (param_values,),
-                                                     (next(run_count),),
-                                                     (kwargs,)))
-
+                                                     (next(run_count),)))
             # empty the queue
             results = []
             for task in job_queue:

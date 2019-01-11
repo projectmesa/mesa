@@ -2,8 +2,6 @@
 The model - a 2D lattice where agents live and have an opinion
 """
 
-
-import random
 from collections import Counter
 
 from mesa import Model, Agent
@@ -56,7 +54,7 @@ class ColorCell(Agent):
             if neighbor[1] == polled_opinions[0][1]:
                 tied_opinions.append(neighbor)
 
-        self._next_state = random.choice(tied_opinions)[0]
+        self._next_state = self.random.choice(tied_opinions)[0]
 
     def advance(self):
         '''
@@ -86,7 +84,7 @@ class ColorPatches(Model):
         # replaced content with _ to appease linter
         for (_, row, col) in self._grid.coord_iter():
             cell = ColorCell((row, col), self,
-                             ColorCell.OPINIONS[random.randrange(0, 16)])
+                             ColorCell.OPINIONS[self.random.randrange(0, 16)])
             self._grid.place_agent(cell, (row, col))
             self._schedule.add(cell)
 
