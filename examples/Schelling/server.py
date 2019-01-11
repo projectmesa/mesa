@@ -3,46 +3,41 @@ from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import VegaVisualization
 
-from mesa.visualization.TextVisualization import (
-    TextData, TextGrid, TextVisualization
-)
+from mesa.visualization.TextVisualization import TextData, TextGrid, TextVisualization
 
 from model import Schelling
 
 
-grid_spec = VegaVisualization.GridSpec(size=(20, 20))
-vega_viz = VegaVisualization.VegaVisualization(grid_spec)
+grid_spec = VegaVisualization.GridSpec(20, 20, color="atype")
+neighbor_chart_spec = VegaVisualization.AgentChartSpec("neighbors")
+happy_chart_spec = VegaVisualization.ModelChartSpec("happy")
+vega_viz = VegaVisualization.VegaVisualization(
+    [grid_spec, neighbor_chart_spec, happy_chart_spec]
+)
+
 
 class SchellingTextVisualization(TextVisualization):
-    '''
-    ASCII visualization for schelling model
-    '''
+    """ASCII visualization for schelling model."""
 
     def __init__(self, model):
-        '''
-        Create new Schelling ASCII visualization.
-        '''
+        """Create new Schelling ASCII visualization."""
         self.model = model
 
         grid_viz = TextGrid(self.model.grid, self.ascii_agent)
-        happy_viz = TextData(self.model, 'happy')
+        happy_viz = TextData(self.model, "happy")
         self.elements = [grid_viz, happy_viz]
 
     @staticmethod
     def ascii_agent(a):
-        '''
-        Minority agents are X, Majority are O.
-        '''
+        """Minority agents are X, Majority are O."""
         if a.type == 0:
-            return 'O'
+            return "O"
         if a.type == 1:
-            return 'X'
+            return "X"
 
 
 class HappyElement(TextElement):
-    '''
-    Display a text count of how many happy agents there are.
-    '''
+    """Display a text count of how many happy agents there are."""
 
     def __init__(self):
         pass
@@ -52,9 +47,7 @@ class HappyElement(TextElement):
 
 
 def schelling_draw(agent):
-    '''
-    Portrayal Method for canvas
-    '''
+    """Portrayal Method for canvas."""
     if agent is None:
         return
     portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
@@ -76,11 +69,11 @@ model_params = {
     "height": 20,
     "width": 20,
     "density": UserSettableParameter("slider", "Agent density", 0.8, 0.1, 1.0, 0.1),
-    "minority_pc": UserSettableParameter("slider", "Fraction minority", 0.2, 0.00, 1.0, 0.05),
-    "homophily": UserSettableParameter("slider", "Homophily", 3, 0, 8, 1)
+    "minority_pc": UserSettableParameter(
+        "slider", "Fraction minority", 0.2, 0.00, 1.0, 0.05
+    ),
+    "homophily": UserSettableParameter("slider", "Homophily", 3, 0, 8, 1),
 }
 
-server = ModularServer(Schelling,
-                       [vega_viz],
-                       "Schelling", model_params)
+server = ModularServer(Schelling, [vega_viz], "Schelling", model_params)
 server.launch()
