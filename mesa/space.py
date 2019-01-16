@@ -19,24 +19,8 @@ import itertools
 import numpy as np
 
 
-def accept_tuple_argument(wrapped_function):
-    """ Decorator to allow grid methods that take a list of (x, y) coord tuples
-    to also handle a single position, by automatically wrapping tuple in
-    single-item list rather than forcing user to do it.
-
-    """
-
-    def wrapper(*args):
-        if isinstance(args[1], tuple) and len(args[1]) == 2:
-            return wrapped_function(args[0], [args[1]])
-        else:
-            return wrapped_function(*args)
-
-    return wrapper
-
-
 class Grid:
-    """ Base class for a square grid.
+    """ Class for a square grid.
 
     Grid cells are indexed by [x][y], where [0][0] is assumed to be the
     bottom-left and [width-1][height-1] is the top-right. If a grid is
@@ -59,8 +43,6 @@ class Grid:
         iter_neighborhood: Returns an iterator over cell coordinates that are
         in the neighborhood of a certain point.
         torus_adj: Converts coordinate, handles torus looping.
-        out_of_bounds: Determines whether position is off the grid, returns
-        the out of bounds coordinate.
         iter_cell_list_contents: Returns an iterator of the contents of the
         cells identified in cell_list.
         get_cell_list_contents: Returns a list of the contents of the cells
@@ -70,7 +52,7 @@ class Grid:
 
     """
 
-    def __init__(self, width, height, torus):
+    def __init__(self, width, height, torus, multigrid=False):
         """ Create a new grid.
 
         Args:
@@ -81,212 +63,119 @@ class Grid:
         self.height = height
         self.width = width
         self.torus = torus
+        self.multigrid = multigrid
 
-        self.grid = []
-
-        for x in range(self.width):
-            col = []
-            for y in range(self.height):
-                col.append(self.default_val())
-            self.grid.append(col)
-
-        # Add all cells to the empties list.
+        self.grid = [[self.empty_value] * width] * height
         self.empties = list(itertools.product(
             *(range(self.width), range(self.height))))
 
-    @staticmethod
-    def default_val():
-        """ Default value for new cell elements. """
-        return None
-
     def __getitem__(self, index):
-        return self.grid[index]
+        return self.grid[index]  # returns column or row?
 
     def __iter__(self):
         # create an iterator that chains the
         #  rows of grid together as if one list:
         return itertools.chain(*self.grid)
 
+    @property
+    def empty_value(self):
+        if self.multigrid:
+            return set()
+        else:
+            return None
+
     def coord_iter(self):
-        """ An iterator that returns coordinates as well as cell contents. """
-        for row in range(self.width):
-            for col in range(self.height):
-                yield self.grid[row][col], row, col  # agent, x, y
+        """ Returns an iterator of tuples (agent, x, y) over the whole square grid. """
+        for x in range(self.width):
+            for y in range(self.height):
+                yield self.grid[x][y], x, y
 
-    def neighbor_iter(self, pos, moore=True):
-        """ Iterate over position neighbors.
-
+    def neighbors(self, pos, moore=True, radius=1, get_agents=False, include_empty=False):
+        """ 
         Args:
-            pos: (x,y) coords tuple for the position to get the neighbors of.
-            moore: Boolean for whether to use Moore neighborhood (including
-                   diagonals) or Von Neumann (only up/down/left/right).
-
-        """
-        neighborhood = self.iter_neighborhood(pos, moore=moore)
-        return self.iter_cell_list_contents(neighborhood)
-
-    def iter_neighborhood(self, pos, moore,
-                          include_center=False, radius=1):
-        """ Return an iterator over cell coordinates that are in the
-        neighborhood of a certain point.
-
-        Args:
-            pos: Coordinate tuple for the neighborhood to get.
-            moore: If True, return Moore neighborhood
+            pos: coordinates (x, y) for the neighborhood to get
+            moore: if True, return Moore neighborhood
                         (including diagonals)
-                   If False, return Von Neumann neighborhood
+                   if False, return Von Neumann neighborhood
                         (exclude diagonals)
-            include_center: If True, return the (x, y) cell as well.
-                            Otherwise, return surrounding cells only.
-            radius: radius, in cells, of neighborhood to get.
+            radius: range of the Moore/von Neumann neighborhood
+            get_agents: 
+                if True, return (agent, (x, y)) as a set element
+                if False, return (x, y) as a set element
+            include_empty:
+                if True, treat empty cells as valid adjacent cells
+                if False, skip empty cells
 
         Returns:
-            A list of coordinate tuples representing the neighborhood. For
-            example with radius 1, it will return list with number of elements
-            equals at most 9 (8) if Moore, 5 (4) if Von Neumann (if not
-            including the center).
+            A set of adjacent cells of a single cell at `pos`. 
 
+            The number of cells 
+            in the Moore neighborhood with radius n is (2n+1)^2 -1.
+            The number of cells in the Moore neighborhood with radius n is [(2n+1)^2 -1]
+            (http://www.conwaylife.com/wiki/Moore_neighbourhood).
+
+            The number of cells in the von Neumann neighbourhood of 
+            radius n of a single cell is 
+            [2n(n+1)](http://www.conwaylife.com/wiki/Von_Neumann_neighborhood).
         """
-        x, y = pos
-        coordinates = set()
-        for dy in range(-radius, radius + 1):
-            for dx in range(-radius, radius + 1):
-                if dx == 0 and dy == 0 and not include_center:
+        if moore:
+            neighbors = self._moore(pos, radius, get_agents, include_empty)
+        else:
+            neighbors = self._von_neumann(
+                pos, radius, get_agents, include_empty)
+
+        return neighbors
+
+    def _moore(self, pos, radius, get_agents, include_empty):
+        """
+        http://www.conwaylife.com/wiki/Moore_neighbourhood
+        radius: range
+        """
+        neighbors = set()
+
+        for dx in range(-radius, radius + 1):
+            for dy in range(-radius, radius + 1):
+                x, y = self._torus_adj((pos[0] + dx, pos[1] + dy))
+                # If a cell is empty and empty cell should not be returned, skip
+                if (self.grid[x][y] == self.empty_value) and (not include_empty):
+                    continue
+                if (get_agents):
+                    neighbors.add((self.grid[x][y], (x, y)))
+                else:
+                    neighbors.add((x, y))
+
+    def _von_neumann(self, pos, radius, get_agents, include_empty):
+        """
+        http://www.conwaylife.com/wiki/Von_Neumann_neighborhood
+        radius: range
+        """
+        neighbors = set()
+
+        for dx in range(-radius, radius + 1):
+            for dy in range(-radius, radius + 1):
+                x, y = self._torus_adj((pos[0] + dx, pos[1] + dy))
+                # If a cell is empty and empty cell should not be returned, skip
+                if (self.grid[x][y] == self.empty_value) and (not include_empty):
                     continue
                 # Skip coordinates that are outside manhattan distance
-                if not moore and abs(dx) + abs(dy) > radius:
-                    continue
-                # Skip if not a torus and new coords out of bounds.
-                if not self.torus and (not (0 <= dx + x < self.width) or not (0 <= dy + y < self.height)):
-                    continue
+                if abs(dx) + abs(dy) > radius:
+                    break
+                if (get_agents):
+                    neighbors.add((self.grid[x][y], (x, y)))
+                else:
+                    neighbors.add((x, y))
 
-                px, py = self.torus_adj((x + dx, y + dy))
-
-                # Skip if new coords out of bounds.
-                if self.out_of_bounds((px, py)):
-                    continue
-
-                coords = (px, py)
-                if coords not in coordinates:
-                    coordinates.add(coords)
-                    yield coords
-
-    def get_neighborhood(self, pos, moore,
-                         include_center=False, radius=1):
-        """ Return a list of cells that are in the neighborhood of a
-        certain point.
-
-        Args:
-            pos: Coordinate tuple for the neighborhood to get.
-            moore: If True, return Moore neighborhood
-                   (including diagonals)
-                   If False, return Von Neumann neighborhood
-                   (exclude diagonals)
-            include_center: If True, return the (x, y) cell as well.
-                            Otherwise, return surrounding cells only.
-            radius: radius, in cells, of neighborhood to get.
-
-        Returns:
-            A list of coordinate tuples representing the neighborhood;
-            With radius 1, at most 9 if Moore, 5 if Von Neumann (8 and 4
-            if not including the center).
-
-        """
-        return list(self.iter_neighborhood(pos, moore, include_center, radius))
-
-    def iter_neighbors(self, pos, moore,
-                       include_center=False, radius=1):
-        """ Return an iterator over neighbors to a certain point.
-
-        Args:
-            pos: Coordinates for the neighborhood to get.
-            moore: If True, return Moore neighborhood
-                    (including diagonals)
-                   If False, return Von Neumann neighborhood
-                     (exclude diagonals)
-            include_center: If True, return the (x, y) cell as well.
-                            Otherwise,
-                            return surrounding cells only.
-            radius: radius, in cells, of neighborhood to get.
-
-        Returns:
-            An iterator of non-None objects in the given neighborhood;
-            at most 9 if Moore, 5 if Von-Neumann
-            (8 and 4 if not including the center).
-
-        """
-        neighborhood = self.iter_neighborhood(
-            pos, moore, include_center, radius)
-        return self.iter_cell_list_contents(neighborhood)
-
-    def get_neighbors(self, pos, moore,
-                      include_center=False, radius=1):
-        """ Return a list of neighbors to a certain point.
-
-        Args:
-            pos: Coordinate tuple for the neighborhood to get.
-            moore: If True, return Moore neighborhood
-                    (including diagonals)
-                   If False, return Von Neumann neighborhood
-                     (exclude diagonals)
-            include_center: If True, return the (x, y) cell as well.
-                            Otherwise,
-                            return surrounding cells only.
-            radius: radius, in cells, of neighborhood to get.
-
-        Returns:
-            A list of non-None objects in the given neighborhood;
-            at most 9 if Moore, 5 if Von-Neumann
-            (8 and 4 if not including the center).
-
-        """
-        return list(self.iter_neighbors(
-            pos, moore, include_center, radius))
-
-    def torus_adj(self, pos):
+    def _torus_adj(self, pos):
         """ Convert coordinate, handling torus looping. """
-        if not self.out_of_bounds(pos):
-            return pos
-        elif not self.torus:
-            raise Exception("Point out of bounds, and space non-toroidal.")
-        else:
+        if self.torus:
             x, y = pos[0] % self.width, pos[1] % self.height
-        return x, y
+            return x, y
+        else:
+            if (not 0 <= pos[0] < self.width) or (not 0 <= pos[1] < self.height):
+                raise IndexError(
+                    "Coordinates out of bounds. Grid is non-toroidal.")
 
-    def out_of_bounds(self, pos):
-        """
-        Determines whether position is off the grid, returns the out of
-        bounds coordinate.
-        """
-        x, y = pos
-        return x < 0 or x >= self.width or y < 0 or y >= self.height
-
-    @accept_tuple_argument
-    def iter_cell_list_contents(self, cell_list):
-        """
-        Args:
-            cell_list: Array-like of (x, y) tuples, or single tuple.
-
-        Returns:
-            An iterator of the contents of the cells identified in cell_list
-
-        """
-        return (
-            self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
-
-    @accept_tuple_argument
-    def get_cell_list_contents(self, cell_list):
-        """
-        Args:
-            cell_list: Array-like of (x, y) tuples, or single tuple.
-
-        Returns:
-            A list of the contents of the cells identified in cell_list
-
-        """
-        return list(self.iter_cell_list_contents(cell_list))
-
-    def move_agent(self, agent, pos):
+    def move_agent(self, agent, pos, replace=False):
         """
         Move an agent from its current position to a new position.
 
@@ -296,20 +185,38 @@ class Grid:
             pos: Tuple of new position to move the agent to.
 
         """
-        pos = self.torus_adj(pos)
+        pos = self._torus_adj(pos)
         self._remove_agent(agent.pos, agent)
         self._place_agent(pos, agent)
         agent.pos = pos
 
-    def place_agent(self, agent, pos):
-        """ Position an agent on the grid, and set its pos variable. """
-        self._place_agent(pos, agent)
+    def place_agent(self, agent, pos, replace=False):
+        """ Position an agent on the grid, and set its pos variable. 
+
+        Args:
+            agent: agent to place at `pos`
+            pos: coordinates of the grid (x, y)
+            replace: if True, replace the possibly existed agent at `pos` with `agent`
+        """
+        self._place_agent(pos, agent, replace)
         agent.pos = pos
 
-    def _place_agent(self, pos, agent):
+    def _place_agent(self, pos, agent, replace):
         """ Place the agent at the correct location. """
         x, y = pos
-        self.grid[x][y] = agent
+        old_agent = self.grid[x][y]
+
+        if old_agent is not None:
+            if replace:
+                old_agent.pos = None
+                self.grid[x][y] = agent
+            else:
+                if self.multigrid:
+                    self.grid[x][y].add(agent)
+                else:
+                    raise Exception(
+                        "Cell already occupied by agent {}".format(old_agent.unique_id))
+
         if pos in self.empties:
             self.empties.remove(pos)
 
