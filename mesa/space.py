@@ -15,7 +15,6 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
-
 import numpy as np
 
 
@@ -66,7 +65,7 @@ class Grid:
         self.multigrid = multigrid
 
         self.grid = [[self.empty_value] * width] * height
-        self.empties = list(itertools.product(
+        self.empties = set(itertools.product(
             *(range(self.width), range(self.height))))
 
     def __getitem__(self, index):
@@ -126,6 +125,28 @@ class Grid:
 
         return neighbors
 
+    def at_row(self, row, include_agents=False):
+        """ Return an iterator over a specific row 
+
+        Args:
+            include_agents: return ((x, y), agent) if True, otherwise (x, y)
+        """
+        _, y = self._torus_adj((0, row))
+        for x in range(self.width):
+            if include_agents:
+                yield ((x, y), self.grid[x][y])
+            else:
+                yield (x, y)
+
+    def at_col(self, col, include_agents=False):
+        """ Return an iterator over a specific column """
+        x, _ = self._torus_adj((col, 0))
+        for y in range(self.height):
+            if include_agents:
+                yield ((x, y), self.grid[x][y])
+            else:
+                yield (x, y)
+
     def _moore(self, pos, radius, get_agents, include_empty):
         """
         http://www.conwaylife.com/wiki/Moore_neighbourhood
@@ -183,14 +204,14 @@ class Grid:
             agent: Agent object to move. Assumed to have its current location
                    stored in a 'pos' tuple.
             pos: Tuple of new position to move the agent to.
-
+            replace: if True, replace the possibly existed agent at `pos` with `agent`
         """
         pos = self._torus_adj(pos)
         self._remove_agent(agent.pos, agent)
-        self._place_agent(pos, agent)
+        self._place_agent(pos, agent, replace)
         agent.pos = pos
 
-    def place_agent(self, agent, pos, replace=False):
+    def place_agent(self, agent, pos=("random", "random"), replace=False):
         """ Position an agent on the grid, and set its pos variable. 
 
         Args:
@@ -198,15 +219,20 @@ class Grid:
             pos: coordinates of the grid (x, y)
             replace: if True, replace the possibly existed agent at `pos` with `agent`
         """
-        self._place_agent(pos, agent, replace)
-        agent.pos = pos
+        if (pos[0] == "random") or (pos[1] == "random"):
+            coords = self._pick_random_position(agent, pos)
+        self._place_agent(coords, agent, replace)
+        agent.pos = coords
 
     def _place_agent(self, pos, agent, replace):
         """ Place the agent at the correct location. """
         x, y = pos
         old_agent = self.grid[x][y]
 
-        if old_agent is not None:
+        if old_agent == self.empty_value:
+            self.grid[x][y] = set(agent) if self.multigrid else agent
+            self.empties.remove(pos)
+        else:
             if replace:
                 old_agent.pos = None
                 self.grid[x][y] = agent
@@ -217,8 +243,26 @@ class Grid:
                     raise Exception(
                         "Cell already occupied by agent {}".format(old_agent.unique_id))
 
-        if pos in self.empties:
-            self.empties.remove(pos)
+    def _pick_random_position(self, agent, pos):
+        if pos == ("random", "random") and self.exists_empty_cells():
+            return agent.random.choice(self.empties)
+        else:
+            empties = set()
+            if pos[0] == "random":
+                # We pick a random cell in a specified row
+                for coords, cell in self.at_row(pos[1], include_agents=True):
+                    if cell == self.empty_value:
+                        empties.add(coords)
+            else:
+                # We pick a random cell in a specified column
+                for coords, cell in self.at_col(pos[0], include_agents=True):
+                    if cell == self.empty_value:
+                        empties.add(coords)
+
+            if len(empties) > 0:
+                return agent.random.choice(empties)
+            else:
+                raise Exception("ERROR: No empty cells")
 
     def remove_agent(self, agent):
         """ Remove the agent from the grid and set its pos variable to None. """
@@ -229,21 +273,26 @@ class Grid:
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
         x, y = pos
-        self.grid[x][y] = self.default_val()
-        self.empties.append(pos)
+        if self.multigrid:
+            self.grid[x][y].remove(agent)
+        else:
+            self.grid[x][y] = None
+
+        if self.is_cell_empty(pos):
+            self.empties.add(pos)
 
     def is_cell_empty(self, pos):
         """ Returns a bool of the contents of a cell. """
         x, y = pos
-        return True if self.grid[x][y] == self.default_val() else False
+        return self.grid[x][y] == self.empty_value
 
     def move_to_empty(self, agent):
         """ Moves agent to a random empty cell, vacating agent's old cell. """
         pos = agent.pos
-        if len(self.empties) == 0:
+        if not self.exists_empty_cells():
             raise Exception("ERROR: No empty cells")
         new_pos = agent.random.choice(self.empties)
-        self._place_agent(new_pos, agent)
+        self._place_agent(new_pos, agent, replace=False)
         agent.pos = new_pos
         self._remove_agent(pos, agent)
 
@@ -267,99 +316,6 @@ class Grid:
     def exists_empty_cells(self):
         """ Return True if any cells empty else False. """
         return len(self.empties) > 0
-
-
-class SingleGrid(Grid):
-    """ Grid where each cell contains exactly at most one object. """
-    empties = []
-
-    def __init__(self, width, height, torus):
-        """ Create a new single-item grid.
-
-        Args:
-            width, height: The width and width of the grid
-            torus: Boolean whether the grid wraps or not.
-
-        """
-        super().__init__(width, height, torus)
-
-    def position_agent(self, agent, x="random", y="random"):
-        """ Position an agent on the grid.
-        This is used when first placing agents! Use 'move_to_empty()'
-        when you want agents to jump to an empty cell.
-        Use 'swap_pos()' to swap agents positions.
-        If x or y are positive, they are used, but if "random",
-        we get a random position.
-        Ensure this random position is not occupied (in Grid).
-
-        """
-        if x == "random" or y == "random":
-            if len(self.empties) == 0:
-                raise Exception("ERROR: Grid full")
-            coords = agent.random.choice(self.empties)
-        else:
-            coords = (x, y)
-        agent.pos = coords
-        self._place_agent(coords, agent)
-
-    def _place_agent(self, pos, agent):
-        if self.is_cell_empty(pos):
-            super()._place_agent(pos, agent)
-        else:
-            raise Exception("Cell not empty")
-
-
-class MultiGrid(Grid):
-    """ Grid where each cell can contain more than one object.
-
-    Grid cells are indexed by [x][y], where [0][0] is assumed to be at
-    bottom-left and [width-1][height-1] is the top-right. If a grid is
-    toroidal, the top and bottom, and left and right, edges wrap to each other.
-
-    Each grid cell holds a set object.
-
-    Properties:
-        width, height: The grid's width and height.
-
-        torus: Boolean which determines whether to treat the grid as a torus.
-
-        grid: Internal list-of-lists which holds the grid cells themselves.
-
-    Methods:
-        get_neighbors: Returns the objects surrounding a given cell.
-    """
-
-    @staticmethod
-    def default_val():
-        """ Default value for new cell elements. """
-        return set()
-
-    def _place_agent(self, pos, agent):
-        """ Place the agent at the correct location. """
-        x, y = pos
-        self.grid[x][y].add(agent)
-        if pos in self.empties:
-            self.empties.remove(pos)
-
-    def _remove_agent(self, pos, agent):
-        """ Remove the agent from the given location. """
-        x, y = pos
-        self.grid[x][y].remove(agent)
-        if self.is_cell_empty(pos):
-            self.empties.append(pos)
-
-    @accept_tuple_argument
-    def iter_cell_list_contents(self, cell_list):
-        """
-        Args:
-            cell_list: Array-like of (x, y) tuples, or single tuple.
-
-        Returns:
-            A iterator of the contents of the cells identified in cell_list
-
-        """
-        return itertools.chain.from_iterable(
-            self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
 
 
 class HexGrid(Grid):
