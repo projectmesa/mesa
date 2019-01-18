@@ -64,7 +64,14 @@ class Grid:
         self.torus = torus
         self.multigrid = multigrid
 
-        self.grid = [[self.empty_value] * width] * height
+        self.grid = []
+
+        for x in range(self.width):
+            col = []
+            for y in range(self.height):
+                col.append(self.empty_value)
+            self.grid.append(col)
+
         self.empties = set(itertools.product(
             *(range(self.width), range(self.height))))
 
@@ -90,7 +97,7 @@ class Grid:
                 yield self.grid[x][y], x, y
 
     def neighbors(self, pos, moore=True, radius=1, get_agents=False, include_empty=False):
-        """ 
+        """
         Args:
             pos: coordinates (x, y) for the neighborhood to get
             moore: if True, return Moore neighborhood
@@ -98,7 +105,7 @@ class Grid:
                    if False, return Von Neumann neighborhood
                         (exclude diagonals)
             radius: range of the Moore/von Neumann neighborhood
-            get_agents: 
+            get_agents:
                 if True, return (agent, (x, y)) as a set element
                 if False, return (x, y) as a set element
             include_empty:
@@ -106,15 +113,15 @@ class Grid:
                 if False, skip empty cells
 
         Returns:
-            A set of adjacent cells of a single cell at `pos`. 
+            A set of adjacent cells of a single cell at `pos`.
 
-            The number of cells 
+            The number of cells
             in the Moore neighborhood with radius n is (2n+1)^2 -1.
             The number of cells in the Moore neighborhood with radius n is [(2n+1)^2 -1]
             (http://www.conwaylife.com/wiki/Moore_neighbourhood).
 
-            The number of cells in the von Neumann neighbourhood of 
-            radius n of a single cell is 
+            The number of cells in the von Neumann neighbourhood of
+            radius n of a single cell is
             [2n(n+1)](http://www.conwaylife.com/wiki/Von_Neumann_neighborhood).
         """
         if moore:
@@ -126,7 +133,7 @@ class Grid:
         return neighbors
 
     def at_row(self, row, include_agents=False):
-        """ Return an iterator over a specific row 
+        """ Return an iterator over a specific row
 
         Args:
             include_agents: return ((x, y), agent) if True, otherwise (x, y)
@@ -164,6 +171,7 @@ class Grid:
                     neighbors.add((self.grid[x][y], (x, y)))
                 else:
                     neighbors.add((x, y))
+        return neighbors
 
     def _von_neumann(self, pos, radius, get_agents, include_empty):
         """
@@ -185,6 +193,8 @@ class Grid:
                     neighbors.add((self.grid[x][y], (x, y)))
                 else:
                     neighbors.add((x, y))
+
+        return neighbors
 
     def _torus_adj(self, pos):
         """ Convert coordinate, handling torus looping. """
@@ -212,7 +222,7 @@ class Grid:
         agent.pos = pos
 
     def place_agent(self, agent, pos=("random", "random"), replace=False):
-        """ Position an agent on the grid, and set its pos variable. 
+        """ Position an agent on the grid, and set its pos variable.
 
         Args:
             agent: agent to place at `pos`
@@ -220,9 +230,9 @@ class Grid:
             replace: if True, replace the possibly existed agent at `pos` with `agent`
         """
         if (pos[0] == "random") or (pos[1] == "random"):
-            coords = self._pick_random_position(agent, pos)
-        self._place_agent(coords, agent, replace)
-        agent.pos = coords
+            pos = self._pick_random_position(agent, pos)
+        self._place_agent(pos, agent, replace)
+        agent.pos = pos
 
     def _place_agent(self, pos, agent, replace):
         """ Place the agent at the correct location. """
@@ -230,7 +240,7 @@ class Grid:
         old_agent = self.grid[x][y]
 
         if old_agent == self.empty_value:
-            self.grid[x][y] = set(agent) if self.multigrid else agent
+            self.grid[x][y] = set((agent, )) if self.multigrid else agent
             self.empties.remove(pos)
         else:
             if replace:
@@ -245,7 +255,7 @@ class Grid:
 
     def _pick_random_position(self, agent, pos):
         if pos == ("random", "random") and self.exists_empty_cells():
-            return agent.random.choice(self.empties)
+            return agent.random.choice(tuple(self.empties))
         else:
             empties = set()
             if pos[0] == "random":
@@ -317,6 +327,26 @@ class Grid:
         """ Return True if any cells empty else False. """
         return len(self.empties) > 0
 
+    # Depreciated functions below
+    def get_neighbors(self, pos, moore,
+                      include_center=False, radius=1):
+        return self.neighbors(pos, moore, radius, True)
+
+    def position_agent(self, agent, x="random", y="random"):
+        self.place_agent(agent, (x, y))
+
+
+class SingleGrid(Grid):
+    """Depreciated class."""
+    def __init__(self, width, height, torus):
+        super().__init__(width, height, torus, multigrid=False)
+
+
+class MultiGrid(Grid):
+    """Depreciated class."""
+    def __init__(self, width, height, torus):
+        super().__init__(width, height, torus, multigrid=True)
+
 
 class HexGrid(Grid):
     """ Hexagonal Grid: Extends Grid to handle hexagonal neighbors.
@@ -336,6 +366,9 @@ class HexGrid(Grid):
             in the neighborhood of a certain point.
 
     """
+    def __getitem__(self, index):
+        return self.grid[index]  # returns column or row?
+
 
     def iter_neighborhood(self, pos,
                           include_center=False, radius=1):
