@@ -1,0 +1,17 @@
+version: '3'
+services:
+  install:
+    build: .
+    image: mesa:dev
+    command: pip3 install -e /opt/mesa
+    volumes:
+      - .:/opt/mesa
+  dev:
+    image: mesa:dev
+    depends_on:
+      - install
+    volumes:
+      - .:/opt/mesa
+    ports:
+      - "127.0.0.1:8521:8521"
+
