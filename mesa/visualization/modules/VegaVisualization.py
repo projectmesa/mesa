@@ -51,6 +51,8 @@ class VegaVisualization(VisualizationElement):
             {key: value for (key, value) in zip(names, agent)}
             for agent in agent_records
         ]
+        for agent in agent_data:
+            agent["unique_id"] = str(agent["unique_id"])
 
         # Call model reporters and store model data in a dict
         if dc.model_reporters:
@@ -79,13 +81,12 @@ class _MesaSpec:
             name="stp", fields=["Step"], bind=self.slider
         )
 
-        self.agent_selector = alt.selection_single(
-            on="mouseover", fields=["unique_id"], name="agent_id"
-        )
+        self.agent_selector = alt.selection_single(name="agent_select", fields=["unique_id"], on="mouseover")
 
     @property
     def json(self):
         """Return specification in JSON format."""
+
         return self.spec.to_json()
 
 
@@ -102,16 +103,15 @@ class GridSpec(_MesaSpec):
         super().__init__("agents")
 
         if not color:
-            color = {}
+            color = alt.value("darkblue")
         else:
-            color = {"field": color, "type": "nominal"}
+            color = color + ":N"
 
         self.spec = (
-            self.spec.mark_circle()
+            self.spec.mark_point(size=120, filled=True)
             .encode(
                 alt.X(x, type="ordinal", scale=alt.Scale(domain=list(range(width)))),
-                alt.Y(y, type="ordinal", scale=alt.Scale(domain=list(range(height)))),
-                # TODO: Let users decide which variable
+                alt.Y(y, type="ordinal", scale=alt.Scale(domain=list(range(height-1, -1, -1)))),
                 color=alt.condition(self.agent_selector, color, alt.value("lightgray")),
                 tooltip=[{"field": "unique_id", "type": "nominal"}],
             )
@@ -154,7 +154,7 @@ class ModelChartSpec(_MesaSpec):
 
 
 class AgentChartSpec(_MesaSpec):
-    """Create a chart spec for a single agent variable.
+    """Create a chart spec for the mean of a single agent variable.
 
     Args:
         variable: agent variable name
@@ -167,15 +167,17 @@ class AgentChartSpec(_MesaSpec):
             self.spec.mark_line()
             .encode(
                 x=alt.X("Step", type="quantitative"),
-                y=alt.Y(variable, type="quantitative"),
-                color=alt.condition(
-                    self.agent_selector, "unique_id:O", alt.value("lightgray")
-                ),
-                opacity=alt.condition(self.agent_selector, alt.value(1), alt.value(0)),
+                y=alt.Y("neighbors", type="quantitative", aggregate="mean")
             )
             .add_selection(self.agent_selector)
-            .add_selection(self.select_step)
-            .transform_filter("datum.Step <= stp_Step")
+            .transform_filter(self.agent_selector)
         )
 
-        self.spec = spec
+        rule = (
+            self.spec.mark_rule(color="gray")
+            .encode(x="Step:Q", tooltip=variable + ":N")
+            .add_selection(self.select_step)
+            .transform_filter(self.select_step)
+        )
+
+        self.spec = alt.layer(spec, rule)
