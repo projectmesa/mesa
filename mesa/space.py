@@ -335,6 +335,17 @@ class Grid:
     def position_agent(self, agent, x="random", y="random"):
         self.place_agent(agent, (x, y))
 
+    def get_cell_list_contents(self, cells):
+        if not isinstance(cells, list):
+            cells = [cells]
+        return [self.grid[cell[0]][cell[1]] for cell in cells]
+
+    def iter_cell_list_contents(self, cells):
+        if not isinstance(cells, list):
+            cells = [cells]
+        for cell in cells:
+            yield self.grid[cell[0]][cell[1]]
+
 
 class SingleGrid(Grid):
     """Depreciated class."""
