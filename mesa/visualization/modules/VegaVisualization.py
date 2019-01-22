@@ -111,7 +111,7 @@ class GridSpec(_MesaSpec):
             self.spec.mark_point(size=120, filled=True)
             .encode(
                 alt.X(x, type="ordinal", scale=alt.Scale(domain=list(range(width)))),
-                alt.Y(y, type="ordinal", scale=alt.Scale(domain=list(range(height-1, -1, -1)))),
+                alt.Y(y, type="ordinal", scale=alt.Scale(domain=list(range(height - 1, -1, -1)))),
                 color=alt.condition(self.agent_selector, color, alt.value("lightgray")),
                 tooltip=[{"field": "unique_id", "type": "nominal"}],
             )
@@ -133,7 +133,8 @@ class ModelChartSpec(_MesaSpec):
 
         if isinstance(variables, str):
             variables = [variables]
-            specs = [self._create_single_spec(variable) for variable in variables]
+
+        specs = [self._create_single_spec(variable) for variable in variables]
 
         variables = [v + ":N" for v in variables]
         rule = (
@@ -143,7 +144,7 @@ class ModelChartSpec(_MesaSpec):
             .transform_filter(self.select_step)
         )
 
-        self.spec = alt.layer(*specs, rule)
+        self.spec = alt.layer(rule, *specs)
 
     def _create_single_spec(self, variable):
         """Create chart spec from a single variable."""
