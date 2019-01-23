@@ -468,6 +468,20 @@ class HexGrid(Grid):
             pos, include_center, radius))
 
 
+class SingleGrid(Grid):
+    """Depreciated class."""
+
+    def __init__(self, width, height, torus):
+        super().__init__(width, height, torus, multigrid=False)
+
+
+class MultiGrid(Grid):
+    """Depreciated class."""
+
+    def __init__(self, width, height, torus):
+        super().__init__(width, height, torus, multigrid=True)
+
+
 class ContinuousSpace:
     """ Continuous space where each agent can have an arbitrary position.
 
