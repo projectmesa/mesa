@@ -19,17 +19,18 @@ import numpy as np
 
 
 class Grid:
-    """ Class for a square grid.
+    """ Class for a 2D regular lattice.
 
     Grid cells are indexed by [x][y], where [0][0] is assumed to be the
     bottom-left and [width-1][height-1] is the top-right. If a grid is
     toroidal, the top and bottom, and left and right, edges wrap to each other
 
     Properties:
-        model: Subtype of Model that the grid is situated in
+        grid: Internal representation of the grid
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
         multigrid: If True, a cell may hold more than one agent
+        empties: A list of empty cells
 
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
@@ -42,7 +43,6 @@ class Grid:
         move_agent: Moves an agent from its current position to a new position.
         iter_neighborhood: Returns an iterator over cell coordinates that are
         in the neighborhood of a certain point.
-        torus_adj: Converts coordinate, handles torus looping.
         remove_agent: Removes an agent from the grid.
         is_cell_empty: Returns a bool of the contents of a cell.
 
@@ -58,24 +58,23 @@ class Grid:
             multigrid: If True, a cell may hold more than one agent
         """
 
-        self.model = model
         self.height = height
         self.width = width
         self.torus = torus
         self.multigrid = multigrid
-        self._grid = []
+        self.grid = []
 
-        for x in range(self.width):
+        for _ in range(self.width):
             col = []
-            for y in range(self.height):
+            for _ in range(self.height):
                 col.append(self.empty_value)
-            self._grid.append(col)
+            self.grid.append(col)
 
         self.empties = set(itertools.product(
             *(range(self.width), range(self.height))))
 
     def __getitem__(self, index):
-        return self._grid[index]
+        return self.grid[index]
 
     def __iter__(self):
         # create an iterator that chains the
@@ -92,17 +91,56 @@ class Grid:
     def is_cell_empty(self, pos):
         """ Returns a bool of the contents of a cell. """
         x, y = pos
-        return self._grid[x][y] == self.empty_value
+        return self.grid[x][y] == self.empty_value
 
     def exists_empty_cells(self):
         """ Return True if any cells empty else False. """
         return len(self.empties) > 0
 
-    def coord_iter(self):
-        """ Returns an iterator of tuples (agent, x, y) over the whole square grid. """
+    def grid_iter(self):
+        """ Returns an iterator of tuples (agent, x, y) over the whole grid. """
         for x in range(self.width):
             for y in range(self.height):
-                yield self._grid[x][y], x, y
+                yield self.grid[x][y], x, y
+
+    def agents_iter(self):
+        """ Returns an iterator of all the agents over the whole grid. """
+        for x in range(self.width):
+            for y in range(self.height):
+                if not self.is_cell_empty((x, y)):
+                    if self.multigrid:
+                        for agent in self.grid[x][y]:
+                            yield agent
+                    else:
+                        yield self.grid[x][y]
+
+    def coords_iter(self):
+        """ Returns an iterator of coordinates (x, y) over the whole grid. """
+        for x in range(self.width):
+            for y in range(self.height):
+                yield (x, y)
+
+    def cells_at_row(self, row, include_agents=False):
+        """ Return an iterator over a specific row
+
+        Args:
+            include_agents: return ((x, y), agent) if True, otherwise (x, y)
+        """
+        _, y = self.torus_adj((0, row))
+        for x in range(self.width):
+            if include_agents:
+                yield ((x, y), self.grid[x][y])
+            else:
+                yield (x, y)
+
+    def cells_at_col(self, col, include_agents=False):
+        """ Return an iterator over a specific column """
+        x, _ = self.torus_adj((col, 0))
+        for y in range(self.height):
+            if include_agents:
+                yield ((x, y), self.grid[x][y])
+            else:
+                yield (x, y)
 
     def neighbors(self, pos, moore=True, radius=1, get_agents=False, include_empty=False):
         """
@@ -121,7 +159,7 @@ class Grid:
                 if False, skip empty cells
 
         Returns:
-            A set of adjacent cells of a single cell at `pos`.
+            A list of adjacent cells of a single cell at `pos`.
 
             The number of cells
             in the Moore neighborhood with radius n is (2n+1)^2 -1.
@@ -140,49 +178,27 @@ class Grid:
 
         return neighbors
 
-    def row_iter(self, row, include_agents=False):
-        """ Return an iterator over a specific row
-
-        Args:
-            include_agents: return ((x, y), agent) if True, otherwise (x, y)
-        """
-        _, y = self._torus_adj((0, row))
-        for x in range(self.width):
-            if include_agents:
-                yield ((x, y), self._grid[x][y])
-            else:
-                yield (x, y)
-
-    def col_iter(self, col, include_agents=False):
-        """ Return an iterator over a specific column """
-        x, _ = self._torus_adj((col, 0))
-        for y in range(self.height):
-            if include_agents:
-                yield ((x, y), self._grid[x][y])
-            else:
-                yield (x, y)
-
     def _moore(self, pos, radius, get_agents, include_empty):
-        neighbors = set()
+        neighbors = []
 
         for dx in range(-radius, radius + 1):
             for dy in range(-radius, radius + 1):
-                x, y = self._torus_adj((pos[0] + dx, pos[1] + dy))
+                x, y = self.torus_adj((pos[0] + dx, pos[1] + dy))
                 # If a cell is empty and empty cell should not be returned, skip
-                if (self._grid[x][y] == self.empty_value) and (not include_empty):
+                if (self.grid[x][y] == self.empty_value) and (not include_empty):
                     continue
                 if (get_agents):
-                    neighbors.add((self.grid[x][y], (x, y)))
+                    neighbors.append((self.grid[x][y], (x, y)))
                 else:
-                    neighbors.add((x, y))
+                    neighbors.append((x, y))
         return neighbors
 
     def _von_neumann(self, pos, radius, get_agents, include_empty):
-        neighbors = set()
+        neighbors = []
 
         for dx in range(-radius, radius + 1):
             for dy in range(-radius, radius + 1):
-                x, y = self._torus_adj((pos[0] + dx, pos[1] + dy))
+                x, y = self.torus_adj((pos[0] + dx, pos[1] + dy))
                 # If a cell is empty and empty cell should not be returned, skip
                 if (self.grid[x][y] == self.empty_value) and (not include_empty):
                     continue
@@ -190,39 +206,17 @@ class Grid:
                 if abs(dx) + abs(dy) > radius:
                     break
                 if (get_agents):
-                    neighbors.add((self.grid[x][y], (x, y)))
+                    neighbors.append((self.grid[x][y], (x, y)))
                 else:
-                    neighbors.add((x, y))
+                    neighbors.append((x, y))
 
         return neighbors
 
-    def _torus_adj(self, pos):
-        """ Convert coordinate, handling torus looping. """
-        if self.torus:
-            x, y = pos[0] % self.width, pos[1] % self.height
-            return x, y
-        else:
-            if (not 0 <= pos[0] < self.width) or (not 0 <= pos[1] < self.height):
-                raise IndexError(
-                    "Coordinates out of bounds. Grid is non-toroidal.")
-
-    def move_agent(self, agent, pos, replace=False):
-        """
-        Move an agent from its current position to a new position.
-
-        Args:
-            agent: Agent object to move. Assumed to have its current location
-                   stored in a 'pos' tuple.
-            pos: Tuple of new position to move the agent to.
-            replace: if True, replace the possibly existed agent at `pos` with `agent`
-        """
-        pos = self._torus_adj(pos)
-        self._remove_agent(agent.pos, agent)
-        self._place_agent(pos, agent, replace)
-        agent.pos = pos
-
-    def place_agent(self, agent, pos=("random", "random"), replace=False):
+    def place_agent(self, agent, pos):
         """ Position an agent on the grid, and set its pos variable.
+
+        If the grid is not a multigrid and the new position is already occupied, 
+        an exception will be raised.
 
         Args:
             agent: agent to place at `pos`
@@ -230,56 +224,34 @@ class Grid:
             replace: if True, replace the possibly existed agent at `pos` with `agent`
         """
         if (pos[0] == "random") or (pos[1] == "random"):
-            pos = self.pick_random_position(agent, pos)
-        self._place_agent(pos, agent, replace)
-        agent.pos = pos
-
-    def _place_agent(self, pos, agent, replace):
-        """ Place the agent at the correct location. """
-        x, y = pos
-        old_agent = self.grid[x][y]
-
-        if old_agent == self.empty_value:
-            self.grid[x][y] = set((agent, )) if self.multigrid else agent
-            self.empties.remove(pos)
+            x, y = self.pick_random_empty_cell(agent, pos)
         else:
-            if replace:
-                old_agent.pos = None
-                self.grid[x][y] = agent
+            x, y = self.torus_adj(pos)
+
+        if self.grid[x][y] != self.empty_value and not self.multigrid:
+            raise Exception("Cell has been ocupied by agent {}.".format(
+                self.grid[x][y].unique_id))
+        else:
+            # Update agent and grid attributes
+            if agent.pos != None:
+                self.remove_agent(agent)
             else:
                 if self.multigrid:
-                    self._grid[x][y].add(agent)
+                    self.grid[x][y].add(agent)
+                    if (x, y) in self.empties:
+                        self.empties.remove((x, y))
                 else:
-                    raise Exception(
-                        "Cell already occupied by agent {}".format(old_agent.unique_id))
+                    self.grid[x][y] = agent
+                    self.empties.remove((x, y))
 
-    def pick_random_position(self, agent, pos):
-        if (pos[0], pos[1]) == ("random", "random") and self.exists_empty_cells():
-            return agent.random.choice(tuple(self.empties))
-        else:
-            empties = set()
-            if pos[0] == "random":
-                # We pick a random cell in a specified row
-                for coords, cell in self.row_iter(pos[1], include_agents=True):
-                    if cell == self.empty_value:
-                        empties.add(coords)
-            else:
-                # We pick a random cell in a specified column
-                for coords, cell in self.col_iter(pos[0], include_agents=True):
-                    if cell == self.empty_value:
-                        empties.add(coords)
-
-            if len(empties) > 0:
-                return agent.random.choice(empties)
-            else:
-                raise Exception("ERROR: No empty cells")
+                agent.pos = (x, y)
 
     def remove_agent(self, agent):
         """ Remove the agent from the grid and set its pos variable to None. """
         x, y = agent.pos
         if self.multigrid:
             self.grid[x][y].remove(agent)
-            if len(self.grid[x][y]) == 0:
+            if self.is_cell_empty((x, y)):
                 self.empties.add((x, y))
         else:
             self.grid[x][y] = None
@@ -288,16 +260,43 @@ class Grid:
         agent.pos = None
 
     def move_to_empty(self, agent):
-        """ Moves agent to a random empty cell, vacating agent's old cell. """
+        """ Moves agent to a random empty cell. """
 
         if not self.exists_empty_cells():
             raise Exception("ERROR: No empty cells")
         else:
-            self.pick_random_position(agent, agent.pos)
-            self.remove_agent(agent)
-            new_pos = agent.random.choice(self.empties)
-            self._place_agent(new_pos, agent, replace=False)
-            agent.pos = new_pos
+            new_pos = self.pick_random_empty_cell(agent)
+            self.place_agent(agent, new_pos)
+
+    def pick_random_empty_cell(self, agent, pos=("random", "random")):
+        """ Return a random empty cell in the grid.
+
+        Args:
+            pos: Default value is ("random", "random"). 
+                Column and/or row index can be given to narrow the search area.
+        """
+        if not self.exists_empty_cells():
+            raise Exception("No empty cells")
+        else:
+            if (pos[0], pos[1]) == ("random", "random"):
+                return agent.random.choice(self.empties)
+            else:
+                empties = set()
+                if pos[0] == "random":
+                    # We pick a random cell in a specified row
+                    for coords, cell in self.cells_at_row(pos[1], include_agents=True):
+                        if cell == self.empty_value:
+                            empties.add(coords)
+                else:
+                    # We pick a random cell in a specified column
+                    for coords, cell in self.cells_at_col(pos[0], include_agents=True):
+                        if cell == self.empty_value:
+                            empties.add(coords)
+
+                if len(empties) > 0:
+                    return agent.random.choice(empties)
+                else:
+                    raise Exception("No empty cells at the given row/column.")
 
     def agents_on_coords(self, cells):
         """ Given a list of cell coordinates (x, y), return a list of respective agents
@@ -312,7 +311,29 @@ class Grid:
             cells = [cells]
         return [self.grid[x][y] for x, y in cells]
 
+    def torus_adj(self, pos):
+        """ Convert coordinate, handling torus looping. """
+        if self.torus:
+            x, y = pos[0] % self.width, pos[1] % self.height
+            return x, y
+        else:
+            if (not 0 <= pos[0] < self.width) or (not 0 <= pos[1] < self.height):
+                raise IndexError(
+                    "Coordinates out of bounds. Grid is non-toroidal.")
+
     # Deprecated methods below
+    def move_agent(self, agent, pos):
+        """ Deprecated method. Call place_agent(agent, pos) instead"""
+        self.place_agent(agent, pos)
+
+    def coord_iter(self):
+        from warnings import warn
+
+        warn(("Deprecated method. Call grid_iter() instead."),
+             DeprecationWarning)
+
+        self.grid_iter()
+
     def find_empty(self):
         """ Pick a random empty cell. """
         from warnings import warn
@@ -363,14 +384,14 @@ class Grid:
 
 
 class SingleGrid(Grid):
-    """Depreciated class."""
+    """ Depreciated class. Use Grid with multigrid set to False instead. """
 
     def __init__(self, width, height, torus):
         super().__init__(width, height, torus, multigrid=False)
 
 
 class MultiGrid(Grid):
-    """Depreciated class."""
+    """ Depreciated class. Use Grid with multigrid set to True instead. """
 
     def __init__(self, width, height, torus):
         super().__init__(width, height, torus, multigrid=True)
@@ -529,20 +550,6 @@ class HexGrid(Grid):
             pos, include_center, radius))
 
 
-class SingleGrid(Grid):
-    """Depreciated class."""
-
-    def __init__(self, width, height, torus):
-        super().__init__(width, height, torus, multigrid=False)
-
-
-class MultiGrid(Grid):
-    """Depreciated class."""
-
-    def __init__(self, width, height, torus):
-        super().__init__(width, height, torus, multigrid=True)
-
-
 class ContinuousSpace:
     """ Continuous space where each agent can have an arbitrary position.
 
@@ -551,7 +558,7 @@ class ContinuousSpace:
     to store agent objects, to speed up neighborhood lookups.
 
     """
-    _grid = None
+    grid = None
 
     def __init__(self, x_max, y_max, torus, x_min=0, y_min=0):
         """ Create a new continuous space.
