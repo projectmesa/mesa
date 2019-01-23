@@ -317,7 +317,9 @@ class Grid:
             x, y = pos[0] % self.width, pos[1] % self.height
             return x, y
         else:
-            if (not 0 <= pos[0] < self.width) or (not 0 <= pos[1] < self.height):
+            if (0 <= pos[0] < self.width) and (0 <= pos[1] < self.height):
+                return pos
+            else:
                 raise IndexError(
                     "Coordinates out of bounds. Grid is non-toroidal.")
 
@@ -332,7 +334,7 @@ class Grid:
         warn(("Deprecated method. Call grid_iter() instead."),
              DeprecationWarning)
 
-        self.grid_iter()
+        return self.grid_iter()
 
     def find_empty(self):
         """ Pick a random empty cell. """
