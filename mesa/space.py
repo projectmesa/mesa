@@ -26,9 +26,10 @@ class Grid:
     toroidal, the top and bottom, and left and right, edges wrap to each other
 
     Properties:
+        model: Subtype of Model that the grid is situated in
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
-        grid: Internal list-of-lists which holds the grid cells themselves.
+        multigrid: If True, a cell may hold more than one agent
 
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
@@ -42,41 +43,39 @@ class Grid:
         iter_neighborhood: Returns an iterator over cell coordinates that are
         in the neighborhood of a certain point.
         torus_adj: Converts coordinate, handles torus looping.
-        iter_cell_list_contents: Returns an iterator of the contents of the
-        cells identified in cell_list.
-        get_cell_list_contents: Returns a list of the contents of the cells
-        identified in cell_list.
         remove_agent: Removes an agent from the grid.
         is_cell_empty: Returns a bool of the contents of a cell.
 
     """
 
-    def __init__(self, width, height, torus, multigrid=False):
+    def __init__(self, model, width, height, torus, multigrid=False):
         """ Create a new grid.
 
         Args:
+            model: Subtype of Model that the grid is situated in
             width, height: The width and height of the grid
             torus: Boolean whether the grid wraps or not.
-
+            multigrid: If True, a cell may hold more than one agent
         """
+
+        self.model = model
         self.height = height
         self.width = width
         self.torus = torus
         self.multigrid = multigrid
-
-        self.grid = []
+        self._grid = []
 
         for x in range(self.width):
             col = []
             for y in range(self.height):
                 col.append(self.empty_value)
-            self.grid.append(col)
+            self._grid.append(col)
 
         self.empties = set(itertools.product(
             *(range(self.width), range(self.height))))
 
     def __getitem__(self, index):
-        return self.grid[index]
+        return self._grid[index]
 
     def __iter__(self):
         # create an iterator that chains the
@@ -93,7 +92,7 @@ class Grid:
     def is_cell_empty(self, pos):
         """ Returns a bool of the contents of a cell. """
         x, y = pos
-        return self.grid[x][y] == self.empty_value
+        return self._grid[x][y] == self.empty_value
 
     def exists_empty_cells(self):
         """ Return True if any cells empty else False. """
@@ -103,7 +102,7 @@ class Grid:
         """ Returns an iterator of tuples (agent, x, y) over the whole square grid. """
         for x in range(self.width):
             for y in range(self.height):
-                yield self.grid[x][y], x, y
+                yield self._grid[x][y], x, y
 
     def neighbors(self, pos, moore=True, radius=1, get_agents=False, include_empty=False):
         """
@@ -150,7 +149,7 @@ class Grid:
         _, y = self._torus_adj((0, row))
         for x in range(self.width):
             if include_agents:
-                yield ((x, y), self.grid[x][y])
+                yield ((x, y), self._grid[x][y])
             else:
                 yield (x, y)
 
@@ -159,7 +158,7 @@ class Grid:
         x, _ = self._torus_adj((col, 0))
         for y in range(self.height):
             if include_agents:
-                yield ((x, y), self.grid[x][y])
+                yield ((x, y), self._grid[x][y])
             else:
                 yield (x, y)
 
@@ -170,7 +169,7 @@ class Grid:
             for dy in range(-radius, radius + 1):
                 x, y = self._torus_adj((pos[0] + dx, pos[1] + dy))
                 # If a cell is empty and empty cell should not be returned, skip
-                if (self.grid[x][y] == self.empty_value) and (not include_empty):
+                if (self._grid[x][y] == self.empty_value) and (not include_empty):
                     continue
                 if (get_agents):
                     neighbors.add((self.grid[x][y], (x, y)))
@@ -249,7 +248,7 @@ class Grid:
                 self.grid[x][y] = agent
             else:
                 if self.multigrid:
-                    self.grid[x][y].add(agent)
+                    self._grid[x][y].add(agent)
                 else:
                     raise Exception(
                         "Cell already occupied by agent {}".format(old_agent.unique_id))
@@ -261,12 +260,12 @@ class Grid:
             empties = set()
             if pos[0] == "random":
                 # We pick a random cell in a specified row
-                for coords, cell in self.at_row(pos[1], include_agents=True):
+                for coords, cell in self.row_iter(pos[1], include_agents=True):
                     if cell == self.empty_value:
                         empties.add(coords)
             else:
                 # We pick a random cell in a specified column
-                for coords, cell in self.at_col(pos[0], include_agents=True):
+                for coords, cell in self.col_iter(pos[0], include_agents=True):
                     if cell == self.empty_value:
                         empties.add(coords)
 
@@ -277,30 +276,28 @@ class Grid:
 
     def remove_agent(self, agent):
         """ Remove the agent from the grid and set its pos variable to None. """
-        pos = agent.pos
-        self._remove_agent(pos, agent)
-        agent.pos = None
-
-    def _remove_agent(self, pos, agent):
-        """ Remove the agent from the given location. """
-        x, y = pos
+        x, y = agent.pos
         if self.multigrid:
             self.grid[x][y].remove(agent)
+            if len(self.grid[x][y]) == 0:
+                self.empties.add((x, y))
         else:
             self.grid[x][y] = None
+            self.empties.add((x, y))
 
-        if self.is_cell_empty(pos):
-            self.empties.add(pos)
+        agent.pos = None
 
     def move_to_empty(self, agent):
         """ Moves agent to a random empty cell, vacating agent's old cell. """
-        pos = agent.pos
+
         if not self.exists_empty_cells():
             raise Exception("ERROR: No empty cells")
-        new_pos = agent.random.choice(self.empties)
-        self._place_agent(new_pos, agent, replace=False)
-        agent.pos = new_pos
-        self._remove_agent(pos, agent)
+        else:
+            self.pick_random_position(agent, agent.pos)
+            self.remove_agent(agent)
+            new_pos = agent.random.choice(self.empties)
+            self._place_agent(new_pos, agent, replace=False)
+            agent.pos = new_pos
 
     def agents_on_coords(self, cells):
         """ Given a list of cell coordinates (x, y), return a list of respective agents
