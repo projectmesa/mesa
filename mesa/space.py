@@ -76,7 +76,7 @@ class Grid:
             *(range(self.width), range(self.height))))
 
     def __getitem__(self, index):
-        return self.grid[index]  # returns column or row?
+        return self.grid[index]
 
     def __iter__(self):
         # create an iterator that chains the
@@ -89,6 +89,15 @@ class Grid:
             return set()
         else:
             return None
+
+    def is_cell_empty(self, pos):
+        """ Returns a bool of the contents of a cell. """
+        x, y = pos
+        return self.grid[x][y] == self.empty_value
+
+    def exists_empty_cells(self):
+        """ Return True if any cells empty else False. """
+        return len(self.empties) > 0
 
     def coord_iter(self):
         """ Returns an iterator of tuples (agent, x, y) over the whole square grid. """
@@ -132,7 +141,7 @@ class Grid:
 
         return neighbors
 
-    def at_row(self, row, include_agents=False):
+    def row_iter(self, row, include_agents=False):
         """ Return an iterator over a specific row
 
         Args:
@@ -145,7 +154,7 @@ class Grid:
             else:
                 yield (x, y)
 
-    def at_col(self, col, include_agents=False):
+    def col_iter(self, col, include_agents=False):
         """ Return an iterator over a specific column """
         x, _ = self._torus_adj((col, 0))
         for y in range(self.height):
@@ -155,10 +164,6 @@ class Grid:
                 yield (x, y)
 
     def _moore(self, pos, radius, get_agents, include_empty):
-        """
-        http://www.conwaylife.com/wiki/Moore_neighbourhood
-        radius: range
-        """
         neighbors = set()
 
         for dx in range(-radius, radius + 1):
@@ -174,10 +179,6 @@ class Grid:
         return neighbors
 
     def _von_neumann(self, pos, radius, get_agents, include_empty):
-        """
-        http://www.conwaylife.com/wiki/Von_Neumann_neighborhood
-        radius: range
-        """
         neighbors = set()
 
         for dx in range(-radius, radius + 1):
@@ -230,7 +231,7 @@ class Grid:
             replace: if True, replace the possibly existed agent at `pos` with `agent`
         """
         if (pos[0] == "random") or (pos[1] == "random"):
-            pos = self._pick_random_position(agent, pos)
+            pos = self.pick_random_position(agent, pos)
         self._place_agent(pos, agent, replace)
         agent.pos = pos
 
@@ -253,8 +254,8 @@ class Grid:
                     raise Exception(
                         "Cell already occupied by agent {}".format(old_agent.unique_id))
 
-    def _pick_random_position(self, agent, pos):
-        if pos == ("random", "random") and self.exists_empty_cells():
+    def pick_random_position(self, agent, pos):
+        if (pos[0], pos[1]) == ("random", "random") and self.exists_empty_cells():
             return agent.random.choice(tuple(self.empties))
         else:
             empties = set()
@@ -291,11 +292,6 @@ class Grid:
         if self.is_cell_empty(pos):
             self.empties.add(pos)
 
-    def is_cell_empty(self, pos):
-        """ Returns a bool of the contents of a cell. """
-        x, y = pos
-        return self.grid[x][y] == self.empty_value
-
     def move_to_empty(self, agent):
         """ Moves agent to a random empty cell, vacating agent's old cell. """
         pos = agent.pos
@@ -306,6 +302,20 @@ class Grid:
         agent.pos = new_pos
         self._remove_agent(pos, agent)
 
+    def agents_on_coords(self, cells):
+        """ Given a list of cell coordinates (x, y), return a list of respective agents
+
+        Args:
+            cells: Array-like of (x, y) tuples, or single tuple.
+
+        Returns:
+            A list of agents corresponding to the given positions.
+        """
+        if not isinstance(cells, list):
+            cells = [cells]
+        return [self.grid[x][y] for x, y in cells]
+
+    # Deprecated methods below
     def find_empty(self):
         """ Pick a random empty cell. """
         from warnings import warn
@@ -323,38 +333,48 @@ class Grid:
         else:
             return None
 
-    def exists_empty_cells(self):
-        """ Return True if any cells empty else False. """
-        return len(self.empties) > 0
-
-    # Depreciated functions below
     def get_neighbors(self, pos, moore,
                       include_center=False, radius=1):
+        import warnings
+        warnings.warn(
+            "Deprecated method. Call neighbors(pos, moore, radius, True) instead. \
+            In addition, parameter `include_center` is removeed.Use `self` in the code. ",
+            DeprecationWarning)
+
         return self.neighbors(pos, moore, radius, True)
 
     def position_agent(self, agent, x="random", y="random"):
+        import warnings
+        warnings.warn(
+            "Deprecated method. Call place_agent(pos) instead.", DeprecationWarning)
+
         self.place_agent(agent, (x, y))
 
     def get_cell_list_contents(self, cells):
-        if not isinstance(cells, list):
-            cells = [cells]
-        return [self.grid[cell[0]][cell[1]] for cell in cells]
+        import warnings
+        warnings.warn(
+            "Deprecated method. Call agents_on_coords(cells) instead.", DeprecationWarning)
+
+        return self.agents_on_coords(cells)
 
     def iter_cell_list_contents(self, cells):
-        if not isinstance(cells, list):
-            cells = [cells]
-        for cell in cells:
-            yield self.grid[cell[0]][cell[1]]
+        import warnings
+        warnings.warn(
+            "Deprecated method. Call agents_on_coords(cells) instead.", DeprecationWarning)
+
+        return self.agents_on_coords(cells)
 
 
 class SingleGrid(Grid):
     """Depreciated class."""
+
     def __init__(self, width, height, torus):
         super().__init__(width, height, torus, multigrid=False)
 
 
 class MultiGrid(Grid):
     """Depreciated class."""
+
     def __init__(self, width, height, torus):
         super().__init__(width, height, torus, multigrid=True)
 
@@ -377,9 +397,9 @@ class HexGrid(Grid):
             in the neighborhood of a certain point.
 
     """
-    def __getitem__(self, index):
-        return self.grid[index]  # returns column or row?
 
+    def __getitem__(self, index):
+        return self.grid[index]
 
     def iter_neighborhood(self, pos,
                           include_center=False, radius=1):
