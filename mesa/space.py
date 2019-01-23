@@ -244,7 +244,7 @@ class Grid:
                     self.grid[x][y] = agent
                     self.empties.remove((x, y))
 
-                agent.pos = (x, y)
+            agent.pos = (x, y)
 
     def remove_agent(self, agent):
         """ Remove the agent from the grid and set its pos variable to None. """
@@ -279,19 +279,19 @@ class Grid:
             raise Exception("No empty cells")
         else:
             if (pos[0], pos[1]) == ("random", "random"):
-                return agent.random.choice(self.empties)
+                return agent.random.choice(list(self.empties))
             else:
-                empties = set()
+                empties = []
                 if pos[0] == "random":
                     # We pick a random cell in a specified row
                     for coords, cell in self.cells_at_row(pos[1], include_agents=True):
                         if cell == self.empty_value:
-                            empties.add(coords)
+                            empties.append(coords)
                 else:
                     # We pick a random cell in a specified column
                     for coords, cell in self.cells_at_col(pos[0], include_agents=True):
                         if cell == self.empty_value:
-                            empties.add(coords)
+                            empties.append(coords)
 
                 if len(empties) > 0:
                     return agent.random.choice(empties)

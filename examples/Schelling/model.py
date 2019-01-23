@@ -8,6 +8,7 @@ class SchellingAgent(Agent):
     '''
     Schelling segregation agent
     '''
+
     def __init__(self, pos, model, agent_type):
         '''
          Create a new Schelling agent.
@@ -72,7 +73,7 @@ class Schelling(Model):
                     agent_type = 0
 
                 agent = SchellingAgent((x, y), self, agent_type)
-                self.grid.position_agent(agent, (x, y))
+                self.grid.position_agent(agent, x, y)
                 self.schedule.add(agent)
 
         self.running = True
