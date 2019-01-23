@@ -57,7 +57,7 @@ class TestModularServer(TestCase):
         }
 
         self.viz_elements = [
-            CanvasGrid(self.portrayal, 10, 10, 20, 20),
+            CanvasGrid(self.portrayal, 10, 10, 20, 20, 20),
             TextElement(),
             # ChartModule([{"Label": "Wolves", "Color": "#AA0000"},  # Todo - test chart module
             #              {"Label": "Sheep", "Color": "#666666"}])

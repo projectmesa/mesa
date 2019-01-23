@@ -38,15 +38,38 @@ other agent locations, represented by circles:
 
 */
 
-var GridVisualization = function(width, height, gridWidth, gridHeight, context, interactionHandler) {
+var GridVisualization = function(width, height, gridWidth, gridHeight, context, interactionHandler, num_agents) {
 
-        // Find cell size:
-        var cellWidth = Math.floor(width / gridWidth);
-        var cellHeight = Math.floor(height / gridHeight);
+        // Find macro cell size:
+        var macroCellWidth = Math.floor(width / gridWidth);
+        var macroCellHeight = Math.floor(height / gridHeight);
+
+        // Find micro cell size
+        var numPartitions = getNextPerfectSquare(num_agents)
+        console.log(numPartitions)
+        var microCellWidth = Math.floor(macroCellWidth / numPartitions)
+        var microCellHeight = Math.floor(macroCellHeight / numPartitions)
 
         // Find max radius of the circle that can be inscribed (fit) into the
         // cell of the grid.
-        var maxR = Math.min(cellHeight, cellWidth)/2 - 1;
+        var maxR = Math.min(microCellHeight, microCellWidth)/2 - 1;
+
+        // Uses Newton's algorithm to check whether num_agents is a perfect square.
+        // If it is, returns it unchanged
+        // If it is not, finds the next perfect square
+        getNextPerfectSquare = function(num_agents) {
+            var x = num_agents
+            var y = ~~((x + 1)/ 2)
+            while (y < x){
+                x = y
+                y = ~~((~~(x + n) / x) / 2)
+            }
+            if (x*x == num_agents)
+                return num_agents
+            var intRoot = Math.round(Math.sqrt(num_agents))
+            var intRoot = intRoot +1
+            return intRoot*intRoot
+        }
 
         // Calls the appropriate shape(agent)
         this.drawLayer = function(portrayalLayer) {
@@ -100,8 +123,8 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
         text_color: Color of the inscribed text.
         */
         this.drawCircle = function(x, y, radius, colors, stroke_color, fill, text, text_color) {
-                var cx = (x + 0.5) * cellWidth;
-                var cy = (y + 0.5) * cellHeight;
+                var cx = (x + 0.5) * microCellWidth;
+                var cy = (y + 0.5) * microCellHeight;
                 var r = radius * maxR;
 
                 context.beginPath();
@@ -145,18 +168,18 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
         this.drawRectangle = function(x, y, w, h, colors, stroke_color, fill, text, text_color) {
 
                 context.beginPath();
-                var dx = w * cellWidth;
-                var dy = h * cellHeight;
+                var dx = w * microCellWidth;
+                var dy = h * microCellHeight;
 
                 // Keep in the center of the cell:
-                var x0 = (x + 0.5) * cellWidth - dx/2;
-                var y0 = (y + 0.5) * cellHeight - dy/2;
+                var x0 = (x + 0.5) * microCellWidth - dx/2;
+                var y0 = (y + 0.5) * microCellHeight - dy/2;
 
                 context.strokeStyle = stroke_color;
                 context.strokeRect(x0, y0, dx, dy);
 
                 if (fill) {
-                        var gradient = context.createLinearGradient(x0, y0, x0 + cellWidth, y0 + cellHeight);
+                        var gradient = context.createLinearGradient(x0, y0, x0 + macroCellWidth, y0 + macroCellHeight);
 
                         for (i = 0; i < colors.length; i++) {
                                 gradient.addColorStop(i/colors.length, colors[i]);
@@ -172,8 +195,8 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
                 }
                 // This part draws the text inside the Rectangle
                 if (text !== undefined) {
-                        var cx = (x + 0.5) * cellWidth;
-                        var cy = (y + 0.5) * cellHeight;
+                        var cx = (x + 0.5) * microCellWidth;
+                        var cy = (y + 0.5) * microCellHeight;
                         context.fillStyle = text_color;
                         context.textAlign = 'center';
                         context.textBaseline= 'middle';
@@ -193,8 +216,8 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
         */
         this.drawArrowHead = function(x, y, heading_x, heading_y, scale, colors, stroke_color, fill, text, text_color) {
                 var arrowR = maxR * scale;
-                var cx = (x + 0.5) * cellWidth;
-                var cy = (y + 0.5) * cellHeight;
+                var cx = (x + 0.5) * microCellWidth;
+                var cy = (y + 0.5) * microCellHeight;
                 if (heading_x === 0 && heading_y === 1) {
                         p1_x = cx;
                         p1_y = cy - arrowR;
@@ -260,8 +283,8 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
 
                 // This part draws the text inside the ArrowHead
                 if (text !== undefined) {
-                        var cx = (x + 0.5) * cellWidth;
-                          var cy = (y + 0.5) * cellHeight;
+                        var cx = (x + 0.5) * microCellWidth;
+                          var cy = (y + 0.5) * microCellHeight;
                         context.fillStyle = text_color
                         context.textAlign = 'center';
                         context.textBaseline= 'middle';
@@ -276,14 +299,14 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
                         var scale = 1
                 }
                 // Calculate coordinates so the image is always centered
-                var dWidth = cellWidth * scale;
-                var dHeight = cellHeight * scale;
-                var cx = x * cellWidth + cellWidth / 2 - dWidth / 2;
-                var cy = y * cellHeight + cellHeight / 2 - dHeight / 2;
+                var dWidth = microCellWidth * scale;
+                var dHeight = microCellHeight * scale;
+                var cx = x * microCellWidth + macroCellWidth / 2 - dWidth / 2;
+                var cy = y * microCellHeight + macroCellHeight / 2 - dHeight / 2;
 
                 // Coordinates for the text
-                var tx = (x + 0.5) * cellWidth;
-                var ty = (y + 0.5) * cellHeight;
+                var tx = (x + 0.5) * microCellWidth;
+                var ty = (y + 0.5) * microCellHeight;
 
 
                 img.onload = function() {
@@ -300,28 +323,53 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
         }
 
         /**
-        Draw Grid lines in the full gird
+        Draw Grid lines in the big grid
         */
 
-        this.drawGridLines = function() {
-                context.beginPath();
-                context.strokeStyle = "#eee";
-                maxX = cellWidth * gridWidth;
-                maxY = cellHeight * gridHeight;
+        this.drawMacroGridLines = function() {
+            context.beginPath();
+            context.strokeStyle = "#eee";
+            maxX = macroCellWidth * gridWidth;
+            maxY = macroCellHeight * gridHeight;
 
-                // Draw horizontal grid lines:
-                for(var y=0; y<=maxY; y+=cellHeight) {
-                        context.moveTo(0, y+0.5);
-                        context.lineTo(maxX, y+0.5);
-                }
+            // Draw horizontal grid lines:
+            for(var y=0; y<=maxY; y+=macroCellHeight) {
+                    context.moveTo(0, y+0.5);
+                    context.lineTo(maxX, y+0.5);
+            }
+            // Draw vertical grid lines:
+            for(var x=0; x<=maxX; x+= macroCellWidth) {
+                    context.moveTo(x+0.5, 0);
+                    context.lineTo(x+0.5, maxY);
+            }
 
-                for(var x=0; x<=maxX; x+= cellWidth) {
-                        context.moveTo(x+0.5, 0);
-                        context.lineTo(x+0.5, maxY);
-                }
-
-                context.stroke();
+            context.stroke();
         };
+
+        /**
+        Draw invisible grid lines within each macro grid
+        */
+
+        this.drawMicroGridLines = function() {
+            context.beginPath();
+            context.strokeStyle = "#fff";
+            maxX = microCellWidth * macroCellWidth
+            maxY = microCellHeight * macroCellHeight
+
+            // Draw horizontal grid lines:
+            for(var y=0; y<=maxY; y+=microCellHeight) {
+                    context.moveTo(0, y+0.5);
+                    context.lineTo(maxX, y+0.5);
+            }
+            // Draw vertical grid lines:
+            for(var x=0; x<=maxX; x+= microCellWidth) {
+                    context.moveTo(x+0.5, 0);
+                    context.lineTo(x+0.5, maxY);
+            }
+
+            context.stroke();
+
+        }
 
         this.resetCanvas = function() {
                 context.clearRect(0, 0, width, height);

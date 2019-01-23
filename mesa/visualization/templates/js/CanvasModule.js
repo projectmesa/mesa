@@ -1,4 +1,4 @@
-var CanvasModule = function(canvas_width, canvas_height, grid_width, grid_height) {
+var CanvasModule = function(canvas_width, canvas_height, grid_width, grid_height, num_agents) {
 	// Create the element
 	// ------------------
 
@@ -22,13 +22,14 @@ var CanvasModule = function(canvas_width, canvas_height, grid_width, grid_height
 
 	// Create an interaction handler using the
 	var interactionHandler = new InteractionHandler(canvas_width, canvas_height, grid_width, grid_height, interaction_canvas.getContext("2d"));
-	var canvasDraw = new GridVisualization(canvas_width, canvas_height, grid_width, grid_height, context, interactionHandler);
+	var canvasDraw = new GridVisualization(canvas_width, canvas_height, grid_width, grid_height, context, interactionHandler, num_agents);
 
 	this.render = function(data) {
 		canvasDraw.resetCanvas();
 		for (var layer in data)
 			canvasDraw.drawLayer(data[layer]);
-		canvasDraw.drawGridLines("#eee");
+		canvasDraw.drawMacroGridLines("#eee");
+		canvasDraw.drawMicroGridLines("#fff")
 	};
 
 	this.reset = function() {
