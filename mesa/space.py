@@ -783,7 +783,7 @@ class NetworkGrid:
         if G is not None:
             self.G = G
         elif generator is not None:
-            if type(args) is tuple:
+            if isinstance(args, tuple):
                 self.G = getattr(networkx, generator)(*args)
             else:
                 self.G = getattr(networkx, generator)(args)
@@ -793,7 +793,7 @@ class NetworkGrid:
 
     def add_nodes(self, node_ids):
         """adds nodes to the graph"""
-        if type(node_ids) is list:
+        if isinstance(node_ids, list):
             for node_id in node_ids:
                 self._add_node(node_id)
         else:
@@ -803,7 +803,7 @@ class NetworkGrid:
         """adds an edge to the graph and initialises the agent list in any new nodes"""
         self.G.add_edge(*edge)
         for node_id in edge:
-            if type(self.G.nodes[node_id]['agent']) is not list:
+            if not isinstance(self.G.nodes[node_id]['agent'], list):
                 self.G.nodes[node_id]['agent'] = list()
 
     def _add_node(self, node_id):
@@ -832,14 +832,14 @@ class NetworkGrid:
     def add_edges(self, node_ids):
         """adds edges between each node_ids tuple to the graph"""
 
-        if type(node_ids) is list:
+        if isinstance(node_ids, list):
             for edge in node_ids:
-                if type(edge) is not tuple:
+                if not isinstance(edge, tuple):
                     raise TypeError("node_ids must be a list of tuples or a tuple")
                 else:
                     self._add_edge(edge)
 
-        elif type(node_ids) is tuple:
+        elif isinstance(node_ids, tuple):
             self._add_edge(node_ids)
         else:
             raise TypeError("node_ids must be a list of tuples or a tuple")
@@ -847,7 +847,7 @@ class NetworkGrid:
     def remove_nodes(self, node_ids):
         """removes the nodes from node_ids from the graph and returns their agents"""
         agents = []
-        if type(node_ids) is list:
+        if isinstance(node_ids, list):
             for node_id in node_ids:
                 agents.extend(self._remove_node(node_id))
         else:
@@ -857,9 +857,9 @@ class NetworkGrid:
 
     def remove_edges(self, node_ids):
         """removes the edges between the node_ids tuples from the graph"""
-        if type(node_ids) is list:
+        if isinstance(node_ids, list):
             for edge in node_ids:
-                if type(edge) is not tuple:
+                if not isinstance(edge, tuple):
                     raise TypeError("node_ids must be a list of tuples or a tuple")
                 else:
                     if self.G.has_edge(*edge):
@@ -867,7 +867,7 @@ class NetworkGrid:
                     else:
                         raise ValueError("Edge not found")
 
-        elif type(node_ids) is tuple:
+        elif isinstance(node_ids, tuple):
             if self.G.has_edge(*node_ids):
                 self._remove_edge(node_ids)
             else:
@@ -878,7 +878,7 @@ class NetworkGrid:
     def label_edge(self, node_ids, label, value=""):
         """Adds a label to an edge which can also have a value (i.e. for weight, colour)"""
 
-        if type(node_ids) is not tuple:
+        if not isinstance(node_ids, tuple):
             raise TypeError("node_ids must be a tuple")
         else:
             if self.G.has_edge(*node_ids):
