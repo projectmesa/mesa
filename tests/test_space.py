@@ -548,8 +548,13 @@ class TestNetworkXWrappers(unittest.TestCase):
         # remove multiple edges
         edges = []
         for i in range(0, 4):
-            edges.append((choice(list(self.space.G.nodes())),
-                choice(list(self.space.G.nodes()))))
+            unique = False
+            edge = ()
+            while(not unique):
+                edge = (choice(list(self.space.G.nodes())), choice(list(self.space.G.nodes())))
+                if edge not in edges:
+                    unique = True
+            edges.append(edge)
             if not self.space.G.has_edge(*edges[i]):
                 self.space.add_edges(edges[i])
 
