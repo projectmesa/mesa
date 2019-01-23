@@ -48,7 +48,7 @@ class Grid:
 
     """
 
-    def __init__(self, model, width, height, torus, multigrid=False):
+    def __init__(self, width, height, torus, multigrid=False):
         """ Create a new grid.
 
         Args:
