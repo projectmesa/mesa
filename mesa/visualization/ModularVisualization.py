@@ -160,7 +160,7 @@ class PageHandler(tornado.web.RequestHandler):
         elements = self.application.visualization_elements
         for i, element in enumerate(elements):
             element.index = i
-        self.render("modular_template.html", port=self.application.port,
+        self.render("index.html", port=self.application.port,
                     model_name=self.application.model_name,
                     description=self.application.description,
                     package_includes=self.application.package_includes,
@@ -173,6 +173,10 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         if self.application.verbose:
             print("Socket opened!")
+        self.write_message({
+                "type": "elements",
+                "elements": [element.js_code for element in self.application.visualization_elements]
+            })
 
     def check_origin(self, origin):
         return True

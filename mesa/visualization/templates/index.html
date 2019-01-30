@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>NewViz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="/static/css/main.css"
+    />
+  </head>
+  <body>
+    <header>
+      <div id="modelName">Name</div>
+      <div id="about">About</div>
+      <button id="startModel">Start</button>
+      <button id="stepModel">Step</button>
+      <button id="resetModel">Reset</button>
+    </header>
+    <div class="visualization">
+      <div class="input" id="input"></div>
+      <div class="vizElements" id="elements">
+        <p>Current Step: <span id="step"></span></p>
+      </div>
+    </div>
+
+    <script type="module" src="static/js/main.js"></script>
+    <script src="static/js/jquery.min.js"></script>
+
+    <!-- Script includes go here -->
+    {% for file_name in package_includes %}
+    <script src="/static/js/{{ file_name }}" type="text/javascript"></script>
+    {% end %} {% for file_name in local_includes %}
+    <script src="/local/{{ file_name }}" type="text/javascript"></script>
+    {% end %}
+
+    <!-- template-specific code snippets here -->
+    <script>
+      var port = {{ port }};
+    </script>
+
+    <template id="InputElement">
+      <div>
+        <p id="title"></p>
+        <input />
+        <p>Value: <span id="value"></span></p>
+      </div>
+    </template>
+  </body>
+</html>

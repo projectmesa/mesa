@@ -1,0 +1,9 @@
+header {
+    display: grid;
+    grid-auto-flow: column;
+  }
+
+.visualization {
+  display: grid;
+  grid-auto-flow: column;
+}
