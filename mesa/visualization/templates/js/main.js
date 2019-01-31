@@ -1,4 +1,4 @@
-import { addSliderInput } from "./InputElements.js";
+import "./gui.js"
 import "./controls.js";
 import "./websocket.js";
 

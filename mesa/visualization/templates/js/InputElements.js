@@ -8,7 +8,7 @@ var onSubmitCallback = function(param_name, value) {
 
 /** Add a slider input to the documents "input" section
  * @param {string} param - The id of the parameter
- * @param {object} obj - The object describing the input
+ * @param {object} obj - The object describing the slider
  */
 export const addSliderInput = function(param, obj) {
   const sliderNode = input_template.content.cloneNode(true);

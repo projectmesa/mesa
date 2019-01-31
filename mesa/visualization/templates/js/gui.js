@@ -1,7 +1,7 @@
 import { addSliderInput } from "./InputElements.js";
 
 export const initGUI = function(model_params) {
-  var addParamInput = function(param, option) {
+  const addParamInput = function(param, option) {
     switch (option["param_type"]) {
       case "checkbox":
         addBooleanInput(param, option);
@@ -25,9 +25,9 @@ export const initGUI = function(model_params) {
     }
   };
 
-  for (var option in model_params) {
-    var type = typeof model_params[option];
-    var param_str = String(option);
+  for (let option in model_params) {
+    const type = typeof model_params[option];
+    const param_str = String(option);
 
     switch (type) {
       case "boolean":
