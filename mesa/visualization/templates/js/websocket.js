@@ -1,5 +1,6 @@
-import { control, reset, player } from "./controls.js";
-import { elements, initGUI } from "./main.js";
+import { controller } from "./controls.js";
+import { elements } from "./main.js";
+import { initGUI } from "./gui.js";
 
 // Open the websocket connection; support TLS-specific URLs when appropriate
 const ws = new WebSocket(
@@ -8,37 +9,29 @@ const ws = new WebSocket(
     "/ws"
 );
 
-ws.onopen = function() {
-  console.log("Connection opened!");
-  send({ type: "get_params" }); // Request model parameters when websocket is ready
-  reset();
-};
-
-/** Parse and handle an incoming message on the WebSocket connection. */
+/** Parse and handle an incoming message on the WebSocket connection.
+ * @param {string} message - the message received from the WebSocket
+ */
 ws.onmessage = function(message) {
-  let msg = JSON.parse(message.data);
+  const msg = JSON.parse(message.data);
   switch (msg["type"]) {
     case "viz_state":
-      const data = msg["data"];
+      // Update visualization state
       for (let i in elements) {
-        elements[i].render(data[i]);
+        elements[i].render(msg["data"][i]);
       }
       break;
     case "end":
       // We have reached the end of the model
-      control.running = false;
-      control.done = true;
-      console.log("Done!");
-      clearInterval(player);
-      $(playPauseButton.children()[0]).text("Done");
+      controller.done();
       break;
     case "model_params":
-      console.log(msg["params"]);
-      let model_params = msg["params"];
-      initGUI(model_params);
+      // Create GUI elements for each model parameter and reset everything
+      initGUI(msg["params"]);
+      controller.reset();
       break;
     case "elements":
-      console.log(msg["elements"]);
+      // Create visualization elements
       msg["elements"].forEach(elem => eval(elem));
       break;
     default:
@@ -48,8 +41,10 @@ ws.onmessage = function(message) {
   }
 };
 
-/**	 Turn an object into a string to send to the server, and send it. v*/
+/**	Turn an object into a string to send to the server, and send it.
+ * @param {string} message - The message to send to the Python server
+ */
 export const send = function(message) {
-  let msg = JSON.stringify(message);
+  const msg = JSON.stringify(message);
   ws.send(msg);
 };

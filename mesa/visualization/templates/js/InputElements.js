@@ -1,16 +1,20 @@
 import { send } from "./websocket.js";
 
-const temp = document.querySelector("template")
+const input_template = document.querySelector("template");
 
-var onSubmitCallback = function (param_name, value) {
-  send({"type": "submit_params", "param": param_name, "value": value});
+var onSubmitCallback = function(param_name, value) {
+  send({ type: "submit_params", param: param_name, value: value });
 };
 
-export const addSliderInput = function (param, obj) {
-  const sliderNode = temp.content.cloneNode(true);
+/** Add a slider input to the documents "input" section
+ * @param {string} param - The id of the parameter
+ * @param {object} obj - The object describing the input
+ */
+export const addSliderInput = function(param, obj) {
+  const sliderNode = input_template.content.cloneNode(true);
 
   const title = sliderNode.getElementById("title");
-  title.innerHTML = obj.name
+  title.innerText = obj.name;
 
   const input = sliderNode.querySelector("input");
   input.type = "range";
@@ -21,12 +25,10 @@ export const addSliderInput = function (param, obj) {
   input.id = param;
 
   const output = sliderNode.getElementById("value");
-  output.innerHTML = input.value;
+  output.innerText = input.value;
 
-
-
-  input.oninput = function () {
-    output.innerHTML = input.value;
+  input.oninput = function() {
+    output.innerText = input.value;
     onSubmitCallback(param, Number(input.value));
   };
   document.getElementById("input").appendChild(sliderNode);

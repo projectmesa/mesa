@@ -1,80 +1,73 @@
-import { send } from "./websocket.js"
-import {elements} from "./main.js"
+import { send } from "./websocket.js";
+import { elements } from "./main.js";
 
-export const control = {
-  tick: -1,
-  running: false,
-  done: false,
-  fps: 3
-};
+class ModelController {
+  constructor() {
+    this.tick = 0;
+    this.fps = 3;
+    this.running = false;
+    this.finished = false;
+    this.player = 0;
+  }
+
+  start() {
+    this.running = true;
+    this.player = setInterval(() => this.step(), 1000 / this.fps);
+    startModelButton.innerText = "Stop";
+  }
+
+  stop() {
+    this.running = false;
+    clearInterval(this.player);
+    startModelButton.innerText = "Start";
+  }
+
+  step() {
+    this.tick += 1;
+    send({ type: "get_step", step: this.tick });
+    stepDisplay.innerText = this.tick;
+  }
+
+  reset() {
+    this.tick = 0;
+    stepDisplay.innerText = this.tick;
+    send({ type: "reset" });
+    // Reset all the visualizations
+    for (var i in elements) {
+      elements[i].reset();
+    }
+    this.finished = false;
+    if (!this.running) {
+      startModelButton.innerText = "Start";
+    }
+  }
+
+  done() {
+    this.stop();
+    this.finished = true;
+    startModelButton.innerText = "Done";
+  }
+}
+
+export const controller = new ModelController();
 
 const stepDisplay = document.getElementById("step");
 
-Object.defineProperty(control, "step", {
-  get: function() {
-    return this.tick;
-  },
-  set: function(val) {
-    this.tick = val;
-    stepDisplay.innerText = val;
-  }
-});
-
-control.step = 0;
-
-export var player;
-
-/** Send a message to the server get the next visualization state. */
-const single_step = function() {
-  control.step += 1;
-  send({"type": "get_step", "step": control.tick});
-};
-
-/** Step the model forward. */
-const step = function() {
-  if (!control.running & !control.done) {
-    single_step();
-  } else if (!control.done) {
-    run();
-  }
-};
-
-const run = function() {
-  if (control.running) {
-    control.running = false;
-    clearInterval(player);
-    startModelButton.innerText = "Start";
-  } else if (!control.done) {
-    control.running = true;
-    player = setInterval(single_step, 1000 / control.fps);
-    startModelButton.innerText = "Stop";
-  }
-};
-
-export const reset = function() {
-    control.tick = 0;
-    send({"type": "reset"});
-    // Reset all the visualizations
-    for (var i in elements) {
-        elements[i].reset();
-    }
-  control.done = false;
-  control.step = 0;
-  if (!control.running) startModelButton.innerText = "Start";
-};
-
-
 const startModelButton = document.getElementById("startModel");
-startModelButton.onclick = run;
+startModelButton.onclick = () => {
+  if (controller.running) {
+    controller.stop();
+  } else if (!controller.finished) {
+    controller.start();
+  }
+};
 
 const stepModelButton = document.getElementById("stepModel");
-stepModelButton.onclick = function() {
-  if (!control.running & !control.done) {
-    single_step();
-  } else if (!control.done) {
-    run();
+stepModelButton.onclick = () => {
+  if (!controller.running & !controller.finished) {
+    controller.step();
   }
 };
 
 const resetModelButton = document.getElementById("resetModel");
-resetModelButton.onclick = reset
+resetModelButton.onclick = () => controller.reset();
