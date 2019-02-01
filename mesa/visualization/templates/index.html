@@ -2,33 +2,80 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>NewViz</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      media="screen"
-      href="/static/css/main.css"
-    />
+    <title>{{ model_name }} (Mesa visualization)</title>
+    <link href="/static/css/main.css", type="text/css", rel="stylesheet" />
+    <link href="/static/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <link href="/static/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet"/>
+    <link href="/static/css/bootstrap-switch.min.css" type="text/css" rel="stylesheet"/>
+    <link href="/static/css/bootstrap-slider.min.css" type="text/css" rel="stylesheet"/>
   </head>
   <body>
-    <header>
-      <div id="modelName">Name</div>
-      <div id="about">About</div>
-      <button id="startModel">Start</button>
-      <button id="stepModel">Step</button>
-      <button id="resetModel">Reset</button>
-    </header>
-    <div class="visualization">
-      <div class="input" id="input"></div>
-      <div class="vizElements" id="elements">
-        <p>Current Step: <span id="step"></span></p>
-      </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-inverse navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            <a class="navbar-brand" href="#">{{ model_name }}</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#" data-toggle="modal" data-target="#about" data-title="About" data-content="#about-content">
+                            About
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li id="startModel"><a href="#">Start</a></li>
+                    <li id="stepModel"><a href="#">Step</a></li>
+                    <li id="resetModel"><a href="#">Reset</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+    <div class="container">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-3" id="sidebar"></div>
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-9" id="elements">
+            <div id="elements-topbar">
+                <div class="input-group input-group-lg">
+                    <label class="label label-primary" for="fps" style="margin-right: 15px">Frames Per Second</label>
+                    <input id="fps" data-slider-id='fps' type="text" />
+                </div>
+                <p>Current Step: <span id="step">0</span></p>
+            </div>
+        </div>
     </div>
 
+    <!-- About modal -->
+    <div id="about" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">About {{ model_name }}</h4>
+                </div>
+                <div class="modal-body">
+                    <div>{{ description }}</div>
+                    <div>&nbsp;</div>
+                    <div style="clear: both;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom-load all JavaScript dependencies -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap-switch.min.js"></script>
+    <script src="/static/js/bootstrap-slider.min.js"></script>
+
     <script type="module" src="static/js/main.js"></script>
-    <script src="static/js/jquery.min.js"></script>
 
     <!-- Script includes go here -->
     {% for file_name in package_includes %}
@@ -41,13 +88,5 @@
     <script>
       var port = {{ port }};
     </script>
-
-    <template id="InputElement">
-      <div>
-        <p id="title"></p>
-        <input />
-        <p>Value: <span id="value"></span></p>
-      </div>
-    </template>
   </body>
 </html>

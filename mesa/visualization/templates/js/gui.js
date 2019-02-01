@@ -1,4 +1,10 @@
-import { addSliderInput } from "./InputElements.js";
+import {
+  addBooleanInput,
+  addSliderInput,
+  addChoiceInput,
+  addNumberInput,
+  addTextBox
+} from "./InputElements.js";
 
 export const initGUI = function(model_params) {
   const addParamInput = function(param, option) {

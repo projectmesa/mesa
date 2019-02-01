@@ -13,19 +13,19 @@ class ModelController {
   start() {
     this.running = true;
     this.player = setInterval(() => this.step(), 1000 / this.fps);
-    startModelButton.innerText = "Stop";
+    startModelButton.firstElementChild.innerText = "Stop";
   }
 
   stop() {
     this.running = false;
     clearInterval(this.player);
-    startModelButton.innerText = "Start";
+    startModelButton.firstElementChild.innerText = "Start";
   }
 
   step() {
     this.tick += 1;
-    send({ type: "get_step", step: this.tick });
     stepDisplay.innerText = this.tick;
+    send({ type: "get_step", step: this.tick });
   }
 
   reset() {
@@ -38,20 +38,38 @@ class ModelController {
     }
     this.finished = false;
     if (!this.running) {
-      startModelButton.innerText = "Start";
+      startModelButton.firstElementChild.innerText = "Start";
     }
   }
 
   done() {
     this.stop();
     this.finished = true;
-    startModelButton.innerText = "Done";
+    startModelButton.firstElementChild.innerText = "Done";
+  }
+
+  updateFPS(val) {
+    this.fps = Number(val);
+    if (this.running) {
+      this.stop();
+      this.start();
+    }
   }
 }
 
 export const controller = new ModelController();
 
 const stepDisplay = document.getElementById("step");
+
+const fpsControl = $("#fps").slider({
+  max: 20,
+  min: 0,
+  value: 3,
+  ticks: [0, 20],
+  ticks_labels: [0, 20],
+  ticks_position: [0, 100]
+});
+fpsControl.on('change', () => controller.updateFPS(fpsControl.val()))
 
 const startModelButton = document.getElementById("startModel");
 startModelButton.onclick = () => {
