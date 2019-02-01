@@ -1,5 +1,5 @@
 import { send } from "./websocket.js";
-import { elements } from "./main.js";
+import * as elements from "./elements.js";
 
 class ModelController {
   constructor() {
@@ -33,11 +33,9 @@ class ModelController {
     stepDisplay.innerText = this.tick;
     send({ type: "reset" });
     // Reset all the visualizations
-    for (var i in elements) {
-      elements[i].reset();
-    }
-    this.finished = false;
-    if (!this.running) {
+    elements.reset()
+    if (this.finished) {
+      this.finished = false;
       startModelButton.firstElementChild.innerText = "Start";
     }
   }

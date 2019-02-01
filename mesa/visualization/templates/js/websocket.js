@@ -1,5 +1,5 @@
 import { controller } from "./controls.js";
-import { elements } from "./main.js";
+import * as elements from "./elements.js";
 import { initGUI } from "./gui.js";
 
 // Open the websocket connection; support TLS-specific URLs when appropriate
@@ -17,9 +17,7 @@ ws.onmessage = function(message) {
   switch (msg["type"]) {
     case "viz_state":
       // Update visualization state
-      for (let i in elements) {
-        elements[i].render(msg["data"][i]);
-      }
+      elements.render(msg["data"])
       break;
     case "end":
       // We have reached the end of the model
@@ -32,7 +30,7 @@ ws.onmessage = function(message) {
       break;
     case "elements":
       // Create visualization elements
-      msg["elements"].forEach(elem => eval(elem));
+      elements.add(msg["elements"]);
       break;
     default:
       // There shouldn't be any other message
