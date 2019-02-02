@@ -1,6 +1,4 @@
-import { controller } from "./controls.js";
-
-export const ChartModule = function(series, canvas_width, canvas_height) {
+const ChartModule = function(series, canvas_width, canvas_height) {
   // Create the tag:
   var canvas_tag =
     "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
@@ -81,7 +79,7 @@ export const ChartModule = function(series, canvas_width, canvas_height) {
   });
 
   this.render = function(data) {
-    chart.data.labels.push(controller.tick);
+    chart.data.labels.push(window.controller.tick);
     for (i = 0; i < data.length; i++) {
       chart.data.datasets[i].data.push(data[i]);
     }

@@ -56,6 +56,7 @@ class ModelController {
 }
 
 export const controller = new ModelController();
+window.controller = controller;
 
 const stepDisplay = document.getElementById("step");
 

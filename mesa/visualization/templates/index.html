@@ -79,7 +79,7 @@
 
     <!-- Script includes go here -->
     {% for file_name in package_includes %}
-    <script src="/static/js/{{ file_name }}" type="module"></script>
+    <script src="/static/js/{{ file_name }}" type="text/javascript"></script>
     {% end %} {% for file_name in local_includes %}
     <script src="/local/{{ file_name }}" type="text/javascript"></script>
     {% end %}
