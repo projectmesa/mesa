@@ -17,7 +17,7 @@ ws.onmessage = function(message) {
   switch (msg["type"]) {
     case "viz_state":
       // Update visualization state
-      elements.render(msg["data"])
+      elements.render(msg["data"]);
       break;
     case "end":
       // We have reached the end of the model

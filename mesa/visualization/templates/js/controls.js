@@ -12,13 +12,13 @@ class ModelController {
 
   start() {
     this.running = true;
-    this.player = setInterval(() => this.step(), 1000 / this.fps);
+    this.step();
     startModelButton.firstElementChild.innerText = "Stop";
   }
 
   stop() {
     this.running = false;
-    clearInterval(this.player);
+    clearTimeout(this.player);
     startModelButton.firstElementChild.innerText = "Start";
   }
 
@@ -33,7 +33,7 @@ class ModelController {
     stepDisplay.innerText = this.tick;
     send({ type: "reset" });
     // Reset all the visualizations
-    elements.reset()
+    elements.reset();
     if (this.finished) {
       this.finished = false;
       startModelButton.firstElementChild.innerText = "Start";
@@ -68,7 +68,7 @@ const fpsControl = $("#fps").slider({
   ticks_labels: [0, 20],
   ticks_position: [0, 100]
 });
-fpsControl.on('change', () => controller.updateFPS(fpsControl.val()))
+fpsControl.on("change", () => controller.updateFPS(fpsControl.val()));
 
 const startModelButton = document.getElementById("startModel");
 startModelButton.onclick = () => {
