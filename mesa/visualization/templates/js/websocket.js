@@ -1,15 +1,16 @@
 import { controller } from "./controls.js";
-import * as elements from "./elements.js";
+import * as vizElements from "./viz-elements.js";
 import { initGUI } from "./gui.js";
 
-// Open the websocket connection; support TLS-specific URLs when appropriate
+/** Open the websocket connection; support TLS-specific URLs when appropriate */
 const ws = new WebSocket(
   (window.location.protocol === "https:" ? "wss://" : "ws://") +
     location.host +
     "/ws"
 );
 
-/** Parse and handle an incoming message on the WebSocket connection.
+/**
+ * Parse and handle an incoming message on the WebSocket connection.
  * @param {string} message - the message received from the WebSocket
  */
 ws.onmessage = function(message) {
@@ -17,7 +18,7 @@ ws.onmessage = function(message) {
   switch (msg["type"]) {
     case "viz_state":
       // Update visualization state
-      elements.render(msg["data"]);
+      vizElements.render(msg["data"]);
       break;
     case "end":
       // We have reached the end of the model
@@ -30,7 +31,7 @@ ws.onmessage = function(message) {
       break;
     case "elements":
       // Create visualization elements
-      elements.add(msg["elements"]);
+      vizElements.add(msg["elements"]);
       break;
     default:
       // There shouldn't be any other message
@@ -39,7 +40,8 @@ ws.onmessage = function(message) {
   }
 };
 
-/**	Turn an object into a string to send to the server, and send it.
+/**
+ * Turn an object into a string to send to the server, and send it.
  * @param {string} message - The message to send to the Python server
  */
 export const send = function(message) {

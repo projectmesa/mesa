@@ -6,6 +6,10 @@ import {
   addTextBox
 } from "./InputElements.js";
 
+/**
+ * Create the GUI with user-settable parameters
+ * @param {object} model_params - Create the GUI from these model parameters
+ */
 export const initGUI = function(model_params) {
   const addParamInput = function(param, option) {
     switch (option["param_type"]) {

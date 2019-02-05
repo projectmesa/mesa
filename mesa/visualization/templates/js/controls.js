@@ -1,56 +1,71 @@
 import { send } from "./websocket.js";
-import * as elements from "./elements.js";
+import * as vizElements from "./viz-elements.js";
 
+/** A ModelController class that controls the model state */
 class ModelController {
-  constructor() {
-    this.tick = 0;
-    this.fps = 3;
-    this.running = false;
-    this.finished = false;
-    this.player = 0;
+  /**
+   * Create a ModelController
+   * @param  {number} tick=0 - Initial step of the model
+   * @param  {number} fps=3 - Run the model with this number of frames per second
+   * @param  {boolean} running=false - Initiate the model in a running state?
+   * @param  {boolean} finished=false - Initiate the model in a finished state?
+   */
+  constructor(tick = 0, fps = 3, running = false, finished = false) {
+    this.tick = tick;
+    this.fps = fps;
+    this.running = running;
+    this.finished = running;
   }
 
+  /** Start the model and keep it running until stopped */
   start() {
     this.running = true;
     this.step();
     startModelButton.firstElementChild.innerText = "Stop";
   }
 
+  /** Stop the model */
   stop() {
     this.running = false;
-    clearTimeout(this.player);
     startModelButton.firstElementChild.innerText = "Start";
   }
 
+  /** Step the model ahead and if its in a running state call itself again */
   step() {
-    if (elements.rendered) {
+    if (vizElements.rendered) {
       this.tick += 1;
       stepDisplay.innerText = this.tick;
-      elements.update(this.tick)
+      vizElements.update(this.tick);
     }
     if (this.running) {
-      setTimeout(() => this.step(), 1000 / this.fps)
+      setTimeout(() => this.step(), 1000 / this.fps);
     }
   }
 
+  /** Reset the model and visualization state but keep it in a running state */
   reset() {
     this.tick = 0;
     stepDisplay.innerText = this.tick;
     send({ type: "reset" });
     // Reset all the visualizations
-    elements.reset();
+    vizElements.reset();
     if (this.finished) {
       this.finished = false;
       startModelButton.firstElementChild.innerText = "Start";
     }
   }
 
+  /** Stops the model and put it into a finished state */
   done() {
     this.stop();
     this.finished = true;
     startModelButton.firstElementChild.innerText = "Done";
   }
 
+  /**
+   * Update the frames per second
+   * @param {number} val - The new value of frames per second
+   */
   updateFPS(val) {
     this.fps = Number(val);
   }

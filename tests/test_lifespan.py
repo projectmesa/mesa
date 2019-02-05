@@ -58,7 +58,7 @@ class FiniteLifeAgent(Agent):
         inactivated = self.inactivate()
         if not inactivated:
             self.steps += 1  # keep track of how many ticks are seen
-            if np.random.binomial(1, 0.1) != 0:  # 10% chance of dying
+            if np.random.binomial(1, 0.1) is not 0:  # 10% chance of dying
                 self.model.schedule.remove(self)
 
     def inactivate(self):
