@@ -1,18 +1,22 @@
-import { controller } from "./controls.js"
+import { send } from "./websocket.js";
 
 export const elements = [];
+export let rendered = false;
 
 export const add = function(element) {
   element.forEach(elem => eval(elem));
+};
+
+export const update = function(tick) {
+  send({ type: "get_step", step: tick });
+  rendered = false;
 };
 
 export const render = function(data) {
   for (let i in elements) {
     elements[i].render(data[i]);
   }
-  if (controller.running) {
-    controller.player = setTimeout(() => controller.step(), 1000/controller.fps)
-  }
+  rendered = true;
 };
 
 export const reset = function() {

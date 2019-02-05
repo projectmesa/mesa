@@ -23,9 +23,14 @@ class ModelController {
   }
 
   step() {
-    this.tick += 1;
-    stepDisplay.innerText = this.tick;
-    send({ type: "get_step", step: this.tick });
+    if (elements.rendered) {
+      this.tick += 1;
+      stepDisplay.innerText = this.tick;
+      elements.update(this.tick)
+    }
+    if (this.running) {
+      setTimeout(() => this.step(), 1000 / this.fps)
+    }
   }
 
   reset() {
@@ -48,10 +53,6 @@ class ModelController {
 
   updateFPS(val) {
     this.fps = Number(val);
-    if (this.running) {
-      this.stop();
-      this.start();
-    }
   }
 }
 
