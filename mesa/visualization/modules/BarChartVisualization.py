@@ -79,7 +79,7 @@ class BarChartModule(VisualizationElement):
                 name = s["Label"]
                 try:
                     val = data_collector.model_vars[name][-1]
-                except (IndexError, KeyError) as e:
+                except (IndexError, KeyError):
                     val = 0
                 outDict[name] = val
             current_values.append(outDict)
