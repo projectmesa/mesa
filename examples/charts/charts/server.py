@@ -2,7 +2,7 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule, BarChartModule, PieChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 from charts.agents import Person
-from charts.model import BankReserves
+from charts.model import Charts
 
 """
 Citation:
@@ -79,7 +79,7 @@ pie_chart = PieChartModule([{"Label": "Rich", "Color": RICH_COLOR},
                             {"Label": "Poor", "Color": POOR_COLOR}])
 
 # create instance of Mesa ModularServer
-server = ModularServer(BankReserves, [canvas_element, line_chart, model_bar, agent_bar, pie_chart],
+server = ModularServer(Charts, [canvas_element, line_chart, model_bar, agent_bar, pie_chart],
                        "Mesa Charts",
                        model_params=model_params
                        )
