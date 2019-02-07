@@ -101,6 +101,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
                 // Remainder is the remainder of that division. Controls the x axis
                 multiple = Math.floor(i/numPartitions)
                 remainder = i%numPartitions
+                console.log('p.x: ' + p.x + ' p.y: ' + p.y)
 
                 if (p.Shape == "rect"){
                     this.drawRectangle(p.x, p.y, p.w, p.h, p.Color, p.stroke_color, p.Filled, p.text, p.text_color, p.Many, multiple, remainder);
@@ -183,19 +184,29 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         text: Inscribed text in rectangle.
         text_color: Color of the inscribed text.
         */
-        this.drawRectangle = function(x, y, w, h, colors, stroke_color, fill, text, text_color, many, num_agents_drawn) {
+        this.drawRectangle = function(x, y, w, h, colors, stroke_color, fill, text, text_color, many, multiple, remainder) {
             context.beginPath();
-            var dx = w * microCellWidth;
-            var dy = h * microCellHeight;
+            if (many){
+                var dx = w* microCellWidth
+                var dy = h* microCellHeight
+                var x0 = (x*macroCellWidth) + remainder*microCellWidth
+                var y0 = (y*macroCellHeight) + multiple*microCellHeight
+            }
+            else{
+                var dx = w * macroCellWidth;
+                var dy = h * macroCellHeight;
+                var x0 = (x + 0.5) * macroCellWidth - dx/2;
+                var y0 = (y + 0.5) * macroCellHeight - dy/2;
+            }
 
             // Keep in the center of the cell:
-            var x0 = (x + 0.5) * microCellWidth - dx/2;
-            var y0 = (y + 0.5) * microCellHeight - dy/2;
+
 
             context.strokeStyle = stroke_color;
             context.strokeRect(x0, y0, dx, dy);
 
             if (fill) {
+                console.log('x0: ' + x0  + ' y0: ' + y0 + ' microCellWidth: ' + microCellWidth + ' microCellHeight: ' + microCellHeight)
                 var gradient = context.createLinearGradient(x0, y0, x0 + microCellWidth, y0 + microCellHeight);
 
                 for (i = 0; i < colors.length; i++) {
@@ -206,10 +217,10 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
                 context.fillStyle = gradient;
                 context.fillRect(x0,y0,dx,dy);
             }
-            else {
-                context.fillStyle = color;
-                context.strokeRect(x0, y0, dx, dy);
-            }
+            // else {
+            //     context.fillStyle = color;
+            //     context.strokeRect(x0, y0, dx, dy);
+            // }
             // This part draws the text inside the Rectangle
             if (text !== undefined) {
                 var cx = (x + 0.5) * microCellWidth;
@@ -317,7 +328,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         var dWidth = microCellWidth * scale;
         var dHeight = microCellHeight * scale;
         var cx = x * microCellWidth + macroCellWidth / 2 - dWidth / 2;
-        var cy = y * mucroCellHeight + macroCellHeight / 2 - dHeight / 2;
+        var cy = y * microCellHeight + macroCellHeight / 2 - dHeight / 2;
 
         // Coordinates for the text
         var tx = (x + 0.5) * microCellWidth;
