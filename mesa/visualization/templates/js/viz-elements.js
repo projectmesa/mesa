@@ -1,14 +1,14 @@
 import { send } from "./websocket.js";
+import { controller } from "./controls.js";
 
 export const vizElements = [];
-export let rendered = false;
 
 // All current Visualization modules use elements instead of vizElements
 const elements = vizElements;
 
 /**
  * Add visualization elements
- * @param {string} element - JS code that is evaluated to create visualization elements
+ * @param {Array<string>} newElements - JS code that creates visualization elements
  */
 export const add = function(newElements) {
   newElements.forEach(element => eval(element));
@@ -20,7 +20,7 @@ export const add = function(newElements) {
  */
 export const update = function(step) {
   send({ type: "get_step", step: step });
-  rendered = false;
+  // The response will trigger this modules render function
 };
 
 /**
@@ -31,7 +31,9 @@ export const render = function(data) {
   for (let i in vizElements) {
     vizElements[i].render(data[i]);
   }
-  rendered = true;
+  if (controller.running) {
+    setTimeout(() => controller.step(), 1000 / controller.fps);
+  }
 };
 
 /** Reset the visualization state of each element */

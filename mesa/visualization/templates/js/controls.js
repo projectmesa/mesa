@@ -30,19 +30,18 @@ class ModelController {
     startModelButton.firstElementChild.innerText = "Start";
   }
 
-  /** Step the model ahead and if its in a running state call itself again */
+  /**
+   * Step the model one step ahead.
+   *
+   * If the model is in a running state this function will be called repeatedly
+   * after the visualization elements are rendered. */
   step() {
-    if (vizElements.rendered) {
-      this.tick += 1;
-      stepDisplay.innerText = this.tick;
-      vizElements.update(this.tick);
-    }
-    if (this.running) {
-      setTimeout(() => this.step(), 1000 / this.fps);
-    }
+    this.tick += 1;
+    stepDisplay.innerText = this.tick;
+    vizElements.update(this.tick);
   }
 
-  /** Reset the model and visualization state but keep it in a running state */
+  /** Reset the model and visualization state but keep its running state */
   reset() {
     this.tick = 0;
     stepDisplay.innerText = this.tick;
@@ -72,6 +71,7 @@ class ModelController {
 }
 
 export const controller = new ModelController();
+// put controller in the global namespace of the browser
 window.controller = controller;
 
 const stepDisplay = document.getElementById("step");
@@ -86,6 +86,9 @@ const fpsControl = $("#fps").slider({
 });
 fpsControl.on("change", () => controller.updateFPS(fpsControl.val()));
 
+/**
+ * Button logic for start, stop and reset buttons
+ */
 const startModelButton = document.getElementById("startModel");
 startModelButton.onclick = () => {
   if (controller.running) {
@@ -94,13 +97,11 @@ startModelButton.onclick = () => {
     controller.start();
   }
 };
-
 const stepModelButton = document.getElementById("stepModel");
 stepModelButton.onclick = () => {
   if (!controller.running & !controller.finished) {
     controller.step();
   }
 };
-
 const resetModelButton = document.getElementById("resetModel");
 resetModelButton.onclick = () => controller.reset();
