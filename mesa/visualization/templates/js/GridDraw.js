@@ -140,8 +140,8 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
             if (many) {
                 var r = radius * manyMaxR;
                 console.log(radius, manyMaxR)
-                var cx = x*cellWidth + r + remainder*(microCellWidth);
-                var cy = y*cellHeight + r + multiple*(microCellHeight);
+                var cx = x*cellWidth + 2*r + remainder*(microCellWidth);
+                var cy = y*cellHeight + 2*r + multiple*(microCellHeight);
             }
             else{
                 var r = radius * fewMaxR;
