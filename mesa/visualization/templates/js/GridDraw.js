@@ -40,8 +40,8 @@ other agent locations, represented by circles:
 
 var GridVisualization = function(width, height, gridWidth, gridHeight, num_agents, context, interactionHandler) {
         // Uses Newton's algorithm to check whether num_agents is a perfect square.
-        // If it is, returns it unchanged
-        // If it is not, finds the next perfect square
+        // If it is, returns it's square root
+        // If it is not, finds the next perfect square's root
         getNextPerfectSquareRoot = function(num_agents) {
             var x = num_agents;
             var y = Math.floor((x + 1)/ 2);
@@ -131,18 +131,17 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         text: Inscribed text in rectangle.
         text_color: Color of the inscribed text.
         many: Boolean for whether or not to print all of the agents in a state independently
-        multiple: 
+        multiple: the number of times the current agent number i goes into the next perfect square root. Controls y-axis location.
+        remainder: the remainder of the division of i/next perfect square root. Controls x-axis location.
         */
         this.drawCircle = function(x, y, radius, colors, stroke_color, fill, text, text_color, many, multiple, remainder) {
             if (many) {
                 var r = radius * manyMaxR;
-                console.log(radius, manyMaxR)
                 var cx = x*cellWidth + 4*r + remainder*microCellWidth;
                 var cy = y*cellHeight + 4*r + multiple*microCellHeight;
             }
             else{
                 var r = radius * fewMaxR;
-                console.log(r)
                 var cx = (x + 0.5) * cellWidth;
                 var cy = (y + 0.5) * cellHeight;
             }
@@ -185,6 +184,9 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         fill: Boolean, whether to fill or not.
         text: Inscribed text in rectangle.
         text_color: Color of the inscribed text.
+        many: Boolean for whether or not to print all of the agents in a state independently
+        multiple: the number of times the current agent number i goes into the next perfect square root. Controls y-axis location.
+        remainder: the remainder of the division of i/next perfect square root. Controls x-axis location.
         */
         this.drawRectangle = function(x, y, w, h, colors, stroke_color, fill, text, text_color, many, multiple, remainder) {
             context.beginPath();
@@ -225,9 +227,8 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
             // This part draws the text inside the Rectangle
             if (text !== undefined) {
                 if (many){
-                    var cx = (x*cellWidth) + remainder*microCellWidth+dx/2
-                    var cy = (y*cellHeight) + multiple*microCellHeight+dy/2
-                    console.log(cx, cy)
+                    var cx = (x*cellWidth) + remainder*microCellWidth+dx/2;
+                    var cy = (y*cellHeight) + multiple*microCellHeight+dy/2;
                 }
                 else{
                     var cx = (x + 0.5) * cellWidth;
@@ -249,6 +250,9 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         fill: Boolean, whether to fill or not.
         text: Inscribed text in shape.
         text_color: Color of the inscribed text.
+        many: Boolean for whether or not to print all of the agents in a state independently
+        multiple: the number of times the current agent number i goes into the next perfect square root. Controls y-axis location.
+        remainder: the remainder of the division of i/next perfect square root. Controls x-axis location.
         */
         this.drawArrowHead = function(x, y, heading_x, heading_y, scale, colors, stroke_color, fill, text, text_color, many, multiple, remainder) {
             if (many){
@@ -341,7 +345,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
             }
     };
 
-    this.drawCustomImage = function (shape, x, y, scale, text, text_color_, many, num_agents_drawn) {
+    this.drawCustomImage = function (shape, x, y, scale, text, text_color_) {
         var img = new Image();
             img.src = "local/".concat(shape);
         if (scale === undefined) {
@@ -372,10 +376,10 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         }
 
         /**
-        Draw Grid lines in the big grid
+        Draw Grid lines in the full grid
         */
 
-        this.drawMacroGridLines = function() {
+        this.drawGridLines = function() {
             context.beginPath();
             context.strokeStyle = "#eee";
             maxX = cellWidth * gridWidth;

@@ -28,8 +28,7 @@ var CanvasModule = function(canvas_width, canvas_height, grid_width, grid_height
 		canvasDraw.resetCanvas();
 		for (var layer in data)
 			canvasDraw.drawLayer(data[layer]);
-		canvasDraw.drawMacroGridLines("#eee");
-		canvasDraw.drawMicroGridLines("#fff")
+		canvasDraw.drawGridLines("#eee");
 	};
 
 	this.reset = function() {
