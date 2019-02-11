@@ -69,6 +69,8 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         // Find max radius of the circle that can be inscribed (fit) into the
         // cell of the grid.
         var manyMaxR = Math.min(microCellHeight, microCellWidth)/2 - 1;
+        console.log(microCellHeight, microCellWidth)
+        console.log(numPartitions)
         var fewMaxR = Math.min(cellHeight, cellWidth)/2 - 1;
 
         // Calls the appropriate shape(agent)
@@ -137,8 +139,9 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         this.drawCircle = function(x, y, radius, colors, stroke_color, fill, text, text_color, many, multiple, remainder) {
             if (many) {
                 var r = radius * manyMaxR;
-                var cx = x*cellWidth + 4*r + remainder*microCellWidth;
-                var cy = y*cellHeight + 4*r + multiple*microCellHeight;
+                console.log(radius, manyMaxR)
+                var cx = x*cellWidth + r + remainder*(microCellWidth);
+                var cy = y*cellHeight + r + multiple*(microCellHeight);
             }
             else{
                 var r = radius * fewMaxR;
@@ -190,11 +193,12 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         */
         this.drawRectangle = function(x, y, w, h, colors, stroke_color, fill, text, text_color, many, multiple, remainder) {
             context.beginPath();
+            // TODO: Support different values of w and h when multiple = True
             if (many){
-                var dx = w* microCellWidth;
-                var dy = h* microCellHeight;
-                var x0 = (x*cellWidth) + remainder*microCellWidth;
-                var y0 = (y*cellHeight) + multiple*microCellHeight;
+                var dx = microCellWidth;
+                var dy = microCellHeight;
+                var x0 = (x*cellWidth)+ 1 + remainder*microCellWidth;
+                var y0 = (y*cellHeight)+ 1 + multiple*microCellHeight;
             }
             else{
                 var dx = w * cellWidth;
@@ -220,15 +224,12 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
                 context.fillStyle = gradient;
                 context.fillRect(x0,y0,dx,dy);
             }
-            else {
-                context.fillStyle = color;
-                context.strokeRect(x0, y0, dx, dy);
-            }
+
             // This part draws the text inside the Rectangle
             if (text !== undefined) {
                 if (many){
-                    var cx = (x*cellWidth) + remainder*microCellWidth+dx/2;
-                    var cy = (y*cellHeight) + multiple*microCellHeight+dy/2;
+                    var cx = (x*cellWidth) + 1 + remainder*microCellWidth+dx/2;
+                    var cy = (y*cellHeight) + 1 + multiple*microCellHeight+dy/2;
                 }
                 else{
                     var cx = (x + 0.5) * cellWidth;
@@ -258,8 +259,9 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
             if (many){
                 //scale currently doesn't affect the drawings when many is true
                 var arrowR = manyMaxR;
-                var cx = x*cellWidth + 6*arrowR + remainder*microCellWidth;
-                var cy = y*cellHeight + 6*arrowR + multiple*microCellHeight;
+                console.log(x, cellWidth, arrowR, remainder, microCellWidth)
+                var cx = x*cellWidth + arrowR + remainder*microCellWidth;
+                var cy = y*cellHeight + arrowR + multiple*microCellHeight;
             }
             else{
                 var arrowR = fewMaxR * scale
@@ -331,8 +333,8 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
             // This part draws the text inside the ArrowHead
             if (text !== undefined) {
                 if (many){
-                    var cx = x*cellWidth + 6*arrowR + remainder*microCellWidth;
-                    var cy = y*cellHeight + 6*arrowR + multiple*microCellHeight;
+                    var cx = x*cellWidth + arrowR + remainder*microCellWidth;
+                    var cy = y*cellHeight + arrowR + multiple*microCellHeight;
                 }
                 else{
                     var cx = (x + 0.5) * microCellWidth;
@@ -345,21 +347,35 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
             }
     };
 
-    this.drawCustomImage = function (shape, x, y, scale, text, text_color_) {
+    this.drawCustomImage = function (shape, x, y, scale, text, text_color_, many, multiple, remainder) {
         var img = new Image();
             img.src = "local/".concat(shape);
         if (scale === undefined) {
             var scale = 1
         }
-        // Calculate coordinates so the image is always centered
-        var dWidth = microCellWidth * scale;
-        var dHeight = microCellHeight * scale;
-        var cx = x * microCellWidth + cellWidth / 2 - dWidth / 2;
-        var cy = y * microCellHeight + cellHeight / 2 - dHeight / 2;
 
-        // Coordinates for the text
-        var tx = (x + 0.5) * microCellWidth;
-        var ty = (y + 0.5) * microCellHeight;
+        if (many){
+            var dWidth = microCellWidth*scale;
+            var dHeight = microCellHeight*scale;
+            var cx = (x*cellWidth) + scale + remainder*microCellWidth;
+            var cy = (y*cellHeight) + scale + multiple*microCellHeight;
+
+            var tx = (x*cellWidth) + scale + remainder*microCellWidth + microCellWidth/2;
+            var ty = (y*cellHeight) + scale + multiple*microCellHeight + microCellHeight/2;
+        }
+        else{
+            // Calculate coordinates so the image is always centered
+            var dWidth = cellWidth * scale;
+            var dHeight = cellHeight * scale;
+            var cx = x * cellWidth + cellWidth / 2 - dWidth / 2;
+            var cy = y * cellHeight + cellHeight / 2 - dHeight / 2;
+
+            // Coordinates for the text
+            var tx = (x + 0.5) * cellWidth;
+            var ty = (y + 0.5) * cellHeight;
+        }
+
+
 
 
         img.onload = function() {
