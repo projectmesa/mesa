@@ -50,11 +50,11 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
                 y = Math.floor((x + Math.floor(num_agents / x)) / 2);
             }
             if (x*x == num_agents){
-                return Math.sqrt(num_agents)
+                return Math.sqrt(num_agents);
             }
             var intRoot = Math.floor(Math.sqrt(num_agents));
             var intRoot = intRoot +1;
-            return intRoot
+            return intRoot;
         }
         // Find macro cell size:
         var cellWidth = Math.floor(width / gridWidth);
@@ -69,8 +69,6 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         // Find max radius of the circle that can be inscribed (fit) into the
         // cell of the grid.
         var manyMaxR = Math.min(microCellHeight, microCellWidth)/2 - 1;
-        console.log(microCellHeight, microCellWidth)
-        console.log(numPartitions)
         var fewMaxR = Math.min(cellHeight, cellWidth)/2 - 1;
 
         // Calls the appropriate shape(agent)
@@ -97,7 +95,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
 
                 // If the stroke color is not defined, then the first color in the colors array is the stroke color.
                 if (!p.stroke_color)
-                    p.stroke_color = p.Color[0]
+                    p.stroke_color = p.Color[0];
 
                 // Specifications for drawing objects for multiple option. 
                 // Multiple is the number of times the times i goes into numPartitions. Controls the y-axis.
@@ -139,7 +137,6 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
         this.drawCircle = function(x, y, radius, colors, stroke_color, fill, text, text_color, many, multiple, remainder) {
             if (many) {
                 var r = radius * manyMaxR;
-                console.log(radius, manyMaxR)
                 var cx = x*cellWidth + 2*r + remainder*(microCellWidth);
                 var cy = y*cellHeight + 2*r + multiple*(microCellHeight);
             }
@@ -259,7 +256,6 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
             if (many){
                 //scale currently doesn't affect the drawings when many is true
                 var arrowR = manyMaxR;
-                console.log(x, cellWidth, arrowR, remainder, microCellWidth)
                 var cx = x*cellWidth + arrowR + remainder*microCellWidth;
                 var cy = y*cellHeight + arrowR + multiple*microCellHeight;
             }
@@ -360,6 +356,7 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, num_agent
             var cx = (x*cellWidth) + scale + remainder*microCellWidth;
             var cy = (y*cellHeight) + scale + multiple*microCellHeight;
 
+            // Coordinates for the text
             var tx = (x*cellWidth) + scale + remainder*microCellWidth + microCellWidth/2;
             var ty = (y*cellHeight) + scale + multiple*microCellHeight + microCellHeight/2;
         }
