@@ -151,7 +151,7 @@ To quickly spin up a model visualization, you might do something like:
     server = ModularServer(MyModel, 
                            [grid], 
                            "My Model", 
-                           100, 10, 10)
+                           {'n_agents': 10})
     server.launch()
 
 This will launch the browser-based visualization, on the default port 8521.
