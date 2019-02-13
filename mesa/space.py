@@ -15,7 +15,7 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
-import networkx
+import networkx as nx
 import numpy as np
 
 
@@ -778,15 +778,14 @@ class ContinuousSpace:
 
 class NetworkGrid:
     """ Network Grid where each node contains zero or more agents. """
-    def __init__(self, G=None, generator="Graph", args=()):
+    """ kwargs = the arguments to the nx generator function
+        e.g for watts_strogatz_graph(n, k, p[, seed])"""
+    def __init__(self, G=None, generator="Graph", **kwargs):
         """Default values create empty graph"""
         if G is not None:
             self.G = G
         elif generator is not None:
-            if isinstance(args, tuple):
-                self.G = getattr(networkx, generator)(*args)
-            else:
-                self.G = getattr(networkx, generator)(args)
+                self.G = getattr(nx, generator)(**kwargs)
 
         for node_id in self.G.nodes:
             self.G.nodes[node_id]['agent'] = list()

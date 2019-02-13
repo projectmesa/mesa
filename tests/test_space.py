@@ -2,7 +2,6 @@ import unittest
 
 import networkx as nx
 import numpy as np
-import pytest
 from random import choice, randint
 
 from mesa.space import ContinuousSpace
@@ -427,7 +426,7 @@ class TestNetworkXWrappers(unittest.TestCase):
         self.space = NetworkGrid(generator="Graph")
         assert nx.is_isomorphic(self.space.G, nx.Graph())
 
-        self.space = NetworkGrid(generator="scale_free_graph", args=(10))
+        self.space = NetworkGrid(generator="scale_free_graph", n=10)
         assert self.space.G.number_of_nodes() == 10
         for node in list(self.space.G.nodes):
             assert type(self.space.G.nodes[node]['agent']) is list
@@ -492,7 +491,7 @@ class TestNetworkXWrappers(unittest.TestCase):
         assert a in self.space.G.nodes[nodes[0]]['agent']
 
         # Try to add not an edge
-        with pytest.raises(Exception):
+        with self.assertRaises(Exception):
             self.space.add_edges("strings are not a valid edge")
 
     def test_remove_nodes(self):
@@ -530,7 +529,7 @@ class TestNetworkXWrappers(unittest.TestCase):
             chosen = randint(0, 1000)
             if chosen not in self.space.G:
                 present = False
-                with pytest.raises(Exception):
+                with self.assertRaises(Exception):
                     agents = self.space.remove_nodes(chosen)
 
     def test_remove_edges(self):
@@ -564,7 +563,7 @@ class TestNetworkXWrappers(unittest.TestCase):
 
         # try to remove not an edge
         edge = "strings are not valid edges"
-        with pytest.raises(Exception):
+        with self.assertRaises(Exception):
             self.space.remove_edges(edge)
 
     def test_label_edge(self):
@@ -591,7 +590,7 @@ class TestNetworkXWrappers(unittest.TestCase):
                 choice(list(self.space.G.nodes())))
         if self.space.G.has_edge(*edge):
             self.space.remove_edges(edge)
-        with pytest.raises(Exception):
+        with self.assertRaises(Exception):
             self.space.label_edge(edge)
 
     def test_label_node(self):
@@ -612,7 +611,7 @@ class TestNetworkXWrappers(unittest.TestCase):
         # try to label a node that isn't there
         node = choice(list(self.space.G.nodes()))
         self.space.remove_nodes(node)
-        with pytest.raises(Exception):
+        with self.assertRaises(Exception):
             self.space.label_node(node, "attribute")
 
 
