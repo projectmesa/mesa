@@ -785,7 +785,7 @@ class NetworkGrid:
         if G is not None:
             self.G = G
         elif generator is not None:
-                self.G = getattr(nx, generator)(**kwargs)
+            self.G = getattr(nx, generator)(**kwargs)
 
         for node_id in self.G.nodes:
             self.G.nodes[node_id]['agent'] = list()
