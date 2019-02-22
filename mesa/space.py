@@ -90,9 +90,10 @@ class Grid:
                 col.append(self.default_val())
             self.grid.append(col)
 
+        self.valid_coordinates = frozenset(itertools.product(range(self.width), range(self.height)))
+
         # Add all cells to the empties list.
-        self.empties = set(itertools.product(
-            *(range(self.width), range(self.height))))
+        self.empties = set(self.valid_coordinates)
 
     @staticmethod
     def default_val():
@@ -147,29 +148,32 @@ class Grid:
             including the center).
 
         """
+
         x, y = pos
-        coordinates = set()
-        for dy in range(-radius, radius + 1):
-            for dx in range(-radius, radius + 1):
-                if dx == 0 and dy == 0 and not include_center:
-                    continue
-                # Skip coordinates that are outside manhattan distance
-                if not moore and abs(dx) + abs(dy) > radius:
-                    continue
-                # Skip if not a torus and new coords out of bounds.
-                if not self.torus and (not (0 <= dx + x < self.width) or not (0 <= dy + y < self.height)):
-                    continue
 
-                px, py = self.torus_adj((x + dx, y + dy))
+        if moore:
+            coords = set(
+                itertools.product(
+                    range(x - radius, x + radius + 1), range(y - radius, y + radius + 1)
+                )
+            )
+        else:
+            coords = set(
+                (x + dx, y + dy)
+                for (dx, dy) in itertools.product(
+                    range(-radius, radius + 1), range(-radius, radius + 1)
+                )
+                if abs(dx) + abs(dy) <= radius
+            )
 
-                # Skip if new coords out of bounds.
-                if self.out_of_bounds((px, py)):
-                    continue
+        if not include_center:
+            coords.remove(pos)
 
-                coords = (px, py)
-                if coords not in coordinates:
-                    coordinates.add(coords)
-                    yield coords
+        # Only adjust coordinates outside of valid coordinates
+        for coord in coords - self.valid_coordinates:
+            coord = self.torus_adj(coord)
+
+        yield from coords
 
     def get_neighborhood(self, pos, moore,
                          include_center=False, radius=1):
@@ -245,21 +249,23 @@ class Grid:
 
     def torus_adj(self, pos):
         """ Convert coordinate, handling torus looping. """
-        if not self.out_of_bounds(pos):
+        return pos[0] % self.width, pos[1] % self.height
+
+    def _sanitize_position(self, pos):
+        """Check if pos is on torus and return adjusted position or raise Error."""
+        if pos in self.valid_coordinates:
             return pos
-        elif not self.torus:
-            raise Exception("Point out of bounds, and space non-toroidal.")
+        elif self.torus:
+            return self.torus_adj(pos)
         else:
-            x, y = pos[0] % self.width, pos[1] % self.height
-        return x, y
+            raise Exception("Point out of bounds, and space non-toroidal.")
 
     def out_of_bounds(self, pos):
         """
         Determines whether position is off the grid, returns the out of
         bounds coordinate.
         """
-        x, y = pos
-        return x < 0 or x >= self.width or y < 0 or y >= self.height
+        return pos not in self.valid_coordinates
 
     @accept_tuple_argument
     def iter_cell_list_contents(self, cell_list):
@@ -296,13 +302,14 @@ class Grid:
             pos: Tuple of new position to move the agent to.
 
         """
-        pos = self.torus_adj(pos)
+        pos = self._sanitize_position(pos)
         self._remove_agent(agent.pos, agent)
         self._place_agent(pos, agent)
         agent.pos = pos
 
     def place_agent(self, agent, pos):
         """ Position an agent on the grid, and set its pos variable. """
+        self._sanitize_position(pos)
         self._place_agent(pos, agent)
         agent.pos = pos
 
