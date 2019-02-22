@@ -18,6 +18,10 @@ import itertools
 
 import numpy as np
 
+class OutOfBoundsError(Exception):
+    """Exception raised when position is out of bounds and not a torus"""
+    pass
+
 
 def accept_tuple_argument(wrapped_function):
     """ Decorator to allow grid methods that take a list of (x, y) coord tuples
@@ -171,7 +175,11 @@ class Grid:
 
         # Only adjust coordinates outside of valid coordinates
         for coord in coords - self.valid_coordinates:
-            coord = self.torus_adj(coord)
+            coords.remove(coord)
+            try:
+                coords.add(self._sanitize_position(coord))
+            except OutOfBoundsError:
+                pass
 
         yield from coords
 
@@ -253,12 +261,12 @@ class Grid:
 
     def _sanitize_position(self, pos):
         """Check if pos is on torus and return adjusted position or raise Error."""
-        if pos in self.valid_coordinates:
+        if tuple(pos) in self.valid_coordinates:
             return pos
         elif self.torus:
             return self.torus_adj(pos)
         else:
-            raise Exception("Point out of bounds, and space non-toroidal.")
+            raise OutOfBoundsError("Point out of bounds, and space non-toroidal.")
 
     def out_of_bounds(self, pos):
         """
