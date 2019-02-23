@@ -88,7 +88,7 @@ class FixedBatchRunner:
         self.model_cls = model_cls
         if parameters_list is None:
             parameters_list = []
-        self.parameters_list = parameters_list
+        self.parameters_list = list(parameters_list)
         self.fixed_parameters = fixed_parameters or {}
         self._include_fixed = len(self.fixed_parameters.keys()) > 0
         self.iterations = iterations
@@ -116,19 +116,20 @@ class FixedBatchRunner:
         all_kwargs = []
         all_param_values = []
 
-        if len(self.parameters_list):
-            total_iterations *= len(self.parameters_list)
+        count = len(self.parameters_list)
+        if count:
             for params in self.parameters_list:
                 kwargs = params.copy()
                 kwargs.update(self.fixed_parameters)
                 all_kwargs.append(kwargs)
                 all_param_values.append(params.values())
         elif len(self.fixed_parameters):
+            count = 1
             kwargs = self.fixed_parameters.copy()
             all_kwargs.append(kwargs)
             all_param_values.append(kwargs.values())
-        else:
-            total_iterations = 0
+
+        total_iterations *= count
 
         return (total_iterations, all_kwargs, all_param_values)
 
@@ -151,7 +152,7 @@ class FixedBatchRunner:
 
         # Collect and store results:
         if param_values is not None:
-            model_key = param_values + (run_count,)
+            model_key = tuple(param_values) + (run_count,)
         else:
             model_key = (run_count,)
 
@@ -212,7 +213,10 @@ class FixedBatchRunner:
         column as a key.
         """
         extra_cols = ['Run'] + (extra_cols or [])
-        index_cols = list(self.variable_parameters.keys()) + extra_cols
+        index_cols = set()
+        for params in self.parameters_list:
+            index_cols |= params.keys()
+        index_cols = list(index_cols) + extra_cols
 
         records = []
         for param_key, values in vars_dict.items():
@@ -244,8 +248,8 @@ class ParameterProduct:
     def __iter__(self):
         return self
 
-    def next(self):
-        return dict(zip(self.param_names, self._product.next()))
+    def __next__(self):
+        return dict(zip(self.param_names, next(self._product)))
 
 #Roughly inspired by sklearn.model_selection.ParameterSampler.  Does not handle
 #distributions, only lists.
@@ -264,7 +268,7 @@ class ParameterSampler:
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         return dict(zip(self.param_names, [self.random_state.choose(l) for l in self.param_lists]))
 
 
