@@ -57,7 +57,7 @@ class CanvasGrid(VisualizationElement):
     """
     package_includes = ["GridDraw.js", "CanvasModule.js", "InteractionHandler.js"]
 
-    def __init__(self, portrayal_method, grid_width, grid_height, 
+    def __init__(self, portrayal_method, grid_width, grid_height,
                  num_agents, canvas_width=500, canvas_height=500):
         """ Instantiate a new CanvasGrid.
 
