@@ -31,6 +31,7 @@ class ParameterError(TypeError):
     def __str__(self):
         return self.MESSAGE.format(self.bad_names)
 
+
 class VariableParameterError(ParameterError):
     MESSAGE = ('variable_parameters must map a name to a sequence of values. '
                'These parameters were given with non-sequence values: {}')
@@ -238,11 +239,11 @@ class FixedBatchRunner:
         return ordered
 
 
-#This is kind of a useless class, but it does carry the 'source' parameters with it
+# This is kind of a useless class, but it does carry the 'source' parameters with it
 class ParameterProduct:
     def __init__(self, variable_parameters):
         self.param_names, self.param_lists = \
-            zip( *(copy.deepcopy(variable_parameters)).items() )
+            zip(*(copy.deepcopy(variable_parameters)).items())
         self._product = product(*self.param_lists)
 
     def __iter__(self):
@@ -251,12 +252,13 @@ class ParameterProduct:
     def __next__(self):
         return dict(zip(self.param_names, next(self._product)))
 
-#Roughly inspired by sklearn.model_selection.ParameterSampler.  Does not handle
-#distributions, only lists.
+
+# Roughly inspired by sklearn.model_selection.ParameterSampler.  Does not handle
+# distributions, only lists.
 class ParameterSampler:
     def __init__(self, parameter_lists, n, random_state=None):
         self.param_names, self.param_lists = \
-            zip( *(copy.deepcopy(parameter_lists)).items() )
+            zip(*(copy.deepcopy(parameter_lists)).items())
         self.n = n
         if random_state is None:
             self.random_state = random.Random()

@@ -7,7 +7,7 @@ import unittest
 
 from mesa import Agent, Model
 from mesa.time import BaseScheduler
-from mesa.batchrunner import BatchRunner, ParameterProduct, ParameterSampler, FixedBatchRunner
+from mesa.batchrunner import BatchRunner, ParameterProduct, ParameterSampler
 
 
 NUM_AGENTS = 7
@@ -162,6 +162,7 @@ class TestBatchRunner(unittest.TestCase):
         self.assertEqual(model_vars['reported_fixed_param'].iloc[0],
                 self.fixed_params['fixed_name'])
 
+
 class TestParameters(unittest.TestCase):
     def test_product(self):
         params = ParameterProduct({
@@ -171,11 +172,11 @@ class TestParameters(unittest.TestCase):
 
         lp = list(params)
         self.assertCountEqual(lp, [{'var_alpha': 'a', 'var_num': 10},
-                                            {'var_alpha': 'a', 'var_num': 20},
-                                            {'var_alpha': 'b', 'var_num': 10},
-                                            {'var_alpha': 'b', 'var_num': 20},
-                                            {'var_alpha': 'c', 'var_num': 10},
-                                            {'var_alpha': 'c', 'var_num': 20}])
+                            {'var_alpha': 'a', 'var_num': 20},
+                            {'var_alpha': 'b', 'var_num': 10},
+                            {'var_alpha': 'b', 'var_num': 20},
+                            {'var_alpha': 'c', 'var_num': 10},
+                            {'var_alpha': 'c', 'var_num': 20}])
 
     def test_sampler(self):
         params1 = ParameterSampler({
@@ -193,6 +194,7 @@ class TestParameters(unittest.TestCase):
         lp = list(params1)
         self.assertEqual(10, len(lp))
         self.assertEqual(lp, list(params2))
+
 
 if __name__ == '__main__':
     unittest.main()
