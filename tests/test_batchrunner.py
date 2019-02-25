@@ -170,7 +170,6 @@ class TestParameters(unittest.TestCase):
             })
 
         lp = list(params)
-        print(lp)
         self.assertCountEqual(lp, [{'var_alpha': 'a', 'var_num': 10},
                                             {'var_alpha': 'a', 'var_num': 20},
                                             {'var_alpha': 'b', 'var_num': 10},
