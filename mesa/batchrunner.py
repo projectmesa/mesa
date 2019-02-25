@@ -256,7 +256,7 @@ class ParameterProduct:
 class ParameterSampler:
     def __init__(self, parameter_lists, n, random_state=None):
         self.param_names, self.param_lists = \
-            zip( *(copy.deepcopy(variable_parameters)).items() )
+            zip( *(copy.deepcopy(parameter_lists)).items() )
         self.n = n
         if random_state is None:
             self.random_state = random.Random()
@@ -264,12 +264,16 @@ class ParameterSampler:
             self.random_state = random.Random(random_state)
         else:
             self.random_state = random_state
+        self.count = 0
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        return dict(zip(self.param_names, [self.random_state.choose(l) for l in self.param_lists]))
+        self.count += 1
+        if self.count <= self.n:
+            return dict(zip(self.param_names, [self.random_state.choice(l) for l in self.param_lists]))
+        raise StopIteration()
 
 
 class BatchRunner(FixedBatchRunner):
