@@ -175,7 +175,7 @@ class StagedActivation(BaseScheduler):
             for agent_key in agent_keys:
                 getattr(self._agents[agent_key], stage)()  # Run stage
             if self.shuffle_between_stages:
-                self.model.random.random.shuffle(agent_keys)
+                self.model.random.shuffle(agent_keys)
             self.time += self.stage_time
 
         self.steps += 1
