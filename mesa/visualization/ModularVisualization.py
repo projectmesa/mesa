@@ -314,7 +314,6 @@ class ModularServer(tornado.web.Application):
 
     def launch(self, port=None):
         """ Run the app. """
-        startLoop = not tornado.ioloop.IOLoop.initialized()
         if port is not None:
             self.port = port
         url = 'http://127.0.0.1:{PORT}'.format(PORT=self.port)
@@ -322,5 +321,4 @@ class ModularServer(tornado.web.Application):
         self.listen(self.port)
         webbrowser.open(url)
         tornado.autoreload.start()
-        if startLoop:
-            tornado.ioloop.IOLoop.instance().start()
+        tornado.ioloop.IOLoop.current().start()

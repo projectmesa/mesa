@@ -11,7 +11,7 @@ requires = [
     'networkx',
     'numpy',
     'pandas',
-    'tornado >= 4.2, < 5.0.0',
+    'tornado',
     'tqdm',
 ]
 
