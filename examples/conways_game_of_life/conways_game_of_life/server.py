@@ -1,12 +1,11 @@
-from mesa.visualization.modules import CanvasGrid
+from .VegaModule import VegaGrid
 from mesa.visualization.ModularVisualization import ModularServer
 
-from .portrayal import portrayCell
 from .model import ConwaysGameOfLife
 
 
 # Make a world that is 50x50, on a 250x250 display.
-canvas_element = CanvasGrid(portrayCell, 50, 50, 250, 250)
+vega_grid = VegaGrid()
 
-server = ModularServer(ConwaysGameOfLife, [canvas_element], "Game of Life",
+server = ModularServer(ConwaysGameOfLife, [vega_grid], "Game of Life",
                        {"height": 50, "width": 50})

@@ -43,3 +43,7 @@ class ConwaysGameOfLife(Model):
         Have the scheduler advance each cell by one step
         '''
         self.schedule.step()
+
+    def resurrect(self, x, y):
+        cell = self.grid[x][y]
+        cell.state = cell.ALIVE

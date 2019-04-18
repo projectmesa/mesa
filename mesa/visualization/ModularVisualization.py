@@ -220,6 +220,15 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                 "params": self.application.user_params
             })
 
+        elif msg["type"] == "call_method":
+            # Call model method and re-send visualization state
+            try:
+                getattr(self.application.model, msg["method_name"])(*msg["arguments"])
+                self.write_message(self.viz_state_message)
+            except TypeError:
+                pass
+
+
         else:
             if self.application.verbose:
                 print("Unexpected message!")
@@ -253,14 +262,14 @@ class ModularServer(tornado.web.Application):
         """ Create a new visualization server with the given elements. """
         # Prep visualization elements:
         self.visualization_elements = visualization_elements
-        self.package_includes = set()
-        self.local_includes = set()
+        self.package_includes = list()
+        self.local_includes = list()
         self.js_code = []
         for element in self.visualization_elements:
             for include_file in element.package_includes:
-                self.package_includes.add(include_file)
+                self.package_includes.append(include_file)
             for include_file in element.local_includes:
-                self.local_includes.add(include_file)
+                self.local_includes.append(include_file)
             self.js_code.append(element.js_code)
 
         # Initializing the model

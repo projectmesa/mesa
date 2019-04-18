@@ -1,0 +1,12 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "width": 500,
+    "height": 500,
+    "data": {"name": "cells"},
+    "mark": "bar",
+    "encoding": {
+      "x": {"type": "nominal", "field": "x"},
+      "y": {"type": "nominal", "field": "y"},
+      "color": {"type": "nominal", "field": "alive"}
+    }
+}
