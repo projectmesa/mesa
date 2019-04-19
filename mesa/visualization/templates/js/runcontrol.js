@@ -84,6 +84,7 @@ function ModelController(tick = 0, fps = 3, running = false, finished = false) {
         if (this.running) {
             this.timeout = setTimeout(() => this.step(), 1000 / this.fps);
         }
+    }
 
     /**
      * Update the frames per second
@@ -91,7 +92,6 @@ function ModelController(tick = 0, fps = 3, running = false, finished = false) {
      */
     this.updateFPS = function (val) {
         this.fps = Number(val);
-    }
     }
 }
 
@@ -186,11 +186,11 @@ const initGUI = function (model_params) {
 
     const sidebar = $("#sidebar");
 
-    var onSubmitCallback = function(param_name, value) {
-        send({"type": "submit_params", "param": param_name, "value": value});
+    var onSubmitCallback = function (param_name, value) {
+        send({ "type": "submit_params", "param": param_name, "value": value });
     };
 
-    var addBooleanInput = function(param, obj) {
+    var addBooleanInput = function (param, obj) {
         var domID = param + '_id';
         sidebar.append([
             "<div class='input-group input-group-lg'>",
@@ -201,13 +201,13 @@ const initGUI = function (model_params) {
         $('#' + domID).bootstrapSwitch({
             'state': obj.value,
             'size': 'small',
-            'onSwitchChange': function(e, state) {
+            'onSwitchChange': function (e, state) {
                 onSubmitCallback(param, state);
             }
         });
     };
 
-    var addNumberInput = function(param, obj) {
+    var addNumberInput = function (param, obj) {
         var domID = param + '_id';
         sidebar.append([
             "<div class='input-group input-group-lg'>",
@@ -217,12 +217,12 @@ const initGUI = function (model_params) {
         ].join(''));
         var numberInput = $('#' + domID);
         numberInput.val(obj.value);
-        numberInput.on('change', function() {
+        numberInput.on('change', function () {
             onSubmitCallback(param, Number($(this).val()));
         })
     };
 
-    var addSliderInput = function(param, obj) {
+    var addSliderInput = function (param, obj) {
         var domID = param + '_id';
         var tooltipID = domID + "_tooltip";
         sidebar.append([
@@ -255,12 +255,12 @@ const initGUI = function (model_params) {
             ticks_labels: [obj.min_value, obj.max_value],
             ticks_positions: [0, 100]
         });
-        sliderInput.on('change', function() {
+        sliderInput.on('change', function () {
             onSubmitCallback(param, Number($(this).val()));
         })
     };
 
-    var addChoiceInput = function(param, obj) {
+    var addChoiceInput = function (param, obj) {
         var domID = param + '_id';
         var span = "<span class='caret'></span>";
         var template = [
@@ -287,7 +287,7 @@ const initGUI = function (model_params) {
 
         // Finally render the dropdown and activate choice listeners
         sidebar.append(template.join(''));
-        choiceIdentifiers.forEach(function (id,idx) {
+        choiceIdentifiers.forEach(function (id, idx) {
             $('#' + id).on('click', function () {
                 var value = obj.choices[idx];
                 $('#' + domID).html(value + ' ' + span);
@@ -296,12 +296,12 @@ const initGUI = function (model_params) {
         });
     };
 
-    var addTextBox = function(param, obj) {
+    var addTextBox = function (param, obj) {
         var well = $('<div class="well">' + obj.value + '</div>')[0];
         sidebar.append(well);
     };
 
-    var addParamInput = function(param, option) {
+    var addParamInput = function (param, option) {
         switch (option['param_type']) {
             case 'checkbox':
                 addBooleanInput(param, option);
@@ -327,15 +327,15 @@ const initGUI = function (model_params) {
 
     for (var option in model_params) {
 
-        var type = typeof(model_params[option]);
+        var type = typeof (model_params[option]);
         var param_str = String(option);
 
         switch (type) {
             case "boolean":
-                addBooleanInput(param_str, {'value': model_params[option], 'name': param_str});
+                addBooleanInput(param_str, { 'value': model_params[option], 'name': param_str });
                 break;
             case "number":
-                addNumberInput(param_str, {'value': model_params[option], 'name': param_str});
+                addNumberInput(param_str, { 'value': model_params[option], 'name': param_str });
                 break;
             case "object":
                 addParamInput(param_str, model_params[option]);    // catch-all for params that use Option class
