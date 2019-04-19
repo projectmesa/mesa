@@ -173,6 +173,10 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         if self.application.verbose:
             print("Socket opened!")
+        self.write_message({
+            "type": "model_params",
+            "params": self.application.user_params
+        })
 
     def check_origin(self, origin):
         return True
@@ -213,12 +217,6 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                     self.application.model_kwargs[param].value = value
                 else:
                     self.application.model_kwargs[param] = value
-
-        elif msg["type"] == "get_params":
-            self.write_message({
-                "type": "model_params",
-                "params": self.application.user_params
-            })
 
         else:
             if self.application.verbose:

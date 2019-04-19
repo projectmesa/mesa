@@ -1,307 +1,386 @@
-/** runcontrol.js
+"use strict";
 
- Users can reset() the model, advance it by one step(), or run() it through. reset() and
- step() send a message to the server, which then sends back the appropriate data. run() just
- calls the step() method at fixed intervals.
+/* runcontrol.js
+ Users can reset() the model, advance it by one step(), or start() it. reset() and
+ step() send a message to the server, which then sends back the appropriate data.
+ start() just calls the step() method at fixed intervals.
 
- The model parameters are controlled via the MesaVisualizationControl object.
+ The model parameters are controlled via the ModelController object.
+*/
+
+/*
+ * Variable definitions
  */
+const controller = new ModelController();
+const vizElements = [];
+const startModelButton = document.getElementById("play-pause");
+const stepModelButton = document.getElementById("step");
+const resetModelButton = document.getElementById("reset");
+const stepDisplay = document.getElementById("currentStep");
+
 
 /**
- * Object which holds visualization parameters.
- *
- * tick: What tick of the model we're currently at
- running: Boolean on whether we have reached the end of the current model
- * fps: Current frames per second.
+ * A ModelController that defines the model state.
+ * @param  {number} tick=0 - Initial step of the model
+ * @param  {number} fps=3 - Run the model with this number of frames per second
+ * @param  {boolean} running=false - Initialize the model in a running state?
+ * @param  {boolean} finished=false - Initialize the model in a finished state?
  */
-var MesaVisualizationControl = function() {
-    this.tick = -1; // Counts at which tick of the model we are.
-    this.running = false; // Whether there is currently a model running
-    this.done = false;
-    this.fps = 3; // Frames per second
-};
+function ModelController(tick = 0, fps = 3, running = false, finished = false) {
+    this.tick = tick;
+    this.fps = fps;
+    this.running = running;
+    this.finished = finished;
 
-var player; // Variable to store the continuous player
-var control = new MesaVisualizationControl();
-var elements = [];  // List of Element objects
-var model_params = {};
+    /** Start the model and keep it running until stopped */
+    this.start = function() {
+        this.running = true;
+        this.step();
+        startModelButton.firstElementChild.innerText = "Stop";
+    }
 
-// Playback buttons
-var playPauseButton = $('#play-pause');
-var stepButton = $('#step');
-var resetButton = $('#reset');
-var fpsControl = $('#fps').slider({
+    /** Stop the model */
+    this.stop = function() {
+        this.running = false;
+        startModelButton.firstElementChild.innerText = "Start";
+    }
+
+    /**
+     * Step the model one step ahead.
+     *
+     * If the model is in a running state this function will be called repeatedly
+     * after the visualization elements are rendered. */
+    this.step = function() {
+        this.tick += 1;
+        stepDisplay.innerText = this.tick;
+        send({ type: "get_step", step: this.tick });
+    }
+
+    /** Reset the model and visualization state but keep its running state */
+    this.reset = function() {
+        this.tick = 0;
+        stepDisplay.innerText = this.tick;
+        // Reset all the visualizations
+        vizElements.forEach(element => element.reset());
+        if (this.finished) {
+            this.finished = false;
+            startModelButton.firstElementChild.innerText = "Start";
+        }
+        send({ type: "reset" });
+    }
+
+    /** Stops the model and put it into a finished state */
+    this.done = function() {
+        this.stop();
+        this.finished = true;
+        startModelButton.firstElementChild.innerText = "Done";
+    }
+
+    /**
+     * Update the frames per second
+     * @param {number} val - The new value of frames per second
+     */
+    this.updateFPS = function(val) {
+        this.fps = Number(val);
+    }
+}
+
+/*
+ * Set up the the FPS control
+ */
+const fpsControl = $("#fps").slider({
     max: 20,
     min: 0,
-    value: 3,
+    value: controller.fps,
     ticks: [0, 20],
     ticks_labels: [0, 20],
     ticks_position: [0, 100]
 });
+fpsControl.on("change", () => controller.updateFPS(fpsControl.val()));
 
-// Sidebar dom access
-var sidebar = $("#sidebar");
 
-// WebSocket Stuff
-// Open the websocket connection; support TLS-specific URLs when appropriate
-var ws = new WebSocket((window.location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
+/*
+ * Button logic for start, stop and reset buttons
+ */
+startModelButton.onclick = () => {
+    if (controller.running) {
+        controller.stop();
+    } else if (!controller.finished) {
+        controller.start();
+    }
+};
+stepModelButton.onclick = () => {
+    if (!controller.running & !controller.finished) {
+        controller.step();
+    }
+};
+resetModelButton.onclick = () => controller.reset();
 
-ws.onopen = function() {
-    console.log("Connection opened!");
-    send({"type": "get_params"}); // Request model parameters when websocket is ready
-    reset();
+/*
+ * Websocket opening and message handling
+ */
+
+/** Open the websocket connection; support TLS-specific URLs when appropriate */
+const ws = new WebSocket(
+    (window.location.protocol === "https:" ? "wss://" : "ws://") +
+    location.host +
+    "/ws"
+);
+
+/**
+ * Parse and handle an incoming message on the WebSocket connection.
+ * @param {string} message - the message received from the WebSocket
+ */
+ws.onmessage = function (message) {
+    const msg = JSON.parse(message.data);
+    switch (msg["type"]) {
+        case "viz_state":
+            // Update visualization state
+            let vizData = msg["data"]
+            for (let i in vizElements) {
+                vizElements[i].render(vizData[i]);
+            }
+            if (controller.running) {
+                setTimeout(() => controller.step(), 1000 / controller.fps);
+            }
+            break;
+        case "end":
+            // We have reached the end of the model
+            controller.done();
+            break;
+        case "model_params":
+            // Create GUI elements for each model parameter and reset everything
+            initGUI(msg["params"]);
+            controller.reset();
+            break;
+        case "elements":
+            console.log("what?")
+            // Create visualization elements
+            msg["elements"].forEach(element => eval(element));
+            break;
+        default:
+            // There shouldn't be any other message
+            console.log("Unexpected message.");
+            console.log(msg);
+    }
 };
 
-// Add model parameters that can be edited prior to a model run
-var initGUI = function() {
+/**
+ * Turn an object into a string to send to the server, and send it.
+ * @param {string} message - The message to send to the Python server
+ */
+const send = function (message) {
+    const msg = JSON.stringify(message);
+    ws.send(msg);
+};
 
-    var onSubmitCallback = function(param_name, value) {
-        send({"type": "submit_params", "param": param_name, "value": value});
-    };
 
-    var addBooleanInput = function(param, obj) {
-        var domID = param + '_id';
-        sidebar.append([
-            "<div class='input-group input-group-lg'>",
-            "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
-            "<input class='model-parameter' id='" + domID + "' type='checkbox'/>",
-            "</div>"
-        ].join(''));
-        $('#' + domID).bootstrapSwitch({
-            'state': obj.value,
-            'size': 'small',
-            'onSwitchChange': function(e, state) {
-                onSubmitCallback(param, state);
-            }
-        });
-    };
+/*
+ * GUI initialization (for input parameters)
+ */
 
-    var addNumberInput = function(param, obj) {
-        var domID = param + '_id';
-        sidebar.append([
-            "<div class='input-group input-group-lg'>",
-            "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
-            "<input class='model-parameter' id='" + domID + "' type='number'/>",
-            "</div>"
-        ].join(''));
-        var numberInput = $('#' + domID);
-        numberInput.val(obj.value);
-        numberInput.on('change', function() {
-            onSubmitCallback(param, Number($(this).val()));
-        })
-    };
-
-    var addSliderInput = function(param, obj) {
-        var domID = param + '_id';
-        var tooltipID = domID + "_tooltip";
-        sidebar.append([
-            "<div class='input-group input-group-lg'>",
-            "<p>",
-            "<a id='" + tooltipID + "' data-toggle='tooltip' data-placement='top' class='label label-primary'>",
-            obj.name,
-            "</a>",
-            "</p>",
-            "<input id='" + domID + "' type='text' />",
-            "</div>"
-        ].join(''));
-
-        // Enable tooltip label
-        if (obj.description !== null) {
-            $(tooltipID).tooltip({
-                title: obj.description,
-                placement: 'right'
-            });
-        }
-
-        // Setup slider
-        var sliderInput = $("#" + domID);
-        sliderInput.slider({
-            min: obj.min_value,
-            max: obj.max_value,
-            value: obj.value,
-            step: obj.step,
-            ticks: [obj.min_value, obj.max_value],
-            ticks_labels: [obj.min_value, obj.max_value],
-            ticks_positions: [0, 100]
-        });
-        sliderInput.on('change', function() {
-            onSubmitCallback(param, Number($(this).val()));
-        })
-    };
-
-    var addChoiceInput = function(param, obj) {
-        var domID = param + '_id';
-        var span = "<span class='caret'></span>";
-        var template = [
-            "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
-            "<div class='dropdown'>",
-            "<button id='" + domID + "' class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>" +
-            obj.value + " " + span,
-            "</button>",
-            "<ul class='dropdown-menu' role='menu' aria-labelledby='" + domID + "'>"
-        ];
-        var choiceIdentifiers = [];
-        for (var i = 0; i < obj.choices.length; i++) {
-            var choiceID = domID + '_choice_' + i;
-            choiceIdentifiers.push(choiceID);
-            template.push(
-                "<li role='presentation'><a class='pick-choice' id='" + choiceID + "' role='menuitem' tabindex='-1' href='#'>",
-                obj.choices[i],
-                "</a></li>"
-            );
-        }
-
-        // Close the dropdown options
-        template.push("</ul>", "</div>");
-
-        // Finally render the dropdown and activate choice listeners
-        sidebar.append(template.join(''));
-        choiceIdentifiers.forEach(function (id,idx) {
-            $('#' + id).on('click', function () {
-                var value = obj.choices[idx];
-                $('#' + domID).html(value + ' ' + span);
-                onSubmitCallback(param, value);
-            });
-        });
-    };
-
-    var addTextBox = function(param, obj) {
-        var well = $('<div class="well">' + obj.value + '</div>')[0];
-        sidebar.append(well);
-    };
-
-    var addParamInput = function(param, option) {
-        switch (option['param_type']) {
-            case 'checkbox':
+/**
+ * Create the GUI with user-settable parameters
+ * @param {object} model_params - Create the GUI from these model parameters
+ */
+const initGUI = function (model_params) {
+    const addParamInput = function (param, option) {
+        switch (option["param_type"]) {
+            case "checkbox":
                 addBooleanInput(param, option);
                 break;
 
-            case 'slider':
+            case "slider":
                 addSliderInput(param, option);
                 break;
 
-            case 'choice':
+            case "choice":
                 addChoiceInput(param, option);
                 break;
 
-            case 'number':
-                addNumberInput(param, option);   // Behaves the same as just a simple number
+            case "number":
+                addNumberInput(param, option); // Behaves the same as just a simple number
                 break;
 
-            case 'static_text':
+            case "static_text":
                 addTextBox(param, option);
                 break;
         }
     };
 
-    for (var option in model_params) {
-
-        var type = typeof(model_params[option]);
-        var param_str = String(option);
+    for (let option in model_params) {
+        const type = typeof model_params[option];
+        const param_str = String(option);
 
         switch (type) {
             case "boolean":
-                addBooleanInput(param_str, {'value': model_params[option], 'name': param_str});
+                addBooleanInput(param_str, {
+                    value: model_params[option],
+                    name: param_str
+                });
                 break;
             case "number":
-                addNumberInput(param_str, {'value': model_params[option], 'name': param_str});
+                addNumberInput(param_str, {
+                    value: model_params[option],
+                    name: param_str
+                });
                 break;
             case "object":
-                addParamInput(param_str, model_params[option]);    // catch-all for params that use Option class
+                addParamInput(param_str, model_params[option]); // catch-all for params that use Option class
                 break;
         }
     }
 };
 
-/** Parse and handle an incoming message on the WebSocket connection. */
-ws.onmessage = function(message) {
-    var msg = JSON.parse(message.data);
-    switch (msg["type"]) {
-        case "viz_state":
-            var data = msg["data"];
-            for (var i in elements) {
-                elements[i].render(data[i]);
-            }
-            break;
-        case "end":
-            // We have reached the end of the model
-            control.running = false;
-            control.done = true;
-            console.log("Done!");
-            clearInterval(player);
-            $(playPauseButton.children()[0]).text("Done");
-            break;
-        case "model_params":
-            console.log(msg["params"]);
-            model_params = msg["params"];
-            initGUI();
-            break;
-        default:
-            // There shouldn't be any other message
-            console.log("Unexpected message.");
-    }
+/*
+ * Input parameter definitions
+ */
+
+const onSubmitCallback = function (param_name, value) {
+    send({ type: "submit_params", param: param_name, value: value });
 };
 
-/**	 Turn an object into a string to send to the server, and send it. v*/
-var send = function(message) {
-    msg = JSON.stringify(message);
-    ws.send(msg);
-};
-
-/** Reset the model, and rest the appropriate local variables. */
-var reset = function() {
-    control.tick = 0;
-    send({"type": "reset"});
-
-    // Reset all the visualizations
-    for (var i in elements) {
-        elements[i].reset();
-    }
-    control.done = false;
-    if (!control.running)
-        $(playPauseButton.children()[0]).text("Start");
-};
-
-/** Send a message to the server get the next visualization state. */
-var single_step = function() {
-    control.tick += 1;
-    send({"type": "get_step", "step": control.tick});
-};
-
-/** Step the model forward. */
-var step = function() {
-    if (!control.running & !control.done) {single_step()}
-    else if (!control.done) {run()};
-};
-
-/** Call the step function at fixed intervals, until getting an end message from the server. */
-var run = function() {
-    var anchor = $(playPauseButton.children()[0]);
-    if (control.running) {
-        control.running = false;
-        if (player) {
-            clearInterval(player);
-            player = null;
+const addBooleanInput = function (param, obj) {
+    var domID = param + "_id";
+    sidebar.insertAdjacentHTML(
+        "beforeend",
+        [
+            "<div class='input-group input-group-lg'>",
+            "<p><label for='" +
+            domID +
+            "' class='label label-primary'>" +
+            obj.name +
+            "</label></p>",
+            "<input class='model-parameter' id='" + domID + "' type='checkbox'/>",
+            "</div>"
+        ].join("")
+    );
+    $("#" + domID).bootstrapSwitch({
+        state: obj.value,
+        size: "small",
+        onSwitchChange: function (e, state) {
+            onSubmitCallback(param, state);
         }
-        anchor.text("Start");
-    }
-    else if (!control.done) {
-        control.running = true;
-        player = setInterval(single_step, 1000/control.fps);
-        anchor.text("Stop");
-    }
+    });
 };
 
-var updateFPS = function() {
-    control.fps = Number(fpsControl.val());
-    if (control.running) {
-        run();
-        run();
-    }
+const addNumberInput = function (param, obj) {
+    var domID = param + "_id";
+    sidebar.insertAdjacentHTML(
+        "beforeend",
+        [
+            "<div class='input-group input-group-lg'>",
+            "<p><label for='" +
+            domID +
+            "' class='label label-primary'>" +
+            obj.name +
+            "</label></p>",
+            "<input class='model-parameter' id='" + domID + "' type='number'/>",
+            "</div>"
+        ].join("")
+    );
+    var numberInput = $("#" + domID);
+    numberInput.val(obj.value);
+    numberInput.on("change", function () {
+        onSubmitCallback(param, Number($(this).val()));
+    });
 };
 
-// Initilaize buttons on top bar
-playPauseButton.on('click', run);
-stepButton.on('click', step);
-resetButton.on('click', reset);
-fpsControl.on('change', updateFPS);
+const addSliderInput = function (param, obj) {
+    var domID = param + "_id";
+    var tooltipID = domID + "_tooltip";
+    sidebar.insertAdjacentHTML(
+        "beforeend",
+        [
+            "<div class='input-group input-group-lg'>",
+            "<p>",
+            "<a id='" +
+            tooltipID +
+            "' data-toggle='tooltip' data-placement='top' class='label label-primary'>",
+            obj.name,
+            "</a>",
+            "</p>",
+            "<input id='" + domID + "' type='text' />",
+            "</div>"
+        ].join("")
+    );
+
+    // Enable tooltip label
+    if (obj.description !== null) {
+        $(tooltipID).tooltip({
+            title: obj.description,
+            placement: "right"
+        });
+    }
+
+    // Setup slider
+    var sliderInput = $("#" + domID);
+    sliderInput.slider({
+        min: obj.min_value,
+        max: obj.max_value,
+        value: obj.value,
+        step: obj.step,
+        ticks: [obj.min_value, obj.max_value],
+        ticks_labels: [obj.min_value, obj.max_value],
+        ticks_positions: [0, 100]
+    });
+    sliderInput.on("change", function () {
+        onSubmitCallback(param, Number($(this).val()));
+    });
+};
+
+const addChoiceInput = function (param, obj) {
+    var domID = param + "_id";
+    var span = "<span class='caret'></span>";
+    var template = [
+        "<p><label for='" +
+        domID +
+        "' class='label label-primary'>" +
+        obj.name +
+        "</label></p>",
+        "<div class='dropdown'>",
+        "<button id='" +
+        domID +
+        "' class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>" +
+        obj.value +
+        " " +
+        span,
+        "</button>",
+        "<ul class='dropdown-menu' role='menu' aria-labelledby='" + domID + "'>"
+    ];
+    var choiceIdentifiers = [];
+    for (var i = 0; i < obj.choices.length; i++) {
+        var choiceID = domID + "_choice_" + i;
+        choiceIdentifiers.push(choiceID);
+        template.push(
+            "<li role='presentation'><a class='pick-choice' id='" +
+            choiceID +
+            "' role='menuitem' tabindex='-1' href='#'>",
+            obj.choices[i],
+            "</a></li>"
+        );
+    }
+
+    // Close the dropdown options
+    template.push("</ul>", "</div>");
+
+    // Finally render the dropdown and activate choice listeners
+    sidebar.insertAdjacentHTML("beforeend", template.join(""));
+    choiceIdentifiers.forEach(function (id, idx) {
+        $("#" + id).on("click", function () {
+            var value = obj.choices[idx];
+            $("#" + domID).html(value + " " + span);
+            onSubmitCallback(param, value);
+        });
+    });
+};
+
+const addTextBox = function (param, obj) {
+    var well = $('<div class="well">' + obj.value + "</div>")[0];
+    sidebar.insertAdjacentHTML("beforeend", well);
+};
+
+
+// Backward-Compatibility aliases
+const control = controller;
+const elements = vizElements
