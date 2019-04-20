@@ -7,6 +7,7 @@ Core Objects: Model
 """
 import time
 import random
+import json
 
 
 class Model:
@@ -64,3 +65,47 @@ class Model:
             seed = self._seed
         self.random.seed(seed)
         self._seed = seed
+
+    def as_json(self, filter: bool = True, include_agents: bool = True) -> str:
+        """Convert Model attributes to JSON.
+
+        Args:
+            filter: Whether to filter out unserializable objects and private attributes
+            include_agents: Whether to include agents
+
+        Notes:
+            If an attribute is not JSON-serializable, it is replaced by its
+            string representation unless `filter` is set to True.
+        """
+
+        attributes = json.loads(
+            json.dumps(
+                self.__dict__, default=lambda a: "__REMOVE_ATR" if filter else str(a)
+            )
+        )
+
+        if filter:
+            attributes = {
+                key: value
+                for key, value in attributes.items()
+                if value != "__REMOVE_ATR" and not key.startswith("_")
+            }
+
+        properties = {
+            key: getattr(self, key)
+            for key, value in type(self).__dict__.items()
+            if type(value) == property
+        }
+
+        model_json = json.dumps({**attributes, **properties})
+
+        if not include_agents:
+            return model_json
+
+        out = '{{"model": {model}, "agents": [{agents}]}}'.format(
+            model=model_json,
+            agents=",".join(
+                [agent.as_json(filter=filter) for agent in self.schedule.agents]
+            ),
+        )
+        return out
