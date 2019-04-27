@@ -10,3 +10,4 @@ from mesa.visualization.modules.BarChartVisualization import BarChartModule  # n
 from mesa.visualization.modules.TextVisualization import TextElement  # noqa
 from mesa.visualization.modules.HexGridVisualization import CanvasHexGrid  # noqa
 from mesa.visualization.modules.NetworkVisualization import NetworkModule  # noqa
+from mesa.visualization.modules.VegaVisualization import VegaModule # noqa
