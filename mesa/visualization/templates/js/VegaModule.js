@@ -1,4 +1,4 @@
-const vegaGrid = function (spec) {
+const vegaModule = function (spec) {
     // Create and append the element:
     const vega_element = document.createElement("div");
     vega_element.setAttribute("id", "vega");

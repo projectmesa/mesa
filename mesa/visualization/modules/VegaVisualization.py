@@ -34,7 +34,7 @@ class VegaModule(VisualizationElement):
         """
         self.agent_attributes = agent_attributes
         self.model_attributes = model_attributes
-        self.js_code = "elements.push(new vegaGrid({}));".format(spec)
+        self.js_code = "elements.push(new vegaModule({}));".format(spec)
 
     def render(self, model: Model) -> None:
         """Create a JSON data table from a model."""
