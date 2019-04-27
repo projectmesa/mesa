@@ -1,12 +1,24 @@
-from mesa.visualization.modules import CanvasGrid
+from mesa.visualization.modules import VegaModule
 from mesa.visualization.ModularVisualization import ModularServer
 
-from .portrayal import portrayCell
 from .model import ConwaysGameOfLife
 
+spec = """
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "width": 500,
+    "height": 500,
+    "data": {"name": "model"},
+    "mark": "bar",
+    "encoding": {
+      "x": {"type": "nominal", "field": "x"},
+      "y": {"type": "nominal", "field": "y"},
+      "color": {"type": "nominal", "field": "isAlive"}
+    }
+}
+"""
 
-# Make a world that is 50x50, on a 250x250 display.
-canvas_element = CanvasGrid(portrayCell, 50, 50, 250, 250)
+canvas_element = VegaModule(spec, agent_attributes=["x", "y", "isAlive"])
 
 server = ModularServer(ConwaysGameOfLife, [canvas_element], "Game of Life",
                        {"height": 50, "width": 50})
