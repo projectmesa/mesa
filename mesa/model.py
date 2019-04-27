@@ -99,13 +99,11 @@ class Model:
 
         model_json = json.dumps({**attributes, **properties})
 
-        if not include_agents:
-            return model_json
-
-        out = '{{"model": {model}, "agents": [{agents}]}}'.format(
-            model=model_json,
-            agents=",".join(
+        if include_agents:
+            model_json = model_json[:-1] + ', "agents": [{agents}]}}'.format(
+            agents=", ".join(
                 [agent.as_json(filter=filter) for agent in self.schedule.agents]
             ),
         )
-        return out
+
+        return model_json
