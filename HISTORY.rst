@@ -3,6 +3,24 @@
 Release History
 ---------------
 
+0.8.6 (2019-04-29) Lake Havasu City
++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+* add docker-compose + Dockerfile support #593
+* install: Remove jupyter requirement #614
+* Add Bar and Pie Chart visualization #594 #490
+* Make models pickleable #582
+
+
+**Fixes**
+* Year update. Happy New Year! #613
+* Fixed problem with grid and chart visualization javascript #612 #615
+* removed extra" .random" on line 178. #654
+* updated requirement for networkx #644 #646
+* Fix VisualizationServer to be compatible with recent versions of Tornado #655
+
+
 0.8.5 (2018-11-26) Kearny
 +++++++++++++++++++++++++++++++++++++++++++
 
