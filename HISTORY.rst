@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-0.8.6 (2019-04-29) Lake Havasu City
+0.8.6 (2019-05-02) Lake Havasu City
 +++++++++++++++++++++++++++++++++++++++++++
 
 **Improvements**
