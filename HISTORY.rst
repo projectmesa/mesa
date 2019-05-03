@@ -7,6 +7,7 @@ Release History
 +++++++++++++++++++++++++++++++++++++++++++
 
 **Improvements**
+
 * add docker-compose + Dockerfile support #593
 * install: Remove jupyter requirement #614
 * Add Bar and Pie Chart visualization #594 #490
@@ -14,6 +15,7 @@ Release History
 
 
 **Fixes**
+
 * Year update. Happy New Year! #613
 * Fixed problem with grid and chart visualization javascript #612 #615
 * removed extra" .random" on line 178. #654
