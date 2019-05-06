@@ -24,7 +24,7 @@ model as it runs. Finally, we go over how to write your own
 visualization module, for users who are comfortable with JavaScript.
 
 You can also find all the code this tutorial describes in the
-**examples/Tutorial-Boltzmann\_Wealth\_Model** directory of the Mesa
+`examples/boltzmann_wealth_model/ <https://github.com/projectmesa/mesa/tree/master/examples/boltzmann_wealth_model>`__ directory of the Mesa
 repository.
 
 Sample Model Description
@@ -62,7 +62,7 @@ To install Mesa, simply:
 When you do that, it will install Mesa itself, as well as any
 dependencies that aren't in your setup yet. Additional dependencies
 required by this tutorial can be found in the
-**examples/Tutorial-Boltzmann\_Wealth\_Model/requirements.txt** file,
+`examples/boltzmann_wealth_model/requirements.txt <https://github.com/projectmesa/mesa/blob/master/examples/boltzmann_wealth_model/requirements.txt>`__ file,
 which can be installed by running:
 
 .. code:: bash
