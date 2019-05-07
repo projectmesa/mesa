@@ -44,7 +44,7 @@ To launch an example model, clone the `repository <https://github.com/projectmes
 
 .. code-block:: bash
 
-    schelling $ mesa runserver examples/wolf_sheep
+    $ mesa runserver examples/wolf_sheep
 
 For more help on using Mesa, check out the following resources:
 
