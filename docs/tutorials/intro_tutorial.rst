@@ -84,8 +84,8 @@ especially if the project will end up consisting of multiple files (for
 example, Python files for the model and the visualization, a Notebook
 for analysis, and a Readme with some documentation and discussion).
 
-Begin by creating a folder, and either launch a Notebook or create a new
-Python source file. We will use the name ``MoneyModel.py`` here.
+Begin by creating a folder named `money_model`, and either launch a Notebook or
+create a new Python source file. We will use the name ``model.py`` here.
 
 Setting up the model
 ~~~~~~~~~~~~~~~~~~~~
@@ -110,8 +110,9 @@ with the given number of agents.
 
 The beginning of both classes looks like this:
 
-.. code:: ipython3
+.. code:: python
 
+    # model.py
     from mesa import Agent, Model
     
     class MoneyAgent(Agent):
@@ -157,8 +158,9 @@ activates them all, one at a time.
 With that in mind, the model code with the scheduler added looks like
 this:
 
-.. code:: ipython3
+.. code:: python
 
+    # model.py
     from mesa import Agent, Model
     from mesa.time import RandomActivation
     
@@ -191,15 +193,15 @@ anything. You can see for yourself with a few easy lines. If you've been
 working in an interactive session, you can create a model object
 directly. Otherwise, you need to open an interactive session in the same
 directory as your source code file, and import the classes. For example,
-if your code is in ``MoneyModel.py``:
+if your code is in ``model.py``:
 
 .. code:: python
 
-    from MoneyModel import MoneyModel
+    from model import MoneyModel
 
 Then create the model object, and run it for one step:
 
-.. code:: ipython3
+.. code:: python
 
     empty_model = MoneyModel(10)
     empty_model.step()
@@ -216,11 +218,10 @@ Agent Step
 
 Now we just need to have the agents do what we intend for them to do:
 check their wealth, and if they have the money, give one unit of it away
-to another random agent. To allow the agent to choose another agent at
-random, we use the ``model.random`` random-number generator. This works
-just like Python's ``random`` module, but with a fixed seed set when the
-model is instantiated, that can be used to replicate a specific model
-run later.
+to another random agent. To allow the agent to choose another agent at random,
+we use the ``model.random`` random-number generator. This works just like
+Python's ``random`` module, but with a fixed seed set when the model is
+instantiated, that can be used to replicate a specific model run later. 
 
 To pick an agent at random, we need a list of all agents. Notice that
 there isn't such a list explicitly in the model. The scheduler, however,
@@ -229,8 +230,9 @@ activate.
 
 With that in mind, we rewrite the agent's ``step`` method, like this:
 
-.. code:: ipython3
+.. code:: python
 
+    # model.py
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
         def __init__(self, unique_id, model):
@@ -247,23 +249,15 @@ With that in mind, we rewrite the agent's ``step`` method, like this:
 Running your first model
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-With that last piece in hand, it's time for the first rudimentary run of
-the model.
-
-If you've written the code in its own file (``MoneyModel.py`` or a
-different name), launch an interpreter in the same directory as the file
-(either the plain Python command-line interpreter, or the IPython
-interpreter), or launch a Jupyter Notebook there. Then import the
-classes you created. (If you wrote the code in a Notebook, obviously
-this step isn't necessary).
+With that last piece in hand, it's time for the first rudimentary run of the
+model. This time, let's write a ``run.py`` to run the script instead of using
+the command-line interpreter.  If you wrote the code in a Notebook, you can
+write this in the same notebook.
 
 .. code:: python
 
-    from MoneyModel import *
-
-Now let's create a model with 10 agents, and run it for 10 steps.
-
-.. code:: ipython3
+    # run.py
+    from model import *  # omit this in jupyter notebooks
 
     model = MoneyModel(10)
     for i in range(10):
@@ -274,49 +268,44 @@ to see the distribution of the agent's wealth. We can get the wealth
 values with list comprehension, and then use matplotlib (or another
 graphics library) to visualize the data in a histogram.
 
-.. code:: ipython3
+.. code:: python
 
-    # For a jupyter notebook add the following line:
-    %matplotlib inline
-    
-    # The below is needed for both notebooks and scripts
+    # run.py
     import matplotlib.pyplot as plt
-    
+
     agent_wealth = [a.wealth for a in model.schedule.agents]
     plt.hist(agent_wealth)
+    plt.show()
 
-
-
-
-.. parsed-literal::
-
-    (array([5., 0., 0., 2., 0., 0., 1., 0., 0., 2.]),
-     array([0. , 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 3. ]),
-     <a list of 10 Patch objects>)
-
-
-
-
-.. image:: intro_tutorial_files/intro_tutorial_18_1.png
-
-
-If you are running from a text editor or IDE, you'll also need to add
-this line, to make the graph appear.
+Or, in a Jupyter notebook:
 
 .. code:: python
 
-    plt.show()
+    %matplotlib inline
+    import matplotlib.pyplot as plt
+    agent_wealth = [a.wealth for a in model.schedule.agents]
+    plt.hist(agent_wealth)
+
+.. parsed-literal::
+
+    (array([ 4.,  0.,  0.,  0.,  0.,  2.,  0.,  0.,  0.,  4.]),
+     array([ 0. ,  0.2,  0.4,  0.6,  0.8,  1. ,  1.2,  1.4,  1.6,  1.8,  2. ]),
+     <a list of 10 Patch objects>)
+
 
 You'll probably see something like the distribution shown below. Yours
 will almost certainly look at least slightly different, since each run
 of the model is random, after all.
 
+.. image:: intro_tutorial_files/intro_tutorial_19_1.png
+
 To get a better idea of how a model behaves, we can create multiple
 model runs and see the distribution that emerges from all of them. We
 can do this with a nested for loop:
 
-.. code:: ipython3
+.. code:: python
 
+    # run.py
     all_wealth = []
     for j in range(100):
         # Run the model
@@ -331,18 +320,14 @@ can do this with a nested for loop:
     plt.hist(all_wealth, bins=range(max(all_wealth)+1))
 
 
-
-
 .. parsed-literal::
 
-    (array([447., 284., 162.,  59.,  29.,  19.]),
-     array([0, 1, 2, 3, 4, 5, 6]),
-     <a list of 6 Patch objects>)
+    (array([ 437.,  303.,  144.,   75.,   28.,    9.,    4.]),
+     array([0, 1, 2, 3, 4, 5, 6, 7]),
+     <a list of 7 Patch objects>)
 
 
-
-
-.. image:: intro_tutorial_files/intro_tutorial_20_1.png
+.. image:: intro_tutorial_files/intro_tutorial_21_1.png
 
 
 This runs 100 instantiations of the model, and runs each for 10 steps.
@@ -381,8 +366,9 @@ Mesa has two main types of grids: ``SingleGrid`` and ``MultiGrid``.
 multiple agents to be in the same cell. Since we want agents to be able
 to share a cell, we use ``MultiGrid``.
 
-.. code:: ipython3
+.. code:: python
 
+    # model.py
     from mesa.space import MultiGrid
 
 We instantiate a grid with width and height parameters, and a boolean as
@@ -392,8 +378,9 @@ always be toroidal. We can place agents on a grid with the grid's
 ``place_agent`` method, which takes an agent and an (x, y) tuple of the
 coordinates to place the agent.
 
-.. code:: ipython3
+.. code:: python
 
+    # model.py
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N, width, height):
@@ -445,6 +432,7 @@ With that in mind, the agent's ``move`` method looks like this:
 
 .. code:: python
 
+    # model.py
     class MoneyAgent(Agent):
        #...
         def move(self):
@@ -463,6 +451,7 @@ single tuple if we only care about one cell.
 
 .. code:: python
 
+    # model.py
     class MoneyAgent(Agent):
         #...
         def give_money(self):
@@ -476,6 +465,7 @@ And with those two methods, the agent's ``step`` method becomes:
 
 .. code:: python
 
+    # model.py
     class MoneyAgent(Agent):
         # ...
         def step(self):
@@ -485,7 +475,12 @@ And with those two methods, the agent's ``step`` method becomes:
 
 Now, putting that all together should look like this:
 
-.. code:: ipython3
+.. code:: python
+
+    # model.py
+    from mesa.space import MultiGrid
+    from mesa import Agent, Model
+    from mesa.time import RandomActivation
 
     class MoneyModel(Model):
         """A model with some number of agents."""
@@ -534,8 +529,9 @@ Now, putting that all together should look like this:
 Let's create a model with 50 agents on a 10x10 grid, and run it for 20
 steps.
 
-.. code:: ipython3
+.. code:: python
 
+    # run.py
     model = MoneyModel(50, 10, 10)
     for i in range(20):
         model.step()
@@ -546,8 +542,9 @@ size as the grid, filled with zeros. Then we use the grid object's
 ``coord_iter()`` feature, which lets us loop over every cell in the
 grid, giving us each cell's coordinates and contents in turn.
 
-.. code:: ipython3
+.. code:: python
 
+    # run.py
     import numpy as np
     
     agent_counts = np.zeros((model.grid.width, model.grid.height))
@@ -559,19 +556,19 @@ grid, giving us each cell's coordinates and contents in turn.
     plt.colorbar()
     
     # If running from a text editor or IDE, remember you'll need the following:
-    # plt.show()
+    plt.show()
 
 
 
 
 .. parsed-literal::
 
-    <matplotlib.colorbar.Colorbar at 0x2612cbb19e8>
+    <matplotlib.colorbar.Colorbar at 0x10fb446a0>
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_31_1.png
+.. image:: intro_tutorial_files/intro_tutorial_32_1.png
 
 
 Collecting Data
@@ -590,7 +587,8 @@ storage for us and make it easier to analyze.
 The data collector stores three categories of data: model-level
 variables, agent-level variables, and tables (which are a catch-all for
 everything else). Model- and agent-level variables are added to the data
-collector along with a function for collecting them. Model-level
+collector along with either the name of an attribute that the agents or
+models have, or a function for collecting some data. Model-level
 collection functions take a model object as an input, while agent-level
 collection functions take an agent object as an input. Both then return
 a value computed from the model or each agent at their current state.
@@ -608,42 +606,20 @@ At the model level, let's measure the model's `Gini
 Coefficient <https://en.wikipedia.org/wiki/Gini_coefficient>`__, a
 measure of wealth inequality.
 
-.. code:: ipython3
+.. code:: python
 
+    # model.py
     from mesa.datacollection import DataCollector
     
+    class MoneyAgent(Agent):
+        # ...
+
     def compute_gini(model):
         agent_wealths = [agent.wealth for agent in model.schedule.agents]
         x = sorted(agent_wealths)
         N = model.num_agents
         B = sum( xi * (N-i) for i,xi in enumerate(x) ) / (N*sum(x))
         return (1 + (1/N) - 2*B)
-    
-    class MoneyAgent(Agent):
-        """ An agent with fixed initial wealth."""
-        def __init__(self, unique_id, model):
-            super().__init__(unique_id, model)
-            self.wealth = 1
-    
-        def move(self):
-            possible_steps = self.model.grid.get_neighborhood(
-                self.pos, 
-                moore=True, 
-                include_center=False)
-            new_position = self.random.choice(possible_steps)
-            self.model.grid.move_agent(self, new_position)
-    
-        def give_money(self):
-            cellmates = self.model.grid.get_cell_list_contents([self.pos])
-            if len(cellmates) > 1:
-                other = self.random.choice(cellmates)
-                other.wealth += 1
-                self.wealth -= 1
-    
-        def step(self):
-            self.move()
-            if self.wealth > 0:
-                self.give_money()
     
     class MoneyModel(Model):
         """A model with some number of agents."""
@@ -662,8 +638,8 @@ measure of wealth inequality.
                 self.grid.place_agent(a, (x, y))
             
             self.datacollector = DataCollector(
-                model_reporters={"Gini": compute_gini},
-                agent_reporters={"Wealth": "wealth"})
+                model_reporters={"Gini": compute_gini},  # A function to call
+                agent_reporters={"Wealth": "wealth"})  # An agent attribute
     
         def step(self):
             self.datacollector.collect(self)
@@ -678,16 +654,18 @@ session, especially via a Notebook, comes in handy: the DataCollector
 can export the data it's collected as a pandas DataFrame, for easy
 interactive analysis.
 
-.. code:: ipython3
+.. code:: python
 
+    # run.py
     model = MoneyModel(50, 10, 10)
     for i in range(100):
         model.step()
 
 To get the series of Gini coefficients as a pandas DataFrame:
 
-.. code:: ipython3
+.. code:: python
 
+    # run.py
     gini = model.datacollector.get_model_vars_dataframe()
     gini.plot()
 
@@ -696,17 +674,17 @@ To get the series of Gini coefficients as a pandas DataFrame:
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x2612cbcf048>
+    <matplotlib.axes._subplots.AxesSubplot at 0x10fa4b278>
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_37_1.png
+.. image:: intro_tutorial_files/intro_tutorial_38_1.png
 
 
 Similarly, we can get the agent-wealth data:
 
-.. code:: ipython3
+.. code:: python
 
     agent_wealth = model.datacollector.get_agent_vars_dataframe()
     agent_wealth.head()
@@ -717,19 +695,6 @@ Similarly, we can get the agent-wealth data:
 .. raw:: html
 
     <div>
-    <style scoped>
-        .dataframe tbody tr th:only-of-type {
-            vertical-align: middle;
-        }
-    
-        .dataframe tbody tr th {
-            vertical-align: top;
-        }
-    
-        .dataframe thead th {
-            text-align: right;
-        }
-    </style>
     <table border="1" class="dataframe">
       <thead>
         <tr style="text-align: right;">
@@ -775,7 +740,7 @@ You'll see that the DataFrame's index is pairings of model step and
 agent ID. You can analyze it the way you would any other DataFrame. For
 example, to get a histogram of agent wealth at the model's end:
 
-.. code:: ipython3
+.. code:: python
 
     end_wealth = agent_wealth.xs(99, level="Step")["Wealth"]
     end_wealth.hist(bins=range(agent_wealth.Wealth.max()+1))
@@ -785,17 +750,17 @@ example, to get a histogram of agent wealth at the model's end:
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x2612d972470>
+    <matplotlib.axes._subplots.AxesSubplot at 0x10fa5a978>
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_41_1.png
+.. image:: intro_tutorial_files/intro_tutorial_42_1.png
 
 
 Or to plot the wealth of a given agent (in this example, agent 14):
 
-.. code:: ipython3
+.. code:: python
 
     one_agent_wealth = agent_wealth.xs(14, level="AgentID")
     one_agent_wealth.Wealth.plot()
@@ -805,12 +770,12 @@ Or to plot the wealth of a given agent (in this example, agent 14):
 
 .. parsed-literal::
 
-    <matplotlib.axes._subplots.AxesSubplot at 0x2612dacec50>
+    <matplotlib.axes._subplots.AxesSubplot at 0x10f311438>
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_43_1.png
+.. image:: intro_tutorial_files/intro_tutorial_44_1.png
 
 
 Batch Run
@@ -823,52 +788,29 @@ drive the model's outputs and behaviors. Instead of needing to write
 nested for-loops for each model, Mesa provides a BatchRunner class which
 automates it for you.
 
-.. code:: ipython3
-
-    from mesa.batchrunner import BatchRunner
-
-The BatchRunner also requires an additional variable running for the
+The BatchRunner also requires an additional instance attribute ``running`` for the
 MoneyModel class. This variable enables conditional shut off of the
 model once a condition is met. In this example it will be set as True
-indefinitely.
+indefinitely in ``__init__``.
 
-.. code:: ipython3
+.. code:: python
 
+    # model.py
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N, width, height):
-            self.num_agents = N
-            self.grid = MultiGrid(width, height, True)
-            self.schedule = RandomActivation(self)
             self.running = True
-            
-            # Create agents
-            for i in range(self.num_agents):
-                a = MoneyAgent(i, self)
-                self.schedule.add(a)
-                # Add the agent to a random grid cell
-                x = self.random.randrange(self.grid.width)
-                y = self.random.randrange(self.grid.height)
-                self.grid.place_agent(a, (x, y))
-            
-            self.datacollector = DataCollector(
-                model_reporters={"Gini": compute_gini},
-                agent_reporters={"Wealth": "wealth"})
-    
-        def step(self):
-            self.datacollector.collect(self)
-            self.schedule.step()
+            # ...
 
-We instantiate a BatchRunner with a model class to run, and two
-dictionaries: one of the fixed parameters (mapping model arguments to
-values) and one of varying parameters (mapping each parameter name to a
-sequence of values for it to take). The BatchRunner also takes an
-argument for how many model instantiations to create and run at each
-combination of parameter values, and how many steps to run each
-instantiation for. Finally, like the DataCollector, it takes
-dictionaries of model- and agent-level reporters to collect. Unlike the
-DataCollector, it won't collect the data every step of the model, but
-only at the end of each run.
+We instantiate a BatchRunner with a model class to run, and two dictionaries: 
+one of the fixed parameters (mapping model arguments to values) and one of
+varying parameters (mapping each parameter name to a sequence of values for it
+to take). The BatchRunner also takes an argument for how many model
+instantiations to create and run at each combination of parameter values, and 
+how many steps to run each instantiation for. Finally, like the DataCollector, 
+it takes dictionaries of model- and agent-level reporters to collect. Unlike
+the DataCollector, it won't collect the data every step of the model, but only 
+at the end of each run.
 
 In the following example, we hold the height and width fixed, and vary
 the number of agents. We tell the BatchRunner to run 5 instantiations of
@@ -877,30 +819,27 @@ have it collect the final Gini coefficient value.
 
 Now, we can set up and run the BatchRunner:
 
-.. code:: ipython3
+.. code:: python
+
+    # run.py
+    from mesa.batchrunner import BatchRunner
 
     fixed_params = {"width": 10,
-                   "height": 10}
+                    "height": 10}  
     variable_params = {"N": range(10, 500, 10)}
     
     batch_run = BatchRunner(MoneyModel, 
-                            variable_params,
-                            fixed_params,
+                            fixed_parameters=fixed_params,
+                            variable_parameters=variable_params, 
                             iterations=5, 
                             max_steps=100,
                             model_reporters={"Gini": compute_gini})
     batch_run.run_all()
 
-
-.. parsed-literal::
-
-    245it [01:30,  1.41it/s]
-
-
 Like the DataCollector, we can extract the data we collected as a
 DataFrame.
 
-.. code:: ipython3
+.. code:: python
 
     run_data = batch_run.get_model_vars_dataframe()
     run_data.head()
@@ -911,17 +850,26 @@ DataFrame.
 
 .. parsed-literal::
 
-    <matplotlib.collections.PathCollection at 0x261302b8f98>
+    <matplotlib.collections.PathCollection at 0x114ab80f0>
 
 
 
 
-.. image:: intro_tutorial_files/intro_tutorial_51_1.png
+.. image:: intro_tutorial_files/intro_tutorial_52_1.png
 
 
 Notice that each row is a model run, and gives us the parameter values
 associated with that run. We can use this data to view a scatter-plot
 comparing the number of agents to the final Gini.
+
+Model Best Practices
+~~~~~~~~~~~~~~~~~~~~
+
+If you would like to share your model with other people, or to remind yourself
+of its details when you return to it, you will want to add a few extra bits.
+
+The :doc:`../best-practices` document describes the recommended layout for
+models, including a README and ``requirements.txt``.
 
 Happy Modeling!
 ~~~~~~~~~~~~~~~
