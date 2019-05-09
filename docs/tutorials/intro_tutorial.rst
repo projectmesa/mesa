@@ -618,7 +618,7 @@ At the model level, let's measure the model's `Gini
 Coefficient <https://en.wikipedia.org/wiki/Gini_coefficient>`__, a
 measure of wealth inequality.
 
-.. code:: ipython3
+.. code:: python
 
     from mesa.datacollection import DataCollector
 
@@ -688,7 +688,7 @@ session, especially via a Notebook, comes in handy: the DataCollector
 can export the data it's collected as a pandas DataFrame, for easy
 interactive analysis.
 
-.. code:: ipython3
+.. code:: python
 
     model = MoneyModel(50, 10, 10)
     for i in range(100):
