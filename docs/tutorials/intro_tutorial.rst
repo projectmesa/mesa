@@ -576,13 +576,9 @@ grid, giving us each cell's coordinates and contents in turn.
     # plt.show()
 
 
-
-
 .. parsed-literal::
 
     <matplotlib.colorbar.Colorbar at 0x2612cbb19e8>
-
-
 
 
 .. image:: intro_tutorial_files/intro_tutorial_31_1.png
