@@ -125,7 +125,7 @@ with the given number of agents.
 
 The beginning of both classes looks like this:
 
-.. code:: ipython3
+.. code:: python
 
     from mesa import Agent, Model
 
@@ -172,7 +172,7 @@ activates them all, one at a time.
 With that in mind, the model code with the scheduler added looks like
 this:
 
-.. code:: ipython3
+.. code:: python
 
     from mesa import Agent, Model
     from mesa.time import RandomActivation
@@ -214,7 +214,7 @@ if your code is in ``MoneyModel.py``:
 
 Then create the model object, and run it for one step:
 
-.. code:: ipython3
+.. code:: python
 
     empty_model = MoneyModel(10)
     empty_model.step()
@@ -244,7 +244,7 @@ activate.
 
 With that in mind, we rewrite the agent's ``step`` method, like this:
 
-.. code:: ipython3
+.. code:: python
 
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
@@ -278,7 +278,7 @@ this step isn't necessary).
 
 Now let's create a model with 10 agents, and run it for 10 steps.
 
-.. code:: ipython3
+.. code:: python
 
     model = MoneyModel(10)
     for i in range(10):
@@ -289,7 +289,7 @@ to see the distribution of the agent's wealth. We can get the wealth
 values with list comprehension, and then use matplotlib (or another
 graphics library) to visualize the data in a histogram.
 
-.. code:: ipython3
+.. code:: python
 
     # For a jupyter notebook add the following line:
     %matplotlib inline
@@ -328,7 +328,7 @@ To get a better idea of how a model behaves, we can create multiple
 model runs and see the distribution that emerges from all of them. We
 can do this with a nested for loop:
 
-.. code:: ipython3
+.. code:: python
 
     all_wealth = []
     for j in range(100):
@@ -394,7 +394,7 @@ Mesa has two main types of grids: ``SingleGrid`` and ``MultiGrid``.
 multiple agents to be in the same cell. Since we want agents to be able
 to share a cell, we use ``MultiGrid``.
 
-.. code:: ipython3
+.. code:: python
 
     from mesa.space import MultiGrid
 
@@ -405,7 +405,7 @@ always be toroidal. We can place agents on a grid with the grid's
 ``place_agent`` method, which takes an agent and an (x, y) tuple of the
 coordinates to place the agent.
 
-.. code:: ipython3
+.. code:: python
 
     class MoneyModel(Model):
         """A model with some number of agents."""
@@ -499,7 +499,7 @@ And with those two methods, the agent's ``step`` method becomes:
 
 Now, putting that all together should look like this:
 
-.. code:: ipython3
+.. code:: python
 
     class MoneyModel(Model):
         """A model with some number of agents."""
@@ -548,7 +548,7 @@ Now, putting that all together should look like this:
 Let's create a model with 50 agents on a 10x10 grid, and run it for 20
 steps.
 
-.. code:: ipython3
+.. code:: python
 
     model = MoneyModel(50, 10, 10)
     for i in range(20):
@@ -560,7 +560,7 @@ size as the grid, filled with zeros. Then we use the grid object's
 ``coord_iter()`` feature, which lets us loop over every cell in the
 grid, giving us each cell's coordinates and contents in turn.
 
-.. code:: ipython3
+.. code:: python
 
     import numpy as np
 
@@ -576,13 +576,9 @@ grid, giving us each cell's coordinates and contents in turn.
     # plt.show()
 
 
-
-
 .. parsed-literal::
 
     <matplotlib.colorbar.Colorbar at 0x2612cbb19e8>
-
-
 
 
 .. image:: intro_tutorial_files/intro_tutorial_31_1.png
@@ -622,7 +618,7 @@ At the model level, let's measure the model's `Gini
 Coefficient <https://en.wikipedia.org/wiki/Gini_coefficient>`__, a
 measure of wealth inequality.
 
-.. code:: ipython3
+.. code:: python
 
     from mesa.datacollection import DataCollector
 
@@ -692,7 +688,7 @@ session, especially via a Notebook, comes in handy: the DataCollector
 can export the data it's collected as a pandas DataFrame, for easy
 interactive analysis.
 
-.. code:: ipython3
+.. code:: python
 
     model = MoneyModel(50, 10, 10)
     for i in range(100):
@@ -700,7 +696,7 @@ interactive analysis.
 
 To get the series of Gini coefficients as a pandas DataFrame:
 
-.. code:: ipython3
+.. code:: python
 
     gini = model.datacollector.get_model_vars_dataframe()
     gini.plot()
@@ -720,7 +716,7 @@ To get the series of Gini coefficients as a pandas DataFrame:
 
 Similarly, we can get the agent-wealth data:
 
-.. code:: ipython3
+.. code:: python
 
     agent_wealth = model.datacollector.get_agent_vars_dataframe()
     agent_wealth.head()
@@ -789,7 +785,7 @@ You'll see that the DataFrame's index is pairings of model step and
 agent ID. You can analyze it the way you would any other DataFrame. For
 example, to get a histogram of agent wealth at the model's end:
 
-.. code:: ipython3
+.. code:: python
 
     end_wealth = agent_wealth.xs(99, level="Step")["Wealth"]
     end_wealth.hist(bins=range(agent_wealth.Wealth.max()+1))
@@ -809,7 +805,7 @@ example, to get a histogram of agent wealth at the model's end:
 
 Or to plot the wealth of a given agent (in this example, agent 14):
 
-.. code:: ipython3
+.. code:: python
 
     one_agent_wealth = agent_wealth.xs(14, level="AgentID")
     one_agent_wealth.Wealth.plot()
@@ -837,7 +833,7 @@ drive the model's outputs and behaviors. Instead of needing to write
 nested for-loops for each model, Mesa provides a BatchRunner class which
 automates it for you.
 
-.. code:: ipython3
+.. code:: python
 
     from mesa.batchrunner import BatchRunner
 
@@ -846,7 +842,7 @@ MoneyModel class. This variable enables conditional shut off of the
 model once a condition is met. In this example it will be set as True
 indefinitely.
 
-.. code:: ipython3
+.. code:: python
 
     class MoneyModel(Model):
         """A model with some number of agents."""
@@ -892,7 +888,7 @@ have it collect the final Gini coefficient value.
 
 Now, we can set up and run the BatchRunner:
 
-.. code:: ipython3
+.. code:: python
 
     fixed_params = {
         "width": 10,
@@ -922,7 +918,7 @@ Now, we can set up and run the BatchRunner:
 Like the DataCollector, we can extract the data we collected as a
 DataFrame.
 
-.. code:: ipython3
+.. code:: python
 
     run_data = batch_run.get_model_vars_dataframe()
     run_data.head()

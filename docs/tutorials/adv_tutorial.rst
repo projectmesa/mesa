@@ -41,11 +41,11 @@ import the server class and the Canvas Grid class (so-called because it
 uses HTML5 canvas to draw a grid). If you're in a new file, you'll also
 need to import the actual model object.
 
-.. code:: ipython3
+.. code:: python
 
     from mesa.visualization.modules import CanvasGrid
     from mesa.visualization.ModularVisualization import ModularServer
-    
+
     # If MoneyModel.py is where your code is:
     # from MoneyModel import MoneyModel
 
@@ -57,7 +57,7 @@ a function which takes an agent, and returns a portrayal object. Here's
 the simplest one: it'll draw each agent as a red, filled circle which
 fills half of each cell.
 
-.. code:: ipython3
+.. code:: python
 
     def agent_portrayal(agent):
         portrayal = {"Shape": "circle",
@@ -71,7 +71,7 @@ In addition to the portrayal method, we instantiate a canvas grid with
 its width and height in cells, and in pixels. In this case, let's create
 a 10x10 grid, drawn in 500 x 500 pixels.
 
-.. code:: ipython3
+.. code:: python
 
     grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
 
@@ -93,9 +93,9 @@ Finally, when you're ready to run the visualization, use the server's
 
 .. code:: python
 
-    server = ModularServer(MoneyModel, 
-                           [grid], 
-                           "Money Model", 
+    server = ModularServer(MoneyModel,
+                           [grid],
+                           "Money Model",
                            100, 10, 10)
     server.port = 8521 # The default
     server.launch()
@@ -118,9 +118,9 @@ The full code should now look like:
         return portrayal
 
     grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-    server = ModularServer(MoneyModel, 
-                           [grid], 
-                           "Money Model", 
+    server = ModularServer(MoneyModel,
+                           [grid],
+                           "Money Model",
                            100, 10, 10)
     server.port = 8521 # The default
     server.launch()
@@ -221,13 +221,13 @@ chart will appear underneath the grid.
 
 .. code:: python
 
-    chart = ChartModule([{"Label": "Gini", 
+    chart = ChartModule([{"Label": "Gini",
                           "Color": "Black"}],
                         data_collector_name='datacollector')
 
-    server = ModularServer(MoneyModel, 
-                           [grid, chart], 
-                           "Money Model", 
+    server = ModularServer(MoneyModel,
+                           [grid, chart],
+                           "Money Model",
                            100, 10, 10)
 
 Launch the visualization and start a model run, and you'll see a line
@@ -442,8 +442,8 @@ inherit from, and create the new visualization class.
                 self.canvas_width = canvas_width
                 self.bins = bins
                 new_element = "new HistogramModule({}, {}, {})"
-                new_element = new_element.format(bins, 
-                                                 canvas_width, 
+                new_element = new_element.format(bins,
+                                                 canvas_width,
                                                  canvas_height)
                 self.js_code = "elements.push(" + new_element + ");"
 
@@ -494,9 +494,9 @@ Now, you can create your new HistogramModule and add it to the server:
 .. code:: python
 
         histogram = HistogramModule(list(range(10)), 200, 500)
-        server = ModularServer(MoneyModel, 
-                               [grid, histogram, chart], 
-                               "Money Model", 
+        server = ModularServer(MoneyModel,
+                               [grid, histogram, chart],
+                               "Money Model",
                                100, 10, 10)
         server.launch()
 
