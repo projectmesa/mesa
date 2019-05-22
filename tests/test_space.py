@@ -249,7 +249,7 @@ class TestSpaceAgentMapping(unittest.TestCase):
 
 class TestSingleGrid(unittest.TestCase):
     def setUp(self):
-        self.space = SingleGrid(50, 50, False)
+        self.space = SingleGrid(20, 20, False)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS_GRID):
             a = MockAgent(i, None)
@@ -273,6 +273,15 @@ class TestSingleGrid(unittest.TestCase):
             assert a.pos is None
             assert self.space.grid[pos[0]][pos[1]] is None
 
+    def test_empty_cells(self):
+        while self.space.exists_empty_cells():
+            pos = self.space.find_empty()
+            a = MockAgent(-99, pos)
+            self.space.position_agent(a, x=pos[0], y=pos[1])
+        assert self.space.find_empty() is None
+        with self.assertRaises(Exception):
+            self.space.move_to_empty(a)
+
     def move_agent(self):
         agent_number = 0
         initial_pos = TEST_AGENTS_GRID[agent_number]
@@ -287,6 +296,7 @@ class TestSingleGrid(unittest.TestCase):
         assert _agent.pos == final_pos
         assert self.space.grid[initial_pos[0]][initial_pos[1]] is None
         assert self.space.grid[final_pos[0]][final_pos[1]] == _agent
+
 
 
 class TestSingleNetworkGrid(unittest.TestCase):

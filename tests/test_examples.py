@@ -51,9 +51,12 @@ class TestExamples(unittest.TestCase):
                 try:
                     # model.py at the top level
                     mod = importlib.import_module('model'.format(example))
+                    server = importlib.import_module('server'.format(example))
                 except ImportError:
                     # <example>/model.py
                     mod = importlib.import_module('{}.model'.format(example.replace('-', '_')))
+                    server = importlib.import_module('{}.server'.format(example.replace('-', '_')))
                 Model = getattr(mod, classcase(example))
                 model = Model()
                 (model.step() for _ in range(100))
+
