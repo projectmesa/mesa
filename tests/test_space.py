@@ -298,7 +298,6 @@ class TestSingleGrid(unittest.TestCase):
         assert self.space.grid[final_pos[0]][final_pos[1]] == _agent
 
 
-
 class TestSingleNetworkGrid(unittest.TestCase):
     GRAPH_SIZE = 10
 

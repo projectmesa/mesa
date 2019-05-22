@@ -50,13 +50,14 @@ class TestExamples(unittest.TestCase):
             with self.active_example_dir(example):
                 try:
                     # model.py at the top level
-                    mod = importlib.import_module('model'.format(example))
-                    server = importlib.import_module('server'.format(example))
+                    mod = importlib.import_module('model')
+                    server = importlib.import_module('server')
+                    server.server.render_model()
                 except ImportError:
                     # <example>/model.py
                     mod = importlib.import_module('{}.model'.format(example.replace('-', '_')))
                     server = importlib.import_module('{}.server'.format(example.replace('-', '_')))
+                    server.server.render_model()
                 Model = getattr(mod, classcase(example))
                 model = Model()
                 (model.step() for _ in range(100))
-
