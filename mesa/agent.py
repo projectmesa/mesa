@@ -30,9 +30,15 @@ class Agent:
         Args:
             filter: Whether to filter out unserializable objects and private attributes
 
+        Returns:
+            string representation of attributes and properties
+
         Notes:
             If an attribute is not JSON-serializable, it is replaced by its
             string representation unless `filter` is set to True.
+
+            The JSON representation also includes attributes of base classes, but
+            properties of base classes are currently not supported.
         """
 
         attributes = json.loads(
