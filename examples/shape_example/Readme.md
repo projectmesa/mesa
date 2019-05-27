@@ -4,7 +4,7 @@
 
 A very basic example model to showcase the visulaization on web browser.
 
-A simple grid is dispalyed on browesr with two agents. The example does not
+A simple grid is dispalyed on browser with two agents. The example does not
 have any agent motion involved. This example does not have any movenment of
 agents so as to keep it to the simplest of level possible.
 
