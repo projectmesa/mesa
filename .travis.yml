@@ -1,16 +1,17 @@
 language: python
 sudo: false
+dist: xenial
 os:
   - linux
 cache:
   pip: true
 python:
-  - "3.4"
   - "3.5"
   - "3.6"
-  # - "nightly"
+  - "3.7"
+  - "nightly"
 install:
-  - pip install coveralls
+  - pip install codecov
   - pip install .[dev]
 script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
@@ -18,7 +19,7 @@ script:
   # * E123 - indentation on data structures
   # * W504 - line break after binary operator
   - flake8 . --ignore=F403,E501,E123,E128,W504 --exclude=docs,build
-  - py.test --cov=mesa tests/
+  - py.test --cov=mesa tests/ --cov-report=xml
   # - ./tests/test_end_to_end_viz.sh  # needs to be investigated on why this took forever
 after_success:
-  - coveralls
+  - codecov
