@@ -44,7 +44,7 @@ To launch an example model, clone the `repository <https://github.com/projectmes
 
 .. code-block:: bash
 
-    schelling $ mesa runserver examples/wolf_sheep
+    $ mesa runserver examples/wolf_sheep
 
 For more help on using Mesa, check out the following resources:
 
@@ -87,12 +87,13 @@ ABM features users have shared that you may want to use in your model
 
 .. toctree::
    :hidden:
-   :maxdepth: 6
+   :maxdepth: 7
 
    Mesa Overview <overview>
    tutorials/intro_tutorial
    tutorials/adv_tutorial
    Best Practices <best-practices>
+   Useful Snippets <useful-snippets/snippets>
    API Documentation <apis/api_main>
    Mesa Packages <packages>
 
@@ -102,4 +103,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
