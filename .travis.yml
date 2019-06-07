@@ -1,3 +1,4 @@
+dist: xenial
 language: python
 sudo: false
 os:
@@ -5,7 +6,6 @@ os:
 cache:
   pip: true
 python:
-  - "3.4"
   - "3.5"
   - "3.6"
   # - "nightly"
