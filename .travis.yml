@@ -8,7 +8,8 @@ cache:
 python:
   - "3.5"
   - "3.6"
-  # - "nightly"
+  - "3.7"
+  - "nightly"
 install:
   - pip install coveralls
   - pip install .[dev]
