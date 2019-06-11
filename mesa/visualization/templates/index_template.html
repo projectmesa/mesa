@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<header>
+  <title>{{ model_name }} (Mesa visualization)</title>
+  <!-- <link href="/static/css/index.css" type="text/css" rel="stylesheet" /> -->
+  <link href="/static/css/index_new.css" rel="stylesheet"></link>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</header>
+
+<body>
+  <app-store steps="0">
+      <header>
+        <wl-nav fixed>
+          <span slot="title">{{ model_name }}</span>
+          <app-control slot="right"></app-control>
+        </wl-nav>
+      </header>
+      <aside>
+          <input-parameters></input-parameters>
+      </aside>
+      <main id="elements">
+        <h2>Visualization Elements</h2>
+      </main>
+      <footer>
+        <wl-nav fixed style="bottom: 0px; top: auto;">
+          <div slot="left">
+            <wl-button onclick="document.querySelector('#about-modal').show()">
+              About
+            </wl-button>
+            <wl-dialog fixed backdrop id="about-modal">
+              <h3 slot="header">Model Description</h3>
+              <wl-text slot="content">{{ description }}</wl-text>
+            </wl-dialog>
+          </div>
+          <div slot="right">
+            <fps-control></fps-control>
+          </div>
+        </wl-nav>
+      </footer>
+  </app-store>
+
+  <!-- Bottom-load all JavaScript dependencies -->
+  <script src="/static/js/jquery.min.js"></script>
+  <script src="/static/js/weightless.min.js"></script>
+  <script src="/static/js/hybrids.js"></script>
+
+  <!-- Script includes go here -->
+  {% for file_name in package_includes %}
+  <script src="/static/js/{{ file_name }}" type="text/javascript"></script>
+  {% end %} {% for file_name in local_includes %}
+  <script src="/local/{{ file_name }}" type="text/javascript"></script>
+  {% end %}
+
+  <!-- template-specific code snippets here -->
+  <script>
+    var port = {{ port }};
+  </script>
+  <!-- <script type="module" src="/static/js/runcontrol.js"></script> -->
+  <script type="module" src="/static/js/index.js"></script>
+
+  <!-- Element-specific scripts go here -->
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      (function () {
+        {% for script in scripts %}
+        {% raw script %}
+        {% end %}
+        //do something with b-lazy plugin, lightbox plugin and then with flexslider
+      })();
+
+    });
+  </script>
+</body>
