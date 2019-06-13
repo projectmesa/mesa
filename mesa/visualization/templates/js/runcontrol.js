@@ -1,164 +1,44 @@
-// import { html, define, parent } from "https://unpkg.com/hybrids/src"
 var define = window.hybrids.define
 var html = window.hybrids.html
 var parent = window.hybrids.parent
 var property = window.hybrids.property
 
-const store = document.querySelector("app-store")
-const vizElements = []
-
-/** Open the websocket connection; support TLS-specific URLs when appropriate */
-const ws = new window.WebSocket(
-  (window.location.protocol === "https:" ? "wss://" : "ws://") +
-    window.location.host +
-    "/ws"
-)
-/**
- * Parse and handle an incoming message on the WebSocket connection.
- * @param {string} message - the message received from the WebSocket
- */
-ws.onmessage = function(message) {
-  const msg = JSON.parse(message.data)
-  switch (msg.type) {
-    case "viz_state":
-      // Update visualization state
-      window.control.tick = store.steps
-      vizElements.forEach((element, index) => element.render(msg.data[index]))
-      store.rendered = true
-      break
-    case "end":
-      // We have reached the end of the model
-      store.done = true
-      store.running = false
-      break
-    case "reset":
-      vizElements.forEach(element => element.reset())
-      store.rendered = false
-      break
-    case "model_params":
-      // Create GUI elements for each model parameter and reset everything
-      msg.params.forEach(param => addParameter(store, param))
-      break
-    default:
-      // There shouldn't be any other message
-      console.log("Unexpected message.")
-      console.log(msg)
-  }
-}
-/**
- * Get the first step once the websocket is open
- */
-ws.onopen = () => (store.steps = -1)
+// import { html, define, parent } from "https://unpkg.com/hybrids/src"
 
 /**
- * Turn an object into a string to send to the server, and send it.
- * @param {string} message - The message to send to the Python server
- */
-function send(message) {
-  const msg = JSON.stringify(message)
-  ws.send(msg)
-}
-
-/**
- * Create a default property with observe function attached.
- * @param {any} defaultValue - Defaultvalue for the parameter
- * @param {function} func - observe function to be called when value changes
- */
-function observer(defaultValue = 0, func = () => sideEffects()) {
-  const prop = property(defaultValue)
-  prop.observe = func
-  return prop
-}
-
-/**
- * Main Appstore for saving state accross the Application
+ * Main AppStore for saving state across the Application
  * @typedef {Object} AppStore
  * @property {number} steps - The current model step
  * @property {boolean} running - Should the model continously update
  * @property {boolean} done - Whether the model is in a running state
- * @property {InputParameter[]} parameter - User-settable parameters
+ * @property {Parameter[]} parameter - User-settable parameters
  * @property {boolean} rendered - Is the current visualization state rendered
  * @property {number} timeout - the current timeout for step changes
  */
 const AppStore = {
   steps: { observe: sendStep },
-  running: observer(false, runModel),
+  running: false,
   done: false,
-  parameter: [],
+  parameter: {
+    ...property([]),
+    observe: sendParameter,
+  },
   fps: 3,
-  rendered: observer(false, runModel),
-  timeout: 0
+  timeout: 0,
 }
 
 /**
- * React to changes in the step counter - by resetting or getting the next step.
- * @param {AppStore} store - The application store
+ * Control section to start/step/reset the model
+ * @typedef {object} AppControl
+ * @property {AppStore} store - element instance of the AppStore
+ * @property {boolean} isRunning - Is the model in a running state
+ * @property {string} labelStartStop - The label for the start/stop button
+ * @property {string} render - How the three buttons appear
  */
-function sendStep(store) {
-  if (store.steps < 0) {
-    send({ type: "reset" })
-    store.timeout = setTimeout(incrementStep, 1, {
-      store: store
-    })
-  } else {
-    send({ type: "get_step", step: store.steps })
-  }
-}
-
-/**
- * Host object connected to an AppStore.
- * @typedef {Object} Host
- * @property {AppStore} store - The main application store
-
-/**
- * Increment model steps by one.
- * @param {Host} host - an element instance
- */
-function incrementStep({ store }) {
-  if (!store.done) {
-    store.rendered = false
-    store.steps += 1
-  }
-}
-
-/**
- * Toggle the models running state.
- * @param {Host} host - an element instance
- */
-function toggleRunning({ store }) {
-  clearTimeout(store.timeout)
-  if (!store.done) {
-    store.running = !store.running
-  }
-}
-
-/**
- * Schedule next step if visualiztion is rendered and model is running
- * @param {AppStore} store - The application store
- */
-function runModel(store) {
-  if (store.rendered && store.running) {
-    store.timeout = setTimeout(incrementStep, 1000 / store.fps, {
-      store: store
-    })
-  }
-}
-
-/**
- * Reset the model
- * @param {Host} param0 - an element instance
- */
-function resetModel({ store }) {
-  clearTimeout(store.timeout)
-  store.rendered = false
-  store.done = false
-  store.steps = -1
-}
-
 const AppControl = {
   store: parent(AppStore),
   isRunning: ({ store }) => store.running,
-  labelStartStop: ({ isRunning }) => (isRunning ? "Stop" : "Start"),
+  labelStartStop: ({ isRunning }) => (isRunning ? 'Stop' : 'Start'),
   render: ({ isRunning, labelStartStop }) => html`
     <wl-button onclick=${toggleRunning}>${labelStartStop}</wl-button>
     ${isRunning
@@ -169,47 +49,15 @@ const AppControl = {
           <wl-button onclick=${incrementStep}> Step</wl-button>
         `}
     <wl-button onclick=${resetModel}>Reset</wl-button>
-  `
-}
-
-window.store = document.querySelector("app-store")
-
-function addParameter(store, param) {
-  store.parameter = {
-    ...store.parameter,
-    [param.parameter]: {
-      currentValue: param.value,
-      type: param.param_type,
-      options: param
-    }
-  }
+  `,
 }
 
 /**
- * Change input parameter value
- * @param {InputElement} host - mesa-input instance
- * @param {Event} event - input event
+ * Input section for the individual Input Parameters
+ * @typedef {object} InputParameters
+ * @property {string[]} parameter - List of parameter names
+ * @property {string} render - Mapping of names to mesa inputs
  */
-function changeValue({ store, paramName }, event) {
-  console.log(event)
-  send({
-    type: "submit_params",
-    param: paramName,
-    value: Number(event.target.value) || event.target.value
-  })
-
-  store.parameter = {
-    ...store.parameter,
-    [paramName]: {
-      ...store.parameter[paramName],
-      options: {
-        ...store.parameter[paramName].options,
-        value: event.target.value
-      }
-    }
-  }
-}
-
 const InputParameters = {
   store: parent(AppStore),
   parameter: ({ store }) => Object.keys(store.parameter),
@@ -220,34 +68,38 @@ const InputParameters = {
         <mesa-input paramName=${param}></mesa-input>
       `
     )}
-  `
+  `,
 }
 
 /**
- * @typedef {object} InputElement
+ * @typedef {object} MesaInput
  * @property {AppStore} store - app-store element instance
  * @property {string} paramName - name of the parameter
- * @property {InputParameter} parameter - user-settable input parameter
+ * @property {Parameter} parameter - user-settable input parameter
  */
-const Input = {
+const MesaInput = {
   store: parent(AppStore),
-  paramName: "",
+  paramName: '',
   parameter: ({ store, paramName }) => store.parameter[paramName],
-  type: ({ parameter }) => parameter.type,
-  options: ({ parameter }) => parameter.options,
-  currentValue: ({ parameter }) => parameter.currentValue,
-  render: ({ type, options, currentValue }) => html`
+  render: ({ parameter }) => html`
     <wl-expansion>
-      <span slot="title">${options.name}</span>
-      <span slot="description">${currentValue}</span>
-      ${addInput(type, options, currentValue)}
+      <span slot="title">${parameter.options.name}</span>
+      <span slot="description">${parameter.currentValue}</span>
+      ${addInput(parameter)}
     </wl-expansion>
-  `
+  `,
 }
 
-function addInput(type, options, currentValue) {
+/**
+ * Create input elements based on the type of the input parameter
+ * @param {Parameter} parameter - Input parameter
+ */
+function addInput(parameter) {
+  let type = parameter.type
+  let options = parameter.options
+  let currentValue = parameter.currentValue
   switch (type) {
-    case "slider":
+    case 'slider':
       return html`
         <wl-slider
           thumbLabel
@@ -262,8 +114,7 @@ function addInput(type, options, currentValue) {
           <span slot="after">${options.max_value}</span>
         </wl-slider>
       `
-
-    case "number":
+    case 'number':
       return html`
         <wl-textfield
           type="number"
@@ -274,8 +125,7 @@ function addInput(type, options, currentValue) {
           oninput=${changeValue}
         ></wl-textfield>
       `
-
-    case "choice":
+    case 'choice':
       return html`
         <wl-select oninput=${changeValue}>
           ${options.choices.map(
@@ -286,8 +136,7 @@ function addInput(type, options, currentValue) {
           )}
         </wl-select>
       `
-
-    case "checkbox":
+    case 'checkbox':
       return html`
         ${options.value
           ? html`
@@ -297,19 +146,24 @@ function addInput(type, options, currentValue) {
               <wl-switch></wl-switch>
             `}
       `
-
-    case "static_text":
+    case 'static_text':
       return html`
         <wl-text>${options.value}</wl-text>
       `
 
     default:
-      console.log("unexpected parameter type:")
+      console.log('Unexpected parameter type:')
       console.log(type)
   }
 }
 
-const fpsControl = {
+/**
+ * @typedef {object} FPSControl
+ * @property {number} currentStep - The current model step
+ * @property {number} fps - the current frames per second
+ * @property {string} render - Display of current step and slider for FPS control
+ */
+const FPSControl = {
   store: parent(AppStore),
   currentStep: ({ store }) => (store.steps < 0 ? 0 : store.steps),
   fps: ({ store }) => store.fps,
@@ -334,18 +188,189 @@ const fpsControl = {
     >
     </wl-slider>
     <wl-text slot="left">Current Step: ${currentStep}</wl-text>
-  `
+  `,
+}
+
+define('app-store', AppStore)
+define('app-control', AppControl)
+define('input-parameters', InputParameters)
+define('mesa-input', MesaInput)
+define('fps-control', FPSControl)
+
+/**
+ * Host element instance connected to an AppStore.
+ * @typedef {Object} Host
+ * @property {AppStore} store - The main application store
+
+/**
+ * Increment model steps by one.
+ * @param {Host} host - an element instance
+ */
+function incrementStep({ store }) {
+  if (!store.done) {
+    store.steps += 1
+  }
+}
+
+/**
+ * Toggle the models running state.
+ * @param {Host} host - an element instance
+ */
+function toggleRunning({ store }) {
+  clearTimeout(store.timeout)
+  if (!store.done) {
+    store.running = !store.running
+  }
+  if (store.running) {
+    incrementStep({ store: store })
+  }
+}
+
+/**
+ * Reset the model
+ * @param {Host} host - an element instance
+ */
+function resetModel({ store }) {
+  clearTimeout(store.timeout)
+  store.done = false
+  store.steps = -1
+}
+
+/**
+ * Change input parameter value in the store
+ * @param {InputElement} host - mesa-input instance
+ * @param {Event} event - input event
+ */
+function changeValue({ store, paramName }, event) {
+  store.parameter = {
+    ...store.parameter,
+    [paramName]: {
+      ...store.parameter[paramName],
+      options: {
+        ...store.parameter[paramName].options,
+        value: event.target.value,
+      },
+    },
+  }
 }
 
 function updateFPS({ store }, { target }) {
   store.fps = target.value
 }
 
-define("app-store", AppStore)
-define("app-control", AppControl)
-define("mesa-input", Input)
-define("input-parameters", InputParameters)
-define("fps-control", fpsControl)
+// Side effect functions below
 
+// Set-up element container, reference to app store instance and legacy control object
+const vizElements = []
+const store = document.querySelector('app-store')
+const control = { tick: store.steps }
+
+/**
+ * React to changes in the step counter - by resetting or getting the next step.
+ * @param {AppStore} store - The application store
+ */
+function sendStep(store) {
+  if (store.steps < 0) {
+    send({ type: 'reset' })
+    store.timeout = setTimeout(incrementStep, 1, {
+      store: store,
+    })
+  } else {
+    send({ type: 'get_step', step: store.steps })
+  }
+}
+
+/**
+ * Add user-settable parameters to the input section.
+ * @param {AppStore} store - element instance of the app store
+ * @param {Parameter} param - raw parameter input from the Model Server
+ */
+function addParameter(store, param) {
+  store.parameter = {
+    ...store.parameter,
+    [param.parameter]: {
+      currentValue: param.value,
+      type: param.param_type,
+      options: param,
+    },
+  }
+}
+
+/**
+ * Check which values have changed and send them to the model server
+ * @param {AppStore} store - store element instance
+ * @param {Parameter[]} value - new values of the parameters
+ * @param {Parameter[]} lastValue - old values of the parameters
+ */
+function sendParameter(store, value, lastValue = []) {
+  Object.keys(lastValue).forEach(param => {
+    if (value[param].options.value != lastValue[param].options.value) {
+      send({
+        type: 'submit_params',
+        param: param,
+        value: Number(value[param].options.value) || value[param].options.value,
+      })
+    }
+  })
+}
+
+/** Open the websocket connection; support TLS-specific URLs when appropriate */
+const ws = new window.WebSocket(
+  (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
+    window.location.host +
+    '/ws'
+)
+
+/**
+ * Get the first step once the websocket is open (via resetting the model)
+ */
+ws.onopen = () => (store.steps = -1)
+
+/**
+ * Parse and handle an incoming message on the WebSocket connection.
+ * @param {string} message - the message received from the WebSocket
+ */
+ws.onmessage = function(message) {
+  const msg = JSON.parse(message.data)
+  switch (msg.type) {
+    case 'viz_state':
+      // Update visualization state
+      control.tick = store.steps
+      vizElements.forEach((element, index) => element.render(msg.data[index]))
+      if (store.running) {
+        store.timeout = setTimeout(incrementStep, 1000 / store.fps, {
+          store: store,
+        })
+      }
+      break
+    case 'end':
+      // We have reached the end of the model
+      store.done = true
+      store.running = false
+      break
+    case 'reset':
+      vizElements.forEach(element => element.reset())
+      break
+    case 'model_params':
+      // Create input elements for each model parameter
+      msg.params.forEach(param => addParameter(store, param))
+      break
+    default:
+      // There shouldn't be any other message
+      console.log('Unexpected message.')
+      console.log(msg)
+  }
+}
+
+/**
+ * Turn an object into a string to send to the server, and send it.
+ * @param {string} message - The message to send to the Python server
+ */
+function send(message) {
+  const msg = JSON.stringify(message)
+  ws.send(msg)
+}
+
+window.store = document.querySelector('app-store')
+window.control = control
 window.elements = vizElements
-window.control = { tick: store.steps }

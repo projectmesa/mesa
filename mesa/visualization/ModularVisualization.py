@@ -198,10 +198,10 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         if msg["type"] == "get_step":
             if not self.application.model.running:
                 self.write_message({"type": "end"})
-                return
-            if self.application.model.schedule.steps != msg["step"]:
+            else:
+                self.write_message(self.viz_state_message)
+            if self.application.model.schedule.steps == msg["step"]:
                 self.application.model.step()
-            self.write_message(self.viz_state_message)
 
         elif msg["type"] == "reset":
             self.application.reset_model()
@@ -284,7 +284,6 @@ class ModularServer(tornado.web.Application):
         if model_params is None:
             model_params = {}
         self.model_kwargs = model_params
-        self.reset_model()
 
         # Initializing the application itself:
         super().__init__(self.handlers, **self.settings)

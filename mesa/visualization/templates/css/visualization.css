@@ -1,23 +1,18 @@
 :root {
-    --nav-height: 4.375rem;
-    --nav-bg: hsl(229, 6%, 83%);
+  --nav-height: 4.375rem;
+  --nav-bg: hsl(229, 6%, 83%);
 }
 
 .container {
-    margin: var(--nav-height) auto;
-    max-width: 800px;
-    display: flex;
+  margin: var(--nav-height) auto;
+  max-width: 800px;
+  display: flex;
 }
 
 aside {
-    padding: 8px;
-    width: 250px;
-}
-
-input-parameters {
-    position: fixed;
+  padding: 8px;
 }
 
 main {
-    padding: 8px;
+  padding: 8px;
 }
