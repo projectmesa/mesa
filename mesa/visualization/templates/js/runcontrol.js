@@ -1,307 +1,351 @@
-/** runcontrol.js
+// import { html, define, parent } from "https://unpkg.com/hybrids/src"
+var define = window.hybrids.define
+var html = window.hybrids.html
+var parent = window.hybrids.parent
+var property = window.hybrids.property
 
- Users can reset() the model, advance it by one step(), or run() it through. reset() and
- step() send a message to the server, which then sends back the appropriate data. run() just
- calls the step() method at fixed intervals.
+const store = document.querySelector("app-store")
+const vizElements = []
 
- The model parameters are controlled via the MesaVisualizationControl object.
+/** Open the websocket connection; support TLS-specific URLs when appropriate */
+const ws = new window.WebSocket(
+  (window.location.protocol === "https:" ? "wss://" : "ws://") +
+    window.location.host +
+    "/ws"
+)
+/**
+ * Parse and handle an incoming message on the WebSocket connection.
+ * @param {string} message - the message received from the WebSocket
  */
+ws.onmessage = function(message) {
+  const msg = JSON.parse(message.data)
+  switch (msg.type) {
+    case "viz_state":
+      // Update visualization state
+      window.control.tick = store.steps
+      vizElements.forEach((element, index) => element.render(msg.data[index]))
+      store.rendered = true
+      break
+    case "end":
+      // We have reached the end of the model
+      store.done = true
+      store.running = false
+      break
+    case "reset":
+      vizElements.forEach(element => element.reset())
+      store.rendered = false
+      break
+    case "model_params":
+      // Create GUI elements for each model parameter and reset everything
+      msg.params.forEach(param => addParameter(store, param))
+      break
+    default:
+      // There shouldn't be any other message
+      console.log("Unexpected message.")
+      console.log(msg)
+  }
+}
+/**
+ * Get the first step once the websocket is open
+ */
+ws.onopen = () => (store.steps = -1)
 
 /**
- * Object which holds visualization parameters.
- *
- * tick: What tick of the model we're currently at
- running: Boolean on whether we have reached the end of the current model
- * fps: Current frames per second.
+ * Turn an object into a string to send to the server, and send it.
+ * @param {string} message - The message to send to the Python server
  */
-var MesaVisualizationControl = function() {
-    this.tick = -1; // Counts at which tick of the model we are.
-    this.running = false; // Whether there is currently a model running
-    this.done = false;
-    this.fps = 3; // Frames per second
-};
+function send(message) {
+  const msg = JSON.stringify(message)
+  ws.send(msg)
+}
 
-var player; // Variable to store the continuous player
-var control = new MesaVisualizationControl();
-var elements = [];  // List of Element objects
-var model_params = {};
+/**
+ * Create a default property with observe function attached.
+ * @param {any} defaultValue - Defaultvalue for the parameter
+ * @param {function} func - observe function to be called when value changes
+ */
+function observer(defaultValue = 0, func = () => sideEffects()) {
+  const prop = property(defaultValue)
+  prop.observe = func
+  return prop
+}
 
-// Playback buttons
-var playPauseButton = $('#play-pause');
-var stepButton = $('#step');
-var resetButton = $('#reset');
-var fpsControl = $('#fps').slider({
-    max: 20,
-    min: 0,
-    value: 3,
-    ticks: [0, 20],
-    ticks_labels: [0, 20],
-    ticks_position: [0, 100]
-});
+/**
+ * Main Appstore for saving state accross the Application
+ * @typedef {Object} AppStore
+ * @property {number} steps - The current model step
+ * @property {boolean} running - Should the model continously update
+ * @property {boolean} done - Whether the model is in a running state
+ * @property {InputParameter[]} parameter - User-settable parameters
+ * @property {boolean} rendered - Is the current visualization state rendered
+ * @property {number} timeout - the current timeout for step changes
+ */
+const AppStore = {
+  steps: { observe: sendStep },
+  running: observer(false, runModel),
+  done: false,
+  parameter: [],
+  fps: 3,
+  rendered: observer(false, runModel),
+  timeout: 0
+}
 
-// Sidebar dom access
-var sidebar = $("#sidebar");
+/**
+ * React to changes in the step counter - by resetting or getting the next step.
+ * @param {AppStore} store - The application store
+ */
+function sendStep(store) {
+  if (store.steps < 0) {
+    send({ type: "reset" })
+    store.timeout = setTimeout(incrementStep, 1, {
+      store: store
+    })
+  } else {
+    send({ type: "get_step", step: store.steps })
+  }
+}
 
-// WebSocket Stuff
-// Open the websocket connection; support TLS-specific URLs when appropriate
-var ws = new WebSocket((window.location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
+/**
+ * Host object connected to an AppStore.
+ * @typedef {Object} Host
+ * @property {AppStore} store - The main application store
 
-ws.onopen = function() {
-    console.log("Connection opened!");
-    send({"type": "get_params"}); // Request model parameters when websocket is ready
-    reset();
-};
+/**
+ * Increment model steps by one.
+ * @param {Host} host - an element instance
+ */
+function incrementStep({ store }) {
+  if (!store.done) {
+    store.rendered = false
+    store.steps += 1
+  }
+}
 
-// Add model parameters that can be edited prior to a model run
-var initGUI = function() {
+/**
+ * Toggle the models running state.
+ * @param {Host} host - an element instance
+ */
+function toggleRunning({ store }) {
+  clearTimeout(store.timeout)
+  if (!store.done) {
+    store.running = !store.running
+  }
+}
 
-    var onSubmitCallback = function(param_name, value) {
-        send({"type": "submit_params", "param": param_name, "value": value});
-    };
+/**
+ * Schedule next step if visualiztion is rendered and model is running
+ * @param {AppStore} store - The application store
+ */
+function runModel(store) {
+  if (store.rendered && store.running) {
+    store.timeout = setTimeout(incrementStep, 1000 / store.fps, {
+      store: store
+    })
+  }
+}
 
-    var addBooleanInput = function(param, obj) {
-        var domID = param + '_id';
-        sidebar.append([
-            "<div class='input-group input-group-lg'>",
-            "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
-            "<input class='model-parameter' id='" + domID + "' type='checkbox'/>",
-            "</div>"
-        ].join(''));
-        $('#' + domID).bootstrapSwitch({
-            'state': obj.value,
-            'size': 'small',
-            'onSwitchChange': function(e, state) {
-                onSubmitCallback(param, state);
-            }
-        });
-    };
+/**
+ * Reset the model
+ * @param {Host} param0 - an element instance
+ */
+function resetModel({ store }) {
+  clearTimeout(store.timeout)
+  store.rendered = false
+  store.done = false
+  store.steps = -1
+}
 
-    var addNumberInput = function(param, obj) {
-        var domID = param + '_id';
-        sidebar.append([
-            "<div class='input-group input-group-lg'>",
-            "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
-            "<input class='model-parameter' id='" + domID + "' type='number'/>",
-            "</div>"
-        ].join(''));
-        var numberInput = $('#' + domID);
-        numberInput.val(obj.value);
-        numberInput.on('change', function() {
-            onSubmitCallback(param, Number($(this).val()));
-        })
-    };
+const AppControl = {
+  store: parent(AppStore),
+  isRunning: ({ store }) => store.running,
+  labelStartStop: ({ isRunning }) => (isRunning ? "Stop" : "Start"),
+  render: ({ isRunning, labelStartStop }) => html`
+    <wl-button onclick=${toggleRunning}>${labelStartStop}</wl-button>
+    ${isRunning
+      ? html`
+          <wl-button disabled onclick=${incrementStep}> Step</wl-button>
+        `
+      : html`
+          <wl-button onclick=${incrementStep}> Step</wl-button>
+        `}
+    <wl-button onclick=${resetModel}>Reset</wl-button>
+  `
+}
 
-    var addSliderInput = function(param, obj) {
-        var domID = param + '_id';
-        var tooltipID = domID + "_tooltip";
-        sidebar.append([
-            "<div class='input-group input-group-lg'>",
-            "<p>",
-            "<a id='" + tooltipID + "' data-toggle='tooltip' data-placement='top' class='label label-primary'>",
-            obj.name,
-            "</a>",
-            "</p>",
-            "<input id='" + domID + "' type='text' />",
-            "</div>"
-        ].join(''));
+window.store = document.querySelector("app-store")
 
-        // Enable tooltip label
-        if (obj.description !== null) {
-            $(tooltipID).tooltip({
-                title: obj.description,
-                placement: 'right'
-            });
-        }
-
-        // Setup slider
-        var sliderInput = $("#" + domID);
-        sliderInput.slider({
-            min: obj.min_value,
-            max: obj.max_value,
-            value: obj.value,
-            step: obj.step,
-            ticks: [obj.min_value, obj.max_value],
-            ticks_labels: [obj.min_value, obj.max_value],
-            ticks_positions: [0, 100]
-        });
-        sliderInput.on('change', function() {
-            onSubmitCallback(param, Number($(this).val()));
-        })
-    };
-
-    var addChoiceInput = function(param, obj) {
-        var domID = param + '_id';
-        var span = "<span class='caret'></span>";
-        var template = [
-            "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
-            "<div class='dropdown'>",
-            "<button id='" + domID + "' class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>" +
-            obj.value + " " + span,
-            "</button>",
-            "<ul class='dropdown-menu' role='menu' aria-labelledby='" + domID + "'>"
-        ];
-        var choiceIdentifiers = [];
-        for (var i = 0; i < obj.choices.length; i++) {
-            var choiceID = domID + '_choice_' + i;
-            choiceIdentifiers.push(choiceID);
-            template.push(
-                "<li role='presentation'><a class='pick-choice' id='" + choiceID + "' role='menuitem' tabindex='-1' href='#'>",
-                obj.choices[i],
-                "</a></li>"
-            );
-        }
-
-        // Close the dropdown options
-        template.push("</ul>", "</div>");
-
-        // Finally render the dropdown and activate choice listeners
-        sidebar.append(template.join(''));
-        choiceIdentifiers.forEach(function (id,idx) {
-            $('#' + id).on('click', function () {
-                var value = obj.choices[idx];
-                $('#' + domID).html(value + ' ' + span);
-                onSubmitCallback(param, value);
-            });
-        });
-    };
-
-    var addTextBox = function(param, obj) {
-        var well = $('<div class="well">' + obj.value + '</div>')[0];
-        sidebar.append(well);
-    };
-
-    var addParamInput = function(param, option) {
-        switch (option['param_type']) {
-            case 'checkbox':
-                addBooleanInput(param, option);
-                break;
-
-            case 'slider':
-                addSliderInput(param, option);
-                break;
-
-            case 'choice':
-                addChoiceInput(param, option);
-                break;
-
-            case 'number':
-                addNumberInput(param, option);   // Behaves the same as just a simple number
-                break;
-
-            case 'static_text':
-                addTextBox(param, option);
-                break;
-        }
-    };
-
-    for (var option in model_params) {
-
-        var type = typeof(model_params[option]);
-        var param_str = String(option);
-
-        switch (type) {
-            case "boolean":
-                addBooleanInput(param_str, {'value': model_params[option], 'name': param_str});
-                break;
-            case "number":
-                addNumberInput(param_str, {'value': model_params[option], 'name': param_str});
-                break;
-            case "object":
-                addParamInput(param_str, model_params[option]);    // catch-all for params that use Option class
-                break;
-        }
+function addParameter(store, param) {
+  store.parameter = {
+    ...store.parameter,
+    [param.parameter]: {
+      currentValue: param.value,
+      type: param.param_type,
+      options: param
     }
-};
+  }
+}
 
-/** Parse and handle an incoming message on the WebSocket connection. */
-ws.onmessage = function(message) {
-    var msg = JSON.parse(message.data);
-    switch (msg["type"]) {
-        case "viz_state":
-            var data = msg["data"];
-            for (var i in elements) {
-                elements[i].render(data[i]);
-            }
-            break;
-        case "end":
-            // We have reached the end of the model
-            control.running = false;
-            control.done = true;
-            console.log("Done!");
-            clearInterval(player);
-            $(playPauseButton.children()[0]).text("Done");
-            break;
-        case "model_params":
-            console.log(msg["params"]);
-            model_params = msg["params"];
-            initGUI();
-            break;
-        default:
-            // There shouldn't be any other message
-            console.log("Unexpected message.");
+/**
+ * Change input parameter value
+ * @param {InputElement} host - mesa-input instance
+ * @param {Event} event - input event
+ */
+function changeValue({ store, paramName }, event) {
+  console.log(event)
+  send({
+    type: "submit_params",
+    param: paramName,
+    value: Number(event.target.value) || event.target.value
+  })
+
+  store.parameter = {
+    ...store.parameter,
+    [paramName]: {
+      ...store.parameter[paramName],
+      options: {
+        ...store.parameter[paramName].options,
+        value: event.target.value
+      }
     }
-};
+  }
+}
 
-/**	 Turn an object into a string to send to the server, and send it. v*/
-var send = function(message) {
-    msg = JSON.stringify(message);
-    ws.send(msg);
-};
+const InputParameters = {
+  store: parent(AppStore),
+  parameter: ({ store }) => Object.keys(store.parameter),
+  render: ({ parameter }) => html`
+    <h2>Input Parameters</h2>
+    ${parameter.map(
+      param => html`
+        <mesa-input paramName=${param}></mesa-input>
+      `
+    )}
+  `
+}
 
-/** Reset the model, and rest the appropriate local variables. */
-var reset = function() {
-    control.tick = 0;
-    send({"type": "reset"});
+/**
+ * @typedef {object} InputElement
+ * @property {AppStore} store - app-store element instance
+ * @property {string} paramName - name of the parameter
+ * @property {InputParameter} parameter - user-settable input parameter
+ */
+const Input = {
+  store: parent(AppStore),
+  paramName: "",
+  parameter: ({ store, paramName }) => store.parameter[paramName],
+  type: ({ parameter }) => parameter.type,
+  options: ({ parameter }) => parameter.options,
+  currentValue: ({ parameter }) => parameter.currentValue,
+  render: ({ type, options, currentValue }) => html`
+    <wl-expansion>
+      <span slot="title">${options.name}</span>
+      <span slot="description">${currentValue}</span>
+      ${addInput(type, options, currentValue)}
+    </wl-expansion>
+  `
+}
 
-    // Reset all the visualizations
-    for (var i in elements) {
-        elements[i].reset();
-    }
-    control.done = false;
-    if (!control.running)
-        $(playPauseButton.children()[0]).text("Start");
-};
+function addInput(type, options, currentValue) {
+  switch (type) {
+    case "slider":
+      return html`
+        <wl-slider
+          thumbLabel
+          min=${options.min_value}
+          max=${options.max_value}
+          step=${options.step}
+          buffervalue=${currentValue}
+          oninput=${changeValue}
+          label=${options.value}
+        >
+          <span slot="before">${options.min_value}</span>
+          <span slot="after">${options.max_value}</span>
+        </wl-slider>
+      `
 
-/** Send a message to the server get the next visualization state. */
-var single_step = function() {
-    control.tick += 1;
-    send({"type": "get_step", "step": control.tick});
-};
+    case "number":
+      return html`
+        <wl-textfield
+          type="number"
+          min=${options.min_value}
+          max=${options.max_value}
+          step=${options.step}
+          value=${options.value}
+          oninput=${changeValue}
+        ></wl-textfield>
+      `
 
-/** Step the model forward. */
-var step = function() {
-    if (!control.running & !control.done) {single_step()}
-    else if (!control.done) {run()};
-};
+    case "choice":
+      return html`
+        <wl-select oninput=${changeValue}>
+          ${options.choices.map(
+            option =>
+              html`
+                <option>${option}</option>
+              `
+          )}
+        </wl-select>
+      `
 
-/** Call the step function at fixed intervals, until getting an end message from the server. */
-var run = function() {
-    var anchor = $(playPauseButton.children()[0]);
-    if (control.running) {
-        control.running = false;
-        if (player) {
-            clearInterval(player);
-            player = null;
-        }
-        anchor.text("Start");
-    }
-    else if (!control.done) {
-        control.running = true;
-        player = setInterval(single_step, 1000/control.fps);
-        anchor.text("Stop");
-    }
-};
+    case "checkbox":
+      return html`
+        ${options.value
+          ? html`
+              <wl-switch checked></wl-switch>
+            `
+          : html`
+              <wl-switch></wl-switch>
+            `}
+      `
 
-var updateFPS = function() {
-    control.fps = Number(fpsControl.val());
-    if (control.running) {
-        run();
-        run();
-    }
-};
+    case "static_text":
+      return html`
+        <wl-text>${options.value}</wl-text>
+      `
 
-// Initilaize buttons on top bar
-playPauseButton.on('click', run);
-stepButton.on('click', step);
-resetButton.on('click', reset);
-fpsControl.on('change', updateFPS);
+    default:
+      console.log("unexpected parameter type:")
+      console.log(type)
+  }
+}
+
+const fpsControl = {
+  store: parent(AppStore),
+  currentStep: ({ store }) => (store.steps < 0 ? 0 : store.steps),
+  fps: ({ store }) => store.fps,
+  render: ({ currentStep, fps }) => html`
+    <style>
+      wl-text {
+        margin-left: 8px;
+      }
+      :host {
+        display: flex;
+        align-items: center;
+      }
+    </style>
+    <wl-slider
+      min="0"
+      max="25"
+      step="1"
+      value=${fps}
+      oninput=${updateFPS}
+      label="FPS Control"
+      thumbLabel
+    >
+    </wl-slider>
+    <wl-text slot="left">Current Step: ${currentStep}</wl-text>
+  `
+}
+
+function updateFPS({ store }, { target }) {
+  store.fps = target.value
+}
+
+define("app-store", AppStore)
+define("app-control", AppControl)
+define("mesa-input", Input)
+define("input-parameters", InputParameters)
+define("fps-control", fpsControl)
+
+window.elements = vizElements
+window.control = { tick: store.steps }

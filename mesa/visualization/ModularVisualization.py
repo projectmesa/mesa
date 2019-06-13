@@ -97,13 +97,14 @@ Client -> Server:
 
 """
 import os
+import webbrowser
+
 import tornado.autoreload
+import tornado.escape
+import tornado.gen
 import tornado.ioloop
 import tornado.web
 import tornado.websocket
-import tornado.escape
-import tornado.gen
-import webbrowser
 
 from mesa.visualization.UserParam import UserSettableParameter
 
@@ -162,7 +163,7 @@ class PageHandler(tornado.web.RequestHandler):
         for i, element in enumerate(elements):
             element.index = i
         self.render(
-            "index_template.html",
+            "modular_template.html",
             port=self.application.port,
             model_name=self.application.model_name,
             description=self.application.description,
@@ -178,9 +179,6 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         if self.application.verbose:
             print("Socket opened!")
-        self.write_message(
-            {"type": "model_params", "params": self.application.user_params}
-        )
 
     def check_origin(self, origin):
         return True
@@ -200,20 +198,24 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         if msg["type"] == "get_step":
             if not self.application.model.running:
                 self.write_message({"type": "end"})
-            else:
+                return
+            if self.application.model.schedule.steps != msg["step"]:
                 self.application.model.step()
-                self.write_message(self.viz_state_message)
+            self.write_message(self.viz_state_message)
 
         elif msg["type"] == "reset":
             self.application.reset_model()
-            self.write_message(self.viz_state_message)
+            self.write_message({"type": "reset"})
+            self.write_message(
+                {"type": "model_params", "params": self.application.user_params}
+            )
 
         elif msg["type"] == "submit_params":
             param = msg["param"]
             value = msg["value"]
 
             # Is the param editable?
-            if param in self.application.user_params:
+            if param in [param["parameter"] for param in self.application.user_params]:
                 if isinstance(
                     self.application.model_kwargs[param], UserSettableParameter
                 ):
@@ -255,7 +257,7 @@ class ModularServer(tornado.web.Application):
     EXCLUDE_LIST = ("width", "height")
 
     def __init__(
-        self, model_cls, visualization_elements, name="Mesa Model", model_params={}
+        self, model_cls, visualization_elements, name="Mesa Model", model_params=None
     ):
         """ Create a new visualization server with the given elements. """
         # Prep visualization elements:
@@ -279,6 +281,8 @@ class ModularServer(tornado.web.Application):
         elif model_cls.__doc__ is not None:
             self.description = model_cls.__doc__
 
+        if model_params is None:
+            model_params = {}
         self.model_kwargs = model_params
         self.reset_model()
 
@@ -287,11 +291,11 @@ class ModularServer(tornado.web.Application):
 
     @property
     def user_params(self):
-        result = {}
+        result = []
         for param, val in self.model_kwargs.items():
             if isinstance(val, UserSettableParameter):
-                result[param] = val.json
-
+                val.parameter = param
+                result.append(val.json)
         return result
 
     def reset_model(self):
