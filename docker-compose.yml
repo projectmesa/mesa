@@ -1,17 +1,26 @@
+# The Mesa project publishes "official" code to:
+# - Pip: https://pypi.org/project/Mesa
+# - Docker Hub: not yet!  
+
+# Example showing running a model using mounted volumes.  
+# See Dockerfile
+
+# Build and run with these commands:
+# $ pip install docker-compose
+# $ cd mesa
+# $ (cd examples/conways_game_of_life && pip3 install -r requirements.txt)
+# $ docker compose-up --attach mymesa_instance bash
+
 version: '3'
 services:
-  install:
-    build: .
-    image: mesa:dev
-    command: pip3 install -e /opt/mesa
+  mesa:
+    # Built on your computer with `docker build . -t mymesa_image`
+    image: mymesa_image
+    # Mount examples/conways to /opt/mesa/mymodel before starting image
     volumes:
-      - .:/opt/mesa
-  dev:
-    image: mesa:dev
-    depends_on:
-      - install
-    volumes:
-      - .:/opt/mesa
+      - /examples/conways_game_of_life:/opt/mesa/mymodel
+    # browse to http://127.0.0.1:8521 to see results
     ports:
-      - "127.0.0.1:8521:8521"
+      - "8521:8521"
+
 
