@@ -2,25 +2,35 @@
 # - Pip: https://pypi.org/project/Mesa
 # - Docker Hub: not yet!  
 
-# Example showing running a model using mounted volumes.  
-# See Dockerfile
+# This example shows how to run a model using mounted volumes.  
+# See Dockerfile for details on why.
 
-# Build and run with these commands:
+# Build and run using these commands from this directory:
+
+# 1) build the image
+# $ docker build . -t mymesa_image
+
+# 2) Install docker-compose
 # $ pip install docker-compose
-# $ cd mesa
+
+# 3) Install example's dependencies. () creates new subshell so shell's working directory doesn't change
 # $ (cd examples/conways_game_of_life && pip3 install -r requirements.txt)
-# $ docker compose-up --attach mymesa_instance bash
+
+# 4) Start the image and mount the volume
+# $ docker-compose up
+
+# 5) browse to http://127.0.0.1:8521 to see results
 
 version: '3'
 services:
   mesa:
     # Built on your computer with `docker build . -t mymesa_image`
     image: mymesa_image
-    # Mount examples/conways to /opt/mesa/mymodel before starting image
+    # Mount host dir './examples/conways' 
+    #   to image dir '/opt/mesa/mymodel' before starting image
     volumes:
-      - /examples/conways_game_of_life:/opt/mesa/mymodel
-    # browse to http://127.0.0.1:8521 to see results
+      - ./examples/conways_game_of_life:/opt/mesa/mymodel
     ports:
       - "8521:8521"
-
+    
 
