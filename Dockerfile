@@ -75,7 +75,7 @@ WORKDIR /opt/mesa/mymodel
 
 # NOTE: your model's dependencies are installed here
 RUN pip install -r requirements.txt
-# pipenv LIES and does sufficiently process requirements.txt
+# pipenv LIES and does not sufficiently process requirements.txt
 # and takes forever to do it.
 # RUN pipenv install
 
