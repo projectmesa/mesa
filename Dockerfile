@@ -14,9 +14,9 @@
 # $ docker exec -it mymesa_instance /bin/bash 
 
 # FOR SECURITY:
-# - Don't use random Docker images or libraries.
-# - Use Docker images and libraries packaged by the same people.  
-# - Otherwise, who knows what's in that image?!
+# - Don't use random Docker images, libraries, or napkins in the bin
+# - Use official Docker images, or images packaged by the same people that made the library.
+# - Otherwise, who knows what code is in that image?!
 
 # This example Dockerfile packages the wolf_sheep example model.
 
@@ -42,9 +42,6 @@
 
 # Use official python image from Docker team: https://hub.docker.com/_/python
 FROM python:stretch
-
-# Our "home" directory in the Docker image
-WORKDIR /opt/mesa
 
 # Expose our port:
 EXPOSE 8521/tcp
@@ -73,10 +70,15 @@ COPY examples /opt/mesa/examples
 # Run wolf_sheep so it does something by default
 COPY examples/wolf_sheep /opt/mesa/mymodel
 
+# Our "home" directory in the Docker image
+WORKDIR /opt/mesa/mymodel
+
 # NOTE: your model's dependencies are installed here
-RUN (cd mymodel && pipenv install)
+RUN pip install -r requirements.txt
+# pipenv LIES and does sufficiently process requirements.txt
+# and then takes forever to do it.
+# RUN pipenv install
 
 # Run python
 ENTRYPOINT ["/usr/local/bin/python3"]
-# NOTE: replace with your own parameter
-CMD ["/opt/mesa/mymodel/run.py"]
+CMD ["run.py"]
