@@ -64,20 +64,25 @@ RUN pip install --upgrade pipenv
 # - pipenv from Pip
 # - models can install mesa w/ pip or pipenv
 
-# NOTE: copy your model in here
 # Add examples for fun
 COPY examples /opt/mesa/examples
-# Run wolf_sheep so it does something by default
-COPY examples/wolf_sheep /opt/mesa/mymodel
 
 # Our "home" directory in the Docker image
 WORKDIR /opt/mesa/mymodel
 
-# NOTE: your model's dependencies are installed here
+# Copy requirements.txt w/o code.  This layer is cached so we don't have to push every build
+# NOTE: copy your model requirements.txt here
+COPY examples/wolf_sheep/requirements.txt .
+
+# Install dependencies
 RUN pip install -r requirements.txt
 # pipenv LIES and does not sufficiently process requirements.txt
 # and takes forever to do it.
 # RUN pipenv install
+
+# Copy rest of code so code changes only push the last layer
+# NOTE: copy your model in here
+COPY examples/wolf_sheep/ ./
 
 # Run python
 ENTRYPOINT ["/usr/local/bin/python3"]
