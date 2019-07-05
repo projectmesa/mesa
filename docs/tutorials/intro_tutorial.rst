@@ -672,7 +672,7 @@ measure of wealth inequality.
                 self.grid.place_agent(a, (x, y))
 
             self.datacollector = DataCollector(
-                model_reporters={"Gini": compute_gini},
+                model_reporters={"Gini": compute_gini},  # `compute_gini` defined above
                 agent_reporters={"Wealth": "wealth"})
 
         def step(self):
