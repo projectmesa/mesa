@@ -9,7 +9,7 @@ A simple ecological model, consisting of two agent types: ants, and sugar
 patches.
 
 The ants wander around according to Epstein's rule M:
-- Look out as far as vision pennits in the four principal lattice directions and identify the unoccupied site(s) having the most sugar. The order in which each agent search es the four directions is random.
+- Look out as far as vision pennies in the four principal lattice directions and identify the unoccupied site(s) having the most sugar. The order in which each agent search es the four directions is random.
 - If the greatest sugar value appears on multiple sites then select the nearest one. That is, if the largest sugar within an agent s vision is four, but the value occurs twice, once at a lattice position two units away and again at a site three units away, the former is chosen. If it appears at multiple sites the same distance away, the first site encountered is selected (the site search order being random).
 - Move to this site. Notice that there is no distinction between how far an agent can move and how far it can see. So, if vision equals 5, the agent can move up to 5 lattice positions north , south, east, or west.
 - Collect all the sugar at this new position.
