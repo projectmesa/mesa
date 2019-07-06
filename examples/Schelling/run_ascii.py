@@ -16,12 +16,12 @@ class SchellingTextVisualization(TextVisualization):
         '''
         self.model = model
 
-        grid_viz = TextGrid(self.model.grid, self.ascii_agent)
+        grid_viz = TextGrid(self.model.grid, self.print_ascii_agent)
         happy_viz = TextData(self.model, 'happy')
         self.elements = [grid_viz, happy_viz]
 
     @staticmethod
-    def ascii_agent(a):
+    def print_ascii_agent(a):
         '''
         Minority agents are X, Majority are O.
         '''
