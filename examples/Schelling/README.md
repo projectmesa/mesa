@@ -26,9 +26,14 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 
 To view and run some example model analyses, launch the IPython Notebook and open ``analysis.ipynb``. Visualizing the analysis also requires [matplotlib](http://matplotlib.org/).
 
+## How to Run without the GUI
+
+To run the model with the grid displayed as an ASCII text, run `python run_ascii.py` in this directory.
+
 ## Files
 
 * ``run.py``: Launches a model visualization server.
+* ``run_ascii.py``: Run the model in text mode.
 * ``schelling.py``: Contains the agent class, and the overall model class.
 * ``server.py``: Defines classes for visualizing the model in the browser via Mesa's modular server, and instantiates a visualization server.
 * ``analysis.ipynb``: Notebook demonstrating how to run experiments and parameter sweeps on the model.

@@ -2,37 +2,7 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 
-from mesa.visualization.TextVisualization import (
-    TextData, TextGrid, TextVisualization
-)
-
 from model import Schelling
-
-
-class SchellingTextVisualization(TextVisualization):
-    '''
-    ASCII visualization for schelling model
-    '''
-
-    def __init__(self, model):
-        '''
-        Create new Schelling ASCII visualization.
-        '''
-        self.model = model
-
-        grid_viz = TextGrid(self.model.grid, self.ascii_agent)
-        happy_viz = TextData(self.model, 'happy')
-        self.elements = [grid_viz, happy_viz]
-
-    @staticmethod
-    def ascii_agent(a):
-        '''
-        Minority agents are X, Majority are O.
-        '''
-        if a.type == 0:
-            return 'O'
-        if a.type == 1:
-            return 'X'
 
 
 class HappyElement(TextElement):
