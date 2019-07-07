@@ -17,7 +17,7 @@ Implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%2
 ### epstein_civil_violence
 Joshua Epstein's [model](http://www.uvm.edu/~pdodds/files/papers/others/2002/epstein2002a.pdf) of how a decentralized uprising can be suppressed or reach a critical mass of support.
 
-### boid-flockers
+### boid_flockers
 [Boids](https://en.wikipedia.org/wiki/Boids)-style flocking model, demonstrating the use of agents moving through a continuous space following direction vectors.
 
 ### forest_fire
