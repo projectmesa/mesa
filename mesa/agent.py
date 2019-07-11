@@ -41,25 +41,5 @@ class Agent:
             properties of base classes are currently not supported.
         """
 
-        attributes = json.loads(
-            json.dumps(
-                self.__dict__, default=lambda a: "__REMOVE_ATR" if filter else str(a)
-            )
-        )
-
-        if filter:
-            attributes = {
-                key: value
-                for key, value in attributes.items()
-                if value != "__REMOVE_ATR" and not key.startswith("_")
-            }
-
-        properties = {
-            key: getattr(self, key)
-            for key, value in type(self).__dict__.items()
-            if type(value) == property
-        }
-
-        agent_json = json.dumps({**attributes, **properties})
-
-        return agent_json
+        attributes = json.dumps(self.__dict__, default=lambda a: str(a))
+        return attributes

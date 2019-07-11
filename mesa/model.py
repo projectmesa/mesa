@@ -84,32 +84,11 @@ class Model:
             properties of base classes are currently not supported.
         """
 
-        attributes = json.loads(
-            json.dumps(
-                self.__dict__, default=lambda a: "__REMOVE_ATR" if filter else str(a)
-            )
-        )
+        attributes = json.dumps(self.__dict__, default=lambda a: str(a))
 
-        if filter:
-            attributes = {
-                key: value
-                for key, value in attributes.items()
-                if value != "__REMOVE_ATR" and not key.startswith("_")
-            }
-
-        properties = {
-            key: getattr(self, key)
-            for key, value in type(self).__dict__.items()
-            if type(value) == property
-        }
-
-        model_json = json.dumps({**attributes, **properties})
-
-        if include_agents:
-            model_json = model_json[:-1] + ', "agents": [{agents}]}}'.format(
-                agents=", ".join(
-                    [agent.as_json(filter=filter) for agent in self.schedule.agents]
-                )
+        if include_agents and hasattr(self.schedule, "agents"):
+            model_json = attributes[:-1] + ', "agents": [{agents}]}}'.format(
+                agents=", ".join([agent.as_json() for agent in self.schedule.agents])
             )
 
         return model_json
