@@ -35,20 +35,8 @@ class TestAgentJSON(unittest.TestCase):
         self.model = MockModel()
         self.agent = self.model.schedule.agents[0]
 
-    def test_with_filter(self):
-        agent_json = self.agent.as_json(filter=True)
-        # test if json is deserializable
-        agent_dict = json.loads(agent_json)
-
-        assert "model" not in agent_dict
-        assert "random" not in agent_dict
-
-        assert agent_dict["alive"] is True
-        assert agent_dict["unique_id"] == 1
-        assert agent_dict["is_alive"] is True
-
-    def test_without_filter(self):
-        agent_json = self.agent.as_json(filter=False)
+    def test_json(self):
+        agent_json = self.agent.as_json()
         # test if json is deserializable
         agent_dict = json.loads(agent_json)
 
@@ -65,20 +53,8 @@ class TestModelJSON(unittest.TestCase):
         self.model = MockModel()
         self.agent = self.model.schedule.agents[0]
 
-    def test_with_filter(self):
-        model_json = self.model.as_json(filter=True)
-        # test if json is deserializable
-        model_dict = json.loads(model_json)
-
-        assert "random" not in model_dict
-
-        assert model_dict["running"] is True
-        assert model_dict["current_id"] == 10
-        assert model_dict["is_running"] is True
-        assert isinstance(model_dict["agents"], list)
-
-    def test_without_filter(self):
-        model_json = self.model.as_json(filter=False)
+    def test_json(self):
+        model_json = self.model.as_json()
         # test if json is deserializable
         model_dict = json.loads(model_json)
 
@@ -89,7 +65,7 @@ class TestModelJSON(unittest.TestCase):
         assert "random" in model_dict
 
     def test_without_agents(self):
-        model_json = self.model.as_json(filter=True, include_agents=False)
+        model_json = self.model.as_json(include_agents=False)
         # test if json is deserializable
         model_dict = json.loads(model_json)
 

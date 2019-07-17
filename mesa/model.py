@@ -66,11 +66,10 @@ class Model:
         self.random.seed(seed)
         self._seed = seed
 
-    def as_json(self, filter: bool = True, include_agents: bool = True) -> str:
+    def as_json(self, include_agents: bool = True) -> str:
         """Convert Model attributes to JSON.
 
         Args:
-            filter: Whether to filter out unserializable objects and private attributes
             include_agents: Whether to include agents
 
         Returns:
@@ -78,16 +77,26 @@ class Model:
 
         Notes:
             If an attribute is not JSON-serializable, it is replaced by its
-            string representation unless `filter` is set to True.
+            string representation.
 
             The JSON representation also includes attributes of base classes, but
             properties of base classes are currently not supported.
         """
 
-        attributes = json.dumps(self.__dict__, default=lambda a: str(a))
+        attributes_str = json.dumps(self.__dict__, default=lambda a: str(a))
+
+        properties = {
+            key: getattr(self, key)
+            for key, value in type(self).__dict__.items()
+            if type(value) == property
+        }
+
+        properties_str = json.dumps(properties, default=lambda a: str(a))
+
+        model_json = attributes_str[:-1] + ", " + properties_str[1:]
 
         if include_agents and hasattr(self.schedule, "agents"):
-            model_json = attributes[:-1] + ', "agents": [{agents}]}}'.format(
+            model_json = model_json[:-1] + ', "agents": [{agents}]}}'.format(
                 agents=", ".join([agent.as_json() for agent in self.schedule.agents])
             )
 

@@ -27,19 +27,27 @@ class Agent:
     def as_json(self, filter: bool = True) -> str:
         """Convert Agent attributes to JSON string.
 
-        Args:
-            filter: Whether to filter out unserializable objects and private attributes
-
         Returns:
             string representation of attributes and properties
 
         Notes:
             If an attribute is not JSON-serializable, it is replaced by its
-            string representation unless `filter` is set to True.
+            string representation.
 
             The JSON representation also includes attributes of base classes, but
             properties of base classes are currently not supported.
         """
 
-        attributes = json.dumps(self.__dict__, default=lambda a: str(a))
-        return attributes
+        attributes_str = json.dumps(self.__dict__, default=lambda a: str(a))
+
+        properties = {
+            key: getattr(self, key)
+            for key, value in type(self).__dict__.items()
+            if type(value) == property
+        }
+
+        properties_str = json.dumps(properties, default=lambda a: str(a))
+
+        agent_json = attributes_str[:-1] + ", " + properties_str[1:]
+
+        return agent_json
