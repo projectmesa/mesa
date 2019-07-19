@@ -1,12 +1,45 @@
-from mesa.visualization.modules import CanvasGrid
-from mesa.visualization.ModularVisualization import ModularServer
+import random
 
-from .portrayal import portrayCell
+from mesa.visualization.VegaVisualization import VegaServer
+
 from .model import ConwaysGameOfLife
 
+grid_spec = """
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "width": 300,
+    "height": 300,
+    "data": {"name": "agents"},
+    "mark": "bar",
+    "encoding": {
+      "x": {"type": "nominal", "field": "x"},
+      "y": {"type": "nominal", "field": "y"},
+      "color": {"type": "nominal", "field": "isAlive"}
+    }
+}
+"""
 
-# Make a world that is 50x50, on a 250x250 display.
-canvas_element = CanvasGrid(portrayCell, 50, 50, 250, 250)
+line_spec = """
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
+    "width": 300,
+    "height": 300,
+    "data": {"name": "agents"},
+    "mark": "bar",
+    "encoding": {
+      "x": {"type": "nominal", "field": "isAlive"},
+      "y": {"aggregate": "count", "type": "quantitative"},
+      "color": {"type": "nominal", "field": "isAlive"}
+    }
+}
+"""
 
-server = ModularServer(ConwaysGameOfLife, [canvas_element], "Game of Life",
-                       {"height": 50, "width": 50})
+seed = random.random()
+
+server = VegaServer(
+    ConwaysGameOfLife,
+    [grid_spec, line_spec],
+    "Game of Life",
+    {"height": 20, "width": 20, "seed": seed},
+    n_simulations=2,
+)

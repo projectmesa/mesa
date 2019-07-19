@@ -1,16 +1,18 @@
+import json
+
 from mesa import Agent
 
 
 class Cell(Agent):
-    '''Represents a single ALIVE or DEAD cell in the simulation.'''
+    """Represents a single ALIVE or DEAD cell in the simulation."""
 
     DEAD = 0
     ALIVE = 1
 
     def __init__(self, pos, model, init_state=DEAD):
-        '''
+        """
         Create a cell, in the given state, at the given x, y position.
-        '''
+        """
         super().__init__(pos, model)
         self.x, self.y = pos
         self.state = init_state
@@ -22,16 +24,16 @@ class Cell(Agent):
 
     @property
     def neighbors(self):
-        return self.model.grid.neighbor_iter((self.x, self.y), True)
+        return list(self.model.grid.neighbor_iter((self.x, self.y), True))
 
     def step(self):
-        '''
+        """
         Compute if the cell will be dead or alive at the next tick.  This is
         based on the number of alive or dead neighbors.  The state is not
         changed here, but is just computed and stored in self._nextState,
         because our current state may still be necessary for our neighbors
         to calculate their next state.
-        '''
+        """
 
         # Get the neighbors and apply the rules on whether to be alive or dead
         # at the next tick.
@@ -47,7 +49,10 @@ class Cell(Agent):
                 self._nextState = self.ALIVE
 
     def advance(self):
-        '''
+        """
         Set the state to the new computed state -- computed in step().
-        '''
+        """
         self.state = self._nextState
+
+    def as_json(self):
+        return json.dumps({"isAlive": self.isAlive, "x": self.pos[0], "y": self.pos[1]})
