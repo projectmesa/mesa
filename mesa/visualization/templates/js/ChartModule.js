@@ -26,11 +26,11 @@ var ChartModule = function(series, canvas_width, canvas_height) {
     for (var i in series) {
         var s = series[i];
         var new_series = {
-            label: s.Label,
-            borderColor: s.Color,
-            backgroundColor: convertColorOpacity(s.Color),
             data: []
         };
+        for (var property in s){
+          new_series[property] = s[property];
+        }
         datasets.push(new_series);
     }
 
