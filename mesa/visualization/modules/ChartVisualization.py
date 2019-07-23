@@ -19,10 +19,10 @@ class ChartModule(VisualizationElement):
 
     Attributes:
         series: A list of dictionaries containing information on series to
-                plot. Each dictionary must contain (at least) the "Label" and
-                "Color" keys. The "Label" value must correspond to a
+                plot. Each dictionary must contain (at least) the "label" and
+                "borderColor" keys. The "label" value must correspond to a
                 model-level series collected by the model's DataCollector, and
-                "Color" must have a valid HTML color.
+                "borderColor" must have a valid HTML color.
         canvas_height, canvas_width: The width and height to draw the chart on
                                      the page, in pixels. Default to 200 x 500
         data_collector_name: Name of the DataCollector object in the model to
@@ -31,7 +31,7 @@ class ChartModule(VisualizationElement):
 
 
     Example:
-        schelling_chart = ChartModule([{"Label": "happy", "Color": "Black"}],
+        schelling_chart = ChartModule([{"label": "happy", "borderColor": "Black"}],
                                       data_collector_name="datacollector")
 
     TODO:
@@ -39,7 +39,7 @@ class ChartModule(VisualizationElement):
 
         More Pythonic customization; in particular, have both series-level and
         chart-level options settable in Python, and passed to the front-end
-        the same way that "Color" is currently.
+        the same way that "borderColor" is currently.
 
     """
     package_includes = ["Chart.min.js", "ChartModule.js"]
@@ -52,12 +52,12 @@ class ChartModule(VisualizationElement):
         Args:
             series: A list of dictionaries containing series names and
                     HTML colors to chart them in, e.g.
-                    [{"Label": "happy", "Color": "Black"},]
+                    [{"label": "happy", "borderColor": "Black"},]
             canvas_height, canvas_width: Size in pixels of the chart to draw.
             data_collector_name: Name of the DataCollector to use.
         """
 
-        self.series = series
+        self.series = serieslabel
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
         self.data_collector_name = data_collector_name
@@ -73,7 +73,7 @@ class ChartModule(VisualizationElement):
         data_collector = getattr(model, self.data_collector_name)
 
         for s in self.series:
-            name = s["Label"]
+            name = s["label"]
             try:
                 val = data_collector.model_vars[name][-1]  # Latest value
             except (IndexError, KeyError):
