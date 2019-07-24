@@ -62,7 +62,7 @@ target/
 # Spyder app workspace config file
 .spyderworkspace
 
-# PyCharm environment files
+# PyCharm and Visual Studio environment files
 .idea/
 .vscode/
 
