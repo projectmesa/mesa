@@ -84,6 +84,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
         if response_function:
             response_function(**msg["data"])
+
         return None
 
     @property
@@ -98,19 +99,11 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def get_state(self, step: int) -> None:
         self.write_message(self.states[step])
 
-    def submit_params(self, param: str, value: Any) -> None:
+    def submit_params(self, model: int, param: str, value: Any) -> None:
         """Submit model parameters."""
 
         # Is the param editable?
-        if param in [
-            getattr(param, "parameter") for param in self.application.user_params
-        ]:
-            if isinstance(
-                self.application.model_kwargs[0][param], UserSettableParameter
-            ):
-                self.application.model_kwargs[0][param].value = value
-            else:
-                self.application.model_kwargs[0][param] = value
+        self.application.model_kwargs[model][param].value = value
 
     def reset(self) -> None:
         self.application.reset_models()
@@ -175,7 +168,7 @@ class VegaServer(tornado.web.Application):
     def __init__(
         self,
         model_cls: Any,
-        vega_specifications: str,
+        vega_specifications: List[str],
         name: str = "Mesa Model",
         model_params: Optional[Dict[str, Any]] = None,
         n_simulations: int = 1,
@@ -214,6 +207,11 @@ class VegaServer(tornado.web.Application):
         for param, val in self.model_params.items():
             if isinstance(val, UserSettableParameter):
                 setattr(val, "parameter", param)
+                setattr(
+                    val,
+                    "model_values",
+                    [kwargs[param].value for kwargs in self.model_kwargs],
+                )
                 result.append(val.json)
         return result
 
