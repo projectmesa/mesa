@@ -96,7 +96,7 @@ Finally, when you're ready to run the visualization, use the server's
     server = ModularServer(MoneyModel,
                            [grid],
                            "Money Model",
-                           100, 10, 10)
+                           {"N":100, "width":10, "height":10})
     server.port = 8521 # The default
     server.launch()
 
@@ -121,7 +121,7 @@ The full code should now look like:
     server = ModularServer(MoneyModel,
                            [grid],
                            "Money Model",
-                           100, 10, 10)
+                           {"N":100, "width":10, "height":10})
     server.port = 8521 # The default
     server.launch()
 
@@ -228,7 +228,7 @@ chart will appear underneath the grid.
     server = ModularServer(MoneyModel,
                            [grid, chart],
                            "Money Model",
-                           100, 10, 10)
+                           {"N":100, "width":10, "height":10})
 
 Launch the visualization and start a model run, and you'll see a line
 chart underneath the grid. Every step of the model, the line chart
@@ -497,7 +497,7 @@ Now, you can create your new HistogramModule and add it to the server:
         server = ModularServer(MoneyModel,
                                [grid, histogram, chart],
                                "Money Model",
-                               100, 10, 10)
+                               {"N":100, "width":10, "height":10})
         server.launch()
 
 Run this code, and you should see your brand-new histogram added to the
