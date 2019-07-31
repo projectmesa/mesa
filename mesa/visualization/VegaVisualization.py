@@ -126,6 +126,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
         self.states.append(self.current_state)
         self.application.step()
+        if not any([model.running for model in self.application.models]):
+            self.write_message({"type": "end"})
 
     def call_method(self, step: int, model_id: int, data: Dict[str, Any]) -> None:
         if self.application.current_step != step:

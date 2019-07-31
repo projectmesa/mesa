@@ -100,8 +100,11 @@ class Model:
         )
 
         if include_agents and hasattr(self, "schedule"):
-            model_json = model_json[:-1] + ', "agents": [{agents}]}}'.format(
-                agents=", ".join([agent.as_json() for agent in self.schedule.agents])
+            model_json = model_json[
+                :-1
+            ] + ', "step": {currentStep}, "agents": [{agents}]}}'.format(
+                agents=", ".join([agent.as_json() for agent in self.schedule.agents]),
+                currentStep=self.schedule.steps,
             )
 
         return model_json

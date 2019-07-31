@@ -81,14 +81,18 @@ function addInput(parameter) {
       `
     case "choice":
       return html`
-        <wl-select oninput=${changeValue}>
-          ${options.choices.map(
-            option =>
-              html`
-                <option>${option}</option>
-              `
-          )}
-        </wl-select>
+        ${model_values.map(
+          (value, index) => html`
+            <wl-select oninput=${changeValue.bind(index)}>
+              ${options.choices.map(
+                option =>
+                  html`
+                    <option>${option}</option>
+                  `
+              )}
+            </wl-select>
+          `
+        )}
       `
     case "checkbox":
       return html`

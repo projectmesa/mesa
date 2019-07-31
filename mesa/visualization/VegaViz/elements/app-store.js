@@ -84,7 +84,7 @@ const sendSignal = function(name, value = {}) {
   })
 }
 
-async function updateViews(store, data) {
+export async function updateViews(store, data) {
   data.forEach((modelData, index) => {
     let { agents, ...model } = modelData
     let agentChange = vega

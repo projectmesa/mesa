@@ -1,5 +1,5 @@
 import { html, parent } from "../hybrids.min.js"
-import AppStore from "./app-store.js"
+import AppStore, { updateViews } from "./app-store.js"
 
 /**
  * Control section to start/step/reset the model
@@ -54,6 +54,7 @@ function resetModel({ store }) {
   clearTimeout(store.timeout)
   store.done = false
   send({ type: "reset", data: {} })
+  resetViews(store)
   store.currentStep = 0
   store.maxStep = 0
   send({ type: "get_state", data: { step: 0 } })
@@ -115,4 +116,12 @@ function getState({ store }, { target }) {
 
 function updateFPS({ store }, { target }) {
   store.fps = target.value
+}
+
+function resetViews(store) {
+  store.views.forEach(model =>
+    model.forEach(aview =>
+      aview.then(r => r.view.remove("model", vega.truthy).run())
+    )
+  )
 }

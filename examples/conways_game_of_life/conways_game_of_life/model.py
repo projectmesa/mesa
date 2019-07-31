@@ -11,7 +11,7 @@ class ConwaysGameOfLife(Model):
     Game of Life.
     """
 
-    def __init__(self, height=50, width=50, **kwargs):
+    def __init__(self, size, **kwargs):
         """
         Create a new playing area of (height, width) cells.
         """
@@ -25,7 +25,7 @@ class ConwaysGameOfLife(Model):
         self.schedule = SimultaneousActivation(self)
 
         # Use a simple grid, where edges wrap around.
-        self.grid = Grid(height, width, torus=True)
+        self.grid = Grid(size, size, torus=True)
 
         # Place a cell at each location, with some initialized to
         # ALIVE and some to DEAD.

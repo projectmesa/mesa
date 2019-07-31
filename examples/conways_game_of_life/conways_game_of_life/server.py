@@ -1,14 +1,14 @@
-import random
-
 from mesa.visualization.VegaVisualization import VegaServer
+from mesa.visualization.UserParam import UserSettableParameter
+
 
 from .model import ConwaysGameOfLife
 
 grid_spec = """
 {
     "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
-    "width": 300,
-    "height": 300,
+    "width": 500,
+    "height": 500,
     "data": {"name": "agents"},
     "mark": "bar",
     "encoding": {
@@ -19,27 +19,14 @@ grid_spec = """
 }
 """
 
-line_spec = """
-{
-    "$schema": "https://vega.github.io/schema/vega-lite/v3.json",
-    "width": 300,
-    "height": 300,
-    "data": {"name": "agents"},
-    "mark": "bar",
-    "encoding": {
-      "x": {"type": "nominal", "field": "isAlive"},
-      "y": {"aggregate": "count", "type": "quantitative"},
-      "color": {"type": "nominal", "field": "isAlive"}
-    }
-}
-"""
-
-seed = random.random()
-
 server = VegaServer(
     ConwaysGameOfLife,
-    [grid_spec, line_spec],
+    [grid_spec],
     "Game of Life",
-    {"height": 20, "width": 20, "seed": seed},
-    n_simulations=2,
+    {
+        "size": UserSettableParameter(
+            "slider", "Size", value=50, min_value=10, max_value=100, step=5
+        )
+    },
+    n_simulations=1,
 )
