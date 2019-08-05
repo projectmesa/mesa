@@ -22,7 +22,7 @@ class Model:
         model.random = random.Random(model._seed)
         return model
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """ Create a new model. Overload this method with the actual code to
         start the model.
 
