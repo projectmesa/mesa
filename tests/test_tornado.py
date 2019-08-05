@@ -21,6 +21,10 @@ class TestServer(AsyncHTTPTestCase):
         ws_client = yield tornado.websocket.websocket_connect(ws_url)
 
         # Now we can run a test on the WebSocket.
+        response = yield ws_client.read_message()
+        msg = json.loads(response)
+        assert msg["type"] == "model_params"
+
         ws_client.write_message('{"type": "get_step"}')
         response = yield ws_client.read_message()
         msg = json.loads(response)
@@ -30,11 +34,6 @@ class TestServer(AsyncHTTPTestCase):
         response = yield ws_client.read_message()
         msg = json.loads(response)
         assert msg["type"] == "viz_state"
-
-        ws_client.write_message('{"type": "get_params"}')
-        response = yield ws_client.read_message()
-        msg = json.loads(response)
-        assert msg["type"] == "model_params"
 
         ws_client.write_message("Unknown message!")
         response = yield ws_client.read_message()
