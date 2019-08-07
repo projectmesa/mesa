@@ -3,11 +3,12 @@ Test the BatchRunner
 """
 from functools import reduce
 from operator import mul
+import random
 import unittest
 
 from mesa import Agent, Model
 from mesa.time import BaseScheduler
-from mesa.batchrunner import BatchRunner, ParameterProduct, ParameterSampler
+from mesa.batchrunner import BatchRunner, ParameterProduct, ParameterSampler, BatchRunnerMP
 
 
 NUM_AGENTS = 7
@@ -56,7 +57,7 @@ class MockMixedModel(Model):
         self.variable_name = other_params.get('variable_name', 42)
         self.fixed_name = other_params.get('fixed_name')
         self.running = True
-        self.schedule = BaseScheduler(None)
+        self.schedule = BaseScheduler(self)
         self.schedule.add(MockAgent(1, self, 0))
 
     def step(self):
@@ -85,8 +86,9 @@ class TestBatchRunner(unittest.TestCase):
         self.iterations = 17
         self.max_steps = 3
 
-    def launch_batch_processing(self):
-        batch = BatchRunner(
+    def launch_batch_processing(self, MP=False):
+        Runner = BatchRunner if not MP else BatchRunnerMP
+        batch = Runner(
             self.mock_model,
             variable_parameters=self.variable_params,
             fixed_parameters=self.fixed_params,
@@ -114,6 +116,18 @@ class TestBatchRunner(unittest.TestCase):
         expected_cols = (len(self.variable_params) +
                          len(self.model_reporters) +
                          1)  # extra column with run index
+
+        self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
+
+    def test_model_level_vars_MP(self):
+        """
+        Test that model-level variable collection is of the correct size
+        """
+        batch = self.launch_batch_processing(MP=True)
+        model_vars = batch.get_model_vars_dataframe()
+        expected_cols = (len(self.variable_params) +
+                            len(self.model_reporters) +
+                            1)  # extra column with run index
 
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
 
@@ -190,10 +204,23 @@ class TestParameters(unittest.TestCase):
             n=10,
             random_state=1
             )
+        params3 = ParameterSampler({
+            "var_alpha": ['a', 'b', 'c', 'd', 'e'],
+            "var_num": range(16)},
+            n=10,
+            random_state=None
+            )
+        params3 = ParameterSampler({
+            "var_alpha": ['a', 'b', 'c', 'd', 'e'],
+            "var_num": range(16)},
+            n=10,
+            random_state=random.Random()
+            )
 
         lp = list(params1)
         self.assertEqual(10, len(lp))
         self.assertEqual(lp, list(params2))
+        self.assertNotEqual(lp, list(params3))
 
 
 if __name__ == '__main__':

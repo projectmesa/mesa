@@ -61,9 +61,6 @@ class PieChartModule(VisualizationElement):
 
         for s in self.fields:
             name = s["Label"]
-            try:
-                val = data_collector.model_vars[name][-1]  # Latest value
-            except (IndexError, KeyError):
-                val = 0
+            val = data_collector.model_vars[name][-1]  # Latest value
             current_values.append(val)
         return current_values

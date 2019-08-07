@@ -123,12 +123,12 @@ class FixedBatchRunner:
                 kwargs = params.copy()
                 kwargs.update(self.fixed_parameters)
                 all_kwargs.append(kwargs)
-                all_param_values.append(params.values())
+                all_param_values.append(list(params.values()))
         elif len(self.fixed_parameters):
             count = 1
             kwargs = self.fixed_parameters.copy()
             all_kwargs.append(kwargs)
-            all_param_values.append(kwargs.values())
+            all_param_values.append(list(kwargs.values()))
 
         total_iterations *= count
 

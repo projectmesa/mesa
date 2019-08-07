@@ -2,13 +2,14 @@ from tornado.testing import AsyncHTTPTestCase
 import tornado
 from mesa import Model
 from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization.UserParam import UserSettableParameter
 import json
 
 
 class TestServer(AsyncHTTPTestCase):
 
     def get_app(self):
-        app = ModularServer(Model, [])
+        app = ModularServer(Model, [], model_params={"seed": UserSettableParameter("static_text", value="0")})
         return app
 
     def test_homepage(self):
@@ -35,6 +36,7 @@ class TestServer(AsyncHTTPTestCase):
         msg = json.loads(response)
         assert msg["type"] == "viz_state"
 
-        ws_client.write_message("Unknown message!")
-        response = yield ws_client.read_message()
-        assert response is None
+        ws_client.write_message('{"type": "submit_params", "param": "seed", "value": "12"}')
+
+        ws_client.write_message('{"type": "Unknown"}')
+
