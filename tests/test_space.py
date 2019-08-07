@@ -2,6 +2,7 @@ import unittest
 
 import networkx as nx
 import numpy as np
+import pytest
 
 from mesa.space import ContinuousSpace
 from mesa.space import SingleGrid
@@ -272,6 +273,16 @@ class TestSingleGrid(unittest.TestCase):
             self.space.remove_agent(a)
             assert a.pos is None
             assert self.space.grid[pos[0]][pos[1]] is None
+
+    def test_empty_cells(self):
+        if self.space.exists_empty_cells():
+            pytest.deprecated_call(self.space.find_empty)
+            for i, pos in enumerate(list(self.space.empties)):
+                a = MockAgent(-i, pos)
+                self.space.position_agent(a, x=pos[0], y=pos[1])
+        assert self.space.find_empty() is None
+        with self.assertRaises(Exception):
+            self.space.move_to_empty(a)
 
     def move_agent(self):
         agent_number = 0
