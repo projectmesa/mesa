@@ -61,3 +61,5 @@ class TestExamples(unittest.TestCase):
                 Model = getattr(mod, classcase(example))
                 model = Model()
                 (model.step() for _ in range(100))
+                if example == "schelling":
+                    os.system('python run_ascii.py')

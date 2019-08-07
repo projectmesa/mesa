@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+.mypy_cache/
 
 *py~
 *swp
@@ -42,6 +43,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+.pytest_cache/
 
 # Translations
 *.mo
@@ -62,9 +64,10 @@ target/
 # Spyder app workspace config file
 .spyderworkspace
 
-# PyCharm environment files
+# PyCharm and VSCode environment files
 .idea/
 .vscode/
+.code-workspace
 
 # Apple OSX
 *.DS_Store
