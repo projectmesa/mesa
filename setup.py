@@ -22,6 +22,7 @@ extras_require = {
         'pytest >= 3.6',
         'pytest-cov',
         'sphinx',
+        'pathos'
     ],
     'docs': [
         'sphinx',

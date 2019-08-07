@@ -39,4 +39,3 @@ class TestServer(AsyncHTTPTestCase):
         ws_client.write_message('{"type": "submit_params", "param": "seed", "value": "12"}')
 
         ws_client.write_message('{"type": "Unknown"}')
-

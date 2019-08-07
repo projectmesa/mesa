@@ -125,9 +125,7 @@ class TestBatchRunner(unittest.TestCase):
         """
         batch = self.launch_batch_processing(MP=True)
         model_vars = batch.get_model_vars_dataframe()
-        expected_cols = (len(self.variable_params) +
-                            len(self.model_reporters) +
-                            1)  # extra column with run index
+        expected_cols = (len(self.variable_params) + len(self.model_reporters) + 1)  # extra column with run index
 
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
 
