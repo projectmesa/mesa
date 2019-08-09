@@ -67,7 +67,7 @@ target/
 # PyCharm and VSCode environment files
 .idea/
 .vscode/
-.code-workspace
+*.code-workspace
 
 # Apple OSX
 *.DS_Store
