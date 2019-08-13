@@ -24,7 +24,7 @@ class Agent:
     def random(self):
         return self.model.random
 
-    def as_json(self, filter: bool = True) -> str:
+    def as_json(self) -> str:
         """Convert Agent attributes to JSON string.
 
         Returns:

@@ -7,21 +7,21 @@ import importlib
 
 
 def classcase(name):
-    return "".join(x.capitalize() for x in name.replace("-", "_").split("_"))
+    return ''.join(x.capitalize() for x in name.replace('-', '_').split('_'))
 
 
 class TestExamples(unittest.TestCase):
-    """
+    '''
     Test examples' models.  This creates a model object and iterates it through
     some steps.  The idea is to get code coverage, rather than to test the
     details of each example's model.
-    """
+    '''
 
-    EXAMPLES = os.path.abspath(os.path.join(os.path.dirname(__file__), "../examples"))
+    EXAMPLES = os.path.abspath(os.path.join(os.path.dirname(__file__), '../examples'))
 
     @contextlib.contextmanager
     def active_example_dir(self, example):
-        "save and restore sys.path and sys.modules"
+        'save and restore sys.path and sys.modules'
         old_sys_path = sys.path[:]
         old_sys_modules = sys.modules.copy()
         old_cwd = os.getcwd()
@@ -42,7 +42,7 @@ class TestExamples(unittest.TestCase):
         for example in os.listdir(self.EXAMPLES):
             if not os.path.isdir(os.path.join(self.EXAMPLES, example)):
                 continue
-            if hasattr(self, "test_{}".format(example.replace("-", "_"))):
+            if hasattr(self, 'test_{}'.format(example.replace('-', '_'))):
                 # non-standard example; tested below
                 continue
 
