@@ -55,11 +55,11 @@ along with the `dotenv <https://github.com/theskumar/python-dotenv>`_ projects
 simplifying your experience, but make sure your environment is set up with Python 3.
 Mesa requires Python3 and does not work in Python 2 environments.
 
-To install Mesa, with pipenv simply clone the repository and run:
+To install Mesa, with pipenv run:
 
 .. code:: bash
 
-        $ pipenv sync
+        $ pipenv install mesa
 
 When you do that, it will install Mesa itself, setup an isolated virtual environment
 as well as any dependencies that aren't in your setup yet.
