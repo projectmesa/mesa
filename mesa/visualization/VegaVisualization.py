@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 class PageHandler(tornado.web.RequestHandler):
     """ Handler for the HTML template which holds the visualization. """
 
-    application: "VegaServer"
+    # application: "VegaServer"
 
     def get(self) -> None:
         self.render(
@@ -51,11 +51,11 @@ class PageHandler(tornado.web.RequestHandler):
 
 
 class SocketHandler(tornado.websocket.WebSocketHandler):
-    application: "VegaServer"
+    # application: "VegaServer"
 
     def open(self, *args: str, **kwargs: str) -> Optional[Awaitable[None]]:
         self.set_nodelay(True)
-        self.states: List[str] = []
+        # self.states: List[str] = []
         if self.application.verbose:
             print("Socket opened!")
 
@@ -134,7 +134,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             self.application.restore_state(step)
         self.states = self.states[:step]
 
-        model: "Model" = self.application.models[model_id]
+        model = self.application.models[model_id]
         try:
             method = getattr(model, "on_click")
             method(**data)
@@ -149,7 +149,7 @@ class VegaServer(tornado.web.Application):
 
     verbose = True
 
-    port = 8521  # Default port to listen on
+    port = 3000  # Default port to listen on
     max_steps = 100000
 
     # Handlers and other globals:
@@ -161,7 +161,7 @@ class VegaServer(tornado.web.Application):
         {"path": os.path.dirname(__file__) + "/VegaViz"},
     )
 
-    handlers: List[Any] = [page_handler, socket_handler, static_handler]
+    handlers = [page_handler, socket_handler, static_handler]
 
     settings = {"debug": False, "template_path": os.path.dirname(__file__) + "/VegaViz"}
 
@@ -233,7 +233,7 @@ class VegaServer(tornado.web.Application):
         """ Reinstantiate the model object, using the current parameters. """
 
         self.models = []
-        self.pickles: Dict[int, bytes] = {}
+        self.pickles = {}
         for i in range(self.n_simulations):
             model_params = {}
             for key, val in self.model_kwargs[i].items():
