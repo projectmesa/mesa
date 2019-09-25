@@ -34,6 +34,7 @@ class BaseScheduler:
     (This is explicitly meant to replicate the scheduler in MASON).
 
     """
+
     def __init__(self, model):
         """ Create a new, empty BaseScheduler. """
         self.model = model
@@ -99,6 +100,7 @@ class RandomActivation(BaseScheduler):
     Assumes that all agents have a step(model) method.
 
     """
+
     def step(self):
         """ Executes the step of all agents, one at a time, in
         random order.
@@ -118,6 +120,7 @@ class SimultaneousActivation(BaseScheduler):
     apply them yet. advance() then applies the changes.
 
     """
+
     def step(self):
         """ Step all agents, then advance them. """
         agent_keys = list(self._agents.keys())
@@ -141,8 +144,10 @@ class StagedActivation(BaseScheduler):
     increments of 1 / (# of stages), meaning that 1 step = 1 unit of time.
 
     """
-    def __init__(self, model, stage_list=None, shuffle=False,
-                 shuffle_between_stages=False):
+
+    def __init__(
+        self, model, stage_list=None, shuffle=False, shuffle_between_stages=False
+    ):
         """ Create an empty Staged Activation schedule.
 
         Args:

@@ -9,6 +9,7 @@ Core Objects: Agent
 
 class Agent:
     """ Base class for a model agent. """
+
     def __init__(self, unique_id, model):
         """ Create a new agent. """
         self.unique_id = unique_id

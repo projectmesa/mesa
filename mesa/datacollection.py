@@ -146,15 +146,17 @@ class DataCollector:
     def _record_agents(self, model):
         """ Record agents data in a mapping of functions and agents. """
         rep_funcs = self.agent_reporters.values()
-        if all([hasattr(rep, 'attribute_name') for rep in rep_funcs]):
-            prefix = ['model.schedule.steps', 'unique_id']
+        if all([hasattr(rep, "attribute_name") for rep in rep_funcs]):
+            prefix = ["model.schedule.steps", "unique_id"]
             attributes = [func.attribute_name for func in rep_funcs]
             get_reports = attrgetter(*prefix + attributes)
         else:
+
             def get_reports(agent):
                 prefix = (agent.model.schedule.steps, agent.unique_id)
                 reports = tuple(rep(agent) for rep in rep_funcs)
                 return prefix + reports
+
         agent_records = map(get_reports, model.schedule.agents)
         return agent_records
 
@@ -210,13 +212,11 @@ class DataCollector:
         columns for tick and agent_id.
 
         """
-        all_records = itertools.chain.from_iterable(
-            self._agent_records.values())
+        all_records = itertools.chain.from_iterable(self._agent_records.values())
         rep_names = [rep_name for rep_name in self.agent_reporters]
 
         df = pd.DataFrame.from_records(
-            data=all_records,
-            columns=["Step", "AgentID"] + rep_names,
+            data=all_records, columns=["Step", "AgentID"] + rep_names
         )
         df = df.set_index(["Step", "AgentID"])
         return df

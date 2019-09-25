@@ -7,22 +7,23 @@ from .agent import PDAgent
 
 
 class PdGrid(Model):
-    ''' Model class for iterated, spatial prisoner's dilemma model. '''
+    """ Model class for iterated, spatial prisoner's dilemma model. """
 
-    schedule_types = {"Sequential": BaseScheduler,
-                      "Random": RandomActivation,
-                      "Simultaneous": SimultaneousActivation}
+    schedule_types = {
+        "Sequential": BaseScheduler,
+        "Random": RandomActivation,
+        "Simultaneous": SimultaneousActivation,
+    }
 
     # This dictionary holds the payoff for this agent,
     # keyed on: (my_move, other_move)
 
-    payoff = {("C", "C"): 1,
-              ("C", "D"): 0,
-              ("D", "C"): 1.6,
-              ("D", "D"): 0}
+    payoff = {("C", "C"): 1, ("C", "D"): 0, ("D", "C"): 1.6, ("D", "D"): 0}
 
-    def __init__(self, height=50, width=50, schedule_type="Random", payoffs=None, seed=None):
-        '''
+    def __init__(
+        self, height=50, width=50, schedule_type="Random", payoffs=None, seed=None
+    ):
+        """
         Create a new Spatial Prisoners' Dilemma Model.
 
         Args:
@@ -30,7 +31,7 @@ class PdGrid(Model):
             schedule_type: Can be "Sequential", "Random", or "Simultaneous".
                            Determines the agent activation regime.
             payoffs: (optional) Dictionary of (move, neighbor_move) payoffs.
-        '''
+        """
         self.grid = SingleGrid(height, width, torus=True)
         self.schedule_type = schedule_type
         self.schedule = self.schedule_types[self.schedule_type](self)
@@ -42,10 +43,13 @@ class PdGrid(Model):
                 self.grid.place_agent(agent, (x, y))
                 self.schedule.add(agent)
 
-        self.datacollector = DataCollector({
-            "Cooperating_Agents":
-            lambda m: len([a for a in m.schedule.agents if a.move == "C"])
-        })
+        self.datacollector = DataCollector(
+            {
+                "Cooperating_Agents": lambda m: len(
+                    [a for a in m.schedule.agents if a.move == "C"]
+                )
+            }
+        )
 
         self.running = True
         self.datacollector.collect(self)
@@ -56,6 +60,6 @@ class PdGrid(Model):
         self.datacollector.collect(self)
 
     def run(self, n):
-        ''' Run the model for n steps. '''
+        """ Run the model for n steps. """
         for _ in range(n):
             self.step()

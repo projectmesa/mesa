@@ -41,6 +41,7 @@ class TextVisualization:
                     in the order they are added.
 
     """
+
     def __init__(self, model):
         """ Create a new Text Visualization object. """
         self.model = model
@@ -78,6 +79,7 @@ class TextElement:
 
 class TextData(TextElement):
     """ Prints the value of one particular variable from the base model. """
+
     def __init__(self, model, var_name):
         """ Create a new data renderer. """
         self.model = model
@@ -98,6 +100,7 @@ class TextGrid(TextElement):
         grid: The underlying grid object.
 
     """
+
     grid = None
 
     def __init__(self, grid, converter):
@@ -119,8 +122,8 @@ class TextGrid(TextElement):
             for x in range(self.grid.width):
                 c = self.grid[y][x]
                 if c is None:
-                    viz += ' '
+                    viz += " "
                 else:
                     viz += self.converter(c)
-            viz += '\n'
+            viz += "\n"
         return viz

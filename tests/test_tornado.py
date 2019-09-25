@@ -6,13 +6,12 @@ import json
 
 
 class TestServer(AsyncHTTPTestCase):
-
     def get_app(self):
         app = ModularServer(Model, [])
         return app
 
     def test_homepage(self):
-        response = self.fetch('/')
+        response = self.fetch("/")
         assert response.error is None
 
     @tornado.testing.gen_test

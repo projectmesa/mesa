@@ -54,10 +54,17 @@ class CanvasGrid(VisualizationElement):
         template: "canvas_module.html" stores the module's HTML template.
 
     """
+
     package_includes = ["GridDraw.js", "CanvasModule.js", "InteractionHandler.js"]
 
-    def __init__(self, portrayal_method, grid_width, grid_height,
-                 canvas_width=500, canvas_height=500):
+    def __init__(
+        self,
+        portrayal_method,
+        grid_width,
+        grid_height,
+        canvas_width=500,
+        canvas_height=500,
+    ):
         """ Instantiate a new CanvasGrid.
 
         Args:
@@ -74,9 +81,9 @@ class CanvasGrid(VisualizationElement):
         self.canvas_width = canvas_width
         self.canvas_height = canvas_height
 
-        new_element = ("new CanvasModule({}, {}, {}, {})"
-            .format(self.canvas_width, self.canvas_height,
-                self.grid_width, self.grid_height))
+        new_element = "new CanvasModule({}, {}, {}, {})".format(
+            self.canvas_width, self.canvas_height, self.grid_width, self.grid_height
+        )
 
         self.js_code = "elements.push(" + new_element + ");"
 
