@@ -8,7 +8,7 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 
-from test_batchrunner import MockAgent
+from tests.test_batchrunner import MockAgent
 
 
 class MockModel(Model):
