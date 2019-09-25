@@ -3,6 +3,7 @@ import sys
 import unittest
 from unittest.mock import patch
 from click.testing import CliRunner
+import pytest
 
 from mesa.main import cli
 
@@ -19,6 +20,7 @@ class TestCli(unittest.TestCase):
     def tearDown(self):
         sys.path[:] = self.old_sys_path
 
+    @pytest.mark.skip(reason="based on examples now in external repository")
     def test_run(self):
         with patch('mesa.visualization.ModularVisualization.ModularServer') as ModularServer:
             example_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../examples/wolf_sheep'))

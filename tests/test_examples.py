@@ -4,6 +4,7 @@ import os.path
 import unittest
 import contextlib
 import importlib
+import pytest
 
 
 def classcase(name):
@@ -38,6 +39,7 @@ class TestExamples(unittest.TestCase):
             sys.modules.update(old_sys_modules)
             sys.path[:] = old_sys_path
 
+    @pytest.mark.skip(reason="TODO move in the examples repository - Issue #134")
     def test_examples(self):
         for example in os.listdir(self.EXAMPLES):
             if not os.path.isdir(os.path.join(self.EXAMPLES, example)):
