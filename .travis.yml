@@ -1,6 +1,7 @@
 dist: xenial
 language: python
 sudo: false
+dist: xenial
 os:
   - linux
 cache:
