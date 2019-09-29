@@ -18,7 +18,7 @@ class MockModel(Model):
 
         self.width = width
         self.height = height
-        self.key1 = key1,
+        self.key1 = key1
         self.key2 = key2
         self.schedule = SimultaneousActivation(self)
         self.grid = Grid(width, height, torus=True)

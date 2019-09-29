@@ -7,7 +7,7 @@ import pytest
 import tempfile
 import contextlib
 
-from mesa.main import cli, runserver
+from mesa.main import cli
 
 
 class TestCli(unittest.TestCase):
@@ -67,4 +67,3 @@ class TestCli(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    tbc = TestCli()

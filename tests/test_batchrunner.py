@@ -209,7 +209,7 @@ class TestBatchRunner(unittest.TestCase):
         Test that model-level variable collection is of the correct size
         """
         try:
-            from pathos.multiprocessing import ProcessPool
+            from pathos.multiprocessing import ProcessPool  # noqa: F401
         except ImportError:
             pathos_support = False
         else:
