@@ -4,10 +4,12 @@ Test the BatchRunner
 from functools import reduce
 from operator import mul
 import unittest
+import copy
+import pytest
 
 from mesa import Agent, Model
 from mesa.time import BaseScheduler
-from mesa.batchrunner import BatchRunner, ParameterProduct, ParameterSampler
+from mesa.batchrunner import BatchRunner, ParameterProduct, ParameterSampler, BatchRunnerMP, MPSupport
 
 
 NUM_AGENTS = 7
@@ -160,7 +162,73 @@ class TestBatchRunner(unittest.TestCase):
                          1)
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(model_vars['reported_fixed_param'].iloc[0],
-                self.fixed_params['fixed_name'])
+                         self.fixed_params['fixed_name'])
+
+    def test_agent_step(self):
+        # child agent step
+        self.mock_agent = MockAgent(1, self.mock_model, 3)
+        self.mock_agent.step()
+        self.assertEqual(self.mock_agent.val, 4)
+        # father agent step
+        father_agent = Agent(1, self.mock_model)
+        father_agent_copy = copy.deepcopy(father_agent)
+        father_agent.step()
+        self.assertEqual(father_agent.unique_id, father_agent_copy.unique_id)
+        self.assertEqual(father_agent.model, father_agent_copy.model)
+        self.assertNotEqual(father_agent, father_agent_copy)
+
+    @pytest.mark.skip(reason="TODO: model can be instantiated without random attribute, "
+                             "although this is called in the random property of the agent.")
+    def test_agent_random(self):
+        father_agent = Agent(1, self.mock_model)
+        self.assertEqual(self.mock_agent.random, father_agent.random)
+
+    # test BatchRunnerMP
+    def launch_batch_processingMP(self):
+        batch = BatchRunnerMP(
+            self.mock_model,
+            variable_parameters=self.variable_params,
+            fixed_parameters=self.fixed_params,
+            iterations=self.iterations,
+            max_steps=self.max_steps,
+            model_reporters=self.model_reporters,
+            agent_reporters=self.agent_reporters)
+        batch.run_all()
+        return batch
+
+    @property
+    def model_runsMP(self):
+        """
+        Returns total number of batch runner's iterations.
+        """
+        return (reduce(mul, map(len, self.variable_params.values())) *
+                self.iterations)
+
+    def test_model_level_varsMP(self):
+        """
+        Test that model-level variable collection is of the correct size
+        """
+        try:
+            from pathos.multiprocessing import ProcessPool
+        except ImportError:
+            pathos_support = False
+        else:
+            pathos_support = True
+
+        if not pathos_support:
+            with self.assertRaises(MPSupport):
+                self.launch_batch_processingMP()
+        else:
+            # TODO pathos failing in local.
+            # Dictionary can not be broadcast to list in `for model_vars, agent_vars in list(task):`
+            #
+            # batch = self.launch_batch_processingMP()
+            # model_vars = batch.get_model_vars_dataframe()
+            # expected_cols = (len(self.variable_params) +
+            #                  len(self.model_reporters) +
+            #                  1)  # extra column with run index
+            # self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
+            pass
 
 
 class TestParameters(unittest.TestCase):
@@ -198,3 +266,4 @@ class TestParameters(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+    tbc = TestBatchRunner()

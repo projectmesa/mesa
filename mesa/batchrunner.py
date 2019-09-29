@@ -326,15 +326,15 @@ class BatchRunner(FixedBatchRunner):
 
         """
         super().__init__(model_cls, ParameterProduct(variable_parameters),
-                     fixed_parameters, iterations, max_steps,
-                     model_reporters, agent_reporters,
-                     display_progress)
+                         fixed_parameters, iterations, max_steps,
+                         model_reporters, agent_reporters,
+                         display_progress)
 
 
 class MPSupport(Exception):
     def __str__(self):
         return ("BatchRunnerMP depends on pathos, which is either not "
-               "installed, or the path can not be found. ")
+                "installed, or the path can not be found. ")
 
 
 class BatchRunnerMP(BatchRunner):
