@@ -219,7 +219,7 @@ class TestBatchRunner(unittest.TestCase):
             with self.assertRaises(MPSupport):
                 self.launch_batch_processingMP()
         else:
-            # TODO pathos failing in local.
+            # TODO pathos failing in local. See issue #742
             # Dictionary can not be broadcast to list in `for model_vars, agent_vars in list(task):`
             #
             # batch = self.launch_batch_processingMP()
