@@ -1,13 +1,12 @@
 dist: xenial
 language: python
 sudo: false
-dist: xenial
 os:
   - linux
 cache:
   pip: true
 python:
-  # - "3.5"
+  - "3.5"
   - "3.6"
   - "3.7"
   - "nightly"
@@ -21,7 +20,9 @@ script:
   # * W504 - line break after binary operator
   - flake8 . --ignore=F403,E501,E123,E128,W504,W503 --exclude=docs,build
   - py.test --cov=mesa tests/ --cov-report=xml
-  - black --check --exclude=mesa/cookiecutter-mesa/* .
+  - if [ $PYTHON == "3.6" ];
+    then black --check --exclude=mesa/cookiecutter-mesa/* .;
+    fi
   # - ./tests/test_end_to_end_viz.sh  # needs to be investigated on why this took forever
 after_success:
   - codecov
