@@ -13,6 +13,7 @@ python:
 install:
   - pip install codecov
   - pip install .[dev]
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then pip install -U black; fi
 script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
   # * E501 - line length limit
