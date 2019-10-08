@@ -58,13 +58,11 @@ For more help on using Mesa, check out the following resources:
 * `Docs`_
 * `Email list for users`_
 * `PyPI`_
-* `Black`_
 
 .. _`Intro to Mesa Tutorial` : http://mesa.readthedocs.org/en/master/tutorials/intro_tutorial.html
 .. _`Docs` : http://mesa.readthedocs.org/en/master/
 .. _`Email list for users` : https://groups.google.com/d/forum/projectmesa
 .. _`PyPI` : https://pypi.python.org/pypi/Mesa/
-.. _`Black` : https://github.com/psf/black
 
 Running Mesa in Docker
 ------------------------
