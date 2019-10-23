@@ -97,7 +97,7 @@ var BarChartModule = function(fields, canvas_width, canvas_height, sorting, sort
         if(sorting != "none"){
             if(sorting == "ascending"){
                 data.sort((a, b) => b[sortingKey] - a[sortingKey]);
-            } else if (sorting == "decending") {
+            } else if (sorting == "descending") {
                 data.sort((a, b) => a[sortingKey] - b[sortingKey]);
             }
         }
