@@ -42,10 +42,11 @@ class PdGrid(Model):
                 self.grid.place_agent(agent, (x, y))
                 self.schedule.add(agent)
 
-        self.datacollector = DataCollector({
+        self.datacollector = DataCollector()
+        """{
             "Cooperating_Agents":
             lambda m: len([a for a in m.schedule.agents if a.move == "C"])
-        })
+        })"""
 
         self.running = True
         self.datacollector.collect(self)
@@ -59,3 +60,7 @@ class PdGrid(Model):
         ''' Run the model for n steps. '''
         for _ in range(n):
             self.step()
+
+    @property
+    def cooperating_agents(self):
+        return len([agent.isCooperating for agent in self.schedule.agents])

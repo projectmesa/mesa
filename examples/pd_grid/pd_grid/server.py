@@ -1,20 +1,44 @@
-from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.modules import CanvasGrid
+from mesa.visualization.VegaVisualization import VegaServer
 from mesa.visualization.UserParam import UserSettableParameter
 
-from .portrayal import portrayPDAgent
 from .model import PdGrid
 
+grid_spec = """
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+    "width": 250,
+    "height": 250,
+    "data": {"name": "agents"},
+    "mark": {"type": "bar"},
+    "encoding": {
+      "x": {"type": "nominal", "field": "x"},
+      "y": {"type": "nominal", "field": "y"},
+      "color": {"type": "nominal", "field": "cooperating"}
+    }
+}
+"""
 
-# Make a world that is 50x50, on a 500x500 display.
-canvas_element = CanvasGrid(portrayPDAgent, 50, 50, 500, 500)
+line_spec = """
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+    "width": 250,
+    "height": 250,
+    "data": {"name": "model"},
+    "mark": {"type": "line"},
+    "encoding": {
+      "y": {"type": "quantitative", "field": "cooperating_agents"},
+      "x": {"type": "quantitative", "field": "step"}
+    }
+}
+"""
 
 model_params = {
-    "height": 50,
-    "width": 50,
+    "seed": 123,
+    "height": 30,
+    "width": 30,
     "schedule_type": UserSettableParameter("choice", "Scheduler type", value="Random",
                                            choices=list(PdGrid.schedule_types.keys()))
 }
 
-server = ModularServer(PdGrid, [canvas_element], "Prisoner's Dilemma",
-                       model_params)
+server = VegaServer(PdGrid, [grid_spec, line_spec], "Prisoner's Dilemma",
+                       model_params, 3)

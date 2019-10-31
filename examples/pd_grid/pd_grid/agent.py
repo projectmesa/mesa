@@ -1,3 +1,5 @@
+import json
+
 from mesa import Agent
 
 
@@ -24,7 +26,7 @@ class PDAgent(Agent):
         self.next_move = None
 
     @property
-    def isCooroperating(self):
+    def isCooperating(self):
         return self.move == "C"
 
     def step(self):
@@ -48,3 +50,6 @@ class PDAgent(Agent):
         else:
             moves = [neighbor.move for neighbor in neighbors]
         return sum(self.model.payoff[(self.move, move)] for move in moves)
+
+    def as_json(self):
+        return json.dumps({"x": self.pos[0], "y": self.pos[1], "cooperating": self.isCooperating})
