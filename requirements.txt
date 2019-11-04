@@ -1,0 +1,9 @@
+click==7.0
+cookiecutter==1.6.0
+networkx==2.3
+numpy==1.17.3
+pathos==0.2.5
+pandas==0.25.3
+setuptools==41.6.0
+tornado==6.0.3
+tqdm==4.37.0
