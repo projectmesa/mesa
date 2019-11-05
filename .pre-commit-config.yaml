@@ -1,0 +1,7 @@
+repos:
+-   repo: https://github.com/ambv/black
+    rev: stable
+    hooks:
+    - id: black
+      exclude: mesa/cookiecutter-mesa/*
+      language_version: python3.6

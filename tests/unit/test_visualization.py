@@ -18,7 +18,7 @@ class MockModel(Model):
 
         self.width = width
         self.height = height
-        self.key1 = key1,
+        self.key1 = (key1,)
         self.key2 = key2
         self.schedule = SimultaneousActivation(self)
         self.grid = Grid(width, height, torus=True)
@@ -44,16 +44,16 @@ class TestModularServer(TestCase):
             "Layer": 0,
             "x": 0,
             "y": 0,
-            "Color": "black"
+            "Color": "black",
         }
 
     def setUp(self):
 
         self.user_params = {
-            'width': 1,
-            'height': 1,
-            'key1': UserSettableParameter('number', "Test Parameter", 101),
-            'key2': UserSettableParameter('slider', "Test Parameter", 200, 0, 300, 10)
+            "width": 1,
+            "height": 1,
+            "key1": UserSettableParameter("number", "Test Parameter", 101),
+            "key2": UserSettableParameter("slider", "Test Parameter", 200, 0, 300, 10),
         }
 
         self.viz_elements = [
@@ -63,24 +63,28 @@ class TestModularServer(TestCase):
             #              {"Label": "Sheep", "Color": "#666666"}])
         ]
 
-        self.server = ModularServer(MockModel, self.viz_elements, "Test Model", model_params=self.user_params)
+        self.server = ModularServer(
+            MockModel, self.viz_elements, "Test Model", model_params=self.user_params
+        )
 
     def test_canvas_render_model_state(self):
 
         test_portrayal = self.portrayal(None)
         test_grid_state = defaultdict(list)
-        test_grid_state[test_portrayal['Layer']].append(test_portrayal)
+        test_grid_state[test_portrayal["Layer"]].append(test_portrayal)
 
         state = self.server.render_model()
         assert state[0] == test_grid_state
 
     def test_text_render_model_state(self):
         state = self.server.render_model()
-        assert state[1] == '<b>VisualizationElement goes here</b>.'
+        assert state[1] == "<b>VisualizationElement goes here</b>."
 
     def test_user_params(self):
         print(self.server.user_params)
         assert self.server.user_params == {
-            'key1': UserSettableParameter('number', "Test Parameter", 101).json,
-            'key2': UserSettableParameter('slider', "Test Parameter", 200, 0, 300, 10).json
+            "key1": UserSettableParameter("number", "Test Parameter", 101).json,
+            "key2": UserSettableParameter(
+                "slider", "Test Parameter", 200, 0, 300, 10
+            ).json,
         }
