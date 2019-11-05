@@ -5,3 +5,5 @@ branch = True
 [report]
 omit =
     tests/*
+    mesa/visualization/*
+
