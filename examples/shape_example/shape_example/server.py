@@ -41,3 +41,4 @@ server = ModularServer(
 )
 server.max_steps = 0
 server.port = 8521
+server.launch()
