@@ -1,3 +1,3 @@
-from shape_example.server import launch_shape_model
+from shape_example.server import server 
 
-launch_shape_model()
+server.launch()
