@@ -807,16 +807,16 @@ class NetworkGrid:
     def _place_agent(self, agent, node_id):
         """ Place the agent at the correct node. """
 
-        self.G.node[node_id]['agent'].append(agent)
+        self.G.nodes[node_id]['agent'].append(agent)
 
     def _remove_agent(self, agent, node_id):
         """ Remove an agent from a node. """
 
-        self.G.node[node_id]['agent'].remove(agent)
+        self.G.nodes[node_id]['agent'].remove(agent)
 
     def is_cell_empty(self, node_id):
         """ Returns a bool of the contents of a cell. """
-        return not self.G.node[node_id]['agent']
+        return not self.G.nodes[node_id]['agent']
 
     def get_cell_list_contents(self, cell_list):
         return list(self.iter_cell_list_contents(cell_list))
@@ -825,5 +825,5 @@ class NetworkGrid:
         return list(self.iter_cell_list_contents(self.G))
 
     def iter_cell_list_contents(self, cell_list):
-        list_of_lists = [self.G.node[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
+        list_of_lists = [self.G.nodes[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
         return [item for sublist in list_of_lists for item in sublist]

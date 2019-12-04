@@ -8,7 +8,7 @@ from codecs import open
 requires = [
     'click',
     'cookiecutter',
-    'networkx < 2.4',
+    'networkx',
     'numpy',
     'pandas',
     'tornado',
