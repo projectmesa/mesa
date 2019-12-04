@@ -1,3 +1,3 @@
-from shape_example.server import server 
+from shape_example.server import server
 
 server.launch()
