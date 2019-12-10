@@ -24,4 +24,4 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 * ``run.py``: Launches the visualization
 
 ## Further Reading
-[Explanation of how hexagon neighbors are calculated. (The method is slightly different for cartesian coordinates)](http://www.redblobgames.com/grids/hexagons/#neighbors-offset)
+[Explanation of how hexagon neighbors are calculated. (The method is slightly different for Cartesian coordinates)](http://www.redblobgames.com/grids/hexagons/#neighbors-offset)

@@ -23,12 +23,12 @@ No contribution is too small. Although, contributions can be too big, so let's d
 - `Clone your repository`_ from Github to your machine.
 - Create a new branch in your fork: ``git checkout -b BRANCH_NAME``
 - Install an editable version with developer requirements locally: ``pip install -e .[dev]``
-- Edit the code. Save. 
+- Edit the code. Save.
 - Git add the new files and files with changes: ``git add FILE_NAME``
 - Git commit your changes with a meaningful message: ``git commit -m "Fixes X issue."``
 - If implementing a new feature, include some documentation in docs folder.
 - Make sure that your submission passes the `Travis build`_. See "Testing and Standards below" to be able to run these locally.
-- Push your changed to your fork on Github: ``git push origin NAME_OF_BRANCH``. 
+- Push your changed to your fork on Github: ``git push origin NAME_OF_BRANCH``.
 - `Create a pull request`_.
 - Describe the change w/ ticket number(s) that the code fixes.
 
@@ -41,8 +41,8 @@ No contribution is too small. Although, contributions can be too big, so let's d
 Testing and Code Standards
 --------
 
-.. image:: https://coveralls.io/repos/projectmesa/mesa/badge.svg
-    :target: https://coveralls.io/r/projectmesa/mesa
+.. image:: https://codecov.io/gh/projectmesa/mesa/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/projectmesa/mesa
 
 As part of our contribution process, we practice continuous integration and use Travis to help enforce best practices.
 
@@ -58,19 +58,19 @@ To ensure that your submission will not break the build, you will need to instal
 
 .. code-block:: bash
 
-    pip install flake8 nose
+    pip install flake8 pytest pytest-cov
 
 We test by implementing simple models and through traditional unit tests in the tests/ folder. The following only covers unit tests coverage. Ensure that your test coverage has not gone down. If it has and you need help, we will offer advice on how to structure tests for the contribution.
 
 .. code-block:: bash
 
-    nosetests --with-coverage --cover-package=mesa
+    py.test --cov=mesa tests/
 
 With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_. If the command below generates errors, fix all errors that are returned.
 
 .. code-block:: bash
 
-    flake8 . --ignore=F403,E501,E123,E128 --exclude=docs,build
+    flake8 . --ignore=F403,E501,E123,E128,W504 --exclude=docs,build
 
 .. _`PEP8` : https://www.python.org/dev/peps/pep-0008
 .. _`Google Style Guide` : https://google.github.io/styleguide/pyguide.html

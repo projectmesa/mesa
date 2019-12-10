@@ -36,6 +36,7 @@ The skeleton of a model might look like this:
     class MyAgent(Agent):
         def __init__(self, name, model):
             super().__init__(name, model)
+            self.name = name 
 
         def step(self):
             print("{} activated".format(self.name))
@@ -43,6 +44,7 @@ The skeleton of a model might look like this:
 
     class MyModel(Model):
         def __init__(self, n_agents):
+            super().__init__()
             self.schedule = RandomActivation(self)
             self.grid = MultiGrid(10, 10, torus=True)
             for i in range(n_agents):
@@ -149,7 +151,7 @@ To quickly spin up a model visualization, you might do something like:
     server = ModularServer(MyModel, 
                            [grid], 
                            "My Model", 
-                           100, 10, 10)
+                           {'n_agents': 10})
     server.launch()
 
 This will launch the browser-based visualization, on the default port 8521.

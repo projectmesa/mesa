@@ -2,10 +2,10 @@ Mesa: Agent-based modeling in Python 3+
 =========================================
 
 .. image:: https://api.travis-ci.org/projectmesa/mesa.svg
-        :target: https://travis-ci.org/projectmesa/mesa
+    :target: https://travis-ci.org/projectmesa/mesa
 
-.. image:: https://coveralls.io/repos/projectmesa/mesa/badge.svg
-    :target: https://coveralls.io/r/projectmesa/mesa
+.. image:: https://codecov.io/gh/projectmesa/mesa/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/projectmesa/mesa
 
 `Mesa`_ is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
 
@@ -44,7 +44,7 @@ To launch an example model, clone the `repository <https://github.com/projectmes
 
 .. code-block:: bash
 
-    schelling $ mesa runserver examples/wolf_sheep
+    $ mesa runserver examples/wolf_sheep
 
 For more help on using Mesa, check out the following resources:
 
@@ -87,12 +87,13 @@ ABM features users have shared that you may want to use in your model
 
 .. toctree::
    :hidden:
-   :maxdepth: 6
+   :maxdepth: 7
 
    Mesa Overview <overview>
    tutorials/intro_tutorial
    tutorials/adv_tutorial
    Best Practices <best-practices>
+   Useful Snippets <useful-snippets/snippets>
    API Documentation <apis/api_main>
    Mesa Packages <packages>
 
@@ -102,4 +103,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

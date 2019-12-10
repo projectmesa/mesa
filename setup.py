@@ -8,11 +8,10 @@ from codecs import open
 requires = [
     'click',
     'cookiecutter',
-    'jupyter',
     'networkx',
     'numpy',
     'pandas',
-    'tornado >= 4.2, < 5.0.0',
+    'tornado',
     'tqdm',
 ]
 
@@ -20,7 +19,8 @@ extras_require = {
     'dev': [
         'coverage',
         'flake8',
-        'nose',
+        'pytest >= 3.6',
+        'pytest-cov',
         'sphinx',
     ],
     'docs': [

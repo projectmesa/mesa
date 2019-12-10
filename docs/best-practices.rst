@@ -27,7 +27,7 @@ organize them. For example, if the visualization uses image files, put those in
 an ``images`` directory.
 
 The `Schelling
-<https://github.com/projectmesa/mesa/tree/master/examples/Schelling>`_ model is
+<https://github.com/projectmesa/mesa/tree/master/examples/schelling>`_ model is
 a good example of a small well-packaged model.
 
 It's easy to create a cookiecutter mesa model by running ``mesa startproject``
@@ -47,7 +47,7 @@ like the built-in ``random`` library.
     def cool_method(self):
       interesting_number = self.random.random()
       print(interesting_number)
-   
+
   class AwesomeAgent(Agent):
     # ...
     def __init__(self, unique_id, model, ...):
@@ -57,11 +57,11 @@ like the built-in ``random`` library.
     def my_method(self):
       random_number = self.random.randint(0, 100)
 
-(The agent's random property is just a reference to its parent model's 
-``random`` property). 
+(The agent's random property is just a reference to its parent model's
+``random`` property).
 
 When a model object is created, its random property is automatically seeded
-with the current time. The seed determines the sequence of random numbers; if 
+with the current time. The seed determines the sequence of random numbers; if
 you instantiate a model with the same seed, you will get the same results.
 To allow you to set the seed, make sure your model as a ``seed`` argument in its
 constructor.
@@ -69,14 +69,14 @@ constructor.
 .. code:: python
 
   class AwesomeModel(Model):
-    
+
     def __init__(self, seed=None):
       pass
 
     def cool_method(self):
       interesting_number = self.random.random()
       print(interesting_number)
-    
+
   >>> model0 = AwesomeModel(seed=0)
   >>> model0._seed
   0

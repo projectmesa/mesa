@@ -20,11 +20,6 @@ Key concepts:
     Time: Some models may simulate a continuous 'clock' instead of discrete
     steps. However, by default, the Time is equal to the number of steps the
     model has taken.
-
-
-TODO: Have the schedulers use the model's randomizer, to keep random number
-seeds consistent and allow for replication.
-
 """
 
 from collections import OrderedDict
@@ -67,9 +62,8 @@ class BaseScheduler:
 
     def step(self):
         """ Execute the step of all the agents, one at a time. """
-        agent_keys = list(self._agents.keys())
-        for agent_key in agent_keys:
-            self._agents[agent_key].step()
+        for agent in self.agent_buffer(shuffled=False):
+            agent.step()
         self.steps += 1
         self.time += 1
 
@@ -80,6 +74,19 @@ class BaseScheduler:
     @property
     def agents(self):
         return list(self._agents.values())
+
+    def agent_buffer(self, shuffled=False):
+        """ Simple generator that yields the agents while letting the user
+        remove and/or add agents during stepping.
+
+        """
+        agent_keys = list(self._agents.keys())
+        if shuffled:
+            self.model.random.shuffle(agent_keys)
+
+        for key in agent_keys:
+            if key in self._agents:
+                yield self._agents[key]
 
 
 class RandomActivation(BaseScheduler):
@@ -97,11 +104,8 @@ class RandomActivation(BaseScheduler):
         random order.
 
         """
-        agent_keys = list(self._agents.keys())
-        self.model.random.shuffle(agent_keys)
-
-        for agent_key in agent_keys:
-            self._agents[agent_key].step()
+        for agent in self.agent_buffer(shuffled=True):
+            agent.step()
         self.steps += 1
         self.time += 1
 
@@ -166,7 +170,7 @@ class StagedActivation(BaseScheduler):
             for agent_key in agent_keys:
                 getattr(self._agents[agent_key], stage)()  # Run stage
             if self.shuffle_between_stages:
-                self.model.random.random.shuffle(agent_keys)
+                self.model.random.shuffle(agent_keys)
             self.time += self.stage_time
 
         self.steps += 1

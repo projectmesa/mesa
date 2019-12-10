@@ -173,6 +173,10 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         if self.application.verbose:
             print("Socket opened!")
+        self.write_message({
+            "type": "model_params",
+            "params": self.application.user_params
+        })
 
     def check_origin(self, origin):
         return True
@@ -213,12 +217,6 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                     self.application.model_kwargs[param].value = value
                 else:
                     self.application.model_kwargs[param] = value
-
-        elif msg["type"] == "get_params":
-            self.write_message({
-                "type": "model_params",
-                "params": self.application.user_params
-            })
 
         else:
             if self.application.verbose:
@@ -314,7 +312,6 @@ class ModularServer(tornado.web.Application):
 
     def launch(self, port=None):
         """ Run the app. """
-        startLoop = not tornado.ioloop.IOLoop.initialized()
         if port is not None:
             self.port = port
         url = 'http://127.0.0.1:{PORT}'.format(PORT=self.port)
@@ -322,5 +319,4 @@ class ModularServer(tornado.web.Application):
         self.listen(self.port)
         webbrowser.open(url)
         tornado.autoreload.start()
-        if startLoop:
-            tornado.ioloop.IOLoop.instance().start()
+        tornado.ioloop.IOLoop.current().start()

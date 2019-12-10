@@ -2,6 +2,7 @@ import unittest
 
 import networkx as nx
 import numpy as np
+import pytest
 
 from mesa.space import ContinuousSpace
 from mesa.space import SingleGrid
@@ -273,6 +274,16 @@ class TestSingleGrid(unittest.TestCase):
             assert a.pos is None
             assert self.space.grid[pos[0]][pos[1]] is None
 
+    def test_empty_cells(self):
+        if self.space.exists_empty_cells():
+            pytest.deprecated_call(self.space.find_empty)
+            for i, pos in enumerate(list(self.space.empties)):
+                a = MockAgent(-i, pos)
+                self.space.position_agent(a, x=pos[0], y=pos[1])
+        assert self.space.find_empty() is None
+        with self.assertRaises(Exception):
+            self.space.move_to_empty(a)
+
     def move_agent(self):
         agent_number = 0
         initial_pos = TEST_AGENTS_GRID[agent_number]
@@ -324,12 +335,12 @@ class TestSingleNetworkGrid(unittest.TestCase):
         _agent = self.agents[agent_number]
 
         assert _agent.pos == initial_pos
-        assert _agent in self.space.G.node[initial_pos]['agent']
-        assert _agent not in self.space.G.node[final_pos]['agent']
+        assert _agent in self.space.G.nodes[initial_pos]['agent']
+        assert _agent not in self.space.G.nodes[final_pos]['agent']
         self.space.move_agent(_agent, final_pos)
         assert _agent.pos == final_pos
-        assert _agent not in self.space.G.node[initial_pos]['agent']
-        assert _agent in self.space.G.node[final_pos]['agent']
+        assert _agent not in self.space.G.nodes[initial_pos]['agent']
+        assert _agent in self.space.G.nodes[final_pos]['agent']
 
     def test_is_cell_empty(self):
         assert not self.space.is_cell_empty(0)
@@ -382,18 +393,18 @@ class TestMultipleNetworkGrid(unittest.TestCase):
         _agent = self.agents[agent_number]
 
         assert _agent.pos == initial_pos
-        assert _agent in self.space.G.node[initial_pos]['agent']
-        assert _agent not in self.space.G.node[final_pos]['agent']
-        assert len(self.space.G.node[initial_pos]['agent']) == 2
-        assert len(self.space.G.node[final_pos]['agent']) == 1
+        assert _agent in self.space.G.nodes[initial_pos]['agent']
+        assert _agent not in self.space.G.nodes[final_pos]['agent']
+        assert len(self.space.G.nodes[initial_pos]['agent']) == 2
+        assert len(self.space.G.nodes[final_pos]['agent']) == 1
 
         self.space.move_agent(_agent, final_pos)
 
         assert _agent.pos == final_pos
-        assert _agent not in self.space.G.node[initial_pos]['agent']
-        assert _agent in self.space.G.node[final_pos]['agent']
-        assert len(self.space.G.node[initial_pos]['agent']) == 1
-        assert len(self.space.G.node[final_pos]['agent']) == 2
+        assert _agent not in self.space.G.nodes[initial_pos]['agent']
+        assert _agent in self.space.G.nodes[final_pos]['agent']
+        assert len(self.space.G.nodes[initial_pos]['agent']) == 1
+        assert len(self.space.G.nodes[final_pos]['agent']) == 2
 
     def test_is_cell_empty(self):
         assert not self.space.is_cell_empty(0)
