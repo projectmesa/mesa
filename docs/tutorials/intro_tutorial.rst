@@ -48,7 +48,7 @@ Let's get started.
 Installation
 ~~~~~~~~~~~~
 
-To start, install Mesa. We recommend using a `pipenv <https://pipenv.readthedocs.io/en/latest/>`_,
+To start, install Mesa. We recommend using a `pipenv <https://pipenv.readthedocs.io/en/latest/>`_,
 which combines the `virtual
 environment <https://virtualenvwrapper.readthedocs.org/en/stable/>`_
 along with the `dotenv <https://github.com/theskumar/python-dotenv>`_ projects
