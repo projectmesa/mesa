@@ -18,9 +18,10 @@ import itertools
 
 import numpy as np
 
-from typing import Any, Iterable, Iterator, List, Set, Tuple, Union
+from typing import Iterable, Iterator, List, Optional, Set, Tuple, Union
 from .agent import Agent
 Coordinate = Tuple[int, int]
+GridContent = Union[Optional[Agent], Set[Agent]]
 
 
 def accept_tuple_argument(wrapped_function):
@@ -86,10 +87,10 @@ class Grid:
         self.width = width
         self.torus = torus
 
-        self.grid = []  # type: List[List[Any]]
+        self.grid = []  # type: List[List[GridContent]]
 
         for x in range(self.width):
-            col = []  # type: List[Any]
+            col = []  # type: List[GridContent]
             for y in range(self.height):
                 col.append(self.default_val())
             self.grid.append(col)
@@ -103,23 +104,23 @@ class Grid:
         """ Default value for new cell elements. """
         return None
 
-    def __getitem__(self, index: int) -> List[Any]:
+    def __getitem__(self, index: int) -> List[GridContent]:
         return self.grid[index]
 
-    def __iter__(self) -> Iterator[Any]:
+    def __iter__(self) -> Iterator[GridContent]:
         """
         create an iterator that chains the
         rows of grid together as if one list:
         """
         return itertools.chain(*self.grid)
 
-    def coord_iter(self) -> Iterator[Tuple[Any, int, int]]:
+    def coord_iter(self) -> Iterator[Tuple[GridContent, int, int]]:
         """ An iterator that returns coordinates as well as cell contents. """
         for row in range(self.width):
             for col in range(self.height):
                 yield self.grid[row][col], row, col  # agent, x, y
 
-    def neighbor_iter(self, pos: Coordinate, moore: bool = True) -> Iterator[Any]:
+    def neighbor_iter(self, pos: Coordinate, moore: bool = True) -> Iterator[GridContent]:
         """ Iterate over position neighbors.
 
         Args:
@@ -201,7 +202,7 @@ class Grid:
         return list(self.iter_neighborhood(pos, moore, include_center, radius))
 
     def iter_neighbors(self, pos: Coordinate, moore: bool,
-                       include_center: bool = False, radius: int = 1) -> Iterator[Any]:
+                       include_center: bool = False, radius: int = 1) -> Iterator[GridContent]:
         """ Return an iterator over neighbors to a certain point.
 
         Args:
@@ -249,7 +250,7 @@ class Grid:
         return list(self.iter_neighbors(
             pos, moore, include_center, radius))
 
-    def torus_adj(self, pos: Coordinate) -> Tuple[int, int]:
+    def torus_adj(self, pos: Coordinate) -> Coordinate:
         """ Convert coordinate, handling torus looping. """
         if not self.out_of_bounds(pos):
             return pos
@@ -268,7 +269,7 @@ class Grid:
         return x < 0 or x >= self.width or y < 0 or y >= self.height
 
     @accept_tuple_argument
-    def iter_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> Iterator[Any]:
+    def iter_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> Iterator[GridContent]:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -281,7 +282,7 @@ class Grid:
             self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
 
     @accept_tuple_argument
-    def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> List[Any]:
+    def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> List[GridContent]:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -345,7 +346,7 @@ class Grid:
         agent.pos = new_pos
         self._remove_agent(pos, agent)
 
-    def find_empty(self) -> Union[Coordinate, None]:
+    def find_empty(self) -> Optional[Coordinate]:
         """ Pick a random empty cell. """
         from warnings import warn
         import random
