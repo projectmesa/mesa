@@ -424,18 +424,18 @@ class MultiGrid(Grid):
     @staticmethod
     def default_val():
         """ Default value for new cell elements. """
-        return set()
+        return {}
 
     def _place_agent(self, pos, agent):
         """ Place the agent at the correct location. """
         x, y = pos
-        self.grid[x][y].add(agent)
+        self.grid[x][y][agent] = 1
         self.empties.discard(pos)
 
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
         x, y = pos
-        self.grid[x][y].remove(agent)
+        del self.grid[x][y][agent]
         if self.is_cell_empty(pos):
             self.empties.add(pos)
 
@@ -450,7 +450,7 @@ class MultiGrid(Grid):
 
         """
         return itertools.chain.from_iterable(
-            self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
+            list(self[x][y].keys()) for x, y in cell_list if not self.is_cell_empty((x, y)))
 
 
 class HexGrid(Grid):
