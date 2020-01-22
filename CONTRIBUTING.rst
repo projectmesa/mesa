@@ -60,7 +60,7 @@ If you're changing previous Mesa features, please make sure of the following:
 - Additional features or rewrites of current features are accompanied by tests.
 - New features are demonstrated in a model, so folks can understand more easily.
 
-To ensure that your submission will not break the build, you will need to install Flake8 and Nose.
+To ensure that your submission will not break the build, you will need to install Flake8 and pytest.
 
 .. code-block:: bash
 
@@ -72,15 +72,24 @@ We test by implementing simple models and through traditional unit tests in the 
 
     py.test --cov=mesa tests/
 
-With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_. If the command below generates errors, fix all errors that are returned.
+With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_. We recommend to use `black`_ as an automated code formatter. You can automatically format your code using `pre-commit`_, which will prevent `git commit` of unstyled code and will automtically apply black style so you can immediately re-run `git commit`. To set up pre-commit run the following commands:
 
 .. code-block:: bash
 
-    flake8 . --ignore=F403,E501,E123,E128,W504 --exclude=docs,build
+    pip install pre-commit
+    pre-commit install
+
+You should no longer have to worry about code formatting. If still in doubt you may run the following command. If the command generates errors, fix all errors that are returned.
+
+.. code-block:: bash
+
+    flake8 . --ignore=F403,E501,E123,E128,W504,W503 --exclude=docs,build
+    
 
 .. _`PEP8` : https://www.python.org/dev/peps/pep-0008
 .. _`Google Style Guide` : https://google.github.io/styleguide/pyguide.html
-
+.. _`pre-commit` : https://github.com/pre-commit/pre-commit
+.. _`black` : https://github.com/psf/black
 
 Licensing
 --------
