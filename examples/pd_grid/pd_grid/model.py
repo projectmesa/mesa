@@ -32,7 +32,7 @@ class PdGrid(Model):
                            Determines the agent activation regime.
             payoffs: (optional) Dictionary of (move, neighbor_move) payoffs.
         """
-        self.grid = SingleGrid(height, width, torus=True)
+        self.grid = SingleGrid(width, height, torus=True)
         self.schedule_type = schedule_type
         self.schedule = self.schedule_types[self.schedule_type](self)
 
