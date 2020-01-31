@@ -17,3 +17,7 @@ canvas.world-grid {
     position:absolute;
     border:1px dotted
 }
+
+svg {
+  margin-top: 10px;
+}
