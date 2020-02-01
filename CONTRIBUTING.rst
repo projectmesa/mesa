@@ -41,8 +41,8 @@ No contribution is too small. Although, contributions can be too big, so let's d
 Testing and Code Standards
 --------
 
-.. image:: https://coveralls.io/repos/projectmesa/mesa/badge.svg
-    :target: https://coveralls.io/r/projectmesa/mesa
+.. image:: https://codecov.io/gh/projectmesa/mesa/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/projectmesa/mesa
 
 As part of our contribution process, we practice continuous integration and use Travis to help enforce best practices.
 

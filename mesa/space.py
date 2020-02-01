@@ -91,7 +91,7 @@ class Grid:
             self.grid.append(col)
 
         # Add all cells to the empties list.
-        self.empties = list(itertools.product(
+        self.empties = set(itertools.product(
             *(range(self.width), range(self.height))))
 
     @staticmethod
@@ -310,8 +310,7 @@ class Grid:
         """ Place the agent at the correct location. """
         x, y = pos
         self.grid[x][y] = agent
-        if pos in self.empties:
-            self.empties.remove(pos)
+        self.empties.discard(pos)
 
     def remove_agent(self, agent):
         """ Remove the agent from the grid and set its pos variable to None. """
@@ -323,19 +322,19 @@ class Grid:
         """ Remove the agent from the given location. """
         x, y = pos
         self.grid[x][y] = None
-        self.empties.append(pos)
+        self.empties.add(pos)
 
     def is_cell_empty(self, pos):
         """ Returns a bool of the contents of a cell. """
         x, y = pos
-        return True if self.grid[x][y] == self.default_val() else False
+        return self.grid[x][y] == self.default_val()
 
     def move_to_empty(self, agent):
         """ Moves agent to a random empty cell, vacating agent's old cell. """
         pos = agent.pos
         if len(self.empties) == 0:
             raise Exception("ERROR: No empty cells")
-        new_pos = agent.random.choice(self.empties)
+        new_pos = agent.random.choice(sorted(self.empties))
         self._place_agent(new_pos, agent)
         agent.pos = new_pos
         self._remove_agent(pos, agent)
@@ -352,7 +351,7 @@ class Grid:
             DeprecationWarning)
 
         if self.exists_empty_cells():
-            pos = random.choice(self.empties)
+            pos = random.choice(sorted(self.empties))
             return pos
         else:
             return None
@@ -364,7 +363,7 @@ class Grid:
 
 class SingleGrid(Grid):
     """ Grid where each cell contains exactly at most one object. """
-    empties = []
+    empties = set()
 
     def __init__(self, width, height, torus):
         """ Create a new single-item grid.
@@ -389,7 +388,7 @@ class SingleGrid(Grid):
         if x == "random" or y == "random":
             if len(self.empties) == 0:
                 raise Exception("ERROR: Grid full")
-            coords = agent.random.choice(self.empties)
+            coords = agent.random.choice(sorted(self.empties))
         else:
             coords = (x, y)
         agent.pos = coords
@@ -431,15 +430,14 @@ class MultiGrid(Grid):
         """ Place the agent at the correct location. """
         x, y = pos
         self.grid[x][y].add(agent)
-        if pos in self.empties:
-            self.empties.remove(pos)
+        self.empties.discard(pos)
 
     def _remove_agent(self, pos, agent):
         """ Remove the agent from the given location. """
         x, y = pos
         self.grid[x][y].remove(agent)
         if self.is_cell_empty(pos):
-            self.empties.append(pos)
+            self.empties.add(pos)
 
     @accept_tuple_argument
     def iter_cell_list_contents(self, cell_list):
@@ -809,16 +807,16 @@ class NetworkGrid:
     def _place_agent(self, agent, node_id):
         """ Place the agent at the correct node. """
 
-        self.G.node[node_id]['agent'].append(agent)
+        self.G.nodes[node_id]['agent'].append(agent)
 
     def _remove_agent(self, agent, node_id):
         """ Remove an agent from a node. """
 
-        self.G.node[node_id]['agent'].remove(agent)
+        self.G.nodes[node_id]['agent'].remove(agent)
 
     def is_cell_empty(self, node_id):
         """ Returns a bool of the contents of a cell. """
-        return False if self.G.node[node_id]['agent'] else True
+        return not self.G.nodes[node_id]['agent']
 
     def get_cell_list_contents(self, cell_list):
         return list(self.iter_cell_list_contents(cell_list))
@@ -827,5 +825,5 @@ class NetworkGrid:
         return list(self.iter_cell_list_contents(self.G))
 
     def iter_cell_list_contents(self, cell_list):
-        list_of_lists = [self.G.node[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
+        list_of_lists = [self.G.nodes[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
         return [item for sublist in list_of_lists for item in sublist]

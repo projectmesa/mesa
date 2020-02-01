@@ -20,11 +20,6 @@ Key concepts:
     Time: Some models may simulate a continuous 'clock' instead of discrete
     steps. However, by default, the Time is equal to the number of steps the
     model has taken.
-
-
-TODO: Have the schedulers use the model's randomizer, to keep random number
-seeds consistent and allow for replication.
-
 """
 
 from collections import OrderedDict
@@ -175,7 +170,7 @@ class StagedActivation(BaseScheduler):
             for agent_key in agent_keys:
                 getattr(self._agents[agent_key], stage)()  # Run stage
             if self.shuffle_between_stages:
-                self.model.random.random.shuffle(agent_keys)
+                self.model.random.shuffle(agent_keys)
             self.time += self.stage_time
 
         self.steps += 1

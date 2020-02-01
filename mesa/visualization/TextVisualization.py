@@ -106,14 +106,11 @@ class TextGrid(TextElement):
         Args:
             grid: The underlying Grid object.
             converter: function for converting the content of each cell
-            to ascii
+                       to ascii. Takes the contents of a cell, and returns
+                       a single character.
         """
         self.grid = grid
-
-    @staticmethod
-    def converter(x):
-        """ Text content of cells. """
-        return 'X'
+        self.converter = converter
 
     def render(self):
         """ What to show when printed. """
