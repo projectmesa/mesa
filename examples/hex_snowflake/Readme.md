@@ -1,4 +1,4 @@
-# Conway's Game Of "Life"
+# Conway's Game Of "Life" on a hexagonal grid
 
 ## Summary
 
