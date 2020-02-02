@@ -24,6 +24,17 @@ Key concepts:
 
 from collections import OrderedDict
 
+# mypy
+from typing import Dict, Iterator, List, Optional, Union
+from .agent import Agent
+if False:
+    from .model import Model
+
+
+# BaseScheduler has a self.time of int, while
+# StagedActivation has a self.time of float
+TimeT = Union[float, int]
+
 
 class BaseScheduler:
     """ Simplest scheduler; activates agents one at a time, in the order
@@ -34,14 +45,14 @@ class BaseScheduler:
     (This is explicitly meant to replicate the scheduler in MASON).
 
     """
-    def __init__(self, model):
+    def __init__(self, model: Model) -> None:
         """ Create a new, empty BaseScheduler. """
         self.model = model
         self.steps = 0
-        self.time = 0
-        self._agents = OrderedDict()
+        self.time: TimeT = 0
+        self._agents: Dict[int, Agent] = OrderedDict()
 
-    def add(self, agent):
+    def add(self, agent: Agent) -> None:
         """ Add an Agent object to the schedule.
 
         Args:
@@ -51,7 +62,7 @@ class BaseScheduler:
         """
         self._agents[agent.unique_id] = agent
 
-    def remove(self, agent):
+    def remove(self, agent: Agent) -> None:
         """ Remove all instances of a given agent from the schedule.
 
         Args:
@@ -60,22 +71,22 @@ class BaseScheduler:
         """
         del self._agents[agent.unique_id]
 
-    def step(self):
+    def step(self) -> None:
         """ Execute the step of all the agents, one at a time. """
         for agent in self.agent_buffer(shuffled=False):
             agent.step()
         self.steps += 1
         self.time += 1
 
-    def get_agent_count(self):
+    def get_agent_count(self) -> int:
         """ Returns the current number of agents in the queue. """
         return len(self._agents.keys())
 
     @property
-    def agents(self):
+    def agents(self) -> List[Agent]:
         return list(self._agents.values())
 
-    def agent_buffer(self, shuffled=False):
+    def agent_buffer(self, shuffled: bool = False) -> Iterator[Agent]:
         """ Simple generator that yields the agents while letting the user
         remove and/or add agents during stepping.
 
@@ -99,7 +110,7 @@ class RandomActivation(BaseScheduler):
     Assumes that all agents have a step(model) method.
 
     """
-    def step(self):
+    def step(self) -> None:
         """ Executes the step of all agents, one at a time, in
         random order.
 
@@ -118,7 +129,7 @@ class SimultaneousActivation(BaseScheduler):
     apply them yet. advance() then applies the changes.
 
     """
-    def step(self):
+    def step(self) -> None:
         """ Step all agents, then advance them. """
         agent_keys = list(self._agents.keys())
         for agent_key in agent_keys:
@@ -141,8 +152,13 @@ class StagedActivation(BaseScheduler):
     increments of 1 / (# of stages), meaning that 1 step = 1 unit of time.
 
     """
-    def __init__(self, model, stage_list=None, shuffle=False,
-                 shuffle_between_stages=False):
+    def __init__(
+        self,
+        model: Model,
+        stage_list: Optional[List[str]] = None,
+        shuffle: bool = False,
+        shuffle_between_stages: bool = False,
+    ) -> None:
         """ Create an empty Staged Activation schedule.
 
         Args:
@@ -161,7 +177,7 @@ class StagedActivation(BaseScheduler):
         self.shuffle_between_stages = shuffle_between_stages
         self.stage_time = 1 / len(self.stage_list)
 
-    def step(self):
+    def step(self) -> None:
         """ Executes all the stages for all agents. """
         agent_keys = list(self._agents.keys())
         if self.shuffle:
