@@ -35,7 +35,7 @@ class CanvasGrid(VisualizationElement):
                 "heading_y": represents y direction unit vector.
              For an image:
                 The image must be placed in the same directory from which the
-                server is runned. An image has the attributes "x", "y",
+                server is launched. An image has the attributes "x", "y",
                 "scale", "text" and "text_color".
         "Color": The color to draw the shape in; needs to be a valid HTML
                  color, e.g."Red" or "#AA08F8"
