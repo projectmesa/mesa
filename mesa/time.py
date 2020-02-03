@@ -48,8 +48,8 @@ class BaseScheduler:
         """ Create a new, empty BaseScheduler. """
         self.model = model
         self.steps = 0
-        self.time: TimeT = 0
-        self._agents: Dict[int, Agent] = OrderedDict()
+        self.time = 0  # type: TimeT
+        self._agents = OrderedDict()  # type: Dict[int, Agent]
 
     def add(self, agent: Agent) -> None:
         """ Add an Agent object to the schedule.
