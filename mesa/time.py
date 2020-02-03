@@ -27,8 +27,7 @@ from collections import OrderedDict
 # mypy
 from typing import Dict, Iterator, List, Optional, Union
 from .agent import Agent
-if False:
-    from .model import Model
+from .model import Model
 
 
 # BaseScheduler has a self.time of int, while

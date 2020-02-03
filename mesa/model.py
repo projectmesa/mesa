@@ -5,8 +5,8 @@ The model class for Mesa framework.
 Core Objects: Model
 
 """
-import time
 import random
+
 # mypy
 from typing import Any, Optional
 
@@ -16,13 +16,9 @@ class Model:
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """Create a new model object and instantiate its RNG automatically."""
-
-        model = object.__new__(cls)  # This only works in Python 3.3 and above
-        model._seed = time.time()
-        if "seed" in kwargs and kwargs["seed"] is not None:
-            model._seed = kwargs["seed"]
-        model.random = random.Random(model._seed)
-        return model
+        cls._seed = kwargs.get("seed", None)
+        cls.random = random.Random(cls._seed)
+        return object.__new__(cls)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """ Create a new model. Overload this method with the actual code to
