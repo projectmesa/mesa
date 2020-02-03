@@ -2,10 +2,13 @@
 """
 Mesa Space Module
 =================
+
 Objects used to add a spatial component to a model.
+
 Grid: base grid, a simple list-of-lists.
 SingleGrid: grid which strictly enforces one object per cell.
 MultiGrid: extension to Grid where each cell is a set of objects.
+
 """
 # Instruction for PyLint to suppress variable name errors, since we have a
 # good reason to use one-character variable names for x and y.
@@ -20,6 +23,7 @@ def accept_tuple_argument(wrapped_function):
     """ Decorator to allow grid methods that take a list of (x, y) coord tuples
     to also handle a single position, by automatically wrapping tuple in
     single-item list rather than forcing user to do it.
+
     """
 
     def wrapper(*args):
@@ -33,13 +37,16 @@ def accept_tuple_argument(wrapped_function):
 
 class Grid:
     """ Base class for a square grid.
+
     Grid cells are indexed by [x][y], where [0][0] is assumed to be the
     bottom-left and [width-1][height-1] is the top-right. If a grid is
     toroidal, the top and bottom, and left and right, edges wrap to each other
+
     Properties:
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
         grid: Internal list-of-lists which holds the grid cells themselves.
+
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
         get_neighborhood: Returns the cells surrounding a given cell.
@@ -60,13 +67,16 @@ class Grid:
         identified in cell_list.
         remove_agent: Removes an agent from the grid.
         is_cell_empty: Returns a bool of the contents of a cell.
+
     """
 
     def __init__(self, width, height, torus):
         """ Create a new grid.
+
         Args:
             width, height: The width and height of the grid
             torus: Boolean whether the grid wraps or not.
+
         """
         self.height = height
         self.width = width
@@ -105,10 +115,12 @@ class Grid:
 
     def neighbor_iter(self, pos, moore=True):
         """ Iterate over position neighbors.
+
         Args:
             pos: (x,y) coords tuple for the position to get the neighbors of.
             moore: Boolean for whether to use Moore neighborhood (including
                    diagonals) or Von Neumann (only up/down/left/right).
+
         """
         neighborhood = self.iter_neighborhood(pos, moore=moore)
         return self.iter_cell_list_contents(neighborhood)
@@ -117,6 +129,7 @@ class Grid:
                           include_center=False, radius=1, inner_radius=0):
         """ Return an iterator over cell coordinates that are in the
         neighborhood of a certain point.
+
         Args:
             pos: Coordinate tuple for the neighborhood to get.
             moore: If True, return Moore neighborhood
@@ -126,11 +139,13 @@ class Grid:
             include_center: If True, return the (x, y) cell as well.
                             Otherwise, return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+
         Returns:
             A list of coordinate tuples representing the neighborhood. For
             example with radius 1, it will return list with number of elements
             equals at most 9 (8) if Moore, 5 (4) if Von Neumann (if not
             including the center).
+
         """
         x, y = pos
         coordinates = set()
@@ -162,6 +177,7 @@ class Grid:
                          include_center=False, radius=1, inner_radius=0):
         """ Return a list of cells that are in the neighborhood of a
         certain point.
+
         Args:
             pos: Coordinate tuple for the neighborhood to get.
             moore: If True, return Moore neighborhood
@@ -171,16 +187,19 @@ class Grid:
             include_center: If True, return the (x, y) cell as well.
                             Otherwise, return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+
         Returns:
             A list of coordinate tuples representing the neighborhood;
             With radius 1, at most 9 if Moore, 5 if Von Neumann (8 and 4
             if not including the center).
+
         """
         return list(self.iter_neighborhood(pos, moore, include_center, radius, inner_radius=0))
 
     def iter_neighbors(self, pos, moore,
                        include_center=False, radius=1, inner_radius=0):
         """ Return an iterator over neighbors to a certain point.
+
         Args:
             pos: Coordinates for the neighborhood to get.
             moore: If True, return Moore neighborhood
@@ -191,10 +210,12 @@ class Grid:
                             Otherwise,
                             return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+
         Returns:
             An iterator of non-None objects in the given neighborhood;
             at most 9 if Moore, 5 if Von-Neumann
             (8 and 4 if not including the center).
+
         """
         neighborhood = self.iter_neighborhood(
             pos, moore, include_center, radius, inner_radius=0)
@@ -203,6 +224,7 @@ class Grid:
     def get_neighbors(self, pos, moore,
                       include_center=False, radius=1, inner_radius=0):
         """ Return a list of neighbors to a certain point.
+
         Args:
             pos: Coordinate tuple for the neighborhood to get.
             moore: If True, return Moore neighborhood
@@ -213,10 +235,12 @@ class Grid:
                             Otherwise,
                             return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+
         Returns:
             A list of non-None objects in the given neighborhood;
             at most 9 if Moore, 5 if Von-Neumann
             (8 and 4 if not including the center).
+
         """
         return list(self.iter_neighbors(
             pos, moore, include_center, radius, inner_radius=0))
@@ -244,8 +268,10 @@ class Grid:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
+
         Returns:
             An iterator of the contents of the cells identified in cell_list
+
         """
         return (
             self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
@@ -255,18 +281,22 @@ class Grid:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
+
         Returns:
             A list of the contents of the cells identified in cell_list
+
         """
         return list(self.iter_cell_list_contents(cell_list))
 
     def move_agent(self, agent, pos):
         """
         Move an agent from its current position to a new position.
+
         Args:
             agent: Agent object to move. Assumed to have its current location
                    stored in a 'pos' tuple.
             pos: Tuple of new position to move the agent to.
+
         """
         pos = self.torus_adj(pos)
         self._remove_agent(agent.pos, agent)
@@ -339,9 +369,11 @@ class SingleGrid(Grid):
 
     def __init__(self, width, height, torus):
         """ Create a new single-item grid.
+
         Args:
             width, height: The width and width of the grid
             torus: Boolean whether the grid wraps or not.
+
         """
         super().__init__(width, height, torus)
 
@@ -353,6 +385,7 @@ class SingleGrid(Grid):
         If x or y are positive, they are used, but if "random",
         we get a random position.
         Ensure this random position is not occupied (in Grid).
+
         """
         if x == "random" or y == "random":
             if len(self.empties) == 0:
@@ -372,14 +405,20 @@ class SingleGrid(Grid):
 
 class MultiGrid(Grid):
     """ Grid where each cell can contain more than one object.
+
     Grid cells are indexed by [x][y], where [0][0] is assumed to be at
     bottom-left and [width-1][height-1] is the top-right. If a grid is
     toroidal, the top and bottom, and left and right, edges wrap to each other.
+
     Each grid cell holds a set object.
+
     Properties:
         width, height: The grid's width and height.
+
         torus: Boolean which determines whether to treat the grid as a torus.
+
         grid: Internal list-of-lists which holds the grid cells themselves.
+
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
     """
@@ -407,8 +446,10 @@ class MultiGrid(Grid):
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
+
         Returns:
             A iterator of the contents of the cells identified in cell_list
+
         """
         return itertools.chain.from_iterable(
             self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
@@ -416,33 +457,40 @@ class MultiGrid(Grid):
 
 class HexGrid(Grid):
     """ Hexagonal Grid: Extends Grid to handle hexagonal neighbors.
+
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+
     Properties:
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
+
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
         get_neighborhood: Returns the cells surrounding a given cell.
         neighbor_iter: Iterates over position neightbors.
         iter_neighborhood: Returns an iterator over cell coordinates that are
             in the neighborhood of a certain point.
+
     """
 
     def iter_neighborhood(self, pos,
                           include_center=False, radius=1):
         """ Return an iterator over cell coordinates that are in the
         neighborhood of a certain point.
+
         Args:
             pos: Coordinate tuple for the neighborhood to get.
             include_center: If True, return the (x, y) cell as well.
                             Otherwise, return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+
         Returns:
             A list of coordinate tuples representing the neighborhood. For
             example with radius 1, it will return list with number of elements
             equals at most 9 (8) if Moore, 5 (4) if Von Neumann (if not
             including the center).
+
         """
 
         def torus_adj_2d(pos):
@@ -455,6 +503,7 @@ class HexGrid(Grid):
 
             """
             Both: (0,-), (0,+)
+
             Even: (-,+), (-,0), (+,+), (+,0)
             Odd:  (-,0), (-,-), (+,0), (+,-)
             """
@@ -492,8 +541,10 @@ class HexGrid(Grid):
 
     def neighbor_iter(self, pos):
         """ Iterate over position neighbors.
+
         Args:
             pos: (x,y) coords tuple for the position to get the neighbors of.
+
         """
         neighborhood = self.iter_neighborhood(pos)
         return self.iter_cell_list_contents(neighborhood)
@@ -502,28 +553,34 @@ class HexGrid(Grid):
                          include_center=False, radius=1):
         """ Return a list of cells that are in the neighborhood of a
         certain point.
+
         Args:
             pos: Coordinate tuple for the neighborhood to get.
             include_center: If True, return the (x, y) cell as well.
                             Otherwise, return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+
         Returns:
             A list of coordinate tuples representing the neighborhood;
             With radius 1
+
         """
         return list(self.iter_neighborhood(pos, include_center, radius))
 
     def iter_neighbors(self, pos,
                        include_center=False, radius=1):
         """ Return an iterator over neighbors to a certain point.
+
         Args:
             pos: Coordinates for the neighborhood to get.
             include_center: If True, return the (x, y) cell as well.
                             Otherwise,
                             return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+
         Returns:
             An iterator of non-None objects in the given neighborhood
+
         """
         neighborhood = self.iter_neighborhood(
             pos, include_center, radius)
@@ -532,14 +589,17 @@ class HexGrid(Grid):
     def get_neighbors(self, pos,
                       include_center=False, radius=1):
         """ Return a list of neighbors to a certain point.
+
         Args:
             pos: Coordinate tuple for the neighborhood to get.
             include_center: If True, return the (x, y) cell as well.
                             Otherwise,
                             return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+
         Returns:
             A list of non-None objects in the given neighborhood
+
         """
         return list(self.iter_neighbors(
             pos, include_center, radius))
@@ -547,20 +607,24 @@ class HexGrid(Grid):
 
 class ContinuousSpace:
     """ Continuous space where each agent can have an arbitrary position.
+
     Assumes that all agents are point objects, and have a pos property storing
     their position as an (x, y) tuple. This class uses a numpy array internally
     to store agent objects, to speed up neighborhood lookups.
+
     """
     _grid = None
 
     def __init__(self, x_max, y_max, torus, x_min=0, y_min=0):
         """ Create a new continuous space.
+
         Args:
             x_max, y_max: Maximum x and y coordinates for the space.
             torus: Boolean for whether the edges loop around.
             x_min, y_min: (default 0) If provided, set the minimum x and y
                           coordinates for the space. Below them, values loop to
                           the other edge (if torus=True) or raise an exception.
+
         """
         self.x_min = x_min
         self.x_max = x_max
@@ -578,9 +642,11 @@ class ContinuousSpace:
 
     def place_agent(self, agent, pos):
         """ Place a new agent in the space.
+
         Args:
             agent: Agent object to place.
             pos: Coordinate tuple for where to place the agent.
+
         """
         pos = self.torus_adj(pos)
         if self._agent_points is None:
@@ -593,9 +659,11 @@ class ContinuousSpace:
 
     def move_agent(self, agent, pos):
         """ Move an agent from its current position to a new position.
+
         Args:
             agent: The agent object to move.
             pos: Coordinate tuple to move the agent to.
+
         """
         pos = self.torus_adj(pos)
         idx = self._agent_to_index[agent]
@@ -605,6 +673,7 @@ class ContinuousSpace:
 
     def remove_agent(self, agent):
         """ Remove an agent from the simulation.
+
         Args:
             agent: The agent object to remove
             """
@@ -625,6 +694,7 @@ class ContinuousSpace:
 
     def get_neighbors(self, pos, radius, include_center=True):
         """ Get all objects within a certain radius.
+
         Args:
             pos: (x,y) coordinate tuple to center the search at.
             radius: Get all the objects within this distance of the center.
@@ -632,6 +702,7 @@ class ContinuousSpace:
                             coordinates. i.e. if you are searching for the
                             neighbors of a given agent, True will include that
                             agent in the results.
+
         """
         deltas = np.abs(self._agent_points - np.array(pos))
         if self.torus:
@@ -644,6 +715,7 @@ class ContinuousSpace:
 
     def get_heading(self, pos_1, pos_2):
         """ Get the heading angle between two points, accounting for toroidal space.
+
         Args:
             pos_1, pos_2: Coordinate tuples for both points.
         """
@@ -659,8 +731,10 @@ class ContinuousSpace:
 
     def get_distance(self, pos_1, pos_2):
         """ Get the distance between two point, accounting for toroidal space.
+
         Args:
             pos_1, pos_2: Coordinate tuples for both points.
+
         """
         x1, y1 = pos_1
         x2, y2 = pos_2
@@ -674,11 +748,14 @@ class ContinuousSpace:
 
     def torus_adj(self, pos):
         """ Adjust coordinates to handle torus looping.
+
         If the coordinate is out-of-bounds and the space is toroidal, return
         the corresponding point within the space. If the space is not toroidal,
         raise an exception.
+
         Args:
             pos: Coordinate tuple to convert.
+            
         """
         if not self.out_of_bounds(pos):
             return pos
