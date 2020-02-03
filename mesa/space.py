@@ -755,7 +755,7 @@ class ContinuousSpace:
 
         Args:
             pos: Coordinate tuple to convert.
-            
+
         """
         if not self.out_of_bounds(pos):
             return pos
