@@ -250,7 +250,7 @@ class Grid:
 
         """
         return list(self.iter_neighbors(
-            pos, moore, include_center, radius, inner_radius=0))
+            pos, moore, include_center, radius))
 
     def torus_adj(self, pos: Coordinate) -> Coordinate:
         """ Convert coordinate, handling torus looping. """
