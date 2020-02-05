@@ -146,6 +146,10 @@ class Grid:
             include_center: If True, return the (x, y) cell as well.
                             Otherwise, return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+            inner_radius: If defined, the inner radius will be 
+                          substracted from the radius of neighborhood
+                          to get (also in number of cells).
+                          Otherwise, the full radius is considered.
 
         Returns:
             A list of coordinate tuples representing the neighborhood. For
@@ -194,6 +198,10 @@ class Grid:
             include_center: If True, return the (x, y) cell as well.
                             Otherwise, return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+            inner_radius: If defined, the inner radius will be 
+                          substracted from the radius of neighborhood
+                          to get (also in number of cells).
+                          Otherwise, the full radius is considered.
 
         Returns:
             A list of coordinate tuples representing the neighborhood;
@@ -217,6 +225,10 @@ class Grid:
                             Otherwise,
                             return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+            inner_radius: If defined, the inner radius will be 
+                          substracted from the radius of neighborhood
+                          to get (also in number of cells).
+                          Otherwise, the full radius is considered.
 
         Returns:
             An iterator of non-None objects in the given neighborhood;
@@ -242,6 +254,10 @@ class Grid:
                             Otherwise,
                             return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
+            inner_radius: If defined, the inner radius will be 
+                          substracted from the radius of neighborhood
+                          to get (also in number of cells).
+                          Otherwise, the full radius is considered.
 
         Returns:
             A list of non-None objects in the given neighborhood;
