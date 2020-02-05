@@ -146,7 +146,7 @@ class Grid:
             include_center: If True, return the (x, y) cell as well.
                             Otherwise, return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
-            inner_radius: If defined, the inner radius will be 
+            inner_radius: If defined, the inner radius will be
                           substracted from the radius of neighborhood
                           to get (also in number of cells).
                           Otherwise, the full radius is considered.
@@ -198,7 +198,7 @@ class Grid:
             include_center: If True, return the (x, y) cell as well.
                             Otherwise, return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
-            inner_radius: If defined, the inner radius will be 
+            inner_radius: If defined, the inner radius will be
                           substracted from the radius of neighborhood
                           to get (also in number of cells).
                           Otherwise, the full radius is considered.
@@ -225,7 +225,7 @@ class Grid:
                             Otherwise,
                             return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
-            inner_radius: If defined, the inner radius will be 
+            inner_radius: If defined, the inner radius will be
                           substracted from the radius of neighborhood
                           to get (also in number of cells).
                           Otherwise, the full radius is considered.
@@ -254,7 +254,7 @@ class Grid:
                             Otherwise,
                             return surrounding cells only.
             radius: radius, in cells, of neighborhood to get.
-            inner_radius: If defined, the inner radius will be 
+            inner_radius: If defined, the inner radius will be
                           substracted from the radius of neighborhood
                           to get (also in number of cells).
                           Otherwise, the full radius is considered.
