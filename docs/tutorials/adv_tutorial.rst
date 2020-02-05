@@ -365,7 +365,7 @@ created, we can create the chart object.
         };
 
         // Create the chart object
-        var chart = new Chart(context).Bar(data, options);
+        var chart = new Chart(context, {type: 'bar', data: data, options: options});
 
         // Now what?
     };
@@ -389,14 +389,13 @@ With that in mind, we can add these two methods to the class:
     var HistogramModule = function(bins, canvas_width, canvas_height) {
         // ...Everything from above...
         this.render = function(data) {
-            for (var i in data)
-                chart.datasets[0].bars[i].value = data[i];
+            datasets[0].data = data;
             chart.update();
         };
 
         this.reset = function() {
             chart.destroy();
-            chart = new Chart(context).Bar(data, options);
+            chart = new Chart(context, {type: 'bar', data: data, options: options});
         };
     };
 
