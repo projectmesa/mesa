@@ -20,6 +20,7 @@ import numpy as np
 
 from typing import Iterable, Iterator, List, Optional, Set, Tuple, Union
 from .agent import Agent
+
 Coordinate = Tuple[int, int]
 GridContent = Union[Optional[Agent], Set[Agent]]
 
@@ -96,8 +97,7 @@ class Grid:
             self.grid.append(col)
 
         # Add all cells to the empties list.
-        self.empties = set(itertools.product(
-            *(range(self.width), range(self.height))))
+        self.empties = set(itertools.product(*(range(self.width), range(self.height))))
 
     @staticmethod
     def default_val() -> None:
@@ -120,7 +120,9 @@ class Grid:
             for col in range(self.height):
                 yield self.grid[row][col], row, col  # agent, x, y
 
-    def neighbor_iter(self, pos: Coordinate, moore: bool = True) -> Iterator[GridContent]:
+    def neighbor_iter(
+        self, pos: Coordinate, moore: bool = True
+    ) -> Iterator[GridContent]:
         """ Iterate over position neighbors.
 
         Args:
@@ -132,8 +134,13 @@ class Grid:
         neighborhood = self.iter_neighborhood(pos, moore=moore)
         return self.iter_cell_list_contents(neighborhood)
 
-    def iter_neighborhood(self, pos: Coordinate, moore: bool,
-                          include_center: bool = False, radius: int = 1) -> Iterator[Coordinate]:
+    def iter_neighborhood(
+        self,
+        pos: Coordinate,
+        moore: bool,
+        include_center: bool = False,
+        radius: int = 1,
+    ) -> Iterator[Coordinate]:
         """ Return an iterator over cell coordinates that are in the
         neighborhood of a certain point.
 
@@ -164,7 +171,9 @@ class Grid:
                 if not moore and abs(dx) + abs(dy) > radius:
                     continue
                 # Skip if not a torus and new coords out of bounds.
-                if not self.torus and (not (0 <= dx + x < self.width) or not (0 <= dy + y < self.height)):
+                if not self.torus and (
+                    not (0 <= dx + x < self.width) or not (0 <= dy + y < self.height)
+                ):
                     continue
 
                 px, py = self.torus_adj((x + dx, y + dy))
@@ -178,8 +187,13 @@ class Grid:
                     coordinates.add(coords)
                     yield coords
 
-    def get_neighborhood(self, pos: Coordinate, moore: bool,
-                         include_center: bool = False, radius: int = 1) -> List[Coordinate]:
+    def get_neighborhood(
+        self,
+        pos: Coordinate,
+        moore: bool,
+        include_center: bool = False,
+        radius: int = 1,
+    ) -> List[Coordinate]:
         """ Return a list of cells that are in the neighborhood of a
         certain point.
 
@@ -201,8 +215,13 @@ class Grid:
         """
         return list(self.iter_neighborhood(pos, moore, include_center, radius))
 
-    def iter_neighbors(self, pos: Coordinate, moore: bool,
-                       include_center: bool = False, radius: int = 1) -> Iterator[GridContent]:
+    def iter_neighbors(
+        self,
+        pos: Coordinate,
+        moore: bool,
+        include_center: bool = False,
+        radius: int = 1,
+    ) -> Iterator[GridContent]:
         """ Return an iterator over neighbors to a certain point.
 
         Args:
@@ -222,12 +241,16 @@ class Grid:
             (8 and 4 if not including the center).
 
         """
-        neighborhood = self.iter_neighborhood(
-            pos, moore, include_center, radius)
+        neighborhood = self.iter_neighborhood(pos, moore, include_center, radius)
         return self.iter_cell_list_contents(neighborhood)
 
-    def get_neighbors(self, pos: Coordinate, moore: bool,
-                      include_center: bool = False, radius: int = 1) -> List[Coordinate]:
+    def get_neighbors(
+        self,
+        pos: Coordinate,
+        moore: bool,
+        include_center: bool = False,
+        radius: int = 1,
+    ) -> List[Coordinate]:
         """ Return a list of neighbors to a certain point.
 
         Args:
@@ -247,8 +270,7 @@ class Grid:
             (8 and 4 if not including the center).
 
         """
-        return list(self.iter_neighbors(
-            pos, moore, include_center, radius))
+        return list(self.iter_neighbors(pos, moore, include_center, radius))
 
     def torus_adj(self, pos: Coordinate) -> Coordinate:
         """ Convert coordinate, handling torus looping. """
@@ -269,7 +291,9 @@ class Grid:
         return x < 0 or x >= self.width or y < 0 or y >= self.height
 
     @accept_tuple_argument
-    def iter_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> Iterator[GridContent]:
+    def iter_cell_list_contents(
+        self, cell_list: Iterable[Coordinate]
+    ) -> Iterator[GridContent]:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -278,11 +302,12 @@ class Grid:
             An iterator of the contents of the cells identified in cell_list
 
         """
-        return (
-            self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
+        return (self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
 
     @accept_tuple_argument
-    def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> List[GridContent]:
+    def get_cell_list_contents(
+        self, cell_list: Iterable[Coordinate]
+    ) -> List[GridContent]:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -351,11 +376,15 @@ class Grid:
         from warnings import warn
         import random
 
-        warn(("`find_empty` is being phased out since it uses the global "
-              "`random` instead of the model-level random-number generator. "
-              "Consider replacing it with having a model or agent object "
-              "explicitly pick one of the grid's list of empty cells."),
-             DeprecationWarning)
+        warn(
+            (
+                "`find_empty` is being phased out since it uses the global "
+                "`random` instead of the model-level random-number generator. "
+                "Consider replacing it with having a model or agent object "
+                "explicitly pick one of the grid's list of empty cells."
+            ),
+            DeprecationWarning,
+        )
 
         if self.exists_empty_cells():
             pos = random.choice(sorted(self.empties))
@@ -370,6 +399,7 @@ class Grid:
 
 class SingleGrid(Grid):
     """ Grid where each cell contains exactly at most one object. """
+
     empties = set()  # type: Set[Coordinate]
 
     def __init__(self, width: int, height: int, torus: bool) -> None:
@@ -457,7 +487,8 @@ class MultiGrid(Grid):
 
         """
         return itertools.chain.from_iterable(
-            self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
+            self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y))
+        )
 
 
 class HexGrid(Grid):
@@ -479,8 +510,7 @@ class HexGrid(Grid):
 
     """
 
-    def iter_neighborhood(self, pos,
-                          include_center=False, radius=1):
+    def iter_neighborhood(self, pos, include_center=False, radius=1):
         """ Return an iterator over cell coordinates that are in the
         neighborhood of a certain point.
 
@@ -518,16 +548,14 @@ class HexGrid(Grid):
                 adjacent.append(pos)
 
             if x % 2 == 0:
-                adjacent += [(x - 1, y + 1), (x - 1, y),
-                             (x + 1, y + 1), (x + 1, y)]
+                adjacent += [(x - 1, y + 1), (x - 1, y), (x + 1, y + 1), (x + 1, y)]
             else:
-                adjacent += [(x - 1, y), (x - 1, y - 1),
-                             (x + 1, y), (x + 1, y - 1)]
+                adjacent += [(x - 1, y), (x - 1, y - 1), (x + 1, y), (x + 1, y - 1)]
 
             if self.torus is False:
                 adjacent = list(
-                    filter(lambda coords:
-                           not self.out_of_bounds(coords), adjacent))
+                    filter(lambda coords: not self.out_of_bounds(coords), adjacent)
+                )
             else:
                 adjacent = [torus_adj_2d(coord) for coord in adjacent]
 
@@ -554,8 +582,7 @@ class HexGrid(Grid):
         neighborhood = self.iter_neighborhood(pos)
         return self.iter_cell_list_contents(neighborhood)
 
-    def get_neighborhood(self, pos,
-                         include_center=False, radius=1):
+    def get_neighborhood(self, pos, include_center=False, radius=1):
         """ Return a list of cells that are in the neighborhood of a
         certain point.
 
@@ -572,8 +599,7 @@ class HexGrid(Grid):
         """
         return list(self.iter_neighborhood(pos, include_center, radius))
 
-    def iter_neighbors(self, pos,
-                       include_center=False, radius=1):
+    def iter_neighbors(self, pos, include_center=False, radius=1):
         """ Return an iterator over neighbors to a certain point.
 
         Args:
@@ -587,12 +613,10 @@ class HexGrid(Grid):
             An iterator of non-None objects in the given neighborhood
 
         """
-        neighborhood = self.iter_neighborhood(
-            pos, include_center, radius)
+        neighborhood = self.iter_neighborhood(pos, include_center, radius)
         return self.iter_cell_list_contents(neighborhood)
 
-    def get_neighbors(self, pos,
-                      include_center=False, radius=1):
+    def get_neighbors(self, pos, include_center=False, radius=1):
         """ Return a list of neighbors to a certain point.
 
         Args:
@@ -606,8 +630,7 @@ class HexGrid(Grid):
             A list of non-None objects in the given neighborhood
 
         """
-        return list(self.iter_neighbors(
-            pos, include_center, radius))
+        return list(self.iter_neighbors(pos, include_center, radius))
 
 
 class ContinuousSpace:
@@ -618,6 +641,7 @@ class ContinuousSpace:
     to store agent objects, to speed up neighborhood lookups.
 
     """
+
     _grid = None
 
     def __init__(self, x_max, y_max, torus, x_min=0, y_min=0):
@@ -714,8 +738,10 @@ class ContinuousSpace:
             deltas = np.minimum(deltas, self.size - deltas)
         dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
 
-        idxs, = np.where(dists <= radius ** 2)
-        neighbors = [self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0]
+        (idxs,) = np.where(dists <= radius ** 2)
+        neighbors = [
+            self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0
+        ]
         return neighbors
 
     def get_heading(self, pos_1, pos_2):
@@ -777,8 +803,7 @@ class ContinuousSpace:
     def out_of_bounds(self, pos):
         """ Check if a point is out of bounds. """
         x, y = pos
-        return (x < self.x_min or x >= self.x_max or
-                y < self.y_min or y >= self.y_max)
+        return x < self.x_min or x >= self.x_max or y < self.y_min or y >= self.y_max
 
 
 class NetworkGrid:
@@ -787,7 +812,7 @@ class NetworkGrid:
     def __init__(self, G):
         self.G = G
         for node_id in self.G.nodes:
-            G.nodes[node_id]['agent'] = list()
+            G.nodes[node_id]["agent"] = list()
 
     def place_agent(self, agent, node_id):
         """ Place a agent in a node. """
@@ -814,16 +839,16 @@ class NetworkGrid:
     def _place_agent(self, agent, node_id):
         """ Place the agent at the correct node. """
 
-        self.G.nodes[node_id]['agent'].append(agent)
+        self.G.nodes[node_id]["agent"].append(agent)
 
     def _remove_agent(self, agent, node_id):
         """ Remove an agent from a node. """
 
-        self.G.nodes[node_id]['agent'].remove(agent)
+        self.G.nodes[node_id]["agent"].remove(agent)
 
     def is_cell_empty(self, node_id):
         """ Returns a bool of the contents of a cell. """
-        return not self.G.nodes[node_id]['agent']
+        return not self.G.nodes[node_id]["agent"]
 
     def get_cell_list_contents(self, cell_list):
         return list(self.iter_cell_list_contents(cell_list))
@@ -832,5 +857,9 @@ class NetworkGrid:
         return list(self.iter_cell_list_contents(self.G))
 
     def iter_cell_list_contents(self, cell_list):
-        list_of_lists = [self.G.nodes[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
+        list_of_lists = [
+            self.G.nodes[node_id]["agent"]
+            for node_id in cell_list
+            if not self.is_cell_empty(node_id)
+        ]
         return [item for sublist in list_of_lists for item in sublist]
