@@ -131,17 +131,9 @@ open automatically, try pointing it at http://127.0.0.1:8521 manually.
 If this doesn't show you the visualization, something may have gone
 wrong with the server launch.)
 
-You should see something like the figure below: the model title, an
-empty space where the grid will be, and a control panel off to the
-right.
-
-.. figure:: files/viz_empty.png
-   :alt: Empty Visualization
-
-   Empty Visualization
-
-Click the 'reset' button on the control panel, and you should see the
-grid fill up with red circles, representing agents.
+You should see something like the figure below: the model title, a grid
+filled with red circles representing agents, and a set of buttons to the
+right for running and resetting the model.
 
 .. figure:: files/viz_redcircles.png
    :alt: Redcircles Visualization
@@ -373,7 +365,7 @@ created, we can create the chart object.
         };
 
         // Create the chart object
-        var chart = new Chart(context).Bar(data, options);
+        var chart = new Chart(context, {type: 'bar', data: data, options: options});
 
         // Now what?
     };
@@ -397,14 +389,13 @@ With that in mind, we can add these two methods to the class:
     var HistogramModule = function(bins, canvas_width, canvas_height) {
         // ...Everything from above...
         this.render = function(data) {
-            for (var i in data)
-                chart.datasets[0].bars[i].value = data[i];
+            datasets[0].data = data;
             chart.update();
         };
 
         this.reset = function() {
             chart.destroy();
-            chart = new Chart(context).Bar(data, options);
+            chart = new Chart(context, {type: 'bar', data: data, options: options});
         };
     };
 
