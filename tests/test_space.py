@@ -269,10 +269,10 @@ class TestSingleGrid(unittest.TestCase):
         for i, pos in enumerate(TEST_AGENTS_GRID):
             a = self.agents[i]
             assert a.pos == pos
-            assert self.space.grid[pos[0]][pos[1]] == a
+            assert self.space[pos[0], pos[1]] == a
             self.space.remove_agent(a)
             assert a.pos is None
-            assert self.space.grid[pos[0]][pos[1]] is None
+            assert self.space[pos[0], pos[1]] is None
 
     def test_empty_cells(self):
         if self.space.exists_empty_cells():

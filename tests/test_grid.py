@@ -64,7 +64,7 @@ class TestBaseGrid(unittest.TestCase):
         '''
         for agent in self.agents:
             x, y = agent.pos
-            assert self.grid[x][y] == agent
+            assert self.grid[(x, y)] == agent
 
     def test_cell_agent_reporting(self):
         '''
@@ -171,7 +171,7 @@ class TestBaseGrid(unittest.TestCase):
         x, y = agent.pos
         self.grid.remove_agent(agent)
         assert agent.pos is None
-        assert self.grid.grid[x][y] is None
+        assert self.grid[(x, y)] is None
 
 
 class TestBaseGridTorus(TestBaseGrid):
@@ -315,7 +315,7 @@ class TestMultiGrid(unittest.TestCase):
         '''
         for agent in self.agents:
             x, y = agent.pos
-            assert agent in self.grid[x][y]
+            assert agent in self.grid[(x, y)]
 
     def test_neighbors(self):
         '''
