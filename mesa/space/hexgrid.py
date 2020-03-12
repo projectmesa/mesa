@@ -1,6 +1,6 @@
-from .grid import SingleGrid
+from .grid import Grid
 
-class HexGrid(SingleGrid):
+class HexGrid(Grid):
     """ Hexagonal Grid: Extends Grid to handle hexagonal neighbors.
 
     Functions according to odd-q rules.

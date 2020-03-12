@@ -76,7 +76,7 @@ class EpsteinCivilViolence(Model):
             if self.random.random() < self.cop_density:
                 cop = Cop(unique_id, self, (x, y), vision=self.cop_vision)
                 unique_id += 1
-                self.grid[y][x] = cop
+                self.grid.place_agent(cop, (y,x))
                 self.schedule.add(cop)
             elif self.random.random() < (
                     self.cop_density + self.citizen_density):
@@ -87,7 +87,7 @@ class EpsteinCivilViolence(Model):
                                   threshold=self.active_threshold,
                                   vision=self.citizen_vision)
                 unique_id += 1
-                self.grid[y][x] = citizen
+                self.grid.place_agent(citizen, (y, x))
                 self.schedule.add(citizen)
 
         self.running = True

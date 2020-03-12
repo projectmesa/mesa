@@ -33,7 +33,7 @@ class HexSnowflake(Model):
             self.schedule.add(cell)
 
         # activate the center(ish) cell.
-        centerishCell = self.grid[width // 2][height // 2]
+        centerishCell = self.grid[width // 2, height // 2]
 
         centerishCell.state = 1
         for a in centerishCell.neighbors:

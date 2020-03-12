@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Mesa Space Module
 =================
@@ -15,8 +14,6 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
-
-import numpy as np
 
 from typing import Iterable, Iterator, List, Optional, Set, Tuple, Union
 from mesa.agent import Agent
@@ -79,13 +76,13 @@ class MultiGrid:
         self.width = width
         self.torus = torus
 
-        self.grid = []  # type: List[List[GridContent]]
+        self._grid = []  # type: List[List[GridContent]]
 
         for x in range(self.width):
             col = []  # type: List[GridContent]
             for y in range(self.height):
                 col.append([])
-            self.grid.append(col)
+            self._grid.append(col)
 
         # Add all cells to the empties list.
         self._empties = set(itertools.product(range(self.width), range(self.height)))
@@ -95,15 +92,17 @@ class MultiGrid:
         self._neighborhood_cache = dict()
 
     def __getitem__(self, pos: Coordinate) -> GridContent:
+        if isinstance(pos, int):
+            return self._grid[x]
         x, y = pos
-        return self.grid[x][y]
+        return self._grid[x][y]
 
     def __iter__(self) -> Iterator[GridContent]:
         """
         create an iterator that chains the
         rows of grid together as if one list:
         """
-        return itertools.chain.from_iterable(self.grid)
+        return itertools.chain.from_iterable(self._grid)
 
     def coord_iter(self) -> Iterator[Tuple[GridContent, int, int]]:
         """ An iterator that returns coordinates as well as cell contents. """
@@ -131,7 +130,7 @@ class MultiGrid:
     def place_agent(self, agent: Agent, pos: Coordinate) -> Agent:
         """ Position an agent on the grid, and set its pos variable. """
         x, y = pos
-        self.grid[x][y].append(agent)
+        self._grid[x][y].append(agent)
         self._empties.discard(pos)
         setattr(agent, "pos", pos)
         return agent
@@ -139,7 +138,7 @@ class MultiGrid:
     def remove_agent(self, agent: Agent) -> Agent:
         """ Remove the agent from the grid and set its pos variable to None. """
         x, y = getattr(agent, "pos")
-        content = self.grid[x][y]
+        content = self._grid[x][y]
         content.remove(agent)
         if not content:
             self._empties.add((x, y))
@@ -281,7 +280,7 @@ class MultiGrid:
         include_center: bool = False,
         radius: int = 1,
     ) -> Iterator[GridContent]:
-        """ Depreciated."""
+        """Depreciated."""
         neighborhood = self.get_neighborhood(pos, moore, include_center, radius)
         yield from self.get_contents(neighborhood)
 
@@ -297,7 +296,7 @@ class MultiGrid:
         self, cell_list: Iterable[Coordinate]
     ) -> List[GridContent]:
         """Depreciated"""
-        return self.get_contents(cell_list)
+        return list(itertools.chain(*self.get_contents(cell_list)))
 
     def is_cell_empty(self, pos: Coordinate) -> bool:
         """ Returns a bool of the contents of a cell. """
@@ -355,8 +354,10 @@ class SingleGrid(MultiGrid):
         super().__init__(width, height, torus)
 
     def __getitem__(self, pos):
+        if isinstance(pos, int):
+            return self._grid[pos]
         x, y = pos
-        content = self.grid[x][y]
+        content = self._grid[x][y]
         return content[0] if content else None
 
     def position_agent(self, agent, x="random", y="random"):
@@ -414,6 +415,10 @@ class SingleGrid(MultiGrid):
         return self.get_contents(neighborhood)
         # return list(itertools.chain.from_iterable(neighbors))
 
+    @accept_tuple_argument
+    def get_cell_list_contents(self, cell_list):
+        return self.get_contents(cell_list)
+
 
 class Grid(SingleGrid):
     """ Grid where each cell can contain more than one object.
@@ -434,3 +439,10 @@ class Grid(SingleGrid):
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
     """
+
+    def place_agent(self, agent, pos):
+        if not self.is_cell_empty(pos):
+            x, y = pos
+            self._grid[x][y].clear()
+            self._empties.add(pos)
+        return super().place_agent(agent, pos)
