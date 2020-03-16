@@ -1,5 +1,6 @@
 from .grid import Grid
 
+
 class HexGrid(Grid):
     """ Hexagonal Grid: Extends Grid to handle hexagonal neighbors.
 
@@ -140,4 +141,3 @@ class HexGrid(Grid):
 
         """
         return list(self.iter_neighbors(pos, include_center, radius))
-

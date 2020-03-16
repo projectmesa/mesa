@@ -14,28 +14,42 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
+import warnings
 
-from typing import Iterable, Iterator, List, Optional, Set, Tuple, Union
+from typing import (
+    Iterable,
+    Iterator,
+    Dict,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Callable,
+    Any,
+    Union,
+    TypeVar,
+    cast
+)
 from mesa.agent import Agent
 
 Coordinate = Tuple[int, int]
 GridContent = List[Agent]
 
+F = TypeVar('F', bound=Callable[..., Any])
 
-def accept_tuple_argument(wrapped_function):
+def accept_tuple_argument(wrapped_function: F) -> F:
     """ Decorator to allow grid methods that take a list of (x, y) coord tuples
     to also handle a single position, by automatically wrapping tuple in
     single-item list rather than forcing user to do it.
 
     """
 
-    def wrapper(*args):
+    def wrapper(*args: Any) -> Any:
         if isinstance(args[1], tuple) and len(args[1]) == 2:
             return wrapped_function(args[0], [args[1]])
-        else:
-            return wrapped_function(*args)
+        return wrapped_function(*args)
 
-    return wrapper
+    return cast(F, wrapper)
 
 
 class MultiGrid:
@@ -78,9 +92,9 @@ class MultiGrid:
 
         self._grid = []  # type: List[List[GridContent]]
 
-        for x in range(self.width):
+        for _ in range(self.width):
             col = []  # type: List[GridContent]
-            for y in range(self.height):
+            for _ in range(self.height):
                 col.append([])
             self._grid.append(col)
 
@@ -89,13 +103,21 @@ class MultiGrid:
         self._all_cells = frozenset(self._empties)
 
         # Neighborhood Cache
-        self._neighborhood_cache = dict()
+        self._neighborhood_cache: Dict[Any, List[Coordinate]] = dict()
 
     def __getitem__(self, pos: Coordinate) -> GridContent:
         if isinstance(pos, int):
-            return self._grid[x]
+            warnings.warn(
+                """Accesing the grid via `grid[x][y]` is depreciated.
+                Use `grid[x, y]` instead."""
+            )
+            return self._grid[pos]
         x, y = pos
         return self._grid[x][y]
+
+    def __setitem__(self, pos: Coordinate, agent: Agent) -> None:
+        x, y = pos
+        self._grid[x][y].append(agent)
 
     def __iter__(self) -> Iterator[GridContent]:
         """
@@ -114,11 +136,9 @@ class MultiGrid:
         """ Convert coordinate, handling torus looping. """
         if not self.out_of_bounds(pos):
             return pos
-        elif not self.torus:
+        if not self.torus:
             raise Exception("Point out of bounds, and space non-toroidal.")
-        else:
-            x, y = pos[0] % self.width, pos[1] % self.height
-        return x, y
+        return pos[0] % self.width, pos[1] % self.height
 
     def out_of_bounds(self, pos: Coordinate) -> bool:
         """
@@ -209,8 +229,7 @@ class MultiGrid:
                     if self.out_of_bounds(coord):
                         if not self.torus:
                             continue
-                        else:
-                            coord = self.torus_adj(coord)
+                        coord = self.torus_adj(coord)
 
                     if coord not in coordinates:
                         coordinates.add(coord)
@@ -249,9 +268,7 @@ class MultiGrid:
         neighbors = self.get_contents(neighborhood)
         return list(itertools.chain.from_iterable(neighbors))
 
-    def neighbor_iter(
-        self, pos: Coordinate, moore: bool = True
-    ) -> Iterator[GridContent]:
+    def neighbor_iter(self, pos: Coordinate, moore: bool = True) -> Iterator[Agent]:
         """ Iterate over position neighbors.
 
         Args:
@@ -294,7 +311,7 @@ class MultiGrid:
     @accept_tuple_argument
     def get_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
-    ) -> List[GridContent]:
+    ) -> List[Agent]:
         """Depreciated"""
         return list(itertools.chain(*self.get_contents(cell_list)))
 
@@ -304,7 +321,6 @@ class MultiGrid:
 
     def move_to_empty(self, agent: Agent) -> None:
         """ Moves agent to a random empty cell, vacating agent's old cell. """
-        pos = agent.pos
         if len(self._empties) == 0:
             raise Exception("ERROR: No empty cells")
         new_pos = agent.random.choice(self.empties)
@@ -326,10 +342,8 @@ class MultiGrid:
         )
 
         if self.exists_empty_cells():
-            pos = random.choice(self.empties)
-            return pos
-        else:
-            return None
+            return random.choice(self.empties)
+        return None
 
     @property
     def empties(self) -> List[Coordinate]:
@@ -353,14 +367,16 @@ class SingleGrid(MultiGrid):
         """
         super().__init__(width, height, torus)
 
-    def __getitem__(self, pos):
+    def __getitem__(self, pos: Coordinate) -> Optional[Agent]:
         if isinstance(pos, int):
             return self._grid[pos]
         x, y = pos
         content = self._grid[x][y]
         return content[0] if content else None
 
-    def position_agent(self, agent, x="random", y="random"):
+    def position_agent(
+        self, agent: Agent, x: Union[str, int] = "random", y: Union[str, int] = "random"
+    ) -> None:
         """ Position an agent on the grid.
         This is used when first placing agents! Use 'move_to_empty()'
         when you want agents to jump to an empty cell.
@@ -373,17 +389,16 @@ class SingleGrid(MultiGrid):
         if x == "random" or y == "random":
             if len(self._empties) == 0:
                 raise Exception("ERROR: Grid full")
-            coords = agent.random.choice(self.empties)
+            coords: Tuple[int, int] = agent.random.choice(self.empties)
         else:
-            coords = (x, y)
+            coords = (int(x), int(y))
         agent.pos = coords
         self.place_agent(agent, coords)
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> Agent:
-        if self.is_cell_empty(pos):
-            return super().place_agent(agent, pos)
-        else:
+        if not self.is_cell_empty(pos):
             raise Exception("Cell not empty")
+        return super().place_agent(agent, pos)
 
     def get_neighbors(
         self,
@@ -416,7 +431,7 @@ class SingleGrid(MultiGrid):
         # return list(itertools.chain.from_iterable(neighbors))
 
     @accept_tuple_argument
-    def get_cell_list_contents(self, cell_list):
+    def get_cell_list_contents(self, cell_list: List[Coordinate]) -> List[Agent]:
         return self.get_contents(cell_list)
 
 
@@ -440,7 +455,7 @@ class Grid(SingleGrid):
         get_neighbors: Returns the objects surrounding a given cell.
     """
 
-    def place_agent(self, agent, pos):
+    def place_agent(self, agent: Agent, pos: Coordinate) -> Agent:
         if not self.is_cell_empty(pos):
             x, y = pos
             self._grid[x][y].clear()

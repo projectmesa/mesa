@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class ContinuousSpace:
     """ Continuous space where each agent can have an arbitrary position.
 
@@ -105,7 +106,7 @@ class ContinuousSpace:
             deltas = np.minimum(deltas, self.size - deltas)
         dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
 
-        idxs, = np.where(dists <= radius ** 2)
+        (idxs,) = np.where(dists <= radius ** 2)
         neighbors = [
             self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0
         ]
@@ -171,4 +172,3 @@ class ContinuousSpace:
         """ Check if a point is out of bounds. """
         x, y = pos
         return x < self.x_min or x >= self.x_max or y < self.y_min or y >= self.y_max
-
