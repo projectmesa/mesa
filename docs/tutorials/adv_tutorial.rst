@@ -310,9 +310,9 @@ context, which is required for doing anything with it.
         // Create the tag:
         var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
         canvas_tag += "style='border:1px dotted'></canvas>";
-        // Append it to body:
+        // Append it to #elements:
         var canvas = $(canvas_tag)[0];
-        $("body").append(canvas);
+        $("#elements").append(canvas);
         // Create the context and the drawing controller:
         var context = canvas.getContext("2d");
     };
@@ -330,14 +330,12 @@ created, we can create the chart object.
 .. code:: javascript
 
     var HistogramModule = function(bins, canvas_width, canvas_height) {
-        // Create the elements
-
         // Create the tag:
         var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
         canvas_tag += "style='border:1px dotted'></canvas>";
-        // Append it to body:
+        // Append it to #elements:
         var canvas = $(canvas_tag)[0];
-        $("body").append(canvas);
+        $("#elements").append(canvas);
         // Create the context and the drawing controller:
         var context = canvas.getContext("2d");
 
