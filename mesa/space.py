@@ -119,7 +119,7 @@ class MultiGrid:
         self._all_cells = frozenset(self._empties)
 
         # Neighborhood Cache
-        self._neighborhood_cache: Dict[Any, List[Coordinate]] = dict()
+        self._neighborhood_cache = dict()  # type: Dict[Any, List[Coordinate]]
 
     def __getitem__(self, pos: Coordinate) -> GridContent:
         """Access contents of a given position."""
@@ -402,7 +402,7 @@ class SingleGrid(MultiGrid):
         if x == "random" or y == "random":
             if len(self._empties) == 0:
                 raise Exception("ERROR: Grid full")
-            coords: Tuple[int, int] = agent.random.choice(self.empties)
+            coords = agent.random.choice(self.empties)  # type: Tuple[int, int]
         else:
             coords = (int(x), int(y))
         agent.pos = coords
