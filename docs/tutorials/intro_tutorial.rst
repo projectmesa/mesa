@@ -201,7 +201,7 @@ code is in ``MoneyModel.py``:
 
 .. code:: python
 
-   from MoneyModel import MoneyModel
+   from money_model import MoneyModel
 
 Then create the model object, and run it for one step:
 
@@ -265,7 +265,7 @@ this step isn’t necessary).
 
 .. code:: python
 
-   from MoneyModel import *
+   from money_model import *
 
 Now let’s create a model with 10 agents, and run it for 10 steps.
 
