@@ -256,7 +256,7 @@ Running your first model
 With that last piece in hand, it’s time for the first rudimentary run of
 the model.
 
-If you’ve written the code in its own file (``MoneyModel.py`` or a
+If you’ve written the code in its own file (``money_model.py`` or a
 different name), launch an interpreter in the same directory as the file
 (either the plain Python command-line interpreter, or the IPython
 interpreter), or launch a Jupyter Notebook there. Then import the
