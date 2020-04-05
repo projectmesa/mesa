@@ -414,7 +414,9 @@ class SingleGrid(Grid):
         """
         super().__init__(width, height, torus)
 
-    def position_agent(self, agent: Agent, x: Union[int, str] = "random", y: Union[int, str] = "random") -> None:
+    def position_agent(
+        self, agent: Agent, x: Union[int, str] = "random", y: Union[int, str] = "random"
+    ) -> None:
         """ Position an agent on the grid.
         This is used when first placing agents! Use 'move_to_empty()'
         when you want agents to jump to an empty cell.
@@ -479,7 +481,9 @@ class MultiGrid(Grid):
             self.empties.add(pos)
 
     @accept_tuple_argument
-    def iter_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> Iterator[GridContent]:
+    def iter_cell_list_contents(
+        self, cell_list: Iterable[Coordinate]
+    ) -> Iterator[GridContent]:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -512,9 +516,9 @@ class HexGrid(Grid):
 
     """
 
-
-    def iter_neighborhood(self, pos: Coordinate,
-                          include_center: bool = False, radius: int = 1) -> Iterator[Coordinate]:
+    def iter_neighborhood(
+        self, pos: Coordinate, include_center: bool = False, radius: int = 1
+    ) -> Iterator[Coordinate]:
         """ Return an iterator over cell coordinates that are in the
         neighborhood of a certain point.
 
@@ -586,8 +590,9 @@ class HexGrid(Grid):
         neighborhood = self.iter_neighborhood(pos)
         return self.iter_cell_list_contents(neighborhood)
 
-    def get_neighborhood(self, pos: Coordinate,
-                         include_center: bool = False, radius: int = 1) -> List[Coordinate]:
+    def get_neighborhood(
+        self, pos: Coordinate, include_center: bool = False, radius: int = 1
+    ) -> List[Coordinate]:
         """ Return a list of cells that are in the neighborhood of a
         certain point.
 
@@ -604,8 +609,9 @@ class HexGrid(Grid):
         """
         return list(self.iter_neighborhood(pos, include_center, radius))
 
-    def iter_neighbors(self, pos: Coordinate,
-                       include_center: bool = False, radius: int = 1) -> Iterator[GridContent]:
+    def iter_neighbors(
+        self, pos: Coordinate, include_center: bool = False, radius: int = 1
+    ) -> Iterator[GridContent]:
         """ Return an iterator over neighbors to a certain point.
 
         Args:
@@ -622,8 +628,9 @@ class HexGrid(Grid):
         neighborhood = self.iter_neighborhood(pos, include_center, radius)
         return self.iter_cell_list_contents(neighborhood)
 
-    def get_neighbors(self, pos: Coordinate,
-                      include_center: bool = False, radius: int = 1) -> List[Coordinate]:
+    def get_neighbors(
+        self, pos: Coordinate, include_center: bool = False, radius: int = 1
+    ) -> List[Coordinate]:
         """ Return a list of neighbors to a certain point.
 
         Args:
@@ -651,7 +658,14 @@ class ContinuousSpace:
 
     _grid = None
 
-    def __init__(self, x_max: float, y_max: float, torus: bool, x_min: float = 0, y_min: float = 0) -> None:
+    def __init__(
+        self,
+        x_max: float,
+        y_max: float,
+        torus: bool,
+        x_min: float = 0,
+        y_min: float = 0,
+    ) -> None:
         """ Create a new continuous space.
 
         Args:
@@ -728,7 +742,9 @@ class ContinuousSpace:
         del self._index_to_agent[max_idx]
         agent.pos = None
 
-    def get_neighbors(self, pos: FloatCoordinate, radius: float, include_center: bool = True) -> List[GridContent]:
+    def get_neighbors(
+        self, pos: FloatCoordinate, radius: float, include_center: bool = True
+    ) -> List[GridContent]:
         """ Get all objects within a certain radius.
 
         Args:
@@ -751,7 +767,9 @@ class ContinuousSpace:
         ]
         return neighbors
 
-    def get_heading(self, pos_1: FloatCoordinate, pos_2: FloatCoordinate) -> FloatCoordinate:
+    def get_heading(
+        self, pos_1: FloatCoordinate, pos_2: FloatCoordinate
+    ) -> FloatCoordinate:
         """ Get the heading angle between two points, accounting for toroidal space.
 
         Args:
@@ -864,5 +882,9 @@ class NetworkGrid:
         return list(self.iter_cell_list_contents(self.G))
 
     def iter_cell_list_contents(self, cell_list: List[int]) -> List[GridContent]:
-        list_of_lists = [self.G.nodes[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
+        list_of_lists = [
+            self.G.nodes[node_id]["agent"]
+            for node_id in cell_list
+            if not self.is_cell_empty(node_id)
+        ]
         return [item for sublist in list_of_lists for item in sublist]
