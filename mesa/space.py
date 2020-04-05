@@ -18,10 +18,13 @@ import itertools
 
 import numpy as np
 
-from typing import Iterable, Iterator, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
 from .agent import Agent
+
 Coordinate = Tuple[int, int]
 GridContent = Union[Optional[Agent], Set[Agent]]
+# used in ContinuousSpace
+FloatCoordinate = Union[Tuple[float, float], np.ndarray]
 
 
 def accept_tuple_argument(wrapped_function):
@@ -31,7 +34,7 @@ def accept_tuple_argument(wrapped_function):
 
     """
 
-    def wrapper(*args):
+    def wrapper(*args: Any):
         if isinstance(args[1], tuple) and len(args[1]) == 2:
             return wrapped_function(args[0], [args[1]])
         else:
@@ -382,7 +385,7 @@ class SingleGrid(Grid):
         """
         super().__init__(width, height, torus)
 
-    def position_agent(self, agent, x="random", y="random"):
+    def position_agent(self, agent: Agent, x: Union[int, str] = "random", y: Union[int, str] = "random") -> None:
         """ Position an agent on the grid.
         This is used when first placing agents! Use 'move_to_empty()'
         when you want agents to jump to an empty cell.
@@ -429,7 +432,7 @@ class MultiGrid(Grid):
     """
 
     @staticmethod
-    def default_val():
+    def default_val() -> Set[Agent]:
         """ Default value for new cell elements. """
         return set()
 
@@ -447,7 +450,7 @@ class MultiGrid(Grid):
             self.empties.add(pos)
 
     @accept_tuple_argument
-    def iter_cell_list_contents(self, cell_list):
+    def iter_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> Iterator[GridContent]:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -479,8 +482,8 @@ class HexGrid(Grid):
 
     """
 
-    def iter_neighborhood(self, pos,
-                          include_center=False, radius=1):
+    def iter_neighborhood(self, pos: Coordinate,
+                          include_center: bool = False, radius: int = 1) -> Iterator[Coordinate]:
         """ Return an iterator over cell coordinates that are in the
         neighborhood of a certain point.
 
@@ -498,12 +501,12 @@ class HexGrid(Grid):
 
         """
 
-        def torus_adj_2d(pos):
+        def torus_adj_2d(pos: Coordinate) -> Coordinate:
             return (pos[0] % self.width, pos[1] % self.height)
 
         coordinates = set()
 
-        def find_neighbors(pos, radius):
+        def find_neighbors(pos: Coordinate, radius: int) -> None:
             x, y = pos
 
             """
@@ -544,7 +547,7 @@ class HexGrid(Grid):
         for i in coordinates:
             yield i
 
-    def neighbor_iter(self, pos):
+    def neighbor_iter(self, pos: Coordinate) -> Iterator[GridContent]:
         """ Iterate over position neighbors.
 
         Args:
@@ -554,8 +557,8 @@ class HexGrid(Grid):
         neighborhood = self.iter_neighborhood(pos)
         return self.iter_cell_list_contents(neighborhood)
 
-    def get_neighborhood(self, pos,
-                         include_center=False, radius=1):
+    def get_neighborhood(self, pos: Coordinate,
+                         include_center: bool = False, radius: int = 1) -> List[Coordinate]:
         """ Return a list of cells that are in the neighborhood of a
         certain point.
 
@@ -572,8 +575,8 @@ class HexGrid(Grid):
         """
         return list(self.iter_neighborhood(pos, include_center, radius))
 
-    def iter_neighbors(self, pos,
-                       include_center=False, radius=1):
+    def iter_neighbors(self, pos: Coordinate,
+                       include_center: bool = False, radius: int = 1) -> Iterator[GridContent]:
         """ Return an iterator over neighbors to a certain point.
 
         Args:
@@ -591,8 +594,8 @@ class HexGrid(Grid):
             pos, include_center, radius)
         return self.iter_cell_list_contents(neighborhood)
 
-    def get_neighbors(self, pos,
-                      include_center=False, radius=1):
+    def get_neighbors(self, pos: Coordinate,
+                      include_center: bool = False, radius: int = 1) -> List[Coordinate]:
         """ Return a list of neighbors to a certain point.
 
         Args:
@@ -620,7 +623,7 @@ class ContinuousSpace:
     """
     _grid = None
 
-    def __init__(self, x_max, y_max, torus, x_min=0, y_min=0):
+    def __init__(self, x_max: float, y_max: float, torus: bool, x_min: float = 0, y_min: float = 0) -> None:
         """ Create a new continuous space.
 
         Args:
@@ -642,10 +645,10 @@ class ContinuousSpace:
         self.torus = torus
 
         self._agent_points = None
-        self._index_to_agent = {}
-        self._agent_to_index = {}
+        self._index_to_agent = {}  # type: Dict[int, Agent]
+        self._agent_to_index = {}  # type: Dict[Agent, int]
 
-    def place_agent(self, agent, pos):
+    def place_agent(self, agent: Agent, pos: FloatCoordinate) -> None:
         """ Place a new agent in the space.
 
         Args:
@@ -662,7 +665,7 @@ class ContinuousSpace:
         self._agent_to_index[agent] = self._agent_points.shape[0] - 1
         agent.pos = pos
 
-    def move_agent(self, agent, pos):
+    def move_agent(self, agent: Agent, pos: FloatCoordinate) -> None:
         """ Move an agent from its current position to a new position.
 
         Args:
@@ -676,7 +679,7 @@ class ContinuousSpace:
         self._agent_points[idx, 1] = pos[1]
         agent.pos = pos
 
-    def remove_agent(self, agent):
+    def remove_agent(self, agent: Agent) -> None:
         """ Remove an agent from the simulation.
 
         Args:
@@ -697,7 +700,7 @@ class ContinuousSpace:
         del self._index_to_agent[max_idx]
         agent.pos = None
 
-    def get_neighbors(self, pos, radius, include_center=True):
+    def get_neighbors(self, pos: FloatCoordinate, radius: float, include_center: bool = True) -> List[GridContent]:
         """ Get all objects within a certain radius.
 
         Args:
@@ -718,7 +721,7 @@ class ContinuousSpace:
         neighbors = [self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0]
         return neighbors
 
-    def get_heading(self, pos_1, pos_2):
+    def get_heading(self, pos_1: FloatCoordinate, pos_2: FloatCoordinate) -> FloatCoordinate:
         """ Get the heading angle between two points, accounting for toroidal space.
 
         Args:
@@ -734,7 +737,7 @@ class ContinuousSpace:
             heading = tuple(heading)
         return heading
 
-    def get_distance(self, pos_1, pos_2):
+    def get_distance(self, pos_1: FloatCoordinate, pos_2: FloatCoordinate) -> float:
         """ Get the distance between two point, accounting for toroidal space.
 
         Args:
@@ -751,7 +754,7 @@ class ContinuousSpace:
             dy = min(dy, self.height - dy)
         return np.sqrt(dx * dx + dy * dy)
 
-    def torus_adj(self, pos):
+    def torus_adj(self, pos: FloatCoordinate) -> FloatCoordinate:
         """ Adjust coordinates to handle torus looping.
 
         If the coordinate is out-of-bounds and the space is toroidal, return
@@ -774,7 +777,7 @@ class ContinuousSpace:
             else:
                 return np.array((x, y))
 
-    def out_of_bounds(self, pos):
+    def out_of_bounds(self, pos: FloatCoordinate) -> bool:
         """ Check if a point is out of bounds. """
         x, y = pos
         return (x < self.x_min or x >= self.x_max or
@@ -784,18 +787,18 @@ class ContinuousSpace:
 class NetworkGrid:
     """ Network Grid where each node contains zero or more agents. """
 
-    def __init__(self, G):
+    def __init__(self, G: Any) -> None:
         self.G = G
         for node_id in self.G.nodes:
             G.nodes[node_id]['agent'] = list()
 
-    def place_agent(self, agent, node_id):
+    def place_agent(self, agent: Agent, node_id: int) -> None:
         """ Place a agent in a node. """
 
         self._place_agent(agent, node_id)
         agent.pos = node_id
 
-    def get_neighbors(self, node_id, include_center=False):
+    def get_neighbors(self, node_id: int, include_center: bool = False) -> List[int]:
         """ Get all adjacent nodes """
 
         neighbors = list(self.G.neighbors(node_id))
@@ -804,33 +807,33 @@ class NetworkGrid:
 
         return neighbors
 
-    def move_agent(self, agent, node_id):
+    def move_agent(self, agent: Agent, node_id: int) -> None:
         """ Move an agent from its current node to a new node. """
 
         self._remove_agent(agent, agent.pos)
         self._place_agent(agent, node_id)
         agent.pos = node_id
 
-    def _place_agent(self, agent, node_id):
+    def _place_agent(self, agent: Agent, node_id: int) -> None:
         """ Place the agent at the correct node. """
 
         self.G.nodes[node_id]['agent'].append(agent)
 
-    def _remove_agent(self, agent, node_id):
+    def _remove_agent(self, agent: Agent, node_id: int) -> None:
         """ Remove an agent from a node. """
 
         self.G.nodes[node_id]['agent'].remove(agent)
 
-    def is_cell_empty(self, node_id):
+    def is_cell_empty(self, node_id: int) -> bool:
         """ Returns a bool of the contents of a cell. """
         return not self.G.nodes[node_id]['agent']
 
-    def get_cell_list_contents(self, cell_list):
+    def get_cell_list_contents(self, cell_list: List[int]) -> List[GridContent]:
         return list(self.iter_cell_list_contents(cell_list))
 
-    def get_all_cell_contents(self):
+    def get_all_cell_contents(self) -> List[GridContent]:
         return list(self.iter_cell_list_contents(self.G))
 
-    def iter_cell_list_contents(self, cell_list):
+    def iter_cell_list_contents(self, cell_list: List[int]) -> List[GridContent]:
         list_of_lists = [self.G.nodes[node_id]['agent'] for node_id in cell_list if not self.is_cell_empty(node_id)]
         return [item for sublist in list_of_lists for item in sublist]
