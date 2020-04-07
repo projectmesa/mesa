@@ -216,7 +216,7 @@ class DataCollector:
         rep_names = [rep_name for rep_name in self.agent_reporters]
 
         df = pd.DataFrame.from_records(
-            data=all_records, columns=["Step", "AgentID"] + rep_names
+            data=all_records, columns=["Step", "AgentID"] + rep_names,
         )
         df = df.set_index(["Step", "AgentID"])
         return df
