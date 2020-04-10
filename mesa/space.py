@@ -132,6 +132,15 @@ class MultiGrid:
         x, y = pos
         return self._grid[x][y]
 
+    def _get(self, pos: Coordinate) -> GridContent:
+        """Access content of a given position. 
+        
+        Since we overwrite __getitem__ for SingleGrid and Grid,
+        we have to use this function to always get the internal list.
+        """
+        x, y = pos
+        return self._grid[x][y]
+
     def __setitem__(self, pos: Coordinate, agent: Agent) -> None:
         """Add agents to a position."""
         x, y = pos
@@ -161,19 +170,18 @@ class MultiGrid:
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> Agent:
         """Position an agent on the grid, and set its pos variable."""
-        x, y = pos
-        self._grid[x][y].append(agent)
+        self._get(pos).append(agent)
         self._empties.discard(pos)
         setattr(agent, "pos", pos)
         return agent
 
     def remove_agent(self, agent: Agent) -> Agent:
         """Remove the agent from the grid and set its pos variable to None."""
-        x, y = getattr(agent, "pos")
-        content = self._grid[x][y]
+        pos = getattr(agent, "pos")
+        content = self._get(pos)
         content.remove(agent)
         if not content:
-            self._empties.add((x, y))
+            self._empties.add(pos)
         setattr(agent, "pos", None)
         return agent
 
@@ -379,8 +387,7 @@ class SingleGrid(MultiGrid):
         if isinstance(pos, int):
             warnings.warn("depreciated")
             return [content[0] for content in self._grid[pos] if content]
-        x, y = pos
-        content = self._grid[x][y]
+        content = self._get(pos)
         return content[0] if content else None
 
     def get_contents(self, cell_list: Iterable[Coordinate]) -> List[Agent]:
@@ -470,8 +477,7 @@ class Grid(SingleGrid):
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> Agent:
         if not self.is_cell_empty(pos):
-            x, y = pos
-            self._grid[x][y].clear()
+            self._get(pos).clear()
             self._empties.add(pos)
         return super().place_agent(agent, pos)
 
