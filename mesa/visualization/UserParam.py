@@ -1,4 +1,3 @@
-
 class UserSettableParameter:
     """ A class for providing options to a visualization for a given parameter.
 
@@ -36,19 +35,26 @@ class UserSettableParameter:
         static_text = UserSettableParameter('static_text', value="This is a descriptive textbox")
      """
 
-    NUMBER = 'number'
-    CHECKBOX = 'checkbox'
-    CHOICE = 'choice'
-    SLIDER = 'slider'
-    STATIC_TEXT = 'static_text'
+    NUMBER = "number"
+    CHECKBOX = "checkbox"
+    CHOICE = "choice"
+    SLIDER = "slider"
+    STATIC_TEXT = "static_text"
 
     TYPES = (NUMBER, CHECKBOX, CHOICE, SLIDER, STATIC_TEXT)
 
     _ERROR_MESSAGE = "Missing or malformed inputs for '{}' Option '{}'"
 
     def __init__(
-        self, param_type=None, name='', value=None, min_value=None, max_value=None,
-            step=1, choices=list(), description=None
+        self,
+        param_type=None,
+        name="",
+        value=None,
+        min_value=None,
+        max_value=None,
+        step=1,
+        choices=list(),
+        description=None,
     ):
         if param_type not in self.TYPES:
             raise ValueError("{} is not a valid Option type".format(param_type))
@@ -69,7 +75,9 @@ class UserSettableParameter:
             valid = not (self.value is None)
 
         elif self.param_type == self.SLIDER:
-            valid = not (self.value is None or self.min_value is None or self.max_value is None)
+            valid = not (
+                self.value is None or self.min_value is None or self.max_value is None
+            )
 
         elif self.param_type == self.CHOICE:
             valid = not (self.value is None or len(self.choices) == 0)
@@ -97,11 +105,15 @@ class UserSettableParameter:
                 self._value = self.max_value
         elif self.param_type == self.CHOICE:
             if self._value not in self.choices:
-                print("Selected choice value not in available choices, selected first choice from 'choices' list")
+                print(
+                    "Selected choice value not in available choices, selected first choice from 'choices' list"
+                )
                 self._value = self.choices[0]
 
     @property
     def json(self):
         result = self.__dict__.copy()
-        result['value'] = result.pop('_value')  # Return _value as value, value is the same
+        result["value"] = result.pop(
+            "_value"
+        )  # Return _value as value, value is the same
         return result
