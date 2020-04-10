@@ -19,7 +19,7 @@ script:
   # * E123 - indentation on data structures
   # * W504 - line break after binary operator
   - flake8 . --ignore=F403,E501,E123,E128,W504 --exclude=docs,build
-  - py.test --cov=mesa tests/ --cov-report=xml
+  - py.test --cov=mesa tests/ --cov-report=xml -W ignore::DeprecationWarning 
   # - ./tests/test_end_to_end_viz.sh  # needs to be investigated on why this took forever
 after_success:
   - codecov

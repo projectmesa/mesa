@@ -41,13 +41,14 @@ from typing import (
     cast,
 )
 
-from deprecated import deprecated
 import numpy as np
 
 from mesa.agent import Agent
 
 Coordinate = Tuple[int, int]
 GridContent = List[Agent]
+# used in ContinuousSpace
+FloatCoordinate = Union[Tuple[float, float], np.ndarray]
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -121,17 +122,18 @@ class MultiGrid:
         self._neighborhood_cache = dict()  # type: Dict[Any, List[Coordinate]]
 
     @staticmethod
-    @deprecated
     def default_val() -> None:
         """Default value for new cell elements. """
+        warnings.warn("Not supported anymore", DeprecationWarning)
         return None
 
     def __getitem__(self, pos: Coordinate) -> GridContent:
         """Access contents of a given position."""
         if isinstance(pos, int):
             warnings.warn(
-                """Accesing the grid via `grid[x][y]` is depreciated.
-                Use `grid[x, y]` instead."""
+                """Accesing the grid via `grid[x][y]` is deprecated.
+                Use `grid[x, y]` instead.""",
+                category=DeprecationWarning,
             )
             return self._grid[pos]
         x, y = pos
@@ -143,8 +145,8 @@ class MultiGrid:
         self._grid[x][y].append(agent)
 
     def _get(self, pos: Coordinate) -> GridContent:
-        """Access content of a given position. 
-        
+        """Access content of a given position.
+
         Since we overwrite __getitem__ for SingleGrid and Grid,
         we have to use this function to always get the internal list.
         """
@@ -176,7 +178,6 @@ class MultiGrid:
         agents = itertools.chain.from_iterable(contents)
         return list(agents)
 
-    @deprecated
     def neighbor_iter(
         self, pos: Coordinate, moore: bool = True
     ) -> Iterator[GridContent]:
@@ -188,9 +189,12 @@ class MultiGrid:
                    diagonals) or Von Neumann (only up/down/left/right).
 
         """
+        warnings.warn(
+            "`neighbor_iter` is deprecated, use `get_neighbors` instead",
+            DeprecationWarning,
+        )
         yield from self.get_neighbors(pos, moore=moore)
 
-    @deprecated
     def iter_neighborhood(
         self,
         pos: Coordinate,
@@ -218,6 +222,9 @@ class MultiGrid:
             including the center).
 
         """
+        warnings.warn(
+            "`iter_neighborhood` is deprecated, use `get_neighborhood` instead."
+        )
         yield from self.get_neighborhood(pos, moore, include_center, radius)
 
     def get_neighborhood(
@@ -299,6 +306,10 @@ class MultiGrid:
             (8 and 4 if not including the center).
 
         """
+        warnings.warn(
+            "`iter_neighbors` is deprecated, use `get_neighbors` instead",
+            DeprecationWarning,
+        )
         neighborhood = self.get_neighborhood(pos, moore, include_center, radius)
         yield from self.get_agents(neighborhood)
 
@@ -347,7 +358,6 @@ class MultiGrid:
         x, y = pos
         return x < 0 or x >= self.width or y < 0 or y >= self.height
 
-    @deprecated
     @accept_tuple_argument
     def iter_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
@@ -360,6 +370,10 @@ class MultiGrid:
             An iterator of the contents of the cells identified in cell_list
 
         """
+        warnings.warn(
+            "`iter_cell_list_contents is deprecated, use `get_agents` instead",
+            DeprecationWarning,
+        )
         yield from self.get_agents(cell_list)
 
     @accept_tuple_argument
@@ -374,6 +388,10 @@ class MultiGrid:
             A list of the contents of the cells identified in cell_list
 
         """
+        warnings.warn(
+            "`iter_cell_list_contents is deprecated, use `get_agents` instead",
+            DeprecationWarning,
+        )
         return self.get_agents(cell_list)
 
     def move_agent(self, agent: Agent, pos: Coordinate) -> Agent:
@@ -440,7 +458,6 @@ class MultiGrid:
         else:
             return None
 
-    @deprecated
     def exists_empty_cells(self) -> bool:
         """ Return True if any cells empty else False. """
         return len(self.empties) > 0
