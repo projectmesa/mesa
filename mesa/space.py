@@ -136,22 +136,19 @@ class MultiGrid:
                 category=DeprecationWarning,
             )
             return self._grid[pos]
-        x, y = pos
-        return self._grid[x][y]
+        return self._get(*pos)
 
     def __setitem__(self, pos: Coordinate, agent: Agent) -> None:
         """Add agents to a position."""
-        x, y = pos
-        self._grid[x][y].append(agent)
+        self._get(*pos).append(agent)
 
-    def _get(self, pos: Coordinate) -> GridContent:
+    def _get(self, row: int, col: int) -> GridContent:
         """Access content of a given position.
 
         Since we overwrite __getitem__ for SingleGrid and Grid,
         we have to use this function to always get the internal list.
         """
-        x, y = pos
-        return self._grid[x][y]
+        return self._grid[row][col]
 
     def __iter__(self) -> Iterator[GridContent]:
         """
@@ -316,7 +313,7 @@ class MultiGrid:
     def get_neighbors(
         self,
         pos: Coordinate,
-        moore: bool,
+        moore: bool = True,
         include_center: bool = False,
         radius: int = 1,
     ) -> List[Agent]:
@@ -411,7 +408,7 @@ class MultiGrid:
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """ Position an agent on the grid, and set its pos variable. """
-        self._get(pos).append(agent)
+        self._get(*pos).append(agent)
         self._empties.discard(pos)
         setattr(agent, "pos", pos)
         return agent
@@ -419,7 +416,7 @@ class MultiGrid:
     def remove_agent(self, agent: Agent) -> None:
         """ Remove the agent from the grid and set its pos variable to None. """
         pos = getattr(agent, "pos")
-        content = self._get(pos)
+        content = self._get(*pos)
         content.remove(agent)
         if not content:
             self._empties.add(pos)
@@ -486,9 +483,12 @@ class SingleGrid(MultiGrid):
 
     def __getitem__(self, pos: Coordinate) -> Optional[Agent]:
         if isinstance(pos, int):
-            warnings.warn("depreciated")
-            return [content[0] for content in self._grid[pos] if content]
-        content = self._get(pos)
+            warnings.warn(
+                """Accesing the grid via `grid[x][y]` is deprecated.
+                Use `grid[x, y]` instead.""",
+                category=DeprecationWarning,
+            )
+        content = self._get(*pos)
         return content[0] if content else None
 
     def position_agent(
@@ -523,7 +523,7 @@ class Grid(SingleGrid):
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> Agent:
         if not self.is_cell_empty(pos):
-            self._get(pos).clear()
+            self._get(*pos).clear()
             self._empties.add(pos)
         return super().place_agent(agent, pos)
 
