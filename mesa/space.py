@@ -425,7 +425,7 @@ class MultiGrid:
 
     def is_cell_empty(self, pos: Coordinate) -> bool:
         """ Returns a bool of the contents of a cell. """
-        return pos in self._empties
+        return not bool(self._get(*pos))
 
     def move_to_empty(self, agent: Agent) -> None:
         """ Moves agent to a random empty cell, vacating agent's old cell. """
@@ -515,7 +515,7 @@ class SingleGrid(MultiGrid):
     @accept_tuple_argument
     def get_agents(self, cell_list: Iterable[Coordinate]) -> List[Agent]:
         """Return a list of agents from the given cell list."""
-        return [self[pos] for pos in cell_list if self[pos]]
+        return list(filter(None, self.get_contents(cell_list)))
 
 
 class Grid(SingleGrid):
