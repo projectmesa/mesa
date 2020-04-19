@@ -105,8 +105,48 @@ class Grid:
         """ Default value for new cell elements. """
         return None
 
-    def __getitem__(self, index: int) -> List[GridContent]:
-        return self.grid[index]
+    def __getitem__(
+        self,
+        index: Union[int, Tuple[int, int], Tuple[slice, slice], Tuple[Coordinate]],
+    ) -> Union[List[GridContent], GridContent]:
+
+        if isinstance(index, int):
+            # grid[x]
+            return self.grid[index]
+
+        if isinstance(index[0], tuple):
+            # grid[(x1, y1), (x2, y2)]
+            cells = []
+            for pos in index:
+                x, y = self.torus_adj(pos)
+                cells.append(self.grid[x][y])
+            return cells
+
+        x, y = index
+
+        if isinstance(x, int) and isinstance(y, int):
+            # grid[x, y]
+            x, y = self.torus_adj(index)
+            return self.grid[x][y]
+
+        if isinstance(x, int):
+            # grid[x, :]
+            x, _ = self.torus_adj((x, 0))
+            x = slice(x, x + 1)
+
+        if isinstance(y, int):
+            # grid[:, y]
+            _, y = self.torus_adj((0, y))
+            y = slice(y, y + 1)
+
+        # grid[:, :]
+        cells = []
+        for rows in self.grid[x]:
+            for cell in rows[y]:
+                cells.append(cell)
+        return cells
+
+        raise IndexError
 
     def __iter__(self) -> Iterator[GridContent]:
         """
