@@ -135,7 +135,7 @@ class Grid:
                    diagonals) or Von Neumann (only up/down/left/right).
 
         """
-        neighborhood = self.iter_neighborhood(pos, moore=moore)
+        neighborhood = self.get_neighborhood(pos, moore=moore)
         return self.iter_cell_list_contents(neighborhood)
 
     def iter_neighborhood(
@@ -249,7 +249,7 @@ class Grid:
             (8 and 4 if not including the center).
 
         """
-        neighborhood = self.iter_neighborhood(pos, moore, include_center, radius)
+        neighborhood = self.get_neighborhood(pos, moore, include_center, radius)
         return self.iter_cell_list_contents(neighborhood)
 
     def get_neighbors(
