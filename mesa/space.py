@@ -310,10 +310,7 @@ class Grid:
             An iterator of the contents of the cells identified in cell_list
 
         """
-        for (x, y) in cell_list:
-            content = self.grid[x][y]
-            if not content == self.default_val():
-                yield content
+        return filter(None, (self.grid[x][y] for x, y in cell_list))
 
     @accept_tuple_argument
     def get_cell_list_contents(
