@@ -18,10 +18,10 @@ Release History
 * Added Coverall to Codecov in Contributing file #734
 * Makes opening the browser optional when launching the server #755 #754
 * NetworkGrid: Update to networkx 2.4 API #763
-    * Fixes: Virus on Network example incompatible with networkx >= 2.4 #749
 * Apply black to mesa/ directory #775
 * Updated travis to 3.8 and updated gitignore #777
 * Add information (to docstring) on image as agent portrayal shape #791
+* Change grid empties from list to set #649 (improves speed)
 * Adding mypy annotation
     * space: Add type annotation to Grid class #779
     * add Mypy annotation to time, agent, and model #792
@@ -42,7 +42,6 @@ Release History
 
 **Fixes**
 
-* Changes empties from list to set #649 (improves speed)
 * Fixes link to update code coverage module - Updates Removing last link to coveralls and replacing to codecoverage #748
 * Fixes D3 Network Visualization to update (rather than overwrite) #765 #767
 * Fix parameter order in initializing SingleGrid object #770 #769
