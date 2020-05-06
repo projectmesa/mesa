@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-0.8.7 (2020-05-XX) Lake Havasu City
+0.8.7 (2020-05-05) Mammoth
 +++++++++++++++++++++++++++++++++++++++++++
 
 **Improvements**
