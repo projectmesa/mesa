@@ -6,15 +6,15 @@ from .cell import Cell
 
 
 class ConwaysGameOfLife(Model):
-    '''
+    """
     Represents the 2-dimensional array of cells in Conway's
     Game of Life.
-    '''
+    """
 
     def __init__(self, height=50, width=50):
-        '''
+        """
         Create a new playing area of (height, width) cells.
-        '''
+        """
 
         # Set up the grid and schedule.
 
@@ -39,7 +39,7 @@ class ConwaysGameOfLife(Model):
         self.running = True
 
     def step(self):
-        '''
+        """
         Have the scheduler advance each cell by one step
-        '''
+        """
         self.schedule.step()

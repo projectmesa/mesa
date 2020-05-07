@@ -252,10 +252,7 @@ class ModularServer(tornado.web.Application):
         "template_path": os.path.dirname(__file__) + "/templates",
     }
 
-    EXCLUDE_LIST = (
-        "width",
-        "height",
-    )
+    EXCLUDE_LIST = ("width", "height")
 
     def __init__(
         self, model_cls, visualization_elements, name="Mesa Model", model_params={}

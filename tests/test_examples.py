@@ -7,21 +7,21 @@ import importlib
 
 
 def classcase(name):
-    return ''.join(x.capitalize() for x in name.replace('-', '_').split('_'))
+    return "".join(x.capitalize() for x in name.replace("-", "_").split("_"))
 
 
 class TestExamples(unittest.TestCase):
-    '''
+    """
     Test examples' models.  This creates a model object and iterates it through
     some steps.  The idea is to get code coverage, rather than to test the
     details of each example's model.
-    '''
+    """
 
-    EXAMPLES = os.path.abspath(os.path.join(os.path.dirname(__file__), '../examples'))
+    EXAMPLES = os.path.abspath(os.path.join(os.path.dirname(__file__), "../examples"))
 
     @contextlib.contextmanager
     def active_example_dir(self, example):
-        'save and restore sys.path and sys.modules'
+        "save and restore sys.path and sys.modules"
         old_sys_path = sys.path[:]
         old_sys_modules = sys.modules.copy()
         old_cwd = os.getcwd()
@@ -42,7 +42,7 @@ class TestExamples(unittest.TestCase):
         for example in os.listdir(self.EXAMPLES):
             if not os.path.isdir(os.path.join(self.EXAMPLES, example)):
                 continue
-            if hasattr(self, 'test_{}'.format(example.replace('-', '_'))):
+            if hasattr(self, "test_{}".format(example.replace("-", "_"))):
                 # non-standard example; tested below
                 continue
 
@@ -50,13 +50,17 @@ class TestExamples(unittest.TestCase):
             with self.active_example_dir(example):
                 try:
                     # model.py at the top level
-                    mod = importlib.import_module('model')
-                    server = importlib.import_module('server')
+                    mod = importlib.import_module("model")
+                    server = importlib.import_module("server")
                     server.server.render_model()
                 except ImportError:
                     # <example>/model.py
-                    mod = importlib.import_module('{}.model'.format(example.replace('-', '_')))
-                    server = importlib.import_module('{}.server'.format(example.replace('-', '_')))
+                    mod = importlib.import_module(
+                        "{}.model".format(example.replace("-", "_"))
+                    )
+                    server = importlib.import_module(
+                        "{}.server".format(example.replace("-", "_"))
+                    )
                     server.server.render_model()
                 Model = getattr(mod, classcase(example))
                 model = Model()

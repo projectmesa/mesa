@@ -5,18 +5,19 @@ from mesa.datacollection import DataCollector
 
 
 class SchellingAgent(Agent):
-    '''
+    """
     Schelling segregation agent
-    '''
+    """
+
     def __init__(self, pos, model, agent_type):
-        '''
+        """
          Create a new Schelling agent.
 
          Args:
             unique_id: Unique identifier for the agent.
             x, y: Agent initial location.
             agent_type: Indicator for the agent's type (minority=1, majority=0)
-        '''
+        """
         super().__init__(pos, model)
         self.pos = pos
         self.type = agent_type
@@ -35,13 +36,13 @@ class SchellingAgent(Agent):
 
 
 class Schelling(Model):
-    '''
+    """
     Model class for the Schelling segregation model.
-    '''
+    """
 
     def __init__(self, height=20, width=20, density=0.8, minority_pc=0.2, homophily=3):
-        '''
-        '''
+        """
+        """
 
         self.height = height
         self.width = width
@@ -56,7 +57,8 @@ class Schelling(Model):
         self.datacollector = DataCollector(
             {"happy": "happy"},  # Model-level count of happy agents
             # For testing purposes, agent's individual x and y
-            {"x": lambda a: a.pos[0], "y": lambda a: a.pos[1]})
+            {"x": lambda a: a.pos[0], "y": lambda a: a.pos[1]},
+        )
 
         # Set up agents
         # We use a grid iterator that returns
@@ -79,9 +81,9 @@ class Schelling(Model):
         self.datacollector.collect(self)
 
     def step(self):
-        '''
+        """
         Run one step of the model. If All agents are happy, halt the model.
-        '''
+        """
         self.happy = 0  # Reset counter of happy agents
         self.schedule.step()
         # collect data

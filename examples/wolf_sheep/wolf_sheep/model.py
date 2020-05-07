@@ -1,4 +1,4 @@
-'''
+"""
 Wolf-Sheep Predation Model
 ================================
 
@@ -7,7 +7,7 @@ Replication of the model found in NetLogo:
     http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation.
     Center for Connected Learning and Computer-Based Modeling,
     Northwestern University, Evanston, IL.
-'''
+"""
 
 from mesa import Model
 from mesa.space import MultiGrid
@@ -18,9 +18,9 @@ from wolf_sheep.schedule import RandomActivationByBreed
 
 
 class WolfSheep(Model):
-    '''
+    """
     Wolf-Sheep Predation Model
-    '''
+    """
 
     height = 20
     width = 20
@@ -39,14 +39,24 @@ class WolfSheep(Model):
 
     verbose = False  # Print-monitoring
 
-    description = 'A model for simulating wolf and sheep (predator-prey) ecosystem modelling.'
+    description = (
+        "A model for simulating wolf and sheep (predator-prey) ecosystem modelling."
+    )
 
-    def __init__(self, height=20, width=20,
-                 initial_sheep=100, initial_wolves=50,
-                 sheep_reproduce=0.04, wolf_reproduce=0.05,
-                 wolf_gain_from_food=20,
-                 grass=False, grass_regrowth_time=30, sheep_gain_from_food=4):
-        '''
+    def __init__(
+        self,
+        height=20,
+        width=20,
+        initial_sheep=100,
+        initial_wolves=50,
+        sheep_reproduce=0.04,
+        wolf_reproduce=0.05,
+        wolf_gain_from_food=20,
+        grass=False,
+        grass_regrowth_time=30,
+        sheep_gain_from_food=4,
+    ):
+        """
         Create a new Wolf-Sheep model with the given parameters.
 
         Args:
@@ -59,7 +69,7 @@ class WolfSheep(Model):
             grass_regrowth_time: How long it takes for a grass patch to regrow
                                  once it is eaten
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
-        '''
+        """
         super().__init__()
         # Set parameters
         self.height = height
@@ -76,8 +86,11 @@ class WolfSheep(Model):
         self.schedule = RandomActivationByBreed(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
         self.datacollector = DataCollector(
-            {"Wolves": lambda m: m.schedule.get_breed_count(Wolf),
-             "Sheep": lambda m: m.schedule.get_breed_count(Sheep)})
+            {
+                "Wolves": lambda m: m.schedule.get_breed_count(Wolf),
+                "Sheep": lambda m: m.schedule.get_breed_count(Sheep),
+            }
+        )
 
         # Create sheep:
         for i in range(self.initial_sheep):
@@ -108,8 +121,7 @@ class WolfSheep(Model):
                 else:
                     countdown = self.random.randrange(self.grass_regrowth_time)
 
-                patch = GrassPatch(self.next_id(), (x, y), self,
-                                   fully_grown, countdown)
+                patch = GrassPatch(self.next_id(), (x, y), self, fully_grown, countdown)
                 self.grid.place_agent(patch, (x, y))
                 self.schedule.add(patch)
 
@@ -121,24 +133,24 @@ class WolfSheep(Model):
         # collect data
         self.datacollector.collect(self)
         if self.verbose:
-            print([self.schedule.time,
-                   self.schedule.get_breed_count(Wolf),
-                   self.schedule.get_breed_count(Sheep)])
+            print(
+                [
+                    self.schedule.time,
+                    self.schedule.get_breed_count(Wolf),
+                    self.schedule.get_breed_count(Sheep),
+                ]
+            )
 
     def run_model(self, step_count=200):
 
         if self.verbose:
-            print('Initial number wolves: ',
-                  self.schedule.get_breed_count(Wolf))
-            print('Initial number sheep: ',
-                  self.schedule.get_breed_count(Sheep))
+            print("Initial number wolves: ", self.schedule.get_breed_count(Wolf))
+            print("Initial number sheep: ", self.schedule.get_breed_count(Sheep))
 
         for i in range(step_count):
             self.step()
 
         if self.verbose:
-            print('')
-            print('Final number wolves: ',
-                  self.schedule.get_breed_count(Wolf))
-            print('Final number sheep: ',
-                  self.schedule.get_breed_count(Sheep))
+            print("")
+            print("Final number wolves: ", self.schedule.get_breed_count(Wolf))
+            print("Final number sheep: ", self.schedule.get_breed_count(Sheep))
