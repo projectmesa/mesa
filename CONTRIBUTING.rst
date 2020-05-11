@@ -28,14 +28,17 @@ No contribution is too small. Although, contributions can be too big, so let's d
 - Git commit your changes with a meaningful message: ``git commit -m "Fixes X issue."``
 - If implementing a new feature, include some documentation in docs folder.
 - Make sure that your submission passes the `Travis build`_. See "Testing and Standards below" to be able to run these locally.
-- Push your changed to your fork on Github: ``git push origin NAME_OF_BRANCH``.
+- Make sure that your code is formatted according to `the black`_ standard (you can do it via
+`pre-commit`_).
+- Push your changes to your fork on Github: ``git push origin NAME_OF_BRANCH``.
 - `Create a pull request`_.
 - Describe the change w/ ticket number(s) that the code fixes.
 
 .. _`Clone your repository` : https://help.github.com/articles/cloning-a-repository/
 .. _`Travis build` : https://travis-ci.org/projectmesa/mesa
 .. _`Create a pull request` : https://help.github.com/articles/creating-a-pull-request/
-
+.. _`pre-commit` : https://github.com/pre-commit/pre-commit
+.. _`black` : https://github.com/psf/black
 
 
 Testing and Code Standards
@@ -43,6 +46,9 @@ Testing and Code Standards
 
 .. image:: https://codecov.io/gh/projectmesa/mesa/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/projectmesa/mesa
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
 
 As part of our contribution process, we practice continuous integration and use Travis to help enforce best practices.
 
@@ -54,7 +60,7 @@ If you're changing previous Mesa features, please make sure of the following:
 - Additional features or rewrites of current features are accompanied by tests.
 - New features are demonstrated in a model, so folks can understand more easily.
 
-To ensure that your submission will not break the build, you will need to install Flake8 and Nose.
+To ensure that your submission will not break the build, you will need to install Flake8 and pytest.
 
 .. code-block:: bash
 
@@ -66,15 +72,24 @@ We test by implementing simple models and through traditional unit tests in the 
 
     py.test --cov=mesa tests/
 
-With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_. If the command below generates errors, fix all errors that are returned.
+With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_. We recommend to use `black`_ as an automated code formatter. You can automatically format your code using `pre-commit`_, which will prevent `git commit` of unstyled code and will automtically apply black style so you can immediately re-run `git commit`. To set up pre-commit run the following commands:
 
 .. code-block:: bash
 
-    flake8 . --ignore=F403,E501,E123,E128,W504 --exclude=docs,build
+    pip install pre-commit
+    pre-commit install
+
+You should no longer have to worry about code formatting. If still in doubt you may run the following command. If the command generates errors, fix all errors that are returned.
+
+.. code-block:: bash
+
+    flake8 . --ignore=F403,E501,E123,E128,W504,W503 --exclude=docs,build
+    
 
 .. _`PEP8` : https://www.python.org/dev/peps/pep-0008
 .. _`Google Style Guide` : https://google.github.io/styleguide/pyguide.html
-
+.. _`pre-commit` : https://github.com/pre-commit/pre-commit
+.. _`black` : https://github.com/psf/black
 
 Licensing
 --------

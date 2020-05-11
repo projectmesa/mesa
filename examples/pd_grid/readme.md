@@ -6,10 +6,10 @@ The Demographic Prisoner's Dilemma is a family of variants on the classic two-pl
 
 The model payoff table is:
 
-             | Cooperate | Defect|
-------------:|:---------:|:-----:|
-**Cooperate**| 1, 1      | 0, D  |
-**Defect**   | D, 0      | 0, 0  |
+|               | Cooperate | Defect|
+|:-------------:|:---------:|:-----:|
+| **Cooperate** | 1, 1      | 0, D  |
+| **Defect**    | D, 0      | 0, 0  |
 
 Where *D* is the defection bonus, generally set higher than 1. In these runs, the defection bonus is set to $D=1.6$.
 

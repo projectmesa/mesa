@@ -30,9 +30,16 @@ class BarChartModule(VisualizationElement):
 
     package_includes = ["d3.min.js", "BarChartModule.js"]
 
-    def __init__(self, fields, scope="model", sorting="none",
-                sort_by="none", canvas_height=400,
-                canvas_width=800, data_collector_name="datacollector"):
+    def __init__(
+        self,
+        fields,
+        scope="model",
+        sorting="none",
+        sort_by="none",
+        canvas_height=400,
+        canvas_width=800,
+        data_collector_name="datacollector",
+    ):
         """
         Create a new bar chart visualization.
 
@@ -58,8 +65,9 @@ class BarChartModule(VisualizationElement):
 
         fields_json = json.dumps(self.fields)
         new_element = "new BarChartModule({}, {}, {}, '{}', '{}')"
-        new_element = new_element.format(fields_json, canvas_width, canvas_height,
-                                        sorting, sort_by)
+        new_element = new_element.format(
+            fields_json, canvas_width, canvas_height, sorting, sort_by
+        )
         self.js_code = "elements.push(" + new_element + ")"
 
     def render(self, model):
@@ -67,9 +75,9 @@ class BarChartModule(VisualizationElement):
         data_collector = getattr(model, self.data_collector_name)
 
         if self.scope == "agent":
-            df = data_collector.get_agent_vars_dataframe().astype('float')
+            df = data_collector.get_agent_vars_dataframe().astype("float")
             latest_step = df.index.levels[0][-1]
-            labelStrings = [f['Label'] for f in self.fields]
+            labelStrings = [f["Label"] for f in self.fields]
             dict = df.loc[latest_step].T.loc[labelStrings].to_dict()
             current_values = list(dict.values())
 

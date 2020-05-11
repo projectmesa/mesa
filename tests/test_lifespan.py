@@ -7,7 +7,8 @@ import numpy as np
 
 
 class LifeTimeModel(Model):
-    '''Simple model for running models with a finite life'''
+    """Simple model for running models with a finite life"""
+
     def __init__(self, agent_lifetime=1, n_agents=10):
         super().__init__()
 
@@ -17,27 +18,30 @@ class LifeTimeModel(Model):
         # keep track of the the remaining life of an agent and
         # how many ticks it has seen
         self.datacollector = DataCollector(
-            agent_reporters={"remaining_life": lambda a: a.remaining_life,
-                             "steps": lambda a: a.steps})
+            agent_reporters={
+                "remaining_life": lambda a: a.remaining_life,
+                "steps": lambda a: a.steps,
+            }
+        )
 
         self.current_ID = 0
         self.schedule = RandomActivation(self)
 
         for _ in range(n_agents):
-            self.schedule.add(FiniteLifeAgent(self.next_id(),
-                                              self.agent_lifetime,
-                                              self))
+            self.schedule.add(
+                FiniteLifeAgent(self.next_id(), self.agent_lifetime, self)
+            )
 
     def step(self):
-        '''Add agents back to n_agents in each step'''
+        """Add agents back to n_agents in each step"""
         self.datacollector.collect(self)
         self.schedule.step()
 
         if len(self.schedule.agents) < self.n_agents:
             for _ in range(self.n_agents - len(self.schedule.agents)):
-                self.schedule.add(FiniteLifeAgent(self.next_id(),
-                                                  self.agent_lifetime,
-                                                  self))
+                self.schedule.add(
+                    FiniteLifeAgent(self.next_id(), self.agent_lifetime, self)
+                )
 
     def run_model(self, step_count=100):
         for _ in range(step_count):
@@ -45,9 +49,10 @@ class LifeTimeModel(Model):
 
 
 class FiniteLifeAgent(Agent):
-    '''An agent that is supposed to live for a finite number of ticks.
+    """An agent that is supposed to live for a finite number of ticks.
     Also has a 10% chance of dying in each tick.
-    '''
+    """
+
     def __init__(self, unique_id, lifetime, model):
         super().__init__(unique_id, model)
         self.remaining_life = lifetime
@@ -77,14 +82,13 @@ class TestAgentLifespan(unittest.TestCase):
         self.df = self.df.reset_index()
 
     def test_ticks_seen(self):
-        '''Each agent should be activated no more than one time'''
+        """Each agent should be activated no more than one time"""
         assert self.df.steps.max() == 1
 
     def test_agent_lifetime(self):
-        lifetimes = self.df.groupby(["AgentID"]).agg(
-            {"Step": lambda x: len(x)})
+        lifetimes = self.df.groupby(["AgentID"]).agg({"Step": lambda x: len(x)})
         assert lifetimes.Step.max() == 2
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
