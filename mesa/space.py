@@ -17,29 +17,45 @@ import itertools
 
 import numpy as np
 
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 from mesa.agent import Agent
 
 Coordinate = Tuple[int, int]
-GridContent = Union[Optional[Agent], Set[Agent]]
+GridContent = Optional[Agent]
+MultiGridContent = Set[Agent]
 # used in ContinuousSpace
 FloatCoordinate = Union[Tuple[float, float], np.ndarray]
 
+F = TypeVar("F", bound=Callable[..., Any])
 
-def accept_tuple_argument(wrapped_function):
+
+def accept_tuple_argument(wrapped_function: F) -> F:
     """Decorator to allow grid methods that take a list of (x, y) coord tuples
     to also handle a single position, by automatically wrapping tuple in
     single-item list rather than forcing user to do it.
 
     """
 
-    def wrapper(*args: Any):
+    def wrapper(*args: Any) -> Any:
         if isinstance(args[1], tuple) and len(args[1]) == 2:
             return wrapped_function(args[0], [args[1]])
         else:
             return wrapped_function(*args)
 
-    return wrapper
+    return cast(F, wrapper)
 
 
 class Grid:
@@ -251,7 +267,7 @@ class Grid:
         moore: bool,
         include_center: bool = False,
         radius: int = 1,
-    ) -> List[Coordinate]:
+    ) -> List[GridContent]:
         """Return a list of neighbors to a certain point.
 
         Args:
@@ -330,6 +346,7 @@ class Grid:
 
         """
         pos = self.torus_adj(pos)
+        assert isinstance(agent.pos, Tuple[int, int])
         self._remove_agent(agent.pos, agent)
         self._place_agent(pos, agent)
         agent.pos = pos
@@ -348,6 +365,7 @@ class Grid:
     def remove_agent(self, agent: Agent) -> None:
         """ Remove the agent from the grid and set its pos variable to None. """
         pos = agent.pos
+        assert isinstance(pos, Tuple[int, int])
         self._remove_agent(pos, agent)
         agent.pos = None
 
@@ -365,6 +383,7 @@ class Grid:
     def move_to_empty(self, agent: Agent) -> None:
         """ Moves agent to a random empty cell, vacating agent's old cell. """
         pos = agent.pos
+        assert isinstance(pos, Tuple[int, int])
         if len(self.empties) == 0:
             raise Exception("ERROR: No empty cells")
         new_pos = agent.random.choice(sorted(self.empties))
@@ -430,6 +449,7 @@ class SingleGrid(Grid):
                 raise Exception("ERROR: Grid full")
             coords = agent.random.choice(sorted(self.empties))
         else:
+            assert isinstance(x, int) and isinstance(y, int)
             coords = (x, y)
         agent.pos = coords
         self._place_agent(coords, agent)
@@ -460,6 +480,11 @@ class MultiGrid(Grid):
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
     """
+
+    grid: List[List[MultiGridContent]]
+
+    def __getitem__(self, index: int) -> List[MultiGridContent]:
+        return self.grid[index]
 
     @staticmethod
     def default_val() -> Set[Agent]:
@@ -630,7 +655,7 @@ class HexGrid(Grid):
 
     def get_neighbors(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
-    ) -> List[Coordinate]:
+    ) -> List[GridContent]:
         """Return a list of neighbors to a certain point.
 
         Args:
@@ -856,7 +881,7 @@ class NetworkGrid:
 
     def move_agent(self, agent: Agent, node_id: int) -> None:
         """ Move an agent from its current node to a new node. """
-
+        assert isinstance(agent.pos, int)
         self._remove_agent(agent, agent.pos)
         self._place_agent(agent, node_id)
         agent.pos = node_id

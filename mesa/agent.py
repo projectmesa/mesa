@@ -5,7 +5,9 @@ Core Objects: Agent
 
 """
 # mypy
+from typing import Optional, Union
 from mesa.model import Model
+from mesa.space import Coordinate, FloatCoordinate
 from random import Random
 
 
@@ -16,7 +18,7 @@ class Agent:
         """ Create a new agent. """
         self.unique_id = unique_id
         self.model = model
-        self.pos = None
+        self.pos: Optional[Union[Coordinate, FloatCoordinate, int]] = None
 
     def step(self) -> None:
         """ A single step of the agent. """
