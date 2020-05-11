@@ -13,7 +13,7 @@ class Walker(Agent):
 
 class ShapeExample(Model):
     def __init__(self, N=2, width=20, height=10):
-        self.N = N    # num of agents
+        self.N = N  # num of agents
         self.headings = ((1, 0), (0, 1), (-1, 0), (0, -1))  # tuples are fast
         self.grid = SingleGrid(width, height, torus=False)
         self.schedule = RandomActivation(self)
@@ -31,8 +31,7 @@ class ShapeExample(Model):
             heading = self.random.choice(self.headings)
             # heading = (1, 0)
             if self.grid.is_cell_empty(pos):
-                print("Creating agent {2} at ({0}, {1})"
-                      .format(x, y, unique_id))
+                print("Creating agent {2} at ({0}, {1})".format(x, y, unique_id))
                 a = Walker(unique_id, self, pos, heading)
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos)

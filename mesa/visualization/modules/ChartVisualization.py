@@ -42,10 +42,16 @@ class ChartModule(VisualizationElement):
         the same way that "Color" is currently.
 
     """
+
     package_includes = ["Chart.min.js", "ChartModule.js"]
 
-    def __init__(self, series, canvas_height=200, canvas_width=500,
-                 data_collector_name="datacollector"):
+    def __init__(
+        self,
+        series,
+        canvas_height=200,
+        canvas_width=500,
+        data_collector_name="datacollector",
+    ):
         """
         Create a new line chart visualization.
 
@@ -64,8 +70,7 @@ class ChartModule(VisualizationElement):
 
         series_json = json.dumps(self.series)
         new_element = "new ChartModule({}, {},  {})"
-        new_element = new_element.format(series_json, canvas_width,
-                                         canvas_height)
+        new_element = new_element.format(series_json, canvas_width, canvas_height)
         self.js_code = "elements.push(" + new_element + ");"
 
     def render(self, model):

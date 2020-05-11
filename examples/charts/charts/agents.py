@@ -25,16 +25,17 @@ class Bank(Agent):
         # for tracking total value of deposits
         self.deposits = 0
         # total amount of deposits in reserve
-        self.reserves = ((self.reserve_percent / 100) * self.deposits)
+        self.reserves = (self.reserve_percent / 100) * self.deposits
         # amount the bank is currently able to loan
         self.bank_to_loan = 0
 
     """update the bank's reserves and amount it can loan;
        this is called every time a person balances their books
        see below for Person.balance_books()"""
+
     def bank_balance(self):
-        self.reserves = ((self.reserve_percent / 100) * self.deposits)
-        self.bank_to_loan = (self.deposits - (self.reserves + self.bank_loans))
+        self.reserves = (self.reserve_percent / 100) * self.deposits
+        self.bank_to_loan = self.deposits - (self.reserves + self.bank_loans)
 
 
 # subclass of RandomWalker, which is subclass to Mesa Agent
@@ -129,7 +130,7 @@ class Person(RandomWalker):
                 self.withdraw_from_savings(self.savings)
                 self.repay_a_loan(self.wallet)
         # calculate my wealth
-        self.wealth = (self.savings - self.loans)
+        self.wealth = self.savings - self.loans
 
     # part of balance_books()
     def deposit_to_savings(self, amount):
