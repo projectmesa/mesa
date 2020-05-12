@@ -290,7 +290,7 @@ class ParameterSampler:
             return dict(
                 zip(
                     self.param_names,
-                    [self.random_state.choice(l) for l in self.param_lists],
+                    [self.random_state.choice(p_list) for p_list in self.param_lists],
                 )
             )
         raise StopIteration()
