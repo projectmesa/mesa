@@ -318,7 +318,7 @@ You'll should see something like the distribution below. Yours will
 almost certainly look at least slightly different, since each run of the
 model is random.
 
-.. image:: output_19_1.png
+.. image:: intro_tutorial_files/intro_tutorial_19_1.png
 
 
 To get a better idea of how a model behaves, we can create multiple
@@ -342,7 +342,7 @@ can do this with a nested for loop:
     plt.hist(all_wealth, bins=range(max(all_wealth)+1))
 
 
-.. image:: output_22_1.png
+.. image:: intro_tutorial_files/output_22_1.png
 
 
 This runs 100 instantiations of the model, and runs each for 10 steps.
@@ -567,7 +567,7 @@ grid, giving us each cell's coordinates and contents in turn.
     # plt.show()
 
 
-.. image:: output_33_1.png
+.. image:: intro_tutorial_files/output_33_1.png
 
 
 Collecting Data
@@ -688,7 +688,7 @@ To get the series of Gini coefficients as a pandas DataFrame:
     gini.plot()
 
 
-.. image:: output_39_1.png
+.. image:: intro_tutorial_files/output_39_1.png
 
 
 Similarly, we can get the agent-wealth data:
@@ -766,7 +766,7 @@ example, to get a histogram of agent wealth at the model's end:
     end_wealth.hist(bins=range(agent_wealth.Wealth.max()+1))
 
 
-.. image:: output_43_1.png
+.. image:: intro_tutorial_files/output_43_1.png
 
 
 Or to plot the wealth of a given agent (in this example, agent 14):
@@ -777,7 +777,7 @@ Or to plot the wealth of a given agent (in this example, agent 14):
     one_agent_wealth.Wealth.plot()
 
 
-.. image:: output_45_1.png
+.. image:: intro_tutorial_files/output_45_1.png
 
 
 Batch Run
@@ -881,7 +881,7 @@ DataFrame.
     plt.scatter(run_data.N, run_data.Gini)
 
 
-.. image:: output_53_1.png
+.. image:: intro_tutorial_files/output_53_1.png
 
 
 Notice that each row is a model run, and gives us the parameter values
