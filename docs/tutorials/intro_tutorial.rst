@@ -67,6 +67,12 @@ installed directly form the github repository by running:
 
        $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa/master/examples/boltzmann_wealth_model/requirements.txt  
 
+or if you have the requirements file locally with
+
+.. code:: bash
+
+       $ pip install -r /path/to/requirements.txt
+
 | This will install the dependencies listed in the requirements.txt file
   which are:
 
