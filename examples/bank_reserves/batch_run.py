@@ -55,8 +55,11 @@ def get_num_poor_agents(model):
 def get_num_mid_agents(model):
     """list of middle class agents"""
 
-    mid_agents = [a for a in model.schedule.agents if
-                  a.loans < 10 and a.savings < model.rich_threshold]
+    mid_agents = [
+        a
+        for a in model.schedule.agents
+        if a.loans < 10 and a.savings < model.rich_threshold
+    ]
     # return number of middle class agents
     return len(mid_agents)
 
@@ -96,9 +99,7 @@ def get_total_loans(model):
 
 
 def track_params(model):
-    return (model.init_people,
-            model.rich_threshold,
-            model.reserve_percent)
+    return (model.init_people, model.rich_threshold, model.reserve_percent)
 
 
 def track_run(model):
@@ -116,8 +117,15 @@ class BankReservesModel(Model):
 
     """init parameters "init_people", "rich_threshold", and "reserve_percent"
        are all UserSettableParameters"""
-    def __init__(self, height=grid_h, width=grid_w, init_people=2, rich_threshold=10,
-                 reserve_percent=50,):
+
+    def __init__(
+        self,
+        height=grid_h,
+        width=grid_w,
+        init_people=2,
+        rich_threshold=10,
+        reserve_percent=50,
+    ):
         self.uid = next(self.id_gen)
         self.height = height
         self.width = width
@@ -128,18 +136,20 @@ class BankReservesModel(Model):
         self.rich_threshold = rich_threshold
         self.reserve_percent = reserve_percent
         # see datacollector functions above
-        self.datacollector = DataCollector(model_reporters={
-                                           "Rich": get_num_rich_agents,
-                                           "Poor": get_num_poor_agents,
-                                           "Middle Class": get_num_mid_agents,
-                                           "Savings": get_total_savings,
-                                           "Wallets": get_total_wallets,
-                                           "Money": get_total_money,
-                                           "Loans": get_total_loans,
-                                           "Model Params": track_params,
-                                           "Run": track_run},
-                                           agent_reporters={
-                                           "Wealth": lambda x: x.wealth})
+        self.datacollector = DataCollector(
+            model_reporters={
+                "Rich": get_num_rich_agents,
+                "Poor": get_num_poor_agents,
+                "Middle Class": get_num_mid_agents,
+                "Savings": get_total_savings,
+                "Wallets": get_total_wallets,
+                "Money": get_total_money,
+                "Loans": get_total_loans,
+                "Model Params": track_params,
+                "Run": track_run,
+            },
+            agent_reporters={"Wealth": lambda x: x.wealth},
+        )
 
         # create a single bank for the model
         self.bank = Bank(1, self, self.reserve_percent)
@@ -170,17 +180,21 @@ class BankReservesModel(Model):
 
 
 # parameter lists for each parameter to be tested in batch run
-br_params = {"init_people": [25, 100, 150, 200],
-             "rich_threshold": [5, 10, 15, 20],
-             "reserve_percent": [0, 50, 100]}
+br_params = {
+    "init_people": [25, 100, 150, 200],
+    "rich_threshold": [5, 10, 15, 20],
+    "reserve_percent": [0, 50, 100],
+}
 
-br = BatchRunner(BankReservesModel,
-                 br_params,
-                 iterations=1,
-                 max_steps=1000,
-                 model_reporters={"Data Collector": lambda m: m.datacollector})
+br = BatchRunner(
+    BankReservesModel,
+    br_params,
+    iterations=1,
+    max_steps=1000,
+    model_reporters={"Data Collector": lambda m: m.datacollector},
+)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     br.run_all()
     br_df = br.get_model_vars_dataframe()
     br_step_data = pd.DataFrame()

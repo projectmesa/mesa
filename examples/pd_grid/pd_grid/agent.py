@@ -2,10 +2,10 @@ from mesa import Agent
 
 
 class PDAgent(Agent):
-    ''' Agent member of the iterated, spatial prisoner's dilemma model. '''
+    """ Agent member of the iterated, spatial prisoner's dilemma model. """
 
     def __init__(self, pos, model, starting_move=None):
-        '''
+        """
         Create a new Prisoner's Dilemma agent.
 
         Args:
@@ -13,7 +13,7 @@ class PDAgent(Agent):
             model: model instance
             starting_move: If provided, determines the agent's initial state:
                            C(ooperating) or D(efecting). Otherwise, random.
-        '''
+        """
         super().__init__(pos, model)
         self.pos = pos
         self.score = 0
@@ -28,9 +28,8 @@ class PDAgent(Agent):
         return self.move == "C"
 
     def step(self):
-        ''' Get the neighbors' moves, and change own move accordingly. '''
-        neighbors = self.model.grid.get_neighbors(self.pos, True,
-                                                  include_center=True)
+        """ Get the neighbors' moves, and change own move accordingly. """
+        neighbors = self.model.grid.get_neighbors(self.pos, True, include_center=True)
         best_neighbor = max(neighbors, key=lambda a: a.score)
         self.next_move = best_neighbor.move
 

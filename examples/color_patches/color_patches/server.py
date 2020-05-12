@@ -9,9 +9,24 @@ from mesa.visualization.ModularVisualization import ModularServer
 
 from .model import ColorPatches
 
-_COLORS = ['Aqua', 'Blue', 'Fuchsia', 'Gray', 'Green',
-           'Lime', 'Maroon', 'Navy', 'Olive', 'Orange', 'Purple',
-           'Red', 'Silver', 'Teal', 'White', 'Yellow']
+_COLORS = [
+    "Aqua",
+    "Blue",
+    "Fuchsia",
+    "Gray",
+    "Green",
+    "Lime",
+    "Maroon",
+    "Navy",
+    "Olive",
+    "Orange",
+    "Purple",
+    "Red",
+    "Silver",
+    "Teal",
+    "White",
+    "Yellow",
+]
 
 
 grid_rows = 50
@@ -22,7 +37,7 @@ canvas_height = grid_cols * cell_size
 
 
 def color_patch_draw(cell):
-    '''
+    """
     This function is registered with the visualization server to be called
     each tick to indicate how to draw the cell in its current state.
 
@@ -30,7 +45,7 @@ def color_patch_draw(cell):
 
     :return: the portrayal dictionary.
 
-    '''
+    """
     assert cell is not None
     portrayal = {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Layer": 0}
     portrayal["x"] = cell.get_row()
@@ -39,12 +54,15 @@ def color_patch_draw(cell):
     return portrayal
 
 
-canvas_element = CanvasGrid(color_patch_draw,
-                            grid_rows, grid_cols,
-                            canvas_width, canvas_height)
+canvas_element = CanvasGrid(
+    color_patch_draw, grid_rows, grid_cols, canvas_width, canvas_height
+)
 
-server = ModularServer(ColorPatches,
-                       [canvas_element], "Color Patches",
-                       {"width": canvas_width, "height": canvas_height})
+server = ModularServer(
+    ColorPatches,
+    [canvas_element],
+    "Color Patches",
+    {"width": canvas_width, "height": canvas_height},
+)
 
 # webbrowser.open('http://127.0.0.1:8521')  # TODO: make this configurable

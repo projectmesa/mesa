@@ -26,7 +26,7 @@ class BoltzmannWealthModelNetwork(Model):
         self.schedule = RandomActivation(self)
         self.datacollector = DataCollector(
             model_reporters={"Gini": compute_gini},
-            agent_reporters={"Wealth": lambda _: _.wealth}
+            agent_reporters={"Wealth": lambda _: _.wealth},
         )
 
         list_of_random_nodes = self.random.sample(self.G.nodes(), self.num_agents)
@@ -59,8 +59,11 @@ class MoneyAgent(Agent):
         self.wealth = 1
 
     def move(self):
-        possible_steps = [node for node in self.model.grid.get_neighbors(self.pos, include_center=False) if
-                          self.model.grid.is_cell_empty(node)]
+        possible_steps = [
+            node
+            for node in self.model.grid.get_neighbors(self.pos, include_center=False)
+            if self.model.grid.is_cell_empty(node)
+        ]
         if len(possible_steps) > 0:
             new_position = self.random.choice(possible_steps)
             self.model.grid.move_agent(self, new_position)

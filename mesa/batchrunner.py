@@ -22,8 +22,10 @@ else:
 
 
 class ParameterError(TypeError):
-    MESSAGE = ('parameters must map a name to a value. '
-               'These names did not match paramerets: {}')
+    MESSAGE = (
+        "parameters must map a name to a value. "
+        "These names did not match paramerets: {}"
+    )
 
     def __init__(self, bad_names):
         self.bad_names = bad_names
@@ -33,8 +35,10 @@ class ParameterError(TypeError):
 
 
 class VariableParameterError(ParameterError):
-    MESSAGE = ('variable_parameters must map a name to a sequence of values. '
-               'These parameters were given with non-sequence values: {}')
+    MESSAGE = (
+        "variable_parameters must map a name to a sequence of values. "
+        "These parameters were given with non-sequence values: {}"
+    )
 
     def __init__(self, bad_names):
         super().__init__(bad_names)
@@ -51,10 +55,18 @@ class FixedBatchRunner:
     run. To get step by step data, simply have a reporter store the model's
     entire DataCollector object.
     """
-    def __init__(self, model_cls, parameters_list=None,
-                 fixed_parameters=None, iterations=1, max_steps=1000,
-                 model_reporters=None, agent_reporters=None,
-                 display_progress=True):
+
+    def __init__(
+        self,
+        model_cls,
+        parameters_list=None,
+        fixed_parameters=None,
+        iterations=1,
+        max_steps=1000,
+        model_reporters=None,
+        agent_reporters=None,
+        display_progress=True,
+    ):
         """ Create a new BatchRunner for a given model with the given
         parameters.
 
@@ -205,15 +217,14 @@ class FixedBatchRunner:
         collected.
 
         """
-        return self._prepare_report_table(self.agent_vars,
-                                          extra_cols=['AgentId'])
+        return self._prepare_report_table(self.agent_vars, extra_cols=["AgentId"])
 
     def _prepare_report_table(self, vars_dict, extra_cols=None):
         """
         Creates a dataframe from collected records and sorts it using 'Run'
         column as a key.
         """
-        extra_cols = ['Run'] + (extra_cols or [])
+        extra_cols = ["Run"] + (extra_cols or [])
         index_cols = set()
         for params in self.parameters_list:
             index_cols |= params.keys()
@@ -228,7 +239,7 @@ class FixedBatchRunner:
         df = pd.DataFrame(records)
         rest_cols = set(df.columns) - set(index_cols)
         ordered = df[index_cols + list(sorted(rest_cols))]
-        ordered.sort_values(by='Run', inplace=True)
+        ordered.sort_values(by="Run", inplace=True)
         if self._include_fixed:
             for param in self.fixed_parameters.keys():
                 val = self.fixed_parameters[param]
@@ -242,8 +253,9 @@ class FixedBatchRunner:
 # This is kind of a useless class, but it does carry the 'source' parameters with it
 class ParameterProduct:
     def __init__(self, variable_parameters):
-        self.param_names, self.param_lists = \
-            zip(*(copy.deepcopy(variable_parameters)).items())
+        self.param_names, self.param_lists = zip(
+            *(copy.deepcopy(variable_parameters)).items()
+        )
         self._product = product(*self.param_lists)
 
     def __iter__(self):
@@ -257,8 +269,9 @@ class ParameterProduct:
 # distributions, only lists.
 class ParameterSampler:
     def __init__(self, parameter_lists, n, random_state=None):
-        self.param_names, self.param_lists = \
-            zip(*(copy.deepcopy(parameter_lists)).items())
+        self.param_names, self.param_lists = zip(
+            *(copy.deepcopy(parameter_lists)).items()
+        )
         self.n = n
         if random_state is None:
             self.random_state = random.Random()
@@ -274,7 +287,12 @@ class ParameterSampler:
     def __next__(self):
         self.count += 1
         if self.count <= self.n:
-            return dict(zip(self.param_names, [self.random_state.choice(l) for l in self.param_lists]))
+            return dict(
+                zip(
+                    self.param_names,
+                    [self.random_state.choice(p_list) for p_list in self.param_lists],
+                )
+            )
         raise StopIteration()
 
 
@@ -290,10 +308,18 @@ class BatchRunner(FixedBatchRunner):
     entire DataCollector object.
 
     """
-    def __init__(self, model_cls, variable_parameters=None,
-                 fixed_parameters=None, iterations=1, max_steps=1000,
-                 model_reporters=None, agent_reporters=None,
-                 display_progress=True):
+
+    def __init__(
+        self,
+        model_cls,
+        variable_parameters=None,
+        fixed_parameters=None,
+        iterations=1,
+        max_steps=1000,
+        model_reporters=None,
+        agent_reporters=None,
+        display_progress=True,
+    ):
         """ Create a new BatchRunner for a given model with the given
         parameters.
 
@@ -325,16 +351,24 @@ class BatchRunner(FixedBatchRunner):
             display_progress: Display progresss bar with time estimation?
 
         """
-        super().__init__(model_cls, ParameterProduct(variable_parameters),
-                     fixed_parameters, iterations, max_steps,
-                     model_reporters, agent_reporters,
-                     display_progress)
+        super().__init__(
+            model_cls,
+            ParameterProduct(variable_parameters),
+            fixed_parameters,
+            iterations,
+            max_steps,
+            model_reporters,
+            agent_reporters,
+            display_progress,
+        )
 
 
 class MPSupport(Exception):
     def __str__(self):
-        return ("BatchRunnerMP depends on pathos, which is either not "
-               "installed, or the path can not be found. ")
+        return (
+            "BatchRunnerMP depends on pathos, which is either not "
+            "installed, or the path can not be found. "
+        )
 
 
 class BatchRunnerMP(BatchRunner):
@@ -370,10 +404,14 @@ class BatchRunnerMP(BatchRunner):
                 param_values = all_param_values[i]
                 for _ in range(self.iterations):
                     # make a new process and add it to the queue
-                    job_queue.append(self.pool.uimap(self.run_iteration,
-                                                     (kwargs,),
-                                                     (param_values,),
-                                                     (next(run_count),)))
+                    job_queue.append(
+                        self.pool.uimap(
+                            self.run_iteration,
+                            (kwargs,),
+                            (param_values,),
+                            (next(run_count),),
+                        )
+                    )
             # empty the queue
             results = []
             for task in job_queue:

@@ -8,9 +8,9 @@ from mesa.main import cli
 
 
 class TestCli(unittest.TestCase):
-    '''
+    """
     Test CLI commands
-    '''
+    """
 
     def setUp(self):
         self.old_sys_path = sys.path[:]
@@ -20,9 +20,13 @@ class TestCli(unittest.TestCase):
         sys.path[:] = self.old_sys_path
 
     def test_run(self):
-        with patch('mesa.visualization.ModularVisualization.ModularServer') as ModularServer:
-            example_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../examples/wolf_sheep'))
+        with patch(
+            "mesa.visualization.ModularVisualization.ModularServer"
+        ) as ModularServer:
+            example_dir = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "../examples/wolf_sheep")
+            )
             with self.runner.isolated_filesystem():
-                result = self.runner.invoke(cli, ['runserver', example_dir])
+                result = self.runner.invoke(cli, ["runserver", example_dir])
                 assert result.exit_code == 0, result.output
                 assert ModularServer().launch.call_count == 1
