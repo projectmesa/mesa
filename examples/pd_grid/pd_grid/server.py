@@ -12,9 +12,12 @@ canvas_element = CanvasGrid(portrayPDAgent, 50, 50, 500, 500)
 model_params = {
     "height": 50,
     "width": 50,
-    "schedule_type": UserSettableParameter("choice", "Scheduler type", value="Random",
-                                           choices=list(PdGrid.schedule_types.keys()))
+    "schedule_type": UserSettableParameter(
+        "choice",
+        "Scheduler type",
+        value="Random",
+        choices=list(PdGrid.schedule_types.keys()),
+    ),
 }
 
-server = ModularServer(PdGrid, [canvas_element], "Prisoner's Dilemma",
-                       model_params)
+server = ModularServer(PdGrid, [canvas_element], "Prisoner's Dilemma", model_params)

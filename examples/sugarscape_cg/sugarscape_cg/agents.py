@@ -38,17 +38,24 @@ class SsAgent(Agent):
 
     def move(self):
         # Get neighborhood within vision
-        neighbors = [i for i in self.model.grid.get_neighborhood(self.pos, self.moore,
-                False, radius=self.vision) if not self.is_occupied(i)]
+        neighbors = [
+            i
+            for i in self.model.grid.get_neighborhood(
+                self.pos, self.moore, False, radius=self.vision
+            )
+            if not self.is_occupied(i)
+        ]
         neighbors.append(self.pos)
         # Look for location with the most sugar
         max_sugar = max([self.get_sugar(pos).amount for pos in neighbors])
-        candidates = [pos for pos in neighbors if self.get_sugar(pos).amount ==
-                max_sugar]
+        candidates = [
+            pos for pos in neighbors if self.get_sugar(pos).amount == max_sugar
+        ]
         # Narrow down to the nearest ones
         min_dist = min([get_distance(self.pos, pos) for pos in candidates])
-        final_candidates = [pos for pos in candidates if get_distance(self.pos,
-            pos) == min_dist]
+        final_candidates = [
+            pos for pos in candidates if get_distance(self.pos, pos) == min_dist
+        ]
         self.random.shuffle(final_candidates)
         self.model.grid.move_agent(self, final_candidates[0])
 

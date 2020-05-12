@@ -30,7 +30,7 @@ Sample Model Description
 
 The tutorial model is a very simple simulated agent-based economy, drawn
 from econophysics and presenting a statistical mechanics approach to
-wealth distribution [Dragulescu2002]. The rules of our tutorial model:
+wealth distribution [Dragulescu2002]_. The rules of our tutorial model:
 
 1. There are some number of agents.
 2. All agents begin with 1 unit of money.
@@ -69,10 +69,11 @@ installed directly form the github repository by running:
 
 | This will install the dependencies listed in the requirements.txt file
   which are:
-|   \* jupyter (Ipython interactive notebook)
-|   \* matplotlib (Python visualization library)
-|   \* mesa (this ABM library - if not installed)
-|   \* numpy (numerical python library)
+
+* jupyter (Ipython interactive notebook)
+* matplotlib (Python's visualization library)
+* mesa (this ABM library - if not installed)
+* numpy (Python's numerical python library)
 
 Building a sample model
 -----------------------
@@ -84,7 +85,7 @@ models in two different ways:
 2. Write the model interactively in `Jupyter
    Notebook <http://jupyter.org/>`__ cells.
 
-Either way, it is good practice to put your model in its own folder –
+Either way, it's good practice to put your model in its own folder –
 especially if the project will end up consisting of multiple files (for
 example, Python files for the model and the visualization, a Notebook
 for analysis, and a Readme with some documentation and discussion).
@@ -137,8 +138,8 @@ Adding the scheduler
 ~~~~~~~~~~~~~~~~~~~~
 
 Time in most agent-based models moves in steps, sometimes also called
-**ticks**. At each step of the model, one or more of the agents -
-usually all of them - are activated and take their own step, changing
+**ticks**. At each step of the model, one or more of the agents –
+usually all of them – are activated and take their own step, changing
 internally and/or interacting with one another or the environment.
 
 The **scheduler** is a special model component which controls the order
@@ -151,7 +152,7 @@ model uses, and see whether it changes the model behavior. This may not
 seem important, but scheduling patterns can have an impact on your
 results [Comer2014].
 
-For now, let us use one of the simplest ones: ``RandomActivation``, which
+For now, let's use one of the simplest ones: ``RandomActivation``, which
 activates all the agents once per step, in random order. Every agent is
 expected to have a ``step`` method. The step method is the action the
 agent takes when it is activated by the model schedule. We add an agent
@@ -197,11 +198,11 @@ You can see for yourself with a few easy lines. If you've been working
 in an interactive session, you can create a model object directly.
 Otherwise, you need to open an interactive session in the same directory
 as your source code file, and import the classes. For example, if your
-code is in ``MoneyModel.py``:
+code is in ``money_model.py``:
 
 .. code:: python
 
-   from MoneyModel import MoneyModel
+   from money_model import MoneyModel
 
 Then create the model object, and run it for one step:
 
@@ -209,6 +210,21 @@ Then create the model object, and run it for one step:
 
     empty_model = MoneyModel(10)
     empty_model.step()
+
+
+.. parsed-literal::
+
+    Hi, I am agent 8.
+    Hi, I am agent 0.
+    Hi, I am agent 5.
+    Hi, I am agent 2.
+    Hi, I am agent 3.
+    Hi, I am agent 9.
+    Hi, I am agent 4.
+    Hi, I am agent 1.
+    Hi, I am agent 6.
+    Hi, I am agent 7.
+    
 
 Exercise
 ^^^^^^^^
@@ -233,7 +249,7 @@ there isn't such a list explicitly in the model. The scheduler, however,
 does have an internal list of all the agents it is scheduled to
 activate.
 
-With that in mind, we rewrite the agents ``step`` method, like this:
+With that in mind, we rewrite the agent ``step`` method, like this:
 
 .. code:: ipython3
 
@@ -256,7 +272,7 @@ Running your first model
 With that last piece in hand, it's time for the first rudimentary run of
 the model.
 
-If you've written the code in its own file (``MoneyModel.py`` or a
+If you've written the code in its own file (``money_model.py`` or a
 different name), launch an interpreter in the same directory as the file
 (either the plain Python command-line interpreter, or the IPython
 interpreter), or launch a Jupyter Notebook there. Then import the
@@ -265,7 +281,7 @@ this step isn't necessary).
 
 .. code:: python
 
-   from MoneyModel import *
+   from money_model import *
 
 Now let's create a model with 10 agents, and run it for 10 steps.
 
@@ -287,10 +303,6 @@ this line, to make the graph appear.
 
    plt.show()
 
-You'll probably see something like the distribution shown below. Yours
-will almost certainly look at least slightly different, since each run
-of the model is random, after all.
-
 .. code:: ipython3
 
     # For a jupyter notebook add the following line:
@@ -301,6 +313,13 @@ of the model is random, after all.
     
     agent_wealth = [a.wealth for a in model.schedule.agents]
     plt.hist(agent_wealth)
+
+You'll should see something like the distribution below. Yours will
+almost certainly look at least slightly different, since each run of the
+model is random.
+
+.. image:: output_19_1.png
+
 
 To get a better idea of how a model behaves, we can create multiple
 model runs and see the distribution that emerges from all of them. We
@@ -322,10 +341,15 @@ can do this with a nested for loop:
     
     plt.hist(all_wealth, bins=range(max(all_wealth)+1))
 
+
+.. image:: output_22_1.png
+
+
 This runs 100 instantiations of the model, and runs each for 10 steps.
 (Notice that we set the histogram bins to be integers, since agents can
 only have whole numbers of wealth). This distribution looks a lot
-smoother. By running the model 100 times, we smooth out some of the 'noise' of randomness, and get to the model's overall expected behavior.
+smoother. By running the model 100 times, we smooth out some of the
+'noise' of randomness, and get to the model's overall expected behavior.
 
 This outcome might be surprising. Despite the fact that all agents, on
 average, give and receive one unit of money every step, the model
@@ -415,7 +439,7 @@ But there's an even simpler way, using the grid's built-in
 cell. This method can get two types of cell neighborhoods:
 `Moore <https://en.wikipedia.org/wiki/Moore_neighborhood>`__ (includes
 all 8 surrounding squares), and `Von
-Neumann <https://en.wikipedia.org/wiki/Von_Neumann_neighborhood>`__\ (only 4 squares-
+Neumann <https://en.wikipedia.org/wiki/Von_Neumann_neighborhood>`__\ (only
 up/down/left/right). It also needs an argument as to whether to include
 the center cell itself as one of the neighbors.
 
@@ -542,6 +566,10 @@ grid, giving us each cell's coordinates and contents in turn.
     # If running from a text editor or IDE, remember you'll need the following:
     # plt.show()
 
+
+.. image:: output_33_1.png
+
+
 Collecting Data
 ~~~~~~~~~~~~~~~
 
@@ -659,12 +687,74 @@ To get the series of Gini coefficients as a pandas DataFrame:
     gini = model.datacollector.get_model_vars_dataframe()
     gini.plot()
 
+
+.. image:: output_39_1.png
+
+
 Similarly, we can get the agent-wealth data:
 
 .. code:: ipython3
 
     agent_wealth = model.datacollector.get_agent_vars_dataframe()
     agent_wealth.head()
+
+
+.. raw:: html
+
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+    
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+    
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th></th>
+          <th>Wealth</th>
+        </tr>
+        <tr>
+          <th>Step</th>
+          <th>AgentID</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th rowspan="5" valign="top">0</th>
+          <th>0</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>1</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
 
 You'll see that the DataFrame's index is pairings of model step and
 agent ID. You can analyze it the way you would any other DataFrame. For
@@ -675,12 +765,20 @@ example, to get a histogram of agent wealth at the model's end:
     end_wealth = agent_wealth.xs(99, level="Step")["Wealth"]
     end_wealth.hist(bins=range(agent_wealth.Wealth.max()+1))
 
+
+.. image:: output_43_1.png
+
+
 Or to plot the wealth of a given agent (in this example, agent 14):
 
 .. code:: ipython3
 
     one_agent_wealth = agent_wealth.xs(14, level="AgentID")
     one_agent_wealth.Wealth.plot()
+
+
+.. image:: output_45_1.png
+
 
 Batch Run
 ~~~~~~~~~
@@ -739,7 +837,7 @@ argument for how many model instantiations to create and run at each
 combination of parameter values, and how many steps to run each
 instantiation for. Finally, like the DataCollector, it takes
 dictionaries of model- and agent-level reporters to collect. Unlike the
-DataCollector, it won’t collect the data every step of the model, but
+DataCollector, it won't collect the data every step of the model, but
 only at the end of each run.
 
 In the following example, we hold the height and width fixed, and vary
@@ -750,9 +848,9 @@ We have it collect the final Gini coefficient value.
 
 Now, we can set up and run the BatchRunner:
 
-*\*The total number of runs is 245. That is 10 agents to 490 increasing by
+*The total number of runs is 245. That is 10 agents to 490 increasing by
 10, making 49 agents populations. Each agent population is then run 5
-times (49 \* 5) for 245 iterations*
+times (49* 5) for 245 iterations
 
 .. code:: ipython3
 
@@ -772,6 +870,7 @@ times (49 \* 5) for 245 iterations*
                             model_reporters={"Gini": compute_gini})
     batch_run.run_all()
 
+
 Like the DataCollector, we can extract the data we collected as a
 DataFrame.
 
@@ -780,6 +879,10 @@ DataFrame.
     run_data = batch_run.get_model_vars_dataframe()
     run_data.head()
     plt.scatter(run_data.N, run_data.Gini)
+
+
+.. image:: output_53_1.png
+
 
 Notice that each row is a model run, and gives us the parameter values
 associated with that run. We can use this data to view a scatter-plot
@@ -795,13 +898,12 @@ or have any problems please contact
 ``virtual environment``:
 http://docs.python-guide.org/en/latest/dev/virtualenvs/
 
-[Comer2014] Comer, Kenneth W. "Who Goes First? An Examination of the
-Impact of Activation on Outcome Behavior in AgentBased Models." George
+[Comer2014] Comer, Kenneth W. “Who Goes First? An Examination of the
+Impact of Activation on Outcome Behavior in AgentBased Models.” George
 Mason University, 2014.
 http://mars.gmu.edu/bitstream/handle/1920/9070/Comer_gmu_0883E_10539.pdf
 
-[Dragulescu2002] Dragulescu, Adrian A., and Victor M. Yakovenko.
-"Statistical Mechanics of Money, Income, and Wealth: A Short Survey."
+[Dragulescu2002] Drăgulescu, Adrian A., and Victor M. Yakovenko.
+“Statistical Mechanics of Money, Income, and Wealth: A Short Survey.”
 arXiv Preprint Cond-mat/0211175, 2002.
 http://arxiv.org/abs/cond-mat/0211175.
-

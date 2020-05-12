@@ -29,7 +29,7 @@ def person_portrayal(agent):
     # update portrayal characteristics for each Person object
     if isinstance(agent, Person):
         portrayal["Shape"] = "circle"
-        portrayal["r"] = .5
+        portrayal["r"] = 0.5
         portrayal["Layer"] = 0
         portrayal["Filled"] = "true"
 
@@ -49,24 +49,44 @@ def person_portrayal(agent):
 
 
 # dictionary of user settable parameters - these map to the model __init__ parameters
-model_params = {"init_people": UserSettableParameter("slider", "People", 25, 1, 200,
-                                                    description="Initial Number of People"),
-                "rich_threshold": UserSettableParameter("slider", "Rich Threshold", 10, 1, 20,
-                                                   description="Upper End of Random Initial Wallet Amount"),
-                "reserve_percent": UserSettableParameter("slider", "Reserves", 50, 1, 100,
-                                                    description="Percent of deposits the bank has to hold in reserve")
-                }
+model_params = {
+    "init_people": UserSettableParameter(
+        "slider", "People", 25, 1, 200, description="Initial Number of People"
+    ),
+    "rich_threshold": UserSettableParameter(
+        "slider",
+        "Rich Threshold",
+        10,
+        1,
+        20,
+        description="Upper End of Random Initial Wallet Amount",
+    ),
+    "reserve_percent": UserSettableParameter(
+        "slider",
+        "Reserves",
+        50,
+        1,
+        100,
+        description="Percent of deposits the bank has to hold in reserve",
+    ),
+}
 
 # set the portrayal function and size of the canvas for visualization
 canvas_element = CanvasGrid(person_portrayal, 20, 20, 500, 500)
 
 # map data to chart in the ChartModule
-chart_element = ChartModule([{"Label": "Rich", "Color": RICH_COLOR},
-                             {"Label": "Poor", "Color": POOR_COLOR},
-                             {"Label": "Middle Class", "Color": MID_COLOR}])
+chart_element = ChartModule(
+    [
+        {"Label": "Rich", "Color": RICH_COLOR},
+        {"Label": "Poor", "Color": POOR_COLOR},
+        {"Label": "Middle Class", "Color": MID_COLOR},
+    ]
+)
 
 # create instance of Mesa ModularServer
-server = ModularServer(BankReserves, [canvas_element, chart_element],
-                       "Bank Reserves Model",
-                       model_params=model_params
-                       )
+server = ModularServer(
+    BankReserves,
+    [canvas_element, chart_element],
+    "Bank Reserves Model",
+    model_params=model_params,
+)

@@ -9,7 +9,7 @@ def compute_gini(model):
     x = sorted(agent_wealths)
     N = model.num_agents
     B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * sum(x))
-    return (1 + (1 / N) - 2 * B)
+    return 1 + (1 / N) - 2 * B
 
 
 class BoltzmannWealthModel(Model):
@@ -25,8 +25,7 @@ class BoltzmannWealthModel(Model):
         self.grid = MultiGrid(height, width, True)
         self.schedule = RandomActivation(self)
         self.datacollector = DataCollector(
-            model_reporters={"Gini": compute_gini},
-            agent_reporters={"Wealth": "wealth"}
+            model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
         )
         # Create agents
         for i in range(self.num_agents):
@@ -52,6 +51,7 @@ class BoltzmannWealthModel(Model):
 
 class MoneyAgent(Agent):
     """ An agent with fixed initial wealth."""
+
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.wealth = 1
