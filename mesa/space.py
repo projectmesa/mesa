@@ -346,8 +346,8 @@ class Grid:
 
         """
         pos = self.torus_adj(pos)
-        assert isinstance(agent.pos, Tuple[int, int])
-        self._remove_agent(agent.pos, agent)
+        old_pos = cast(Coordinate, agent.pos)
+        self._remove_agent(old_pos, agent)
         self._place_agent(pos, agent)
         agent.pos = pos
 
@@ -364,8 +364,7 @@ class Grid:
 
     def remove_agent(self, agent: Agent) -> None:
         """ Remove the agent from the grid and set its pos variable to None. """
-        pos = agent.pos
-        assert isinstance(pos, Tuple[int, int])
+        pos = cast(Coordinate, agent.pos)
         self._remove_agent(pos, agent)
         agent.pos = None
 
@@ -382,8 +381,7 @@ class Grid:
 
     def move_to_empty(self, agent: Agent) -> None:
         """ Moves agent to a random empty cell, vacating agent's old cell. """
-        pos = agent.pos
-        assert isinstance(pos, Tuple[int, int])
+        pos = cast(Coordinate, agent.pos)
         if len(self.empties) == 0:
             raise Exception("ERROR: No empty cells")
         new_pos = agent.random.choice(sorted(self.empties))
@@ -881,8 +879,8 @@ class NetworkGrid:
 
     def move_agent(self, agent: Agent, node_id: int) -> None:
         """ Move an agent from its current node to a new node. """
-        assert isinstance(agent.pos, int)
-        self._remove_agent(agent, agent.pos)
+        old_pos = cast(int, agent.pos)
+        self._remove_agent(agent, old_pos)
         self._place_agent(agent, node_id)
         agent.pos = node_id
 
