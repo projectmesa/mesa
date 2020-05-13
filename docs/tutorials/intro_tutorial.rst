@@ -30,7 +30,7 @@ Sample Model Description
 
 The tutorial model is a very simple simulated agent-based economy, drawn
 from econophysics and presenting a statistical mechanics approach to
-wealth distribution [Dragulescu2002]_. The rules of our tutorial model:
+wealth distribution [Dragulescu2002]. The rules of our tutorial model:
 
 1. There are some number of agents.
 2. All agents begin with 1 unit of money.
@@ -122,7 +122,7 @@ with the given number of agents.
 
 The beginning of both classes looks like this:
 
-.. code:: ipython3
+.. code:: python
 
     from mesa import Agent, Model
     
@@ -169,7 +169,7 @@ activates and executes each agent's ``step`` method.
 With that in mind, the model code with the scheduler added looks like
 this:
 
-.. code:: ipython3
+.. code:: python
 
     from mesa import Agent, Model
     from mesa.time import RandomActivation
@@ -212,7 +212,7 @@ code is in ``money_model.py``:
 
 Then create the model object, and run it for one step:
 
-.. code:: ipython3
+.. code:: python
 
     empty_model = MoneyModel(10)
     empty_model.step()
@@ -257,7 +257,7 @@ activate.
 
 With that in mind, we rewrite the agent ``step`` method, like this:
 
-.. code:: ipython3
+.. code:: python
 
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
@@ -280,7 +280,7 @@ the model.
 
 If you've written the code in its own file (``money_model.py`` or a
 different name), launch an interpreter in the same directory as the file
-(either the plain Python command-line interpreter, or the IPython
+(either the plain Python command-line interpreter, or the make htm
 interpreter), or launch a Jupyter Notebook there. Then import the
 classes you created. (If you wrote the code in a Notebook, obviously
 this step isn't necessary).
@@ -291,7 +291,7 @@ this step isn't necessary).
 
 Now let's create a model with 10 agents, and run it for 10 steps.
 
-.. code:: ipython3
+.. code:: python
 
     model = MoneyModel(10)
     for i in range(10):
@@ -302,23 +302,18 @@ to see the distribution of the agent's wealth. We can get the wealth
 values with list comprehension, and then use matplotlib (or another
 graphics library) to visualize the data in a histogram.
 
-If you are running from a text editor or IDE, you'll also need to add
-this line, to make the graph appear.
-
 .. code:: python
 
-   plt.show()
-
-.. code:: ipython3
-
-    # For a jupyter notebook add the following line:
-    %matplotlib inline
-    
     # The below is needed for both notebooks and scripts
     import matplotlib.pyplot as plt
-    
+
+    # For jupyter notebook add the following line:
+    %matplotlib inline
+
     agent_wealth = [a.wealth for a in model.schedule.agents]
     plt.hist(agent_wealth)
+    #For a script add the following line
+    plt.show()
 
 You'll should see something like the distribution below. Yours will
 almost certainly look at least slightly different, since each run of the
@@ -330,7 +325,7 @@ To get a better idea of how a model behaves, we can create multiple
 model runs and see the distribution that emerges from all of them. We
 can do this with a nested for loop:
 
-.. code:: ipython3
+.. code:: python
 
     all_wealth = []
     #This runs the model 100 times, each model executing 10 steps. 
@@ -386,7 +381,7 @@ Mesa has two main types of grids: ``SingleGrid`` and ``MultiGrid``.
 multiple agents to be in the same cell. Since we want agents to be able
 to share a cell, we use ``MultiGrid``.
 
-.. code:: ipython3
+.. code:: python
 
     from mesa.space import MultiGrid
 
@@ -397,7 +392,7 @@ always be toroidal. We can place agents on a grid with the grid's
 ``place_agent`` method, which takes an agent and an (x, y) tuple of the
 coordinates to place the agent.
 
-.. code:: ipython3
+.. code:: python
 
     class MoneyModel(Model):
         """A model with some number of agents."""
@@ -492,7 +487,7 @@ And with those two methods, the agent's ``step`` method becomes:
 
 Now, putting that all together should look like this:
 
-.. code:: ipython3
+.. code:: python
 
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
@@ -544,7 +539,7 @@ Now, putting that all together should look like this:
 Let's create a model with 50 agents on a 10x10 grid, and run it for 20
 steps.
 
-.. code:: ipython3
+.. code:: python
 
     model = MoneyModel(50, 10, 10)
     for i in range(20):
@@ -556,7 +551,7 @@ size as the grid, filled with zeros. Then we use the grid object's
 ``coord_iter()`` feature, which lets us loop over every cell in the
 grid, giving us each cell's coordinates and contents in turn.
 
-.. code:: ipython3
+.. code:: python
 
     import numpy as np
     
@@ -609,7 +604,7 @@ At the model level, let's measure the model's `Gini
 Coefficient <https://en.wikipedia.org/wiki/Gini_coefficient>`__, a
 measure of wealth inequality.
 
-.. code:: ipython3
+.. code:: python
 
     from mesa.datacollection import DataCollector
     
@@ -679,7 +674,7 @@ session, especially via a Notebook, comes in handy: the DataCollector
 can export the data it's collected as a pandas DataFrame, for easy
 interactive analysis.
 
-.. code:: ipython3
+.. code:: python
 
     model = MoneyModel(50, 10, 10)
     for i in range(100):
@@ -687,7 +682,7 @@ interactive analysis.
 
 To get the series of Gini coefficients as a pandas DataFrame:
 
-.. code:: ipython3
+.. code:: python
 
     gini = model.datacollector.get_model_vars_dataframe()
     gini.plot()
@@ -698,7 +693,7 @@ To get the series of Gini coefficients as a pandas DataFrame:
 
 Similarly, we can get the agent-wealth data:
 
-.. code:: ipython3
+.. code:: python
 
     agent_wealth = model.datacollector.get_agent_vars_dataframe()
     agent_wealth.head()
@@ -765,7 +760,7 @@ You'll see that the DataFrame's index is pairings of model step and
 agent ID. You can analyze it the way you would any other DataFrame. For
 example, to get a histogram of agent wealth at the model's end:
 
-.. code:: ipython3
+.. code:: python
 
     end_wealth = agent_wealth.xs(99, level="Step")["Wealth"]
     end_wealth.hist(bins=range(agent_wealth.Wealth.max()+1))
@@ -776,7 +771,7 @@ example, to get a histogram of agent wealth at the model's end:
 
 Or to plot the wealth of a given agent (in this example, agent 14):
 
-.. code:: ipython3
+.. code:: python
 
     one_agent_wealth = agent_wealth.xs(14, level="AgentID")
     one_agent_wealth.Wealth.plot()
@@ -800,7 +795,7 @@ for the MoneyModel class. This variable enables conditional shut off of
 the model once a condition is met. In this example it will be set as
 True indefinitely.
 
-.. code:: ipython3
+.. code:: python
 
     def compute_gini(model):
         agent_wealths = [agent.wealth for agent in model.schedule.agents]
@@ -857,11 +852,11 @@ Now, we can set up and run the BatchRunner:
 10, making 49 agents populations. Each agent population is then run 5
 times (49* 5) for 245 iterations
 
-.. code:: ipython3
+.. code:: python
 
     from mesa.batchrunner import BatchRunner
 
-.. code:: ipython3
+.. code:: python
 
     fixed_params = {"width": 10,
                    "height": 10}
@@ -879,7 +874,7 @@ times (49* 5) for 245 iterations
 Like the DataCollector, we can extract the data we collected as a
 DataFrame.
 
-.. code:: ipython3
+.. code:: python
 
     run_data = batch_run.get_model_vars_dataframe()
     run_data.head()
