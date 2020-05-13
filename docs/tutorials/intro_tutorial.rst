@@ -326,7 +326,6 @@ model is random.
 
 .. image:: intro_tutorial_files/intro_tutorial_19_1.png
 
-
 To get a better idea of how a model behaves, we can create multiple
 model runs and see the distribution that emerges from all of them. We
 can do this with a nested for loop:
