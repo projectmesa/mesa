@@ -137,9 +137,7 @@ class Grid:
             for col in range(self.height):
                 yield self.grid[row][col], row, col  # agent, x, y
 
-    def neighbor_iter(
-        self, pos: Coordinate, moore: bool = True
-    ) -> Iterator[GridContent]:
+    def neighbor_iter(self, pos: Coordinate, moore: bool = True) -> Iterator[Agent]:
         """Iterate over position neighbors.
 
         Args:
@@ -238,7 +236,7 @@ class Grid:
         moore: bool,
         include_center: bool = False,
         radius: int = 1,
-    ) -> Iterator[GridContent]:
+    ) -> Iterator[Agent]:
         """Return an iterator over neighbors to a certain point.
 
         Args:
@@ -267,7 +265,7 @@ class Grid:
         moore: bool,
         include_center: bool = False,
         radius: int = 1,
-    ) -> List[GridContent]:
+    ) -> List[Agent]:
         """Return a list of neighbors to a certain point.
 
         Args:
@@ -310,7 +308,7 @@ class Grid:
     @accept_tuple_argument
     def iter_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
-    ) -> Iterator[GridContent]:
+    ) -> Iterator[Agent]:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -319,12 +317,13 @@ class Grid:
             An iterator of the contents of the cells identified in cell_list
 
         """
-        return (self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y)))
+        return cast(
+            Iterator[Agent],
+            (self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y))),
+        )
 
     @accept_tuple_argument
-    def get_cell_list_contents(
-        self, cell_list: Iterable[Coordinate]
-    ) -> List[GridContent]:
+    def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> List[Agent]:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -506,7 +505,7 @@ class MultiGrid(Grid):
     @accept_tuple_argument
     def iter_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
-    ) -> Iterator[GridContent]:
+    ) -> Iterator[Agent]:
         """
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -603,7 +602,7 @@ class HexGrid(Grid):
         for i in coordinates:
             yield i
 
-    def neighbor_iter(self, pos: Coordinate) -> Iterator[GridContent]:
+    def neighbor_iter(self, pos: Coordinate) -> Iterator[Agent]:
         """Iterate over position neighbors.
 
         Args:
@@ -634,7 +633,7 @@ class HexGrid(Grid):
 
     def iter_neighbors(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
-    ) -> Iterator[GridContent]:
+    ) -> Iterator[Agent]:
         """Return an iterator over neighbors to a certain point.
 
         Args:
@@ -653,7 +652,7 @@ class HexGrid(Grid):
 
     def get_neighbors(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
-    ) -> List[GridContent]:
+    ) -> List[Agent]:
         """Return a list of neighbors to a certain point.
 
         Args:
@@ -767,7 +766,7 @@ class ContinuousSpace:
 
     def get_neighbors(
         self, pos: FloatCoordinate, radius: float, include_center: bool = True
-    ) -> List[GridContent]:
+    ) -> List[Agent]:
         """Get all objects within a certain radius.
 
         Args:
@@ -868,7 +867,7 @@ class NetworkGrid:
         self._place_agent(agent, node_id)
         agent.pos = node_id
 
-    def get_neighbors(self, node_id: int, include_center: bool = False) -> List[int]:
+    def get_neighbors(self, node_id: int, include_center: bool = False) -> List[Agent]:
         """ Get all adjacent nodes """
 
         neighbors = list(self.G.neighbors(node_id))
@@ -898,13 +897,13 @@ class NetworkGrid:
         """ Returns a bool of the contents of a cell. """
         return not self.G.nodes[node_id]["agent"]
 
-    def get_cell_list_contents(self, cell_list: List[int]) -> List[GridContent]:
+    def get_cell_list_contents(self, cell_list: List[int]) -> List[Agent]:
         return list(self.iter_cell_list_contents(cell_list))
 
     def get_all_cell_contents(self) -> List[GridContent]:
         return list(self.iter_cell_list_contents(self.G))
 
-    def iter_cell_list_contents(self, cell_list: List[int]) -> List[GridContent]:
+    def iter_cell_list_contents(self, cell_list: List[int]) -> List[Agent]:
         list_of_lists = [
             self.G.nodes[node_id]["agent"]
             for node_id in cell_list
