@@ -5,12 +5,12 @@ Core Objects: Agent
 
 """
 # mypy
-from typing import Optional, Union, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from random import Random
 
 if TYPE_CHECKING:
     from mesa.model import Model
-    from mesa.space import Coordinate, FloatCoordinate
+    from mesa.space import Position
 
 
 class Agent:
@@ -20,7 +20,7 @@ class Agent:
         """ Create a new agent. """
         self.unique_id = unique_id
         self.model = model
-        self.pos: Optional[Union[Coordinate, FloatCoordinate, int]] = None
+        self.pos = None  # type: Optional[Position]
 
     def step(self) -> None:
         """ A single step of the agent. """

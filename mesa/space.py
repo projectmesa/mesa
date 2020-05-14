@@ -21,6 +21,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Generic,
     Iterable,
     Iterator,
     List,
@@ -34,12 +35,16 @@ from typing import (
 from mesa.agent import Agent
 
 Coordinate = Tuple[int, int]
+FloatCoordinate = Union[Tuple[float, float], np.ndarray]
+NetworkCoordinate = int
+
+Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
+
 GridContent = Optional[Agent]
 MultiGridContent = Set[Agent]
-# used in ContinuousSpace
-FloatCoordinate = Union[Tuple[float, float], np.ndarray]
 
 F = TypeVar("F", bound=Callable[..., Any])
+Content = TypeVar("Content")
 
 
 def accept_tuple_argument(wrapped_function: F) -> F:
@@ -58,7 +63,7 @@ def accept_tuple_argument(wrapped_function: F) -> F:
     return cast(F, wrapper)
 
 
-class Grid:
+class BaseGrid(Generic[Content]):
     """Base class for a square grid.
 
     Grid cells are indexed by [x][y], where [0][0] is assumed to be the
@@ -105,10 +110,10 @@ class Grid:
         self.width = width
         self.torus = torus
 
-        self.grid: List[List[GridContent]] = []
+        self.grid: List[List[Content]] = []
 
         for x in range(self.width):
-            col: List[GridContent] = []
+            col: List[Content] = []
             for y in range(self.height):
                 col.append(self.default_val())
             self.grid.append(col)
@@ -117,21 +122,20 @@ class Grid:
         self.empties = set(itertools.product(*(range(self.width), range(self.height))))
 
     @staticmethod
-    def default_val() -> None:
-        """ Default value for new cell elements. """
-        return None
+    def default_val() -> Content:
+        pass
 
-    def __getitem__(self, index: int) -> List[GridContent]:
+    def __getitem__(self, index: int) -> List[Content]:
         return self.grid[index]
 
-    def __iter__(self) -> Iterator[GridContent]:
+    def __iter__(self) -> Iterator[Content]:
         """
         create an iterator that chains the
         rows of grid together as if one list:
         """
         return itertools.chain(*self.grid)
 
-    def coord_iter(self) -> Iterator[Tuple[GridContent, int, int]]:
+    def coord_iter(self) -> Iterator[Tuple[Content, int, int]]:
         """ An iterator that returns coordinates as well as cell contents. """
         for row in range(self.width):
             for col in range(self.height):
@@ -350,16 +354,13 @@ class Grid:
         self._place_agent(pos, agent)
         agent.pos = pos
 
+    def _place_agent(self, pos: Coordinate, agent: Agent) -> None:
+        pass
+
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """ Position an agent on the grid, and set its pos variable. """
         self._place_agent(pos, agent)
         agent.pos = pos
-
-    def _place_agent(self, pos: Coordinate, agent: Agent) -> None:
-        """ Place the agent at the correct location. """
-        x, y = pos
-        self.grid[x][y] = agent
-        self.empties.discard(pos)
 
     def remove_agent(self, agent: Agent) -> None:
         """ Remove the agent from the grid and set its pos variable to None. """
@@ -368,10 +369,7 @@ class Grid:
         agent.pos = None
 
     def _remove_agent(self, pos: Coordinate, agent: Agent) -> None:
-        """ Remove the agent from the given location. """
-        x, y = pos
-        self.grid[x][y] = None
-        self.empties.add(pos)
+        pass
 
     def is_cell_empty(self, pos: Coordinate) -> bool:
         """ Returns a bool of the contents of a cell. """
@@ -412,6 +410,25 @@ class Grid:
     def exists_empty_cells(self) -> bool:
         """ Return True if any cells empty else False. """
         return len(self.empties) > 0
+
+
+class Grid(BaseGrid[GridContent]):
+    @staticmethod
+    def default_val() -> GridContent:
+        """ Default value for new cell elements. """
+        return None
+
+    def _place_agent(self, pos: Coordinate, agent: Agent) -> None:
+        """ Place the agent at the correct location. """
+        x, y = pos
+        self.grid[x][y] = agent
+        self.empties.discard(pos)
+
+    def _remove_agent(self, pos: Coordinate, agent: Agent) -> None:
+        """ Remove the agent from the given location. """
+        x, y = pos
+        self.grid[x][y] = None
+        self.empties.add(pos)
 
 
 class SingleGrid(Grid):
@@ -458,7 +475,7 @@ class SingleGrid(Grid):
             raise Exception("Cell not empty")
 
 
-class MultiGrid(Grid):
+class MultiGrid(BaseGrid[MultiGridContent]):
     """Grid where each cell can contain more than one object.
 
     Grid cells are indexed by [x][y], where [0][0] is assumed to be at
@@ -478,7 +495,7 @@ class MultiGrid(Grid):
         get_neighbors: Returns the objects surrounding a given cell.
     """
 
-    grid: List[List[MultiGridContent]]
+    grid = []  # type: List[List[MultiGridContent]]
 
     def __getitem__(self, index: int) -> List[MultiGridContent]:
         return self.grid[index]
@@ -592,7 +609,8 @@ class HexGrid(Grid):
             coordinates.update(adjacent)
 
             if radius > 1:
-                [find_neighbors(coords, radius - 1) for coords in adjacent]
+                for coords in adjacent:
+                    find_neighbors(coords, radius - 1)
 
         find_neighbors(pos, radius)
 
