@@ -427,7 +427,7 @@ class Grid(BaseGrid[GridContent]):
     def _remove_agent(self, pos: Coordinate, agent: Agent) -> None:
         """ Remove the agent from the given location. """
         x, y = pos
-        self.grid[x][y] = None
+        self.grid[x][y] = self.default_val()
         self.empties.add(pos)
 
 
