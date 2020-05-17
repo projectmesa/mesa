@@ -37,6 +37,32 @@ var NetworkModule = function(svg_width, svg_height) {
         .append("svg:path")
         .attr("d", "M0,-5L10,0L0,5");
 
+    svg.append("svg:defs").selectAll("marker")
+        .data(["endlarge"])      // Different link/path types can be defined here
+        .enter().append("svg:marker")    // This section adds in the arrows
+        .attr("id", String)
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 15)
+        .attr("refY", 0.5)
+        .attr("markerWidth", 3)
+        .attr("markerHeight", 3)
+        .attr("orient", "auto")
+        .append("svg:path")
+        .attr("d", "M0,-5L10,0L0,5");
+
+    svg.append("svg:defs").selectAll("marker")
+        .data(["endxl"])      // Different link/path types can be defined here
+        .enter().append("svg:marker")    // This section adds in the arrows
+        .attr("id", String)
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 15)
+        .attr("refY", 0.5)
+        .attr("markerWidth", 4)
+        .attr("markerHeight", 4)
+        .attr("orient", "auto")
+        .append("svg:path")
+        .attr("d", "M0,-5L10,0L0,5");
+
     var links = g.append("g")
         .attr("class", "links")
 
@@ -74,7 +100,9 @@ var NetworkModule = function(svg_width, svg_height) {
             .attr("y2", function(d) { return d.target.y; })
             .attr("stroke-width", function(d) { return d.width; })
             .attr("stroke", function(d) { return d.color; })
-            .attr("marker-end", function(d) { return d.directed ? "url(#end)" : ""});
+            .attr("marker-end", function(d) {
+                return d.directed ? "url(#end" + (d.marker_size !== undefined ? d.marker_size : '') + ")" : ""
+            });
 
         links
             .selectAll("line")

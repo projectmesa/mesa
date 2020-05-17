@@ -47,7 +47,8 @@ def network_portrayal(G):
             "target": target,
             "color": edge_color(*get_agents(source, target)),
             "width": edge_width(*get_agents(source, target)),
-            "directed": True
+            "directed": True,
+            "arrowhead_size": 3.
         }
         for (source, target) in G.edges
     ]
