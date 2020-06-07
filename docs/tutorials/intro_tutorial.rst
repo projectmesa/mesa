@@ -65,7 +65,7 @@ file, which can be installed directly from the github repository by running:
 
 .. code:: bash
 
-       $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa/master/examples/boltzmann_wealth_model/requirements.txt  
+       $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa/master/examples/boltzmann_wealth_model/requirements.txt
 
 or if you have the requirements file locally with
 
@@ -125,13 +125,13 @@ The beginning of both classes looks like this:
 .. code:: python
 
     from mesa import Agent, Model
-    
+
     class MoneyAgent(Agent):
         """An agent with fixed initial wealth."""
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.wealth = 1
-    
+
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N):
@@ -173,18 +173,18 @@ this:
 
     from mesa import Agent, Model
     from mesa.time import RandomActivation
-    
+
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.wealth = 1
-    
+
         def step(self):
             # The agent's step will go here.
             # For demonstration purposes we will print the agent's unique_id
             print ("Hi, I am agent " + str(self.unique_id) +".")
-    
+
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N):
@@ -194,7 +194,7 @@ this:
             for i in range(self.num_agents):
                 a = MoneyAgent(i, self)
                 self.schedule.add(a)
-    
+
         def step(self):
             '''Advance the model by one step.'''
             self.schedule.step()
@@ -208,7 +208,7 @@ code is in ``money_model.py``:
 
 .. code:: python
 
-   from money_model import MoneyModel
+    from money_model import MoneyModel
 
 Then create the model object, and run it for one step:
 
@@ -230,7 +230,7 @@ Then create the model object, and run it for one step:
     Hi, I am agent 1.
     Hi, I am agent 6.
     Hi, I am agent 7.
-    
+
 
 Exercise
 ^^^^^^^^
@@ -264,7 +264,7 @@ With that in mind, we rewrite the agent ``step`` method, like this:
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.wealth = 1
-    
+
         def step(self):
             if self.wealth == 0:
                 return
@@ -280,14 +280,13 @@ the model.
 
 If you've written the code in its own file (``money_model.py`` or a
 different name), launch an interpreter in the same directory as the file
-(either the plain Python command-line interpreter, or the make htm
-interpreter), or launch a Jupyter Notebook there. Then import the
+(either the plain Python command-line interpreter, or the IPython interpreter), or launch a Jupyter Notebook there. Then import the
 classes you created. (If you wrote the code in a Notebook, obviously
 this step isn't necessary).
 
 .. code:: python
 
-   from money_model import *
+    from money_model import *
 
 Now let's create a model with 10 agents, and run it for 10 steps.
 
@@ -319,7 +318,7 @@ You'll should see something like the distribution below. Yours will
 almost certainly look at least slightly different, since each run of the
 model is random.
 
-.. image:: intro_tutorial_files/intro_tutorial_19_1.png
+.. image:: files/output_19_1.png
 
 To get a better idea of how a model behaves, we can create multiple
 model runs and see the distribution that emerges from all of them. We
@@ -328,17 +327,17 @@ can do this with a nested for loop:
 .. code:: python
 
     all_wealth = []
-    #This runs the model 100 times, each model executing 10 steps. 
+    #This runs the model 100 times, each model executing 10 steps.
     for j in range(100):
         # Run the model
         model = MoneyModel(10)
         for i in range(10):
             model.step()
-        
+
         # Store the results
         for agent in model.schedule.agents:
             all_wealth.append(agent.wealth)
-    
+
     plt.hist(all_wealth, bins=range(max(all_wealth)+1))
 
 
@@ -400,12 +399,12 @@ coordinates to place the agent.
             self.num_agents = N
             self.grid = MultiGrid(width, height, True)
             self.schedule = RandomActivation(self)
-            
+
             # Create agents
             for i in range(self.num_agents):
                 a = MoneyAgent(i, self)
                 self.schedule.add(a)
-                
+
                 # Add the agent to a random grid cell
                 x = self.random.randrange(self.grid.width)
                 y = self.random.randrange(self.grid.height)
@@ -428,11 +427,11 @@ coordinates +/- 1 away from it. For example:
 
 .. code:: python
 
-   neighbors = []
-   x, y = self.pos
-   for dx in [-1, 0, 1]:
-       for dy in [-1, 0, 1]:
-           neighbors.append((x+dx, y+dy))
+    neighbors = []
+    x, y = self.pos
+    for dx in [-1, 0, 1]:
+        for dy in [-1, 0, 1]:
+            neighbors.append((x+dx, y+dy))
 
 But there's an even simpler way, using the grid's built-in
 ``get_neighborhood`` method, which returns all the neighbors of a given
@@ -447,15 +446,15 @@ With that in mind, the agent's ``move`` method looks like this:
 
 .. code:: python
 
-   class MoneyAgent(Agent):
-      #...
-       def move(self):
-           possible_steps = self.model.grid.get_neighborhood(
-               self.pos, 
-               moore=True,
-               include_center=False)
-           new_position = self.random.choice(possible_steps)
-           self.model.grid.move_agent(self, new_position)
+    class MoneyAgent(Agent):
+        #...
+        def move(self):
+            possible_steps = self.model.grid.get_neighborhood(
+                self.pos,
+                moore=True,
+                include_center=False)
+            new_position = self.random.choice(possible_steps)
+            self.model.grid.move_agent(self, new_position)
 
 Next, we need to get all the other agents present in a cell, and give
 one of them some money. We can get the contents of one or more cells
@@ -465,25 +464,25 @@ single tuple if we only care about one cell.
 
 .. code:: python
 
-   class MoneyAgent(Agent):
-       #...
-       def give_money(self):
-           cellmates = self.model.grid.get_cell_list_contents([self.pos])
-           if len(cellmates) > 1:
-               other = self.random.choice(cellmates)
-               other.wealth += 1
-               self.wealth -= 1
+    class MoneyAgent(Agent):
+        #...
+        def give_money(self):
+            cellmates = self.model.grid.get_cell_list_contents([self.pos])
+            if len(cellmates) > 1:
+                other = self.random.choice(cellmates)
+                other.wealth += 1
+                self.wealth -= 1
 
 And with those two methods, the agent's ``step`` method becomes:
 
 .. code:: python
 
-   class MoneyAgent(Agent):
-       # ...
-       def step(self):
-           self.move()
-           if self.wealth > 0:
-               self.give_money()
+    class MoneyAgent(Agent):
+        # ...
+        def step(self):
+            self.move()
+            if self.wealth > 0:
+                self.give_money()
 
 Now, putting that all together should look like this:
 
@@ -494,28 +493,28 @@ Now, putting that all together should look like this:
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.wealth = 1
-    
+
         def move(self):
             possible_steps = self.model.grid.get_neighborhood(
-                self.pos, 
-                moore=True, 
+                self.pos,
+                moore=True,
                 include_center=False)
             new_position = self.random.choice(possible_steps)
             self.model.grid.move_agent(self, new_position)
-    
+
         def give_money(self):
             cellmates = self.model.grid.get_cell_list_contents([self.pos])
             if len(cellmates) > 1:
                 other_agent = self.random.choice(cellmates)
                 other_agent.wealth += 1
                 self.wealth -= 1
-    
+
         def step(self):
             self.move()
             if self.wealth > 0:
                 self.give_money()
-    
-    
+
+
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N, width, height):
@@ -530,11 +529,11 @@ Now, putting that all together should look like this:
                 x = self.random.randrange(self.grid.width)
                 y = self.random.randrange(self.grid.height)
                 self.grid.place_agent(a, (x, y))
-    
+
         def step(self):
             self.schedule.step()
-    
-    
+
+
 
 Let's create a model with 50 agents on a 10x10 grid, and run it for 20
 steps.
@@ -554,7 +553,7 @@ grid, giving us each cell's coordinates and contents in turn.
 .. code:: python
 
     import numpy as np
-    
+
     agent_counts = np.zeros((model.grid.width, model.grid.height))
     for cell in model.grid.coord_iter():
         cell_content, x, y = cell
@@ -562,7 +561,7 @@ grid, giving us each cell's coordinates and contents in turn.
         agent_counts[x][y] = agent_count
     plt.imshow(agent_counts, interpolation='nearest')
     plt.colorbar()
-    
+
     # If running from a text editor or IDE, remember you'll need the following:
     # plt.show()
 
@@ -607,47 +606,47 @@ measure of wealth inequality.
 .. code:: python
 
     from mesa.datacollection import DataCollector
-    
+
     def compute_gini(model):
         agent_wealths = [agent.wealth for agent in model.schedule.agents]
         x = sorted(agent_wealths)
         N = model.num_agents
         B = sum( xi * (N-i) for i,xi in enumerate(x) ) / (N*sum(x))
         return (1 + (1/N) - 2*B)
-    
+
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.wealth = 1
-    
+
         def move(self):
             possible_steps = self.model.grid.get_neighborhood(
-                self.pos, 
-                moore=True, 
+                self.pos,
+                moore=True,
                 include_center=False)
             new_position = self.random.choice(possible_steps)
             self.model.grid.move_agent(self, new_position)
-    
+
         def give_money(self):
             cellmates = self.model.grid.get_cell_list_contents([self.pos])
             if len(cellmates) > 1:
                 other = self.random.choice(cellmates)
                 other.wealth += 1
                 self.wealth -= 1
-    
+
         def step(self):
             self.move()
             if self.wealth > 0:
                 self.give_money()
-    
+
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N, width, height):
             self.num_agents = N
             self.grid = MultiGrid(width, height, True)
             self.schedule = RandomActivation(self)
-            
+
             # Create agents
             for i in range(self.num_agents):
                 a = MoneyAgent(i, self)
@@ -656,11 +655,11 @@ measure of wealth inequality.
                 x = self.random.randrange(self.grid.width)
                 y = self.random.randrange(self.grid.height)
                 self.grid.place_agent(a, (x, y))
-            
+
             self.datacollector = DataCollector(
                 model_reporters={"Gini": compute_gini},
                 agent_reporters={"Wealth": "wealth"})
-    
+
         def step(self):
             self.datacollector.collect(self)
             self.schedule.step()
@@ -706,11 +705,11 @@ Similarly, we can get the agent-wealth data:
         .dataframe tbody tr th:only-of-type {
             vertical-align: middle;
         }
-    
+
         .dataframe tbody tr th {
             vertical-align: top;
         }
-    
+
         .dataframe thead th {
             text-align: right;
         }
@@ -803,7 +802,7 @@ True indefinitely.
         N = model.num_agents
         B = sum( xi * (N-i) for i,xi in enumerate(x) ) / (N*sum(x))
         return (1 + (1/N) - 2*B)
-    
+
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N, width, height):
@@ -811,7 +810,7 @@ True indefinitely.
             self.grid = MultiGrid(width, height, True)
             self.schedule = RandomActivation(self)
             self.running = True
-            
+
             # Create agents
             for i in range(self.num_agents):
                 a = MoneyAgent(i, self)
@@ -820,11 +819,11 @@ True indefinitely.
                 x = self.random.randrange(self.grid.width)
                 y = self.random.randrange(self.grid.height)
                 self.grid.place_agent(a, (x, y))
-            
+
             self.datacollector = DataCollector(
                 model_reporters={"Gini": compute_gini},
                 agent_reporters={"Wealth": "wealth"})
-    
+
         def step(self):
             self.datacollector.collect(self)
             self.schedule.step()
@@ -861,11 +860,11 @@ times (49* 5) for 245 iterations
     fixed_params = {"width": 10,
                    "height": 10}
     variable_params = {"N": range(10, 500, 10)}
-    
-    batch_run = BatchRunner(MoneyModel, 
+
+    batch_run = BatchRunner(MoneyModel,
                             variable_params,
                             fixed_params,
-                            iterations=5, 
+                            iterations=5,
                             max_steps=100,
                             model_reporters={"Gini": compute_gini})
     batch_run.run_all()
