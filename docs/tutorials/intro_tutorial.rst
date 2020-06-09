@@ -65,7 +65,7 @@ file, which can be installed directly from the github repository by running:
 
 .. code:: bash
 
-       $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa/master/examples/boltzmann_wealth_model/requirements.txt  
+       $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa/master/examples/boltzmann_wealth_model/requirements.txt
 
 or if you have the requirements file locally with
 
@@ -184,7 +184,7 @@ this:
             # The agent's step will go here.
             # For demonstration purposes we will print the agent's unique_id
             print ("Hi, I am agent " + str(self.unique_id) +".")
-    
+
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N):
@@ -208,7 +208,7 @@ code is in ``money_model.py``:
 
 .. code:: python
 
-   from money_model import MoneyModel
+    from money_model import MoneyModel
 
 Then create the model object, and run it for one step:
 
@@ -216,7 +216,6 @@ Then create the model object, and run it for one step:
 
     empty_model = MoneyModel(10)
     empty_model.step()
-
 
 .. parsed-literal::
 
@@ -230,7 +229,6 @@ Then create the model object, and run it for one step:
     Hi, I am agent 1.
     Hi, I am agent 6.
     Hi, I am agent 7.
-    
 
 Exercise
 ^^^^^^^^
@@ -280,14 +278,13 @@ the model.
 
 If you've written the code in its own file (``money_model.py`` or a
 different name), launch an interpreter in the same directory as the file
-(either the plain Python command-line interpreter, or the make htm
-interpreter), or launch a Jupyter Notebook there. Then import the
+(either the plain Python command-line interpreter, or the IPython interpreter), or launch a Jupyter Notebook there. Then import the
 classes you created. (If you wrote the code in a Notebook, obviously
 this step isn't necessary).
 
 .. code:: python
 
-   from money_model import *
+    from money_model import *
 
 Now let's create a model with 10 agents, and run it for 10 steps.
 
@@ -315,11 +312,11 @@ graphics library) to visualize the data in a histogram.
     #For a script add the following line
     plt.show()
 
-You'll should see something like the distribution below. Yours will
+You should see something like the distribution below. Yours will
 almost certainly look at least slightly different, since each run of the
 model is random.
 
-.. image:: intro_tutorial_files/intro_tutorial_19_1.png
+.. image:: files/output_19_1.png
 
 To get a better idea of how a model behaves, we can create multiple
 model runs and see the distribution that emerges from all of them. We
@@ -328,7 +325,8 @@ can do this with a nested for loop:
 .. code:: python
 
     all_wealth = []
-    #This runs the model 100 times, each model executing 10 steps. 
+
+    #This runs the model 100 times, each model executing 10 steps.
     for j in range(100):
         # Run the model
         model = MoneyModel(10)
@@ -447,15 +445,15 @@ With that in mind, the agent's ``move`` method looks like this:
 
 .. code:: python
 
-   class MoneyAgent(Agent):
-      #...
-       def move(self):
-           possible_steps = self.model.grid.get_neighborhood(
-               self.pos, 
-               moore=True,
-               include_center=False)
-           new_position = self.random.choice(possible_steps)
-           self.model.grid.move_agent(self, new_position)
+    class MoneyAgent(Agent):
+        #...
+        def move(self):
+            possible_steps = self.model.grid.get_neighborhood(
+                self.pos,
+                moore=True,
+                include_center=False)
+            new_position = self.random.choice(possible_steps)
+            self.model.grid.move_agent(self, new_position)
 
 Next, we need to get all the other agents present in a cell, and give
 one of them some money. We can get the contents of one or more cells
@@ -535,6 +533,27 @@ Now, putting that all together should look like this:
             self.schedule.step()
     
     
+
+
+    class MoneyModel(Model):
+        """A model with some number of agents."""
+        def __init__(self, N, width, height):
+            self.num_agents = N
+            self.grid = MultiGrid(width, height, True)
+            self.schedule = RandomActivation(self)
+            # Create agents
+            for i in range(self.num_agents):
+                a = MoneyAgent(i, self)
+                self.schedule.add(a)
+                # Add the agent to a random grid cell
+                x = self.random.randrange(self.grid.width)
+                y = self.random.randrange(self.grid.height)
+                self.grid.place_agent(a, (x, y))
+
+        def step(self):
+            self.schedule.step()
+
+
 
 Let's create a model with 50 agents on a 10x10 grid, and run it for 20
 steps.
@@ -803,7 +822,7 @@ True indefinitely.
         N = model.num_agents
         B = sum( xi * (N-i) for i,xi in enumerate(x) ) / (N*sum(x))
         return (1 + (1/N) - 2*B)
-    
+
     class MoneyModel(Model):
         """A model with some number of agents."""
         def __init__(self, N, width, height):
@@ -824,7 +843,7 @@ True indefinitely.
             self.datacollector = DataCollector(
                 model_reporters={"Gini": compute_gini},
                 agent_reporters={"Wealth": "wealth"})
-    
+
         def step(self):
             self.datacollector.collect(self)
             self.schedule.step()
@@ -858,14 +877,14 @@ times (49* 5) for 245 iterations
 
 .. code:: python
 
-    fixed_params = {"width": 10,
+fixed_params = {"width": 10,
                    "height": 10}
     variable_params = {"N": range(10, 500, 10)}
-    
-    batch_run = BatchRunner(MoneyModel, 
+
+    batch_run = BatchRunner(MoneyModel,
                             variable_params,
                             fixed_params,
-                            iterations=5, 
+                            iterations=5,
                             max_steps=100,
                             model_reporters={"Gini": compute_gini})
     batch_run.run_all()
