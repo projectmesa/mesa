@@ -32,7 +32,7 @@ Sample Model Description
 
 The tutorial model is a very simple simulated agent-based economy, drawn
 from econophysics and presenting a statistical mechanics approach to
-wealth distribution [Dragulescu2002]\_. The rules of our tutorial model:
+wealth distribution [Dragulescu2002]_. The rules of our tutorial model:
 
 1. There are some number of agents.
 2. All agents begin with 1 unit of money.
@@ -48,18 +48,18 @@ Let's get started.
 Installation
 ~~~~~~~~~~~~
 
-To start, install Mesa. We recommend using a `pipenv <https://docs.pipenv.org/en/latest/>`_,
+To start, install Mesa. We recommend using a `pipenv <https://pipenv.readthedocs.io/en/latest/>`_,
 which combines the `virtual
 environment <https://virtualenvwrapper.readthedocs.org/en/stable/>`_
 along with the `dotenv <https://github.com/theskumar/python-dotenv>`_ projects
 simplifying your experience, but make sure your environment is set up with Python 3.
 Mesa requires Python3 and does not work in Python 2 environments.
 
-To install Mesa, with pipenv simply clone the repository and run:
+To install Mesa, with pipenv run:
 
 .. code:: bash
 
-        $ pipenv sync
+        $ pipenv install mesa
 
 When you do that, it will install Mesa itself, setup an isolated virtual environment
 as well as any dependencies that aren't in your setup yet.
@@ -159,7 +159,7 @@ offers a few different built-in scheduler classes, with a common
 interface. That makes it easy to change the activation regime a given
 model uses, and see whether it changes the model behavior. This may not
 seem important, but scheduling patterns can have an impact on your
-results [Comer2014]\_.
+results [Comer2014]_.
 
 For now, let's use one of the simplest ones: ``RandomActivation``, which
 activates all the agents once per step, in random order. Every agent is
@@ -951,11 +951,11 @@ or have any problems please contact
 ``virtual environment``:
 http://docs.python-guide.org/en/latest/dev/virtualenvs/
 
-[Comer2014] Comer, Kenneth W. “Who Goes First? An Examination of the
-Impact of Activation on Outcome Behavior in AgentBased Models.” George
-Mason University, 2014. http://gradworks.umi.com/36/23/3623940.html.
+.. [Comer2014] Comer, Kenneth W. “Who Goes First? An Examination of the
+ Impact of Activation on Outcome Behavior in AgentBased Models.” George
+ Mason University, 2014. http://gradworks.umi.com/36/23/3623940.html.
 
-[Dragulescu2002] Drăgulescu, Adrian A., and Victor M. Yakovenko.
-“Statistical Mechanics of Money, Income, and Wealth: A Short Survey.”
-arXiv Preprint Cond-mat/0211175, 2002.
-http://arxiv.org/abs/cond-mat/0211175.
+.. [Dragulescu2002] Drăgulescu, Adrian A., and Victor M. Yakovenko.
+ “Statistical Mechanics of Money, Income, and Wealth: A Short Survey.”
+ arXiv Preprint Cond-mat/0211175, 2002.
+ http://arxiv.org/abs/cond-mat/0211175.

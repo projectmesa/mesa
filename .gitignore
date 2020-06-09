@@ -11,6 +11,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
+venv/
 build/
 develop-eggs/
 dist/
@@ -43,7 +44,6 @@ htmlcov/
 nosetests.xml
 coverage.xml
 .pytest_cache/
-.mypy_cache/
 
 # Translations
 *.mo
@@ -67,9 +67,14 @@ target/
 # PyCharm environment files
 .idea/
 
+# VSCode environment files
+.vscode/
+*.code-workspace
+
 # Apple OSX
 *.DS_Store
 
-# Visual studio code
-.vscode/
-*.code-workspace
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json

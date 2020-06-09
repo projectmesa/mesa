@@ -96,7 +96,7 @@ Finally, when you're ready to run the visualization, use the server's
     server = ModularServer(MoneyModel,
                            [grid],
                            "Money Model",
-                           100, 10, 10)
+                           {"N":100, "width":10, "height":10})
     server.port = 8521 # The default
     server.launch()
 
@@ -121,7 +121,7 @@ The full code should now look like:
     server = ModularServer(MoneyModel,
                            [grid],
                            "Money Model",
-                           100, 10, 10)
+                           {"N":100, "width":10, "height":10})
     server.port = 8521 # The default
     server.launch()
 
@@ -131,17 +131,9 @@ open automatically, try pointing it at http://127.0.0.1:8521 manually.
 If this doesn't show you the visualization, something may have gone
 wrong with the server launch.)
 
-You should see something like the figure below: the model title, an
-empty space where the grid will be, and a control panel off to the
-right.
-
-.. figure:: files/viz_empty.png
-   :alt: Empty Visualization
-
-   Empty Visualization
-
-Click the 'reset' button on the control panel, and you should see the
-grid fill up with red circles, representing agents.
+You should see something like the figure below: the model title, a grid
+filled with red circles representing agents, and a set of buttons to the
+right for running and resetting the model.
 
 .. figure:: files/viz_redcircles.png
    :alt: Redcircles Visualization
@@ -228,7 +220,7 @@ chart will appear underneath the grid.
     server = ModularServer(MoneyModel,
                            [grid, chart],
                            "Money Model",
-                           100, 10, 10)
+                           {"N":100, "width":10, "height":10})
 
 Launch the visualization and start a model run, and you'll see a line
 chart underneath the grid. Every step of the model, the line chart
@@ -318,9 +310,9 @@ context, which is required for doing anything with it.
         // Create the tag:
         var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
         canvas_tag += "style='border:1px dotted'></canvas>";
-        // Append it to body:
+        // Append it to #elements:
         var canvas = $(canvas_tag)[0];
-        $("body").append(canvas);
+        $("#elements").append(canvas);
         // Create the context and the drawing controller:
         var context = canvas.getContext("2d");
     };
@@ -338,14 +330,12 @@ created, we can create the chart object.
 .. code:: javascript
 
     var HistogramModule = function(bins, canvas_width, canvas_height) {
-        // Create the elements
-
         // Create the tag:
         var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
         canvas_tag += "style='border:1px dotted'></canvas>";
-        // Append it to body:
+        // Append it to #elements:
         var canvas = $(canvas_tag)[0];
-        $("body").append(canvas);
+        $("#elements").append(canvas);
         // Create the context and the drawing controller:
         var context = canvas.getContext("2d");
 
@@ -373,7 +363,7 @@ created, we can create the chart object.
         };
 
         // Create the chart object
-        var chart = new Chart(context).Bar(data, options);
+        var chart = new Chart(context, {type: 'bar', data: data, options: options});
 
         // Now what?
     };
@@ -397,14 +387,13 @@ With that in mind, we can add these two methods to the class:
     var HistogramModule = function(bins, canvas_width, canvas_height) {
         // ...Everything from above...
         this.render = function(data) {
-            for (var i in data)
-                chart.datasets[0].bars[i].value = data[i];
+            datasets[0].data = data;
             chart.update();
         };
 
         this.reset = function() {
             chart.destroy();
-            chart = new Chart(context).Bar(data, options);
+            chart = new Chart(context, {type: 'bar', data: data, options: options});
         };
     };
 
@@ -497,7 +486,7 @@ Now, you can create your new HistogramModule and add it to the server:
         server = ModularServer(MoneyModel,
                                [grid, histogram, chart],
                                "Money Model",
-                               100, 10, 10)
+                               {"N":100, "width":10, "height":10})
         server.launch()
 
 Run this code, and you should see your brand-new histogram added to the

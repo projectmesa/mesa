@@ -22,7 +22,7 @@ class CanvasGrid(VisualizationElement):
 
     A portrayal as a dictionary with the following structure:
         "x", "y": Coordinates for the cell in which the object is placed.
-        "Shape": Can be either "circle", "rect" or "arrowHead"
+        "Shape": Can be either "circle", "rect", "arrowHead" or a custom image.
             For Circles:
                 "r": The radius, defined as a fraction of cell size. r=1 will
                      fill the entire cell.
@@ -30,9 +30,13 @@ class CanvasGrid(VisualizationElement):
                 "w", "h": The width and height of the rectangle, which are in
                           fractions of cell width and height.
             For arrowHead:
-            "scale": Proportion scaling as a fraction of cell size.
-            "heading_x": represents x direction unit vector.
-            "heading_y": represents y direction unit vector.
+                "scale": Proportion scaling as a fraction of cell size.
+                "heading_x": represents x direction unit vector.
+                "heading_y": represents y direction unit vector.
+             For an image:
+                The image must be placed in the same directory from which the
+                server is launched. An image has the attributes "x", "y",
+                "scale", "text" and "text_color".
         "Color": The color to draw the shape in; needs to be a valid HTML
                  color, e.g."Red" or "#AA08F8"
         "Filled": either "true" or "false", and determines whether the shape is
@@ -54,10 +58,17 @@ class CanvasGrid(VisualizationElement):
         template: "canvas_module.html" stores the module's HTML template.
 
     """
+
     package_includes = ["GridDraw.js", "CanvasModule.js", "InteractionHandler.js"]
 
-    def __init__(self, portrayal_method, grid_width, grid_height,
-                 canvas_width=500, canvas_height=500):
+    def __init__(
+        self,
+        portrayal_method,
+        grid_width,
+        grid_height,
+        canvas_width=500,
+        canvas_height=500,
+    ):
         """ Instantiate a new CanvasGrid.
 
         Args:
@@ -74,9 +85,9 @@ class CanvasGrid(VisualizationElement):
         self.canvas_width = canvas_width
         self.canvas_height = canvas_height
 
-        new_element = ("new CanvasModule({}, {}, {}, {})"
-            .format(self.canvas_width, self.canvas_height,
-                self.grid_width, self.grid_height))
+        new_element = "new CanvasModule({}, {}, {}, {})".format(
+            self.canvas_width, self.canvas_height, self.grid_width, self.grid_height
+        )
 
         self.js_code = "elements.push(" + new_element + ");"
 
