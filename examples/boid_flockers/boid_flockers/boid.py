@@ -4,7 +4,7 @@ from mesa import Agent
 
 
 class Boid(Agent):
-    '''
+    """
     A Boid-style flocker agent.
 
     The agent follows three behaviors to flock:
@@ -16,10 +16,22 @@ class Boid(Agent):
     neighbors to flock with. Their speed (a scalar) and velocity (a vector)
     define their movement. Separation is their desired minimum distance from
     any other Boid.
-    '''
-    def __init__(self, unique_id, model, pos, speed, velocity, vision,
-            separation, cohere=0.025, separate=0.25, match=0.04):
-        '''
+    """
+
+    def __init__(
+        self,
+        unique_id,
+        model,
+        pos,
+        speed,
+        velocity,
+        vision,
+        separation,
+        cohere=0.025,
+        separate=0.25,
+        match=0.04,
+    ):
+        """
         Create a new Boid flocker agent.
 
         Args:
@@ -33,7 +45,7 @@ class Boid(Agent):
             separate: the relative importance of avoiding close neighbors
             match: the relative importance of matching neighbors' headings
 
-        '''
+        """
         super().__init__(unique_id, model)
         self.pos = np.array(pos)
         self.speed = speed
@@ -45,9 +57,9 @@ class Boid(Agent):
         self.match_factor = match
 
     def cohere(self, neighbors):
-        '''
+        """
         Return the vector toward the center of mass of the local neighbors.
-        '''
+        """
         cohere = np.zeros(2)
         if neighbors:
             for neighbor in neighbors:
@@ -56,9 +68,9 @@ class Boid(Agent):
         return cohere
 
     def separate(self, neighbors):
-        '''
+        """
         Return a vector away from any neighbors closer than separation dist.
-        '''
+        """
         me = self.pos
         them = (n.pos for n in neighbors)
         separation_vector = np.zeros(2)
@@ -68,9 +80,9 @@ class Boid(Agent):
         return separation_vector
 
     def match_heading(self, neighbors):
-        '''
+        """
         Return a vector of the neighbors' average heading.
-        '''
+        """
         match_vector = np.zeros(2)
         if neighbors:
             for neighbor in neighbors:
@@ -79,14 +91,16 @@ class Boid(Agent):
         return match_vector
 
     def step(self):
-        '''
+        """
         Get the Boid's neighbors, compute the new vector, and move accordingly.
-        '''
+        """
 
         neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
-        self.velocity += (self.cohere(neighbors) * self.cohere_factor +
-                          self.separate(neighbors) * self.separate_factor +
-                          self.match_heading(neighbors) * self.match_factor) / 2
+        self.velocity += (
+            self.cohere(neighbors) * self.cohere_factor
+            + self.separate(neighbors) * self.separate_factor
+            + self.match_heading(neighbors) * self.match_factor
+        ) / 2
         self.velocity /= np.linalg.norm(self.velocity)
         new_pos = self.pos + self.velocity * self.speed
         self.model.space.move_agent(self, new_pos)

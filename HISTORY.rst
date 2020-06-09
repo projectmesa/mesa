@@ -3,6 +3,74 @@
 Release History
 ---------------
 
+0.8.7 (2020-05-05) Mammoth
++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Enable BatchRunner to run specified set of parameter combinations #651 (#607)
+* Restructured runcontrol.js #661
+* Add pipenv support for mesa #678
+* Increase test coverage and change to codecov #692
+* Updates Travis to explicitly set the dist to be Xenial #699
+* time: Remove resolved TODO on random seed of random scheduler #708
+* hex_snowflake: Update description to be more informative #712
+* Added Coverall to Codecov in Contributing file #734
+* Makes opening the browser optional when launching the server #755 #754
+* NetworkGrid: Update to networkx 2.4 API #763
+* Apply black to mesa/ directory #775
+* Updated travis to 3.8 and updated gitignore #777
+* Add information (to docstring) on image as agent portrayal shape #791
+* Change grid empties from list to set #649 (improves speed)
+* Adding mypy annotation
+    * space: Add type annotation to Grid class #779
+    * add Mypy annotation to time, agent, and model #792
+    * space: Add mypy annotation to the remaining methods/functions #796
+* Docs related
+    * Bulk merge of docs from 'docs' to 'master' #684
+    * Created useful snippets code section in the docs #668 #669
+        * Updating index.rst #672
+        * Clarify runserver snippet in index.rst #682
+    * Add documentation for feature (pipenv) added in #678 #683
+    * Add docs for BatchRunner to support Variable and Fixed Parameter Contribution #679 #683
+        * Resources #651 in docs branch #691. This preps for #683 to be merged.
+    * intro tutorial: Clarify a function that is not defined in the class #705
+    * Updates formatting the readme Docs markdown #737
+* Examples related
+    * Schelling: Separate text-only viz into run_ascii.py #706
+    * examples/Readme.md: Update description to be consistent with the folder names #707
+
+**Fixes**
+
+* Fixes link to update code coverage module - Updates Removing last link to coveralls and replacing to codecoverage #748
+* Fixes D3 Network Visualization to update (rather than overwrite) #765 #767
+* Fix parameter order in initializing SingleGrid object #770 #769
+* Updating pipenv link #773
+* Fixed pip install from github by specifying egg #802
+* Compatibility fixes
+    * Fixes VisualizationServer to be compatible with recent versions of Tornado #655
+    * Fixes #749 networkx incompatibility #750
+* Fixing typos
+    * Fixes documentation typos in example code #695 #696
+    * Fixes typo in ModularServer's last parameter #711
+    * Fixed typo in BarChartModule line 100 #747
+    * Fix typo in documentation #809
+* Doc fixes (not relating to typos)
+    * Update tutorial to point to correct repo location #671 #670
+    * Updating sphinx and reverting issues #674 #675 #677 #681
+    * Fixes code blocks that weren't showing up in the tutorial #686
+    * Remove figure from advanced tutorial showing the empty visualization #729
+    * Removes git clone from tutorial - Update intro_tutorial.rst #730
+    * Fixes citation links in docs tutorial section #736
+    * Fix histogram in advanced tutorial #794 #610
+    * Fixes Advanced Tutorial #elements #804 #803
+* Fixes to examples
+    * Fixing test_random_walk bug - wolf sheep. #821
+    * Fixes shape_example server launch #762 #756
+    * Fixing broken table in pd_grid example #824
+
+
+
 0.8.6 (2019-05-02) Lake Havasu City
 +++++++++++++++++++++++++++++++++++++++++++
 

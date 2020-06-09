@@ -3,9 +3,9 @@
 
 The Mesa core functionality is just a subset of what we believe researchers creating Agent Based Models (ABMs) will use. We designed Mesa to be extensible, so that individuals from various domains can build, maintain, and share their own packages that work with Mesa in pursuit of "unifying algorithmic theories of the relation between adaptive behavior and system complexity (Volker Grimm et al 2005)."
 
-**DRY Principal**
+**DRY Principle**
 
-This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the `DRY principal (or don't repeat yourself) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ (Hunt and Thomas 2010). The creators of Mesa designed Mesa in order for this principal to be exercised in the development of agent-based models (ABMs). For example, a group health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
+This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the `DRY principle (or don't repeat yourself) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ (Hunt and Thomas 2010). The creators of Mesa designed Mesa in order for this principle to be exercised in the development of agent-based models (ABMs). For example, a group health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
 
 **Benefits to Scientists**
 
