@@ -10,6 +10,7 @@ class ForestFire(Model):
     """
     Simple Forest Fire model.
     """
+
     def __init__(self, height=100, width=100, density=0.65):
         """
         Create a new forest fire model.
@@ -28,9 +29,12 @@ class ForestFire(Model):
         self.grid = Grid(height, width, torus=False)
 
         self.datacollector = DataCollector(
-            {"Fine": lambda m: self.count_type(m, "Fine"),
-             "On Fire": lambda m: self.count_type(m, "On Fire"),
-             "Burned Out": lambda m: self.count_type(m, "Burned Out")})
+            {
+                "Fine": lambda m: self.count_type(m, "Fine"),
+                "On Fire": lambda m: self.count_type(m, "On Fire"),
+                "Burned Out": lambda m: self.count_type(m, "Burned Out"),
+            }
+        )
 
         # Place a tree in each cell with Prob = density
         for (contents, x, y) in self.grid.coord_iter():

@@ -6,14 +6,14 @@ from hex_snowflake.cell import Cell
 
 
 class HexSnowflake(Model):
-    '''
+    """
     Represents the hex grid of cells. The grid is represented by a 2-dimensional array of cells with adjacency rules specific to hexagons.
-    '''
+    """
 
     def __init__(self, height=50, width=50):
-        '''
+        """
         Create a new playing area of (height, width) cells.
-        '''
+        """
 
         # Set up the grid and schedule.
 
@@ -42,7 +42,7 @@ class HexSnowflake(Model):
         self.running = True
 
     def step(self):
-        '''
+        """
         Have the scheduler advance each cell by one step
-        '''
+        """
         self.schedule.step()

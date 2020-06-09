@@ -1,6 +1,6 @@
-'''
+"""
 Test the Grid objects.
-'''
+"""
 import random
 import unittest
 from mesa.space import Grid, SingleGrid, MultiGrid, HexGrid
@@ -14,17 +14,13 @@ from mesa.space import Grid, SingleGrid, MultiGrid, HexGrid
 #   1 0 1
 #   0 0 1
 # -------------------
-TEST_GRID = [
-    [0, 1, 0, 1, 0],
-    [0, 0, 1, 1, 0],
-    [1, 1, 0, 0, 0]
-]
+TEST_GRID = [[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [1, 1, 0, 0, 0]]
 
 
 class MockAgent:
-    '''
+    """
     Minimalistic agent for testing purposes.
-    '''
+    """
 
     def __init__(self, unique_id, pos):
         self.random = random.Random(0)
@@ -33,18 +29,18 @@ class MockAgent:
 
 
 class TestBaseGrid(unittest.TestCase):
-    '''
+    """
     Testing a non-toroidal grid.
-    '''
+    """
 
     torus = False
 
     def setUp(self):
-        '''
+        """
         Create a test non-toroidal grid and populate it with Mock Agents
-        '''
-        width = 3    # width of grid
-        height = 5    # height of grid
+        """
+        width = 3  # width of grid
+        height = 5  # height of grid
         self.grid = Grid(width, height, self.torus)
         self.agents = []
         counter = 0
@@ -59,54 +55,54 @@ class TestBaseGrid(unittest.TestCase):
                 self.grid.place_agent(a, (x, y))
 
     def test_agent_positions(self):
-        '''
+        """
         Ensure that the agents are all placed properly.
-        '''
+        """
         for agent in self.agents:
             x, y = agent.pos
             assert self.grid[x][y] == agent
 
     def test_cell_agent_reporting(self):
-        '''
+        """
         Ensure that if an agent is in a cell, get_cell_list_contents accurately
         reports that fact.
-        '''
+        """
         for agent in self.agents:
             x, y = agent.pos
             assert agent in self.grid.get_cell_list_contents([(x, y)])
 
     def test_listfree_cell_agent_reporting(self):
-        '''
+        """
         Ensure that if an agent is in a cell, get_cell_list_contents accurately
         reports that fact, even when single position is not wrapped in a list.
-        '''
+        """
         for agent in self.agents:
             x, y = agent.pos
             assert agent in self.grid.get_cell_list_contents((x, y))
 
     def test_iter_cell_agent_reporting(self):
-        '''
+        """
         Ensure that if an agent is in a cell, iter_cell_list_contents
         accurately reports that fact.
-        '''
+        """
         for agent in self.agents:
             x, y = agent.pos
             assert agent in self.grid.iter_cell_list_contents([(x, y)])
 
     def test_listfree_iter_cell_agent_reporting(self):
-        '''
+        """
         Ensure that if an agent is in a cell, iter_cell_list_contents
         accurately reports that fact, even when single position is not
         wrapped in a list.
-        '''
+        """
         for agent in self.agents:
             x, y = agent.pos
             assert agent in self.grid.iter_cell_list_contents((x, y))
 
     def test_neighbors(self):
-        '''
+        """
         Test the base neighborhood methods on the non-toroid.
-        '''
+        """
 
         neighborhood = self.grid.get_neighborhood((1, 1), moore=True)
         assert len(neighborhood) == 8
@@ -126,8 +122,7 @@ class TestBaseGrid(unittest.TestCase):
         neighbors = self.grid.get_neighbors((4, 1), moore=True)
         assert len(neighbors) == 0
 
-        neighbors = self.grid.get_neighbors((1, 1), moore=False,
-                                            include_center=True)
+        neighbors = self.grid.get_neighbors((1, 1), moore=False, include_center=True)
         assert len(neighbors) == 3
 
         neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
@@ -175,16 +170,16 @@ class TestBaseGrid(unittest.TestCase):
 
 
 class TestBaseGridTorus(TestBaseGrid):
-    '''
+    """
     Testing the toroidal base grid.
-    '''
+    """
 
     torus = True
 
     def test_neighbors(self):
-        '''
+        """
         Test the toroidal neighborhood methods.
-        '''
+        """
 
         neighborhood = self.grid.get_neighborhood((1, 1), moore=True)
         assert len(neighborhood) == 8
@@ -201,8 +196,7 @@ class TestBaseGridTorus(TestBaseGrid):
         neighbors = self.grid.get_neighbors((1, 4), moore=True)
         assert len(neighbors) == 3
 
-        neighbors = self.grid.get_neighbors((1, 1), moore=False,
-                                            include_center=True)
+        neighbors = self.grid.get_neighbors((1, 1), moore=False, include_center=True)
         assert len(neighbors) == 3
 
         neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
@@ -210,17 +204,17 @@ class TestBaseGridTorus(TestBaseGrid):
 
 
 class TestSingleGrid(unittest.TestCase):
-    '''
+    """
     Test the SingleGrid object.
 
     Since it inherits from Grid, all the functionality tested above should
     work here too. Instead, this tests the enforcement.
-    '''
+    """
 
     def setUp(self):
-        '''
+        """
         Create a test non-toroidal grid and populate it with Mock Agents
-        '''
+        """
         width = 3
         height = 5
         self.grid = SingleGrid(width, height, True)
@@ -237,9 +231,9 @@ class TestSingleGrid(unittest.TestCase):
                 self.grid.place_agent(a, (x, y))
 
     def test_enforcement(self):
-        '''
+        """
         Test the SingleGrid empty count and enforcement.
-        '''
+        """
 
         assert len(self.grid.empties) == 9
         a = MockAgent(100, None)
@@ -279,22 +273,20 @@ class TestSingleGrid(unittest.TestCase):
 #   1 1 0
 #   0 0 0
 # -------------------
-TEST_MULTIGRID = [[0, 1, 0, 2, 0],
-                  [0, 1, 5, 0, 0],
-                  [0, 0, 0, 3, 0]]
+TEST_MULTIGRID = [[0, 1, 0, 2, 0], [0, 1, 5, 0, 0], [0, 0, 0, 3, 0]]
 
 
 class TestMultiGrid(unittest.TestCase):
-    '''
+    """
     Testing a toroidal MultiGrid
-    '''
+    """
 
     torus = True
 
     def setUp(self):
-        '''
+        """
         Create a test non-toroidal grid and populate it with Mock Agents
-        '''
+        """
         width = 3
         height = 5
         self.grid = MultiGrid(width, height, self.torus)
@@ -310,17 +302,17 @@ class TestMultiGrid(unittest.TestCase):
                     self.grid.place_agent(a, (x, y))
 
     def test_agent_positions(self):
-        '''
+        """
         Ensure that the agents are all placed properly on the MultiGrid.
-        '''
+        """
         for agent in self.agents:
             x, y = agent.pos
             assert agent in self.grid[x][y]
 
     def test_neighbors(self):
-        '''
+        """
         Test the toroidal MultiGrid neighborhood methods.
-        '''
+        """
 
         neighborhood = self.grid.get_neighborhood((1, 1), moore=True)
         assert len(neighborhood) == 8
@@ -337,8 +329,7 @@ class TestMultiGrid(unittest.TestCase):
         neighbors = self.grid.get_neighbors((1, 4), moore=True)
         assert len(neighbors) == 5
 
-        neighbors = self.grid.get_neighbors((1, 1), moore=False,
-                                            include_center=True)
+        neighbors = self.grid.get_neighbors((1, 1), moore=False, include_center=True)
         assert len(neighbors) == 7
 
         neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
@@ -346,14 +337,14 @@ class TestMultiGrid(unittest.TestCase):
 
 
 class TestHexGrid(unittest.TestCase):
-    '''
+    """
     Testing a hexagonal grid.
-    '''
+    """
 
     def setUp(self):
-        '''
+        """
         Create a test non-toroidal grid and populate it with Mock Agents
-        '''
+        """
         width = 3
         height = 5
         self.grid = HexGrid(width, height, torus=False)
@@ -370,9 +361,9 @@ class TestHexGrid(unittest.TestCase):
                 self.grid.place_agent(a, (x, y))
 
     def test_neighbors(self):
-        '''
+        """
         Test the hexagonal neighborhood methods on the non-toroid.
-        '''
+        """
 
         neighborhood = self.grid.get_neighborhood((1, 1))
         assert len(neighborhood) == 6
@@ -397,16 +388,16 @@ class TestHexGrid(unittest.TestCase):
 
 
 class TestHexGridTorus(TestBaseGrid):
-    '''
+    """
     Testing a hexagonal toroidal grid.
-    '''
+    """
 
     torus = True
 
     def setUp(self):
-        '''
+        """
         Create a test non-toroidal grid and populate it with Mock Agents
-        '''
+        """
         width = 3
         height = 5
         self.grid = HexGrid(width, height, torus=True)
@@ -423,9 +414,9 @@ class TestHexGridTorus(TestBaseGrid):
                 self.grid.place_agent(a, (x, y))
 
     def test_neighbors(self):
-        '''
+        """
         Test the hexagonal neighborhood methods on the toroid.
-        '''
+        """
 
         neighborhood = self.grid.get_neighborhood((1, 1))
         assert len(neighborhood) == 6
@@ -440,5 +431,5 @@ class TestHexGridTorus(TestBaseGrid):
         assert len(neighborhood) == 6
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

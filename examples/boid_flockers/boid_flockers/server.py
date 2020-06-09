@@ -15,7 +15,7 @@ model_params = {
     "height": 100,
     "speed": 5,
     "vision": 10,
-    "separation": 2
+    "separation": 2,
 }
 
 server = ModularServer(BoidFlockers, [boid_canvas], "Boids", model_params)

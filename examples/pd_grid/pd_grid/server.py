@@ -36,9 +36,14 @@ model_params = {
     "seed": 123,
     "height": 30,
     "width": 30,
-    "schedule_type": UserSettableParameter("choice", "Scheduler type", value="Random",
-                                           choices=list(PdGrid.schedule_types.keys()))
+    "schedule_type": UserSettableParameter(
+        "choice",
+        "Scheduler type",
+        value="Random",
+        choices=list(PdGrid.schedule_types.keys()),
+    ),
 }
 
-server = VegaServer(PdGrid, [grid_spec, line_spec], "Prisoner's Dilemma",
-                       model_params, 3)
+server = VegaServer(
+    PdGrid, [grid_spec, line_spec], "Prisoner's Dilemma", model_params, 3
+)

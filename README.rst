@@ -7,6 +7,9 @@ Mesa: Agent-based modeling in Python 3+
 .. image:: https://codecov.io/gh/projectmesa/mesa/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/projectmesa/mesa
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
 `Mesa`_ is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
 
 It allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python 3-based alternative to NetLogo, Repast, or MASON.
