@@ -108,7 +108,7 @@ class TestBatchRunner(unittest.TestCase):
         """
         Returns total number of batch runner's iterations.
         """
-        return reduce(mul, map(len, self.variable_params.values())) * self.iterations
+        return reduce(mul, map(len, self.variable_params.values()), 1) * self.iterations
 
     def test_model_level_vars(self):
         """
@@ -170,6 +170,36 @@ class TestBatchRunner(unittest.TestCase):
         self.assertEqual(
             model_vars["reported_fixed_param"].iloc[0], self.fixed_params["fixed_name"]
         )
+
+    def test_model_with_no_variable_parameters(self):
+        """
+        Test that model with no variable parameters is properly handled
+        """
+        self.variable_params = {}
+        self.fixed_params = {
+            "variable_model_param": 1,
+            "variable_agent_param": 1,
+        }
+        batch = self.launch_batch_processing()
+        model_vars = batch.get_model_vars_dataframe()
+        agent_vars = batch.get_agent_vars_dataframe()
+
+        self.assertEqual(len(model_vars) * NUM_AGENTS, len(agent_vars))
+        self.assertEqual(len(model_vars), self.model_runs)
+
+    def test_model_with_no_variable_and_no_fixed_parameters(self):
+        """
+        Test that model with no variable and no fixed parameters is properly handled
+        """
+        self.mock_model = lambda: MockModel(1, 1)
+        self.variable_params = None
+        self.fixed_params = None
+        batch = self.launch_batch_processing()
+        model_vars = batch.get_model_vars_dataframe()
+        agent_vars = batch.get_agent_vars_dataframe()
+
+        self.assertEqual(len(model_vars) * NUM_AGENTS, len(agent_vars))
+        self.assertEqual(len(model_vars), self.iterations)
 
 
 class TestParameters(unittest.TestCase):
