@@ -141,6 +141,10 @@ class FixedBatchRunner:
             kwargs = self.fixed_parameters.copy()
             all_kwargs.append(kwargs)
             all_param_values.append(kwargs.values())
+        else:
+            count = 1
+            all_kwargs.append({})
+            all_param_values.append([])
 
         total_iterations *= count
 
@@ -253,10 +257,14 @@ class FixedBatchRunner:
 # This is kind of a useless class, but it does carry the 'source' parameters with it
 class ParameterProduct:
     def __init__(self, variable_parameters):
-        self.param_names, self.param_lists = zip(
-            *(copy.deepcopy(variable_parameters)).items()
-        )
-        self._product = product(*self.param_lists)
+        if variable_parameters:
+            self.param_names, self.param_lists = zip(
+                *(copy.deepcopy(variable_parameters)).items()
+            )
+            self._product = product(*self.param_lists)
+        else:
+            self.param_names, self.param_lists = (), ()
+            self._product = iter([])
 
     def __iter__(self):
         return self
