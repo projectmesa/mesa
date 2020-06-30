@@ -19,7 +19,7 @@ import itertools
 import numpy as np
 
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
-from .agent import Agent
+from mesa.agent import Agent
 
 Coordinate = Tuple[int, int]
 GridContent = Union[Optional[Agent], Set[Agent]]
