@@ -8,7 +8,7 @@ from codecs import open
 requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "tornado", "tqdm"]
 
 extras_require = {
-    "dev": ["coverage", "flake8", "pytest >= 3.6", "pytest-cov", "sphinx"],
+    "dev": ["coverage", "flake8", "pytest >= 4.6", "pytest-cov", "sphinx"],
     "docs": ["sphinx"],
 }
 
