@@ -98,6 +98,7 @@ Client -> Server:
 import asyncio
 import os
 import platform
+import sys
 import tornado.autoreload
 import tornado.ioloop
 import tornado.web
@@ -107,6 +108,10 @@ import tornado.gen
 import webbrowser
 
 from mesa.visualization.UserParam import UserSettableParameter
+
+template_path = os.path.join(
+    os.path.dirname(sys.modules["mesa.visualization"].__file__), "templates"
+)
 
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
@@ -243,7 +248,7 @@ class ModularServer(tornado.web.Application):
     static_handler = (
         r"/static/(.*)",
         tornado.web.StaticFileHandler,
-        {"path": os.path.dirname(__file__) + "/templates"},
+        {"path": template_path},
     )
     local_handler = (r"/local/(.*)", tornado.web.StaticFileHandler, {"path": ""})
 
@@ -252,7 +257,7 @@ class ModularServer(tornado.web.Application):
     settings = {
         "debug": True,
         "autoreload": False,
-        "template_path": os.path.dirname(__file__) + "/templates",
+        "template_path": template_path,
     }
 
     EXCLUDE_LIST = ("width", "height")
