@@ -245,14 +245,26 @@ class ModularServer(tornado.web.Application):
     # Handlers and other globals:
     page_handler = (r"/", PageHandler)
     socket_handler = (r"/ws", SocketHandler)
+    health_handler = (
+        r"/healthz",
+        tornado.web.ErrorHandler, {"status_code": 200}
+    )
     static_handler = (
         r"/static/(.*)",
         tornado.web.StaticFileHandler,
         {"path": template_path},
     )
-    local_handler = (r"/local/(.*)", tornado.web.StaticFileHandler, {"path": ""})
+    local_handler = (
+        r"/local/(.*)", tornado.web.StaticFileHandler, {"path": ""}
+    )
 
-    handlers = [page_handler, socket_handler, static_handler, local_handler]
+    handlers = [
+        page_handler,
+        socket_handler,
+        health_handler,
+        static_handler,
+        local_handler
+    ]
 
     settings = {
         "debug": True,
@@ -263,7 +275,8 @@ class ModularServer(tornado.web.Application):
     EXCLUDE_LIST = ("width", "height")
 
     def __init__(
-        self, model_cls, visualization_elements, name="Mesa Model", model_params={}
+        self, model_cls, visualization_elements,
+        name="Mesa Model", model_params={}
     ):
         """ Create a new visualization server with the given elements. """
         # Prep visualization elements:
