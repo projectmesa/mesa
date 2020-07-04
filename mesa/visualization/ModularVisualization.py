@@ -178,21 +178,66 @@ class PageHandler(tornado.web.RequestHandler):
 
 
 class SocketHandler(tornado.websocket.WebSocketHandler):
-    """ Handler for websocket. """
+    """
+    Handler for websocket.
+
+    Each websocket creates a new instance of the model and renders its
+    output to the page. This allows you to have multiple tabs open to
+    the same server, each running its own version of the model.
+    """
 
     def open(self):
+        self.model_kwargs = self.application.model_kwargs.copy()
+        self.reset_model()
         if self.application.verbose:
             print("Socket opened!")
+            print("Model ID:", id(self.model))
         self.write_message(
-            {"type": "model_params", "params": self.application.user_params}
+            {"type": "model_params", "params": self.user_params}
         )
 
     def check_origin(self, origin):
         return True
 
     @property
+    def user_params(self):
+        result = {}
+        for param, val in self.model_kwargs.items():
+            if isinstance(val, UserSettableParameter):
+                result[param] = val.json
+
+        return result
+
+    def reset_model(self):
+        """ Reinstantiate the model object, using the current parameters. """
+
+        model_params = {}
+        for key, val in self.model_kwargs.items():
+            if isinstance(val, UserSettableParameter):
+                if (
+                    val.param_type == "static_text"
+                ):  # static_text is never used for setting params
+                    continue
+                model_params[key] = val.value
+            else:
+                model_params[key] = val
+
+        self.model = self.application.model_cls(**model_params)
+
+    def render_model(self):
+        """ Turn the current state of the model into a dictionary of
+        visualizations
+
+        """
+        visualization_state = []
+        for element in self.application.visualization_elements:
+            element_state = element.render(self.model)
+            visualization_state.append(element_state)
+        return visualization_state
+
+    @property
     def viz_state_message(self):
-        return {"type": "viz_state", "data": self.application.render_model()}
+        return {"type": "viz_state", "data": self.render_model()}
 
     def on_message(self, message):
         """ Receiving a message from the websocket, parse, and act accordingly.
@@ -203,14 +248,14 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(message)
 
         if msg["type"] == "get_step":
-            if not self.application.model.running:
+            if not self.model.running:
                 self.write_message({"type": "end"})
             else:
-                self.application.model.step()
+                self.model.step()
                 self.write_message(self.viz_state_message)
 
         elif msg["type"] == "reset":
-            self.application.reset_model()
+            self.reset_model()
             self.write_message(self.viz_state_message)
 
         elif msg["type"] == "submit_params":
@@ -218,13 +263,13 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             value = msg["value"]
 
             # Is the param editable?
-            if param in self.application.user_params:
+            if param in self.user_params:
                 if isinstance(
-                    self.application.model_kwargs[param], UserSettableParameter
+                    self.model_kwargs[param], UserSettableParameter
                 ):
-                    self.application.model_kwargs[param].value = value
+                    self.model_kwargs[param].value = value
                 else:
-                    self.application.model_kwargs[param] = value
+                    self.model_kwargs[param] = value
 
         else:
             if self.application.verbose:
@@ -298,46 +343,9 @@ class ModularServer(tornado.web.Application):
             self.description = model_cls.__doc__
 
         self.model_kwargs = model_params
-        self.reset_model()
 
         # Initializing the application itself:
         super().__init__(self.handlers, **self.settings)
-
-    @property
-    def user_params(self):
-        result = {}
-        for param, val in self.model_kwargs.items():
-            if isinstance(val, UserSettableParameter):
-                result[param] = val.json
-
-        return result
-
-    def reset_model(self):
-        """ Reinstantiate the model object, using the current parameters. """
-
-        model_params = {}
-        for key, val in self.model_kwargs.items():
-            if isinstance(val, UserSettableParameter):
-                if (
-                    val.param_type == "static_text"
-                ):  # static_text is never used for setting params
-                    continue
-                model_params[key] = val.value
-            else:
-                model_params[key] = val
-
-        self.model = self.model_cls(**model_params)
-
-    def render_model(self):
-        """ Turn the current state of the model into a dictionary of
-        visualizations
-
-        """
-        visualization_state = []
-        for element in self.visualization_elements:
-            element_state = element.render(self.model)
-            visualization_state.append(element_state)
-        return visualization_state
 
     def launch(self, port=None, open_browser=True):
         """ Run the app. """
