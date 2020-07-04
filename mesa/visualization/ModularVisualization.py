@@ -183,128 +183,24 @@ class PageHandler(tornado.web.RequestHandler):
 
 
 class SocketHandler(tornado.websocket.WebSocketHandler):
-    """ Handler for websocket. """
+    """
+    Handler for websocket.
+
+    Each websocket creates a new instance of the model and renders its
+    output to the page. This allows you to have multiple tabs open to
+    the same server, each running its own version of the model.
+    """
 
     def open(self):
+        self.model_kwargs = self.application.model_kwargs.copy()
+        self.reset_model()
         if self.application.verbose:
             print("Socket opened!")
-        self.write_message(
-            {"type": "model_params", "params": self.application.user_params}
-        )
+            print("Model ID:", id(self.model))
+        self.write_message({"type": "model_params", "params": self.user_params})
 
     def check_origin(self, origin):
         return True
-
-    @property
-    def viz_state_message(self):
-        return {"type": "viz_state", "data": self.application.render_model()}
-
-    def on_message(self, message):
-        """Receiving a message from the websocket, parse, and act accordingly."""
-        if self.application.verbose:
-            print(message)
-        msg = tornado.escape.json_decode(message)
-
-        if msg["type"] == "get_step":
-            if not self.application.model.running:
-                self.write_message({"type": "end"})
-            else:
-                self.application.model.step()
-                self.write_message(self.viz_state_message)
-
-        elif msg["type"] == "reset":
-            self.application.reset_model()
-            self.write_message(self.viz_state_message)
-
-        elif msg["type"] == "submit_params":
-            param = msg["param"]
-            value = msg["value"]
-
-            # Is the param editable?
-            if param in self.application.user_params:
-                if isinstance(
-                    self.application.model_kwargs[param], UserSettableParameter
-                ):
-                    self.application.model_kwargs[param].value = value
-                else:
-                    self.application.model_kwargs[param] = value
-
-        else:
-            if self.application.verbose:
-                print("Unexpected message!")
-
-
-class ModularServer(tornado.web.Application):
-    """ Main visualization application. """
-
-    verbose = True
-
-    port = int(os.getenv("PORT", 8521))  # Default port to listen on
-    max_steps = 100000
-
-    # Handlers and other globals:
-    page_handler = (r"/", PageHandler)
-    socket_handler = (r"/ws", SocketHandler)
-    health_handler = (
-        r"/healthz",
-        tornado.web.ErrorHandler, {"status_code": 200}
-    )
-    static_handler = (
-        r"/static/(.*)",
-        tornado.web.StaticFileHandler,
-        {"path": template_path},
-    )
-    local_handler = (
-        r"/local/(.*)", tornado.web.StaticFileHandler, {"path": ""}
-    )
-
-    handlers = [
-        page_handler,
-        socket_handler,
-        health_handler,
-        static_handler,
-        local_handler
-    ]
-
-    settings = {
-        "debug": True,
-        "autoreload": False,
-        "template_path": template_path,
-    }
-
-    EXCLUDE_LIST = ("width", "height")
-
-    def __init__(
-        self, model_cls, visualization_elements,
-        name="Mesa Model", model_params={}
-    ):
-        """ Create a new visualization server with the given elements. """
-        # Prep visualization elements:
-        self.visualization_elements = visualization_elements
-        self.package_includes = set()
-        self.local_includes = set()
-        self.js_code = []
-        for element in self.visualization_elements:
-            for include_file in element.package_includes:
-                self.package_includes.add(include_file)
-            for include_file in element.local_includes:
-                self.local_includes.add(include_file)
-            self.js_code.append(element.js_code)
-
-        # Initializing the model
-        self.model_name = name
-        self.model_cls = model_cls
-        self.description = "No description available"
-        if hasattr(model_cls, "description"):
-            self.description = model_cls.description
-        elif model_cls.__doc__ is not None:
-            self.description = model_cls.__doc__
-
-        self.model_kwargs = model_params
-        self.reset_model()
-
-        # Initializing the application itself:
-        super().__init__(self.handlers, **self.settings)
 
     @property
     def user_params(self):
@@ -329,7 +225,7 @@ class ModularServer(tornado.web.Application):
             else:
                 model_params[key] = val
 
-        self.model = self.model_cls(**model_params)
+        self.model = self.application.model_cls(**model_params)
 
     def render_model(self):
         """Turn the current state of the model into a dictionary of
@@ -337,10 +233,112 @@ class ModularServer(tornado.web.Application):
 
         """
         visualization_state = []
-        for element in self.visualization_elements:
+        for element in self.application.visualization_elements:
             element_state = element.render(self.model)
             visualization_state.append(element_state)
         return visualization_state
+
+    @property
+    def viz_state_message(self):
+        return {"type": "viz_state", "data": self.render_model()}
+
+    def on_message(self, message):
+        """Receiving a message from the websocket, parse, and act accordingly."""
+        if self.application.verbose:
+            print(message)
+        msg = tornado.escape.json_decode(message)
+
+        if msg["type"] == "get_step":
+            if not self.model.running:
+                self.write_message({"type": "end"})
+            else:
+                self.model.step()
+                self.write_message(self.viz_state_message)
+
+        elif msg["type"] == "reset":
+            self.reset_model()
+            self.write_message(self.viz_state_message)
+
+        elif msg["type"] == "submit_params":
+            param = msg["param"]
+            value = msg["value"]
+
+            # Is the param editable?
+            if param in self.user_params:
+                if isinstance(self.model_kwargs[param], UserSettableParameter):
+                    self.model_kwargs[param].value = value
+                else:
+                    self.model_kwargs[param] = value
+
+        else:
+            if self.application.verbose:
+                print("Unexpected message!")
+
+
+class ModularServer(tornado.web.Application):
+    """ Main visualization application. """
+
+    verbose = True
+
+    port = int(os.getenv("PORT", 8521))  # Default port to listen on
+    max_steps = 100000
+
+    # Handlers and other globals:
+    page_handler = (r"/", PageHandler)
+    socket_handler = (r"/ws", SocketHandler)
+    health_handler = (r"/healthz", tornado.web.ErrorHandler, {"status_code": 200})
+    static_handler = (
+        r"/static/(.*)",
+        tornado.web.StaticFileHandler,
+        {"path": template_path},
+    )
+    local_handler = (r"/local/(.*)", tornado.web.StaticFileHandler, {"path": ""})
+
+    handlers = [
+        page_handler,
+        socket_handler,
+        health_handler,
+        static_handler,
+        local_handler,
+    ]
+
+    settings = {
+        "debug": True,
+        "autoreload": False,
+        "template_path": template_path,
+    }
+
+    EXCLUDE_LIST = ("width", "height")
+
+    def __init__(
+        self, model_cls, visualization_elements, name="Mesa Model", model_params={}
+    ):
+        """ Create a new visualization server with the given elements. """
+        # Prep visualization elements:
+        self.visualization_elements = visualization_elements
+        self.package_includes = set()
+        self.local_includes = set()
+        self.js_code = []
+        for element in self.visualization_elements:
+            for include_file in element.package_includes:
+                self.package_includes.add(include_file)
+            for include_file in element.local_includes:
+                self.local_includes.add(include_file)
+            self.js_code.append(element.js_code)
+
+        # Initializing the model
+        self.model_name = name
+        self.model_cls = model_cls
+        self.description = "No description available"
+        if hasattr(model_cls, "description"):
+            self.description = model_cls.description
+        elif model_cls.__doc__ is not None:
+            self.description = model_cls.__doc__
+
+        self.model_kwargs = model_params
+
+        # Initializing the application itself:
+        super().__init__(self.handlers, **self.settings)
 
     def launch(self, port=None, open_browser=True):
         """ Run the app. """
