@@ -13,6 +13,7 @@ from multiprocessing import Pool, cpu_count
 import pandas as pd
 from tqdm import tqdm
 
+
 class ParameterError(TypeError):
     MESSAGE = (
         "Parameters must map a name to a value. "
@@ -49,15 +50,15 @@ class FixedBatchRunner:
     """
 
     def __init__(
-        self,
-        model_cls,
-        parameters_list=None,
-        fixed_parameters=None,
-        iterations=1,
-        max_steps=1000,
-        model_reporters=None,
-        agent_reporters=None,
-        display_progress=True,
+            self,
+            model_cls,
+            parameters_list=None,
+            fixed_parameters=None,
+            iterations=1,
+            max_steps=1000,
+            model_reporters=None,
+            agent_reporters=None,
+            display_progress=True,
     ):
         """ Create a new BatchRunner for a given model with the given
         parameters.
@@ -108,8 +109,12 @@ class FixedBatchRunner:
         if self.agent_reporters:
             self.agent_vars = {}
 
+        self.datacollector_model_reporters = {}
+        self.datacollector_agent_reporters = {}
+
         self.display_progress = display_progress
 
+    @property
     def _make_model_args(self):
         """Prepare all combinations of parameter values for `run_all`
 
@@ -121,27 +126,56 @@ class FixedBatchRunner:
         all_kwargs = []
         all_param_values = []
 
-        count = len(self.parameters_list)
-        if count:
+        _count: int = len(self.parameters_list)
+        if _count:
             for params in self.parameters_list:
                 kwargs = params.copy()
                 kwargs.update(self.fixed_parameters)
                 all_kwargs.append(kwargs)
-                all_param_values.append(params.values())
+                all_param_values.append(list(params.values()))
         elif len(self.fixed_parameters):
-            count = 1
+            _count = 1
             kwargs = self.fixed_parameters.copy()
             all_kwargs.append(kwargs)
-            all_param_values.append(kwargs.values())
+            all_param_values.append(list(kwargs.values()))
 
-        total_iterations *= count
+        total_iterations *= _count
 
-        return (total_iterations, all_kwargs, all_param_values)
+        return total_iterations, all_kwargs, all_param_values
+
+    def _make_model_args_mp(self):
+        """Prepare all combinations of parameter values for `run_all`
+        Due to multiprocessing requirements of @StaticMethod takes different input, hence the similar function
+        Returns:
+            List of list with the form:
+            [[model_object, dictionary_of_kwargs, max_steps, iterations]]
+        """
+        total_iterations = self.iterations
+        all_kwargs = []
+
+        _count: int = len(self.parameters_list)
+        if _count:
+            for params in self.parameters_list:
+                kwargs = params.copy()
+                kwargs.update(self.fixed_parameters)
+                # run each iterations specific number of times
+                for _iter in range(self.iterations):
+                    kwargs_repeated = kwargs.copy()
+                    all_kwargs.append([self.model_cls, kwargs_repeated, self.max_steps, _iter])
+
+        elif len(self.fixed_parameters):
+            _count = 1
+            kwargs = self.fixed_parameters.copy()
+            all_kwargs.append(kwargs)
+
+        total_iterations *= _count
+
+        return all_kwargs, total_iterations
 
     def run_all(self):
         """ Run the model at all parameter combinations and store results. """
         run_count = count()
-        total_iterations, all_kwargs, all_param_values = self._make_model_args()
+        total_iterations, all_kwargs, all_param_values = self._make_model_args
 
         with tqdm(total_iterations, disable=not self.display_progress) as pbar:
             for i, kwargs in enumerate(all_kwargs):
@@ -151,11 +185,9 @@ class FixedBatchRunner:
                     pbar.update()
 
     def run_iteration(self, kwargs, param_values, run_count):
-        kwargscopy = copy.deepcopy(kwargs)
-        model = self.model_cls(**kwargscopy)
-        self.run_model(model)
-
-        # Collect and store results:
+        kwargs_copy = copy.deepcopy(kwargs)
+        model = self.model_cls(**kwargs_copy)
+        results = self.run_model(model)
         if param_values is not None:
             model_key = tuple(param_values) + (run_count,)
         else:
@@ -168,36 +200,59 @@ class FixedBatchRunner:
             for agent_id, reports in agent_vars.items():
                 agent_key = model_key + (agent_id,)
                 self.agent_vars[agent_key] = reports
-        return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None))
+        # Collects data from datacollector object in model
+        if results is not None:
+            if results.model_reporters is not None:
+                self.datacollector_model_reporters[model_key] = results.get_model_vars_dataframe()
+            if results.agent_reporters is not None:
+                self.datacollector_agent_reporters[model_key] = results.get_agent_vars_dataframe()
+
+        return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None),
+                getattr(self, "datacollector_model_reporters", None),
+                getattr(self, "datacollector_agent_reporters", None))
 
     @staticmethod
-    def run_wrapperMP(iter_args):
-        '''
-        TODO: Deconflict run_iteration and run_WrapperMP
-        :param iter_args:
+    def run_wrappermp(iter_args):
+        """
+        Based on requirement of Python multiprocessing requires @staticmethod decorator;
+        this is primarily to ensure functionality on Windows OS and doe not impact MAC or Linux distros
+
+        :param iter_args: List of arguments for model run
+            iter_args[0] = model object
+            iter_args[1] = key word arguments needed for model object
+            iter_args[2] = maximum number of steps for model
+            iter_args[3] = number of time to run model for stochastic/random variation with same parameters
         :return:
-        '''
+            tuple of param values which serves as a unique key for model results
+            model object
+        """
 
-        model_i = iter_args[0]
-        kwargs = iter_args[1]
-        max_steps = iter_args[2]
-        iteration = iter_args[3]
+        _model_i: classmethod = iter_args[0]
+        _kwargs: dict = iter_args[1]
+        _max_steps: int = iter_args[2]
+        _iteration: int = iter_args[3]
 
-        def run_iterationMP(model_i, kwargs, max_steps, iteration):
+        def run_iteration_mp(_model_i: classmethod, _kwargs: dict, _max_steps: int, _iteration: int):
+            """
+            :type _model_i: object of model
+            :type _kwargs: dict of keyword argument dictionary for model
+            :type _max_steps: int of number of steps
+            :type _iteration: int of number of iterations
+            """
             # instantiate version of model with correct parameters
-            model = model_i(**kwargs)
-            while model.running and model.schedule.steps < max_steps:
+            model: classmethod = _model_i(**_kwargs)
+            while model.running and model.schedule.steps < _max_steps:
                 model.step()
 
             # add iteration number to dictionary to make unique_key
-            kwargs["iteration"] = iteration
+            _kwargs["iteration"] = _iteration
 
-            if model.datacollector:
-                return kwargs, model.datacollector.get_model_vars_dataframe()
-            else:
-                return kwargs, "no datacollector in model"
+            # convert kwargs dict to tuple to  make consistent
+            _param_values = tuple(_kwargs.values())
 
-        return run_iterationMP(model_i, kwargs, max_steps, iteration)
+            return _param_values, model
+
+        return run_iteration_mp(_model_i, _kwargs, _max_steps, _iteration)
 
     def run_model(self, model):
         """ Run a model object to completion, or until reaching max steps.
@@ -209,11 +264,17 @@ class FixedBatchRunner:
         while model.running and model.schedule.steps < self.max_steps:
             model.step()
 
+        if hasattr(model, "datacollector"):
+            return model.datacollector
+        else:
+            return None
+
     def collect_model_vars(self, model):
         """ Run reporters and collect model-level variables. """
         model_vars = {}
         for var, reporter in self.model_reporters.items():
             model_vars[var] = reporter(model)
+
         return model_vars
 
     def collect_agent_vars(self, model):
@@ -226,20 +287,27 @@ class FixedBatchRunner:
             agent_vars[agent.unique_id] = agent_record
         return agent_vars
 
-    #TODO: Deconflict why this was commented out
     def get_model_vars_dataframe(self):
         """ Generate a pandas DataFrame from the model-level variables
         collected.
-
         """
+
         return self._prepare_report_table(self.model_vars)
 
     def get_agent_vars_dataframe(self):
         """ Generate a pandas DataFrame from the agent-level variables
         collected.
-
         """
+
         return self._prepare_report_table(self.agent_vars, extra_cols=["AgentId"])
+
+    def get_collector_model(self):
+
+        return self.datacollector_model_reporters
+
+    def get_collector_agents(self):
+
+        return self.datacollector_agent_reporters
 
     def _prepare_report_table(self, vars_dict, extra_cols=None):
         """
@@ -267,13 +335,11 @@ class FixedBatchRunner:
                 val = self.fixed_parameters[param]
 
                 # avoid error when val is an iterable
-                vallist = [val for i in range(ordered.shape[0])]
-                ordered[param] = vallist
+                _vallist = [val for i in range(ordered.shape[0])]
+                ordered[param] = _vallist
         return ordered
 
 
-#TODO: Set up path for when there is no variable parameters?
-# This is kind of a useless class, but it does carry the 'source' parameters with it
 class ParameterProduct:
     def __init__(self, variable_parameters):
         self.param_names, self.param_lists = zip(
@@ -318,7 +384,8 @@ class ParameterSampler:
             )
         raise StopIteration()
 
-#TODO: No difference- deleting will remove whitespace issue
+
+# TODO: No difference- deleting will remove whitespace issue
 class BatchRunner(FixedBatchRunner):
     """ This class is instantiated with a model class, and model parameters
     associated with one or more values. It is also instantiated with model and
@@ -333,15 +400,15 @@ class BatchRunner(FixedBatchRunner):
     """
 
     def __init__(
-        self,
-        model_cls,
-        variable_parameters=None,
-        fixed_parameters=None,
-        iterations=1,
-        max_steps=1000,
-        model_reporters=None,
-        agent_reporters=None,
-        display_progress=True,
+            self,
+            model_cls,
+            variable_parameters=None,
+            fixed_parameters=None,
+            iterations=1,
+            max_steps=1000,
+            model_reporters=None,
+            agent_reporters=None,
+            display_progress=True,
     ):
         """ Create a new BatchRunner for a given model with the given
         parameters.
@@ -385,6 +452,7 @@ class BatchRunner(FixedBatchRunner):
             display_progress,
         )
 
+
 class BatchRunnerMP(BatchRunner):
     """ Child class of BatchRunner, extended with multiprocessing support. """
 
@@ -398,7 +466,7 @@ class BatchRunnerMP(BatchRunner):
                       should start, all running in parallel.
         kwargs: the kwargs required for the parent BatchRunner class
         """
-        if nr_processes == None:
+        if nr_processes is None:
             # identify the number of processors available on users machine
             available_processors = cpu_count()
             self.processes = available_processors
@@ -409,35 +477,60 @@ class BatchRunnerMP(BatchRunner):
         super().__init__(model_cls, **kwargs)
         self.pool = Pool(self.processes)
 
-    # TODO: Make test run to debug
+    def result_prep_mp(self, results):
+        """
+        Helper Function
+        :param results: Takes results dictionary from Processpool and single processor debug run and fixes format to
+        mac compatible with BatchRunner Output
+        :updates model_vars and agents vars so consistent across all batchrunner
+        """
+        # Take results and convert to dictionary so dataframe can be called
+        for model_key, model in results.items():
+            if self.model_reporters:
+                self.model_vars[model_key] = self.collect_model_vars(model)
+            if self.agent_reporters:
+                agent_vars = self.collect_agent_vars(model)
+                for agent_id, reports in agent_vars.items():
+                    agent_key = model_key + (agent_id,)
+                    self.agent_vars[agent_key] = reports
+            if hasattr(model, "datacollector"):
+                if model.datacollector.model_reporters is not None:
+                    self.datacollector_model_reporters[model_key] = model.datacollector.get_model_vars_dataframe()
+                if model.datacollector.agent_reporters is not None:
+                    self.datacollector_agent_reporters[model_key] = model.datacollector.get_agent_vars_dataframe()
+
+        # Make results consistent
+        if len(self.datacollector_model_reporters.keys()) == 0:
+            self.datacollector_model_reporters = None
+        if len(self.datacollector_agent_reporters.keys()) == 0:
+            self.datacollector_agent_reporters = None
+
     def run_all(self):
         """
         Run the model at all parameter combinations and store results,
         overrides run_all from BatchRunner.
         """
 
-        run_iter_args, total_iterations = self._make_model_args()
+        run_iter_args, total_iterations = self._make_model_args_mp()
         # register the process pool and init a queue
-        #store results in dictionary
+        # store results in dictionary
         results = {}
 
         if self.processes > 1:
             with tqdm(total_iterations, disable=not self.display_progress) as pbar:
-                for params, model_data in self.pool.imap_unordered(self.run_wrapper, run_iter_args):
-                    results[str(params)] = model_data
-
-                #Makes a dummy list to update tqdm progress bar as mutlprocess produces results
-                dummy_tracker = [] #TODO: Identfiy more elegant ways to do this
-                for task in list(results.keys()):
-                    dummy_tracker.append(task)
+                for params, model in self.pool.imap_unordered(self.run_wrappermp, run_iter_args):
+                    results[params] = model
                     pbar.update()
 
+                self.result_prep_mp(results)
         # For debugging model due to difficulty of getting errors during multiprocessing
         else:
             for run in run_iter_args:
-                params, model_data = self.run_wrapper(run)
-                # params, model_data = self.run_wrapper(run)
-                # no need for a dictionary since one set of results
-                results[str(params)] = model_data
+                params, model_data = self.run_wrappermp(run)
+                results[params] = model_data
 
-        return results
+            self.result_prep_mp(results)
+
+        return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None),
+                getattr(self, "datacollector_model_reporters", None),
+                getattr(self, "datacollector_agent_reporters", None))

@@ -51,10 +51,15 @@ class MockModel(Model):
             {
                 "total_agents": lambda m: m.schedule.get_agent_count(),
                 "model_value": "model_val",
+                "model_calc": self.schedule.get_agent_count(),
+                "model_calc_comp": [self.model_calc_comp, [3, 4]],
             },
             {"value": lambda a: a.val, "value2": "val2"},
             {"Final_Values": ["agent_id", "final_value"]},
         )
+
+    def model_calc_comp(self, input1, input2):
+        return (self.model_val * input1) / input2
 
     def step(self):
         self.schedule.step()
@@ -80,12 +85,20 @@ class TestDataCollector(unittest.TestCase):
         data_collector = self.model.datacollector
         assert "total_agents" in data_collector.model_vars
         assert "model_value" in data_collector.model_vars
+        assert "model_calc" in data_collector.model_vars
+        assert "model_calc_comp" in data_collector.model_vars
         assert len(data_collector.model_vars["total_agents"]) == 7
         assert len(data_collector.model_vars["model_value"]) == 7
+        assert len(data_collector.model_vars["model_calc"]) == 7
+        assert len(data_collector.model_vars["model_calc_comp"]) == 7
         for element in data_collector.model_vars["total_agents"]:
             assert element == 10
         for element in data_collector.model_vars["model_value"]:
             assert element == 100
+        for element in data_collector.model_vars['model_calc']:
+            assert element == 10
+        for element in data_collector.model_vars['model_calc_comp']:
+            assert element == 75
 
     def test_agent_records(self):
         """
@@ -123,8 +136,7 @@ class TestDataCollector(unittest.TestCase):
         model_vars = data_collector.get_model_vars_dataframe()
         agent_vars = data_collector.get_agent_vars_dataframe()
         table_df = data_collector.get_table_dataframe("Final_Values")
-
-        assert model_vars.shape == (7, 2)
+        assert model_vars.shape == (7, 4)
         assert agent_vars.shape == (70, 2)
         assert table_df.shape == (10, 2)
 
