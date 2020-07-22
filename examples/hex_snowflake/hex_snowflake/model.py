@@ -2,7 +2,7 @@ from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import HexGrid
 
-from hex_snowflake.cell import Cell
+from cell import Cell
 
 
 class HexSnowflake(Model):

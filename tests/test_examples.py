@@ -25,6 +25,7 @@ class TestExamples(unittest.TestCase):
         old_sys_path = sys.path[:]
         old_sys_modules = sys.modules.copy()
         old_cwd = os.getcwd()
+        example = example+"\\"+ example
         example_path = os.path.abspath(os.path.join(self.EXAMPLES, example))
         try:
             sys.path.insert(0, example_path)

@@ -9,7 +9,7 @@ Author of NetLogo code:
     Northwestern University, Evanston, IL.
 """
 
-from charts.agents import Bank, Person
+from agents import Bank, Person
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector

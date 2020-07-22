@@ -1,7 +1,7 @@
 from mesa.visualization.ModularVisualization import ModularServer
 
-from .model import BoidFlockers
-from .SimpleContinuousModule import SimpleCanvas
+from model import BoidFlockers
+from SimpleContinuousModule import SimpleCanvas
 
 
 def boid_draw(agent):

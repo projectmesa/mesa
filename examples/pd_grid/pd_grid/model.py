@@ -3,7 +3,7 @@ from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
 from mesa.space import SingleGrid
 from mesa.datacollection import DataCollector
 
-from .agent import PDAgent
+from agent import PDAgent
 
 
 class PdGrid(Model):

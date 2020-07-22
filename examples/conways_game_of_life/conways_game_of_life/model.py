@@ -2,7 +2,7 @@ from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import Grid
 
-from .cell import Cell
+from cell import Cell
 
 
 class ConwaysGameOfLife(Model):
