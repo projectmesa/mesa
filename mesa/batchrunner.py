@@ -302,11 +302,18 @@ class FixedBatchRunner:
         return self._prepare_report_table(self.agent_vars, extra_cols=["AgentId"])
 
     def get_collector_model(self):
+        """
+        Passes pandas dataframes from datacollector module in dictionary format of model reporters
+        :return: dict {(Param1, Param2,...,iteration): <DataCollector Pandas DataFrame>}
+        """
 
         return self.datacollector_model_reporters
 
     def get_collector_agents(self):
-
+        """
+                Passes pandas dataframes from datacollector module in dictionary format of agent reporters
+                :return: dict {(Param1, Param2,...,iteration): <DataCollector Pandas DataFrame>}
+                """
         return self.datacollector_agent_reporters
 
     def _prepare_report_table(self, vars_dict, extra_cols=None):
