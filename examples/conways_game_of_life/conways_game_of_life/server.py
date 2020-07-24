@@ -1,8 +1,8 @@
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 
-from .portrayal import portrayCell
-from .model import ConwaysGameOfLife
+from portrayal import portrayCell
+from model import ConwaysGameOfLife
 
 
 # Make a world that is 50x50, on a 250x250 display.

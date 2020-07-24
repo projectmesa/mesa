@@ -24,9 +24,11 @@ class TestCli(unittest.TestCase):
             "mesa.visualization.ModularVisualization.ModularServer"
         ) as ModularServer:
             example_dir = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "../examples/wolf_sheep")
+                os.path.join(os.path.dirname(__file__), "../examples/wolf_sheep/wolf_sheep")
             )
+            print (example_dir)
             with self.runner.isolated_filesystem():
                 result = self.runner.invoke(cli, ["runserver", example_dir])
+                print ("This is runner", result.exit_code, result.output)
                 assert result.exit_code == 0, result.output
                 assert ModularServer().launch.call_count == 1

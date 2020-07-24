@@ -2,7 +2,7 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import ChartModule
 from mesa.visualization.modules import NetworkModule
-from .model import BoltzmannWealthModelNetwork
+from model import BoltzmannWealthModelNetwork
 
 
 def network_portrayal(G):

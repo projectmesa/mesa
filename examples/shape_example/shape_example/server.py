@@ -1,7 +1,7 @@
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 
-from .model import Walker, ShapeExample
+from model import Walker, ShapeExample
 
 
 def agent_draw(agent):

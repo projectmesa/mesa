@@ -5,7 +5,7 @@ from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import ChartModule
 from mesa.visualization.modules import NetworkModule
 from mesa.visualization.modules import TextElement
-from .model import VirusOnNetwork, State, number_infected
+from model import VirusOnNetwork, State, number_infected
 
 
 def network_portrayal(G):

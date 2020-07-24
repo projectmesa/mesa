@@ -1,8 +1,8 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid
 
-from .model import EpsteinCivilViolence
-from .agent import Citizen, Cop
+from model import EpsteinCivilViolence
+from agent import Citizen, Cop
 
 
 COP_COLOR = "#000000"

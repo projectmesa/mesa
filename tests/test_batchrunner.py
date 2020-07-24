@@ -7,6 +7,7 @@ import unittest
 
 from mesa import Agent, Model
 from mesa.time import BaseScheduler
+from mesa.datacollection import DataCollector
 from mesa.batchrunner import BatchRunner, ParameterProduct, ParameterSampler
 
 
@@ -22,9 +23,11 @@ class MockAgent(Agent):
         super().__init__(unique_id, model)
         self.unique_id = unique_id
         self.val = val
+        self.local = 0
 
     def step(self):
         self.val += 1
+        self.local += 0.25
 
 
 class MockModel(Model):
@@ -46,6 +49,9 @@ class MockModel(Model):
         self.variable_agent_param = variable_agent_param
         self.fixed_model_param = fixed_model_param
         self.n_agents = kwargs.get("n_agents", NUM_AGENTS)
+        self.datacollector = DataCollector(model_reporters={
+            "reported_model_param": self.get_local_model_param()},
+            agent_reporters={"agent_id": "unique_id", "agent_local": "local"})
         self.running = True
         self.init_agents()
 
@@ -53,7 +59,11 @@ class MockModel(Model):
         for i in range(self.n_agents):
             self.schedule.add(MockAgent(i, self, self.variable_agent_param))
 
+    def get_local_model_param(self):
+        return 42
+
     def step(self):
+        self.datacollector.collect(self)
         self.schedule.step()
 
 
@@ -108,7 +118,7 @@ class TestBatchRunner(unittest.TestCase):
         """
         Returns total number of batch runner's iterations.
         """
-        return reduce(mul, map(len, self.variable_params.values()), 1) * self.iterations
+        return reduce(mul, map(len, self.variable_params.values())) * self.iterations
 
     def test_model_level_vars(self):
         """
@@ -116,11 +126,12 @@ class TestBatchRunner(unittest.TestCase):
         """
         batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
+        model_collector = batch.get_collector_model()
         expected_cols = (
-            len(self.variable_params) + len(self.model_reporters) + 1
+                len(self.variable_params) + len(self.model_reporters) + 1
         )  # extra column with run index
-
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
+        self.assertEqual(len(model_collector.keys()), self.model_runs)
 
     def test_agent_level_vars(self):
         """
@@ -128,12 +139,17 @@ class TestBatchRunner(unittest.TestCase):
         """
         batch = self.launch_batch_processing()
         agent_vars = batch.get_agent_vars_dataframe()
+        agent_collector = batch.get_collector_agents()
         expected_cols = (
-            len(self.variable_params) + len(self.agent_reporters) + 2
+                len(self.variable_params) + len(self.agent_reporters) + 2
         )  # extra columns with run index and agentId
 
         self.assertEqual(
             agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols)
+        )
+
+        self.assertEqual(
+            agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
         )
 
     def test_model_with_fixed_parameters_as_kwargs(self):
@@ -170,36 +186,6 @@ class TestBatchRunner(unittest.TestCase):
         self.assertEqual(
             model_vars["reported_fixed_param"].iloc[0], self.fixed_params["fixed_name"]
         )
-
-    def test_model_with_no_variable_parameters(self):
-        """
-        Test that model with no variable parameters is properly handled
-        """
-        self.variable_params = {}
-        self.fixed_params = {
-            "variable_model_param": 1,
-            "variable_agent_param": 1,
-        }
-        batch = self.launch_batch_processing()
-        model_vars = batch.get_model_vars_dataframe()
-        agent_vars = batch.get_agent_vars_dataframe()
-
-        self.assertEqual(len(model_vars) * NUM_AGENTS, len(agent_vars))
-        self.assertEqual(len(model_vars), self.model_runs)
-
-    def test_model_with_no_variable_and_no_fixed_parameters(self):
-        """
-        Test that model with no variable and no fixed parameters is properly handled
-        """
-        self.mock_model = lambda: MockModel(1, 1)
-        self.variable_params = None
-        self.fixed_params = None
-        batch = self.launch_batch_processing()
-        model_vars = batch.get_model_vars_dataframe()
-        agent_vars = batch.get_agent_vars_dataframe()
-
-        self.assertEqual(len(model_vars) * NUM_AGENTS, len(agent_vars))
-        self.assertEqual(len(model_vars), self.iterations)
 
 
 class TestParameters(unittest.TestCase):

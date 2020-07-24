@@ -3,7 +3,7 @@ from mesa.time import RandomActivation
 from mesa.space import Grid
 from mesa.datacollection import DataCollector
 
-from .agent import Cop, Citizen
+from agent import Cop, Citizen
 
 
 class EpsteinCivilViolence(Model):

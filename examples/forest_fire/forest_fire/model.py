@@ -3,7 +3,7 @@ from mesa.datacollection import DataCollector
 from mesa.space import Grid
 from mesa.time import RandomActivation
 
-from .agent import TreeCell
+from agent import TreeCell
 
 
 class ForestFire(Model):
