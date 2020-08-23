@@ -138,9 +138,8 @@ class TestBatchRunner(unittest.TestCase):
         batch = self.launch_batch_processing()
         agent_vars = batch.get_agent_vars_dataframe()
         agent_collector = batch.get_collector_agents()
-        expected_cols = (
-                len(self.variable_params) + len(self.agent_reporters) + 2
-        )  # extra columns with run index and agentId
+        # extra columns with run index and agentId
+        expected_cols = (len(self.variable_params) + len(self.agent_reporters) + 2)
 
         self.assertEqual(agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols))
 
