@@ -140,7 +140,6 @@ class TestBatchRunner(unittest.TestCase):
         agent_collector = batch.get_collector_agents()
         # extra columns with run index and agentId
         expected_cols = (len(self.variable_params) + len(self.agent_reporters) + 2)
-
         self.assertEqual(agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols))
 
         self.assertEqual(
