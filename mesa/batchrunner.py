@@ -126,7 +126,7 @@ class FixedBatchRunner:
         all_kwargs = []
         all_param_values = []
 
-        _count: int = len(self.parameters_list)
+        _count = len(self.parameters_list)
         if _count:
             for params in self.parameters_list:
                 kwargs = params.copy()
@@ -154,7 +154,7 @@ class FixedBatchRunner:
         total_iterations = self.iterations
         all_kwargs = []
 
-        _count: int = len(self.parameters_list)
+        _count = len(self.parameters_list)
         if _count:
             for params in self.parameters_list:
                 kwargs = params.copy()
@@ -228,12 +228,12 @@ class FixedBatchRunner:
             model object
         """
 
-        _model_i: classmethod = iter_args[0]
-        _kwargs: dict = iter_args[1]
-        _max_steps: int = iter_args[2]
-        _iteration: int = iter_args[3]
+        _model_i = iter_args[0]
+        _kwargs = iter_args[1]
+        _max_steps = iter_args[2]
+        _iteration = iter_args[3]
 
-        def run_iteration_mp(_model_i: classmethod, _kwargs: dict, _max_steps: int, _iteration: int):
+        def run_iteration_mp(_model_i, _kwargs, _max_steps, _iteration):
             """
             :type _model_i: object of model
             :type _kwargs: dict of keyword argument dictionary for model
@@ -446,7 +446,7 @@ class BatchRunner(FixedBatchRunner):
             agent_reporters: Like model_reporters, but each variable is now
                 collected at the level of each agent present in the model at
                 the end of the run.
-            display_progress: Display progresss bar with time estimation?
+            display_progress: Display progress bar with time estimation?
 
         """
         super().__init__(
