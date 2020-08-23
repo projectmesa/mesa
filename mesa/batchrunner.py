@@ -539,6 +539,9 @@ class BatchRunnerMP(BatchRunner):
 
             self.result_prep_mp(results)
 
+        # Close multi-processing
+        self.pool.close()
+
         return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None),
                 getattr(self, "datacollector_model_reporters", None),
                 getattr(self, "datacollector_agent_reporters", None))
