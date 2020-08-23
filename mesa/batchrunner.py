@@ -524,7 +524,7 @@ class BatchRunnerMP(BatchRunner):
         run_iter_args, total_iterations = self._make_model_args_mp()
         # register the process pool and init a queue
         # store results in dictionary
-        results = {}
+        results = OrderedDict()
 
         if self.processes > 1:
             with tqdm(total_iterations, disable=not self.display_progress) as pbar:
