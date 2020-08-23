@@ -110,7 +110,7 @@ class FixedBatchRunner:
         if self.agent_reporters:
             self.agent_vars = {}
 
-        #Make Compatible with Python 3.5
+        # Make Compatible with Python 3.5
         self.datacollector_model_reporters = OrderedDict()
         self.datacollector_agent_reporters = OrderedDict()
 
@@ -523,7 +523,7 @@ class BatchRunnerMP(BatchRunner):
 
         run_iter_args, total_iterations = self._make_model_args_mp()
         # register the process pool and init a queue
-        # store results in dictionary
+        # store results in ordered dictionary
         results = OrderedDict()
 
         if self.processes > 1:
