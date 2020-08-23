@@ -26,7 +26,6 @@ class TestCli(unittest.TestCase):
             example_dir = os.path.abspath(
                 os.path.join(os.path.dirname(__file__), "../examples/wolf_sheep")
             )
-
             with self.runner.isolated_filesystem():
                 result = self.runner.invoke(cli, ["runserver", example_dir])
                 assert result.exit_code == 0, result.output
