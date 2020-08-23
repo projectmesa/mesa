@@ -12,6 +12,7 @@ from itertools import product, count
 from multiprocessing import Pool, cpu_count
 import pandas as pd
 from tqdm import tqdm
+from collections import OrderedDict
 
 
 class ParameterError(TypeError):
@@ -109,8 +110,9 @@ class FixedBatchRunner:
         if self.agent_reporters:
             self.agent_vars = {}
 
-        self.datacollector_model_reporters = {}
-        self.datacollector_agent_reporters = {}
+        #Make Compatible with Python 3.5
+        self.datacollector_model_reporters = OrderedDict()
+        self.datacollector_agent_reporters = OrderedDict()
 
         self.display_progress = display_progress
 
