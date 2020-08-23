@@ -1,8 +1,8 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
-from agents import SsAgent, Sugar
-from model import SugarscapeCg
+from .agents import SsAgent, Sugar
+from .model import SugarscapeCg
 
 color_dic = {4: "#005C00", 3: "#008300", 2: "#00AA00", 1: "#00F800"}
 

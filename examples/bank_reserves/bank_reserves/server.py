@@ -1,8 +1,8 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
-from agents import Person
-from model import BankReserves
+from bank_reserves.agents import Person
+from bank_reserves.model import BankReserves
 
 """
 Citation:

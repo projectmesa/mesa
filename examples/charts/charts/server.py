@@ -6,8 +6,8 @@ from mesa.visualization.modules import (
     PieChartModule,
 )
 from mesa.visualization.UserParam import UserSettableParameter
-from agents import Person
-from model import Charts
+from charts.agents import Person
+from charts.model import Charts
 
 """
 Citation:
@@ -95,14 +95,14 @@ model_bar = BarChartModule(
         {"Label": "Middle Class", "Color": MID_COLOR},
     ]
 )
-#'''
+
 agent_bar = BarChartModule(
     [{"Label": "Wealth", "Color": MID_COLOR}],
     scope="agent",
     sorting="ascending",
     sort_by="Wealth",
 )
-#'''
+
 pie_chart = PieChartModule(
     [
         {"Label": "Rich", "Color": RICH_COLOR},
@@ -114,8 +114,7 @@ pie_chart = PieChartModule(
 # create instance of Mesa ModularServer
 server = ModularServer(
     Charts,
-    #TODO: Fix agent_bar currently produces error
-    [canvas_element, line_chart, model_bar,pie_chart],
+    [canvas_element, line_chart, model_bar, agent_bar, pie_chart],
     "Mesa Charts",
     model_params=model_params,
 )
