@@ -127,9 +127,7 @@ class TestBatchRunner(unittest.TestCase):
         batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
         model_collector = batch.get_collector_model()
-        expected_cols = (
-                len(self.variable_params) + len(self.model_reporters) + 1
-        )  # extra column with run index
+        expected_cols = (len(self.variable_params) + len(self.model_reporters) + 1)  # extra column with run index
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(len(model_collector.keys()), self.model_runs)
 
@@ -144,9 +142,7 @@ class TestBatchRunner(unittest.TestCase):
                 len(self.variable_params) + len(self.agent_reporters) + 2
         )  # extra columns with run index and agentId
 
-        self.assertEqual(
-            agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols)
-        )
+        self.assertEqual(agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols))
 
         self.assertEqual(
             agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
