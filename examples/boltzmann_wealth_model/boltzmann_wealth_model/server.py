@@ -1,5 +1,5 @@
 from mesa.visualization.ModularVisualization import ModularServer
-from model import BoltzmannWealthModel
+from .model import BoltzmannWealthModel
 
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.modules import ChartModule

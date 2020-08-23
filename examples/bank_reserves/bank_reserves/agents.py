@@ -10,7 +10,7 @@ Author of NetLogo code:
 """
 
 from mesa import Agent
-from random_walk import RandomWalker
+from bank_reserves.random_walk import RandomWalker
 
 
 class Bank(Agent):
