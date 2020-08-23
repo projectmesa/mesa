@@ -11,7 +11,7 @@ from mesa import Model
 from mesa.space import ContinuousSpace
 from mesa.time import RandomActivation
 
-from .boid_flockers import Boid
+from .boid_flockers.boid import Boid
 
 
 class BoidFlockers(Model):
