@@ -241,7 +241,7 @@ class FixedBatchRunner:
             :type _iteration: int of number of iterations
             """
             # instantiate version of model with correct parameters
-            model: classmethod = _model_i(**_kwargs)
+            model = _model_i(**_kwargs)
             while model.running and model.schedule.steps < _max_steps:
                 model.step()
 
@@ -538,6 +538,9 @@ class BatchRunnerMP(BatchRunner):
                 results[params] = model_data
 
             self.result_prep_mp(results)
+
+        # Close multi-processing
+        self.pool.close()
 
         return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None),
                 getattr(self, "datacollector_model_reporters", None),

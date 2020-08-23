@@ -46,7 +46,7 @@ class SugarscapeCg(Model):
         # Create sugar
         import numpy as np
 
-        sugar_distribution = sugar_distribution = np.genfromtxt("sugarscape_cg/sugar-map.txt")
+        sugar_distribution = np.genfromtxt("sugarscape_cg/sugar-map.txt")
         for _, x, y in self.grid.coord_iter():
             max_sugar = sugar_distribution[x, y]
             sugar = Sugar((x, y), self, max_sugar)
