@@ -5,6 +5,7 @@ from mesa.datacollection import DataCollector
 
 from .agent import Cop, Citizen
 
+
 class EpsteinCivilViolence(Model):
     """
     Model 1 from "Modeling civil violence: An agent-based computational
