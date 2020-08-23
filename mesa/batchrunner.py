@@ -241,7 +241,7 @@ class FixedBatchRunner:
             :type _iteration: int of number of iterations
             """
             # instantiate version of model with correct parameters
-            model: classmethod = _model_i(**_kwargs)
+            model = _model_i(**_kwargs)
             while model.running and model.schedule.steps < _max_steps:
                 model.step()
 
