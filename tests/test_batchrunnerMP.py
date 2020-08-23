@@ -175,10 +175,7 @@ class TestBatchRunnerMP(unittest.TestCase):
         self.variable_params = {"variable_name": [1, 2, 3]}
         batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
-        expected_cols = (len(self.variable_params)
-            + len(self.fixed_params)
-            + len(self.model_reporters) + 1
-        )
+        expected_cols = (len(self.variable_params) + len(self.fixed_params) + len(self.model_reporters) + 1)
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(
             model_vars["reported_fixed_param"].iloc[0], self.fixed_params["fixed_name"]
