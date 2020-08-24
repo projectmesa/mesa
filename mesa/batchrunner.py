@@ -105,10 +105,10 @@ class FixedBatchRunner:
         self.agent_reporters = agent_reporters
 
         if self.model_reporters:
-            self.model_vars = {}
+            self.model_vars = OrderedDict()
 
         if self.agent_reporters:
-            self.agent_vars = {}
+            self.agent_vars = OrderedDict()
 
         # Make Compatible with Python 3.5
         self.datacollector_model_reporters = OrderedDict()
@@ -274,7 +274,7 @@ class FixedBatchRunner:
 
     def collect_model_vars(self, model):
         """ Run reporters and collect model-level variables. """
-        model_vars = OrderedDict()
+        model_vars = {}
         for var, reporter in self.model_reporters.items():
             model_vars[var] = reporter(model)
 
@@ -282,7 +282,7 @@ class FixedBatchRunner:
 
     def collect_agent_vars(self, model):
         """ Run reporters and collect agent-level variables. """
-        agent_vars = OrderedDict()
+        agent_vars = {}
         for agent in model.schedule._agents.values():
             agent_record = {}
             for var, reporter in self.agent_reporters.items():
@@ -524,7 +524,7 @@ class BatchRunnerMP(BatchRunner):
         run_iter_args, total_iterations = self._make_model_args_mp()
         # register the process pool and init a queue
         # store results in ordered dictionary
-        results = OrderedDict()
+        results = {}
 
         if self.processes > 1:
             with tqdm(total_iterations, disable=not self.display_progress) as pbar:
