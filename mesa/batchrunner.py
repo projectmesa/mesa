@@ -284,7 +284,7 @@ class FixedBatchRunner:
         """ Run reporters and collect agent-level variables. """
         agent_vars = OrderedDict()
         for agent in model.schedule._agents.values():
-            agent_record = {}
+            agent_record = OrderedDict()
             for var, reporter in self.agent_reporters.items():
                 agent_record[var] = getattr(agent, reporter)
             agent_vars[agent.unique_id] = agent_record
