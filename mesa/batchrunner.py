@@ -274,7 +274,7 @@ class FixedBatchRunner:
 
     def collect_model_vars(self, model):
         """ Run reporters and collect model-level variables. """
-        model_vars = {}
+        model_vars = OrderedDict()
         for var, reporter in self.model_reporters.items():
             model_vars[var] = reporter(model)
 
@@ -282,7 +282,7 @@ class FixedBatchRunner:
 
     def collect_agent_vars(self, model):
         """ Run reporters and collect agent-level variables. """
-        agent_vars = {}
+        agent_vars = OrderedDict()
         for agent in model.schedule._agents.values():
             agent_record = {}
             for var, reporter in self.agent_reporters.items():
@@ -491,8 +491,8 @@ class BatchRunnerMP(BatchRunner):
         """
         Helper Function
         :param results: Takes results dictionary from Processpool and single processor debug run and fixes format to
-        mac compatible with BatchRunner Output
-        :updates model_vars and agents vars so consistent across all batchrunner
+        make compatible with BatchRunner Output
+        :updates model_vars and agents_vars so consistent across all batchrunner
         """
         # Take results and convert to dictionary so dataframe can be called
         for model_key, model in results.items():
