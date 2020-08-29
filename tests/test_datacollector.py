@@ -106,7 +106,7 @@ class TestDataCollector(unittest.TestCase):
         for element in data_collector.model_vars['model_calc_comp']:
             assert element == 75
         for element in data_collector.model_vars["model_calc_fail"]:
-            assert element == None
+            assert element is None
 
     def test_agent_records(self):
         """
