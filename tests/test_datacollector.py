@@ -119,6 +119,11 @@ class TestDataCollector(unittest.TestCase):
             for values in records:
                 assert len(values) == 4
 
+        assert data_collector.get_agent_vars_dataframe().shape == (70, 2)
+
+        with self.assertRaises(Exception):
+            data_collector._agent_records[8]
+
     def test_table_rows(self):
         """
         Test table collection
