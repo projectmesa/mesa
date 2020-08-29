@@ -53,7 +53,7 @@ class MockModel(Model):
                 "model_value": "model_val",
                 "model_calc": self.schedule.get_agent_count(),
                 "model_calc_comp": [self.test_model_calc_comp, [3, 4]],
-                "model_calc_fail": [self.test_model_calc_comp, [12,0]],
+                "model_calc_fail": [self.test_model_calc_comp, [12,0]]
             },
             {"value": lambda a: a.val, "value2": "val2"},
             {"Final_Values": ["agent_id", "final_value"]},
