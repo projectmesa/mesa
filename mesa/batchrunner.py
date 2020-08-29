@@ -105,10 +105,10 @@ class FixedBatchRunner:
         self.agent_reporters = agent_reporters
 
         if self.model_reporters:
-            self.model_vars = OrderedDict()
+            self.model_vars = {}
 
         if self.agent_reporters:
-            self.agent_vars = OrderedDict()
+            self.agent_vars = {}
 
         # Make Compatible with Python 3.5
         self.datacollector_model_reporters = OrderedDict()
