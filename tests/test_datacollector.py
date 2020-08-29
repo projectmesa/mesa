@@ -113,15 +113,20 @@ class TestDataCollector(unittest.TestCase):
         Test agent-level variable collection.
         """
         data_collector = self.model.datacollector
+        agent_table = data_collector.get_agent_vars_dataframe()
+
         assert len(data_collector._agent_records) == 7
         for step, records in data_collector._agent_records.items():
             assert len(records) == 10
             for values in records:
                 assert len(values) == 4
 
-        assert data_collector.get_agent_vars_dataframe().shape == (70, 2)
+        assert agent_table.shape == (70, 2)
+        assert 'value' in list(agent_table.columns)
+        assert "value2" in list(agent_table.columns)
+        assert "value3" not in list(agent_table.columns)
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(KeyError):
             data_collector._agent_records[8]
 
     def test_table_rows(self):
