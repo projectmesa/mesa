@@ -144,11 +144,12 @@ class TestBatchRunner(unittest.TestCase):
         assert "agent_val" in list(agent_vars.columns)
         assert "val_non_existent" not in list(agent_vars.columns)
         assert "agent_id" in list(agent_collector[(0, 1, 1)].columns)
-        assert "Step" in list(agent_collector[(0, 1, 5)].index)
+        print(agent_collector[(0,1,5)].index.names)
+        assert "Step" in list(agent_collector[(0, 1, 5)].index.names)
         assert "nose" not in list(agent_collector[(0, 1, 1)].columns)
 
         self.assertEqual(
-            agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 4)
+            agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
         )
 
         with self.assertRaises(KeyError):
