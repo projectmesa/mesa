@@ -9,7 +9,7 @@ from mesa import Agent, Model
 from mesa.time import BaseScheduler
 from mesa.datacollection import DataCollector
 from mesa.batchrunner import BatchRunnerMP, ParameterProduct, ParameterSampler
-from multiprocessing import freeze_support
+from multiprocessing import freeze_support, cpu_count
 
 NUM_AGENTS = 7
 
@@ -127,6 +127,8 @@ class TestBatchRunnerMP(unittest.TestCase):
         Test that model-level variable collection is of the correct size
         """
         batch = self.launch_batch_processing()
+        assert batch.processes == cpu_count()
+        assert batch.processes != 1
         model_vars = batch.get_model_vars_dataframe()
         model_collector = batch.get_collector_model()
         expected_cols = (len(self.variable_params) + len(self.model_reporters) + 1)  # extra column with run index
@@ -142,13 +144,18 @@ class TestBatchRunnerMP(unittest.TestCase):
         agent_collector = batch.get_collector_agents()
         # extra columns with run index and agentId
         expected_cols = (len(self.variable_params) + len(self.agent_reporters) + 2)
+        assert "agent_val" in list(agent_vars.columns)
+        assert "val_non_existent" not in list(agent_vars.columns)
+        assert "agent_id" in list(agent_collector[(0, 1, 1)].columns)
+        assert "Step" in list(agent_collector[(0, 1, 5)].columns)
+        assert "nose" not in list(agent_collector[(0, 1, 1)].columns)
 
         self.assertEqual(
             agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols)
         )
 
         self.assertEqual(
-            agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
+            agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 4)
         )
 
     def test_model_with_fixed_parameters_as_kwargs(self):

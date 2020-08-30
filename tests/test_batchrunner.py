@@ -141,10 +141,18 @@ class TestBatchRunner(unittest.TestCase):
         # extra columns with run index and agentId
         expected_cols = (len(self.variable_params) + len(self.agent_reporters) + 2)
         self.assertEqual(agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols))
+        assert "agent_val" in list(agent_vars.columns)
+        assert "val_non_existent" not in list(agent_vars.columns)
+        assert "agent_id" in list(agent_collector[(0, 1, 1)].columns)
+        assert "Step" in list(agent_collector[(0, 1, 5)].columns)
+        assert "nose" not in list(agent_collector[(0,1,1)].columns)
 
         self.assertEqual(
-            agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
+            agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 4)
         )
+
+        with self.assertRaises(KeyError):
+            agent_collector[(900, "k" , 3)]
 
     def test_model_with_fixed_parameters_as_kwargs(self):
         """

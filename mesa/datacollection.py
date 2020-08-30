@@ -247,7 +247,6 @@ class DataCollector:
         df = pd.DataFrame.from_records(
             data=all_records, columns=["Step", "AgentID"] + rep_names,
         )
-        df = df.set_index(["Step", "AgentID"])
         return df
 
     def get_table_dataframe(self, table_name):
