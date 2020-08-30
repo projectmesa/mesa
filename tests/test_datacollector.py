@@ -154,7 +154,7 @@ class TestDataCollector(unittest.TestCase):
         agent_vars = data_collector.get_agent_vars_dataframe()
         table_df = data_collector.get_table_dataframe("Final_Values")
         assert model_vars.shape == (7, 5)
-        assert agent_vars.shape == (70, 4)
+        assert agent_vars.shape == (70, 2)
         assert table_df.shape == (10, 2)
 
         with self.assertRaises(Exception):
