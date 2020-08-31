@@ -115,12 +115,38 @@ class TestBatchRunnerMP(unittest.TestCase):
         batch.run_all()
         return batch
 
+    def launch_batch_processing_debug(self):
+        '''
+        Tests with one processor for debugging purposes
+        '''
+
+        batch = BatchRunnerMP(
+            self.mock_model,
+            nr_processes=1,
+            variable_parameters=self.variable_params,
+            fixed_parameters=self.fixed_params,
+            iterations=self.iterations,
+            max_steps=self.max_steps,
+            model_reporters=self.model_reporters,
+            agent_reporters=self.agent_reporters,
+        )
+
+        batch.run_all()
+        return batch
+
     @property
     def model_runs(self):
         """
         Returns total number of batch runner's iterations.
         """
         return reduce(mul, map(len, self.variable_params.values())) * self.iterations
+
+    def batch_model_vars(self, results):
+        model_vars = results.get_model_vars_dataframe()
+        model_collector = results.get_collector_model()
+        expected_cols = (len(self.variable_params) + len(self.model_reporters) + 1)  # extra column with run index
+        self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
+        self.assertEqual(len(model_collector.keys()), self.model_runs)
 
     def test_model_level_vars(self):
         """
@@ -129,19 +155,14 @@ class TestBatchRunnerMP(unittest.TestCase):
         batch = self.launch_batch_processing()
         assert batch.processes == cpu_count()
         assert batch.processes != 1
-        model_vars = batch.get_model_vars_dataframe()
-        model_collector = batch.get_collector_model()
-        expected_cols = (len(self.variable_params) + len(self.model_reporters) + 1)  # extra column with run index
-        self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
-        self.assertEqual(len(model_collector.keys()), self.model_runs)
+        self.batch_model_vars(batch)
 
-    def test_agent_level_vars(self):
-        """
-        Test that agent-level variable collection is of the correct size
-        """
-        batch = self.launch_batch_processing()
-        agent_vars = batch.get_agent_vars_dataframe()
-        agent_collector = batch.get_collector_agents()
+        batch2 = self.launch_batch_processing_debug()
+        self.batch_model_vars(batch2)
+
+    def batch_agent_vars(self, result):
+        agent_vars = result.get_agent_vars_dataframe()
+        agent_collector = result.get_collector_agents()
         # extra columns with run index and agentId
         expected_cols = (len(self.variable_params) + len(self.agent_reporters) + 2)
         assert "agent_val" in list(agent_vars.columns)
@@ -157,6 +178,16 @@ class TestBatchRunnerMP(unittest.TestCase):
         self.assertEqual(
             agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
         )
+
+    def test_agent_level_vars(self):
+        """
+        Test that agent-level variable collection is of the correct size
+        """
+        batch = self.launch_batch_processing()
+        self.batch_agent_vars(batch)
+
+        batch2 = self.launch_batch_processing_debug()
+        self.batch_agent_vars(batch2)
 
     def test_model_with_fixed_parameters_as_kwargs(self):
         """

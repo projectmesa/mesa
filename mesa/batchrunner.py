@@ -395,7 +395,6 @@ class ParameterSampler:
         raise StopIteration()
 
 
-# TODO: No difference- deleting will remove whitespace issue
 class BatchRunner(FixedBatchRunner):
     """ This class is instantiated with a model class, and model parameters
     associated with one or more values. It is also instantiated with model and
@@ -451,16 +450,28 @@ class BatchRunner(FixedBatchRunner):
             display_progress: Display progress bar with time estimation?
 
         """
-        super().__init__(
-            model_cls,
-            ParameterProduct(variable_parameters),
-            fixed_parameters,
-            iterations,
-            max_steps,
-            model_reporters,
-            agent_reporters,
-            display_progress,
-        )
+        if variable_parameters is None:
+            super().__init__(
+                model_cls,
+                variable_parameters,
+                fixed_parameters,
+                iterations,
+                max_steps,
+                model_reporters,
+                agent_reporters,
+                display_progress,
+            )
+        else:
+            super().__init__(
+                model_cls,
+                ParameterProduct(variable_parameters),
+                fixed_parameters,
+                iterations,
+                max_steps,
+                model_reporters,
+                agent_reporters,
+                display_progress,
+            )
 
 
 class BatchRunnerMP(BatchRunner):

@@ -37,8 +37,8 @@ class MockModel(Model):
 
     def __init__(
         self,
-        variable_model_param,
-        variable_agent_param,
+        variable_model_param=None,
+        variable_agent_param=None,
         fixed_model_param=None,
         schedule=None,
         **kwargs
@@ -56,8 +56,12 @@ class MockModel(Model):
         self.init_agents()
 
     def init_agents(self):
+        if self.variable_agent_param is None:
+            agent_val = 1
+        else:
+            agent_val = self.variable_agent_param
         for i in range(self.n_agents):
-            self.schedule.add(MockAgent(i, self, self.variable_agent_param))
+            self.schedule.add(MockAgent(i, self, agent_val))
 
     def get_local_model_param(self):
         return 42
@@ -113,6 +117,20 @@ class TestBatchRunner(unittest.TestCase):
         batch.run_all()
         return batch
 
+    def launch_batch_processing_fixed(self):
+        # Adding second batchrun to test fixed params increase coverage
+        batch2 = BatchRunner(
+            self.mock_model,
+            fixed_parameters={"fixed": "happy"},
+            iterations=4,
+            max_steps=self.max_steps,
+            model_reporters=self.model_reporters,
+            agent_reporters=None,
+        )
+
+        batch2.run_all()
+        return batch2
+
     @property
     def model_runs(self):
         """
@@ -163,10 +181,22 @@ class TestBatchRunner(unittest.TestCase):
         batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
         agent_vars = batch.get_agent_vars_dataframe()
-
         self.assertEqual(len(model_vars), len(agent_vars))
         self.assertEqual(len(model_vars), self.model_runs)
         self.assertEqual(model_vars["reported_fixed_value"].unique(), ["Fixed"])
+
+    def test_model_with_only_fixed_parameters(self):
+        """
+        Test that model with only fixed parameters and multiple iterations is
+        properly handled
+        """
+        batch = self.launch_batch_processing_fixed()
+        model_vars = batch.get_model_vars_dataframe()
+        self.assertEqual(len(model_vars), 4)
+        self.assertEqual(model_vars["fixed"].unique(), ["happy"])
+
+        with self.assertRaises(AttributeError):
+            batch.get_agent_vars_dataframe()
 
     def test_model_with_variable_and_fixed_kwargs(self):
         self.mock_model = MockMixedModel
