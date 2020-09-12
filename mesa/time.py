@@ -60,6 +60,10 @@ class BaseScheduler:
             have a step() method.
 
         """
+
+        if agent.unique_id in self._agents:
+            raise Exception("Agent with unique id {0} already added to scheduler".format(repr(agent.unique_id)))
+
         self._agents[agent.unique_id] = agent
 
     def remove(self, agent: Agent) -> None:
