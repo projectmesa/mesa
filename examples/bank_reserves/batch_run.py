@@ -148,7 +148,7 @@ class BankReservesModel(Model):
                 "Model Params": track_params,
                 "Run": track_run,
             },
-            agent_reporters={"Wealth": lambda x: x.wealth},
+            agent_reporters={"Wealth": "wealth"},
         )
 
         # create a single bank for the model
@@ -181,21 +181,23 @@ class BankReservesModel(Model):
 
 # parameter lists for each parameter to be tested in batch run
 br_params = {
-    "init_people": [25, 100, 150, 200],
-    "rich_threshold": [5, 10, 15, 20],
-    "reserve_percent": [0, 50, 100],
+    "init_people": [25, 100],
+    "rich_threshold": [5, 10],
+    "reserve_percent": 50,
 }
 
 br = BatchRunner(
     BankReservesModel,
     br_params,
-    iterations=1,
+    iterations=2,
     max_steps=1000,
-    model_reporters={"Data Collector": lambda m: m.datacollector},
+    nr_processes=1,
+    # model_reporters={"Data Collector": lambda m: m.datacollector},
 )
 
 if __name__ == "__main__":
     br.run_all()
+    """
     br_df = br.get_model_vars_dataframe()
     br_step_data = pd.DataFrame()
     for i in range(len(br_df["Data Collector"])):
@@ -203,3 +205,4 @@ if __name__ == "__main__":
             i_run_data = br_df["Data Collector"][i].get_model_vars_dataframe()
             br_step_data = br_step_data.append(i_run_data, ignore_index=True)
     br_step_data.to_csv("BankReservesModel_Step_Data.csv")
+    """
