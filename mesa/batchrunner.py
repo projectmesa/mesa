@@ -136,7 +136,7 @@ class FixedBatchRunner:
                 all_param_values.append(list(params.values()))
 
         elif len(self.fixed_parameters):
-            _count = 1
+            count = 1
             kwargs = self.fixed_parameters.copy()
             all_kwargs.append(kwargs)
             all_param_values.append(list(kwargs.values()))
