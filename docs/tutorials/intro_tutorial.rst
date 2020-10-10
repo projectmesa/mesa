@@ -295,12 +295,12 @@ to see the distribution of the agent's wealth. We can get the wealth
 values with list comprehension, and then use matplotlib (or another
 graphics library) to visualize the data in a histogram.
 
-If you are running from a text editor or IDE, you'll also need to add
-this line, to make the graph appear.
-
 .. code:: python
 
    plt.show()
+
+If you are running from a text editor or IDE, you'll also need to add
+this line, to make the graph appear.
 
 .. code:: ipython3
 

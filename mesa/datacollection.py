@@ -85,14 +85,14 @@ class DataCollector:
             If your model includes a large number of agents, you should *only*
             use attribute names for the agent reporter, it will be much faster.
 
-            Model reporters can take three types of arguments:
+            Model reporters can take four types of arguments:
             lambda like above:
             {"agent_count": lambda m: m.schedule.get_agent_count() }
             method with @property decorators
             {"agent_count": schedule.get_agent_count()
             class attributes of model
             {"model_attribute": "model_attribute"}
-            functions with paramters that have placed in a list
+            functions with parameters that have placed in a list
             {"Model_Function":[function, [param_1, param_2]]}
 
         """
@@ -186,14 +186,7 @@ class DataCollector:
                 elif isinstance(reporter, list):
                     self.model_vars[var].append(reporter[0](*reporter[1]))
                 else:
-                    try:
-                        self.model_vars[var].append(reporter)
-                    except TypeError:
-                        print("Reporters must be in dictionary in one of the following forms: /n\
-                        - key_name: <class attribute> /n \
-                        - key_name: function (e.g schedule.get_agent_count) /n \
-                        - key_name: lambda function /n \
-                        - key_name: [function, [<arguments for function>]")
+                    self.model_vars[var].append(reporter)
 
         if self.agent_reporters:
             agent_records = self._record_agents(model)
