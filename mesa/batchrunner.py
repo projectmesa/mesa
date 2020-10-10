@@ -116,7 +116,6 @@ class FixedBatchRunner:
 
         self.display_progress = display_progress
 
-    @property
     def _make_model_args(self):
         """Prepare all combinations of parameter values for `run_all`
 
@@ -128,8 +127,8 @@ class FixedBatchRunner:
         all_kwargs = []
         all_param_values = []
 
-        _count = len(self.parameters_list)
-        if _count:
+        count = len(self.parameters_list)
+        if count:
             for params in self.parameters_list:
                 kwargs = params.copy()
                 kwargs.update(self.fixed_parameters)
@@ -137,12 +136,12 @@ class FixedBatchRunner:
                 all_param_values.append(list(params.values()))
 
         elif len(self.fixed_parameters):
-            _count = 1
+            count = 1
             kwargs = self.fixed_parameters.copy()
             all_kwargs.append(kwargs)
             all_param_values.append(list(kwargs.values()))
 
-        total_iterations *= _count
+        total_iterations *= count
 
         return total_iterations, all_kwargs, all_param_values
 
@@ -178,7 +177,7 @@ class FixedBatchRunner:
     def run_all(self):
         """ Run the model at all parameter combinations and store results. """
         run_count = count()
-        total_iterations, all_kwargs, all_param_values = self._make_model_args
+        total_iterations, all_kwargs, all_param_values = self._make_model_args()
 
         with tqdm(total_iterations, disable=not self.display_progress) as pbar:
             for i, kwargs in enumerate(all_kwargs):
@@ -188,8 +187,7 @@ class FixedBatchRunner:
                     pbar.update()
 
     def run_iteration(self, kwargs, param_values, run_count):
-        kwargs_copy = copy.deepcopy(kwargs)
-        model = self.model_cls(**kwargs_copy)
+        model = self.model_cls(**kwargs)
         results = self.run_model(model)
         if param_values is not None:
             model_key = tuple(param_values) + (run_count,)
@@ -215,7 +213,7 @@ class FixedBatchRunner:
                 getattr(self, "datacollector_agent_reporters", None))
 
     @staticmethod
-    def run_wrappermp(iter_args):
+    def _run_wrappermp(iter_args):
         """
         Based on requirement of Python multiprocessing requires @staticmethod decorator;
         this is primarily to ensure functionality on Windows OS and doe not impact MAC or Linux distros
@@ -498,7 +496,7 @@ class BatchRunnerMP(BatchRunner):
         super().__init__(model_cls, **kwargs)
         self.pool = Pool(self.processes)
 
-    def result_prep_mp(self, results):
+    def _result_prep_mp(self, results):
         """
         Helper Function
         :param results: Takes results dictionary from Processpool and single processor debug run and fixes format to
@@ -539,18 +537,18 @@ class BatchRunnerMP(BatchRunner):
 
         if self.processes > 1:
             with tqdm(total_iterations, disable=not self.display_progress) as pbar:
-                for params, model in self.pool.imap_unordered(self.run_wrappermp, run_iter_args):
+                for params, model in self.pool.imap_unordered(self._run_wrappermp, run_iter_args):
                     results[params] = model
                     pbar.update()
 
-                self.result_prep_mp(results)
+                self._result_prep_mp(results)
         # For debugging model due to difficulty of getting errors during multiprocessing
         else:
             for run in run_iter_args:
-                params, model_data = self.run_wrappermp(run)
+                params, model_data = self._run_wrappermp(run)
                 results[params] = model_data
 
-            self.result_prep_mp(results)
+            self._result_prep_mp(results)
 
         # Close multi-processing
         self.pool.close()
