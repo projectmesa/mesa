@@ -26,7 +26,7 @@ every step of every run.
 from bank_reserves.agents import Bank, Person
 import itertools
 from mesa import Model
-from mesa.batchrunner import BatchRunner
+from mesa.batchrunner import batch_run
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 from mesa.time import RandomActivation
@@ -186,17 +186,18 @@ br_params = {
     "reserve_percent": 50,
 }
 
-br = BatchRunner(
+"""br = BatchRunner(
     BankReservesModel,
     br_params,
     iterations=2,
     max_steps=1000,
-    nr_processes=1,
+    nr_processes=None,
     # model_reporters={"Data Collector": lambda m: m.datacollector},
-)
+)"""
 
 if __name__ == "__main__":
-    br.run_all()
+    batch_run(BankReservesModel, br_params)
+    # br.run_all()
     """
     br_df = br.get_model_vars_dataframe()
     br_step_data = pd.DataFrame()
