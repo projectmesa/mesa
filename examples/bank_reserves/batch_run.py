@@ -196,7 +196,9 @@ br_params = {
 )"""
 
 if __name__ == "__main__":
-    batch_run(BankReservesModel, br_params)
+    batch_run(
+        BankReservesModel, br_params, model_reporters={"Rich": get_num_rich_agents}
+    )
     # br.run_all()
     """
     br_df = br.get_model_vars_dataframe()

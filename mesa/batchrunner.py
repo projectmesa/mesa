@@ -16,6 +16,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 import pandas as pd
 from tqdm import tqdm
 
+from mesa.datacollection import DataCollector
 from mesa.model import Model
 
 ParameterName = str
@@ -27,7 +28,8 @@ ModelData = Any
 def batch_run(
     model_cls: Type[Model],
     parameters: Dict[ParameterName, Union[ParameterValue, Iterable[ParameterValue]]],
-    nr_processes: Optional[int] = 1,
+    model_reporters: Any = None,
+    nr_processes: Optional[int] = None,
     iterations: int = 1,
     max_steps: int = 1000,
     display_progress: bool = True,
@@ -36,29 +38,31 @@ def batch_run(
 
     kwargs_list = _make_model_kwargs(parameters)
     process_func = partial(
-        _model_run_func, model_cls, max_steps=max_steps, reporter=None
+        _model_run_func, model_cls, max_steps=max_steps, model_reporters=model_reporters
     )
 
     total_iterations = len(kwargs_list) * iterations
 
-    results = {}
+    results = []
 
     with tqdm(total_iterations, disable=not display_progress) as pbar:
         if nr_processes == 1:
             for kwargs in kwargs_list:
-                params, data = process_func(kwargs)
-                results[params] = data
+                data = process_func(kwargs)
+                results.append(data)
                 pbar.update()
 
         else:
             with mp.Pool(nr_processes) as p:
-                for params, data in p.imap_unordered(process_func, kwargs_list):
-                    results[params] = data
+                for data in p.imap_unordered(process_func, kwargs_list):
+                    results.append(data)
                     pbar.update()
 
     print(results)
+    df_results = pd.DataFrame(results)
+    print(df_results)
 
-    return results
+    return df_results
 
 
 def _make_model_kwargs(
@@ -78,22 +82,27 @@ def _make_model_kwargs(
 
 
 def _model_run_func(
-    model_cls: Type[Model], kwargs: ModelParameters, max_steps: int, reporter: Any
-) -> Tuple[Tuple[ParameterValue], Any]:
+    model_cls: Type[Model],
+    kwargs: ModelParameters,
+    max_steps: int,
+    model_reporters: Any,
+) -> Dict[str, Any]:
     """Run a single model run."""
     model = model_cls(**kwargs)
     while model.running and model.schedule.steps < max_steps:
         model.step()
 
-    params = tuple(kwargs.values())
-    data = _collect_data(model, reporter)
+    data = _collect_data(model, model_reporters)
 
-    return params, data
+    return {**kwargs, **data}
 
 
-def _collect_data(model: Model, reporter: Any) -> int:
+def _collect_data(model: Model, model_reporters: Any) -> Any:
     "stub that just returns the model hash, but should handle the reporters"
-    return hash(model)
+    dc = DataCollector(model_reporters=model_reporters)
+    dc.collect(model)
+    model_data = {key: value[0] for key, value in dc.model_vars.items()}
+    return model_data
 
 
 try:
