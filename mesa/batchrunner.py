@@ -29,6 +29,7 @@ def batch_run(
     model_cls: Type[Model],
     parameters: Dict[ParameterName, Union[ParameterValue, Iterable[ParameterValue]]],
     model_reporters: Any = None,
+    agent_reporters: Any = None,
     nr_processes: Optional[int] = None,
     iterations: int = 1,
     max_steps: int = 1000,
@@ -38,7 +39,11 @@ def batch_run(
 
     kwargs_list = _make_model_kwargs(parameters)
     process_func = partial(
-        _model_run_func, model_cls, max_steps=max_steps, model_reporters=model_reporters
+        _model_run_func,
+        model_cls,
+        max_steps=max_steps,
+        model_reporters=model_reporters,
+        agent_reporters=agent_reporters,
     )
 
     total_iterations = len(kwargs_list) * iterations
@@ -49,20 +54,16 @@ def batch_run(
         if nr_processes == 1:
             for kwargs in kwargs_list:
                 data = process_func(kwargs)
-                results.append(data)
+                results.extend(data)
                 pbar.update()
 
         else:
             with mp.Pool(nr_processes) as p:
                 for data in p.imap_unordered(process_func, kwargs_list):
-                    results.append(data)
+                    results.extend(data)
                     pbar.update()
 
-    print(results)
-    df_results = pd.DataFrame(results)
-    print(df_results)
-
-    return df_results
+    return results
 
 
 def _make_model_kwargs(
@@ -86,23 +87,38 @@ def _model_run_func(
     kwargs: ModelParameters,
     max_steps: int,
     model_reporters: Any,
-) -> Dict[str, Any]:
+    agent_reporters: Any,
+) -> List[Dict[str, Any]]:
     """Run a single model run."""
     model = model_cls(**kwargs)
     while model.running and model.schedule.steps < max_steps:
         model.step()
 
-    data = _collect_data(model, model_reporters)
+    model_data, agent_data = _collect_data(model, model_reporters, agent_reporters)
 
-    return {**kwargs, **data}
+    data = [{**kwargs, **model_data, **agent_datum} for agent_datum in agent_data]
+
+    return data
 
 
-def _collect_data(model: Model, model_reporters: Any) -> Any:
-    "stub that just returns the model hash, but should handle the reporters"
-    dc = DataCollector(model_reporters=model_reporters)
+def _collect_data(
+    model: Model,
+    model_reporters: Dict[str, Any] = None,
+    agent_reporters: Dict[str, Any] = None,
+) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+    """Collect model and agent data from a model using mesas datacollector."""
+    dc = DataCollector(model_reporters=model_reporters, agent_reporters=agent_reporters)
     dc.collect(model)
+
     model_data = {key: value[0] for key, value in dc.model_vars.items()}
-    return model_data
+
+    agent_data = []
+    raw_agent_data = dc._agent_records.get(model.schedule.steps, [])
+    for data in raw_agent_data:
+        agent_dict = dict(zip(dc.agent_reporters, data[2:]))
+        agent_dict["AgentID"] = data[1]
+        agent_data.append(agent_dict)
+    return model_data, agent_data
 
 
 try:

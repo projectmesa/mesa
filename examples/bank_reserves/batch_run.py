@@ -183,7 +183,7 @@ class BankReservesModel(Model):
 br_params = {
     "init_people": [25, 100],
     "rich_threshold": [5, 10],
-    "reserve_percent": 50,
+    "reserve_percent": 5,
 }
 
 """br = BatchRunner(
@@ -196,9 +196,14 @@ br_params = {
 )"""
 
 if __name__ == "__main__":
-    batch_run(
-        BankReservesModel, br_params, model_reporters={"Rich": get_num_rich_agents}
+    data = batch_run(
+        BankReservesModel,
+        br_params,
+        model_reporters={"Rich": get_num_rich_agents},
+        agent_reporters={"Wealth": "wealth"},
     )
+    br_df = pd.DataFrame(data)
+    br_df.to_csv("BankReservesModel_Data.csv")
     # br.run_all()
     """
     br_df = br.get_model_vars_dataframe()
