@@ -50,13 +50,13 @@ class MockModel(Model):
         self.fixed_model_param = fixed_model_param
         self.n_agents = kwargs.get("n_agents", NUM_AGENTS)
         self.datacollector = DataCollector(model_reporters={
-            "reported_model_param": self.get_local_model_param(1)},
+            "reported_model_param": self.get_local_model_param},
             agent_reporters={"agent_id": "unique_id", "agent_local": "local"})
         self.running = True
         self.init_agents()
 
-    def get_local_model_param(self, add):
-        return 41 + add
+    def get_local_model_param(self):
+        return 42
 
     def init_agents(self):
         for i in range(self.n_agents):
