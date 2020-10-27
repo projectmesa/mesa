@@ -50,7 +50,7 @@ class MockModel(Model):
         self.fixed_model_param = fixed_model_param
         self.n_agents = kwargs.get("n_agents", NUM_AGENTS)
         self.datacollector = DataCollector(model_reporters={
-            "reported_model_param": self.get_local_model_param()},
+            "reported_model_param": self.get_local_model_param},
             agent_reporters={"agent_id": "unique_id", "agent_local": "local"})
         self.running = True
         self.init_agents()
@@ -170,7 +170,7 @@ class TestBatchRunner(unittest.TestCase):
         )
 
         with self.assertRaises(KeyError):
-            agent_collector[(900, "k" , 3)]
+            agent_collector[(900, "k", 3)]
 
     def test_model_with_fixed_parameters_as_kwargs(self):
         """

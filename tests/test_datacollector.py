@@ -51,7 +51,7 @@ class MockModel(Model):
             {
                 "total_agents": lambda m: m.schedule.get_agent_count(),
                 "model_value": "model_val",
-                "model_calc": self.schedule.get_agent_count(),
+                "model_calc": self.schedule.get_agent_count,
                 "model_calc_comp": [self.test_model_calc_comp, [3, 4]],
                 "model_calc_fail": [self.test_model_calc_comp, [12, 0]]
             },
@@ -78,10 +78,20 @@ class TestDataCollector(unittest.TestCase):
         """
         self.model = MockModel()
         for i in range(7):
+            if i == 4:
+                self.model.schedule.remove(self.model.schedule._agents[3])
             self.model.step()
+
         # Write to table:
         for agent in self.model.schedule.agents:
             agent.write_final_values()
+
+    def step_assertion(self, model_var):
+        for element in model_var:
+            if model_var.index(element) < 4:
+                assert element == 10
+            else:
+                assert element == 9
 
     def test_model_vars(self):
         """
@@ -97,12 +107,10 @@ class TestDataCollector(unittest.TestCase):
         assert len(data_collector.model_vars["model_value"]) == 7
         assert len(data_collector.model_vars["model_calc"]) == 7
         assert len(data_collector.model_vars["model_calc_comp"]) == 7
-        for element in data_collector.model_vars["total_agents"]:
-            assert element == 10
+        self.step_assertion(data_collector.model_vars["total_agents"])
         for element in data_collector.model_vars["model_value"]:
             assert element == 100
-        for element in data_collector.model_vars['model_calc']:
-            assert element == 10
+        self.step_assertion((data_collector.model_vars["model_calc"]))
         for element in data_collector.model_vars['model_calc_comp']:
             assert element == 75
         for element in data_collector.model_vars["model_calc_fail"]:
@@ -117,7 +125,11 @@ class TestDataCollector(unittest.TestCase):
 
         assert len(data_collector._agent_records) == 7
         for step, records in data_collector._agent_records.items():
-            assert len(records) == 10
+            if step < 5:
+                assert len(records) == 10
+            else:
+                assert len(records) == 9
+
             for values in records:
                 assert len(values) == 4
 
@@ -137,7 +149,7 @@ class TestDataCollector(unittest.TestCase):
         assert "agent_id" in data_collector.tables["Final_Values"]
         assert "final_value" in data_collector.tables["Final_Values"]
         for key, data in data_collector.tables["Final_Values"].items():
-            assert len(data) == 10
+            assert len(data) == 9
 
         with self.assertRaises(Exception):
             data_collector.add_table_row("error_table", {})
@@ -154,8 +166,8 @@ class TestDataCollector(unittest.TestCase):
         agent_vars = data_collector.get_agent_vars_dataframe()
         table_df = data_collector.get_table_dataframe("Final_Values")
         assert model_vars.shape == (7, 5)
-        assert agent_vars.shape == (70, 2)
-        assert table_df.shape == (10, 2)
+        assert agent_vars.shape == (67, 2)
+        assert table_df.shape == (9, 2)
 
         with self.assertRaises(Exception):
             table_df = data_collector.get_table_dataframe("not a real table")
