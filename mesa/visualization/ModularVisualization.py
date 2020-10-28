@@ -162,6 +162,44 @@ class VisualizationElement:
 
 # =============================================================================
 # Actual Tornado code starts here:
+def reset_model(model_cls, model_kwargs):
+    """ Reinstantiate the model object, using the current parameters. """
+
+    model_params = {}
+    for key, val in model_kwargs.items():
+        if isinstance(val, UserSettableParameter):
+            if (
+                val.param_type == "static_text"
+            ):  # static_text is never used for setting params
+                continue
+            model_params[key] = val.value
+        else:
+            model_params[key] = val
+
+    model = model_cls(**model_params)
+
+    return model
+
+
+def render_model(model, visualization_elements):
+    """Turn the current state of the model into a dictionary of
+    visualizations
+
+    """
+    visualization_state = []
+    for element in visualization_elements:
+        element_state = element.render(model)
+        visualization_state.append(element_state)
+    return visualization_state
+
+
+def user_params(model_kwargs):
+    result = {}
+    for param, val in model_kwargs.items():
+        if isinstance(val, UserSettableParameter):
+            result[param] = val.json
+
+    return result
 
 
 class PageHandler(tornado.web.RequestHandler):
@@ -193,54 +231,23 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         self.model_kwargs = self.application.model_kwargs.copy()
-        self.reset_model()
+        self.model = reset_model(self.application.model_cls, self.model_kwargs)
         if self.application.verbose:
             print("Socket opened!")
             print("Model ID:", id(self.model))
-        self.write_message({"type": "model_params", "params": self.user_params})
+        self.write_message(
+            {"type": "model_params", "params": user_params(self.model_kwargs)}
+        )
 
     def check_origin(self, origin):
         return True
 
     @property
-    def user_params(self):
-        result = {}
-        for param, val in self.model_kwargs.items():
-            if isinstance(val, UserSettableParameter):
-                result[param] = val.json
-
-        return result
-
-    def reset_model(self):
-        """ Reinstantiate the model object, using the current parameters. """
-
-        model_params = {}
-        for key, val in self.model_kwargs.items():
-            if isinstance(val, UserSettableParameter):
-                if (
-                    val.param_type == "static_text"
-                ):  # static_text is never used for setting params
-                    continue
-                model_params[key] = val.value
-            else:
-                model_params[key] = val
-
-        self.model = self.application.model_cls(**model_params)
-
-    def render_model(self):
-        """Turn the current state of the model into a dictionary of
-        visualizations
-
-        """
-        visualization_state = []
-        for element in self.application.visualization_elements:
-            element_state = element.render(self.model)
-            visualization_state.append(element_state)
-        return visualization_state
-
-    @property
     def viz_state_message(self):
-        return {"type": "viz_state", "data": self.render_model()}
+        return {
+            "type": "viz_state",
+            "data": render_model(self.model, self.application.visualization_elements),
+        }
 
     def on_message(self, message):
         """Receiving a message from the websocket, parse, and act accordingly."""
@@ -256,7 +263,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                 self.write_message(self.viz_state_message)
 
         elif msg["type"] == "reset":
-            self.reset_model()
+            self.model = reset_model(self.application.model_cls, self.model_kwargs)
             self.write_message(self.viz_state_message)
 
         elif msg["type"] == "submit_params":
@@ -264,7 +271,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             value = msg["value"]
 
             # Is the param editable?
-            if param in self.user_params:
+            if param in user_params(self.model_kwargs):
                 if isinstance(self.model_kwargs[param], UserSettableParameter):
                     self.model_kwargs[param].value = value
                 else:

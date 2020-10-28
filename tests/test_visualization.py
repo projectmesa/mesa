@@ -4,7 +4,12 @@ from collections import defaultdict
 from mesa.model import Model
 from mesa.space import Grid
 from mesa.time import SimultaneousActivation
-from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization.ModularVisualization import (
+    ModularServer,
+    render_model,
+    reset_model,
+    user_params,
+)
 from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 
@@ -67,22 +72,28 @@ class TestModularServer(TestCase):
             MockModel, self.viz_elements, "Test Model", model_params=self.user_params
         )
 
+        self.model = MockModel(width=1, height=1, key1=101, key2=200)
+
+    def test_reset_model(self):
+        server_model = reset_model(self.server.model_cls, self.server.model_kwargs)
+        assert self.model.key1 == server_model.key1
+        assert self.model.key2 == server_model.key2
+
     def test_canvas_render_model_state(self):
 
         test_portrayal = self.portrayal(None)
         test_grid_state = defaultdict(list)
         test_grid_state[test_portrayal["Layer"]].append(test_portrayal)
 
-        state = self.server.render_model()
+        state = render_model(self.model, self.server.visualization_elements)
         assert state[0] == test_grid_state
 
     def test_text_render_model_state(self):
-        state = self.server.render_model()
+        state = render_model(self.model, self.server.visualization_elements)
         assert state[1] == "<b>VisualizationElement goes here</b>."
 
     def test_user_params(self):
-        print(self.server.user_params)
-        assert self.server.user_params == {
+        assert user_params(self.server.model_kwargs) == {
             "key1": UserSettableParameter("number", "Test Parameter", 101).json,
             "key2": UserSettableParameter(
                 "slider", "Test Parameter", 200, 0, 300, 10

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from mesa.visualization.ModularVisualization import render_model
 import sys
 import os.path
 import unittest
@@ -52,7 +53,6 @@ class TestExamples(unittest.TestCase):
                     # model.py at the top level
                     mod = importlib.import_module("model")
                     server = importlib.import_module("server")
-                    server.server.render_model()
                 except ImportError:
                     # <example>/model.py
                     mod = importlib.import_module(
@@ -61,8 +61,8 @@ class TestExamples(unittest.TestCase):
                     server = importlib.import_module(
                         "{}.server".format(example.replace("-", "_"))
                     )
-                    server.server.render_model()
                 Model = getattr(mod, classcase(example))
                 model = Model()
                 for _ in range(10):
                     model.step()
+                render_model(model, server.server.visualization_elements)
