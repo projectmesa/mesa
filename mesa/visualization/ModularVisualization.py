@@ -236,7 +236,7 @@ class ModularServer(tornado.web.Application):
 
     verbose = True
 
-    port = 8521  # Default port to listen on
+    port = int(os.getenv("PORT", 8521))  # Default port to listen on
     max_steps = 100000
 
     # Handlers and other globals:
