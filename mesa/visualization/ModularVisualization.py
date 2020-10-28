@@ -95,7 +95,9 @@ Client -> Server:
     }
 
 """
+import asyncio
 import os
+import sys
 import tornado.autoreload
 import tornado.ioloop
 import tornado.web
@@ -109,6 +111,10 @@ from mesa.visualization.UserParam import UserSettableParameter
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
 # pylint: disable=attribute-defined-outside-init
+
+# Change the event loop policy for windows
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 class VisualizationElement:
