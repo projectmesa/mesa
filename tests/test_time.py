@@ -122,6 +122,12 @@ class TestStagedActivation(TestCase):
         model.schedule.remove(agent)
         assert agent not in model.schedule.agents
 
+    def test_add_existing_agent(self):
+        model = MockModel()
+        agent = model.schedule.agents[0]
+        with self.assertRaises(Exception):
+            model.schedule.add(agent)
+
 
 class TestRandomActivation(TestCase):
     """
