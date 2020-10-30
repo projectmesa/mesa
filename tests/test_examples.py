@@ -64,4 +64,5 @@ class TestExamples(unittest.TestCase):
                     server.server.render_model()
                 Model = getattr(mod, classcase(example))
                 model = Model()
-                (model.step() for _ in range(100))
+                for _ in range(10):
+                    model.step()

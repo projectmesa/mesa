@@ -28,8 +28,7 @@ No contribution is too small. Although, contributions can be too big, so let's d
 - Git commit your changes with a meaningful message: ``git commit -m "Fixes X issue."``
 - If implementing a new feature, include some documentation in docs folder.
 - Make sure that your submission passes the `Travis build`_. See "Testing and Standards below" to be able to run these locally.
-- Make sure that your code is formatted according to `the black`_ standard (you can do it via
-`pre-commit`_).
+- Make sure that your code is formatted according to `the black`_ standard (you can do it via `pre-commit`_). 
 - Push your changes to your fork on Github: ``git push origin NAME_OF_BRANCH``.
 - `Create a pull request`_.
 - Describe the change w/ ticket number(s) that the code fixes.

@@ -82,7 +82,7 @@ Mesa Packages
 ABM features users have shared that you may want to use in your model
 
 * `See the Packages <https://github.com/projectmesa/mesa/wiki>`_
-* :ref:`Mesa-Packages`
+* :ref:`Mesa-Packages <packages>`
 
 
 .. toctree::

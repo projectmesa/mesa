@@ -7,6 +7,7 @@ import unittest
 
 from mesa import Agent, Model
 from mesa.time import BaseScheduler
+from mesa.datacollection import DataCollector
 from mesa.batchrunner import BatchRunner, ParameterProduct, ParameterSampler
 
 
@@ -22,9 +23,11 @@ class MockAgent(Agent):
         super().__init__(unique_id, model)
         self.unique_id = unique_id
         self.val = val
+        self.local = 0
 
     def step(self):
         self.val += 1
+        self.local += 0.25
 
 
 class MockModel(Model):
@@ -34,8 +37,8 @@ class MockModel(Model):
 
     def __init__(
         self,
-        variable_model_param,
-        variable_agent_param,
+        variable_model_param=None,
+        variable_agent_param=None,
         fixed_model_param=None,
         schedule=None,
         **kwargs
@@ -46,14 +49,25 @@ class MockModel(Model):
         self.variable_agent_param = variable_agent_param
         self.fixed_model_param = fixed_model_param
         self.n_agents = kwargs.get("n_agents", NUM_AGENTS)
+        self.datacollector = DataCollector(model_reporters={
+            "reported_model_param": self.get_local_model_param},
+            agent_reporters={"agent_id": "unique_id", "agent_local": "local"})
         self.running = True
         self.init_agents()
 
     def init_agents(self):
+        if self.variable_agent_param is None:
+            agent_val = 1
+        else:
+            agent_val = self.variable_agent_param
         for i in range(self.n_agents):
-            self.schedule.add(MockAgent(i, self, self.variable_agent_param))
+            self.schedule.add(MockAgent(i, self, agent_val))
+
+    def get_local_model_param(self):
+        return 42
 
     def step(self):
+        self.datacollector.collect(self)
         self.schedule.step()
 
 
@@ -103,6 +117,20 @@ class TestBatchRunner(unittest.TestCase):
         batch.run_all()
         return batch
 
+    def launch_batch_processing_fixed(self):
+        # Adding second batchrun to test fixed params increase coverage
+        batch2 = BatchRunner(
+            self.mock_model,
+            fixed_parameters={"fixed": "happy"},
+            iterations=4,
+            max_steps=self.max_steps,
+            model_reporters=self.model_reporters,
+            agent_reporters=None,
+        )
+
+        batch2.run_all()
+        return batch2
+
     @property
     def model_runs(self):
         """
@@ -116,11 +144,10 @@ class TestBatchRunner(unittest.TestCase):
         """
         batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
-        expected_cols = (
-            len(self.variable_params) + len(self.model_reporters) + 1
-        )  # extra column with run index
-
+        model_collector = batch.get_collector_model()
+        expected_cols = (len(self.variable_params) + len(self.model_reporters) + 1)  # extra column with run index
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
+        self.assertEqual(len(model_collector.keys()), self.model_runs)
 
     def test_agent_level_vars(self):
         """
@@ -128,13 +155,22 @@ class TestBatchRunner(unittest.TestCase):
         """
         batch = self.launch_batch_processing()
         agent_vars = batch.get_agent_vars_dataframe()
-        expected_cols = (
-            len(self.variable_params) + len(self.agent_reporters) + 2
-        )  # extra columns with run index and agentId
+        agent_collector = batch.get_collector_agents()
+        # extra columns with run index and agentId
+        expected_cols = (len(self.variable_params) + len(self.agent_reporters) + 2)
+        self.assertEqual(agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols))
+        assert "agent_val" in list(agent_vars.columns)
+        assert "val_non_existent" not in list(agent_vars.columns)
+        assert "agent_id" in list(agent_collector[(0, 1, 1)].columns)
+        assert "Step" in list(agent_collector[(0, 1, 5)].index.names)
+        assert "nose" not in list(agent_collector[(0, 1, 1)].columns)
 
         self.assertEqual(
-            agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols)
+            agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
         )
+
+        with self.assertRaises(KeyError):
+            agent_collector[(900, "k", 3)]
 
     def test_model_with_fixed_parameters_as_kwargs(self):
         """
@@ -145,10 +181,22 @@ class TestBatchRunner(unittest.TestCase):
         batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
         agent_vars = batch.get_agent_vars_dataframe()
-
         self.assertEqual(len(model_vars), len(agent_vars))
         self.assertEqual(len(model_vars), self.model_runs)
         self.assertEqual(model_vars["reported_fixed_value"].unique(), ["Fixed"])
+
+    def test_model_with_only_fixed_parameters(self):
+        """
+        Test that model with only fixed parameters and multiple iterations is
+        properly handled
+        """
+        batch = self.launch_batch_processing_fixed()
+        model_vars = batch.get_model_vars_dataframe()
+        self.assertEqual(len(model_vars), 4)
+        self.assertEqual(model_vars["fixed"].unique(), ["happy"])
+
+        with self.assertRaises(AttributeError):
+            batch.get_agent_vars_dataframe()
 
     def test_model_with_variable_and_fixed_kwargs(self):
         self.mock_model = MockMixedModel

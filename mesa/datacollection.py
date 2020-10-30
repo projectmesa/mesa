@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Mesa Data Collection Module
 ===========================
@@ -40,6 +39,7 @@ from functools import partial
 import itertools
 from operator import attrgetter
 import pandas as pd
+import types
 
 
 class DataCollector:
@@ -57,7 +57,6 @@ class DataCollector:
 
     def __init__(self, model_reporters=None, agent_reporters=None, tables=None):
         """ Instantiate a DataCollector with lists of model and agent reporters.
-
         Both model_reporters and agent_reporters accept a dictionary mapping a
         variable name to either an attribute name, or a method.
         For example, if there was only one model-level reporter for number of
@@ -84,6 +83,17 @@ class DataCollector:
             If you want to pickle your model you must not use lambda functions.
             If your model includes a large number of agents, you should *only*
             use attribute names for the agent reporter, it will be much faster.
+
+            Model reporters can take four types of arguments:
+            lambda like above:
+            {"agent_count": lambda m: m.schedule.get_agent_count() }
+            method with @property decorators
+            {"agent_count": schedule.get_agent_count()
+            class attributes of model
+            {"model_attribute": "model_attribute"}
+            functions with parameters that have placed in a list
+            {"Model_Function":[function, [param_1, param_2]]}
+
         """
         self.model_reporters = {}
         self.agent_reporters = {}
@@ -153,18 +163,32 @@ class DataCollector:
         else:
 
             def get_reports(agent):
-                prefix = (agent.model.schedule.steps, agent.unique_id)
+                _prefix = (agent.model.schedule.steps, agent.unique_id)
                 reports = tuple(rep(agent) for rep in rep_funcs)
-                return prefix + reports
+                return _prefix + reports
 
         agent_records = map(get_reports, model.schedule.agents)
         return agent_records
 
+    def _reporter_decorator(self, reporter):
+        return reporter()
+
     def collect(self, model):
         """ Collect all the data for the given model object. """
         if self.model_reporters:
+
             for var, reporter in self.model_reporters.items():
-                self.model_vars[var].append(reporter(model))
+                # Check if Lambda operator
+                if isinstance(reporter, types.LambdaType):
+                    self.model_vars[var].append(reporter(model))
+                # Check if model attribute
+                elif isinstance(reporter, partial):
+                    self.model_vars[var].append(reporter(model))
+                # Check if function with arguments
+                elif isinstance(reporter, list):
+                    self.model_vars[var].append(reporter[0](*reporter[1]))
+                else:
+                    self.model_vars[var].append(self._reporter_decorator(reporter))
 
         if self.agent_reporters:
             agent_records = self._record_agents(model)
@@ -192,9 +216,9 @@ class DataCollector:
                 raise Exception("Could not insert row with missing column")
 
     @staticmethod
-    def _getattr(name, object):
+    def _getattr(name, _object):
         """ Turn around arguments of getattr to make it partially callable."""
-        return getattr(object, name, None)
+        return getattr(_object, name, None)
 
     def get_model_vars_dataframe(self):
         """ Create a pandas DataFrame from the model variables.

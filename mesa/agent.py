@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 The agent class for Mesa framework.
 
@@ -6,7 +5,7 @@ Core Objects: Agent
 
 """
 # mypy
-from .model import Model
+from mesa.model import Model
 from random import Random
 
 

@@ -23,7 +23,7 @@ model as it runs. Finally, we go over how to write your own
 visualization module, for users who are comfortable with JavaScript.
 
 You can also find all the code this tutorial describes in the
-`examples/boltzmann_wealth_model <https://github.com/projectmesa/mesa/tree/master/examples/boltzmann_wealth_model>`__ directory of the Mesa repository.
+**examples/boltzmann_wealth_model** directory of the Mesa repository.
 
 Sample Model Description
 ------------------------
@@ -60,26 +60,19 @@ To install Mesa, simply:
 When you do that, it will install Mesa itself, as well as any
 dependencies that aren't in your setup yet. Additional dependencies
 required by this tutorial can be found in the
-`examples/boltzmann_wealth_model <https://github.com/projectmesa/mesa/tree/master/examples/boltzmann_wealth_model>`__
-file, which can be installed directly from the github repository by running:
+**examples/boltzmann_wealth_model/requirements.txt** file, which can be
+installed directly form the github repository by running:
 
 .. code:: bash
 
        $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa/master/examples/boltzmann_wealth_model/requirements.txt
 
-or if you have the requirements file locally with
-
-.. code:: bash
-
-       $ pip install -r /path/to/requirements.txt
-
 | This will install the dependencies listed in the requirements.txt file
   which are:
-
-* jupyter (Ipython interactive notebook)
-* matplotlib (Python's visualization library)
-* mesa (this ABM library - if not installed)
-* numpy (Python's numerical python library)
+| - jupyter (Ipython interactive notebook)
+| - matplotlib (Python's visualization library)
+| - mesa (this ABM library – if not installed)
+| - numpy (Python's numerical python library)
 
 Building a sample model
 -----------------------
@@ -122,7 +115,7 @@ with the given number of agents.
 
 The beginning of both classes looks like this:
 
-.. code:: python
+.. code:: ipython3
 
     from mesa import Agent, Model
 
@@ -169,7 +162,7 @@ activates and executes each agent's ``step`` method.
 With that in mind, the model code with the scheduler added looks like
 this:
 
-.. code:: python
+.. code:: ipython3
 
     from mesa import Agent, Model
     from mesa.time import RandomActivation
@@ -212,7 +205,7 @@ code is in ``money_model.py``:
 
 Then create the model object, and run it for one step:
 
-.. code:: python
+.. code:: ipython3
 
     empty_model = MoneyModel(10)
     empty_model.step()
@@ -220,17 +213,17 @@ Then create the model object, and run it for one step:
 
 .. parsed-literal::
 
-    Hi, I am agent 8.
-    Hi, I am agent 0.
-    Hi, I am agent 5.
     Hi, I am agent 2.
-    Hi, I am agent 3.
     Hi, I am agent 9.
-    Hi, I am agent 4.
-    Hi, I am agent 1.
-    Hi, I am agent 6.
+    Hi, I am agent 5.
+    Hi, I am agent 3.
     Hi, I am agent 7.
-
+    Hi, I am agent 0.
+    Hi, I am agent 4.
+    Hi, I am agent 6.
+    Hi, I am agent 8.
+    Hi, I am agent 1.
+    
 
 Exercise
 ^^^^^^^^
@@ -257,7 +250,7 @@ activate.
 
 With that in mind, we rewrite the agent ``step`` method, like this:
 
-.. code:: python
+.. code:: ipython3
 
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
@@ -280,7 +273,8 @@ the model.
 
 If you've written the code in its own file (``money_model.py`` or a
 different name), launch an interpreter in the same directory as the file
-(either the plain Python command-line interpreter, or the IPython interpreter), or launch a Jupyter Notebook there. Then import the
+(either the plain Python command-line interpreter, or the IPython
+interpreter), or launch a Jupyter Notebook there. Then import the
 classes you created. (If you wrote the code in a Notebook, obviously
 this step isn't necessary).
 
@@ -290,7 +284,7 @@ this step isn't necessary).
 
 Now let's create a model with 10 agents, and run it for 10 steps.
 
-.. code:: python
+.. code:: ipython3
 
     model = MoneyModel(10)
     for i in range(10):
@@ -303,28 +297,45 @@ graphics library) to visualize the data in a histogram.
 
 .. code:: python
 
+   plt.show()
+
+If you are running from a text editor or IDE, you'll also need to add
+this line, to make the graph appear.
+
+.. code:: ipython3
+
+    # For a jupyter notebook add the following line:
+    %matplotlib inline
+    
     # The below is needed for both notebooks and scripts
     import matplotlib.pyplot as plt
-
-    # For jupyter notebook add the following line:
-    %matplotlib inline
-
+    
     agent_wealth = [a.wealth for a in model.schedule.agents]
     plt.hist(agent_wealth)
-    #For a script add the following line
-    plt.show()
 
-You'll should see something like the distribution below. Yours will
+
+
+.. parsed-literal::
+
+    (array([3., 0., 0., 5., 0., 0., 1., 0., 0., 1.]),
+     array([0. , 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 3. ]),
+     <a list of 10 Patch objects>)
+
+
+
+
+.. image:: intro_tutorial_files/output_19_1.png
+
+
+You'll should see something like the distribution above. Yours will
 almost certainly look at least slightly different, since each run of the
-model is random.
-
-.. image:: files/output_19_1.png
+model is random, after all.
 
 To get a better idea of how a model behaves, we can create multiple
 model runs and see the distribution that emerges from all of them. We
 can do this with a nested for loop:
 
-.. code:: python
+.. code:: ipython3
 
     all_wealth = []
     #This runs the model 100 times, each model executing 10 steps.
@@ -341,6 +352,17 @@ can do this with a nested for loop:
     plt.hist(all_wealth, bins=range(max(all_wealth)+1))
 
 
+
+
+.. parsed-literal::
+
+    (array([421., 314., 164.,  65.,  22.,  14.]),
+     array([0, 1, 2, 3, 4, 5, 6]),
+     <a list of 6 Patch objects>)
+
+
+
+
 .. image:: intro_tutorial_files/output_22_1.png
 
 
@@ -348,7 +370,7 @@ This runs 100 instantiations of the model, and runs each for 10 steps.
 (Notice that we set the histogram bins to be integers, since agents can
 only have whole numbers of wealth). This distribution looks a lot
 smoother. By running the model 100 times, we smooth out some of the
-'noise' of randomness, and get to the model's overall expected behavior.
+‘noise' of randomness, and get to the model's overall expected behavior.
 
 This outcome might be surprising. Despite the fact that all agents, on
 average, give and receive one unit of money every step, the model
@@ -380,7 +402,7 @@ Mesa has two main types of grids: ``SingleGrid`` and ``MultiGrid``.
 multiple agents to be in the same cell. Since we want agents to be able
 to share a cell, we use ``MultiGrid``.
 
-.. code:: python
+.. code:: ipython3
 
     from mesa.space import MultiGrid
 
@@ -391,7 +413,7 @@ always be toroidal. We can place agents on a grid with the grid's
 ``place_agent`` method, which takes an agent and an (x, y) tuple of the
 coordinates to place the agent.
 
-.. code:: python
+.. code:: ipython3
 
     class MoneyModel(Model):
         """A model with some number of agents."""
@@ -486,7 +508,7 @@ And with those two methods, the agent's ``step`` method becomes:
 
 Now, putting that all together should look like this:
 
-.. code:: python
+.. code:: ipython3
 
     class MoneyAgent(Agent):
         """ An agent with fixed initial wealth."""
@@ -538,7 +560,7 @@ Now, putting that all together should look like this:
 Let's create a model with 50 agents on a 10x10 grid, and run it for 20
 steps.
 
-.. code:: python
+.. code:: ipython3
 
     model = MoneyModel(50, 10, 10)
     for i in range(20):
@@ -550,7 +572,7 @@ size as the grid, filled with zeros. Then we use the grid object's
 ``coord_iter()`` feature, which lets us loop over every cell in the
 grid, giving us each cell's coordinates and contents in turn.
 
-.. code:: python
+.. code:: ipython3
 
     import numpy as np
 
@@ -564,6 +586,15 @@ grid, giving us each cell's coordinates and contents in turn.
 
     # If running from a text editor or IDE, remember you'll need the following:
     # plt.show()
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.colorbar.Colorbar at 0x1b5ac1c3ac8>
+
+
 
 
 .. image:: intro_tutorial_files/output_33_1.png
@@ -603,7 +634,7 @@ At the model level, let's measure the model's `Gini
 Coefficient <https://en.wikipedia.org/wiki/Gini_coefficient>`__, a
 measure of wealth inequality.
 
-.. code:: python
+.. code:: ipython3
 
     from mesa.datacollection import DataCollector
 
@@ -673,7 +704,7 @@ session, especially via a Notebook, comes in handy: the DataCollector
 can export the data it's collected as a pandas DataFrame, for easy
 interactive analysis.
 
-.. code:: python
+.. code:: ipython3
 
     model = MoneyModel(50, 10, 10)
     for i in range(100):
@@ -681,10 +712,19 @@ interactive analysis.
 
 To get the series of Gini coefficients as a pandas DataFrame:
 
-.. code:: python
+.. code:: ipython3
 
     gini = model.datacollector.get_model_vars_dataframe()
     gini.plot()
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x1b5af8c5588>
+
+
 
 
 .. image:: intro_tutorial_files/output_39_1.png
@@ -692,10 +732,12 @@ To get the series of Gini coefficients as a pandas DataFrame:
 
 Similarly, we can get the agent-wealth data:
 
-.. code:: python
+.. code:: ipython3
 
     agent_wealth = model.datacollector.get_agent_vars_dataframe()
     agent_wealth.head()
+
+
 
 
 .. raw:: html
@@ -759,10 +801,19 @@ You'll see that the DataFrame's index is pairings of model step and
 agent ID. You can analyze it the way you would any other DataFrame. For
 example, to get a histogram of agent wealth at the model's end:
 
-.. code:: python
+.. code:: ipython3
 
     end_wealth = agent_wealth.xs(99, level="Step")["Wealth"]
     end_wealth.hist(bins=range(agent_wealth.Wealth.max()+1))
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x1b5af93f1c8>
+
+
 
 
 .. image:: intro_tutorial_files/output_43_1.png
@@ -770,10 +821,19 @@ example, to get a histogram of agent wealth at the model's end:
 
 Or to plot the wealth of a given agent (in this example, agent 14):
 
-.. code:: python
+.. code:: ipython3
 
     one_agent_wealth = agent_wealth.xs(14, level="AgentID")
     one_agent_wealth.Wealth.plot()
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.axes._subplots.AxesSubplot at 0x1b5af9e0cc8>
+
+
 
 
 .. image:: intro_tutorial_files/output_45_1.png
@@ -794,7 +854,7 @@ for the MoneyModel class. This variable enables conditional shut off of
 the model once a condition is met. In this example it will be set as
 True indefinitely.
 
-.. code:: python
+.. code:: ipython3
 
     def compute_gini(model):
         agent_wealths = [agent.wealth for agent in model.schedule.agents]
@@ -851,11 +911,11 @@ Now, we can set up and run the BatchRunner:
 10, making 49 agents populations. Each agent population is then run 5
 times (49* 5) for 245 iterations
 
-.. code:: python
+.. code:: ipython3
 
     from mesa.batchrunner import BatchRunner
 
-.. code:: python
+.. code:: ipython3
 
     fixed_params = {"width": 10,
                    "height": 10}
@@ -870,14 +930,30 @@ times (49* 5) for 245 iterations
     batch_run.run_all()
 
 
-Like the DataCollector, we can extract the data we collected as a
-DataFrame.
+.. parsed-literal::
 
-.. code:: python
+    245it [03:36,  1.13it/s]
+    
+
+BatchRunner has two ways to collect data.
+
+First, one can pass model collection via BatchRunner as seen above with
+output below.
+
+.. code:: ipython3
 
     run_data = batch_run.get_model_vars_dataframe()
     run_data.head()
     plt.scatter(run_data.N, run_data.Gini)
+
+
+
+
+.. parsed-literal::
+
+    <matplotlib.collections.PathCollection at 0x1b5bd2efc88>
+
+
 
 
 .. image:: intro_tutorial_files/output_53_1.png
@@ -886,6 +962,191 @@ DataFrame.
 Notice that each row is a model run, and gives us the parameter values
 associated with that run. We can use this data to view a scatter-plot
 comparing the number of agents to the final Gini.
+
+Second, BatchRunner can call the datacollector from the model. The
+output is a dictionary, where each key is the parameters with the
+iteration number and then the datacollector dataframe. So in this model
+(<#number of agents>, <iteration#>).
+
+.. code:: ipython3
+
+    #Get the Agent DataCollection
+    data_collector_agents = batch_run.get_collector_agents()
+    
+    data_collector_agents[(10,2)]
+
+
+
+
+.. raw:: html
+
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+    
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+    
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th></th>
+          <th>Wealth</th>
+        </tr>
+        <tr>
+          <th>Step</th>
+          <th>AgentID</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th rowspan="5" valign="top">0</th>
+          <th>0</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>...</th>
+          <th>...</th>
+          <td>...</td>
+        </tr>
+        <tr>
+          <th rowspan="5" valign="top">99</th>
+          <th>5</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>6</th>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>7</th>
+          <td>0</td>
+        </tr>
+        <tr>
+          <th>8</th>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>9</th>
+          <td>1</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>1000 rows × 1 columns</p>
+    </div>
+
+
+
+.. code:: ipython3
+
+    #Get the Model DataCollection. 
+    
+    data_collector_model = batch_run.get_collector_model()
+    
+    data_collector_model[(10,1)]
+
+
+
+
+.. raw:: html
+
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+    
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+    
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>Gini</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0.00</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>0.00</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>0.18</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>0.32</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>0.32</td>
+        </tr>
+        <tr>
+          <th>...</th>
+          <td>...</td>
+        </tr>
+        <tr>
+          <th>95</th>
+          <td>0.62</td>
+        </tr>
+        <tr>
+          <th>96</th>
+          <td>0.62</td>
+        </tr>
+        <tr>
+          <th>97</th>
+          <td>0.62</td>
+        </tr>
+        <tr>
+          <th>98</th>
+          <td>0.62</td>
+        </tr>
+        <tr>
+          <th>99</th>
+          <td>0.62</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>100 rows × 1 columns</p>
+    </div>
+
+
 
 Happy Modeling!
 ~~~~~~~~~~~~~~~

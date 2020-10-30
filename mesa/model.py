@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 The model class for Mesa framework.
 

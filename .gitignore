@@ -78,3 +78,6 @@ target/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# pythonenv
+pythonenv*/
