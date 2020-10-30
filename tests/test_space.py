@@ -107,6 +107,10 @@ class TestSpaceToroidal(unittest.TestCase):
         pos_2 = (-25, -25)
         self.assertEqual((10, 0), self.space.get_heading(pos_1, pos_2))
 
+        pos_1 = (self.space.center[0] + 1, self.space.center[1] + 1)
+        pos_2 = (self.space.center[0] - 1, self.space.center[1] - 1)
+        self.assertEqual((-2, -2), self.space.get_heading(pos_1, pos_2))
+
     def test_neighborhood_retrieval(self):
         """
         Test neighborhood retrieval
