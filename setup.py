@@ -9,7 +9,7 @@ requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "tornado", "
 
 extras_require = {
     "dev": ["coverage", "flake8", "pytest >= 4.6", "pytest-cov", "sphinx"],
-    "docs": ["sphinx"],
+    "docs": ["sphinx", "ipython"],
 }
 
 version = ""
