@@ -88,9 +88,9 @@ def batch_run(
                 for kwargs in kwargs_list:
                     _, data = process_func(kwargs)
                     run_id = next(run_counter)
-                    for datum in data:
-                        datum["iteration"] = iteration + 1
-                        datum["RunId"] = run_id
+                    for run_data in data:
+                        run_data["iteration"] = iteration + 1
+                        run_data["RunId"] = run_id
                     results.extend(data)
                     pbar.update()
 
@@ -101,9 +101,9 @@ def batch_run(
                     iteration_counter[paramValues] += 1
                     iteration = iteration_counter[paramValues]
                     run_id = next(run_counter)
-                    for datum in data:
-                        datum["iteration"] = iteration
-                        datum["RunId"] = run_id
+                    for run_data in data:
+                        run_data["iteration"] = iteration
+                        run_data["RunId"] = run_id
                     results.extend(data)
                     pbar.update()
 
@@ -149,15 +149,15 @@ def _model_run_func(
     Parameters
     ----------
     model_cls : Type[Model]
-        [description]
+        The model class to batch-run
     kwargs : Dict[str, Any]
-        [description]
+        model kwargs used for this run
     max_steps : int
-        [description]
-    model_reporters : Any
-        [description]
-    agent_reporters : Any
-        [description]
+        Maximum number of model steps after which the model halts, by default 1000
+    model_reporters : Optional[Mapping[str, Any]]
+        Model reporters. See mesa.datacollection for details, by default None
+    agent_reporters : Optional[Mapping[str, Any]]
+        Agent reporters. See mesa.datacollection for details, by default None
 
     Returns
     -------
@@ -168,9 +168,9 @@ def _model_run_func(
     while model.running and model.schedule.steps < max_steps:
         model.step()
 
-    model_data, agent_data = _collect_data(model, model_reporters, agent_reporters)
+    model_data, all_agents_data = _collect_data(model, model_reporters, agent_reporters)
 
-    data = [{**kwargs, **model_data, **agent_datum} for agent_datum in agent_data]
+    data = [{**kwargs, **model_data, **agent_data} for agent_data in all_agents_data]
 
     return tuple(kwargs.values()), data
 
@@ -186,13 +186,13 @@ def _collect_data(
 
     model_data = {key: value[0] for key, value in dc.model_vars.items()}
 
-    agent_data = []
+    all_agents_data = []
     raw_agent_data = dc._agent_records.get(model.schedule.steps, [])
     for data in raw_agent_data:
         agent_dict = {"AgentID": data[1]}
         agent_dict.update(zip(dc.agent_reporters, data[2:]))
-        agent_data.append(agent_dict)
-    return model_data, agent_data
+        all_agents_data.append(agent_dict)
+    return model_data, all_agents_data
 
 
 try:
