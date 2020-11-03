@@ -151,7 +151,7 @@ class FixedBatchRunner:
 
         with tqdm(total_iterations, disable=not self.display_progress) as pbar:
             for i, kwargs in enumerate(all_kwargs):
-                param_values = all_param_values[i]
+                param_values = list(all_param_values[i])
                 for _ in range(self.iterations):
                     self.run_iteration(kwargs, param_values, next(run_count))
                     pbar.update()
