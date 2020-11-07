@@ -10,7 +10,7 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class ChartModule(VisualizationElement):
-    """ Each chart can visualize one or more model-level series as lines
+    """Each chart can visualize one or more model-level series as lines
      with the data value on the Y axis and the step number as the X axis.
 
     At the moment, each call to the render method returns a list of the most

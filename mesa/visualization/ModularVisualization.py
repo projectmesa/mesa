@@ -137,7 +137,7 @@ class VisualizationElement:
         pass
 
     def render(self, model):
-        """ Build visualization data from a model object.
+        """Build visualization data from a model object.
 
         Args:
             model: A model object
@@ -189,9 +189,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         return {"type": "viz_state", "data": self.application.render_model()}
 
     def on_message(self, message):
-        """ Receiving a message from the websocket, parse, and act accordingly.
-
-        """
+        """Receiving a message from the websocket, parse, and act accordingly."""
         if self.application.verbose:
             print(message)
         msg = tornado.escape.json_decode(message)
@@ -310,7 +308,7 @@ class ModularServer(tornado.web.Application):
         self.model = self.model_cls(**model_params)
 
     def render_model(self):
-        """ Turn the current state of the model into a dictionary of
+        """Turn the current state of the model into a dictionary of
         visualizations
 
         """

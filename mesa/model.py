@@ -20,7 +20,7 @@ class Model:
         return object.__new__(cls)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        """ Create a new model. Overload this method with the actual code to
+        """Create a new model. Overload this method with the actual code to
         start the model.
 
         Attributes:
@@ -34,7 +34,7 @@ class Model:
         self.current_id = 0
 
     def run_model(self) -> None:
-        """ Run the model until the end condition is reached. Overload as
+        """Run the model until the end condition is reached. Overload as
         needed.
 
         """

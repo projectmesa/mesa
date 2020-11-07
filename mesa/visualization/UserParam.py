@@ -1,39 +1,39 @@
 class UserSettableParameter:
-    """ A class for providing options to a visualization for a given parameter.
+    """A class for providing options to a visualization for a given parameter.
 
-        UserSettableParameter can be used instead of keyword arguments when specifying model parameters in an
-        instance of a `ModularServer` so that the parameter can be adjusted in the UI without restarting the server.
+    UserSettableParameter can be used instead of keyword arguments when specifying model parameters in an
+    instance of a `ModularServer` so that the parameter can be adjusted in the UI without restarting the server.
 
-        Validation of correctly-specified params happens on startup of a `ModularServer`. Each param is handled
-        individually in the UI and sends callback events to the server when an option is updated. That option is then
-        re-validated, in the `value.setter` property method to ensure input is correct from the UI to `reset_model`
-        callback.
+    Validation of correctly-specified params happens on startup of a `ModularServer`. Each param is handled
+    individually in the UI and sends callback events to the server when an option is updated. That option is then
+    re-validated, in the `value.setter` property method to ensure input is correct from the UI to `reset_model`
+    callback.
 
-        Parameter types include:
-            - 'number' - a simple numerical input
-            - 'checkbox' - boolean checkbox
-            - 'choice' - String-based dropdown input, for selecting choices within a model
-            - 'slider' - A number-based slider input with settable increment
-            - 'static_text' - A non-input textbox for displaying model info.
+    Parameter types include:
+        - 'number' - a simple numerical input
+        - 'checkbox' - boolean checkbox
+        - 'choice' - String-based dropdown input, for selecting choices within a model
+        - 'slider' - A number-based slider input with settable increment
+        - 'static_text' - A non-input textbox for displaying model info.
 
-        Examples:
+    Examples:
 
-        # Simple number input
-        number_option = UserSettableParameter('number', 'My Number', value=123)
+    # Simple number input
+    number_option = UserSettableParameter('number', 'My Number', value=123)
 
-        # Checkbox input
-        boolean_option = UserSettableParameter('checkbox', 'My Boolean', value=True)
+    # Checkbox input
+    boolean_option = UserSettableParameter('checkbox', 'My Boolean', value=True)
 
-        # Choice input
-        choice_option = UserSettableParameter('choice', 'My Choice', value='Default choice',
-                                              choices=['Default Choice', 'Alternate Choice'])
+    # Choice input
+    choice_option = UserSettableParameter('choice', 'My Choice', value='Default choice',
+                                          choices=['Default Choice', 'Alternate Choice'])
 
-        # Slider input
-        slider_option = UserSettableParameter('slider', 'My Slider', value=123, min_value=10, max_value=200, step=0.1)
+    # Slider input
+    slider_option = UserSettableParameter('slider', 'My Slider', value=123, min_value=10, max_value=200, step=0.1)
 
-        # Static text
-        static_text = UserSettableParameter('static_text', value="This is a descriptive textbox")
-     """
+    # Static text
+    static_text = UserSettableParameter('static_text', value="This is a descriptive textbox")
+    """
 
     NUMBER = "number"
     CHECKBOX = "checkbox"

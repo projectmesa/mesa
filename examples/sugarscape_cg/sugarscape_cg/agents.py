@@ -4,7 +4,7 @@ from mesa import Agent
 
 
 def get_distance(pos_1, pos_2):
-    """ Get the distance between two point
+    """Get the distance between two point
 
     Args:
         pos_1, pos_2: Coordinate tuples for both points.
