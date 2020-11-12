@@ -85,7 +85,7 @@ line_chart = ChartModule(
         {"Label": "Rich", "Color": RICH_COLOR},
         {"Label": "Poor", "Color": POOR_COLOR},
         {"Label": "Middle Class", "Color": MID_COLOR},
-    ]
+    ], title="line chart"
 )
 
 model_bar = BarChartModule(

@@ -1,4 +1,4 @@
-var ChartModule = function(series, canvas_width, canvas_height) {
+var ChartModule = function(series, canvas_width, canvas_height, title) {
     // Create the tag:
     var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
     canvas_tag += "style='border:1px dotted'></canvas>";
@@ -45,6 +45,10 @@ var ChartModule = function(series, canvas_width, canvas_height) {
             mode: 'index',
             intersect: false
         },
+		title: {
+			display: true,
+			text: title
+		},
         hover: {
             mode: 'nearest',
             intersect: true
