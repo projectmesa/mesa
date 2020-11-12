@@ -1,4 +1,4 @@
-const ChartModule = function (series, canvas_width, canvas_height) {
+const ChartModule = function (series, canvas_width, canvas_height, title) {
   const canvas = document.createElement("canvas");
   Object.assign(canvas, {
     width: canvas_width,
@@ -47,6 +47,10 @@ const ChartModule = function (series, canvas_width, canvas_height) {
       mode: "index",
       intersect: false,
     },
+    title: {
+			display: true,
+			text: title
+		},
     hover: {
       mode: "nearest",
       intersect: true,
