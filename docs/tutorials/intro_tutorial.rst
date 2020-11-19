@@ -926,7 +926,7 @@ times (49* 5) for 245 iterations
                             fixed_params,
                             iterations=5,
                             max_steps=100,
-                            model_reporters={"Gini": compute_gini})
+                            model_reporters={"Gini": compute_gini()})
     batch_run.run_all()
 
 
