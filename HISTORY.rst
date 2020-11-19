@@ -3,6 +3,48 @@
 Release History
 ---------------
 
+0.8.8 (2020-05-21) Nogales
++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Linting related
+    * Add pre-commit to automatically maintain a standard formatting with black #732
+
+**Fixes**
+
+* MultiGrid: Set to using list for cell content #783
+* Docs
+    * Fix broken link to templates list in advanced tutorial. #833
+    * Fix image links in rst #838
+    * clean html to attempt correct build #839
+    * Fixes links on Botzmann model #843
+    * Documentation update - batchrunner & data collector #870
+    * Doc builds #837, #840, #844
+* Fix bulleted list in contribution read me #836
+* Update test_examples.py, changed unused generator expression to actually run the models. #829
+* Fixes #827 issue (example Epstein Civil Violence JUpyter Notebook typos) #828
+* eliminated Ipython3 references #841
+* Fix cookie cutter Fixes #850. #853
+* Remove relative imports -- fix #855
+#863
+* Update pytest requirement to fix issues on travis
+#864
+* Make linux compatible - travis #886
+* Fix python 3.5 fails, boid failure #889
+* Fix example testing issues close multiprocess pools
+#890
+* use ordered dict to make compatible with python 3.5
+#892
+* Fix for #919, adding exception for duplicate ids. #920
+* Batchrunner
+    * Batchrunner_redux fixes #928
+    * Fix empty/None `variable_parameters` argument to BatchRunner (#861) #862
+    * add ordereddict to BatchrunerMP for python 3.5 #893
+    * Fixes python 3.5 fails bathrunnerMP (multiple tries) #897, #896, #895
+* ModularServer updates: Fix EventLoop and changes to default port #936
+
+
 0.8.7 (2020-05-05) Mammoth
 +++++++++++++++++++++++++++++++++++++++++++
 
