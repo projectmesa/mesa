@@ -8,8 +8,7 @@ Release History
 
 **Improvements**
 
-* Linting related
-    * Add pre-commit to automatically maintain a standard formatting with black #732
+* Add pre-commit to automatically maintain a standard formatting with black #732
 
 **Fixes**
 
