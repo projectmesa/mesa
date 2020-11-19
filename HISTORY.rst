@@ -26,16 +26,12 @@ Release History
 * Fixes #827 issue (example Epstein Civil Violence JUpyter Notebook typos) #828
 * eliminated Ipython3 references #841
 * Fix cookie cutter Fixes #850. #853
-* Remove relative imports -- fix #855
-#863
-* Update pytest requirement to fix issues on travis
-#864
+* Remove relative imports -- fix #855. #863
+* Update pytest requirement to fix issues on travis #864
 * Make linux compatible - travis #886
 * Fix python 3.5 fails, boid failure #889
-* Fix example testing issues close multiprocess pools
-#890
-* use ordered dict to make compatible with python 3.5
-#892
+* Fix example testing issues close multiprocess pools #890
+* use ordered dict to make compatible with python 3.5 #892
 * Fix for #919, adding exception for duplicate ids. #920
 * Batchrunner
     * Batchrunner_redux fixes #928
