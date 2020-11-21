@@ -10,7 +10,7 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class PieChartModule(VisualizationElement):
-    """ Each chart can visualize one set of fields from a datacollector as a
+    """Each chart can visualize one set of fields from a datacollector as a
     pie chart.
 
 

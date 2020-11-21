@@ -10,7 +10,7 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class CanvasHexGrid(VisualizationElement):
-    """ A CanvasHexGrid object functions similarly to a CanvasGrid object. It takes a portrayal dictionary and talks to HexDraw.js to draw that shape.
+    """A CanvasHexGrid object functions similarly to a CanvasGrid object. It takes a portrayal dictionary and talks to HexDraw.js to draw that shape.
 
     A portrayal as a dictionary with the following structure:
         "x", "y": Coordinates for the cell in which the object is placed.
@@ -52,7 +52,7 @@ class CanvasHexGrid(VisualizationElement):
         canvas_width=500,
         canvas_height=500,
     ):
-        """ Instantiate a new CanvasGrid.
+        """Instantiate a new CanvasGrid.
 
         Args:
             portrayal_method: function to convert each object on the grid to

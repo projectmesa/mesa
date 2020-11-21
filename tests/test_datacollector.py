@@ -53,7 +53,7 @@ class MockModel(Model):
                 "model_value": "model_val",
                 "model_calc": self.schedule.get_agent_count,
                 "model_calc_comp": [self.test_model_calc_comp, [3, 4]],
-                "model_calc_fail": [self.test_model_calc_comp, [12, 0]]
+                "model_calc_fail": [self.test_model_calc_comp, [12, 0]],
             },
             {"value": lambda a: a.val, "value2": "val2"},
             {"Final_Values": ["agent_id", "final_value"]},
@@ -111,7 +111,7 @@ class TestDataCollector(unittest.TestCase):
         for element in data_collector.model_vars["model_value"]:
             assert element == 100
         self.step_assertion((data_collector.model_vars["model_calc"]))
-        for element in data_collector.model_vars['model_calc_comp']:
+        for element in data_collector.model_vars["model_calc_comp"]:
             assert element == 75
         for element in data_collector.model_vars["model_calc_fail"]:
             assert element is None
@@ -133,7 +133,7 @@ class TestDataCollector(unittest.TestCase):
             for values in records:
                 assert len(values) == 4
 
-        assert 'value' in list(agent_table.columns)
+        assert "value" in list(agent_table.columns)
         assert "value2" in list(agent_table.columns)
         assert "value3" not in list(agent_table.columns)
 

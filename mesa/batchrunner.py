@@ -38,7 +38,7 @@ class VariableParameterError(ParameterError):
 
 
 class FixedBatchRunner:
-    """ This class is instantiated with a model class, and model parameters
+    """This class is instantiated with a model class, and model parameters
     associated with one or more values. It is also instantiated with model and
     agent-level reporters, dictionaries mapping a variable name to a function
     which collects some data from the model or its agents at the end of the run
@@ -50,17 +50,17 @@ class FixedBatchRunner:
     """
 
     def __init__(
-            self,
-            model_cls,
-            parameters_list=None,
-            fixed_parameters=None,
-            iterations=1,
-            max_steps=1000,
-            model_reporters=None,
-            agent_reporters=None,
-            display_progress=True,
+        self,
+        model_cls,
+        parameters_list=None,
+        fixed_parameters=None,
+        iterations=1,
+        max_steps=1000,
+        model_reporters=None,
+        agent_reporters=None,
+        display_progress=True,
     ):
-        """ Create a new BatchRunner for a given model with the given
+        """Create a new BatchRunner for a given model with the given
         parameters.
 
         Args:
@@ -174,16 +174,23 @@ class FixedBatchRunner:
         # Collects data from datacollector object in model
         if results is not None:
             if results.model_reporters is not None:
-                self.datacollector_model_reporters[model_key] = results.get_model_vars_dataframe()
+                self.datacollector_model_reporters[
+                    model_key
+                ] = results.get_model_vars_dataframe()
             if results.agent_reporters is not None:
-                self.datacollector_agent_reporters[model_key] = results.get_agent_vars_dataframe()
+                self.datacollector_agent_reporters[
+                    model_key
+                ] = results.get_agent_vars_dataframe()
 
-        return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None),
-                getattr(self, "datacollector_model_reporters", None),
-                getattr(self, "datacollector_agent_reporters", None))
+        return (
+            getattr(self, "model_vars", None),
+            getattr(self, "agent_vars", None),
+            getattr(self, "datacollector_model_reporters", None),
+            getattr(self, "datacollector_agent_reporters", None),
+        )
 
     def run_model(self, model):
-        """ Run a model object to completion, or until reaching max steps.
+        """Run a model object to completion, or until reaching max steps.
 
         If your model runs in a non-standard way, this is the method to modify
         in your subclass.
@@ -216,14 +223,14 @@ class FixedBatchRunner:
         return agent_vars
 
     def get_model_vars_dataframe(self):
-        """ Generate a pandas DataFrame from the model-level variables
+        """Generate a pandas DataFrame from the model-level variables
         collected.
         """
 
         return self._prepare_report_table(self.model_vars)
 
     def get_agent_vars_dataframe(self):
-        """ Generate a pandas DataFrame from the agent-level variables
+        """Generate a pandas DataFrame from the agent-level variables
         collected.
         """
 
@@ -239,9 +246,9 @@ class FixedBatchRunner:
 
     def get_collector_agents(self):
         """
-                Passes pandas dataframes from datacollector module in dictionary format of agent reporters
-                :return: dict {(Param1, Param2,...,iteration): <DataCollector Pandas DataFrame>}
-                """
+        Passes pandas dataframes from datacollector module in dictionary format of agent reporters
+        :return: dict {(Param1, Param2,...,iteration): <DataCollector Pandas DataFrame>}
+        """
         return self.datacollector_agent_reporters
 
     def _prepare_report_table(self, vars_dict, extra_cols=None):
@@ -321,7 +328,7 @@ class ParameterSampler:
 
 
 class BatchRunner(FixedBatchRunner):
-    """ This class is instantiated with a model class, and model parameters
+    """This class is instantiated with a model class, and model parameters
     associated with one or more values. It is also instantiated with model and
     agent-level reporters, dictionaries mapping a variable name to a function
     which collects some data from the model or its agents at the end of the run
@@ -334,17 +341,17 @@ class BatchRunner(FixedBatchRunner):
     """
 
     def __init__(
-            self,
-            model_cls,
-            variable_parameters=None,
-            fixed_parameters=None,
-            iterations=1,
-            max_steps=1000,
-            model_reporters=None,
-            agent_reporters=None,
-            display_progress=True,
+        self,
+        model_cls,
+        variable_parameters=None,
+        fixed_parameters=None,
+        iterations=1,
+        max_steps=1000,
+        model_reporters=None,
+        agent_reporters=None,
+        display_progress=True,
     ):
-        """ Create a new BatchRunner for a given model with the given
+        """Create a new BatchRunner for a given model with the given
         parameters.
 
         Args:
@@ -403,7 +410,7 @@ class BatchRunnerMP(BatchRunner):
     """ Child class of BatchRunner, extended with multiprocessing support. """
 
     def __init__(self, model_cls, nr_processes=None, **kwargs):
-        """ Create a new BatchRunnerMP for a given model with the given
+        """Create a new BatchRunnerMP for a given model with the given
         parameters.
 
         model_cls: The class of model to batch-run.
@@ -441,7 +448,9 @@ class BatchRunnerMP(BatchRunner):
                 # run each iterations specific number of times
                 for iter in range(self.iterations):
                     kwargs_repeated = kwargs.copy()
-                    all_kwargs.append([self.model_cls, kwargs_repeated, self.max_steps, iter])
+                    all_kwargs.append(
+                        [self.model_cls, kwargs_repeated, self.max_steps, iter]
+                    )
 
         elif len(self.fixed_parameters):
             count = 1
@@ -504,9 +513,13 @@ class BatchRunnerMP(BatchRunner):
                     self.agent_vars[agent_key] = reports
             if hasattr(model, "datacollector"):
                 if model.datacollector.model_reporters is not None:
-                    self.datacollector_model_reporters[model_key] = model.datacollector.get_model_vars_dataframe()
+                    self.datacollector_model_reporters[
+                        model_key
+                    ] = model.datacollector.get_model_vars_dataframe()
                 if model.datacollector.agent_reporters is not None:
-                    self.datacollector_agent_reporters[model_key] = model.datacollector.get_agent_vars_dataframe()
+                    self.datacollector_agent_reporters[
+                        model_key
+                    ] = model.datacollector.get_agent_vars_dataframe()
 
         # Make results consistent
         if len(self.datacollector_model_reporters.keys()) == 0:
@@ -527,7 +540,9 @@ class BatchRunnerMP(BatchRunner):
 
         if self.processes > 1:
             with tqdm(total_iterations, disable=not self.display_progress) as pbar:
-                for params, model in self.pool.imap_unordered(self._run_wrappermp, run_iter_args):
+                for params, model in self.pool.imap_unordered(
+                    self._run_wrappermp, run_iter_args
+                ):
                     results[params] = model
                     pbar.update()
 
@@ -543,6 +558,9 @@ class BatchRunnerMP(BatchRunner):
         # Close multi-processing
         self.pool.close()
 
-        return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None),
-                getattr(self, "datacollector_model_reporters", None),
-                getattr(self, "datacollector_agent_reporters", None))
+        return (
+            getattr(self, "model_vars", None),
+            getattr(self, "agent_vars", None),
+            getattr(self, "datacollector_model_reporters", None),
+            getattr(self, "datacollector_agent_reporters", None),
+        )

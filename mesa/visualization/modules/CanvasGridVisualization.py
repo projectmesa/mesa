@@ -10,7 +10,7 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class CanvasGrid(VisualizationElement):
-    """ A CanvasGrid object uses a user-provided portrayal method to generate a
+    """A CanvasGrid object uses a user-provided portrayal method to generate a
     portrayal for each object. A portrayal is a JSON-ready dictionary which
     tells the relevant JavaScript code (GridDraw.js) where to draw what shape.
 
@@ -68,7 +68,7 @@ class CanvasGrid(VisualizationElement):
         canvas_width=500,
         canvas_height=500,
     ):
-        """ Instantiate a new CanvasGrid.
+        """Instantiate a new CanvasGrid.
 
         Args:
             portrayal_method: function to convert each object on the grid to

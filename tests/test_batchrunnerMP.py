@@ -36,12 +36,12 @@ class MockModel(Model):
     """
 
     def __init__(
-            self,
-            variable_model_param,
-            variable_agent_param,
-            fixed_model_param=None,
-            schedule=None,
-            **kwargs
+        self,
+        variable_model_param,
+        variable_agent_param,
+        fixed_model_param=None,
+        schedule=None,
+        **kwargs
     ):
         super().__init__()
         self.schedule = BaseScheduler(None) if schedule is None else schedule
@@ -49,9 +49,10 @@ class MockModel(Model):
         self.variable_agent_param = variable_agent_param
         self.fixed_model_param = fixed_model_param
         self.n_agents = kwargs.get("n_agents", NUM_AGENTS)
-        self.datacollector = DataCollector(model_reporters={
-            "reported_model_param": self.get_local_model_param},
-            agent_reporters={"agent_id": "unique_id", "agent_local": "local"})
+        self.datacollector = DataCollector(
+            model_reporters={"reported_model_param": self.get_local_model_param},
+            agent_reporters={"agent_id": "unique_id", "agent_local": "local"},
+        )
         self.running = True
         self.init_agents()
 
@@ -116,9 +117,9 @@ class TestBatchRunnerMP(unittest.TestCase):
         return batch
 
     def launch_batch_processing_debug(self):
-        '''
+        """
         Tests with one processor for debugging purposes
-        '''
+        """
 
         batch = BatchRunnerMP(
             self.mock_model,
@@ -144,7 +145,9 @@ class TestBatchRunnerMP(unittest.TestCase):
     def batch_model_vars(self, results):
         model_vars = results.get_model_vars_dataframe()
         model_collector = results.get_collector_model()
-        expected_cols = (len(self.variable_params) + len(self.model_reporters) + 1)  # extra column with run index
+        expected_cols = (
+            len(self.variable_params) + len(self.model_reporters) + 1
+        )  # extra column with run index
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(len(model_collector.keys()), self.model_runs)
 
@@ -164,7 +167,7 @@ class TestBatchRunnerMP(unittest.TestCase):
         agent_vars = result.get_agent_vars_dataframe()
         agent_collector = result.get_collector_agents()
         # extra columns with run index and agentId
-        expected_cols = (len(self.variable_params) + len(self.agent_reporters) + 2)
+        expected_cols = len(self.variable_params) + len(self.agent_reporters) + 2
         assert "agent_val" in list(agent_vars.columns)
         assert "val_non_existent" not in list(agent_vars.columns)
         assert "agent_id" in list(agent_collector[(0, 1, 1)].columns)
@@ -213,7 +216,12 @@ class TestBatchRunnerMP(unittest.TestCase):
         self.variable_params = {"variable_name": [1, 2, 3]}
         batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
-        expected_cols = (len(self.variable_params) + len(self.fixed_params) + len(self.model_reporters) + 1)
+        expected_cols = (
+            len(self.variable_params)
+            + len(self.fixed_params)
+            + len(self.model_reporters)
+            + 1
+        )
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(
             model_vars["reported_fixed_param"].iloc[0], self.fixed_params["fixed_name"]
