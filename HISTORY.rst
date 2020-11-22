@@ -6,7 +6,7 @@ Release History
 0.8.8 (2020-05-22) Nogales
 +++++++++++++++++++++++++++++++++++++++++++
 
-*Note: This is the last version to support 3.5.*
+*Note: This is the last version to support Python 3.5.*
 
 **Improvements**
 
