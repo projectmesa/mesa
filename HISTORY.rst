@@ -6,6 +6,8 @@ Release History
 0.8.8 (2020-05-22) Nogales
 +++++++++++++++++++++++++++++++++++++++++++
 
+*Note: This is the last version to support 3.5.*
+
 **Improvements**
 
 * Added pre-commit to automatically maintain a standard formatting with black #732
