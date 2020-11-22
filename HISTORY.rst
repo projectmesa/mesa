@@ -17,13 +17,13 @@ Release History
     * Fixed broken link to templates list in advanced tutorial. #833
     * Fixed image links in rst #838
     * Cleaned html to attempt correct build #839
-    * Fixed links on Botzmann model #843
+    * Fixed links on Boltzmann model #843
     * Documentation update - batchrunner & data collector #870
     * Deleted readthedocs.yml #946
     * Doc builds #837, #840, #844, #941, #942
 * Fixed bulleted list in contribution read me #836
 * Updated test_examples.py, changed unused generator expression to actually run the models. #829
-* Fixed #827 issue (example Epstein Civil Violence JUpyter Notebook typos) #828
+* Fixed #827 issue (example Epstein Civil Violence Jupyter Notebook typos) #828
 * Eliminated Ipython3 references #841
 * Fixed cookie cutter Fixes #850. #853
 * Removed relative imports -- fix #855. #863
