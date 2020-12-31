@@ -27,5 +27,5 @@ line_chart = ChartModule(
     ],chart_title = "line chart"
 )
 
-Code block modified in C:\Users\anjal\Projects\Mesaissue\mesa\examples\charts\charts\server.py for testing.
+Code block modified in \mesa\examples\charts\charts\server.py for testing.
 
