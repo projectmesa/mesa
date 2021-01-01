@@ -9,6 +9,9 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
+        exclude:
+          - os: windows-latest
+            python-version: 3.6
 
     steps:
     - uses: actions/checkout@v2
