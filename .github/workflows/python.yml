@@ -1,4 +1,4 @@
-name: Python package
+name: build
 
 on: [push, pull_request]
 
@@ -23,10 +23,8 @@ jobs:
         pip install .[dev]
     - name: Lint with flake8
       run: |
-        # stop the build if there are Python syntax errors or undefined names
+        # Use settings from mesas .flake8 file
         flake8 . --count --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Lint with black
       run: |
         black --check --exclude=mesa/cookiecutter-mesa/*
