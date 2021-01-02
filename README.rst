@@ -1,8 +1,8 @@
 Mesa: Agent-based modeling in Python 3+
 =========================================
 
-.. image:: https://api.travis-ci.org/projectmesa/mesa.svg?branch=master
-        :target: https://travis-ci.org/projectmesa/mesa
+.. image:: https://github.com/projectmesa/mesa/workflows/build/badge.svg
+        :target: https://github.com/projectmesa/mesa/actions
 
 .. image:: https://codecov.io/gh/projectmesa/mesa/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/projectmesa/mesa
