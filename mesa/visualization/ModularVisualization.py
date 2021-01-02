@@ -97,6 +97,7 @@ Client -> Server:
 """
 import asyncio
 import os
+import platform
 import sys
 import tornado.autoreload
 import tornado.ioloop
@@ -113,7 +114,7 @@ from mesa.visualization.UserParam import UserSettableParameter
 # pylint: disable=attribute-defined-outside-init
 
 # Change the event loop policy for windows
-if sys.platform == "win32":
+if platform.system == "Windows" and platform.python_version_tuple >= (3, 7):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
