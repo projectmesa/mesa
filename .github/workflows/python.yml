@@ -32,7 +32,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install codecov black
+        # We pin black's version until either PyPy3 becomes Python 3.8 or black
+        # removes its typed-ast dependency. See
+        # https://github.com/psf/black/issues/727
+        pip install codecov black==19.3b0
         pip install .[dev]
     - name: Lint with flake8
       run: |
