@@ -29,6 +29,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('Pipfile.lock') }}
+      if: matrix.python-version == 'pypy3'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
