@@ -27,17 +27,15 @@ from typing import (
 import pandas as pd
 from tqdm import tqdm
 
-from mesa.datacollection import DataCollector
 from mesa.model import Model
 
 
 def batch_run(
     model_cls: Type[Model],
     parameters: Mapping[str, Union[Any, Iterable[Any]]],
-    model_reporters: Optional[Mapping[str, Any]] = None,
-    agent_reporters: Optional[Mapping[str, Any]] = None,
     nr_processes: Optional[int] = None,
     iterations: int = 1,
+    i_steps: int = -1,
     max_steps: int = 1000,
     display_progress: bool = True,
 ) -> List[Dict[str, Any]]:
@@ -49,12 +47,8 @@ def batch_run(
         The model class to batch-run
     parameters : Mapping[str, Union[Any, Iterable[Any]]],
         Dictionary with model parameters over which to run the model. You can either pass single values or iterables.
-    model_reporters : Optional[Mapping[str, Any]]
-        Model reporters. See mesa.datacollection for details, by default None
-    agent_reporters : Optional[Mapping[str, Any]]
-        Agent reporters. See mesa.datacollection for details, by default None
-    nr_processes : Optional[int], optional
-        Number of processes used. Uses all available processors by default, by default None
+    nr_processes : int, optional
+        Number of processes used. Set to None (default) to use all available processors
     iterations : int, optional
         Number of iterations for each parameter combination, by default 1
     max_steps : int, optional
@@ -73,8 +67,7 @@ def batch_run(
         _model_run_func,
         model_cls,
         max_steps=max_steps,
-        model_reporters=model_reporters,
-        agent_reporters=agent_reporters,
+        i_steps=i_steps,
     )
 
     total_iterations = len(kwargs_list) * iterations
@@ -86,24 +79,28 @@ def batch_run(
         if nr_processes == 1:
             for iteration in range(iterations):
                 for kwargs in kwargs_list:
-                    _, data = process_func(kwargs)
+                    _, rawdata = process_func(kwargs)
                     run_id = next(run_counter)
-                    for run_data in data:
-                        run_data["iteration"] = iteration + 1
-                        run_data["RunId"] = run_id
+                    data = []
+                    for run_data in rawdata:
+                        out = {"RunId": run_id, "iteration": iteration + 1}
+                        out.update(run_data)
+                        data.append(out)
                     results.extend(data)
                     pbar.update()
 
         else:
             iteration_counter: Counter[Tuple[Any, ...]] = Counter()
             with mp.Pool(nr_processes) as p:
-                for paramValues, data in p.imap_unordered(process_func, kwargs_list):
+                for paramValues, rawdata in p.imap_unordered(process_func, kwargs_list):
                     iteration_counter[paramValues] += 1
                     iteration = iteration_counter[paramValues]
                     run_id = next(run_counter)
-                    for run_data in data:
-                        run_data["iteration"] = iteration
-                        run_data["RunId"] = run_id
+                    data = []
+                    for run_data in rawdata:
+                        out = {"RunId": run_id, "iteration": iteration + 1}
+                        out.update(run_data)
+                        data.append(out)
                     results.extend(data)
                     pbar.update()
 
@@ -118,7 +115,7 @@ def _make_model_kwargs(
     Parameters
     ----------
     parameters : Mapping[str, Union[Any, Iterable[Any]]]
-        Single or multiple values for each model parameter name 
+        Single or multiple values for each model parameter name
 
     Returns
     -------
@@ -141,8 +138,7 @@ def _model_run_func(
     model_cls: Type[Model],
     kwargs: Dict[str, Any],
     max_steps: int,
-    model_reporters: Optional[Mapping[str, Any]],
-    agent_reporters: Optional[Mapping[str, Any]],
+    i_steps: int,
 ) -> Tuple[Tuple[Any, ...], List[Dict[str, Any]]]:
     """Run a single model run and collect model and agent data.
 
@@ -154,10 +150,8 @@ def _model_run_func(
         model kwargs used for this run
     max_steps : int
         Maximum number of model steps after which the model halts, by default 1000
-    model_reporters : Optional[Mapping[str, Any]]
-        Model reporters. See mesa.datacollection for details, by default None
-    agent_reporters : Optional[Mapping[str, Any]]
-        Agent reporters. See mesa.datacollection for details, by default None
+    i_steps : int
+        Collect data every ith step
 
     Returns
     -------
@@ -165,29 +159,38 @@ def _model_run_func(
         Return model_data, agent_data from the reporters
     """
     model = model_cls(**kwargs)
-    while model.running and model.schedule.steps < max_steps:
+    while model.running and model.schedule.steps <= max_steps:
         model.step()
 
-    model_data, all_agents_data = _collect_data(model, model_reporters, agent_reporters)
+    data = []
 
-    data = [{**kwargs, **model_data, **agent_data} for agent_data in all_agents_data]
+    steps = list(range(0, model.schedule.steps, i_steps))
+    if not steps or steps[-1] != model.schedule.steps - 1:
+        steps.append(model.schedule.steps - 1)
+
+    for step in steps:
+        model_data, all_agents_data = _collect_data(model, step)
+
+        stepdata = [
+            {**{"Step": step}, **kwargs, **model_data, **agent_data}
+            for agent_data in all_agents_data
+        ]
+        data.extend(stepdata)
 
     return tuple(kwargs.values()), data
 
 
 def _collect_data(
     model: Model,
-    model_reporters: Optional[Mapping[str, Any]] = None,
-    agent_reporters: Optional[Mapping[str, Any]] = None,
+    step: int,
 ) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     """Collect model and agent data from a model using mesas datacollector."""
-    dc = DataCollector(model_reporters=model_reporters, agent_reporters=agent_reporters)
-    dc.collect(model)
+    dc = model.datacollector
 
-    model_data = {key: value[0] for key, value in dc.model_vars.items()}
+    model_data = {param: values[step] for param, values in dc.model_vars.items()}
 
     all_agents_data = []
-    raw_agent_data = dc._agent_records.get(model.schedule.steps, [])
+    raw_agent_data = dc._agent_records.get(step, [])
     for data in raw_agent_data:
         agent_dict = {"AgentID": data[1]}
         agent_dict.update(zip(dc.agent_reporters, data[2:]))
@@ -227,7 +230,7 @@ class VariableParameterError(ParameterError):
 
 
 class FixedBatchRunner:
-    """ This class is instantiated with a model class, and model parameters
+    """This class is instantiated with a model class, and model parameters
     associated with one or more values. It is also instantiated with model and
     agent-level reporters, dictionaries mapping a variable name to a function
     which collects some data from the model or its agents at the end of the run
@@ -249,7 +252,7 @@ class FixedBatchRunner:
         agent_reporters=None,
         display_progress=True,
     ):
-        """ Create a new BatchRunner for a given model with the given
+        """Create a new BatchRunner for a given model with the given
         parameters.
 
         Args:
@@ -361,7 +364,7 @@ class FixedBatchRunner:
         return (getattr(self, "model_vars", None), getattr(self, "agent_vars", None))
 
     def run_model(self, model):
-        """ Run a model object to completion, or until reaching max steps.
+        """Run a model object to completion, or until reaching max steps.
 
         If your model runs in a non-standard way, this is the method to modify
         in your subclass.
@@ -388,14 +391,14 @@ class FixedBatchRunner:
         return agent_vars
 
     def get_model_vars_dataframe(self):
-        """ Generate a pandas DataFrame from the model-level variables
+        """Generate a pandas DataFrame from the model-level variables
         collected.
 
         """
         return self._prepare_report_table(self.model_vars)
 
     def get_agent_vars_dataframe(self):
-        """ Generate a pandas DataFrame from the agent-level variables
+        """Generate a pandas DataFrame from the agent-level variables
         collected.
 
         """
@@ -479,7 +482,7 @@ class ParameterSampler:
 
 
 class BatchRunner(FixedBatchRunner):
-    """ This class is instantiated with a model class, and model parameters
+    """This class is instantiated with a model class, and model parameters
     associated with one or more values. It is also instantiated with model and
     agent-level reporters, dictionaries mapping a variable name to a function
     which collects some data from the model or its agents at the end of the run
@@ -502,7 +505,7 @@ class BatchRunner(FixedBatchRunner):
         agent_reporters=None,
         display_progress=True,
     ):
-        """ Create a new BatchRunner for a given model with the given
+        """Create a new BatchRunner for a given model with the given
         parameters.
 
         Args:
@@ -557,7 +560,7 @@ class BatchRunnerMP(BatchRunner):
     """ Child class of BatchRunner, extended with multiprocessing support. """
 
     def __init__(self, model_cls, nr_processes=2, **kwargs):
-        """ Create a new BatchRunnerMP for a given model with the given
+        """Create a new BatchRunnerMP for a given model with the given
         parameters.
 
         Args:
