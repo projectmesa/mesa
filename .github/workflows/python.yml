@@ -1,0 +1,39 @@
+name: build
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install codecov black
+        pip install .[dev]
+    - name: Lint with flake8
+      run: |
+        # Use settings from mesas .flake8 file
+        flake8 . --count --show-source --statistics
+    - name: Lint with black
+      run: |
+        black --check --exclude=mesa/cookiecutter-mesa/*
+    - name: Test with pytest
+      run: |
+        pytest --cov=mesa tests/ --cov-report=xml
+    - name: Codecov
+      uses: codecov/codecov-action@v1.0.15

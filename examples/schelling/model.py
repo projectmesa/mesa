@@ -11,12 +11,12 @@ class SchellingAgent(Agent):
 
     def __init__(self, pos, model, agent_type):
         """
-         Create a new Schelling agent.
+        Create a new Schelling agent.
 
-         Args:
-            unique_id: Unique identifier for the agent.
-            x, y: Agent initial location.
-            agent_type: Indicator for the agent's type (minority=1, majority=0)
+        Args:
+           unique_id: Unique identifier for the agent.
+           x, y: Agent initial location.
+           agent_type: Indicator for the agent's type (minority=1, majority=0)
         """
         super().__init__(pos, model)
         self.pos = pos
@@ -41,8 +41,7 @@ class Schelling(Model):
     """
 
     def __init__(self, height=20, width=20, density=0.8, minority_pc=0.2, homophily=3):
-        """
-        """
+        """"""
 
         self.height = height
         self.width = width

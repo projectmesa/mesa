@@ -10,7 +10,7 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class BarChartModule(VisualizationElement):
-    """ Each bar chart can either visualize model-level or agent-level fields from a datcollector
+    """Each bar chart can either visualize model-level or agent-level fields from a datcollector
         with a bar chart.
 
     Attributes:

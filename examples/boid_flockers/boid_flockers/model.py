@@ -42,7 +42,7 @@ class BoidFlockers(Model):
             separation: What's the minimum distance each Boid will attempt to
                     keep from any other
             cohere, separate, match: factors for the relative importance of
-                    the three drives.        """
+                    the three drives."""
         self.population = population
         self.vision = vision
         self.speed = speed

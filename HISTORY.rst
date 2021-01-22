@@ -3,6 +3,52 @@
 Release History
 ---------------
 
+0.8.8 (2020-11-27) Nogales
++++++++++++++++++++++++++++++++++++++++++++
+
+*Note: This is the last version to support Python 3.5.*
+
+**Improvements**
+
+* Added pre-commit to automatically maintain a standard formatting with black #732
+
+**Fixes**
+
+* MultiGrid: Set to using list for cell content #783
+* Docs
+    * Fixed broken link to templates list in advanced tutorial. #833
+    * Fixed image links in rst #838
+    * Cleaned html to attempt correct build #839
+    * Fixed links on Boltzmann model #843
+    * Documentation update - batchrunner & data collector #870
+    * Deleted readthedocs.yml #946
+    * Doc builds #837, #840, #844, #941, #942
+* Fixed bulleted list in contribution read me #836
+* Updated test_examples.py, changed unused generator expression to actually run the models. #829
+* Fixed #827 issue (example Epstein Civil Violence Jupyter Notebook typos) #828
+* Eliminated Ipython3 references #841
+* Fixed cookie cutter Fixes #850. #853
+* Removed relative imports -- fix #855. #863
+* Updated pytest requirement to fix issues on travis #864
+* Made linux compatible - travis #886
+* Fixed python 3.5 fails, boid failure #889, #898
+* Travis: Removed python 3.5 #899
+* Fixed example testing issues close multiprocess pools #890
+* Used ordered dict to make compatible with python 3.5 #892
+* Increased number of test to fix codecov patch #916
+* Fixed for #919, adding an exception for duplicate ids. #920
+* Batchrunner
+    * Batch runner redux #917
+    * Fixed empty/None `variable_parameters` argument to BatchRunner (#861) #862
+    * Added ordereddict to BatchrunerMP for python 3.5 #893
+    * Fixed python 3.5 fails bathrunnerMP (multiple tries) #897, #896, #895
+    * Batchrunner_redux fixes #928
+* Fixed variables names, mp function locations, datacollector #933
+* ModularServer updated: Fix EventLoop and changes to default port #936
+* Ran black 20.8b1, which formats docstrings #951
+
+
+
 0.8.7 (2020-05-05) Mammoth
 +++++++++++++++++++++++++++++++++++++++++++
 

@@ -35,7 +35,7 @@ TimeT = Union[float, int]
 
 
 class BaseScheduler:
-    """ Simplest scheduler; activates agents one at a time, in the order
+    """Simplest scheduler; activates agents one at a time, in the order
     they were added.
 
     Assumes that each agent added has a *step* method which takes no arguments.
@@ -52,17 +52,25 @@ class BaseScheduler:
         self._agents = OrderedDict()  # type: Dict[int, Agent]
 
     def add(self, agent: Agent) -> None:
-        """ Add an Agent object to the schedule.
+        """Add an Agent object to the schedule.
 
         Args:
             agent: An Agent to be added to the schedule. NOTE: The agent must
             have a step() method.
 
         """
+
+        if agent.unique_id in self._agents:
+            raise Exception(
+                "Agent with unique id {0} already added to scheduler".format(
+                    repr(agent.unique_id)
+                )
+            )
+
         self._agents[agent.unique_id] = agent
 
     def remove(self, agent: Agent) -> None:
-        """ Remove all instances of a given agent from the schedule.
+        """Remove all instances of a given agent from the schedule.
 
         Args:
             agent: An agent object.
@@ -86,7 +94,7 @@ class BaseScheduler:
         return list(self._agents.values())
 
     def agent_buffer(self, shuffled: bool = False) -> Iterator[Agent]:
-        """ Simple generator that yields the agents while letting the user
+        """Simple generator that yields the agents while letting the user
         remove and/or add agents during stepping.
 
         """
@@ -100,7 +108,7 @@ class BaseScheduler:
 
 
 class RandomActivation(BaseScheduler):
-    """ A scheduler which activates each agent once per step, in random order,
+    """A scheduler which activates each agent once per step, in random order,
     with the order reshuffled every step.
 
     This is equivalent to the NetLogo 'ask agents...' and is generally the
@@ -111,7 +119,7 @@ class RandomActivation(BaseScheduler):
     """
 
     def step(self) -> None:
-        """ Executes the step of all agents, one at a time, in
+        """Executes the step of all agents, one at a time, in
         random order.
 
         """
@@ -122,7 +130,7 @@ class RandomActivation(BaseScheduler):
 
 
 class SimultaneousActivation(BaseScheduler):
-    """ A scheduler to simulate the simultaneous activation of all the agents.
+    """A scheduler to simulate the simultaneous activation of all the agents.
 
     This scheduler requires that each agent have two methods: step and advance.
     step() activates the agent and stages any necessary changes, but does not
@@ -142,7 +150,7 @@ class SimultaneousActivation(BaseScheduler):
 
 
 class StagedActivation(BaseScheduler):
-    """ A scheduler which allows agent activation to be divided into several
+    """A scheduler which allows agent activation to be divided into several
     stages instead of a single `step` method. All agents execute one stage
     before moving on to the next.
 
@@ -161,7 +169,7 @@ class StagedActivation(BaseScheduler):
         shuffle: bool = False,
         shuffle_between_stages: bool = False,
     ) -> None:
-        """ Create an empty Staged Activation schedule.
+        """Create an empty Staged Activation schedule.
 
         Args:
             model: Model object associated with the schedule.

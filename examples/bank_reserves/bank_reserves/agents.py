@@ -59,7 +59,7 @@ class Person(RandomWalker):
 
     def do_business(self):
         """check if person has any savings, any money in wallet, or if the
-           bank can loan them any money"""
+        bank can loan them any money"""
         if self.savings > 0 or self.wallet > 0 or self.bank.bank_to_loan > 0:
             # create list of people at my location (includes self)
             my_cell = self.model.grid.get_cell_list_contents([self.pos])
@@ -69,7 +69,7 @@ class Person(RandomWalker):
                 customer = self
                 while customer == self:
                     """select a random person from the people at my location
-                       to trade with"""
+                    to trade with"""
                     customer = self.random.choice(my_cell)
                 # 50% chance of trading with customer
                 if self.random.randint(0, 1) == 0:
@@ -90,14 +90,14 @@ class Person(RandomWalker):
             # if negative money in wallet, check if my savings can cover the balance
             if self.savings >= (self.wallet * -1):
                 """if my savings can cover the balance, withdraw enough
-                   money from my savings so that my wallet has a 0 balance"""
+                money from my savings so that my wallet has a 0 balance"""
                 self.withdraw_from_savings(self.wallet * -1)
             # if my savings cannot cover the negative balance of my wallet
             else:
                 # check if i have any savings
                 if self.savings > 0:
                     """if i have savings, withdraw all of it to reduce my
-                       negative balance in my wallet"""
+                    negative balance in my wallet"""
                     self.withdraw_from_savings(self.savings)
                 # record how much money the bank can loan out right now
                 temp_loan = self.bank.bank_to_loan
@@ -105,17 +105,17 @@ class Person(RandomWalker):
                    remaining negative balance in my wallet"""
                 if temp_loan >= (self.wallet * -1):
                     """if the bank can loan me enough money to cover
-                       the remaining negative balance in my wallet, take out a
-                       loan for the remaining negative balance"""
+                    the remaining negative balance in my wallet, take out a
+                    loan for the remaining negative balance"""
                     self.take_out_loan(self.wallet * -1)
                 else:
                     """if the bank cannot loan enough money to cover the negative
-                       balance of my wallet, then take out a loan for the
-                       total amount the bank can loan right now"""
+                    balance of my wallet, then take out a loan for the
+                    total amount the bank can loan right now"""
                     self.take_out_loan(temp_loan)
         else:
             """if i have money in my wallet from trading with customer, deposit
-               it to my savings in the bank"""
+            it to my savings in the bank"""
             self.deposit_to_savings(self.wallet)
         # check if i have any outstanding loans, and if i have savings
         if self.loans > 0 and self.savings > 0:
@@ -161,7 +161,7 @@ class Person(RandomWalker):
     # part of balance_books()
     def take_out_loan(self, amount):
         """borrow from the bank to put money in my wallet, and increase my
-           outstanding loans"""
+        outstanding loans"""
         self.loans += amount
         self.wallet += amount
         # decresae the amount the bank can loan right now
