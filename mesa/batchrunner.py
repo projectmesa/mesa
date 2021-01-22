@@ -7,10 +7,11 @@ A single class to manage a batch run or parameter sweep of a given model.
 """
 import copy
 import itertools
-import multiprocessing as mp
 import random
+from collections import OrderedDict
 from functools import partial
 from itertools import count, product
+from multiprocessing import Pool, cpu_count
 from typing import (
     Any,
     Counter,
@@ -91,7 +92,7 @@ def batch_run(
 
         else:
             iteration_counter: Counter[Tuple[Any, ...]] = Counter()
-            with mp.Pool(nr_processes) as p:
+            with Pool(nr_processes) as p:
                 for paramValues, rawdata in p.imap_unordered(process_func, kwargs_list):
                     iteration_counter[paramValues] += 1
                     iteration = iteration_counter[paramValues]
@@ -196,14 +197,6 @@ def _collect_data(
         agent_dict.update(zip(dc.agent_reporters, data[2:]))
         all_agents_data.append(agent_dict)
     return model_data, all_agents_data
-
-
-try:
-    from pathos.multiprocessing import ProcessPool
-except ImportError:
-    pathos_support = False
-else:
-    pathos_support = True
 
 
 class ParameterError(TypeError):
