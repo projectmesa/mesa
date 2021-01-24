@@ -151,6 +151,11 @@ class TestBatchRunner(unittest.TestCase):
         )  # extra column with run index
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(len(model_collector.keys()), self.model_runs)
+        for var, values in self.variable_params.items():
+            self.assertEqual(set(model_vars[var].unique()), set(values))
+        if self.fixed_params:
+            for var, values in self.fixed_params.items():
+                self.assertEqual(set(model_vars[var].unique()), set(values))
 
     def test_agent_level_vars(self):
         """
@@ -169,6 +174,8 @@ class TestBatchRunner(unittest.TestCase):
         assert "agent_id" in list(agent_collector[(0, 1, 1)].columns)
         assert "Step" in list(agent_collector[(0, 1, 5)].index.names)
         assert "nose" not in list(agent_collector[(0, 1, 1)].columns)
+        for var, values in self.variable_params.items():
+            self.assertEqual(set(agent_vars[var].unique()), set(values))
 
         self.assertEqual(
             agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
