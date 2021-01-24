@@ -257,10 +257,10 @@ class FixedBatchRunner:
         column as a key.
         """
         extra_cols = ["Run"] + (extra_cols or [])
-        index_cols = set()
-        for params in self.parameters_list:
-            index_cols |= params.keys()
-        index_cols = list(index_cols) + extra_cols
+        index_cols = []
+        if self.parameters_list:
+            index_cols = list(self.parameters_list[0].keys())
+        index_cols += extra_cols
 
         records = []
         for param_key, values in vars_dict.items():
