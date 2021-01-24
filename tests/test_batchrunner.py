@@ -273,19 +273,13 @@ class TestBatchRunner(unittest.TestCase):
             {"variable_model_param": 2},
             {"variable_model_param": 2, "variable_agent_param": 8},
             {"variable_model_param": 3, "variable_agent_param": 8},
+            {"variable_agent_param": 1},
         ]
-        max_n_params = max(len(p) for p in self.variable_params)
-        batch = self.launch_batch_processing_fixed_list()
+        # This is currently not supported. Check that it raises the correct error.
+        msg = "parameter names in parameters_list are not equal across the list"
+        with self.assertRaises(ValueError, msg=msg):
+            self.launch_batch_processing_fixed_list()
 
-        model_vars = batch.get_model_vars_dataframe()
-        expected_cols = max_n_params + len(self.model_reporters) + 1
-        self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
-
-        agent_vars = batch.get_agent_vars_dataframe()
-        expected_cols = max_n_params + len(self.agent_reporters) + 2
-        self.assertEqual(
-            agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols)
-        )
 
 class TestParameters(unittest.TestCase):
     def test_product(self):

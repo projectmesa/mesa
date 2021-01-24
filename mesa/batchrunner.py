@@ -100,6 +100,11 @@ class FixedBatchRunner:
         self.iterations = iterations
         self.max_steps = max_steps
 
+        for params in self.parameters_list:
+            if list(params) != list(self.parameters_list[0]):
+                msg = "parameter names in parameters_list are not equal across the list"
+                raise ValueError(msg)
+
         self.model_reporters = model_reporters
         self.agent_reporters = agent_reporters
 
