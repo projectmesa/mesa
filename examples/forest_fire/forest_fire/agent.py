@@ -34,6 +34,3 @@ class TreeCell(Agent):
                 if neighbor.condition == "Fine":
                     neighbor.condition = "On Fire"
             self.condition = "Burned Out"
-
-    def get_pos(self):
-        return self.pos

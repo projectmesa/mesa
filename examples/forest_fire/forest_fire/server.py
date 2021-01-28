@@ -11,7 +11,7 @@ def forest_fire_portrayal(tree):
     if tree is None:
         return
     portrayal = {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Layer": 0}
-    (x, y) = tree.get_pos()
+    (x, y) = tree.pos
     portrayal["x"] = x
     portrayal["y"] = y
     portrayal["Color"] = COLORS[tree.condition]
