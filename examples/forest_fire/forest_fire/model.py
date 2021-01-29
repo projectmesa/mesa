@@ -19,11 +19,6 @@ class ForestFire(Model):
             height, width: The size of the grid to model
             density: What fraction of grid cells have a tree in them.
         """
-        # Initialize model parameters
-        self.height = height
-        self.width = width
-        self.density = density
-
         # Set up model objects
         self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=False)
@@ -38,7 +33,7 @@ class ForestFire(Model):
 
         # Place a tree in each cell with Prob = density
         for (contents, x, y) in self.grid.coord_iter():
-            if self.random.random() < self.density:
+            if self.random.random() < density:
                 # Create a tree
                 new_tree = TreeCell((x, y), self)
                 # Set all trees in the first column on fire.
