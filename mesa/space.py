@@ -247,7 +247,7 @@ class Grid:
             An iterator of non-None objects in the given neighborhood;
             at most 9 if Moore, 5 if Von-Neumann
             (8 and 4 if not including the center).
-
+g
         """
         neighborhood = self.get_neighborhood(pos, moore, include_center, radius)
         return self.iter_cell_list_contents(neighborhood)
@@ -258,8 +258,8 @@ class Grid:
         moore: bool,
         include_center: bool = False,
         radius: int = 1,
-    ) -> List[Coordinate]:
-        """Return a list of neighbors to a certain point.
+    ) -> List[GridContent]:
+        """ Return a list of neighbors to a certain point.
 
         Args:
             pos: Coordinate tuple for the neighborhood to get.
@@ -287,8 +287,7 @@ class Grid:
         elif not self.torus:
             raise Exception("Point out of bounds, and space non-toroidal.")
         else:
-            x, y = pos[0] % self.width, pos[1] % self.height
-        return x, y
+            return pos[0] % self.width, pos[1] % self.height
 
     def out_of_bounds(self, pos: Coordinate) -> bool:
         """
