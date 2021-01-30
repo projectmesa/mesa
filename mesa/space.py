@@ -89,10 +89,10 @@ class Grid:
         self.width = width
         self.torus = torus
 
-        self.grid = []  # type: List[List[GridContent]]
+        self.grid: List[List[GridContent]] = []
 
         for x in range(self.width):
-            col = []  # type: List[GridContent]
+            col: List[GridContent] = []
             for y in range(self.height):
                 col.append(self.default_val())
             self.grid.append(col)
@@ -163,7 +163,7 @@ class Grid:
 
         """
         x, y = pos
-        coordinates = set()  # type: Set[Coordinate]
+        coordinates: Set[Coordinate] = set()
         for dy in range(-radius, radius + 1):
             for dx in range(-radius, radius + 1):
                 if dx == 0 and dy == 0 and not include_center:
@@ -401,7 +401,7 @@ class Grid:
 class SingleGrid(Grid):
     """ Grid where each cell contains exactly at most one object. """
 
-    empties = set()  # type: Set[Coordinate]
+    empties: Set[Coordinate] = set()
 
     def __init__(self, width: int, height: int, torus: bool) -> None:
         """Create a new single-item grid.
@@ -687,8 +687,8 @@ class ContinuousSpace:
         self.torus = torus
 
         self._agent_points = None
-        self._index_to_agent = {}  # type: Dict[int, Agent]
-        self._agent_to_index = {}  # type: Dict[Agent, int]
+        self._index_to_agent: Dict[int, Agent] = {}
+        self._agent_to_index: Dict[Agent, int] = {}
 
     def place_agent(self, agent: Agent, pos: FloatCoordinate) -> None:
         """Place a new agent in the space.
