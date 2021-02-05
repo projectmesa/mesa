@@ -101,7 +101,7 @@ class Grid:
         self.empties = set(itertools.product(*(range(self.width), range(self.height))))
 
         # Neighborhood Cache
-        self._neighborhood_cache = dict()  # type: Dict[Any, List[Coordinate]]
+        self._neighborhood_cache: Dict[Any, List[Coordinate]] = dict()
 
     @staticmethod
     def default_val() -> None:
@@ -197,7 +197,7 @@ class Grid:
         neighborhood = self._neighborhood_cache.get(cache_key, None)
 
         if neighborhood is None:
-            coordinates = set()  # type: Set[Coordinate]
+            coordinates: Set[Coordinate] = set()
 
             x, y = pos
             for dy in range(-radius, radius + 1):
@@ -247,7 +247,6 @@ class Grid:
             An iterator of non-None objects in the given neighborhood;
             at most 9 if Moore, 5 if Von-Neumann
             (8 and 4 if not including the center).
-g
         """
         neighborhood = self.get_neighborhood(pos, moore, include_center, radius)
         return self.iter_cell_list_contents(neighborhood)
