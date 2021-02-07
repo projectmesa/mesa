@@ -8,7 +8,7 @@ import unittest
 from mesa import Agent, Model
 from mesa.time import BaseScheduler
 from mesa.datacollection import DataCollector
-from mesa.batchrunner import BatchRunner, ParameterProduct, ParameterSampler
+from mesa.batchrunner import BatchRunner, FixedBatchRunner, ParameterProduct, ParameterSampler
 
 
 NUM_AGENTS = 7
@@ -120,7 +120,7 @@ class TestBatchRunner(unittest.TestCase):
 
     def launch_batch_processing_fixed(self):
         # Adding second batchrun to test fixed params increase coverage
-        batch2 = BatchRunner(
+        batch = BatchRunner(
             self.mock_model,
             fixed_parameters={"fixed": "happy"},
             iterations=4,
@@ -129,15 +129,31 @@ class TestBatchRunner(unittest.TestCase):
             agent_reporters=None,
         )
 
-        batch2.run_all()
-        return batch2
+        batch.run_all()
+        return batch
+
+    def launch_batch_processing_fixed_list(self):
+        batch = FixedBatchRunner(
+            self.mock_model,
+            parameters_list=self.variable_params,
+            fixed_parameters=self.fixed_params,
+            iterations=self.iterations,
+            max_steps=self.max_steps,
+            model_reporters=self.model_reporters,
+            agent_reporters=self.agent_reporters,
+        )
+        batch.run_all()
+        return batch
 
     @property
     def model_runs(self):
         """
         Returns total number of batch runner's iterations.
         """
-        return reduce(mul, map(len, self.variable_params.values())) * self.iterations
+        if isinstance(self.variable_params, list):
+            return len(self.variable_params) * self.iterations
+        else:
+            return reduce(mul, map(len, self.variable_params.values())) * self.iterations
 
     def test_model_level_vars(self):
         """
@@ -151,6 +167,11 @@ class TestBatchRunner(unittest.TestCase):
         )  # extra column with run index
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(len(model_collector.keys()), self.model_runs)
+        for var, values in self.variable_params.items():
+            self.assertEqual(set(model_vars[var].unique()), set(values))
+        if self.fixed_params:
+            for var, values in self.fixed_params.items():
+                self.assertEqual(set(model_vars[var].unique()), set(values))
 
     def test_agent_level_vars(self):
         """
@@ -169,6 +190,8 @@ class TestBatchRunner(unittest.TestCase):
         assert "agent_id" in list(agent_collector[(0, 1, 1)].columns)
         assert "Step" in list(agent_collector[(0, 1, 5)].index.names)
         assert "nose" not in list(agent_collector[(0, 1, 1)].columns)
+        for var, values in self.variable_params.items():
+            self.assertEqual(set(agent_vars[var].unique()), set(values))
 
         self.assertEqual(
             agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
@@ -223,6 +246,39 @@ class TestBatchRunner(unittest.TestCase):
         self.assertEqual(
             model_vars["reported_fixed_param"].iloc[0], self.fixed_params["fixed_name"]
         )
+
+    def test_model_with_variable_kwargs_list(self):
+        self.variable_params = [
+            {"variable_model_param": 1, "variable_agent_param": 1},
+            {"variable_model_param": 2, "variable_agent_param": 1},
+            {"variable_model_param": 2, "variable_agent_param": 8},
+            {"variable_model_param": 3, "variable_agent_param": 8},
+        ]
+        n_params = len(self.variable_params[0])
+        batch = self.launch_batch_processing_fixed_list()
+
+        model_vars = batch.get_model_vars_dataframe()
+        expected_cols = n_params + len(self.model_reporters) + 1
+        self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
+
+        agent_vars = batch.get_agent_vars_dataframe()
+        expected_cols = n_params + len(self.agent_reporters) + 2
+        self.assertEqual(
+            agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols)
+        )
+
+    def test_model_with_variable_kwargs_list_mixed_length(self):
+        self.variable_params = [
+            {"variable_model_param": 1},
+            {"variable_model_param": 2},
+            {"variable_model_param": 2, "variable_agent_param": 8},
+            {"variable_model_param": 3, "variable_agent_param": 8},
+            {"variable_agent_param": 1},
+        ]
+        # This is currently not supported. Check that it raises the correct error.
+        msg = "parameter names in parameters_list are not equal across the list"
+        with self.assertRaises(ValueError, msg=msg):
+            self.launch_batch_processing_fixed_list()
 
 
 class TestParameters(unittest.TestCase):

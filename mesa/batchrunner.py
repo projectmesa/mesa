@@ -100,6 +100,11 @@ class FixedBatchRunner:
         self.iterations = iterations
         self.max_steps = max_steps
 
+        for params in self.parameters_list:
+            if list(params) != list(self.parameters_list[0]):
+                msg = "parameter names in parameters_list are not equal across the list"
+                raise ValueError(msg)
+
         self.model_reporters = model_reporters
         self.agent_reporters = agent_reporters
 
@@ -257,10 +262,10 @@ class FixedBatchRunner:
         column as a key.
         """
         extra_cols = ["Run"] + (extra_cols or [])
-        index_cols = set()
-        for params in self.parameters_list:
-            index_cols |= params.keys()
-        index_cols = list(index_cols) + extra_cols
+        index_cols = []
+        if self.parameters_list:
+            index_cols = list(self.parameters_list[0].keys())
+        index_cols += extra_cols
 
         records = []
         for param_key, values in vars_dict.items():
