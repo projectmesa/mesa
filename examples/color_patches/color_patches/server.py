@@ -62,7 +62,7 @@ server = ModularServer(
     ColorPatches,
     [canvas_element],
     "Color Patches",
-    {"width": canvas_width, "height": canvas_height},
+    {"width": grid_rows, "height": grid_cols},
 )
 
 # webbrowser.open('http://127.0.0.1:8521')  # TODO: make this configurable
