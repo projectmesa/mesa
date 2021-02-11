@@ -96,6 +96,7 @@ Client -> Server:
 
 """
 import asyncio
+import copy
 import os
 import platform
 import sys
@@ -230,7 +231,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     """
 
     def open(self):
-        self.model_kwargs = self.application.model_kwargs.copy()
+        self.model_kwargs = copy.deepcopy(self.application.model_kwargs)
         self.model = reset_model(self.application.model_cls, self.model_kwargs)
         if self.application.verbose:
             print("Socket opened!")
