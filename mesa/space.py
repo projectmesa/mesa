@@ -13,6 +13,7 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # good reason to use one-character variable names for x and y.
 # pylint: disable=invalid-name
 
+from abc import abstractmethod
 import itertools
 
 import numpy as np
@@ -41,7 +42,7 @@ NetworkCoordinate = int
 Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
 
 GridContent = Optional[Agent]
-MultiGridContent = Set[Agent]
+MultiGridContent = List[Agent]
 
 F = TypeVar("F", bound=Callable[..., Any])
 Content = TypeVar("Content")
@@ -122,6 +123,7 @@ class BaseGrid(Generic[Content]):
         self.empties = set(itertools.product(*(range(self.width), range(self.height))))
 
     @staticmethod
+    @abstractmethod
     def default_val() -> Content:
         pass
 
@@ -436,16 +438,6 @@ class SingleGrid(Grid):
 
     empties: Set[Coordinate] = set()
 
-    def __init__(self, width: int, height: int, torus: bool) -> None:
-        """Create a new single-item grid.
-
-        Args:
-            width, height: The width and width of the grid
-            torus: Boolean whether the grid wraps or not.
-
-        """
-        super().__init__(width, height, torus)
-
     def position_agent(
         self, agent: Agent, x: Union[int, str] = "random", y: Union[int, str] = "random"
     ) -> None:
@@ -501,7 +493,7 @@ class MultiGrid(BaseGrid[MultiGridContent]):
         return self.grid[index]
 
     @staticmethod
-    def default_val() -> Set[Agent]:
+    def default_val() -> List[Agent]:
         """ Default value for new cell elements. """
         return []
 
