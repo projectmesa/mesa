@@ -35,7 +35,7 @@ It's easy to create a cookiecutter mesa model by running ``mesa startproject``
 Randomization
 -------------
 
-If your model involves some random choice, you can use the build-in ``random``
+If your model involves some random choice, you can use the built-in ``random``
 property that Mesa ``Model`` and ``Agent`` objects have. This works exactly
 like the built-in ``random`` library.
 

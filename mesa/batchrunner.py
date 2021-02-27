@@ -88,7 +88,7 @@ class FixedBatchRunner:
             agent_reporters: Like model_reporters, but each variable is now
                 collected at the level of each agent present in the model at
                 the end of the run.
-            display_progress: Display progresss bar with time estimation?
+            display_progress: Display progress bar with time estimation?
 
         """
         self.model_cls = model_cls
@@ -362,7 +362,7 @@ class BatchRunner(FixedBatchRunner):
         Args:
             model_cls: The class of model to batch-run.
             variable_parameters: Dictionary of parameters to lists of values.
-                The model will be run with every combo of these paramters.
+                The model will be run with every combo of these parameters.
                 For example, given variable_parameters of
                     {"param_1": range(5),
                      "param_2": [1, 5, 10]}
