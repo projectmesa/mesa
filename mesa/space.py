@@ -59,7 +59,7 @@ class Grid:
         get_neighborhood: Returns the cells surrounding a given cell.
         get_cell_list_contents: Returns the contents of a list of cells
             ((x,y) tuples)
-        neighbor_iter: Iterates over position neightbors.
+        neighbor_iter: Iterates over position neighbours.
         coord_iter: Returns coordinates as well as cell contents.
         place_agent: Positions an agent on the grid, and set its pos variable.
         move_agent: Moves an agent from its current position to a new position.
@@ -510,7 +510,7 @@ class HexGrid(Grid):
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
         get_neighborhood: Returns the cells surrounding a given cell.
-        neighbor_iter: Iterates over position neightbors.
+        neighbor_iter: Iterates over position neighbours.
         iter_neighborhood: Returns an iterator over cell coordinates that are
             in the neighborhood of a certain point.
 

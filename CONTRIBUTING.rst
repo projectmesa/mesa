@@ -71,7 +71,7 @@ We test by implementing simple models and through traditional unit tests in the 
 
     py.test --cov=mesa tests/
 
-With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_. We recommend to use `black`_ as an automated code formatter. You can automatically format your code using `pre-commit`_, which will prevent `git commit` of unstyled code and will automtically apply black style so you can immediately re-run `git commit`. To set up pre-commit run the following commands:
+With respect to code standards, we follow `PEP8`_ and the `Google Style Guide`_. We recommend to use `black`_ as an automated code formatter. You can automatically format your code using `pre-commit`_, which will prevent `git commit` of unstyled code and will automatically apply black style so you can immediately re-run `git commit`. To set up pre-commit run the following commands:
 
 .. code-block:: bash
 
