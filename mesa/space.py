@@ -871,6 +871,12 @@ class NetworkGrid:
 
         self.G.nodes[node_id]["agent"].remove(agent)
 
+    def remove_agent(self, agent: Agent) -> None:
+        """ Remove the agent from the network and set its pos variable to None. """
+        pos = agent.pos
+        self._remove_agent(agent, pos)
+        agent.pos = None
+
     def is_cell_empty(self, node_id: int) -> bool:
         """ Returns a bool of the contents of a cell. """
         return not self.G.nodes[node_id]["agent"]
