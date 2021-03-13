@@ -17,8 +17,21 @@ import itertools
 
 import numpy as np
 
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
-from mesa.agent import Agent
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Sequence,
+    Tuple,
+    Union,
+    cast,
+    overload,
+)
+from .agent import Agent
 
 Coordinate = Tuple[int, int]
 GridContent = Union[Optional[Agent], Set[Agent]]
@@ -105,8 +118,69 @@ class Grid:
         """ Default value for new cell elements. """
         return None
 
+    @overload
     def __getitem__(self, index: int) -> List[GridContent]:
-        return self.grid[index]
+        ...
+
+    @overload
+    def __getitem__(
+        self, index: Tuple[Union[int, slice], Union[int, slice]]
+    ) -> Union[GridContent, List[GridContent]]:
+        ...
+
+    @overload
+    def __getitem__(self, index: Sequence[Coordinate]) -> List[GridContent]:
+        ...
+
+    def __getitem__(
+        self,
+        index: Union[
+            int, Sequence[Coordinate], Tuple[Union[int, slice], Union[int, slice]],
+        ],
+    ) -> Union[GridContent, List[GridContent]]:
+        """Access contents from the grid."""
+
+        if isinstance(index, int):
+            # grid[x]
+            return self.grid[index]
+
+        if isinstance(index[0], tuple):
+            # grid[(x1, y1), (x2, y2)]
+            index = cast(Sequence[Coordinate], index)
+
+            cells = []
+            for pos in index:
+                x1, y1 = self.torus_adj(pos)
+                cells.append(self.grid[x1][y1])
+            return cells
+
+        x, y = index
+
+        if isinstance(x, int) and isinstance(y, int):
+            # grid[x, y]
+            index = cast(Coordinate, index)
+            x, y = self.torus_adj(index)
+            return self.grid[x][y]
+
+        if isinstance(x, int):
+            # grid[x, :]
+            x, _ = self.torus_adj((x, 0))
+            x = slice(x, x + 1)
+
+        if isinstance(y, int):
+            # grid[:, y]
+            _, y = self.torus_adj((0, y))
+            y = slice(y, y + 1)
+
+        # grid[:, :]
+        x, y = (cast(slice, x), cast(slice, y))
+        cells = []
+        for rows in self.grid[x]:
+            for cell in rows[y]:
+                cells.append(cell)
+        return cells
+
+        raise IndexError
 
     def __iter__(self) -> Iterator[GridContent]:
         """
