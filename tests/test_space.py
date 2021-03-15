@@ -357,6 +357,15 @@ class TestSingleNetworkGrid(unittest.TestCase):
         assert _agent not in self.space.G.nodes[initial_pos]["agent"]
         assert _agent in self.space.G.nodes[final_pos]["agent"]
 
+    def test_remove_agent(self):
+        for i, pos in enumerate(TEST_AGENTS_NETWORK_SINGLE):
+            a = self.agents[i]
+            assert a.pos == pos
+            assert a in self.space.G.nodes[pos]["agent"]
+            self.space.remove_agent(a)
+            assert a.pos is None
+            assert a not in self.space.G.nodes[pos]["agent"]
+
     def test_is_cell_empty(self):
         assert not self.space.is_cell_empty(0)
         assert self.space.is_cell_empty(TestSingleNetworkGrid.GRAPH_SIZE - 1)
