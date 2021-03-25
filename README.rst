@@ -4,7 +4,7 @@ Mesa: Agent-based modeling in Python 3+
 .. image:: https://github.com/projectmesa/mesa/workflows/build/badge.svg
         :target: https://github.com/projectmesa/mesa/actions
 
-.. image:: https://codecov.io/gh/projectmesa/mesa/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/projectmesa/mesa/branch/main/graph/badge.svg
   :target: https://codecov.io/gh/projectmesa/mesa
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
@@ -15,7 +15,7 @@ Mesa: Agent-based modeling in Python 3+
 It allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python 3-based alternative to NetLogo, Repast, or MASON.
 
 
-.. image:: https://github.com/projectmesa/mesa/blob/master/docs/images/Mesa_Screenshot.png
+.. image:: https://github.com/projectmesa/mesa/blob/main/docs/images/Mesa_Screenshot.png
    :width: 100%
    :scale: 100%
    :alt: A screenshot of the Schelling Model in Mesa
@@ -50,7 +50,7 @@ You can also use `pip` to install the github version:
 
     $ pip install -e git+https://github.com/projectmesa/mesa#egg=mesa
 
-Take a look at the `examples <https://github.com/projectmesa/mesa/tree/master/examples>`_ folder for sample models demonstrating Mesa features.
+Take a look at the `examples <https://github.com/projectmesa/mesa/tree/main/examples>`_ folder for sample models demonstrating Mesa features.
 
 For more help on using Mesa, check out the following resources:
 
@@ -77,7 +77,7 @@ If you are a Mesa developer, first `install docker-compose <https://docs.docker.
     ...
     $ docker-compose up -d dev # start the docker container
     $ docker-compose exec dev bash # enter the docker container that has your current version of Mesa installed at /opt/mesa
-    $ mesa runserver examples/Schelling # or any other example model in examples
+    $ mesa runserver examples/schelling # or any other example model in examples
 
 
 The docker-compose file does two important things:
@@ -105,5 +105,5 @@ If you would like to add a feature, please reach out via `ticket`_ or the `dev e
 
 .. _`ticket` : https://github.com/projectmesa/mesa/issues
 .. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
-.. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/master/CONTRIBUTING.rst
+.. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.rst
 .. _`Github` : https://github.com/projectmesa/mesa/

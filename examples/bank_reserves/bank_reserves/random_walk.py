@@ -1,7 +1,7 @@
 """
 Citation:
 The following code is a copy from random_walk.py at
-https://github.com/projectmesa/mesa/blob/master/examples/wolf_sheep/wolf_sheep/random_walk.py
+https://github.com/projectmesa/mesa/blob/main/examples/wolf_sheep/wolf_sheep/random_walk.py
 Accessed on: November 2, 2017
 Original Author: Jackie Kazil
 

@@ -4,7 +4,7 @@ Mesa: Agent-based modeling in Python 3+
 .. image:: https://api.travis-ci.org/projectmesa/mesa.svg
     :target: https://travis-ci.org/projectmesa/mesa
 
-.. image:: https://codecov.io/gh/projectmesa/mesa/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/projectmesa/mesa/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/projectmesa/mesa
 
 `Mesa`_ is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
@@ -72,7 +72,7 @@ If you would like to add a feature, please reach out via `ticket`_ or the `email
 
 .. _`ticket` : https://github.com/projectmesa/mesa/issues
 .. _`email list` : https://groups.google.com/d/forum/projectmesa
-.. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/master/CONTRIBUTING.rst
+.. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.rst
 .. _`Github` : https://github.com/projectmesa/mesa/
 
 
