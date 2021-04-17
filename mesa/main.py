@@ -19,7 +19,7 @@ def cli():
 
 @cli.command()
 @click.argument("project", type=PROJECT_PATH, default=".")
-def runserver(project):
+def runserver(project) :
     """Run mesa project PROJECT
 
     PROJECT is the path to the directory containing `run.py`, or the current
