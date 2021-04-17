@@ -65,7 +65,7 @@ installed directly form the github repository by running:
 
 .. code:: bash
 
-       $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa/master/examples/boltzmann_wealth_model/requirements.txt
+       $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa/main/examples/boltzmann_wealth_model/requirements.txt
 
 | This will install the dependencies listed in the requirements.txt file
   which are:
@@ -223,7 +223,7 @@ Then create the model object, and run it for one step:
     Hi, I am agent 6.
     Hi, I am agent 8.
     Hi, I am agent 1.
-    
+
 
 Exercise
 ^^^^^^^^
@@ -306,10 +306,10 @@ this line, to make the graph appear.
 
     # For a jupyter notebook add the following line:
     %matplotlib inline
-    
+
     # The below is needed for both notebooks and scripts
     import matplotlib.pyplot as plt
-    
+
     agent_wealth = [a.wealth for a in model.schedule.agents]
     plt.hist(agent_wealth)
 
@@ -933,7 +933,7 @@ times (49* 5) for 245 iterations
 .. parsed-literal::
 
     245it [03:36,  1.13it/s]
-    
+
 
 BatchRunner has two ways to collect data.
 
@@ -972,7 +972,7 @@ iteration number and then the datacollector dataframe. So in this model
 
     #Get the Agent DataCollection
     data_collector_agents = batch_run.get_collector_agents()
-    
+
     data_collector_agents[(10,2)]
 
 
@@ -985,11 +985,11 @@ iteration number and then the datacollector dataframe. So in this model
         .dataframe tbody tr th:only-of-type {
             vertical-align: middle;
         }
-    
+
         .dataframe tbody tr th {
             vertical-align: top;
         }
-    
+
         .dataframe thead th {
             text-align: right;
         }
@@ -1064,10 +1064,10 @@ iteration number and then the datacollector dataframe. So in this model
 
 .. code:: ipython3
 
-    #Get the Model DataCollection. 
-    
+    #Get the Model DataCollection.
+
     data_collector_model = batch_run.get_collector_model()
-    
+
     data_collector_model[(10,1)]
 
 
@@ -1080,11 +1080,11 @@ iteration number and then the datacollector dataframe. So in this model
         .dataframe tbody tr th:only-of-type {
             vertical-align: middle;
         }
-    
+
         .dataframe tbody tr th {
             vertical-align: top;
         }
-    
+
         .dataframe thead th {
             text-align: right;
         }

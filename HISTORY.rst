@@ -485,7 +485,7 @@ Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 * Fixes: Order of operations reversed: agent is removed first and then it is placed.
 * Improvement: `LICENSE`_ was updates from MIT to Apache 2.0.
 
-.. _`LICENSE` : https://github.com/projectmesa/mesa/blob/master/LICENSE
+.. _`LICENSE` : https://github.com/projectmesa/mesa/blob/main/LICENSE
 
 
 0.6.0 (2015-06-21)

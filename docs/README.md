@@ -29,13 +29,13 @@ Updating docs can be confusing. Here are the basic setups.
  * ```git commit -am "Updating docs."```
 1. Push the branch
  * ```git push origin doc-updates```
-1. From here you will want to submit a pull request to master.
+1. From here you will want to submit a pull request to main.
 
 ##### Update read the docs
 
 From this point, you will need to find someone that has access to readthedocs. Currently, that is [@jackiekazil](https://github.com/jackiekazil) and [@dmasad](https://github.com/dmasad).
 
-1. Accept the pull request into master.
+1. Accept the pull request into main.
 1. Log into readthedocs and launch a new build -- builds take about 10 minutes or so.
 
 ### Helpful Sphnix tips
