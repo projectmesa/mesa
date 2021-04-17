@@ -457,5 +457,5 @@ class TestIndexing:
         assert self.grid[:, :] == [(x, y) for x in range(3) for y in range(5)]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
