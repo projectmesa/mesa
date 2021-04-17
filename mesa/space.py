@@ -138,7 +138,9 @@ class Grid:
     def __getitem__(
         self,
         index: Union[
-            int, Sequence[Coordinate], Tuple[Union[int, slice], Union[int, slice]],
+            int,
+            Sequence[Coordinate],
+            Tuple[Union[int, slice], Union[int, slice]],
         ],
     ) -> Union[GridContent, List[GridContent]]:
         """Access contents from the grid."""
@@ -332,7 +334,7 @@ class Grid:
         include_center: bool = False,
         radius: int = 1,
     ) -> List[GridContent]:
-        """ Return a list of neighbors to a certain point.
+        """Return a list of neighbors to a certain point.
 
         Args:
             pos: Coordinate tuple for the neighborhood to get.
