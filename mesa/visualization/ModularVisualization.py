@@ -217,16 +217,25 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
             # Is the param editable?
             if param in self.application.user_params:
-                if isinstance(
-                    self.application.model_kwargs[param], UserSettableParameter
-                ):
-                    self.application.model_kwargs[param].value = value
-                else:
-                    self.application.model_kwargs[param] = value
+                self.edit_app_param(self.application.model_kwargs, param, value)
 
         else:
             if self.application.verbose:
                 print("Unexpected message!")
+                
+    def edit_app_param(self, args, param, value):
+        """Recursive application of the parameters"""
+        for key, val in args.items():
+            if isinstance(val, dict):
+                self.edit_app_param(val, param, value)
+            else:
+                if key == param:
+                    if isinstance(
+                        args[param], UserSettableParameter
+                    ):
+                        args[param].value = value
+                    else:
+                        args[param] = value
 
 
 class ModularServer(tornado.web.Application):
@@ -291,27 +300,36 @@ class ModularServer(tornado.web.Application):
     @property
     def user_params(self):
         result = {}
-        for param, val in self.model_kwargs.items():
+        result = self.extract_param_from_dict(self.model_kwargs, result)
+        return result
+    
+    def extract_param_from_dict(self, args, result):
+        for param, val in args.items():
             if isinstance(val, UserSettableParameter):
                 result[param] = val.json
-
+            elif isinstance(val, dict):
+                result = self.extract_param_from_dict(val, result)
         return result
 
     def reset_model(self):
         """ Reinstantiate the model object, using the current parameters. """
+        model_params = self.parse_params_dict(self.model_kwargs)
+        self.model = self.model_cls(**model_params)
 
+    def parse_params_dict(self, args):
         model_params = {}
-        for key, val in self.model_kwargs.items():
+        for key, val in args.items():
             if isinstance(val, UserSettableParameter):
                 if (
                     val.param_type == "static_text"
                 ):  # static_text is never used for setting params
                     continue
                 model_params[key] = val.value
+            elif isinstance(val, dict):
+                model_params[key] = self.parse_params_dict(val)
             else:
                 model_params[key] = val
-
-        self.model = self.model_cls(**model_params)
+        return model_params
 
     def render_model(self):
         """Turn the current state of the model into a dictionary of
