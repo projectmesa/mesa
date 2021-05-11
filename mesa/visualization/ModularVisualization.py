@@ -117,6 +117,10 @@ if platform.system() == "Windows" and platform.python_version_tuple() >= ("3", "
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
+class NoCollectInInitError(Exception):
+    pass
+
+
 class VisualizationElement:
     """
     Defines an element of the visualization.
@@ -312,6 +316,29 @@ class ModularServer(tornado.web.Application):
                 model_params[key] = val
 
         self.model = self.model_cls(**model_params)
+        self.check_initial_data_collection()
+
+    def check_initial_data_collection(self):
+        """Perform a check on whether the user has added
+        `self.datacollector.collect(self)` in their model __init__."""
+        if not hasattr(self.model, "datacollector"):
+            # Do nothing if the model doesn't do data collection.
+            # TODO: we assume that the DataCollector is initialized into the
+            # `datacollector` attribute. Which is not true in general.
+            return
+
+        err_msg = (
+            "You initialized a DataCollector object in your model but haven't"
+            " added a `self.datacollector.collect(self)` in your model __init__."
+        )
+        if bool(self.model.datacollector.model_reporters):
+            for val in self.model.datacollector.model_vars.values():
+                if len(val) == 0:
+                    raise NoCollectInInitError(err_msg)
+
+        if bool(self.model.datacollector.agent_reporters):
+            if not bool(self.model.datacollector._agent_records):
+                raise NoCollectInInitError(err_msg)
 
     def render_model(self):
         """Turn the current state of the model into a dictionary of
