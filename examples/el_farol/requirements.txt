@@ -1,0 +1,5 @@
+pyibl
+jupyter
+matplotlib
+mesa
+numpy
