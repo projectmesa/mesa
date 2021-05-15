@@ -4,33 +4,39 @@ from mesa.visualization.UserParam import UserSettableParameter
 
 from .model import ElFarolBar
 
-COLORS = {"In": "#00AA00", "Out": "#880000"}
+COLORS = {True: "Green", False: "Red"}
 
 
-def forest_fire_portrayal(tree):
-    if tree is None:
-        return
-    portrayal = {"Shape": "circle", "w": 1, "h": 1, "Layer": 0}
-    (x, y) = tree.pos
-    portrayal["x"] = x
-    portrayal["y"] = y
-    portrayal["Color"] = COLORS[tree.condition]
+def el_farol_portrayal(customer):
+    
+    #portrayal = {"Shape": "circle", "Filled":True,"Layer": 0}
+    #(x, y) = customer.pos
+    #portrayal["x"] = x
+    #portrayal["y"] = y
+    #portrayal["Color"] = "red"#COLORS[customer.attend]
+    #return portrayal
+    portrayal = {"Shape": "circle",
+                 "Filled": "true",
+                 "Layer": 0,
+                 "Color": "red",
+                 "r": 0.1}
     return portrayal
 
-
-canvas_element = CanvasGrid(forest_fire_portrayal, 100, 100, 500, 500)
-tree_chart = ChartModule(
-    [{"Label": label, "Color": color} for (label, color) in COLORS.items()]
-)
-pie_chart = PieChartModule(
-    [{"Label": label, "Color": color} for (label, color) in COLORS.items()]
-)
+canvas_element = CanvasGrid(el_farol_portrayal, 20,20, 500, 500)
+#tree_chart = ChartModule(
+#    [{"Label": label, "Color": color} for (label, color) in COLORS.items()]
+#)
+#pie_chart = PieChartModule(
+#    [{"Label": label, "Color": color} for (label, color) in COLORS.items()]
+#)
 
 model_params = {
-    "height": 100,
-    "width": 100,
-    "density": UserSettableParameter("slider", "Tree density", 0.65, 0.01, 1.0, 0.01),
+    "num_strategies":10,
+    "height": 20,
+    "width": 20,
+    "N":10,
+    "num_strategies": UserSettableParameter("slider", "Number of Strategies", 10, 0, 20, 1),
 }
 server = ModularServer(
-    ForestFire, [canvas_element, tree_chart, pie_chart], "Forest Fire", model_params
+    ElFarolBar,[canvas_element],"El Farol Restaurant",model_params
 )
