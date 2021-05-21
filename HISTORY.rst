@@ -20,7 +20,7 @@ Release History
     * rename github action to "build", remove redundant flake8 check #971
     * GA: Run on Windows and macOS #970
     * Add GitHub Action for continuous integration testing #966
-*[PERF] Add neighborhood cache to grids and improve iter_cell_list_contents #823
+* [PERF] Add neighborhood cache to grids and improve iter_cell_list_contents #823
 * forest_fire: Remove unnecessary code #981
 * Migrate away from type comments #984
 * Update License #985
