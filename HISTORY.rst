@@ -3,12 +3,37 @@
 Release History
 ---------------
 
-
-0.8.9 (TBD) Oro Valley
+0.8.9 (2020-05-20) Oro Valley
 +++++++++++++++++++++++++++++++++++++++++++
 
 *Note: Master branch was renamed to Main on 03/13/2021*
 
+**Improvements**
+
+* Master to Main change:
+    * Docs/examples: Update links to use main instead of master as branch #1012
+    * CI: Run on pushed to main and release branches #1011
+* Github Actions
+    * GitHub Actions: run black only on ubuntu 3.8 #996
+    * GA: Only run CI when pushed to master #974
+    * GA: Add pypy3 #972
+    * rename github action to "build", remove redundant flake8 check #971
+    * GA: Run on Windows and macOS #970
+    * Add GitHub Action for continuous integration testing #966
+*[PERF] Add neighborhood cache to grids and improve iter_cell_list_contents #823
+* forest_fire: Remove unnecessary code #981
+* Migrate away from type comments #984
+* Update License #985
+* Public remove_agent function for NetworkGrid #1001
+* Date update to release #962
+* Advanced indexing of grid #820
+
+**Fixes**
+
+* Correct spelling #999
+* Update Pipfile.lock #983
+* Fix order of variable_params in model and agent vars data frames #979
+* Fix asyncio on windows with python 3.6 #973
 
 
 0.8.8 (2020-11-27) Nogales
