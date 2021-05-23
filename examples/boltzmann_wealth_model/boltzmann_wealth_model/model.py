@@ -50,7 +50,7 @@ class BoltzmannWealthModel(Model):
 
 
 class MoneyAgent(Agent):
-    """ An agent with fixed initial wealth."""
+    """An agent with fixed initial wealth."""
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
