@@ -118,7 +118,7 @@ class Grid:
 
     @staticmethod
     def default_val() -> None:
-        """ Default value for new cell elements. """
+        """Default value for new cell elements."""
         return None
 
     @overload
@@ -195,7 +195,7 @@ class Grid:
         return itertools.chain(*self.grid)
 
     def coord_iter(self) -> Iterator[Tuple[GridContent, int, int]]:
-        """ An iterator that returns coordinates as well as cell contents. """
+        """An iterator that returns coordinates as well as cell contents."""
         for row in range(self.width):
             for col in range(self.height):
                 yield self.grid[row][col], row, col  # agent, x, y
@@ -356,7 +356,7 @@ class Grid:
         return list(self.iter_neighbors(pos, moore, include_center, radius))
 
     def torus_adj(self, pos: Coordinate) -> Coordinate:
-        """ Convert coordinate, handling torus looping. """
+        """Convert coordinate, handling torus looping."""
         if not self.out_of_bounds(pos):
             return pos
         elif not self.torus:
@@ -416,35 +416,35 @@ class Grid:
         agent.pos = pos
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
-        """ Position an agent on the grid, and set its pos variable. """
+        """Position an agent on the grid, and set its pos variable."""
         self._place_agent(pos, agent)
         agent.pos = pos
 
     def _place_agent(self, pos: Coordinate, agent: Agent) -> None:
-        """ Place the agent at the correct location. """
+        """Place the agent at the correct location."""
         x, y = pos
         self.grid[x][y] = agent
         self.empties.discard(pos)
 
     def remove_agent(self, agent: Agent) -> None:
-        """ Remove the agent from the grid and set its pos variable to None. """
+        """Remove the agent from the grid and set its pos variable to None."""
         pos = agent.pos
         self._remove_agent(pos, agent)
         agent.pos = None
 
     def _remove_agent(self, pos: Coordinate, agent: Agent) -> None:
-        """ Remove the agent from the given location. """
+        """Remove the agent from the given location."""
         x, y = pos
         self.grid[x][y] = None
         self.empties.add(pos)
 
     def is_cell_empty(self, pos: Coordinate) -> bool:
-        """ Returns a bool of the contents of a cell. """
+        """Returns a bool of the contents of a cell."""
         x, y = pos
         return self.grid[x][y] == self.default_val()
 
     def move_to_empty(self, agent: Agent) -> None:
-        """ Moves agent to a random empty cell, vacating agent's old cell. """
+        """Moves agent to a random empty cell, vacating agent's old cell."""
         pos = agent.pos
         if len(self.empties) == 0:
             raise Exception("ERROR: No empty cells")
@@ -454,7 +454,7 @@ class Grid:
         self._remove_agent(pos, agent)
 
     def find_empty(self) -> Optional[Coordinate]:
-        """ Pick a random empty cell. """
+        """Pick a random empty cell."""
         from warnings import warn
         import random
 
@@ -475,12 +475,12 @@ class Grid:
             return None
 
     def exists_empty_cells(self) -> bool:
-        """ Return True if any cells empty else False. """
+        """Return True if any cells empty else False."""
         return len(self.empties) > 0
 
 
 class SingleGrid(Grid):
-    """ Grid where each cell contains exactly at most one object. """
+    """Grid where each cell contains exactly at most one object."""
 
     empties: Set[Coordinate] = set()
 
@@ -544,18 +544,18 @@ class MultiGrid(Grid):
 
     @staticmethod
     def default_val() -> Set[Agent]:
-        """ Default value for new cell elements. """
+        """Default value for new cell elements."""
         return []
 
     def _place_agent(self, pos: Coordinate, agent: Agent) -> None:
-        """ Place the agent at the correct location. """
+        """Place the agent at the correct location."""
         x, y = pos
         if agent not in self.grid[x][y]:
             self.grid[x][y].append(agent)
         self.empties.discard(pos)
 
     def _remove_agent(self, pos: Coordinate, agent: Agent) -> None:
-        """ Remove the agent from the given location. """
+        """Remove the agent from the given location."""
         x, y = pos
         self.grid[x][y].remove(agent)
         if self.is_cell_empty(pos):
@@ -907,13 +907,13 @@ class ContinuousSpace:
                 return np.array((x, y))
 
     def out_of_bounds(self, pos: FloatCoordinate) -> bool:
-        """ Check if a point is out of bounds. """
+        """Check if a point is out of bounds."""
         x, y = pos
         return x < self.x_min or x >= self.x_max or y < self.y_min or y >= self.y_max
 
 
 class NetworkGrid:
-    """ Network Grid where each node contains zero or more agents. """
+    """Network Grid where each node contains zero or more agents."""
 
     def __init__(self, G: Any) -> None:
         self.G = G
@@ -921,13 +921,13 @@ class NetworkGrid:
             G.nodes[node_id]["agent"] = list()
 
     def place_agent(self, agent: Agent, node_id: int) -> None:
-        """ Place a agent in a node. """
+        """Place a agent in a node."""
 
         self._place_agent(agent, node_id)
         agent.pos = node_id
 
     def get_neighbors(self, node_id: int, include_center: bool = False) -> List[int]:
-        """ Get all adjacent nodes """
+        """Get all adjacent nodes"""
 
         neighbors = list(self.G.neighbors(node_id))
         if include_center:
@@ -936,30 +936,30 @@ class NetworkGrid:
         return neighbors
 
     def move_agent(self, agent: Agent, node_id: int) -> None:
-        """ Move an agent from its current node to a new node. """
+        """Move an agent from its current node to a new node."""
 
         self._remove_agent(agent, agent.pos)
         self._place_agent(agent, node_id)
         agent.pos = node_id
 
     def _place_agent(self, agent: Agent, node_id: int) -> None:
-        """ Place the agent at the correct node. """
+        """Place the agent at the correct node."""
 
         self.G.nodes[node_id]["agent"].append(agent)
 
     def _remove_agent(self, agent: Agent, node_id: int) -> None:
-        """ Remove an agent from a node. """
+        """Remove an agent from a node."""
 
         self.G.nodes[node_id]["agent"].remove(agent)
 
     def remove_agent(self, agent: Agent) -> None:
-        """ Remove the agent from the network and set its pos variable to None. """
+        """Remove the agent from the network and set its pos variable to None."""
         pos = agent.pos
         self._remove_agent(agent, pos)
         agent.pos = None
 
     def is_cell_empty(self, node_id: int) -> bool:
-        """ Returns a bool of the contents of a cell. """
+        """Returns a bool of the contents of a cell."""
         return not self.G.nodes[node_id]["agent"]
 
     def get_cell_list_contents(self, cell_list: List[int]) -> List[GridContent]:

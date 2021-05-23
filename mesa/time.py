@@ -45,7 +45,7 @@ class BaseScheduler:
     """
 
     def __init__(self, model: Model) -> None:
-        """ Create a new, empty BaseScheduler. """
+        """Create a new, empty BaseScheduler."""
         self.model = model
         self.steps = 0
         self.time: TimeT = 0
@@ -79,14 +79,14 @@ class BaseScheduler:
         del self._agents[agent.unique_id]
 
     def step(self) -> None:
-        """ Execute the step of all the agents, one at a time. """
+        """Execute the step of all the agents, one at a time."""
         for agent in self.agent_buffer(shuffled=False):
             agent.step()
         self.steps += 1
         self.time += 1
 
     def get_agent_count(self) -> int:
-        """ Returns the current number of agents in the queue. """
+        """Returns the current number of agents in the queue."""
         return len(self._agents.keys())
 
     @property
@@ -139,7 +139,7 @@ class SimultaneousActivation(BaseScheduler):
     """
 
     def step(self) -> None:
-        """ Step all agents, then advance them. """
+        """Step all agents, then advance them."""
         agent_keys = list(self._agents.keys())
         for agent_key in agent_keys:
             self._agents[agent_key].step()
@@ -188,7 +188,7 @@ class StagedActivation(BaseScheduler):
         self.stage_time = 1 / len(self.stage_list)
 
     def step(self) -> None:
-        """ Executes all the stages for all agents. """
+        """Executes all the stages for all agents."""
         agent_keys = list(self._agents.keys())
         if self.shuffle:
             self.model.random.shuffle(agent_keys)

@@ -2,7 +2,7 @@ from mesa import Agent
 
 
 class PDAgent(Agent):
-    """ Agent member of the iterated, spatial prisoner's dilemma model. """
+    """Agent member of the iterated, spatial prisoner's dilemma model."""
 
     def __init__(self, pos, model, starting_move=None):
         """
@@ -28,7 +28,7 @@ class PDAgent(Agent):
         return self.move == "C"
 
     def step(self):
-        """ Get the neighbors' moves, and change own move accordingly. """
+        """Get the neighbors' moves, and change own move accordingly."""
         neighbors = self.model.grid.get_neighbors(self.pos, True, include_center=True)
         best_neighbor = max(neighbors, key=lambda a: a.score)
         self.next_move = best_neighbor.move
