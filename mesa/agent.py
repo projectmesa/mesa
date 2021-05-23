@@ -10,16 +10,16 @@ from random import Random
 
 
 class Agent:
-    """ Base class for a model agent. """
+    """Base class for a model agent."""
 
     def __init__(self, unique_id: int, model: Model) -> None:
-        """ Create a new agent. """
+        """Create a new agent."""
         self.unique_id = unique_id
         self.model = model
         self.pos = None
 
     def step(self) -> None:
-        """ A single step of the agent. """
+        """A single step of the agent."""
         pass
 
     def advance(self) -> None:

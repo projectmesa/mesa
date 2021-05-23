@@ -150,7 +150,7 @@ class FixedBatchRunner:
         return total_iterations, all_kwargs, all_param_values
 
     def run_all(self):
-        """ Run the model at all parameter combinations and store results. """
+        """Run the model at all parameter combinations and store results."""
         run_count = count()
         total_iterations, all_kwargs, all_param_values = self._make_model_args()
 
@@ -210,7 +210,7 @@ class FixedBatchRunner:
             return None
 
     def collect_model_vars(self, model):
-        """ Run reporters and collect model-level variables. """
+        """Run reporters and collect model-level variables."""
         model_vars = OrderedDict()
         for var, reporter in self.model_reporters.items():
             model_vars[var] = reporter(model)
@@ -218,7 +218,7 @@ class FixedBatchRunner:
         return model_vars
 
     def collect_agent_vars(self, model):
-        """ Run reporters and collect agent-level variables. """
+        """Run reporters and collect agent-level variables."""
         agent_vars = OrderedDict()
         for agent in model.schedule._agents.values():
             agent_record = OrderedDict()
@@ -412,7 +412,7 @@ class BatchRunner(FixedBatchRunner):
 
 
 class BatchRunnerMP(BatchRunner):
-    """ Child class of BatchRunner, extended with multiprocessing support. """
+    """Child class of BatchRunner, extended with multiprocessing support."""
 
     def __init__(self, model_cls, nr_processes=None, **kwargs):
         """Create a new BatchRunnerMP for a given model with the given
