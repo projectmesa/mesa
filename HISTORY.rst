@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-0.8.9 (2020-05-22) Oro Valley
+0.8.9 (2020-05-24) Oro Valley
 +++++++++++++++++++++++++++++++++++++++++++
 
 *Note: Master branch was renamed to Main on 03/13/2021*
