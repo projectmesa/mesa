@@ -2,36 +2,56 @@
 from mesa.space import MultiGrid
 from mesa import Model
 from mesa.time import RandomActivation
-from .agent import BarCustomer
 import numpy as np
+from el_farol.agent import BarCustomer
+from el_farol.agent import BarCustomerIBLT
 
+from mesa.datacollection import DataCollector
 
 class ElFarolBar(Model):
-    def __init__(self, num_strategies=10,memory_size = 10,width = 100,height = 100,N=100):
+    def __init__(self, crowdthreshold=60,num_strategies=10,memory_size = 10,width = 100,height = 100,N=100):
         self.running = True 
         self.num_agents = N
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(width, height, True)
-        self.attendance = 0
-        self.history = np.random.randint(0,100,size = memory_size*2)
-
+        self.history = np.random.randint(0,100,size = memory_size*2).tolist()
+        self.attendance = self.history[-1]
+        strategies = np.random.rand(num_strategies,memory_size+1,N)*2-1
         for i in range(self.num_agents):
-            
-            #self.datacollector = DataCollector(
-            #agent_reporters={"Bar": "Bar"})
-#            x,y = random.randint(0,self.grid.width-1)\
-#            ,random.randint(0,self.grid.height-1)
-#            if x>width//2 and y>height//2:
-#                if random.randint(0,1) ==0:
-#                    x = x-(width//2-1)
-#                else:
-#                    y =y-(height//2-1)
-            a = BarCustomer(i,self, num_strategies,memory_size) 
+            a = BarCustomer(i,self,memory_size,crowdthreshold,strategies[:,:,i]) 
             self.schedule.add(a)
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(a, (x, y))
-            self.grid.place_agent(a,(x,y))
-
+        self.datacollector = DataCollector(
+            model_reporters ={'Customers':"attendance"},
+            agent_reporters={"Utility": "utility"})
+        
     def step(self):
+        self.datacollector.collect(self)
+        self.attendance = 0
         self.schedule.step()
+        self.history.pop(0)
+        self.history.append(self.attendance)
+        for agent in self.schedule.agent_buffer(shuffled=False):
+            agent.update_strategies()
+        
+class ElFarolBarIBLT(Model):
+    def __init__(self, crowdthreshold=60,decay=1,memory_size = 10,width = 100,height = 100,N=100):
+        self.running = True 
+        self.num_agents = N
+        self.schedule = RandomActivation(self)
+        self.grid = MultiGrid(width, height, True)
+        self.history = np.random.randint(0,100,size = memory_size*2).tolist()
+        self.attendance = self.history[0]
+        for i in range(self.num_agents):
+            a = BarCustomerIBLT(i,self,decay,crowdthreshold) 
+            self.schedule.add(a)
+        self.datacollector = DataCollector(
+            model_reporters ={'Customers':"attendance"},
+            agent_reporters={"Utility": "utility"})
+    def step(self):
+        self.datacollector.collect(self)
+        self.attendance = 0
+        self.schedule.step()
+        self.history.pop(0)
+        self.history.append(self.attendance)
+        for agent in self.schedule.agent_buffer(shuffled=False):
+            agent.update_strategies()
