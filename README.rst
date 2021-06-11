@@ -107,3 +107,10 @@ If you would like to add a feature, please reach out via `ticket`_ or the `dev e
 .. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
 .. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.rst
 .. _`Github` : https://github.com/projectmesa/mesa/
+
+Citing Mesa
+----------------------------
+
+To cite Mesa in your publication, you can use the `CITATION.bib`_.
+
+.. _`CITATION.bib` : https://github.com/projectmesa/mesa/blob/main/CITATION.bib
