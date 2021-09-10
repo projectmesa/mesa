@@ -15,4 +15,6 @@ Launch the model: Please check el_farol.ipynb for more information
 ## Further Reading
 
 [1] Kumar, Shikhar, and Cleotilde Gonzalez. "Heterogeneity of Memory Decay and Collective Learning in the El Farol Bar Problem." (2016).
+
+
 =======
