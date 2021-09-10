@@ -1,7 +1,7 @@
 # El Farol
 
-An implementation of El Farol restaurant model. Agents (simulated restaurant customers) try to make decision based on their memory and reward from previous trials. 
-It also demonstrates how to deploy a cognitive model with the mesa environment. A cognitive modeling was used from PyIBL package to replicate research paper [1]
+An implementation of El Farol restaurant model. Agents (simulated restaurant customers) try to decide whether to go to the restaurant or not based on their memory and reward from previous trials. 
+It also demonstrates how to deploy a cognitive model under the mesa environment. A cognitive modeling was used from the PyIBL package to replicate the research paper [1]
 
 ## How to Run
 
@@ -16,5 +16,6 @@ Launch the model: Please check el_farol.ipynb for more information
 
 [1] Kumar, Shikhar, and Cleotilde Gonzalez. "Heterogeneity of Memory Decay and Collective Learning in the El Farol Bar Problem." (2016).
 
-
 =======
+
+

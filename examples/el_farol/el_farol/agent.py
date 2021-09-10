@@ -13,7 +13,6 @@ class BarCustomer(Agent):
         self.utility = 0 
         self.update_strategies()
 
-    #need to add step method here, to activate make_decision
     def step(self):
         prediction = self.predict_attendance(self.best_strategy,self.model.history[-self.memory_size:])
         #print(prediction)
@@ -45,6 +44,7 @@ class BarCustomer(Agent):
         #print(strategy[1:],subhistory,strategy[0],strategy[0]*100+ sum(strategy[1:]*subhistory))
         return strategy[0]*100+ sum(strategy[1:]*subhistory)
 
+
 class BarCustomerIBLT(Agent):
     def __init__(self, unique_id, model,decay,crowdthreshold):
         super().__init__(unique_id, model)
@@ -52,10 +52,11 @@ class BarCustomerIBLT(Agent):
         self.agent.default_utility=10
         self.attend = False
         self.utility = 0
+        self.decay = decay
         self.crowdthreshold = crowdthreshold
         self.step()
         self.update_strategies()
-    
+        
     def step(self):
         choise = self.agent.choose('Attend','Not Attend')
         if choise =='Attend':
