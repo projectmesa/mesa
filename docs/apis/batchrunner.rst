@@ -1,5 +1,2 @@
-Batchrunner
------------
-
 .. automodule:: batchrunner
    :members:
