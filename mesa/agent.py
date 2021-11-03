@@ -14,7 +14,7 @@ class Agent:
 
     def __init__(self, unique_id: int, model: Model) -> None:
         """Create a new agent.
-        
+
         Args:
             unique_id (int): A unique numeric identified for the agent
             model: (Model): Instance of the model that contains the agent
