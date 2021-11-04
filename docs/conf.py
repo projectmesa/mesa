@@ -58,7 +58,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "Mesa"
-copyright = "2016, Project Mesa Team"
+copyright = "2015-2021, Project Mesa Team"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -92,7 +92,13 @@ exclude_patterns = ["_build"]
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-# add_module_names = True
+add_module_names = False
+
+# Sort members by the order in the source files instead of alphabetically
+autodoc_member_order = 'bysource'
+
+# Show both the class-level docstring and the constructor docstring
+autoclass_content = 'both'
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
