@@ -116,7 +116,9 @@ class Grid:
     def __getitem__(
         self,
         index: Union[
-            int, Sequence[Coordinate], Tuple[Union[int, slice], Union[int, slice]],
+            int,
+            Sequence[Coordinate],
+            Tuple[Union[int, slice], Union[int, slice]],
         ],
     ) -> Union[GridContent, List[GridContent]]:
         """Access contents from the grid."""

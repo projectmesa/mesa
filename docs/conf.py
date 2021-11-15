@@ -95,10 +95,10 @@ exclude_patterns = ["_build"]
 add_module_names = False
 
 # Sort members by the order in the source files instead of alphabetically
-autodoc_member_order = 'bysource'
+autodoc_member_order = "bysource"
 
 # Show both the class-level docstring and the constructor docstring
-autoclass_content = 'both'
+autoclass_content = "both"
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
