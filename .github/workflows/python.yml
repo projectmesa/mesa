@@ -69,6 +69,6 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies
       run: pip install .[dev]
-    - run: pip install black
+    - run: pip install black black[jupyter]
     - name: Lint with black
       run: black --check --exclude=mesa/cookiecutter-mesa/* .
