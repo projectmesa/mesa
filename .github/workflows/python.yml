@@ -42,8 +42,9 @@ jobs:
       run: pip install .[dev]
     - name: Test with pytest
       run: pytest --cov=mesa tests/ --cov-report=xml
-    - name: Codecov
-      uses: codecov/codecov-action@v1.0.15
+    - if: matrix.os == 'ubuntu'
+      name: Codecov
+      uses: codecov/codecov-action@v2
 
   lint-flake:
     runs-on: ubuntu-latest
