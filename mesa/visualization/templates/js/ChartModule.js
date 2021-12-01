@@ -50,21 +50,21 @@ var ChartModule = function(series, canvas_width, canvas_height) {
             intersect: true
         },
         scales: {
-            xAxes: [{
+            x: {
                 display: true,
-                scaleLabel: {
+                title: {
                     display: true
                 },
                 ticks: {
                     maxTicksLimit: 11
                 }
-            }],
-            yAxes: [{
+            },
+            y: {
                 display: true,
-                scaleLabel: {
+                title: {
                     display: true
                 }
-            }]
+            }
         }
     };
 
