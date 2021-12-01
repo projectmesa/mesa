@@ -569,7 +569,7 @@ class HexGrid(Grid):
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
         get_neighborhood: Returns the cells surrounding a given cell.
-        neighbor_iter: Iterates over position neighbours.
+        neighbor_iter: Iterates over position neighbors.
         iter_neighborhood: Returns an iterator over cell coordinates that are
             in the neighborhood of a certain point.
 
