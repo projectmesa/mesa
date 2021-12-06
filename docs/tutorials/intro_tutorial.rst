@@ -16,7 +16,7 @@ bugs, or just find something unclear or confusing, `let us
 know <https://github.com/projectmesa/mesa/issues>`__!
 
 The base for this tutorial is a very simple model of agents exchanging
-money. Next, we add *space* to allow agents move. Then, we'll cover two
+money. Next, we add *space* to allow agents to move. Then, we'll cover two
 of Mesa's analytic tools: the *data collector* and *batch runner*. After
 that, we'll add an *interactive visualization* which lets us watch the
 model as it runs. Finally, we go over how to write your own
