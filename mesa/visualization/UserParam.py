@@ -57,7 +57,7 @@ class UserSettableParameter:
         description=None,
     ):
         if param_type not in self.TYPES:
-            raise ValueError("{} is not a valid Option type".format(param_type))
+            raise ValueError(f"{param_type} is not a valid Option type")
         self.param_type = param_type
         self.name = name
         self._value = value

@@ -428,7 +428,7 @@ class BatchRunnerMP(BatchRunner):
             # identify the number of processors available on users machine
             available_processors = cpu_count()
             self.processes = available_processors
-            print("BatchRunner MP will use {} processors.".format(self.processes))
+            print(f"BatchRunner MP will use {self.processes} processors.")
         else:
             self.processes = nr_processes
 
