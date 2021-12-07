@@ -14,7 +14,7 @@ from mesa import Agent
 class RandomWalker(Agent):
     """
     Class implementing random walker methods in a generalized manner.
-    Not indended to be used on its own, but to inherit its methods to multiple
+    Not intended to be used on its own, but to inherit its methods to multiple
     other agents.
     """
 

@@ -27,7 +27,7 @@ Simple cellular automata of a fire spreading through a forest of cells on a grid
 Conway's game of life on a hexagonal grid.
 
 ### pd_grid
-Grid-based demographic prisoner's dilemma model, demonstrating how simple mimicing can lead to the emergence of widespread cooperation -- and how a model activation regime can change its outcome.
+Grid-based demographic prisoner's dilemma model, demonstrating how simple rules can lead to the emergence of widespread cooperation -- and how a model activation regime can change its outcome.
 
 ### schelling (GUI and Text)
 Mesa implementation of the classic [Schelling segregation model](http://nifty.stanford.edu/2014/mccown-schelling-model-segregation/).
