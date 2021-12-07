@@ -14,12 +14,12 @@ class BarChartModule(VisualizationElement):
         with a bar chart.
 
     Attributes:
-        scope: wheter to visualize agent-level or model-level fields
+        scope: whether to visualize agent-level or model-level fields
         fields: A List of Dictionaries containing information about each field to be charted,
                 including the name of the datacollector field and the desired color of the
-                cooresponding bar.
+                corresponding bar.
                 Ex: [{"Label":"<your field name>", "Color":"<your desired color in hex>"}]
-        sorting: Wheter to sort ascending, descending, or neither when charting agent fields
+        sorting: Whether to sort ascending, descending, or neither when charting agent fields
         sort_by: The agent field to sort by
         canvas_height, canvas_width: The width and height to draw the chart on the page, in pixels.
                                     Default to 800 x 400
@@ -47,7 +47,7 @@ class BarChartModule(VisualizationElement):
                    fields.
             fields: A List of Dictionaries containing information about each field to be charted,
                     including the name of the datacollector field and the desired color of the
-                    cooresponding bar.
+                    corresponding bar.
                     Ex: [{"Label":"<your field name>", "Color":"<your desired color in hex>"}]
             sorting: "ascending", "descending", or "none"
             sort_by: The agent field to sort by
