@@ -2,7 +2,7 @@
 
 ## Summary
 
-In this model, each dead cell will become alive if it has exactly one neighbor. Alive cells stay alive forever.  
+In this model, each dead cell will become alive if it has exactly one neighbor. Alive cells stay alive forever.
 
 
 ## How to Run

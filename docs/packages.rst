@@ -37,7 +37,7 @@ User Guide
 
 **Step 1: Select a package**
 
-Currently, a central list of compatible packages is located on the `Mesa Wiki Packages Page <https://github.com/projectmesa/mesa/wiki/Mesa-Packages>`_. 
+Currently, a central list of compatible packages is located on the `Mesa Wiki Packages Page <https://github.com/projectmesa/mesa/wiki/Mesa-Packages>`_.
 
 **Step 2: Establish an environment**
 

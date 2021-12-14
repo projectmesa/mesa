@@ -2,7 +2,7 @@
 
 ## Summary
 
-A highly abstracted, simplified model of an economy, with only one type of agent and a single bank representing all banks in an economy. People (represented by circles) move randomly within the grid. If two or more people are on the same grid location, there is a 50% chance that they will trade with each other. If they trade, there is an equal chance of giving the other agent $5 or $2. A positive trade balance will be deposited in the bank as savings. If trading results in a negative balance, the agent will try to withdraw from its savings to cover the balance. If it does not have enough savings to cover the negative balance, it will take out a loan from the bank to cover the difference. The bank is required to keep a certain percentage of deposits as reserves. If run.py is used to run the model, then the percent of deposits the bank is required to retain is a user settable parameter. The amount the bank is able to loan at any given time is a function of the amount of deposits, its reserves, and its current total outstanding loan amount. 
+A highly abstracted, simplified model of an economy, with only one type of agent and a single bank representing all banks in an economy. People (represented by circles) move randomly within the grid. If two or more people are on the same grid location, there is a 50% chance that they will trade with each other. If they trade, there is an equal chance of giving the other agent $5 or $2. A positive trade balance will be deposited in the bank as savings. If trading results in a negative balance, the agent will try to withdraw from its savings to cover the balance. If it does not have enough savings to cover the negative balance, it will take out a loan from the bank to cover the difference. The bank is required to keep a certain percentage of deposits as reserves. If run.py is used to run the model, then the percent of deposits the bank is required to retain is a user settable parameter. The amount the bank is able to loan at any given time is a function of the amount of deposits, its reserves, and its current total outstanding loan amount.
 
 The model demonstrates the following Mesa features:
  - MultiGrid for creating shareable space for agents
@@ -32,7 +32,7 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/), sele
 
 ## Batch Run
 
-To run the model as a batch run to collect data on multiple combinations of model parameters, run "batch_run.py" in this directory. 
+To run the model as a batch run to collect data on multiple combinations of model parameters, run "batch_run.py" in this directory.
 
 ```
     $ python batch_run.py
@@ -48,7 +48,7 @@ To update the parameters to test other parameter sweeps, edit the list of parame
 * ``bank_reserves/model.py``: Defines the Bank Reserves model and the DataCollector functions.
 * ``bank_reserves/server.py``: Sets up the interactive visualization server.
 * ``run.py``: Launches a model visualization server.
-* ``batch_run.py``: Basically the same as model.py, but includes a Mesa BatchRunner. The result of the batch run will be a .csv file with the data from every step of every run. 
+* ``batch_run.py``: Basically the same as model.py, but includes a Mesa BatchRunner. The result of the batch run will be a .csv file with the data from every step of every run.
 
 ## Further Reading
 
