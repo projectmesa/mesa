@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import re
 
 from setuptools import setup, find_packages
@@ -13,7 +12,7 @@ extras_require = {
 }
 
 version = ""
-with open("mesa/__init__.py", "r") as fd:
+with open("mesa/__init__.py") as fd:
     version = re.search(
         r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE
     ).group(1)
