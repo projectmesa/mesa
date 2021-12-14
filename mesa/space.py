@@ -623,8 +623,7 @@ class HexGrid(Grid):
         if not include_center and pos in coordinates:
             coordinates.remove(pos)
 
-        for i in coordinates:
-            yield i
+        yield from coordinates
 
     def neighbor_iter(self, pos: Coordinate) -> Iterator[GridContent]:
         """Iterate over position neighbors.

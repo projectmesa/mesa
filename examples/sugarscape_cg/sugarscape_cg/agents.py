@@ -47,12 +47,12 @@ class SsAgent(Agent):
         ]
         neighbors.append(self.pos)
         # Look for location with the most sugar
-        max_sugar = max([self.get_sugar(pos).amount for pos in neighbors])
+        max_sugar = max(self.get_sugar(pos).amount for pos in neighbors)
         candidates = [
             pos for pos in neighbors if self.get_sugar(pos).amount == max_sugar
         ]
         # Narrow down to the nearest ones
-        min_dist = min([get_distance(self.pos, pos) for pos in candidates])
+        min_dist = min(get_distance(self.pos, pos) for pos in candidates)
         final_candidates = [
             pos for pos in candidates if get_distance(self.pos, pos) == min_dist
         ]
