@@ -11,7 +11,7 @@ from typing import Any, Optional
 
 
 class Model:
-    """ Base class for models. """
+    """Base class for models."""
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """Create a new model object and instantiate its RNG automatically."""
@@ -42,11 +42,11 @@ class Model:
             self.step()
 
     def step(self) -> None:
-        """ A single step. Fill in here. """
+        """A single step. Fill in here."""
         pass
 
     def next_id(self) -> int:
-        """ Return the next unique ID for agents, increment current_id"""
+        """Return the next unique ID for agents, increment current_id"""
         self.current_id += 1
         return self.current_id
 

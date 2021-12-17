@@ -16,7 +16,7 @@ def network_portrayal(G):
             "color": "#CC0000" if not agents or agents[0].wealth == 0 else "#007959",
             "label": None
             if not agents
-            else "Agent:{} Wealth:{}".format(agents[0].unique_id, agents[0].wealth),
+            else f"Agent:{agents[0].unique_id} Wealth:{agents[0].wealth}",
         }
         for (node_id, agents) in G.nodes.data("agent")
     ]

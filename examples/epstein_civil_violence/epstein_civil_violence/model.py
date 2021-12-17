@@ -15,7 +15,7 @@ class EpsteinCivilViolence(Model):
         height: grid height
         width: grid width
         citizen_density: approximate % of cells occupied by citizens.
-        cop_density: approximate % of calles occupied by cops.
+        cop_density: approximate % of cells occupied by cops.
         citizen_vision: number of cells in each direction (N, S, E and W) that
             citizen can inspect
         cop_vision: number of cells in each direction (N, S, E and W) that cop

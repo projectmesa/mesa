@@ -42,17 +42,17 @@ class TextVisualization:
     """
 
     def __init__(self, model):
-        """ Create a new Text Visualization object. """
+        """Create a new Text Visualization object."""
         self.model = model
         self.elements = []
 
     def render(self):
-        """ Render all the text elements, in order. """
+        """Render all the text elements, in order."""
         for element in self.elements:
             print(element)
 
     def step(self):
-        """ Advance the model by a step and print the results. """
+        """Advance the model by a step and print the results."""
         self.model.step()
         self.render()
 
@@ -69,7 +69,7 @@ class TextElement:
         pass
 
     def render(self):
-        """ Render the element as text. """
+        """Render the element as text."""
         return "Placeholder!"
 
     def __str__(self):
@@ -77,10 +77,10 @@ class TextElement:
 
 
 class TextData(TextElement):
-    """ Prints the value of one particular variable from the base model. """
+    """Prints the value of one particular variable from the base model."""
 
     def __init__(self, model, var_name):
-        """ Create a new data renderer. """
+        """Create a new data renderer."""
         self.model = model
         self.var_name = var_name
 
@@ -115,7 +115,7 @@ class TextGrid(TextElement):
         self.converter = converter
 
     def render(self):
-        """ What to show when printed. """
+        """What to show when printed."""
         viz = ""
         for y in range(self.grid.height):
             for x in range(self.grid.width):

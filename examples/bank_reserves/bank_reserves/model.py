@@ -26,7 +26,7 @@ For details see batch_run.py in the same directory as run.py.
 
 
 def get_num_rich_agents(model):
-    """ return number of rich agents"""
+    """return number of rich agents"""
 
     rich_agents = [a for a in model.schedule.agents if a.savings > model.rich_threshold]
     return len(rich_agents)

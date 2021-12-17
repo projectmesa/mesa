@@ -15,7 +15,7 @@ Mesa: Agent-based modeling in Python 3+
 It allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python 3-based alternative to NetLogo, Repast, or MASON.
 
 
-.. image:: https://github.com/projectmesa/mesa/blob/main/docs/images/Mesa_Screenshot.png
+.. image:: https://raw.githubusercontent.com/projectmesa/mesa/main/docs/images/Mesa_Screenshot.png
    :width: 100%
    :scale: 100%
    :alt: A screenshot of the Schelling Model in Mesa
@@ -107,3 +107,10 @@ If you would like to add a feature, please reach out via `ticket`_ or the `dev e
 .. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
 .. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.rst
 .. _`Github` : https://github.com/projectmesa/mesa/
+
+Citing Mesa
+----------------------------
+
+To cite Mesa in your publication, you can use the `CITATION.bib`_.
+
+.. _`CITATION.bib` : https://github.com/projectmesa/mesa/blob/main/CITATION.bib

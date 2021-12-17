@@ -17,7 +17,7 @@ class NetworkModule(VisualizationElement):
         library_types = ["sigma", "d3"]
         if library not in library_types:
             raise ValueError(
-                "Invalid javascript library type. Expected one of: %s" % library_types
+                f"Invalid javascript library type. Expected one of: {library_types}"
             )
 
         NetworkModule.package_includes = (
@@ -29,9 +29,7 @@ class NetworkModule(VisualizationElement):
         self.portrayal_method = portrayal_method
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
-        new_element = "new NetworkModule({}, {})".format(
-            self.canvas_width, self.canvas_height
-        )
+        new_element = f"new NetworkModule({self.canvas_width}, {self.canvas_height})"
         self.js_code = "elements.push(" + new_element + ");"
 
     def render(self, model):
