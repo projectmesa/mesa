@@ -18,6 +18,9 @@ class TestExamples(unittest.TestCase):
     """
 
     EXAMPLES = os.path.abspath(os.path.join(os.path.dirname(__file__), "../examples"))
+    EXCEPTIONS = ["el_farol"]
+    # Exceptions contains examples not being tested.
+    # One package used in el_farol cannot be installed by pip, so it is excluded for testing.
 
     @contextlib.contextmanager
     def active_example_dir(self, example):
@@ -40,7 +43,10 @@ class TestExamples(unittest.TestCase):
 
     def test_examples(self):
         for example in os.listdir(self.EXAMPLES):
-            if not os.path.isdir(os.path.join(self.EXAMPLES, example)):
+            if (
+                not os.path.isdir(os.path.join(self.EXAMPLES, example))
+                or example in self.EXCEPTIONS
+            ):
                 continue
             if hasattr(self, f"test_{example.replace('-', '_')}"):
                 # non-standard example; tested below

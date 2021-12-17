@@ -2,13 +2,21 @@ from mesa.space import MultiGrid
 from mesa import Model
 from mesa.time import RandomActivation
 import numpy as np
-from agents import BarCustomer
-from agents import BarCustomerIBLT
+from .agents import BarCustomer
+from .agents import BarCustomerIBLT
 from mesa.datacollection import DataCollector
 
 
 class ElFarolBar(Model):
-    def __init__(self, crowdthreshold=60, num_strategies=10, memory_size=10, width=100, height=100, N=100):
+    def __init__(
+        self,
+        crowdthreshold=60,
+        num_strategies=10,
+        memory_size=10,
+        width=100,
+        height=100,
+        N=100,
+    ):
         self.running = True
         self.num_agents = N
         self.schedule = RandomActivation(self)
@@ -20,8 +28,9 @@ class ElFarolBar(Model):
             a = BarCustomer(i, self, memory_size, crowdthreshold, strategies[:, :, i])
             self.schedule.add(a)
         self.datacollector = DataCollector(
-            model_reporters={'Customers': "attendance"},
-            agent_reporters={"Utility": "utility", "Attendance": "attend"})
+            model_reporters={"Customers": "attendance"},
+            agent_reporters={"Utility": "utility", "Attendance": "attend"},
+        )
 
     def step(self):
         self.datacollector.collect(self)
@@ -34,7 +43,15 @@ class ElFarolBar(Model):
 
 
 class ElFarolBarIBLT(Model):
-    def __init__(self, crowdthreshold=60, decay={1: 1}, memory_size=10, width=100, height=100, N=100):
+    def __init__(
+        self,
+        crowdthreshold=60,
+        decay={1: 1},
+        memory_size=10,
+        width=100,
+        height=100,
+        N=100,
+    ):
         self.running = True
         self.num_agents = N
         self.schedule = RandomActivation(self)
@@ -48,8 +65,13 @@ class ElFarolBarIBLT(Model):
                 self.schedule.add(a)
                 i += 1
         self.datacollector = DataCollector(
-            model_reporters={'Customers': "attendance"},
-            agent_reporters={"Utility": "utility", "Decay": "decay", "Attendance": "attend"})
+            model_reporters={"Customers": "attendance"},
+            agent_reporters={
+                "Utility": "utility",
+                "Decay": "decay",
+                "Attendance": "attend",
+            },
+        )
 
     def step(self):
         self.datacollector.collect(self)

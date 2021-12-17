@@ -1,4 +1,3 @@
-pyibl
 jupyter
 matplotlib
 mesa
