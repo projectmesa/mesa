@@ -26,7 +26,7 @@ every step of every run.
 from bank_reserves.agents import Bank, Person
 import itertools
 from mesa import Model
-from mesa.batchrunner import BatchRunner
+from mesa.batchrunner import batch_run
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 from mesa.time import RandomActivation
@@ -148,7 +148,7 @@ class BankReservesModel(Model):
                 "Model Params": track_params,
                 "Run": track_run,
             },
-            agent_reporters={"Wealth": lambda x: x.wealth},
+            agent_reporters={"Wealth": "wealth"},
         )
 
         # create a single bank for the model
@@ -181,21 +181,31 @@ class BankReservesModel(Model):
 
 # parameter lists for each parameter to be tested in batch run
 br_params = {
-    "init_people": [25, 100, 150, 200],
-    "rich_threshold": [5, 10, 15, 20],
-    "reserve_percent": [0, 50, 100],
+    "init_people": [25, 100],
+    "rich_threshold": [5, 10],
+    "reserve_percent": 5,
 }
 
-br = BatchRunner(
+"""br = BatchRunner(
     BankReservesModel,
     br_params,
-    iterations=1,
+    iterations=2,
     max_steps=1000,
-    model_reporters={"Data Collector": lambda m: m.datacollector},
-)
+    nr_processes=None,
+    # model_reporters={"Data Collector": lambda m: m.datacollector},
+)"""
 
 if __name__ == "__main__":
-    br.run_all()
+    data = batch_run(
+        BankReservesModel,
+        br_params,
+        model_reporters={"Rich": get_num_rich_agents},
+        agent_reporters={"Wealth": "wealth"},
+    )
+    br_df = pd.DataFrame(data)
+    br_df.to_csv("BankReservesModel_Data.csv")
+    # br.run_all()
+    """
     br_df = br.get_model_vars_dataframe()
     br_step_data = pd.DataFrame()
     for i in range(len(br_df["Data Collector"])):
@@ -203,3 +213,4 @@ if __name__ == "__main__":
             i_run_data = br_df["Data Collector"][i].get_model_vars_dataframe()
             br_step_data = br_step_data.append(i_run_data, ignore_index=True)
     br_step_data.to_csv("BankReservesModel_Step_Data.csv")
+    """
