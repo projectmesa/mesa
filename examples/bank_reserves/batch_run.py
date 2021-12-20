@@ -186,15 +186,6 @@ br_params = {
     "reserve_percent": 5,
 }
 
-"""br = BatchRunner(
-    BankReservesModel,
-    br_params,
-    iterations=2,
-    max_steps=1000,
-    nr_processes=None,
-    # model_reporters={"Data Collector": lambda m: m.datacollector},
-)"""
-
 if __name__ == "__main__":
     data = batch_run(
         BankReservesModel,
@@ -204,8 +195,20 @@ if __name__ == "__main__":
     )
     br_df = pd.DataFrame(data)
     br_df.to_csv("BankReservesModel_Data.csv")
-    # br.run_all()
+
+    # The commented out code below is the equivalent code as above, but done
+    # via the legacy BatchRunner class. This is a good example to look at if
+    # you want to migrate your code to use `batch_run()` from `BatchRunner`.
     """
+    br = BatchRunner(
+        BankReservesModel,
+        br_params,
+        iterations=2,
+        max_steps=1000,
+        nr_processes=None,
+        # model_reporters={"Data Collector": lambda m: m.datacollector},
+    )
+    br.run_all()
     br_df = br.get_model_vars_dataframe()
     br_step_data = pd.DataFrame()
     for i in range(len(br_df["Data Collector"])):
