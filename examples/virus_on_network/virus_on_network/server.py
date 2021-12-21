@@ -27,11 +27,7 @@ def network_portrayal(G):
         return 2
 
     def get_agents(source, target):
-<<<<<<< HEAD
-        return G.nodes[source]['agent'][0], G.nodes[target]['agent'][0]
-=======
         return G.nodes[source]["agent"][0], G.nodes[target]["agent"][0]
->>>>>>> cda0495a4c7ca9656cbefd393d9a085b7cbf3367
 
     portrayal = dict()
     portrayal["nodes"] = [

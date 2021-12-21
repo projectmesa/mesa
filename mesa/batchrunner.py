@@ -172,10 +172,15 @@ def _model_run_func(
     for step in steps:
         model_data, all_agents_data = _collect_data(model, step)
 
-        stepdata = [
-            {**{"Step": step}, **kwargs, **model_data, **agent_data}
-            for agent_data in all_agents_data
-        ]
+        if all_agents_data:
+            stepdata = [
+                {**{"Step": step}, **kwargs, **model_data, **agent_data}
+                for agent_data in all_agents_data
+            ]
+        else:
+            stepdata = [
+                {**{"Step": step}, **kwargs, **model_data}
+            ]
         data.extend(stepdata)
 
     return tuple(kwargs.values()), data
