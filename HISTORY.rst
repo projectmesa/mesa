@@ -3,6 +3,153 @@
 Release History
 ---------------
 
+0.8.9 (2020-05-24) Oro Valley
++++++++++++++++++++++++++++++++++++++++++++
+
+*Note: Master branch was renamed to Main on 03/13/2021*
+
+**Improvements**
+
+* Master to Main change:
+    * Docs/examples: Update links to use main instead of master as branch #1012
+    * CI: Run on pushed to main and release branches #1011
+* Github Actions
+    * GitHub Actions: run black only on ubuntu 3.8 #996
+    * GA: Only run CI when pushed to master #974
+    * GA: Add pypy3 #972
+    * rename github action to "build", remove redundant flake8 check #971
+    * GA: Run on Windows and macOS #970
+    * Add GitHub Action for continuous integration testing #966
+* [PERF] Add neighborhood cache to grids and improve iter_cell_list_contents #823
+* forest_fire: Remove unnecessary code #981
+* Migrate away from type comments #984
+* Update License #985
+* Public remove_agent function for NetworkGrid #1001
+* Date update to release #962
+* Advanced indexing of grid #820
+
+**Fixes**
+
+* Correct spelling #999
+* Update Pipfile.lock #983
+* Fix order of variable_params in model and agent vars data frames #979
+* Fix asyncio on windows with python 3.6 #973
+
+
+0.8.8 (2020-11-27) Nogales
++++++++++++++++++++++++++++++++++++++++++++
+
+*Note: This is the last version to support Python 3.5.*
+
+**Improvements**
+
+* Added pre-commit to automatically maintain a standard formatting with black #732
+
+**Fixes**
+
+* MultiGrid: Set to using list for cell content #783
+* Docs
+    * Fixed broken link to templates list in advanced tutorial. #833
+    * Fixed image links in rst #838
+    * Cleaned html to attempt correct build #839
+    * Fixed links on Boltzmann model #843
+    * Documentation update - batchrunner & data collector #870
+    * Deleted readthedocs.yml #946
+    * Doc builds #837, #840, #844, #941, #942
+* Fixed bulleted list in contribution read me #836
+* Updated test_examples.py, changed unused generator expression to actually run the models. #829
+* Fixed #827 issue (example Epstein Civil Violence Jupyter Notebook typos) #828
+* Eliminated Ipython3 references #841
+* Fixed cookie cutter Fixes #850. #853
+* Removed relative imports -- fix #855. #863
+* Updated pytest requirement to fix issues on travis #864
+* Made linux compatible - travis #886
+* Fixed python 3.5 fails, boid failure #889, #898
+* Travis: Removed python 3.5 #899
+* Fixed example testing issues close multiprocess pools #890
+* Used ordered dict to make compatible with python 3.5 #892
+* Increased number of test to fix codecov patch #916
+* Fixed for #919, adding an exception for duplicate ids. #920
+* Batchrunner
+    * Batch runner redux #917
+    * Fixed empty/None `variable_parameters` argument to BatchRunner (#861) #862
+    * Added ordereddict to BatchrunerMP for python 3.5 #893
+    * Fixed python 3.5 fails bathrunnerMP (multiple tries) #897, #896, #895
+    * Batchrunner_redux fixes #928
+* Fixed variables names, mp function locations, datacollector #933
+* ModularServer updated: Fix EventLoop and changes to default port #936
+* Ran black 20.8b1, which formats docstrings #951
+
+
+
+0.8.7 (2020-05-05) Mammoth
++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Enable BatchRunner to run specified set of parameter combinations #651 (#607)
+* Restructured runcontrol.js #661
+* Add pipenv support for mesa #678
+* Increase test coverage and change to codecov #692
+* Updates Travis to explicitly set the dist to be Xenial #699
+* time: Remove resolved TODO on random seed of random scheduler #708
+* hex_snowflake: Update description to be more informative #712
+* Added Coverall to Codecov in Contributing file #734
+* Makes opening the browser optional when launching the server #755 #754
+* NetworkGrid: Update to networkx 2.4 API #763
+* Apply black to mesa/ directory #775
+* Updated travis to 3.8 and updated gitignore #777
+* Add information (to docstring) on image as agent portrayal shape #791
+* Change grid empties from list to set #649 (improves speed)
+* Adding mypy annotation
+    * space: Add type annotation to Grid class #779
+    * add Mypy annotation to time, agent, and model #792
+    * space: Add mypy annotation to the remaining methods/functions #796
+* Docs related
+    * Bulk merge of docs from 'docs' to 'master' #684
+    * Created useful snippets code section in the docs #668 #669
+        * Updating index.rst #672
+        * Clarify runserver snippet in index.rst #682
+    * Add documentation for feature (pipenv) added in #678 #683
+    * Add docs for BatchRunner to support Variable and Fixed Parameter Contribution #679 #683
+        * Resources #651 in docs branch #691. This preps for #683 to be merged.
+    * intro tutorial: Clarify a function that is not defined in the class #705
+    * Updates formatting the readme Docs markdown #737
+* Examples related
+    * Schelling: Separate text-only viz into run_ascii.py #706
+    * examples/Readme.md: Update description to be consistent with the folder names #707
+
+**Fixes**
+
+* Fixes link to update code coverage module - Updates Removing last link to coveralls and replacing to codecoverage #748
+* Fixes D3 Network Visualization to update (rather than overwrite) #765 #767
+* Fix parameter order in initializing SingleGrid object #770 #769
+* Updating pipenv link #773
+* Fixed pip install from github by specifying egg #802
+* Compatibility fixes
+    * Fixes VisualizationServer to be compatible with recent versions of Tornado #655
+    * Fixes #749 networkx incompatibility #750
+* Fixing typos
+    * Fixes documentation typos in example code #695 #696
+    * Fixes typo in ModularServer's last parameter #711
+    * Fixed typo in BarChartModule line 100 #747
+    * Fix typo in documentation #809
+* Doc fixes (not relating to typos)
+    * Update tutorial to point to correct repo location #671 #670
+    * Updating sphinx and reverting issues #674 #675 #677 #681
+    * Fixes code blocks that weren't showing up in the tutorial #686
+    * Remove figure from advanced tutorial showing the empty visualization #729
+    * Removes git clone from tutorial - Update intro_tutorial.rst #730
+    * Fixes citation links in docs tutorial section #736
+    * Fix histogram in advanced tutorial #794 #610
+    * Fixes Advanced Tutorial #elements #804 #803
+* Fixes to examples
+    * Fixing test_random_walk bug - wolf sheep. #821
+    * Fixes shape_example server launch #762 #756
+    * Fixing broken table in pd_grid example #824
+
+
+
 0.8.6 (2019-05-02) Lake Havasu City
 +++++++++++++++++++++++++++++++++++++++++++
 
@@ -363,20 +510,20 @@ Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 * Fixes: Order of operations reversed: agent is removed first and then it is placed.
 * Improvement: `LICENSE`_ was updates from MIT to Apache 2.0.
 
-.. _`LICENSE` : https://github.com/projectmesa/mesa/blob/master/LICENSE
+.. _`LICENSE` : https://github.com/projectmesa/mesa/blob/main/LICENSE
 
 
 0.6.0 (2015-06-21)
 ++++++++++++++++++
 
-* Improvment: Add modular server feature, which breaks up a model into a .py file and a .js file. This breaks backwards compatibility.
+* Improvement: Add modular server feature, which breaks up a model into a .py file and a .js file. This breaks backwards compatibility.
 
 Pre 0.6.0
 ++++++++++++++++++
 
 Code that is pre-0.6.0 is very unstable.
 
-Our inital release was 0.5.0 (2014-11).
+Our initial release was 0.5.0 (2014-11).
 
 It included code for placing agents on a grid; a data collector and batch runner; and a front-end visualization using HTML 5 and JavaScript.
 

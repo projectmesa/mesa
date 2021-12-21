@@ -43,6 +43,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+.pytest_cache/
 
 # Translations
 *.mo
@@ -65,7 +66,18 @@ target/
 
 # PyCharm environment files
 .idea/
+
+# VSCode environment files
 .vscode/
+*.code-workspace
 
 # Apple OSX
 *.DS_Store
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# pythonenv
+pythonenv*/

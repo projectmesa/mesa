@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Modular Canvas Rendering
 ========================
@@ -11,7 +10,7 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class CanvasHexGrid(VisualizationElement):
-    """ A CanvasHexGrid object functions similarly to a CanvasGrid object. It takes a portrayal dictionary and talks to HexDraw.js to draw that shape.
+    """A CanvasHexGrid object functions similarly to a CanvasGrid object. It takes a portrayal dictionary and talks to HexDraw.js to draw that shape.
 
     A portrayal as a dictionary with the following structure:
         "x", "y": Coordinates for the cell in which the object is placed.
@@ -39,14 +38,21 @@ class CanvasHexGrid(VisualizationElement):
         template: "canvas_module.html" stores the module's HTML template.
 
     """
+
     package_includes = ["HexDraw.js", "CanvasHexModule.js", "InteractionHandler.js"]
     portrayal_method = None  # Portrayal function
     canvas_width = 500
     canvas_height = 500
 
-    def __init__(self, portrayal_method, grid_width, grid_height,
-                 canvas_width=500, canvas_height=500):
-        """ Instantiate a new CanvasGrid.
+    def __init__(
+        self,
+        portrayal_method,
+        grid_width,
+        grid_height,
+        canvas_width=500,
+        canvas_height=500,
+    ):
+        """Instantiate a new CanvasGrid.
 
         Args:
             portrayal_method: function to convert each object on the grid to
@@ -62,9 +68,9 @@ class CanvasHexGrid(VisualizationElement):
         self.canvas_width = canvas_width
         self.canvas_height = canvas_height
 
-        new_element = ("new CanvasHexModule({}, {}, {}, {})"
-            .format(self.canvas_width, self.canvas_height,
-                self.grid_width, self.grid_height))
+        new_element = "new CanvasHexModule({}, {}, {}, {})".format(
+            self.canvas_width, self.canvas_height, self.grid_width, self.grid_height
+        )
 
         self.js_code = "elements.push(" + new_element + ");"
 

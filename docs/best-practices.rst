@@ -27,7 +27,7 @@ organize them. For example, if the visualization uses image files, put those in
 an ``images`` directory.
 
 The `Schelling
-<https://github.com/projectmesa/mesa/tree/master/examples/schelling>`_ model is
+<https://github.com/projectmesa/mesa/tree/main/examples/schelling>`_ model is
 a good example of a small well-packaged model.
 
 It's easy to create a cookiecutter mesa model by running ``mesa startproject``
@@ -35,7 +35,7 @@ It's easy to create a cookiecutter mesa model by running ``mesa startproject``
 Randomization
 -------------
 
-If your model involves some random choice, you can use the build-in ``random``
+If your model involves some random choice, you can use the built-in ``random``
 property that Mesa ``Model`` and ``Agent`` objects have. This works exactly
 like the built-in ``random`` library.
 

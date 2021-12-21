@@ -1,5 +1,8 @@
-init
+Base Classes
 ----
 
-.. automodule:: __init__
+.. autoclass:: mesa.Agent
+   :members:
+
+.. autoclass:: mesa.Model
    :members:

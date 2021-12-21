@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Pie Chart Module
 ============
@@ -11,7 +10,7 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class PieChartModule(VisualizationElement):
-    """ Each chart can visualize one set of fields from a datacollector as a
+    """Each chart can visualize one set of fields from a datacollector as a
     pie chart.
 
 
@@ -29,10 +28,16 @@ class PieChartModule(VisualizationElement):
 
 
     """
+
     package_includes = ["d3.min.js", "PieChartModule.js"]
 
-    def __init__(self, fields, canvas_height=500, canvas_width=500,
-    data_collector_name="datacollector"):
+    def __init__(
+        self,
+        fields,
+        canvas_height=500,
+        canvas_width=500,
+        data_collector_name="datacollector",
+    ):
         """
         Create a new line chart visualization.
 
@@ -51,8 +56,7 @@ class PieChartModule(VisualizationElement):
 
         fields_json = json.dumps(self.fields)
         new_element = "new PieChartModule({}, {}, {})"
-        new_element = new_element.format(fields_json, canvas_width,
-                                         canvas_height)
+        new_element = new_element.format(fields_json, canvas_width, canvas_height)
         self.js_code = "elements.push(" + new_element + ");"
 
     def render(self, model):

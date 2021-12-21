@@ -37,4 +37,4 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/), sele
 
 ## Further Reading
 
-See the "bank_reserves" model for more information. 
+See the "bank_reserves" model for more information.

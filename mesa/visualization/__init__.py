@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Mesa Visualization Module
 -------------------------

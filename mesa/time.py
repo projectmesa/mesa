@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Mesa Time Module
 ================
@@ -24,9 +23,19 @@ Key concepts:
 
 from collections import OrderedDict
 
+# mypy
+from typing import Dict, Iterator, List, Optional, Union
+from mesa.agent import Agent
+from mesa.model import Model
+
+
+# BaseScheduler has a self.time of int, while
+# StagedActivation has a self.time of float
+TimeT = Union[float, int]
+
 
 class BaseScheduler:
-    """ Simplest scheduler; activates agents one at a time, in the order
+    """Simplest scheduler; activates agents one at a time, in the order
     they were added.
 
     Assumes that each agent added has a *step* method which takes no arguments.
@@ -34,25 +43,34 @@ class BaseScheduler:
     (This is explicitly meant to replicate the scheduler in MASON).
 
     """
-    def __init__(self, model):
-        """ Create a new, empty BaseScheduler. """
+
+    def __init__(self, model: Model) -> None:
+        """Create a new, empty BaseScheduler."""
         self.model = model
         self.steps = 0
-        self.time = 0
-        self._agents = OrderedDict()
+        self.time: TimeT = 0
+        self._agents: Dict[int, Agent] = OrderedDict()
 
-    def add(self, agent):
-        """ Add an Agent object to the schedule.
+    def add(self, agent: Agent) -> None:
+        """Add an Agent object to the schedule.
 
         Args:
             agent: An Agent to be added to the schedule. NOTE: The agent must
             have a step() method.
 
         """
+
+        if agent.unique_id in self._agents:
+            raise Exception(
+                "Agent with unique id {0} already added to scheduler".format(
+                    repr(agent.unique_id)
+                )
+            )
+
         self._agents[agent.unique_id] = agent
 
-    def remove(self, agent):
-        """ Remove all instances of a given agent from the schedule.
+    def remove(self, agent: Agent) -> None:
+        """Remove all instances of a given agent from the schedule.
 
         Args:
             agent: An agent object.
@@ -60,23 +78,23 @@ class BaseScheduler:
         """
         del self._agents[agent.unique_id]
 
-    def step(self):
-        """ Execute the step of all the agents, one at a time. """
+    def step(self) -> None:
+        """Execute the step of all the agents, one at a time."""
         for agent in self.agent_buffer(shuffled=False):
             agent.step()
         self.steps += 1
         self.time += 1
 
-    def get_agent_count(self):
-        """ Returns the current number of agents in the queue. """
+    def get_agent_count(self) -> int:
+        """Returns the current number of agents in the queue."""
         return len(self._agents.keys())
 
     @property
-    def agents(self):
+    def agents(self) -> List[Agent]:
         return list(self._agents.values())
 
-    def agent_buffer(self, shuffled=False):
-        """ Simple generator that yields the agents while letting the user
+    def agent_buffer(self, shuffled: bool = False) -> Iterator[Agent]:
+        """Simple generator that yields the agents while letting the user
         remove and/or add agents during stepping.
 
         """
@@ -90,7 +108,7 @@ class BaseScheduler:
 
 
 class RandomActivation(BaseScheduler):
-    """ A scheduler which activates each agent once per step, in random order,
+    """A scheduler which activates each agent once per step, in random order,
     with the order reshuffled every step.
 
     This is equivalent to the NetLogo 'ask agents...' and is generally the
@@ -99,8 +117,9 @@ class RandomActivation(BaseScheduler):
     Assumes that all agents have a step(model) method.
 
     """
-    def step(self):
-        """ Executes the step of all agents, one at a time, in
+
+    def step(self) -> None:
+        """Executes the step of all agents, one at a time, in
         random order.
 
         """
@@ -111,15 +130,16 @@ class RandomActivation(BaseScheduler):
 
 
 class SimultaneousActivation(BaseScheduler):
-    """ A scheduler to simulate the simultaneous activation of all the agents.
+    """A scheduler to simulate the simultaneous activation of all the agents.
 
     This scheduler requires that each agent have two methods: step and advance.
     step() activates the agent and stages any necessary changes, but does not
     apply them yet. advance() then applies the changes.
 
     """
-    def step(self):
-        """ Step all agents, then advance them. """
+
+    def step(self) -> None:
+        """Step all agents, then advance them."""
         agent_keys = list(self._agents.keys())
         for agent_key in agent_keys:
             self._agents[agent_key].step()
@@ -130,7 +150,7 @@ class SimultaneousActivation(BaseScheduler):
 
 
 class StagedActivation(BaseScheduler):
-    """ A scheduler which allows agent activation to be divided into several
+    """A scheduler which allows agent activation to be divided into several
     stages instead of a single `step` method. All agents execute one stage
     before moving on to the next.
 
@@ -141,9 +161,15 @@ class StagedActivation(BaseScheduler):
     increments of 1 / (# of stages), meaning that 1 step = 1 unit of time.
 
     """
-    def __init__(self, model, stage_list=None, shuffle=False,
-                 shuffle_between_stages=False):
-        """ Create an empty Staged Activation schedule.
+
+    def __init__(
+        self,
+        model: Model,
+        stage_list: Optional[List[str]] = None,
+        shuffle: bool = False,
+        shuffle_between_stages: bool = False,
+    ) -> None:
+        """Create an empty Staged Activation schedule.
 
         Args:
             model: Model object associated with the schedule.
@@ -161,8 +187,8 @@ class StagedActivation(BaseScheduler):
         self.shuffle_between_stages = shuffle_between_stages
         self.stage_time = 1 / len(self.stage_list)
 
-    def step(self):
-        """ Executes all the stages for all agents. """
+    def step(self) -> None:
+        """Executes all the stages for all agents."""
         agent_keys = list(self._agents.keys())
         if self.shuffle:
             self.model.random.shuffle(agent_keys)

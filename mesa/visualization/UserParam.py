@@ -1,57 +1,63 @@
-
 class UserSettableParameter:
-    """ A class for providing options to a visualization for a given parameter.
+    """A class for providing options to a visualization for a given parameter.
 
-        UserSettableParameter can be used instead of keyword arguments when specifying model parameters in an
-        instance of a `ModularServer` so that the parameter can be adjusted in the UI without restarting the server.
+    UserSettableParameter can be used instead of keyword arguments when specifying model parameters in an
+    instance of a `ModularServer` so that the parameter can be adjusted in the UI without restarting the server.
 
-        Validation of correctly-specified params happens on startup of a `ModularServer`. Each param is handled
-        individually in the UI and sends callback events to the server when an option is updated. That option is then
-        re-validated, in the `value.setter` property method to ensure input is correct from the UI to `reset_model`
-        callback.
+    Validation of correctly-specified params happens on startup of a `ModularServer`. Each param is handled
+    individually in the UI and sends callback events to the server when an option is updated. That option is then
+    re-validated, in the `value.setter` property method to ensure input is correct from the UI to `reset_model`
+    callback.
 
-        Parameter types include:
-            - 'number' - a simple numerical input
-            - 'checkbox' - boolean checkbox
-            - 'choice' - String-based dropdown input, for selecting choices within a model
-            - 'slider' - A number-based slider input with settable increment
-            - 'static_text' - A non-input textbox for displaying model info.
+    Parameter types include:
+        - 'number' - a simple numerical input
+        - 'checkbox' - boolean checkbox
+        - 'choice' - String-based dropdown input, for selecting choices within a model
+        - 'slider' - A number-based slider input with settable increment
+        - 'static_text' - A non-input textbox for displaying model info.
 
-        Examples:
+    Examples:
 
-        # Simple number input
-        number_option = UserSettableParameter('number', 'My Number', value=123)
+    # Simple number input
+    number_option = UserSettableParameter('number', 'My Number', value=123)
 
-        # Checkbox input
-        boolean_option = UserSettableParameter('checkbox', 'My Boolean', value=True)
+    # Checkbox input
+    boolean_option = UserSettableParameter('checkbox', 'My Boolean', value=True)
 
-        # Choice input
-        choice_option = UserSettableParameter('choice', 'My Choice', value='Default choice',
-                                              choices=['Default Choice', 'Alternate Choice'])
+    # Choice input
+    choice_option = UserSettableParameter('choice', 'My Choice', value='Default choice',
+                                          choices=['Default Choice', 'Alternate Choice'])
 
-        # Slider input
-        slider_option = UserSettableParameter('slider', 'My Slider', value=123, min_value=10, max_value=200, step=0.1)
+    # Slider input
+    slider_option = UserSettableParameter('slider', 'My Slider', value=123, min_value=10, max_value=200, step=0.1)
 
-        # Static text
-        static_text = UserSettableParameter('static_text', value="This is a descriptive textbox")
-     """
+    # Static text
+    static_text = UserSettableParameter('static_text', value="This is a descriptive textbox")
+    """
 
-    NUMBER = 'number'
-    CHECKBOX = 'checkbox'
-    CHOICE = 'choice'
-    SLIDER = 'slider'
-    STATIC_TEXT = 'static_text'
+    NUMBER = "number"
+    CHECKBOX = "checkbox"
+    CHOICE = "choice"
+    SLIDER = "slider"
+    STATIC_TEXT = "static_text"
 
     TYPES = (NUMBER, CHECKBOX, CHOICE, SLIDER, STATIC_TEXT)
 
     _ERROR_MESSAGE = "Missing or malformed inputs for '{}' Option '{}'"
 
     def __init__(
-        self, param_type=None, name='', value=None, min_value=None, max_value=None,
-            step=1, choices=list(), description=None
+        self,
+        param_type=None,
+        name="",
+        value=None,
+        min_value=None,
+        max_value=None,
+        step=1,
+        choices=list(),
+        description=None,
     ):
         if param_type not in self.TYPES:
-            raise ValueError("{} is not a valid Option type".format(param_type))
+            raise ValueError(f"{param_type} is not a valid Option type")
         self.param_type = param_type
         self.name = name
         self._value = value
@@ -69,7 +75,9 @@ class UserSettableParameter:
             valid = not (self.value is None)
 
         elif self.param_type == self.SLIDER:
-            valid = not (self.value is None or self.min_value is None or self.max_value is None)
+            valid = not (
+                self.value is None or self.min_value is None or self.max_value is None
+            )
 
         elif self.param_type == self.CHOICE:
             valid = not (self.value is None or len(self.choices) == 0)
@@ -97,11 +105,15 @@ class UserSettableParameter:
                 self._value = self.max_value
         elif self.param_type == self.CHOICE:
             if self._value not in self.choices:
-                print("Selected choice value not in available choices, selected first choice from 'choices' list")
+                print(
+                    "Selected choice value not in available choices, selected first choice from 'choices' list"
+                )
                 self._value = self.choices[0]
 
     @property
     def json(self):
         result = self.__dict__.copy()
-        result['value'] = result.pop('_value')  # Return _value as value, value is the same
+        result["value"] = result.pop(
+            "_value"
+        )  # Return _value as value, value is the same
         return result

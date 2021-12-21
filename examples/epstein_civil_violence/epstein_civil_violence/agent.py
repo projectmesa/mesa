@@ -29,8 +29,17 @@ class Citizen(Agent):
 
     """
 
-    def __init__(self, unique_id, model, pos, hardship, regime_legitimacy,
-                 risk_aversion, threshold, vision):
+    def __init__(
+        self,
+        unique_id,
+        model,
+        pos,
+        hardship,
+        regime_legitimacy,
+        risk_aversion,
+        threshold,
+        vision,
+    ):
         """
         Create a new Citizen.
         Args:
@@ -48,7 +57,7 @@ class Citizen(Agent):
             model: model instance
         """
         super().__init__(unique_id, model)
-        self.breed = 'citizen'
+        self.breed = "citizen"
         self.pos = pos
         self.hardship = hardship
         self.regime_legitimacy = regime_legitimacy
@@ -70,12 +79,15 @@ class Citizen(Agent):
         self.update_neighbors()
         self.update_estimated_arrest_probability()
         net_risk = self.risk_aversion * self.arrest_probability
-        if self.condition == 'Quiescent' and (
-                self.grievance - net_risk) > self.threshold:
-            self.condition = 'Active'
-        elif self.condition == 'Active' and (
-                self.grievance - net_risk) <= self.threshold:
-            self.condition = 'Quiescent'
+        if (
+            self.condition == "Quiescent"
+            and (self.grievance - net_risk) > self.threshold
+        ):
+            self.condition = "Active"
+        elif (
+            self.condition == "Active" and (self.grievance - net_risk) <= self.threshold
+        ):
+            self.condition = "Quiescent"
         if self.model.movement and self.empty_neighbors:
             new_pos = self.random.choice(self.empty_neighbors)
             self.model.grid.move_agent(self, new_pos)
@@ -84,11 +96,13 @@ class Citizen(Agent):
         """
         Look around and see who my neighbors are
         """
-        self.neighborhood = self.model.grid.get_neighborhood(self.pos,
-                                                        moore=False, radius=1)
+        self.neighborhood = self.model.grid.get_neighborhood(
+            self.pos, moore=False, radius=1
+        )
         self.neighbors = self.model.grid.get_cell_list_contents(self.neighborhood)
-        self.empty_neighbors = [c for c in self.neighborhood if
-                                self.model.grid.is_cell_empty(c)]
+        self.empty_neighbors = [
+            c for c in self.neighborhood if self.model.grid.is_cell_empty(c)
+        ]
 
     def update_estimated_arrest_probability(self):
         """
@@ -96,16 +110,18 @@ class Citizen(Agent):
         p(Arrest | I go active).
 
         """
-        cops_in_vision = len([c for c in self.neighbors if c.breed == 'cop'])
-        actives_in_vision = 1.  # citizen counts herself
+        cops_in_vision = len([c for c in self.neighbors if c.breed == "cop"])
+        actives_in_vision = 1.0  # citizen counts herself
         for c in self.neighbors:
-            if (c.breed == 'citizen' and
-                    c.condition == 'Active' and
-                    c.jail_sentence == 0):
+            if (
+                c.breed == "citizen"
+                and c.condition == "Active"
+                and c.jail_sentence == 0
+            ):
                 actives_in_vision += 1
         self.arrest_probability = 1 - math.exp(
-            -1 * self.model.arrest_prob_constant * (
-                cops_in_vision / actives_in_vision))
+            -1 * self.model.arrest_prob_constant * (cops_in_vision / actives_in_vision)
+        )
 
 
 class Cop(Agent):
@@ -131,7 +147,7 @@ class Cop(Agent):
             model: model instance
         """
         super().__init__(unique_id, model)
-        self.breed = 'cop'
+        self.breed = "cop"
         self.pos = pos
         self.vision = vision
 
@@ -143,9 +159,11 @@ class Cop(Agent):
         self.update_neighbors()
         active_neighbors = []
         for agent in self.neighbors:
-            if agent.breed == 'citizen' and \
-                    agent.condition == 'Active' and \
-                    agent.jail_sentence == 0:
+            if (
+                agent.breed == "citizen"
+                and agent.condition == "Active"
+                and agent.jail_sentence == 0
+            ):
                 active_neighbors.append(agent)
         if active_neighbors:
             arrestee = self.random.choice(active_neighbors)
@@ -159,8 +177,10 @@ class Cop(Agent):
         """
         Look around and see who my neighbors are.
         """
-        self.neighborhood = self.model.grid.get_neighborhood(self.pos,
-                                                        moore=False, radius=1)
+        self.neighborhood = self.model.grid.get_neighborhood(
+            self.pos, moore=False, radius=1
+        )
         self.neighbors = self.model.grid.get_cell_list_contents(self.neighborhood)
-        self.empty_neighbors = [c for c in self.neighborhood if
-                                self.model.grid.is_cell_empty(c)]
+        self.empty_neighbors = [
+            c for c in self.neighborhood if self.model.grid.is_cell_empty(c)
+        ]

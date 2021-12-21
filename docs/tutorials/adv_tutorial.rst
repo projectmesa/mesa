@@ -131,17 +131,9 @@ open automatically, try pointing it at http://127.0.0.1:8521 manually.
 If this doesn't show you the visualization, something may have gone
 wrong with the server launch.)
 
-You should see something like the figure below: the model title, an
-empty space where the grid will be, and a control panel off to the
-right.
-
-.. figure:: files/viz_empty.png
-   :alt: Empty Visualization
-
-   Empty Visualization
-
-Click the 'reset' button on the control panel, and you should see the
-grid fill up with red circles, representing agents.
+You should see something like the figure below: the model title, a grid
+filled with red circles representing agents, and a set of buttons to the
+right for running and resetting the model.
 
 .. figure:: files/viz_redcircles.png
    :alt: Redcircles Visualization
@@ -318,9 +310,9 @@ context, which is required for doing anything with it.
         // Create the tag:
         var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
         canvas_tag += "style='border:1px dotted'></canvas>";
-        // Append it to body:
+        // Append it to #elements:
         var canvas = $(canvas_tag)[0];
-        $("body").append(canvas);
+        $("#elements").append(canvas);
         // Create the context and the drawing controller:
         var context = canvas.getContext("2d");
     };
@@ -338,14 +330,12 @@ created, we can create the chart object.
 .. code:: javascript
 
     var HistogramModule = function(bins, canvas_width, canvas_height) {
-        // Create the elements
-
         // Create the tag:
         var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
         canvas_tag += "style='border:1px dotted'></canvas>";
-        // Append it to body:
+        // Append it to #elements:
         var canvas = $(canvas_tag)[0];
-        $("body").append(canvas);
+        $("#elements").append(canvas);
         // Create the context and the drawing controller:
         var context = canvas.getContext("2d");
 
@@ -373,7 +363,7 @@ created, we can create the chart object.
         };
 
         // Create the chart object
-        var chart = new Chart(context).Bar(data, options);
+        var chart = new Chart(context, {type: 'bar', data: data, options: options});
 
         // Now what?
     };
@@ -397,14 +387,13 @@ With that in mind, we can add these two methods to the class:
     var HistogramModule = function(bins, canvas_width, canvas_height) {
         // ...Everything from above...
         this.render = function(data) {
-            for (var i in data)
-                chart.datasets[0].bars[i].value = data[i];
+            datasets[0].data = data;
             chart.update();
         };
 
         this.reset = function() {
             chart.destroy();
-            chart = new Chart(context).Bar(data, options);
+            chart = new Chart(context, {type: 'bar', data: data, options: options});
         };
     };
 
@@ -450,7 +439,7 @@ inherit from, and create the new visualization class.
 There are a few things going on here. ``package_includes`` is a list of
 JavaScript files that are part of Mesa itself that the visualization
 element relies on. You can see the included files in
-`mesa/visualization/templates/ <https://github.com/projectmesa/mesa/tree/tutorial_update/mesa/visualization/templates>`__.
+`mesa/visualization/templates/ <https://github.com/projectmesa/mesa/tree/main/mesa/visualization/templates>`__.
 Similarly, ``local_includes`` is a list of JavaScript files in the same
 directory as the class code itself. Note that both of these are class
 variables, not object variables -- they hold for all particular objects.
@@ -510,9 +499,9 @@ visualization and updating along with the model!
 
 If you've felt comfortable with this section, it might be instructive to
 read the code for the
-`ModularServer <https://github.com/projectmesa/mesa/blob/master/mesa/visualization/ModularVisualization.py#L259>`__
+`ModularServer <https://github.com/projectmesa/mesa/blob/main/mesa/visualization/ModularVisualization.py#L259>`__
 and the
-`modular\_template <https://github.com/projectmesa/mesa/blob/master/mesa/visualization/templates/modular_template.html>`__
+`modular\_template <https://github.com/projectmesa/mesa/blob/main/mesa/visualization/templates/modular_template.html>`__
 to get a better idea of how all the pieces fit together.
 
 Happy Modeling!

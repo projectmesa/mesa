@@ -13,6 +13,7 @@ class TreeCell(Agent):
     unique_id isn't strictly necessary here, but it's good
     practice to give one to each agent anyway.
     """
+
     def __init__(self, pos, model):
         """
         Create a new tree.
@@ -33,6 +34,3 @@ class TreeCell(Agent):
                 if neighbor.condition == "Fine":
                     neighbor.condition = "On Fire"
             self.condition = "Burned Out"
-
-    def get_pos(self):
-        return self.pos

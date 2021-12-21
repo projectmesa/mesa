@@ -7,13 +7,13 @@ Core Objects: Model, and Agent.
 """
 import datetime
 
-from .model import Model
-from .agent import Agent
+from mesa.model import Model
+from mesa.agent import Agent
 
 
 __all__ = ["Model", "Agent"]
 
-__title__ = 'mesa'
-__version__ = '0.8.6'
-__license__ = 'Apache 2.0'
-__copyright__ = 'Copyright %s Project Mesa Team' % datetime.date.today().year
+__title__ = "mesa"
+__version__ = "0.8.9"
+__license__ = "Apache 2.0"
+__copyright__ = f"Copyright {datetime.date.today().year} Project Mesa Team"
