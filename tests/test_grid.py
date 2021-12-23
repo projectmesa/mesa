@@ -229,6 +229,7 @@ class TestSingleGrid(unittest.TestCase):
                 a = MockAgent(counter, None)
                 self.agents.append(a)
                 self.grid.place_agent(a, (x, y))
+        self.num_agents = len(self.agents)
 
     def test_enforcement(self):
         """
@@ -242,11 +243,14 @@ class TestSingleGrid(unittest.TestCase):
 
         # Place the agent in an empty cell
         self.grid.position_agent(a)
+        self.num_agents += 1
         # Test whether after placing, the empty cells are reduced by 1
         assert a.pos not in self.grid.empties
         assert len(self.grid.empties) == 8
         for i in range(10):
-            self.grid.move_to_empty(a)
+            # Since the agents and the grid are not associated with a model, we
+            # must explicitly tell move_to_empty the number of agents.
+            self.grid.move_to_empty(a, num_agents=self.num_agents)
         assert len(self.grid.empties) == 8
 
         # Place agents until the grid is full
@@ -254,13 +258,14 @@ class TestSingleGrid(unittest.TestCase):
         for i in range(empty_cells):
             a = MockAgent(101 + i, None)
             self.grid.position_agent(a)
+            self.num_agents += 1
         assert len(self.grid.empties) == 0
 
         a = MockAgent(110, None)
         with self.assertRaises(Exception):
             self.grid.position_agent(a)
         with self.assertRaises(Exception):
-            self.move_to_empty(self.agents[0])
+            self.move_to_empty(self.agents[0], num_agents=self.num_agents)
 
 
 # Number of agents at each position for testing
