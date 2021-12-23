@@ -172,10 +172,15 @@ def _model_run_func(
     for step in steps:
         model_data, all_agents_data = _collect_data(model, step)
 
-        stepdata = [
-            {**{"Step": step}, **kwargs, **model_data, **agent_data}
-            for agent_data in all_agents_data
-        ]
+        # If there are agent_reporters, then create an entry for each agent
+        if all_agents_data:
+            stepdata = [
+                {**{"Step": step}, **kwargs, **model_data, **agent_data}
+                for agent_data in all_agents_data
+            ]
+        # If there is only model data, then create a single entry for the step
+        else:
+            stepdata = [{**{"Step": step}, **kwargs, **model_data}]
         data.extend(stepdata)
 
     return tuple(kwargs.values()), data

@@ -47,6 +47,7 @@ class MockModel(Model):
         variable_agent_param=None,
         fixed_model_param=None,
         schedule=None,
+        enable_agent_reporters=True,
         **kwargs
     ):
         super().__init__()
@@ -55,9 +56,13 @@ class MockModel(Model):
         self.variable_agent_param = variable_agent_param
         self.fixed_model_param = fixed_model_param
         self.n_agents = 3
+        if enable_agent_reporters:
+            agent_reporters = {"agent_id": "unique_id", "agent_local": "local"}
+        else:
+            agent_reporters = None
         self.datacollector = DataCollector(
             model_reporters={"reported_model_param": self.get_local_model_param},
-            agent_reporters={"agent_id": "unique_id", "agent_local": "local"},
+            agent_reporters=agent_reporters,
         )
         self.running = True
         self.init_agents()
@@ -119,6 +124,20 @@ def test_batch_run_with_params():
             "variable_agent_params": ["H", "E", "L", "L", "O"],
         },
     )
+
+
+def test_batch_run_no_agent_reporters():
+    result = batch_run(MockModel, {"enable_agent_reporters": False})
+    print(result)
+    assert result == [
+        {
+            "RunId": 0,
+            "iteration": 0,
+            "Step": 1000,
+            "enable_agent_reporters": False,
+            "reported_model_param": 42,
+        }
+    ]
 
 
 def test_batch_run_single_core():
