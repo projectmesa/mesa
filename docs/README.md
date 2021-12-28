@@ -12,7 +12,7 @@ Updating docs can be confusing. Here are the basic setups.
 #### Create the rST files from ipynb files
 1. Change to the appropriate directory (usually docs/tutorials)
   * ```cd tutorials```
-1. Create rST files using nbconvert
+2. Create rST files using nbconvert
   * ```jupyter nbconvert --to rST *.ipynb```
   * **Requires**
     * jupyter: `pip install jupyter`
@@ -21,22 +21,22 @@ Updating docs can be confusing. Here are the basic setups.
 ##### Submit a pull request with updates
 1. Create branch (either via branching or fork of repo) -- try to use a descriptive name.
  * ```git checkout -b doc-updates```
-1. Update the docs. Save.
-1. Build the docs, from the inside of the docs folder.
+2. Update the docs. Save.
+3. Build the docs, from the inside of the docs folder.
  * **Requires** sphinx: `pip install sphinx`
  * ```make html```
-1. Commit the changes. If there are new files, you will have to explicit add them.
+4. Commit the changes. If there are new files, you will have to explicit add them.
  * ```git commit -am "Updating docs."```
-1. Push the branch
+5. Push the branch
  * ```git push origin doc-updates```
-1. From here you will want to submit a pull request to main.
+6. From here you will want to submit a pull request to main.
 
 ##### Update read the docs
 
 From this point, you will need to find someone that has access to readthedocs. Currently, that is [@jackiekazil](https://github.com/jackiekazil) and [@dmasad](https://github.com/dmasad).
 
 1. Accept the pull request into main.
-1. Log into readthedocs and launch a new build -- builds take about 10 minutes or so.
+2. Log into readthedocs and launch a new build -- builds take about 10 minutes or so.
 
 ### Helpful Sphnix tips
 * Build html from docs:
