@@ -36,7 +36,7 @@ def batch_run(
     parameters: Mapping[str, Union[Any, Iterable[Any]]],
     nr_processes: Optional[int] = None,
     iterations: int = 1,
-    i_steps: int = -1,
+    data_collection_period: int = -1,
     max_steps: int = 1000,
     display_progress: bool = True,
 ) -> List[Dict[str, Any]]:
@@ -52,6 +52,8 @@ def batch_run(
         Number of processes used. Set to None (default) to use all available processors
     iterations : int, optional
         Number of iterations for each parameter combination, by default 1
+    data_collection_period : int, optional
+        Number of steps after which data gets collected, by default -1 (end of episode)
     max_steps : int, optional
         Maximum number of model steps after which the model halts, by default 1000
     display_progress : bool, optional
@@ -68,7 +70,7 @@ def batch_run(
         _model_run_func,
         model_cls,
         max_steps=max_steps,
-        i_steps=i_steps,
+        data_collection_period=data_collection_period,
     )
 
     total_iterations = len(kwargs_list) * iterations
@@ -139,7 +141,7 @@ def _model_run_func(
     model_cls: Type[Model],
     kwargs: Dict[str, Any],
     max_steps: int,
-    i_steps: int,
+    data_collection_period: int,
 ) -> Tuple[Tuple[Any, ...], List[Dict[str, Any]]]:
     """Run a single model run and collect model and agent data.
 
@@ -151,8 +153,8 @@ def _model_run_func(
         model kwargs used for this run
     max_steps : int
         Maximum number of model steps after which the model halts, by default 1000
-    i_steps : int
-        Collect data every ith step
+    data_collection_period : int
+        Number of steps after which data gets collected
 
     Returns
     -------
@@ -165,7 +167,7 @@ def _model_run_func(
 
     data = []
 
-    steps = list(range(0, model.schedule.steps, i_steps))
+    steps = list(range(0, model.schedule.steps, data_collection_period))
     if not steps or steps[-1] != model.schedule.steps - 1:
         steps.append(model.schedule.steps - 1)
 
