@@ -67,7 +67,7 @@ For more help on using Mesa, check out the following resources:
 
 .. _`Intro to Mesa Tutorial` : http://mesa.readthedocs.org/en/master/tutorials/intro_tutorial.html
 .. _`Docs` : http://mesa.readthedocs.org/en/master/
-.. _`Email list for users` : https://groups.google.com/d/forum/projectmesa
+.. _`GitHub Discussions` : https://github.com/projectmesa/mesa/discussions
 .. _`PyPI` : https://pypi.python.org/pypi/Mesa/
 
 Running Mesa in Docker
