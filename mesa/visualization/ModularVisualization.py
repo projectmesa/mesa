@@ -204,7 +204,7 @@ def user_params(model_kwargs):
 
 
 class PageHandler(tornado.web.RequestHandler):
-    """ Handler for the HTML template which holds the visualization. """
+    """Handler for the HTML template which holds the visualization."""
 
     def get(self):
         elements = self.application.visualization_elements
@@ -284,7 +284,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
 
 class ModularServer(tornado.web.Application):
-    """ Main visualization application. """
+    """Main visualization application."""
 
     verbose = True
 
@@ -321,7 +321,7 @@ class ModularServer(tornado.web.Application):
     def __init__(
         self, model_cls, visualization_elements, name="Mesa Model", model_params={}
     ):
-        """ Create a new visualization server with the given elements. """
+        """Create a new visualization server with the given elements."""
         # Prep visualization elements:
         self.visualization_elements = visualization_elements
         self.package_includes = set()
@@ -349,11 +349,11 @@ class ModularServer(tornado.web.Application):
         super().__init__(self.handlers, **self.settings)
 
     def launch(self, port=None, open_browser=True):
-        """ Run the app. """
+        """Run the app."""
         if port is not None:
             self.port = port
-        url = "http://127.0.0.1:{PORT}".format(PORT=self.port)
-        print("Interface starting at {url}".format(url=url))
+        url = f"http://127.0.0.1:{self.port}"
+        print(f"Interface starting at {url}")
         self.listen(self.port)
         if open_browser:
             webbrowser.open(url)

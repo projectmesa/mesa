@@ -7,7 +7,7 @@ from .agent import PDAgent
 
 
 class PdGrid(Model):
-    """ Model class for iterated, spatial prisoner's dilemma model. """
+    """Model class for iterated, spatial prisoner's dilemma model."""
 
     schedule_types = {
         "Sequential": BaseScheduler,
@@ -60,6 +60,6 @@ class PdGrid(Model):
         self.datacollector.collect(self)
 
     def run(self, n):
-        """ Run the model for n steps. """
+        """Run the model for n steps."""
         for _ in range(n):
             self.step()

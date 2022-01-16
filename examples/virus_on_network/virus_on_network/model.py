@@ -15,7 +15,7 @@ class State(Enum):
 
 
 def number_state(model, state):
-    return sum([1 for a in model.grid.get_all_cell_contents() if a.state is state])
+    return sum(1 for a in model.grid.get_all_cell_contents() if a.state is state)
 
 
 def number_infected(model):

@@ -5,7 +5,7 @@ The Mesa core functionality is just a subset of what we believe researchers crea
 
 **DRY Principle**
 
-This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the `DRY principle (or don't repeat yourself) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ (Hunt and Thomas 2010). The creators of Mesa designed Mesa in order for this principle to be exercised in the development of agent-based models (ABMs). For example, a group health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
+This decoupling of code to create building blocks is a best practice in software engineering. Specifically, it exercises the `DRY principle (or don't repeat yourself) <https://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ (Hunt and Thomas 2010). The creators of Mesa designed Mesa in order for this principle to be exercised in the development of agent-based models (ABMs). For example, a group of health experts may create a library of human interactions on top of core Mesa. That library then is used by other health experts. So, those health experts don't have to rewrite the same basic behaviors.
 
 **Benefits to Scientists**
 
@@ -27,7 +27,7 @@ This process isn't perfect. Just because you write something doesn't mean people
 
 **What is in this doc**
 
-There are two sections in this documention. The first is the User Guide, which is aimed at users of packages. The section is a package development guide, which is aimed at those who want to develop packages. Without further ado, let's get started!
+There are two sections in this documentation. The first is the User Guide, which is aimed at users of packages. The section is a package development guide, which is aimed at those who want to develop packages. Without further ado, let's get started!
 
 
 User Guide
@@ -37,7 +37,7 @@ User Guide
 
 **Step 1: Select a package**
 
-Currently, a central list of compatible packages is located on the `Mesa Wiki Packages Page <https://github.com/projectmesa/mesa/wiki/Mesa-Packages>`_. 
+Currently, a central list of compatible packages is located on the `Mesa Wiki Packages Page <https://github.com/projectmesa/mesa/wiki/Mesa-Packages>`_.
 
 **Step 2: Establish an environment**
 
@@ -120,7 +120,7 @@ References
 
 Grimm, Volker, Eloy Revilla, Uta Berger, Florian Jeltsch, Wolf M. Mooij, Steven F. Railsback, Hans-Hermann Thulke, Jacob Weiner, Thorsten Wiegand, and Donald L. DeAngelis. 2005. “Pattern-Oriented Modeling of Agent Based Complex Systems: Lessons from Ecology.” American Association for the Advancement of Science 310 (5750): 987–91. doi:10.1126/science.1116681.
 
-Hunt, Andrew, and David Thomas. 2010. The Pragmatic Progammer: From Journeyman to Master. Reading, Massachusetts: Addison-Wesley.
+Hunt, Andrew, and David Thomas. 2010. The Pragmatic Programmer: From Journeyman to Master. Reading, Massachusetts: Addison-Wesley.
 
 Leek, Jeffrey T., and Roger D. Peng. 2015. “Reproducible Research Can Still Be Wrong: Adopting a Prevention Approach.” Proceedings of the National Academy of Sciences 112 (6): 1645–46. doi:10.1073/pnas.1421412111.
 

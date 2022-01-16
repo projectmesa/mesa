@@ -7,7 +7,7 @@ from bank_reserves.model import BankReserves
 """
 Citation:
 The following code was adapted from server.py at
-https://github.com/projectmesa/mesa/blob/master/examples/wolf_sheep/wolf_sheep/server.py
+https://github.com/projectmesa/mesa/blob/main/examples/wolf_sheep/wolf_sheep/server.py
 Accessed on: November 2, 2017
 Author of original code: Taylor Mutch
 """

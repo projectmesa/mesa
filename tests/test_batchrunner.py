@@ -8,7 +8,12 @@ import unittest
 from mesa import Agent, Model
 from mesa.time import BaseScheduler
 from mesa.datacollection import DataCollector
-from mesa.batchrunner import BatchRunner, FixedBatchRunner, ParameterProduct, ParameterSampler
+from mesa.batchrunner import (
+    BatchRunner,
+    FixedBatchRunner,
+    ParameterProduct,
+    ParameterSampler,
+)
 
 
 NUM_AGENTS = 7
@@ -153,7 +158,9 @@ class TestBatchRunner(unittest.TestCase):
         if isinstance(self.variable_params, list):
             return len(self.variable_params) * self.iterations
         else:
-            return reduce(mul, map(len, self.variable_params.values())) * self.iterations
+            return (
+                reduce(mul, map(len, self.variable_params.values())) * self.iterations
+            )
 
     def test_model_level_vars(self):
         """

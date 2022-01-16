@@ -431,5 +431,31 @@ class TestHexGridTorus(TestBaseGrid):
         assert len(neighborhood) == 6
 
 
+class TestIndexing:
+    # Create a grid where the content of each coordinate is a tuple of its coordinates
+    grid = Grid(3, 5, True)
+    for _, x, y in grid.coord_iter():
+        grid.grid[x][y] = (x, y)
+
+    def test_int(self):
+        assert self.grid[0][0] == (0, 0)
+
+    def test_tuple(self):
+        assert self.grid[1, 1] == (1, 1)
+
+    def test_list(self):
+        assert self.grid[(0, 0), (1, 1)] == [(0, 0), (1, 1)]
+        assert self.grid[(0, 0), (5, 3)] == [(0, 0), (2, 3)]
+
+    def test_torus(self):
+        assert self.grid[3, 5] == (0, 0)
+
+    def test_slice(self):
+        assert self.grid[:, 0] == [(0, 0), (1, 0), (2, 0)]
+        assert self.grid[::-1, 0] == [(2, 0), (1, 0), (0, 0)]
+        assert self.grid[1, :] == [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4)]
+        assert self.grid[:, :] == [(x, y) for x in range(3) for y in range(5)]
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -38,7 +38,7 @@ The full tutorial describing how the model is built can be found at:
 http://mesa.readthedocs.io/en/master/tutorials/intro_tutorial.html
 
 
-[Stonedahl, F. and Wilensky, U. (2008). NetLogo Virus on a Network model](http://ccl.northwestern.edu/netlogo/models/VirusonaNetwork). 
+[Stonedahl, F. and Wilensky, U. (2008). NetLogo Virus on a Network model](http://ccl.northwestern.edu/netlogo/models/VirusonaNetwork).
 Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
 

@@ -41,7 +41,7 @@ class Schelling(Model):
     """
 
     def __init__(self, height=20, width=20, density=0.8, minority_pc=0.2, homophily=3):
-        """"""
+        """ """
 
         self.height = height
         self.width = width

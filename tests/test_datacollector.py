@@ -110,7 +110,7 @@ class TestDataCollector(unittest.TestCase):
         self.step_assertion(data_collector.model_vars["total_agents"])
         for element in data_collector.model_vars["model_value"]:
             assert element == 100
-        self.step_assertion((data_collector.model_vars["model_calc"]))
+        self.step_assertion(data_collector.model_vars["model_calc"])
         for element in data_collector.model_vars["model_calc_comp"]:
             assert element == 75
         for element in data_collector.model_vars["model_calc_fail"]:

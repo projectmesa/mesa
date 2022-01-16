@@ -3,6 +3,39 @@
 Release History
 ---------------
 
+0.8.9 (2020-05-24) Oro Valley
++++++++++++++++++++++++++++++++++++++++++++
+
+*Note: Master branch was renamed to Main on 03/13/2021*
+
+**Improvements**
+
+* Master to Main change:
+    * Docs/examples: Update links to use main instead of master as branch #1012
+    * CI: Run on pushed to main and release branches #1011
+* Github Actions
+    * GitHub Actions: run black only on ubuntu 3.8 #996
+    * GA: Only run CI when pushed to master #974
+    * GA: Add pypy3 #972
+    * rename github action to "build", remove redundant flake8 check #971
+    * GA: Run on Windows and macOS #970
+    * Add GitHub Action for continuous integration testing #966
+* [PERF] Add neighborhood cache to grids and improve iter_cell_list_contents #823
+* forest_fire: Remove unnecessary code #981
+* Migrate away from type comments #984
+* Update License #985
+* Public remove_agent function for NetworkGrid #1001
+* Date update to release #962
+* Advanced indexing of grid #820
+
+**Fixes**
+
+* Correct spelling #999
+* Update Pipfile.lock #983
+* Fix order of variable_params in model and agent vars data frames #979
+* Fix asyncio on windows with python 3.6 #973
+
+
 0.8.8 (2020-11-27) Nogales
 +++++++++++++++++++++++++++++++++++++++++++
 
@@ -477,20 +510,20 @@ Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 * Fixes: Order of operations reversed: agent is removed first and then it is placed.
 * Improvement: `LICENSE`_ was updates from MIT to Apache 2.0.
 
-.. _`LICENSE` : https://github.com/projectmesa/mesa/blob/master/LICENSE
+.. _`LICENSE` : https://github.com/projectmesa/mesa/blob/main/LICENSE
 
 
 0.6.0 (2015-06-21)
 ++++++++++++++++++
 
-* Improvment: Add modular server feature, which breaks up a model into a .py file and a .js file. This breaks backwards compatibility.
+* Improvement: Add modular server feature, which breaks up a model into a .py file and a .js file. This breaks backwards compatibility.
 
 Pre 0.6.0
 ++++++++++++++++++
 
 Code that is pre-0.6.0 is very unstable.
 
-Our inital release was 0.5.0 (2014-11).
+Our initial release was 0.5.0 (2014-11).
 
 It included code for placing agents on a grid; a data collector and batch runner; and a front-end visualization using HTML 5 and JavaScript.
 

@@ -439,7 +439,7 @@ inherit from, and create the new visualization class.
 There are a few things going on here. ``package_includes`` is a list of
 JavaScript files that are part of Mesa itself that the visualization
 element relies on. You can see the included files in
-`mesa/visualization/templates/ <https://github.com/projectmesa/mesa/tree/master/mesa/visualization/templates>`__.
+`mesa/visualization/templates/ <https://github.com/projectmesa/mesa/tree/main/mesa/visualization/templates>`__.
 Similarly, ``local_includes`` is a list of JavaScript files in the same
 directory as the class code itself. Note that both of these are class
 variables, not object variables -- they hold for all particular objects.
@@ -499,9 +499,9 @@ visualization and updating along with the model!
 
 If you've felt comfortable with this section, it might be instructive to
 read the code for the
-`ModularServer <https://github.com/projectmesa/mesa/blob/master/mesa/visualization/ModularVisualization.py#L259>`__
+`ModularServer <https://github.com/projectmesa/mesa/blob/main/mesa/visualization/ModularVisualization.py#L259>`__
 and the
-`modular\_template <https://github.com/projectmesa/mesa/blob/master/mesa/visualization/templates/modular_template.html>`__
+`modular\_template <https://github.com/projectmesa/mesa/blob/main/mesa/visualization/templates/modular_template.html>`__
 to get a better idea of how all the pieces fit together.
 
 Happy Modeling!

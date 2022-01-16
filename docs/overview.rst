@@ -23,7 +23,7 @@ Most models consist of one class to represent the model itself; one class (or mo
 
 * ``mesa.Model``, ``mesa.Agent``
 * `mesa.time <apis/time.html>`_
-* `mesa.space <apis/space.html>`_ 
+* `mesa.space <apis/space.html>`_
 
 The skeleton of a model might look like this:
 
@@ -36,7 +36,7 @@ The skeleton of a model might look like this:
     class MyAgent(Agent):
         def __init__(self, name, model):
             super().__init__(name, model)
-            self.name = name 
+            self.name = name
 
         def step(self):
             print("{} activated".format(self.name))
@@ -73,7 +73,7 @@ Analysis modules
 If you're using modeling for research, you'll want a way to collect the data each model run generates. You'll probably also want to run the model multiple times, to see how some output changes with different parameters. Data collection and batch running are implemented in the appropriately-named analysis modules:
 
 * `mesa.datacollection <apis/datacollection.html>`_
-* `mesa.batchrunner <apis/batchrunner.html>`_ 
+* `mesa.batchrunner <apis/batchrunner.html>`_
 
 You'd add a data collector to the model like this:
 
@@ -86,7 +86,7 @@ You'd add a data collector to the model like this:
     class MyModel(Model):
         def __init__(self, n_agents):
             # ...
-            self.dc = DataCollector(model_reporters={"agent_count": 
+            self.dc = DataCollector(model_reporters={"agent_count":
                                         lambda m: m.schedule.get_agent_count()},
                                     agent_reporters={"name": lambda a: a.name})
 
@@ -148,9 +148,9 @@ To quickly spin up a model visualization, you might do something like:
         return portrayal
 
     grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-    server = ModularServer(MyModel, 
-                           [grid], 
-                           "My Model", 
+    server = ModularServer(MyModel,
+                           [grid],
+                           "My Model",
                            {'n_agents': 10})
     server.launch()
 

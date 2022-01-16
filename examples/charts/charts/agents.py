@@ -177,5 +177,5 @@ class Person(RandomWalker):
         self.do_business()
         # deposit money or take out a loan
         self.balance_books()
-        # updat the bank's reserves and the amount it can loan right now
+        # update the bank's reserves and the amount it can loan right now
         self.bank.bank_balance()

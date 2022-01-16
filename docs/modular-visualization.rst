@@ -46,7 +46,7 @@ Using Pre-Built Modules
 
 Mesa already comes with some pre-built modules. Using the built-ins
 allow you to build a visualization without worrying about the HTML and
-javascript. Consult the documention for a variety of modules.
+javascript. Consult the documentation for a variety of modules.
 
 One built-in module is **CanvasGrid**, which you can use to visualize
 objects located on grid cells. The CanvasGrid will cover a majority of

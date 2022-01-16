@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import re
 
 from setuptools import setup, find_packages
@@ -8,12 +7,12 @@ from codecs import open
 requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "tornado", "tqdm"]
 
 extras_require = {
-    "dev": ["coverage", "flake8", "pytest >= 4.6", "pytest-cov", "sphinx"],
+    "dev": ["black", "coverage", "flake8", "pytest >= 4.6", "pytest-cov", "sphinx"],
     "docs": ["sphinx", "ipython"],
 }
 
 version = ""
-with open("mesa/__init__.py", "r") as fd:
+with open("mesa/__init__.py") as fd:
     version = re.search(
         r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE
     ).group(1)

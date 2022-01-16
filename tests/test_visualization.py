@@ -17,7 +17,7 @@ from tests.test_batchrunner import MockAgent
 
 
 class MockModel(Model):
-    """ Test model for testing """
+    """Test model for testing"""
 
     def __init__(self, width, height, key1=103, key2=104):
 
@@ -38,7 +38,7 @@ class MockModel(Model):
 
 
 class TestModularServer(TestCase):
-    """ Test server for testing """
+    """Test server for testing"""
 
     def portrayal(self, cell):
         return {

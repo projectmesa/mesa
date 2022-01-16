@@ -6,12 +6,204 @@ A single class to manage a batch run or parameter sweep of a given model.
 
 """
 import copy
+import itertools
 import random
-from itertools import product, count
+from collections import OrderedDict
+from functools import partial
+from itertools import count, product
 from multiprocessing import Pool, cpu_count
+from typing import (
+    Any,
+    Counter,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
+
 import pandas as pd
 from tqdm import tqdm
-from collections import OrderedDict
+
+from mesa.model import Model
+
+
+def batch_run(
+    model_cls: Type[Model],
+    parameters: Mapping[str, Union[Any, Iterable[Any]]],
+    nr_processes: Optional[int] = None,
+    iterations: int = 1,
+    data_collection_period: int = -1,
+    max_steps: int = 1000,
+    display_progress: bool = True,
+) -> List[Dict[str, Any]]:
+    """Batch run a mesa model with a set of parameter values.
+
+    Parameters
+    ----------
+    model_cls : Type[Model]
+        The model class to batch-run
+    parameters : Mapping[str, Union[Any, Iterable[Any]]],
+        Dictionary with model parameters over which to run the model. You can either pass single values or iterables.
+    nr_processes : int, optional
+        Number of processes used. Set to None (default) to use all available processors
+    iterations : int, optional
+        Number of iterations for each parameter combination, by default 1
+    data_collection_period : int, optional
+        Number of steps after which data gets collected, by default -1 (end of episode)
+    max_steps : int, optional
+        Maximum number of model steps after which the model halts, by default 1000
+    display_progress : bool, optional
+        Display batch run process, by default True
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        [description]
+    """
+
+    kwargs_list = _make_model_kwargs(parameters) * iterations
+    process_func = partial(
+        _model_run_func,
+        model_cls,
+        max_steps=max_steps,
+        data_collection_period=data_collection_period,
+    )
+
+    total_iterations = len(kwargs_list) * iterations
+    run_counter = count()
+
+    results: List[Dict[str, Any]] = []
+
+    with tqdm(total_iterations, disable=not display_progress) as pbar:
+        if nr_processes == 1:
+            for iteration in range(iterations):
+                for kwargs in kwargs_list:
+                    _, rawdata = process_func(kwargs)
+                    run_id = next(run_counter)
+                    data = []
+                    for run_data in rawdata:
+                        out = {"RunId": run_id, "iteration": iteration - 1}
+                        out.update(run_data)
+                        data.append(out)
+                    results.extend(data)
+                    pbar.update()
+
+        else:
+            iteration_counter: Counter[Tuple[Any, ...]] = Counter()
+            with Pool(nr_processes) as p:
+                for paramValues, rawdata in p.imap_unordered(process_func, kwargs_list):
+                    iteration_counter[paramValues] += 1
+                    iteration = iteration_counter[paramValues]
+                    run_id = next(run_counter)
+                    data = []
+                    for run_data in rawdata:
+                        out = {"RunId": run_id, "iteration": iteration - 1}
+                        out.update(run_data)
+                        data.append(out)
+                    results.extend(data)
+                    pbar.update()
+
+    return results
+
+
+def _make_model_kwargs(
+    parameters: Mapping[str, Union[Any, Iterable[Any]]]
+) -> List[Dict[str, Any]]:
+    """Create model kwargs from parameters dictionary.
+
+    Parameters
+    ----------
+    parameters : Mapping[str, Union[Any, Iterable[Any]]]
+        Single or multiple values for each model parameter name
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        A list of all kwargs combinations.
+    """
+    parameter_list = []
+    for param, values in parameters.items():
+        try:
+            all_values = [(param, value) for value in values]
+        except TypeError:
+            all_values = [(param, values)]
+        parameter_list.append(all_values)
+    all_kwargs = itertools.product(*parameter_list)
+    kwargs_list = [dict(kwargs) for kwargs in all_kwargs]
+    return kwargs_list
+
+
+def _model_run_func(
+    model_cls: Type[Model],
+    kwargs: Dict[str, Any],
+    max_steps: int,
+    data_collection_period: int,
+) -> Tuple[Tuple[Any, ...], List[Dict[str, Any]]]:
+    """Run a single model run and collect model and agent data.
+
+    Parameters
+    ----------
+    model_cls : Type[Model]
+        The model class to batch-run
+    kwargs : Dict[str, Any]
+        model kwargs used for this run
+    max_steps : int
+        Maximum number of model steps after which the model halts, by default 1000
+    data_collection_period : int
+        Number of steps after which data gets collected
+
+    Returns
+    -------
+    Tuple[Tuple[Any, ...], List[Dict[str, Any]]]
+        Return model_data, agent_data from the reporters
+    """
+    model = model_cls(**kwargs)
+    while model.running and model.schedule.steps <= max_steps:
+        model.step()
+
+    data = []
+
+    steps = list(range(0, model.schedule.steps, data_collection_period))
+    if not steps or steps[-1] != model.schedule.steps - 1:
+        steps.append(model.schedule.steps - 1)
+
+    for step in steps:
+        model_data, all_agents_data = _collect_data(model, step)
+
+        # If there are agent_reporters, then create an entry for each agent
+        if all_agents_data:
+            stepdata = [
+                {**{"Step": step}, **kwargs, **model_data, **agent_data}
+                for agent_data in all_agents_data
+            ]
+        # If there is only model data, then create a single entry for the step
+        else:
+            stepdata = [{**{"Step": step}, **kwargs, **model_data}]
+        data.extend(stepdata)
+
+    return tuple(kwargs.values()), data
+
+
+def _collect_data(
+    model: Model,
+    step: int,
+) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+    """Collect model and agent data from a model using mesas datacollector."""
+    dc = model.datacollector
+
+    model_data = {param: values[step] for param, values in dc.model_vars.items()}
+
+    all_agents_data = []
+    raw_agent_data = dc._agent_records.get(step, [])
+    for data in raw_agent_data:
+        agent_dict = {"AgentID": data[1]}
+        agent_dict.update(zip(dc.agent_reporters, data[2:]))
+        all_agents_data.append(agent_dict)
+    return model_data, all_agents_data
 
 
 class ParameterError(TypeError):
@@ -88,7 +280,7 @@ class FixedBatchRunner:
             agent_reporters: Like model_reporters, but each variable is now
                 collected at the level of each agent present in the model at
                 the end of the run.
-            display_progress: Display progresss bar with time estimation?
+            display_progress: Display progress bar with time estimation?
 
         """
         self.model_cls = model_cls
@@ -150,7 +342,7 @@ class FixedBatchRunner:
         return total_iterations, all_kwargs, all_param_values
 
     def run_all(self):
-        """ Run the model at all parameter combinations and store results. """
+        """Run the model at all parameter combinations and store results."""
         run_count = count()
         total_iterations, all_kwargs, all_param_values = self._make_model_args()
 
@@ -210,7 +402,7 @@ class FixedBatchRunner:
             return None
 
     def collect_model_vars(self, model):
-        """ Run reporters and collect model-level variables. """
+        """Run reporters and collect model-level variables."""
         model_vars = OrderedDict()
         for var, reporter in self.model_reporters.items():
             model_vars[var] = reporter(model)
@@ -218,7 +410,7 @@ class FixedBatchRunner:
         return model_vars
 
     def collect_agent_vars(self, model):
-        """ Run reporters and collect agent-level variables. """
+        """Run reporters and collect agent-level variables."""
         agent_vars = OrderedDict()
         for agent in model.schedule._agents.values():
             agent_record = OrderedDict()
@@ -362,7 +554,7 @@ class BatchRunner(FixedBatchRunner):
         Args:
             model_cls: The class of model to batch-run.
             variable_parameters: Dictionary of parameters to lists of values.
-                The model will be run with every combo of these paramters.
+                The model will be run with every combo of these parameters.
                 For example, given variable_parameters of
                     {"param_1": range(5),
                      "param_2": [1, 5, 10]}
@@ -412,7 +604,7 @@ class BatchRunner(FixedBatchRunner):
 
 
 class BatchRunnerMP(BatchRunner):
-    """ Child class of BatchRunner, extended with multiprocessing support. """
+    """Child class of BatchRunner, extended with multiprocessing support."""
 
     def __init__(self, model_cls, nr_processes=None, **kwargs):
         """Create a new BatchRunnerMP for a given model with the given
@@ -428,7 +620,7 @@ class BatchRunnerMP(BatchRunner):
             # identify the number of processors available on users machine
             available_processors = cpu_count()
             self.processes = available_processors
-            print("BatchRunner MP will use {} processors.".format(self.processes))
+            print(f"BatchRunner MP will use {self.processes} processors.")
         else:
             self.processes = nr_processes
 

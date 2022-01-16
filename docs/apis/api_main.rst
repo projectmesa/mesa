@@ -5,8 +5,8 @@ APIs
    :maxdepth: 3
 
    Base Classes <init>
-   batchrunner
-   datacollection
-   space
    time
+   space
+   datacollection
+   batchrunner
    visualization
