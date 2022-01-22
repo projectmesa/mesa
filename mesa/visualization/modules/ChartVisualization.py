@@ -6,6 +6,7 @@ Module for drawing live-updating line charts using Charts.js
 
 """
 import json
+import statistics
 from mesa.visualization.ModularVisualization import VisualizationElement
 
 
@@ -34,8 +35,6 @@ class ChartModule(VisualizationElement):
                                       data_collector_name="datacollector")
 
     TODO:
-        Have it be able to handle agent-level variables as well.
-
         More Pythonic customization; in particular, have both series-level and
         chart-level options settable in Python, and passed to the front-end
         the same way that "Color" is currently.
@@ -78,9 +77,35 @@ class ChartModule(VisualizationElement):
 
         for s in self.series:
             name = s["Label"]
-            try:
-                val = data_collector.model_vars[name][-1]  # Latest value
-            except (IndexError, KeyError):
-                val = 0
+            entity = s["Type"]
+            if entity == "Model":
+                try:
+                    val = data_collector.model_vars[name][-1]  # Latest value
+                except (IndexError, KeyError):
+                    val = 0
+            elif entity == "Agent":
+                agent_dict = {e.__name__: e for e in list(model.schedule.agents_by_type.keys())}
+                agent_type = agent_dict[s["Agent_type"]]
+                try:
+                    # Get the reporter from the name
+                    reporter = model.datacollector.agent_name_index[agent_type][name]
+
+                    # Get the index of the reporter
+                    attr_index = model.datacollector.agent_attr_index[agent_type][reporter]
+
+                    # Create a dictionary with all attributes from all agents
+                    attr_dict = model.datacollector._agent_records[agent_type]
+
+                    # Get the values from all agents in a list
+                    values_tuples = list(attr_dict.values())[-1]
+
+                    # Get the correct value using the attribute index
+                    values = [value_tuple[attr_index] for value_tuple in values_tuples]
+
+                    # Calculate the mean among all agents
+                    val = statistics.mean(values)
+
+                except (IndexError, KeyError):
+                    val = 0
             current_values.append(val)
         return current_values

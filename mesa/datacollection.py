@@ -95,20 +95,31 @@ class DataCollector:
             {"Model_Function":[function, [param_1, param_2]]}
 
         """
-        self.model_reporters = {}
-        self.agent_reporters = {}
+        self.agent_types = agent_reporters.keys()
 
+        self.model_reporters = {}
         self.model_vars = {}
-        self._agent_records = {}
-        self.tables = {}
 
         if model_reporters is not None:
             for name, reporter in model_reporters.items():
                 self._new_model_reporter(name, reporter)
 
-        if agent_reporters is not None:
-            for name, reporter in agent_reporters.items():
-                self._new_agent_reporter(name, reporter)
+        self.agent_reporters = {}
+        self._agent_records = {}
+        self.agent_attr_index = {}
+        self.agent_name_index = {}
+
+        for agent_type in self.agent_types:
+            self.agent_reporters[agent_type] = {}
+            self._agent_records[agent_type] = {}
+            self.agent_name_index[agent_type] = {}
+        self.tables = {}
+
+        for agent_type in self.agent_types:
+            if agent_reporters[agent_type] is not None:
+                for name, reporter in agent_reporters[agent_type].items():
+                    self.agent_name_index[agent_type][name] = reporter
+                    self._new_agent_reporter(name, reporter, agent_type)
 
         if tables is not None:
             for name, columns in tables.items():
@@ -127,7 +138,7 @@ class DataCollector:
         self.model_reporters[name] = reporter
         self.model_vars[name] = []
 
-    def _new_agent_reporter(self, name, reporter):
+    def _new_agent_reporter(self, name, reporter, agent_type):
         """Add a new agent-level reporter to collect.
 
         Args:
@@ -140,7 +151,7 @@ class DataCollector:
             attribute_name = reporter
             reporter = partial(self._getattr, reporter)
             reporter.attribute_name = attribute_name
-        self.agent_reporters[name] = reporter
+        self.agent_reporters[agent_type][name] = reporter
 
     def _new_table(self, table_name, table_columns):
         """Add a new table that objects can write to.
@@ -153,13 +164,16 @@ class DataCollector:
         new_table = {column: [] for column in table_columns}
         self.tables[table_name] = new_table
 
-    def _record_agents(self, model):
+    def _record_agents(self, model, agent_type):
         """Record agents data in a mapping of functions and agents."""
-        rep_funcs = self.agent_reporters.values()
+        rep_funcs = self.agent_reporters[agent_type].values()
         if all([hasattr(rep, "attribute_name") for rep in rep_funcs]):
             prefix = ["model.schedule.steps", "unique_id"]
             attributes = [func.attribute_name for func in rep_funcs]
+            self.agent_attr_index[agent_type] = {k: v for v, k in enumerate(prefix + attributes)}
+            print(self.agent_attr_index[agent_type])
             get_reports = attrgetter(*prefix + attributes)
+
         else:
 
             def get_reports(agent):
@@ -167,7 +181,7 @@ class DataCollector:
                 reports = tuple(rep(agent) for rep in rep_funcs)
                 return _prefix + reports
 
-        agent_records = map(get_reports, model.schedule.agents)
+        agent_records = map(get_reports, model.schedule.agents_by_type[agent_type].values())
         return agent_records
 
     def _reporter_decorator(self, reporter):
@@ -190,9 +204,10 @@ class DataCollector:
                 else:
                     self.model_vars[var].append(self._reporter_decorator(reporter))
 
-        if self.agent_reporters:
-            agent_records = self._record_agents(model)
-            self._agent_records[model.schedule.steps] = list(agent_records)
+        for agent_type in self.agent_types:
+            if self.agent_reporters[agent_type]:
+                agent_records = self._record_agents(model, agent_type)
+                self._agent_records[agent_type][model.schedule.steps] = list(agent_records)
 
     def add_table_row(self, table_name, row, ignore_missing=False):
         """Add a row dictionary to a specific table.
@@ -229,21 +244,21 @@ class DataCollector:
         """
         return pd.DataFrame(self.model_vars)
 
-    def get_agent_vars_dataframe(self):
+    def get_agent_vars_dataframe(self, agent_type):
         """Create a pandas DataFrame from the agent variables.
 
         The DataFrame has one column for each variable, with two additional
         columns for tick and agent_id.
 
         """
-        all_records = itertools.chain.from_iterable(self._agent_records.values())
-        rep_names = [rep_name for rep_name in self.agent_reporters]
+        all_records = itertools.chain.from_iterable(self._agent_records[agent_type].values())
+        rep_names = [rep_name for rep_name in self.agent_reporters[agent_type]]
 
         df = pd.DataFrame.from_records(
             data=all_records,
-            columns=["Step", "AgentID"] + rep_names,
+            columns=["Step", f"{agent_type}_AgentID"] + rep_names,
         )
-        df = df.set_index(["Step", "AgentID"])
+        df = df.set_index(["Step", f"{agent_type}_AgentID"])
         return df
 
     def get_table_dataframe(self, table_name):
