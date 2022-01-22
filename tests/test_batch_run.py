@@ -141,4 +141,4 @@ def test_batch_run_no_agent_reporters():
 
 
 def test_batch_run_single_core():
-    batch_run(MockModel, {}, nr_processes=1, iterations=10)
+    batch_run(MockModel, {}, number_processes=1, iterations=10)

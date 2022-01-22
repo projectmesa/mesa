@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/ambv/black
-    rev: stable
+    rev: 21.12b0
     hooks:
     - id: black
       exclude: mesa/cookiecutter-mesa/*

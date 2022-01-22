@@ -919,13 +919,13 @@ We call ``batch_run`` with the following arguments:
   will then generate all possible parameter combinations based on this
   dictionary and run the model ``iterations`` times for each combination.
 
-* ``nr_processes``
+* ``number_processes``
 
   Number of processors used to run the sweep in parallel. Optional.
   If not specified, defaults to use all the available processors.
 
   Note: Multiprocessing does make debugging challenging. If your
-  parameter sweeps are resulting in unexpected errors set ``nr_processes = 1``.
+  parameter sweeps are resulting in unexpected errors set ``number_processes = 1``.
 
 * ``iterations``
 
@@ -980,7 +980,7 @@ iteration).
         parameters=params,
         iterations=5,
         max_steps=100,
-        nr_processes=None,
+        number_processes=None,
         data_collection_period=1,
         display_progress=True,
     )
