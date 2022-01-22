@@ -12,6 +12,7 @@ from collections import OrderedDict
 from functools import partial
 from itertools import count, product
 from multiprocessing import Pool, cpu_count
+from warnings import warn
 from typing import (
     Any,
     Counter,
@@ -34,7 +35,7 @@ from mesa.model import Model
 def batch_run(
     model_cls: Type[Model],
     parameters: Mapping[str, Union[Any, Iterable[Any]]],
-    nr_processes: Optional[int] = None,
+    number_processes: Optional[int] = None,
     iterations: int = 1,
     data_collection_period: int = -1,
     max_steps: int = 1000,
@@ -48,7 +49,7 @@ def batch_run(
         The model class to batch-run
     parameters : Mapping[str, Union[Any, Iterable[Any]]],
         Dictionary with model parameters over which to run the model. You can either pass single values or iterables.
-    nr_processes : int, optional
+    number_processes : int, optional
         Number of processes used. Set to None (default) to use all available processors
     iterations : int, optional
         Number of iterations for each parameter combination, by default 1
@@ -79,7 +80,7 @@ def batch_run(
     results: List[Dict[str, Any]] = []
 
     with tqdm(total_iterations, disable=not display_progress) as pbar:
-        if nr_processes == 1:
+        if number_processes == 1:
             for iteration in range(iterations):
                 for kwargs in kwargs_list:
                     _, rawdata = process_func(kwargs)
@@ -94,7 +95,7 @@ def batch_run(
 
         else:
             iteration_counter: Counter[Tuple[Any, ...]] = Counter()
-            with Pool(nr_processes) as p:
+            with Pool(number_processes) as p:
                 for paramValues, rawdata in p.imap_unordered(process_func, kwargs_list):
                     iteration_counter[paramValues] += 1
                     iteration = iteration_counter[paramValues]
@@ -525,7 +526,8 @@ class ParameterSampler:
 
 
 class BatchRunner(FixedBatchRunner):
-    """This class is instantiated with a model class, and model parameters
+    """DEPRECATION WARNING: BatchRunner Class has been replaced batch_run function
+    This class is instantiated with a model class, and model parameters
     associated with one or more values. It is also instantiated with model and
     agent-level reporters, dictionaries mapping a variable name to a function
     which collects some data from the model or its agents at the end of the run
@@ -579,6 +581,11 @@ class BatchRunner(FixedBatchRunner):
             display_progress: Display progress bar with time estimation?
 
         """
+        warn(
+            "BatchRunner class has been replaced by batch_run function. Please see documentation.",
+            DeprecationWarning,
+            2,
+        )
         if variable_parameters is None:
             super().__init__(
                 model_cls,
@@ -604,7 +611,8 @@ class BatchRunner(FixedBatchRunner):
 
 
 class BatchRunnerMP(BatchRunner):
-    """Child class of BatchRunner, extended with multiprocessing support."""
+    """DEPRECATION WARNING: BatchRunner class has been replaced by batch_run
+    Child class of BatchRunner, extended with multiprocessing support."""
 
     def __init__(self, model_cls, nr_processes=None, **kwargs):
         """Create a new BatchRunnerMP for a given model with the given
@@ -616,6 +624,11 @@ class BatchRunnerMP(BatchRunner):
                       should start, all running in parallel.
         kwargs: the kwargs required for the parent BatchRunner class
         """
+        warn(
+            "BatchRunnerMP class has been replaced by batch_run function. Please see documentation.",
+            DeprecationWarning,
+            2,
+        )
         if nr_processes is None:
             # identify the number of processors available on users machine
             available_processors = cpu_count()
