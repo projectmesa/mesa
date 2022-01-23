@@ -40,6 +40,7 @@ import itertools
 from operator import attrgetter
 import pandas as pd
 import types
+import statistics
 
 
 class DataCollector:
@@ -100,6 +101,8 @@ class DataCollector:
 
         self.model_vars = {}
         self._agent_records = {}
+        self.agent_attr_index = {}
+        self.agent_name_index = {}
         self.tables = {}
 
         if model_reporters is not None:
@@ -108,6 +111,7 @@ class DataCollector:
 
         if agent_reporters is not None:
             for name, reporter in agent_reporters.items():
+                self.agent_name_index[name] = reporter
                 self._new_agent_reporter(name, reporter)
 
         if tables is not None:
@@ -159,6 +163,7 @@ class DataCollector:
         if all([hasattr(rep, "attribute_name") for rep in rep_funcs]):
             prefix = ["model.schedule.steps", "unique_id"]
             attributes = [func.attribute_name for func in rep_funcs]
+            self.agent_attr_index = {k: v for v, k in enumerate(prefix + attributes)}
             get_reports = attrgetter(*prefix + attributes)
         else:
 
@@ -256,3 +261,36 @@ class DataCollector:
         if table_name not in self.tables:
             raise Exception("No such table.")
         return pd.DataFrame(self.tables[table_name])
+
+    def get_agent_metric(self, var_name, metric="mean"):
+        """Get a single aggegrated value from an agent variable.
+
+        Args:
+            var_name: The name of the variable to aggegrate.
+            metric: Statistics metric to be used (default: mean)
+                    all functions from built-in statistics module are supported
+                    as well as "min", "max", "sum" and "len"
+
+        """
+        # Get the reporter from the name
+        reporter = self.agent_name_index[var_name]
+
+        # Get the index of the reporter
+        attr_index = self.agent_attr_index[reporter]
+
+        # Create a dictionary with all attributes from all agents
+        attr_dict = self._agent_records
+
+        # Get the values from all agents in a list
+        values_tuples = list(attr_dict.values())[-1]
+
+        # Get the correct value using the attribute index
+        values = [value_tuple[attr_index] for value_tuple in values_tuples]
+
+        # Calculate the metric among all agents (mean by default)
+        if metric in ["min", "max", "sum", "len"]:
+            value = eval(f"{metric}(values)")
+        else:
+            stat_function = getattr(statistics, metric)
+            value = stat_function(values)
+        return value

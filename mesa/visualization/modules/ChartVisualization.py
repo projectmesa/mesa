@@ -34,7 +34,8 @@ class ChartModule(VisualizationElement):
                                       data_collector_name="datacollector")
 
     TODO:
-        Have it be able to handle agent-level variables as well.
+        Aggregate agent level variables other than mean (requires ChartModule
+        API change)
 
         More Pythonic customization; in particular, have both series-level and
         chart-level options settable in Python, and passed to the front-end
@@ -78,9 +79,18 @@ class ChartModule(VisualizationElement):
 
         for s in self.series:
             name = s["Label"]
-            try:
-                val = data_collector.model_vars[name][-1]  # Latest value
-            except (IndexError, KeyError):
+            if name in data_collector.model_vars.keys():
+                try:
+                    val = data_collector.model_vars[name][-1]  # Latest value
+                except (IndexError, KeyError):
+                    val = 0
+            elif name in data_collector.agent_name_index.keys():
+                try:
+                    # Returns mean of latest value of all agents
+                    val = data_collector.get_agent_metric(name)
+                except (IndexError, KeyError):
+                    val = 0
+            else:
                 val = 0
             current_values.append(val)
         return current_values
