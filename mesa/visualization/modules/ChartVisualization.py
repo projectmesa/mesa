@@ -6,7 +6,6 @@ Module for drawing live-updating line charts using Charts.js
 
 """
 import json
-import statistics
 from mesa.visualization.ModularVisualization import VisualizationElement
 
 
@@ -86,25 +85,12 @@ class ChartModule(VisualizationElement):
             elif entity == "Agent":
                 agent_dict = {e.__name__: e for e in list(model.schedule.agents_by_type.keys())}
                 agent_type = agent_dict[s["Agent_type"]]
+                if "Metric" in s.keys():
+                    metric = s["Metric"]
+                else:
+                    metric = "mean"
                 try:
-                    # Get the reporter from the name
-                    reporter = model.datacollector.agent_name_index[agent_type][name]
-
-                    # Get the index of the reporter
-                    attr_index = model.datacollector.agent_attr_index[agent_type][reporter]
-
-                    # Create a dictionary with all attributes from all agents
-                    attr_dict = model.datacollector._agent_records[agent_type]
-
-                    # Get the values from all agents in a list
-                    values_tuples = list(attr_dict.values())[-1]
-
-                    # Get the correct value using the attribute index
-                    values = [value_tuple[attr_index] for value_tuple in values_tuples]
-
-                    # Calculate the mean among all agents
-                    val = statistics.mean(values)
-
+                    val = data_collector.get_agent_metric(name, agent_type, metric)
                 except (IndexError, KeyError):
                     val = 0
             current_values.append(val)
