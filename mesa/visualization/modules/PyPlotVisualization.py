@@ -1,8 +1,8 @@
 import base64
 import io
 from typing import Any, Callable
-
 from matplotlib.figure import figure
+
 from mesa import Model
 from mesa.visualization.ModularVisualization import VisualizationElement
 
