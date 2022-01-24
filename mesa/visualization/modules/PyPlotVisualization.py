@@ -1,8 +1,10 @@
-from mesa.visualization.ModularVisualization import VisualizationElement
 import base64
 import io
-from typing import Callable, Any
+from typing import Any, Callable
+
 from matplotlib.figure import figure
+from mesa import Model
+from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class PyPlotVisualizationModule(VisualizationElement):
@@ -31,12 +33,10 @@ class PyPlotVisualizationModule(VisualizationElement):
                                          canvas_height)
         self.js_code = "elements.push(" + new_element + ");"
 
-    def render(self, model):
+    def render(self, model: Model):
         fig = self.img_func(model)
         io_bytes = io.BytesIO()
-        fig.tight_layout()
         fig.savefig(io_bytes, format='jpg')
         io_bytes.seek(0)
         jpg_data = base64.b64encode(io_bytes.read())
-
         return jpg_data.decode('utf-8')
