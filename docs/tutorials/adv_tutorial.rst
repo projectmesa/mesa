@@ -235,6 +235,38 @@ updates along with the grid. Reset the model, and the chart resets too.
 couple of steps; this is due to a bug in Charts.js which will hopefully
 be fixed soon.
 
+
+Adding PyPlots to visualization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can add pyplot visualizations to the modular sever using the following sample code:
+
+```python
+    def img(model:Model) -> plt.figure:
+        fig, ax = plt.subplots(2, 1)
+
+        agent_vars: pd.DataFrame = model.datacollector.get_agent_vars_dataframe().reset_index()
+
+        if agent_vars.empty:
+            return fig
+
+        pivot_df = pd.pivot_table(agent_vars, values='Knowledge',
+                                index='Step', columns='AgentID', aggfunc=sum)
+        pivot_df.max().sort_values().plot.barh(ax=ax[0])
+        ax[0].set_title('Known Info')
+
+        pivot_df2 = pd.pivot_table(agent_vars, values='Agents',
+                                index='Step', columns='AgentID', aggfunc=sum)
+        pivot_df2.max().sort_values().plot.barh(ax=ax[1])
+        ax[1].set_title('Known Agents')
+        return fig
+
+```
+.. figure:: files/viz_pyplot.png
+   :alt: PyPlot Visualization
+
+   PyPlot Visualization
+
 Building your own visualization component
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
