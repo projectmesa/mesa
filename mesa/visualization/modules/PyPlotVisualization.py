@@ -8,15 +8,17 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class PyPlotVisualizationModule(VisualizationElement):
-    """Visualize pyplot image visualizations on modular server.
-    """
+    """Visualize pyplot image visualizations on modular server."""
 
     package_includes = []
     local_includes = ["pltviz.js"]
 
-    def __init__(self, img_func: Callable[[Any], figure],
-                 canvas_height: int = 500,
-                 canvas_width: int = 500):
+    def __init__(
+        self,
+        img_func: Callable[[Any], figure],
+        canvas_height: int = 500,
+        canvas_width: int = 500,
+    ):
         """Creates a new pyplot visualization.
 
         Args:
@@ -29,14 +31,13 @@ class PyPlotVisualizationModule(VisualizationElement):
         self.img_func = img_func
         self.time_steps = []
         new_element = "new PyPlotModule({}, {})"
-        new_element = new_element.format(canvas_width,
-                                         canvas_height)
+        new_element = new_element.format(canvas_width, canvas_height)
         self.js_code = "elements.push(" + new_element + ");"
 
     def render(self, model: Model):
         fig = self.img_func(model)
         io_bytes = io.BytesIO()
-        fig.savefig(io_bytes, format='jpg')
+        fig.savefig(io_bytes, format="jpg")
         io_bytes.seek(0)
         jpg_data = base64.b64encode(io_bytes.read())
-        return jpg_data.decode('utf-8')
+        return jpg_data.decode("utf-8")
