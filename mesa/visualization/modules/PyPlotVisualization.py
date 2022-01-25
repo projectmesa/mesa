@@ -1,7 +1,8 @@
 import base64
 import io
 from typing import Any, Callable
-from matplotlib.figure import figure
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 
 from mesa import Model
 from mesa.visualization.ModularVisualization import VisualizationElement
@@ -15,7 +16,7 @@ class PyPlotVisualizationModule(VisualizationElement):
 
     def __init__(
         self,
-        img_func: Callable[[Any], figure],
+        img_func: Callable[[Any], Figure],
         canvas_height: int = 500,
         canvas_width: int = 500,
     ):

@@ -1,11 +1,17 @@
-from unittest import TestCase
 from collections import defaultdict
+from unittest import TestCase
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 
 from mesa.model import Model
 from mesa.space import Grid
 from mesa.time import SimultaneousActivation
 from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.modules import CanvasGrid, TextElement
+from mesa.visualization.modules import (
+    CanvasGrid,
+    PyPlotVisualizationModule,
+    TextElement,
+)
 from mesa.visualization.UserParam import UserSettableParameter
 
 from tests.test_batchrunner import MockAgent
@@ -66,6 +72,15 @@ class TestModularServer(TestCase):
         self.server = ModularServer(
             MockModel, self.viz_elements, "Test Model", model_params=self.user_params
         )
+
+    def test_pyplot_visualization(self):
+        def _img(model) -> Figure:
+            return plt.figure()
+
+        viz = PyPlotVisualizationModule(_img)
+        actual = viz.render(self.server.model)
+        expected = 7236
+        self.assertEqual(len(actual), expected)
 
     def test_canvas_render_model_state(self):
 
