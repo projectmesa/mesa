@@ -236,8 +236,8 @@ couple of steps; this is due to a bug in Charts.js which will hopefully
 be fixed soon.
 
 
-Adding PyPlots to visualization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Adding PyPlot
+~~~~~~~~~~~~~
 
 You can add pyplot visualizations to the modular sever using the following sample code:
 
@@ -262,6 +262,7 @@ You can add pyplot visualizations to the modular sever using the following sampl
         return fig
 
 ```
+
 .. figure:: files/viz_pyplot.png
    :alt: PyPlot Visualization
 
