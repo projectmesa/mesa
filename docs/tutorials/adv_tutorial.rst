@@ -239,7 +239,7 @@ be fixed soon.
 Adding PyPlot
 ~~~~~~~~~~~~~
 
-You can add pyplot visualizations to the modular sever using the following sample code:
+You can add pyplot visualizations to the modular server using the following sample code:
 
 ```python
     def img(model:Model) -> plt.figure:
