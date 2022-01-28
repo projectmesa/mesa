@@ -1,4 +1,4 @@
-var ContinuousVisualization = function(height, width, context) {
+var ContinuousVisualization = function(width, height, context) {
 	var height = height;
 	var width = width;
 	var context = context;
@@ -51,7 +51,7 @@ var ContinuousVisualization = function(height, width, context) {
 	};
 
 	this.resetCanvas = function() {
-		context.clearRect(0, 0, height, width);
+		context.clearRect(0, 0, width, height);
 		context.beginPath();
 	};
 };
