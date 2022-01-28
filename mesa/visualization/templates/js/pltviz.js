@@ -1,4 +1,4 @@
-var PyPlotModule = function(canvas_width, canvas_height) {
+let PyPlotModule = function(canvas_width, canvas_height) {
     var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
     canvas_tag += "style='border:1px dotted'></canvas>";
     var canvas = $(canvas_tag)[0];

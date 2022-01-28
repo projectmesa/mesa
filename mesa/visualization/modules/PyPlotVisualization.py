@@ -1,7 +1,6 @@
 import base64
 import io
 from typing import Any, Callable
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
 from mesa import Model
