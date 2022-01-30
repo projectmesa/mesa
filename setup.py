@@ -4,7 +4,7 @@ import re
 from setuptools import setup, find_packages
 from codecs import open
 
-requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "tornado", "tqdm"]
+requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "tornado", "tqdm", "matplotlib"]
 
 extras_require = {
     "dev": ["black", "coverage", "flake8", "pytest >= 4.6", "pytest-cov", "sphinx"],
