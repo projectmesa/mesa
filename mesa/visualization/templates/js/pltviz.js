@@ -6,8 +6,8 @@ let PyPlotModule = function(canvas_width, canvas_height) {
     const context = canvas.getContext("2d");
 
     this.render = function(data) {
-        let image_data = data[1]
-        let image = new Image();
+        const image_data = data[1]
+        const image = new Image();
         image.onload = function() {
             const hRatio = canvas.width / image.width    ;
             const vRatio = canvas.height / image.height  ;
