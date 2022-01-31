@@ -3,6 +3,52 @@
 Release History
 ---------------
 
+0.9.0 (2022-01-31) Page
++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+
+* Update number_processes and associated docs #1141
+* [PERF] Improve move_to_empty performance #1116 
+* Adding logic to check whether there is agent data #1115 
+* Convert all text strings to f-strings #1099 
+* Format Python and Jupyter Notebook files with Black #1078
+* README: Add info on how to cite Mesa #1046 
+* Re-Implementation of BatchRunner #924 
+* CI Related
+    * CI: Add workflow to update Pipfile.lock every month #1018
+    * CI: Lint typos with Codespell #1098 
+    * CI: Only run Codecov on Ubuntu jobs and update to v2 #1083 
+    * CI: Maintenance: Update to Python 3.10, split of lint jobs #1074 
+* Dependency updates
+    * Updates to Pipfile.lock (dependencies) #1114, #1086, #1080
+    * Update Pipfile to use Python 3.9 #1075 
+    * Update Chart.js to 3.6.1 (v3) #1087 
+    * Update Chart.js to version 2.9.4 #1084
+    * Pyupgrade 3.6: Update syntax with Python 3.6+ features #1105 
+    * Bump urllib3 from 1.26.2 to 1.26.5 #1043 
+    * Update packages.rst #1068 
+* Docs
+    * Update docs/README.md #1118 
+    * Update number_processes and associated docs #1141
+    * Update section 'Batch Run' of introductory tutorial #1119 
+    * Readme: Add command to install specific branch #1111 
+    * Docs: Add back some comments in space.py #1091 
+    * Docs: Remove trailing white spaces #1106
+    * Update intro_tutorial.rst #1097, #1095
+    * Tweaking and improving the documentation #1072 
+
+**Fixes**
+
+* Rename i_steps -> data_collection_period and add docstring #1120 
+* bank_reserves: Say that the commented out legacy code is for comparison #1110
+* Fix broken image on PyPI #1071
+* Docs
+    * Fix numbering typos in docs/README.md #1117    
+    * Readme: Fix command for installing custom branch on fork #1144 
+    * Docs: space.py: Fix single case of neighbor spelled as neighbour #1090 
+
+
 0.8.9 (2020-05-24) Oro Valley
 +++++++++++++++++++++++++++++++++++++++++++
 
