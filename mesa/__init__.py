@@ -13,6 +13,6 @@ from mesa.agent import Agent
 __all__ = ["Model", "Agent"]
 
 __title__ = "mesa"
-__version__ = "0.8.9"
+__version__ = "0.9.0"
 __license__ = "Apache 2.0"
 __copyright__ = f"Copyright {datetime.date.today().year} Project Mesa Team"
