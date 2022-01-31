@@ -84,7 +84,7 @@ class ChartModule(VisualizationElement):
                     val = data_collector.model_vars[name][-1]  # Latest value
                 except (IndexError, KeyError):
                     val = 0
-            elif name in data_collector.agent_name_index.keys():
+            elif name in data_collector.agent_reporters.keys():
                 try:
                     # Returns mean of latest value of all agents
                     val = data_collector.get_agent_metric(name)

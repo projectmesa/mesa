@@ -102,7 +102,6 @@ class DataCollector:
         self.model_vars = {}
         self._agent_records = {}
         self.agent_attr_index = {}
-        self.agent_name_index = {}
         self.tables = {}
 
         if model_reporters is not None:
@@ -111,7 +110,6 @@ class DataCollector:
 
         if agent_reporters is not None:
             for name, reporter in agent_reporters.items():
-                self.agent_name_index[name] = reporter
                 self._new_agent_reporter(name, reporter)
 
         if tables is not None:
@@ -273,7 +271,7 @@ class DataCollector:
 
         """
         # Get the reporter from the name
-        reporter = self.agent_name_index[var_name]
+        reporter = self.agent_reporters[var_name]
 
         # Get the index of the reporter
         attr_index = self.agent_attr_index[reporter]
