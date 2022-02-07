@@ -100,8 +100,8 @@ class DataCollector:
         self.agent_reporters = {}
 
         self.model_vars = {}
+        self.agent_vars = {}
         self._agent_records = {}
-        self.agent_attr_index = {}
         self.tables = {}
 
         if model_reporters is not None:
@@ -161,7 +161,7 @@ class DataCollector:
         if all([hasattr(rep, "attribute_name") for rep in rep_funcs]):
             prefix = ["model.schedule.steps", "unique_id"]
             attributes = [func.attribute_name for func in rep_funcs]
-            self.agent_attr_index = {k: v for v, k in enumerate(prefix + attributes)}
+            self.agent_vars = {k: v for v, k in enumerate(prefix + attributes)}
             get_reports = attrgetter(*prefix + attributes)
         else:
 
@@ -274,7 +274,7 @@ class DataCollector:
         reporter = self.agent_reporters[var_name]
 
         # Get the index of the reporter
-        attr_index = self.agent_attr_index[reporter]
+        attr_index = self.agent_vars[reporter]
 
         # Create a dictionary with all attributes from all agents
         attr_dict = self._agent_records
