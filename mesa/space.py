@@ -837,7 +837,7 @@ class ContinuousSpace:
             deltas = np.minimum(deltas, self.size - deltas)
         dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
 
-        (idxs,) = np.where(dists <= radius ** 2)
+        (idxs,) = np.where(dists <= radius**2)
         neighbors = [
             self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0
         ]
