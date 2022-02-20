@@ -10,11 +10,13 @@ from mesa.time import (
     StagedActivation,
     RandomActivation,
     SimultaneousActivation,
+    RandomActivationByType,
 )
 
 RANDOM = "random"
 STAGED = "staged"
 SIMULTANEOUS = "simultaneous"
+RANDOM_BY_TYPE = "random_by_type"
 
 
 class MockAgent(Agent):
@@ -66,6 +68,8 @@ class MockModel(Model):
             self.schedule = RandomActivation(self)
         elif activation == SIMULTANEOUS:
             self.schedule = SimultaneousActivation(self)
+        elif activation == RANDOM_BY_TYPE:
+            self.schedule = RandomActivationByType(self)
         else:
             self.schedule = BaseScheduler(self)
 
@@ -182,6 +186,45 @@ class TestSimultaneousActivation(TestCase):
         agent_advances = [i.advances for i in model.schedule.agents]
         assert all(map(lambda x: x == 1, agent_steps))
         assert all(map(lambda x: x == 1, agent_advances))
+
+
+class TestRandomActivationByType(TestCase):
+    """
+    Test the random activation by type.
+    TODO implement at least 2 types of agents, and test that step_type only
+    does step for one type of agents, not the entire agents.
+    """
+
+    def test_random_activation_step_shuffles(self):
+        """
+        Test the random activation by type step
+        """
+        model = MockModel(activation=RANDOM_BY_TYPE)
+        model.random = mock.Mock()
+        model.schedule.step()
+        assert model.random.shuffle.call_count == 2
+
+    def test_random_activation_step_increments_step_and_time_counts(self):
+        """
+        Test the random activation by type step increments step and time counts
+        """
+        model = MockModel(activation=RANDOM_BY_TYPE)
+        assert model.schedule.steps == 0
+        assert model.schedule.time == 0
+        model.schedule.step()
+        assert model.schedule.steps == 1
+        assert model.schedule.time == 1
+
+    def test_random_activation_step_steps_each_agent(self):
+        """
+        Test the random activation by type step causes each agent to step
+        """
+
+        model = MockModel(activation=RANDOM_BY_TYPE)
+        model.step()
+        agent_steps = [i.steps for i in model.schedule.agents]
+        # one step for each of 2 agents
+        assert all(map(lambda x: x == 1, agent_steps))
 
 
 if __name__ == "__main__":
