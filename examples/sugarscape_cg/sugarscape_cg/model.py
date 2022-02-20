@@ -12,9 +12,9 @@ Northwestern University, Evanston, IL.
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
+from mesa.time import RandomActivationByType
 
 from .agents import SsAgent, Sugar
-from .schedule import RandomActivationByBreed
 
 
 class SugarscapeCg(Model):
@@ -37,10 +37,10 @@ class SugarscapeCg(Model):
         self.width = width
         self.initial_population = initial_population
 
-        self.schedule = RandomActivationByBreed(self)
+        self.schedule = RandomActivationByType(self)
         self.grid = MultiGrid(self.height, self.width, torus=False)
         self.datacollector = DataCollector(
-            {"SsAgent": lambda m: m.schedule.get_breed_count(SsAgent)}
+            {"SsAgent": lambda m: m.schedule.get_type_count(SsAgent)}
         )
 
         # Create sugar
@@ -72,14 +72,14 @@ class SugarscapeCg(Model):
         # collect data
         self.datacollector.collect(self)
         if self.verbose:
-            print([self.schedule.time, self.schedule.get_breed_count(SsAgent)])
+            print([self.schedule.time, self.schedule.get_type_count(SsAgent)])
 
     def run_model(self, step_count=200):
 
         if self.verbose:
             print(
                 "Initial number Sugarscape Agent: ",
-                self.schedule.get_breed_count(SsAgent),
+                self.schedule.get_type_count(SsAgent),
             )
 
         for i in range(step_count):
@@ -89,5 +89,5 @@ class SugarscapeCg(Model):
             print("")
             print(
                 "Final number Sugarscape Agent: ",
-                self.schedule.get_breed_count(SsAgent),
+                self.schedule.get_type_count(SsAgent),
             )
