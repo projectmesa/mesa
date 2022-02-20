@@ -12,9 +12,9 @@ Replication of the model found in NetLogo:
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
+from mesa.time import RandomActivationByType
 
 from wolf_sheep.agents import Sheep, Wolf, GrassPatch
-from wolf_sheep.schedule import RandomActivationByBreed
 
 
 class WolfSheep(Model):
@@ -83,12 +83,12 @@ class WolfSheep(Model):
         self.grass_regrowth_time = grass_regrowth_time
         self.sheep_gain_from_food = sheep_gain_from_food
 
-        self.schedule = RandomActivationByBreed(self)
+        self.schedule = RandomActivationByType(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
         self.datacollector = DataCollector(
             {
-                "Wolves": lambda m: m.schedule.get_breed_count(Wolf),
-                "Sheep": lambda m: m.schedule.get_breed_count(Sheep),
+                "Wolves": lambda m: m.schedule.get_type_count(Wolf),
+                "Sheep": lambda m: m.schedule.get_type_count(Sheep),
             }
         )
 
@@ -136,21 +136,21 @@ class WolfSheep(Model):
             print(
                 [
                     self.schedule.time,
-                    self.schedule.get_breed_count(Wolf),
-                    self.schedule.get_breed_count(Sheep),
+                    self.schedule.get_type_count(Wolf),
+                    self.schedule.get_type_count(Sheep),
                 ]
             )
 
     def run_model(self, step_count=200):
 
         if self.verbose:
-            print("Initial number wolves: ", self.schedule.get_breed_count(Wolf))
-            print("Initial number sheep: ", self.schedule.get_breed_count(Sheep))
+            print("Initial number wolves: ", self.schedule.get_type_count(Wolf))
+            print("Initial number sheep: ", self.schedule.get_type_count(Sheep))
 
         for i in range(step_count):
             self.step()
 
         if self.verbose:
             print("")
-            print("Final number wolves: ", self.schedule.get_breed_count(Wolf))
-            print("Final number sheep: ", self.schedule.get_breed_count(Sheep))
+            print("Final number wolves: ", self.schedule.get_type_count(Wolf))
+            print("Final number sheep: ", self.schedule.get_type_count(Sheep))
