@@ -28,22 +28,22 @@ jobs:
             python-version: pypy3
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('Pipfile.lock') }}
-        if: matrix.python-version == 'pypy3'
-      - name: Install dependencies
-        run: pip install .[dev]
-      - name: Test with pytest
-        run: pytest --cov=mesa tests/ --cov-report=xml
-      - name: Codecov
-        uses: codecov/codecov-action@v1.0.15
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('Pipfile.lock') }}
+      if: matrix.python-version == 'pypy3'
+    - name: Install dependencies
+      run: pip install .[dev]
+    - name: Test with pytest
+      run: pytest --cov=mesa tests/ --cov-report=xml
+    - name: Codecov
+      uses: codecov/codecov-action@v1.0.15
 
   lint-flake:
     runs-on: ubuntu-latest
