@@ -19,7 +19,12 @@ jobs:
         run: pip install -U pip wheel setuptools
       - name: Build package
         run: python setup.py sdist bdist_wheel
-      - name: Upload package
+      - name: Upload package as artifact to GitHub
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: dist/
+      - name: Upload packages to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
