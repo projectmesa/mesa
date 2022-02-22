@@ -5,12 +5,13 @@ Mesa: Agent-based modeling in Python 3+
         :target: https://github.com/projectmesa/mesa/actions
 
 .. image:: https://codecov.io/gh/projectmesa/mesa/branch/main/graph/badge.svg
-  :target: https://codecov.io/gh/projectmesa/mesa
+        :target: https://codecov.io/gh/projectmesa/mesa
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
+        :target: https://github.com/psf/black
 
-`Mesa`_ is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
+.. image:: https://img.shields.io/matrix/projectmesa:matrix.org?label=chat&logo=Matrix
+        :target: https://matrix.to/#/#projectmesa:matrix.org
 
 It allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python 3-based alternative to NetLogo, Repast, or MASON.
 
@@ -49,7 +50,7 @@ You can also use `pip` to install the github version:
 .. code-block:: bash
 
     $ pip install -e git+https://github.com/projectmesa/mesa#egg=mesa
-    
+
 Or any other (development) branch on this repo or your own fork:
 
 .. code-block:: bash
@@ -106,9 +107,12 @@ If you run into an issue, please file a `ticket`_ for us to discuss. If possible
 
 If you would like to add a feature, please reach out via `ticket`_ or the `dev email list`_ for discussion. A feature is most likely to be added if you build it!
 
+Mesa also has a `Matrix chat room`_ in which questions, issues, and ideas can be (informally) discussed.
+
 * `Contributors guide`_
 * `Github`_
 
+.. _`Matrix chat room` : https://matrix.to/#/#projectmesa:matrix.org
 .. _`ticket` : https://github.com/projectmesa/mesa/issues
 .. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
 .. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.rst
