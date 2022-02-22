@@ -19,4 +19,5 @@ Please see this [link](http://pyibl.ddmlab.com/) to install pyibl package
 
 ## Further Reading
 
+=======
 [1] Kumar, Shikhar, and Cleotilde Gonzalez. "Heterogeneity of Memory Decay and Collective Learning in the El Farol Bar Problem." (2016).
