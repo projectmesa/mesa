@@ -18,6 +18,9 @@ class TestExamples(unittest.TestCase):
     """
 
     EXAMPLES = os.path.abspath(os.path.join(os.path.dirname(__file__), "../examples"))
+    EXCEPTIONS = ["el_farol"]
+    # Exceptions contains examples not being tested.
+    # One package used in el_farol cannot be installed by pip, so it is excluded for testing.
 
     @contextlib.contextmanager
     def active_example_dir(self, example):
@@ -40,13 +43,16 @@ class TestExamples(unittest.TestCase):
 
     def test_examples(self):
         for example in os.listdir(self.EXAMPLES):
-            if not os.path.isdir(os.path.join(self.EXAMPLES, example)):
+            if (
+                not os.path.isdir(os.path.join(self.EXAMPLES, example))
+                or example in self.EXCEPTIONS
+            ):
                 continue
-            if hasattr(self, "test_{}".format(example.replace("-", "_"))):
+            if hasattr(self, f"test_{example.replace('-', '_')}"):
                 # non-standard example; tested below
                 continue
 
-            print("testing example {!r}".format(example))
+            print(f"testing example {example!r}")
             with self.active_example_dir(example):
                 try:
                     # model.py at the top level
@@ -55,11 +61,9 @@ class TestExamples(unittest.TestCase):
                     server.server.render_model()
                 except ImportError:
                     # <example>/model.py
-                    mod = importlib.import_module(
-                        "{}.model".format(example.replace("-", "_"))
-                    )
+                    mod = importlib.import_module(f"{example.replace('-', '_')}.model")
                     server = importlib.import_module(
-                        "{}.server".format(example.replace("-", "_"))
+                        f"{example.replace('-', '_')}.server"
                     )
                     server.server.render_model()
                 Model = getattr(mod, classcase(example))

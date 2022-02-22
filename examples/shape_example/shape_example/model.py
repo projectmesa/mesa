@@ -31,7 +31,7 @@ class ShapeExample(Model):
             heading = self.random.choice(self.headings)
             # heading = (1, 0)
             if self.grid.is_cell_empty(pos):
-                print("Creating agent {2} at ({0}, {1})".format(x, y, unique_id))
+                print(f"Creating agent {unique_id} at ({x}, {y})")
                 a = Walker(unique_id, self, pos, heading)
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos)

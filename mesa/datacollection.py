@@ -154,7 +154,7 @@ class DataCollector:
         self.tables[table_name] = new_table
 
     def _record_agents(self, model):
-        """ Record agents data in a mapping of functions and agents. """
+        """Record agents data in a mapping of functions and agents."""
         rep_funcs = self.agent_reporters.values()
         if all([hasattr(rep, "attribute_name") for rep in rep_funcs]):
             prefix = ["model.schedule.steps", "unique_id"]
@@ -174,7 +174,7 @@ class DataCollector:
         return reporter()
 
     def collect(self, model):
-        """ Collect all the data for the given model object. """
+        """Collect all the data for the given model object."""
         if self.model_reporters:
 
             for var, reporter in self.model_reporters.items():
@@ -217,7 +217,7 @@ class DataCollector:
 
     @staticmethod
     def _getattr(name, _object):
-        """ Turn around arguments of getattr to make it partially callable."""
+        """Turn around arguments of getattr to make it partially callable."""
         return getattr(_object, name, None)
 
     def get_model_vars_dataframe(self):
