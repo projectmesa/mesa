@@ -75,7 +75,7 @@ class TestSpaceToroidal(unittest.TestCase):
 
         pos_6 = (-30, -29)
         pos_7 = (21, -5)
-        assert self.space.get_distance(pos_6, pos_7) == np.sqrt(49 ** 2 + 24 ** 2)
+        assert self.space.get_distance(pos_6, pos_7) == np.sqrt(49**2 + 24**2)
 
     def test_heading(self):
         pos_1 = (-30, -30)

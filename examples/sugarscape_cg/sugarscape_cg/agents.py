@@ -14,7 +14,7 @@ def get_distance(pos_1, pos_2):
     x2, y2 = pos_2
     dx = x1 - x2
     dy = y1 - y2
-    return math.sqrt(dx ** 2 + dy ** 2)
+    return math.sqrt(dx**2 + dy**2)
 
 
 class SsAgent(Agent):
