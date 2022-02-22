@@ -2,8 +2,8 @@ from mesa.space import MultiGrid
 from mesa import Model
 from mesa.time import RandomActivation
 import numpy as np
-from .agents import BarCustomer
-from .agents import BarCustomerIBLT
+from agents import BarCustomer
+from agents import BarCustomerIBLT
 from mesa.datacollection import DataCollector
 
 
