@@ -28,17 +28,17 @@ class WalkerWorld(Model):
     height = 10
     width = 10
 
-    def __init__(self, height, width, agent_count):
+    def __init__(self, width, height, agent_count):
         """
         Create a new WalkerWorld.
 
         Args:
-            height, width: World size.
+            width, height: World size.
             agent_count: How many agents to create.
         """
         self.height = height
         self.width = width
-        self.grid = MultiGrid(self.height, self.width, torus=True)
+        self.grid = MultiGrid(self.width, self.height, torus=True)
         self.agent_count = agent_count
 
         self.schedule = RandomActivation(self)
