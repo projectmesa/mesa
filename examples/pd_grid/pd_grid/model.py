@@ -21,13 +21,13 @@ class PdGrid(Model):
     payoff = {("C", "C"): 1, ("C", "D"): 0, ("D", "C"): 1.6, ("D", "D"): 0}
 
     def __init__(
-        self, height=50, width=50, schedule_type="Random", payoffs=None, seed=None
+        self, width=50, height=50, schedule_type="Random", payoffs=None, seed=None
     ):
         """
         Create a new Spatial Prisoners' Dilemma Model.
 
         Args:
-            height, width: Grid size. There will be one agent per grid cell.
+            width, height: Grid size. There will be one agent per grid cell.
             schedule_type: Can be "Sequential", "Random", or "Simultaneous".
                            Determines the agent activation regime.
             payoffs: (optional) Dictionary of (move, neighbor_move) payoffs.

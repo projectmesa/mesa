@@ -22,7 +22,7 @@ class BoltzmannWealthModel(Model):
 
     def __init__(self, N=100, width=10, height=10):
         self.num_agents = N
-        self.grid = MultiGrid(height, width, True)
+        self.grid = MultiGrid(width, height, True)
         self.schedule = RandomActivation(self)
         self.datacollector = DataCollector(
             model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}

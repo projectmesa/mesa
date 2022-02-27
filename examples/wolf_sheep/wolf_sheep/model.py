@@ -45,8 +45,8 @@ class WolfSheep(Model):
 
     def __init__(
         self,
-        height=20,
         width=20,
+        height=20,
         initial_sheep=100,
         initial_wolves=50,
         sheep_reproduce=0.04,
@@ -72,8 +72,8 @@ class WolfSheep(Model):
         """
         super().__init__()
         # Set parameters
-        self.height = height
         self.width = width
+        self.height = height
         self.initial_sheep = initial_sheep
         self.initial_wolves = initial_wolves
         self.sheep_reproduce = sheep_reproduce
@@ -84,7 +84,7 @@ class WolfSheep(Model):
         self.sheep_gain_from_food = sheep_gain_from_food
 
         self.schedule = RandomActivationByType(self)
-        self.grid = MultiGrid(self.height, self.width, torus=True)
+        self.grid = MultiGrid(self.width, self.height, torus=True)
         self.datacollector = DataCollector(
             {
                 "Wolves": lambda m: m.schedule.get_type_count(Wolf),

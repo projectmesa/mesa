@@ -24,7 +24,7 @@ class SugarscapeCg(Model):
 
     verbose = True  # Print-monitoring
 
-    def __init__(self, height=50, width=50, initial_population=100):
+    def __init__(self, width=50, height=50, initial_population=100):
         """
         Create a new Constant Growback model with the given parameters.
 
@@ -33,12 +33,12 @@ class SugarscapeCg(Model):
         """
 
         # Set parameters
-        self.height = height
         self.width = width
+        self.height = height
         self.initial_population = initial_population
 
         self.schedule = RandomActivationByType(self)
-        self.grid = MultiGrid(self.height, self.width, torus=False)
+        self.grid = MultiGrid(self.width, self.height, torus=False)
         self.datacollector = DataCollector(
             {"SsAgent": lambda m: m.schedule.get_type_count(SsAgent)}
         )
