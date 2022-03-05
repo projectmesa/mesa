@@ -10,8 +10,8 @@ Mesa: Agent-based modeling in Python 3+
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
         :target: https://github.com/psf/black
 
-.. image:: https://img.shields.io/matrix/projectmesa:matrix.org?label=chat&logo=Matrix
-        :target: https://matrix.to/#/#projectmesa:matrix.org
+.. image:: https://img.shields.io/matrix/project-mesa:matrix.org?label=chat&logo=Matrix
+        :target: https://matrix.to/#/#project-mesa:matrix.org
 
 It allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python 3-based alternative to NetLogo, Repast, or MASON.
 
@@ -100,23 +100,28 @@ directory with the run.py file):
 
     $ docker run --rm -it -p127.0.0.1:8521:8521 -v${PWD}:/code comses/mesa:dev mesa runserver /code
 
-Contributing back to Mesa
+Contributing to Mesa
 ----------------------------
+
+Want to join the Mesa team or just curious about what is happening with Mesa? You can...
+
+  * Join our `Matrix chat room`_ in which questions, issues, and ideas can be (informally) discussed.
+  * Come to a monthly dev session (you can find dev session times, agendas and notes on `Mesa discussions`_).
+  * Just check out the code on `GitHub`_.
 
 If you run into an issue, please file a `ticket`_ for us to discuss. If possible, follow up with a pull request.
 
-If you would like to add a feature, please reach out via `ticket`_ or the `dev email list`_ for discussion. A feature is most likely to be added if you build it!
+If you would like to add a feature, please reach out via `ticket`_ or join a dev session (see `Mesa discussions`_).
+A feature is most likely to be added if you build it!
 
-Mesa also has a `Matrix chat room`_ in which questions, issues, and ideas can be (informally) discussed.
+Don't forget to checkout the `Contributors guide`_.
 
-* `Contributors guide`_
-* `Github`_
-
-.. _`Matrix chat room` : https://matrix.to/#/#projectmesa:matrix.org
+.. _`Matrix chat room` : https://matrix.to/#/#project-mesa:matrix.org
+.. _`Mesa discussions` : https://github.com/projectmesa/mesa/discussions
+.. _`GitHub` : https://github.com/projectmesa/mesa/
 .. _`ticket` : https://github.com/projectmesa/mesa/issues
-.. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
 .. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.rst
-.. _`Github` : https://github.com/projectmesa/mesa/
+
 
 Citing Mesa
 ----------------------------
