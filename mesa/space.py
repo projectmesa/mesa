@@ -31,7 +31,10 @@ from typing import (
     cast,
     overload,
 )
+
+# For Mypy
 from .agent import Agent
+from numbers import Real
 
 Coordinate = Tuple[int, int]
 GridContent = Union[Optional[Agent], Set[Agent]]
@@ -57,6 +60,11 @@ def accept_tuple_argument(wrapped_function):
             return wrapped_function(*args)
 
     return wrapper
+
+
+def is_integer(x: Real) -> bool:
+    # Check if x is either a CPython integer or Numpy integer.
+    return isinstance(x, (int, np.integer))
 
 
 class Grid:
@@ -142,18 +150,18 @@ class Grid:
 
         x, y = index
 
-        if isinstance(x, int) and isinstance(y, int):
+        if is_integer(x) and is_integer(y):
             # grid[x, y]
             index = cast(Coordinate, index)
             x, y = self.torus_adj(index)
             return self.grid[x][y]
 
-        if isinstance(x, int):
+        if is_integer(x):
             # grid[x, :]
             x, _ = self.torus_adj((x, 0))
             x = slice(x, x + 1)
 
-        if isinstance(y, int):
+        if is_integer(y):
             # grid[:, y]
             _, y = self.torus_adj((0, y))
             y = slice(y, y + 1)
