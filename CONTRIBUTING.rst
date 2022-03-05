@@ -1,7 +1,10 @@
 Contributing
 =========================
 
-As an open source project, Mesa welcomes contributions of many forms.
+As an open source project, Mesa welcomes contributions of many forms, and from beginners to experts. If you are
+curious or just want to see what is happening, we post our development session agendas
+and development session notes on `Mesa discussions`_. We also have a threaded discussion forum on `Matrix`_
+for casual conversation.
 
 In no particular order, examples include:
 
@@ -11,9 +14,11 @@ In no particular order, examples include:
 - Documentation improvements
 - Tutorials
 
-No contribution is too small. Although, contributions can be too big, so let's discuss via the `dev email list`_ OR `an issue`_.
+No contribution is too small. Although, contributions can be too big, so let's
+discuss via `Matrix`_ OR via `an issue`_.
 
-.. _`dev email list` : https://groups.google.com/forum/#!forum/projectmesa-dev
+.. _`Mesa discussions`: https://github.com/projectmesa/mesa/discussions
+.. _`Matrix`: https://matrix.to/#/#project-mesa:matrix.org`
 .. _`an issue` : https://github.com/projectmesa/mesa/issues
 
 **To submit a contribution**
