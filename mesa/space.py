@@ -197,8 +197,13 @@ class Grid:
             moore: Boolean for whether to use Moore neighborhood (including
                    diagonals) or Von Neumann (only up/down/left/right).
         """
-        neighborhood = self.get_neighborhood(pos, moore=moore)
-        return self.iter_cell_list_contents(neighborhood)
+        from warnings import warn
+
+        warn(
+            "`neighbor_iter` is deprecated in favor of `iter_neighbors` "
+            "and will be removed in the subsequent version."
+        )
+        return self.iter_neighbors(pos, moore)
 
     def iter_neighborhood(
         self,
@@ -606,7 +611,7 @@ class HexGrid(Grid):
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
         get_neighborhood: Returns the cells surrounding a given cell.
-        neighbor_iter: Iterates over position neighbors.
+        iter_neighbors: Iterates over position neighbors.
         iter_neighborhood: Returns an iterator over cell coordinates that are
             in the neighborhood of a certain point.
     """
@@ -679,8 +684,13 @@ class HexGrid(Grid):
         Args:
             pos: (x,y) coords tuple for the position to get the neighbors of.
         """
-        neighborhood = self.iter_neighborhood(pos)
-        return self.iter_cell_list_contents(neighborhood)
+        from warnings import warn
+
+        warn(
+            "`neighbor_iter` is deprecated in favor of `iter_neighbors` "
+            "and will be removed in the subsequent version."
+        )
+        return self.iter_neighbors(pos)
 
     def get_neighborhood(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
