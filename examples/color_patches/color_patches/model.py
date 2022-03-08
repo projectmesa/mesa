@@ -45,8 +45,8 @@ class ColorCell(Agent):
         A choice is made at random in case of a tie
         The next state is stored until all cells have been polled
         """
-        neighbor_iter_ = self.model.grid.neighbor_iter((self._row, self._col), True)
-        neighbors_opinion = Counter(n.get_state() for n in neighbor_iter_)
+        _neighbor_iter = self.model.grid.iter_neighbors((self._row, self._col), True)
+        neighbors_opinion = Counter(n.get_state() for n in _neighbor_iter)
         # Following is a a tuple (attribute, occurrences)
         polled_opinions = neighbors_opinion.most_common()
         tied_opinions = []

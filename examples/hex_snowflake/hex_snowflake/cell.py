@@ -23,7 +23,7 @@ class Cell(Agent):
 
     @property
     def neighbors(self):
-        return self.model.grid.neighbor_iter((self.x, self.y))
+        return self.model.grid.iter_neighbors((self.x, self.y))
 
     @property
     def considered(self):

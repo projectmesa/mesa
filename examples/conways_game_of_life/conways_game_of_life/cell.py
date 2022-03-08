@@ -22,7 +22,7 @@ class Cell(Agent):
 
     @property
     def neighbors(self):
-        return self.model.grid.neighbor_iter((self.x, self.y), True)
+        return self.model.grid.iter_neighbors((self.x, self.y), True)
 
     def step(self):
         """
