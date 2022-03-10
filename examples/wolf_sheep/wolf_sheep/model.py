@@ -12,8 +12,8 @@ Replication of the model found in NetLogo:
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
-from mesa.time import RandomActivationByType
 
+from wolf_sheep.scheduler import RandomActivationByTypeFiltered
 from wolf_sheep.agents import Sheep, Wolf, GrassPatch
 
 
@@ -83,12 +83,15 @@ class WolfSheep(Model):
         self.grass_regrowth_time = grass_regrowth_time
         self.sheep_gain_from_food = sheep_gain_from_food
 
-        self.schedule = RandomActivationByType(self)
+        self.schedule = RandomActivationByTypeFiltered(self)
         self.grid = MultiGrid(self.width, self.height, torus=True)
         self.datacollector = DataCollector(
             {
                 "Wolves": lambda m: m.schedule.get_type_count(Wolf),
                 "Sheep": lambda m: m.schedule.get_type_count(Sheep),
+                "Grass": lambda m: m.schedule.get_type_count(
+                    GrassPatch, lambda x: x.fully_grown
+                ),
             }
         )
 
@@ -138,6 +141,7 @@ class WolfSheep(Model):
                     self.schedule.time,
                     self.schedule.get_type_count(Wolf),
                     self.schedule.get_type_count(Sheep),
+                    self.schedule.get_type_count(GrassPatch, lambda x: x.fully_grown),
                 ]
             )
 
@@ -146,6 +150,10 @@ class WolfSheep(Model):
         if self.verbose:
             print("Initial number wolves: ", self.schedule.get_type_count(Wolf))
             print("Initial number sheep: ", self.schedule.get_type_count(Sheep))
+            print(
+                "Initial number grass: ",
+                self.schedule.get_type_count(GrassPatch, lambda x: x.fully_grown),
+            )
 
         for i in range(step_count):
             self.step()
@@ -154,3 +162,7 @@ class WolfSheep(Model):
             print("")
             print("Final number wolves: ", self.schedule.get_type_count(Wolf))
             print("Final number sheep: ", self.schedule.get_type_count(Sheep))
+            print(
+                "Final number grass: ",
+                self.schedule.get_type_count(GrassPatch, lambda x: x.fully_grown),
+            )
