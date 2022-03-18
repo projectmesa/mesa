@@ -1,7 +1,8 @@
 repos:
 -   repo: https://github.com/ambv/black
-    rev: 21.12b0
+    rev: 22.1.0
     hooks:
-    - id: black
-      exclude: mesa/cookiecutter-mesa/*
-      language_version: python3.6
+      - id: black
+        exclude: ^mesa/cookiecutter-mesa/
+        language_version: python3.6
+      - id: black-jupyter
