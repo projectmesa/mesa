@@ -713,10 +713,11 @@ At every step of the model, the datacollector will collect and store the
 model-level current Gini coefficient, as well as each agent’s wealth,
 associating each with the current step.
 
-We run the model just as we did above. Now is when an interactive
-session, especially via a Notebook, comes in handy: the DataCollector
-can export the data it’s collected as a pandas DataFrame, for easy
-interactive analysis.
+We run the model just as we did above. Now is when an interactive session, especially via a Notebook, comes in handy: the DataCollector can export the data its collected as a pandas\* DataFrame, for easy interactive analysis.
+
+\*If you are new to Python, please be aware that pandas is already installed as a dependency of Mesa and that `pandas`_ is a "fast, powerful, flexible and easy to use open source data analysis and manipulation tool". pandas is a great resource to help analyze the data collected in your models
+
+.. _pandas: https://pandas.pydata.org/docs/
 
 .. code:: python
 
@@ -852,6 +853,19 @@ Or to plot the wealth of a given agent (in this example, agent 14):
 
 .. image:: intro_tutorial_files/intro_tutorial_45_1.png
 
+You can also use pandas to export the data to a CSV (comma separated value),
+which can be opened by any common spreadsheet application or opened by pandas.
+
+If you do not specify a file path, the file will be saved in the local directory.
+After you run the code below you will see two files appear (*model_data.csv* and *agent_data.csv*)
+
+.. code:: python
+
+    # save the model data (stored in the pandas gini object) to csv
+    gini.to_csv("model_data.csv")
+
+    # save the agent data (stored in the pandas agent_wealth object) to csv.
+    agent_wealth.to_csv("agent_data.csv")
 
 Batch Run
 ~~~~~~~~~
@@ -970,6 +984,9 @@ iteration).
 .. code:: python
 
     from mesa.batchrunner import batch_run
+**Note for Windows OS users:** If you are running this tutorial in Jupyter, we recommend changing the the parameter
+that controls the number of processors you are using from `number_processes = None` (this uses all available processors)
+to `number_processes = 1`. More information on leveraging batch_run's multiprocessing capability is below.
 
 .. code:: python
 
@@ -990,6 +1007,33 @@ iteration).
 
     245it [00:25,  9.75it/s]
 
+**Note for Windows OS users:** You will have an issue with `batch_run` and `number_processes = None`. Your cell will
+show no progress, and in your terminal you will receive *AttributeError: Can't get attribute 'MoneyModel' on
+<module '__main__' (built-in)>*. One way to overcome this is to take your code outside of Jupyter and adjust the above
+code as follows.
+
+
+.. code:: python
+    from multiprocessing import freeze_support
+
+    params = {"width": 10, "height": 10, "N": range(10, 500, 10)}
+
+    if __name__ == '__main__':
+        freeze_support()
+        results = batch_run(
+                MoneyModel,
+                parameters=params,
+                iterations=5,
+                max_steps=100,
+                number_processes=None,
+                data_collection_period=1,
+                display_progress=True,
+        )
+
+
+If you would still like to run your code in Jupyter you will need to adjust the cell as noted above. Then you can
+you can add the `nbmultitask library <(https://nbviewer.org/github/micahscopes/nbmultitask/blob/39b6f31b047e8a51a0fcb5c93ae4572684f877ce/examples.ipynb)>`__
+or look at this `stackoverflow <https://stackoverflow.com/questions/50937362/multiprocessing-on-python-3-jupyter>`__.
 
 To further analyze the return of the ``batch_run`` function, we convert
 the list of dictionaries to a Pandas DataFrame and print its keys.
