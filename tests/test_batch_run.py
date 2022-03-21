@@ -1,3 +1,5 @@
+import multiprocessing  # noqa
+
 from mesa.agent import Agent
 from mesa.batchrunner import _make_model_kwargs, batch_run
 from mesa.datacollection import DataCollector
