@@ -861,10 +861,10 @@ After you run the code below you will see two files appear (*model_data.csv* and
 
 .. code:: python
 
-    # save the model data (stored in the pandas gini object) to csv
+    # save the model data (stored in the pandas gini object) to CSV
     gini.to_csv("model_data.csv")
 
-    # save the agent data (stored in the pandas agent_wealth object) to csv.
+    # save the agent data (stored in the pandas agent_wealth object) to CSV.
     agent_wealth.to_csv("agent_data.csv")
 
 Batch Run
