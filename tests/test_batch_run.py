@@ -1,3 +1,6 @@
+from multiprocessing import set_start_method
+set_start_method("spawn")
+
 from mesa.agent import Agent
 from mesa.batchrunner import _make_model_kwargs, batch_run
 from mesa.datacollection import DataCollector
