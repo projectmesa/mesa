@@ -1014,6 +1014,7 @@ code as follows.
 
 
 .. code:: python
+
     from multiprocessing import freeze_support
 
     params = {"width": 10, "height": 10, "N": range(10, 500, 10)}
