@@ -18,8 +18,8 @@ The BatchRunner is set up to collect step by step data of the model. It does
 this by collecting the DataCollector object in a model_reporter (i.e. the
 DataCollector is collecting itself every step).
 
-The end result of the batch run will be a csv file created in the same
-directory from which Python was run. The csv file will contain the data from
+The end result of the batch run will be a CSV file created in the same
+directory from which Python was run. The CSV file will contain the data from
 every step of every run.
 """
 
