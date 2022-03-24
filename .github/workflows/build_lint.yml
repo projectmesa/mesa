@@ -5,7 +5,13 @@ on:
     branches:
     - main
     - release**
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
 
 jobs:
   build:
@@ -72,12 +78,3 @@ jobs:
     - run: pip install black[jupyter]
     - name: Lint with black
       run: black --check --exclude=mesa/cookiecutter-mesa/* .
-
-  codespell:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: codespell-project/actions-codespell@master
-      with:
-        ignore_words_file: .codespellignore
-        skip: .*bootstrap.*,*.js,.*bootstrap-theme.css.map
