@@ -32,8 +32,6 @@ jobs:
           - os: ubuntu
             python-version: "3.7"
           - os: ubuntu
-            python-version: "3.6"
-          - os: ubuntu
             python-version: pypy3
 
     steps:
