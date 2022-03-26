@@ -14,6 +14,7 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # pylint: disable=invalid-name
 
 import itertools
+import math
 
 import numpy as np
 
@@ -890,12 +891,12 @@ class ContinuousSpace:
         x1, y1 = pos_1
         x2, y2 = pos_2
 
-        dx = np.abs(x1 - x2)
-        dy = np.abs(y1 - y2)
+        dx = abs(x1 - x2)
+        dy = abs(y1 - y2)
         if self.torus:
             dx = min(dx, self.width - dx)
             dy = min(dy, self.height - dy)
-        return np.sqrt(dx * dx + dy * dy)
+        return math.sqrt(dx * dx + dy * dy)
 
     def torus_adj(self, pos: FloatCoordinate) -> FloatCoordinate:
         """Adjust coordinates to handle torus looping.
