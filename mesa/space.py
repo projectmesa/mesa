@@ -40,7 +40,9 @@ Coordinate = Tuple[int, int]
 GridContent = Union[Optional[Agent], Set[Agent]]
 # used in ContinuousSpace
 FloatCoordinate = Union[Tuple[float, float], np.ndarray]
+NetworkCoordinate = int
 
+Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
 
 def clamp(x: float, lowest: float, highest: float) -> float:
     # This should be faster than np.clip for a scalar x.
