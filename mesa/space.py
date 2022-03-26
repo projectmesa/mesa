@@ -20,6 +20,7 @@ import numpy as np
 
 from typing import (
     Any,
+    Callable,
     Dict,
     Iterable,
     Iterator,
@@ -28,6 +29,7 @@ from typing import (
     Set,
     Sequence,
     Tuple,
+    TypeVar,
     Union,
     cast,
     overload,
@@ -36,14 +38,20 @@ from typing import (
 # For Mypy
 from .agent import Agent
 from numbers import Real
+import numpy.typing as npt
 
 Coordinate = Tuple[int, int]
-GridContent = Union[Optional[Agent], Set[Agent]]
 # used in ContinuousSpace
-FloatCoordinate = Union[Tuple[float, float], np.ndarray]
+FloatCoordinate = Union[Tuple[float, float], npt.NDArray[float]]
 NetworkCoordinate = int
 
 Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
+
+GridContent = Optional[Agent]
+MultiGridContent = List[Agent]
+
+F = TypeVar("F", bound=Callable[..., Any])
+
 
 def clamp(x: float, lowest: float, highest: float) -> float:
     # This should be faster than np.clip for a scalar x.
@@ -51,18 +59,18 @@ def clamp(x: float, lowest: float, highest: float) -> float:
     return max(lowest, min(x, highest))
 
 
-def accept_tuple_argument(wrapped_function):
+def accept_tuple_argument(wrapped_function: F) -> F:
     """Decorator to allow grid methods that take a list of (x, y) coord tuples
     to also handle a single position, by automatically wrapping tuple in
     single-item list rather than forcing user to do it."""
 
-    def wrapper(*args: Any):
+    def wrapper(*args: Any) -> Any:
         if isinstance(args[1], tuple) and len(args[1]) == 2:
             return wrapped_function(args[0], [args[1]])
         else:
             return wrapped_function(*args)
 
-    return wrapper
+    return cast(F, wrapper)
 
 
 def is_integer(x: Real) -> bool:
@@ -140,8 +148,7 @@ class Grid:
         if isinstance(index, int):
             # grid[x]
             return self.grid[index]
-
-        if isinstance(index[0], tuple):
+        elif isinstance(index[0], tuple):
             # grid[(x1, y1), (x2, y2)]
             index = cast(Sequence[Coordinate], index)
 
@@ -564,7 +571,7 @@ class MultiGrid(Grid):
     """
 
     @staticmethod
-    def default_val() -> Set[Agent]:
+    def default_val() -> MultiGridContent:
         """Default value for new cell elements."""
         return []
 
@@ -585,7 +592,7 @@ class MultiGrid(Grid):
     @accept_tuple_argument
     def iter_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
-    ) -> Iterator[GridContent]:
+    ) -> Iterator[MultiGridContent]:
         """Returns an iterator of the contents of the
         cells identified in cell_list.
 
@@ -786,7 +793,7 @@ class ContinuousSpace:
         self.size = np.array((self.width, self.height))
         self.torus = torus
 
-        self._agent_points = None
+        self._agent_points: Optional[npt.NDArray[FloatCoordinate]] = None
         self._index_to_agent: Dict[int, Agent] = {}
         self._agent_to_index: Dict[Agent, int] = {}
 
