@@ -76,29 +76,29 @@ Running Mesa in Docker
 
 You can run Mesa in a Docker container in a few ways.
 
-If you are a Mesa developer, first `install docker-compose <https://docs.docker.com/compose/install/>`_ and then run:
+If you are a Mesa developer, first `install Docker Compose <https://docs.docker.com/compose/install/>`_ and then run:
 
 .. code-block:: bash
 
-    $ docker-compose build --pull
-    ...
-    $ docker-compose up -d dev # start the docker container
-    $ docker-compose exec dev bash # enter the docker container that has your current version of Mesa installed at /opt/mesa
-    $ mesa runserver examples/schelling # or any other example model in examples
+    $ docker compose up
+    # If you want to make it run in the background, you instead run
+    $ docker compose up -d
 
+This runs the wolf-sheep predation model, as an example.
 
-The docker-compose file does two important things:
+The docker-compose.yml file does two important things:
 
-* It binds the docker container's port 8521 to your host system's port 8521 so you can interact with the running model as usual by visiting localhost:8521 on your browser
 * It mounts the mesa root directory (relative to the docker-compose.yml file) into /opt/mesa and runs pip install -e on that directory so your changes to mesa should be reflected in the running container.
+* It binds the docker container's port 8521 to your host system's port 8521 so you can interact with the running model as usual by visiting localhost:8521 on your browser
 
 
-If you are a model developer that wants to run Mesa on a model (assuming you are currently in your top-level model
-directory with the run.py file):
+If you are a model developer that wants to run Mesa on a model, you need to:
 
-.. code-block:: bash
+* make sure that your model folder is inside the folder containing the docker-compose.yml file
+* change the ``MODEL_DIR`` variable in docker-compose.yml to point to the path of your model
+* make sure that the model folder contains a run.py file
 
-    $ docker run --rm -it -p127.0.0.1:8521:8521 -v${PWD}:/code comses/mesa:dev mesa runserver /code
+Then, you just need to run `docker compose up -d` to make it accessible from ``localhost:8521``.
 
 Contributing to Mesa
 ----------------------------
