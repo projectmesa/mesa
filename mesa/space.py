@@ -569,6 +569,8 @@ class MultiGrid(Grid):
         get_neighbors: Returns the objects surrounding a given cell.
     """
 
+    grid: List[List[MultiGridContent]]
+
     @staticmethod
     def default_val() -> MultiGridContent:
         """Default value for new cell elements."""
