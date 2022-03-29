@@ -197,9 +197,7 @@ class Grid:
             for col in range(self.height):
                 yield self.grid[row][col], row, col  # agent, x, y
 
-    def neighbor_iter(
-        self, pos: Coordinate, moore: bool = True
-    ) -> Iterator[GridContent]:
+    def neighbor_iter(self, pos: Coordinate, moore: bool = True) -> Iterator[Agent]:
         """Iterate over position neighbors.
 
         Args:
@@ -304,7 +302,7 @@ class Grid:
         moore: bool,
         include_center: bool = False,
         radius: int = 1,
-    ) -> Iterator[GridContent]:
+    ) -> Iterator[Agent]:
         """Return an iterator over neighbors to a certain point.
 
         Args:
@@ -332,7 +330,7 @@ class Grid:
         moore: bool,
         include_center: bool = False,
         radius: int = 1,
-    ) -> List[GridContent]:
+    ) -> List[Agent]:
         """Return a list of neighbors to a certain point.
 
         Args:
@@ -371,7 +369,7 @@ class Grid:
     @accept_tuple_argument
     def iter_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
-    ) -> Iterator[GridContent]:
+    ) -> Iterator[Agent]:
         """Returns an iterator of the contents of the cells
         identified in cell_list.
 
@@ -387,9 +385,7 @@ class Grid:
         return filter(None, (self.grid[x][y] for x, y in cell_list))
 
     @accept_tuple_argument
-    def get_cell_list_contents(
-        self, cell_list: Iterable[Coordinate]
-    ) -> List[GridContent]:
+    def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> List[Agent]:
         """Returns a list of the contents of the cells
         identified in cell_list.
 
@@ -691,7 +687,7 @@ class HexGrid(Grid):
 
         yield from coordinates
 
-    def neighbor_iter(self, pos: Coordinate) -> Iterator[GridContent]:
+    def neighbor_iter(self, pos: Coordinate) -> Iterator[Agent]:
         """Iterate over position neighbors.
 
         Args:
@@ -725,7 +721,7 @@ class HexGrid(Grid):
 
     def iter_neighbors(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
-    ) -> Iterator[GridContent]:
+    ) -> Iterator[Agent]:
         """Return an iterator over neighbors to a certain point.
 
         Args:
@@ -743,7 +739,7 @@ class HexGrid(Grid):
 
     def get_neighbors(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
-    ) -> List[Coordinate]:
+    ) -> List[Agent]:
         """Return a list of neighbors to a certain point.
 
         Args:
@@ -852,7 +848,7 @@ class ContinuousSpace:
 
     def get_neighbors(
         self, pos: FloatCoordinate, radius: float, include_center: bool = True
-    ) -> List[GridContent]:
+    ) -> List[Agent]:
         """Get all objects within a certain radius.
 
         Args:
