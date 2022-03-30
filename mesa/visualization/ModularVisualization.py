@@ -164,7 +164,7 @@ class VisualizationElement:
 # =============================================================================
 # Actual Tornado code starts here:
 def reset_model(model_cls, model_kwargs):
-    """ Reinstantiate the model object, using the current parameters. """
+    """Reinstantiate the model object, using the current parameters. """
 
     model_params = {}
     for key, val in model_kwargs.items():
