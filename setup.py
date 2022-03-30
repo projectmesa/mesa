@@ -25,6 +25,10 @@ with open("README.rst", "rb", encoding="utf-8") as f:
     readme = f.read()
 
 # Ensure Bootstrap
+# Important: when you update the Bootstrap version, make sure to also update the
+# hardcoded included files and versions in:
+# - MANIFEST.in
+# - mesa/visualization/templates/modular_template.html
 bootstrap_version = "3.3.7"
 bootstrap_dir = f"bootstrap-{bootstrap_version}"
 template_dir = "mesa/visualization/templates"
