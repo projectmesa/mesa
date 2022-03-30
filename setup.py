@@ -24,33 +24,20 @@ with open("mesa/__init__.py") as fd:
 with open("README.rst", "rb", encoding="utf-8") as f:
     readme = f.read()
 
-
-def merge_folders(src: str, dst: str) -> None:
-    for file_name in os.listdir(src):
-        file_path = os.path.join(src, file_name)
-        if os.path.isdir(file_path):
-            # Ensure that a folder exists, i.e. "mkdir -p"
-            dest_dir = os.path.join(dst, file_name)
-            os.makedirs(dest_dir, exist_ok=True)
-            merge_folders(file_path, dest_dir)
-            continue
-        dst_file = os.path.join(dst, file_name)
-        print("Creating", dst_file)
-        shutil.copy(file_path, dst_file)
-
-
 # Ensure Bootstrap
-if not os.path.isfile("mesa/visualization/templates/js/bootstrap.js"):
+bootstrap_version = "3.3.7"
+bootstrap_dir = f"bootstrap-{bootstrap_version}"
+template_dir = "mesa/visualization/templates"
+dst_bootstrap_path = os.path.join(template_dir, bootstrap_dir)
+if not os.path.isdir(dst_bootstrap_path):
     print("Downloading the Bootstrap dependency from the internet...")
-    url = "https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip"
+    url = f"https://github.com/twbs/bootstrap/releases/download/v{bootstrap_version}/bootstrap-{bootstrap_version}-dist.zip"
     zip_file = "bootstrap-dist.zip"
     urllib.request.urlretrieve(url, zip_file)
     with zipfile.ZipFile(zip_file, "r") as zip_ref:
         zip_ref.extractall()
-    dir = "bootstrap-3.3.7-dist"
-    merge_folders(dir, "mesa/visualization/templates")
+    shutil.move(f"bootstrap-{bootstrap_version}-dist", dst_bootstrap_path)
     # Cleanup
-    shutil.rmtree(dir)
     os.remove(zip_file)
     print("Done")
 
@@ -67,8 +54,8 @@ setup(
         "mesa": [
             "visualization/templates/*.html",
             "visualization/templates/css/*",
-            "visualization/templates/fonts/*",
             "visualization/templates/js/*",
+            f"visualization/templates/{bootstrap_dir}/**/*",
         ],
         "cookiecutter-mesa": ["cookiecutter-mesa/*"],
     },
