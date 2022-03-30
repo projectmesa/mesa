@@ -76,7 +76,7 @@ Running Mesa in Docker
 
 You can run Mesa in a Docker container in a few ways.
 
-If you are a Mesa developer, first `install Docker Compose <https://docs.docker.com/compose/install/>`_ and then run:
+If you are a Mesa developer, first `install Docker Compose <https://docs.docker.com/compose/install/>`_ and then, in the folder containing the Mesa Git repository, you run:
 
 .. code-block:: bash
 
@@ -86,7 +86,7 @@ If you are a Mesa developer, first `install Docker Compose <https://docs.docker.
 
 This runs the wolf-sheep predation model, as an example.
 
-The docker-compose.yml file does two important things:
+With the docker-compose.yml file in this Git repository, the `docker compose up` command does two important things:
 
 * It mounts the mesa root directory (relative to the docker-compose.yml file) into /opt/mesa and runs pip install -e on that directory so your changes to mesa should be reflected in the running container.
 * It binds the docker container's port 8521 to your host system's port 8521 so you can interact with the running model as usual by visiting localhost:8521 on your browser
