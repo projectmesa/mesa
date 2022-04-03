@@ -81,3 +81,6 @@ dmypy.json
 
 # pythonenv
 pythonenv*/
+
+# JS dependencies
+mesa/visualization/templates/external/
