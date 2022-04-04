@@ -31,6 +31,28 @@ var NetworkModule = function (svg_width, svg_height) {
     })
   );
 
+  function addMarkers(element) {
+    element
+    .enter().append("svg:marker")
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 15)
+    .attr("refY", 0.5)
+    .attr("orient", "auto")
+    .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+  }
+
+  let marker_size;
+
+  for (const size of ["end", "endlarge", "endxl"]) {
+    addMarkers(svg.append("svg:defs").selectAll("marker").data([size]));
+    if (size === "end") { marker_size = 4; }
+    else if (size === "large") { marker_size = 5; }
+    else { marker_size = 6; }
+    d3.select(`#${size}`).attr("markerWidth", marker_size).attr("markerHeight", marker_size);
+  }
+
   var links = g.append("g").attr("class", "links");
 
   var nodes = g.append("g").attr("class", "nodes");
@@ -80,6 +102,9 @@ var NetworkModule = function (svg_width, svg_height) {
       })
       .attr("stroke", function (d) {
         return d.color;
+      })
+      .attr("marker-end", function(d) {
+        return d.directed ? "url(#end" + (d.marker_size !== undefined ? d.marker_size : '') + ")" : ""
       });
 
     links.selectAll("line").data(graph.edges).exit().remove();
