@@ -50,7 +50,7 @@ var NetworkModule = function (svg_width, svg_height) {
     addMarkers(svg.append("svg:defs").selectAll("marker").data([size]));
     if (size === "end") {
       marker_size = 4;
-    } else if (size === "large") {
+    } else if (size === "endlarge") {
       marker_size = 5;
     } else {
       marker_size = 6;
