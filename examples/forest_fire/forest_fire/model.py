@@ -39,7 +39,7 @@ class ForestFire(Model):
                 # Set all trees in the first column on fire.
                 if x == 0:
                     new_tree.condition = "On Fire"
-                self.grid._place_agent(new_tree, (x, y))
+                self.grid.place_agent(new_tree, (x, y))
                 self.schedule.add(new_tree)
 
         self.running = True
