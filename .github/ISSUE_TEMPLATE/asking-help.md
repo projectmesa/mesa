@@ -1,6 +1,6 @@
 ---
 name: Asking for help
-about: If you need help using Mesa, you should post in https://github.com/projectmesa/mesa/discussions
+about: If you need help using Mesa, you should post in [Discussions](https://github.com/projectmesa/mesa/discussions)
 ---
 
 <!--
