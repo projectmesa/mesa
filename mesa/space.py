@@ -15,6 +15,7 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 
 import itertools
 import math
+from warnings import warn
 
 import numpy as np
 
@@ -205,7 +206,6 @@ class Grid:
             moore: Boolean for whether to use Moore neighborhood (including
                    diagonals) or Von Neumann (only up/down/left/right).
         """
-        from warnings import warn
 
         warn(
             "`neighbor_iter` is deprecated in favor of `iter_neighbors` "
@@ -388,6 +388,7 @@ class Grid:
     def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> List[Agent]:
         """Returns a list of the contents of the cells
         identified in cell_list.
+        Note: this method returns a list of `Agent`'s; `None` contents are excluded.
 
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -484,7 +485,6 @@ class Grid:
 
     def find_empty(self) -> Optional[Coordinate]:
         """Pick a random empty cell."""
-        from warnings import warn
         import random
 
         warn(
@@ -695,7 +695,6 @@ class HexGrid(Grid):
         Args:
             pos: (x,y) coords tuple for the position to get the neighbors of.
         """
-        from warnings import warn
 
         warn(
             "`neighbor_iter` is deprecated in favor of `iter_neighbors` "
@@ -985,7 +984,9 @@ class NetworkGrid:
         return not self.G.nodes[node_id]["agent"]
 
     def get_cell_list_contents(self, cell_list: List[int]) -> List[GridContent]:
-        """Returns the contents of a list of cells ((x,y) tuples)"""
+        """Returns the contents of a list of cells ((x,y) tuples)
+        Note: this method returns a list of `Agent`'s; `None` contents are excluded.
+        """
         return list(self.iter_cell_list_contents(cell_list))
 
     def get_all_cell_contents(self) -> List[GridContent]:
