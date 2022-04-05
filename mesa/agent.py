@@ -28,6 +28,7 @@ class Agent:
         self.unique_id = unique_id
         self.model = model
         self.pos: Optional[Position] = None
+        self.heading = 90
 
     def step(self) -> None:
         """A single step of the agent."""
@@ -35,6 +36,10 @@ class Agent:
 
     def advance(self) -> None:
         pass
+
+    def setxy(self, x,y):
+        """Sets the current position to the specified x,y parameters"""
+        self.pos = (x,y)
 
     @property
     def random(self) -> Random:
