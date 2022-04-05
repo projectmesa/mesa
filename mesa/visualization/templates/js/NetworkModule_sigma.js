@@ -1,13 +1,13 @@
-var NetworkModule = function(canvas_width, canvas_height) {
+const NetworkModule = function(canvas_width, canvas_height) {
 
-    var div_tag = "<div id='graph-container' style='width: " +
+    const div_tag = "<div id='graph-container' style='width: " +
         canvas_width + "px; height: " + canvas_height + "px;'></div>";
 
     // Append it to #elements:
-    var div = $(div_tag)[0];
+    const div = $(div_tag)[0];
     $("#elements").append(div);
 
-    var s = {
+    let s = {
         container: 'graph-container',
         settings: {
             defaultNodeColor: 'black',
@@ -17,7 +17,7 @@ var NetworkModule = function(canvas_width, canvas_height) {
     };
 
     this.render = function(data) {
-        var graph = JSON.parse(JSON.stringify(data));
+        const graph = JSON.parse(JSON.stringify(data));
 
         // Update the instance's graph:
         if (s instanceof sigma) {
