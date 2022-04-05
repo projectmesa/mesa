@@ -1,6 +1,6 @@
-var TextModule = function() {
-	var tag = "<p class='lead'></p>";
-	var text = $(tag)[0];
+const TextModule = function() {
+	const tag = "<p class='lead'></p>";
+	const text = $(tag)[0];
 
 	// Append text tag to #elements:
     $("#elements").append(text);
