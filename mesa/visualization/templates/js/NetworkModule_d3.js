@@ -113,7 +113,7 @@ var NetworkModule = function (svg_width, svg_height) {
       .attr("marker-end", function (d) {
         return d.directed
           ? "url(#end" +
-              (d.marker_size !== undefined ? d.marker_size : "") +
+              (d.marker_size = d.marker_size ?? "") +
               ")"
           : "";
       });
