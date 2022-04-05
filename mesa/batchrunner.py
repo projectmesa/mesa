@@ -87,7 +87,7 @@ def batch_run(
                     run_id = next(run_counter)
                     data = []
                     for run_data in rawdata:
-                        out = {"RunId": run_id, "iteration": iteration - 1}
+                        out = {"RunId": run_id, "iteration": iteration + 1}
                         out.update(run_data)
                         data.append(out)
                     results.extend(data)
@@ -102,7 +102,7 @@ def batch_run(
                     run_id = next(run_counter)
                     data = []
                     for run_data in rawdata:
-                        out = {"RunId": run_id, "iteration": iteration - 1}
+                        out = {"RunId": run_id, "iteration": iteration + 1}
                         out.update(run_data)
                         data.append(out)
                     results.extend(data)
