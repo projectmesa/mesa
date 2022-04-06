@@ -35,7 +35,7 @@ class Sheep(RandomWalker):
 
             # Death
             if self.energy < 0:
-                self.model.grid._remove_agent(self.pos, self)
+                self.model.grid.remove_agent(self)
                 self.model.schedule.remove(self)
                 living = False
 
@@ -74,12 +74,12 @@ class Wolf(RandomWalker):
             self.energy += self.model.wolf_gain_from_food
 
             # Kill the sheep
-            self.model.grid._remove_agent(self.pos, sheep_to_eat)
+            self.model.grid.remove_agent(sheep_to_eat)
             self.model.schedule.remove(sheep_to_eat)
 
         # Death or reproduction
         if self.energy < 0:
-            self.model.grid._remove_agent(self.pos, self)
+            self.model.grid.remove_agent(self)
             self.model.schedule.remove(self)
         else:
             if self.random.random() < self.model.wolf_reproduce:

@@ -68,7 +68,7 @@ class SsAgent(Agent):
         self.move()
         self.eat()
         if self.sugar <= 0:
-            self.model.grid._remove_agent(self.pos, self)
+            self.model.grid.remove_agent(self)
             self.model.schedule.remove(self)
 
 

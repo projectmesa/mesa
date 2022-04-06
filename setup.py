@@ -31,9 +31,11 @@ with open("README.rst", "rb", encoding="utf-8") as f:
 # - mesa/visualization/templates/modular_template.html
 bootstrap_version = "3.3.7"
 bootstrap_dir = f"bootstrap-{bootstrap_version}"
-template_dir = "mesa/visualization/templates"
-dst_bootstrap_path = os.path.join(template_dir, bootstrap_dir)
+external_dir = "mesa/visualization/templates/external"
+dst_bootstrap_path = os.path.join(external_dir, bootstrap_dir)
 if not os.path.isdir(dst_bootstrap_path):
+    # First, ensure that the external/ directory exists
+    os.makedirs(external_dir, exist_ok=True)
     print("Downloading the Bootstrap dependency from the internet...")
     url = f"https://github.com/twbs/bootstrap/releases/download/v{bootstrap_version}/bootstrap-{bootstrap_version}-dist.zip"
     zip_file = "bootstrap-dist.zip"
@@ -59,7 +61,7 @@ setup(
             "visualization/templates/*.html",
             "visualization/templates/css/*",
             "visualization/templates/js/*",
-            f"visualization/templates/{bootstrap_dir}/**/*",
+            f"visualization/templates/external/{bootstrap_dir}/**/*",
         ],
         "cookiecutter-mesa": ["cookiecutter-mesa/*"],
     },

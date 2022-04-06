@@ -8,4 +8,4 @@ include mesa/visualization/templates/*.html
 include mesa/visualization/templates/css/*
 include mesa/visualization/templates/fonts/*
 include mesa/visualization/templates/js/*
-include mesa/visualization/templates/bootstrap-3.3.7/*
+include mesa/visualization/templates/external/bootstrap-3.3.7/*

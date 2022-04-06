@@ -38,23 +38,23 @@ other agent locations, represented by circles:
 
 */
 
-var GridVisualization = function(width, height, gridWidth, gridHeight, context, interactionHandler) {
+const GridVisualization = function(width, height, gridWidth, gridHeight, context, interactionHandler) {
 
         // Find cell size:
-        var cellWidth = Math.floor(width / gridWidth);
-        var cellHeight = Math.floor(height / gridHeight);
+        const cellWidth = Math.floor(width / gridWidth);
+        const cellHeight = Math.floor(height / gridHeight);
 
         // Find max radius of the circle that can be inscribed (fit) into the
         // cell of the grid.
-        var maxR = Math.min(cellHeight, cellWidth)/2 - 1;
+        const maxR = Math.min(cellHeight, cellWidth)/2 - 1;
 
         // Calls the appropriate shape(agent)
         this.drawLayer = function(portrayalLayer) {
                 // Re-initialize the lookup table
                 (interactionHandler) ? interactionHandler.mouseoverLookupTable.init() : null
 
-                for (var i in portrayalLayer) {
-                        var p = portrayalLayer[i];
+                for (const i in portrayalLayer) {
+                        const p = portrayalLayer[i];
 
                         // If p.Color is a string scalar, cast it to an array.
                         // This is done to maintain backwards compatibility
@@ -100,9 +100,9 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
         text_color: Color of the inscribed text.
         */
         this.drawCircle = function(x, y, radius, colors, stroke_color, fill, text, text_color) {
-                var cx = (x + 0.5) * cellWidth;
-                var cy = (y + 0.5) * cellHeight;
-                var r = radius * maxR;
+                const cx = (x + 0.5) * cellWidth;
+                const cy = (y + 0.5) * cellHeight;
+                const r = radius * maxR;
 
                 context.beginPath();
                 context.arc(cx, cy, r, 0, Math.PI * 2, false);
@@ -112,9 +112,9 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
                 context.stroke();
 
                 if (fill) {
-                        var gradient = context.createRadialGradient(cx, cy, r, cx, cy, 0);
+                        const gradient = context.createRadialGradient(cx, cy, r, cx, cy, 0);
 
-                        for (i = 0; i < colors.length; i++) {
+                        for (let i = 0; i < colors.length; i++) {
                                 gradient.addColorStop(i/colors.length, colors[i]);
                         }
 
@@ -145,20 +145,20 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
         this.drawRectangle = function(x, y, w, h, colors, stroke_color, fill, text, text_color) {
 
                 context.beginPath();
-                var dx = w * cellWidth;
-                var dy = h * cellHeight;
+                const dx = w * cellWidth;
+                const dy = h * cellHeight;
 
                 // Keep in the center of the cell:
-                var x0 = (x + 0.5) * cellWidth - dx/2;
-                var y0 = (y + 0.5) * cellHeight - dy/2;
+                const x0 = (x + 0.5) * cellWidth - dx/2;
+                const y0 = (y + 0.5) * cellHeight - dy/2;
 
                 context.strokeStyle = stroke_color;
                 context.strokeRect(x0, y0, dx, dy);
 
                 if (fill) {
-                        var gradient = context.createLinearGradient(x0, y0, x0 + cellWidth, y0 + cellHeight);
+                        const gradient = context.createLinearGradient(x0, y0, x0 + cellWidth, y0 + cellHeight);
 
-                        for (i = 0; i < colors.length; i++) {
+                        for (let i = 0; i < colors.length; i++) {
                                 gradient.addColorStop(i/colors.length, colors[i]);
                         }
 
@@ -172,8 +172,8 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
                 }
                 // This part draws the text inside the Rectangle
                 if (text !== undefined) {
-                        var cx = (x + 0.5) * cellWidth;
-                        var cy = (y + 0.5) * cellHeight;
+                        const cx = (x + 0.5) * cellWidth;
+                        const cy = (y + 0.5) * cellHeight;
                         context.fillStyle = text_color;
                         context.textAlign = 'center';
                         context.textBaseline= 'middle';
@@ -192,9 +192,9 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
         text_color: Color of the inscribed text.
         */
         this.drawArrowHead = function(x, y, heading_x, heading_y, scale, colors, stroke_color, fill, text, text_color) {
-                var arrowR = maxR * scale;
-                var cx = (x + 0.5) * cellWidth;
-                var cy = (y + 0.5) * cellHeight;
+                const arrowR = maxR * scale;
+                const cx = (x + 0.5) * cellWidth;
+                const cy = (y + 0.5) * cellHeight;
                 if (heading_x === 0 && heading_y === 1) {
                         p1_x = cx;
                         p1_y = cy - arrowR;
@@ -247,9 +247,9 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
                 context.stroke();
 
                 if (fill) {
-                        var gradient = context.createLinearGradient(p1_x, p1_y, p3_x, p3_y);
+                        const gradient = context.createLinearGradient(p1_x, p1_y, p3_x, p3_y);
 
-                        for (i = 0; i < colors.length; i++) {
+                        for (let i = 0; i < colors.length; i++) {
                                 gradient.addColorStop(i/colors.length, colors[i]);
                         }
 
@@ -260,8 +260,6 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
 
                 // This part draws the text inside the ArrowHead
                 if (text !== undefined) {
-                        var cx = (x + 0.5) * cellWidth;
-                          var cy = (y + 0.5) * cellHeight;
                         context.fillStyle = text_color
                         context.textAlign = 'center';
                         context.textBaseline= 'middle';
@@ -270,20 +268,20 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
         };
 
         this.drawCustomImage = function (shape, x, y, scale, text, text_color_) {
-                var img = new Image();
-                        img.src = "local/".concat(shape);
+                const img = new Image();
+                img.src = "local/".concat(shape);
                 if (scale === undefined) {
-                        var scale = 1
+                        scale = 1
                 }
                 // Calculate coordinates so the image is always centered
-                var dWidth = cellWidth * scale;
-                var dHeight = cellHeight * scale;
-                var cx = x * cellWidth + cellWidth / 2 - dWidth / 2;
-                var cy = y * cellHeight + cellHeight / 2 - dHeight / 2;
+                const dWidth = cellWidth * scale;
+                const dHeight = cellHeight * scale;
+                const cx = x * cellWidth + cellWidth / 2 - dWidth / 2;
+                const cy = y * cellHeight + cellHeight / 2 - dHeight / 2;
 
                 // Coordinates for the text
-                var tx = (x + 0.5) * cellWidth;
-                var ty = (y + 0.5) * cellHeight;
+                const tx = (x + 0.5) * cellWidth;
+                const ty = (y + 0.5) * cellHeight;
 
 
                 img.onload = function() {
@@ -310,12 +308,12 @@ var GridVisualization = function(width, height, gridWidth, gridHeight, context, 
                 maxY = cellHeight * gridHeight;
 
                 // Draw horizontal grid lines:
-                for(var y=0; y<=maxY; y+=cellHeight) {
+                for(let y=0; y<=maxY; y+=cellHeight) {
                         context.moveTo(0, y+0.5);
                         context.lineTo(maxX, y+0.5);
                 }
 
-                for(var x=0; x<=maxX; x+= cellWidth) {
+                for(let x=0; x<=maxX; x+= cellWidth) {
                         context.moveTo(x+0.5, 0);
                         context.lineTo(x+0.5, maxY);
                 }

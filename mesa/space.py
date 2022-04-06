@@ -15,6 +15,7 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 
 import itertools
 import math
+from warnings import warn
 
 import numpy as np
 
@@ -205,7 +206,6 @@ class Grid:
             moore: Boolean for whether to use Moore neighborhood (including
                    diagonals) or Von Neumann (only up/down/left/right).
         """
-        from warnings import warn
 
         warn(
             "`neighbor_iter` is deprecated in favor of `iter_neighbors` "
@@ -388,6 +388,7 @@ class Grid:
     def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> List[Agent]:
         """Returns a list of the contents of the cells
         identified in cell_list.
+        Note: this method returns a list of `Agent`'s; `None` contents are excluded.
 
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -406,32 +407,28 @@ class Grid:
             pos: Tuple of new position to move the agent to.
         """
         pos = self.torus_adj(pos)
-        self._remove_agent(agent.pos, agent)
-        self._place_agent(pos, agent)
+        self.remove_agent(agent)
+        self._place_agent(agent, pos)
         agent.pos = pos
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Position an agent on the grid, and set its pos variable."""
-        self._place_agent(pos, agent)
+        self._place_agent(agent, pos)
         agent.pos = pos
 
-    def _place_agent(self, pos: Coordinate, agent: Agent) -> None:
+    def _place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the correct location."""
         x, y = pos
         self.grid[x][y] = agent
         self.empties.discard(pos)
 
     def remove_agent(self, agent: Agent) -> None:
-        """Remove the agent from the grid and set its pos variable to None."""
+        """Remove the agent from the grid and set its pos attribute to None."""
         pos = agent.pos
-        self._remove_agent(pos, agent)
-        agent.pos = None
-
-    def _remove_agent(self, pos: Coordinate, agent: Agent) -> None:
-        """Remove the agent from the given location."""
         x, y = pos
         self.grid[x][y] = self.default_val()
         self.empties.add(pos)
+        agent.pos = None
 
     def is_cell_empty(self, pos: Coordinate) -> bool:
         """Returns a bool of the contents of a cell."""
@@ -442,7 +439,6 @@ class Grid:
         self, agent: Agent, cutoff: float = 0.998, num_agents: Optional[int] = None
     ) -> None:
         """Moves agent to a random empty cell, vacating agent's old cell."""
-        pos = agent.pos
         if len(self.empties) == 0:
             raise Exception("ERROR: No empty cells")
         if num_agents is None:
@@ -478,13 +474,12 @@ class Grid:
                     break
         else:
             new_pos = agent.random.choice(sorted(self.empties))
-        self._place_agent(new_pos, agent)
+        self.remove_agent(agent)
+        self._place_agent(agent, new_pos)
         agent.pos = new_pos
-        self._remove_agent(pos, agent)
 
     def find_empty(self) -> Optional[Coordinate]:
         """Pick a random empty cell."""
-        from warnings import warn
         import random
 
         warn(
@@ -540,11 +535,11 @@ class SingleGrid(Grid):
         else:
             coords = (x, y)
         agent.pos = coords
-        self._place_agent(coords, agent)
+        self._place_agent(agent, coords)
 
-    def _place_agent(self, pos: Coordinate, agent: Agent) -> None:
+    def _place_agent(self, agent: Agent, pos: Coordinate) -> None:
         if self.is_cell_empty(pos):
-            super()._place_agent(pos, agent)
+            super()._place_agent(agent, pos)
         else:
             raise Exception("Cell not empty")
 
@@ -576,19 +571,21 @@ class MultiGrid(Grid):
         """Default value for new cell elements."""
         return []
 
-    def _place_agent(self, pos: Coordinate, agent: Agent) -> None:
+    def _place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the correct location."""
         x, y = pos
         if agent not in self.grid[x][y]:
             self.grid[x][y].append(agent)
         self.empties.discard(pos)
 
-    def _remove_agent(self, pos: Coordinate, agent: Agent) -> None:
-        """Remove the agent from the given location."""
+    def remove_agent(self, agent: Agent) -> None:
+        """Remove the agent from the given location and set its pos attribute to None."""
+        pos = agent.pos
         x, y = pos
         self.grid[x][y].remove(agent)
         if self.is_cell_empty(pos):
             self.empties.add(pos)
+        agent.pos = None
 
     @accept_tuple_argument
     def iter_cell_list_contents(
@@ -695,7 +692,6 @@ class HexGrid(Grid):
         Args:
             pos: (x,y) coords tuple for the position to get the neighbors of.
         """
-        from warnings import warn
 
         warn(
             "`neighbor_iter` is deprecated in favor of `iter_neighbors` "
@@ -960,7 +956,7 @@ class NetworkGrid:
     def move_agent(self, agent: Agent, node_id: int) -> None:
         """Move an agent from its current node to a new node."""
 
-        self._remove_agent(agent, agent.pos)
+        self.remove_agent(agent)
         self._place_agent(agent, node_id)
         agent.pos = node_id
 
@@ -969,15 +965,10 @@ class NetworkGrid:
 
         self.G.nodes[node_id]["agent"].append(agent)
 
-    def _remove_agent(self, agent: Agent, node_id: int) -> None:
-        """Remove an agent from a node."""
-
-        self.G.nodes[node_id]["agent"].remove(agent)
-
     def remove_agent(self, agent: Agent) -> None:
-        """Remove the agent from the network and set its pos variable to None."""
-        pos = agent.pos
-        self._remove_agent(agent, pos)
+        """Remove the agent from the network and set its pos attribute to None."""
+        node_id = agent.pos
+        self.G.nodes[node_id]["agent"].remove(agent)
         agent.pos = None
 
     def is_cell_empty(self, node_id: int) -> bool:
@@ -985,7 +976,9 @@ class NetworkGrid:
         return not self.G.nodes[node_id]["agent"]
 
     def get_cell_list_contents(self, cell_list: List[int]) -> List[GridContent]:
-        """Returns the contents of a list of cells ((x,y) tuples)"""
+        """Returns the contents of a list of cells ((x,y) tuples)
+        Note: this method returns a list of `Agent`'s; `None` contents are excluded.
+        """
         return list(self.iter_cell_list_contents(cell_list))
 
     def get_all_cell_contents(self) -> List[GridContent]:
