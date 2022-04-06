@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     # We need an explicit timeout because sometimes the batch_runner test never
     # completes.
-    timeout-minutes: 10
+    timeout-minutes: 6
     strategy:
       fail-fast: False
       matrix:
