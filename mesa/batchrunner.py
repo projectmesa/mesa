@@ -610,7 +610,7 @@ class BatchRunner(FixedBatchRunner):
             )
 
 
-class BatchRunnerMP(BatchRunner):
+class BatchRunnerMP(BatchRunner):  # pragma: no cover
     """DEPRECATION WARNING: BatchRunner class has been replaced by batch_run
     Child class of BatchRunner, extended with multiprocessing support."""
 
