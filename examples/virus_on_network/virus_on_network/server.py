@@ -52,7 +52,7 @@ def network_portrayal(G):
     return portrayal
 
 
-network = NetworkModule(network_portrayal, 500, 500, library="d3")
+network = NetworkModule(network_portrayal, 500, 500)
 chart = ChartModule(
     [
         {"Label": "Infected", "Color": "#FF0000"},
