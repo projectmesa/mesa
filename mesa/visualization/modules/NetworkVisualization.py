@@ -5,7 +5,7 @@ Network Visualization Module
 Module for rendering the network, using [sigma.js](http://sigmajs.org/) or [d3.js](https://d3js.org/) frameworks.
 
 """
-from mesa.visualization.ModularVisualization import VisualizationElement
+from mesa.visualization.ModularVisualization import VisualizationElement, D3_JS_FILE
 
 
 class NetworkModule(VisualizationElement):
@@ -23,7 +23,7 @@ class NetworkModule(VisualizationElement):
         NetworkModule.package_includes = (
             ["NetworkModule_sigma.js", "sigma.min.js"]
             if library == "sigma"
-            else ["NetworkModule_d3.js", "d3.min.js"]
+            else ["NetworkModule_d3.js", D3_JS_FILE]
         )
 
         self.portrayal_method = portrayal_method
