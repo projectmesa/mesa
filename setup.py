@@ -24,28 +24,44 @@ with open("mesa/__init__.py") as fd:
 with open("README.rst", "rb", encoding="utf-8") as f:
     readme = f.read()
 
-# Ensure Bootstrap
-# Important: when you update the Bootstrap version, make sure to also update the
-# hardcoded included files and versions in:
-# - MANIFEST.in
-# - mesa/visualization/templates/modular_template.html
-bootstrap_version = "3.3.7"
-bootstrap_dir = f"bootstrap-{bootstrap_version}"
+# Ensure JS dependencies are downloaded
 external_dir = "mesa/visualization/templates/external"
-dst_bootstrap_path = os.path.join(external_dir, bootstrap_dir)
-if not os.path.isdir(dst_bootstrap_path):
-    # First, ensure that the external/ directory exists
-    os.makedirs(external_dir, exist_ok=True)
-    print("Downloading the Bootstrap dependency from the internet...")
-    url = f"https://github.com/twbs/bootstrap/releases/download/v{bootstrap_version}/bootstrap-{bootstrap_version}-dist.zip"
-    zip_file = "bootstrap-dist.zip"
+# First, ensure that the external/ directory exists
+os.makedirs(external_dir, exist_ok=True)
+
+
+def ensure_JS_dep(dirname, url):
+    dst_path = os.path.join(external_dir, dirname)
+    if os.path.isdir(dst_path):
+        # Do nothing if already downloaded
+        return
+    print(f"Downloading the {dirname} dependency from the internet...")
+    zip_file = dirname + ".zip"
     urllib.request.urlretrieve(url, zip_file)
     with zipfile.ZipFile(zip_file, "r") as zip_ref:
         zip_ref.extractall()
-    shutil.move(f"bootstrap-{bootstrap_version}-dist", dst_bootstrap_path)
+    shutil.move(dirname, dst_path)
     # Cleanup
     os.remove(zip_file)
     print("Done")
+
+
+# Important: when you update JS dependency version, make sure to also update the
+# hardcoded included files and versions in: mesa/visualization/templates/modular_template.html
+
+# Ensure Bootstrap
+bootstrap_version = "3.3.7"
+ensure_JS_dep(
+    f"bootstrap-{bootstrap_version}-dist",
+    f"https://github.com/twbs/bootstrap/releases/download/v{bootstrap_version}/bootstrap-{bootstrap_version}-dist.zip",
+)
+
+# Ensure Bootstrap Slider
+bootstrap_slider_version = "9.8.0"
+ensure_JS_dep(
+    f"bootstrap-slider-{bootstrap_slider_version}",
+    f"https://github.com/seiyria/bootstrap-slider/archive/refs/tags/v{bootstrap_slider_version}.zip",
+)
 
 setup(
     name="Mesa",
@@ -61,7 +77,7 @@ setup(
             "visualization/templates/*.html",
             "visualization/templates/css/*",
             "visualization/templates/js/*",
-            f"visualization/templates/external/{bootstrap_dir}/**/*",
+            "visualization/templates/external/**/*",
         ],
         "cookiecutter-mesa": ["cookiecutter-mesa/*"],
     },
