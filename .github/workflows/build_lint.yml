@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     # We need an explicit timeout because sometimes the batch_runner test never
     # completes.
-    timeout-minutes: 10
+    timeout-minutes: 6
     strategy:
       fail-fast: False
       matrix:
@@ -31,8 +31,9 @@ jobs:
             python-version: "3.8"
           - os: ubuntu
             python-version: "3.7"
-          - os: ubuntu
-            python-version: 'pypy-3.8'
+          # Disabled for now. See https://github.com/projectmesa/mesa/issues/1253
+          #- os: ubuntu
+          #  python-version: 'pypy-3.8'
 
     steps:
     - uses: actions/checkout@v3
