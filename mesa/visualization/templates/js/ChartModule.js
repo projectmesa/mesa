@@ -1,14 +1,13 @@
-var ChartModule = function(series, canvas_width, canvas_height) {
+const ChartModule = function(series, canvas_width, canvas_height) {
     // Create the tag:
-    var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
-    canvas_tag += "style='border:1px dotted'></canvas>";
+    const canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' style='border:1px dotted'></canvas>";
     // Append it to #elements
-    var canvas = $(canvas_tag)[0];
+    const canvas = $(canvas_tag)[0];
     $("#elements").append(canvas);
     // Create the context and the drawing controller:
-    var context = canvas.getContext("2d");
+    const context = canvas.getContext("2d");
 
-    var convertColorOpacity = function(hex) {
+    const convertColorOpacity = function(hex) {
 
         if (hex.indexOf('#') != 0) {
             return 'rgba(0,0,0,0.1)';
@@ -22,10 +21,10 @@ var ChartModule = function(series, canvas_width, canvas_height) {
     };
 
     // Prep the chart properties and series:
-    var datasets = []
-    for (var i in series) {
-        var s = series[i];
-        var new_series = {
+    const datasets = []
+    for (const i in series) {
+        const s = series[i];
+        const new_series = {
             label: s.Label,
             borderColor: s.Color,
             backgroundColor: convertColorOpacity(s.Color),
@@ -34,12 +33,12 @@ var ChartModule = function(series, canvas_width, canvas_height) {
         datasets.push(new_series);
     }
 
-    var chartData = {
+    const chartData = {
         labels: [],
         datasets: datasets
     };
 
-    var chartOptions = {
+    const chartOptions = {
         responsive: true,
         tooltips: {
             mode: 'index',
@@ -68,7 +67,7 @@ var ChartModule = function(series, canvas_width, canvas_height) {
         }
     };
 
-    var chart = new Chart(context, {
+    const chart = new Chart(context, {
         type: 'line',
         data: chartData,
         options: chartOptions
@@ -76,7 +75,7 @@ var ChartModule = function(series, canvas_width, canvas_height) {
 
     this.render = function(data) {
         chart.data.labels.push(control.tick);
-        for (i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
             chart.data.datasets[i].data.push(data[i]);
         }
         chart.update();
