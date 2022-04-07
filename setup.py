@@ -26,8 +26,12 @@ with open("README.rst", "rb", encoding="utf-8") as f:
 
 # Ensure JS dependencies are downloaded
 external_dir = "mesa/visualization/templates/external"
-# First, ensure that the external/ directory exists
+# We use a different path for single-file JS because some of them are loaded
+# the same way as Mesa JS files
+external_dir_single = "mesa/visualization/templates/js/external"
+# First, ensure that the external directories exists
 os.makedirs(external_dir, exist_ok=True)
+os.makedirs(external_dir_single, exist_ok=True)
 
 
 def ensure_JS_dep(dirname, url):
@@ -46,6 +50,17 @@ def ensure_JS_dep(dirname, url):
     print("Done")
 
 
+def ensure_JS_dep_single(url):
+    # Used for downloading e.g. jQuery single file
+    out_name = url.split("/")[-1]
+    dst_path = os.path.join(external_dir_single, out_name)
+    if os.path.isfile(dst_path):
+        return
+    print(f"Downloading the {out_name} dependency from the internet...")
+    urllib.request.urlretrieve(url, out_name)
+    shutil.move(out_name, dst_path)
+
+
 # Important: when you update JS dependency version, make sure to also update the
 # hardcoded included files and versions in: mesa/visualization/templates/modular_template.html
 
@@ -61,6 +76,11 @@ bootstrap_slider_version = "9.8.0"
 ensure_JS_dep(
     f"bootstrap-slider-{bootstrap_slider_version}",
     f"https://github.com/seiyria/bootstrap-slider/archive/refs/tags/v{bootstrap_slider_version}.zip",
+)
+
+jquery_version = "2.2.4"
+ensure_JS_dep_single(
+    f"https://code.jquery.com/jquery-{jquery_version}.min.js",
 )
 
 setup(

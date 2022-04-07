@@ -7,5 +7,5 @@ include mesa/cookiecutter-mesa/*
 include mesa/visualization/templates/*.html
 include mesa/visualization/templates/css/*
 include mesa/visualization/templates/fonts/*
-include mesa/visualization/templates/js/*
+recursive-include mesa/visualization/templates/js *
 recursive-include mesa/visualization/templates/external *
