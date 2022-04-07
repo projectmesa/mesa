@@ -1,25 +1,24 @@
 'use strict';
 // Note: This grouped bar chart is based off the example found here:
 // https://bl.ocks.org/mbostock/3887051
-var BarChartModule = function(fields, canvas_width, canvas_height, sorting, sortingKey) {
+const BarChartModule = function(fields, canvas_width, canvas_height, sorting, sortingKey) {
     // Create the overall chart div
-    var chart_div_tag = "<div class='bar chart' width='" + canvas_width + "'></div>";
-    var chart_div = $(chart_div_tag)[0];
+    const chart_div_tag = "<div class='bar chart' width='" + canvas_width + "'></div>";
+    const chart_div = $(chart_div_tag)[0];
     $("#elements").append(chart_div);
 
     // Create the tag:
-    var svg_tag = "<svg width='" + canvas_width + "' height='" + canvas_height + "' ";
-    svg_tag += "style='border:1px dotted'></svg>";
+    const svg_tag = "<svg width='" + canvas_width + "' height='" + canvas_height + "' style='border:1px dotted'></svg>";
     // Append it to #elements
-    var svg_element = $(svg_tag)[0];
+    const svg_element = $(svg_tag)[0];
     chart_div.append(svg_element);
 
     //create the legend
-    var legend_tag = "<div class='legend'></div>";
-    var legend_element = $(legend_tag)[0];
+    const legend_tag = "<div class='legend'></div>";
+    const legend_element = $(legend_tag)[0];
     chart_div.append(legend_element);
 
-    var legend = d3.select(legend_element)
+    const legend = d3.select(legend_element)
         .attr("style","display:block;width:"
             + canvas_width + "px;text-align:center")
 
@@ -34,25 +33,25 @@ var BarChartModule = function(fields, canvas_width, canvas_height, sorting, sort
         .attr("style", "padding-left:10px;padding-right:10px;")
 
     // setup the d3 svg selection
-    var svg = d3.select(svg_element)
-    var margin = {top: 20, right: 20, bottom: 30, left: 40}
-    var width = +svg.attr("width") - margin.left - margin.right
-    var height = +svg.attr("height") - margin.top - margin.bottom
-    var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    const svg = d3.select(svg_element)
+    const margin = {top: 20, right: 20, bottom: 30, left: 40}
+    const width = +svg.attr("width") - margin.left - margin.right
+    const height = +svg.attr("height") - margin.top - margin.bottom
+    const g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // Setup the bar chart
-    var x0 = d3.scaleBand()
+    const x0 = d3.scaleBand()
         .rangeRound([0, width])
         .paddingInner(0.1);
-    var x1 = d3.scaleBand()
+    const x1 = d3.scaleBand()
         .padding(0.05);
-    var y = d3.scaleLinear()
+    const y = d3.scaleLinear()
         .rangeRound([height, 0]);
-    var colorScale = d3.scaleOrdinal(fields.map(field => field["Color"]));
-    var keys = fields.map(f => f['Label'])
-    var chart = g.append("g")
-    var axisBottom = g.append("g")
-    var axisLeft = g.append("g")
+    const colorScale = d3.scaleOrdinal(fields.map(field => field["Color"]));
+    const keys = fields.map(f => f['Label'])
+    const chart = g.append("g")
+    const axisBottom = g.append("g")
+    const axisLeft = g.append("g")
 
     axisBottom
         .attr("class", "axis")
@@ -67,7 +66,7 @@ var BarChartModule = function(fields, canvas_width, canvas_height, sorting, sort
     //Render step
     this.render = function(data){
         //Axes
-        var minY = d3.min(data, function(d){
+        let minY = d3.min(data, function(d){
             return d3.min(keys, function(key){
                 return d[key];
             })
@@ -75,7 +74,7 @@ var BarChartModule = function(fields, canvas_width, canvas_height, sorting, sort
         if(minY > 0){
             minY = 0;
         }
-        var maxY = d3.max(data, function(d){
+        const maxY = d3.max(data, function(d){
             return d3.max(keys, function(key){
                 return d[key];
             })
@@ -103,7 +102,7 @@ var BarChartModule = function(fields, canvas_width, canvas_height, sorting, sort
         }
 
         //Draw Chart
-        var rects = chart
+        const rects = chart
             .selectAll("g")
             .data(data)
             .enter().append("g")

@@ -186,12 +186,12 @@ const initGUI = function (model_params) {
 
     const sidebar = $("#sidebar");
 
-    var onSubmitCallback = function (param_name, value) {
+    const onSubmitCallback = function (param_name, value) {
         send({ "type": "submit_params", "param": param_name, "value": value });
     };
 
-    var addBooleanInput = function (param, obj) {
-        var domID = param + '_id';
+    const addBooleanInput = function (param, obj) {
+        const domID = param + '_id';
         sidebar.append([
             "<div class='input-group input-group-lg'>",
             "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
@@ -207,24 +207,24 @@ const initGUI = function (model_params) {
         });
     };
 
-    var addNumberInput = function (param, obj) {
-        var domID = param + '_id';
+    const addNumberInput = function (param, obj) {
+        const domID = param + '_id';
         sidebar.append([
             "<div class='input-group input-group-lg'>",
             "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
             "<input class='model-parameter' id='" + domID + "' type='number'/>",
             "</div>"
         ].join(''));
-        var numberInput = $('#' + domID);
+        const numberInput = $('#' + domID);
         numberInput.val(obj.value);
         numberInput.on('change', function () {
             onSubmitCallback(param, Number($(this).val()));
         })
     };
 
-    var addSliderInput = function (param, obj) {
-        var domID = param + '_id';
-        var tooltipID = domID + "_tooltip";
+    const addSliderInput = function (param, obj) {
+        const domID = param + '_id';
+        const tooltipID = domID + "_tooltip";
         sidebar.append([
             "<div class='input-group input-group-lg'>",
             "<p>",
@@ -245,7 +245,7 @@ const initGUI = function (model_params) {
         }
 
         // Setup slider
-        var sliderInput = $("#" + domID);
+        const sliderInput = $("#" + domID);
         sliderInput.slider({
             min: obj.min_value,
             max: obj.max_value,
@@ -260,10 +260,10 @@ const initGUI = function (model_params) {
         })
     };
 
-    var addChoiceInput = function (param, obj) {
-        var domID = param + '_id';
-        var span = "<span class='caret'></span>";
-        var template = [
+    const addChoiceInput = function (param, obj) {
+        const domID = param + '_id';
+        const span = "<span class='caret'></span>";
+        const template = [
             "<p><label for='" + domID + "' class='label label-primary'>" + obj.name + "</label></p>",
             "<div class='dropdown'>",
             "<button id='" + domID + "' class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>" +
@@ -271,9 +271,9 @@ const initGUI = function (model_params) {
             "</button>",
             "<ul class='dropdown-menu' role='menu' aria-labelledby='" + domID + "'>"
         ];
-        var choiceIdentifiers = [];
-        for (var i = 0; i < obj.choices.length; i++) {
-            var choiceID = domID + '_choice_' + i;
+        const choiceIdentifiers = [];
+        for (let i = 0; i < obj.choices.length; i++) {
+            const choiceID = domID + '_choice_' + i;
             choiceIdentifiers.push(choiceID);
             template.push(
                 "<li role='presentation'><a class='pick-choice' id='" + choiceID + "' role='menuitem' tabindex='-1' href='#'>",
@@ -289,19 +289,19 @@ const initGUI = function (model_params) {
         sidebar.append(template.join(''));
         choiceIdentifiers.forEach(function (id, idx) {
             $('#' + id).on('click', function () {
-                var value = obj.choices[idx];
+                const value = obj.choices[idx];
                 $('#' + domID).html(value + ' ' + span);
                 onSubmitCallback(param, value);
             });
         });
     };
 
-    var addTextBox = function (param, obj) {
-        var well = $('<div class="well">' + obj.value + '</div>')[0];
+    const addTextBox = function (param, obj) {
+        const well = $('<div class="well">' + obj.value + '</div>')[0];
         sidebar.append(well);
     };
 
-    var addParamInput = function (param, option) {
+    const addParamInput = function (param, option) {
         switch (option['param_type']) {
             case 'checkbox':
                 addBooleanInput(param, option);
@@ -325,10 +325,10 @@ const initGUI = function (model_params) {
         }
     };
 
-    for (var option in model_params) {
+    for (const option in model_params) {
 
-        var type = typeof (model_params[option]);
-        var param_str = String(option);
+        const type = typeof (model_params[option]);
+        const param_str = String(option);
 
         switch (type) {
             case "boolean":

@@ -1,6 +1,6 @@
-var NetworkModule = function (svg_width, svg_height) {
+const NetworkModule = function (svg_width, svg_height) {
   // Create the svg tag:
-  var svg_tag =
+  const svg_tag =
     "<svg id='NetworkModule_d3' width='" +
     svg_width +
     "' height='" +
@@ -11,15 +11,15 @@ var NetworkModule = function (svg_width, svg_height) {
   // Append svg to #elements:
   $("#elements").append($(svg_tag)[0]);
 
-  var svg = d3.select("#NetworkModule_d3");
-  var width = +svg.attr("width");
-  var height = +svg.attr("height");
-  var g = svg
+  const svg = d3.select("#NetworkModule_d3");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
+  const g = svg
     .append("g")
     .classed("network_root", true)
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-  var tooltip = d3
+  const tooltip = d3
     .select("body")
     .append("div")
     .attr("class", "tooltip")
@@ -31,12 +31,12 @@ var NetworkModule = function (svg_width, svg_height) {
     })
   );
 
-  var links = g.append("g").attr("class", "links");
+  const links = g.append("g").attr("class", "links");
 
-  var nodes = g.append("g").attr("class", "nodes");
+  const nodes = g.append("g").attr("class", "nodes");
 
   this.render = function (data) {
-    var graph = JSON.parse(JSON.stringify(data));
+    const graph = JSON.parse(JSON.stringify(data));
 
     simulation = d3
       .forceSimulation()
@@ -47,7 +47,7 @@ var NetworkModule = function (svg_width, svg_height) {
       .stop();
 
     for (
-      var i = 0,
+      let i = 0,
         n = Math.ceil(
           Math.log(simulation.alphaMin()) /
             Math.log(1 - simulation.alphaDecay())
