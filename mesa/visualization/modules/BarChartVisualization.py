@@ -6,7 +6,7 @@ Module for drawing live-updating bar charts using d3.js
 
 """
 import json
-from mesa.visualization.ModularVisualization import VisualizationElement
+from mesa.visualization.ModularVisualization import VisualizationElement, D3_JS_FILE
 
 
 class BarChartModule(VisualizationElement):
@@ -27,7 +27,7 @@ class BarChartModule(VisualizationElement):
 
     """
 
-    package_includes = ["d3.min.js", "BarChartModule.js"]
+    package_includes = [D3_JS_FILE, "BarChartModule.js"]
 
     def __init__(
         self,

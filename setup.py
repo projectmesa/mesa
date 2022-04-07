@@ -50,9 +50,10 @@ def ensure_JS_dep(dirname, url):
     print("Done")
 
 
-def ensure_JS_dep_single(url):
+def ensure_JS_dep_single(url, out_name=None):
     # Used for downloading e.g. jQuery single file
-    out_name = url.split("/")[-1]
+    if out_name is None:
+        out_name = url.split("/")[-1]
     dst_path = os.path.join(external_dir_single, out_name)
     if os.path.isfile(dst_path):
         return
@@ -82,6 +83,14 @@ jquery_version = "2.2.4"
 ensure_JS_dep_single(
     f"https://code.jquery.com/jquery-{jquery_version}.min.js",
 )
+# Important: when updating the D3 version, make sure to update the constant
+# D3_JS_FILE in mesa/visualization/ModularVisualization.py.
+d3_version = "4.13.0"
+ensure_JS_dep_single(
+    f"https://cdnjs.cloudflare.com/ajax/libs/d3/{d3_version}/d3.min.js",
+    out_name=f"d3-{d3_version}.min.js",
+)
+
 
 setup(
     name="Mesa",

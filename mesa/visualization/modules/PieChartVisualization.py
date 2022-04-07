@@ -6,7 +6,7 @@ Module for drawing live-updating pie charts using d3.js
 
 """
 import json
-from mesa.visualization.ModularVisualization import VisualizationElement
+from mesa.visualization.ModularVisualization import VisualizationElement, D3_JS_FILE
 
 
 class PieChartModule(VisualizationElement):
@@ -29,7 +29,7 @@ class PieChartModule(VisualizationElement):
 
     """
 
-    package_includes = ["d3.min.js", "PieChartModule.js"]
+    package_includes = [D3_JS_FILE, "PieChartModule.js"]
 
     def __init__(
         self,
