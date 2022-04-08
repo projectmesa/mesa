@@ -72,6 +72,11 @@ class Agent:
         """Gives you the distance between the agent and another agent"""
         return self.distancexy(another_agent.pos[0], another_agent.pos[1])
 
+    def die(self):
+        """Removes the agent from the schedule and the grid"""
+        self.model.schedule.remove(self)
+        self.model.space.remove_agent(self)
+
     @property
     def random(self) -> Random:
         return self.model.random
