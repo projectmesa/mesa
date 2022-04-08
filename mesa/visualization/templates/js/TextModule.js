@@ -1,15 +1,15 @@
-const TextModule = function() {
-	const tag = "<p class='lead'></p>";
-	const text = $(tag)[0];
+const TextModule = function () {
+  const tag = "<p class='lead'></p>";
+  const text = $(tag)[0];
 
-	// Append text tag to #elements:
-    $("#elements").append(text);
+  // Append text tag to #elements:
+  $("#elements").append(text);
 
-	this.render = function(data) {
-		$(text).html(data);
-	};
+  this.render = function (data) {
+    $(text).html(data);
+  };
 
-	this.reset = function() {
-		$(text).html("");
-	};
+  this.reset = function () {
+    $(text).html("");
+  };
 };
