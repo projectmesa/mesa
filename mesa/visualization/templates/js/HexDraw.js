@@ -38,50 +38,70 @@ other agent locations, represented by circles:
 
 */
 
-const HexVisualization = function(width, height, gridWidth, gridHeight, context, interactionHandler) {
+const HexVisualization = function (
+  width,
+  height,
+  gridWidth,
+  gridHeight,
+  context,
+  interactionHandler
+) {
+  // Find cell size:
+  const cellWidth = Math.floor(width / gridWidth);
+  const cellHeight = Math.floor(height / gridHeight);
 
-	// Find cell size:
-	const cellWidth = Math.floor(width / gridWidth);
-	const cellHeight = Math.floor(height / gridHeight);
+  // Find max radius of the circle that can be inscribed (fit) into the
+  // cell of the grid.
+  const maxR = Math.min(cellHeight, cellWidth) / 2 - 1;
 
-        // Find max radius of the circle that can be inscribed (fit) into the
-        // cell of the grid.
-	const maxR = Math.min(cellHeight, cellWidth)/2 - 1;
+  // Configure the interaction handler to use a hex coordinate mapper
+  interactionHandler ? interactionHandler.setCoordinateMapper("hex") : null;
 
-	// Configure the interaction handler to use a hex coordinate mapper
-  (interactionHandler) ? interactionHandler.setCoordinateMapper("hex") : null;
+  // Calls the appropriate shape(agent)
+  this.drawLayer = function (portrayalLayer) {
+    // Re-initialize the lookup table
+    interactionHandler ? interactionHandler.mouseoverLookupTable.init() : null;
+    for (const i in portrayalLayer) {
+      const p = portrayalLayer[i];
+      // Does the inversion of y positioning because of html5
+      // canvas y direction is from top to bottom. But we
+      // normally keep y-axis in plots from bottom to top.
+      p.y = gridHeight - p.y - 1;
 
-	// Calls the appropriate shape(agent)
-        this.drawLayer = function(portrayalLayer) {
-	        // Re-initialize the lookup table
-	        (interactionHandler) ? interactionHandler.mouseoverLookupTable.init() : null
-		for (const i in portrayalLayer) {
-			const p = portrayalLayer[i];
-                        // Does the inversion of y positioning because of html5
-                        // canvas y direction is from top to bottom. But we
-                        // normally keep y-axis in plots from bottom to top.
-                        p.y = gridHeight - p.y - 1;
+      // if a handler exists, add coordinates for the portrayalLayer index
+      interactionHandler
+        ? interactionHandler.mouseoverLookupTable.set(p.x, p.y, i)
+        : null;
 
-                        // if a handler exists, add coordinates for the portrayalLayer index
-                        (interactionHandler) ? interactionHandler.mouseoverLookupTable.set(p.x, p.y, i) : null;
+      if (p.Shape == "hex")
+        this.drawHex(p.x, p.y, p.r, p.Color, p.Filled, p.text, p.text_color);
+      else if (p.Shape == "circle")
+        this.drawCircle(p.x, p.y, p.r, p.Color, p.Filled, p.text, p.text_color);
+      else if (p.Shape == "arrowHead")
+        this.drawArrowHead(
+          p.x,
+          p.y,
+          p.heading_x,
+          p.heading_y,
+          p.scale,
+          p.Color,
+          p.Filled,
+          p.text,
+          p.text_color
+        );
+      else
+        this.drawCustomImage(p.Shape, p.x, p.y, p.scale, p.text, p.text_color);
+    }
+    // if a handler exists, update its mouse listeners with the new data
+    interactionHandler
+      ? interactionHandler.updateMouseListeners(portrayalLayer)
+      : null;
+  };
 
-			if (p.Shape == "hex")
-				this.drawHex(p.x, p.y, p.r, p.Color, p.Filled, p.text, p.text_color);
-			else if (p.Shape == "circle")
-				this.drawCircle(p.x, p.y, p.r, p.Color, p.Filled, p.text, p.text_color);
-            else if (p.Shape == "arrowHead")
-				this.drawArrowHead(p.x, p.y, p.heading_x, p.heading_y, p.scale, p.Color, p.Filled, p.text, p.text_color);
-			else
-				this.drawCustomImage(p.Shape, p.x, p.y, p.scale, p.text, p.text_color)
-		}
-		// if a handler exists, update its mouse listeners with the new data
-		(interactionHandler) ? interactionHandler.updateMouseListeners(portrayalLayer): null;
-	};
+  // DRAWING METHODS
+  // =====================================================================
 
-	// DRAWING METHODS
-	// =====================================================================
-
-	/**
+  /**
 	Draw a circle in the specified grid cell.
 	x, y: Grid coords
 	r: Radius, as a multiple of cell size
@@ -90,39 +110,38 @@ const HexVisualization = function(width, height, gridWidth, gridHeight, context,
         text: Inscribed text in rectangle.
         text_color: Color of the inscribed text.
         */
-	this.drawCircle = function(x, y, radius, color, fill, text, text_color) {
-		const cx = (x + 0.5) * cellWidth;
-		let cy;
-		if(x % 2 == 0){
-			cy = (y + 0.5) * cellHeight;
-		} else {
-			cy = ((y + 0.5) * cellHeight) + cellHeight/2;
-		}
-		const r = radius * maxR;
+  this.drawCircle = function (x, y, radius, color, fill, text, text_color) {
+    const cx = (x + 0.5) * cellWidth;
+    let cy;
+    if (x % 2 == 0) {
+      cy = (y + 0.5) * cellHeight;
+    } else {
+      cy = (y + 0.5) * cellHeight + cellHeight / 2;
+    }
+    const r = radius * maxR;
 
-		context.beginPath();
-		context.arc(cx, cy, r, 0, Math.PI * 2, false);
-		context.closePath();
+    context.beginPath();
+    context.arc(cx, cy, r, 0, Math.PI * 2, false);
+    context.closePath();
 
-		context.strokeStyle = color;
-		context.stroke();
+    context.strokeStyle = color;
+    context.stroke();
 
-		if (fill) {
-			context.fillStyle = color;
-			context.fill();
-		}
+    if (fill) {
+      context.fillStyle = color;
+      context.fill();
+    }
 
-                // This part draws the text inside the Circle
-                if (text !== undefined) {
-                        context.fillStyle = text_color;
-                        context.textAlign = 'center';
-                        context.textBaseline= 'middle';
-                        context.fillText(text, cx, cy);
-                }
+    // This part draws the text inside the Circle
+    if (text !== undefined) {
+      context.fillStyle = text_color;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(text, cx, cy);
+    }
+  };
 
-	};
-
-	/**
+  /**
 	Draw a hexagon in the specified grid cell.
 	x, y: Grid coords
 	r: Radius, as a multiple of cell size
@@ -131,122 +150,117 @@ const HexVisualization = function(width, height, gridWidth, gridHeight, context,
         text: Inscribed text in rectangle.
         text_color: Color of the inscribed text.
         */
-	this.drawHex = function(x, y, radius, color, fill, text, text_color) {
-		const cx = (x + 0.5) * cellWidth;
-		let cy;
-		if(x % 2 == 0){
-			cy = (y + 0.5) * cellHeight;
-		} else {
-			cy = ((y + 0.5) * cellHeight) + cellHeight/2;
-		}
-		maxHexRadius = cellHeight/Math.sqrt(3)
-		const r = radius * maxHexRadius;
+  this.drawHex = function (x, y, radius, color, fill, text, text_color) {
+    const cx = (x + 0.5) * cellWidth;
+    let cy;
+    if (x % 2 == 0) {
+      cy = (y + 0.5) * cellHeight;
+    } else {
+      cy = (y + 0.5) * cellHeight + cellHeight / 2;
+    }
+    maxHexRadius = cellHeight / Math.sqrt(3);
+    const r = radius * maxHexRadius;
 
-		function hex_corner(x,y, size, i){
-		    const angle_deg = 60 * i
-		    const angle_rad = Math.PI / 180 * angle_deg
-		    return [(x + size * Math.cos(angle_rad) * 1.2),
-		            (y + size * Math.sin(angle_rad))]
-		}
+    function hex_corner(x, y, size, i) {
+      const angle_deg = 60 * i;
+      const angle_rad = (Math.PI / 180) * angle_deg;
+      return [
+        x + size * Math.cos(angle_rad) * 1.2,
+        y + size * Math.sin(angle_rad),
+      ];
+    }
 
+    context.beginPath();
+    let [px, py] = hex_corner(cx, cy, r, 1);
+    // console.log(px,py)
+    context.moveTo(px, py);
+    //for i in range(5):
+    Array.from(new Array(5), (n, i) => {
+      [px, py] = hex_corner(cx, cy, r, i + 2);
+      // console.log(px,py)
+      context.lineTo(px, py);
+    });
+    context.closePath();
 
-		context.beginPath();
-		let [px, py] = hex_corner(cx,cy,r,1)
-		// console.log(px,py)
-		context.moveTo(px,py)
-		//for i in range(5):
-		Array.from(new Array(5), (n,i) => {
-			[px, py] = hex_corner(cx,cy,r,i + 2)
-			// console.log(px,py)
-			context.lineTo(px,py)
-		})
-		context.closePath()
+    context.strokeStyle = color;
+    context.stroke();
 
-		context.strokeStyle = color;
-		context.stroke();
+    if (fill) {
+      context.fillStyle = color;
+      context.fill();
+    }
+    // This part draws the text inside the Circle
+    if (text !== undefined) {
+      context.fillStyle = text_color;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(text, cx, cy);
+    }
+  };
 
-		if (fill) {
-			context.fillStyle = color;
-			context.fill();
-		}
-                // This part draws the text inside the Circle
-                if (text !== undefined) {
-                        context.fillStyle = text_color;
-                        context.textAlign = 'center';
-                        context.textBaseline= 'middle';
-                        context.fillText(text, cx, cy);
-                }
+  this.drawCustomImage = function (shape, x, y, scale, text, text_color_) {
+    const img = new Image();
+    img.src = "local/".concat(shape);
+    if (scale === undefined) {
+      scale = 1;
+    }
+    // Calculate coordinates so the image is always centered
+    const dWidth = cellWidth * scale;
+    const dHeight = cellHeight * scale;
+    const cx = x * cellWidth + cellWidth / 2 - dWidth / 2;
+    const cy = y * cellHeight + cellHeight / 2 - dHeight / 2;
 
-	};
+    // Coordinates for the text
+    const tx = (x + 0.5) * cellWidth;
+    const ty = (y + 0.5) * cellHeight;
 
+    img.onload = function () {
+      context.drawImage(img, cx, cy, dWidth, dHeight);
+      // This part draws the text on the image
+      if (text !== undefined) {
+        // ToDo: Fix fillStyle
+        // context.fillStyle = text_color;
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText(text, tx, ty);
+      }
+    };
+  };
 
-	this.drawCustomImage = function (shape, x, y, scale, text, text_color_) {
-		const img = new Image();
-			img.src = "local/".concat(shape);
-		if (scale === undefined) {
-			scale = 1
-		}
-		// Calculate coordinates so the image is always centered
-		const dWidth = cellWidth * scale;
-		const dHeight = cellHeight * scale;
-		const cx = x * cellWidth + cellWidth / 2 - dWidth / 2;
-		const cy = y * cellHeight + cellHeight / 2 - dHeight / 2;
-
-		// Coordinates for the text
-		const tx = (x + 0.5) * cellWidth;
-		const ty = (y + 0.5) * cellHeight;
-
-
-		img.onload = function() {
-			context.drawImage(img, cx, cy, dWidth, dHeight);
-			// This part draws the text on the image
-			if (text !== undefined) {
-				// ToDo: Fix fillStyle
-				// context.fillStyle = text_color;
-				context.textAlign = 'center';
-				context.textBaseline= 'middle';
-				context.fillText(text, tx, ty);
-			}
-		}
-	}
-
-	/**
+  /**
         Draw Grid lines in the full gird
         */
 
-	this.drawGridLines = function(strokeColor) {
-		context.beginPath();
-		context.strokeStyle = strokeColor || "#eee";
-		const maxX = cellWidth * gridWidth;
-		const maxY = cellHeight * gridHeight;
+  this.drawGridLines = function (strokeColor) {
+    context.beginPath();
+    context.strokeStyle = strokeColor || "#eee";
+    const maxX = cellWidth * gridWidth;
+    const maxY = cellHeight * gridHeight;
 
-		const xStep = cellWidth * 0.33;
-		const yStep = cellHeight * 0.5;
+    const xStep = cellWidth * 0.33;
+    const yStep = cellHeight * 0.5;
 
-		let yStart = yStep;
-		for(let x=cellWidth/2; x<=maxX; x+= cellWidth) {
-				for(let y=yStart; y<=maxY; y+=cellHeight) {
+    let yStart = yStep;
+    for (let x = cellWidth / 2; x <= maxX; x += cellWidth) {
+      for (let y = yStart; y <= maxY; y += cellHeight) {
+        context.moveTo(x - 2 * xStep, y);
 
-					context.moveTo(x - 2 * xStep, y);
+        context.lineTo(x - xStep, y - yStep);
+        context.lineTo(x + xStep, y - yStep);
+        context.lineTo(x + 2 * xStep, y);
 
-					context.lineTo(x - xStep, y - yStep)
-					context.lineTo(x + xStep, y - yStep)
-					context.lineTo(x + 2 * xStep, y )
+        context.lineTo(x + xStep, y + yStep);
+        context.lineTo(x - xStep, y + yStep);
+        context.lineTo(x - 2 * xStep, y);
+      }
+      yStart = yStart === 0 ? yStep : 0;
+    }
 
-					context.lineTo(x + xStep, y + yStep )
-					context.lineTo(x - xStep, y + yStep )
-					context.lineTo(x - 2 * xStep, y)
+    context.stroke();
+  };
 
-				}
-			yStart = (yStart === 0) ? yStep: 0;
-		}
-
-		context.stroke();
-	};
-
-	this.resetCanvas = function() {
-		context.clearRect(0, 0, width, height);
-		context.beginPath();
-	};
-
+  this.resetCanvas = function () {
+    context.clearRect(0, 0, width, height);
+    context.beginPath();
+  };
 };
