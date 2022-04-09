@@ -79,6 +79,13 @@ ensure_JS_dep(
     f"https://github.com/seiyria/bootstrap-slider/archive/refs/tags/v{bootstrap_slider_version}.zip",
 )
 
+# Ensure Bootstrap Switch
+bootstrap_switch_version = "3.3.4"
+ensure_JS_dep(
+    f"bootstrap-switch-{bootstrap_switch_version}",
+    f"https://github.com/Bttstrp/bootstrap-switch/archive/refs/tags/v{bootstrap_switch_version}.zip",
+)
+
 jquery_version = "2.2.4"
 ensure_JS_dep_single(
     f"https://code.jquery.com/jquery-{jquery_version}.min.js",
