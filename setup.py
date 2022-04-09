@@ -90,6 +90,13 @@ ensure_JS_dep_single(
     f"https://cdnjs.cloudflare.com/ajax/libs/d3/{d3_version}/d3.min.js",
     out_name=f"d3-{d3_version}.min.js",
 )
+# Important: Make sure to update CHART_JS_FILE in
+# mesa/visualization/ModularVisualization.py.
+chartjs_version = "3.6.1"
+ensure_JS_dep_single(
+    f"https://cdn.jsdelivr.net/npm/chart.js@{chartjs_version}/dist/chart.min.js",
+    out_name=f"chart-{chartjs_version}.min.js",
+)
 
 
 setup(

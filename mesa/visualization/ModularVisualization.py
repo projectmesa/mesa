@@ -117,6 +117,7 @@ if platform.system() == "Windows" and platform.python_version_tuple() >= ("3", "
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 D3_JS_FILE = "external/d3-4.13.0.min.js"
+CHART_JS_FILE = "external/chart-3.6.1.min.js"
 
 
 class VisualizationElement:

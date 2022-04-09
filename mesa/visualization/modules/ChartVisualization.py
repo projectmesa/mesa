@@ -6,7 +6,7 @@ Module for drawing live-updating line charts using Charts.js
 
 """
 import json
-from mesa.visualization.ModularVisualization import VisualizationElement
+from mesa.visualization.ModularVisualization import VisualizationElement, CHART_JS_FILE
 
 
 class ChartModule(VisualizationElement):
@@ -42,7 +42,7 @@ class ChartModule(VisualizationElement):
 
     """
 
-    package_includes = ["Chart.min.js", "ChartModule.js"]
+    package_includes = [CHART_JS_FILE, "ChartModule.js"]
 
     def __init__(
         self,
