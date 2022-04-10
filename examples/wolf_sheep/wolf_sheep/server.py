@@ -51,20 +51,15 @@ model_params = {
     "grass": mesa.visualization.UserSettableParameter(
         "checkbox", "Grass Enabled", True
     ),
-    "grass_regrowth_time": mesa.visualization.UserSettableParameter(
-        "slider", "Grass Regrowth Time", 20, 1, 50
+    "grass_regrowth_time": mesa.visualization.Slider("Grass Regrowth Time", 20, 1, 50),
+    "initial_sheep": mesa.visualization.Slider(
+        "Initial Sheep Population", 100, 10, 300
     ),
-    "initial_sheep": mesa.visualization.UserSettableParameter(
-        "slider", "Initial Sheep Population", 100, 10, 300
+    "sheep_reproduce": mesa.visualization.Slider(
+        "Sheep Reproduction Rate", 0.04, 0.01, 1.0, 0.01
     ),
-    "sheep_reproduce": mesa.visualization.UserSettableParameter(
-        "slider", "Sheep Reproduction Rate", 0.04, 0.01, 1.0, 0.01
-    ),
-    "initial_wolves": mesa.visualization.UserSettableParameter(
-        "slider", "Initial Wolf Population", 50, 10, 300
-    ),
-    "wolf_reproduce": mesa.visualization.UserSettableParameter(
-        "slider",
+    "initial_wolves": mesa.visualization.Slider("Initial Wolf Population", 50, 10, 300),
+    "wolf_reproduce": mesa.visualization.Slider(
         "Wolf Reproduction Rate",
         0.05,
         0.01,
@@ -72,12 +67,10 @@ model_params = {
         0.01,
         description="The rate at which wolf agents reproduce.",
     ),
-    "wolf_gain_from_food": mesa.visualization.UserSettableParameter(
-        "slider", "Wolf Gain From Food Rate", 20, 1, 50
+    "wolf_gain_from_food": mesa.visualization.Slider(
+        "Wolf Gain From Food Rate", 20, 1, 50
     ),
-    "sheep_gain_from_food": mesa.visualization.UserSettableParameter(
-        "slider", "Sheep Gain From Food", 4, 1, 10
-    ),
+    "sheep_gain_from_food": mesa.visualization.Slider("Sheep Gain From Food", 4, 1, 10),
 }
 
 server = mesa.visualization.ModularServer(

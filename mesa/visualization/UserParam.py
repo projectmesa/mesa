@@ -1,3 +1,10 @@
+NUMBER = "number"
+CHECKBOX = "checkbox"
+CHOICE = "choice"
+SLIDER = "slider"
+STATIC_TEXT = "static_text"
+
+
 class UserSettableParameter:
     """A class for providing options to a visualization for a given parameter.
 
@@ -35,11 +42,11 @@ class UserSettableParameter:
     static_text = UserSettableParameter('static_text', value="This is a descriptive textbox")
     """
 
-    NUMBER = "number"
-    CHECKBOX = "checkbox"
-    CHOICE = "choice"
-    SLIDER = "slider"
-    STATIC_TEXT = "static_text"
+    NUMBER = NUMBER
+    CHECKBOX = CHECKBOX
+    CHOICE = CHOICE
+    SLIDER = SLIDER
+    STATIC_TEXT = STATIC_TEXT
 
     TYPES = (NUMBER, CHECKBOX, CHOICE, SLIDER, STATIC_TEXT)
 
@@ -119,3 +126,63 @@ class UserSettableParameter:
             "_value"
         )  # Return _value as value, value is the same
         return result
+
+
+class UserParam:
+    _ERROR_MESSAGE = "Missing or malformed inputs for '{}' Option '{}'"
+
+    @property
+    def json(self):
+        result = self.__dict__.copy()
+        result["value"] = result.pop(
+            "_value"
+        )  # Return _value as value, value is the same
+        return result
+
+
+class Slider(UserParam):
+    """
+    A number-based slider input with settable increment.
+
+    Example:
+
+    slider_option = Slider("My Slider", value=123, min_value=10, max_value=200, step=0.1)
+    """
+
+    def __init__(
+        self,
+        name="",
+        value=None,
+        min_value=None,
+        max_value=None,
+        step=1,
+        description=None,
+    ):
+        self.param_type = SLIDER
+        self.name = name
+        self._value = value
+        self.min_value = min_value
+        self.max_value = max_value
+        self.step = step
+        self.description = description
+
+        # Validate option types to make sure values are supplied properly
+        valid = not (
+            self.value is None or self.min_value is None or self.max_value is None
+        )
+
+        if not valid:
+            msg = self._ERROR_MESSAGE.format(self.param_type, name)
+            raise ValueError(msg)
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
+        if self._value < self.min_value:
+            self._value = self.min_value
+        elif self._value > self.max_value:
+            self._value = self.max_value

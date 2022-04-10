@@ -106,7 +106,7 @@ import tornado.escape
 import tornado.gen
 import webbrowser
 
-from mesa.visualization.UserParam import UserSettableParameter
+from mesa.visualization.UserParam import UserSettableParameter, UserParam
 
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
@@ -118,6 +118,12 @@ if platform.system() == "Windows" and platform.python_version_tuple() >= ("3", "
 
 D3_JS_FILE = "external/d3-7.4.3.min.js"
 CHART_JS_FILE = "external/chart-3.6.1.min.js"
+
+
+def is_user_param(val):
+    return isinstance(val, UserSettableParameter) or issubclass(
+        val.__class__, UserParam
+    )
 
 
 class VisualizationElement:
@@ -222,9 +228,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
             # Is the param editable?
             if param in self.application.user_params:
-                if isinstance(
-                    self.application.model_kwargs[param], UserSettableParameter
-                ):
+                if is_user_param(self.application.model_kwargs[param]):
                     self.application.model_kwargs[param].value = value
                 else:
                     self.application.model_kwargs[param] = value
@@ -307,7 +311,7 @@ class ModularServer(tornado.web.Application):
     def user_params(self):
         result = {}
         for param, val in self.model_kwargs.items():
-            if isinstance(val, UserSettableParameter):
+            if is_user_param(val):
                 result[param] = val.json
 
         return result
@@ -317,10 +321,9 @@ class ModularServer(tornado.web.Application):
 
         model_params = {}
         for key, val in self.model_kwargs.items():
-            if isinstance(val, UserSettableParameter):
-                if (
-                    val.param_type == "static_text"
-                ):  # static_text is never used for setting params
+            if is_user_param(val):
+                if val.param_type == "static_text":
+                    # static_text is never used for setting params
                     continue
                 model_params[key] = val.value
             else:
