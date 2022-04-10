@@ -38,7 +38,7 @@ const NetworkModule = function (svg_width, svg_height) {
   this.render = function (data) {
     const graph = JSON.parse(JSON.stringify(data));
 
-    simulation = d3
+    const simulation = d3
       .forceSimulation()
       .nodes(graph.nodes)
       .force("charge", d3.forceManyBody().strength(-80).distanceMin(2))
@@ -89,12 +89,12 @@ const NetworkModule = function (svg_width, svg_height) {
       .data(graph.nodes)
       .enter()
       .append("circle")
-      .on("mouseover", function (d) {
+      .on("mouseover", function (event, d) {
         tooltip.transition().duration(200).style("opacity", 0.9);
         tooltip
           .html(d.tooltip)
-          .style("left", d3.event.pageX + "px")
-          .style("top", d3.event.pageY + "px");
+          .style("left", event.pageX + "px")
+          .style("top", event.pageY + "px");
       })
       .on("mouseout", function () {
         tooltip.transition().duration(500).style("opacity", 0);
