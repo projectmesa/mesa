@@ -21,7 +21,7 @@ portrayal = {
 
 **/
 
-var InteractionHandler = function (width, height, gridWidth, gridHeight, ctx) {
+const InteractionHandler = function (width, height, gridWidth, gridHeight, ctx) {
   // Find cell size:
   const cellWidth = Math.floor(width / gridWidth);
   const cellHeight = Math.floor(height / gridHeight);
@@ -47,12 +47,12 @@ var InteractionHandler = function (width, height, gridWidth, gridHeight, ctx) {
   ];
 
   // Set a variable to hold the lookup table and make it accessible to draw scripts
-  var mouseoverLookupTable = (this.mouseoverLookupTable = buildLookupTable(
+  const mouseoverLookupTable = (this.mouseoverLookupTable = buildLookupTable(
     gridWidth,
     gridHeight
   ));
   function buildLookupTable(gridWidth, gridHeight) {
-    var lookupTable;
+    let lookupTable;
     this.init = function () {
       lookupTable = [...Array(gridHeight).keys()].map((i) => Array(gridWidth));
     };
@@ -70,7 +70,7 @@ var InteractionHandler = function (width, height, gridWidth, gridHeight, ctx) {
     return this;
   }
 
-  var coordinateMapper;
+  let coordinateMapper;
   this.setCoordinateMapper = function (mapperName) {
     if (mapperName === "hex") {
       coordinateMapper = function (event) {
@@ -108,8 +108,8 @@ var InteractionHandler = function (width, height, gridWidth, gridHeight, ctx) {
     ctx.shadowColor = "transparent";
   }
 
-  var listener;
-  var tmp;
+  let listener;
+  let tmp;
   this.updateMouseListeners = function (portrayalLayer) {
     tmp = portrayalLayer;
 
@@ -144,8 +144,8 @@ var InteractionHandler = function (width, height, gridWidth, gridHeight, ctx) {
             Math.min(height - textHeight, event.offsetY - textHeight / 2)
           );
           const rectMargin = 2 * lineHeight;
-          var x = 0;
-          var rectX = 0;
+          let x = 0;
+          let rectX = 0;
 
           if (event.offsetX < width / 2) {
             x =
