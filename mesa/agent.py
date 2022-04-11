@@ -73,7 +73,7 @@ class Agent:
         return self.distancexy(another_agent.pos[0], another_agent.pos[1])
 
     def die(self):
-        """Removes the agent from the schedule and the grid"""
+        """Removes the agent from the schedule and the grid """
         self.model.schedule.remove(self)
         self.model.space.remove_agent(self)
 
