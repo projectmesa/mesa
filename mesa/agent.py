@@ -42,7 +42,10 @@ class Agent:
         new_x = float(self.pos[0]) + sign * math.cos(self.heading * math.pi / 180) * amount
         new_y = float(self.pos[1]) + sign * math.sin(self.heading * math.pi / -180) * amount
         next_move = (new_x, new_y)
-        self.model.space.move_agent(self, next_move)
+        try:
+            self.model.space.move_agent(self, next_move)
+        except:
+            print("agent.py (forward_backwards): could not move agent within self.model.space")
 
     def forward(self, amount):
         """Moves the agent forward by the amount given"""
@@ -74,8 +77,14 @@ class Agent:
 
     def die(self):
         """Removes the agent from the schedule and the grid """
-        self.model.schedule.remove(self)
-        self.model.space.remove_agent(self)
+        try:
+            self.model.schedule.remove(self)
+        except:
+            print("agent.py (die): could not remove agent from self.model.schedule")
+        try:
+            self.model.space.remove_agent(self)
+        except:
+            print("agent.py (die): could not remove agent from self.model.space")
 
     @property
     def random(self) -> Random:
