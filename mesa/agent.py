@@ -37,35 +37,39 @@ class Agent:
     def advance(self) -> None:
         pass
 
-    def forward_backward(self, amount, sign):
+    def move_forward_or_backward(self, amount, sign):
         """Does the calculation to find  the agent's next move and is used within the forward and backward functions"""
         new_x = float(self.pos[0]) + sign * math.cos(self.heading * math.pi / 180) * amount
         new_y = float(self.pos[1]) + sign * math.sin(self.heading * math.pi / -180) * amount
-        next_move = (new_x, new_y)
+        next_pos = (new_x, new_y)
         try:
-            self.model.space.move_agent(self, next_move)
+            self.model.space.move_agent(self, next_pos)
         except:
             print("agent.py (forward_backwards): could not move agent within self.model.space")
 
-    def forward(self, amount):
+    def move_forward(self, amount):
         """Moves the agent forward by the amount given"""
-        self.forward_backward(amount, 1)
+        self.move_forward_or_backward(amount, 1)
 
-    def back(self, amount):
+    def move_backward(self, amount):
         """Moves the agent backwards from where its facing by the given amount"""
-        self.forward_backward(amount, -1)
+        self.move_forward_or_backward(amount, -1)
 
-    def right(self, degree):
+    def turn_right(self, degree):
         """Turns the agent right by the given degree"""
         self.heading = (self.heading - degree) % 360
 
-    def left(self, degree):
+    def turn_left(self, degree):
         """Turns the agent left by the given degree"""
         self.heading = (self.heading + degree) % 360
 
     def setxy(self, x, y):
         """Sets the current position to the specified x,y parameters"""
         self.pos = (x, y)
+
+    def set_pos(self, apos):
+        """Sets the current position to the specified pos parameter"""
+        self.pos = apos
 
     def distancexy(self, x, y):
         """Gives you the distance of the agent and the given coordinate"""
@@ -86,12 +90,8 @@ class Agent:
         except:
             print("agent.py (die): could not remove agent from self.model.space")
 
-    def random_choice(self, adictionary):
-        """Agent makes choive given dictionary values"""
-        return random.choices(list(adictionary.keys()), weights=adictionary.values(), k=1)[0]
-
     def towardsxy(self, x, y):
-        """Makes the agent move towards a given coordinate"""
+        """Calculates angle between a given coordinate and horizon as if the current position is the origin"""
         dx = x - float(self.pos[0])
         dy = float(self.pos[1]) - y
         if dx == 0:
@@ -100,7 +100,7 @@ class Agent:
             return math.degrees(math.atan2(dy, dx))
 
     def towards(self, another_agent):
-        """Makes agent move towards another agent"""
+        """Calculates angle between an agent and horizon as if the current position is the origin"""
         return self.towardsxy(*another_agent.pos)
 
     def facexy(self, x, y):
