@@ -7,6 +7,14 @@
     <link href="/static/external/bootstrap-slider-9.8.0/dist/css/bootstrap-slider.min.css" type="text/css" rel="stylesheet" />
     <link href="/static/css/visualization.css" type="text/css" rel="stylesheet" />
 
+    <!-- CSS includes go here -->
+    {% for file_name in package_css_includes %}
+        <link href="/static/css/{{ file_name }}" type="text/css" rel="stylesheet" />
+    {% end %}
+    {% for file_name in local_css_includes %}
+        <link href="/local/{{ file_name }}" type="text/css" rel="stylesheet" />
+    {% end %}
+
 	<!-- This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to
 	the server (the port is set via the template). On every step, it receives inputs, one per module, and sends
 	them to the associated function to render. -->
@@ -78,10 +86,10 @@
     <script src="/static/external/bootstrap-slider-9.8.0/dist/bootstrap-slider.min.js"></script>
 
     <!-- Script includes go here -->
-	{% for file_name in package_includes %}
+	{% for file_name in package_js_includes %}
 		<script src="/static/js/{{ file_name }}" type="text/javascript"></script>
 	{% end %}
-	{% for file_name in local_includes %}
+	{% for file_name in local_js_includes %}
 		<script src="/local/{{ file_name }}" type="text/javascript"></script>
 	{% end %}
 
