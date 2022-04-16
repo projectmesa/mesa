@@ -22,7 +22,7 @@ const NetworkModule = function (svg_width, svg_height) {
   const tooltip = d3
     .select("body")
     .append("div")
-    .attr("class", "tooltip")
+    .attr("class", "d3tooltip")
     .style("opacity", 0);
 
   svg.call(
