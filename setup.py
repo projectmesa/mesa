@@ -66,7 +66,7 @@ def ensure_JS_dep_single(url, out_name=None):
 # hardcoded included files and versions in: mesa/visualization/templates/modular_template.html
 
 # Ensure Bootstrap
-bootstrap_version = "3.3.7"
+bootstrap_version = "4.6.1"
 ensure_JS_dep(
     f"bootstrap-{bootstrap_version}-dist",
     f"https://github.com/twbs/bootstrap/releases/download/v{bootstrap_version}/bootstrap-{bootstrap_version}-dist.zip",

@@ -190,10 +190,10 @@ const initGUI = function (model_params) {
     const domID = param + "_id";
     sidebar.append(
       [
-        "<div class='input-group input-group-lg'>",
+        "<div>",
         "<p><label for='" +
           domID +
-          "' class='label label-primary'>" +
+          "' class='badge badge-primary'>" +
           obj.name +
           "</label></p>",
         "<input class='model-parameter' id='" + domID + "' type='checkbox'/>",
@@ -213,10 +213,10 @@ const initGUI = function (model_params) {
     const domID = param + "_id";
     sidebar.append(
       [
-        "<div class='input-group input-group-lg'>",
+        "<div>",
         "<p><label for='" +
           domID +
-          "' class='label label-primary'>" +
+          "' class='badge badge-primary'>" +
           obj.name +
           "</label></p>",
         "<input class='model-parameter' id='" + domID + "' type='number'/>",
@@ -235,11 +235,11 @@ const initGUI = function (model_params) {
     const tooltipID = domID + "_tooltip";
     sidebar.append(
       [
-        "<div class='input-group input-group-lg'>",
+        "<div>",
         "<p>",
         "<a id='" +
           tooltipID +
-          "' data-toggle='tooltip' data-placement='top' class='label label-primary'>",
+          "' data-toggle='tooltip' data-placement='top' class='badge badge-primary'>",
         obj.name,
         "</a>",
         "</p>",
@@ -278,7 +278,7 @@ const initGUI = function (model_params) {
     const template = [
       "<p><label for='" +
         domID +
-        "' class='label label-primary'>" +
+        "' class='badge badge-primary'>" +
         obj.name +
         "</label></p>",
       "<div class='dropdown'>",

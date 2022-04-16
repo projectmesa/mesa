@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <head>
 	<title>{{ model_name }} (Mesa visualization)</title>
-    <link href="/static/external/bootstrap-3.3.7-dist/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
-    <link href="/static/external/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
+    <link href="/static/external/bootstrap-4.6.1-dist/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
     <link href="/static/external/bootstrap-switch-3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css" type="text/css" rel="stylesheet" />
     <link href="/static/external/bootstrap-slider-9.8.0/dist/css/bootstrap-slider.min.css" type="text/css" rel="stylesheet" />
     <link href="/static/css/visualization.css" type="text/css" rel="stylesheet" />
@@ -22,42 +21,43 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-inverse navbar-static-top">
+    <nav class="navbar navbar-dark bg-dark navbar-static-top navbar-expand-md mb-3">
         <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
+            <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                &#x2630;
+            </button>
             <a class="navbar-brand" href="#">{{ model_name }}</a>
-            </div>
+
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>
-                        <a href="#" data-toggle="modal" data-target="#about" data-title="About" data-content="#about-content">
+                    <li class="nav-item">
+                        <a href="#" data-toggle="modal" data-target="#about" data-title="About" data-content="#about-content" class="nav-link">
                             About
                         </a>
                     </li>
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li id="play-pause"><a href="#">Start</a></li>
-                    <li id="step"><a href="#">Step</a></li>
-                    <li id="reset"><a href="#">Reset</a></li>
+                <ul class="nav navbar-nav ml-auto">
+                    <li id="play-pause" class="nav-item"><a href="#" class="nav-link">Start</a>
+                    </li>
+                    <li id="step" class="nav-item"><a href="#" class="nav-link">Step</a>
+                    </li>
+                    <li id="reset" class="nav-item"><a href="#" class="nav-link">Reset</a>
+                    </li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div>
     </nav>
-    <div class="container">
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-3" id="sidebar"></div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-9" id="elements">
+    <div class="container d-flex flex-row">
+        <div class="col-xl-4 col-lg-4 col-md-4 col-3" id="sidebar"></div>
+        <div class="col-xl-8 col-lg-8 col-md-8 col-9" id="elements">
             <div id="elements-topbar">
-                <div class="input-group input-group-lg">
-                    <label class="label label-primary" for="fps" style="margin-right: 15px">Frames Per Second</label>
-                    <input id="fps" data-slider-id='fps' type="text" />
-                    <p>Current Step: <span id="currentStep">0</span></p>
+                <div">
+                    <label class="badge badge-primary" for="fps" style="margin-right: 15px">Frames Per Second</label>
+                    <input id="fps" data-slider-id="fps" type="text">
                 </div>
+                <p>Current Step: <span id="currentStep">0</span>
+                </p>
             </div>
         </div>
     </div>
@@ -67,12 +67,13 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">About {{ model_name }}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&#xD7;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div>{{ description }}</div>
-                    <div>&nbsp;</div>
+                    <div>&#xA0;</div>
                     <div style="clear: both;"></div>
                 </div>
             </div>
@@ -81,7 +82,7 @@
 
     <!-- Bottom-load all JavaScript dependencies -->
     <script src="/static/js/external/jquery-2.2.4.min.js"></script>
-    <script src="/static/external/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <script src="/static/external/bootstrap-4.6.1-dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/external/bootstrap-switch-3.3.4/dist/js/bootstrap-switch.min.js"></script>
     <script src="/static/external/bootstrap-slider-9.8.0/dist/bootstrap-slider.min.js"></script>
 
