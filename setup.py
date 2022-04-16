@@ -73,7 +73,7 @@ ensure_JS_dep(
 )
 
 # Ensure Bootstrap Slider
-bootstrap_slider_version = "9.8.0"
+bootstrap_slider_version = "11.0.2"
 ensure_JS_dep(
     f"bootstrap-slider-{bootstrap_slider_version}",
     f"https://github.com/seiyria/bootstrap-slider/archive/refs/tags/v{bootstrap_slider_version}.zip",
