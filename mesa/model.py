@@ -6,6 +6,8 @@ Core Objects: Model
 """
 import random
 
+from mesa.datacollection import DataCollector
+
 # mypy
 from typing import Any, Optional
 
@@ -61,3 +63,22 @@ class Model:
             seed = self._seed
         self.random.seed(seed)
         self._seed = seed
+
+    def initialize_data_collector(
+        self, model_reporters=None, agent_reporters=None, tables=None
+    ) -> None:
+        if not hasattr(self, "schedule") or self.schedule is None:
+            raise RuntimeError(
+                "You must initialize the scheduler (self.schedule) before initializing the data collector."
+            )
+        if self.schedule.get_agent_count() == 0:
+            raise RuntimeError(
+                "You must add agents to the scheduler before initializing the data collector."
+            )
+        self.datacollector = DataCollector(
+            model_reporters=model_reporters,
+            agent_reporters=agent_reporters,
+            tables=tables,
+        )
+        # Collect data for the first time during initialization.
+        self.datacollector.collect(self)
