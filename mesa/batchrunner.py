@@ -128,10 +128,14 @@ def _make_model_kwargs(
     """
     parameter_list = []
     for param, values in parameters.items():
-        try:
-            all_values = [(param, value) for value in values]
-        except TypeError:
+        if isinstance(values, str):
+            # The values is a single string, so we shouldn't iterate over it.
             all_values = [(param, values)]
+        else:
+            try:
+                all_values = [(param, value) for value in values]
+            except TypeError:
+                all_values = [(param, values)]
         parameter_list.append(all_values)
     all_kwargs = itertools.product(*parameter_list)
     kwargs_list = [dict(kwargs) for kwargs in all_kwargs]
