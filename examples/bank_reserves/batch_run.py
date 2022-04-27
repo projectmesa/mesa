@@ -190,8 +190,6 @@ if __name__ == "__main__":
     data = batch_run(
         BankReservesModel,
         br_params,
-        model_reporters={"Rich": get_num_rich_agents},
-        agent_reporters={"Wealth": "wealth"},
     )
     br_df = pd.DataFrame(data)
     br_df.to_csv("BankReservesModel_Data.csv")
@@ -199,14 +197,20 @@ if __name__ == "__main__":
     # The commented out code below is the equivalent code as above, but done
     # via the legacy BatchRunner class. This is a good example to look at if
     # you want to migrate your code to use `batch_run()` from `BatchRunner`.
+    # Things to note:
+    # - You have to set "reserve_percent" in br_params to `[5]`, because the
+    #   legacy BatchRunner doesn't auto-detect that it is single-valued.
+    # - The model reporters need to be explicitly specified in the legacy
+    #   BatchRunner
     """
-    br = BatchRunner(
+    from mesa.batchrunner import BatchRunnerMP
+    br = BatchRunnerMP(
         BankReservesModel,
-        br_params,
+        nr_processes=2,
+        variable_parameters=br_params,
         iterations=2,
         max_steps=1000,
-        nr_processes=None,
-        # model_reporters={"Data Collector": lambda m: m.datacollector},
+        model_reporters={"Data Collector": lambda m: m.datacollector},
     )
     br.run_all()
     br_df = br.get_model_vars_dataframe()
