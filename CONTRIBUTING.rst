@@ -27,6 +27,7 @@ discuss via `Matrix`_ OR via `an issue`_.
 - Fork the Mesa repository.
 - `Clone your repository`_ from Github to your machine.
 - Create a new branch in your fork: ``git checkout -b BRANCH_NAME``
+- Run ``git config pull.rebase true``. This prevents messy merge commits when updating your branch on top of Mesa main branch.
 - Install an editable version with developer requirements locally: ``pip install -e .[dev]``
 - Edit the code. Save.
 - Git add the new files and files with changes: ``git add FILE_NAME``
