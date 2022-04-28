@@ -20,9 +20,7 @@ class TestCli(unittest.TestCase):
         sys.path[:] = self.old_sys_path
 
     def test_run(self):
-        with patch(
-            "mesa.visualization.ModularVisualization.ModularServer"
-        ) as ModularServer:
+        with patch("mesa.visualization.ModularServer") as ModularServer:
             example_dir = os.path.abspath(
                 os.path.join(os.path.dirname(__file__), "../examples/wolf_sheep")
             )

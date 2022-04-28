@@ -9,8 +9,12 @@ import datetime
 from mesa.model import Model
 from mesa.agent import Agent
 
+import mesa.time as time
+import mesa.space as space
+import mesa.flat.visualization as visualization
+from mesa.datacollection import DataCollector
 
-__all__ = ["Model", "Agent"]
+__all__ = ["Model", "Agent", "time", "space", "visualization", "DataCollector"]
 
 __title__ = "mesa"
 __version__ = "0.9.0"
