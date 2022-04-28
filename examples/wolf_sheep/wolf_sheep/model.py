@@ -9,15 +9,13 @@ Replication of the model found in NetLogo:
     Northwestern University, Evanston, IL.
 """
 
-from mesa import Model
-from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
+import mesa
 
 from wolf_sheep.scheduler import RandomActivationByTypeFiltered
 from wolf_sheep.agents import Sheep, Wolf, GrassPatch
 
 
-class WolfSheep(Model):
+class WolfSheep(mesa.Model):
     """
     Wolf-Sheep Predation Model
     """
@@ -84,8 +82,8 @@ class WolfSheep(Model):
         self.sheep_gain_from_food = sheep_gain_from_food
 
         self.schedule = RandomActivationByTypeFiltered(self)
-        self.grid = MultiGrid(self.width, self.height, torus=True)
-        self.datacollector = DataCollector(
+        self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
+        self.datacollector = mesa.DataCollector(
             {
                 "Wolves": lambda m: m.schedule.get_type_count(Wolf),
                 "Sheep": lambda m: m.schedule.get_type_count(Sheep),
