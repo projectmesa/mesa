@@ -1,4 +1,4 @@
-from mesa import Agent
+import mesa
 from wolf_sheep.random_walk import RandomWalker
 
 
@@ -92,7 +92,7 @@ class Wolf(RandomWalker):
                 self.model.schedule.add(cub)
 
 
-class GrassPatch(Agent):
+class GrassPatch(mesa.Agent):
     """
     A patch of grass that grows at a fixed rate and it is eaten by sheep
     """
