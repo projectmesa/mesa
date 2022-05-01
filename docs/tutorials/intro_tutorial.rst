@@ -936,7 +936,8 @@ We call ``batch_run`` with the following arguments:
 * ``number_processes``
 
   Number of processors used to run the sweep in parallel. Optional.
-  If not specified, defaults to use all the available processors.
+  If not specified, defaults to 1. Set it to `None` to use all the available
+  processors.
 
   Note: Multiprocessing does make debugging challenging. If your
   parameter sweeps are resulting in unexpected errors set ``number_processes = 1``.
@@ -984,9 +985,7 @@ iteration).
 .. code:: python
 
     from mesa.batchrunner import batch_run
-**Note for Windows OS users:** If you are running this tutorial in Jupyter, we recommend changing the the parameter
-that controls the number of processors you are using from `number_processes = None` (this uses all available processors)
-to `number_processes = 1`. More information on leveraging batch_run's multiprocessing capability is below.
+**Note for Windows OS users:** If you are running this tutorial in Jupyter, make sure that you set `number_processes = 1` (single process). If `number_processes` is greater than 1, it is less straightforward to set up. You can read `Mesa's collection of useful snippets <https://github.com/projectmesa/mesa/blob/main/docs/useful-snippets/snippets.rst>`__, in "Using multi-process ```batch_run``` on Windows" section for how to do it.
 
 .. code:: python
 
@@ -997,7 +996,7 @@ to `number_processes = 1`. More information on leveraging batch_run's multiproce
         parameters=params,
         iterations=5,
         max_steps=100,
-        number_processes=None,
+        number_processes=1,
         data_collection_period=1,
         display_progress=True,
     )
@@ -1006,35 +1005,6 @@ to `number_processes = 1`. More information on leveraging batch_run's multiproce
 .. parsed-literal::
 
     245it [00:25,  9.75it/s]
-
-**Note for Windows OS users:** You will have an issue with `batch_run` and `number_processes = None`. Your cell will
-show no progress, and in your terminal you will receive *AttributeError: Can't get attribute 'MoneyModel' on
-<module '__main__' (built-in)>*. One way to overcome this is to take your code outside of Jupyter and adjust the above
-code as follows.
-
-
-.. code:: python
-
-    from multiprocessing import freeze_support
-
-    params = {"width": 10, "height": 10, "N": range(10, 500, 10)}
-
-    if __name__ == '__main__':
-        freeze_support()
-        results = batch_run(
-                MoneyModel,
-                parameters=params,
-                iterations=5,
-                max_steps=100,
-                number_processes=None,
-                data_collection_period=1,
-                display_progress=True,
-        )
-
-
-If you would still like to run your code in Jupyter you will need to adjust the cell as noted above. Then you can
-you can add the `nbmultitask library <(https://nbviewer.org/github/micahscopes/nbmultitask/blob/39b6f31b047e8a51a0fcb5c93ae4572684f877ce/examples.ipynb)>`__
-or look at this `stackoverflow <https://stackoverflow.com/questions/50937362/multiprocessing-on-python-3-jupyter>`__.
 
 To further analyze the return of the ``batch_run`` function, we convert
 the list of dictionaries to a Pandas DataFrame and print its keys.
