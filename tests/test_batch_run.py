@@ -86,7 +86,7 @@ class MockModel(Model):
 
 
 def test_batch_run():
-    result = batch_run(MockModel, {})
+    result = batch_run(MockModel, {}, number_processes=2)
     assert result == [
         {
             "RunId": 0,
@@ -125,11 +125,12 @@ def test_batch_run_with_params():
             "variable_model_params": range(5),
             "variable_agent_params": ["H", "E", "L", "L", "O"],
         },
+        number_processes=2,
     )
 
 
 def test_batch_run_no_agent_reporters():
-    result = batch_run(MockModel, {"enable_agent_reporters": False})
+    result = batch_run(MockModel, {"enable_agent_reporters": False}, number_processes=2)
     print(result)
     assert result == [
         {

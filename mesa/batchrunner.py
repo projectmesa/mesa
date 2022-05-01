@@ -35,7 +35,8 @@ from mesa.model import Model
 def batch_run(
     model_cls: Type[Model],
     parameters: Mapping[str, Union[Any, Iterable[Any]]],
-    number_processes: Optional[int] = None,
+    # We still retain the Optional[int] because users may set it to None (i.e. use all CPUs)
+    number_processes: Optional[int] = 1,
     iterations: int = 1,
     data_collection_period: int = -1,
     max_steps: int = 1000,
@@ -50,7 +51,7 @@ def batch_run(
     parameters : Mapping[str, Union[Any, Iterable[Any]]],
         Dictionary with model parameters over which to run the model. You can either pass single values or iterables.
     number_processes : int, optional
-        Number of processes used. Set to None (default) to use all available processors
+        Number of processes used, by default 1. Set this to None if you want to use all CPUs.
     iterations : int, optional
         Number of iterations for each parameter combination, by default 1
     data_collection_period : int, optional
