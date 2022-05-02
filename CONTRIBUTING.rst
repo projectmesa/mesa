@@ -31,7 +31,7 @@ discuss via `Matrix`_ OR via `an issue`_.
 - Install an editable version with developer requirements locally: ``pip install -e .[dev]``
 - Edit the code. Save.
 - Git add the new files and files with changes: ``git add FILE_NAME``
-- Git commit your changes with a meaningful message: ``git commit -m "Fixes X issue."``
+- Git commit your changes with a meaningful message: ``git commit -m "Fix issue X"``
 - If implementing a new feature, include some documentation in docs folder.
 - Make sure that your submission passes the `GH Actions build`_. See "Testing and Standards below" to be able to run these locally.
 - Make sure that your code is formatted according to `the black`_ standard (you can do it via `pre-commit`_).
