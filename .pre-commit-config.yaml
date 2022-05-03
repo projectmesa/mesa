@@ -4,5 +4,4 @@ repos:
     hooks:
       - id: black
         exclude: ^mesa/cookiecutter-mesa/
-        language_version: python3
       - id: black-jupyter
