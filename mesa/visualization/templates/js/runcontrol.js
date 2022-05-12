@@ -233,13 +233,17 @@ const initGUI = function (model_params) {
   const addSliderInput = function (param, obj) {
     const domID = param + "_id";
     const tooltipID = domID + "_tooltip";
+    let tooltip = "";
+    // Enable tooltip label
+    if (obj.description !== null) {
+      tooltip = `title='${obj.description}'`
+    }
+
     sidebar.append(
       [
         "<div>",
         "<p>",
-        "<a id='" +
-          tooltipID +
-          "' data-toggle='tooltip' data-placement='top' class='badge badge-primary'>",
+        `<a id='${tooltipID}' ${tooltip} data-toggle='tooltip' data-placement='top' class='badge badge-primary'>`,
         obj.name,
         "</a>",
         "</p>",
@@ -247,14 +251,6 @@ const initGUI = function (model_params) {
         "</div>",
       ].join("")
     );
-
-    // Enable tooltip label
-    if (obj.description !== null) {
-      $(tooltipID).tooltip({
-        title: obj.description,
-        placement: "right",
-      });
-    }
 
     // Setup slider
     const sliderInput = $("#" + domID);
