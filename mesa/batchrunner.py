@@ -75,39 +75,34 @@ def batch_run(
         data_collection_period=data_collection_period,
     )
 
-    total_iterations = len(kwargs_list) * iterations
+    total_iterations = len(kwargs_list)
     run_counter = count()
 
     results: List[Dict[str, Any]] = []
 
     with tqdm(total_iterations, disable=not display_progress) as pbar:
-        if number_processes == 1:
-            for iteration in range(iterations):
-                for kwargs in kwargs_list:
-                    _, rawdata = process_func(kwargs)
-                    run_id = next(run_counter)
-                    data = []
-                    for run_data in rawdata:
-                        out = {"RunId": run_id, "iteration": iteration - 1}
-                        out.update(run_data)
-                        data.append(out)
-                    results.extend(data)
-                    pbar.update()
+        iteration_counter: Counter[Tuple[Any, ...]] = Counter()
 
+        def _fn(paramValues, rawdata):
+            iteration_counter[paramValues] += 1
+            iteration = iteration_counter[paramValues]
+            run_id = next(run_counter)
+            data = []
+            for run_data in rawdata:
+                out = {"RunId": run_id, "iteration": iteration - 1}
+                out.update(run_data)
+                data.append(out)
+            results.extend(data)
+            pbar.update()
+
+        if number_processes == 1:
+            for kwargs in kwargs_list:
+                paramValues, rawdata = process_func(kwargs)
+                _fn(paramValues, rawdata)
         else:
-            iteration_counter: Counter[Tuple[Any, ...]] = Counter()
             with Pool(number_processes) as p:
                 for paramValues, rawdata in p.imap_unordered(process_func, kwargs_list):
-                    iteration_counter[paramValues] += 1
-                    iteration = iteration_counter[paramValues]
-                    run_id = next(run_counter)
-                    data = []
-                    for run_data in rawdata:
-                        out = {"RunId": run_id, "iteration": iteration - 1}
-                        out.update(run_data)
-                        data.append(out)
-                    results.extend(data)
-                    pbar.update()
+                    _fn(paramValues, rawdata)
 
     return results
 
