@@ -46,7 +46,7 @@ jobs:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('Pipfile.lock') }}
     - name: Install dependencies
-      run: pip install .[dev]
+      run: pip install wheel && pip install .[dev]
     - name: Test with pytest
       run: pytest --cov=mesa tests/ --cov-report=xml
     - if: matrix.os == 'ubuntu'
