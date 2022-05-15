@@ -34,7 +34,7 @@ class SsAgent(Agent):
 
     def is_occupied(self, pos):
         this_cell = self.model.grid.get_cell_list_contents([pos])
-        return len(this_cell) > 1
+        return any(isinstance(agent, SsAgent) for agent in this_cell)
 
     def move(self):
         # Get neighborhood within vision
