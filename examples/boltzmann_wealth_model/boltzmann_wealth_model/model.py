@@ -1,7 +1,4 @@
-from mesa import Agent, Model
-from mesa.time import RandomActivation
-from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
+import mesa
 
 
 def compute_gini(model):
@@ -12,7 +9,7 @@ def compute_gini(model):
     return 1 + (1 / N) - 2 * B
 
 
-class BoltzmannWealthModel(Model):
+class BoltzmannWealthModel(mesa.Model):
     """A simple model of an economy where agents exchange currency at random.
 
     All the agents begin with one unit of currency, and each time step can give
@@ -22,9 +19,9 @@ class BoltzmannWealthModel(Model):
 
     def __init__(self, N=100, width=10, height=10):
         self.num_agents = N
-        self.grid = MultiGrid(width, height, True)
-        self.schedule = RandomActivation(self)
-        self.datacollector = DataCollector(
+        self.grid = mesa.space.MultiGrid(width, height, True)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
         )
         # Create agents
@@ -49,7 +46,7 @@ class BoltzmannWealthModel(Model):
             self.step()
 
 
-class MoneyAgent(Agent):
+class MoneyAgent(mesa.Agent):
     """An agent with fixed initial wealth."""
 
     def __init__(self, unique_id, model):
