@@ -9,11 +9,12 @@ Author of NetLogo code:
     Northwestern University, Evanston, IL.
 """
 
-from mesa import Agent
+import mesa
+
 from bank_reserves.random_walk import RandomWalker
 
 
-class Bank(Agent):
+class Bank(mesa.Agent):
     def __init__(self, unique_id, model, reserve_percent=50):
         # initialize the parent class with required parameters
         super().__init__(unique_id, model)

@@ -8,10 +8,10 @@ Original Author: Jackie Kazil
 Generalized behavior for random walking, one grid cell at a time.
 """
 
-from mesa import Agent
+import mesa
 
 
-class RandomWalker(Agent):
+class RandomWalker(mesa.Agent):
     """
     Class implementing random walker methods in a generalized manner.
     Not intended to be used on its own, but to inherit its methods to multiple

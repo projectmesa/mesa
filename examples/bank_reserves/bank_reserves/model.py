@@ -9,13 +9,10 @@ Author of NetLogo code:
     Northwestern University, Evanston, IL.
 """
 
-from bank_reserves.agents import Bank, Person
-from mesa import Model
-from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
-from mesa.time import RandomActivation
+import mesa
 import numpy as np
 
+from bank_reserves.agents import Bank, Person
 
 """
 If you want to perform a parameter sweep, call batch_run.py instead of run.py.
@@ -82,7 +79,7 @@ def get_total_loans(model):
     return np.sum(agent_loans)
 
 
-class BankReserves(Model):
+class BankReserves(mesa.Model):
     """
     This model is a Mesa implementation of the Bank Reserves model from NetLogo.
     It is a highly abstracted, simplified model of an economy, with only one
@@ -119,13 +116,13 @@ class BankReserves(Model):
         self.height = height
         self.width = width
         self.init_people = init_people
-        self.schedule = RandomActivation(self)
-        self.grid = MultiGrid(self.width, self.height, torus=True)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
         # rich_threshold is the amount of savings a person needs to be considered "rich"
         self.rich_threshold = rich_threshold
         self.reserve_percent = reserve_percent
         # see datacollector functions above
-        self.datacollector = DataCollector(
+        self.datacollector = mesa.DataCollector(
             model_reporters={
                 "Rich": get_num_rich_agents,
                 "Poor": get_num_poor_agents,
