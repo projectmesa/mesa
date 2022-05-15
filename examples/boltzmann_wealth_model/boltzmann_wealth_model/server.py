@@ -1,9 +1,6 @@
-from mesa.visualization.ModularVisualization import ModularServer
-from .model import BoltzmannWealthModel
+import mesa
 
-from mesa.visualization.modules import CanvasGrid
-from mesa.visualization.modules import ChartModule
-from mesa.visualization.UserParam import UserSettableParameter
+from .model import BoltzmannWealthModel
 
 
 def agent_portrayal(agent):
@@ -19,13 +16,13 @@ def agent_portrayal(agent):
     return portrayal
 
 
-grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-chart = ChartModule(
+grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+chart = mesa.visualization.ChartModule(
     [{"Label": "Gini", "Color": "#0000FF"}], data_collector_name="datacollector"
 )
 
 model_params = {
-    "N": UserSettableParameter(
+    "N": mesa.visualization.UserSettableParameter(
         "slider",
         "Number of agents",
         100,
@@ -38,5 +35,7 @@ model_params = {
     "height": 10,
 }
 
-server = ModularServer(BoltzmannWealthModel, [grid, chart], "Money Model", model_params)
+server = mesa.visualization.ModularServer(
+    BoltzmannWealthModel, [grid, chart], "Money Model", model_params
+)
 server.port = 8521
