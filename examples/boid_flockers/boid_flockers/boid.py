@@ -1,9 +1,8 @@
+import mesa
 import numpy as np
 
-from mesa import Agent
 
-
-class Boid(Agent):
+class Boid(mesa.Agent):
     """
     A Boid-style flocker agent.
 

@@ -1,4 +1,4 @@
-from mesa.visualization.ModularVisualization import ModularServer
+import mesa
 
 from .model import BoidFlockers
 from .SimpleContinuousModule import SimpleCanvas
@@ -18,4 +18,6 @@ model_params = {
     "separation": 2,
 }
 
-server = ModularServer(BoidFlockers, [boid_canvas], "Boids", model_params)
+server = mesa.visualization.ModularServer(
+    BoidFlockers, [boid_canvas], "Boids", model_params
+)
