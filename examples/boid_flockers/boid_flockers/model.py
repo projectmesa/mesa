@@ -5,16 +5,13 @@ A Mesa implementation of Craig Reynolds's Boids flocker model.
 Uses numpy arrays to represent vectors.
 """
 
+import mesa
 import numpy as np
-
-from mesa import Model
-from mesa.space import ContinuousSpace
-from mesa.time import RandomActivation
 
 from .boid import Boid
 
 
-class BoidFlockers(Model):
+class BoidFlockers(mesa.Model):
     """
     Flocker model class. Handles agent creation, placement and scheduling.
     """
@@ -47,8 +44,8 @@ class BoidFlockers(Model):
         self.vision = vision
         self.speed = speed
         self.separation = separation
-        self.schedule = RandomActivation(self)
-        self.space = ContinuousSpace(width, height, True)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.space = mesa.space.ContinuousSpace(width, height, True)
         self.factors = dict(cohere=cohere, separate=separate, match=match)
         self.make_agents()
         self.running = True
