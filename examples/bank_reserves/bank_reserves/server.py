@@ -1,6 +1,5 @@
-from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.modules import CanvasGrid, ChartModule
-from mesa.visualization.UserParam import UserSettableParameter
+import mesa
+
 from bank_reserves.agents import Person
 from bank_reserves.model import BankReserves
 
@@ -50,10 +49,10 @@ def person_portrayal(agent):
 
 # dictionary of user settable parameters - these map to the model __init__ parameters
 model_params = {
-    "init_people": UserSettableParameter(
+    "init_people": mesa.visualization.UserSettableParameter(
         "slider", "People", 25, 1, 200, description="Initial Number of People"
     ),
-    "rich_threshold": UserSettableParameter(
+    "rich_threshold": mesa.visualization.UserSettableParameter(
         "slider",
         "Rich Threshold",
         10,
@@ -61,7 +60,7 @@ model_params = {
         20,
         description="Upper End of Random Initial Wallet Amount",
     ),
-    "reserve_percent": UserSettableParameter(
+    "reserve_percent": mesa.visualization.UserSettableParameter(
         "slider",
         "Reserves",
         50,
@@ -72,10 +71,10 @@ model_params = {
 }
 
 # set the portrayal function and size of the canvas for visualization
-canvas_element = CanvasGrid(person_portrayal, 20, 20, 500, 500)
+canvas_element = mesa.visualization.CanvasGrid(person_portrayal, 20, 20, 500, 500)
 
 # map data to chart in the ChartModule
-chart_element = ChartModule(
+chart_element = mesa.visualization.ChartModule(
     [
         {"Label": "Rich", "Color": RICH_COLOR},
         {"Label": "Poor", "Color": POOR_COLOR},
@@ -84,7 +83,7 @@ chart_element = ChartModule(
 )
 
 # create instance of Mesa ModularServer
-server = ModularServer(
+server = mesa.visualization.ModularServer(
     BankReserves,
     [canvas_element, chart_element],
     "Bank Reserves Model",
