@@ -1,14 +1,16 @@
 const ChartModule = function (series, canvas_width, canvas_height) {
-  // Create the tag:
-  const canvas_tag =
-    "<canvas width='" +
-    canvas_width +
-    "' height='" +
-    canvas_height +
-    "' style='border:1px dotted'></canvas>";
+  const canvas = document.createElement("canvas");
+  Object.assign(
+    canvas,
+    {
+      width: canvas_width,
+      height: canvas_height,
+      style: "border:1px dotted"
+    }
+  );
   // Append it to #elements
-  const canvas = $(canvas_tag)[0];
-  $("#elements").append(canvas);
+  const elements = document.getElementById("elements");
+  elements.appendChild(canvas);
   // Create the context and the drawing controller:
   const context = canvas.getContext("2d");
 
@@ -18,10 +20,10 @@ const ChartModule = function (series, canvas_width, canvas_height) {
     }
 
     hex = hex.replace("#", "");
-    r = parseInt(hex.substring(0, 2), 16);
-    g = parseInt(hex.substring(2, 4), 16);
-    b = parseInt(hex.substring(4, 6), 16);
-    return "rgba(" + r + "," + g + "," + b + ",0.1)";
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return `rgba(${r},${g},${b},0.1)`;
   };
 
   // Prep the chart properties and series:
