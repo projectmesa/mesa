@@ -11,7 +11,7 @@ const ChartModule = function (series, canvas_width, canvas_height) {
   // Create the context and the drawing controller:
   const context = canvas.getContext("2d");
 
-  const convertColorOpacity = function (hex) {
+  const convertColorOpacity = (hex) => {
     if (hex.indexOf("#") != 0) {
       return "rgba(0,0,0,0.1)";
     }
@@ -76,7 +76,7 @@ const ChartModule = function (series, canvas_width, canvas_height) {
     options: chartOptions,
   });
 
-  this.render = function (data) {
+  this.render = (data) => {
     chart.data.labels.push(control.tick);
     for (let i = 0; i < data.length; i++) {
       chart.data.datasets[i].data.push(data[i]);
@@ -84,11 +84,11 @@ const ChartModule = function (series, canvas_width, canvas_height) {
     chart.update();
   };
 
-  this.reset = function () {
+  this.reset = () => {
     while (chart.data.labels.length) {
       chart.data.labels.pop();
     }
-    chart.data.datasets.forEach(function (dataset) {
+    chart.data.datasets.forEach((dataset) => {
       while (dataset.data.length) {
         dataset.data.pop();
       }
