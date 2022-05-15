@@ -1,13 +1,10 @@
 const ChartModule = function (series, canvas_width, canvas_height) {
   const canvas = document.createElement("canvas");
-  Object.assign(
-    canvas,
-    {
-      width: canvas_width,
-      height: canvas_height,
-      style: "border:1px dotted"
-    }
-  );
+  Object.assign(canvas, {
+    width: canvas_width,
+    height: canvas_height,
+    style: "border:1px dotted",
+  });
   // Append it to #elements
   const elements = document.getElementById("elements");
   elements.appendChild(canvas);
