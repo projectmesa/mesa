@@ -27,3 +27,8 @@ def test_import():
     DataCollector
     mesa.DataCollector
     mf.DataCollector
+
+    from mesa.batchrunner import batch_run
+
+    batch_run
+    mesa.batch_run
