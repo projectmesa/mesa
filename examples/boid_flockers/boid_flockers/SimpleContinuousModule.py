@@ -1,7 +1,7 @@
-from mesa.visualization.ModularVisualization import VisualizationElement
+import mesa
 
 
-class SimpleCanvas(VisualizationElement):
+class SimpleCanvas(mesa.visualization.VisualizationElement):
     local_includes = ["boid_flockers/simple_continuous_canvas.js"]
     portrayal_method = None
     canvas_height = 500
