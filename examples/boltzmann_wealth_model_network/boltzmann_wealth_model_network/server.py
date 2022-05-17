@@ -1,7 +1,5 @@
-from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.UserParam import UserSettableParameter
-from mesa.visualization.modules import ChartModule
-from mesa.visualization.modules import NetworkModule
+import mesa
+
 from .model import BoltzmannWealthModelNetwork
 
 
@@ -29,13 +27,13 @@ def network_portrayal(G):
     return portrayal
 
 
-grid = NetworkModule(network_portrayal, 500, 500)
-chart = ChartModule(
+grid = mesa.visualization.NetworkModule(network_portrayal, 500, 500)
+chart = mesa.visualization.ChartModule(
     [{"Label": "Gini", "Color": "Black"}], data_collector_name="datacollector"
 )
 
 model_params = {
-    "num_agents": UserSettableParameter(
+    "num_agents": mesa.visualization.UserSettableParameter(
         "slider",
         "Number of agents",
         7,
@@ -44,7 +42,7 @@ model_params = {
         1,
         description="Choose how many agents to include in the model",
     ),
-    "num_nodes": UserSettableParameter(
+    "num_nodes": mesa.visualization.UserSettableParameter(
         "slider",
         "Number of nodes",
         10,
@@ -56,7 +54,7 @@ model_params = {
     ),
 }
 
-server = ModularServer(
+server = mesa.visualization.ModularServer(
     BoltzmannWealthModelNetwork, [grid, chart], "Money Model", model_params
 )
 server.port = 8521

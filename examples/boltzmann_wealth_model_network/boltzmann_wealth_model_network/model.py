@@ -1,9 +1,5 @@
-from mesa import Agent, Model
-from mesa.time import RandomActivation
-from mesa.datacollection import DataCollector
+import mesa
 import networkx as nx
-
-from mesa.space import NetworkGrid
 
 
 def compute_gini(model):
@@ -14,7 +10,7 @@ def compute_gini(model):
     return 1 + (1 / N) - 2 * B
 
 
-class BoltzmannWealthModelNetwork(Model):
+class BoltzmannWealthModelNetwork(mesa.Model):
     """A model with some number of agents."""
 
     def __init__(self, num_agents=7, num_nodes=10):
@@ -22,9 +18,9 @@ class BoltzmannWealthModelNetwork(Model):
         self.num_agents = num_agents
         self.num_nodes = num_nodes if num_nodes >= self.num_agents else self.num_agents
         self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=0.5)
-        self.grid = NetworkGrid(self.G)
-        self.schedule = RandomActivation(self)
-        self.datacollector = DataCollector(
+        self.grid = mesa.space.NetworkGrid(self.G)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": compute_gini},
             agent_reporters={"Wealth": lambda _: _.wealth},
         )
@@ -51,7 +47,7 @@ class BoltzmannWealthModelNetwork(Model):
             self.step()
 
 
-class MoneyAgent(Agent):
+class MoneyAgent(mesa.Agent):
     """An agent with fixed initial wealth."""
 
     def __init__(self, unique_id, model):
