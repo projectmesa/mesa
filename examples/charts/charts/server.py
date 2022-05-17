@@ -1,11 +1,5 @@
-from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.modules import (
-    CanvasGrid,
-    ChartModule,
-    BarChartModule,
-    PieChartModule,
-)
-from mesa.visualization.UserParam import UserSettableParameter
+import mesa
+
 from charts.agents import Person
 from charts.model import Charts
 
@@ -56,10 +50,10 @@ def person_portrayal(agent):
 
 # dictionary of user settable parameters - these map to the model __init__ parameters
 model_params = {
-    "init_people": UserSettableParameter(
+    "init_people": mesa.visualization.UserSettableParameter(
         "slider", "People", 25, 1, 200, description="Initial Number of People"
     ),
-    "rich_threshold": UserSettableParameter(
+    "rich_threshold": mesa.visualization.UserSettableParameter(
         "slider",
         "Rich Threshold",
         10,
@@ -67,7 +61,7 @@ model_params = {
         20,
         description="Upper End of Random Initial Wallet Amount",
     ),
-    "reserve_percent": UserSettableParameter(
+    "reserve_percent": mesa.visualization.UserSettableParameter(
         "slider",
         "Reserves",
         50,
@@ -78,10 +72,10 @@ model_params = {
 }
 
 # set the portrayal function and size of the canvas for visualization
-canvas_element = CanvasGrid(person_portrayal, 20, 20, 500, 500)
+canvas_element = mesa.visualization.CanvasGrid(person_portrayal, 20, 20, 500, 500)
 
 # map data to chart in the ChartModule
-line_chart = ChartModule(
+line_chart = mesa.visualization.ChartModule(
     [
         {"Label": "Rich", "Color": RICH_COLOR},
         {"Label": "Poor", "Color": POOR_COLOR},
@@ -89,7 +83,7 @@ line_chart = ChartModule(
     ]
 )
 
-model_bar = BarChartModule(
+model_bar = mesa.visualization.BarChartModule(
     [
         {"Label": "Rich", "Color": RICH_COLOR},
         {"Label": "Poor", "Color": POOR_COLOR},
@@ -97,14 +91,14 @@ model_bar = BarChartModule(
     ]
 )
 
-agent_bar = BarChartModule(
+agent_bar = mesa.visualization.BarChartModule(
     [{"Label": "Wealth", "Color": MID_COLOR}],
     scope="agent",
     sorting="ascending",
     sort_by="Wealth",
 )
 
-pie_chart = PieChartModule(
+pie_chart = mesa.visualization.PieChartModule(
     [
         {"Label": "Rich", "Color": RICH_COLOR},
         {"Label": "Middle Class", "Color": MID_COLOR},
@@ -113,7 +107,7 @@ pie_chart = PieChartModule(
 )
 
 # create instance of Mesa ModularServer
-server = ModularServer(
+server = mesa.visualization.ModularServer(
     Charts,
     [canvas_element, line_chart, model_bar, agent_bar, pie_chart],
     "Mesa Charts",
