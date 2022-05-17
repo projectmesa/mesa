@@ -9,13 +9,10 @@ Author of NetLogo code:
     Northwestern University, Evanston, IL.
 """
 
-from charts.agents import Bank, Person
-from mesa import Model
-from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
-from mesa.time import RandomActivation
+import mesa
 import numpy as np
 
+from charts.agents import Bank, Person
 
 """
 If you want to perform a parameter sweep, call batch_run.py instead of run.py.
@@ -82,7 +79,7 @@ def get_total_loans(model):
     return np.sum(agent_loans)
 
 
-class Charts(Model):
+class Charts(mesa.Model):
 
     # grid height
     grid_h = 20
@@ -103,13 +100,13 @@ class Charts(Model):
         self.height = height
         self.width = width
         self.init_people = init_people
-        self.schedule = RandomActivation(self)
-        self.grid = MultiGrid(self.width, self.height, torus=True)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
         # rich_threshold is the amount of savings a person needs to be considered "rich"
         self.rich_threshold = rich_threshold
         self.reserve_percent = reserve_percent
         # see datacollector functions above
-        self.datacollector = DataCollector(
+        self.datacollector = mesa.DataCollector(
             model_reporters={
                 "Rich": get_num_rich_agents,
                 "Poor": get_num_poor_agents,
