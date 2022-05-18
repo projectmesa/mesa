@@ -1,9 +1,9 @@
 import math
 
-from mesa import Agent
+import mesa
 
 
-class Citizen(Agent):
+class Citizen(mesa.Agent):
     """
     A member of the general population, may or may not be in active rebellion.
     Summary of rule: If grievance - risk > threshold, rebel.
@@ -124,7 +124,7 @@ class Citizen(Agent):
         )
 
 
-class Cop(Agent):
+class Cop(mesa.Agent):
     """
     A cop for life.  No defection.
     Summary of rule: Inspect local vision and arrest a random active agent.

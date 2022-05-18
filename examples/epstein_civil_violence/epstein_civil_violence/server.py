@@ -1,5 +1,4 @@
-from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.modules import CanvasGrid
+import mesa
 
 from .model import EpsteinCivilViolence
 from .agent import Citizen, Cop
@@ -49,7 +48,7 @@ model_params = dict(
     max_jail_term=1000,
 )
 
-canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 480, 480)
-server = ModularServer(
+canvas_element = mesa.visualization.CanvasGrid(citizen_cop_portrayal, 40, 40, 480, 480)
+server = mesa.visualization.ModularServer(
     EpsteinCivilViolence, [canvas_element], "Epstein Civil Violence", model_params
 )
