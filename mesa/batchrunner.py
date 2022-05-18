@@ -226,9 +226,6 @@ class VariableParameterError(ParameterError):
         "These parameters were given with non-sequence values: {}"
     )
 
-    def __init__(self, bad_names):
-        super().__init__(bad_names)
-
 
 class FixedBatchRunner:
     """This class is instantiated with a model class, and model parameters
