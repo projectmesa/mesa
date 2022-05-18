@@ -4,8 +4,7 @@ the drawing of the model representation on the canvas
 """
 # import webbrowser
 
-from mesa.visualization.modules import CanvasGrid
-from mesa.visualization.ModularVisualization import ModularServer
+import mesa
 
 from .model import ColorPatches
 
@@ -55,11 +54,11 @@ def color_patch_draw(cell):
     return portrayal
 
 
-canvas_element = CanvasGrid(
+canvas_element = mesa.visualization.CanvasGrid(
     color_patch_draw, grid_rows, grid_cols, canvas_width, canvas_height
 )
 
-server = ModularServer(
+server = mesa.visualization.ModularServer(
     ColorPatches,
     [canvas_element],
     "Color Patches",

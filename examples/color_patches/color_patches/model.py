@@ -4,12 +4,10 @@ The model - a 2D lattice where agents live and have an opinion
 
 from collections import Counter
 
-from mesa import Model, Agent
-from mesa.time import SimultaneousActivation
-from mesa.space import Grid
+import mesa
 
 
-class ColorCell(Agent):
+class ColorCell(mesa.Agent):
     """
     Represents a cell's opinion (visualized by a color)
     """
@@ -63,7 +61,7 @@ class ColorCell(Agent):
         self._state = self._next_state
 
 
-class ColorPatches(Model):
+class ColorPatches(mesa.Model):
     """
     represents a 2D lattice where agents live
     """
@@ -74,8 +72,8 @@ class ColorPatches(Model):
         The agents next state is first determined before updating the grid
         """
 
-        self._grid = Grid(width, height, torus=False)
-        self._schedule = SimultaneousActivation(self)
+        self._grid = mesa.space.Grid(width, height, torus=False)
+        self._schedule = mesa.time.SimultaneousActivation(self)
 
         # self._grid.coord_iter()
         #  --> should really not return content + col + row
