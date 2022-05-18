@@ -1,12 +1,9 @@
-from mesa import Model
-from mesa.time import RandomActivation
-from mesa.space import Grid
-from mesa.datacollection import DataCollector
+import mesa
 
 from .agent import Cop, Citizen
 
 
-class EpsteinCivilViolence(Model):
+class EpsteinCivilViolence(mesa.Model):
     """
     Model 1 from "Modeling civil violence: An agent-based computational
     approach," by Joshua Epstein.
@@ -62,8 +59,8 @@ class EpsteinCivilViolence(Model):
         self.movement = movement
         self.max_iters = max_iters
         self.iteration = 0
-        self.schedule = RandomActivation(self)
-        self.grid = Grid(width, height, torus=True)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.grid = mesa.space.Grid(width, height, torus=True)
         model_reporters = {
             "Quiescent": lambda m: self.count_type_citizens(m, "Quiescent"),
             "Active": lambda m: self.count_type_citizens(m, "Active"),
@@ -77,7 +74,7 @@ class EpsteinCivilViolence(Model):
             "condition": lambda a: getattr(a, "condition", None),
             "arrest_probability": lambda a: getattr(a, "arrest_probability", None),
         }
-        self.datacollector = DataCollector(
+        self.datacollector = mesa.DataCollector(
             model_reporters=model_reporters, agent_reporters=agent_reporters
         )
         unique_id = 0
