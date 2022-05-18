@@ -1,7 +1,7 @@
-from mesa import Agent
+import mesa
 
 
-class TreeCell(Agent):
+class TreeCell(mesa.Agent):
     """
     A tree cell.
 

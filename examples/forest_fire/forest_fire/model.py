@@ -1,12 +1,9 @@
-from mesa import Model
-from mesa.datacollection import DataCollector
-from mesa.space import Grid
-from mesa.time import RandomActivation
+import mesa
 
 from .agent import TreeCell
 
 
-class ForestFire(Model):
+class ForestFire(mesa.Model):
     """
     Simple Forest Fire model.
     """
@@ -20,10 +17,10 @@ class ForestFire(Model):
             density: What fraction of grid cells have a tree in them.
         """
         # Set up model objects
-        self.schedule = RandomActivation(self)
-        self.grid = Grid(width, height, torus=False)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.grid = mesa.space.Grid(width, height, torus=False)
 
-        self.datacollector = DataCollector(
+        self.datacollector = mesa.DataCollector(
             {
                 "Fine": lambda m: self.count_type(m, "Fine"),
                 "On Fire": lambda m: self.count_type(m, "On Fire"),
