@@ -53,9 +53,11 @@ class UserSettableParameter:
         min_value=None,
         max_value=None,
         step=1,
-        choices=list(),
+        choices=None,
         description=None,
     ):
+        if choices is None:
+            choices = list()
         if param_type not in self.TYPES:
             raise ValueError(f"{param_type} is not a valid Option type")
         self.param_type = param_type
