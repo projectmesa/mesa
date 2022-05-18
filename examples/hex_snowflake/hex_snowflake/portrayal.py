@@ -5,7 +5,8 @@ def portrayCell(cell):
     :param cell:  the cell in the simulation
     :return: the portrayal dictionary.
     """
-    assert cell is not None
+    if cell is None:
+        raise AssertionError
     return {
         "Shape": "hex",
         "r": 1,

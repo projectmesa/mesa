@@ -46,7 +46,8 @@ def color_patch_draw(cell):
     :return: the portrayal dictionary.
 
     """
-    assert cell is not None
+    if cell is None:
+        raise AssertionError
     portrayal = {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Layer": 0}
     portrayal["x"] = cell.get_row()
     portrayal["y"] = cell.get_col()
