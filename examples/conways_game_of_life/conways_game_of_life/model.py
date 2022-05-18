@@ -1,11 +1,9 @@
-from mesa import Model
-from mesa.time import SimultaneousActivation
-from mesa.space import Grid
+import mesa
 
 from .cell import Cell
 
 
-class ConwaysGameOfLife(Model):
+class ConwaysGameOfLife(mesa.Model):
     """
     Represents the 2-dimensional array of cells in Conway's
     Game of Life.
@@ -22,10 +20,10 @@ class ConwaysGameOfLife(Model):
         # computing their next state simultaneously.  This needs to
         # be done because each cell's next state depends on the current
         # state of all its neighbors -- before they've changed.
-        self.schedule = SimultaneousActivation(self)
+        self.schedule = mesa.time.SimultaneousActivation(self)
 
         # Use a simple grid, where edges wrap around.
-        self.grid = Grid(width, height, torus=True)
+        self.grid = mesa.space.Grid(width, height, torus=True)
 
         # Place a cell at each location, with some initialized to
         # ALIVE and some to DEAD.
