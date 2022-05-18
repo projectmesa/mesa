@@ -5,7 +5,8 @@ def portrayPDAgent(agent):
     :param agent:  the agent in the simulation
     :return: the portrayal dictionary
     """
-    assert agent is not None
+    if agent is None:
+        raise AssertionError
     return {
         "Shape": "rect",
         "w": 1,
