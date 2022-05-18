@@ -31,7 +31,7 @@ class TestExamples(unittest.TestCase):
             yield
         finally:
             os.chdir(old_cwd)
-            added = [m for m in sys.modules.keys() if m not in old_sys_modules]
+            added = [m for m in sys.modules if m not in old_sys_modules]
             for mod in added:
                 del sys.modules[mod]
             sys.modules.update(old_sys_modules)
