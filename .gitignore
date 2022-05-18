@@ -85,3 +85,5 @@ pythonenv*/
 # JS dependencies
 mesa/visualization/templates/external/
 mesa/visualization/templates/js/external/
+
+*node_modules/

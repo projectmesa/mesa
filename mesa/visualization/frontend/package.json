@@ -1,0 +1,26 @@
+{
+  "name": "mesa-frontend",
+  "version": "0.1.0",
+  "description": "Frontend for mesa ABM",
+  "main": "main.ts",
+  "scripts": {
+    "build": "esbuild src/main.tsx --bundle --outfile=../templates/js/main.js --minify",
+    "dev": "esbuild src/main.tsx --bundle --outfile=../templates/js/main.js --watch"
+  },
+  "author": "Project Mesa Team",
+  "repository": {
+    "url": "https://github.com/projectmesa/mesa"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.4",
+    "esbuild": "^0.14.39",
+    "eslint": "^8.15.0",
+    "prettier": "^2.6.2"
+  }
+}
