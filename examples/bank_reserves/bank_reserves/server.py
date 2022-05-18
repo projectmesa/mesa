@@ -11,12 +11,13 @@ Accessed on: November 2, 2017
 Author of original code: Taylor Mutch
 """
 
+# The colors here are taken from Matplotlib's tab10 palette
 # Green
-RICH_COLOR = "#46FF33"
+RICH_COLOR = "#2ca02c"
 # Red
-POOR_COLOR = "#FF3C33"
+POOR_COLOR = "#d62728"
 # Blue
-MID_COLOR = "#3349FF"
+MID_COLOR = "#1f77b4"
 
 
 def person_portrayal(agent):
