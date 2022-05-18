@@ -188,25 +188,30 @@ const initGUI = function (model_params) {
 
   const addBooleanInput = function (param, obj) {
     const domID = param + "_id";
-    sidebar.append(
-      [
-        "<div>",
-        "<p><label for='" +
-          domID +
-          "' class='badge badge-primary'>" +
-          obj.name +
-          "</label></p>",
-        "<input class='model-parameter' id='" + domID + "' type='checkbox'/>",
-        "</div>",
-      ].join("")
-    );
-    $("#" + domID).bootstrapSwitch({
-      state: obj.value,
-      size: "small",
-      onSwitchChange: function (e, state) {
-        onSubmitCallback(param, state);
-      },
+    const _switch = document.createElement("div");
+    _switch.className = "form-check form-switch";
+
+    const label = `
+      <label class="form-check-label badge bg-primary" for="${domID}">
+        ${obj.name}
+      </label>
+    `;
+    _switch.innerHTML += label;
+
+    const input = document.createElement("input");
+    Object.assign(input, {
+      className: "form-check-input model-parameter",
+      type: "checkbox",
+      id: domID,
+      checked: obj.value,
     });
+    input.setAttribute("role", "switch");
+    input.addEventListener("change", (event) =>
+      onSubmitCallback(param, event.currentTarget.checked)
+    );
+    _switch.appendChild(input);
+
+    sidebar.append(_switch);
   };
 
   const addNumberInput = function (param, obj) {
@@ -216,7 +221,7 @@ const initGUI = function (model_params) {
         "<div>",
         "<p><label for='" +
           domID +
-          "' class='badge badge-primary'>" +
+          "' class='badge bg-primary'>" +
           obj.name +
           "</label></p>",
         "<input class='model-parameter' id='" + domID + "' type='number'/>",
@@ -236,16 +241,16 @@ const initGUI = function (model_params) {
     let tooltip = "";
     // Enable tooltip label
     if (obj.description !== null) {
-      tooltip = `title='${obj.description}'`
+      tooltip = `title='${obj.description}'`;
     }
 
     sidebar.append(
       [
         "<div>",
         "<p>",
-        `<a id='${tooltipID}' ${tooltip} data-toggle='tooltip' data-placement='top' class='badge badge-primary'>`,
+        `<span id='${tooltipID}' ${tooltip} data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-primary'>`,
         obj.name,
-        "</a>",
+        "</span>",
         "</p>",
         "<input id='" + domID + "' type='text' />",
         "</div>",
@@ -274,13 +279,13 @@ const initGUI = function (model_params) {
     const template = [
       "<p><label for='" +
         domID +
-        "' class='badge badge-primary'>" +
+        "' class='badge bg-primary'>" +
         obj.name +
         "</label></p>",
       "<div class='dropdown'>",
       "<button id='" +
         domID +
-        "' class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>" +
+        "' class='btn btn-default dropdown-toggle' type='button' data-bs-toggle='dropdown'>" +
         obj.value +
         " " +
         span,
@@ -292,7 +297,7 @@ const initGUI = function (model_params) {
       const choiceID = domID + "_choice_" + i;
       choiceIdentifiers.push(choiceID);
       template.push(
-        "<li role='presentation'><a class='pick-choice' id='" +
+        "<li role='presentation'><a class='pick-choice dropdown-item' id='" +
           choiceID +
           "' role='menuitem' tabindex='-1' href='#'>",
         obj.choices[i],

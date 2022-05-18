@@ -66,7 +66,7 @@ def ensure_JS_dep_single(url, out_name=None):
 # hardcoded included files and versions in: mesa/visualization/templates/modular_template.html
 
 # Ensure Bootstrap
-bootstrap_version = "4.6.1"
+bootstrap_version = "5.1.3"
 ensure_JS_dep(
     f"bootstrap-{bootstrap_version}-dist",
     f"https://github.com/twbs/bootstrap/releases/download/v{bootstrap_version}/bootstrap-{bootstrap_version}-dist.zip",
@@ -77,13 +77,6 @@ bootstrap_slider_version = "11.0.2"
 ensure_JS_dep(
     f"bootstrap-slider-{bootstrap_slider_version}",
     f"https://github.com/seiyria/bootstrap-slider/archive/refs/tags/v{bootstrap_slider_version}.zip",
-)
-
-# Ensure Bootstrap Switch
-bootstrap_switch_version = "3.3.4"
-ensure_JS_dep(
-    f"bootstrap-switch-{bootstrap_switch_version}",
-    f"https://github.com/Bttstrp/bootstrap-switch/archive/refs/tags/v{bootstrap_switch_version}.zip",
 )
 
 jquery_version = "2.2.4"
