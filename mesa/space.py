@@ -508,15 +508,6 @@ class SingleGrid(Grid):
 
     empties: Set[Coordinate] = set()
 
-    def __init__(self, width: int, height: int, torus: bool) -> None:
-        """Create a new single-item grid.
-
-        Args:
-            width, height: The width and width of the grid
-            torus: Boolean whether the grid wraps or not.
-        """
-        super().__init__(width, height, torus)
-
     def position_agent(
         self, agent: Agent, x: Union[int, str] = "random", y: Union[int, str] = "random"
     ) -> None:
