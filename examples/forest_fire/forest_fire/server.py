@@ -1,6 +1,4 @@
-from mesa.visualization.modules import CanvasGrid, ChartModule, PieChartModule
-from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.UserParam import UserSettableParameter
+import mesa
 
 from .model import ForestFire
 
@@ -18,19 +16,23 @@ def forest_fire_portrayal(tree):
     return portrayal
 
 
-canvas_element = CanvasGrid(forest_fire_portrayal, 100, 100, 500, 500)
-tree_chart = ChartModule(
+canvas_element = mesa.visualization.CanvasGrid(
+    forest_fire_portrayal, 100, 100, 500, 500
+)
+tree_chart = mesa.visualization.ChartModule(
     [{"Label": label, "Color": color} for (label, color) in COLORS.items()]
 )
-pie_chart = PieChartModule(
+pie_chart = mesa.visualization.PieChartModule(
     [{"Label": label, "Color": color} for (label, color) in COLORS.items()]
 )
 
 model_params = {
     "height": 100,
     "width": 100,
-    "density": UserSettableParameter("slider", "Tree density", 0.65, 0.01, 1.0, 0.01),
+    "density": mesa.visualization.UserSettableParameter(
+        "slider", "Tree density", 0.65, 0.01, 1.0, 0.01
+    ),
 }
-server = ModularServer(
+server = mesa.visualization.ModularServer(
     ForestFire, [canvas_element, tree_chart, pie_chart], "Forest Fire", model_params
 )
