@@ -9,33 +9,30 @@ const BarChartModule = function (
   sortingKey
 ) {
   // Create the overall chart div
-  const chart_div_tag =
-    "<div class='bar chart' width='" + canvas_width + "'></div>";
-  const chart_div = $(chart_div_tag)[0];
-  $("#elements").append(chart_div);
+  const chartDiv = document.createElement("div");
+  chartDiv.className = "bar chart";
+  chartDiv.setAttribute("width", canvas_width);
+  const elements = document.getElementById("elements");
+  elements.appendChild(chartDiv);
 
-  // Create the tag:
-  const svg_tag =
-    "<svg width='" +
-    canvas_width +
-    "' height='" +
-    canvas_height +
-    "' style='border:1px dotted'></svg>";
-  // Append it to #elements
-  const svg_element = $(svg_tag)[0];
-  chart_div.append(svg_element);
+  // Create the svg element:
+  const svg = d3.create("svg");
+  svg
+    .attr("width", canvas_width)
+    .attr("height", canvas_height)
+    .style("border", "1px dotted");
+  chartDiv.appendChild(svg.node());
 
   //create the legend
-  const legend_tag = "<div class='legend'></div>";
-  const legend_element = $(legend_tag)[0];
-  chart_div.append(legend_element);
-
-  const legend = d3
-    .select(legend_element)
+  const legend = d3.create("div");
+  legend
+    .attr("class", "legend")
     .attr(
       "style",
-      "display:block;width:" + canvas_width + "px;text-align:center"
+      `display:block;width:${canvas_width}px;text-align:center`
     );
+
+  chartDiv.appendChild(legend.node());
 
   legend
     .selectAll("span")
@@ -53,8 +50,7 @@ const BarChartModule = function (
     })
     .attr("style", "padding-left:10px;padding-right:10px;");
 
-  // setup the d3 svg selection
-  const svg = d3.select(svg_element);
+  // setup the d3 svg
   const margin = { top: 20, right: 20, bottom: 30, left: 40 };
   const width = +svg.attr("width") - margin.left - margin.right;
   const height = +svg.attr("height") - margin.top - margin.bottom;
