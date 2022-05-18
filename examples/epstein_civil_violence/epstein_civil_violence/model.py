@@ -67,7 +67,7 @@ class EpsteinCivilViolence(Model):
         model_reporters = {
             "Quiescent": lambda m: self.count_type_citizens(m, "Quiescent"),
             "Active": lambda m: self.count_type_citizens(m, "Active"),
-            "Jailed": lambda m: self.count_jailed(m),
+            "Jailed": self.count_jailed,
         }
         agent_reporters = {
             "x": lambda a: a.pos[0],
