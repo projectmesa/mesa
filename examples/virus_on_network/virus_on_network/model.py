@@ -81,7 +81,7 @@ class VirusOnNetwork(Model):
             self.grid.place_agent(a, node)
 
         # Infect some nodes
-        infected_nodes = self.random.sample(self.G.nodes(), self.initial_outbreak_size)
+        infected_nodes = self.random.sample(list(self.G), self.initial_outbreak_size)
         for a in self.grid.get_cell_list_contents(infected_nodes):
             a.state = State.INFECTED
 
