@@ -1,7 +1,7 @@
-from mesa import Agent
+import mesa
 
 
-class Cell(Agent):
+class Cell(mesa.Agent):
     """Represents a single ALIVE or DEAD cell in the simulation."""
 
     DEAD = 0

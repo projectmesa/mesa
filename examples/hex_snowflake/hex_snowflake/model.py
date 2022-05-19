@@ -1,11 +1,9 @@
-from mesa import Model
-from mesa.time import SimultaneousActivation
-from mesa.space import HexGrid
+import mesa
 
 from hex_snowflake.cell import Cell
 
 
-class HexSnowflake(Model):
+class HexSnowflake(mesa.Model):
     """
     Represents the hex grid of cells. The grid is represented by a 2-dimensional array of cells with adjacency rules specific to hexagons.
     """
@@ -21,10 +19,10 @@ class HexSnowflake(Model):
         # computing their next state simultaneously.  This needs to
         # be done because each cell's next state depends on the current
         # state of all its neighbors -- before they've changed.
-        self.schedule = SimultaneousActivation(self)
+        self.schedule = mesa.time.SimultaneousActivation(self)
 
         # Use a hexagonal grid, where edges wrap around.
-        self.grid = HexGrid(width, height, torus=True)
+        self.grid = mesa.space.HexGrid(width, height, torus=True)
 
         # Place a dead cell at each location.
         for (contents, x, y) in self.grid.coord_iter():
