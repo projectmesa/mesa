@@ -1,10 +1,7 @@
-from mesa import Model, Agent
-from mesa.time import RandomActivation
-from mesa.space import SingleGrid
-from mesa.datacollection import DataCollector
+import mesa
 
 
-class SchellingAgent(Agent):
+class SchellingAgent(mesa.Agent):
     """
     Schelling segregation agent
     """
@@ -35,7 +32,7 @@ class SchellingAgent(Agent):
             self.model.happy += 1
 
 
-class Schelling(Model):
+class Schelling(mesa.Model):
     """
     Model class for the Schelling segregation model.
     """
@@ -49,11 +46,11 @@ class Schelling(Model):
         self.minority_pc = minority_pc
         self.homophily = homophily
 
-        self.schedule = RandomActivation(self)
-        self.grid = SingleGrid(width, height, torus=True)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
         self.happy = 0
-        self.datacollector = DataCollector(
+        self.datacollector = mesa.DataCollector(
             {"happy": "happy"},  # Model-level count of happy agents
             # For testing purposes, agent's individual x and y
             {"x": lambda a: a.pos[0], "y": lambda a: a.pos[1]},
