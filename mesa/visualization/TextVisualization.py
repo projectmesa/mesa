@@ -13,7 +13,7 @@ in some way using Elements, which are stored in a list and rendered in that
 order. Each element, in turn, renders a particular piece of information as
 text.
 
-TextElement: Parent class for all other ASCII elements. render() returns its
+ASCIIElement: Parent class for all other ASCII elements. render() returns its
 representative string, which can be printed via the overloaded __str__ method.
 
 TextData: Uses getattr to get the value of a particular property of a model
@@ -57,7 +57,7 @@ class TextVisualization:
         self.render()
 
 
-class TextElement:
+class ASCIIElement:
     """Base class for all TextElements to render.
 
     Methods:
@@ -76,7 +76,7 @@ class TextElement:
         return self.render()
 
 
-class TextData(TextElement):
+class TextData(ASCIIElement):
     """Prints the value of one particular variable from the base model."""
 
     def __init__(self, model, var_name):
@@ -88,7 +88,7 @@ class TextData(TextElement):
         return self.var_name + ": " + str(getattr(self.model, self.var_name))
 
 
-class TextGrid(TextElement):
+class TextGrid(ASCIIElement):
     """Class for creating an ASCII visualization of a basic grid object.
 
     By default, assume that each cell is represented by one character, and
