@@ -1,7 +1,7 @@
-from mesa import Agent
+import mesa
 
 
-class PDAgent(Agent):
+class PDAgent(mesa.Agent):
     """Agent member of the iterated, spatial prisoner's dilemma model."""
 
     def __init__(self, pos, model, starting_move=None):

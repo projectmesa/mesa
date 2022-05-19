@@ -1,18 +1,15 @@
-from mesa import Model
-from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
-from mesa.space import SingleGrid
-from mesa.datacollection import DataCollector
+import mesa
 
 from .agent import PDAgent
 
 
-class PdGrid(Model):
+class PdGrid(mesa.Model):
     """Model class for iterated, spatial prisoner's dilemma model."""
 
     schedule_types = {
-        "Sequential": BaseScheduler,
-        "Random": RandomActivation,
-        "Simultaneous": SimultaneousActivation,
+        "Sequential": mesa.time.BaseScheduler,
+        "Random": mesa.time.RandomActivation,
+        "Simultaneous": mesa.time.SimultaneousActivation,
     }
 
     # This dictionary holds the payoff for this agent,
@@ -32,7 +29,7 @@ class PdGrid(Model):
                            Determines the agent activation regime.
             payoffs: (optional) Dictionary of (move, neighbor_move) payoffs.
         """
-        self.grid = SingleGrid(width, height, torus=True)
+        self.grid = mesa.space.SingleGrid(width, height, torus=True)
         self.schedule_type = schedule_type
         self.schedule = self.schedule_types[self.schedule_type](self)
 
@@ -43,7 +40,7 @@ class PdGrid(Model):
                 self.grid.place_agent(agent, (x, y))
                 self.schedule.add(agent)
 
-        self.datacollector = DataCollector(
+        self.datacollector = mesa.DataCollector(
             {
                 "Cooperating_Agents": lambda m: len(
                     [a for a in m.schedule.agents if a.move == "C"]
