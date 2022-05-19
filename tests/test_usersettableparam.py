@@ -1,11 +1,12 @@
 from unittest import TestCase
-from mesa.visualization.UserParam import UserSettableParameter, Slider
+from mesa.visualization.UserParam import UserSettableParameter, Slider, Checkbox
 
 
 class TestOption(TestCase):
     def setUp(self):
         self.number_option = UserSettableParameter("number", value=123)
         self.checkbox_option = UserSettableParameter("checkbox", value=True)
+        self.checkbox_option_standalone = Checkbox(value=True)
         self.choice_option = UserSettableParameter(
             "choice",
             value="I am your default choice",
@@ -22,9 +23,10 @@ class TestOption(TestCase):
         assert self.number_option.value == 321
 
     def test_checkbox(self):
-        assert self.checkbox_option.value
-        self.checkbox_option.value = False
-        assert not self.checkbox_option.value
+        for option in [self.checkbox_option, self.checkbox_option_standalone]:
+            assert option.value
+            option.value = False
+            assert not option.value
 
     def test_choice(self):
         assert self.choice_option.value == "I am your default choice"
