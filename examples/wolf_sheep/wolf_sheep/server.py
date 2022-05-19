@@ -48,9 +48,7 @@ chart_element = mesa.visualization.ChartModule(
 )
 
 model_params = {
-    "grass": mesa.visualization.UserSettableParameter(
-        "checkbox", "Grass Enabled", True
-    ),
+    "grass": mesa.visualization.Checkbox("Grass Enabled", True),
     "grass_regrowth_time": mesa.visualization.Slider("Grass Regrowth Time", 20, 1, 50),
     "initial_sheep": mesa.visualization.Slider(
         "Initial Sheep Population", 100, 10, 300

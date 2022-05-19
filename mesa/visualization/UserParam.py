@@ -139,6 +139,19 @@ class UserParam:
         )  # Return _value as value, value is the same
         return result
 
+    def maybe_raise_error(self, valid):
+        if not valid:
+            msg = self._ERROR_MESSAGE.format(self.param_type, self.name)
+            raise ValueError(msg)
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
+
 
 class Slider(UserParam):
     """
@@ -170,10 +183,7 @@ class Slider(UserParam):
         valid = not (
             self.value is None or self.min_value is None or self.max_value is None
         )
-
-        if not valid:
-            msg = self._ERROR_MESSAGE.format(self.param_type, name)
-            raise ValueError(msg)
+        self.maybe_raise_error(valid)
 
     @property
     def value(self):
@@ -186,3 +196,23 @@ class Slider(UserParam):
             self._value = self.min_value
         elif self._value > self.max_value:
             self._value = self.max_value
+
+
+class Checkbox(UserParam):
+    """
+    Boolean checkbox.
+
+    Example:
+
+    boolean_option = Checkbox('My Boolean', True)
+    """
+
+    def __init__(self, name="", value=None, description=None):
+        self.param_type = CHECKBOX
+        self.name = name
+        self._value = value
+        self.description = description
+
+        # Validate option types to make sure values are supplied properly
+        valid = isinstance(self.value, bool)
+        self.maybe_raise_error(valid)
