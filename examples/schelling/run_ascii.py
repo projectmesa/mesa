@@ -1,9 +1,9 @@
-from mesa.visualization.TextVisualization import TextData, TextGrid, TextVisualization
+import mesa
 
 from model import Schelling
 
 
-class SchellingTextVisualization(TextVisualization):
+class SchellingTextVisualization(mesa.visualization.TextVisualization):
     """
     ASCII visualization for schelling model
     """
@@ -14,8 +14,8 @@ class SchellingTextVisualization(TextVisualization):
         """
         self.model = model
 
-        grid_viz = TextGrid(self.model.grid, self.print_ascii_agent)
-        happy_viz = TextData(self.model, "happy")
+        grid_viz = mesa.visualization.TextGrid(self.model.grid, self.print_ascii_agent)
+        happy_viz = mesa.visualization.TextData(self.model, "happy")
         self.elements = [grid_viz, happy_viz]
 
     @staticmethod
