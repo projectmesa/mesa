@@ -11,7 +11,7 @@
   "repository": {
     "url": "https://github.com/projectmesa/mesa"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "react": "^18.1.0",
     "react-dom": "^18.1.0"
