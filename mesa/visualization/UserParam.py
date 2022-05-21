@@ -179,7 +179,7 @@ class Slider(UserParam):
         self.step = step
         self.description = description
 
-        # Validate option types to make sure values are supplied properly
+        # Validate option type to make sure values are supplied properly
         valid = not (
             self.value is None or self.min_value is None or self.max_value is None
         )
@@ -213,6 +213,43 @@ class Checkbox(UserParam):
         self._value = value
         self.description = description
 
-        # Validate option types to make sure values are supplied properly
+        # Validate option type to make sure values are supplied properly
         valid = isinstance(self.value, bool)
         self.maybe_raise_error(valid)
+
+
+class Choice(UserParam):
+    """
+    String-based dropdown input, for selecting choices within a model
+
+    Example:
+    choice_option = Choice(
+        'My Choice',
+        value='Default choice',
+        choices=['Default Choice', 'Alternate Choice']
+    )
+    """
+
+    def __init__(self, name="", value=None, choices=None, description=None):
+        self.param_type = CHOICE
+        self.name = name
+        self._value = value
+        self.choices = choices
+        self.description = description
+
+        # Validate option type to make sure values are supplied properly
+        valid = not (self.value is None or len(self.choices) == 0)
+        self.maybe_raise_error(valid)
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
+        if self._value not in self.choices:
+            print(
+                "Selected choice value not in available choices, selected first choice from 'choices' list"
+            )
+            self._value = self.choices[0]
