@@ -1,6 +1,6 @@
 import math
 
-from mesa import Agent
+import mesa
 
 
 def get_distance(pos_1, pos_2):
@@ -17,7 +17,7 @@ def get_distance(pos_1, pos_2):
     return math.sqrt(dx**2 + dy**2)
 
 
-class SsAgent(Agent):
+class SsAgent(mesa.Agent):
     def __init__(self, pos, model, moore=False, sugar=0, metabolism=0, vision=0):
         super().__init__(pos, model)
         self.pos = pos
@@ -72,7 +72,7 @@ class SsAgent(Agent):
             self.model.schedule.remove(self)
 
 
-class Sugar(Agent):
+class Sugar(mesa.Agent):
     def __init__(self, pos, model, max_sugar):
         super().__init__(pos, model)
         self.amount = max_sugar

@@ -9,15 +9,12 @@ Center for Connected Learning and Computer-Based Modeling,
 Northwestern University, Evanston, IL.
 """
 
-from mesa import Model
-from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
-from mesa.time import RandomActivationByType
+import mesa
 
 from .agents import SsAgent, Sugar
 
 
-class SugarscapeCg(Model):
+class SugarscapeCg(mesa.Model):
     """
     Sugarscape 2 Constant Growback
     """
@@ -37,9 +34,9 @@ class SugarscapeCg(Model):
         self.height = height
         self.initial_population = initial_population
 
-        self.schedule = RandomActivationByType(self)
-        self.grid = MultiGrid(self.width, self.height, torus=False)
-        self.datacollector = DataCollector(
+        self.schedule = mesa.time.RandomActivationByType(self)
+        self.grid = mesa.space.MultiGrid(self.width, self.height, torus=False)
+        self.datacollector = mesa.DataCollector(
             {"SsAgent": lambda m: m.schedule.get_type_count(SsAgent)}
         )
 
