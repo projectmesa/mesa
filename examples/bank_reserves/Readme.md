@@ -7,7 +7,7 @@ A highly abstracted, simplified model of an economy, with only one type of agent
 The model demonstrates the following Mesa features:
  - MultiGrid for creating shareable space for agents
  - DataCollector for collecting data on individual model runs
- - UserSettableParameters for adjusting initial model parameters
+ - Slider for adjusting initial model parameters
  - ModularServer for visualization of agent interaction
  - Agent object inheritance
  - Using a BatchRunner to collect data on multiple combinations of model parameters

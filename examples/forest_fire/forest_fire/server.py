@@ -29,9 +29,7 @@ pie_chart = mesa.visualization.PieChartModule(
 model_params = {
     "height": 100,
     "width": 100,
-    "density": mesa.visualization.UserSettableParameter(
-        "slider", "Tree density", 0.65, 0.01, 1.0, 0.01
-    ),
+    "density": mesa.visualization.Slider("Tree density", 0.65, 0.01, 1.0, 0.01),
 }
 server = mesa.visualization.ModularServer(
     ForestFire, [canvas_element, tree_chart, pie_chart], "Forest Fire", model_params
