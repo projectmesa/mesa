@@ -1,5 +1,4 @@
-from mesa.visualization.modules import CanvasGrid
-from mesa.visualization.ModularVisualization import ModularServer
+import mesa
 
 from .model import Walker, ShapeExample
 
@@ -32,8 +31,10 @@ width = 15
 height = 10
 num_agents = 2
 pixel_ratio = 50
-grid = CanvasGrid(agent_draw, width, height, width * pixel_ratio, height * pixel_ratio)
-server = ModularServer(
+grid = mesa.visualization.CanvasGrid(
+    agent_draw, width, height, width * pixel_ratio, height * pixel_ratio
+)
+server = mesa.visualization.ModularServer(
     ShapeExample,
     [grid],
     "Shape Model Example",
