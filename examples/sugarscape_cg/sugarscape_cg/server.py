@@ -1,5 +1,4 @@
-from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.modules import CanvasGrid, ChartModule
+import mesa
 
 from .agents import SsAgent, Sugar
 from .model import SugarscapeCg
@@ -32,10 +31,12 @@ def SsAgent_portrayal(agent):
     return portrayal
 
 
-canvas_element = CanvasGrid(SsAgent_portrayal, 50, 50, 500, 500)
-chart_element = ChartModule([{"Label": "SsAgent", "Color": "#AA0000"}])
+canvas_element = mesa.visualization.CanvasGrid(SsAgent_portrayal, 50, 50, 500, 500)
+chart_element = mesa.visualization.ChartModule(
+    [{"Label": "SsAgent", "Color": "#AA0000"}]
+)
 
-server = ModularServer(
+server = mesa.visualization.ModularServer(
     SugarscapeCg, [canvas_element, chart_element], "Sugarscape 2 Constant Growback"
 )
 # server.launch()
