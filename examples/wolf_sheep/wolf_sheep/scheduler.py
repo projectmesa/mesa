@@ -1,9 +1,9 @@
 from typing import Type, Callable
-from mesa.agent import Agent
-from mesa.time import RandomActivationByType
+
+import mesa
 
 
-class RandomActivationByTypeFiltered(RandomActivationByType):
+class RandomActivationByTypeFiltered(mesa.time.RandomActivationByType):
     """
     A scheduler that overrides the get_type_count method to allow for filtering
     of agents by a function before counting.
@@ -14,7 +14,9 @@ class RandomActivationByTypeFiltered(RandomActivationByType):
     """
 
     def get_type_count(
-        self, type_class: Type[Agent], filter_func: Callable[[Agent], bool] = None
+        self,
+        type_class: Type[mesa.Agent],
+        filter_func: Callable[[mesa.Agent], bool] = None,
     ) -> int:
         """
         Returns the current number of agents of certain type in the queue that satisfy the filter function.
