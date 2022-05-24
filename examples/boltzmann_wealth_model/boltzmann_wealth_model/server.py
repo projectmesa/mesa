@@ -22,8 +22,7 @@ chart = mesa.visualization.ChartModule(
 )
 
 model_params = {
-    "N": mesa.visualization.UserSettableParameter(
-        "slider",
+    "N": mesa.visualization.Slider(
         "Number of agents",
         100,
         2,
