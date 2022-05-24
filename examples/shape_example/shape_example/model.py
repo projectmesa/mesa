@@ -1,9 +1,7 @@
-from mesa import Model, Agent
-from mesa.space import SingleGrid
-from mesa.time import RandomActivation
+import mesa
 
 
-class Walker(Agent):
+class Walker(mesa.Agent):
     def __init__(self, unique_id, model, pos, heading=(1, 0)):
         super().__init__(unique_id, model)
         self.pos = pos
@@ -11,12 +9,12 @@ class Walker(Agent):
         self.headings = {(1, 0), (0, 1), (-1, 0), (0, -1)}
 
 
-class ShapeExample(Model):
+class ShapeExample(mesa.Model):
     def __init__(self, N=2, width=20, height=10):
         self.N = N  # num of agents
         self.headings = ((1, 0), (0, 1), (-1, 0), (0, -1))  # tuples are fast
-        self.grid = SingleGrid(width, height, torus=False)
-        self.schedule = RandomActivation(self)
+        self.grid = mesa.space.SingleGrid(width, height, torus=False)
+        self.schedule = mesa.time.RandomActivation(self)
         self.make_walker_agents()
         self.running = True
 
