@@ -50,19 +50,17 @@ def person_portrayal(agent):
 
 # dictionary of user settable parameters - these map to the model __init__ parameters
 model_params = {
-    "init_people": mesa.visualization.UserSettableParameter(
-        "slider", "People", 25, 1, 200, description="Initial Number of People"
+    "init_people": mesa.visualization.Slider(
+        "People", 25, 1, 200, description="Initial Number of People"
     ),
-    "rich_threshold": mesa.visualization.UserSettableParameter(
-        "slider",
+    "rich_threshold": mesa.visualization.Slider(
         "Rich Threshold",
         10,
         1,
         20,
         description="Upper End of Random Initial Wallet Amount",
     ),
-    "reserve_percent": mesa.visualization.UserSettableParameter(
-        "slider",
+    "reserve_percent": mesa.visualization.Slider(
         "Reserves",
         50,
         1,

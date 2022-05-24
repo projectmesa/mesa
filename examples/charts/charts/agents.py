@@ -20,8 +20,8 @@ class Bank(mesa.Agent):
         super().__init__(unique_id, model)
         # for tracking total value of loans outstanding
         self.bank_loans = 0
-        """percent of deposits the bank must keep in reserves - this is a
-           UserSettableParameter in server.py"""
+        """percent of deposits the bank must keep in reserves - this is set via
+           Slider in server.py"""
         self.reserve_percent = reserve_percent
         # for tracking total value of deposits
         self.deposits = 0

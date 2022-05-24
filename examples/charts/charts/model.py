@@ -87,7 +87,7 @@ class Charts(mesa.Model):
     grid_w = 20
 
     """init parameters "init_people", "rich_threshold", and "reserve_percent"
-       are all UserSettableParameters"""
+       are all set via Slider"""
 
     def __init__(
         self,

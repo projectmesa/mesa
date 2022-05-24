@@ -71,8 +71,7 @@ class MyTextElement(mesa.visualization.TextElement):
 
 
 model_params = {
-    "num_nodes": mesa.visualization.UserSettableParameter(
-        "slider",
+    "num_nodes": mesa.visualization.Slider(
         "Number of agents",
         10,
         10,
@@ -80,11 +79,10 @@ model_params = {
         1,
         description="Choose how many agents to include in the model",
     ),
-    "avg_node_degree": mesa.visualization.UserSettableParameter(
-        "slider", "Avg Node Degree", 3, 3, 8, 1, description="Avg Node Degree"
+    "avg_node_degree": mesa.visualization.Slider(
+        "Avg Node Degree", 3, 3, 8, 1, description="Avg Node Degree"
     ),
-    "initial_outbreak_size": mesa.visualization.UserSettableParameter(
-        "slider",
+    "initial_outbreak_size": mesa.visualization.Slider(
         "Initial Outbreak Size",
         1,
         1,
@@ -92,8 +90,7 @@ model_params = {
         1,
         description="Initial Outbreak Size",
     ),
-    "virus_spread_chance": mesa.visualization.UserSettableParameter(
-        "slider",
+    "virus_spread_chance": mesa.visualization.Slider(
         "Virus Spread Chance",
         0.4,
         0.0,
@@ -101,8 +98,7 @@ model_params = {
         0.1,
         description="Probability that susceptible neighbor will be infected",
     ),
-    "virus_check_frequency": mesa.visualization.UserSettableParameter(
-        "slider",
+    "virus_check_frequency": mesa.visualization.Slider(
         "Virus Check Frequency",
         0.4,
         0.0,
@@ -110,8 +106,7 @@ model_params = {
         0.1,
         description="Frequency the nodes check whether they are infected by " "a virus",
     ),
-    "recovery_chance": mesa.visualization.UserSettableParameter(
-        "slider",
+    "recovery_chance": mesa.visualization.Slider(
         "Recovery Chance",
         0.3,
         0.0,
@@ -119,8 +114,7 @@ model_params = {
         0.1,
         description="Probability that the virus will be removed",
     ),
-    "gain_resistance_chance": mesa.visualization.UserSettableParameter(
-        "slider",
+    "gain_resistance_chance": mesa.visualization.Slider(
         "Gain Resistance Chance",
         0.5,
         0.0,

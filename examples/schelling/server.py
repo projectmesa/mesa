@@ -39,15 +39,9 @@ happy_chart = mesa.visualization.ChartModule([{"Label": "happy", "Color": "Black
 model_params = {
     "height": 20,
     "width": 20,
-    "density": mesa.visualization.UserSettableParameter(
-        "slider", "Agent density", 0.8, 0.1, 1.0, 0.1
-    ),
-    "minority_pc": mesa.visualization.UserSettableParameter(
-        "slider", "Fraction minority", 0.2, 0.00, 1.0, 0.05
-    ),
-    "homophily": mesa.visualization.UserSettableParameter(
-        "slider", "Homophily", 3, 0, 8, 1
-    ),
+    "density": mesa.visualization.Slider("Agent density", 0.8, 0.1, 1.0, 0.1),
+    "minority_pc": mesa.visualization.Slider("Fraction minority", 0.2, 0.00, 1.0, 0.05),
+    "homophily": mesa.visualization.Slider("Homophily", 3, 0, 8, 1),
 }
 
 server = mesa.visualization.ModularServer(
