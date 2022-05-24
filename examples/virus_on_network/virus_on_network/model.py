@@ -2,10 +2,7 @@ import math
 from enum import Enum
 import networkx as nx
 
-from mesa import Agent, Model
-from mesa.time import RandomActivation
-from mesa.datacollection import DataCollector
-from mesa.space import NetworkGrid
+import mesa
 
 
 class State(Enum):
@@ -30,7 +27,7 @@ def number_resistant(model):
     return number_state(model, State.RESISTANT)
 
 
-class VirusOnNetwork(Model):
+class VirusOnNetwork(mesa.Model):
     """A virus model with some number of agents"""
 
     def __init__(
@@ -47,8 +44,8 @@ class VirusOnNetwork(Model):
         self.num_nodes = num_nodes
         prob = avg_node_degree / self.num_nodes
         self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=prob)
-        self.grid = NetworkGrid(self.G)
-        self.schedule = RandomActivation(self)
+        self.grid = mesa.space.NetworkGrid(self.G)
+        self.schedule = mesa.time.RandomActivation(self)
         self.initial_outbreak_size = (
             initial_outbreak_size if initial_outbreak_size <= num_nodes else num_nodes
         )
@@ -57,7 +54,7 @@ class VirusOnNetwork(Model):
         self.recovery_chance = recovery_chance
         self.gain_resistance_chance = gain_resistance_chance
 
-        self.datacollector = DataCollector(
+        self.datacollector = mesa.DataCollector(
             {
                 "Infected": number_infected,
                 "Susceptible": number_susceptible,
@@ -106,7 +103,7 @@ class VirusOnNetwork(Model):
             self.step()
 
 
-class VirusAgent(Agent):
+class VirusAgent(mesa.Agent):
     def __init__(
         self,
         unique_id,

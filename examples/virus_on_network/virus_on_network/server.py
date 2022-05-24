@@ -1,10 +1,7 @@
 import math
 
-from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.UserParam import UserSettableParameter
-from mesa.visualization.modules import ChartModule
-from mesa.visualization.modules import NetworkModule
-from mesa.visualization.modules import TextElement
+import mesa
+
 from .model import VirusOnNetwork, State, number_infected
 
 
@@ -52,8 +49,8 @@ def network_portrayal(G):
     return portrayal
 
 
-network = NetworkModule(network_portrayal, 500, 500)
-chart = ChartModule(
+network = mesa.visualization.NetworkModule(network_portrayal, 500, 500)
+chart = mesa.visualization.ChartModule(
     [
         {"Label": "Infected", "Color": "#FF0000"},
         {"Label": "Susceptible", "Color": "#008000"},
@@ -62,7 +59,7 @@ chart = ChartModule(
 )
 
 
-class MyTextElement(TextElement):
+class MyTextElement(mesa.visualization.TextElement):
     def render(self, model):
         ratio = model.resistant_susceptible_ratio()
         ratio_text = "&infin;" if ratio is math.inf else f"{ratio:.2f}"
@@ -74,7 +71,7 @@ class MyTextElement(TextElement):
 
 
 model_params = {
-    "num_nodes": UserSettableParameter(
+    "num_nodes": mesa.visualization.UserSettableParameter(
         "slider",
         "Number of agents",
         10,
@@ -83,10 +80,10 @@ model_params = {
         1,
         description="Choose how many agents to include in the model",
     ),
-    "avg_node_degree": UserSettableParameter(
+    "avg_node_degree": mesa.visualization.UserSettableParameter(
         "slider", "Avg Node Degree", 3, 3, 8, 1, description="Avg Node Degree"
     ),
-    "initial_outbreak_size": UserSettableParameter(
+    "initial_outbreak_size": mesa.visualization.UserSettableParameter(
         "slider",
         "Initial Outbreak Size",
         1,
@@ -95,7 +92,7 @@ model_params = {
         1,
         description="Initial Outbreak Size",
     ),
-    "virus_spread_chance": UserSettableParameter(
+    "virus_spread_chance": mesa.visualization.UserSettableParameter(
         "slider",
         "Virus Spread Chance",
         0.4,
@@ -104,7 +101,7 @@ model_params = {
         0.1,
         description="Probability that susceptible neighbor will be infected",
     ),
-    "virus_check_frequency": UserSettableParameter(
+    "virus_check_frequency": mesa.visualization.UserSettableParameter(
         "slider",
         "Virus Check Frequency",
         0.4,
@@ -113,7 +110,7 @@ model_params = {
         0.1,
         description="Frequency the nodes check whether they are infected by " "a virus",
     ),
-    "recovery_chance": UserSettableParameter(
+    "recovery_chance": mesa.visualization.UserSettableParameter(
         "slider",
         "Recovery Chance",
         0.3,
@@ -122,7 +119,7 @@ model_params = {
         0.1,
         description="Probability that the virus will be removed",
     ),
-    "gain_resistance_chance": UserSettableParameter(
+    "gain_resistance_chance": mesa.visualization.UserSettableParameter(
         "slider",
         "Gain Resistance Chance",
         0.5,
@@ -134,7 +131,7 @@ model_params = {
     ),
 }
 
-server = ModularServer(
+server = mesa.visualization.ModularServer(
     VirusOnNetwork, [network, MyTextElement(), chart], "Virus Model", model_params
 )
 server.port = 8521
