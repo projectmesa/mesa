@@ -253,3 +253,18 @@ class Choice(UserParam):
                 "Selected choice value not in available choices, selected first choice from 'choices' list"
             )
             self._value = self.choices[0]
+
+
+class StaticText(UserParam):
+    """
+    A non-input textbox for displaying model info.
+
+    Example:
+    static_text = StaticText("This is a descriptive textbox")
+    """
+
+    def __init__(self, value=None):
+        self.param_type = STATIC_TEXT
+        self._value = value
+        valid = isinstance(self.value, str)
+        self.maybe_raise_error(valid)
