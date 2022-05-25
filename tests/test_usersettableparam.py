@@ -1,5 +1,11 @@
 from unittest import TestCase
-from mesa.visualization.UserParam import UserSettableParameter, Slider, Checkbox, Choice
+from mesa.visualization.UserParam import (
+    UserSettableParameter,
+    Slider,
+    Checkbox,
+    Choice,
+    StaticText,
+)
 
 
 class TestOption(TestCase):
@@ -20,6 +26,7 @@ class TestOption(TestCase):
             "slider", value=123, min_value=100, max_value=200
         )
         self.slider_option_standalone = Slider(value=123, min_value=100, max_value=200)
+        self.static_text_option = StaticText("Hurr, Durr Im'a Sheep")
 
     def test_number(self):
         assert self.number_option.value == 123
@@ -52,3 +59,6 @@ class TestOption(TestCase):
             assert option.json["value"] == 200
         with self.assertRaises(ValueError):
             Slider()
+
+    def test_static_text(self):
+        assert self.static_text_option.value == "Hurr, Durr Im'a Sheep"
