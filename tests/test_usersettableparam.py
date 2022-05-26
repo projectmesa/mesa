@@ -5,12 +5,14 @@ from mesa.visualization.UserParam import (
     Checkbox,
     Choice,
     StaticText,
+    NumberInput
 )
 
 
 class TestOption(TestCase):
     def setUp(self):
         self.number_option = UserSettableParameter("number", value=123)
+        self.number_option_standalone = NumberInput("number", value=123)
         self.checkbox_option = UserSettableParameter("checkbox", value=True)
         self.checkbox_option_standalone = Checkbox(value=True)
         self.choice_option = UserSettableParameter(
@@ -29,9 +31,10 @@ class TestOption(TestCase):
         self.static_text_option = StaticText("Hurr, Durr Im'a Sheep")
 
     def test_number(self):
-        assert self.number_option.value == 123
-        self.number_option.value = 321
-        assert self.number_option.value == 321
+        for option in [self.number_option, self.number_option_standalone]:
+            assert option.value == 123
+            option.value = 321
+            assert option.value == 321
 
     def test_checkbox(self):
         for option in [self.checkbox_option, self.checkbox_option_standalone]:
