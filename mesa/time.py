@@ -21,10 +21,14 @@ Key concepts:
     model has taken.
 """
 
+# Mypy; for the `|` operator purpose
+# Remove this __future__ import once the oldest supported Python is 3.10
+from __future__ import annotations
+
 from collections import OrderedDict, defaultdict
 
 # mypy
-from typing import Dict, Iterator, List, Optional, Union, Type
+from typing import Dict, Iterator, List, Type, Union
 from mesa.agent import Agent
 from mesa.model import Model
 
@@ -163,7 +167,7 @@ class StagedActivation(BaseScheduler):
     def __init__(
         self,
         model: Model,
-        stage_list: Optional[List[str]] = None,
+        stage_list: List[str] | None = None,
         shuffle: bool = False,
         shuffle_between_stages: bool = False,
     ) -> None:
