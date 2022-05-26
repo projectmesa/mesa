@@ -1,3 +1,5 @@
+from numbers import Number
+
 NUMBER = "number"
 CHECKBOX = "checkbox"
 CHOICE = "choice"
@@ -267,4 +269,20 @@ class StaticText(UserParam):
         self.param_type = STATIC_TEXT
         self._value = value
         valid = isinstance(self.value, str)
+        self.maybe_raise_error(valid)
+
+
+class NumberInput(UserParam):
+    """
+    a simple numerical input
+
+    Example:
+    number_option = NumberInput("My Number", value=123)
+    """
+
+    def __init__(self, name="", value=None, description=None):
+        self.param_type = NUMBER
+        self.name = name
+        self._value = value
+        valid = isinstance(self.value, Number)
         self.maybe_raise_error(valid)
