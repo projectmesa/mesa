@@ -13,6 +13,10 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 # good reason to use one-character variable names for x and y.
 # pylint: disable=invalid-name
 
+# Mypy; for the `|` operator purpose
+# Remove this __future__ import once the oldest supported Python is 3.10
+from __future__ import annotations
+
 import itertools
 import math
 from warnings import warn
@@ -26,7 +30,6 @@ from typing import (
     Iterable,
     Iterator,
     List,
-    Optional,
     Set,
     Sequence,
     Tuple,
@@ -48,7 +51,7 @@ NetworkCoordinate = int
 
 Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
 
-GridContent = Optional[Agent]
+GridContent = Union[Agent, None]
 MultiGridContent = List[Agent]
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -128,8 +131,8 @@ class Grid:
 
     @overload
     def __getitem__(
-        self, index: Tuple[Union[int, slice], Union[int, slice]]
-    ) -> Union[GridContent, List[GridContent]]:
+        self, index: Tuple[int | slice, int | slice]
+    ) -> GridContent | List[GridContent]:
         ...
 
     @overload
@@ -138,12 +141,8 @@ class Grid:
 
     def __getitem__(
         self,
-        index: Union[
-            int,
-            Sequence[Coordinate],
-            Tuple[Union[int, slice], Union[int, slice]],
-        ],
-    ) -> Union[GridContent, List[GridContent]]:
+        index: int | Sequence[Coordinate] | Tuple[int | slice, int | slice],
+    ) -> GridContent | List[GridContent]:
         """Access contents from the grid."""
 
         if isinstance(index, int):
@@ -436,7 +435,7 @@ class Grid:
         return self.grid[x][y] == self.default_val()
 
     def move_to_empty(
-        self, agent: Agent, cutoff: float = 0.998, num_agents: Optional[int] = None
+        self, agent: Agent, cutoff: float = 0.998, num_agents: int | None = None
     ) -> None:
         """Moves agent to a random empty cell, vacating agent's old cell."""
         if len(self.empties) == 0:
@@ -478,7 +477,7 @@ class Grid:
         self._place_agent(agent, new_pos)
         agent.pos = new_pos
 
-    def find_empty(self) -> Optional[Coordinate]:
+    def find_empty(self) -> Coordinate | None:
         """Pick a random empty cell."""
         import random
 
@@ -509,7 +508,7 @@ class SingleGrid(Grid):
     empties: Set[Coordinate] = set()
 
     def position_agent(
-        self, agent: Agent, x: Union[int, str] = "random", y: Union[int, str] = "random"
+        self, agent: Agent, x: int | str = "random", y: int | str = "random"
     ) -> None:
         """Position an agent on the grid.
         This is used when first placing agents! Use 'move_to_empty()'
@@ -781,7 +780,7 @@ class ContinuousSpace:
         self.size = np.array((self.width, self.height))
         self.torus = torus
 
-        self._agent_points: Optional[npt.NDArray[FloatCoordinate]] = None
+        self._agent_points: npt.NDArray[FloatCoordinate] | None = None
         self._index_to_agent: Dict[int, Agent] = {}
         self._agent_to_index: Dict[Agent, int] = {}
 

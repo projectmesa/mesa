@@ -4,12 +4,16 @@ The model class for Mesa framework.
 Core Objects: Model
 
 """
+# Mypy; for the `|` operator purpose
+# Remove this __future__ import once the oldest supported Python is 3.10
+from __future__ import annotations
+
 import random
 
 from mesa.datacollection import DataCollector
 
 # mypy
-from typing import Any, Optional
+from typing import Any
 
 
 class Model:
@@ -52,7 +56,7 @@ class Model:
         self.current_id += 1
         return self.current_id
 
-    def reset_randomizer(self, seed: Optional[int] = None) -> None:
+    def reset_randomizer(self, seed: int | None = None) -> None:
         """Reset the model random number generator.
 
         Args:

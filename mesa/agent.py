@@ -4,8 +4,12 @@ The agent class for Mesa framework.
 Core Objects: Agent
 
 """
+# Mypy; for the `|` operator purpose
+# Remove this __future__ import once the oldest supported Python is 3.10
+from __future__ import annotations
+
 # mypy
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from random import Random
 
 if TYPE_CHECKING:
@@ -27,7 +31,7 @@ class Agent:
         """
         self.unique_id = unique_id
         self.model = model
-        self.pos: Optional[Position] = None
+        self.pos: Position | None = None
 
     def step(self) -> None:
         """A single step of the agent."""
