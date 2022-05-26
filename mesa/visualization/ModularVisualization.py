@@ -164,6 +164,15 @@ class VisualizationElement:
         return "<b>VisualizationElement goes here</b>."
 
 
+class TextElement(VisualizationElement):
+    """
+    Module for drawing live-updating text.
+    """
+
+    package_includes = ["TextModule.js"]
+    js_code = "elements.push(new TextModule());"
+
+
 # =============================================================================
 # Actual Tornado code starts here:
 
@@ -273,7 +282,9 @@ class ModularServer(tornado.web.Application):
         if model_params is None:
             model_params = {}
         # Prep visualization elements:
-        self.visualization_elements = visualization_elements
+        self.visualization_elements = self._auto_convert_functions_to_TextElements(
+            visualization_elements
+        )
         self.package_js_includes = set()
         self.package_css_includes = set()
         self.local_js_includes = set()
@@ -357,3 +368,26 @@ class ModularServer(tornado.web.Application):
     @staticmethod
     def _is_stylesheet(filename):
         return filename.lower().endswith(".css")
+
+    def _auto_convert_fn_to_TextElement(self, x):
+        """
+        Automatically convert a function to a TextElement object.
+        See https://github.com/projectmesa/mesa/issues/1233.
+        """
+
+        # Note: a class constructor is also a callable.
+        if not callable(x):
+            # i.e. not a function
+            return x
+
+        class MyTextElement(TextElement):
+            def render(self, model):
+                return x(model)
+
+        return MyTextElement()
+
+    def _auto_convert_functions_to_TextElements(self, visualization_elements):
+        out_elements = [
+            self._auto_convert_fn_to_TextElement(e) for e in visualization_elements
+        ]
+        return out_elements
