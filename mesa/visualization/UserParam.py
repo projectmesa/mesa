@@ -1,4 +1,6 @@
 from numbers import Number
+from warnings import warn
+
 
 NUMBER = "number"
 CHECKBOX = "checkbox"
@@ -65,6 +67,13 @@ class UserSettableParameter:
         choices=None,
         description=None,
     ):
+
+        warn(
+            "UserSettableParameter is deprecated in favor of UserParam objects "
+            "such as Slider, Checkbox, Choice, StaticText, NumberInput. "
+            "See the examples folder for how to use them. "
+            "UserSettableParameter will be removed in the next major release."
+        )
         if choices is None:
             choices = list()
         if param_type not in self.TYPES:
