@@ -63,7 +63,7 @@ class Person(RandomWalker):
         bank can loan them any money"""
         if self.savings > 0 or self.wallet > 0 or self.bank.bank_to_loan > 0:
             # create list of people at my location (includes self)
-            my_cell = self.model.grid.get_cell_list_contents([self.pos])
+            my_cell = self.model.space.get_cell_list_contents([self.pos])
             # check if other people are at my location
             if len(my_cell) > 1:
                 # set customer to self for while loop condition

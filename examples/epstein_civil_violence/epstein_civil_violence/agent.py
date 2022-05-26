@@ -90,18 +90,18 @@ class Citizen(mesa.Agent):
             self.condition = "Quiescent"
         if self.model.movement and self.empty_neighbors:
             new_pos = self.random.choice(self.empty_neighbors)
-            self.model.grid.move_agent(self, new_pos)
+            self.model.space.move_agent(self, new_pos)
 
     def update_neighbors(self):
         """
         Look around and see who my neighbors are
         """
-        self.neighborhood = self.model.grid.get_neighborhood(
+        self.neighborhood = self.model.space.get_neighborhood(
             self.pos, moore=False, radius=1
         )
-        self.neighbors = self.model.grid.get_cell_list_contents(self.neighborhood)
+        self.neighbors = self.model.space.get_cell_list_contents(self.neighborhood)
         self.empty_neighbors = [
-            c for c in self.neighborhood if self.model.grid.is_cell_empty(c)
+            c for c in self.neighborhood if self.model.space.is_cell_empty(c)
         ]
 
     def update_estimated_arrest_probability(self):
@@ -171,16 +171,16 @@ class Cop(mesa.Agent):
             arrestee.jail_sentence = sentence
         if self.model.movement and self.empty_neighbors:
             new_pos = self.random.choice(self.empty_neighbors)
-            self.model.grid.move_agent(self, new_pos)
+            self.model.space.move_agent(self, new_pos)
 
     def update_neighbors(self):
         """
         Look around and see who my neighbors are.
         """
-        self.neighborhood = self.model.grid.get_neighborhood(
+        self.neighborhood = self.model.space.get_neighborhood(
             self.pos, moore=False, radius=1
         )
-        self.neighbors = self.model.grid.get_cell_list_contents(self.neighborhood)
+        self.neighbors = self.model.space.get_cell_list_contents(self.neighborhood)
         self.empty_neighbors = [
-            c for c in self.neighborhood if self.model.grid.is_cell_empty(c)
+            c for c in self.neighborhood if self.model.space.is_cell_empty(c)
         ]

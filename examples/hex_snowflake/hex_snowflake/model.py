@@ -22,16 +22,16 @@ class HexSnowflake(mesa.Model):
         self.schedule = mesa.time.SimultaneousActivation(self)
 
         # Use a hexagonal grid, where edges wrap around.
-        self.grid = mesa.space.HexGrid(width, height, torus=True)
+        self.space = mesa.space.HexGrid(width, height, torus=True)
 
         # Place a dead cell at each location.
-        for (contents, x, y) in self.grid.coord_iter():
+        for (contents, x, y) in self.space.coord_iter():
             cell = Cell((x, y), self)
-            self.grid.place_agent(cell, (x, y))
+            self.space.place_agent(cell, (x, y))
             self.schedule.add(cell)
 
         # activate the center(ish) cell.
-        centerishCell = self.grid[width // 2][height // 2]
+        centerishCell = self.space[width // 2][height // 2]
 
         centerishCell.state = 1
         for a in centerishCell.neighbors:

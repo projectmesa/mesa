@@ -14,7 +14,7 @@ class SchellingTextVisualization(mesa.visualization.TextVisualization):
         """
         self.model = model
 
-        grid_viz = mesa.visualization.TextGrid(self.model.grid, self.print_ascii_agent)
+        grid_viz = mesa.visualization.TextGrid(self.model.space, self.print_ascii_agent)
         happy_viz = mesa.visualization.TextData(self.model, "happy")
         self.elements = [grid_viz, happy_viz]
 

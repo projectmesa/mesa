@@ -19,7 +19,7 @@ class BoltzmannWealthModel(mesa.Model):
 
     def __init__(self, N=100, width=10, height=10):
         self.num_agents = N
-        self.grid = mesa.space.MultiGrid(width, height, True)
+        self.space = mesa.space.MultiGrid(width, height, True)
         self.schedule = mesa.time.RandomActivation(self)
         self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
@@ -29,9 +29,9 @@ class BoltzmannWealthModel(mesa.Model):
             a = MoneyAgent(i, self)
             self.schedule.add(a)
             # Add the agent to a random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(a, (x, y))
+            x = self.random.randrange(self.space.width)
+            y = self.random.randrange(self.space.height)
+            self.space.place_agent(a, (x, y))
 
         self.running = True
         self.datacollector.collect(self)
@@ -54,14 +54,14 @@ class MoneyAgent(mesa.Agent):
         self.wealth = 1
 
     def move(self):
-        possible_steps = self.model.grid.get_neighborhood(
+        possible_steps = self.model.space.get_neighborhood(
             self.pos, moore=True, include_center=False
         )
         new_position = self.random.choice(possible_steps)
-        self.model.grid.move_agent(self, new_position)
+        self.model.space.move_agent(self, new_position)
 
     def give_money(self):
-        cellmates = self.model.grid.get_cell_list_contents([self.pos])
+        cellmates = self.model.space.get_cell_list_contents([self.pos])
         if len(cellmates) > 1:
             other = self.random.choice(cellmates)
             other.wealth += 1

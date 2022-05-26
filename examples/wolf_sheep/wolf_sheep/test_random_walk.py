@@ -38,7 +38,7 @@ class WalkerWorld(Model):
         """
         self.height = height
         self.width = width
-        self.grid = MultiGrid(self.width, self.height, torus=True)
+        self.space = MultiGrid(self.width, self.height, torus=True)
         self.agent_count = agent_count
 
         self.schedule = RandomActivation(self)
@@ -48,7 +48,7 @@ class WalkerWorld(Model):
             y = self.random.randrange(self.height)
             a = WalkerAgent(i, (x, y), self, True)
             self.schedule.add(a)
-            self.grid.place_agent(a, (x, y))
+            self.space.place_agent(a, (x, y))
 
     def step(self):
         self.schedule.step()
@@ -68,7 +68,7 @@ class WalkerWorldViz(TextVisualization):
             model: An instance of a WalkerWorld model.
         """
         self.model = model
-        grid_viz = TextGrid(self.model.grid, None)
+        grid_viz = TextGrid(self.model.space, None)
         grid_viz.converter = lambda x: str(len(x))
         self.elements = [grid_viz]
 

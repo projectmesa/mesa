@@ -82,7 +82,7 @@ class WolfSheep(mesa.Model):
         self.sheep_gain_from_food = sheep_gain_from_food
 
         self.schedule = RandomActivationByTypeFiltered(self)
-        self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
+        self.space = mesa.space.MultiGrid(self.width, self.height, torus=True)
         self.datacollector = mesa.DataCollector(
             {
                 "Wolves": lambda m: m.schedule.get_type_count(Wolf),
@@ -99,7 +99,7 @@ class WolfSheep(mesa.Model):
             y = self.random.randrange(self.height)
             energy = self.random.randrange(2 * self.sheep_gain_from_food)
             sheep = Sheep(self.next_id(), (x, y), self, True, energy)
-            self.grid.place_agent(sheep, (x, y))
+            self.space.place_agent(sheep, (x, y))
             self.schedule.add(sheep)
 
         # Create wolves
@@ -108,12 +108,12 @@ class WolfSheep(mesa.Model):
             y = self.random.randrange(self.height)
             energy = self.random.randrange(2 * self.wolf_gain_from_food)
             wolf = Wolf(self.next_id(), (x, y), self, True, energy)
-            self.grid.place_agent(wolf, (x, y))
+            self.space.place_agent(wolf, (x, y))
             self.schedule.add(wolf)
 
         # Create grass patches
         if self.grass:
-            for agent, x, y in self.grid.coord_iter():
+            for agent, x, y in self.space.coord_iter():
 
                 fully_grown = self.random.choice([True, False])
 
@@ -123,7 +123,7 @@ class WolfSheep(mesa.Model):
                     countdown = self.random.randrange(self.grass_regrowth_time)
 
                 patch = GrassPatch(self.next_id(), (x, y), self, fully_grown, countdown)
-                self.grid.place_agent(patch, (x, y))
+                self.space.place_agent(patch, (x, y))
                 self.schedule.add(patch)
 
         self.running = True

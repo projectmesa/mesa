@@ -29,7 +29,7 @@ class PdGrid(mesa.Model):
                            Determines the agent activation regime.
             payoffs: (optional) Dictionary of (move, neighbor_move) payoffs.
         """
-        self.grid = mesa.space.SingleGrid(width, height, torus=True)
+        self.space = mesa.space.SingleGrid(width, height, torus=True)
         self.schedule_type = schedule_type
         self.schedule = self.schedule_types[self.schedule_type](self)
 
@@ -37,7 +37,7 @@ class PdGrid(mesa.Model):
         for x in range(width):
             for y in range(height):
                 agent = PDAgent((x, y), self)
-                self.grid.place_agent(agent, (x, y))
+                self.space.place_agent(agent, (x, y))
                 self.schedule.add(agent)
 
         self.datacollector = mesa.DataCollector(

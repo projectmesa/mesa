@@ -12,7 +12,7 @@ class State(Enum):
 
 
 def number_state(model, state):
-    return sum(1 for a in model.grid.get_all_cell_contents() if a.state is state)
+    return sum(1 for a in model.space.get_all_cell_contents() if a.state is state)
 
 
 def number_infected(model):
@@ -44,7 +44,7 @@ class VirusOnNetwork(mesa.Model):
         self.num_nodes = num_nodes
         prob = avg_node_degree / self.num_nodes
         self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=prob)
-        self.grid = mesa.space.NetworkGrid(self.G)
+        self.space = mesa.space.NetworkGrid(self.G)
         self.schedule = mesa.time.RandomActivation(self)
         self.initial_outbreak_size = (
             initial_outbreak_size if initial_outbreak_size <= num_nodes else num_nodes
@@ -75,11 +75,11 @@ class VirusOnNetwork(mesa.Model):
             )
             self.schedule.add(a)
             # Add the agent to the node
-            self.grid.place_agent(a, node)
+            self.space.place_agent(a, node)
 
         # Infect some nodes
         infected_nodes = self.random.sample(list(self.G), self.initial_outbreak_size)
-        for a in self.grid.get_cell_list_contents(infected_nodes):
+        for a in self.space.get_cell_list_contents(infected_nodes):
             a.state = State.INFECTED
 
         self.running = True
@@ -124,10 +124,10 @@ class VirusAgent(mesa.Agent):
         self.gain_resistance_chance = gain_resistance_chance
 
     def try_to_infect_neighbors(self):
-        neighbors_nodes = self.model.grid.get_neighbors(self.pos, include_center=False)
+        neighbors_nodes = self.model.space.get_neighbors(self.pos, include_center=False)
         susceptible_neighbors = [
             agent
-            for agent in self.model.grid.get_cell_list_contents(neighbors_nodes)
+            for agent in self.model.space.get_cell_list_contents(neighbors_nodes)
             if agent.state is State.SUSCEPTIBLE
         ]
         for a in susceptible_neighbors:

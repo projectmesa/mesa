@@ -18,7 +18,7 @@ class BoltzmannWealthModelNetwork(mesa.Model):
         self.num_agents = num_agents
         self.num_nodes = num_nodes if num_nodes >= self.num_agents else self.num_agents
         self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=0.5)
-        self.grid = mesa.space.NetworkGrid(self.G)
+        self.space = mesa.space.NetworkGrid(self.G)
         self.schedule = mesa.time.RandomActivation(self)
         self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": compute_gini},
@@ -32,7 +32,7 @@ class BoltzmannWealthModelNetwork(mesa.Model):
             a = MoneyAgent(i, self)
             self.schedule.add(a)
             # Add the agent to a random node
-            self.grid.place_agent(a, list_of_random_nodes[i])
+            self.space.place_agent(a, list_of_random_nodes[i])
 
         self.running = True
         self.datacollector.collect(self)
@@ -57,17 +57,17 @@ class MoneyAgent(mesa.Agent):
     def move(self):
         possible_steps = [
             node
-            for node in self.model.grid.get_neighbors(self.pos, include_center=False)
-            if self.model.grid.is_cell_empty(node)
+            for node in self.model.space.get_neighbors(self.pos, include_center=False)
+            if self.model.space.is_cell_empty(node)
         ]
         if len(possible_steps) > 0:
             new_position = self.random.choice(possible_steps)
-            self.model.grid.move_agent(self, new_position)
+            self.model.space.move_agent(self, new_position)
 
     def give_money(self):
 
-        neighbors_nodes = self.model.grid.get_neighbors(self.pos, include_center=False)
-        neighbors = self.model.grid.get_cell_list_contents(neighbors_nodes)
+        neighbors_nodes = self.model.space.get_neighbors(self.pos, include_center=False)
+        neighbors = self.model.space.get_cell_list_contents(neighbors_nodes)
         if len(neighbors) > 0:
             other = self.random.choice(neighbors)
             other.wealth += 1

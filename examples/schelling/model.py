@@ -21,13 +21,13 @@ class SchellingAgent(mesa.Agent):
 
     def step(self):
         similar = 0
-        for neighbor in self.model.grid.iter_neighbors(self.pos, True):
+        for neighbor in self.model.space.iter_neighbors(self.pos, True):
             if neighbor.type == self.type:
                 similar += 1
 
         # If unhappy, move:
         if similar < self.model.homophily:
-            self.model.grid.move_to_empty(self)
+            self.model.space.move_to_empty(self)
         else:
             self.model.happy += 1
 
@@ -47,7 +47,7 @@ class Schelling(mesa.Model):
         self.homophily = homophily
 
         self.schedule = mesa.time.RandomActivation(self)
-        self.grid = mesa.space.SingleGrid(width, height, torus=True)
+        self.space = mesa.space.SingleGrid(width, height, torus=True)
 
         self.happy = 0
         self.datacollector = mesa.DataCollector(
@@ -60,7 +60,7 @@ class Schelling(mesa.Model):
         # We use a grid iterator that returns
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
-        for cell in self.grid.coord_iter():
+        for cell in self.space.coord_iter():
             x = cell[1]
             y = cell[2]
             if self.random.random() < self.density:
@@ -70,7 +70,7 @@ class Schelling(mesa.Model):
                     agent_type = 0
 
                 agent = SchellingAgent((x, y), self, agent_type)
-                self.grid.position_agent(agent, (x, y))
+                self.space.position_agent(agent, (x, y))
                 self.schedule.add(agent)
 
         self.running = True

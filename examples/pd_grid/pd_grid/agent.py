@@ -29,7 +29,7 @@ class PDAgent(mesa.Agent):
 
     def step(self):
         """Get the best neighbor's move, and change own move accordingly if better than own score."""
-        neighbors = self.model.grid.get_neighbors(self.pos, True, include_center=True)
+        neighbors = self.model.space.get_neighbors(self.pos, True, include_center=True)
         best_neighbor = max(neighbors, key=lambda a: a.score)
         self.next_move = best_neighbor.move
 
@@ -41,7 +41,7 @@ class PDAgent(mesa.Agent):
         self.score += self.increment_score()
 
     def increment_score(self):
-        neighbors = self.model.grid.get_neighbors(self.pos, True)
+        neighbors = self.model.space.get_neighbors(self.pos, True)
         if self.model.schedule_type == "Simultaneous":
             moves = [neighbor.next_move for neighbor in neighbors]
         else:

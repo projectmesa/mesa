@@ -43,7 +43,7 @@ class ColorCell(mesa.Agent):
         A choice is made at random in case of a tie
         The next state is stored until all cells have been polled
         """
-        _neighbor_iter = self.model.grid.iter_neighbors((self._row, self._col), True)
+        _neighbor_iter = self.model.space.iter_neighbors((self._row, self._col), True)
         neighbors_opinion = Counter(n.get_state() for n in _neighbor_iter)
         # Following is a a tuple (attribute, occurrences)
         polled_opinions = neighbors_opinion.most_common()
@@ -110,9 +110,9 @@ class ColorPatches(mesa.Model):
         is directly accessing Model.grid
              76     def render(self, model):
              77         grid_state = defaultdict(list)
-        ---> 78         for y in range(model.grid.height):
-             79             for x in range(model.grid.width):
-             80                 cell_objects = model.grid.get_cell_list_contents([(x, y)])
+        ---> 78         for y in range(model.space.height):
+             79             for x in range(model.space.width):
+             80                 cell_objects = model.space.get_cell_list_contents([(x, y)])
 
         AttributeError: 'ColorPatches' object has no attribute 'grid'
         """

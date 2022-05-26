@@ -27,20 +27,20 @@ class SsAgent(mesa.Agent):
         self.vision = vision
 
     def get_sugar(self, pos):
-        this_cell = self.model.grid.get_cell_list_contents([pos])
+        this_cell = self.model.space.get_cell_list_contents([pos])
         for agent in this_cell:
             if type(agent) is Sugar:
                 return agent
 
     def is_occupied(self, pos):
-        this_cell = self.model.grid.get_cell_list_contents([pos])
+        this_cell = self.model.space.get_cell_list_contents([pos])
         return any(isinstance(agent, SsAgent) for agent in this_cell)
 
     def move(self):
         # Get neighborhood within vision
         neighbors = [
             i
-            for i in self.model.grid.get_neighborhood(
+            for i in self.model.space.get_neighborhood(
                 self.pos, self.moore, False, radius=self.vision
             )
             if not self.is_occupied(i)
@@ -57,7 +57,7 @@ class SsAgent(mesa.Agent):
             pos for pos in candidates if get_distance(self.pos, pos) == min_dist
         ]
         self.random.shuffle(final_candidates)
-        self.model.grid.move_agent(self, final_candidates[0])
+        self.model.space.move_agent(self, final_candidates[0])
 
     def eat(self):
         sugar_patch = self.get_sugar(self.pos)
@@ -68,7 +68,7 @@ class SsAgent(mesa.Agent):
         self.move()
         self.eat()
         if self.sugar <= 0:
-            self.model.grid.remove_agent(self)
+            self.model.space.remove_agent(self)
             self.model.schedule.remove(self)
 
 

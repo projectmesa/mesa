@@ -35,7 +35,7 @@ class SugarscapeCg(mesa.Model):
         self.initial_population = initial_population
 
         self.schedule = mesa.time.RandomActivationByType(self)
-        self.grid = mesa.space.MultiGrid(self.width, self.height, torus=False)
+        self.space = mesa.space.MultiGrid(self.width, self.height, torus=False)
         self.datacollector = mesa.DataCollector(
             {"SsAgent": lambda m: m.schedule.get_type_count(SsAgent)}
         )
@@ -44,10 +44,10 @@ class SugarscapeCg(mesa.Model):
         import numpy as np
 
         sugar_distribution = np.genfromtxt("sugarscape_cg/sugar-map.txt")
-        for _, x, y in self.grid.coord_iter():
+        for _, x, y in self.space.coord_iter():
             max_sugar = sugar_distribution[x, y]
             sugar = Sugar((x, y), self, max_sugar)
-            self.grid.place_agent(sugar, (x, y))
+            self.space.place_agent(sugar, (x, y))
             self.schedule.add(sugar)
 
         # Create agent:
@@ -58,7 +58,7 @@ class SugarscapeCg(mesa.Model):
             metabolism = self.random.randrange(2, 4)
             vision = self.random.randrange(1, 6)
             ssa = SsAgent((x, y), self, False, sugar, metabolism, vision)
-            self.grid.place_agent(ssa, (x, y))
+            self.space.place_agent(ssa, (x, y))
             self.schedule.add(ssa)
 
         self.running = True

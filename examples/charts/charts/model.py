@@ -101,7 +101,7 @@ class Charts(mesa.Model):
         self.width = width
         self.init_people = init_people
         self.schedule = mesa.time.RandomActivation(self)
-        self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
+        self.space = mesa.space.MultiGrid(self.width, self.height, torus=True)
         # rich_threshold is the amount of savings a person needs to be considered "rich"
         self.rich_threshold = rich_threshold
         self.reserve_percent = reserve_percent
@@ -129,7 +129,7 @@ class Charts(mesa.Model):
             y = self.random.randrange(self.height)
             p = Person(i, (x, y), self, True, self.bank, self.rich_threshold)
             # place the Person object on the grid at coordinates (x, y)
-            self.grid.place_agent(p, (x, y))
+            self.space.place_agent(p, (x, y))
             # add the Person object to the model schedule
             self.schedule.add(p)
 
