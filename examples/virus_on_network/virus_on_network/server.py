@@ -59,15 +59,14 @@ chart = mesa.visualization.ChartModule(
 )
 
 
-class MyTextElement(mesa.visualization.TextElement):
-    def render(self, model):
-        ratio = model.resistant_susceptible_ratio()
-        ratio_text = "&infin;" if ratio is math.inf else f"{ratio:.2f}"
-        infected_text = str(number_infected(model))
+def get_resistant_susceptible_ratio(model):
+    ratio = model.resistant_susceptible_ratio()
+    ratio_text = "&infin;" if ratio is math.inf else f"{ratio:.2f}"
+    infected_text = str(number_infected(model))
 
-        return "Resistant/Susceptible Ratio: {}<br>Infected Remaining: {}".format(
-            ratio_text, infected_text
-        )
+    return "Resistant/Susceptible Ratio: {}<br>Infected Remaining: {}".format(
+        ratio_text, infected_text
+    )
 
 
 model_params = {
@@ -126,6 +125,9 @@ model_params = {
 }
 
 server = mesa.visualization.ModularServer(
-    VirusOnNetwork, [network, MyTextElement(), chart], "Virus Model", model_params
+    VirusOnNetwork,
+    [network, get_resistant_susceptible_ratio, chart],
+    "Virus Model",
+    model_params,
 )
 server.port = 8521
