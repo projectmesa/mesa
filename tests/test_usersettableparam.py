@@ -5,7 +5,7 @@ from mesa.visualization.UserParam import (
     Checkbox,
     Choice,
     StaticText,
-    NumberInput
+    NumberInput,
 )
 
 
