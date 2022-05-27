@@ -79,6 +79,38 @@ class Agent:
         """Gives you the distance between the agent and another agent"""
         return self.distancexy(another_agent.pos[0], another_agent.pos[1])
 
+    def die(self):
+        """Removes the agent from the schedule and the grid """
+        try:
+            self.model.schedule.remove(self)
+        except:
+            print("agent.py (die): could not remove agent from self.model.schedule")
+        try:
+            self.model.space.remove_agent(self)
+        except:
+            print("agent.py (die): could not remove agent from self.model.space")
+
+    def towardsxy(self, x, y):
+        """Calculates angle between a given coordinate and horizon as if the current position is the origin"""
+        dx = x - float(self.pos[0])
+        dy = float(self.pos[1]) - y
+        if dx == 0:
+            return 90 if dy > 0 else 270
+        else:
+            return math.degrees(math.atan2(dy, dx))
+
+    def towards(self, another_agent):
+        """Calculates angle between an agent and horizon as if the current position is the origin"""
+        return self.towardsxy(*another_agent.pos)
+
+    def facexy(self, x, y):
+        """Makes agent face a given coordinate"""
+        self.heading = self.towardsxy(x, y)
+
+    def face(self, another_agent):
+        """Makes agent face another agent"""
+        x, y = another_agent.pos
+        self.facexy(x, y)
 
     @property
     def random(self) -> Random:
