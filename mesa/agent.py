@@ -63,6 +63,22 @@ class Agent:
         """Turns the agent left by the given degree"""
         self.heading = (self.heading + degree) % 360
 
+    def setxy(self, x, y):
+        """Sets the current position to the specified x,y parameters"""
+        self.pos = (x, y)
+
+    def set_pos(self, apos):
+        """Sets the current position to the specified pos parameter"""
+        self.pos = apos
+
+    def distancexy(self, x, y):
+        """Gives you the distance of the agent and the given coordinate"""
+        return math.dist(self.pos, (x, y))
+
+    def distance(self, another_agent):
+        """Gives you the distance between the agent and another agent"""
+        return self.distancexy(another_agent.pos[0], another_agent.pos[1])
+
 
     @property
     def random(self) -> Random:
