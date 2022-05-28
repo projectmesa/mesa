@@ -1,17 +1,15 @@
 const NetworkModule = function (svg_width, svg_height) {
-  // Create the svg tag:
-  const svg_tag =
-    "<svg id='NetworkModule_d3' width='" +
-    svg_width +
-    "' height='" +
-    svg_height +
-    "' " +
-    "style='border:1px dotted'></svg>";
+  // Create the svg element:
+  const svg = d3.create("svg");
+  svg
+    .attr("class", "NetworkModule_d3")
+    .attr("width", svg_width)
+    .attr("height", svg_height)
+    .style("border", "1px dotted");
 
   // Append svg to #elements:
-  $("#elements").append($(svg_tag)[0]);
+  document.getElementById("elements").appendChild(svg.node());
 
-  const svg = d3.select("#NetworkModule_d3");
   const width = +svg.attr("width");
   const height = +svg.attr("height");
   const g = svg
@@ -26,7 +24,7 @@ const NetworkModule = function (svg_width, svg_height) {
     .style("opacity", 0);
 
   svg.call(
-    d3.zoom().on("zoom", function () {
+    d3.zoom().on("zoom", () => {
       g.attr("transform", d3.event.transform);
     })
   );
@@ -35,7 +33,7 @@ const NetworkModule = function (svg_width, svg_height) {
 
   const nodes = g.append("g").attr("class", "nodes");
 
-  this.render = function (data) {
+  this.render = (data) => {
     const graph = JSON.parse(JSON.stringify(data));
 
     const simulation = d3
@@ -119,5 +117,5 @@ const NetworkModule = function (svg_width, svg_height) {
     nodes.selectAll("circle").data(graph.nodes).exit().remove();
   };
 
-  this.reset = function () {};
+  this.reset = () => {};
 };
