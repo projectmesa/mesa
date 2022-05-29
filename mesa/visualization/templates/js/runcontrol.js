@@ -320,7 +320,9 @@ const initGUI = function (model_params) {
   };
 
   const addTextBox = function (param, obj) {
-    const well = $('<div class="well">' + obj.value + "</div>")[0];
+    const well = document.createElement("div");
+    well.className = "well";
+    well.innerHTML = obj.value;
     sidebar.append(well);
   };
 
