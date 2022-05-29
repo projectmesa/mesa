@@ -97,7 +97,7 @@ function ModelController(tick = 0, fps = 3, running = false, finished = false) {
 /*
  * Set up the the FPS control
  */
-const fpsControl = $("#fps").slider({
+const fpsControl = new Slider("#fps", {
   max: 20,
   min: 0,
   value: controller.fps,
@@ -105,7 +105,8 @@ const fpsControl = $("#fps").slider({
   ticks_labels: [0, 20],
   ticks_position: [0, 100],
 });
-fpsControl.on("change", () => controller.updateFPS(fpsControl.val()));
+document.getElementById("fps").onchange = () =>
+  controller.updateFPS(fpsControl.getValue());
 
 /*
  * Button logic for start, stop and reset buttons
@@ -258,8 +259,7 @@ const initGUI = function (model_params) {
     );
 
     // Setup slider
-    const sliderInput = $("#" + domID);
-    sliderInput.slider({
+    const sliderInput = new Slider("#" + domID, {
       min: obj.min_value,
       max: obj.max_value,
       value: obj.value,
@@ -268,9 +268,9 @@ const initGUI = function (model_params) {
       ticks_labels: [obj.min_value, obj.max_value],
       ticks_positions: [0, 100],
     });
-    sliderInput.on("change", function () {
-      onSubmitCallback(param, Number($(this).val()));
-    });
+    document.getElementById(domID).onchange = () => {
+      onSubmitCallback(param, Number(sliderInput.getValue()));
+    };
   };
 
   const addChoiceInput = function (param, obj) {
