@@ -229,11 +229,11 @@ const initGUI = function (model_params) {
         "</div>",
       ].join("")
     );
-    const numberInput = $("#" + domID);
-    numberInput.val(obj.value);
-    numberInput.on("change", function () {
-      onSubmitCallback(param, Number($(this).val()));
-    });
+    const numberInput = document.getElementById(domID);
+    numberInput.value = obj.value;
+    numberInput.onchange = () => {
+      onSubmitCallback(param, Number(numberInput.value));
+    };
   };
 
   const addSliderInput = function (param, obj) {
