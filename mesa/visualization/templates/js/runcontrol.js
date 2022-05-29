@@ -275,48 +275,32 @@ const initGUI = function (model_params) {
 
   const addChoiceInput = function (param, obj) {
     const domID = param + "_id";
-    const span = "<span class='caret'></span>";
     const template = [
-      "<p><label for='" +
-        domID +
-        "' class='badge bg-primary'>" +
-        obj.name +
-        "</label></p>",
-      "<div class='dropdown'>",
-      "<button id='" +
-        domID +
-        "' class='btn btn-default dropdown-toggle' type='button' data-bs-toggle='dropdown'>" +
-        obj.value +
-        " " +
-        span,
-      "</button>",
-      "<ul class='dropdown-menu' role='menu' aria-labelledby='" + domID + "'>",
+      `<p>
+        <label for='${domID}' class='badge bg-primary'>
+        ${obj.name}
+        "</label>
+      </p>`,
+      `<select
+        id='${domID}'
+        class='form-select'
+        style='width:auto'
+        aria-label='select input'>`,
     ];
-    const choiceIdentifiers = [];
-    for (let i = 0; i < obj.choices.length; i++) {
-      const choiceID = domID + "_choice_" + i;
-      choiceIdentifiers.push(choiceID);
-      template.push(
-        "<li role='presentation'><a class='pick-choice dropdown-item' id='" +
-          choiceID +
-          "' role='menuitem' tabindex='-1' href='#'>",
-        obj.choices[i],
-        "</a></li>"
-      );
+    for (const idx in obj.choices) {
+      const choice = obj.choices[idx];
+      const selected = choice === obj.value ? "selected" : "";
+      template.push(`<option ${selected} value=${idx}>${choice}</option>`);
     }
 
-    // Close the dropdown options
-    template.push("</ul>", "</div>");
+    // Close the select options
+    template.push("</select>");
 
     // Finally render the dropdown and activate choice listeners
     sidebar.append(template.join(""));
-    choiceIdentifiers.forEach(function (id, idx) {
-      $("#" + id).on("click", function () {
-        const value = obj.choices[idx];
-        $("#" + domID).html(value + " " + span);
-        onSubmitCallback(param, value);
-      });
-    });
+
+    const select = document.getElementById(domID);
+    select.onchange = () => onSubmitCallback(param, obj.choices[select.value]);
   };
 
   const addTextBox = function (param, obj) {
