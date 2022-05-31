@@ -25,9 +25,13 @@ class CanvasGrid(VisualizationElement):
             For Circles:
                 "r": The radius, defined as a fraction of cell size. r=1 will
                      fill the entire cell.
+                "xAlign", "yAlign": Alignment of the circle within the cell.
+                                    Defaults to 0.5 (center).
             For Rectangles:
                 "w", "h": The width and height of the rectangle, which are in
                           fractions of cell width and height.
+                "xAlign", "yAlign": Alignment of the rectangle within the
+                                    cell. Defaults to 0.5 (center).
             For arrowHead:
                 "scale": Proportion scaling as a fraction of cell size.
                 "heading_x": represents x direction unit vector.
