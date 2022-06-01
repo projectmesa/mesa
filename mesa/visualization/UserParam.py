@@ -1,5 +1,5 @@
-from numbers import Number
 from warnings import warn
+import numbers
 
 
 NUMBER = "number"
@@ -293,5 +293,5 @@ class NumberInput(UserParam):
         self.param_type = NUMBER
         self.name = name
         self._value = value
-        valid = isinstance(self.value, Number)
+        valid = isinstance(self.value, numbers.Number)
         self.maybe_raise_error(valid)
