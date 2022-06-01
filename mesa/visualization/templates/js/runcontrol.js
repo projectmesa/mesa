@@ -181,7 +181,7 @@ const send = function (message) {
  * @param {object} model_params - Create the GUI from these model parameters
  */
 const initGUI = function (model_params) {
-  const sidebar = $("#sidebar");
+  const sidebar = document.getElementById("sidebar");
 
   const onSubmitCallback = function (param_name, value) {
     send({ type: "submit_params", param: param_name, value: value });
@@ -212,23 +212,21 @@ const initGUI = function (model_params) {
     );
     _switch.appendChild(input);
 
-    sidebar.append(_switch);
+    sidebar.appendChild(_switch);
   };
 
   const addNumberInput = function (param, obj) {
     const domID = param + "_id";
-    sidebar.append(
-      [
-        "<div>",
-        "<p><label for='" +
-          domID +
-          "' class='badge bg-primary'>" +
-          obj.name +
-          "</label></p>",
-        "<input class='model-parameter' id='" + domID + "' type='number'/>",
-        "</div>",
-      ].join("")
-    );
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <p>
+        <label for='${domID}' class='badge bg-primary'>
+          ${obj.name}
+        </label>
+      </p>
+      <input class='model-parameter' id='${domID}' type='number'/>
+    `;
+    sidebar.appendChild(div);
     const numberInput = document.getElementById(domID);
     numberInput.value = obj.value;
     numberInput.onchange = () => {
@@ -245,18 +243,16 @@ const initGUI = function (model_params) {
       tooltip = `title='${obj.description}'`;
     }
 
-    sidebar.append(
-      [
-        "<div>",
-        "<p>",
-        `<span id='${tooltipID}' ${tooltip} data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-primary'>`,
-        obj.name,
-        "</span>",
-        "</p>",
-        "<input id='" + domID + "' type='text' />",
-        "</div>",
-      ].join("")
-    );
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <p>
+        <span id='${tooltipID}' ${tooltip} data-bs-toggle='tooltip' data-bs-placement='top' class='badge bg-primary'>
+          ${obj.name}
+        </span>
+      </p>
+      <input id='${domID}' type='text' />
+    `;
+    sidebar.appendChild(div);
 
     // Setup slider
     const sliderInput = new Slider("#" + domID, {
@@ -297,7 +293,9 @@ const initGUI = function (model_params) {
     template.push("</select>");
 
     // Finally render the dropdown and activate choice listeners
-    sidebar.append(template.join(""));
+    const div = document.createElement("div");
+    div.innerHTML = template.join("");
+    sidebar.appendChild(div);
 
     const select = document.getElementById(domID);
     select.onchange = () => onSubmitCallback(param, obj.choices[select.value]);
@@ -307,7 +305,7 @@ const initGUI = function (model_params) {
     const well = document.createElement("div");
     well.className = "well";
     well.innerHTML = obj.value;
-    sidebar.append(well);
+    sidebar.appendChild(well);
   };
 
   const addParamInput = function (param, option) {
