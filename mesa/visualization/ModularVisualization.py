@@ -212,7 +212,11 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
     @property
     def viz_state_message(self):
-        return {"type": "viz_state", "data": self.application.render_model()}
+        return {
+            "type": "viz_state",
+            "data": self.application.render_model(),
+            "step": self.application.model.schedule.steps,
+        }
 
     def on_message(self, message):
         """Receiving a message from the websocket, parse, and act accordingly."""
