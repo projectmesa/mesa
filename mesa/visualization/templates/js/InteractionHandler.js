@@ -36,6 +36,8 @@ const InteractionHandler = function (width, height, gridWidth, gridHeight, ctx) 
     "r",
     "x",
     "y",
+    "xAlign",
+    "yAlign",
     "w",
     "h",
     "width",

@@ -79,10 +79,16 @@ const GridVisualization = function (
       // If the stroke color is not defined, then the first color in the colors array is the stroke color.
       if (!p.stroke_color) p.stroke_color = p.Color[0];
 
+      // Default alignments to 0.5 (center of a cell)
+      p.xAlign ??= 0.5;
+      p.yAlign ??= 0.5;
+
       if (p.Shape == "rect")
         this.drawRectangle(
           p.x,
           p.y,
+          p.xAlign,
+          p.yAlign,
           p.w,
           p.h,
           p.Color,
@@ -95,6 +101,8 @@ const GridVisualization = function (
         this.drawCircle(
           p.x,
           p.y,
+          p.xAlign,
+          p.yAlign,
           p.r,
           p.Color,
           p.stroke_color,
@@ -130,6 +138,7 @@ const GridVisualization = function (
   /**
         Draw a circle in the specified grid cell.
         x, y: Grid coords
+        xAlign, yAlign: Alignment within the cell, defaults to 0.5 (center)
         r: Radius, as a multiple of cell size
         colors: List of colors for the gradient. Providing only one color will fill the shape with only that color, not gradient.
         stroke_color: Color to stroke the shape
@@ -140,6 +149,8 @@ const GridVisualization = function (
   this.drawCircle = function (
     x,
     y,
+    xAlign,
+    yAlign,
     radius,
     colors,
     stroke_color,
@@ -147,8 +158,14 @@ const GridVisualization = function (
     text,
     text_color
   ) {
-    const cx = (x + 0.5) * cellWidth;
-    const cy = (y + 0.5) * cellHeight;
+    // Prevent circle from being drawn outside cell bounds.
+    // Since a radius of 1 corresponds to a circle that fills
+    // the entire cell, it is necessary to divide radius by 2.
+    xAlign = clamp(xAlign, radius / 2, 1 - radius / 2);
+    yAlign = clamp(yAlign, radius / 2, 1 - radius / 2);
+
+    const cx = (x + xAlign) * cellWidth;
+    const cy = (y + yAlign) * cellHeight;
     const r = radius * maxR;
 
     context.beginPath();
@@ -181,6 +198,7 @@ const GridVisualization = function (
   /**
         Draw a rectangle in the specified grid cell.
         x, y: Grid coords
+        xAlign, yAlign: Alignment within the cell, defaults to 0.5 (center)
         w, h: Width and height, [0, 1]
         colors: List of colors for the gradient. Providing only one color will fill the shape with only that color, not gradient.
         stroke_color: Color to stroke the shape
@@ -191,6 +209,8 @@ const GridVisualization = function (
   this.drawRectangle = function (
     x,
     y,
+    xAlign,
+    yAlign,
     w,
     h,
     colors,
@@ -203,9 +223,12 @@ const GridVisualization = function (
     const dx = w * cellWidth;
     const dy = h * cellHeight;
 
-    // Keep in the center of the cell:
-    const x0 = (x + 0.5) * cellWidth - dx / 2;
-    const y0 = (y + 0.5) * cellHeight - dy / 2;
+    // Prevent rect from being drawn outside cell bounds.
+    xAlign = clamp(xAlign, w / 2, 1 - w / 2);
+    yAlign = clamp(yAlign, h / 2, 1 - h / 2);
+
+    const x0 = (x + xAlign) * cellWidth - dx / 2;
+    const y0 = (y + yAlign) * cellHeight - dy / 2;
 
     context.strokeStyle = stroke_color;
     context.strokeRect(x0, y0, dx, dy);
@@ -392,3 +415,7 @@ const GridVisualization = function (
     context.beginPath();
   };
 };
+
+const clamp = function (val, min, max) {
+  return Math.min(Math.max(min, val), max);
+}
