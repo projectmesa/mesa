@@ -83,9 +83,6 @@ const GridVisualization = function (
       p.xAlign ??= 0.5;
       p.yAlign ??= 0.5;
 
-      p.xAlign = clamp(p.xAlign, 0.0, 1.0)
-      p.yAlign = clamp(p.yAlign, 0.0, 1.0)
-
       if (p.Shape == "rect")
         this.drawRectangle(
           p.x,
@@ -161,6 +158,12 @@ const GridVisualization = function (
     text,
     text_color
   ) {
+    // Prevent circle from being drawn outside cell bounds.
+    // Since a radius of 1 corresponds to a circle that fills
+    // the entire cell, it is necessary to divide radius by 2.
+    xAlign = clamp(xAlign, radius / 2, 1 - radius / 2);
+    yAlign = clamp(yAlign, radius / 2, 1 - radius / 2);
+
     const cx = (x + xAlign) * cellWidth;
     const cy = (y + yAlign) * cellHeight;
     const r = radius * maxR;
@@ -219,6 +222,10 @@ const GridVisualization = function (
     context.beginPath();
     const dx = w * cellWidth;
     const dy = h * cellHeight;
+
+    // Prevent rect from being drawn outside cell bounds.
+    xAlign = clamp(xAlign, w / 2, 1 - w / 2);
+    yAlign = clamp(yAlign, h / 2, 1 - h / 2);
 
     const x0 = (x + xAlign) * cellWidth - dx / 2;
     const y0 = (y + yAlign) * cellHeight - dy / 2;
