@@ -13,6 +13,13 @@ export const App = () => {
 
   const { sendJSON, currentStep, done, vizState, modelParams } = useWebSocket();
 
+  const requestNextStep = () => {
+    sendJSON({
+      type: "get_step",
+      data: { step: currentStep + 1 },
+    });
+  };
+
   useEffect(() => {
     window.control = { tick: 0 };
     window.elements = [];
@@ -38,6 +45,7 @@ export const App = () => {
         elements.appendChild(elementsTopbar);
         window.elements = [];
       }
+      sendJSON({ type: "reset" });
     };
   }, []);
 
@@ -55,10 +63,7 @@ export const App = () => {
   useEffect(() => {
     if (running && !done) {
       const timeout = setTimeout(() => {
-        sendJSON({
-          type: "get_step",
-          data: { step: currentStep },
-        });
+        requestNextStep();
       }, 1000 / fps);
 
       return () => clearTimeout(timeout);
@@ -70,7 +75,7 @@ export const App = () => {
   };
 
   const handleClickStep = () => {
-    sendJSON({ type: "get_step", data: { step: currentStep } });
+    requestNextStep();
   };
 
   const handleClickReset = () => {
@@ -81,17 +86,17 @@ export const App = () => {
   return (
     // Navbar
     <>
-      <nav className="navbar navbar-dark bg-dark navbar-static-top navbar-expand-md mb-3">
+      <nav className="navbar navbar-dark bg-dark navbar-static-top navbar-expand-lg mb-3">
         <div className="container">
           <button
             type="button"
             className="navbar-toggler collapsed"
-            data-toggle="collapse"
-            data-target="#navbar"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbar"
             aria-expanded="false"
             aria-controls="navbar"
           >
-            <span className="sr-only">Toggle navigation</span>
+            <span className="visually-hidden">Toggle navigation</span>
             &#x2630;
           </button>
           <a className="navbar-brand" href="#">
@@ -102,17 +107,17 @@ export const App = () => {
               <li className="nav-item">
                 <a
                   href="#"
-                  data-toggle="modal"
-                  data-target="#about"
-                  data-title="About"
-                  data-content="#about-content"
+                  data-bs-toggle="modal"
+                  data-bs-target="#about"
+                  data-bs-title="About"
+                  data-bs-content="#about-content"
                   className="nav-link"
                 >
                   About
                 </a>
               </li>
             </ul>
-            <ul className="nav navbar-nav ml-auto">
+            <ul className="nav navbar-nav ms-auto">
               <li id="play-pause" className="nav-item">
                 <a href="#" className="nav-link" onClick={handleClickStartStop}>
                   {running ? "Stop" : "Start"}

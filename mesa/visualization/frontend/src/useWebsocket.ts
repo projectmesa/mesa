@@ -15,8 +15,11 @@ export const useWebSocket = () => {
 
   const ws = useRef<WebSocket>(socket);
 
+  const sendJSON = (msg: WSOutgoingMessage) =>
+    ws.current.send(JSON.stringify(msg));
+
   useEffect(() => {
-    ws.current.onopen = () => console.log("ws opened");
+    ws.current.onopen = () => sendJSON({ type: "reset" });
     ws.current.onclose = () => console.log("ws closed");
     ws.current.onmessage = (message: WSIncomingMessage) => {
       const msg = JSON.parse(message.data);
@@ -47,9 +50,6 @@ export const useWebSocket = () => {
       };
     };
   }, []);
-
-  const sendJSON = (msg: WSOutgoingMessage) =>
-    ws.current.send(JSON.stringify(msg));
 
   return {
     socket: ws.current,
