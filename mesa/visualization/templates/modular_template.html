@@ -20,9 +20,6 @@
 
     <div id="root"></div>
 
-    <!-- Bottom-load all JavaScript dependencies -->
-    <script src="/static/js/external/jquery-2.2.4.min.js"></script>
-
     <!-- Script includes go here -->
 	{% for file_name in package_js_includes %}
 		<script src="/static/js/{{ file_name }}" type="text/javascript"></script>

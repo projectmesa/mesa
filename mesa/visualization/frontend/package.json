@@ -5,7 +5,7 @@
   "main": "main.ts",
   "scripts": {
     "build": "esbuild src/main.tsx --bundle --outfile=../templates/main.js --minify",
-    "dev": "esbuild src/main.tsx --bundle --outfile=../templates/main.js --sourcemap --watch"
+    "dev": "esbuild src/main.tsx --bundle --outfile=../templates/main.js --minify --sourcemap --watch"
   },
   "author": "Project Mesa Team",
   "repository": {
