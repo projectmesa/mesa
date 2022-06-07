@@ -105,8 +105,7 @@ const fpsControl = new Slider("#fps", {
   ticks_labels: [0, 20],
   ticks_position: [0, 100],
 });
-document.getElementById("fps").onchange = () =>
-  controller.updateFPS(fpsControl.getValue());
+fpsControl.on("change", () => controller.updateFPS(fpsControl.getValue()));
 
 /*
  * Button logic for start, stop and reset buttons
@@ -264,9 +263,9 @@ const initGUI = function (model_params) {
       ticks_labels: [obj.min_value, obj.max_value],
       ticks_positions: [0, 100],
     });
-    document.getElementById(domID).onchange = () => {
+    sliderInput.on("change", () => {
       onSubmitCallback(param, Number(sliderInput.getValue()));
-    };
+    });
   };
 
   const addChoiceInput = function (param, obj) {
