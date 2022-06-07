@@ -55,18 +55,14 @@ const Simple_Continuous_Module = function(canvas_width, canvas_height) {
 	// Create the element
 	// ------------------
 
-	// Create the tag:
-	const canvas_tag = `
-    <canvas
-      width='${canvas_width}'
-      height='${canvas_height}'
-      style='border:1px dotted'>
-    </canvas>
-  `;
-  ;
+  const canvas = document.createElement("canvas");
+  Object.assign(canvas, {
+    width: canvas_width,
+    height: canvas_height,
+    style: 'border:1px dotted'
+  });
 	// Append it to body:
-	const canvas = $(canvas_tag)[0];
-	$("#elements").append(canvas);
+  document.getElementById("elements").appendChild(canvas);
 
 	// Create the context and the drawing controller:
 	const context = canvas.getContext("2d");
@@ -80,5 +76,4 @@ const Simple_Continuous_Module = function(canvas_width, canvas_height) {
 	this.reset = function() {
 		canvasDraw.resetCanvas();
 	};
-
 };
