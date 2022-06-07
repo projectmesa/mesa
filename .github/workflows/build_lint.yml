@@ -45,6 +45,16 @@ jobs:
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('Pipfile.lock') }}
+    - if: matrix.os == 'ubuntu'
+      uses: actions/cache@v3
+      with:
+        path: ~/mesa_virtualenv
+        key: ${{ runner.os }}-mesa_virtualenv-${{ matrix.python-version }}-${{ hashFiles('Pipfile.lock') }}
+    - if: matrix.os == 'ubuntu'
+      name: Setup virtualenv
+      run: |
+        python3 -m venv ~/mesa_virtualenv
+        . ~/mesa_virtualenv/bin/activate
     - name: Install dependencies
       run: pip install wheel && pip install .[dev]
     - name: Test with pytest
