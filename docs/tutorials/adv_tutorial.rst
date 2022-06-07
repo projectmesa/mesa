@@ -289,7 +289,7 @@ the class itself:
 
 .. code:: javascript
 
-    var HistogramModule = function(bins, canvas_width, canvas_height) {
+    const HistogramModule = function(bins, canvas_width, canvas_height) {
         // The actual code will go here.
     };
 
@@ -300,21 +300,25 @@ up in the visualization window.
 When the visualization object is instantiated, the first thing it needs
 to do is prepare to draw on the current page. To do so, it adds a
 `canvas <https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API>`__
-tag to the page, using `JQuery's <https://jquery.com/>`__ dollar-sign
-syntax (JQuery is already included with Mesa). It also gets the canvas'
-context, which is required for doing anything with it.
+tag to the page. It also gets the canvas' context, which is required for doing
+anything with it.
 
 .. code:: javascript
 
-    var HistogramModule = function(bins, canvas_width, canvas_height) {
-        // Create the tag:
-        var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
-        canvas_tag += "style='border:1px dotted'></canvas>";
-        // Append it to #elements:
-        var canvas = $(canvas_tag)[0];
-        $("#elements").append(canvas);
-        // Create the context and the drawing controller:
-        var context = canvas.getContext("2d");
+    const HistogramModule = function(bins, canvas_width, canvas_height) {
+      // Create the canvas object:
+        const canvas = document.createElement("canvas");
+        Object.assign(canvas, {
+          width: canvas_width,
+          height: canvas_height,
+          style: "border:1px dotted",
+        });
+      // Append it to #elements:
+      const elements = document.getElementById("elements");
+      elements.appendChild(canvas);
+
+      // Create the context and the drawing controller:
+      const context = canvas.getContext("2d");
     };
 
 Look at the Charts.js `bar chart
@@ -329,43 +333,48 @@ created, we can create the chart object.
 
 .. code:: javascript
 
-    var HistogramModule = function(bins, canvas_width, canvas_height) {
-        // Create the tag:
-        var canvas_tag = "<canvas width='" + canvas_width + "' height='" + canvas_height + "' ";
-        canvas_tag += "style='border:1px dotted'></canvas>";
-        // Append it to #elements:
-        var canvas = $(canvas_tag)[0];
-        $("#elements").append(canvas);
-        // Create the context and the drawing controller:
-        var context = canvas.getContext("2d");
+    const HistogramModule = function(bins, canvas_width, canvas_height) {
+      // Create the canvas object:
+        const canvas = document.createElement("canvas");
+        Object.assign(canvas, {
+          width: canvas_width,
+          height: canvas_height,
+          style: "border:1px dotted",
+        });
+      // Append it to #elements:
+      const elements = document.getElementById("elements");
+      elements.appendChild(canvas);
 
-        // Prep the chart properties and series:
-        var datasets = [{
-            label: "Data",
-            fillColor: "rgba(151,187,205,0.5)",
-            strokeColor: "rgba(151,187,205,0.8)",
-            highlightFill: "rgba(151,187,205,0.75)",
-            highlightStroke: "rgba(151,187,205,1)",
-            data: []
-        }];
+      // Create the context and the drawing controller:
+      const context = canvas.getContext("2d");
 
-        // Add a zero value for each bin
-        for (var i in bins)
-            datasets[0].data.push(0);
+      // Prep the chart properties and series:
+      const datasets = [{
+        label: "Data",
+        fillColor: "rgba(151,187,205,0.5)",
+        strokeColor: "rgba(151,187,205,0.8)",
+        highlightFill: "rgba(151,187,205,0.75)",
+        highlightStroke: "rgba(151,187,205,1)",
+        data: []
+      }];
 
-        var data = {
-            labels: bins,
-            datasets: datasets
-        };
+      // Add a zero value for each bin
+      for (var i in bins)
+        datasets[0].data.push(0);
 
-        var options = {
-            scaleBeginsAtZero: true
-        };
+      const data = {
+        labels: bins,
+        datasets: datasets
+      };
 
-        // Create the chart object
-        var chart = new Chart(context, {type: 'bar', data: data, options: options});
+      const options = {
+        scaleBeginsAtZero: true
+      };
 
-        // Now what?
+      // Create the chart object
+      const chart = new Chart(context, {type: 'bar', data: data, options: options});
+
+      // Now what?
     };
 
 There are two methods every client-side visualization class must
@@ -384,17 +393,17 @@ With that in mind, we can add these two methods to the class:
 
 .. code:: javascript
 
-    var HistogramModule = function(bins, canvas_width, canvas_height) {
-        // ...Everything from above...
-        this.render = function(data) {
-            datasets[0].data = data;
-            chart.update();
-        };
+    const HistogramModule = function(bins, canvas_width, canvas_height) {
+      // ...Everything from above...
+      this.render = function(data) {
+        datasets[0].data = data;
+        chart.update();
+      };
 
-        this.reset = function() {
-            chart.destroy();
-            chart = new Chart(context, {type: 'bar', data: data, options: options});
-        };
+      this.reset = function() {
+        chart.destroy();
+        chart = new Chart(context, {type: 'bar', data: data, options: options});
+      };
     };
 
 Note the ``this``. before the method names. This makes them public and
