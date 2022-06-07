@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: False
       matrix:
-        os: [windows, ubuntu, macos]
+        os: [ubuntu, macos]
         python-version: ["3.10"]
         include:
           - os: ubuntu
@@ -49,16 +49,23 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/mesa_virtualenv
-        key: ${{ runner.os }}-mesa_virtualenv-${{ matrix.python-version }}-${{ hashFiles('Pipfile.lock') }}
+        key: v1-${{ runner.os }}-mesa_virtualenv-${{ matrix.python-version }}-${{ hashFiles('Pipfile.lock') }}
     - if: matrix.os == 'ubuntu'
       name: Setup virtualenv
       run: |
         python3 -m venv ~/mesa_virtualenv
-        . ~/mesa_virtualenv/bin/activate
     - name: Install dependencies
-      run: pip install wheel && pip install .[dev]
+      run: |
+        if [ -f ~/mesa_virtualenv/bin/activate ]; then
+          source ~/mesa_virtualenv/bin/activate
+        fi
+        pip install wheel && pip install .[dev]
     - name: Test with pytest
-      run: pytest --cov=mesa tests/ --cov-report=xml
+      run: |
+        if [ -f ~/mesa_virtualenv/bin/activate ]; then
+          source ~/mesa_virtualenv/bin/activate
+        fi
+        pytest --cov=mesa tests/ --cov-report=xml
     - if: matrix.os == 'ubuntu'
       name: Codecov
       uses: codecov/codecov-action@v2
