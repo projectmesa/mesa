@@ -177,26 +177,28 @@ for the TextVisualization. Here it is, in all its glory:
 
 .. code:: javascript
 
-        var TextModule = function() {
-            var tag = "<p></p>";
-            var text = $(tag)[0];
-            $("body").append(text);
+    const TextModule = function () {
+      const text = document.createElement("p");
+      text.className = "lead";
 
-            this.render = function(data) {
-                $(text).html(data);
-            };
+      // Append text tag to #elements:
+      document.getElementById("elements").appendChild(text);
 
-            this.reset = function() {
-                $(text).html("");
-            };
-        };
+      this.render = function (data) {
+        text.innerHTML = data;
+      };
+
+      this.reset = function () {
+        text.innerHTML = "";
+      };
+    };
 
 This code is the JavaScript equivalent of defining a class. When
 instantiated, a TextModule object will create a new paragraph tag and
 append it to the parent HTML page's *body*. The object will have two
 methods attached:
 
-1. *render(data)* -- uses JQuery to replace the HTML contents of the
+1. *render(data)* -- replaces the inner HTML contents of the
    paragraph with the text it gets as an input. This function will be
    called at each step of the model, to draw the data associated with
    the model coming over the websocket.
