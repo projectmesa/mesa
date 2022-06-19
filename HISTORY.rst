@@ -3,6 +3,140 @@
 Release History
 ---------------
 
+1.0.0 (2022-06-30) Quartzsite
++++++++++++++++++++++++++++++++++++++++++++
+
+**Improvements**
+
+* feat: Implement auto-conversion of function to TextElement #1346 
+* Readme: Add Matrix badge and description #1164
+* examples: Convert nodes to list when drawing random sample#1330
+* examples: Use nicer color for bank_reserves #1324 
+* examples: Use nicer color for chart #1323 
+* model: Implement initialize_data_collector #1287
+* Default batch_run to 1 CPU #1300 
+* CONTRIBUTING: Add instruction to enable git pull autorebase #1298 
+* Improve MANIFEST.in #1281 
+* refactor: Merge _remove_agent into remove_agent #1245 
+* examples: Remove usage of internal method _remove_agent #1241 
+* refactor: Make _place_agent args consistent with place_agent #1240 
+* Redirect user to GH discussions for seeking help #1237 
+* setup.py: Update setup classifiers and add python_requires for Python>=3.7 #1215 
+* The tutorial.rst doesn't mention that the Pandas DataFrame output can be in CSV #1148 
+* Deprecate neighbor_iter in favor of iter_neighbors #1184 
+* Add snippet about using numpy's random #1204 
+* docs: make windows multiprocessing code appear #1201 
+* Capitalize CSV whenever applicable #1200 
+* update intro tutorial for pandas and CSV and batch_run and windows #1196 
+* docker-compose.yml: Make it consistent with Dockerfile #1197 
+* Improve Dockerfile #1193 
+* update to include Matrix and GitHub discussion links #1179 
+* Update docs to remove old discussion forums #1171 
+* Add "Grass" curve to wolf_sheep example chart #1178 
+* feat: Implement random activation by type #1162 
+
+* mypy 
+    * mypy: Use "|" operator instead of Union/Optional #1345
+    * mypy: Improve space.py annotation, part 2 #1219 
+    * mypy: Improve annotations #1212 
+
+* Userparam class updates
+    * feat: Implement NumberInput UserParam class #1343 
+    * feat: Implement StaticText UserParam #1342 
+    * feat: Implement Choice UserParam class #1338 
+    * feat: Implement Checkbox UserParam class #1332 
+    * feat: Implement Slider UserParam class #1272
+        * examples: Convert to using Slider UserParam class #1340 
+
+* Front-end updates
+    * frontend: Add alignment options to agent portrayals in CanvasGridVisualization #1349
+    * frontend: Update Bootstrap 4.6.1 -> 5.1.3 #1325
+    * ChartModule.js: Use more semantic HTML element creation method #1319 
+    * Issue #1232; Replaced usage of var to const/let in some files #1248 
+    * [Issue 1232] Refactor NetworkModuleSigma PieChartModule TextModule JS #1246
+    * js: Update D3 from 4.13.0 to 7.4.3 #1270 
+    * support package and local css includes #1283 
+    * Upgrade to Bootstrap 4! #1282
+    * refactor: update var to const/let in InteractionHandler.js #1273 
+    * Change remaining vendored JS dependencies to be downloaded during install #1268 
+    * Download jQuery and D3 during install #1260
+    * CSS support for custom visualization element #1267 
+    * style: prettify js files #1266 
+    * refactor: Change var to const/let for remaining js files #1265 
+    * Remove NetworkModule_sigma and its dependencies #1262 
+    * js: Download bootstrap-slider during install #1257 
+    * js deps: Move Bootstrap to be inside external folder #1236 
+    * Apply prettier to NetworkModule_d3.js #1225 
+    * js: Download Bootstrap on-the-fly during install instead #1220 
+    * Install JS dependencies using Fanstatic #1195 
+    * JQuery updates
+        * examples: Remove all usage of jQuery #1356
+        * Remove jQuery dependency completely #1355
+        * refactor: frontend: Remove remaining usage of jQuery #1351 
+        * refactor: frontend: Remove usage of jQuery for most of the JS code #1348 
+        * refactor: frontend: Remove jQuery usage in CanvasHexModule.js & CanvasModule.js #1347 
+        * refactor: frontend: Remove jQuery usage in BarChartModule.js #1326 
+        * visualization: Specify tooltip without jQuery #1308
+
+* Implement simplified namespace
+    * docs: simplified namespace tutorial update #1361 
+    * examples: Convert shape_example, sugarscape_cg, virus_on_network, wolf_sheep to simple namespace #1339 
+    * Convert hex_snowflake, pd_grid, schelling to simple namespace; [BREAKING] Remove class name collision #1333 
+    * examples: Convert color_patches, conways_game_of_life, epstein_civil_violence, forest_fire to simple namespace #1331 
+    * Examples: Convert boltzmann_wealth_model_network and chart to simple namespace #1322 
+    * examples: Convert boid_flockers, boltzmann_wealth_model to simple namespace #1321
+    * examples: Convert bank_reserves to simple namespace #1317
+    * add batch_run to simple namespace #1316 
+    * Implement simpler Mesa namespace #1294
+
+* CI Updates
+    * ci: Ensure wheel is install before pip install step #1312
+    * Fix contributing (increasing black version) #1303
+    * ci: Disable PyPy for now #1254 
+    * CI: Update checkout, setup-python and cache actions to v3 #1217 
+    * CI: Split off codespell job, don't run build on doc changes #1170 
+    * ci: Add 6 min timeout for the test jobs #1194 
+    * CI: test flake: batch runner sometimes takes 6 hours then gets killed by GitHub Actions #1166 
+    * ci: Enable cache for all Python versions 🇺🇦 #1177 
+    * CI: Create Action to publish to PyPI on release #1169 
+    * CI: Python 3.6 should be removed because it has reached EOL #1165
+    * Update Black formatting (no spaces for power operator) #1160
+    * Improve code quality with static analysis #1328 
+    * CI test: Increase timeout to 10 minutes #1250 
+
+* Dependency updates 
+    * build(deps): bump cookiecutter from 2.1.0 to 2.1.1 dependencies #1360
+    * Update Pipfile.lock (dependencies) #1350, #1301, #1224, #1203, #1135 by github-actions bot 
+    * Migrate D3 from v4 to v7 #1088 
+
+
+**Fixes**
+
+* Git tags out of sync with conda and PyPi (0.8.8 and 0.8.9 missing on git) #1076
+* fix: Remove mesa.visualization.Number #1352
+* CI: the "install dependencies" step is slow #1163 
+* Readme related
+    * readme: Clarify/Update Docker instruction #1222, #1214
+    * Readme: Fix links to docs #1205 
+* Add mesa/visualization/templates/js/external to gitignore #1320
+* fix: sugarscape_cg: Use better way to check if a cell is occupied by SsAgent #1313 
+* fix double multiply of iterations in singleprocess #1310 
+* pre-commit: fix required python version, correct example commit messa… #1302 
+* fix: Make bank_reserves batch_run example work #1293 
+* Fixes #498. Replaces canvas_width with grid_rows to fill out color patches  3 - Accept easy task!!! #989 
+* update pre-commit to include jupyter; fix warning #1190 
+* fix: Grid.__getitem__: Handle Numpy integers #1181 
+* fix: Make argument order in example models consistent #1176 
+* issue template: Linkify discussions url #1239 
+* batch_run: Do not iterate values when it is a single string #1289 
+* examples: Clarify install instruction in wolf_sheep #1275 
+* test: Disable batchrunnerMP (CI: test flake: batch runner sometimes takes 6 hours then gets killed by GitHub Actions #1166) #1256 
+* examples: correcting comment in examples/pd_grid/pd_grid/agent.py #1247 
+* space: Clarify the return object of get_cell_list_contents #1242 
+* width and height were changed up #1149 
+
+
+
 0.9.0 (2022-01-31) Page
 +++++++++++++++++++++++++++++++++++++++++++
 
