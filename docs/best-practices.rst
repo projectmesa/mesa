@@ -63,7 +63,7 @@ like the built-in ``random`` library.
 When a model object is created, its random property is automatically seeded
 with the current time. The seed determines the sequence of random numbers; if
 you instantiate a model with the same seed, you will get the same results.
-To allow you to set the seed, make sure your model as a ``seed`` argument in its
+To allow you to set the seed, make sure your model has a ``seed`` argument in its
 constructor.
 
 .. code:: python
