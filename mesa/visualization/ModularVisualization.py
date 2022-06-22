@@ -276,7 +276,12 @@ class ModularServer(tornado.web.Application):
     EXCLUDE_LIST = ("width", "height")
 
     def __init__(
-        self, model_cls, visualization_elements, name="Mesa Model", model_params=None
+        self,
+        model_cls,
+        visualization_elements,
+        name="Mesa Model",
+        model_params=None,
+        package_includes=None,
     ):
         """Create a new visualization server with the given elements."""
         if model_params is None:
@@ -290,12 +295,13 @@ class ModularServer(tornado.web.Application):
         self.local_js_includes = set()
         self.local_css_includes = set()
         self.js_code = []
+        if package_includes is not None:
+            # This is custom JS/CSS files specified by the user.
+            for include_file in package_includes:
+                self._add_include(include_file)
         for element in self.visualization_elements:
             for include_file in element.package_includes:
-                if self._is_stylesheet(include_file):
-                    self.package_css_includes.add(include_file)
-                else:
-                    self.package_js_includes.add(include_file)
+                self._add_include(include_file)
             for include_file in element.local_includes:
                 if self._is_stylesheet(include_file):
                     self.local_css_includes.add(include_file)
@@ -368,6 +374,12 @@ class ModularServer(tornado.web.Application):
     @staticmethod
     def _is_stylesheet(filename):
         return filename.lower().endswith(".css")
+
+    def _add_include(self, include_file):
+        if self._is_stylesheet(include_file):
+            self.package_css_includes.add(include_file)
+        else:
+            self.package_js_includes.add(include_file)
 
     def _auto_convert_fn_to_TextElement(self, x):
         """
