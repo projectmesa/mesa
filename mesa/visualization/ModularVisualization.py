@@ -136,6 +136,7 @@ class VisualizationElement:
         local_includes: A list of JavaScript and CSS files that are local to
                         the directory that the server is being run in.
         js_code: A JavaScript code string to instantiate the element.
+        local_dir: A full path to the directory containing the local includes.
 
     Methods:
         render: Takes a model object, and produces JSON data which can be sent
@@ -147,6 +148,7 @@ class VisualizationElement:
     local_includes = []
     js_code = ""
     render_args = {}
+    local_dir = ""
 
     def __init__(self):
         pass
@@ -259,6 +261,7 @@ class ModularServer(tornado.web.Application):
         name="Mesa Model",
         port=None,
         model_params=None,
+        local_dir="",
     ):
         """
         Args:
@@ -291,13 +294,8 @@ class ModularServer(tornado.web.Application):
             tornado.web.StaticFileHandler,
             {"path": os.path.dirname(__file__) + "/templates"},
         )
-        local_handler = (
-            r"/local/(.*)",
-            tornado.web.StaticFileHandler,
-            {"path": ""},
-        )
 
-        self.handlers = [page_handler, socket_handler, static_handler, local_handler]
+        self.handlers = [page_handler, socket_handler, static_handler]
 
         self.settings = {
             "debug": True,
@@ -317,6 +315,7 @@ class ModularServer(tornado.web.Application):
         self.local_js_includes = set()
         self.local_css_includes = set()
         self.js_code = []
+        local_dirs = []
         for element in self.visualization_elements:
             for include_file in element.package_includes:
                 if self._is_stylesheet(include_file):
@@ -328,6 +327,9 @@ class ModularServer(tornado.web.Application):
                     self.local_css_includes.add(include_file)
                 else:
                     self.local_js_includes.add(include_file)
+            if len(element.local_includes) > 0:
+                if element.local_dir != "":
+                    local_dirs.append(element.local_dir)
             self.js_code.append(element.js_code)
 
         # Initializing the model
@@ -341,6 +343,15 @@ class ModularServer(tornado.web.Application):
 
         self.model_kwargs = model_params
         self.reset_model()
+
+        local_dirs.append(local_dir)  # Set this to be the last one.
+        for _local_dir in local_dirs:
+            local_handler = (
+                r"/local/(.*)",
+                tornado.web.StaticFileHandler,
+                {"path": _local_dir},
+            )
+            self.handlers.append(local_handler)
 
         # Initializing the application itself:
         super().__init__(self.handlers, **self.settings)
