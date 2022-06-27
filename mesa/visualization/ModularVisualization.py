@@ -136,6 +136,11 @@ class VisualizationElement:
         local_includes: A list of JavaScript and CSS files that are local to
                         the directory that the server is being run in.
         js_code: A JavaScript code string to instantiate the element.
+        local_dir: A full path to the directory containing the local includes.
+                   If a relative path is given, it is relative to the working
+                   directory where the server is being run. If an absolute path
+                   is given, it is used as-is. Default is the current working
+                   directory.
 
     Methods:
         render: Takes a model object, and produces JSON data which can be sent
@@ -147,6 +152,7 @@ class VisualizationElement:
     local_includes = []
     js_code = ""
     render_args = {}
+    local_dir = ""
 
     def __init__(self):
         pass
@@ -291,13 +297,7 @@ class ModularServer(tornado.web.Application):
             tornado.web.StaticFileHandler,
             {"path": os.path.dirname(__file__) + "/templates"},
         )
-        local_handler = (
-            r"/local/(.*)",
-            tornado.web.StaticFileHandler,
-            {"path": ""},
-        )
-
-        self.handlers = [page_handler, socket_handler, static_handler, local_handler]
+        self.handlers = [page_handler, socket_handler, static_handler]
 
         self.settings = {
             "debug": True,
@@ -323,11 +323,20 @@ class ModularServer(tornado.web.Application):
                     self.package_css_includes.add(include_file)
                 else:
                     self.package_js_includes.add(include_file)
-            for include_file in element.local_includes:
-                if self._is_stylesheet(include_file):
-                    self.local_css_includes.add(include_file)
-                else:
-                    self.local_js_includes.add(include_file)
+            if element.local_includes:
+                mapped_local_dir = element.__class__.__name__
+                element_file_handler = (
+                    rf"/local/{mapped_local_dir}/(.*)",
+                    tornado.web.StaticFileHandler,
+                    {"path": element.local_dir},
+                )
+                self.handlers.append(element_file_handler)
+                for include_file in element.local_includes:
+                    include_file_path = f"{mapped_local_dir}/{include_file}"
+                    if self._is_stylesheet(include_file):
+                        self.local_css_includes.add(include_file_path)
+                    else:
+                        self.local_js_includes.add(include_file_path)
             self.js_code.append(element.js_code)
 
         # Initializing the model
