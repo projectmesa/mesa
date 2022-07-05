@@ -10,7 +10,7 @@ Release History
 
 * BREAKING: Rename mesa.visualizations.TextVisualization.TextElement to ASCIIElement
 * POTENTIALLY BREAKING: Default batch_run to 1 CPU #1300 
-* Simplified namespace implements - see improvements.
+* Simplified namespace implements - see Improvements section.
 
 **Improvements**
 
