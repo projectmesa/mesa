@@ -3,37 +3,27 @@
 Release History
 ---------------
 
-1.0.0 (2022-06-30) Quartzsite
+1.0.0 (2022-07-06) Quartzsite
 +++++++++++++++++++++++++++++++++++++++++++
+
+**Special notes**
+
+* BREAKING: Rename mesa.visualizations.TextVisualization.TextElement to ASCIIElement
+* POTENTIALLY BREAKING: Default batch_run to 1 CPU #1300 
+* Simplified namespace implements - see improvements.
 
 **Improvements**
 
-* feat: Implement auto-conversion of function to TextElement #1346 
-* Readme: Add Matrix badge and description #1164
-* examples: Convert nodes to list when drawing random sample#1330
-* examples: Use nicer color for bank_reserves #1324 
-* examples: Use nicer color for chart #1323 
-* model: Implement initialize_data_collector #1287
-* Default batch_run to 1 CPU #1300 
-* CONTRIBUTING: Add instruction to enable git pull autorebase #1298 
-* Improve MANIFEST.in #1281 
-* refactor: Merge _remove_agent into remove_agent #1245 
-* examples: Remove usage of internal method _remove_agent #1241 
-* refactor: Make _place_agent args consistent with place_agent #1240 
-* Redirect user to GH discussions for seeking help #1237 
-* setup.py: Update setup classifiers and add python_requires for Python>=3.7 #1215 
-* The tutorial.rst doesn't mention that the Pandas DataFrame output can be in CSV #1148 
-* Deprecate neighbor_iter in favor of iter_neighbors #1184 
-* Add snippet about using numpy's random #1204 
-* docs: make windows multiprocessing code appear #1201 
-* Capitalize CSV whenever applicable #1200 
-* update intro tutorial for pandas and CSV and batch_run and windows #1196 
-* docker-compose.yml: Make it consistent with Dockerfile #1197 
-* Improve Dockerfile #1193 
-* update to include Matrix and GitHub discussion links #1179 
-* Update docs to remove old discussion forums #1171 
-* Add "Grass" curve to wolf_sheep example chart #1178 
-* feat: Implement random activation by type #1162 
+* Implement simplified namespace
+    * docs: simplified namespace tutorial update #1361 
+    * examples: Convert shape_example, sugarscape_cg, virus_on_network, wolf_sheep to simple namespace #1339 
+    * Convert hex_snowflake, pd_grid, schelling to simple namespace; [BREAKING] Remove class name collision #1333 
+    * examples: Convert color_patches, conways_game_of_life, epstein_civil_violence, forest_fire to simple namespace #1331 
+    * Examples: Convert boltzmann_wealth_model_network and chart to simple namespace #1322 
+    * examples: Convert boid_flockers, boltzmann_wealth_model to simple namespace #1321
+    * examples: Convert bank_reserves to simple namespace #1317
+    * add batch_run to simple namespace #1316 
+    * Implement simpler Mesa namespace #1294
 
 * mypy 
     * mypy: Use "|" operator instead of Union/Optional #1345
@@ -78,17 +68,6 @@ Release History
         * refactor: frontend: Remove jQuery usage in BarChartModule.js #1326 
         * visualization: Specify tooltip without jQuery #1308
 
-* Implement simplified namespace
-    * docs: simplified namespace tutorial update #1361 
-    * examples: Convert shape_example, sugarscape_cg, virus_on_network, wolf_sheep to simple namespace #1339 
-    * Convert hex_snowflake, pd_grid, schelling to simple namespace; [BREAKING] Remove class name collision #1333 
-    * examples: Convert color_patches, conways_game_of_life, epstein_civil_violence, forest_fire to simple namespace #1331 
-    * Examples: Convert boltzmann_wealth_model_network and chart to simple namespace #1322 
-    * examples: Convert boid_flockers, boltzmann_wealth_model to simple namespace #1321
-    * examples: Convert bank_reserves to simple namespace #1317
-    * add batch_run to simple namespace #1316 
-    * Implement simpler Mesa namespace #1294
-
 * CI Updates
     * ci: Ensure wheel is install before pip install step #1312
     * Fix contributing (increasing black version) #1303
@@ -108,6 +87,33 @@ Release History
     * build(deps): bump cookiecutter from 2.1.0 to 2.1.1 dependencies #1360
     * Update Pipfile.lock (dependencies) #1350, #1301, #1224, #1203, #1135 by github-actions bot 
     * Migrate D3 from v4 to v7 #1088 
+
+* Other Improvements
+    * feat: Implement auto-conversion of function to Te xtElement #1346 
+    * Readme: Add Matrix badge and description #1164
+    * examples: Convert nodes to list when drawing random sample#1330
+    * examples: Use nicer color for bank_reserves #1324 
+    * examples: Use nicer color for chart #1323 
+    * model: Implement initialize_data_collector #1287
+    * CONTRIBUTING: Add instruction to enable git pull autorebase #1298 
+    * Improve MANIFEST.in #1281 
+    * refactor: Merge _remove_agent into remove_agent #1245 
+    * examples: Remove usage of internal method _remove_agent #1241 
+    * refactor: Make _place_agent args consistent with place_agent #1240 
+    * Redirect user to GH discussions for seeking help #1237 
+    * setup.py: Update setup classifiers and add python_requires for Python>=3.7 #1215 
+    * The tutorial.rst doesn't mention that the Pandas DataFrame output can be in CSV #1148 
+    * Deprecate neighbor_iter in favor of iter_neighbors #1184 
+    * Add snippet about using numpy's random #1204 
+    * docs: make windows multiprocessing code appear #1201 
+    * Capitalize CSV whenever applicable #1200 
+    * update intro tutorial for pandas and CSV and batch_run and windows #1196 
+    * docker-compose.yml: Make it consistent with Dockerfile #1197 
+    * Improve Dockerfile #1193 
+    * update to include Matrix and GitHub discussion links #1179 
+    * Update docs to remove old discussion forums #1171 
+    * Add "Grass" curve to wolf_sheep example chart #1178 
+    * feat: Implement random activation by type #1162 
 
 
 **Fixes**
