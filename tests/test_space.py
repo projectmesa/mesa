@@ -24,6 +24,30 @@ REMOVAL_TEST_AGENTS = [
     (31, 41),
     (55, 32),
 ]
+TEST_AGENTS_PERF = 200000
+
+
+@pytest.mark.skip(reason="a perf test will slow down the CI")
+class TestSpacePerformance(unittest.TestCase):
+    """
+    Testing adding many agents for a continuous space.
+    """
+
+    def setUp(self):
+        """
+        Create a test space and populate with Mock Agents.
+        """
+        self.space = ContinuousSpace(10, 10, True, -10, -10)
+
+    def test_agents_add_many(self):
+        """
+        Add many agents
+        """
+        positions = np.random.rand(TEST_AGENTS_PERF, 2)
+        for i in range(TEST_AGENTS_PERF):
+            a = MockAgent(i, None)
+            pos = [positions[i, 0], positions[i, 1]]
+            self.space.place_agent(a, pos)
 
 
 class TestSpaceToroidal(unittest.TestCase):

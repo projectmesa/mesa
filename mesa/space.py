@@ -747,8 +747,11 @@ class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position.
 
     Assumes that all agents are point objects, and have a pos property storing
-    their position as an (x, y) tuple. This class uses a numpy array internally
-    to store agent objects, to speed up neighborhood lookups.
+    their position as an (x, y) tuple.
+
+    This class uses a numpy array internally to store agent objects, to speed
+    up neighborhood lookups. This array is calculated on the first neighborhood
+    lookup, and is reused (and updated) until agents are added or removed.
     """
 
     _grid = None
@@ -782,7 +785,23 @@ class ContinuousSpace:
 
         self._agent_points: npt.NDArray[FloatCoordinate] | None = None
         self._index_to_agent: Dict[int, Agent] = {}
-        self._agent_to_index: Dict[Agent, int] = {}
+        self._agent_to_index: Dict[Agent, int | None] = {}
+
+    def _build_agent_cache(self):
+        """Cache Agent positions to speed up neighbors calculations."""
+        self._index_to_agent = {}
+        agents = self._agent_to_index.keys()
+        for idx, agent in enumerate(agents):
+            self._agent_to_index[agent] = idx
+            self._index_to_agent[idx] = agent
+        self._agent_points = np.array(
+            [self._index_to_agent[idx].pos for idx in range(len(agents))]
+        )
+
+    def _invalidate_agent_cache(self):
+        """Clear cached data of Agents and positions in the space."""
+        self._agent_points = None
+        self._index_to_agent = {}
 
     def place_agent(self, agent: Agent, pos: FloatCoordinate) -> None:
         """Place a new agent in the space.
@@ -791,13 +810,9 @@ class ContinuousSpace:
             agent: Agent object to place.
             pos: Coordinate tuple for where to place the agent.
         """
+        self._invalidate_agent_cache()
+        self._agent_to_index[agent] = None
         pos = self.torus_adj(pos)
-        if self._agent_points is None:
-            self._agent_points = np.array([pos])
-        else:
-            self._agent_points = np.append(self._agent_points, np.array([pos]), axis=0)
-        self._index_to_agent[self._agent_points.shape[0] - 1] = agent
-        self._agent_to_index[agent] = self._agent_points.shape[0] - 1
         agent.pos = pos
 
     def move_agent(self, agent: Agent, pos: FloatCoordinate) -> None:
@@ -808,10 +823,14 @@ class ContinuousSpace:
             pos: Coordinate tuple to move the agent to.
         """
         pos = self.torus_adj(pos)
-        idx = self._agent_to_index[agent]
-        self._agent_points[idx, 0] = pos[0]
-        self._agent_points[idx, 1] = pos[1]
         agent.pos = pos
+
+        if self._agent_points is not None:
+            # instead of invalidating the full cache,
+            # apply the move to the cached values
+            idx = self._agent_to_index[agent]
+            self._agent_points[idx, 0] = pos[0]
+            self._agent_points[idx, 1] = pos[1]
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove an agent from the simulation.
@@ -821,17 +840,9 @@ class ContinuousSpace:
         """
         if agent not in self._agent_to_index:
             raise Exception("Agent does not exist in the space")
-        idx = self._agent_to_index[agent]
-        del self._agent_to_index[agent]
-        max_idx = max(self._index_to_agent.keys())
-        # Delete the agent's position and decrement the index/agent mapping
-        self._agent_points = np.delete(self._agent_points, idx, axis=0)
-        for a, index in self._agent_to_index.items():
-            if index > idx:
-                self._agent_to_index[a] = index - 1
-                self._index_to_agent[index - 1] = a
-        # The largest index is now redundant
-        del self._index_to_agent[max_idx]
+        self._agent_to_index.pop(agent)
+
+        self._invalidate_agent_cache()
         agent.pos = None
 
     def get_neighbors(
@@ -847,6 +858,9 @@ class ContinuousSpace:
                             neighbors of a given agent, True will include that
                             agent in the results.
         """
+        if self._agent_points is None:
+            self._build_agent_cache()
+
         deltas = np.abs(self._agent_points - np.array(pos))
         if self.torus:
             deltas = np.minimum(deltas, self.size - deltas)
