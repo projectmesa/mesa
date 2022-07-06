@@ -89,7 +89,7 @@ Release History
     * Migrate D3 from v4 to v7 #1088 
 
 * Other Improvements
-    * feat: Implement auto-conversion of function to Te xtElement #1346 
+    * feat: Implement auto-conversion of function to TextElement #1346 
     * Readme: Add Matrix badge and description #1164
     * examples: Convert nodes to list when drawing random sample#1330
     * examples: Use nicer color for bank_reserves #1324 
