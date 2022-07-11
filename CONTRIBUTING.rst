@@ -38,12 +38,14 @@ discuss via `Matrix`_ OR via `an issue`_.
 - Push your changes to your fork on Github: ``git push origin NAME_OF_BRANCH``.
 - `Create a pull request`_.
 - Describe the change w/ ticket number(s) that the code fixes.
+- Format your commit message as per `Tim Pope's guideline`_.
 
 .. _`Clone your repository` : https://help.github.com/articles/cloning-a-repository/
 .. _`GH Actions build` : https://github.com/projectmesa/mesa/actions/workflows/build_lint.yml
 .. _`Create a pull request` : https://help.github.com/articles/creating-a-pull-request/
 .. _`pre-commit` : https://github.com/pre-commit/pre-commit
 .. _`black` : https://github.com/psf/black
+.. _`Tim Pope's guideline` : https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 
 
 Testing and Code Standards
