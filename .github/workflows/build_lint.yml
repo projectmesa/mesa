@@ -13,6 +13,13 @@ on:
       - '**.md'
       - '**.rst'
 
+# This will cancel previous run if a newer job that obsoletes the said previous
+# run, is started.
+# Based on https://github.com/zulip/zulip/commit/4a11642cee3c8aec976d305d51a86e60e5d70522
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.run_id }}"
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}-latest
