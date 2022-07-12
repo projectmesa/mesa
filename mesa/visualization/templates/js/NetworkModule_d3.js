@@ -14,8 +14,7 @@ const NetworkModule = function (svg_width, svg_height) {
   const height = +svg.attr("height");
   const g = svg
     .append("g")
-    .classed("network_root", true)
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    .classed("network_root", true);
 
   const tooltip = d3
     .select("body")
@@ -29,6 +28,11 @@ const NetworkModule = function (svg_width, svg_height) {
     });
 
   svg.call(zoom);
+
+  svg.call(
+    zoom.transform,
+    d3.zoomIdentity.translate(width / 2, height / 2)
+  );
 
   const links = g.append("g").attr("class", "links");
 
