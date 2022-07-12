@@ -23,11 +23,12 @@ const NetworkModule = function (svg_width, svg_height) {
     .attr("class", "d3tooltip")
     .style("opacity", 0);
 
-  svg.call(
-    d3.zoom().on("zoom", () => {
-      g.attr("transform", d3.event.transform);
-    })
-  );
+  const zoom = d3.zoom()
+    .on("zoom", (event) => {
+      g.attr("transform", event.transform);
+    });
+
+  svg.call(zoom);
 
   const links = g.append("g").attr("class", "links");
 
