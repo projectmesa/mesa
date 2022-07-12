@@ -8,7 +8,7 @@ import numpy as np
 
 import mesa
 
-from .agents import SsAgent, Sugar, Spice
+from .agents import Trader, Sugar, Spice
 
 
 def mean(x):
@@ -35,7 +35,6 @@ class SugarscapeG1mt(mesa.Model):
     def __init__(self, width=50, height=50, initial_population=100, seed=42):
         """
         Create a new Constant Growback model with the given parameters.
-
         Args:
             initial_population: Number of population to start with
         """
@@ -49,13 +48,13 @@ class SugarscapeG1mt(mesa.Model):
         self.grid = mesa.space.MultiGrid(self.width, self.height, torus=False)
         self.datacollector = mesa.DataCollector(
             {
-                "SsAgent": lambda m: m.schedule.get_type_count(SsAgent),
+                "Trader": lambda m: m.schedule.get_type_count(Trader),
                 "Trade volume": lambda m: sum(
-                    len(a.prices) for a in m.schedule.agents_by_type[SsAgent].values()
+                    len(a.prices) for a in m.schedule.agents_by_type[Trader].values()
                 ),
                 "Price": lambda m: geometric_mean(
                     flatten(
-                        [a.prices for a in m.schedule.agents_by_type[SsAgent].values()]
+                        [a.prices for a in m.schedule.agents_by_type[Trader].values()]
                     )
                 ),
             },
@@ -63,7 +62,7 @@ class SugarscapeG1mt(mesa.Model):
 
         # Create sugar
         sugar_distribution = np.genfromtxt("sugarscape_g1mt/sugar-map.txt")
-        spice_distribution = sugar_distribution.T
+        spice_distribution = np.flip(sugar_distribution, 1)
         for _, x, y in self.grid.coord_iter():
             max_sugar = sugar_distribution[x, y]
             if max_sugar > 0:
@@ -89,7 +88,7 @@ class SugarscapeG1mt(mesa.Model):
             metabolism_sugar = self.random.randrange(1, 3)
             metabolism_spice = self.random.randrange(1, 3)
             vision = self.random.randrange(1, 6)
-            ssa = SsAgent(
+            ssa = Trader(
                 (x, y),
                 self,
                 False,
@@ -110,27 +109,27 @@ class SugarscapeG1mt(mesa.Model):
             sugar.step()
         for spice in self.schedule.agents_by_type[Spice].values():
             spice.step()
-        ssAgents = self.schedule.agents_by_type[SsAgent].values()
-        for agent in ssAgents:
+        Traders = self.schedule.agents_by_type[Trader].values()
+        for agent in Traders:
             agent.move()
-        for agent in ssAgents:
+        for agent in Traders:
             agent.eat()
-        for agent in list(ssAgents):
+        for agent in list(Traders):
             agent.maybe_die()
-        for agent in ssAgents:
+        for agent in Traders:
             agent.prices = agent.trade_with_neighbors()
 
         # collect data
         self.datacollector.collect(self)
         if self.verbose:
-            print([self.schedule.time, self.schedule.get_type_count(SsAgent)])
+            print([self.schedule.time, self.schedule.get_type_count(Trader)])
 
     def run_model(self, step_count=200):
 
         if self.verbose:
             print(
                 "Initial number Sugarscape Agent: ",
-                self.schedule.get_type_count(SsAgent),
+                self.schedule.get_type_count(Trader),
             )
 
         for i in range(step_count):
@@ -140,7 +139,7 @@ class SugarscapeG1mt(mesa.Model):
             print("")
             print(
                 "Final number Sugarscape Agent: ",
-                self.schedule.get_type_count(SsAgent),
+                self.schedule.get_type_count(Trader),
             )
 
             # For plotting purpose TODO remove this.

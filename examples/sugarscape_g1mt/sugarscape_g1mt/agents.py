@@ -8,11 +8,8 @@ import mesa
 
 def get_distance(pos_1, pos_2):
     """Calculate Euclidean distance between two positions.
-
-
     Args:
         pos_1, pos_2: Coordinate tuples for both points.
-
     """
     x1, y1 = pos_1
     x2, y2 = pos_2
@@ -53,7 +50,7 @@ class Spice(mesa.Agent):
         self.amount = min([self.max_spice, self.amount + 1])
 
 
-class SsAgent(mesa.Agent):
+class Trader(mesa.Agent):
     def __init__(
         self,
         pos,
@@ -102,16 +99,16 @@ class SsAgent(mesa.Agent):
             return spice_patch.amount
         return 0
 
-    def get_ssagent(self, pos):
+    def get_trader(self, pos):
         this_cell = self.model.grid.get_cell_list_contents([pos])
         for agent in this_cell:
-            if isinstance(agent, SsAgent):
+            if isinstance(agent, Trader):
                 return agent
 
     def is_occupied(self, pos):
         this_cell = self.model.grid.get_cell_list_contents([pos])
         for a in this_cell:
-            if isinstance(a, SsAgent):
+            if isinstance(a, Trader):
                 return True
         return False
 
@@ -240,7 +237,7 @@ class SsAgent(mesa.Agent):
     def trade_with_neighbors(self):
         # von Neumann neighbors
         neighbor_agents = [
-            self.get_ssagent(pos)
+            self.get_trader(pos)
             for pos in self.model.grid.get_neighborhood(
                 self.pos, self.moore, False, radius=self.vision
             )
