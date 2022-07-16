@@ -25,8 +25,9 @@ class Sugar(mesa.Agent):
     - grows 1 amount of sugar at each turn (Epstein's rule G1).
     """
 
-    def __init__(self, pos, model, max_sugar):
-        super().__init__(pos, model)
+    def __init__(self, unique_id, model, pos, max_sugar):
+        super().__init__(unique_id, model)
+        self.pos = pos
         self.amount = max_sugar
         self.max_sugar = max_sugar
 
@@ -41,8 +42,9 @@ class Spice(mesa.Agent):
     - grows 1 amount of spice at each turn (Epstein's rule G1).
     """
 
-    def __init__(self, pos, model, max_spice):
-        super().__init__(pos, model)
+    def __init__(self, unique_id, model, pos, max_spice):
+        super().__init__(unique_id, model)
+        self.pos = pos
         self.amount = max_spice
         self.max_spice = max_spice
 
@@ -53,8 +55,9 @@ class Spice(mesa.Agent):
 class Trader(mesa.Agent):
     def __init__(
         self,
-        pos,
+        id,
         model,
+        pos,
         moore=False,
         sugar=0,
         spice=0,
@@ -62,7 +65,7 @@ class Trader(mesa.Agent):
         metabolism_spice=0,
         vision=0,
     ):
-        super().__init__(pos, model)
+        super().__init__(id, model)
         self.pos = pos
         self.moore = moore
         self.sugar = sugar

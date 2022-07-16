@@ -63,18 +63,22 @@ class SugarscapeG1mt(mesa.Model):
         # Create sugar
         sugar_distribution = np.genfromtxt("sugarscape_g1mt/sugar-map.txt")
         spice_distribution = np.flip(sugar_distribution, 1)
+        # ensure each agent has a unique _id
+        agent_id = 0
         for _, x, y in self.grid.coord_iter():
             max_sugar = sugar_distribution[x, y]
             if max_sugar > 0:
-                sugar = Sugar((x, y), self, max_sugar)
+                sugar = Sugar(agent_id, self, (x, y), max_sugar)
                 self.grid.place_agent(sugar, (x, y))
                 self.schedule.add(sugar)
+                agent_id += 1
             # Same, but spice
             max_spice = spice_distribution[x, y]
             if max_spice > 0:
-                spice = Spice((x, y), self, max_spice)
+                spice = Spice(agent_id, self, (x, y), max_spice)
                 self.grid.place_agent(spice, (x, y))
                 self.schedule.add(spice)
+                agent_id += 1
 
         # Create agent:
         for i in range(self.initial_population):
@@ -89,8 +93,9 @@ class SugarscapeG1mt(mesa.Model):
             metabolism_spice = self.random.randrange(1, 3)
             vision = self.random.randrange(1, 6)
             ssa = Trader(
-                (x, y),
+                agent_id,
                 self,
+                (x, y),
                 False,
                 sugar,
                 spice,
@@ -100,6 +105,7 @@ class SugarscapeG1mt(mesa.Model):
             )
             self.grid.place_agent(ssa, (x, y))
             self.schedule.add(ssa)
+            agent_id += 1
 
         self.running = True
         self.datacollector.collect(self)
