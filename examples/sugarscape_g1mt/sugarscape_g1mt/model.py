@@ -111,19 +111,7 @@ class SugarscapeG1mt(mesa.Model):
         self.datacollector.collect(self)
 
     def step(self):
-        for sugar in self.schedule.agents_by_type[Sugar].values():
-            sugar.step()
-        for spice in self.schedule.agents_by_type[Spice].values():
-            spice.step()
-        Traders = self.schedule.agents_by_type[Trader].values()
-        for agent in Traders:
-            agent.move()
-        for agent in Traders:
-            agent.eat()
-        for agent in list(Traders):
-            agent.maybe_die()
-        for agent in Traders:
-            agent.prices = agent.trade_with_neighbors()
+        self.schedule.step()
 
         # collect data
         self.datacollector.collect(self)

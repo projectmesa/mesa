@@ -266,8 +266,8 @@ class Trader(mesa.Agent):
 
         # Our extra sanity check. The agent must still have enough resource
         # before the trade.
-        assert self.sugar > 0
-        assert self.spice > 0
+        # assert self.sugar > 0
+        # assert self.spice > 0
 
         # This may happen if other agent no longer has enough resource, but has
         # yet to execute maybe_die.
@@ -340,3 +340,9 @@ class Trader(mesa.Agent):
             spice = self.spice
         # See GAS page 102 equation 3.
         return (spice / self.metabolism_spice) / (sugar / self.metabolism_sugar)
+
+    def step(self):
+        self.move()
+        self.eat()
+        self.trade_with_neighbors()
+        self.maybe_die()
