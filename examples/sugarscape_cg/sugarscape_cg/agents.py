@@ -18,8 +18,10 @@ def get_distance(pos_1, pos_2):
 
 
 class SsAgent(mesa.Agent):
-    def __init__(self, pos, model, moore=False, sugar=0, metabolism=0, vision=0):
-        super().__init__(pos, model)
+    def __init__(
+        self, unique_id, pos, model, moore=False, sugar=0, metabolism=0, vision=0
+    ):
+        super().__init__(unique_id, model)
         self.pos = pos
         self.moore = moore
         self.sugar = sugar
@@ -73,8 +75,8 @@ class SsAgent(mesa.Agent):
 
 
 class Sugar(mesa.Agent):
-    def __init__(self, pos, model, max_sugar):
-        super().__init__(pos, model)
+    def __init__(self, unique_id, pos, model, max_sugar):
+        super().__init__(unique_id, model)
         self.amount = max_sugar
         self.max_sugar = max_sugar
 
