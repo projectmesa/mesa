@@ -652,15 +652,13 @@ applies each agent-level collection function to each agent currently in
 the schedule, associating the resulting value with the step of the
 model, and the agent’s ``unique_id``.
 
-Let’s add a DataCollector to the model with |mesa.DataCollector|__,
+Let’s add a DataCollector to the model with
+`mesa.DataCollector <https://github.com/projectmesa/mesa/blob/main/mesa/datacollection.py>`__,
 and collect two variables. At the agent level, we want to collect every
 agent’s wealth at every step. At the model level, let’s measure the
 model’s `Gini
 Coefficient <https://en.wikipedia.org/wiki/Gini_coefficient>`__, a
 measure of wealth inequality.
-
-.. |mesa.DataCollector| replace:: ``mesa.DataCollector``
-__ mesa.DataCollector: https://github.com/projectmesa/mesa/blob/main/mesa/datacollection.py
 
 .. code:: ipython3
 
@@ -898,11 +896,8 @@ Like we mentioned above, you usually won’t run a model only once, but
 multiple times, with fixed parameters to find the overall distributions
 the model generates, and with varying parameters to analyze how they
 drive the model’s outputs and behaviors. Instead of needing to write
-nested for-loops for each model, Mesa provides a |batch_run|__ function
-which automates it for you.
-
-.. |batch_run| replace:: ``batch_run``
-__ batch_run: https://github.com/projectmesa/mesa/blob/main/mesa/batchrunner.py
+nested for-loops for each model, Mesa provides a `batch_run <https://github.com/projectmesa/mesa/blob/main/mesa/batchrunner.py>`__
+function which automates it for you.
 
 The batch runner also requires an additional variable ``self.running``
 for the MoneyModel class. This variable enables conditional shut off of
