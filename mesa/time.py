@@ -236,7 +236,7 @@ class RandomActivationByType(BaseScheduler):
             agent: An Agent to be added to the schedule.
         """
 
-        self._agents[agent.unique_id] = agent
+        super().add(agent)
         agent_class: Type[Agent] = type(agent)
         self.agents_by_type[agent_class][agent.unique_id] = agent
 
