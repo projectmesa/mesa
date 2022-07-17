@@ -44,9 +44,11 @@ class SugarscapeCg(mesa.Model):
         import numpy as np
 
         sugar_distribution = np.genfromtxt("sugarscape_cg/sugar-map.txt")
+        agent_id = 0
         for _, x, y in self.grid.coord_iter():
             max_sugar = sugar_distribution[x, y]
-            sugar = Sugar((x, y), self, max_sugar)
+            sugar = Sugar(agent_id, (x, y), self, max_sugar)
+            agent_id += 1
             self.grid.place_agent(sugar, (x, y))
             self.schedule.add(sugar)
 
@@ -57,7 +59,8 @@ class SugarscapeCg(mesa.Model):
             sugar = self.random.randrange(6, 25)
             metabolism = self.random.randrange(2, 4)
             vision = self.random.randrange(1, 6)
-            ssa = SsAgent((x, y), self, False, sugar, metabolism, vision)
+            ssa = SsAgent(agent_id, (x, y), self, False, sugar, metabolism, vision)
+            agent_id += 1
             self.grid.place_agent(ssa, (x, y))
             self.schedule.add(ssa)
 
