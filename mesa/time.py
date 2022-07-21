@@ -145,6 +145,9 @@ class SimultaneousActivation(BaseScheduler):
         agent_keys = list(self._agents.keys())
         for agent_key in agent_keys:
             self._agents[agent_key].step()
+        # We recompute the keys because some agents might have been removed in
+        # the previous loop.
+        agent_keys = list(self._agents.keys())
         for agent_key in agent_keys:
             self._agents[agent_key].advance()
         self.steps += 1
