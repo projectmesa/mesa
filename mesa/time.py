@@ -200,6 +200,9 @@ class StagedActivation(BaseScheduler):
         for stage in self.stage_list:
             for agent_key in agent_keys:
                 getattr(self._agents[agent_key], stage)()  # Run stage
+            # We recompute the keys because some agents might have been removed
+            # in the previous loop.
+            agent_keys = list(self._agents.keys())
             if self.shuffle_between_stages:
                 self.model.random.shuffle(agent_keys)
             self.time += self.stage_time
