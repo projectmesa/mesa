@@ -226,6 +226,19 @@ class TestRandomActivationByType(TestCase):
         # one step for each of 2 agents
         assert all(map(lambda x: x == 1, agent_steps))
 
+    def test_add_non_unique_ids(self):
+        """
+        Test that adding agent with duplicate ids result in an error.
+        TODO: we need to run this test on all schedulers, not just
+        RandomActivationByType.
+        """
+        model = MockModel(activation=RANDOM_BY_TYPE)
+        a = MockAgent(0, None)
+        b = MockAgent(0, None)
+        model.schedule.add(a)
+        with self.assertRaises(Exception):
+            model.schedule.add(b)
+
 
 if __name__ == "__main__":
     unittest.main()
