@@ -156,4 +156,6 @@ To quickly spin up a model visualization, you might do something like:
 
 This will launch the browser-based visualization, on the default port 8521.
 
+To change the port, set environment variable ``PORT=<desired port>`` or call ``server.launch(port=<desired port>)``. 
 
+To add a path segment to the URL, e.g. to publish the model at ``localhost:8521/model``, set environment variable ``URLPATH=model``.

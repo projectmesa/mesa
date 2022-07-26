@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <head>
 	<title>{{ model_name }} (Mesa visualization)</title>
-    <link href="/static/external/bootstrap-5.1.3-dist/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
-    <link href="/static/external/bootstrap-slider-11.0.2/dist/css/bootstrap-slider.min.css" type="text/css" rel="stylesheet" />
-    <link href="/static/css/visualization.css" type="text/css" rel="stylesheet" />
+    <link href="./static/external/bootstrap-4.6.1-dist/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <link href="./static/external/bootstrap-switch-3.3.4/dist/css/bootstrap3/bootstrap-switch.min.css" type="text/css" rel="stylesheet" />
+    <link href="./static/external/bootstrap-slider-11.0.2/dist/css/bootstrap-slider.min.css" type="text/css" rel="stylesheet" />
+    <link href="./static/css/visualization.css" type="text/css" rel="stylesheet" />
 
     <!-- CSS includes go here -->
     {% for file_name in package_css_includes %}
-        <link href="/static/css/{{ file_name }}" type="text/css" rel="stylesheet" />
+        <link href="./static/css/{{ file_name }}" type="text/css" rel="stylesheet" />
     {% end %}
     {% for file_name in local_css_includes %}
-        <link href="/local/{{ file_name }}" type="text/css" rel="stylesheet" />
+        <link href="./local/{{ file_name }}" type="text/css" rel="stylesheet" />
     {% end %}
 
 	<!-- This is the Tornado template for the Modular Visualization. The Javascript code opens a WebSocket connection to
@@ -80,22 +81,24 @@
     </div>
 
     <!-- Bottom-load all JavaScript dependencies -->
-    <script src="/static/external/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/external/bootstrap-slider-11.0.2/dist/bootstrap-slider.min.js"></script>
+    <script src="./static/js/external/jquery-2.2.4.min.js"></script>
+    <script src="./static/external/bootstrap-4.6.1-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./static/external/bootstrap-switch-3.3.4/dist/js/bootstrap-switch.min.js"></script>
+    <script src="./static/external/bootstrap-slider-11.0.2/dist/bootstrap-slider.min.js"></script>
 
     <!-- Script includes go here -->
 	{% for file_name in package_js_includes %}
-		<script src="/static/js/{{ file_name }}" type="text/javascript"></script>
+		<script src="./static/js/{{ file_name }}" type="text/javascript"></script>
 	{% end %}
 	{% for file_name in local_js_includes %}
-		<script src="/local/{{ file_name }}" type="text/javascript"></script>
+		<script src="./local/{{ file_name }}" type="text/javascript"></script>
 	{% end %}
 
     <!-- template-specific code snippets here -->
     <script>
         var port = {{ port }};
     </script>
-    <script src="/static/js/runcontrol.js"></script>
+    <script src="./static/js/runcontrol.js"></script>
 
     <!-- Element-specific scripts go here -->
     <script>

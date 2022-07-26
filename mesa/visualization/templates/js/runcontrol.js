@@ -131,8 +131,8 @@ resetModelButton.onclick = () => controller.reset();
 /** Open the websocket connection; support TLS-specific URLs when appropriate */
 const ws = new WebSocket(
   (window.location.protocol === "https:" ? "wss://" : "ws://") +
-    location.host +
-    "/ws"
+    location.host + location.pathname + 
+    "ws"
 );
 
 /**
