@@ -80,7 +80,7 @@ def batch_run(
 
     results: List[Dict[str, Any]] = []
 
-    with tqdm(total_iterations, disable=not display_progress) as pbar:
+    with tqdm(total=total_iterations, disable=not display_progress) as pbar:
         iteration_counter: Counter[Tuple[Any, ...]] = Counter()
 
         def _fn(paramValues, rawdata):
