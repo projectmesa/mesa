@@ -13,8 +13,11 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "@mantine/core": "^4.2.9",
+    "@mantine/hooks": "^4.2.9",
     "bootstrap": "^5.1.3",
     "bootstrap-slider": "^11.0.2",
+    "emotion": "^11.0.0",
     "jquery": "^3.6.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0"
@@ -23,8 +26,12 @@
     "@types/bootstrap-slider": "^11.0.2",
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
     "esbuild": "^0.14.39",
-    "eslint": "^8.15.0",
+    "eslint": "^8.20.0",
+    "eslint-plugin-react": "^7.30.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^2.6.2"
   }
 }

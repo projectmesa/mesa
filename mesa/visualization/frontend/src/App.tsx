@@ -1,8 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useWebSocket } from "./useWebsocket";
-import Slider from "bootstrap-slider";
-import "bootstrap-slider/dist/css/bootstrap-slider.min.css";
-import { Sidebar } from "./Sidebar";
+import { Sidebar } from "./components/Sidebar";
+import { Aside, Divider, Group, Header, Slider } from "@mantine/core";
+import { css } from "@emotion/css";
+import { ControlButton } from "./components/ControlButton";
+
+declare global {
+  interface Window {
+    control: {
+      tick: number;
+    };
+    elements: { render: (vizState: unknown) => void }[];
+    initElements: () => void;
+  }
+}
+
+window.control = { tick: 0 };
+window.elements = [];
 
 export const App = () => {
   const model_name = "Model Name";
@@ -13,34 +27,23 @@ export const App = () => {
 
   const { sendJSON, currentStep, done, vizState, modelParams } = useWebSocket();
 
-  const requestNextStep = () => {
+  const requestNextStep = useCallback(() => {
     sendJSON({
       type: "get_step",
       data: { step: currentStep + 1 },
     });
-  };
+  }, [currentStep, sendJSON]);
 
   useEffect(() => {
-    window.control = { tick: 0 };
-    window.elements = [];
     window.initElements();
-    const fpsControl = new Slider(document.querySelector("#fps"), {
-      max: 20,
-      min: 0,
-      value: fps,
-      ticks: [0, 20],
-      ticks_labels: [0, 20],
-      ticks_position: [0, 100],
-    });
-
-    fpsControl.on("change", () => setFps(fpsControl.getValue()));
+    sendJSON({ type: "reset" });
 
     // cleanup function only relevant for react development mode
     return () => {
       const elementsTopbar = document.getElementById("elements-topbar");
       const elements = document.getElementById("elements");
 
-      if (elements) {
+      if (elements && elementsTopbar) {
         elements.innerHTML = "";
         elements.appendChild(elementsTopbar);
         window.elements = [];
@@ -54,7 +57,9 @@ export const App = () => {
   }, [currentStep]);
 
   useEffect(() => {
-    if (!vizState) return;
+    if (!vizState) {
+      return;
+    }
     window.elements.forEach((element, index) => {
       element.render(vizState[index]);
     });
@@ -68,7 +73,7 @@ export const App = () => {
 
       return () => clearTimeout(timeout);
     }
-  }, [running, done, currentStep, fps]);
+  }, [running, done, currentStep, fps, requestNextStep]);
 
   const handleClickStartStop = () => {
     setRunning(!running);
@@ -84,98 +89,50 @@ export const App = () => {
   };
 
   return (
-    // Navbar
     <>
-      <nav className="navbar navbar-dark bg-dark navbar-static-top navbar-expand-lg mb-3">
-        <div className="container">
-          <button
-            type="button"
-            className="navbar-toggler collapsed"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbar"
-            aria-expanded="false"
-            aria-controls="navbar"
-          >
-            <span className="visually-hidden">Toggle navigation</span>
-            &#x2630;
-          </button>
-          <a className="navbar-brand" href="#">
-            {model_name}
-          </a>
-          <div id="navbar" className="navbar-collapse collapse">
-            <ul className="nav navbar-nav">
-              <li className="nav-item">
-                <a
-                  href="#"
-                  data-bs-toggle="modal"
-                  data-bs-target="#about"
-                  data-bs-title="About"
-                  data-bs-content="#about-content"
-                  className="nav-link"
-                >
-                  About
-                </a>
-              </li>
-            </ul>
-            <ul className="nav navbar-nav ms-auto">
-              <li id="play-pause" className="nav-item">
-                <a href="#" className="nav-link" onClick={handleClickStartStop}>
-                  {running ? "Stop" : "Start"}
-                </a>
-              </li>
-              <li id="step" className="nav-item">
-                <a href="#" className="nav-link" onClick={handleClickStep}>
-                  Step
-                </a>
-              </li>
-              <li id="reset" className="nav-item">
-                <a href="#" className="nav-link" onClick={handleClickReset}>
-                  Reset
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-      <div className="container d-flex flex-row">
-        <Sidebar modelParams={modelParams} send={sendJSON} />
-        <div className="col-xl-8 col-lg-8 col-md-8 col-9" id="elements">
+      <Header
+        height={56}
+        styles={(theme) => ({
+          root: {
+            backgroundColor: theme.colors.dark[6],
+            display: "flex",
+            flexDirection: "row",
+          },
+        })}
+      >
+        <h3 style={{ color: "grey" }}>{model_name}</h3>
+        <Group position="right" style={{ flex: 1 }}>
+          <ControlButton onClick={handleClickStartStop}>
+            {running ? "Stop" : "Start"}
+          </ControlButton>
+          <ControlButton onClick={handleClickStep}>Step</ControlButton>
+          <ControlButton onClick={handleClickReset}>Reset</ControlButton>
+        </Group>
+      </Header>
+      <div
+        className={css`
+          display: flex;
+          padding: 16px;
+        `}
+      >
+        <Aside sx={{ flex: 1 }}>
+          <Sidebar modelParams={modelParams} send={sendJSON} />
+        </Aside>
+        <Divider orientation="vertical" sx={{ height: "100vh" }} mx="md" />
+        <div id="elements" style={{ flex: 2 }}>
           <div id="elements-topbar">
-            <div>
-              <label
-                className="badge badge-primary"
-                htmlFor="fps"
-                style={{ marginRight: 15 }}
-              >
-                Frames Per Second
-              </label>
-              <input id="fps" data-slider-id="fps" type="text" />
-            </div>
-            <p>
-              Current Step: <span id="currentStep">{currentStep}</span>
-            </p>
-          </div>
-        </div>
-      </div>
-      <div id="about" className="modal fade" tabIndex={-1} role="dialog">
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">About {model_name}</h4>
-              <button
-                type="button"
-                className="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&#xD7;</span>
-              </button>
-            </div>
-            <div className="modal-body">
-              <div>{description}</div>
-              <div>&#xA0;</div>
-              <div style={{ clear: "both" }}></div>
-            </div>
+            <Slider
+              defaultValue={fps}
+              min={0}
+              max={20}
+              marks={[
+                { value: 0, label: 0 },
+                { value: 20, label: 20 },
+              ]}
+              label={(value) => value.toPrecision(1)}
+              onChangeEnd={(value) => setFps(value)}
+            />
+            <p>Current Step: {currentStep}</p>
           </div>
         </div>
       </div>

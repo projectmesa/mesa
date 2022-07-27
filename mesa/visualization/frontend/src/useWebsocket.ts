@@ -8,15 +8,17 @@ const url = `${
 const socket = new WebSocket(url);
 
 export const useWebSocket = () => {
-  const [vizState, setVizState] = useState();
+  const [vizState, setVizState] = useState([]);
   const [done, setDone] = useState(false);
-  const [modelParams, setModelParams] = useState();
+  const [modelParams, setModelParams] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
 
   const ws = useRef<WebSocket>(socket);
 
-  const sendJSON = (msg: WSOutgoingMessage) =>
+  const sendJSON = (msg: WSOutgoingMessage) => {
+    console.log("Sending:", msg);
     ws.current.send(JSON.stringify(msg));
+  };
 
   useEffect(() => {
     ws.current.onopen = () => sendJSON({ type: "reset" });
