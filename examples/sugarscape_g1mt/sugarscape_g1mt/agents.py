@@ -109,14 +109,14 @@ class Trader(mesa.Agent):
                 return agent
 
     def is_occupied(self, pos):
-        this_cell = self.model.grid.get_cell_list_contents([pos])
+        this_cell = self.model.grid.get_cell_list_contents(pos)
         for a in this_cell:
             if isinstance(a, Trader):
                 return True
         return False
 
     def move(self):
-        # Epstein multicommodity agent movement rule M.
+        # Multi-commodity agent movement rule M.
         # See GAS page 98-99.
 
         # Our extra sanity check. The agent must still have enough resource
@@ -266,17 +266,19 @@ class Trader(mesa.Agent):
 
         # Our extra sanity check. The agent must still have enough resource
         # before the trade.
-        # assert self.sugar > 0
-        # assert self.spice > 0
+        assert self.sugar > 0
+        assert self.spice > 0
 
         # This may happen if other agent no longer has enough resource, but has
         # yet to execute maybe_die.
+        """
         if other.sugar <= 0 or other.spice <= 0:
             return
-
+        """
         # Agent and neighbor compute their MRSs; if these are equal then end,
         # else continue
         mrs_self = self.calculate_MRS()
+        welfare_self = self.calculate_welfare()
         welfare_self = self.calculate_welfare()
         welfare_other = other.calculate_welfare()
         mrs_other = other.calculate_MRS()
@@ -292,7 +294,7 @@ class Trader(mesa.Agent):
         if mrs_self < 1e-6 or mrs_other < 1e-6:
             return
         price = math.sqrt(mrs_self * mrs_other)
-        self.prices.append(price)
+        # self.prices.append(price)
 
         # If this trade will (a) make both agents better off (increases the
         # welfare of both agents), and (b) not cause the agents' MRSs to cross
@@ -303,13 +305,15 @@ class Trader(mesa.Agent):
             sold = self.maybe_sell_spice(other, price, welfare_self, welfare_other)
             if not sold:
                 return
+            self.prices.append(price)
         else:
             # self is a spice buyer
             sold = other.maybe_sell_spice(self, price, welfare_other, welfare_self)
             if not sold:
                 return
+            self.prices.append(price)
         # continue trading
-        self.trade(other)
+        # self.trade(other)
 
     def calculate_welfare(self, sugar=None, spice=None):
         # Calculate the welfare given sugar and spice amount.
@@ -341,8 +345,4 @@ class Trader(mesa.Agent):
         # See GAS page 102 equation 3.
         return (spice / self.metabolism_spice) / (sugar / self.metabolism_sugar)
 
-    def step(self):
-        self.move()
-        self.eat()
-        self.trade_with_neighbors()
-        self.maybe_die()
+    # def step(self):
