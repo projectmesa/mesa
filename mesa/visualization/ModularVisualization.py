@@ -341,6 +341,9 @@ class ModularServer(tornado.web.Application):
                 model_params[key] = val
 
         self.model = self.model_cls(**model_params)
+        # We specify the `running` attribute here so that the user doesn't have
+        # to define it explicitly in their model's __init__.
+        self.model.running = True
 
     def render_model(self):
         """Turn the current state of the model into a dictionary of
