@@ -26,13 +26,9 @@ import numpy as np
 from typing import (
     Any,
     Callable,
-    Dict,
     Iterable,
     Iterator,
-    List,
-    Set,
     Sequence,
-    Tuple,
     TypeVar,
     Union,
     cast,
@@ -44,15 +40,15 @@ from .agent import Agent
 from numbers import Real
 import numpy.typing as npt
 
-Coordinate = Tuple[int, int]
+Coordinate = tuple[int, int]
 # used in ContinuousSpace
-FloatCoordinate = Union[Tuple[float, float], npt.NDArray[float]]
+FloatCoordinate = Union[tuple[float, float], npt.NDArray[float]]
 NetworkCoordinate = int
 
 Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
 
 GridContent = Union[Agent, None]
-MultiGridContent = List[Agent]
+MultiGridContent = list[Agent]
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -106,10 +102,10 @@ class Grid:
         self.width = width
         self.torus = torus
 
-        self.grid: List[List[GridContent]] = []
+        self.grid: list[list[GridContent]] = []
 
         for x in range(self.width):
-            col: List[GridContent] = []
+            col: list[GridContent] = []
             for y in range(self.height):
                 col.append(self.default_val())
             self.grid.append(col)
@@ -118,7 +114,7 @@ class Grid:
         self.empties = set(itertools.product(*(range(self.width), range(self.height))))
 
         # Neighborhood Cache
-        self._neighborhood_cache: Dict[Any, List[Coordinate]] = dict()
+        self._neighborhood_cache: dict[Any, list[Coordinate]] = dict()
 
     @staticmethod
     def default_val() -> None:
@@ -126,23 +122,23 @@ class Grid:
         return None
 
     @overload
-    def __getitem__(self, index: int) -> List[GridContent]:
+    def __getitem__(self, index: int) -> list[GridContent]:
         ...
 
     @overload
     def __getitem__(
-        self, index: Tuple[int | slice, int | slice]
-    ) -> GridContent | List[GridContent]:
+        self, index: tuple[int | slice, int | slice]
+    ) -> GridContent | list[GridContent]:
         ...
 
     @overload
-    def __getitem__(self, index: Sequence[Coordinate]) -> List[GridContent]:
+    def __getitem__(self, index: Sequence[Coordinate]) -> list[GridContent]:
         ...
 
     def __getitem__(
         self,
-        index: int | Sequence[Coordinate] | Tuple[int | slice, int | slice],
-    ) -> GridContent | List[GridContent]:
+        index: int | Sequence[Coordinate] | tuple[int | slice, int | slice],
+    ) -> GridContent | list[GridContent]:
         """Access contents from the grid."""
 
         if isinstance(index, int):
@@ -191,7 +187,7 @@ class Grid:
         as if it is one list:"""
         return itertools.chain(*self.grid)
 
-    def coord_iter(self) -> Iterator[Tuple[GridContent, int, int]]:
+    def coord_iter(self) -> Iterator[tuple[GridContent, int, int]]:
         """An iterator that returns coordinates as well as cell contents."""
         for row in range(self.width):
             for col in range(self.height):
@@ -246,7 +242,7 @@ class Grid:
         moore: bool,
         include_center: bool = False,
         radius: int = 1,
-    ) -> List[Coordinate]:
+    ) -> list[Coordinate]:
         """Return a list of cells that are in the neighborhood of a
         certain point.
 
@@ -269,7 +265,7 @@ class Grid:
         neighborhood = self._neighborhood_cache.get(cache_key, None)
 
         if neighborhood is None:
-            coordinates: Set[Coordinate] = set()
+            coordinates: set[Coordinate] = set()
 
             x, y = pos
             for dy in range(-radius, radius + 1):
@@ -329,7 +325,7 @@ class Grid:
         moore: bool,
         include_center: bool = False,
         radius: int = 1,
-    ) -> List[Agent]:
+    ) -> list[Agent]:
         """Return a list of neighbors to a certain point.
 
         Args:
@@ -384,7 +380,7 @@ class Grid:
         return filter(None, (self.grid[x][y] for x, y in cell_list))
 
     @accept_tuple_argument
-    def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> List[Agent]:
+    def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> list[Agent]:
         """Returns a list of the contents of the cells
         identified in cell_list.
         Note: this method returns a list of `Agent`'s; `None` contents are excluded.
@@ -403,7 +399,7 @@ class Grid:
         Args:
             agent: Agent object to move. Assumed to have its current location
                    stored in a 'pos' tuple.
-            pos: Tuple of new position to move the agent to.
+            pos: tuple of new position to move the agent to.
         """
         pos = self.torus_adj(pos)
         self.remove_agent(agent)
@@ -505,7 +501,7 @@ class Grid:
 class SingleGrid(Grid):
     """Grid where each cell contains exactly at most one object."""
 
-    empties: Set[Coordinate] = set()
+    empties: set[Coordinate] = set()
 
     def position_agent(
         self, agent: Agent, x: int | str = "random", y: int | str = "random"
@@ -554,7 +550,7 @@ class MultiGrid(Grid):
         get_neighbors: Returns the objects surrounding a given cell.
     """
 
-    grid: List[List[MultiGridContent]]
+    grid: list[list[MultiGridContent]]
 
     @staticmethod
     def default_val() -> MultiGridContent:
@@ -691,7 +687,7 @@ class HexGrid(Grid):
 
     def get_neighborhood(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
-    ) -> List[Coordinate]:
+    ) -> list[Coordinate]:
         """Return a list of cells that are in the neighborhood of a
         certain point.
 
@@ -727,7 +723,7 @@ class HexGrid(Grid):
 
     def get_neighbors(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
-    ) -> List[Agent]:
+    ) -> list[Agent]:
         """Return a list of neighbors to a certain point.
 
         Args:
@@ -784,8 +780,8 @@ class ContinuousSpace:
         self.torus = torus
 
         self._agent_points: npt.NDArray[FloatCoordinate] | None = None
-        self._index_to_agent: Dict[int, Agent] = {}
-        self._agent_to_index: Dict[Agent, int | None] = {}
+        self._index_to_agent: dict[int, Agent] = {}
+        self._agent_to_index: dict[Agent, int | None] = {}
 
     def _build_agent_cache(self):
         """Cache Agent positions to speed up neighbors calculations."""
@@ -847,7 +843,7 @@ class ContinuousSpace:
 
     def get_neighbors(
         self, pos: FloatCoordinate, radius: float, include_center: bool = True
-    ) -> List[Agent]:
+    ) -> list[Agent]:
         """Get all objects within a certain radius.
 
         Args:
@@ -948,7 +944,7 @@ class NetworkGrid:
         self._place_agent(agent, node_id)
         agent.pos = node_id
 
-    def get_neighbors(self, node_id: int, include_center: bool = False) -> List[int]:
+    def get_neighbors(self, node_id: int, include_center: bool = False) -> list[int]:
         """Get all adjacent nodes"""
 
         neighbors = list(self.G.neighbors(node_id))
@@ -979,18 +975,18 @@ class NetworkGrid:
         """Returns a bool of the contents of a cell."""
         return not self.G.nodes[node_id]["agent"]
 
-    def get_cell_list_contents(self, cell_list: List[int]) -> List[GridContent]:
+    def get_cell_list_contents(self, cell_list: list[int]) -> list[GridContent]:
         """Returns the contents of a list of cells ((x,y) tuples)
         Note: this method returns a list of `Agent`'s; `None` contents are excluded.
         """
         return list(self.iter_cell_list_contents(cell_list))
 
-    def get_all_cell_contents(self) -> List[GridContent]:
+    def get_all_cell_contents(self) -> list[GridContent]:
         """Returns a list of the contents of the cells
         identified in cell_list."""
         return list(self.iter_cell_list_contents(self.G))
 
-    def iter_cell_list_contents(self, cell_list: List[int]) -> List[GridContent]:
+    def iter_cell_list_contents(self, cell_list: list[int]) -> list[GridContent]:
         """Returns an iterator of the contents of the cells
         identified in cell_list."""
         list_of_lists = [
