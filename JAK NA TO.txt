@@ -1,0 +1,6 @@
+cmd
+python ale spusten v ceste kde jsou danné moduly pro import, nebo se musi zmenit cesta odkud taha data
+a to prikazem:
+import sys
+sys.path.append('C:\J\PythonMesaExampl\')#cestu samozrejme
+ kde potrebuju

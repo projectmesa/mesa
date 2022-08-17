@@ -1,0 +1,9 @@
+click~=8.0.1
+Mesa~=1.0.0
+numpy~=1.20.3
+tornado~=6.1
+pandas~=1.2.4
+tqdm~=4.61.0
+setuptools~=58.0.4
+networkx~=2.5.1
+matplotlib~=3.4.3
