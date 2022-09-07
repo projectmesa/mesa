@@ -274,7 +274,7 @@ const initGUI = function (model_params) {
       `<p>
         <label for='${domID}' class='badge bg-primary'>
         ${obj.name}
-        "</label>
+        </label>
       </p>`,
       `<select
         id='${domID}'
