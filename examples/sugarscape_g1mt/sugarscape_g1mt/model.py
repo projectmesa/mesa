@@ -25,6 +25,14 @@ def geometric_mean(x):
     return np.exp(np.log(x).mean())
 
 
+def trade_volume(trader_list):
+    num_trades = 0
+    for trader in trader_list:
+        if len(trader.prices) > 0:
+            num_trades += 1
+    return num_trades
+
+
 class SugarscapeG1mt(mesa.Model):
     """
     Sugarscape ({G1}, {M, T})
@@ -61,14 +69,21 @@ class SugarscapeG1mt(mesa.Model):
         self.metabolism_max = metabolism_max
         self.vision_min = vision_min
         self.vision_max = vision_max
+        """
+        "Trade volume": lambda m: sum(
+            len(a.prices) for a in m.schedule.agents_by_type[Trader].values()
+        )
+        """
 
         self.schedule = mesa.time.RandomActivationByType(self)
-        self.grid = mesa.space.MultiGrid(self.width, self.height, torus=False)
+        self.grid = mesa.space.MultiGrid(
+            self.width, self.height, torus=True
+        )  # page 22 GAS
         self.datacollector = mesa.DataCollector(
             {
                 "Trader": lambda m: m.schedule.get_type_count(Trader),
-                "Trade volume": lambda m: sum(
-                    len(a.prices) for a in m.schedule.agents_by_type[Trader].values()
+                "Trade volume": lambda m: trade_volume(
+                    m.schedule.agents_by_type[Trader].values()
                 ),
                 "Price": lambda m: geometric_mean(
                     flatten(
@@ -104,8 +119,8 @@ class SugarscapeG1mt(mesa.Model):
             y = self.random.randrange(self.height)
             # See GAS page 108 for parameters initialization.
             # Each agent is endowed by a random amount of sugar and spice
-            sugar = self.random.uniform(self.endowment_min, self.endowment_max + 1)
-            spice = self.random.uniform(self.endowment_min, self.endowment_max + 1)
+            sugar = self.random.uniform(self.endowment_min, self.endowment_max)
+            spice = self.random.uniform(self.endowment_min, self.endowment_max)
             # Each agent's phenotype is initialized with uniform value
             metabolism_sugar = self.random.uniform(
                 self.metabolism_min, self.metabolism_max
@@ -113,7 +128,7 @@ class SugarscapeG1mt(mesa.Model):
             metabolism_spice = self.random.uniform(
                 self.metabolism_min, self.metabolism_max
             )
-            vision = int(self.random.uniform(self.vision_min, self.vision_max))
+            vision = int(self.random.uniform(self.vision_min, self.vision_max + 1))
             trader = Trader(
                 agent_id,
                 self,
@@ -131,23 +146,31 @@ class SugarscapeG1mt(mesa.Model):
         self.running = True
         self.datacollector.collect(self)
 
+    def randomize_traders(self):
+        """
+        Helper function for step to change agent order to prevent mover positional advantage
+        """
+        Traders = self.schedule.agents_by_type[Trader].values()
+        Traders_shuffle = list(Traders)
+        self.random.shuffle(Traders_shuffle)
+
+        return Traders_shuffle
+
     def step(self):
         for sugar in self.schedule.agents_by_type[Sugar].values():
             sugar.step()
         for spice in self.schedule.agents_by_type[Spice].values():
             spice.step()
-        Traders = self.schedule.agents_by_type[Trader].values()
-        Trader_shuffle = list(Traders)
-        self.random.shuffle(Trader_shuffle)
+
+        Trader_shuffle = self.randomize_traders()
+
         for agent in Trader_shuffle:
             agent.move()
-        self.random.shuffle(Trader_shuffle)
-        for agent in Trader_shuffle:
             agent.eat()
-        for agent in list(Traders):
             agent.maybe_die()
-        Trader_shuffle = list(Traders)
-        self.random.shuffle(Trader_shuffle)
+
+        Trader_shuffle = self.randomize_traders()
+
         for agent in Trader_shuffle:
             agent.prices = agent.trade_with_neighbors()
         self.schedule.steps += 1

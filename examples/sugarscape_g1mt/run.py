@@ -1,7 +1,7 @@
 from sugarscape_g1mt.model import SugarscapeG1mt
 
 
-model = SugarscapeG1mt(seed=42)
+model = SugarscapeG1mt()
 model.run_model()
 
 """

@@ -55,7 +55,7 @@ class Spice(mesa.Agent):
 class Trader(mesa.Agent):
     def __init__(
         self,
-        id,
+        unique_id,
         model,
         pos,
         moore=False,
@@ -65,7 +65,7 @@ class Trader(mesa.Agent):
         metabolism_spice=0,
         vision=0,
     ):
-        super().__init__(id, model)
+        super().__init__(unique_id, model)
         self.pos = pos
         self.moore = moore
         self.sugar = sugar
@@ -77,7 +77,7 @@ class Trader(mesa.Agent):
         self.prices = []
 
     def get_sugar(self, pos):
-        this_cell = self.model.grid.get_cell_list_contents([pos])
+        this_cell = self.model.grid.get_cell_list_contents(pos)
         for agent in this_cell:
             if type(agent) is Sugar:
                 return agent
@@ -103,7 +103,7 @@ class Trader(mesa.Agent):
         return 0
 
     def get_trader(self, pos):
-        this_cell = self.model.grid.get_cell_list_contents([pos])
+        this_cell = self.model.grid.get_cell_list_contents(pos)
         for agent in this_cell:
             if isinstance(agent, Trader):
                 return agent
@@ -111,7 +111,7 @@ class Trader(mesa.Agent):
     def is_occupied(self, pos):
         this_cell = self.model.grid.get_cell_list_contents(pos)
         for a in this_cell:
-            if isinstance(a, Trader):
+            if isinstance(a, Trader) and a.pos != self.pos:
                 return True
         return False
 
@@ -128,15 +128,12 @@ class Trader(mesa.Agent):
         neighbors = [
             i
             for i in self.model.grid.get_neighborhood(
-                self.pos, self.moore, False, radius=self.vision
+                self.pos, self.moore, True, radius=self.vision
             )
             if not self.is_occupied(i)
         ]
-        # TODO maybe just use include_center
-        neighbors.append(self.pos)
 
         # 2. Find the patch which produces maximum welfare.
-        eps = 1e-7
         welfares = [
             self.calculate_welfare(
                 self.sugar + self.get_sugar_amount(pos),
@@ -146,7 +143,9 @@ class Trader(mesa.Agent):
         ]
         max_welfare = max(welfares)
         candidate_indices = [
-            i for i in range(len(welfares)) if abs(welfares[i] - max_welfare) < eps
+            i
+            for i in range(len(welfares))
+            if math.isclose(welfares[i], max_welfare, rel_tol=1e-02)
         ]
         candidates = [neighbors[i] for i in candidate_indices]
 
@@ -155,7 +154,7 @@ class Trader(mesa.Agent):
         final_candidates = [
             pos
             for pos in candidates
-            if abs(get_distance(self.pos, pos) - min_dist) < eps
+            if math.isclose(get_distance(self.pos, pos), min_dist, rel_tol=1e-02)
         ]
         self.random.shuffle(final_candidates)
 
@@ -213,7 +212,7 @@ class Trader(mesa.Agent):
         self_spice = self.spice - spice_exchanged
         other_spice = other.spice + spice_exchanged
 
-        # Our extra rule (not specified by Epstein) to prevent the
+        # Our extra rule (not specified by book) to prevent the
         # buyer/seller running out of sugar/spice.
         if (
             (self_sugar <= 0)
@@ -226,9 +225,7 @@ class Trader(mesa.Agent):
         both_agents_better_off = (
             welfare_self < self.calculate_welfare(self_sugar, self_spice)
         ) and (welfare_other < other.calculate_welfare(other_sugar, other_spice))
-        mrs_not_crossing = self.calculate_MRS(
-            self_sugar, self_spice
-        ) > other.calculate_MRS(other_sugar, other_spice)
+        mrs_not_crossing = self.calculate_MRS() > other.calculate_MRS()
         if not (both_agents_better_off and mrs_not_crossing):
             # To prevent infinite loop of trading.
             return False
@@ -262,27 +259,23 @@ class Trader(mesa.Agent):
         return []
 
     def trade(self, other):
-        # Epstein rule T for a pair of agents, page 105
+        # rule T for a pair of agents, page 105
 
         # Our extra sanity check. The agent must still have enough resource
         # before the trade.
         assert self.sugar > 0
         assert self.spice > 0
+        assert other.sugar > 0
+        assert other.spice > 0
 
-        # This may happen if other agent no longer has enough resource, but has
-        # yet to execute maybe_die.
-        """
-        if other.sugar <= 0 or other.spice <= 0:
-            return
-        """
         # Agent and neighbor compute their MRSs; if these are equal then end,
         # else continue
         mrs_self = self.calculate_MRS()
         welfare_self = self.calculate_welfare()
-        welfare_self = self.calculate_welfare()
         welfare_other = other.calculate_welfare()
         mrs_other = other.calculate_MRS()
-        if math.isclose(mrs_self, mrs_other):
+        # if mrs is close no need for trade
+        if math.isclose(mrs_self, mrs_other, rel_tol=1e-02):
             return
 
         # The direction of exchange is as follows: spice flows from the
@@ -291,10 +284,7 @@ class Trader(mesa.Agent):
 
         # The geometric mean of the two MRSsis calculated- this will serve as
         # the price, p.
-        if mrs_self < 1e-6 or mrs_other < 1e-6:
-            return
         price = math.sqrt(mrs_self * mrs_other)
-        # self.prices.append(price)
 
         # If this trade will (a) make both agents better off (increases the
         # welfare of both agents), and (b) not cause the agents' MRSs to cross
@@ -305,15 +295,14 @@ class Trader(mesa.Agent):
             sold = self.maybe_sell_spice(other, price, welfare_self, welfare_other)
             if not sold:
                 return
-            self.prices.append(price)
         else:
             # self is a spice buyer
             sold = other.maybe_sell_spice(self, price, welfare_other, welfare_self)
             if not sold:
                 return
-            self.prices.append(price)
+        self.prices.append(price)
         # continue trading
-        # self.trade(other)
+        self.trade(other)
 
     def calculate_welfare(self, sugar=None, spice=None):
         # Calculate the welfare given sugar and spice amount.
@@ -334,15 +323,11 @@ class Trader(mesa.Agent):
             self.metabolism_spice / m_total
         )
 
-    def calculate_MRS(self, sugar=None, spice=None):
-        # Calculate the MRS given sugar and spice amount.
-        if sugar is None:
-            # If not specified, then use the whole sugar in possession.
-            sugar = self.sugar
-        if spice is None:
-            # If not specified, then use the whole spice in possession.
-            spice = self.spice
+    def calculate_MRS(self):
+
         # See GAS page 102 equation 3.
-        return (spice / self.metabolism_spice) / (sugar / self.metabolism_sugar)
+        return (self.spice / self.metabolism_spice) / (
+            self.sugar / self.metabolism_sugar
+        )
 
     # def step(self):
