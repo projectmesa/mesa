@@ -75,6 +75,7 @@ class Trader(mesa.Agent):
         self.vision = vision
 
         self.prices = []
+        self.trade_partners = []
 
     def get_sugar(self, pos):
         this_cell = self.model.grid.get_cell_list_contents(pos)
@@ -244,19 +245,18 @@ class Trader(mesa.Agent):
             if self.is_occupied(pos)
         ]
         if len(neighbor_agents) == 0:
-            return []
+            return [], []
 
         self.random.shuffle(neighbor_agents)
-        count = 0
         for a in neighbor_agents:
             if a:
                 self.trade(a)
-                count += 1
-        if count > 0:
-            prices = [p for p in self.prices if p]
-            self.prices = []
-            return prices
-        return []
+
+        prices = [p for p in self.prices if p]
+        trader_partners = [t for t in self.trade_partners if t]
+        self.prices = []
+        self.trade_partners = []
+        return prices, trader_partners
 
     def trade(self, other):
         # rule T for a pair of agents, page 105
@@ -275,7 +275,7 @@ class Trader(mesa.Agent):
         welfare_other = other.calculate_welfare()
         mrs_other = other.calculate_MRS()
         # if mrs is close no need for trade
-        if math.isclose(mrs_self, mrs_other, rel_tol=1e-02):
+        if math.isclose(mrs_self, mrs_other, rel_tol=1e-06):
             return
 
         # The direction of exchange is as follows: spice flows from the
@@ -301,6 +301,8 @@ class Trader(mesa.Agent):
             if not sold:
                 return
         self.prices.append(price)
+        if other.unique_id not in self.trade_partners:
+            self.trade_partners.append(other.unique_id)
         # continue trading
         self.trade(other)
 

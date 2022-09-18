@@ -82,8 +82,9 @@ class SugarscapeG1mt(mesa.Model):
         self.datacollector = mesa.DataCollector(
             {
                 "Trader": lambda m: m.schedule.get_type_count(Trader),
-                "Trade volume": lambda m: trade_volume(
-                    m.schedule.agents_by_type[Trader].values()
+                "Trade volume": lambda m: sum(
+                    len(a.trade_partners)
+                    for a in m.schedule.agents_by_type[Trader].values()
                 ),
                 "Price": lambda m: geometric_mean(
                     flatten(
@@ -172,7 +173,7 @@ class SugarscapeG1mt(mesa.Model):
         Trader_shuffle = self.randomize_traders()
 
         for agent in Trader_shuffle:
-            agent.prices = agent.trade_with_neighbors()
+            agent.prices, agent.trade_partners = agent.trade_with_neighbors()
         self.schedule.steps += 1
         self.schedule.time += 1
 
