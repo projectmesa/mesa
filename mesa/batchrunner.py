@@ -15,7 +15,6 @@ from multiprocessing import Pool, cpu_count
 from warnings import warn
 from typing import (
     Any,
-    Counter,
     Dict,
     Iterable,
     List,
@@ -67,7 +66,13 @@ def batch_run(
         [description]
     """
 
-    kwargs_list = _make_model_kwargs(parameters) * iterations
+    runs_list = []
+    run_id = 0
+    for iteration in range(iterations):
+        for kwargs in _make_model_kwargs(parameters):
+            runs_list.append((run_id, iteration, kwargs))
+            run_id += 1
+
     process_func = partial(
         _model_run_func,
         model_cls,
@@ -75,34 +80,19 @@ def batch_run(
         data_collection_period=data_collection_period,
     )
 
-    total_iterations = len(kwargs_list)
-    run_counter = count()
-
     results: List[Dict[str, Any]] = []
 
-    with tqdm(total=total_iterations, disable=not display_progress) as pbar:
-        iteration_counter: Counter[Tuple[Any, ...]] = Counter()
-
-        def _fn(paramValues, rawdata):
-            iteration_counter[paramValues] += 1
-            iteration = iteration_counter[paramValues]
-            run_id = next(run_counter)
-            data = []
-            for run_data in rawdata:
-                out = {"RunId": run_id, "iteration": iteration - 1}
-                out.update(run_data)
-                data.append(out)
-            results.extend(data)
-            pbar.update()
-
+    with tqdm(total=len(runs_list), disable=not display_progress) as pbar:
         if number_processes == 1:
-            for kwargs in kwargs_list:
-                paramValues, rawdata = process_func(kwargs)
-                _fn(paramValues, rawdata)
+            for run in runs_list:
+                data = process_func(run)
+                results.extend(data)
+                pbar.update()
         else:
             with Pool(number_processes) as p:
-                for paramValues, rawdata in p.imap_unordered(process_func, kwargs_list):
-                    _fn(paramValues, rawdata)
+                for data in p.imap_unordered(process_func, runs_list):
+                    results.extend(data)
+                    pbar.update()
 
     return results
 
@@ -140,18 +130,18 @@ def _make_model_kwargs(
 
 def _model_run_func(
     model_cls: Type[Model],
-    kwargs: Dict[str, Any],
+    run: Tuple[int, int, Dict[str, Any]],
     max_steps: int,
     data_collection_period: int,
-) -> Tuple[Tuple[Any, ...], List[Dict[str, Any]]]:
+) -> List[Dict[str, Any]]:
     """Run a single model run and collect model and agent data.
 
     Parameters
     ----------
     model_cls : Type[Model]
         The model class to batch-run
-    kwargs : Dict[str, Any]
-        model kwargs used for this run
+    run: Tuple[int, int, Dict[str, Any]]
+        The run id, iteration number, and kwargs for this run
     max_steps : int
         Maximum number of model steps after which the model halts, by default 1000
     data_collection_period : int
@@ -159,9 +149,10 @@ def _model_run_func(
 
     Returns
     -------
-    Tuple[Tuple[Any, ...], List[Dict[str, Any]]]
+    List[Dict[str, Any]]
         Return model_data, agent_data from the reporters
     """
+    run_id, iteration, kwargs = run
     model = model_cls(**kwargs)
     while model.running and model.schedule.steps <= max_steps:
         model.step()
@@ -178,15 +169,30 @@ def _model_run_func(
         # If there are agent_reporters, then create an entry for each agent
         if all_agents_data:
             stepdata = [
-                {**{"Step": step}, **kwargs, **model_data, **agent_data}
+                {
+                    "RunId": run_id,
+                    "iteration": iteration,
+                    "Step": step,
+                    **kwargs,
+                    **model_data,
+                    **agent_data,
+                }
                 for agent_data in all_agents_data
             ]
         # If there is only model data, then create a single entry for the step
         else:
-            stepdata = [{**{"Step": step}, **kwargs, **model_data}]
+            stepdata = [
+                {
+                    "RunId": run_id,
+                    "iteration": iteration,
+                    "Step": step,
+                    **kwargs,
+                    **model_data,
+                }
+            ]
         data.extend(stepdata)
 
-    return tuple(kwargs.values()), data
+    return data
 
 
 def _collect_data(
