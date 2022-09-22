@@ -49,13 +49,13 @@ You can also use `pip` to install the github version:
 
 .. code-block:: bash
 
-    $ pip install -e git+https://github.com/projectmesa/mesa#egg=mesa
+    $ pip install -U -e git+https://github.com/projectmesa/mesa@main#egg=mesa
 
 Or any other (development) branch on this repo or your own fork:
 
 .. code-block:: bash
 
-    $ pip install -e git+https://github.com/YOUR_FORK/mesa@YOUR_BRANCH#egg=mesa
+    $ pip install -U -e git+https://github.com/YOUR_FORK/mesa@YOUR_BRANCH#egg=mesa
 
 Take a look at the `examples <https://github.com/projectmesa/mesa/tree/main/examples>`_ folder for sample models demonstrating Mesa features.
 
