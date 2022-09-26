@@ -50,7 +50,7 @@ need to import the actual model object.
 .. code:: ipython3
 
     import mesa
-    
+
     # If MoneyModel.py is where your code is:
     # from MoneyModel import MoneyModel
 
@@ -89,8 +89,8 @@ a 10x10 grid, drawn in 500 x 500 pixels.
     """
     # from MoneyModel import *
     import mesa
-    
-    
+
+
     def agent_portrayal(agent):
         portrayal = {
             "Shape": "circle",
@@ -100,8 +100,8 @@ a 10x10 grid, drawn in 500 x 500 pixels.
             "r": 0.5,
         }
         return portrayal
-    
-    
+
+
     grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
     server = mesa.visualization.ModularServer(
         MoneyModel, [grid], "Money Model", {"N": 100, "width": 10, "height": 10}
@@ -252,13 +252,13 @@ chart will appear underneath the grid.
 
 .. code:: python
 
-   chart = mesa.visualization.ChartModule([{"Label": "Gini", 
+   chart = mesa.visualization.ChartModule([{"Label": "Gini",
                          "Color": "Black"}],
                        data_collector_name='datacollector')
 
-   server = mesa.visualization.ModularServer(MoneyModel, 
-                          [grid, chart], 
-                          "Money Model", 
+   server = mesa.visualization.ModularServer(MoneyModel,
+                          [grid, chart],
+                          "Money Model",
                           {"N":100, "width":10, "height":10})
 
 Launch the visualization and start a model run, and you’ll see a line
@@ -479,8 +479,8 @@ inherit from, and create the new visualization class.
                self.canvas_width = canvas_width
                self.bins = bins
                new_element = "new HistogramModule({}, {}, {})"
-               new_element = new_element.format(bins, 
-                                                canvas_width, 
+               new_element = new_element.format(bins,
+                                                canvas_width,
                                                 canvas_height)
                self.js_code = "elements.push(" + new_element + ");"
 
@@ -531,9 +531,9 @@ Now, you can create your new HistogramModule and add it to the server:
 .. code:: python
 
        histogram = mesa.visualization.HistogramModule(list(range(10)), 200, 500)
-       server = mesa.visualization.ModularServer(MoneyModel, 
-                              [grid, histogram, chart], 
-                              "Money Model", 
+       server = mesa.visualization.ModularServer(MoneyModel,
+                              [grid, histogram, chart],
+                              "Money Model",
                               {"N":100, "width":10, "height":10})
        server.launch()
 

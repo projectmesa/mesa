@@ -16,7 +16,7 @@ If you have `Multiple` type agents and one of them has time attribute you can st
 Using ```numpy.random```
 -------------
 
-Sometimes you need to use ``numpy``'s ``random`` library, for example to get a Poisson distribution. 
+Sometimes you need to use ``numpy``'s ``random`` library, for example to get a Poisson distribution.
 
 .. code:: python
 
