@@ -44,7 +44,7 @@ import numpy.typing as npt
 
 Coordinate = Tuple[int, int]
 # used in ContinuousSpace
-FloatCoordinate = Union[tuple[float, float], npt.NDArray[float]]
+FloatCoordinate = Union[Tuple[float, float], npt.NDArray[float]]
 NetworkCoordinate = int
 
 Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
