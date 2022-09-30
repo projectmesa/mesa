@@ -28,7 +28,7 @@ from __future__ import annotations
 from collections import OrderedDict, defaultdict
 
 # mypy
-from typing import Dict, Iterator, List, Type, Union
+from typing import Iterator, Union
 from mesa.agent import Agent
 from mesa.model import Model
 
@@ -53,7 +53,7 @@ class BaseScheduler:
         self.model = model
         self.steps = 0
         self.time: TimeT = 0
-        self._agents: Dict[int, Agent] = OrderedDict()
+        self._agents: dict[int, Agent] = OrderedDict()
 
     def add(self, agent: Agent) -> None:
         """Add an Agent object to the schedule.
@@ -92,7 +92,7 @@ class BaseScheduler:
         return len(self._agents.keys())
 
     @property
-    def agents(self) -> List[Agent]:
+    def agents(self) -> list[Agent]:
         return list(self._agents.values())
 
     def agent_buffer(self, shuffled: bool = False) -> Iterator[Agent]:
@@ -170,7 +170,7 @@ class StagedActivation(BaseScheduler):
     def __init__(
         self,
         model: Model,
-        stage_list: List[str] | None = None,
+        stage_list: list[str] | None = None,
         shuffle: bool = False,
         shuffle_between_stages: bool = False,
     ) -> None:
@@ -243,7 +243,7 @@ class RandomActivationByType(BaseScheduler):
         """
 
         super().add(agent)
-        agent_class: Type[Agent] = type(agent)
+        agent_class: type[Agent] = type(agent)
         self.agents_by_type[agent_class][agent.unique_id] = agent
 
     def remove(self, agent: Agent) -> None:
@@ -253,7 +253,7 @@ class RandomActivationByType(BaseScheduler):
 
         del self._agents[agent.unique_id]
 
-        agent_class: Type[Agent] = type(agent)
+        agent_class: type[Agent] = type(agent)
         del self.agents_by_type[agent_class][agent.unique_id]
 
     def step(self, shuffle_types: bool = True, shuffle_agents: bool = True) -> None:
@@ -266,7 +266,7 @@ class RandomActivationByType(BaseScheduler):
             shuffle_agents: If True, the order of execution of each agents in a
                             type group is shuffled.
         """
-        type_keys: List[Type[Agent]] = list(self.agents_by_type.keys())
+        type_keys: list[type[Agent]] = list(self.agents_by_type.keys())
         if shuffle_types:
             self.model.random.shuffle(type_keys)
         for agent_class in type_keys:
@@ -274,7 +274,7 @@ class RandomActivationByType(BaseScheduler):
         self.steps += 1
         self.time += 1
 
-    def step_type(self, type_class: Type[Agent], shuffle_agents: bool = True) -> None:
+    def step_type(self, type_class: type[Agent], shuffle_agents: bool = True) -> None:
         """
         Shuffle order and run all agents of a given type.
         This method is equivalent to the NetLogo 'ask [breed]...'.
@@ -282,13 +282,13 @@ class RandomActivationByType(BaseScheduler):
         Args:
             type_class: Class object of the type to run.
         """
-        agent_keys: List[int] = list(self.agents_by_type[type_class].keys())
+        agent_keys: list[int] = list(self.agents_by_type[type_class].keys())
         if shuffle_agents:
             self.model.random.shuffle(agent_keys)
         for agent_key in agent_keys:
             self.agents_by_type[type_class][agent_key].step()
 
-    def get_type_count(self, type_class: Type[Agent]) -> int:
+    def get_type_count(self, type_class: type[Agent]) -> int:
         """
         Returns the current number of agents of certain type in the queue.
         """
