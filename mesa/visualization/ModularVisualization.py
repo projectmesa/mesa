@@ -257,8 +257,8 @@ class ModularServer(tornado.web.Application):
         model_cls,
         visualization_elements,
         name="Mesa Model",
-        port=None,
         model_params=None,
+        port=None,
     ):
         """
         Args:
