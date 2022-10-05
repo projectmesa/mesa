@@ -3,6 +3,59 @@
 Release History
 ---------------
 
+1.1.0 (2022-10-10) Safford
+++++++++++++++++++++++++++
+
+**Special notes**
+
+* Perf: ContinuousSpace: speed-up add/remove agents #1376. This is a ~6x performance improvement for add/remove.
+* fix: time: Recompute agent_keys between stages #1391. This is a correctness fix for ``SimultaneousActivation`` and ``StagedActivation`` when agents are being removed during simulation.
+* ModularServer: Always set model.running = True on reset #1399. With this change, specifying ``self.running = True`` in your model ``__init__`` is now optional. Mesa's visualization server will automatically sets it to ``True`` in the beginning of a simulation.
+* feat: Allow user-specified local dir to be served by Tornado #1435. This simplifies the usage of ``ModularServer`` in Mesa-Geo.
+* Allow batch_run to take arbitrary parameters #1413. With this change, you can finally use any arbitrary Python objects as ``batch_run`` parameters, where previously they are restricted to hashable objects only.
+* Prevent seed and random from being shared between instances #1439. With this fix, a model instance has their own isolated RNG.
+
+**Improvements**
+
+* CI Updates
+    * ci: Cancel previous obsolete runs #1378
+    * ci: update black to prevent click error #1382
+    * Add "falsy" to .codespellignore #1412
+    * Upgrade pre-commit CI (with pyupgrade and syntax checks) #1422
+* Tests
+    * test: RandomActivationByType: Test adding agents with duplicate ID #1392
+* Dependency updates
+    * Update Pipfile.lock (dependencies) #1398
+    * Update Pipfile.lock (dependencies) #1408
+    * Update Pipfile.lock (dependencies) #1434
+* Docs
+    * docs: Add Tim Pope's guideline for proper Git commit msg #1379
+    * readme: Improve the pip install for Git repo instruction #1416
+    * Docs: Remove trailing whitespaces #1421
+    * Fixes #1423 - fixes build badge in docs #1424
+* Refactors
+    * refactor: Apply pyupgrade --py37-plus #1429
+    * refactor ModularServer (moving code into __init__) #1403
+* Perf: ContinuousSpace: speed-up add/remove agents #1376
+* Remove monospace formatting for hyperlinks #1388
+* ModularServer: Always set model.running = True on reset #1399
+* Allow batch_run to take arbitrary parameters #1413
+* ModularServer: Put new optional arg port last #1432
+* feat: Allow user-specified local dir to be served by Tornado #1435
+* Improve and measure speed of clamp function #1440
+
+**Fixes**
+
+* Fix stray " in modular_template.html #1380
+* Fix zoom on network visualisation #1381
+* Fix broken monospace links #1387
+* fix: Ensure agent id is unique in RandomActivationByType.add #1386
+* fix: time: Recompute agent_keys between stages #1391
+* Fix batchrunner progress bar #1395
+* Fix stray " in visualisation dropdown labels #1409
+* space: Fix type error for Python < 3.9 #1430
+* Prevent seed and random from being shared between instances #1439
+
 1.0.0 (2022-07-06) Quartzsite
 +++++++++++++++++++++++++++++++++++++++++++
 
