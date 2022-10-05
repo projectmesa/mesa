@@ -21,9 +21,10 @@ class Model:
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """Create a new model object and instantiate its RNG automatically."""
-        cls._seed = kwargs.get("seed", None)
-        cls.random = random.Random(cls._seed)
-        return object.__new__(cls)
+        obj = object.__new__(cls)
+        obj._seed = kwargs.get("seed", None)
+        obj.random = random.Random(obj._seed)
+        return obj
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a new model. Overload this method with the actual code to

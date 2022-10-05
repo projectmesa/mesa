@@ -28,6 +28,9 @@ def test_running():
 def test_seed(seed=23):
     model = Model(seed=seed)
     assert model._seed == seed
+    model2 = Model(seed=seed + 1)
+    assert model2._seed == seed + 1
+    assert model._seed == seed
 
 
 def test_reset_randomizer(newseed=42):
