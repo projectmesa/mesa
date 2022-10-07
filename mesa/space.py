@@ -56,9 +56,8 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 
 def clamp(x: float, lowest: float, highest: float) -> float:
-    # This should be faster than np.clip for a scalar x.
-    # TODO: measure how much faster this function is.
-    return max(lowest, min(x, highest))
+    # much faster than np.clip for a scalar x.
+    return lowest if x <= lowest else (highest if x >= highest else x)
 
 
 def accept_tuple_argument(wrapped_function: F) -> F:
