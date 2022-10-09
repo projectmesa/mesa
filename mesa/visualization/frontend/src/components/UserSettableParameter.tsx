@@ -1,4 +1,3 @@
-import React from "react";
 import { Checkbox, Slider } from "@mantine/core";
 
 type SliderInput = {
@@ -22,7 +21,7 @@ export type UserInput = SliderInput | CheckboxInput;
 
 type IProps = {
   param: UserInput;
-  onChange: (value: any) => void;
+  onChange: (value: unknown) => void;
 };
 
 export const UserSettableParameter = ({ param, onChange }: IProps) => {

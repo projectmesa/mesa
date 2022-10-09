@@ -1,14 +1,15 @@
 import { Badge, Stack } from "@mantine/core";
+import { WSOutgoingMessage } from "../types";
 import { UserInput, UserSettableParameter } from "./UserSettableParameter";
 
 type SidebarProps = {
   modelParams: { [name: string]: UserInput };
-  send: (data: any) => void;
+  send: (msg: WSOutgoingMessage) => void;
 };
 
 export const Sidebar = ({ modelParams = {}, send }: SidebarProps) => {
   const handleChange = (param_name: string) => {
-    return (value: any) =>
+    return (value: unknown) =>
       send({ type: "submit_params", param: param_name, value: value });
   };
 

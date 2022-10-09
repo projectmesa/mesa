@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useWebSocket } from "./useWebsocket";
 import { Sidebar } from "./components/Sidebar";
 import { Aside, Divider, Group, Header, Slider } from "@mantine/core";
@@ -36,7 +36,6 @@ export const App = () => {
 
   useEffect(() => {
     window.initElements();
-    sendJSON({ type: "reset" });
 
     // cleanup function only relevant for react development mode
     return () => {
@@ -48,20 +47,17 @@ export const App = () => {
         elements.appendChild(elementsTopbar);
         window.elements = [];
       }
-      sendJSON({ type: "reset" });
     };
   }, []);
 
-  useEffect(() => {
-    window.control.tick = currentStep;
-  }, [currentStep]);
+  window.control.tick = currentStep;
 
   useEffect(() => {
     if (!vizState) {
       return;
     }
     window.elements.forEach((element, index) => {
-      element.render(vizState[index]);
+      element.render(vizState[index] || []);
     });
   }, [vizState]);
 
