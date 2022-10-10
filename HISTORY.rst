@@ -138,7 +138,7 @@ Release History
 
 * Dependency updates
     * build(deps): bump cookiecutter from 2.1.0 to 2.1.1 dependencies #1360
-    * Update Pipfile.lock (dependencies) #1350, #1301, #1224, #1203, #1135 by github-actions bot
+    * Update Pipfile.lock (dependencies) #1374, #1350, #1301, #1224, #1203, #1135 by github-actions bot
     * Migrate D3 from v4 to v7 #1088
 
 * Other Improvements
@@ -193,6 +193,8 @@ Release History
 * examples: correcting comment in examples/pd_grid/pd_grid/agent.py #1247
 * space: Clarify the return object of get_cell_list_contents #1242
 * width and height were changed up #1149
+* fix typo in best-practices.rst #1368
+* fix: examples: Make space x, y order consistent #1366
 
 
 
