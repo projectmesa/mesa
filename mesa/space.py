@@ -230,7 +230,7 @@ class Grid:
             radius: radius, in cells, of neighborhood to get.
 
         Returns:
-            A list of coordinate tuples representing the neighborhood. For
+            An iterator of coordinate tuples representing the neighborhood. For
             example with radius 1, it will return list with number of elements
             equals at most 9 (8) if Moore, 5 (4) if Von Neumann (if not
             including the center).
@@ -624,7 +624,7 @@ class HexGrid(Grid):
             radius: radius, in cells, of neighborhood to get.
 
         Returns:
-            A list of coordinate tuples representing the neighborhood. For
+            An iterator of coordinate tuples representing the neighborhood. For
             example with radius 1, it will return list with number of elements
             equals at most 9 (8) if Moore, 5 (4) if Von Neumann (if not
             including the center).
