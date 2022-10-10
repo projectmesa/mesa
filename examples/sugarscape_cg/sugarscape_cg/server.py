@@ -10,25 +10,24 @@ def SsAgent_portrayal(agent):
     if agent is None:
         return
 
-    portrayal = {}
-
     if type(agent) is SsAgent:
-        portrayal["Shape"] = "sugarscape_cg/resources/ant.png"
-        portrayal["scale"] = 0.9
-        portrayal["Layer"] = 1
+        return {"Shape": "sugarscape_cg/resources/ant.png", "scale": 0.9, "Layer": 1}
 
     elif type(agent) is Sugar:
         if agent.amount != 0:
-            portrayal["Color"] = color_dic[agent.amount]
+            color = color_dic[agent.amount]
         else:
-            portrayal["Color"] = "#D6F5D6"
-        portrayal["Shape"] = "rect"
-        portrayal["Filled"] = "true"
-        portrayal["Layer"] = 0
-        portrayal["w"] = 1
-        portrayal["h"] = 1
+            color = "#D6F5D6"
+        return {
+            "Color": color,
+            "Shape": "rect",
+            "Filled": "true",
+            "Layer": 0,
+            "w": 1,
+            "h": 1,
+        }
 
-    return portrayal
+    return {}
 
 
 canvas_element = mesa.visualization.CanvasGrid(SsAgent_portrayal, 50, 50, 500, 500)
