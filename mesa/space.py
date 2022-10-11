@@ -633,9 +633,15 @@ class HexGrid(Grid):
         def torus_adj_2d(pos: Coordinate) -> Coordinate:
             return (pos[0] % self.width, pos[1] % self.height)
 
+        explored = dict()
         coordinates = set()
 
         def find_neighbors(pos: Coordinate, radius: int) -> None:
+
+            if pos in explored and explored[pos] >= radius:
+                return
+            explored[pos] = radius
+
             x, y = pos
 
             """

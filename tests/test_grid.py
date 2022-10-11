@@ -391,6 +391,9 @@ class TestHexGrid(unittest.TestCase):
         neighborhood = self.grid.get_neighborhood((1, 1), include_center=True)
         assert len(neighborhood) == 7
 
+        neighborhood = self.grid.get_neighborhood((1, 1), radius=3)
+        assert len(neighborhood) == 12
+
 
 class TestHexGridTorus(TestBaseGrid):
     """
@@ -434,6 +437,9 @@ class TestHexGridTorus(TestBaseGrid):
 
         neighborhood = self.grid.get_neighborhood((2, 4))
         assert len(neighborhood) == 6
+
+        neighborhood = self.grid.get_neighborhood((1, 1), include_center=True, radius=2)
+        assert len(neighborhood) == 13
 
 
 class TestIndexing:
