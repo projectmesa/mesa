@@ -125,7 +125,6 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Intended Audience :: Science/Research",
         "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
@@ -138,5 +137,5 @@ setup(
         [console_scripts]
         mesa=mesa.main:cli
     """,
-    python_requires=">=3.7",
+    python_requires=">=3.8",
 )
