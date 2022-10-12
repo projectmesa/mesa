@@ -652,9 +652,6 @@ class HexGrid(Grid):
             """
             adjacent = [(x, y - 1), (x, y + 1)]
 
-            if include_center:
-                adjacent.append(pos)
-
             if x % 2 == 0:
                 adjacent += [(x - 1, y + 1), (x - 1, y), (x + 1, y + 1), (x + 1, y)]
             else:
@@ -674,8 +671,10 @@ class HexGrid(Grid):
 
         find_neighbors(pos, radius)
 
-        if not include_center and pos in coordinates:
-            coordinates.remove(pos)
+        if include_center:
+            coordinates.add(pos)
+        else:
+            coordinates.discard(pos)
 
         yield from coordinates
 
