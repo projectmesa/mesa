@@ -5,6 +5,7 @@ Sugarscape {G1}, {M, T} Model
 """
 
 import numpy as np
+import itertools
 
 import mesa
 
@@ -19,6 +20,13 @@ def mean(x):
 
 def flatten(list_of_lists):
     return [item for sublist in list_of_lists for item in sublist]
+
+
+def get_trade(agent):
+    if type(agent) == Trader:
+        return agent.trade_partners
+    else:
+        return None
 
 
 def geometric_mean(x):
@@ -51,7 +59,7 @@ class SugarscapeG1mt(mesa.Model):
         metabolism_max=5,
         vision_min=1,
         vision_max=5,
-        seed=42,
+        seed=96,
     ):
         """
         Create a new Constant Growback model with the given parameters.
@@ -69,29 +77,25 @@ class SugarscapeG1mt(mesa.Model):
         self.metabolism_max = metabolism_max
         self.vision_min = vision_min
         self.vision_max = vision_max
-        """
-        "Trade volume": lambda m: sum(
-            len(a.prices) for a in m.schedule.agents_by_type[Trader].values()
-        )
-        """
 
         self.schedule = mesa.time.RandomActivationByType(self)
         self.grid = mesa.space.MultiGrid(
             self.width, self.height, torus=True
         )  # page 22 GAS
         self.datacollector = mesa.DataCollector(
-            {
+            model_reporters={
                 "Trader": lambda m: m.schedule.get_type_count(Trader),
                 "Trade volume": lambda m: sum(
                     len(a.trade_partners)
                     for a in m.schedule.agents_by_type[Trader].values()
                 ),
-                "Price": lambda m: geometric_mean(
-                    flatten(
+                "Price": lambda m: list(
+                    itertools.chain.from_iterable(
                         [a.prices for a in m.schedule.agents_by_type[Trader].values()]
                     )
                 ),
             },
+            agent_reporters={"trade_partners": lambda a: get_trade(a)},
         )
 
         # Create sugar
@@ -120,14 +124,14 @@ class SugarscapeG1mt(mesa.Model):
             y = self.random.randrange(self.height)
             # See GAS page 108 for parameters initialization.
             # Each agent is endowed by a random amount of sugar and spice
-            sugar = self.random.uniform(self.endowment_min, self.endowment_max)
-            spice = self.random.uniform(self.endowment_min, self.endowment_max)
+            sugar = int(self.random.uniform(self.endowment_min, self.endowment_max + 1))
+            spice = int(self.random.uniform(self.endowment_min, self.endowment_max + 1))
             # Each agent's phenotype is initialized with uniform value
-            metabolism_sugar = self.random.uniform(
-                self.metabolism_min, self.metabolism_max
+            metabolism_sugar = int(
+                self.random.uniform(self.metabolism_min, self.metabolism_max + 1)
             )
-            metabolism_spice = self.random.uniform(
-                self.metabolism_min, self.metabolism_max
+            metabolism_spice = int(
+                self.random.uniform(self.metabolism_min, self.metabolism_max + 1)
             )
             vision = int(self.random.uniform(self.vision_min, self.vision_max + 1))
             trader = Trader(
@@ -145,7 +149,6 @@ class SugarscapeG1mt(mesa.Model):
             self.schedule.add(trader)
             agent_id += 1
         self.running = True
-        self.datacollector.collect(self)
 
     def randomize_traders(self):
         """
@@ -182,7 +185,7 @@ class SugarscapeG1mt(mesa.Model):
         if self.verbose:
             print([self.schedule.time, self.schedule.get_type_count(Trader)])
 
-    def run_model(self, step_count=1000):
+    def run_model(self, step_count=100):
 
         if self.verbose:
             print(
@@ -204,7 +207,12 @@ class SugarscapeG1mt(mesa.Model):
             import matplotlib.pyplot as plt
 
             print(sum(self.datacollector.model_vars["Trade volume"]), "total trade")
-            plt.plot(self.datacollector.model_vars["Price"])
+            results_df = self.datacollector.get_model_vars_dataframe()
+            results_df["Average Price"] = results_df["Price"].apply(geometric_mean)
+            plt.figure(figsize=(10, 7))
+            plt.ylim(top=1.5, bottom=0.6)
+            plt.title("Average Price over Time")
+            plt.plot(results_df.index, results_df["Average Price"])
             plt.show()
             # print(len([i for i in range(len(self.datacollector.model_vars["Trade volume"]))]))
             plt.bar(
@@ -212,3 +220,5 @@ class SugarscapeG1mt(mesa.Model):
                 self.datacollector.model_vars["Trade volume"],
             )
             plt.show()
+
+            print(self.datacollector.get_agent_vars_dataframe())

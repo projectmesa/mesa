@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 import mesa
 
@@ -144,9 +145,7 @@ class Trader(mesa.Agent):
         ]
         max_welfare = max(welfares)
         candidate_indices = [
-            i
-            for i in range(len(welfares))
-            if math.isclose(welfares[i], max_welfare, rel_tol=1e-02)
+            i for i in range(len(welfares)) if math.isclose(welfares[i], max_welfare)
         ]
         candidates = [neighbors[i] for i in candidate_indices]
 
@@ -155,7 +154,7 @@ class Trader(mesa.Agent):
         final_candidates = [
             pos
             for pos in candidates
-            if math.isclose(get_distance(self.pos, pos), min_dist, rel_tol=1e-02)
+            if math.isclose(get_distance(self.pos, pos), min_dist)
         ]
         self.random.shuffle(final_candidates)
 
@@ -168,13 +167,13 @@ class Trader(mesa.Agent):
         # Sometimes the position has absolutely no sugar content, and so we
         # check for its existence.
         if sugar_patch:
-            self.sugar = self.sugar - self.metabolism_sugar + sugar_patch.amount
+            self.sugar = (self.sugar + sugar_patch.amount) - self.metabolism_sugar
             sugar_patch.amount = 0
 
         spice_patch = self.get_spice(self.pos)
         # Likewise for spice.
         if spice_patch:
-            self.spice = self.spice - self.metabolism_spice + spice_patch.amount
+            self.spice = (self.spice + spice_patch.amount) - self.metabolism_spice
             spice_patch.amount = 0
 
     def is_starved(self):
@@ -275,7 +274,7 @@ class Trader(mesa.Agent):
         welfare_other = other.calculate_welfare()
         mrs_other = other.calculate_MRS()
         # if mrs is close no need for trade
-        if math.isclose(mrs_self, mrs_other, rel_tol=1e-06):
+        if math.isclose(mrs_self, mrs_other):
             return
 
         # The direction of exchange is as follows: spice flows from the
