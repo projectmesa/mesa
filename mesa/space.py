@@ -638,10 +638,6 @@ class HexGrid(Grid):
 
         def find_neighbors(pos: Coordinate, radius: int) -> None:
 
-            if pos in explored and explored[pos] >= radius:
-                return
-            explored[pos] = radius
-
             x, y = pos
 
             """
@@ -667,7 +663,13 @@ class HexGrid(Grid):
             coordinates.update(adjacent)
 
             if radius > 1:
-                [find_neighbors(coords, radius - 1) for coords in adjacent]
+                decr_radius = radius - 1
+                for coord in adjacent:
+                    if coord in explored and explored[coord] >= decr_radius:
+                        continue
+                    explored[coord] = decr_radius
+                    # recursive call
+                    find_neighbors(coord, decr_radius)
 
         find_neighbors(pos, radius)
 
