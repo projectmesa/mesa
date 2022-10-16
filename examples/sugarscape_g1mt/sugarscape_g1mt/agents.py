@@ -167,13 +167,13 @@ class Trader(mesa.Agent):
         # Sometimes the position has absolutely no sugar content, and so we
         # check for its existence.
         if sugar_patch:
-            self.sugar = (self.sugar + sugar_patch.amount) - self.metabolism_sugar
+            self.sugar = self.sugar - self.metabolism_sugar + sugar_patch.amount
             sugar_patch.amount = 0
 
         spice_patch = self.get_spice(self.pos)
         # Likewise for spice.
         if spice_patch:
-            self.spice = (self.spice + spice_patch.amount) - self.metabolism_spice
+            self.spice = self.spice - self.metabolism_spice + spice_patch.amount
             spice_patch.amount = 0
 
     def is_starved(self):
