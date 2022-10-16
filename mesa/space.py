@@ -18,6 +18,7 @@ MultiGrid: extension to Grid where each cell is a set of objects.
 from __future__ import annotations
 
 import itertools
+import collections
 import math
 from warnings import warn
 
@@ -604,11 +605,20 @@ class HexGrid(Grid):
             in the neighborhood of a certain point.
     """
 
+    def torus_adj_2d(self, pos: Coordinate) -> Coordinate:
+        return pos[0] % self.width, pos[1] % self.height
+
     def iter_neighborhood(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
     ) -> Iterator[Coordinate]:
         """Return an iterator over cell coordinates that are in the
-        neighborhood of a certain point.
+        neighborhood of a certain point. To calculate the neighborhood
+        for a HexGrid the parity of the x coordinate of the point is
+        important, the neighborhood can be sketched as:
+
+            Always: (0,-), (0,+)
+            When x is even: (-,+), (-,0), (+,+), (+,0)
+            When x is odd:  (-,0), (-,-), (+,0), (+,-)
 
         Args:
             pos: Coordinate tuple for the neighborhood to get.
@@ -623,46 +633,55 @@ class HexGrid(Grid):
             including the center).
         """
 
-        def torus_adj_2d(pos: Coordinate) -> Coordinate:
-            return (pos[0] % self.width, pos[1] % self.height)
-
-        explored = dict()
+        queue = collections.deque()
+        queue.append(pos)
         coordinates = set()
 
-        def find_neighbors(pos: Coordinate, radius: int) -> None:
+        while radius > 0:
 
-            if pos in explored and explored[pos] >= radius:
-                return
-            explored[pos] = radius
+            level_size = len(queue)
+            radius -= 1
 
-            x, y = pos
+            for i in range(level_size):
 
-            """
-            Both: (0,-), (0,+)
+                x, y = queue.pop()
 
-            Even: (-,+), (-,0), (+,+), (+,0)
-            Odd:  (-,0), (-,-), (+,0), (+,-)
-            """
-            adjacent = [(x, y - 1), (x, y + 1)]
+                if x % 2 == 0:
+                    adjacent = [
+                        (x, y - 1),
+                        (x, y + 1),
+                        (x - 1, y + 1),
+                        (x - 1, y),
+                        (x + 1, y + 1),
+                        (x + 1, y),
+                    ]
+                else:
+                    adjacent = [
+                        (x, y - 1),
+                        (x, y + 1),
+                        (x - 1, y),
+                        (x - 1, y - 1),
+                        (x + 1, y),
+                        (x + 1, y - 1),
+                    ]
 
-            if x % 2 == 0:
-                adjacent += [(x - 1, y + 1), (x - 1, y), (x + 1, y + 1), (x + 1, y)]
-            else:
-                adjacent += [(x - 1, y), (x - 1, y - 1), (x + 1, y), (x + 1, y - 1)]
+                if self.torus:
+                    adjacent = [
+                        coord
+                        for coord in map(self.torus_adj_2d, adjacent)
+                        if coord not in coordinates
+                    ]
+                else:
+                    adjacent = [
+                        coord
+                        for coord in adjacent
+                        if not self.out_of_bounds(coord) and coord not in coordinates
+                    ]
 
-            if self.torus is False:
-                adjacent = list(
-                    filter(lambda coords: not self.out_of_bounds(coords), adjacent)
-                )
-            else:
-                adjacent = [torus_adj_2d(coord) for coord in adjacent]
+                coordinates.update(adjacent)
 
-            coordinates.update(adjacent)
-
-            if radius > 1:
-                [find_neighbors(coords, radius - 1) for coords in adjacent]
-
-        find_neighbors(pos, radius)
+                if radius > 0:
+                    queue.extendleft(adjacent)
 
         if include_center:
             coordinates.add(pos)
