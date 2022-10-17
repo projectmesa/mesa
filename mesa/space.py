@@ -404,19 +404,14 @@ class Grid:
         """
         pos = self.torus_adj(pos)
         self.remove_agent(agent)
-        self._place_agent(agent, pos)
-        agent.pos = pos
+        self.place_agent(agent, pos)
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
-        """Position an agent on the grid, and set its pos variable."""
-        self._place_agent(agent, pos)
-        agent.pos = pos
-
-    def _place_agent(self, agent: Agent, pos: Coordinate) -> None:
-        """Place the agent at the correct location."""
+        """Place the agent at the specified location, and set its pos variable."""
         x, y = pos
         self.grid[x][y] = agent
         self.empties.discard(pos)
+        agent.pos = pos
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the grid and set its pos attribute to None."""
@@ -471,8 +466,7 @@ class Grid:
         else:
             new_pos = agent.random.choice(sorted(self.empties))
         self.remove_agent(agent)
-        self._place_agent(agent, new_pos)
-        agent.pos = new_pos
+        self.place_agent(agent, new_pos)
 
     def find_empty(self) -> Coordinate | None:
         """Pick a random empty cell."""
@@ -521,12 +515,11 @@ class SingleGrid(Grid):
             coords = agent.random.choice(sorted(self.empties))
         else:
             coords = (x, y)
-        agent.pos = coords
-        self._place_agent(agent, coords)
+        self.place_agent(agent, coords)
 
-    def _place_agent(self, agent: Agent, pos: Coordinate) -> None:
+    def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         if self.is_cell_empty(pos):
-            super()._place_agent(agent, pos)
+            super().place_agent(agent, pos)
         else:
             raise Exception("Cell not empty")
 
@@ -558,12 +551,13 @@ class MultiGrid(Grid):
         """Default value for new cell elements."""
         return []
 
-    def _place_agent(self, agent: Agent, pos: Coordinate) -> None:
-        """Place the agent at the correct location."""
+    def place_agent(self, agent: Agent, pos: Coordinate) -> None:
+        """Place the agent at the specified location, and set its pos variable."""
         x, y = pos
         if agent not in self.grid[x][y]:
             self.grid[x][y].append(agent)
         self.empties.discard(pos)
+        agent.pos = pos
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the given location and set its pos attribute to None."""
@@ -947,7 +941,7 @@ class NetworkGrid:
     def place_agent(self, agent: Agent, node_id: int) -> None:
         """Place a agent in a node."""
 
-        self._place_agent(agent, node_id)
+        self.G.nodes[node_id]["agent"].append(agent)
         agent.pos = node_id
 
     def get_neighbors(self, node_id: int, include_center: bool = False) -> list[int]:
@@ -963,13 +957,7 @@ class NetworkGrid:
         """Move an agent from its current node to a new node."""
 
         self.remove_agent(agent)
-        self._place_agent(agent, node_id)
-        agent.pos = node_id
-
-    def _place_agent(self, agent: Agent, node_id: int) -> None:
-        """Place the agent at the correct node."""
-
-        self.G.nodes[node_id]["agent"].append(agent)
+        self.place_agent(agent, node_id)
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the network and set its pos attribute to None."""
