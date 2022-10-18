@@ -25,7 +25,7 @@ Key concepts:
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
 # mypy
 from typing import Iterator, Union
@@ -53,7 +53,7 @@ class BaseScheduler:
         self.model = model
         self.steps = 0
         self.time: TimeT = 0
-        self._agents: dict[int, Agent] = OrderedDict()
+        self._agents: dict[int, Agent] = {}
 
     def add(self, agent: Agent) -> None:
         """Add an Agent object to the schedule.
