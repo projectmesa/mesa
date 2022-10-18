@@ -8,7 +8,6 @@ A single class to manage a batch run or parameter sweep of a given model.
 import copy
 import itertools
 import random
-from collections import OrderedDict
 from functools import partial
 from itertools import count, product
 from multiprocessing import Pool, cpu_count
@@ -310,9 +309,8 @@ class FixedBatchRunner:
         if self.agent_reporters:
             self.agent_vars = {}
 
-        # Make Compatible with Python 3.5
-        self.datacollector_model_reporters = OrderedDict()
-        self.datacollector_agent_reporters = OrderedDict()
+        self.datacollector_model_reporters = {}
+        self.datacollector_agent_reporters = {}
 
         self.display_progress = display_progress
 
@@ -407,7 +405,7 @@ class FixedBatchRunner:
 
     def collect_model_vars(self, model):
         """Run reporters and collect model-level variables."""
-        model_vars = OrderedDict()
+        model_vars = {}
         for var, reporter in self.model_reporters.items():
             model_vars[var] = reporter(model)
 
@@ -415,9 +413,9 @@ class FixedBatchRunner:
 
     def collect_agent_vars(self, model):
         """Run reporters and collect agent-level variables."""
-        agent_vars = OrderedDict()
+        agent_vars = {}
         for agent in model.schedule._agents.values():
-            agent_record = OrderedDict()
+            agent_record = {}
             for var, reporter in self.agent_reporters.items():
                 agent_record[var] = getattr(agent, reporter)
             agent_vars[agent.unique_id] = agent_record
