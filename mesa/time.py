@@ -89,7 +89,7 @@ class BaseScheduler:
 
     def get_agent_count(self) -> int:
         """Returns the current number of agents in the queue."""
-        return len(self._agents.keys())
+        return len(self._agents)
 
     @property
     def agents(self) -> list[Agent]:
@@ -142,14 +142,12 @@ class SimultaneousActivation(BaseScheduler):
 
     def step(self) -> None:
         """Step all agents, then advance them."""
-        agent_keys = list(self._agents.keys())
-        for agent_key in agent_keys:
-            self._agents[agent_key].step()
-        # We recompute the keys because some agents might have been removed in
-        # the previous loop.
-        agent_keys = list(self._agents.keys())
-        for agent_key in agent_keys:
-            self._agents[agent_key].advance()
+        for agent in self._agents.values():
+            agent.step()
+        # the previous steps might remove some agents, but
+        # this loop will go over the remaining existing agents
+        for agent in self._agents.values():
+            agent.advance()
         self.steps += 1
         self.time += 1
 
@@ -292,4 +290,4 @@ class RandomActivationByType(BaseScheduler):
         """
         Returns the current number of agents of certain type in the queue.
         """
-        return len(self.agents_by_type[type_class].values())
+        return len(self.agents_by_type[type_class])
