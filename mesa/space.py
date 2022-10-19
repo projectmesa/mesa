@@ -415,7 +415,8 @@ class Grid:
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the grid and set its pos attribute to None."""
-        pos = agent.pos
+        if (pos := agent.pos) is None:
+            return
         x, y = pos
         self.grid[x][y] = self.default_val()
         self.empties.add(pos)
@@ -502,20 +503,18 @@ class SingleGrid(Grid):
         self, agent: Agent, x: int | str = "random", y: int | str = "random"
     ) -> None:
         """Position an agent on the grid.
-        This is used when first placing agents! Use 'move_to_empty()'
-        when you want agents to jump to an empty cell.
+        This is used when first placing agents! Setting either x or y to "random"
+        gives the same behavior as 'move_to_empty()' to get a random position.
+        If x or y are positive, they are used.
         Use 'swap_pos()' to swap agents positions.
-        If x or y are positive, they are used, but if "random",
-        we get a random position.
-        Ensure this random position is not occupied (in Grid).
         """
         if x == "random" or y == "random":
             if len(self.empties) == 0:
                 raise Exception("ERROR: Grid full")
-            coords = agent.random.choice(sorted(self.empties))
+            self.move_to_empty(agent)
         else:
             coords = (x, y)
-        self.place_agent(agent, coords)
+            self.place_agent(agent, coords)
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         if self.is_cell_empty(pos):
