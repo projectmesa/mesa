@@ -3,6 +3,7 @@ Test the Grid objects.
 """
 import random
 import unittest
+from unittest.mock import patch, Mock
 from mesa.space import Grid, SingleGrid, MultiGrid, HexGrid
 
 # Initial agent positions for testing
@@ -231,7 +232,8 @@ class TestSingleGrid(unittest.TestCase):
                 self.grid.place_agent(a, (x, y))
         self.num_agents = len(self.agents)
 
-    def test_enforcement(self):
+    @patch.object(MockAgent, "model", create=True)
+    def test_enforcement(self, mock_model):
         """
         Test the SingleGrid empty count and enforcement.
         """
@@ -242,6 +244,7 @@ class TestSingleGrid(unittest.TestCase):
             self.grid.place_agent(a, (0, 1))
 
         # Place the agent in an empty cell
+        mock_model.schedule.get_agent_count = Mock(side_effect=lambda: len(self.agents))
         self.grid.position_agent(a)
         self.num_agents += 1
         # Test whether after placing, the empty cells are reduced by 1
