@@ -55,9 +55,7 @@ class TestExamples(unittest.TestCase):
                 except ImportError:
                     # <example>/model.py
                     mod = importlib.import_module(f"{example.replace('-', '_')}.model")
-                    server = importlib.import_module(
-                        f"{example.replace('-', '_')}.server"
-                    )
+                    server = importlib.import_module(f"{example.replace('-', '_')}.server")
                     server.server.render_model()
                 Model = getattr(mod, classcase(example))
                 model = Model()

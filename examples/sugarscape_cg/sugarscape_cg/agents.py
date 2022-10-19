@@ -18,9 +18,7 @@ def get_distance(pos_1, pos_2):
 
 
 class SsAgent(mesa.Agent):
-    def __init__(
-        self, unique_id, pos, model, moore=False, sugar=0, metabolism=0, vision=0
-    ):
+    def __init__(self, unique_id, pos, model, moore=False, sugar=0, metabolism=0, vision=0):
         super().__init__(unique_id, model)
         self.pos = pos
         self.moore = moore
@@ -50,14 +48,10 @@ class SsAgent(mesa.Agent):
         neighbors.append(self.pos)
         # Look for location with the most sugar
         max_sugar = max(self.get_sugar(pos).amount for pos in neighbors)
-        candidates = [
-            pos for pos in neighbors if self.get_sugar(pos).amount == max_sugar
-        ]
+        candidates = [pos for pos in neighbors if self.get_sugar(pos).amount == max_sugar]
         # Narrow down to the nearest ones
         min_dist = min(get_distance(self.pos, pos) for pos in candidates)
-        final_candidates = [
-            pos for pos in candidates if get_distance(self.pos, pos) == min_dist
-        ]
+        final_candidates = [pos for pos in candidates if get_distance(self.pos, pos) == min_dist]
         self.random.shuffle(final_candidates)
         self.model.grid.move_agent(self, final_candidates[0])
 

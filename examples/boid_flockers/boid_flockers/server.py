@@ -18,6 +18,4 @@ model_params = {
     "separation": 2,
 }
 
-server = mesa.visualization.ModularServer(
-    BoidFlockers, [boid_canvas], "Boids", model_params
-)
+server = mesa.visualization.ModularServer(BoidFlockers, [boid_canvas], "Boids", model_params)

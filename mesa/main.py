@@ -3,9 +3,7 @@ import os
 import click
 from subprocess import call
 
-PROJECT_PATH = click.Path(
-    exists=True, file_okay=False, dir_okay=True, resolve_path=True
-)
+PROJECT_PATH = click.Path(exists=True, file_okay=False, dir_okay=True, resolve_path=True)
 COOKIECUTTER_DIR = "mesa/cookiecutter-mesa"
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 COOKIECUTTER_PATH = os.path.join(os.path.dirname(SCRIPTS_DIR), COOKIECUTTER_DIR)
@@ -34,9 +32,7 @@ def runserver(project):
 
 
 @click.command()
-@click.option(
-    "--no-input", is_flag=True, help="Do not prompt user for custom mesa model input."
-)
+@click.option("--no-input", is_flag=True, help="Do not prompt user for custom mesa model input.")
 def startproject(no_input):
     args = ["cookiecutter", COOKIECUTTER_PATH]
     if no_input:

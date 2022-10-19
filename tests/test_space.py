@@ -396,9 +396,11 @@ class TestSingleNetworkGrid(unittest.TestCase):
 
     def test_get_cell_list_contents(self):
         assert self.space.get_cell_list_contents([0]) == [self.agents[0]]
-        assert self.space.get_cell_list_contents(
-            list(range(TestSingleNetworkGrid.GRAPH_SIZE))
-        ) == [self.agents[0], self.agents[1], self.agents[2]]
+        assert self.space.get_cell_list_contents(list(range(TestSingleNetworkGrid.GRAPH_SIZE))) == [
+            self.agents[0],
+            self.agents[1],
+            self.agents[2],
+        ]
 
     def test_get_all_cell_contents(self):
         assert self.space.get_all_cell_contents() == [

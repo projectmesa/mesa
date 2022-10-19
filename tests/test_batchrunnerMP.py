@@ -175,13 +175,9 @@ class TestBatchRunnerMP(unittest.TestCase):
         assert "Step" in list(agent_collector[(0, 1, 5)].index.names)
         assert "nose" not in list(agent_collector[(0, 1, 1)].columns)
 
-        self.assertEqual(
-            agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols)
-        )
+        self.assertEqual(agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols))
 
-        self.assertEqual(
-            agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
-        )
+        self.assertEqual(agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2))
 
     def test_agent_level_vars(self):
         """
@@ -218,10 +214,7 @@ class TestBatchRunnerMP(unittest.TestCase):
         batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
         expected_cols = (
-            len(self.variable_params)
-            + len(self.fixed_params)
-            + len(self.model_reporters)
-            + 1
+            len(self.variable_params) + len(self.fixed_params) + len(self.model_reporters) + 1
         )
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(

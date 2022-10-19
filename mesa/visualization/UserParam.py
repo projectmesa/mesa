@@ -95,9 +95,7 @@ class UserSettableParameter:
             valid = not (self.value is None)
 
         elif self.param_type == self.SLIDER:
-            valid = not (
-                self.value is None or self.min_value is None or self.max_value is None
-            )
+            valid = not (self.value is None or self.min_value is None or self.max_value is None)
 
         elif self.param_type == self.CHOICE:
             valid = not (self.value is None or len(self.choices) == 0)
@@ -133,9 +131,7 @@ class UserSettableParameter:
     @property
     def json(self):
         result = self.__dict__.copy()
-        result["value"] = result.pop(
-            "_value"
-        )  # Return _value as value, value is the same
+        result["value"] = result.pop("_value")  # Return _value as value, value is the same
         return result
 
 
@@ -145,9 +141,7 @@ class UserParam:
     @property
     def json(self):
         result = self.__dict__.copy()
-        result["value"] = result.pop(
-            "_value"
-        )  # Return _value as value, value is the same
+        result["value"] = result.pop("_value")  # Return _value as value, value is the same
         return result
 
     def maybe_raise_error(self, valid):
@@ -191,9 +185,7 @@ class Slider(UserParam):
         self.description = description
 
         # Validate option type to make sure values are supplied properly
-        valid = not (
-            self.value is None or self.min_value is None or self.max_value is None
-        )
+        valid = not (self.value is None or self.min_value is None or self.max_value is None)
         self.maybe_raise_error(valid)
 
     @property

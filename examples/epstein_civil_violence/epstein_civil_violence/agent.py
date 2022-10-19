@@ -79,14 +79,9 @@ class Citizen(mesa.Agent):
         self.update_neighbors()
         self.update_estimated_arrest_probability()
         net_risk = self.risk_aversion * self.arrest_probability
-        if (
-            self.condition == "Quiescent"
-            and (self.grievance - net_risk) > self.threshold
-        ):
+        if self.condition == "Quiescent" and (self.grievance - net_risk) > self.threshold:
             self.condition = "Active"
-        elif (
-            self.condition == "Active" and (self.grievance - net_risk) <= self.threshold
-        ):
+        elif self.condition == "Active" and (self.grievance - net_risk) <= self.threshold:
             self.condition = "Quiescent"
         if self.model.movement and self.empty_neighbors:
             new_pos = self.random.choice(self.empty_neighbors)
@@ -96,13 +91,9 @@ class Citizen(mesa.Agent):
         """
         Look around and see who my neighbors are
         """
-        self.neighborhood = self.model.grid.get_neighborhood(
-            self.pos, moore=False, radius=1
-        )
+        self.neighborhood = self.model.grid.get_neighborhood(self.pos, moore=False, radius=1)
         self.neighbors = self.model.grid.get_cell_list_contents(self.neighborhood)
-        self.empty_neighbors = [
-            c for c in self.neighborhood if self.model.grid.is_cell_empty(c)
-        ]
+        self.empty_neighbors = [c for c in self.neighborhood if self.model.grid.is_cell_empty(c)]
 
     def update_estimated_arrest_probability(self):
         """
@@ -113,11 +104,7 @@ class Citizen(mesa.Agent):
         cops_in_vision = len([c for c in self.neighbors if c.breed == "cop"])
         actives_in_vision = 1.0  # citizen counts herself
         for c in self.neighbors:
-            if (
-                c.breed == "citizen"
-                and c.condition == "Active"
-                and c.jail_sentence == 0
-            ):
+            if c.breed == "citizen" and c.condition == "Active" and c.jail_sentence == 0:
                 actives_in_vision += 1
         self.arrest_probability = 1 - math.exp(
             -1 * self.model.arrest_prob_constant * (cops_in_vision / actives_in_vision)
@@ -177,10 +164,6 @@ class Cop(mesa.Agent):
         """
         Look around and see who my neighbors are.
         """
-        self.neighborhood = self.model.grid.get_neighborhood(
-            self.pos, moore=False, radius=1
-        )
+        self.neighborhood = self.model.grid.get_neighborhood(self.pos, moore=False, radius=1)
         self.neighbors = self.model.grid.get_cell_list_contents(self.neighborhood)
-        self.empty_neighbors = [
-            c for c in self.neighborhood if self.model.grid.is_cell_empty(c)
-        ]
+        self.empty_neighbors = [c for c in self.neighborhood if self.model.grid.is_cell_empty(c)]

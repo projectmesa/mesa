@@ -9,9 +9,7 @@ def network_portrayal(G):
     # The model ensures there is always 1 agent per node
 
     def node_color(agent):
-        return {State.INFECTED: "#FF0000", State.SUSCEPTIBLE: "#008000"}.get(
-            agent.state, "#808080"
-        )
+        return {State.INFECTED: "#FF0000", State.SUSCEPTIBLE: "#008000"}.get(agent.state, "#808080")
 
     def edge_color(agent1, agent2):
         if State.RESISTANT in (agent1.state, agent2.state):

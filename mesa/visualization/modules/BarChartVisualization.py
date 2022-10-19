@@ -64,9 +64,7 @@ class BarChartModule(VisualizationElement):
 
         fields_json = json.dumps(self.fields)
         new_element = "new BarChartModule({}, {}, {}, '{}', '{}')"
-        new_element = new_element.format(
-            fields_json, canvas_width, canvas_height, sorting, sort_by
-        )
+        new_element = new_element.format(fields_json, canvas_width, canvas_height, sorting, sort_by)
         self.js_code = "elements.push(" + new_element + ")"
 
     def render(self, model):

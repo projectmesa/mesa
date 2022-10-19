@@ -16,9 +16,7 @@ def forest_fire_portrayal(tree):
     return portrayal
 
 
-canvas_element = mesa.visualization.CanvasGrid(
-    forest_fire_portrayal, 100, 100, 500, 500
-)
+canvas_element = mesa.visualization.CanvasGrid(forest_fire_portrayal, 100, 100, 500, 500)
 tree_chart = mesa.visualization.ChartModule(
     [{"Label": label, "Color": color} for (label, color) in COLORS.items()]
 )

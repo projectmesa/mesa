@@ -84,7 +84,5 @@ class TestModularServer(TestCase):
         print(self.server.user_params)
         assert self.server.user_params == {
             "key1": UserSettableParameter("number", "Test Parameter", 101).json,
-            "key2": UserSettableParameter(
-                "slider", "Test Parameter", 200, 0, 300, 10
-            ).json,
+            "key2": UserSettableParameter("slider", "Test Parameter", 200, 0, 300, 10).json,
         }

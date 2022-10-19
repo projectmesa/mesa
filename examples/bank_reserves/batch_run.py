@@ -54,9 +54,7 @@ def get_num_mid_agents(model):
     """list of middle class agents"""
 
     mid_agents = [
-        a
-        for a in model.schedule.agents
-        if a.loans < 10 and a.savings < model.rich_threshold
+        a for a in model.schedule.agents if a.loans < 10 and a.savings < model.rich_threshold
     ]
     # return number of middle class agents
     return len(mid_agents)

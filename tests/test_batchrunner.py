@@ -158,9 +158,7 @@ class TestBatchRunner(unittest.TestCase):
         if isinstance(self.variable_params, list):
             return len(self.variable_params) * self.iterations
         else:
-            return (
-                reduce(mul, map(len, self.variable_params.values())) * self.iterations
-            )
+            return reduce(mul, map(len, self.variable_params.values())) * self.iterations
 
     def test_model_level_vars(self):
         """
@@ -189,9 +187,7 @@ class TestBatchRunner(unittest.TestCase):
         agent_collector = batch.get_collector_agents()
         # extra columns with run index and agentId
         expected_cols = len(self.variable_params) + len(self.agent_reporters) + 2
-        self.assertEqual(
-            agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols)
-        )
+        self.assertEqual(agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols))
         assert "agent_val" in list(agent_vars.columns)
         assert "val_non_existent" not in list(agent_vars.columns)
         assert "agent_id" in list(agent_collector[(0, 1, 1)].columns)
@@ -200,9 +196,7 @@ class TestBatchRunner(unittest.TestCase):
         for var, values in self.variable_params.items():
             self.assertEqual(set(agent_vars[var].unique()), set(values))
 
-        self.assertEqual(
-            agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2)
-        )
+        self.assertEqual(agent_collector[(0, 1, 0)].shape, (NUM_AGENTS * self.max_steps, 2))
 
         with self.assertRaises(KeyError):
             agent_collector[(900, "k", 3)]
@@ -244,10 +238,7 @@ class TestBatchRunner(unittest.TestCase):
         batch = self.launch_batch_processing()
         model_vars = batch.get_model_vars_dataframe()
         expected_cols = (
-            len(self.variable_params)
-            + len(self.fixed_params)
-            + len(self.model_reporters)
-            + 1
+            len(self.variable_params) + len(self.fixed_params) + len(self.model_reporters) + 1
         )
         self.assertEqual(model_vars.shape, (self.model_runs, expected_cols))
         self.assertEqual(
@@ -270,9 +261,7 @@ class TestBatchRunner(unittest.TestCase):
 
         agent_vars = batch.get_agent_vars_dataframe()
         expected_cols = n_params + len(self.agent_reporters) + 2
-        self.assertEqual(
-            agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols)
-        )
+        self.assertEqual(agent_vars.shape, (self.model_runs * NUM_AGENTS, expected_cols))
 
     def test_model_with_variable_kwargs_list_mixed_length(self):
         self.variable_params = [

@@ -81,9 +81,7 @@ class ColorPatches(mesa.Model):
         # for (contents, col, row) in self._grid.coord_iter():
         # replaced content with _ to appease linter
         for (_, row, col) in self._grid.coord_iter():
-            cell = ColorCell(
-                (row, col), self, ColorCell.OPINIONS[self.random.randrange(0, 16)]
-            )
+            cell = ColorCell((row, col), self, ColorCell.OPINIONS[self.random.randrange(0, 16)])
             self._grid.place_agent(cell, (row, col))
             self._schedule.add(cell)
 

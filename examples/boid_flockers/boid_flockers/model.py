@@ -60,14 +60,7 @@ class BoidFlockers(mesa.Model):
             pos = np.array((x, y))
             velocity = np.random.random(2) * 2 - 1
             boid = Boid(
-                i,
-                self,
-                pos,
-                self.speed,
-                velocity,
-                self.vision,
-                self.separation,
-                **self.factors
+                i, self, pos, self.speed, velocity, self.vision, self.separation, **self.factors
             )
             self.space.place_agent(boid, pos)
             self.schedule.add(boid)

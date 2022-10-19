@@ -17,9 +17,7 @@ extras_require = {
 
 version = ""
 with open("mesa/__init__.py") as fd:
-    version = re.search(
-        r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE
-    ).group(1)
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE).group(1)
 
 with open("README.rst", "rb", encoding="utf-8") as f:
     readme = f.read()

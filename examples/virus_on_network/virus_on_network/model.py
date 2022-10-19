@@ -87,9 +87,7 @@ class VirusOnNetwork(mesa.Model):
 
     def resistant_susceptible_ratio(self):
         try:
-            return number_state(self, State.RESISTANT) / number_state(
-                self, State.SUSCEPTIBLE
-            )
+            return number_state(self, State.RESISTANT) / number_state(self, State.SUSCEPTIBLE)
         except ZeroDivisionError:
             return math.inf
 

@@ -121,9 +121,7 @@ CHART_JS_FILE = "external/chart-3.6.1.min.js"
 
 
 def is_user_param(val):
-    return isinstance(val, UserSettableParameter) or issubclass(
-        val.__class__, UserParam
-    )
+    return isinstance(val, UserSettableParameter) or issubclass(val.__class__, UserParam)
 
 
 class VisualizationElement:
@@ -209,9 +207,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         if self.application.verbose:
             print("Socket opened!")
-        self.write_message(
-            {"type": "model_params", "params": self.application.user_params}
-        )
+        self.write_message({"type": "model_params", "params": self.application.user_params})
 
     def check_origin(self, origin):
         return True
@@ -426,7 +422,5 @@ class ModularServer(tornado.web.Application):
         return MyTextElement()
 
     def _auto_convert_functions_to_TextElements(self, visualization_elements):
-        out_elements = [
-            self._auto_convert_fn_to_TextElement(e) for e in visualization_elements
-        ]
+        out_elements = [self._auto_convert_fn_to_TextElement(e) for e in visualization_elements]
         return out_elements

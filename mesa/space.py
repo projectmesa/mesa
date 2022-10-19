@@ -363,9 +363,7 @@ class Grid:
         return x < 0 or x >= self.width or y < 0 or y >= self.height
 
     @accept_tuple_argument
-    def iter_cell_list_contents(
-        self, cell_list: Iterable[Coordinate]
-    ) -> Iterator[Agent]:
+    def iter_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> Iterator[Agent]:
         """Returns an iterator of the contents of the cells
         identified in cell_list.
 
@@ -651,9 +649,7 @@ class HexGrid(Grid):
                 adjacent += [(x - 1, y), (x - 1, y - 1), (x + 1, y), (x + 1, y - 1)]
 
             if self.torus is False:
-                adjacent = list(
-                    filter(lambda coords: not self.out_of_bounds(coords), adjacent)
-                )
+                adjacent = list(filter(lambda coords: not self.out_of_bounds(coords), adjacent))
             else:
                 adjacent = [torus_adj_2d(coord) for coord in adjacent]
 
@@ -789,9 +785,7 @@ class ContinuousSpace:
         for idx, agent in enumerate(agents):
             self._agent_to_index[agent] = idx
             self._index_to_agent[idx] = agent
-        self._agent_points = np.array(
-            [self._index_to_agent[idx].pos for idx in range(len(agents))]
-        )
+        self._agent_points = np.array([self._index_to_agent[idx].pos for idx in range(len(agents))])
 
     def _invalidate_agent_cache(self):
         """Clear cached data of Agents and positions in the space."""
@@ -862,14 +856,10 @@ class ContinuousSpace:
         dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
 
         (idxs,) = np.where(dists <= radius**2)
-        neighbors = [
-            self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0
-        ]
+        neighbors = [self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0]
         return neighbors
 
-    def get_heading(
-        self, pos_1: FloatCoordinate, pos_2: FloatCoordinate
-    ) -> FloatCoordinate:
+    def get_heading(self, pos_1: FloatCoordinate, pos_2: FloatCoordinate) -> FloatCoordinate:
         """Get the heading angle between two points, accounting for toroidal space.
 
         Args:

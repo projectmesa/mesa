@@ -31,9 +31,7 @@ def SsAgent_portrayal(agent):
 
 
 canvas_element = mesa.visualization.CanvasGrid(SsAgent_portrayal, 50, 50, 500, 500)
-chart_element = mesa.visualization.ChartModule(
-    [{"Label": "SsAgent", "Color": "#AA0000"}]
-)
+chart_element = mesa.visualization.ChartModule([{"Label": "SsAgent", "Color": "#AA0000"}])
 
 server = mesa.visualization.ModularServer(
     SugarscapeCg, [canvas_element, chart_element], "Sugarscape 2 Constant Growback"
