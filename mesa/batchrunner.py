@@ -402,19 +402,19 @@ class FixedBatchRunner:
 
     def collect_model_vars(self, model):
         """Run reporters and collect model-level variables."""
-        model_vars = {}
-        for var, reporter in self.model_reporters.items():
-            model_vars[var] = reporter(model)
-
+        model_vars = {
+            var: reporter(model) for var, reporter in self.model_reporters.items()
+        }
         return model_vars
 
     def collect_agent_vars(self, model):
         """Run reporters and collect agent-level variables."""
         agent_vars = {}
         for agent in model.schedule._agents.values():
-            agent_record = {}
-            for var, reporter in self.agent_reporters.items():
-                agent_record[var] = getattr(agent, reporter)
+            agent_record = {
+                var: getattr(agent, reporter)
+                for var, reporter in self.agent_reporters.items()
+            }
             agent_vars[agent.unique_id] = agent_record
         return agent_vars
 
