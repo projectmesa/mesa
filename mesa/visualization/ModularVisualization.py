@@ -339,6 +339,13 @@ class ModularServer(tornado.web.Application):
                         self.local_js_includes.add(include_file_path)
             self.js_code.append(element.js_code)
 
+        local_handler = (
+            r"/local/(.*)",
+            tornado.web.StaticFileHandler,
+            {"path": ""},
+        )
+        self.handlers.append(local_handler)
+
         # Initializing the model
         self.model_name = name
         self.model_cls = model_cls
