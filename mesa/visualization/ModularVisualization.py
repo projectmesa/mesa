@@ -297,7 +297,12 @@ class ModularServer(tornado.web.Application):
             tornado.web.StaticFileHandler,
             {"path": os.path.dirname(__file__) + "/templates"},
         )
-        self.handlers = [page_handler, socket_handler, static_handler]
+        custom_handler = (
+            r"/local/custom/(.*)",
+            tornado.web.StaticFileHandler,
+            {"path": ""},
+        )
+        self.handlers = [page_handler, socket_handler, static_handler, custom_handler]
 
         self.settings = {
             "debug": True,
@@ -338,13 +343,6 @@ class ModularServer(tornado.web.Application):
                     else:
                         self.local_js_includes.add(include_file_path)
             self.js_code.append(element.js_code)
-
-        local_handler = (
-            r"/local/(.*)",
-            tornado.web.StaticFileHandler,
-            {"path": ""},
-        )
-        self.handlers.append(local_handler)
 
         # Initializing the model
         self.model_name = name

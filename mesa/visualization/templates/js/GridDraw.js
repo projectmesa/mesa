@@ -359,7 +359,7 @@ const GridVisualization = function (
 
   this.drawCustomImage = function (shape, x, y, scale, text, text_color_) {
     const img = new Image();
-    img.src = "local/".concat(shape);
+    img.src = "local/custom/".concat(shape);
     if (scale === undefined) {
       scale = 1;
     }
