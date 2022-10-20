@@ -291,7 +291,7 @@ class FixedBatchRunner:
             parameters_list = []
         self.parameters_list = list(parameters_list)
         self.fixed_parameters = fixed_parameters or {}
-        self._include_fixed = len(self.fixed_parameters.keys()) > 0
+        self._include_fixed = len(self.fixed_parameters) > 0
         self.iterations = iterations
         self.max_steps = max_steps
 
@@ -472,8 +472,7 @@ class FixedBatchRunner:
         ordered = df[index_cols + list(sorted(rest_cols))]
         ordered.sort_values(by="Run", inplace=True)
         if self._include_fixed:
-            for param in self.fixed_parameters.keys():
-                val = self.fixed_parameters[param]
+            for param, val in self.fixed_parameters.items():
 
                 # avoid error when val is an iterable
                 vallist = [val for i in range(ordered.shape[0])]
@@ -733,9 +732,9 @@ class BatchRunnerMP(BatchRunner):  # pragma: no cover
                     ] = model.datacollector.get_agent_vars_dataframe()
 
         # Make results consistent
-        if len(self.datacollector_model_reporters.keys()) == 0:
+        if len(self.datacollector_model_reporters) == 0:
             self.datacollector_model_reporters = None
-        if len(self.datacollector_agent_reporters.keys()) == 0:
+        if len(self.datacollector_agent_reporters) == 0:
             self.datacollector_agent_reporters = None
 
     def run_all(self):
