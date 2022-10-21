@@ -632,6 +632,12 @@ class HexGrid(Grid):
             equals at most 9 (8) if Moore, 5 (4) if Von Neumann (if not
             including the center).
         """
+        cache_key = (pos, include_center, radius)
+        neighborhood = self._neighborhood_cache.get(cache_key, None)
+
+        if neighborhood is not None:
+            yield from neighborhood
+            return
 
         queue = collections.deque()
         queue.append(pos)
@@ -688,7 +694,10 @@ class HexGrid(Grid):
         else:
             coordinates.discard(pos)
 
-        yield from coordinates
+        neighborhood = sorted(coordinates)
+        self._neighborhood_cache[cache_key] = neighborhood
+
+        yield from neighborhood
 
     def neighbor_iter(self, pos: Coordinate) -> Iterator[Agent]:
         """Iterate over position neighbors.
