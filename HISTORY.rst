@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+1.1.1 (2022-10-21)
+++++++++++++++++++
+
+This release fixes https://github.com/projectmesa/mesa/issues/1461 where custom user-specified portrayal images don't load in the visualization server.
+
 1.1.0 (2022-10-10) Safford
 ++++++++++++++++++++++++++
 
