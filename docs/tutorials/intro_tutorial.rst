@@ -445,7 +445,7 @@ coordinates to place the agent.
         def __init__(self, N, width, height):
             self.num_agents = N
             self.grid = mesa.space.MultiGrid(width, height, True)
-            self.schedule = RandomActivation(self)
+            self.schedule = mesa.time.RandomActivation(self)
 
             # Create agents
             for i in range(self.num_agents):
