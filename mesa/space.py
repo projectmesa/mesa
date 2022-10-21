@@ -104,16 +104,13 @@ class Grid:
         self.width = width
         self.torus = torus
 
-        self.grid: list[list[GridContent]] = []
-
-        for x in range(self.width):
-            col: list[GridContent] = []
-            for y in range(self.height):
-                col.append(self.default_val())
-            self.grid.append(col)
+        self.grid: list[list[GridContent]]
+        self.grid = [
+            [self.default_val() for _ in range(self.height)] for _ in range(self.width)
+        ]
 
         # Add all cells to the empties list.
-        self.empties = set(itertools.product(*(range(self.width), range(self.height))))
+        self.empties = set(itertools.product(range(self.width), range(self.height)))
 
         # Neighborhood Cache
         self._neighborhood_cache: dict[Any, list[Coordinate]] = dict()
