@@ -29,11 +29,9 @@ The skeleton of a model might look like this:
 
 .. code:: python
 
-    from mesa import Agent, Model
-    from mesa.time import RandomActivation
-    from mesa.space import MultiGrid
+    import mesa
 
-    class MyAgent(Agent):
+    class MyAgent(mesa.Agent):
         def __init__(self, name, model):
             super().__init__(name, model)
             self.name = name
@@ -42,11 +40,11 @@ The skeleton of a model might look like this:
             print("{} activated".format(self.name))
             # Whatever else the agent does when activated
 
-    class MyModel(Model):
+    class MyModel(mesa.Model):
         def __init__(self, n_agents):
             super().__init__()
-            self.schedule = RandomActivation(self)
-            self.grid = MultiGrid(10, 10, torus=True)
+            self.schedule = mesa.timeRandomActivation(self)
+            self.grid = mesa.space.MultiGrid(10, 10, torus=True)
             for i in range(n_agents):
                 a = MyAgent(i, self)
                 self.schedule.add(a)
@@ -79,14 +77,14 @@ You'd add a data collector to the model like this:
 
 .. code:: python
 
-    from mesa.datacollection import DataCollector
+    import mesa
 
     # ...
 
-    class MyModel(Model):
+    class MyModel(mesa.Model):
         def __init__(self, n_agents):
             # ...
-            self.dc = DataCollector(model_reporters={"agent_count":
+            self.dc = mesa.DataCollector(model_reporters={"agent_count":
                                         lambda m: m.schedule.get_agent_count()},
                                     agent_reporters={"name": lambda a: a.name})
 
@@ -136,8 +134,7 @@ To quickly spin up a model visualization, you might do something like:
 
 .. code:: python
 
-    from mesa.visualization.modules import CanvasGrid
-    from mesa.visualization.ModularVisualization import ModularServer
+    import mesa
 
     def agent_portrayal(agent):
         portrayal = {"Shape": "circle",
@@ -147,8 +144,8 @@ To quickly spin up a model visualization, you might do something like:
                      "r": 0.5}
         return portrayal
 
-    grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-    server = ModularServer(MyModel,
+    grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+    server = mesa.visualization.ModularServer(MyModel,
                            [grid],
                            "My Model",
                            {'n_agents': 10})
