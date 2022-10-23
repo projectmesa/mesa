@@ -144,42 +144,32 @@ class Grid:
             # grid[x]
             return self.grid[index]
         elif isinstance(index[0], tuple):
-            # grid[(x1, y1), (x2, y2)]
+            # grid[(x1, y1), (x2, y2), ...]
             index = cast(Sequence[Coordinate], index)
-
-            cells = []
-            for pos in index:
-                x1, y1 = self.torus_adj(pos)
-                cells.append(self.grid[x1][y1])
-            return cells
+            return [self.grid[x][y] for x, y in map(self.torus_adj, index)]
 
         x, y = index
+        x_int, y_int = is_integer(x), is_integer(y)
 
-        if is_integer(x) and is_integer(y):
+        if x_int and y_int:
             # grid[x, y]
             index = cast(Coordinate, index)
             x, y = self.torus_adj(index)
             return self.grid[x][y]
-
-        if is_integer(x):
+        elif x_int:
             # grid[x, :]
             x, _ = self.torus_adj((x, 0))
-            x = slice(x, x + 1)
-
-        if is_integer(y):
+            y = cast(slice, y)
+            return self.grid[x][y]
+        elif y_int:
             # grid[:, y]
             _, y = self.torus_adj((0, y))
-            y = slice(y, y + 1)
-
-        # grid[:, :]
-        x, y = (cast(slice, x), cast(slice, y))
-        cells = []
-        for rows in self.grid[x]:
-            for cell in rows[y]:
-                cells.append(cell)
-        return cells
-
-        raise IndexError
+            x = cast(slice, x)
+            return [rows[y] for rows in self.grid[x]]
+        else:
+            # grid[:, :]
+            x, y = (cast(slice, x), cast(slice, y))
+            return [cell for rows in self.grid[x] for cell in rows[y]]
 
     def __iter__(self) -> Iterator[GridContent]:
         """Create an iterator that chains the rows of the grid together
