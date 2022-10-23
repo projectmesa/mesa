@@ -608,10 +608,10 @@ class HexGrid(Grid):
     def torus_adj_2d(self, pos: Coordinate) -> Coordinate:
         return pos[0] % self.width, pos[1] % self.height
 
-    def iter_neighborhood(
+    def get_neighborhood(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
-    ) -> Iterator[Coordinate]:
-        """Return an iterator over cell coordinates that are in the
+    ) -> list[Coordinate]:
+        """Return a list of coordinates that are in the
         neighborhood of a certain point. To calculate the neighborhood
         for a HexGrid the parity of the x coordinate of the point is
         important, the neighborhood can be sketched as:
@@ -627,7 +627,7 @@ class HexGrid(Grid):
             radius: radius, in cells, of neighborhood to get.
 
         Returns:
-            An iterator of coordinate tuples representing the neighborhood. For
+            A list of coordinate tuples representing the neighborhood. For
             example with radius 1, it will return list with number of elements
             equals at most 9 (8) if Moore, 5 (4) if Von Neumann (if not
             including the center).
@@ -636,8 +636,7 @@ class HexGrid(Grid):
         neighborhood = self._neighborhood_cache.get(cache_key, None)
 
         if neighborhood is not None:
-            yield from neighborhood
-            return
+            return neighborhood
 
         queue = collections.deque()
         queue.append(pos)
@@ -697,7 +696,7 @@ class HexGrid(Grid):
         neighborhood = sorted(coordinates)
         self._neighborhood_cache[cache_key] = neighborhood
 
-        yield from neighborhood
+        return neighborhood
 
     def neighbor_iter(self, pos: Coordinate) -> Iterator[Agent]:
         """Iterate over position neighbors.
@@ -712,11 +711,11 @@ class HexGrid(Grid):
         )
         return self.iter_neighbors(pos)
 
-    def get_neighborhood(
+    def iter_neighborhood(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
-    ) -> list[Coordinate]:
-        """Return a list of cells that are in the neighborhood of a
-        certain point.
+    ) -> Iterator[Coordinate]:
+        """Return an iterator over cell coordinates that are in the
+        neighborhood of a certain point.
 
         Args:
             pos: Coordinate tuple for the neighborhood to get.
@@ -725,10 +724,9 @@ class HexGrid(Grid):
             radius: radius, in cells, of neighborhood to get.
 
         Returns:
-            A list of coordinate tuples representing the neighborhood;
-            With radius 1
+            An iterator of coordinate tuples representing the neighborhood.
         """
-        return list(self.iter_neighborhood(pos, include_center, radius))
+        yield from self.get_neighborhood(pos, include_center, radius)
 
     def iter_neighbors(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
