@@ -507,6 +507,26 @@ class SingleGrid(Grid):
             coords = (x, y)
             self.place_agent(agent, coords)
 
+    def swap_pos(self, agent_a: Agent, agent_b: Agent) -> None:
+        """Swap agents positions"""
+        agents_no_pos = []
+        if (pos_a := agent_a.pos) is None:
+            agents_no_pos.append(agent_a)
+        if (pos_b := agent_b.pos) is None:
+            agents_no_pos.append(agent_b)
+        if agents_no_pos:
+            agents_no_pos = [f"<Agent id: {a.unique_id}>" for a in agents_no_pos]
+            raise Exception(f"{', '.join(agents_no_pos)} - not on the grid")
+
+        if pos_a == pos_b:
+            return
+
+        self.remove_agent(agent_a)
+        self.remove_agent(agent_b)
+
+        self.place_agent(agent_a, pos_b)
+        self.place_agent(agent_b, pos_a)
+
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         if self.is_cell_empty(pos):
             super().place_agent(agent, pos)
