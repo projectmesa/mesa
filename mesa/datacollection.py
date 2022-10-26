@@ -53,8 +53,6 @@ class DataCollector:
 
     """
 
-    model = None
-
     def __init__(self, model_reporters=None, agent_reporters=None, tables=None):
         """Instantiate a DataCollector with lists of model and agent reporters.
         Both model_reporters and agent_reporters accept a dictionary mapping a
@@ -156,7 +154,7 @@ class DataCollector:
     def _record_agents(self, model):
         """Record agents data in a mapping of functions and agents."""
         rep_funcs = self.agent_reporters.values()
-        if all([hasattr(rep, "attribute_name") for rep in rep_funcs]):
+        if all(hasattr(rep, "attribute_name") for rep in rep_funcs):
             prefix = ["model.schedule.steps", "unique_id"]
             attributes = [func.attribute_name for func in rep_funcs]
             get_reports = attrgetter(*prefix + attributes)
