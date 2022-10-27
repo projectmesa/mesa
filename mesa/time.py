@@ -28,7 +28,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 # mypy
-from typing import Iterator, Union
+from typing import Iterator, Union, Iterable
 from mesa.agent import Agent
 from mesa.model import Model
 
@@ -100,8 +100,9 @@ class BaseScheduler:
         remove and/or add agents during stepping.
 
         """
-        agent_keys = list(self._agents.keys())
+        agent_keys = self._agents.keys()
         if shuffled:
+            agent_keys = list(agent_keys)
             self.model.random.shuffle(agent_keys)
 
         for key in agent_keys:
@@ -192,16 +193,18 @@ class StagedActivation(BaseScheduler):
 
     def step(self) -> None:
         """Executes all the stages for all agents."""
-        agent_keys = list(self._agents.keys())
+        agent_keys = self._agents.keys()
         if self.shuffle:
+            agent_keys = list(agent_keys)
             self.model.random.shuffle(agent_keys)
         for stage in self.stage_list:
             for agent_key in agent_keys:
                 getattr(self._agents[agent_key], stage)()  # Run stage
             # We recompute the keys because some agents might have been removed
             # in the previous loop.
-            agent_keys = list(self._agents.keys())
+            agent_keys = self._agents.keys()
             if self.shuffle_between_stages:
+                agent_keys = list(agent_keys)
                 self.model.random.shuffle(agent_keys)
             self.time += self.stage_time
 
@@ -264,8 +267,9 @@ class RandomActivationByType(BaseScheduler):
             shuffle_agents: If True, the order of execution of each agents in a
                             type group is shuffled.
         """
-        type_keys: list[type[Agent]] = list(self.agents_by_type.keys())
+        type_keys: Iterable[type[Agent]] = self.agents_by_type.keys()
         if shuffle_types:
+            type_keys = list(type_keys)
             self.model.random.shuffle(type_keys)
         for agent_class in type_keys:
             self.step_type(agent_class, shuffle_agents=shuffle_agents)
@@ -280,8 +284,9 @@ class RandomActivationByType(BaseScheduler):
         Args:
             type_class: Class object of the type to run.
         """
-        agent_keys: list[int] = list(self.agents_by_type[type_class].keys())
+        agent_keys: Iterable[int] = self.agents_by_type[type_class].keys()
         if shuffle_agents:
+            agent_keys = list(agent_keys)
             self.model.random.shuffle(agent_keys)
         for agent_key in agent_keys:
             self.agents_by_type[type_class][agent_key].step()
