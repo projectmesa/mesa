@@ -37,7 +37,6 @@ The default DataCollector here makes several assumptions:
 """
 from functools import partial
 import itertools
-from operator import attrgetter
 import pandas as pd
 import types
 
