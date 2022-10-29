@@ -1,8 +1,5 @@
 name: Release
-on:
-  release:
-    types:
-      - published
+on: [push, pull_request, workflow_dispatch]
 
 permissions:
   id-token: write
@@ -19,16 +16,17 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install -U pip wheel setuptools
-      - name: Build package
-        run: python setup.py sdist bdist_wheel
+        run: pip install -U pip build wheel setuptools
+      - name: Build distributions
+        run: python -m build
       - name: Upload package as artifact to GitHub
+        if: github.repository == 'projectmesa/mesa' && startsWith(github.ref, 'refs/tags')
         uses: actions/upload-artifact@v3
         with:
           name: package
           path: dist/
-      - name: Upload packages to PyPI
+      - name: Publish package to PyPI
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          user: __token__
-          password: ${{ secrets.pypi_password }}
+          password: ${{ secrets.PYPI_API_TOKEN }}
