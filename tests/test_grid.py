@@ -251,8 +251,6 @@ class TestSingleGrid(unittest.TestCase):
         assert a.pos not in self.grid.empties
         assert len(self.grid.empties) == 8
         for i in range(10):
-            # Since the agents and the grid are not associated with a model, we
-            # must explicitly tell move_to_empty the number of agents.
             self.grid.move_to_empty(a, num_agents=self.num_agents)
         assert len(self.grid.empties) == 8
 

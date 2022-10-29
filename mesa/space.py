@@ -103,6 +103,7 @@ class Grid:
         self.height = height
         self.width = width
         self.torus = torus
+        self.num_cells = height * width
 
         self.grid: list[list[GridContent]]
         self.grid = [
@@ -422,32 +423,24 @@ class Grid:
         self, agent: Agent, cutoff: float = 0.998, num_agents: int | None = None
     ) -> None:
         """Moves agent to a random empty cell, vacating agent's old cell."""
-        if len(self.empties) == 0:
+        if num_agents is not None:
+            warn(
+                (
+                    "`num_agents` is being deprecated since it's no longer used "
+                    "inside the function, it shouldn't be passed as a parameter."
+                ),
+                DeprecationWarning,
+            )
+        num_empty_cells = len(self.empties)
+        if num_empty_cells == 0:
             raise Exception("ERROR: No empty cells")
-        if num_agents is None:
-            try:
-                num_agents = agent.model.schedule.get_agent_count()
-            except AttributeError:
-                raise Exception(
-                    "Your agent is not attached to a model, and so Mesa is unable\n"
-                    "to figure out the total number of agents you have created.\n"
-                    "This number is required in order to calculate the threshold\n"
-                    "for using a much faster algorithm to find an empty cell.\n"
-                    "In this case, you must specify `num_agents`."
-                )
-        new_pos = (0, 0)  # Initialize it with a starting value.
-        # This method is based on Agents.jl's random_empty() implementation.
-        # See https://github.com/JuliaDynamics/Agents.jl/pull/541.
-        # For the discussion, see
-        # https://github.com/projectmesa/mesa/issues/1052.
-        # This switch assumes the worst case (for this algorithm) of one
-        # agent per position, which is not true in general but is appropriate
-        # here.
-        if clamp(num_agents / (self.width * self.height), 0.0, 1.0) < cutoff:
-            # The default cutoff value provided is the break-even comparison
-            # with the time taken in the else branching point.
-            # The number is measured to be 0.998 in Agents.jl, but since Mesa
-            # run under different environment, the number is different here.
+
+        # This method is based on Agents.jl's random_empty() implementation. See
+        # https://github.com/JuliaDynamics/Agents.jl/pull/541. For the discussion, see
+        # https://github.com/projectmesa/mesa/issues/1052. The default cutoff value
+        # provided is the break-even comparison with the time taken in the else
+        # branching point.
+        if 1 - num_empty_cells / self.num_cells < cutoff:
             while True:
                 new_pos = (
                     agent.random.randrange(self.width),
