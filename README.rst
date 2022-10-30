@@ -1,5 +1,4 @@
 Mesa: Agent-based modeling in Python 3+
-squash
 =========================================
 
 .. image:: https://github.com/projectmesa/mesa/workflows/build/badge.svg
