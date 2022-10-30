@@ -52,7 +52,9 @@ class DataCollector:
 
     """
 
-    def __init__(self, model_reporters=None, agent_reporters=None, tables=None, schedule=None):
+    def __init__(
+        self, model_reporters=None, agent_reporters=None, tables=None, schedule=None
+    ):
         """Instantiate a DataCollector with lists of model and agent reporters.
         Both model_reporters and agent_reporters accept a dictionary mapping a
         variable name to either an attribute name, or a method.
@@ -155,12 +157,14 @@ class DataCollector:
 
     def _record_agents(self, model, schedule):
         """Record agents data in a mapping of functions and agents."""
-        agent_records = map(partial(self._get_reports, self, schedule.steps), schedule.agents)
+        agent_records = map(
+            partial(self._get_reports, self, schedule.steps), schedule.agents
+        )
         return agent_records
 
     @staticmethod
     def _get_reports(collector, steps, agent):
-        """Get the agent reports for a given agent and return them in a tuple. """
+        """Get the agent reports for a given agent and return them in a tuple."""
         rep_funcs = collector.agent_reporters.values()
         _prefix = (steps, agent.unique_id)
         reports = tuple(rep(agent) for rep in rep_funcs)
