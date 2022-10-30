@@ -13,7 +13,7 @@ Mesa: Agent-based modeling in Python 3+
 .. image:: https://img.shields.io/matrix/project-mesa:matrix.org?label=chat&logo=Matrix
         :target: https://matrix.to/#/#project-mesa:matrix.org
 
-It allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python 3-based alternative to NetLogo, Repast, or MASON.
+Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python 3-based alternative to NetLogo, Repast, or MASON.
 
 
 .. image:: https://raw.githubusercontent.com/projectmesa/mesa/main/docs/images/Mesa_Screenshot.png
