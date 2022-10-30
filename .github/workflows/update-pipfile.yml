@@ -19,7 +19,7 @@ jobs:
     - run: pip install -U wheel
     - run: pip install -U pipenv
     - run: pipenv lock
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: "Pipfile lock"
         path: Pipfile.lock
