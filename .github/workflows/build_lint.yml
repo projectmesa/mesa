@@ -56,7 +56,7 @@ jobs:
       run: pytest --cov=mesa tests/ --cov-report=xml
     - if: matrix.os == 'ubuntu'
       name: Codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
 
   lint-flake:
     runs-on: ubuntu-latest
