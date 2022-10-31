@@ -488,8 +488,6 @@ class Grid:
 class SingleGrid(Grid):
     """Grid where each cell contains exactly at most one object."""
 
-    empties: set[Coordinate] = set()
-
     def position_agent(
         self, agent: Agent, x: int | str = "random", y: int | str = "random"
     ) -> None:
