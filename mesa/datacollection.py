@@ -33,7 +33,6 @@ The default DataCollector here makes several assumptions:
     * The model has a schedule object called 'schedule'
     * The schedule has an agent list called agents
     * For collecting agent-level variables, agents must have a unique_id
-
 """
 from functools import partial
 import itertools
@@ -50,7 +49,6 @@ class DataCollector:
     functions which actually collect them. When the collect(...) method is
     called, it collects these attributes and executes these functions one by
     one and stores the results.
-
     """
 
     def __init__(self, model_reporters=None, agent_reporters=None, tables=None):
@@ -91,7 +89,6 @@ class DataCollector:
             {"model_attribute": "model_attribute"}
             functions with parameters that have placed in a list
             {"Model_Function":[function, [param_1, param_2]]}
-
         """
         self.model_reporters = {}
         self.agent_reporters = {}
@@ -132,7 +129,6 @@ class DataCollector:
             name: Name of the agent-level variable to collect.
             reporter: Attribute string, or function object that returns the
                       variable when given a model instance.
-
         """
         if type(reporter) is str:
             attribute_name = reporter
@@ -146,7 +142,6 @@ class DataCollector:
         Args:
             table_name: Name of the new table.
             table_columns: List of columns to add to the table.
-
         """
         new_table = {column: [] for column in table_columns}
         self.tables[table_name] = new_table
@@ -200,7 +195,6 @@ class DataCollector:
             row: A dictionary of the form {column_name: value...}
             ignore_missing: If True, fill any missing columns with Nones;
                             if False, throw an error if any columns are missing
-
         """
         if table_name not in self.tables:
             raise Exception("Table does not exist.")
@@ -223,7 +217,6 @@ class DataCollector:
 
         The DataFrame has one column for each model variable, and the index is
         (implicitly) the model tick.
-
         """
         return pd.DataFrame(self.model_vars)
 
@@ -232,7 +225,6 @@ class DataCollector:
 
         The DataFrame has one column for each variable, with two additional
         columns for tick and agent_id.
-
         """
         all_records = itertools.chain.from_iterable(self._agent_records.values())
         rep_names = list(self.agent_reporters)
@@ -249,7 +241,6 @@ class DataCollector:
 
         Args:
             table_name: The name of the table to convert.
-
         """
         if table_name not in self.tables:
             raise Exception("No such table.")
