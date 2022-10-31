@@ -93,7 +93,6 @@ Client -> Server:
     {
     "type": "get_params"
     }
-
 """
 import asyncio
 import os
@@ -145,7 +144,6 @@ class VisualizationElement:
     Methods:
         render: Takes a model object, and produces JSON data which can be sent
                 to the client.
-
     """
 
     package_includes = []
@@ -165,7 +163,6 @@ class VisualizationElement:
 
         Returns:
             A JSON-ready object.
-
         """
         return "<b>VisualizationElement goes here</b>."
 
@@ -389,7 +386,6 @@ class ModularServer(tornado.web.Application):
     def render_model(self):
         """Turn the current state of the model into a dictionary of
         visualizations
-
         """
         visualization_state = []
         for element in self.visualization_elements:

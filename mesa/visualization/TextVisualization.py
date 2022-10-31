@@ -24,7 +24,6 @@ one ASCII character via a converter method. This (as opposed to a dictionary)
 is used so as to allow the method to access Agent internals, as well as to
 potentially render a cell based on several values (e.g. an Agent grid and a
 Patch value grid).
-
 """
 # Pylint instructions: allow single-character variable names.
 # pylint: disable=invalid-name
@@ -38,7 +37,6 @@ class TextVisualization:
         model: The underlying model object to be visualized.
         elements: List of visualization elements, which will be rendered
                     in the order they are added.
-
     """
 
     def __init__(self, model):
@@ -97,7 +95,6 @@ class TextGrid(ASCIIElement):
 
     Properties:
         grid: The underlying grid object.
-
     """
 
     grid = None

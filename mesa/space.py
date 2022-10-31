@@ -7,7 +7,6 @@ Objects used to add a spatial component to a model.
 Grid: base grid, a simple list-of-lists.
 SingleGrid: grid which strictly enforces one object per cell.
 MultiGrid: extension to Grid where each cell is a set of objects.
-
 """
 # Instruction for PyLint to suppress variable name errors, since we have a
 # good reason to use one-character variable names for x and y.
@@ -576,7 +575,6 @@ class MultiGrid(Grid):
 
         Returns:
             A iterator of the contents of the cells identified in cell_list
-
         """
         return itertools.chain.from_iterable(
             self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y))

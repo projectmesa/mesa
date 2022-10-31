@@ -2,7 +2,6 @@
 The agent class for Mesa framework.
 
 Core Objects: Agent
-
 """
 # Mypy; for the `|` operator purpose
 # Remove this __future__ import once the oldest supported Python is 3.10

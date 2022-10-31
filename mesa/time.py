@@ -45,7 +45,6 @@ class BaseScheduler:
     Assumes that each agent added has a *step* method which takes no arguments.
 
     (This is explicitly meant to replicate the scheduler in MASON).
-
     """
 
     def __init__(self, model: Model) -> None:
@@ -61,7 +60,6 @@ class BaseScheduler:
         Args:
             agent: An Agent to be added to the schedule. NOTE: The agent must
             have a step() method.
-
         """
 
         if agent.unique_id in self._agents:
@@ -76,7 +74,6 @@ class BaseScheduler:
 
         Args:
             agent: An agent object.
-
         """
         del self._agents[agent.unique_id]
 
@@ -98,7 +95,6 @@ class BaseScheduler:
     def agent_buffer(self, shuffled: bool = False) -> Iterator[Agent]:
         """Simple generator that yields the agents while letting the user
         remove and/or add agents during stepping.
-
         """
         agent_keys = self._agents.keys()
         if shuffled:
@@ -118,7 +114,6 @@ class RandomActivation(BaseScheduler):
     default behavior for an ABM.
 
     Assumes that all agents have a step(model) method.
-
     """
 
     def step(self) -> None:
@@ -138,7 +133,6 @@ class SimultaneousActivation(BaseScheduler):
     This scheduler requires that each agent have two methods: step and advance.
     step() activates the agent and stages any necessary changes, but does not
     apply them yet. advance() then applies the changes.
-
     """
 
     def step(self) -> None:
@@ -163,7 +157,6 @@ class StagedActivation(BaseScheduler):
 
     This schedule tracks steps and time separately. Time advances in fractional
     increments of 1 / (# of stages), meaning that 1 step = 1 unit of time.
-
     """
 
     def __init__(
@@ -183,7 +176,6 @@ class StagedActivation(BaseScheduler):
             shuffle_between_stages: If True, shuffle the agents after each
                                     stage; otherwise, only shuffle at the start
                                     of each step.
-
         """
         super().__init__(model)
         self.stage_list = ["step"] if not stage_list else stage_list

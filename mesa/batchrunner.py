@@ -3,7 +3,6 @@ Batchrunner
 ===========
 
 A single class to manage a batch run or parameter sweep of a given model.
-
 """
 import copy
 import itertools
@@ -284,7 +283,6 @@ class FixedBatchRunner:
                 collected at the level of each agent present in the model at
                 the end of the run.
             display_progress: Display progress bar with time estimation?
-
         """
         self.model_cls = model_cls
         if parameters_list is None:
@@ -393,7 +391,6 @@ class FixedBatchRunner:
 
         If your model runs in a non-standard way, this is the method to modify
         in your subclass.
-
         """
         while model.running and model.schedule.steps < self.max_steps:
             model.step()
@@ -536,7 +533,6 @@ class BatchRunner(FixedBatchRunner):
     Note that by default, the reporters only collect data at the *end* of the
     run. To get step by step data, simply have a reporter store the model's
     entire DataCollector object.
-
     """
 
     def __init__(
@@ -579,7 +575,6 @@ class BatchRunner(FixedBatchRunner):
                 collected at the level of each agent present in the model at
                 the end of the run.
             display_progress: Display progress bar with time estimation?
-
         """
         warn(
             "BatchRunner class has been replaced by batch_run function. Please see documentation.",
