@@ -56,11 +56,6 @@ MultiGridContent = List[Agent]
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-def clamp(x: float, lowest: float, highest: float) -> float:
-    # much faster than np.clip for a scalar x.
-    return lowest if x <= lowest else (highest if x >= highest else x)
-
-
 def accept_tuple_argument(wrapped_function: F) -> F:
     """Decorator to allow grid methods that take a list of (x, y) coord tuples
     to also handle a single position, by automatically wrapping tuple in
@@ -427,7 +422,7 @@ class Grid:
             warn(
                 (
                     "`num_agents` is being deprecated since it's no longer used "
-                    "inside the function, it shouldn't be passed as a parameter."
+                    "inside `move_to_empty`. It shouldn't be passed as a parameter."
                 ),
                 DeprecationWarning,
             )
