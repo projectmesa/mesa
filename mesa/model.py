@@ -2,7 +2,6 @@
 The model class for Mesa framework.
 
 Core Objects: Model
-
 """
 # Mypy; for the `|` operator purpose
 # Remove this __future__ import once the oldest supported Python is 3.10
@@ -33,7 +32,6 @@ class Model:
         Attributes:
             schedule: schedule object
             running: a bool indicating if the model should continue running
-
         """
 
         self.running = True
@@ -43,7 +41,6 @@ class Model:
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as
         needed.
-
         """
         while self.running:
             self.step()
