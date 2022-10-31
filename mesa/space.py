@@ -99,10 +99,11 @@ class Grid:
         self.width = width
         self.torus = torus
         self.num_cells = height * width
+        self._default_val = type(self.default_val())
 
         self.grid: list[list[GridContent]]
         self.grid = [
-            [self.default_val() for _ in range(self.height)] for _ in range(self.width)
+            [self._default_val() for _ in range(self.height)] for _ in range(self.width)
         ]
 
         # Add all cells to the empties list.
@@ -405,14 +406,14 @@ class Grid:
         if (pos := agent.pos) is None:
             return
         x, y = pos
-        self.grid[x][y] = self.default_val()
+        self.grid[x][y] = self._default_val()
         self.empties.add(pos)
         agent.pos = None
 
     def is_cell_empty(self, pos: Coordinate) -> bool:
         """Returns a bool of the contents of a cell."""
         x, y = pos
-        return self.grid[x][y] == self.default_val()
+        return self.grid[x][y] == self._default_val()
 
     def move_to_empty(
         self, agent: Agent, cutoff: float = 0.998, num_agents: int | None = None
@@ -543,7 +544,7 @@ class MultiGrid(Grid):
     grid: list[list[MultiGridContent]]
 
     @staticmethod
-    def default_val() -> MultiGridContent:
+    def default_val() -> list:
         """Default value for new cell elements."""
         return []
 
