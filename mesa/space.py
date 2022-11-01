@@ -958,14 +958,12 @@ class NetworkGrid:
             G.nodes[node_id]["agent"] = list()
 
     def place_agent(self, agent: Agent, node_id: int) -> None:
-        """Place a agent in a node."""
-
+        """Place an agent in a node."""
         self.G.nodes[node_id]["agent"].append(agent)
         agent.pos = node_id
 
     def get_neighbors(self, node_id: int, include_center: bool = False) -> list[int]:
         """Get all adjacent nodes"""
-
         neighbors = list(self.G.neighbors(node_id))
         if include_center:
             neighbors.append(node_id)
@@ -974,7 +972,6 @@ class NetworkGrid:
 
     def move_agent(self, agent: Agent, node_id: int) -> None:
         """Move an agent from its current node to a new node."""
-
         self.remove_agent(agent)
         self.place_agent(agent, node_id)
 
@@ -989,22 +986,20 @@ class NetworkGrid:
         return not self.G.nodes[node_id]["agent"]
 
     def get_cell_list_contents(self, cell_list: list[int]) -> list[GridContent]:
-        """Returns the contents of a list of cells ((x,y) tuples)
-        Note: this method returns a list of `Agent`'s; `None` contents are excluded.
+        """Returns a list of the agents in the nodes identified in `cell_list`;
+        nodes with empty content are excluded.
         """
-        return list(self.iter_cell_list_contents(cell_list))
-
-    def get_all_cell_contents(self) -> list[GridContent]:
-        """Returns a list of the contents of the cells
-        identified in cell_list."""
-        return list(self.iter_cell_list_contents(self.G))
-
-    def iter_cell_list_contents(self, cell_list: list[int]) -> list[GridContent]:
-        """Returns an iterator of the contents of the cells
-        identified in cell_list."""
         list_of_lists = [
             self.G.nodes[node_id]["agent"]
             for node_id in cell_list
             if not self.is_cell_empty(node_id)
         ]
         return [item for sublist in list_of_lists for item in sublist]
+
+    def get_all_cell_contents(self) -> list[GridContent]:
+        """Returns a list of all the agents in the network."""
+        return self.get_cell_list_contents(self.G)
+
+    def iter_cell_list_contents(self, cell_list: list[int]) -> Iterator[GridContent]:
+        """Returns an iterator of the agents in the nodes identified in `cell_list`."""
+        yield from self.get_cell_list_contents(cell_list)
