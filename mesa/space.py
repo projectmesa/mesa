@@ -955,7 +955,12 @@ class NetworkGrid:
     def __init__(self, G: Any) -> None:
         self.G = G
         for node_id in self.G.nodes:
-            G.nodes[node_id]["agent"] = list()
+            G.nodes[node_id]["agent"] = self.default_val()
+
+    @staticmethod
+    def default_val() -> list:
+        """Default value for a new node."""
+        return []
 
     def place_agent(self, agent: Agent, node_id: int) -> None:
         """Place a agent in a node."""
@@ -986,7 +991,7 @@ class NetworkGrid:
 
     def is_cell_empty(self, node_id: int) -> bool:
         """Returns a bool of the contents of a cell."""
-        return not self.G.nodes[node_id]["agent"]
+        return self.G.nodes[node_id]["agent"] == self.default_val()
 
     def get_cell_list_contents(self, cell_list: list[int]) -> list[GridContent]:
         """Returns the contents of a list of cells ((x,y) tuples)
