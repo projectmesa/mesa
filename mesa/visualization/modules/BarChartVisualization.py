@@ -3,7 +3,6 @@ Pie Chart Module
 ============
 
 Module for drawing live-updating bar charts using d3.js
-
 """
 import json
 from mesa.visualization.ModularVisualization import VisualizationElement, D3_JS_FILE
@@ -24,7 +23,6 @@ class BarChartModule(VisualizationElement):
         canvas_height, canvas_width: The width and height to draw the chart on the page, in pixels.
                                     Default to 800 x 400
         data_collector_name: Name of the DataCollector object in the model to retrieve data from.
-
     """
 
     package_includes = [D3_JS_FILE, "BarChartModule.js"]

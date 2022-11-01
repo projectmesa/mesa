@@ -43,7 +43,6 @@ def color_patch_draw(cell):
     :param cell:  the cell in the simulation
 
     :return: the portrayal dictionary.
-
     """
     if cell is None:
         raise AssertionError

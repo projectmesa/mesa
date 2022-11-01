@@ -11,7 +11,6 @@ class RandomWalker(mesa.Agent):
 
     Not intended to be used on its own, but to inherit its methods to multiple
     other agents.
-
     """
 
     grid = None

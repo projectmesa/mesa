@@ -26,7 +26,6 @@ class Citizen(mesa.Agent):
             how aggrieved is agent at the regime?
         arrest_probability: agent's assessment of arrest probability, given
             rebellion
-
     """
 
     def __init__(
@@ -108,7 +107,6 @@ class Citizen(mesa.Agent):
         """
         Based on the ratio of cops to actives in my neighborhood, estimate the
         p(Arrest | I go active).
-
         """
         cops_in_vision = len([c for c in self.neighbors if c.breed == "cop"])
         actives_in_vision = 1.0  # citizen counts herself

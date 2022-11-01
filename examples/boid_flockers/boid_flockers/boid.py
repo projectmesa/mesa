@@ -43,7 +43,6 @@ class Boid(mesa.Agent):
             cohere: the relative importance of matching neighbors' positions
             separate: the relative importance of avoiding close neighbors
             match: the relative importance of matching neighbors' headings
-
         """
         super().__init__(unique_id, model)
         self.pos = np.array(pos)
