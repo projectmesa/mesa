@@ -3,7 +3,6 @@ Modular Canvas Rendering
 ========================
 
 Module for visualizing model objects in grid cells.
-
 """
 from collections import defaultdict
 from mesa.visualization.ModularVisualization import VisualizationElement
@@ -59,7 +58,6 @@ class CanvasGrid(VisualizationElement):
         canvas_height, canvas_width: Size, in pixels, of the grid visualization
                                      to draw on the client.
         template: "canvas_module.html" stores the module's HTML template.
-
     """
 
     package_includes = ["GridDraw.js", "CanvasModule.js", "InteractionHandler.js"]
@@ -80,7 +78,6 @@ class CanvasGrid(VisualizationElement):
             grid_width, grid_height: Size of the grid, in cells.
             canvas_height, canvas_width: Size of the canvas to draw in the
                                          client, in pixels. (default: 500x500)
-
         """
         self.portrayal_method = portrayal_method
         self.grid_width = grid_width

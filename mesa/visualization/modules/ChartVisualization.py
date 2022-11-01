@@ -3,7 +3,6 @@ Chart Module
 ============
 
 Module for drawing live-updating line charts using Charts.js
-
 """
 import json
 from mesa.visualization.ModularVisualization import VisualizationElement, CHART_JS_FILE
@@ -39,7 +38,6 @@ class ChartModule(VisualizationElement):
         More Pythonic customization; in particular, have both series-level and
         chart-level options settable in Python, and passed to the front-end
         the same way that "Color" is currently.
-
     """
 
     package_includes = [CHART_JS_FILE, "ChartModule.js"]

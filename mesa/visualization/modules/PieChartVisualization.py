@@ -3,7 +3,6 @@ Pie Chart Module
 ============
 
 Module for drawing live-updating pie charts using d3.js
-
 """
 import json
 from mesa.visualization.ModularVisualization import VisualizationElement, D3_JS_FILE
@@ -12,7 +11,6 @@ from mesa.visualization.ModularVisualization import VisualizationElement, D3_JS_
 class PieChartModule(VisualizationElement):
     """Each chart can visualize one set of fields from a datacollector as a
     pie chart.
-
 
     Attributes:
         fields: A list of dictionaries containing information on fields to
@@ -24,9 +22,6 @@ class PieChartModule(VisualizationElement):
                                      the page, in pixels. Default to 500 x 500
         data_collector_name: Name of the DataCollector object in the model to
                              retrieve data from.
-
-
-
     """
 
     package_includes = [D3_JS_FILE, "PieChartModule.js"]
