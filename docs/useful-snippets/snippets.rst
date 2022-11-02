@@ -101,5 +101,6 @@ One may occasionally want multiple schedules with distinct sets of agents and co
 To get the data at the end of the model, simply call:
 
 .. code:: python
+
   schedule_one_agent_data = model.datacollector_one.get_agent_vars_dataframe()
   schedule_two_agent_data = model.datacollector_two.get_agent_vars_dataframe()
