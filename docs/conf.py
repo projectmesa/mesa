@@ -14,6 +14,7 @@
 
 import sys
 import os
+from datetime import date
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -57,7 +58,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "Mesa"
-copyright = "2015-2022, Project Mesa Team"
+copyright = f"2015-{date.today().year}, Project Mesa Team"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
