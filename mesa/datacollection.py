@@ -155,20 +155,17 @@ class DataCollector:
         new_table = {column: [] for column in table_columns}
         self.tables[table_name] = new_table
 
-    def _record_agents(self, model, schedule):
+    def _record_agents(self, schedule):
         """Record agents data in a mapping of functions and agents."""
-        agent_records = map(
-            partial(self._get_reports, self, schedule.steps), schedule.agents
-        )
-        return agent_records
+        rep_funcs = self.agent_reporters.values()
 
-    @staticmethod
-    def _get_reports(collector, steps, agent):
-        """Get the agent reports for a given agent and return them in a tuple."""
-        rep_funcs = collector.agent_reporters.values()
-        _prefix = (steps, agent.unique_id)
-        reports = tuple(rep(agent) for rep in rep_funcs)
-        return _prefix + reports
+        def get_reports(agent):
+            _prefix = (schedule.steps, agent.unique_id)
+            reports = tuple(rep(agent) for rep in rep_funcs)
+            return _prefix + reports
+
+        agent_records = map(get_reports, schedule.agents)
+        return agent_records
 
     def _reporter_decorator(self, reporter):
         return reporter()
@@ -196,7 +193,7 @@ class DataCollector:
                     self.model_vars[var].append(self._reporter_decorator(reporter))
 
         if self.agent_reporters:
-            agent_records = self._record_agents(model, schedule)
+            agent_records = self._record_agents(schedule)
             self._agent_records[schedule.steps] = list(agent_records)
 
     def add_table_row(self, table_name, row, ignore_missing=False):
