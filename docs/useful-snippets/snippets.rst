@@ -65,6 +65,7 @@ Using multiple schedules and data collectors
 One may occasionally want multiple schedules with distinct sets of agents and collect data on each of those schedules independently while allowing the agents to interact in the same model. This would be particularly useful if the agents in your model do not all have the same attributes and you want to collect data on them in groups. You can create a simple scheduler class to mix the agents in each schedule and data collect on each schedule independently.
 
 .. code:: python
+
   from random import shuffle
 
   # simple schedule mixer
