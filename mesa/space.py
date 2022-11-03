@@ -737,7 +737,7 @@ class HexGrid(Grid):
         Returns:
             An iterator of non-None objects in the given neighborhood
         """
-        neighborhood = self.iter_neighborhood(pos, include_center, radius)
+        neighborhood = self.get_neighborhood(pos, include_center, radius)
         return self.iter_cell_list_contents(neighborhood)
 
     def get_neighbors(
