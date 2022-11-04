@@ -986,8 +986,8 @@ class NetworkGrid:
         return not self.G.nodes[node_id]["agent"]
 
     def get_cell_list_contents(self, cell_list: list[int]) -> list[GridContent]:
-        """Returns a list of the agents in the nodes identified in `cell_list`;
-        nodes with empty content are excluded.
+        """Returns a list of the agents contained in the nodes identified
+        in `cell_list`; nodes with empty content are excluded.
         """
         list_of_lists = [
             self.G.nodes[node_id]["agent"]
@@ -1001,5 +1001,7 @@ class NetworkGrid:
         return self.get_cell_list_contents(self.G)
 
     def iter_cell_list_contents(self, cell_list: list[int]) -> Iterator[GridContent]:
-        """Returns an iterator of the agents in the nodes identified in `cell_list`."""
+        """Returns an iterator of the agents contained in the nodes identified
+        in `cell_list`.
+        """
         yield from self.get_cell_list_contents(cell_list)
