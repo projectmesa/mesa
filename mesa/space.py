@@ -972,7 +972,6 @@ class NetworkGrid:
         neighbors = list(self.G.neighbors(node_id))
         if include_center:
             neighbors.append(node_id)
-
         return neighbors
 
     def move_agent(self, agent: Agent, node_id: int) -> None:
@@ -990,7 +989,7 @@ class NetworkGrid:
         """Returns a bool of the contents of a cell."""
         return self.G.nodes[node_id]["agent"] == self.default_val()
 
-    def get_cell_list_contents(self, cell_list: list[int]) -> list[GridContent]:
+    def get_cell_list_contents(self, cell_list: list[int]) -> list[Agent]:
         """Returns a list of the agents contained in the nodes identified
         in `cell_list`; nodes with empty content are excluded.
         """
@@ -1001,11 +1000,11 @@ class NetworkGrid:
         ]
         return [item for sublist in list_of_lists for item in sublist]
 
-    def get_all_cell_contents(self) -> list[GridContent]:
+    def get_all_cell_contents(self) -> list[Agent]:
         """Returns a list of all the agents in the network."""
         return self.get_cell_list_contents(self.G)
 
-    def iter_cell_list_contents(self, cell_list: list[int]) -> Iterator[GridContent]:
+    def iter_cell_list_contents(self, cell_list: list[int]) -> Iterator[Agent]:
         """Returns an iterator of the agents contained in the nodes identified
         in `cell_list`; nodes with empty content are excluded.
         """
