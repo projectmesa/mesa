@@ -70,16 +70,20 @@ One may occasionally want multiple schedules with distinct sets of agents and co
 
   # simple schedule mixer
   class ScheduleMixerRandom:
-      def __init__(self, schedules: list):
-          self.schedules = schedules
+      """
+      Note that ScheduleMixerRandom as written here would not capture changes to
+      the agent lists in the sub-schedules. The user would need to be mindful if
+      this functionality were to be included.
+      """
+
+      def __init__(self, schedules):
+          self._agents = []
+          for s in schedules:
+              self._agents.extends(s.agents)
 
       def step(self):
-          agents = []
-          for s in self.schedules:
-              agents.extend(s.agents)
-          agents = shuffle(agents) # step through them randomly
-          for a in agents:
-              a.step()
+          # do stuff with self._agents
+          ...
 
   class MyModel(Model):
       def __init__(self, ...):
@@ -97,6 +101,8 @@ One may occasionally want multiple schedules with distinct sets of agents and co
           self.schedule_mixer.step() # calls step() on each agent in both schedules, mixed together
           self.datacollector_one.collect(self) # collects data on the agents in schedule_one
           self.datacollector_two.collect(self) # collects data on the agents in schedule_two
+
+
 
 
 To get the data at the end of the model, simply call:
