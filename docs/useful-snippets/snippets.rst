@@ -71,15 +71,16 @@ One may occasionally want multiple schedules with distinct sets of agents and co
   # simple schedule mixer
   class ScheduleMixerRandom:
       """
-      Note that ScheduleMixerRandom as written here would not capture changes to
+      Be careful: ScheduleMixerRandom as written here would not capture changes to
       the agent lists in the sub-schedules. The user would need to be mindful if
       this functionality were to be included.
       """
 
       def __init__(self, schedules):
-          self._agents = []
+          self._agents = {}
           for s in schedules:
-              self._agents.extends(s.agents)
+          for a in s.agents:
+              self._agents[a.unique_id] = a # each agent must have a unique id across models
 
       def step(self):
           # do stuff with self._agents
