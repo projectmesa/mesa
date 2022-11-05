@@ -169,6 +169,36 @@ class TestBaseGrid(unittest.TestCase):
         assert agent.pos is None
         assert self.grid.grid[x][y] is None
 
+    def test_swap_pos(self):
+
+        # Swap agents positions
+        agent_a, agent_b = random.sample(list(self.grid), k=2)
+        pos_a = agent_a.pos
+        pos_b = agent_b.pos
+
+        self.grid.swap_pos(agent_a, agent_b)
+
+        assert agent_a.pos == pos_b
+        assert agent_b.pos == pos_a
+        assert self.grid[pos_a] == agent_b
+        assert self.grid[pos_b] == agent_a
+
+        # Swap the same agents
+        self.grid.swap_pos(agent_a, agent_a)
+
+        assert agent_a.pos == pos_b
+        assert self.grid[pos_b] == agent_a
+
+        # Raise for agents not on the grid
+        self.grid.remove_agent(agent_a)
+        self.grid.remove_agent(agent_b)
+
+        id_a = agent_a.unique_id
+        id_b = agent_b.unique_id
+        e_message = f"<Agent id: {id_a}>, <Agent id: {id_b}> - not on the grid"
+        with self.assertRaisesRegex(Exception, e_message):
+            self.grid.swap_pos(agent_a, agent_b)
+
 
 class TestBaseGridTorus(TestBaseGrid):
     """
@@ -267,34 +297,6 @@ class TestSingleGrid(unittest.TestCase):
             self.grid.position_agent(a)
         with self.assertRaises(Exception):
             self.move_to_empty(self.agents[0], num_agents=self.num_agents)
-
-        # Swap agents positions
-        agent_a, agent_b = random.sample(list(self.grid), k=2)
-        pos_a = agent_a.pos
-        pos_b = agent_b.pos
-
-        self.grid.swap_pos(agent_a, agent_b)
-
-        assert agent_a.pos == pos_b
-        assert agent_b.pos == pos_a
-        assert self.grid[pos_a] == agent_b
-        assert self.grid[pos_b] == agent_a
-
-        # Swap the same agents
-        self.grid.swap_pos(agent_a, agent_a)
-
-        assert agent_a.pos == pos_b
-        assert self.grid[pos_b] == agent_a
-
-        # Raise for agents not on the grid
-        self.grid.remove_agent(agent_a)
-        self.grid.remove_agent(agent_b)
-
-        id_a = agent_a.unique_id
-        id_b = agent_b.unique_id
-        e_message = f"<Agent id: {id_a}>, <Agent id: {id_b}> - not on the grid"
-        with self.assertRaisesRegex(Exception, e_message):
-            self.grid.swap_pos(agent_a, agent_b)
 
 
 # Number of agents at each position for testing
