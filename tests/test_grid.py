@@ -172,7 +172,7 @@ class TestBaseGrid(unittest.TestCase):
     def test_swap_pos(self):
 
         # Swap agents positions
-        agent_a, agent_b = random.sample(list(self.grid), k=2)
+        agent_a, agent_b = list(filter(None, self.grid))[:2]
         pos_a = agent_a.pos
         pos_b = agent_b.pos
 
