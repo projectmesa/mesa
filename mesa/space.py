@@ -552,7 +552,7 @@ class MultiGrid(Grid):
         if agent.pos != pos:
             self.grid[x][y].append(agent)
             agent.pos = pos
-            self.empties.discard(pos)
+        self.empties.discard(pos)
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the given location and set its pos attribute to None."""
