@@ -70,7 +70,7 @@ class Schelling(mesa.Model):
                     agent_type = 0
 
                 agent = SchellingAgent((x, y), self, agent_type)
-                self.grid.position_agent(agent, (x, y))
+                self.grid.place_agent(agent, (x, y))
                 self.schedule.add(agent)
 
         self.running = True
