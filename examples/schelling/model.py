@@ -71,7 +71,6 @@ class Schelling(mesa.Model):
 
                 agent = SchellingAgent((x, y), self, agent_type)
                 self.grid.place_agent(agent, (x, y))
-
                 self.schedule.add(agent)
 
         self.running = True
