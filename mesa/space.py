@@ -549,10 +549,10 @@ class MultiGrid(Grid):
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         x, y = pos
-        if agent not in self.grid[x][y]:
+        if agent.pos != pos:
             self.grid[x][y].append(agent)
-        self.empties.discard(pos)
-        agent.pos = pos
+            agent.pos = pos
+            self.empties.discard(pos)
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the given location and set its pos attribute to None."""
