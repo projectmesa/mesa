@@ -233,6 +233,25 @@ class TestSingleGrid(unittest.TestCase):
         self.num_agents = len(self.agents)
 
     @patch.object(MockAgent, "model", create=True)
+    def test_position_agent(self, mock_model):
+        a = MockAgent(100, None)
+        with self.assertRaises(Exception) as exc_info:
+            self.grid.position_agent(a, (1, 1))
+        expected = (
+            "x must be an integer or a string 'random'."
+            " Actual type: <class 'tuple'>. Actual value: (1, 1)."
+        )
+        assert str(exc_info.exception) == expected
+        with self.assertRaises(Exception) as exc_info:
+            self.grid.position_agent(a, "(1, 1)")
+        expected = (
+            "x must be an integer or a string 'random'."
+            " Actual type: <class 'str'>. Actual value: (1, 1)."
+        )
+        assert str(exc_info.exception) == expected
+        self.grid.position_agent(a, "random")
+
+    @patch.object(MockAgent, "model", create=True)
     def test_enforcement(self, mock_model):
         """
         Test the SingleGrid empty count and enforcement.

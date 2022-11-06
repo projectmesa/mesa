@@ -484,6 +484,17 @@ class SingleGrid(Grid):
         If x or y are positive, they are used.
         Use 'swap_pos()' to swap agents positions.
         """
+        if not (isinstance(x, int) or x == "random"):
+            raise Exception(
+                "x must be an integer or a string 'random'."
+                f" Actual type: {type(x)}. Actual value: {x}."
+            )
+        if not (isinstance(y, int) or y == "random"):
+            raise Exception(
+                "y must be an integer or a string 'random'."
+                f" Actual type: {type(y)}. Actual value: {y}."
+            )
+
         if x == "random" or y == "random":
             if len(self.empties) == 0:
                 raise Exception("ERROR: Grid full")
