@@ -504,6 +504,16 @@ class SingleGrid(Grid):
         If x or y are positive, they are used.
         Use 'swap_pos()' to swap agents positions.
         """
+        warn(
+            (
+                "`position_agent` is being deprecated; use instead "
+                "`place_agent` to place an agent at a specified "
+                "location or `move_to_empty` to place an agent "
+                "at a random empty cell."
+            ),
+            DeprecationWarning,
+        )
+
         if x == "random" or y == "random":
             if len(self.empties) == 0:
                 raise Exception("ERROR: Grid full")
