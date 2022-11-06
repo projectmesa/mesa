@@ -549,7 +549,7 @@ class MultiGrid(Grid):
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         x, y = pos
-        if agent.pos != pos:
+        if agent.pos != pos or agent.pos not in self.grid[x][y]:
             self.grid[x][y].append(agent)
             agent.pos = pos
             self.empties.discard(pos)
