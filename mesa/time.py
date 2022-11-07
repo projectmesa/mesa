@@ -102,8 +102,7 @@ class BaseScheduler:
             self.model.random.shuffle(agent_keys)
 
         for key in agent_keys:
-            if key in self._agents:
-                yield self._agents[key]
+            yield self._agents[key]
 
 
 class RandomActivation(BaseScheduler):
