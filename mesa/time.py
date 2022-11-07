@@ -96,6 +96,8 @@ class BaseScheduler:
         """Simple generator that yields the agents while letting the user
         remove and/or add agents during stepping.
         """
+        # To be able to remove and/or add agents during stepping
+        # it's necessary to cast the keys view to a list
         agent_keys = list(self._agents.keys())
         if shuffled:
             self.model.random.shuffle(agent_keys)
@@ -136,6 +138,8 @@ class SimultaneousActivation(BaseScheduler):
 
     def step(self) -> None:
         """Step all agents, then advance them."""
+        # To be able to remove and/or add agents during stepping
+        # it's necessary to cast the keys view to a list
         agent_keys = list(self._agents.keys())
         for agent_key in agent_keys:
             self._agents[agent_key].step()
@@ -186,6 +190,8 @@ class StagedActivation(BaseScheduler):
 
     def step(self) -> None:
         """Executes all the stages for all agents."""
+        # To be able to remove and/or add agents during stepping
+        # it's necessary to cast the keys view to a list
         agent_keys = list(self._agents.keys())
         if self.shuffle:
             self.model.random.shuffle(agent_keys)
@@ -258,6 +264,8 @@ class RandomActivationByType(BaseScheduler):
             shuffle_agents: If True, the order of execution of each agents in a
                             type group is shuffled.
         """
+        # To be able to remove and/or add agents during stepping
+        # it's necessary to cast the keys view to a list
         type_keys: list[type[Agent]] = list(self.agents_by_type.keys())
         if shuffle_types:
             self.model.random.shuffle(type_keys)
