@@ -974,6 +974,11 @@ class NetworkGrid:
     """Network Grid where each node contains zero or more agents."""
 
     def __init__(self, G: Any) -> None:
+        """Create a new network.
+
+        Args:
+            G: a NetworkX graph instance.
+        """
         self.G = G
         for node_id in self.G.nodes:
             G.nodes[node_id]["agent"] = self.default_val()
