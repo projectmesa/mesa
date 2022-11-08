@@ -251,22 +251,33 @@ class Grid:
         if neighborhood is not None:
             return neighborhood
 
+        # Using a list for neighhborhood in respect to any other built-in data
+        # structure allows to optimize the code further (e.g. with Cython or Numba)
+        # more easily. Also, lists are more optimized in PyPy than in Cpython. Look at
+        # https://github.com/projectmesa/mesa/pull/1476#issuecomment-1306220403 and in
+        # general to the PR#1476 to better understand how the algorithm was conceived.
         neighborhood = []
-
         x, y = pos
-        if self.torus:
-            x_radius = min(radius, self.width // 2)
-            y_radius = min(radius, self.height // 2)
 
-            for dx in range(-x_radius, x_radius + 1):
-                for dy in range(-y_radius, y_radius + 1):
+        if self.torus:
+            x_max_radius, y_max_radius = self.width // 2, self.height // 2
+            x_radius, y_radius = min(radius, x_max_radius), min(radius, y_max_radius)
+
+            # For each dimension, in the edge case where the radius is as big as
+            # possible and the dimension is even we need to shrink by one the range
+            # of values to avoid duplicates in neighborhood
+            xdim_even, ydim_even = (self.width + 1) % 2, (self.height + 1) % 2
+            kx = int(x_radius == x_max_radius and xdim_even)
+            ky = int(y_radius == y_max_radius and ydim_even)
+
+            for dx in range(-x_radius, x_radius + 1 - kx):
+                for dy in range(-y_radius, y_radius + 1 - ky):
 
                     if not moore and abs(dx) + abs(dy) > radius:
                         continue
 
                     nx, ny = (x + dx) % self.width, (y + dy) % self.height
                     neighborhood.append((nx, ny))
-
         else:
             x_range = range(max(0, x - radius), min(self.width, x + radius + 1))
             y_range = range(max(0, y - radius), min(self.height, y + radius + 1))

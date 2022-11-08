@@ -15,7 +15,7 @@ from mesa.space import Grid, SingleGrid, MultiGrid, HexGrid
 #   1 0 1
 #   0 0 1
 # -------------------
-TEST_GRID = [[0, 1, 0, 1, 0], [0, 0, 1, 1, 0], [1, 1, 0, 0, 0]]
+TEST_GRID = [[0, 1, 0, 1, 0, 0], [0, 0, 1, 1, 0, 1], [1, 1, 0, 0, 0, 1]]
 
 
 class MockAgent:
@@ -40,8 +40,9 @@ class TestBaseGrid(unittest.TestCase):
         """
         Create a test non-toroidal grid and populate it with Mock Agents
         """
+        # The height needs to be even to test the edge case described in PR #1517
+        height = 6  # height of grid
         width = 3  # width of grid
-        height = 5  # height of grid
         self.grid = Grid(width, height, self.torus)
         self.agents = []
         counter = 0
@@ -109,10 +110,10 @@ class TestBaseGrid(unittest.TestCase):
         assert len(neighborhood) == 8
 
         neighborhood = self.grid.get_neighborhood((1, 4), moore=False)
-        assert len(neighborhood) == 3
+        assert len(neighborhood) == 4
 
         neighborhood = self.grid.get_neighborhood((1, 4), moore=True)
-        assert len(neighborhood) == 5
+        assert len(neighborhood) == 8
 
         neighborhood = self.grid.get_neighborhood((0, 0), moore=False)
         assert len(neighborhood) == 2
@@ -127,7 +128,7 @@ class TestBaseGrid(unittest.TestCase):
         assert len(neighbors) == 3
 
         neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
-        assert len(neighbors) == 2
+        assert len(neighbors) == 3
 
     def test_coord_iter(self):
         ci = self.grid.coord_iter()
@@ -221,17 +222,25 @@ class TestBaseGridTorus(TestBaseGrid):
         neighborhood = self.grid.get_neighborhood((0, 0), moore=False)
         assert len(neighborhood) == 4
 
+        # here we test the edge case described in PR #1517 using a radius
+        # measuring half of the grid height
+        neighborhood = self.grid.get_neighborhood((0, 0), moore=True, radius=3)
+        assert len(neighborhood) == 17
+
+        neighborhood = self.grid.get_neighborhood((1, 1), moore=False, radius=3)
+        assert len(neighborhood) == 15
+
         neighbors = self.grid.get_neighbors((1, 4), moore=False)
-        assert len(neighbors) == 1
+        assert len(neighbors) == 2
 
         neighbors = self.grid.get_neighbors((1, 4), moore=True)
-        assert len(neighbors) == 3
+        assert len(neighbors) == 4
 
         neighbors = self.grid.get_neighbors((1, 1), moore=False, include_center=True)
         assert len(neighbors) == 3
 
         neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
-        assert len(neighbors) == 2
+        assert len(neighbors) == 3
 
 
 class TestSingleGrid(unittest.TestCase):
