@@ -28,7 +28,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 # mypy
-from typing import Iterator, Union, Iterable
+from typing import Iterator, Union
 from mesa.agent import Agent
 from mesa.model import Model
 
@@ -96,9 +96,10 @@ class BaseScheduler:
         """Simple generator that yields the agents while letting the user
         remove and/or add agents during stepping.
         """
-        agent_keys = self._agents.keys()
+        # To be able to remove and/or add agents during stepping
+        # it's necessary to cast the keys view to a list.
+        agent_keys = list(self._agents.keys())
         if shuffled:
-            agent_keys = list(agent_keys)
             self.model.random.shuffle(agent_keys)
 
         for key in agent_keys:
@@ -137,12 +138,16 @@ class SimultaneousActivation(BaseScheduler):
 
     def step(self) -> None:
         """Step all agents, then advance them."""
-        for agent in self._agents.values():
-            agent.step()
-        # the previous steps might remove some agents, but
-        # this loop will go over the remaining existing agents
-        for agent in self._agents.values():
-            agent.advance()
+        # To be able to remove and/or add agents during stepping
+        # it's necessary to cast the keys view to a list.
+        agent_keys = list(self._agents.keys())
+        for agent_key in agent_keys:
+            self._agents[agent_key].step()
+        # We recompute the keys because some agents might have been removed in
+        # the previous loop.
+        agent_keys = list(self._agents.keys())
+        for agent_key in agent_keys:
+            self._agents[agent_key].advance()
         self.steps += 1
         self.time += 1
 
@@ -185,18 +190,18 @@ class StagedActivation(BaseScheduler):
 
     def step(self) -> None:
         """Executes all the stages for all agents."""
-        agent_keys = self._agents.keys()
+        # To be able to remove and/or add agents during stepping
+        # it's necessary to cast the keys view to a list.
+        agent_keys = list(self._agents.keys())
         if self.shuffle:
-            agent_keys = list(agent_keys)
             self.model.random.shuffle(agent_keys)
         for stage in self.stage_list:
             for agent_key in agent_keys:
                 getattr(self._agents[agent_key], stage)()  # Run stage
             # We recompute the keys because some agents might have been removed
             # in the previous loop.
-            agent_keys = self._agents.keys()
+            agent_keys = list(self._agents.keys())
             if self.shuffle_between_stages:
-                agent_keys = list(agent_keys)
                 self.model.random.shuffle(agent_keys)
             self.time += self.stage_time
 
@@ -259,9 +264,10 @@ class RandomActivationByType(BaseScheduler):
             shuffle_agents: If True, the order of execution of each agents in a
                             type group is shuffled.
         """
-        type_keys: Iterable[type[Agent]] = self.agents_by_type.keys()
+        # To be able to remove and/or add agents during stepping
+        # it's necessary to cast the keys view to a list.
+        type_keys: list[type[Agent]] = list(self.agents_by_type.keys())
         if shuffle_types:
-            type_keys = list(type_keys)
             self.model.random.shuffle(type_keys)
         for agent_class in type_keys:
             self.step_type(agent_class, shuffle_agents=shuffle_agents)
@@ -276,9 +282,8 @@ class RandomActivationByType(BaseScheduler):
         Args:
             type_class: Class object of the type to run.
         """
-        agent_keys: Iterable[int] = self.agents_by_type[type_class].keys()
+        agent_keys: list[int] = list(self.agents_by_type[type_class].keys())
         if shuffle_agents:
-            agent_keys = list(agent_keys)
             self.model.random.shuffle(agent_keys)
         for agent_key in agent_keys:
             self.agents_by_type[type_class][agent_key].step()
