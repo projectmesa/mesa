@@ -251,29 +251,37 @@ class Grid:
         if neighborhood is not None:
             return neighborhood
 
-        coordinates: set[Coordinate] = set()
+        neighborhood = []
 
         x, y = pos
-        for dy in range(-radius, radius + 1):
-            for dx in range(-radius, radius + 1):
-                # Skip coordinates that are outside manhattan distance
-                if not moore and abs(dx) + abs(dy) > radius:
-                    continue
+        if self.torus:
+            x_radius = min(radius, self.width // 2)
+            y_radius = min(radius, self.height // 2)
 
-                coord = (x + dx, y + dy)
+            for dx in range(-x_radius, x_radius + 1):
+                for dy in range(-y_radius, y_radius + 1):
 
-                if self.out_of_bounds(coord):
-                    # Skip if not a torus and new coords out of bounds.
-                    if not self.torus:
+                    if not moore and abs(dx) + abs(dy) > radius:
                         continue
-                    coord = self.torus_adj(coord)
 
-                coordinates.add(coord)
+                    nx, ny = (x + dx) % self.width, (y + dy) % self.height
+                    neighborhood.append((nx, ny))
 
-        if not include_center:
-            coordinates.discard(pos)
+        else:
+            x_range = range(max(0, x - radius), min(self.width, x + radius + 1))
+            y_range = range(max(0, y - radius), min(self.height, y + radius + 1))
 
-        neighborhood = sorted(coordinates)
+            for nx in x_range:
+                for ny in y_range:
+
+                    if not moore and abs(nx - x) + abs(ny - y) > radius:
+                        continue
+
+                    neighborhood.append((nx, ny))
+
+        if not include_center and neighborhood:
+            neighborhood.remove(pos)
+
         self._neighborhood_cache[cache_key] = neighborhood
 
         return neighborhood
