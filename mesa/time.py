@@ -97,7 +97,7 @@ class BaseScheduler:
         remove and/or add agents during stepping.
         """
         # To be able to remove and/or add agents during stepping
-        # it's necessary to cast the keys view to a list
+        # it's necessary to cast the keys view to a list.
         agent_keys = list(self._agents.keys())
         if shuffled:
             self.model.random.shuffle(agent_keys)
@@ -191,7 +191,7 @@ class StagedActivation(BaseScheduler):
     def step(self) -> None:
         """Executes all the stages for all agents."""
         # To be able to remove and/or add agents during stepping
-        # it's necessary to cast the keys view to a list
+        # it's necessary to cast the keys view to a list.
         agent_keys = list(self._agents.keys())
         if self.shuffle:
             self.model.random.shuffle(agent_keys)
