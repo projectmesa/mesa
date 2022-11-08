@@ -4,9 +4,13 @@ Mesa Space Module
 
 Objects used to add a spatial component to a model.
 
-Grid: base grid, a simple list-of-lists.
-SingleGrid: grid which strictly enforces one object per cell.
-MultiGrid: extension to Grid where each cell is a set of objects.
+Grid: base grid, which creates a rectangular grid.
+SingleGrid: extension to Grid which strictly enforces one agent per cell.
+MultiGrid: extension to Grid where each cell can contain a set of agents.
+HexGrid: extension to Grid to handle hexagonal neighbors.
+ContinuousSpace: a two-dimensional space where each agent has an arbitrary
+                 position of `float`'s.
+NetworkGrid: a network where each node contains zero or more agents.
 """
 # Instruction for PyLint to suppress variable name errors, since we have a
 # good reason to use one-character variable names for x and y.
@@ -75,7 +79,7 @@ def is_integer(x: Real) -> bool:
 
 
 class Grid:
-    """Base class for a square grid.
+    """Base class for a rectangular grid.
 
     Grid cells are indexed by [x][y], where [0][0] is assumed to be the
     bottom-left and [width-1][height-1] is the top-right. If a grid is
