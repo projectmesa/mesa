@@ -33,6 +33,8 @@ jobs:
         python-version: ["3.10"]
         include:
           - os: ubuntu
+            python-version: "3.11.1"
+          - os: ubuntu
             python-version: "3.9"
           - os: ubuntu
             python-version: "3.8"
