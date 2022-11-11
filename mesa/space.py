@@ -251,11 +251,12 @@ class Grid:
         if neighborhood is not None:
             return neighborhood
 
-        # Using a list for neighhborhood in respect to any other built-in data
-        # structure allows to optimize the code further (e.g. with Cython or Numba)
-        # more easily. To better understand how the algorithm was conceived, look at
-        # https://github.com/projectmesa/mesa/pull/1476#issuecomment-1306220403 and in
-        # general to the PR#1476.
+        # We use a list instead of a dict for the neighborhood because it would
+        # be easier to port the code to Cython or Numba (for performance
+        # purpose), with minimal changes. To better understand how the
+        # algorithm was conceived, look at
+        # https://github.com/projectmesa/mesa/pull/1476#issuecomment-1306220403
+        # and the discussion in that PR in general.
         neighborhood = []
 
         x, y = pos
@@ -264,10 +265,11 @@ class Grid:
             x_radius, y_radius = min(radius, x_max_radius), min(radius, y_max_radius)
 
             # For each dimension, in the edge case where the radius is as big as
-            # possible and the dimension is even we need to shrink by one the range
-            # of values to avoid duplicates in neighborhood. For example, if the
-            # width = 4 and x = radius = 2, we loop through range(0, 5) in respect
-            # to x but this means that the 0 position is repeated since 0 % 4 = 4 % 4.
+            # possible and the dimension is even, we need to shrink by one the range
+            # of values, to avoid duplicates in neighborhood. For example, if
+            # the width is 4, while x, x_radius, and x_max_radius are 2, then
+            # (x + dx) has a value from 0 to 4 (inclusive), but this means that
+            # the 0 position is repeated since 0 % 4 and 4 % 4 are both 0.
             xdim_even, ydim_even = (self.width + 1) % 2, (self.height + 1) % 2
             kx = int(x_radius == x_max_radius and xdim_even)
             ky = int(y_radius == y_max_radius and ydim_even)
