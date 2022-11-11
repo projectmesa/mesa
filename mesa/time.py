@@ -61,7 +61,6 @@ class BaseScheduler:
             agent: An Agent to be added to the schedule. NOTE: The agent must
             have a step() method.
         """
-
         if agent.unique_id in self._agents:
             raise Exception(
                 f"Agent with unique id {repr(agent.unique_id)} already added to scheduler"
@@ -102,9 +101,9 @@ class BaseScheduler:
         if shuffled:
             self.model.random.shuffle(agent_keys)
 
-        for key in agent_keys:
-            if key in self._agents:
-                yield self._agents[key]
+        for agent_key in agent_keys:
+            if agent_key in self._agents:
+                yield self._agents[agent_key]
 
 
 class RandomActivation(BaseScheduler):
@@ -197,7 +196,8 @@ class StagedActivation(BaseScheduler):
             self.model.random.shuffle(agent_keys)
         for stage in self.stage_list:
             for agent_key in agent_keys:
-                getattr(self._agents[agent_key], stage)()  # Run stage
+                if agent_key in self._agents:
+                    getattr(self._agents[agent_key], stage)()  # Run stage
             # We recompute the keys because some agents might have been removed
             # in the previous loop.
             agent_keys = list(self._agents.keys())
@@ -239,7 +239,6 @@ class RandomActivationByType(BaseScheduler):
         Args:
             agent: An Agent to be added to the schedule.
         """
-
         super().add(agent)
         agent_class: type[Agent] = type(agent)
         self.agents_by_type[agent_class][agent.unique_id] = agent
@@ -248,7 +247,6 @@ class RandomActivationByType(BaseScheduler):
         """
         Remove all instances of a given agent from the schedule.
         """
-
         del self._agents[agent.unique_id]
 
         agent_class: type[Agent] = type(agent)
@@ -286,7 +284,8 @@ class RandomActivationByType(BaseScheduler):
         if shuffle_agents:
             self.model.random.shuffle(agent_keys)
         for agent_key in agent_keys:
-            self.agents_by_type[type_class][agent_key].step()
+            if agent_key in self.agents_by_type[type_class]:
+                self.agents_by_type[type_class][agent_key].step()
 
     def get_type_count(self, type_class: type[Agent]) -> int:
         """
