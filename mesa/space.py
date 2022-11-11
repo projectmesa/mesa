@@ -253,7 +253,7 @@ class Grid:
 
         # Using a list for neighhborhood in respect to any other built-in data
         # structure allows to optimize the code further (e.g. with Cython or Numba)
-        # more easily. to better understand how the algorithm was conceived. Look at
+        # more easily. To better understand how the algorithm was conceived, look at
         # https://github.com/projectmesa/mesa/pull/1476#issuecomment-1306220403 and in
         # general to the PR#1476.
         neighborhood = []
