@@ -253,12 +253,12 @@ class Grid:
 
         # Using a list for neighhborhood in respect to any other built-in data
         # structure allows to optimize the code further (e.g. with Cython or Numba)
-        # more easily. Also, lists are more optimized in PyPy than in Cpython. Look at
+        # more easily. to better understand how the algorithm was conceived. Look at
         # https://github.com/projectmesa/mesa/pull/1476#issuecomment-1306220403 and in
-        # general to the PR#1476 to better understand how the algorithm was conceived.
+        # general to the PR#1476.
         neighborhood = []
-        x, y = pos
 
+        x, y = pos
         if self.torus:
             x_max_radius, y_max_radius = self.width // 2, self.height // 2
             x_radius, y_radius = min(radius, x_max_radius), min(radius, y_max_radius)
