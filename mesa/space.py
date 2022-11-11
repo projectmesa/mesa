@@ -265,7 +265,9 @@ class Grid:
 
             # For each dimension, in the edge case where the radius is as big as
             # possible and the dimension is even we need to shrink by one the range
-            # of values to avoid duplicates in neighborhood
+            # of values to avoid duplicates in neighborhood. For example, if the
+            # width = 4 and x = radius = 2, we loop through range(0, 5) in respect 
+            # to x but this means that the 0 position is repeated since 0 % 4 = 4 % 4.
             xdim_even, ydim_even = (self.width + 1) % 2, (self.height + 1) % 2
             kx = int(x_radius == x_max_radius and xdim_even)
             ky = int(y_radius == y_max_radius and ydim_even)
