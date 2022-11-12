@@ -270,7 +270,7 @@ class _Grid:
 
         if self.out_of_bounds(pos):
             raise Exception("The `pos` tuple passed is out of bounds.")
-             
+
         # We use a list instead of a dict for the neighborhood because it would
         # be easier to port the code to Cython or Numba (for performance
         # purpose), with minimal changes. To better understand how the
