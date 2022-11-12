@@ -268,6 +268,9 @@ class _Grid:
         if neighborhood is not None:
             return neighborhood
 
+        if self.out_of_bounds(pos):
+            raise Exception("The `pos` tuple passed is out of bounds.")
+             
         # We use a list instead of a dict for the neighborhood because it would
         # be easier to port the code to Cython or Numba (for performance
         # purpose), with minimal changes. To better understand how the
@@ -309,7 +312,7 @@ class _Grid:
 
                     neighborhood.append((nx, ny))
 
-        if not include_center and neighborhood:
+        if not include_center:
             neighborhood.remove(pos)
 
         self._neighborhood_cache[cache_key] = neighborhood
