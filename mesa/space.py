@@ -388,10 +388,8 @@ class Grid:
         Returns:
             An iterator of the contents of the cells identified in cell_list
         """
-        # Note: filter(None, iterator) filters away an element of iterator that
-        # is falsy. Hence, iter_cell_list_contents returns only non-empty
-        # contents.
-        return filter(None, (self.grid[x][y] for x, y in cell_list))
+        # iter_cell_list_contents returns only non-empty contents.
+        return (self.grid[x][y] for x, y in cell_list if self.grid[x][y])
 
     @accept_tuple_argument
     def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> list[Agent]:
