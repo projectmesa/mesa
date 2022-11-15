@@ -1,10 +1,7 @@
-from mesa import Agent, Model
-from mesa.time import RandomActivation
-from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
+import mesa
 
 
-class {{cookiecutter.agent}}(Agent):  # noqa
+class {{cookiecutter.agent}}(mesa.Agent):  # noqa
     """
     An agent
     """
@@ -24,7 +21,7 @@ class {{cookiecutter.agent}}(Agent):  # noqa
         pass
 
 
-class {{cookiecutter.model}}(Model):
+class {{cookiecutter.model}}(mesa.Model):
     """
     The model class holds the model-level attributes, manages the agents, and generally handles
     the global level of our model.
@@ -38,8 +35,8 @@ class {{cookiecutter.model}}(Model):
     def __init__(self, num_agents, width, height):
         super().__init__()
         self.num_agents = num_agents
-        self.schedule = RandomActivation(self)
-        self.grid = MultiGrid(width=width, height=height, torus=True)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.grid = mesa.space.MultiGrid(width=width, height=height, torus=True)
 
         for i in range(self.num_agents):
             agent = {{cookiecutter.agent}}(i, self)
@@ -50,7 +47,7 @@ class {{cookiecutter.model}}(Model):
             self.grid.place_agent(agent, (x, y))
 
         # example data collector
-        self.datacollector = DataCollector()
+        self.datacollector = mesa.datacollection.DataCollector()
 
         self.running = True
         self.datacollector.collect(self)

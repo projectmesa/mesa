@@ -4,8 +4,7 @@ Configure visualization elements and instantiate a server
 
 from .model import {{ cookiecutter.model }}, {{ cookiecutter.agent }}  # noqa
 
-from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.modules import CanvasGrid, ChartModule
+import mesa
 
 
 def circle_portrayal_example(agent):
@@ -22,12 +21,14 @@ def circle_portrayal_example(agent):
     return portrayal
 
 
-canvas_element = CanvasGrid(circle_portrayal_example, 20, 20, 500, 500)
-chart_element = ChartModule([{"Label": "{{ cookiecutter.camel }}", "Color": "Pink"}])
+canvas_element = mesa.visualization.CanvasGrid(
+    circle_portrayal_example, 20, 20, 500, 500
+)
+chart_element = mesa.visualization.ChartModule([{"Label": "{{ cookiecutter.camel }}", "Color": "Pink"}])
 
 model_kwargs = {"num_agents": 10, "width": 10, "height": 10}
 
-server = ModularServer(
+server = mesa.visualization.ModularServer(
     {{cookiecutter.model}},
     [canvas_element, chart_element],
     "{{ cookiecutter.camel }}",
