@@ -31,7 +31,7 @@ class MockAgent(Agent):
 
     def kill_other_agent(self):
         for agent in self.model.schedule.agents:
-            if agent != self:
+            if agent is not self:
                 self.model.schedule.remove(agent)
                 break
 
