@@ -64,11 +64,11 @@ def accept_tuple_argument(wrapped_function: F) -> F:
     to also handle a single position, by automatically wrapping tuple in
     single-item list rather than forcing user to do it."""
 
-    def wrapper(*args: Any) -> Any:
-        if isinstance(args[1], tuple) and len(args[1]) == 2:
-            return wrapped_function(args[0], [args[1]])
+    def wrapper(grid_instance, positions) -> Any:
+        if isinstance(positions, tuple) and len(positions) == 2:
+            return wrapped_function(grid_instance, [positions])
         else:
-            return wrapped_function(*args)
+            return wrapped_function(grid_instance, positions)
 
     return cast(F, wrapper)
 
