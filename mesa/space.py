@@ -934,8 +934,8 @@ class ContinuousSpace:
     def get_heading(
         self, pos_1: FloatCoordinate, pos_2: FloatCoordinate
     ) -> FloatCoordinate:
-        """Get the heading difference between two points, accounting for toroidal space.
-        It is possible calculate the heading angle applying the atan2 function to the
+        """Get the heading vector between two points, accounting for toroidal space.
+        It is possible to calculate the heading angle by applying the atan2 function to the
         result.
 
         Args:
