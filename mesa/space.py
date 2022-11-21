@@ -807,15 +807,13 @@ class HexGrid(Grid):
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position.
 
-    Assumes that all agents are point objects, and have a pos property storing
-    their position as an (x, y) tuple.
+    Assumes that all agents have a pos property storing their position as
+    an (x, y) tuple.
 
-    This class uses a numpy array internally to store agent objects, to speed
+    This class uses a numpy array internally to store agents in order to speed
     up neighborhood lookups. This array is calculated on the first neighborhood
-    lookup, and is reused (and updated) until agents are added or removed.
+    lookup, and is updated if agents are added or removed.
     """
-
-    _grid = None
 
     def __init__(
         self,
@@ -849,7 +847,7 @@ class ContinuousSpace:
         self._agent_to_index: dict[Agent, int | None] = {}
 
     def _build_agent_cache(self):
-        """Cache Agent positions to speed up neighbors calculations."""
+        """Cache agents positions to speed up neighbors calculations."""
         self._index_to_agent = {}
         agents = self._agent_to_index.keys()
         for idx, agent in enumerate(agents):
@@ -860,7 +858,7 @@ class ContinuousSpace:
         )
 
     def _invalidate_agent_cache(self):
-        """Clear cached data of Agents and positions in the space."""
+        """Clear cached data of agents and positions in the space."""
         self._agent_points = None
         self._index_to_agent = {}
 
@@ -894,7 +892,7 @@ class ContinuousSpace:
             self._agent_points[idx, 1] = pos[1]
 
     def remove_agent(self, agent: Agent) -> None:
-        """Remove an agent from the simulation.
+        """Remove an agent from the space.
 
         Args:
             agent: The agent object to remove
@@ -909,7 +907,7 @@ class ContinuousSpace:
     def get_neighbors(
         self, pos: FloatCoordinate, radius: float, include_center: bool = True
     ) -> list[Agent]:
-        """Get all objects within a certain radius.
+        """Get all agents within a certain radius.
 
         Args:
             pos: (x,y) coordinate tuple to center the search at.
@@ -936,7 +934,9 @@ class ContinuousSpace:
     def get_heading(
         self, pos_1: FloatCoordinate, pos_2: FloatCoordinate
     ) -> FloatCoordinate:
-        """Get the heading angle between two points, accounting for toroidal space.
+        """Get the heading vector between two points, accounting for toroidal space.
+        It is possible to calculate the heading angle by applying the atan2 function to the
+        result.
 
         Args:
             pos_1, pos_2: Coordinate tuples for both points.
