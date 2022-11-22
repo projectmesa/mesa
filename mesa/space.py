@@ -849,18 +849,15 @@ class ContinuousSpace:
     def _build_agent_cache(self):
         """Cache agents positions to speed up neighbors calculations."""
         self._index_to_agent = {}
-        agents = self._agent_to_index.keys()
-        for idx, agent in enumerate(agents):
+        for idx, agent in enumerate(self._agent_to_index):
             self._agent_to_index[agent] = idx
             self._index_to_agent[idx] = agent
-        self._agent_points = np.array(
-            [self._index_to_agent[idx].pos for idx in range(len(agents))]
-        )
+        # Since dicts are ordered by insertion, we can iterate through agents keys
+        self._agent_points = np.array([agent.pos for agent in self._agent_to_index])
 
     def _invalidate_agent_cache(self):
         """Clear cached data of agents and positions in the space."""
         self._agent_points = None
-        self._index_to_agent = {}
 
     def place_agent(self, agent: Agent, pos: FloatCoordinate) -> None:
         """Place a new agent in the space.
@@ -888,8 +885,7 @@ class ContinuousSpace:
             # instead of invalidating the full cache,
             # apply the move to the cached values
             idx = self._agent_to_index[agent]
-            self._agent_points[idx, 0] = pos[0]
-            self._agent_points[idx, 1] = pos[1]
+            self._agent_points[idx] = pos
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove an agent from the space.
@@ -899,7 +895,7 @@ class ContinuousSpace:
         """
         if agent not in self._agent_to_index:
             raise Exception("Agent does not exist in the space")
-        self._agent_to_index.pop(agent)
+        del self._agent_to_index[agent]
 
         self._invalidate_agent_cache()
         agent.pos = None
