@@ -858,6 +858,7 @@ class ContinuousSpace:
     def _invalidate_agent_cache(self):
         """Clear cached data of agents and positions in the space."""
         self._agent_points = None
+        self._index_to_agent = {}
 
     def place_agent(self, agent: Agent, pos: FloatCoordinate) -> None:
         """Place a new agent in the space.
