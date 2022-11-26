@@ -35,7 +35,7 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 ## Further Reading
 
 The full tutorial describing how the model is built can be found at:
-http://mesa.readthedocs.io/en/master/tutorials/intro_tutorial.html
+https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html
 
 
 [Stonedahl, F. and Wilensky, U. (2008). NetLogo Virus on a Network model](http://ccl.northwestern.edu/netlogo/models/VirusonaNetwork).
