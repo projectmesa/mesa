@@ -2,7 +2,7 @@
 
 ## Summary
 
-A simple model of agents exchanging wealth. All agents start with the same amount of money. Every step, each agent with one unit of money or more gives one unit of wealth to another random agent. This is the model described in the [Intro Tutorial](http://mesa.readthedocs.io/en/latest/intro-tutorial.html).
+A simple model of agents exchanging wealth. All agents start with the same amount of money. Every step, each agent with one unit of money or more gives one unit of wealth to another random agent. This is the model described in the [Intro Tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html).
 
 As the model runs, the distribution of wealth among agents goes from being perfectly uniform (all agents have the same starting wealth), to highly skewed -- a small number have high wealth, more have none at all.
 
@@ -10,7 +10,7 @@ As the model runs, the distribution of wealth among agents goes from being perfe
 
 To follow the tutorial examples, launch the Jupyter Notebook and run the code in ``Introduction to Mesa Tutorial Code.ipynb``.
 
-To launch the interactive server, as described in the [last section of the tutorial](http://mesa.readthedocs.io/en/latest/intro-tutorial.html#adding-visualization), run:
+To launch the interactive server, as described in the [last section of the tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html#adding-visualization), run:
 
 ```
     $ python viz_money_model.py
@@ -28,7 +28,7 @@ If your browser doesn't open automatically, point it to [http://127.0.0.1:8521/]
 ## Further Reading
 
 The full tutorial describing how the model is built can be found at:
-http://mesa.readthedocs.io/en/latest/intro-tutorial.html
+https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html
 
 This model is drawn from econophysics and presents a statistical mechanics approach to wealth distribution. Some examples of further reading on the topic can be found at:
 

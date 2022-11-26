@@ -4,7 +4,7 @@
 
 This is the same Boltzmann Wealth Model, but with a network grid implementation.
 
-A simple model of agents exchanging wealth. All agents start with the same amount of money. Every step, each agent with one unit of money or more gives one unit of wealth to another random agent. This is the model described in the [Intro Tutorial](http://mesa.readthedocs.io/en/latest/intro-tutorial.html).
+A simple model of agents exchanging wealth. All agents start with the same amount of money. Every step, each agent with one unit of money or more gives one unit of wealth to another random agent. This is the model described in the [Intro Tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html).
 
 In this network implementation, agents must be located on a node, with a limit of one agent per node. In order to give or receive the unit of money, the agent must be directly connected to the other agent (there must be a direct link between the nodes).
 
@@ -39,7 +39,7 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 ## Further Reading
 
 The full tutorial describing how the model is built can be found at:
-http://mesa.readthedocs.io/en/master/tutorials/intro_tutorial.html
+https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html
 
 This model is drawn from econophysics and presents a statistical mechanics approach to wealth distribution. Some examples of further reading on the topic can be found at:
 
