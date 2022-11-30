@@ -48,6 +48,7 @@ class ChartModule(VisualizationElement):
         canvas_height=200,
         canvas_width=500,
         data_collector_name="datacollector",
+        initial_tick=None,
     ):
         """
         Create a new line chart visualization.
@@ -69,6 +70,8 @@ class ChartModule(VisualizationElement):
         new_element = "new ChartModule({}, {},  {})"
         new_element = new_element.format(series_json, canvas_width, canvas_height)
         self.js_code = "elements.push(" + new_element + ");"
+        if initial_tick is not None:
+            self.js_code += f"controller.tick = {initial_tick};"
 
     def render(self, model):
         current_values = []

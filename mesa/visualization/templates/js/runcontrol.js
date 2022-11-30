@@ -22,8 +22,12 @@ const stepDisplay = document.getElementById("currentStep");
  * @param  {number} fps=3 - Run the model with this number of frames per second
  * @param  {boolean} running=false - Initialize the model in a running state?
  * @param  {boolean} finished=false - Initialize the model in a finished state?
+ *
+ * Specifying the tick to a certain number allows the the tick label start from
+ * this number every time the simulation is reset.
  */
 function ModelController(tick = 0, fps = 3, running = false, finished = false) {
+  this.initialTick = tick
   this.tick = tick;
   this.fps = fps;
   this.running = running;
@@ -55,7 +59,7 @@ function ModelController(tick = 0, fps = 3, running = false, finished = false) {
 
   /** Reset the model and visualization state but keep its running state */
   this.reset = function reset() {
-    this.tick = 0;
+    this.tick = this.initialTick;
     stepDisplay.innerText = this.tick;
     // Reset all the visualizations
     vizElements.forEach((element) => element.reset());
