@@ -1069,22 +1069,27 @@ class NetworkGrid:
         self.G.nodes[node_id]["agent"].append(agent)
         agent.pos = node_id
 
-    def get_neighbors(
+    def get_neighborhood(
         self, node_id: int, include_center: bool = False, radius: int = 1
     ) -> list[int]:
         """Get all adjacent nodes within a certain radius"""
         if radius == 1:
-            neighbors = list(self.G.neighbors(node_id))
+            neighborhood = list(self.G.neighbors(node_id))
             if include_center:
-                neighbors.append(node_id)
+                neighborhood.append(node_id)
         else:
             neighbors_with_distance = nx.single_source_shortest_path_length(
                 self.G, node_id, radius
             )
             if not include_center:
                 del neighbors_with_distance[node_id]
-            neighbors = sorted(neighbors_with_distance.keys())
-        return neighbors
+            neighborhood = sorted(neighbors_with_distance.keys())
+        return neighborhood
+
+    def get_neighbors(self, node_id: int, include_center: bool = False) -> list[Agent]:
+        """Get all agents in adjacent nodes."""
+        neighborhood = self.get_neighborhood(node_id, include_center)
+        return self.get_cell_list_contents(neighborhood)
 
     def move_agent(self, agent: Agent, node_id: int) -> None:
         """Move an agent from its current node to a new node."""
