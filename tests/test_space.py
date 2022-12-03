@@ -283,7 +283,7 @@ class TestSpaceAgentMapping(unittest.TestCase):
 
 class TestSingleGrid(unittest.TestCase):
     def setUp(self):
-        self.space = SingleGrid(50, 50, False)
+        self.space = SingleGrid(50, 50, False, True)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS_GRID):
             a = MockAgent(i, None)

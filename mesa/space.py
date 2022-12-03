@@ -91,7 +91,9 @@ class Grid:
         grid: Internal list-of-lists which holds the grid cells themselves.
     """
 
-    def __init__(self, width: int, height: int, torus: bool) -> None:
+    def __init__(
+        self, width: int, height: int, torus: bool, track_empties: bool = False
+    ) -> None:
         """Create a new grid.
 
         Args:
@@ -102,17 +104,36 @@ class Grid:
         self.width = width
         self.torus = torus
         self.num_cells = height * width
+        self.track_empties = track_empties
 
         self.grid: list[list[GridContent]]
         self.grid = [
             [self.default_val() for _ in range(self.height)] for _ in range(self.width)
         ]
 
-        # Add all cells to the empties list.
-        self.empties = set(itertools.product(range(self.width), range(self.height)))
+        if self.track_empties:
+            # Add all cells to the empties list.
+            self._empties = set(
+                itertools.product(range(self.width), range(self.height))
+            )
+        else:
+            self.num_empties = self.num_cells
 
         # Neighborhood Cache
         self._neighborhood_cache: dict[Any, list[Coordinate]] = dict()
+
+    @property
+    def empties(self):
+        # this method can be removed in some further release, when
+        # users will be warned about the change in the API.
+        if self.track_empties == False:
+            raise Exception(
+                "`empties` set is not built when `track_empties` is "
+                "False. Consider assigning `track_empties` to True "
+                "in the initialization of the Grid."
+            )
+        else:
+            return self._empties
 
     @staticmethod
     def default_val() -> None:
@@ -414,24 +435,36 @@ class Grid:
             pos: Tuple of new position to move the agent to.
         """
         pos = self.torus_adj(pos)
-        self.remove_agent(agent)
-        self.place_agent(agent, pos)
+        if self.track_empties:
+            self._empties.discard(pos)
+            self._empties.add(agent.pos)
+        x, y = agent.pos
+        self.grid[x][y] = self.default_val()
+        x, y = pos
+        self.grid[x][y] = agent
+        agent.pos = pos
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         x, y = pos
-        self.grid[x][y] = agent
-        self.empties.discard(pos)
         agent.pos = pos
+        self.grid[x][y] = agent
+        if self.track_empties:
+            self._empties.discard(pos)
+        else:
+            self.num_empties -= 1
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the grid and set its pos attribute to None."""
         if (pos := agent.pos) is None:
             return
         x, y = pos
-        self.grid[x][y] = self.default_val()
-        self.empties.add(pos)
         agent.pos = None
+        self.grid[x][y] = self.default_val()
+        if self.track_empties:
+            self._empties.add(pos)
+        else:
+            self.num_empties += 1
 
     def swap_pos(self, agent_a: Agent, agent_b: Agent) -> None:
         """Swap agents positions"""
@@ -470,7 +503,11 @@ class Grid:
                 ),
                 DeprecationWarning,
             )
-        num_empty_cells = len(self.empties)
+        if self.track_empties:
+            num_empty_cells = len(self._empties)
+        else:
+            num_empty_cells = self.num_empties
+
         if num_empty_cells == 0:
             raise Exception("ERROR: No empty cells")
 
@@ -551,16 +588,24 @@ class SingleGrid(Grid):
             )
 
         if x == "random" or y == "random":
-            if len(self.empties) == 0:
+            if len(self._empties) == 0:
                 raise Exception("ERROR: Grid full")
             self.move_to_empty(agent)
         else:
             coords = (x, y)
             self.place_agent(agent, coords)
 
-    def place_agent(self, agent: Agent, pos: Coordinate) -> None:
+    def move_agent(self, agent: Agent, pos: Coordinate) -> None:
+        """Move an agent from its current position to a new position."""
         if self.is_cell_empty(pos):
-            super().place_agent(agent, pos)
+            Grid.move_agent(self, agent, pos)
+        else:
+            raise Exception("Cell not empty")
+
+    def place_agent(self, agent: Agent, pos: Coordinate) -> None:
+        """Place the agent at the specified location, and set its pos variable."""
+        if self.is_cell_empty(pos):
+            Grid.place_agent(self, agent, pos)
         else:
             raise Exception("Cell not empty")
 
@@ -598,7 +643,10 @@ class MultiGrid(Grid):
         if agent.pos is None or agent not in self.grid[x][y]:
             self.grid[x][y].append(agent)
             agent.pos = pos
-            self.empties.discard(pos)
+            if self.track_empties:
+                self._empties.discard(pos)
+            elif self.is_cell_empty(pos):
+                self.num_empties -= 1
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the given location and set its pos attribute to None."""
@@ -606,8 +654,17 @@ class MultiGrid(Grid):
         x, y = pos
         self.grid[x][y].remove(agent)
         if self.is_cell_empty(pos):
-            self.empties.add(pos)
+            if self.track_empties:
+                self.empties.add(pos)
+            else:
+                self.num_empties += 1
         agent.pos = None
+
+    def move_agent(self, agent: Agent, pos: Coordinate) -> None:
+        """Move an agent from its current position to a new position."""
+        pos = self.torus_adj(pos)
+        self.remove_agent(agent)
+        self.place_agent(agent, pos)
 
     @accept_tuple_argument
     def iter_cell_list_contents(

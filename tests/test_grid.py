@@ -43,7 +43,7 @@ class TestBaseGrid(unittest.TestCase):
         # The height needs to be even to test the edge case described in PR #1517
         height = 6  # height of grid
         width = 3  # width of grid
-        self.grid = Grid(width, height, self.torus)
+        self.grid = Grid(width, height, self.torus, track_empties=True)
         self.agents = []
         counter = 0
         for x in range(width):
@@ -251,13 +251,14 @@ class TestSingleGrid(unittest.TestCase):
     work here too. Instead, this tests the enforcement.
     """
 
-    def setUp(self):
+    @unittest.skip
+    def create_grid(self, track_empties):
         """
         Create a test non-toroidal grid and populate it with Mock Agents
         """
         width = 3
         height = 5
-        self.grid = SingleGrid(width, height, True)
+        self.grid = SingleGrid(width, height, True, track_empties=track_empties)
         self.agents = []
         counter = 0
         for x in range(width):
@@ -271,8 +272,15 @@ class TestSingleGrid(unittest.TestCase):
                 self.grid.place_agent(a, (x, y))
         self.num_agents = len(self.agents)
 
-    @patch.object(MockAgent, "model", create=True)
-    def test_position_agent(self, mock_model):
+    def test_agent_move(self):
+        self.create_grid(track_empties=False)
+        # get the agent at [0, 1]
+        agent = self.agents[0]
+        self.grid.move_agent(agent, (1, 1))
+        assert agent.pos == (1, 1)
+
+    def test_position_agent(self):
+        self.create_grid(track_empties=False)
         a = MockAgent(100, None)
         with self.assertRaises(Exception) as exc_info:
             self.grid.position_agent(a, (1, 1))
@@ -295,7 +303,7 @@ class TestSingleGrid(unittest.TestCase):
         """
         Test the SingleGrid empty count and enforcement.
         """
-
+        self.create_grid(track_empties=True)
         assert len(self.grid.empties) == 9
         a = MockAgent(100, None)
         with self.assertRaises(Exception):
@@ -353,7 +361,7 @@ class TestMultiGrid(unittest.TestCase):
         """
         width = 3
         height = 5
-        self.grid = MultiGrid(width, height, self.torus)
+        self.grid = MultiGrid(width, height, self.torus, track_empties=True)
         self.agents = []
         counter = 0
         for x in range(width):
@@ -372,6 +380,13 @@ class TestMultiGrid(unittest.TestCase):
         for agent in self.agents:
             x, y = agent.pos
             assert agent in self.grid[x][y]
+
+    def test_agent_remove(self):
+        agent = self.agents[0]
+        x, y = agent.pos
+        self.grid.remove_agent(agent)
+        assert agent.pos is None
+        assert self.grid.grid[x][y] == []
 
     def test_neighbors(self):
         """
