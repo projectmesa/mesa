@@ -108,8 +108,10 @@ class Grid:
             [self.default_val() for _ in range(self.height)] for _ in range(self.width)
         ]
 
-        # Add all cells to the empties list.
-        self.empties = set(itertools.product(range(self.width), range(self.height)))
+        # Flag to check if the empties set has been created. Better than initializing
+        # _empties as set() because in this case it would become impossible to discern
+        # if the set hasn't still being built or if it has become empty after creation.
+        self.empties_built = False
 
         # Neighborhood Cache
         self._neighborhood_cache: dict[Any, list[Coordinate]] = dict()
@@ -118,6 +120,21 @@ class Grid:
     def default_val() -> None:
         """Default value for new cell elements."""
         return None
+
+    @property
+    def empties(self) -> set:
+        if not self.empties_built:
+            self.build_empties()
+        return self._empties
+
+    def build_empties(self) -> None:
+        self._empties = set(
+            filter(
+                self.is_cell_empty,
+                itertools.product(range(self.width), range(self.height)),
+            )
+        )
+        self.empties_built = True
 
     @overload
     def __getitem__(self, index: int) -> list[GridContent]:
@@ -421,7 +438,8 @@ class Grid:
         """Place the agent at the specified location, and set its pos variable."""
         x, y = pos
         self.grid[x][y] = agent
-        self.empties.discard(pos)
+        if self.empties_built:
+            self._empties.discard(pos)
         agent.pos = pos
 
     def remove_agent(self, agent: Agent) -> None:
@@ -430,7 +448,8 @@ class Grid:
             return
         x, y = pos
         self.grid[x][y] = self.default_val()
-        self.empties.add(pos)
+        if self.empties_built:
+            self._empties.add(pos)
         agent.pos = None
 
     def swap_pos(self, agent_a: Agent, agent_b: Agent) -> None:
@@ -551,8 +570,6 @@ class SingleGrid(Grid):
             )
 
         if x == "random" or y == "random":
-            if len(self.empties) == 0:
-                raise Exception("ERROR: Grid full")
             self.move_to_empty(agent)
         else:
             coords = (x, y)
@@ -598,15 +615,16 @@ class MultiGrid(Grid):
         if agent.pos is None or agent not in self.grid[x][y]:
             self.grid[x][y].append(agent)
             agent.pos = pos
-            self.empties.discard(pos)
+            if self.empties_built:
+                self._empties.discard(pos)
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the given location and set its pos attribute to None."""
         pos = agent.pos
         x, y = pos
         self.grid[x][y].remove(agent)
-        if self.is_cell_empty(pos):
-            self.empties.add(pos)
+        if self.empties_built and self.is_cell_empty(pos):
+            self._empties.add(pos)
         agent.pos = None
 
     @accept_tuple_argument
