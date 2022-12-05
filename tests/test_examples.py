@@ -10,7 +10,7 @@ def classcase(name):
 
 
 @unittest.skip(
-    "Skipping TextExamples, because TextExamples was moved. More discussion needed."
+    "Skipping TextExamples, because examples folder was moved. More discussion needed."
 )
 class TestExamples(unittest.TestCase):
     """
