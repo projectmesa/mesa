@@ -126,7 +126,7 @@ class Grid:
     def empties(self):
         # this method can be removed in some further release, when
         # users will be warned about the change in the API.
-        if self.track_empties is False:
+        if not self.track_empties:
             raise Exception(
                 "`empties` set is not built when `track_empties` is "
                 "False. Consider assigning `track_empties` to True "
