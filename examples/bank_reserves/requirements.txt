@@ -1,4 +1,0 @@
-itertools
-mesa
-numpy
-pandas
