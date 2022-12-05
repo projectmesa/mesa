@@ -588,8 +588,6 @@ class SingleGrid(Grid):
             )
 
         if x == "random" or y == "random":
-            if len(self._empties) == 0:
-                raise Exception("ERROR: Grid full")
             self.move_to_empty(agent)
         else:
             coords = (x, y)
