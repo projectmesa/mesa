@@ -393,8 +393,8 @@ const GridVisualization = function (
   this.drawGridLines = function () {
     context.beginPath();
     context.strokeStyle = "#eee";
-    maxX = cellWidth * gridWidth;
-    maxY = cellHeight * gridHeight;
+    const maxX = cellWidth * gridWidth;
+    const maxY = cellHeight * gridHeight;
 
     // Draw horizontal grid lines:
     for (let y = 0; y <= maxY; y += cellHeight) {
