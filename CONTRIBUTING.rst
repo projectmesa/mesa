@@ -33,7 +33,7 @@ discuss via `Matrix`_ OR via `an issue`_.
 - Git add the new files and files with changes: ``git add FILE_NAME``
 - Git commit your changes with a meaningful message: ``git commit -m "Fix issue X"``
 - If implementing a new feature, include some documentation in docs folder.
-- Make sure that your submission works with a few of the examples in the examples repository. If adding a new feature to mesa, please illustrate usage by implementing it in an example. 
+- Make sure that your submission works with a few of the examples in the examples repository. If adding a new feature to mesa, please illustrate usage by implementing it in an example.
 - Make sure that your submission passes the `GH Actions build`_. See "Testing and Standards below" to be able to run these locally.
 - Make sure that your code is formatted according to `the black`_ standard (you can do it via `pre-commit`_).
 - Push your changes to your fork on Github: ``git push origin NAME_OF_BRANCH``.
