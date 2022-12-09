@@ -125,8 +125,6 @@ const InteractionHandler = function (width, height, gridWidth, gridHeight, ctx) 
 
       // map the event to x,y coordinates
       const position = coordinateMapper(event);
-      const yPosition = Math.floor(event.offsetY / cellHeight);
-      const xPosition = Math.floor(event.offsetX / cellWidth);
 
       // look up the portrayal items the coordinates refer to and draw a tooltip
       mouseoverLookupTable

@@ -57,7 +57,7 @@ const GridVisualization = function (
   // Calls the appropriate shape(agent)
   this.drawLayer = function (portrayalLayer) {
     // Re-initialize the lookup table
-    interactionHandler ? interactionHandler.mouseoverLookupTable.init() : null;
+    if (interactionHandler) interactionHandler.mouseoverLookupTable.init();
 
     for (const i in portrayalLayer) {
       const p = portrayalLayer[i];
@@ -72,9 +72,7 @@ const GridVisualization = function (
       p.y = gridHeight - p.y - 1;
 
       // if a handler exists, add coordinates for the portrayalLayer index
-      interactionHandler
-        ? interactionHandler.mouseoverLookupTable.set(p.x, p.y, i)
-        : null;
+      if (interactionHandler) interactionHandler.mouseoverLookupTable.set(p.x, p.y, i);
 
       // If the stroke color is not defined, then the first color in the colors array is the stroke color.
       if (!p.stroke_color) p.stroke_color = p.Color[0];
@@ -127,9 +125,7 @@ const GridVisualization = function (
         this.drawCustomImage(p.Shape, p.x, p.y, p.scale, p.text, p.text_color);
     }
     // if a handler exists, update its mouse listeners with the new data
-    interactionHandler
-      ? interactionHandler.updateMouseListeners(portrayalLayer)
-      : null;
+    if (interactionHandler) interactionHandler.updateMouseListeners(portrayalLayer);
   };
 
   // DRAWING METHODS

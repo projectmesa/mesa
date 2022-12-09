@@ -55,12 +55,12 @@ const HexVisualization = function (
   const maxR = Math.min(cellHeight, cellWidth) / 2 - 1;
 
   // Configure the interaction handler to use a hex coordinate mapper
-  interactionHandler ? interactionHandler.setCoordinateMapper("hex") : null;
+  if (interactionHandler) interactionHandler.setCoordinateMapper("hex");
 
   // Calls the appropriate shape(agent)
   this.drawLayer = function (portrayalLayer) {
     // Re-initialize the lookup table
-    interactionHandler ? interactionHandler.mouseoverLookupTable.init() : null;
+    if (interactionHandler) interactionHandler.mouseoverLookupTable.init();
     for (const i in portrayalLayer) {
       const p = portrayalLayer[i];
       // Does the inversion of y positioning because of html5
@@ -69,9 +69,7 @@ const HexVisualization = function (
       p.y = gridHeight - p.y - 1;
 
       // if a handler exists, add coordinates for the portrayalLayer index
-      interactionHandler
-        ? interactionHandler.mouseoverLookupTable.set(p.x, p.y, i)
-        : null;
+      if (interactionHandler) interactionHandler.mouseoverLookupTable.set(p.x, p.y, i);
 
       if (p.Shape == "hex")
         this.drawHex(p.x, p.y, p.r, p.Color, p.Filled, p.text, p.text_color);
@@ -93,9 +91,7 @@ const HexVisualization = function (
         this.drawCustomImage(p.Shape, p.x, p.y, p.scale, p.text, p.text_color);
     }
     // if a handler exists, update its mouse listeners with the new data
-    interactionHandler
-      ? interactionHandler.updateMouseListeners(portrayalLayer)
-      : null;
+    if (interactionHandler) interactionHandler.updateMouseListeners(portrayalLayer);
   };
 
   // DRAWING METHODS
@@ -158,7 +154,7 @@ const HexVisualization = function (
     } else {
       cy = (y + 0.5) * cellHeight + cellHeight / 2;
     }
-    maxHexRadius = cellHeight / Math.sqrt(3);
+    const maxHexRadius = cellHeight / Math.sqrt(3);
     const r = radius * maxHexRadius;
 
     function hex_corner(x, y, size, i) {
