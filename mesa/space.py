@@ -112,6 +112,9 @@ class Grid:
         # _empties as set() because in this case it would become impossible to discern
         # if the set hasn't still being built or if it has become empty after creation.
         self.empties_built = False
+        
+        # Just for comparisons
+        self.default = self.default_val()
 
         # Neighborhood Cache
         self._neighborhood_cache: dict[Any, list[Coordinate]] = dict()
@@ -475,7 +478,7 @@ class Grid:
     def is_cell_empty(self, pos: Coordinate) -> bool:
         """Returns a bool of the contents of a cell."""
         x, y = pos
-        return self.grid[x][y] == self.default_val()
+        return self.grid[x][y] == self.default
 
     def move_to_empty(
         self, agent: Agent, cutoff: float = 0.998, num_agents: int | None = None
@@ -1023,6 +1026,9 @@ class NetworkGrid:
         for node_id in self.G.nodes:
             G.nodes[node_id]["agent"] = self.default_val()
 
+        # Just for comparisons
+        self.default = self.default_val()
+
     @staticmethod
     def default_val() -> list:
         """Default value for a new node."""
@@ -1053,7 +1059,7 @@ class NetworkGrid:
 
     def is_cell_empty(self, node_id: int) -> bool:
         """Returns a bool of the contents of a cell."""
-        return self.G.nodes[node_id]["agent"] == self.default_val()
+        return self.G.nodes[node_id]["agent"] == self.default
 
     def get_cell_list_contents(self, cell_list: list[int]) -> list[Agent]:
         """Returns a list of the agents contained in the nodes identified
