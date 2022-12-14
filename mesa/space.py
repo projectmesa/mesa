@@ -112,7 +112,7 @@ class Grid:
         # _empties as set() because in this case it would become impossible to discern
         # if the set hasn't still being built or if it has become empty after creation.
         self.empties_built = False
-        
+
         # Just for comparisons
         self.default = self.default_val()
 
