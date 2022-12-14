@@ -113,7 +113,7 @@ class Grid:
         # if the set hasn't still being built or if it has become empty after creation.
         self.empties_built = False
 
-        # Useful to check if a cell is empty
+        # Default value used to check if a cell is empty
         self.empty_value = self.default_val()
 
         # Neighborhood Cache
@@ -1026,7 +1026,7 @@ class NetworkGrid:
         for node_id in self.G.nodes:
             G.nodes[node_id]["agent"] = self.default_val()
 
-        # Useful to check if a cell is empty
+        # Default value used to check if a cell is empty
         self.empty_value = self.default_val()
 
     @staticmethod
