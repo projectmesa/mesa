@@ -340,7 +340,7 @@ class TestSingleNetworkGrid(unittest.TestCase):
         """
         Create a test network grid and populate with Mock Agents.
         """
-        G = nx.complete_graph(TestSingleNetworkGrid.GRAPH_SIZE)
+        G = nx.cycle_graph(TestSingleNetworkGrid.GRAPH_SIZE)
         self.space = NetworkGrid(G)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS_NETWORK_SINGLE):
@@ -357,14 +357,10 @@ class TestSingleNetworkGrid(unittest.TestCase):
             assert a.pos == pos
 
     def test_get_neighbors(self):
-        assert (
-            len(self.space.get_neighbors(0, include_center=True))
-            == TestSingleNetworkGrid.GRAPH_SIZE
-        )
-        assert (
-            len(self.space.get_neighbors(0, include_center=False))
-            == TestSingleNetworkGrid.GRAPH_SIZE - 1
-        )
+        assert len(self.space.get_neighbors(0, include_center=True)) == 3
+        assert len(self.space.get_neighbors(0, include_center=False)) == 2
+        assert len(self.space.get_neighbors(2, include_center=True, radius=3)) == 7
+        assert len(self.space.get_neighbors(2, include_center=False, radius=3)) == 6
 
     def test_move_agent(self):
         initial_pos = 1
