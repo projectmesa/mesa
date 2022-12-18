@@ -119,6 +119,11 @@ class _Grid:
         # Neighborhood Cache
         self._neighborhood_cache: dict[Any, list[Coordinate]] = {}
 
+        # Cutoff used inside self.move_to_empty. The parameters are fitted on Python
+        # 3.11 and it was verified that they are roughly the same for 3.10. Refer to
+        # the code in PR#1565 to check for their stability when a new release gets out.
+        self.cutoff_empties = 7.953 * self.num_cells**0.384
+
     @staticmethod
     def default_val() -> None:
         """Default value for new cell elements."""
@@ -464,9 +469,7 @@ class _Grid:
         x, y = pos
         return self._grid[x][y] == self.default_val()
 
-    def move_to_empty(
-        self, agent: Agent, cutoff: float = 0.998, num_agents: int | None = None
-    ) -> None:
+    def move_to_empty(self, agent: Agent, num_agents: int | None = None) -> None:
         """Moves agent to a random empty cell, vacating agent's old cell."""
         if num_agents is not None:
             warn(
@@ -482,10 +485,10 @@ class _Grid:
 
         # This method is based on Agents.jl's random_empty() implementation. See
         # https://github.com/JuliaDynamics/Agents.jl/pull/541. For the discussion, see
-        # https://github.com/projectmesa/mesa/issues/1052. The default cutoff value
-        # provided is the break-even comparison with the time taken in the else
-        # branching point.
-        if 1 - num_empty_cells / self.num_cells < cutoff:
+        # https://github.com/projectmesa/mesa/issues/1052 and
+        # https://github.com/projectmesa/mesa/pull/1565. The cutoff value provided
+        # is the break-even comparison with the time taken in the else branching point.
+        if num_empty_cells > self.cutoff_empties:
             while True:
                 new_pos = (
                     agent.random.randrange(self.width),
