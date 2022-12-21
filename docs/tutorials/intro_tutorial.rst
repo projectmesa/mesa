@@ -594,15 +594,14 @@ Now let’s use matplotlib and numpy to visualize the number of agents
 residing in each cell. To do that, we create a numpy array of the same
 size as the grid, filled with zeros. Then we use the grid object’s
 ``coord_iter()`` feature, which lets us loop over every cell in the
-grid, giving us each cell’s coordinates and contents in turn.
+grid, giving us each cell’s positions and contents in turn.
 
 .. code:: ipython3
 
     import numpy as np
 
     agent_counts = np.zeros((model.grid.width, model.grid.height))
-    for cell in model.grid.coord_iter():
-        cell_content, x, y = cell
+    for cell_content, (x, y) in model.grid.coord_iter():
         agent_count = len(cell_content)
         agent_counts[x][y] = agent_count
     plt.imshow(agent_counts, interpolation="nearest")

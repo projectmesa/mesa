@@ -136,15 +136,13 @@ class TestBaseGrid(unittest.TestCase):
         # no agent in first space
         first = next(ci)
         assert first[0] is None
-        assert first[1] == 0
-        assert first[2] == 0
+        assert first[1] == (0, 0)
 
         # first agent in the second space
         second = next(ci)
         assert second[0].unique_id == 1
         assert second[0].pos == (0, 1)
-        assert second[1] == 0
-        assert second[2] == 1
+        assert second[1] == (0, 1)
 
     def test_agent_move(self):
         # get the agent at [0, 1]
@@ -509,8 +507,9 @@ class TestHexGridTorus(TestBaseGrid):
 class TestIndexing:
     # Create a grid where the content of each coordinate is a tuple of its coordinates
     grid = Grid(3, 5, True)
-    for _, x, y in grid.coord_iter():
-        grid.grid[x][y] = (x, y)
+    for _, pos in grid.coord_iter():
+        x, y = pos
+        grid.grid[x][y] = pos
 
     def test_int(self):
         assert self.grid[0][0] == (0, 0)
