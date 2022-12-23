@@ -113,7 +113,9 @@ class Grid:
         # if the set hasn't still being built or if it has become empty after creation.
         self.empties_built = False
 
-        # Default value used to check if a cell is empty
+        # Default value to use only to check if a cell is empty. To create new empty
+        # cells calling self.default_val() directly is necessary since the objects
+        # need to be independent.
         self.empty_value = self.default_val()
 
         # Neighborhood Cache
