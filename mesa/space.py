@@ -26,6 +26,7 @@ import math
 from warnings import warn
 
 import numpy as np
+import networkx as nx
 
 from typing import (
     Any,
@@ -1033,11 +1034,21 @@ class NetworkGrid:
         self.G.nodes[node_id]["agent"].append(agent)
         agent.pos = node_id
 
-    def get_neighbors(self, node_id: int, include_center: bool = False) -> list[int]:
-        """Get all adjacent nodes"""
-        neighbors = list(self.G.neighbors(node_id))
-        if include_center:
-            neighbors.append(node_id)
+    def get_neighbors(
+        self, node_id: int, include_center: bool = False, radius: int = 1
+    ) -> list[int]:
+        """Get all adjacent nodes within a certain radius"""
+        if radius == 1:
+            neighbors = list(self.G.neighbors(node_id))
+            if include_center:
+                neighbors.append(node_id)
+        else:
+            neighbors_with_distance = nx.single_source_shortest_path_length(
+                self.G, node_id, radius
+            )
+            if not include_center:
+                del neighbors_with_distance[node_id]
+            neighbors = list(neighbors_with_distance.keys())
         return neighbors
 
     def move_agent(self, agent: Agent, node_id: int) -> None:
