@@ -302,10 +302,10 @@ class TestSingleGrid(unittest.TestCase):
         for i, pos in enumerate(TEST_AGENTS_GRID):
             a = self.agents[i]
             assert a.pos == pos
-            assert self.space.grid[pos[0]][pos[1]] == a
+            assert self.space[pos[0]][pos[1]] == a
             self.space.remove_agent(a)
             assert a.pos is None
-            assert self.space.grid[pos[0]][pos[1]] is None
+            assert self.space[pos[0]][pos[1]] is None
 
     def test_empty_cells(self):
         if self.space.exists_empty_cells():
@@ -325,12 +325,12 @@ class TestSingleGrid(unittest.TestCase):
         _agent = self.agents[agent_number]
 
         assert _agent.pos == initial_pos
-        assert self.space.grid[initial_pos[0]][initial_pos[1]] == _agent
-        assert self.space.grid[final_pos[0]][final_pos[1]] is None
+        assert self.space[initial_pos[0]][initial_pos[1]] == _agent
+        assert self.space[final_pos[0]][final_pos[1]] is None
         self.space.move_agent(_agent, final_pos)
         assert _agent.pos == final_pos
-        assert self.space.grid[initial_pos[0]][initial_pos[1]] is None
-        assert self.space.grid[final_pos[0]][final_pos[1]] == _agent
+        assert self.space[initial_pos[0]][initial_pos[1]] is None
+        assert self.space[final_pos[0]][final_pos[1]] == _agent
 
 
 class TestSingleNetworkGrid(unittest.TestCase):

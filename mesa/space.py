@@ -89,7 +89,6 @@ class Grid:
     Properties:
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
-        grid: Internal list-of-lists which holds the grid cells themselves.
     """
 
     def __init__(self, width: int, height: int, torus: bool) -> None:
@@ -104,15 +103,16 @@ class Grid:
         self.torus = torus
         self.num_cells = height * width
 
-        self.grid: list[list[GridContent]]
-        self.grid = [
+        # Internal list-of-lists which holds the grid cells themselves
+        self._grid: list[list[GridContent]]
+        self._grid = [
             [self.default_val() for _ in range(self.height)] for _ in range(self.width)
         ]
 
         # Flag to check if the empties set has been created. Better than initializing
         # _empties as set() because in this case it would become impossible to discern
         # if the set hasn't still being built or if it has become empty after creation.
-        self.empties_built = False
+        self._empties_built = False
 
         # Neighborhood Cache
         self._neighborhood_cache: dict[Any, list[Coordinate]] = dict()
@@ -124,7 +124,7 @@ class Grid:
 
     @property
     def empties(self) -> set:
-        if not self.empties_built:
+        if not self._empties_built:
             self.build_empties()
         return self._empties
 
@@ -135,7 +135,7 @@ class Grid:
                 itertools.product(range(self.width), range(self.height)),
             )
         )
-        self.empties_built = True
+        self._empties_built = True
 
     @overload
     def __getitem__(self, index: int) -> list[GridContent]:
@@ -159,11 +159,11 @@ class Grid:
 
         if isinstance(index, int):
             # grid[x]
-            return self.grid[index]
+            return self._grid[index]
         elif isinstance(index[0], tuple):
             # grid[(x1, y1), (x2, y2), ...]
             index = cast(Sequence[Coordinate], index)
-            return [self.grid[x][y] for x, y in map(self.torus_adj, index)]
+            return [self._grid[x][y] for x, y in map(self.torus_adj, index)]
 
         x, y = index
         x_int, y_int = is_integer(x), is_integer(y)
@@ -172,32 +172,32 @@ class Grid:
             # grid[x, y]
             index = cast(Coordinate, index)
             x, y = self.torus_adj(index)
-            return self.grid[x][y]
+            return self._grid[x][y]
         elif x_int:
             # grid[x, :]
             x, _ = self.torus_adj((x, 0))
             y = cast(slice, y)
-            return self.grid[x][y]
+            return self._grid[x][y]
         elif y_int:
             # grid[:, y]
             _, y = self.torus_adj((0, y))
             x = cast(slice, x)
-            return [rows[y] for rows in self.grid[x]]
+            return [rows[y] for rows in self._grid[x]]
         else:
             # grid[:, :]
             x, y = (cast(slice, x), cast(slice, y))
-            return [cell for rows in self.grid[x] for cell in rows[y]]
+            return [cell for rows in self._grid[x] for cell in rows[y]]
 
     def __iter__(self) -> Iterator[GridContent]:
         """Create an iterator that chains the rows of the grid together
         as if it is one list:"""
-        return itertools.chain(*self.grid)
+        return itertools.chain(*self._grid)
 
     def coord_iter(self) -> Iterator[tuple[GridContent, int, int]]:
         """An iterator that returns coordinates as well as cell contents."""
         for row in range(self.width):
             for col in range(self.height):
-                yield self.grid[row][col], row, col  # agent, x, y
+                yield self._grid[row][col], row, col  # agent, x, y
 
     def neighbor_iter(self, pos: Coordinate, moore: bool = True) -> Iterator[Agent]:
         """Iterate over position neighbors.
@@ -407,7 +407,7 @@ class Grid:
             An iterator of the contents of the cells identified in cell_list
         """
         # iter_cell_list_contents returns only non-empty contents.
-        return (self.grid[x][y] for x, y in cell_list if self.grid[x][y])
+        return (self._grid[x][y] for x, y in cell_list if self._grid[x][y])
 
     @accept_tuple_argument
     def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> list[Agent]:
@@ -438,8 +438,8 @@ class Grid:
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         x, y = pos
-        self.grid[x][y] = agent
-        if self.empties_built:
+        self._grid[x][y] = agent
+        if self._empties_built:
             self._empties.discard(pos)
         agent.pos = pos
 
@@ -448,8 +448,8 @@ class Grid:
         if (pos := agent.pos) is None:
             return
         x, y = pos
-        self.grid[x][y] = self.default_val()
-        if self.empties_built:
+        self._grid[x][y] = self.default_val()
+        if self._empties_built:
             self._empties.add(pos)
         agent.pos = None
 
@@ -476,7 +476,7 @@ class Grid:
     def is_cell_empty(self, pos: Coordinate) -> bool:
         """Returns a bool of the contents of a cell."""
         x, y = pos
-        return self.grid[x][y] == self.default_val()
+        return self._grid[x][y] == self.default_val()
 
     def move_to_empty(
         self, agent: Agent, cutoff: float = 0.998, num_agents: int | None = None
@@ -613,18 +613,18 @@ class MultiGrid(Grid):
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         x, y = pos
-        if agent.pos is None or agent not in self.grid[x][y]:
-            self.grid[x][y].append(agent)
+        if agent.pos is None or agent not in self._grid[x][y]:
+            self._grid[x][y].append(agent)
             agent.pos = pos
-            if self.empties_built:
+            if self._empties_built:
                 self._empties.discard(pos)
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the given location and set its pos attribute to None."""
         pos = agent.pos
         x, y = pos
-        self.grid[x][y].remove(agent)
-        if self.empties_built and self.is_cell_empty(pos):
+        self._grid[x][y].remove(agent)
+        if self._empties_built and self.is_cell_empty(pos):
             self._empties.add(pos)
         agent.pos = None
 

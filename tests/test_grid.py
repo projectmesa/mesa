@@ -168,7 +168,7 @@ class TestBaseGrid(unittest.TestCase):
         x, y = agent.pos
         self.grid.remove_agent(agent)
         assert agent.pos is None
-        assert self.grid.grid[x][y] is None
+        assert self.grid[x][y] is None
 
     def test_swap_pos(self):
 
@@ -510,7 +510,7 @@ class TestIndexing:
     # Create a grid where the content of each coordinate is a tuple of its coordinates
     grid = Grid(3, 5, True)
     for _, x, y in grid.coord_iter():
-        grid.grid[x][y] = (x, y)
+        grid._grid[x][y] = (x, y)
 
     def test_int(self):
         assert self.grid[0][0] == (0, 0)
