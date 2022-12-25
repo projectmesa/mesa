@@ -1048,7 +1048,7 @@ class NetworkGrid:
             )
             if not include_center:
                 del neighbors_with_distance[node_id]
-            neighbors = list(neighbors_with_distance.keys())
+            neighbors = sorted(neighbors_with_distance.keys())
         return neighbors
 
     def move_agent(self, agent: Agent, node_id: int) -> None:
