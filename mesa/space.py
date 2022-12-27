@@ -594,10 +594,7 @@ class MultiGrid(Grid):
 
     Properties:
         width, height: The grid's width and height.
-
         torus: Boolean which determines whether to treat the grid as a torus.
-
-        grid: Internal list-of-lists which holds the grid cells themselves.
 
     Methods:
         get_neighbors: Returns the objects surrounding a given cell.
