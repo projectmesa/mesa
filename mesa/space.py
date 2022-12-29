@@ -1082,5 +1082,6 @@ class NetworkGrid:
         """
         nodes_to_agents = map(lambda node_id: self.G.nodes[node_id]["agent"], cell_list)
         return itertools.chain.from_iterable(
-            itertools.filterfalse(self.is_cell_empty, nodes_to_agents)
+            self.G.nodes[node_id]["agent"]
+            for node_id in cell_list if self.is_cell_empty(node_id))
         )
