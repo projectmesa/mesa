@@ -397,29 +397,31 @@ class Grid:
     def iter_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
     ) -> Iterator[Agent]:
-        """Returns an iterator of the contents of the cells
-        identified in cell_list.
+        """Returns an iterator of the agents contained in the cells identified
+        in `cell_list`; cells with empty content are excluded.
 
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
 
         Returns:
-            An iterator of the contents of the cells identified in cell_list
+            An iterator of the agents contained in the cells identified in `cell_list`.
         """
         # iter_cell_list_contents returns only non-empty contents.
-        return (self._grid[x][y] for x, y in cell_list if self._grid[x][y])
+        return (
+            self._grid[x][y]
+            for x, y in itertools.filterfalse(self.is_cell_empty, cell_list)
+        )
 
     @accept_tuple_argument
     def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> list[Agent]:
-        """Returns a list of the contents of the cells
-        identified in cell_list.
-        Note: this method returns a list of `Agent`'s; `None` contents are excluded.
+        """Returns an iterator of the agents contained in the cells identified
+        in `cell_list`; cells with empty content are excluded.
 
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
 
         Returns:
-            A list of the contents of the cells identified in cell_list
+            A list of the agents contained in the cells identified in `cell_list`.
         """
         return list(self.iter_cell_list_contents(cell_list))
 
@@ -628,18 +630,19 @@ class MultiGrid(Grid):
     @accept_tuple_argument
     def iter_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
-    ) -> Iterator[MultiGridContent]:
-        """Returns an iterator of the contents of the
-        cells identified in cell_list.
+    ) -> Iterator[Agent]:
+        """Returns an iterator of the agents contained in the cells identified
+        in `cell_list`; cells with empty content are excluded.
 
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
 
         Returns:
-            A iterator of the contents of the cells identified in cell_list
+            An iterator of the agents contained in the cells identified in `cell_list`.
         """
         return itertools.chain.from_iterable(
-            self[x][y] for x, y in cell_list if not self.is_cell_empty((x, y))
+            self._grid[x][y]
+            for x, y in itertools.filterfalse(self.is_cell_empty, cell_list)
         )
 
 
@@ -1067,12 +1070,7 @@ class NetworkGrid:
         """Returns a list of the agents contained in the nodes identified
         in `cell_list`; nodes with empty content are excluded.
         """
-        list_of_lists = [
-            self.G.nodes[node_id]["agent"]
-            for node_id in cell_list
-            if not self.is_cell_empty(node_id)
-        ]
-        return [item for sublist in list_of_lists for item in sublist]
+        return list(self.iter_cell_list_contents(cell_list))
 
     def get_all_cell_contents(self) -> list[Agent]:
         """Returns a list of all the agents in the network."""
@@ -1082,4 +1080,7 @@ class NetworkGrid:
         """Returns an iterator of the agents contained in the nodes identified
         in `cell_list`; nodes with empty content are excluded.
         """
-        yield from self.get_cell_list_contents(cell_list)
+        nodes_to_agents = map(lambda node_id: self.G.nodes[node_id]["agent"], cell_list)
+        return itertools.chain.from_iterable(
+            itertools.filterfalse(self.is_cell_empty, nodes_to_agents)
+        )
