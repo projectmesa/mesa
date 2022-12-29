@@ -1080,8 +1080,8 @@ class NetworkGrid:
         """Returns an iterator of the agents contained in the nodes identified
         in `cell_list`; nodes with empty content are excluded.
         """
-        nodes_to_agents = map(lambda node_id: self.G.nodes[node_id]["agent"], cell_list)
         return itertools.chain.from_iterable(
             self.G.nodes[node_id]["agent"]
-            for node_id in cell_list if not self.is_cell_empty(node_id)
+            for node_id in cell_list
+            if not self.is_cell_empty(node_id)
         )
