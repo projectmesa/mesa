@@ -79,7 +79,7 @@ def is_integer(x: Real) -> bool:
     return isinstance(x, (int, np.integer))
 
 
-class Grid:
+class _Grid:
     """Base class for a rectangular grid.
 
     Grid cells are indexed by [x][y], where [0][0] is assumed to be the
@@ -435,24 +435,6 @@ class Grid:
         self.remove_agent(agent)
         self.place_agent(agent, pos)
 
-    def place_agent(self, agent: Agent, pos: Coordinate) -> None:
-        """Place the agent at the specified location, and set its pos variable."""
-        x, y = pos
-        self._grid[x][y] = agent
-        if self._empties_built:
-            self._empties.discard(pos)
-        agent.pos = pos
-
-    def remove_agent(self, agent: Agent) -> None:
-        """Remove the agent from the grid and set its pos attribute to None."""
-        if (pos := agent.pos) is None:
-            return
-        x, y = pos
-        self._grid[x][y] = self.default_val()
-        if self._empties_built:
-            self._empties.add(pos)
-        agent.pos = None
-
     def swap_pos(self, agent_a: Agent, agent_b: Agent) -> None:
         """Swap agents positions"""
         agents_no_pos = []
@@ -537,8 +519,17 @@ class Grid:
         return len(self.empties) > 0
 
 
-class SingleGrid(Grid):
-    """Grid where each cell contains exactly at most one object."""
+class SingleGrid(_Grid):
+    """Rectangular grid where each cell contains exactly at most one agent.
+
+    Grid cells are indexed by [x][y], where [0][0] is assumed to be the
+    bottom-left and [width-1][height-1] is the top-right. If a grid is
+    toroidal, the top and bottom, and left and right, edges wrap to each other.
+
+    Properties:
+        width, height: The grid's width and height.
+        torus: Boolean which determines whether to treat the grid as a torus.
+    """
 
     def position_agent(
         self, agent: Agent, x: int | str = "random", y: int | str = "random"
@@ -577,27 +568,37 @@ class SingleGrid(Grid):
             self.place_agent(agent, coords)
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
+        """Place the agent at the specified location, and set its pos variable."""
         if self.is_cell_empty(pos):
-            super().place_agent(agent, pos)
+            x, y = pos
+            self._grid[x][y] = agent
+            if self._empties_built:
+                self._empties.discard(pos)
+            agent.pos = pos
         else:
             raise Exception("Cell not empty")
 
+    def remove_agent(self, agent: Agent) -> None:
+        """Remove the agent from the grid and set its pos attribute to None."""
+        if (pos := agent.pos) is None:
+            return
+        x, y = pos
+        self._grid[x][y] = self.default_val()
+        if self._empties_built:
+            self._empties.add(pos)
+        agent.pos = None
 
-class MultiGrid(Grid):
-    """Grid where each cell can contain more than one object.
+
+class MultiGrid(_Grid):
+    """Rectangular grid where each cell can contain more than one agent.
 
     Grid cells are indexed by [x][y], where [0][0] is assumed to be at
     bottom-left and [width-1][height-1] is the top-right. If a grid is
     toroidal, the top and bottom, and left and right, edges wrap to each other.
 
-    Each grid cell holds a set object.
-
     Properties:
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
-
-    Methods:
-        get_neighbors: Returns the objects surrounding a given cell.
     """
 
     grid: list[list[MultiGridContent]]
@@ -643,7 +644,7 @@ class MultiGrid(Grid):
         )
 
 
-class HexGrid(Grid):
+class _HexGrid(_Grid):
     """Hexagonal Grid: Extends Grid to handle hexagonal neighbors.
 
     Functions according to odd-q rules.
@@ -818,6 +819,30 @@ class HexGrid(Grid):
             A list of non-None objects in the given neighborhood
         """
         return list(self.iter_neighbors(pos, include_center, radius))
+
+
+class SingleHexGrid(_HexGrid, SingleGrid):
+    """Hexagonal SingleGrid: Extends SingleGrid to handle hexagonal neighbors.
+
+    Functions according to odd-q rules.
+    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+
+    Properties:
+        width, height: The grid's width and height.
+        torus: Boolean which determines whether to treat the grid as a torus.
+    """
+
+
+class MultiHexGrid(_HexGrid, MultiGrid):
+    """Hexagonal MultiGrid: Extends MultiGrid to handle hexagonal neighbors.
+
+    Functions according to odd-q rules.
+    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+
+    Properties:
+        width, height: The grid's width and height.
+        torus: Boolean which determines whether to treat the grid as a torus.
+    """
 
 
 class ContinuousSpace:
