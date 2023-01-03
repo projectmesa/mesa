@@ -82,8 +82,8 @@ def is_integer(x: Real) -> bool:
 class _Grid:
     """Base class for a rectangular grid.
 
-    Grid cells are indexed by [x][y], where [0][0] is assumed to be the
-    bottom-left and [width-1][height-1] is the top-right. If a grid is
+    Grid cells are indexed by [x, y], where [0, 0] is assumed to be the
+    bottom-left and [width-1, height-1] is the top-right. If a grid is
     toroidal, the top and bottom, and left and right, edges wrap to each other
 
     Properties:
@@ -522,8 +522,8 @@ class _Grid:
 class SingleGrid(_Grid):
     """Rectangular grid where each cell contains exactly at most one agent.
 
-    Grid cells are indexed by [x][y], where [0][0] is assumed to be the
-    bottom-left and [width-1][height-1] is the top-right. If a grid is
+    Grid cells are indexed by [x, y], where [0, 0] is assumed to be the
+    bottom-left and [width-1, height-1] is the top-right. If a grid is
     toroidal, the top and bottom, and left and right, edges wrap to each other.
 
     Properties:
@@ -592,8 +592,8 @@ class SingleGrid(_Grid):
 class MultiGrid(_Grid):
     """Rectangular grid where each cell can contain more than one agent.
 
-    Grid cells are indexed by [x][y], where [0][0] is assumed to be at
-    bottom-left and [width-1][height-1] is the top-right. If a grid is
+    Grid cells are indexed by [x, y], where [0, 0] is assumed to be at
+    bottom-left and [width-1, height-1] is the top-right. If a grid is
     toroidal, the top and bottom, and left and right, edges wrap to each other.
 
     Properties:
