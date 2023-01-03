@@ -4,7 +4,7 @@ Test the Grid objects.
 import random
 import unittest
 from unittest.mock import patch, Mock
-from mesa.space import SingleGrid, MultiGrid, SingleHexGrid
+from mesa.space import SingleGrid, MultiGrid, HexGrid
 
 # Initial agent positions for testing
 #
@@ -397,7 +397,7 @@ class TestMultiGrid(unittest.TestCase):
         assert len(neighbors) == 11
 
 
-class TestSingleHexGrid(unittest.TestCase):
+class TestHexGrid(unittest.TestCase):
     """
     Testing a hexagonal singlegrid.
     """
@@ -408,7 +408,7 @@ class TestSingleHexGrid(unittest.TestCase):
         """
         width = 3
         height = 5
-        self.grid = SingleHexGrid(width, height, torus=False)
+        self.grid = HexGrid(width, height, torus=False)
         self.agents = []
         counter = 0
         for x in range(width):
@@ -452,7 +452,7 @@ class TestSingleHexGrid(unittest.TestCase):
         assert sum(x + y for x, y in neighborhood) == 39
 
 
-class TestSingleHexGridTorus(TestSingleGrid):
+class TestHexGridTorus(TestSingleGrid):
     """
     Testing a hexagonal toroidal singlegrid.
     """
@@ -465,7 +465,7 @@ class TestSingleHexGridTorus(TestSingleGrid):
         """
         width = 3
         height = 5
-        self.grid = SingleHexGrid(width, height, torus=True)
+        self.grid = HexGrid(width, height, torus=True)
         self.agents = []
         counter = 0
         for x in range(width):
