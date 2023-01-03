@@ -423,6 +423,12 @@ class _Grid:
         """
         return list(self.iter_cell_list_contents(cell_list))
 
+    def place_agent(self, agent: Agent, pos: Coordinate) -> None:
+        ...
+
+    def remove_agent(self, agent: Agent) -> None:
+        ...
+
     def move_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Move an agent from its current position to a new position.
 
@@ -644,8 +650,8 @@ class MultiGrid(_Grid):
         )
 
 
-class _HexGrid(_Grid):
-    """Hexagonal Grid: Extends Grid to handle hexagonal neighbors.
+class HexGrid(SingleGrid):
+    """Hexagonal Grid: Extends SingleGrid to handle hexagonal neighbors.
 
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
@@ -819,30 +825,6 @@ class _HexGrid(_Grid):
             A list of non-None objects in the given neighborhood
         """
         return list(self.iter_neighbors(pos, include_center, radius))
-
-
-class SingleHexGrid(_HexGrid, SingleGrid):
-    """Hexagonal SingleGrid: Extends SingleGrid to handle hexagonal neighbors.
-
-    Functions according to odd-q rules.
-    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
-
-    Properties:
-        width, height: The grid's width and height.
-        torus: Boolean which determines whether to treat the grid as a torus.
-    """
-
-
-class MultiHexGrid(_HexGrid, MultiGrid):
-    """Hexagonal MultiGrid: Extends MultiGrid to handle hexagonal neighbors.
-
-    Functions according to odd-q rules.
-    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
-
-    Properties:
-        width, height: The grid's width and height.
-        torus: Boolean which determines whether to treat the grid as a torus.
-    """
 
 
 class ContinuousSpace:
