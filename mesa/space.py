@@ -1082,6 +1082,5 @@ class NetworkGrid:
         """
         return itertools.chain.from_iterable(
             self.G.nodes[node_id]["agent"]
-            for node_id in cell_list
-            if not self.is_cell_empty(node_id)
+            for node_id in itertools.filterfalse(self.is_cell_empty, cell_list)
         )
