@@ -4,7 +4,7 @@ Test the Grid objects.
 import random
 import unittest
 from unittest.mock import patch, Mock
-from mesa.space import Grid, SingleGrid, MultiGrid, HexGrid
+from mesa.space import SingleGrid, MultiGrid, HexGrid
 
 # Initial agent positions for testing
 #
@@ -29,9 +29,9 @@ class MockAgent:
         self.pos = pos
 
 
-class TestBaseGrid(unittest.TestCase):
+class TestSingleGrid(unittest.TestCase):
     """
-    Testing a non-toroidal grid.
+    Testing a non-toroidal singlegrid.
     """
 
     torus = False
@@ -43,7 +43,7 @@ class TestBaseGrid(unittest.TestCase):
         # The height needs to be even to test the edge case described in PR #1517
         height = 6  # height of grid
         width = 3  # width of grid
-        self.grid = Grid(width, height, self.torus)
+        self.grid = SingleGrid(width, height, self.torus)
         self.agents = []
         counter = 0
         for x in range(width):
@@ -149,8 +149,8 @@ class TestBaseGrid(unittest.TestCase):
     def test_agent_move(self):
         # get the agent at [0, 1]
         agent = self.agents[0]
-        self.grid.move_agent(agent, (1, 1))
-        assert agent.pos == (1, 1)
+        self.grid.move_agent(agent, (1, 0))
+        assert agent.pos == (1, 0)
         # move it off the torus and check for the exception
         if not self.torus:
             with self.assertRaises(Exception):
@@ -158,10 +158,10 @@ class TestBaseGrid(unittest.TestCase):
             with self.assertRaises(Exception):
                 self.grid.move_agent(agent, [1, self.grid.height + 1])
         else:
-            self.grid.move_agent(agent, [-1, 1])
-            assert agent.pos == (self.grid.width - 1, 1)
-            self.grid.move_agent(agent, [1, self.grid.height + 1])
-            assert agent.pos == (1, 1)
+            self.grid.move_agent(agent, [0, -1])
+            assert agent.pos == (0, self.grid.height - 1)
+            self.grid.move_agent(agent, [1, self.grid.height])
+            assert agent.pos == (1, 0)
 
     def test_agent_remove(self):
         agent = self.agents[0]
@@ -201,9 +201,9 @@ class TestBaseGrid(unittest.TestCase):
             self.grid.swap_pos(agent_a, agent_b)
 
 
-class TestBaseGridTorus(TestBaseGrid):
+class TestSingleGridTorus(TestSingleGrid):
     """
-    Testing the toroidal base grid.
+    Testing the toroidal singlegrid.
     """
 
     torus = True
@@ -243,12 +243,9 @@ class TestBaseGridTorus(TestBaseGrid):
         assert len(neighbors) == 3
 
 
-class TestSingleGrid(unittest.TestCase):
+class TestSingleGridEnforcement(unittest.TestCase):
     """
-    Test the SingleGrid object.
-
-    Since it inherits from Grid, all the functionality tested above should
-    work here too. Instead, this tests the enforcement.
+    Test the enforcement in SingleGrid.
     """
 
     def setUp(self):
@@ -402,7 +399,7 @@ class TestMultiGrid(unittest.TestCase):
 
 class TestHexGrid(unittest.TestCase):
     """
-    Testing a hexagonal grid.
+    Testing a hexagonal singlegrid.
     """
 
     def setUp(self):
@@ -455,9 +452,9 @@ class TestHexGrid(unittest.TestCase):
         assert sum(x + y for x, y in neighborhood) == 39
 
 
-class TestHexGridTorus(TestBaseGrid):
+class TestHexGridTorus(TestSingleGrid):
     """
-    Testing a hexagonal toroidal grid.
+    Testing a hexagonal toroidal singlegrid.
     """
 
     torus = True
@@ -508,7 +505,7 @@ class TestHexGridTorus(TestBaseGrid):
 
 class TestIndexing:
     # Create a grid where the content of each coordinate is a tuple of its coordinates
-    grid = Grid(3, 5, True)
+    grid = SingleGrid(3, 5, True)
     for _, x, y in grid.coord_iter():
         grid._grid[x][y] = (x, y)
 

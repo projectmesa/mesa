@@ -2,7 +2,7 @@ from unittest import TestCase
 from collections import defaultdict
 
 from mesa.model import Model
-from mesa.space import Grid
+from mesa.space import MultiGrid
 from mesa.time import SimultaneousActivation
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, TextElement
@@ -21,7 +21,7 @@ class MockModel(Model):
         self.key1 = (key1,)
         self.key2 = key2
         self.schedule = SimultaneousActivation(self)
-        self.grid = Grid(width, height, torus=True)
+        self.grid = MultiGrid(width, height, torus=True)
 
         for (c, x, y) in self.grid.coord_iter():
             a = MockAgent(x + y * 100, self, x * y * 3)
