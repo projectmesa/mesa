@@ -647,7 +647,7 @@ class MultiGrid(_Grid):
 
 
 class _HexGrid:
-    """Hexagonal Grid: Extends SingleGrid to handle hexagonal neighbors.
+    """Hexagonal Grid which handles hexagonal neighbors.
 
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
@@ -822,11 +822,29 @@ class _HexGrid:
 
 
 class HexSingleGrid(_HexGrid, SingleGrid):
-    ...
+    """Hexagonal Single: a SingleGrid where neighbors are computed
+    according to an hexagonal tiling of the grid.
+
+    Functions according to odd-q rules.
+    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+
+    Properties:
+        width, height: The grid's width and height.
+        torus: Boolean which determines whether to treat the grid as a torus.
+    """
 
 
 class HexMultiGrid(_HexGrid, MultiGrid):
-    ...
+    """Hexagonal MultiGrid: a MultiGrid where neighbors are computed
+    according to an hexagonal tiling of the grid.
+
+    Functions according to odd-q rules.
+    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+
+    Properties:
+        width, height: The grid's width and height.
+        torus: Boolean which determines whether to treat the grid as a torus.
+    """
 
 
 class ContinuousSpace:
