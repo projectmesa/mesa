@@ -153,7 +153,7 @@ class TestSingleGrid(unittest.TestCase):
         self.grid.move_agent(agent, (1, 0))
         assert agent.pos == (1, 0)
         # move it off the torus and check for the exception
-        if not self.torus:
+        if not self.grid.torus:
             with self.assertRaises(Exception):
                 self.grid.move_agent(agent, [-1, 1])
             with self.assertRaises(Exception):
