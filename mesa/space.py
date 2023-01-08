@@ -646,7 +646,7 @@ class MultiGrid(_Grid):
         )
 
 
-class HexGrid(SingleGrid):
+class _HexGrid:
     """Hexagonal Grid: Extends SingleGrid to handle hexagonal neighbors.
 
     Functions according to odd-q rules.
@@ -819,6 +819,14 @@ class HexGrid(SingleGrid):
             A list of non-None objects in the given neighborhood
         """
         return list(self.iter_neighbors(pos, include_center, radius))
+
+
+class HexSingleGrid(_HexGrid, SingleGrid):
+    ...
+
+
+class HexMultiGrid(_HexGrid, MultiGrid):
+    ...
 
 
 class ContinuousSpace:
