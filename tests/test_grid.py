@@ -408,7 +408,7 @@ class TestHexSingleGrid(unittest.TestCase):
         """
         width = 3
         height = 5
-        self.grid = SingleHexGrid(width, height, torus=False)
+        self.grid = HexSingleGrid(width, height, torus=False)
         self.agents = []
         counter = 0
         for x in range(width):
