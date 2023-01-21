@@ -1,8 +1,0 @@
-[flake8]
-# Ignore list taken from https://github.com/psf/black/blob/master/.flake8
-# E203	Whitespace before ':'
-# E266	Too many leading '#' for block comment
-# E501	Line too long (82 > 79 characters)
-# W503	Line break occurred before a binary operator
-ignore = E203, E266, E501, W503
-exclude = docs, build

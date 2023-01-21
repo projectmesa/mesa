@@ -68,11 +68,11 @@ If you're changing previous Mesa features, please make sure of the following:
 - Additional features or rewrites of current features are accompanied by tests.
 - New features are demonstrated in a model, so folks can understand more easily.
 
-To ensure that your submission will not break the build, you will need to install Flake8 and pytest.
+To ensure that your submission will not break the build, you will need to install Ruff and pytest.
 
 .. code-block:: bash
 
-    pip install flake8 pytest pytest-cov
+    pip install ruff pytest pytest-cov
 
 We test by implementing simple models and through traditional unit tests in the tests/ folder. The following only covers unit tests coverage. Ensure that your test coverage has not gone down. If it has and you need help, we will offer advice on how to structure tests for the contribution.
 
@@ -91,7 +91,7 @@ You should no longer have to worry about code formatting. If still in doubt you 
 
 .. code-block:: bash
 
-    flake8 . --ignore=F403,E501,E123,E128,W504,W503 --exclude=docs,build
+    ruff .
 
 
 .. _`PEP8` : https://www.python.org/dev/peps/pep-0008
