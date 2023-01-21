@@ -92,7 +92,7 @@ class UserSettableParameter:
         valid = True
 
         if self.param_type == self.NUMBER:
-            valid = not (self.value is None)
+            valid = self.value is not None
 
         elif self.param_type == self.SLIDER:
             valid = not (

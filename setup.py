@@ -11,7 +11,7 @@ from codecs import open
 requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "tornado", "tqdm"]
 
 extras_require = {
-    "dev": ["black", "coverage", "flake8", "pytest >= 4.6", "pytest-cov", "sphinx"],
+    "dev": ["black", "ruff", "coverage", "pytest >= 4.6", "pytest-cov", "sphinx"],
     "docs": ["sphinx", "ipython"],
 }
 
