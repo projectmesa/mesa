@@ -1,8 +1,10 @@
-from tornado.testing import AsyncHTTPTestCase
+import json
+
 import tornado
+from tornado.testing import AsyncHTTPTestCase
+
 from mesa import Model
 from mesa.visualization.ModularVisualization import ModularServer
-import json
 
 
 class TestServer(AsyncHTTPTestCase):

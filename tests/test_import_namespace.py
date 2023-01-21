@@ -3,7 +3,6 @@ def test_import():
     # https://github.com/projectmesa/mesa/pull/1294.
     import mesa
     import mesa.flat as mf
-
     from mesa.time import RandomActivation
 
     mesa.time.RandomActivation

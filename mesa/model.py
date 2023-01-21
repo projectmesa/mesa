@@ -9,10 +9,10 @@ from __future__ import annotations
 
 import random
 
-from mesa.datacollection import DataCollector
-
 # mypy
 from typing import Any
+
+from mesa.datacollection import DataCollector
 
 
 class Model:

@@ -7,9 +7,10 @@ Core Objects: Agent
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
+from random import Random
+
 # mypy
 from typing import TYPE_CHECKING
-from random import Random
 
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic

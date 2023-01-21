@@ -1,5 +1,6 @@
-import unittest
 import os
+import unittest
+
 from click.testing import CliRunner
 
 from mesa.main import cli

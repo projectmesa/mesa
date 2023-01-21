@@ -34,11 +34,12 @@ The default DataCollector here makes several assumptions:
     * The schedule has an agent list called agents
     * For collecting agent-level variables, agents must have a unique_id
 """
-from functools import partial
 import itertools
-from operator import attrgetter
-import pandas as pd
 import types
+from functools import partial
+from operator import attrgetter
+
+import pandas as pd
 
 
 class DataCollector:
@@ -165,7 +166,6 @@ class DataCollector:
     def collect(self, model):
         """Collect all the data for the given model object."""
         if self.model_reporters:
-
             for var, reporter in self.model_reporters.items():
                 # Check if Lambda operator
                 if isinstance(reporter, types.LambdaType):

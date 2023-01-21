@@ -10,7 +10,6 @@ import random
 from functools import partial
 from itertools import count, product
 from multiprocessing import Pool, cpu_count
-from warnings import warn
 from typing import (
     Any,
     Dict,
@@ -22,6 +21,7 @@ from typing import (
     Type,
     Union,
 )
+from warnings import warn
 
 import pandas as pd
 from tqdm import tqdm
@@ -470,7 +470,6 @@ class FixedBatchRunner:
         ordered.sort_values(by="Run", inplace=True)
         if self._include_fixed:
             for param, val in self.fixed_parameters.items():
-
                 # avoid error when val is an iterable
                 vallist = [val for i in range(ordered.shape[0])]
                 ordered[param] = vallist

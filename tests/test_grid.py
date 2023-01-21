@@ -3,8 +3,9 @@ Test the Grid objects.
 """
 import random
 import unittest
-from unittest.mock import patch, Mock
-from mesa.space import SingleGrid, MultiGrid, HexGrid
+from unittest.mock import Mock, patch
+
+from mesa.space import HexGrid, MultiGrid, SingleGrid
 
 # Initial agent positions for testing
 #
@@ -171,7 +172,6 @@ class TestSingleGrid(unittest.TestCase):
         assert self.grid[x][y] is None
 
     def test_swap_pos(self):
-
         # Swap agents positions
         agent_a, agent_b = list(filter(None, self.grid))[:2]
         pos_a = agent_a.pos

@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-import re
 import os
+import re
+import shutil
 import urllib.request
 import zipfile
-import shutil
-
-from setuptools import setup, find_packages
 from codecs import open
+
+from setuptools import find_packages, setup
 
 requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "tornado", "tqdm"]
 
 extras_require = {
-    "dev": ["black", "coverage", "flake8", "pytest >= 4.6", "pytest-cov", "sphinx"],
+    "dev": ["black", "ruff", "coverage", "pytest >= 4.6", "pytest-cov", "sphinx"],
     "docs": ["sphinx", "ipython"],
 }
 

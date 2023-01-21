@@ -20,20 +20,16 @@ NetworkGrid: a network where each node contains zero or more agents.
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
-import itertools
 import collections
+import itertools
 import math
-from warnings import warn
-
-import numpy as np
-import networkx as nx
-
+from numbers import Real
 from typing import (
     Any,
     Callable,
-    List,
     Iterable,
     Iterator,
+    List,
     Sequence,
     Tuple,
     TypeVar,
@@ -41,11 +37,17 @@ from typing import (
     cast,
     overload,
 )
+from warnings import warn
+
+import networkx as nx
+import numpy as np
+import numpy.typing as npt
 
 # For Mypy
 from .agent import Agent
-from numbers import Real
-import numpy.typing as npt
+
+# for better performance, we calculate the tuple to use in the is_integer function
+_types_integer = (int, np.integer)
 
 Coordinate = Tuple[int, int]
 # used in ContinuousSpace
@@ -76,7 +78,7 @@ def accept_tuple_argument(wrapped_function: F) -> F:
 
 def is_integer(x: Real) -> bool:
     # Check if x is either a CPython integer or Numpy integer.
-    return isinstance(x, (int, np.integer))
+    return isinstance(x, _types_integer)
 
 
 class _Grid:
@@ -298,7 +300,6 @@ class _Grid:
 
             for dx in range(-x_radius, x_radius + 1 - kx):
                 for dy in range(-y_radius, y_radius + 1 - ky):
-
                     if not moore and abs(dx) + abs(dy) > radius:
                         continue
 
@@ -310,7 +311,6 @@ class _Grid:
 
             for nx in x_range:
                 for ny in y_range:
-
                     if not moore and abs(nx - x) + abs(ny - y) > radius:
                         continue
 
@@ -709,12 +709,10 @@ class HexGrid(SingleGrid):
         coordinates = set()
 
         while radius > 0:
-
             level_size = len(queue)
             radius -= 1
 
             for i in range(level_size):
-
                 x, y = queue.pop()
 
                 if x % 2 == 0:

@@ -1,6 +1,5 @@
-from warnings import warn
 import numbers
-
+from warnings import warn
 
 NUMBER = "number"
 CHECKBOX = "checkbox"
@@ -67,7 +66,6 @@ class UserSettableParameter:
         choices=None,
         description=None,
     ):
-
         warn(
             "UserSettableParameter is deprecated in favor of UserParam objects "
             "such as Slider, Checkbox, Choice, StaticText, NumberInput. "
@@ -92,7 +90,7 @@ class UserSettableParameter:
         valid = True
 
         if self.param_type == self.NUMBER:
-            valid = not (self.value is None)
+            valid = self.value is not None
 
         elif self.param_type == self.SLIDER:
             valid = not (

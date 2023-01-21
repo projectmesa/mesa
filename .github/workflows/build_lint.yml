@@ -60,7 +60,7 @@ jobs:
       name: Codecov
       uses: codecov/codecov-action@v3
 
-  lint-flake:
+  lint-ruff:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -68,10 +68,11 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: "3.10"
-    - run: pip install flake8
-    - name: Lint with flake8
-      # Use settings from mesas .flake8 file
-      run: flake8 . --count --show-source --statistics
+    - run: pip install ruff
+    - name: Lint with ruff
+      # Include `--format=github` to enable automatic inline annotations.
+      # Use settings from pyproject.toml.
+      run: ruff . --format=github --extend-exclude mesa/cookiecutter-mesa/*
 
   lint-black:
     runs-on: ubuntu-latest

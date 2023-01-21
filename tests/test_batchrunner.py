@@ -1,20 +1,19 @@
 """
 Test the BatchRunner
 """
+import unittest
 from functools import reduce
 from operator import mul
-import unittest
 
 from mesa import Agent, Model
-from mesa.time import BaseScheduler
-from mesa.datacollection import DataCollector
 from mesa.batchrunner import (
     BatchRunner,
     FixedBatchRunner,
     ParameterProduct,
     ParameterSampler,
 )
-
+from mesa.datacollection import DataCollector
+from mesa.time import BaseScheduler
 
 NUM_AGENTS = 7
 
