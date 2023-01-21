@@ -10,7 +10,6 @@ import random
 from functools import partial
 from itertools import count, product
 from multiprocessing import Pool, cpu_count
-from warnings import warn
 from typing import (
     Any,
     Dict,
@@ -22,6 +21,7 @@ from typing import (
     Type,
     Union,
 )
+from warnings import warn
 
 import pandas as pd
 from tqdm import tqdm

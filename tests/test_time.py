@@ -4,13 +4,14 @@ Test the advanced schedulers.
 
 import unittest
 from unittest import TestCase, mock
-from mesa import Model, Agent
+
+from mesa import Agent, Model
 from mesa.time import (
     BaseScheduler,
-    StagedActivation,
     RandomActivation,
-    SimultaneousActivation,
     RandomActivationByType,
+    SimultaneousActivation,
+    StagedActivation,
 )
 
 RANDOM = "random"

@@ -1,7 +1,8 @@
-import sys
 import os
-import click
+import sys
 from subprocess import call
+
+import click
 
 PROJECT_PATH = click.Path(
     exists=True, file_okay=False, dir_okay=True, resolve_path=True

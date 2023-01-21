@@ -5,14 +5,13 @@ Core Objects: Model, and Agent.
 """
 import datetime
 
-from mesa.model import Model
-from mesa.agent import Agent
-
-import mesa.time as time
-import mesa.space as space
 import mesa.flat.visualization as visualization
-from mesa.datacollection import DataCollector
+import mesa.space as space
+import mesa.time as time
+from mesa.agent import Agent
 from mesa.batchrunner import batch_run  # noqa
+from mesa.datacollection import DataCollector
+from mesa.model import Model
 
 __all__ = [
     "Model",

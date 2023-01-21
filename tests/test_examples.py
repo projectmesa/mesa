@@ -1,8 +1,8 @@
-import sys
-import os.path
-import unittest
 import contextlib
 import importlib
+import os.path
+import sys
+import unittest
 
 
 def classcase(name):

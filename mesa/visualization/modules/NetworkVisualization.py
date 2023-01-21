@@ -4,7 +4,7 @@ Network Visualization Module
 
 Module for rendering the network, using [d3.js](https://d3js.org/) framework.
 """
-from mesa.visualization.ModularVisualization import VisualizationElement, D3_JS_FILE
+from mesa.visualization.ModularVisualization import D3_JS_FILE, VisualizationElement
 
 
 class NetworkModule(VisualizationElement):

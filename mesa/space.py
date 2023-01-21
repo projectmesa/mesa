@@ -20,20 +20,16 @@ NetworkGrid: a network where each node contains zero or more agents.
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
-import itertools
 import collections
+import itertools
 import math
-from warnings import warn
-
-import numpy as np
-import networkx as nx
-
+from numbers import Real
 from typing import (
     Any,
     Callable,
-    List,
     Iterable,
     Iterator,
+    List,
     Sequence,
     Tuple,
     TypeVar,
@@ -41,11 +37,14 @@ from typing import (
     cast,
     overload,
 )
+from warnings import warn
+
+import networkx as nx
+import numpy as np
+import numpy.typing as npt
 
 # For Mypy
 from .agent import Agent
-from numbers import Real
-import numpy.typing as npt
 
 Coordinate = Tuple[int, int]
 # used in ContinuousSpace

@@ -29,9 +29,9 @@ from collections import defaultdict
 
 # mypy
 from typing import Iterator, Union
+
 from mesa.agent import Agent
 from mesa.model import Model
-
 
 # BaseScheduler has a self.time of int, while
 # StagedActivation has a self.time of float

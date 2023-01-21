@@ -1,15 +1,15 @@
 """
 Test the BatchRunner
 """
-from functools import reduce
-from operator import mul
 import unittest
+from functools import reduce
+from multiprocessing import cpu_count, freeze_support
+from operator import mul
 
 from mesa import Agent, Model
-from mesa.time import BaseScheduler
-from mesa.datacollection import DataCollector
 from mesa.batchrunner import BatchRunnerMP, ParameterProduct, ParameterSampler
-from multiprocessing import freeze_support, cpu_count
+from mesa.datacollection import DataCollector
+from mesa.time import BaseScheduler
 
 NUM_AGENTS = 7
 

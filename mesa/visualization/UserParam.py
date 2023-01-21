@@ -1,6 +1,5 @@
-from warnings import warn
 import numbers
-
+from warnings import warn
 
 NUMBER = "number"
 CHECKBOX = "checkbox"
