@@ -1,11 +1,12 @@
 from unittest import TestCase
+
 from mesa.visualization.UserParam import (
-    UserSettableParameter,
-    Slider,
     Checkbox,
     Choice,
-    StaticText,
     NumberInput,
+    Slider,
+    StaticText,
+    UserSettableParameter,
 )
 
 

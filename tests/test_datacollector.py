@@ -3,7 +3,7 @@ Test the DataCollector
 """
 import unittest
 
-from mesa import Model, Agent
+from mesa import Agent, Model
 from mesa.time import BaseScheduler
 
 

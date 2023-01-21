@@ -1,4 +1,5 @@
 [tool.ruff]
+select = ["E", "F", "I"]
 # Ignore list taken from https://github.com/psf/black/blob/master/.flake8
 # E203	Whitespace before ':'
 # E266	Too many leading '#' for block comment

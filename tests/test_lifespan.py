@@ -1,9 +1,10 @@
 import unittest
 
-from mesa.time import RandomActivation
-from mesa.datacollection import DataCollector
-from mesa import Model, Agent
 import numpy as np
+
+from mesa import Agent, Model
+from mesa.datacollection import DataCollector
+from mesa.time import RandomActivation
 
 
 class LifeTimeModel(Model):

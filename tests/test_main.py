@@ -2,6 +2,7 @@ import os
 import sys
 import unittest
 from unittest.mock import patch
+
 from click.testing import CliRunner
 
 from mesa.main import cli

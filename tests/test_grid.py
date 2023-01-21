@@ -3,8 +3,9 @@ Test the Grid objects.
 """
 import random
 import unittest
-from unittest.mock import patch, Mock
-from mesa.space import SingleGrid, MultiGrid, HexGrid
+from unittest.mock import Mock, patch
+
+from mesa.space import HexGrid, MultiGrid, SingleGrid
 
 # Initial agent positions for testing
 #

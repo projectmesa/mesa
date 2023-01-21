@@ -1,5 +1,5 @@
-from unittest import TestCase
 from collections import defaultdict
+from unittest import TestCase
 
 from mesa.model import Model
 from mesa.space import MultiGrid
@@ -7,7 +7,6 @@ from mesa.time import SimultaneousActivation
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
-
 from tests.test_batchrunner import MockAgent
 
 
