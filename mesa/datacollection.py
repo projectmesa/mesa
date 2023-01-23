@@ -117,8 +117,6 @@ class DataCollector:
             reporter: Attribute string, or function object that returns the
                       variable when given a model instance.
         """
-        if type(reporter) is str:
-            reporter = partial(self._getattr, reporter)
         self.model_reporters[name] = reporter
         self.model_vars[name] = []
 
@@ -172,8 +170,8 @@ class DataCollector:
                 if isinstance(reporter, types.LambdaType):
                     self.model_vars[var].append(reporter(model))
                 # Check if model attribute
-                elif isinstance(reporter, partial):
-                    self.model_vars[var].append(reporter(model))
+                elif isinstance(reporter, str):
+                    self.model_vars[var].append(getattr(model, reporter, None))
                 # Check if function with arguments
                 elif isinstance(reporter, list):
                     self.model_vars[var].append(reporter[0](*reporter[1]))
