@@ -83,7 +83,7 @@ class DataCollector:
             Model reporters can take four types of arguments:
             lambda like above:
             {"agent_count": lambda m: m.schedule.get_agent_count() }
-            method with @property decorators
+            method with @property decorator
             {"agent_count": schedule.get_agent_count}
             class attributes of model
             {"model_attribute": "model_attribute"}
@@ -180,7 +180,7 @@ class DataCollector:
                 # Check if function with no arguments
                 elif callable(reporter):
                     self.model_vars[var].append(reporter())
-                # Check if @property decorated function
+                # Check if @property decorated method
                 else:
                     self.model_vars[var].append(reporter)
 
