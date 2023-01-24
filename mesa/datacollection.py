@@ -163,9 +163,6 @@ class DataCollector:
         agent_records = map(get_reports, model.schedule.agents)
         return agent_records
 
-    def _reporter_decorator(self, reporter):
-        return reporter()
-
     def collect(self, model):
         """Collect all the data for the given model object."""
         if self.model_reporters:
@@ -181,7 +178,7 @@ class DataCollector:
                 elif isinstance(reporter, list):
                     self.model_vars[var].append(reporter[0](*reporter[1]))
                 else:
-                    self.model_vars[var].append(self._reporter_decorator(reporter))
+                    self.model_vars[var].append(reporter())
 
         if self.agent_reporters:
             agent_records = self._record_agents(model)
