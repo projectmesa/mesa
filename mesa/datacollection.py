@@ -177,7 +177,8 @@ class DataCollector:
                 # Check if function with arguments
                 elif isinstance(reporter, list):
                     self.model_vars[var].append(reporter[0](*reporter[1]))
-                # Check if method of a class
+                # TODO: Check if method of a class, as of now it is assumed
+                implicitly if the other checks fail.
                 else:
                     self.model_vars[var].append(reporter())
 
