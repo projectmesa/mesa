@@ -84,7 +84,7 @@ class DataCollector:
             lambda like above:
             {"agent_count": lambda m: m.schedule.get_agent_count() }
             method of a class:
-            {"agent_count": schedule.get_agent_count}
+            {"agent_count": self.get_agent_count} # self here is a Scheduler instance
             class attributes of model
             {"model_attribute": "model_attribute"}
             functions with parameters that have placed in a list
