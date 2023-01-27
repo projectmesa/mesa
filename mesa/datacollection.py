@@ -83,9 +83,10 @@ class DataCollector:
             Model reporters can take four types of arguments:
             lambda like above:
             {"agent_count": lambda m: m.schedule.get_agent_count() }
-            method with @property decorators
-            {"agent_count": schedule.get_agent_count()
-            class attributes of model
+            method of a class/instance:
+            {"agent_count": self.get_agent_count} # self here is a class instance
+            {"agent_count": Model.get_agent_count} # Model here is a class
+            class attributes of a model
             {"model_attribute": "model_attribute"}
             functions with parameters that have placed in a list
             {"Model_Function":[function, [param_1, param_2]]}
@@ -175,6 +176,8 @@ class DataCollector:
                 # Check if function with arguments
                 elif isinstance(reporter, list):
                     self.model_vars[var].append(reporter[0](*reporter[1]))
+                # TODO: Check if method of a class, as of now it is assumed
+                # implicitly if the other checks fail.
                 else:
                     self.model_vars[var].append(reporter())
 
