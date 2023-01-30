@@ -1,5 +1,30 @@
 [tool.ruff]
-select = ["E", "F", "I"]
+# See https://github.com/charliermarsh/ruff#rules for error code definitions.
+select = [
+    # "ANN", # annotations TODO
+    "B", # bugbear
+    "C4", # comprehensions
+    "DTZ", # naive datetime
+    "E", # style errors
+    "F", # flakes
+    "I", # import sorting
+    "ISC", # string concatenation
+    "N", # naming
+    "PGH", # pygrep-hooks
+    "PIE", # miscellaneous
+    "PLC", # pylint convention
+    "PLE", # pylint error
+    # "PLR", # pylint refactor TODO
+    "PLW", # pylint warning
+    "Q", # quotes
+    "RUF", # Ruff
+    "S", # security
+    "SIM", # simplify
+    "T10", # debugger
+    "UP", # upgrade
+    "W", # style warnings
+    "YTT", # sys.version
+]
 # Ignore list taken from https://github.com/psf/black/blob/master/.flake8
 # E203	Whitespace before ':'
 # E266	Too many leading '#' for block comment
@@ -8,7 +33,12 @@ select = ["E", "F", "I"]
 # But we don't specify them because ruff's Black already
 # checks for it.
 # See https://github.com/charliermarsh/ruff/issues/1842#issuecomment-1381210185
-extend-ignore = ["E501"]
+extend-ignore = [
+    "E501",
+    "S101", # Use of `assert` detected
+    "B017", # `assertRaises(Exception)` should be considered evil TODO
+    "PGH004", # Use specific rule codes when using `noqa` TODO
+]
 extend-exclude = ["docs", "build"]
 # Hardcode to Python 3.8.
 target-version = "py38"
