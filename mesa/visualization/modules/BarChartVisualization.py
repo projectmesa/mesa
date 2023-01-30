@@ -75,20 +75,20 @@ class BarChartModule(VisualizationElement):
         if self.scope == "agent":
             df = data_collector.get_agent_vars_dataframe().astype("float")
             latest_step = df.index.levels[0][-1]
-            labelStrings = [f["Label"] for f in self.fields]
-            dict = df.loc[latest_step].T.loc[labelStrings].to_dict()
+            label_strings = [f["Label"] for f in self.fields]
+            dict = df.loc[latest_step].T.loc[label_strings].to_dict()
             current_values = list(dict.values())
 
         elif self.scope == "model":
-            outDict = {}
+            out_dict = {}
             for s in self.fields:
                 name = s["Label"]
                 try:
                     val = data_collector.model_vars[name][-1]
                 except (IndexError, KeyError):
                     val = 0
-                outDict[name] = val
-            current_values.append(outDict)
+                out_dict[name] = val
+            current_values.append(out_dict)
         else:
             raise ValueError("scope must be 'agent' or 'model'")
         return current_values

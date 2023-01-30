@@ -26,4 +26,5 @@ __all__ = [
 __title__ = "mesa"
 __version__ = "1.1.1"
 __license__ = "Apache 2.0"
-__copyright__ = f"Copyright {datetime.date.today().year} Project Mesa Team"
+_this_year = datetime.datetime.now(tz=datetime.timezone.utc).date().year
+__copyright__ = f"Copyright {_this_year} Project Mesa Team"

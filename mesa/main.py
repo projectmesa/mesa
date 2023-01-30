@@ -30,7 +30,7 @@ def runserver(project):
 
     with open("run.py") as f:
         code = compile(f.read(), "run.py", "exec")
-        exec(code, {}, {})
+        exec(code, {}, {})  # noqa: S102
 
 
 @click.command()
