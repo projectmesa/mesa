@@ -337,7 +337,7 @@ class TestSingleNetworkGrid(unittest.TestCase):
         """
         Create a test network grid and populate with Mock Agents.
         """
-        G = nx.cycle_graph(TestSingleNetworkGrid.GRAPH_SIZE)
+        G = nx.cycle_graph(TestSingleNetworkGrid.GRAPH_SIZE)  # noqa: N806
         self.space = NetworkGrid(G)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS_NETWORK_SINGLE):
@@ -408,7 +408,7 @@ class TestMultipleNetworkGrid(unittest.TestCase):
         """
         Create a test network grid and populate with Mock Agents.
         """
-        G = nx.complete_graph(TestMultipleNetworkGrid.GRAPH_SIZE)
+        G = nx.complete_graph(TestMultipleNetworkGrid.GRAPH_SIZE)  # noqa: N806
         self.space = NetworkGrid(G)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS_NETWORK_MULTIPLE):

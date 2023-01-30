@@ -62,7 +62,7 @@ class TestExamples(unittest.TestCase):
                         f"{example.replace('-', '_')}.server"
                     )
                     server.server.render_model()
-                Model = getattr(mod, classcase(example))
-                model = Model()
+                model_class = getattr(mod, classcase(example))
+                model = model_class()
                 for _ in range(10):
                     model.step()

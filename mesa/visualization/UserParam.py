@@ -121,12 +121,11 @@ class UserSettableParameter:
                 self._value = self.min_value
             elif self._value > self.max_value:
                 self._value = self.max_value
-        elif self.param_type == self.CHOICE:
-            if self._value not in self.choices:
-                print(
-                    "Selected choice value not in available choices, selected first choice from 'choices' list"
-                )
-                self._value = self.choices[0]
+        elif (self.param_type == self.CHOICE) and self._value not in self.choices:
+            print(
+                "Selected choice value not in available choices, selected first choice from 'choices' list"
+            )
+            self._value = self.choices[0]
 
     @property
     def json(self):

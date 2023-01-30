@@ -1019,15 +1019,15 @@ class ContinuousSpace:
 class NetworkGrid:
     """Network Grid where each node contains zero or more agents."""
 
-    def __init__(self, G: Any) -> None:
+    def __init__(self, g: Any) -> None:
         """Create a new network.
 
         Args:
             G: a NetworkX graph instance.
         """
-        self.G = G
+        self.G = g
         for node_id in self.G.nodes:
-            G.nodes[node_id]["agent"] = self.default_val()
+            g.nodes[node_id]["agent"] = self.default_val()
 
     @staticmethod
     def default_val() -> list:
