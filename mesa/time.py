@@ -99,7 +99,7 @@ class BaseScheduler:
         # it's necessary to cast the keys view to a list.
         agent_keys = list(self._agents.keys())
         if shuffled:
-            self.model.random.shuffle(agent_keys)
+            self.model.np_rng.shuffle(agent_keys)
 
         for agent_key in agent_keys:
             if agent_key in self._agents:
@@ -193,7 +193,7 @@ class StagedActivation(BaseScheduler):
         # it's necessary to cast the keys view to a list.
         agent_keys = list(self._agents.keys())
         if self.shuffle:
-            self.model.random.shuffle(agent_keys)
+            self.model.np_rng.shuffle(agent_keys)
         for stage in self.stage_list:
             for agent_key in agent_keys:
                 if agent_key in self._agents:
@@ -202,7 +202,7 @@ class StagedActivation(BaseScheduler):
             # in the previous loop.
             agent_keys = list(self._agents.keys())
             if self.shuffle_between_stages:
-                self.model.random.shuffle(agent_keys)
+                self.model.np_rng.shuffle(agent_keys)
             self.time += self.stage_time
 
         self.steps += 1
@@ -266,7 +266,7 @@ class RandomActivationByType(BaseScheduler):
         # it's necessary to cast the keys view to a list.
         type_keys: list[type[Agent]] = list(self.agents_by_type.keys())
         if shuffle_types:
-            self.model.random.shuffle(type_keys)
+            self.model.np_rng.shuffle(type_keys)
         for agent_class in type_keys:
             self.step_type(agent_class, shuffle_agents=shuffle_agents)
         self.steps += 1
@@ -282,7 +282,7 @@ class RandomActivationByType(BaseScheduler):
         """
         agent_keys: list[int] = list(self.agents_by_type[type_class].keys())
         if shuffle_agents:
-            self.model.random.shuffle(agent_keys)
+            self.model.np_rng.shuffle(agent_keys)
         for agent_key in agent_keys:
             if agent_key in self.agents_by_type[type_class]:
                 self.agents_by_type[type_class][agent_key].step()

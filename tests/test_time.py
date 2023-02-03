@@ -123,10 +123,10 @@ class TestStagedActivation(TestCase):
 
     def test_shuffle_shuffles_agents(self):
         model = MockModel(shuffle=True)
-        model.random = mock.Mock()
-        assert model.random.shuffle.call_count == 0
+        model.np_rng = mock.Mock()
+        assert model.np_rng.shuffle.call_count == 0
         model.step()
-        assert model.random.shuffle.call_count == 1
+        assert model.np_rng.shuffle.call_count == 1
 
     def test_remove(self):
         """
@@ -164,9 +164,9 @@ class TestRandomActivation(TestCase):
         Test the random activation step
         """
         model = MockModel(activation=RANDOM)
-        model.random = mock.Mock()
+        model.np_rng = mock.Mock()
         model.schedule.step()
-        assert model.random.shuffle.call_count == 1
+        assert model.np_rng.shuffle.call_count == 1
 
     def test_random_activation_step_increments_step_and_time_counts(self):
         """
@@ -229,9 +229,9 @@ class TestRandomActivationByType(TestCase):
         Test the random activation by type step
         """
         model = MockModel(activation=RANDOM_BY_TYPE)
-        model.random = mock.Mock()
+        model.np_rng = mock.Mock()
         model.schedule.step()
-        assert model.random.shuffle.call_count == 2
+        assert model.np_rng.shuffle.call_count == 2
 
     def test_random_activation_step_increments_step_and_time_counts(self):
         """

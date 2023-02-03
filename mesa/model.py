@@ -8,6 +8,7 @@ Core Objects: Model
 from __future__ import annotations
 
 import random
+import numpy as np
 
 from mesa.datacollection import DataCollector
 
@@ -19,11 +20,25 @@ class Model:
     """Base class for models."""
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
-        """Create a new model object and instantiate its RNG automatically."""
+        """Create a new model object and instantiate its RNGs automatically."""
         obj = object.__new__(cls)
         obj._seed = kwargs.get("seed", None)
         obj.random = random.Random(obj._seed)
+        obj.np_rng = np.random.default_rng(np.random.MT19937())
+        obj._set_jumped_state_np_rng()
         return obj
+
+    def _set_jumped_state_np_rng(self) -> None:
+        py_rng_state = self.random.getstate()
+        np_key = np.asarray(py_rng_state[1][:-1], dtype=np.uint32)
+        np_pos = py_rng_state[1][-1]
+        np_rng_state = {
+            "bit_generator": "MT19937",
+            "state": {"key": np_key, "pos": np_pos},
+        }
+        self.np_rng.bit_generator.state = np_rng_state
+        jumped_bit_generator = self.np_rng.bit_generator.jumped(1)
+        self.np_rng = np.random.default_rng(jumped_bit_generator)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a new model. Overload this method with the actual code to
@@ -55,16 +70,17 @@ class Model:
         return self.current_id
 
     def reset_randomizer(self, seed: int | None = None) -> None:
-        """Reset the model random number generator.
+        """Reset the model random number generators.
 
         Args:
-            seed: A new seed for the RNG; if None, reset using the current seed
+            seed: A new seed for the RNGs; if None, reset using the current seed
         """
 
         if seed is None:
             seed = self._seed
         self.random.seed(seed)
         self._seed = seed
+        self._set_jumped_state_np_rng()
 
     def initialize_data_collector(
         self, model_reporters=None, agent_reporters=None, tables=None
