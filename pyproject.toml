@@ -10,5 +10,5 @@ select = ["E", "F", "I"]
 # See https://github.com/charliermarsh/ruff/issues/1842#issuecomment-1381210185
 extend-ignore = ["E501"]
 extend-exclude = ["docs", "build"]
-# Hardcode to Python 3.10.
-target-version = "py310"
+# Hardcode to Python 3.8.
+target-version = "py38"
