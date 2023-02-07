@@ -35,7 +35,6 @@ class Agent:
 
     def step(self) -> None:
         """A single step of the agent."""
-        pass
 
     def advance(self) -> None:
         pass

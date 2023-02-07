@@ -305,7 +305,7 @@ class TestSingleGridEnforcement(unittest.TestCase):
         # Test whether after placing, the empty cells are reduced by 1
         assert a.pos not in self.grid.empties
         assert len(self.grid.empties) == 8
-        for i in range(10):
+        for _i in range(10):
             self.grid.move_to_empty(a, num_agents=self.num_agents)
         assert len(self.grid.empties) == 8
 
@@ -355,7 +355,7 @@ class TestMultiGrid(unittest.TestCase):
         counter = 0
         for x in range(width):
             for y in range(height):
-                for i in range(TEST_MULTIGRID[x][y]):
+                for _i in range(TEST_MULTIGRID[x][y]):
                     counter += 1
                     # Create and place the mock agent
                     a = MockAgent(counter, None)

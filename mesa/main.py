@@ -15,7 +15,6 @@ COOKIECUTTER_PATH = os.path.join(os.path.dirname(SCRIPTS_DIR), COOKIECUTTER_DIR)
 @click.group()
 def cli():
     "Manage Mesa projects"
-    pass
 
 
 @cli.command()
