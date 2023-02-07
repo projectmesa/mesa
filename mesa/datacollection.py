@@ -166,7 +166,6 @@ class DataCollector:
     def collect(self, model):
         """Collect all the data for the given model object."""
         if self.model_reporters:
-
             for var, reporter in self.model_reporters.items():
                 # Check if Lambda operator
                 if isinstance(reporter, types.LambdaType):

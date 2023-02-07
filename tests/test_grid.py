@@ -172,7 +172,6 @@ class TestSingleGrid(unittest.TestCase):
         assert self.grid[x][y] is None
 
     def test_swap_pos(self):
-
         # Swap agents positions
         agent_a, agent_b = list(filter(None, self.grid))[:2]
         pos_a = agent_a.pos

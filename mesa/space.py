@@ -297,7 +297,6 @@ class _Grid:
 
             for dx in range(-x_radius, x_radius + 1 - kx):
                 for dy in range(-y_radius, y_radius + 1 - ky):
-
                     if not moore and abs(dx) + abs(dy) > radius:
                         continue
 
@@ -309,7 +308,6 @@ class _Grid:
 
             for nx in x_range:
                 for ny in y_range:
-
                     if not moore and abs(nx - x) + abs(ny - y) > radius:
                         continue
 
@@ -708,12 +706,10 @@ class HexGrid(SingleGrid):
         coordinates = set()
 
         while radius > 0:
-
             level_size = len(queue)
             radius -= 1
 
             for i in range(level_size):
-
                 x, y = queue.pop()
 
                 if x % 2 == 0:
