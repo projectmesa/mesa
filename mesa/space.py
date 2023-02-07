@@ -117,7 +117,7 @@ class _Grid:
         self._empties_built = False
 
         # Neighborhood Cache
-        self._neighborhood_cache: dict[Any, list[Coordinate]] = dict()
+        self._neighborhood_cache: dict[Any, list[Coordinate]] = {}
 
     @staticmethod
     def default_val() -> None:
@@ -712,7 +712,7 @@ class HexGrid(SingleGrid):
             level_size = len(queue)
             radius -= 1
 
-            for i in range(level_size):
+            for _i in range(level_size):
                 x, y = queue.pop()
 
                 if x % 2 == 0:

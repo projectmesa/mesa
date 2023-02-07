@@ -73,7 +73,7 @@ class UserSettableParameter:
             "UserSettableParameter will be removed in the next major release."
         )
         if choices is None:
-            choices = list()
+            choices = []
         if param_type not in self.TYPES:
             raise ValueError(f"{param_type} is not a valid Option type")
         self.param_type = param_type

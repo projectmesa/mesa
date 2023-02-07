@@ -357,7 +357,7 @@ class FixedBatchRunner:
         model = self.model_cls(**kwargs)
         results = self.run_model(model)
         if param_values is not None:
-            model_key = tuple(param_values) + (run_count,)
+            model_key = (*tuple(param_values), run_count)
         else:
             model_key = (run_count,)
 
@@ -366,7 +366,7 @@ class FixedBatchRunner:
         if self.agent_reporters:
             agent_vars = self.collect_agent_vars(model)
             for agent_id, reports in agent_vars.items():
-                agent_key = model_key + (agent_id,)
+                agent_key = (*model_key, agent_id)
                 self.agent_vars[agent_key] = reports
         # Collects data from datacollector object in model
         if results is not None:
@@ -466,7 +466,7 @@ class FixedBatchRunner:
 
         df = pd.DataFrame(records)
         rest_cols = set(df.columns) - set(index_cols)
-        ordered = df[index_cols + list(sorted(rest_cols))]
+        ordered = df[index_cols + sorted(rest_cols)]
         ordered.sort_values(by="Run", inplace=True)
         if self._include_fixed:
             for param, val in self.fixed_parameters.items():
@@ -713,7 +713,7 @@ class BatchRunnerMP(BatchRunner):  # pragma: no cover
             if self.agent_reporters:
                 agent_vars = self.collect_agent_vars(model)
                 for agent_id, reports in agent_vars.items():
-                    agent_key = model_key + (agent_id,)
+                    agent_key = (*model_key, agent_id)
                     self.agent_vars[agent_key] = reports
             if hasattr(model, "datacollector"):
                 if model.datacollector.model_reporters is not None:

@@ -21,7 +21,7 @@ class MockModel(Model):
         self.schedule = SimultaneousActivation(self)
         self.grid = MultiGrid(width, height, torus=True)
 
-        for c, x, y in self.grid.coord_iter():
+        for _c, x, y in self.grid.coord_iter():
             a = MockAgent(x + y * 100, self, x * y * 3)
             self.grid.place_agent(a, (x, y))
             self.schedule.add(a)

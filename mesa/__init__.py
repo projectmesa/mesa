@@ -9,7 +9,7 @@ import mesa.flat.visualization as visualization
 import mesa.space as space
 import mesa.time as time
 from mesa.agent import Agent
-from mesa.batchrunner import batch_run  # noqa
+from mesa.batchrunner import batch_run
 from mesa.datacollection import DataCollector
 from mesa.model import Model
 
