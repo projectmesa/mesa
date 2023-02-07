@@ -66,7 +66,6 @@ class UserSettableParameter:
         choices=None,
         description=None,
     ):
-
         warn(
             "UserSettableParameter is deprecated in favor of UserParam objects "
             "such as Slider, Checkbox, Choice, StaticText, NumberInput. "

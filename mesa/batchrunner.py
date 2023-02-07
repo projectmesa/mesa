@@ -470,7 +470,6 @@ class FixedBatchRunner:
         ordered.sort_values(by="Run", inplace=True)
         if self._include_fixed:
             for param, val in self.fixed_parameters.items():
-
                 # avoid error when val is an iterable
                 vallist = [val for i in range(ordered.shape[0])]
                 ordered[param] = vallist
