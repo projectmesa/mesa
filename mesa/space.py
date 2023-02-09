@@ -46,6 +46,9 @@ import numpy.typing as npt
 # For Mypy
 from .agent import Agent
 
+# for better performance, we calculate the tuple to use in the is_integer function
+_types_integer = (int, np.integer)
+
 Coordinate = Tuple[int, int]
 # used in ContinuousSpace
 FloatCoordinate = Union[Tuple[float, float], npt.NDArray[float]]
@@ -75,7 +78,7 @@ def accept_tuple_argument(wrapped_function: F) -> F:
 
 def is_integer(x: Real) -> bool:
     # Check if x is either a CPython integer or Numpy integer.
-    return isinstance(x, (int, np.integer))
+    return isinstance(x, _types_integer)
 
 
 class _Grid:
