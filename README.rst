@@ -57,19 +57,21 @@ Or any other (development) branch on this repo or your own fork:
 
     $ pip install -U -e git+https://github.com/YOUR_FORK/mesa@YOUR_BRANCH#egg=mesa
 
-Take a look at the `examples <https://github.com/projectmesa/mesa/tree/main/examples>`_ folder for sample models demonstrating Mesa features.
+For resources or help on using Mesa, check out the following:
 
-For more help on using Mesa, check out the following resources:
-
-* `Intro to Mesa Tutorial`_
-* `Docs`_
-* `Email list for users`_
-* `PyPI`_
+* `Intro to Mesa Tutorial`_ (An introductory model, the Boltzmann Wealth Model, for beginners or those new to Mesa.)
+* `Complexity Explorer Tutorial`_ (An advanced-beginner model, SugarScape with Traders, with instructional videos)
+* `Mesa Examples`_ (A repository of seminal ABMs using Mesa and examples of employing specific Mesa Features)
+* `Docs`_ (Mesa's documentation, API and useful snippets)
+* `Discussions`_ (GitHub threaded discussions about Mesa)
+* `Matrix Chat`_ (Chat Forum via Matrix to talk about Mesa)
 
 .. _`Intro to Mesa Tutorial` : http://mesa.readthedocs.org/en/main/tutorials/intro_tutorial.html
+.. _`Complexity Explorer Tutorial` : https://www.complexityexplorer.org/courses/172-agent-based-models-with-python-an-introduction-to-mesa
+.. _`Mesa Examples` : https://github.com/projectmesa/mesa-examples/tree/main/examples
 .. _`Docs` : http://mesa.readthedocs.org/en/main/
-.. _`Email list for users` : https://groups.google.com/d/forum/projectmesa
-.. _`PyPI` : https://pypi.python.org/pypi/Mesa/
+.. _`Discussions` : https://github.com/projectmesa/mesa/discussions
+.. _`Matrix Chat` : https://matrix.to/#/#project-mesa:matrix.org
 
 Running Mesa in Docker
 ------------------------
