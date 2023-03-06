@@ -3,6 +3,87 @@
 Release History
 ---------------
 
+
+1.2.0 (2023-03-09) Taylor
+++++++++++++++++++++++++++
+
+**Special notes**
+
+New features:
+
+* Implement radius for NetworkGrid.get_neighbors #1564
+
+Some highlights for the perf improvements:
+
+* Use getattr for attribute strings in model data collection #1590 this is a 2x speedup over the relevant line
+* Faster is_integer function for common cases #1597 is for 1.3x speedup for grid access (grid[x, y])
+* Refactor iter/get_cell_list_contents methods #1570 at least 1.3x speedup for iter/get_cell_list_contents
+* Evaluate empties set more lazily #1546 (comment) ~1.3x speedup for place_agent, remove_agent, and move_agent
+
+**Improvements**
+
+* ci: Add testing on Python 3.11 #1519
+* Remove auto-update GH Actions for Pipfile.lock #1558 
+* ruff
+    * ruff: Add isort #1594
+    * ci: Replace flake8 with Ruff #1587
+    * ruff: Add more rules based on Zulip's config #1596
+* perf: faster is_integer function for common cases #1597
+* Remove _reporter_decorator #1591
+* Change index at DataFrame creation in get_agent_vars_dataframe #1586
+* Make Grid class private #1575
+* Make the internal grid and empties_built in Grid class private #1568
+* Simplify code in ContinuousSpace #1536
+* Improve docstrings of ContinuousSpace #1535
+* Simplify accept_tuple_argument decorator in space.py #1531
+* Enhance schedulers to support intra-step removal of agents #1523
+* perf: Refactor iter_cell_list_contents Performance #1527
+* Replace two loops with dictionary comprehension, list- with generator comprehension #1458
+* Make MultiGrid.place_agent faster #1508
+* Update space module-level docstring summary #1518
+* Update NetworkGrid.__init__ docstring #1514
+* Deprecate SingleGrid.position_agent #1512
+* Make swap_pos part of Grid instead of SingleGrid #1507
+* Refactor NetworkGrid docstrings and iter/get_cell_list_contents #1498
+* Hexgrid: use get_neighborhood in iter_neighbors #1504
+* Auto update year for copyright in docs #1503
+* Refactor Grid.move_to_empty #1482
+* Put "Mesa" instead of "it" in README #1490
+* Batchrunner: Remove unnecessary dict transformation, .keys() in len() #1460
+* Add Dependabot configuration for GitHub Actions update check #1480
+* Use list transformation only when shuffled is True #1478
+* Implement swap_pos #1474
+* Clean up DataCollector #1475
+
+
+**Fixes**
+
+* Update resources in README #1605
+* Fix accident from https://github.com/projectmesa/mesa/pull/1488 #1489
+* pre-commit autoupdate #1598, #1576, #1548, #1494
+* Fix docstring of DataCollector #1592
+* Update Pipfile.lock (dependencies) #1495 #1487
+* build(deps): 
+    * build(deps): bump codecov/codecov-action from 2 to 3  dependencies Pull requests that update a dependency file #1486
+    * build(deps): bump actions/upload-artifact from 2 to 3  dependencies Pull requests that update a dependency file #1485
+    * build(deps): bump peter-evans/create-pull-request from 3 to 4  dependencies Pull requests that update a dependency file #1484
+    * build(deps): bump actions/setup-python from 3 to 4  dependencies Pull requests that update a dependency file #1483
+* Establish reproducibility for NetworkGrid.get_neighbors when radius > 1 #1569
+* Format js code #1554
+* Add some missing const declarations #1549
+* fix tutorial url in examples #1538
+* Update cookiecutter to flat import style. #1525
+* Fix bug in Grid.get_neighborhood #1517
+* Revert changes of #1478 and #1456 #1516
+* Fix return types of some NetworkGrid methods #1505 
+* Update year for copyright #1501
+* Add default_value function to NetworkGrid #1497
+* Remove extraneous spaces from docstrings in modules 2 #1496
+* Remove extraneous spaces from docstrings in modules #1493
+* SingleGrid: Remove extraneous attribute declaration (empties) #1491
+
+
+
 1.1.1 (2022-10-21)
 ++++++++++++++++++
 
