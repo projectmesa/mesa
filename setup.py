@@ -11,7 +11,14 @@ from setuptools import find_packages, setup
 requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "tornado", "tqdm"]
 
 extras_require = {
-    "dev": ["black", "ruff", "coverage", "pytest >= 4.6", "pytest-cov", "sphinx"],
+    "dev": [
+        "black",
+        "ruff==0.0.254",
+        "coverage",
+        "pytest >= 4.6",
+        "pytest-cov",
+        "sphinx",
+    ],
     "docs": ["sphinx", "ipython"],
 }
 
