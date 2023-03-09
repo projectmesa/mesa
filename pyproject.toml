@@ -40,6 +40,7 @@ extend-ignore = [
     "PGH004", # Use specific rule codes when using `noqa` TODO
     "B905", # `zip()` without an explicit `strict=` parameter
     "N802", # Function name should be lowercase
+    "N999",  # Invalid module name. We should revisit this in the future, TODO
 ]
 extend-exclude = ["docs", "build"]
 # Hardcode to Python 3.8.
