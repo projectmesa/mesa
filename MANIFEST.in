@@ -3,10 +3,10 @@ include LICENSE
 include HISTORY.rst
 include README.rst
 include setup.py
-include mesa/cookiecutter-mesa/*
 include mesa/visualization/templates/*.html
 include mesa/visualization/templates/css/*
 include mesa/visualization/templates/fonts/*
+graft mesa/cookiecutter-mesa
 graft mesa/visualization/templates/js
 graft mesa/visualization/templates/external
 global-exclude *.py[co]
