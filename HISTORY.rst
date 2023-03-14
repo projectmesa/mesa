@@ -23,7 +23,7 @@ Some highlights for the perf improvements:
 **Improvements**
 
 * ci: Add testing on Python 3.11 #1519
-* Remove auto-update GH Actions for Pipfile.lock #1558 
+* Remove auto-update GH Actions for Pipfile.lock #1558
 * ruff
     * ruff: Add isort #1594
     * ci: Replace flake8 with Ruff #1587
@@ -63,7 +63,7 @@ Some highlights for the perf improvements:
 * pre-commit autoupdate #1598, #1576, #1548, #1494
 * Fix docstring of DataCollector #1592
 * Update Pipfile.lock (dependencies) #1495 #1487
-* build(deps): 
+* build(deps):
     * build(deps): bump codecov/codecov-action from 2 to 3  dependencies Pull requests that update a dependency file #1486
     * build(deps): bump actions/upload-artifact from 2 to 3  dependencies Pull requests that update a dependency file #1485
     * build(deps): bump peter-evans/create-pull-request from 3 to 4  dependencies Pull requests that update a dependency file #1484
@@ -75,7 +75,7 @@ Some highlights for the perf improvements:
 * Update cookiecutter to flat import style. #1525
 * Fix bug in Grid.get_neighborhood #1517
 * Revert changes of #1478 and #1456 #1516
-* Fix return types of some NetworkGrid methods #1505 
+* Fix return types of some NetworkGrid methods #1505
 * Update year for copyright #1501
 * Add default_value function to NetworkGrid #1497
 * Remove extraneous spaces from docstrings in modules 2 #1496
