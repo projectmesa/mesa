@@ -216,6 +216,12 @@ class DataCollector:
         The DataFrame has one column for each model variable, and the index is
         (implicitly) the model tick.
         """
+        # Check if self.model_reporters dictionary is empty, if so raise warning
+        if not self.model_reporters:
+            raise UserWarning(
+                "No model reporters have been defined in the DataCollector, returning empty DataFrame."
+            )
+
         return pd.DataFrame(self.model_vars)
 
     def get_agent_vars_dataframe(self):
@@ -224,6 +230,12 @@ class DataCollector:
         The DataFrame has one column for each variable, with two additional
         columns for tick and agent_id.
         """
+        # Check if self.agent_reporters dictionary is empty, if so raise warning
+        if not self.agent_reporters:
+            raise UserWarning(
+                "No agent reporters have been defined in the DataCollector, returning empty DataFrame."
+            )
+
         all_records = itertools.chain.from_iterable(self._agent_records.values())
         rep_names = list(self.agent_reporters)
 
