@@ -3,15 +3,16 @@
 Release History
 ---------------
 
-1.2.1 (2023-03-16)
+1.2.1 (2023-03-18)
 ++++++++++++++++++
 
 This release fixes https://github.com/projectmesa/mesa/issues/1606, where `mesa startproject` doesn't work.
 
 Changes:
-- fix: Include cookiecutter folders in install content #1611
-- Fix Ruff errors and pin Ruff version #1609
-- datacollector: Add warning when returning empty dataframe with no reporters defined #1614
+
+* fix: Include cookiecutter folders in install content #1611
+* Fix Ruff errors and pin Ruff version #1609
+* datacollector: Add warning when returning empty dataframe with no reporters defined #1614
 
 1.2.0 (2023-03-09) Taylor
 ++++++++++++++++++++++++++
