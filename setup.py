@@ -8,7 +8,7 @@ from codecs import open
 
 from setuptools import find_packages, setup
 
-requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "tornado", "tqdm"]
+requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "scipy", "tornado", "tqdm"]
 
 extras_require = {
     "dev": [
