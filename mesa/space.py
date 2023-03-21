@@ -864,6 +864,7 @@ class ContinuousSpace:
         self.height = y_max - y_min
         self.center = np.array(((x_max + x_min) / 2, (y_max + y_min) / 2))
         self.size = np.array((self.width, self.height))
+        self.half_size = self.size / 2
         self.torus = torus
 
         self._agent_points: npt.NDArray[FloatCoordinate] | None = None
@@ -962,15 +963,12 @@ class ContinuousSpace:
         Args:
             pos_1, pos_2: Coordinate tuples for both points.
         """
-        one = np.array(pos_1)
-        two = np.array(pos_2)
+        heading = np.asarray(pos_2) - np.asarray(pos_1)
+
         if self.torus:
-            one = (one - self.center) % self.size
-            two = (two - self.center) % self.size
-        heading = two - one
-        if isinstance(pos_1, tuple):
-            heading = tuple(heading)
-        return heading
+            heading = (heading + self.half_size) % self.half_size
+
+        return tuple(heading)
 
     def get_distance(self, pos_1: FloatCoordinate, pos_2: FloatCoordinate) -> float:
         """Get the distance between two point, accounting for toroidal space.
