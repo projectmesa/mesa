@@ -43,8 +43,11 @@ import networkx as nx
 import numpy as np
 import numpy.typing as npt
 
+from scipy.spatial import KDTree
+
 # For Mypy
 from .agent import Agent
+
 
 # for better performance, we calculate the tuple to use in the is_integer function
 _types_integer = (int, np.integer)
@@ -867,6 +870,7 @@ class ContinuousSpace:
         self.torus = torus
 
         self._agent_points: npt.NDArray[FloatCoordinate] | None = None
+        self._kdtree = None
         self._index_to_agent: dict[int, Agent] = {}
         self._agent_to_index: dict[Agent, int | None] = {}
 
@@ -878,6 +882,7 @@ class ContinuousSpace:
             self._index_to_agent[idx] = agent
         # Since dicts are ordered by insertion, we can iterate through agents keys
         self._agent_points = np.array([agent.pos for agent in self._agent_to_index])
+        self._kdtree = KDTree(self._agent_points, boxsize=self.size if self.torus else None)
 
     def _invalidate_agent_cache(self):
         """Clear cached data of agents and positions in the space."""
@@ -941,15 +946,14 @@ class ContinuousSpace:
         if self._agent_points is None:
             self._build_agent_cache()
 
-        deltas = np.abs(self._agent_points - np.array(pos))
-        if self.torus:
-            deltas = np.minimum(deltas, self.size - deltas)
-        dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
+        pos_arr = np.array(pos)
 
-        (idxs,) = np.where(dists <= radius**2)
-        neighbors = [
-            self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0
-        ]
+        idxs = self._kdtree.query_ball_point(pos_arr, radius)
+
+        if not include_center:
+            idxs = [idx for idx in idxs if not np.array_equal(self._agent_points[idx], pos_arr)]
+
+        neighbors = [self._index_to_agent[idx] for idx in idxs]
         return neighbors
 
     def get_heading(
