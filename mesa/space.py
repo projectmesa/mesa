@@ -966,7 +966,7 @@ class ContinuousSpace:
         heading = np.asarray(pos_2) - np.asarray(pos_1)
 
         if self.torus:
-            heading = (heading + self.half_size) % self.half_size
+            heading = (heading + self.half_size) % self.size - self.half_size
 
         return tuple(heading)
 
