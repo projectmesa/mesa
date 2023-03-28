@@ -222,7 +222,9 @@ class DataCollector:
                 "No model reporters have been defined in the DataCollector, returning empty DataFrame."
             )
 
-        return pd.DataFrame(self.model_vars)
+        df = pd.DataFrame.from_dict(self.model_vars)
+        df.index.name = "Step"
+        return df
 
     def get_agent_vars_dataframe(self):
         """Create a pandas DataFrame from the agent variables.
@@ -244,6 +246,7 @@ class DataCollector:
             columns=["Step", "AgentID", *rep_names],
             index=["Step", "AgentID"],
         )
+        df.index.names = ["Step", "AgentID"]
         return df
 
     def get_table_dataframe(self, table_name):
