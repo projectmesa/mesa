@@ -107,6 +107,25 @@ class TestSpaceToroidal(unittest.TestCase):
         pos_2 = (-25, -25)
         self.assertEqual((10, 0), self.space.get_heading(pos_1, pos_2))
 
+    def test_heading_same_position(self):
+        pos_1 = (0, 0)
+        pos_2 = (0, 0)
+        self.assertEqual((0, 0), self.space.get_heading(pos_1, pos_2))
+
+    def test_heading_diagonal(self):
+        pos_1 = (-30, -30)
+        pos_2 = (40, -10)
+        self.assertEqual((-30, 20), self.space.get_heading(pos_1, pos_2))
+
+    def test_heading_edge_cases(self):
+        pos_1 = (70, 20)
+        pos_2 = (-30, -30)
+        self.assertEqual((0, 0), self.space.get_heading(pos_1, pos_2))
+
+        pos_1 = (40, -10)
+        pos_2 = (-30, -30)
+        self.assertEqual((30, -20), self.space.get_heading(pos_1, pos_2))
+
     def test_neighborhood_retrieval(self):
         """
         Test neighborhood retrieval
@@ -142,7 +161,7 @@ class TestSpaceToroidal(unittest.TestCase):
 
 class TestSpaceNonToroidal(unittest.TestCase):
     """
-    Testing a toroidal continuous space.
+    Testing a non-toroidal continuous space.
     """
 
     def setUp(self):
@@ -189,6 +208,25 @@ class TestSpaceNonToroidal(unittest.TestCase):
         pos_1 = (65, -25)
         pos_2 = (-25, -25)
         self.assertEqual((-90, 0), self.space.get_heading(pos_1, pos_2))
+
+    def test_heading_same_position(self):
+        pos_1 = (0, 0)
+        pos_2 = (0, 0)
+        self.assertEqual((0, 0), self.space.get_heading(pos_1, pos_2))
+
+    def test_heading_diagonal(self):
+        pos_1 = (-30, -30)
+        pos_2 = (40, -10)
+        self.assertEqual((70, 20), self.space.get_heading(pos_1, pos_2))
+
+    def test_heading_edge_cases(self):
+        pos_1 = (70, 20)
+        pos_2 = (-30, -30)
+        self.assertEqual((-100, -50), self.space.get_heading(pos_1, pos_2))
+
+        pos_1 = (40, -10)
+        pos_2 = (-30, -30)
+        self.assertEqual((-70, -20), self.space.get_heading(pos_1, pos_2))
 
     def test_neighborhood_retrieval(self):
         """
