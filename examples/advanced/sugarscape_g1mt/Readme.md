@@ -63,7 +63,7 @@ To run the model a single instance of the model:
 To run the model with BatchRunner: 
 
 ```
-  $ python run.py
+  $ python run.py -b
 ```
 
 To run the model interactively:

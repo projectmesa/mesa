@@ -19,7 +19,7 @@ def assess_results(results, single_agent):
         plt.plot(results_df["Step"], results_df["Trader"])
         plt.show()
     else:
-        n = max(results_df["RunID"])
+        n = max(results_df["RunId"])
         # Plot number of Traders
         for i in range(n):
             results_explore = results_df[results_df["RunId"] == i]

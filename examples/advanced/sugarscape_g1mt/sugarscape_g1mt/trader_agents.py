@@ -322,23 +322,21 @@ class Trader(mesa.Agent):
         self.model.grid.move_agent(self, final_candidate)
 
     def eat(self):
-        """
-        Function for trader to consume sugar and spice in grid cell
-        """
-
         # get sugar
         sugar_patch = self.get_sugar(self.pos)
-        # eat sugar
-        if sugar_patch:
-            self.sugar = self.sugar - self.metabolism_sugar + sugar_patch.amount
-            sugar_patch.amount = 0
 
-        # get spice
+        if sugar_patch:
+            self.sugar += sugar_patch.amount
+            sugar_patch.amount = 0
+        self.sugar -= self.metabolism_sugar
+
+        # get_spice
         spice_patch = self.get_spice(self.pos)
-        # eat spice
+
         if spice_patch:
-            self.spice = self.spice - self.metabolism_spice + spice_patch.amount
+            self.spice += spice_patch.amount
             spice_patch.amount = 0
+        self.spice -= self.metabolism_spice
 
     def maybe_die(self):
         """
