@@ -822,7 +822,7 @@ class _HexGrid:
 
 
 class HexSingleGrid(_HexGrid, SingleGrid):
-    """Hexagonal Single: a SingleGrid where neighbors are computed
+    """Hexagonal SingleGrid: a SingleGrid where neighbors are computed
     according to an hexagonal tiling of the grid.
 
     Functions according to odd-q rules.
@@ -846,6 +846,22 @@ class HexMultiGrid(_HexGrid, MultiGrid):
         torus: Boolean which determines whether to treat the grid as a torus.
     """
 
+
+class HexGrid(HexSingleGrid):
+    """Hexagonal Grid: a Grid where neighbors are computed
+    according to an hexagonal tiling of the grid.
+
+    Functions according to odd-q rules.
+    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+
+    Properties:
+        width, height: The grid's width and height.
+        torus: Boolean which determines whether to treat the grid as a torus.
+    """
+    def __init__(self, width: int, height: int, torus: bool) -> None:
+        super().__init__(width, height, torus)
+        warn("HexGrid defaults to HexSingleGrid but this space is deprecated in " \
+             "favor of HexSingleGrid or HexMultiGrid depending on your use case.")
 
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position.
