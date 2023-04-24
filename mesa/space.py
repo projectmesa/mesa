@@ -858,10 +858,16 @@ class HexGrid(HexSingleGrid):
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
     """
+
     def __init__(self, width: int, height: int, torus: bool) -> None:
         super().__init__(width, height, torus)
-        warn(("HexGrid is being deprecated; use instead HexSingleGrid or HexMultiGrid "
-              "depending on your use case."), DeprecationWarning)
+        warn(
+            (
+                "HexGrid is being deprecated; use instead HexSingleGrid or HexMultiGrid "
+                "depending on your use case."
+            ),
+            DeprecationWarning,
+        )
 
 
 class ContinuousSpace:
