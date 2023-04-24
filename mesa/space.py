@@ -863,6 +863,7 @@ class HexGrid(HexSingleGrid):
         warn("HexGrid defaults to HexSingleGrid but this space is deprecated in " \
              "favor of HexSingleGrid or HexMultiGrid depending on your use case.")
 
+
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position.
 
