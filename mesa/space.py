@@ -860,8 +860,8 @@ class HexGrid(HexSingleGrid):
     """
     def __init__(self, width: int, height: int, torus: bool) -> None:
         super().__init__(width, height, torus)
-        warn("HexGrid defaults to HexSingleGrid but this space is deprecated in " \
-             "favor of HexSingleGrid or HexMultiGrid depending on your use case.")
+        warn(("HexGrid is being deprecated; use instead HexSingleGrid or HexMultiGrid "
+              "depending on your use case."), DeprecationWarning)
 
 
 class ContinuousSpace:
