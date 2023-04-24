@@ -65,7 +65,7 @@ installed directly form the github repository by running:
 
 .. code:: bash
 
-       $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa/main/examples/boltzmann_wealth_model/requirements.txt
+       $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa-examples/main/examples/Boltzmann_Wealth_Model/requirements.txt
 
 | This will install the dependencies listed in the requirements.txt file
   which are:
