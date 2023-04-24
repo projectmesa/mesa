@@ -27,7 +27,7 @@ organize them. For example, if the visualization uses image files, put those in
 an ``images`` directory.
 
 The `Schelling
-<https://github.com/projectmesa/mesa/tree/main/examples/schelling>`_ model is
+<https://github.com/projectmesa/mesa-examples/tree/main/examples/Schelling>`_ model is
 a good example of a small well-packaged model.
 
 It's easy to create a cookiecutter mesa model by running ``mesa startproject``
