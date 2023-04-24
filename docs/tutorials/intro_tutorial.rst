@@ -55,7 +55,7 @@ To install Mesa, simply:
 
 .. code:: bash
 
-       $ pip install mesa
+       pip install mesa
 
 When you do that, it will install Mesa itself, as well as any
 dependencies that aren’t in your setup yet. Additional dependencies
@@ -65,7 +65,7 @@ installed directly form the github repository by running:
 
 .. code:: bash
 
-       $ pip install -r https://raw.githubusercontent.com/projectmesa/mesa-examples/main/examples/Boltzmann_Wealth_Model/requirements.txt
+       pip install -r https://raw.githubusercontent.com/projectmesa/mesa-examples/main/examples/Boltzmann_Wealth_Model/requirements.txt
 
 | This will install the dependencies listed in the requirements.txt file
   which are:
