@@ -1,8 +1,11 @@
 import os
 import sys
+from pathlib import Path
 from subprocess import call
 
 import click
+
+from mesa import __version__
 
 PROJECT_PATH = click.Path(
     exists=True, file_okay=False, dir_okay=True, resolve_path=True
@@ -11,8 +14,10 @@ COOKIECUTTER_DIR = "mesa/cookiecutter-mesa"
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 COOKIECUTTER_PATH = os.path.join(os.path.dirname(SCRIPTS_DIR), COOKIECUTTER_DIR)
 
+CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 
-@click.group()
+
+@click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
     "Manage Mesa projects"
 
@@ -25,12 +30,11 @@ def runserver(project):
     PROJECT is the path to the directory containing `run.py`, or the current
     directory if not specified.
     """
-    sys.path.insert(0, project)
-    os.chdir(project)
-
-    with open("run.py") as f:
-        code = compile(f.read(), "run.py", "exec")
-        exec(code, {}, {})  # noqa: S102
+    run_path = Path(project) / "run.py"
+    if not run_path.exists():
+        sys.exit(f"ERROR: file {run_path} does not exist")
+    args = [sys.executable, str(run_path)]
+    call(args)
 
 
 @click.command()
@@ -38,11 +42,19 @@ def runserver(project):
     "--no-input", is_flag=True, help="Do not prompt user for custom mesa model input."
 )
 def startproject(no_input):
+    """Create a new mesa project"""
     args = ["cookiecutter", COOKIECUTTER_PATH]
     if no_input:
         args.append("--no-input")
     call(args)
 
 
+@click.command()
+def version():
+    """Show the version of mesa"""
+    print(f"mesa {__version__}")
+
+
 cli.add_command(runserver)
 cli.add_command(startproject)
+cli.add_command(version)
