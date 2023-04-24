@@ -140,7 +140,7 @@ class _Grid:
         self._empties_built = True
 
     @overload
-    def __getitem__(self, index: int) -> list[GridContent]:
+    def __getitem__(self, index: int | Sequence[Coordinate]) -> list[GridContent]:
         ...
 
     @overload
@@ -149,14 +149,7 @@ class _Grid:
     ) -> GridContent | list[GridContent]:
         ...
 
-    @overload
-    def __getitem__(self, index: Sequence[Coordinate]) -> list[GridContent]:
-        ...
-
-    def __getitem__(
-        self,
-        index: int | Sequence[Coordinate] | tuple[int | slice, int | slice],
-    ) -> GridContent | list[GridContent]:
+    def __getitem__(self, index):
         """Access contents from the grid."""
 
         if isinstance(index, int):
