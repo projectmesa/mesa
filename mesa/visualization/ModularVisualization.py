@@ -404,7 +404,10 @@ class ModularServer(tornado.web.Application):
         if open_browser:
             webbrowser.open(url)
         tornado.autoreload.start()
-        tornado.ioloop.IOLoop.current().start()
+        try:
+            tornado.ioloop.IOLoop.current().start()
+        except KeyboardInterrupt:
+            tornado.ioloop.IOLoop.current().stop()
 
     @staticmethod
     def _is_stylesheet(filename):
