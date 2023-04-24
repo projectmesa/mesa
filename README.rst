@@ -43,19 +43,19 @@ Getting started quickly:
 
 .. code-block:: bash
 
-    $ pip install mesa
+    pip install mesa
 
 You can also use `pip` to install the github version:
 
 .. code-block:: bash
 
-    $ pip install -U -e git+https://github.com/projectmesa/mesa@main#egg=mesa
+    pip install -U -e git+https://github.com/projectmesa/mesa@main#egg=mesa
 
 Or any other (development) branch on this repo or your own fork:
 
 .. code-block:: bash
 
-    $ pip install -U -e git+https://github.com/YOUR_FORK/mesa@YOUR_BRANCH#egg=mesa
+    pip install -U -e git+https://github.com/YOUR_FORK/mesa@YOUR_BRANCH#egg=mesa
 
 For resources or help on using Mesa, check out the following:
 

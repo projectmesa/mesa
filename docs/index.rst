@@ -44,13 +44,13 @@ Getting started quickly:
 
 .. code-block:: bash
 
-    $ pip install mesa
+    pip install mesa
 
 To launch an example model, clone the `repository <https://github.com/projectmesa/mesa>`_ folder and invoke ``mesa runserver`` for one of the ``examples/`` subdirectories:
 
 .. code-block:: bash
 
-    $ mesa runserver examples/wolf_sheep
+    mesa runserver examples/wolf_sheep
 
 For more help on using Mesa, check out the following resources:
 
