@@ -47,7 +47,7 @@ Installation
 ~~~~~~~~~~~~
 
 To start, install Mesa. We recommend doing this in a `virtual
-environment <https://virtualenvwrapper.readthedocs.org/en/stable/>`__,
+environment <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`__,
 but make sure your environment is set up with Python 3. Mesa requires
 Python3 and does not work in Python 2 environments.
 
@@ -1172,8 +1172,6 @@ This document is a work in progress. If you see any errors, exclusions
 or have any problems please contact
 `us <https://github.com/projectmesa/mesa/issues>`__.
 
-``virtual environment``:
-http://docs.python-guide.org/en/latest/dev/virtualenvs/
 
 [Comer2014] Comer, Kenneth W. “Who Goes First? An Examination of the
 Impact of Activation on Outcome Behavior in AgentBased Models.” George
