@@ -1,0 +1,4 @@
+jupyter
+matplotlib
+mesa~=1.1
+numpy
