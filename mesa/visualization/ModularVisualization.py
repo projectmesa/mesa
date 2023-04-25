@@ -96,6 +96,7 @@ Client -> Server:
 """
 import asyncio
 import os
+from pathlib import Path
 import platform
 import webbrowser
 
@@ -305,7 +306,7 @@ class ModularServer(tornado.web.Application):
         self.settings = {
             "debug": True,
             "autoreload": False,
-            "template_path": os.path.dirname(__file__) + "/templates",
+            "template_path": Path(__file__).parent / "templates",
         }
 
         """Create a new visualization server with the given elements."""

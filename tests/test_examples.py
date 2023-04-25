@@ -1,6 +1,7 @@
 import contextlib
 import importlib
-import os.path
+import os
+from pathlib import Path
 import sys
 import unittest
 
@@ -19,17 +20,17 @@ class TestExamples(unittest.TestCase):
     details of each example's model.
     """
 
-    EXAMPLES = os.path.abspath(os.path.join(os.path.dirname(__file__), "../examples"))
+    EXAMPLES = (Path(__file__) / "../examples").resolve()
 
     @contextlib.contextmanager
     def active_example_dir(self, example):
         "save and restore sys.path and sys.modules"
         old_sys_path = sys.path[:]
         old_sys_modules = sys.modules.copy()
-        old_cwd = os.getcwd()
-        example_path = os.path.abspath(os.path.join(self.EXAMPLES, example))
+        old_cwd = Path.cwd()
+        example_path = (Path(self.EXAMPLES) / example).resolve()
         try:
-            sys.path.insert(0, example_path)
+            sys.path.insert(0, str(example_path))
             os.chdir(example_path)
             yield
         finally:
@@ -42,9 +43,10 @@ class TestExamples(unittest.TestCase):
 
     def test_examples(self):
         for example in os.listdir(self.EXAMPLES):
-            if not os.path.isdir(os.path.join(self.EXAMPLES, example)):
+            if not (self.EXAMPLES / example).isdir():
                 continue
-            if hasattr(self, f"test_{example.replace('-', '_')}"):
+            example_snaked = f"test_{example.replace('-', '_')}"
+            if hasattr(self, example_snaked):
                 # non-standard example; tested below
                 continue
 
@@ -57,10 +59,8 @@ class TestExamples(unittest.TestCase):
                     server.server.render_model()
                 except ImportError:
                     # <example>/model.py
-                    mod = importlib.import_module(f"{example.replace('-', '_')}.model")
-                    server = importlib.import_module(
-                        f"{example.replace('-', '_')}.server"
-                    )
+                    mod = importlib.import_module(f"{example_snaked}.model")
+                    server = importlib.import_module(f"{example_snaked}.server")
                     server.server.render_model()
                 model_class = getattr(mod, classcase(example))
                 model = model_class()

@@ -11,8 +11,8 @@ PROJECT_PATH = click.Path(
     exists=True, file_okay=False, dir_okay=True, resolve_path=True
 )
 COOKIECUTTER_DIR = "mesa/cookiecutter-mesa"
-SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
-COOKIECUTTER_PATH = os.path.join(os.path.dirname(SCRIPTS_DIR), COOKIECUTTER_DIR)
+SCRIPTS_DIR = Path(__file__).parent.resolve()
+COOKIECUTTER_PATH = SCRIPTS_DIR / COOKIECUTTER_DIR
 
 CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 
@@ -43,7 +43,7 @@ def runserver(project):
 )
 def startproject(no_input):
     """Create a new mesa project"""
-    args = ["cookiecutter", COOKIECUTTER_PATH]
+    args = ["cookiecutter", str(COOKIECUTTER_PATH)]
     if no_input:
         args.append("--no-input")
     call(args)

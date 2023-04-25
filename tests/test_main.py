@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import sys
 import unittest
 from unittest.mock import patch
@@ -25,10 +25,8 @@ class TestCli(unittest.TestCase):
     )
     def test_run(self):
         with patch("mesa.visualization.ModularServer") as ModularServer:  # noqa: N806
-            example_dir = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "../examples/wolf_sheep")
-            )
+            example_dir = (Path(__file__).parent / "../examples/wolf_sheep").resolve()
             with self.runner.isolated_filesystem():
-                result = self.runner.invoke(cli, ["runserver", example_dir])
+                result = self.runner.invoke(cli, ["runserver", str(example_dir)])
                 assert result.exit_code == 0, result.output
                 assert ModularServer().launch.call_count == 1
