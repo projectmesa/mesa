@@ -17,9 +17,10 @@ create a new visualization element.
 
 **Note for Jupyter users: Due to conflicts with the tornado server Mesa
 uses and Jupyter, the interactive browser of your model will load but
-likely not work. This will require you to run the code from .py
+likely not work. This will require you to use run the code from .py
 files. The Mesa development team is working to develop a** `Jupyter
-compatible interface <https://github.com/projectmesa/mesa/issues/1363>`_.
+compatible
+interface <https://github.com/projectmesa/mesa/issues/1363>`__.*\*
 
 First, a quick explanation of how Mesa’s interactive visualization
 works. Visualization is done in a browser window, using JavaScript to
@@ -35,7 +36,6 @@ server and turns a model state into JSON data; and a JavaScript side,
 which takes that JSON data and draws it in the browser window. Mesa
 comes with a few modules built in, and let you add your own as well.
 
-
 Grid Visualization
 ^^^^^^^^^^^^^^^^^^
 
@@ -50,7 +50,7 @@ need to import the actual model object.
 .. code:: ipython3
 
     import mesa
-
+    
     # If MoneyModel.py is where your code is:
     # from MoneyModel import MoneyModel
 
@@ -89,8 +89,8 @@ a 10x10 grid, drawn in 500 x 500 pixels.
     """
     # from MoneyModel import *
     import mesa
-
-
+    
+    
     def agent_portrayal(agent):
         portrayal = {
             "Shape": "circle",
@@ -100,8 +100,8 @@ a 10x10 grid, drawn in 500 x 500 pixels.
             "r": 0.5,
         }
         return portrayal
-
-
+    
+    
     grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
     server = mesa.visualization.ModularServer(
         MoneyModel, [grid], "Money Model", {"N": 100, "width": 10, "height": 10}
@@ -252,13 +252,13 @@ chart will appear underneath the grid.
 
 .. code:: python
 
-   chart = mesa.visualization.ChartModule([{"Label": "Gini",
+   chart = mesa.visualization.ChartModule([{"Label": "Gini", 
                          "Color": "Black"}],
                        data_collector_name='datacollector')
 
-   server = mesa.visualization.ModularServer(MoneyModel,
-                          [grid, chart],
-                          "Money Model",
+   server = mesa.visualization.ModularServer(MoneyModel, 
+                          [grid, chart], 
+                          "Money Model", 
                           {"N":100, "width":10, "height":10})
 
 Launch the visualization and start a model run, and you’ll see a line
@@ -328,9 +328,9 @@ the class itself:
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-        // The actual code will go here.
-    };
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+       // The actual code will go here.
+   };
 
 Note that our object is instantiated with three arguments: the number of
 integer bins, and the width and height (in pixels) the chart will take
@@ -339,27 +339,26 @@ up in the visualization window.
 When the visualization object is instantiated, the first thing it needs
 to do is prepare to draw on the current page. To do so, it adds a
 `canvas <https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API>`__
-tag to the page. It also gets the canvas' context, which is required for doing
-anything with it.
+tag to the page. It also gets the canvas’ context, which is required for
+doing anything with it.
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-      // Create the canvas object:
-        const canvas = document.createElement("canvas");
-        Object.assign(canvas, {
-          width: canvas_width,
-          height: canvas_height,
-          style: "border:1px dotted",
-        });
-      // Append it to #elements:
-      const elements = document.getElementById("elements");
-      elements.appendChild(canvas);
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+     // Create the canvas object:
+       const canvas = document.createElement("canvas");
+       Object.assign(canvas, {
+         width: canvas_width,
+         height: canvas_height,
+         style: "border:1px dotted",
+       });
+     // Append it to #elements:
+     const elements = document.getElementById("elements");
+     elements.appendChild(canvas);
 
-      // Create the context and the drawing controller:
-      const context = canvas.getContext("2d");
-    };
-
+     // Create the context and the drawing controller:
+     const context = canvas.getContext("2d");
+   };
 
 Look at the Charts.js `bar chart
 documentation <http://www.chartjs.org/docs/#bar-chart-introduction>`__.
@@ -373,49 +372,49 @@ created, we can create the chart object.
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-      // Create the canvas object:
-        const canvas = document.createElement("canvas");
-        Object.assign(canvas, {
-          width: canvas_width,
-          height: canvas_height,
-          style: "border:1px dotted",
-        });
-      // Append it to #elements:
-      const elements = document.getElementById("elements");
-      elements.appendChild(canvas);
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+     // Create the canvas object:
+       const canvas = document.createElement("canvas");
+       Object.assign(canvas, {
+         width: canvas_width,
+         height: canvas_height,
+         style: "border:1px dotted",
+       });
+     // Append it to #elements:
+     const elements = document.getElementById("elements");
+     elements.appendChild(canvas);
 
-      // Create the context and the drawing controller:
-      const context = canvas.getContext("2d");
+     // Create the context and the drawing controller:
+     const context = canvas.getContext("2d");
 
-      // Prep the chart properties and series:
-      const datasets = [{
-        label: "Data",
-        fillColor: "rgba(151,187,205,0.5)",
-        strokeColor: "rgba(151,187,205,0.8)",
-        highlightFill: "rgba(151,187,205,0.75)",
-        highlightStroke: "rgba(151,187,205,1)",
-        data: []
-      }];
+     // Prep the chart properties and series:
+     const datasets = [{
+       label: "Data",
+       fillColor: "rgba(151,187,205,0.5)",
+       strokeColor: "rgba(151,187,205,0.8)",
+       highlightFill: "rgba(151,187,205,0.75)",
+       highlightStroke: "rgba(151,187,205,1)",
+       data: []
+     }];
 
-      // Add a zero value for each bin
-      for (var i in bins)
-        datasets[0].data.push(0);
+     // Add a zero value for each bin
+     for (var i in bins)
+       datasets[0].data.push(0);
 
-      const data = {
-        labels: bins,
-        datasets: datasets
-      };
+     const data = {
+       labels: bins,
+       datasets: datasets
+     };
 
-      const options = {
-        scaleBeginsAtZero: true
-      };
+     const options = {
+       scaleBeginsAtZero: true
+     };
 
-      // Create the chart object
-      const chart = new Chart(context, {type: 'bar', data: data, options: options});
+     // Create the chart object
+     const chart = new Chart(context, {type: 'bar', data: data, options: options});
 
-      // Now what?
-    };
+     // Now what?
+   };
 
 There are two methods every client-side visualization class must
 implement to be able to work: ``render(data)`` to render the incoming
@@ -433,18 +432,19 @@ With that in mind, we can add these two methods to the class:
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-      // ...Everything from above...
-      this.render = function(data) {
-        datasets[0].data = data;
-        chart.update();
-      };
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+     // ...Everything from above...
+     this.render = function(data) {
+       datasets[0].data = data;
+       chart.update();
+     };
 
-      this.reset = function() {
-        chart.destroy();
-        chart = new Chart(context, {type: 'bar', data: data, options: options});
-      };
-    };
+     this.reset = function() {
+       chart.destroy();
+       chart = new Chart(context, {type: 'bar', data: data, options: options});
+     };
+   };
+
 Note the ``this``. before the method names. This makes them public and
 ensures that they are accessible outside of the object itself. All the
 other variables inside the class are only accessible inside the object
@@ -479,8 +479,8 @@ inherit from, and create the new visualization class.
                self.canvas_width = canvas_width
                self.bins = bins
                new_element = "new HistogramModule({}, {}, {})"
-               new_element = new_element.format(bins,
-                                                canvas_width,
+               new_element = new_element.format(bins, 
+                                                canvas_width, 
                                                 canvas_height)
                self.js_code = "elements.push(" + new_element + ");"
 
@@ -531,9 +531,9 @@ Now, you can create your new HistogramModule and add it to the server:
 .. code:: python
 
        histogram = mesa.visualization.HistogramModule(list(range(10)), 200, 500)
-       server = mesa.visualization.ModularServer(MoneyModel,
-                              [grid, histogram, chart],
-                              "Money Model",
+       server = mesa.visualization.ModularServer(MoneyModel, 
+                              [grid, histogram, chart], 
+                              "Money Model", 
                               {"N":100, "width":10, "height":10})
        server.launch()
 
