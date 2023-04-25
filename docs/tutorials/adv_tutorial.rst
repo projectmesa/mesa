@@ -17,9 +17,10 @@ create a new visualization element.
 
 **Note for Jupyter users: Due to conflicts with the tornado server Mesa
 uses and Jupyter, the interactive browser of your model will load but
-likely not work. This will require you to run the code from .py
+likely not work. This will require you to use run the code from .py
 files. The Mesa development team is working to develop a** `Jupyter
-compatible interface <https://github.com/projectmesa/mesa/issues/1363>`_.
+compatible
+interface <https://github.com/projectmesa/mesa/issues/1363>`__.*\*
 
 First, a quick explanation of how Mesa’s interactive visualization
 works. Visualization is done in a browser window, using JavaScript to
@@ -35,7 +36,6 @@ server and turns a model state into JSON data; and a JavaScript side,
 which takes that JSON data and draws it in the browser window. Mesa
 comes with a few modules built in, and let you add your own as well.
 
-
 Grid Visualization
 ^^^^^^^^^^^^^^^^^^
 
@@ -50,9 +50,66 @@ need to import the actual model object.
 .. code:: ipython3
 
     import mesa
-
+    # from MoneyModel import MoneyModel
     # If MoneyModel.py is where your code is:
     # from MoneyModel import MoneyModel
+
+
+::
+
+
+    ---------------------------------------------------------------------------
+
+    ModuleNotFoundError                       Traceback (most recent call last)
+
+    Cell In[12], line 1
+    ----> 1 import mesa
+          2 # from MoneyModel import MoneyModel
+          3 # If MoneyModel.py is where your code is:
+          4 # from MoneyModel import MoneyModel
+
+
+    ModuleNotFoundError: No module named 'mesa'
+
+
+.. code:: ipython3
+
+    !pip install mesa
+
+
+.. parsed-literal::
+
+    [33mDEPRECATION: Configuring installation scheme with distutils config files is deprecated and will no longer work in the near future. If you are using a Homebrew or Linuxbrew Python, please see discussion at https://github.com/Homebrew/homebrew-core/issues/76621[0m[33m
+    [0mRequirement already satisfied: mesa in /opt/homebrew/lib/python3.9/site-packages (1.2.1)
+    Requirement already satisfied: cookiecutter in /opt/homebrew/lib/python3.9/site-packages (from mesa) (2.1.1)
+    Requirement already satisfied: tornado in /opt/homebrew/lib/python3.9/site-packages (from mesa) (6.2)
+    Requirement already satisfied: networkx in /opt/homebrew/lib/python3.9/site-packages (from mesa) (3.1)
+    Requirement already satisfied: numpy in /opt/homebrew/lib/python3.9/site-packages (from mesa) (1.22.4)
+    Requirement already satisfied: click in /opt/homebrew/lib/python3.9/site-packages (from mesa) (8.1.3)
+    Requirement already satisfied: tqdm in /opt/homebrew/lib/python3.9/site-packages (from mesa) (4.64.0)
+    Requirement already satisfied: pandas in /opt/homebrew/lib/python3.9/site-packages (from mesa) (1.4.4)
+    Requirement already satisfied: requests>=2.23.0 in /opt/homebrew/lib/python3.9/site-packages (from cookiecutter->mesa) (2.28.1)
+    Requirement already satisfied: binaryornot>=0.4.4 in /opt/homebrew/lib/python3.9/site-packages (from cookiecutter->mesa) (0.4.4)
+    Requirement already satisfied: pyyaml>=5.3.1 in /opt/homebrew/lib/python3.9/site-packages (from cookiecutter->mesa) (6.0)
+    Requirement already satisfied: python-slugify>=4.0.0 in /opt/homebrew/lib/python3.9/site-packages (from cookiecutter->mesa) (8.0.1)
+    Requirement already satisfied: Jinja2<4.0.0,>=2.7 in /opt/homebrew/lib/python3.9/site-packages (from cookiecutter->mesa) (3.1.2)
+    Requirement already satisfied: jinja2-time>=0.2.0 in /opt/homebrew/lib/python3.9/site-packages (from cookiecutter->mesa) (0.2.0)
+    Requirement already satisfied: pytz>=2020.1 in /opt/homebrew/lib/python3.9/site-packages (from pandas->mesa) (2022.2.1)
+    Requirement already satisfied: python-dateutil>=2.8.1 in /opt/homebrew/lib/python3.9/site-packages (from pandas->mesa) (2.8.2)
+    Requirement already satisfied: chardet>=3.0.2 in /opt/homebrew/lib/python3.9/site-packages (from binaryornot>=0.4.4->cookiecutter->mesa) (5.1.0)
+    Requirement already satisfied: MarkupSafe>=2.0 in /opt/homebrew/lib/python3.9/site-packages (from Jinja2<4.0.0,>=2.7->cookiecutter->mesa) (2.1.1)
+    Requirement already satisfied: arrow in /opt/homebrew/lib/python3.9/site-packages (from jinja2-time>=0.2.0->cookiecutter->mesa) (1.2.3)
+    Requirement already satisfied: six>=1.5 in /opt/homebrew/lib/python3.9/site-packages (from python-dateutil>=2.8.1->pandas->mesa) (1.16.0)
+    Requirement already satisfied: text-unidecode>=1.3 in /opt/homebrew/lib/python3.9/site-packages (from python-slugify>=4.0.0->cookiecutter->mesa) (1.3)
+    Requirement already satisfied: charset-normalizer<3,>=2 in /opt/homebrew/lib/python3.9/site-packages (from requests>=2.23.0->cookiecutter->mesa) (2.1.0)
+    Requirement already satisfied: certifi>=2017.4.17 in /opt/homebrew/lib/python3.9/site-packages (from requests>=2.23.0->cookiecutter->mesa) (2022.5.18.1)
+    Requirement already satisfied: idna<4,>=2.5 in /opt/homebrew/lib/python3.9/site-packages (from requests>=2.23.0->cookiecutter->mesa) (3.3)
+    Requirement already satisfied: urllib3<1.27,>=1.21.1 in /opt/homebrew/lib/python3.9/site-packages (from requests>=2.23.0->cookiecutter->mesa) (1.26.9)
+    [33mDEPRECATION: Configuring installation scheme with distutils config files is deprecated and will no longer work in the near future. If you are using a Homebrew or Linuxbrew Python, please see discussion at https://github.com/Homebrew/homebrew-core/issues/76621[0m[33m
+    [0m
+    [1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m A new release of pip available: [0m[31;49m22.2.2[0m[39;49m -> [0m[32;49m23.1.1[0m
+    [1m[[0m[34;49mnotice[0m[1;39;49m][0m[39;49m To update, run: [0m[32;49mpython3.9 -m pip install --upgrade pip[0m
+
 
 ``CanvasGrid`` works by looping over every cell in a grid, and
 generating a portrayal for every agent it finds. A portrayal is a
@@ -82,33 +139,6 @@ a 10x10 grid, drawn in 500 x 500 pixels.
 
     grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
 
-.. code:: ipython3
-
-    """
-    The full code should now look like:
-    """
-    # from MoneyModel import *
-    import mesa
-
-
-    def agent_portrayal(agent):
-        portrayal = {
-            "Shape": "circle",
-            "Filled": "true",
-            "Layer": 0,
-            "Color": "red",
-            "r": 0.5,
-        }
-        return portrayal
-
-
-    grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-    server = mesa.visualization.ModularServer(
-        MoneyModel, [grid], "Money Model", {"N": 100, "width": 10, "height": 10}
-    )
-    server.port = 8521  # The default
-    server.launch()
-
 Now we create and launch the actual server. We do this with the
 following arguments:
 
@@ -123,16 +153,31 @@ following arguments:
 Once we create the server, we set the port for it to listen on (you can
 treat this as just a piece of the URL you’ll open in the browser).
 Finally, when you’re ready to run the visualization, use the server’s
-``launch()`` method.
+``launch()`` method:
 
-.. code:: python
+.. code:: ipython3
 
-   server = ModularServer(MoneyModel,
-                          [grid],
-                          "Money Model",
-                          {"N":100, "width":10, "height":10})
-   server.port = 8521 # The default
-   server.launch()
+    # from MoneyModel import *
+    import mesa
+    
+    
+    def agent_portrayal(agent):
+        portrayal = {
+            "Shape": "circle",
+            "Filled": "true",
+            "Layer": 0,
+            "Color": "red",
+            "r": 0.5,
+        }
+        return portrayal
+    
+    
+    grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+    server = mesa.visualization.ModularServer(
+        MoneyModel, [grid], "Money Model", {"N": 100, "width": 10, "height": 10}
+    )
+    server.port = 8521  # The default
+    server.launch()
 
 The full code should now look like:
 
@@ -153,10 +198,7 @@ The full code should now look like:
    grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
    server = mesa.visualization.ModularServer(
        MoneyModel, [grid], "Money Model", {"N": 100, "width": 10, "height": 10}
-   )server = ModularServer(MoneyModel,
-                          [grid],
-                          "Money Model",
-                          {"N":100, "width":10, "height":10})
+   )
    server.port = 8521 # The default
    server.launch()
 
@@ -166,17 +208,9 @@ open automatically, try pointing it at http://127.0.0.1:8521 manually.
 If this doesn’t show you the visualization, something may have gone
 wrong with the server launch.)
 
-You should see something like the figure below: the model title, an
-empty space where the grid will be, and a control panel off to the
-right.
-
-.. figure:: files/viz_empty.png
-   :alt: Empty Visualization
-
-   Empty Visualization
-
-Click the ‘reset’ button on the control panel, and you should see the
-grid fill up with red circles, representing agents.
+You should see something like the figure below: the model title, a grid
+filled up with red circles, representing agents, and a control panel off
+to the right.
 
 .. figure:: files/viz_redcircles.png
    :alt: Redcircles Visualization
@@ -252,13 +286,13 @@ chart will appear underneath the grid.
 
 .. code:: python
 
-   chart = mesa.visualization.ChartModule([{"Label": "Gini",
+   chart = mesa.visualization.ChartModule([{"Label": "Gini", 
                          "Color": "Black"}],
                        data_collector_name='datacollector')
 
-   server = mesa.visualization.ModularServer(MoneyModel,
-                          [grid, chart],
-                          "Money Model",
+   server = mesa.visualization.ModularServer(MoneyModel, 
+                          [grid, chart], 
+                          "Money Model", 
                           {"N":100, "width":10, "height":10})
 
 Launch the visualization and start a model run, and you’ll see a line
@@ -328,9 +362,9 @@ the class itself:
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-        // The actual code will go here.
-    };
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+       // The actual code will go here.
+   };
 
 Note that our object is instantiated with three arguments: the number of
 integer bins, and the width and height (in pixels) the chart will take
@@ -339,27 +373,26 @@ up in the visualization window.
 When the visualization object is instantiated, the first thing it needs
 to do is prepare to draw on the current page. To do so, it adds a
 `canvas <https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API>`__
-tag to the page. It also gets the canvas' context, which is required for doing
-anything with it.
+tag to the page. It also gets the canvas’ context, which is required for
+doing anything with it.
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-      // Create the canvas object:
-        const canvas = document.createElement("canvas");
-        Object.assign(canvas, {
-          width: canvas_width,
-          height: canvas_height,
-          style: "border:1px dotted",
-        });
-      // Append it to #elements:
-      const elements = document.getElementById("elements");
-      elements.appendChild(canvas);
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+     // Create the canvas object:
+       const canvas = document.createElement("canvas");
+       Object.assign(canvas, {
+         width: canvas_width,
+         height: canvas_height,
+         style: "border:1px dotted",
+       });
+     // Append it to #elements:
+     const elements = document.getElementById("elements");
+     elements.appendChild(canvas);
 
-      // Create the context and the drawing controller:
-      const context = canvas.getContext("2d");
-    };
-
+     // Create the context and the drawing controller:
+     const context = canvas.getContext("2d");
+   };
 
 Look at the Charts.js `bar chart
 documentation <http://www.chartjs.org/docs/#bar-chart-introduction>`__.
@@ -373,49 +406,49 @@ created, we can create the chart object.
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-      // Create the canvas object:
-        const canvas = document.createElement("canvas");
-        Object.assign(canvas, {
-          width: canvas_width,
-          height: canvas_height,
-          style: "border:1px dotted",
-        });
-      // Append it to #elements:
-      const elements = document.getElementById("elements");
-      elements.appendChild(canvas);
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+     // Create the canvas object:
+       const canvas = document.createElement("canvas");
+       Object.assign(canvas, {
+         width: canvas_width,
+         height: canvas_height,
+         style: "border:1px dotted",
+       });
+     // Append it to #elements:
+     const elements = document.getElementById("elements");
+     elements.appendChild(canvas);
 
-      // Create the context and the drawing controller:
-      const context = canvas.getContext("2d");
+     // Create the context and the drawing controller:
+     const context = canvas.getContext("2d");
 
-      // Prep the chart properties and series:
-      const datasets = [{
-        label: "Data",
-        fillColor: "rgba(151,187,205,0.5)",
-        strokeColor: "rgba(151,187,205,0.8)",
-        highlightFill: "rgba(151,187,205,0.75)",
-        highlightStroke: "rgba(151,187,205,1)",
-        data: []
-      }];
+     // Prep the chart properties and series:
+     const datasets = [{
+       label: "Data",
+       fillColor: "rgba(151,187,205,0.5)",
+       strokeColor: "rgba(151,187,205,0.8)",
+       highlightFill: "rgba(151,187,205,0.75)",
+       highlightStroke: "rgba(151,187,205,1)",
+       data: []
+     }];
 
-      // Add a zero value for each bin
-      for (var i in bins)
-        datasets[0].data.push(0);
+     // Add a zero value for each bin
+     for (var i in bins)
+       datasets[0].data.push(0);
 
-      const data = {
-        labels: bins,
-        datasets: datasets
-      };
+     const data = {
+       labels: bins,
+       datasets: datasets
+     };
 
-      const options = {
-        scaleBeginsAtZero: true
-      };
+     const options = {
+       scaleBeginsAtZero: true
+     };
 
-      // Create the chart object
-      const chart = new Chart(context, {type: 'bar', data: data, options: options});
+     // Create the chart object
+     const chart = new Chart(context, {type: 'bar', data: data, options: options});
 
-      // Now what?
-    };
+     // Now what?
+   };
 
 There are two methods every client-side visualization class must
 implement to be able to work: ``render(data)`` to render the incoming
@@ -433,18 +466,19 @@ With that in mind, we can add these two methods to the class:
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-      // ...Everything from above...
-      this.render = function(data) {
-        datasets[0].data = data;
-        chart.update();
-      };
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+     // ...Everything from above...
+     this.render = function(data) {
+       datasets[0].data = data;
+       chart.update();
+     };
 
-      this.reset = function() {
-        chart.destroy();
-        chart = new Chart(context, {type: 'bar', data: data, options: options});
-      };
-    };
+     this.reset = function() {
+       chart.destroy();
+       chart = new Chart(context, {type: 'bar', data: data, options: options});
+     };
+   };
+
 Note the ``this``. before the method names. This makes them public and
 ensures that they are accessible outside of the object itself. All the
 other variables inside the class are only accessible inside the object
@@ -479,8 +513,8 @@ inherit from, and create the new visualization class.
                self.canvas_width = canvas_width
                self.bins = bins
                new_element = "new HistogramModule({}, {}, {})"
-               new_element = new_element.format(bins,
-                                                canvas_width,
+               new_element = new_element.format(bins, 
+                                                canvas_width, 
                                                 canvas_height)
                self.js_code = "elements.push(" + new_element + ");"
 
@@ -531,9 +565,9 @@ Now, you can create your new HistogramModule and add it to the server:
 .. code:: python
 
        histogram = mesa.visualization.HistogramModule(list(range(10)), 200, 500)
-       server = mesa.visualization.ModularServer(MoneyModel,
-                              [grid, histogram, chart],
-                              "Money Model",
+       server = mesa.visualization.ModularServer(MoneyModel, 
+                              [grid, histogram, chart], 
+                              "Money Model", 
                               {"N":100, "width":10, "height":10})
        server.launch()
 
