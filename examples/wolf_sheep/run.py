@@ -3,7 +3,7 @@ import sys
 
 open_browser: bool = True
 
-if sys.argv[1] == 'headless':
+if sys.argc >= 2 and sys.argv[1] == 'headless':
     open_browser = False
 
 server.launch(open_browser=open_browser)
