@@ -59,7 +59,7 @@ class EpsteinCivilViolence(mesa.Model):
         self.max_iters = max_iters
         self.iteration = 0
         self.schedule = mesa.time.RandomActivation(self)
-        self.grid = mesa.space.Grid(width, height, torus=True)
+        self.grid = mesa.space.SingleGrid(width, height, torus=True)
         model_reporters = {
             "Quiescent": lambda m: self.count_type_citizens(m, "Quiescent"),
             "Active": lambda m: self.count_type_citizens(m, "Active"),
