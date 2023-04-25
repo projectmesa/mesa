@@ -957,25 +957,13 @@ class ContinuousSpace:
         """
         one = np.array(pos_1)
         two = np.array(pos_2)
+        heading = two - one
         if self.torus:
-            one = self.torus_adj(one)
-            two = self.torus_adj(two)
-            minimal_square_distance = float("inf")
-            winner_vector = np.array((0, 0))
-            for a in [-1, 0, 1]:
-                for b in [-1, 0, 1]:
-                    shifted_two = np.array(
-                        (two[0] + a * self.width, two[1] + b * self.height)
-                    )
-                    square_distance = (shifted_two[0] - one[0]) ** 2 + (
-                        shifted_two[1] - one[1]
-                    ) ** 2
-                    if square_distance < minimal_square_distance:
-                        minimal_square_distance = square_distance
-                        winner_vector = shifted_two
-            heading = winner_vector - one
-        else:
-            heading = two - one
+            wrapped_one = (one - self.center) % self.size
+            wrapped_two = (two - self.center) % self.size
+            wrapped_heading = wrapped_two - wrapped_one
+            # Use the heading vector with the smaller magnitude
+            heading = sorted((heading, wrapped_heading), key=np.linalg.norm)[0]
         if isinstance(pos_1, tuple):
             heading = tuple(heading)
         return heading
