@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import unittest
 
 from click.testing import CliRunner
@@ -17,6 +18,6 @@ class ScaffoldTest(unittest.TestCase):
 
     def test_scaffold_creates_project_dir(self):
         with self.runner.isolated_filesystem():
-            assert not os.path.isdir("example_project")
+            assert not Path("example_project").is_dir()
             self.runner.invoke(cli, ["startproject", "--no-input"])
-            assert os.path.isdir("example_project")
+            assert Path("example_project").is_dir()
