@@ -27,7 +27,7 @@ class ConwaysGameOfLife(mesa.Model):
 
         # Place a cell at each location, with some initialized to
         # ALIVE and some to DEAD.
-        for (contents, x, y) in self.grid.coord_iter():
+        for contents, x, y in self.grid.coord_iter():
             cell = Cell((x, y), self)
             if self.random.random() < 0.1:
                 cell.state = cell.ALIVE
