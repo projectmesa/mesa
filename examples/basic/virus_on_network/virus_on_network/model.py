@@ -40,7 +40,6 @@ class VirusOnNetwork(mesa.Model):
         recovery_chance=0.3,
         gain_resistance_chance=0.5,
     ):
-
         self.num_nodes = num_nodes
         prob = avg_node_degree / self.num_nodes
         self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=prob)
