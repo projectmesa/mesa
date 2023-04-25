@@ -62,7 +62,10 @@ class MoneyAgent(mesa.Agent):
 
     def give_money(self):
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
-        if len(cellmates) > 1:
+        cellmates.pop(
+            cellmates.index(self)
+        )  # Ensure agent is not giving money to itself
+        if len(cellmates) > 0:
             other = self.random.choice(cellmates)
             other.wealth += 1
             self.wealth -= 1
