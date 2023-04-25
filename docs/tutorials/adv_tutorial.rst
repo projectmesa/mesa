@@ -17,9 +17,10 @@ create a new visualization element.
 
 **Note for Jupyter users: Due to conflicts with the tornado server Mesa
 uses and Jupyter, the interactive browser of your model will load but
-likely not work. This will require you to run the code from .py
+likely not work. This will require you to use run the code from .py
 files. The Mesa development team is working to develop a** `Jupyter
-compatible interface <https://github.com/projectmesa/mesa/issues/1363>`_.
+compatible
+interface <https://github.com/projectmesa/mesa/issues/1363>`__.
 
 First, a quick explanation of how Mesa’s interactive visualization
 works. Visualization is done in a browser window, using JavaScript to
@@ -35,32 +36,30 @@ server and turns a model state into JSON data; and a JavaScript side,
 which takes that JSON data and draws it in the browser window. Mesa
 comes with a few modules built in, and let you add your own as well.
 
-
 Grid Visualization
 ^^^^^^^^^^^^^^^^^^
 
 To start with, let’s have a visualization where we can watch the agents
 moving around the grid. For this, you will need to put your model code
-in a separate Python source file; for example, ``MoneyModel.py``. Next,
-either in the same file or in a new one (e.g. ``MoneyModel_Viz.py``)
-import the server class and the Canvas Grid class (so-called because it
-uses HTML5 canvas to draw a grid). If you’re in a new file, you’ll also
-need to import the actual model object.
+in a separate Python source file. For now, let us use the ``MoneyModel``
+created in the `Introductory
+Tutorial <https://mesa.readthedocs.io/en/main/tutorials/intro_tutorial.html>`__
+saved to ``MoneyModel.py`` file provided. Next, in a new source file
+(e.g. ``MoneyModel_Viz.py``) include the code shown in the following
+cells to run and avoid Jupyter compatibility issue.
 
 .. code:: ipython3
 
-    import mesa
-
     # If MoneyModel.py is where your code is:
-    # from MoneyModel import MoneyModel
+    from MoneyModel import mesa, MoneyModel
 
-``CanvasGrid`` works by looping over every cell in a grid, and
-generating a portrayal for every agent it finds. A portrayal is a
-dictionary (which can easily be turned into a JSON object) which tells
-the JavaScript side how to draw it. The only thing we need to provide is
-a function which takes an agent, and returns a portrayal object. Here’s
-the simplest one: it’ll draw each agent as a red, filled circle which
-fills half of each cell.
+Mesa’s ``CanvasGrid`` visualization class works by looping over every
+cell in a grid, and generating a portrayal for every agent it finds. A
+portrayal is a dictionary (which can easily be turned into a JSON
+object) which tells the JavaScript side how to draw it. The only thing
+we need to provide is a function which takes an agent, and returns a
+portrayal object. Here’s the simplest one: it’ll draw each agent as a
+red, filled circle which fills half of each cell.
 
 .. code:: ipython3
 
@@ -82,33 +81,6 @@ a 10x10 grid, drawn in 500 x 500 pixels.
 
     grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
 
-.. code:: ipython3
-
-    """
-    The full code should now look like:
-    """
-    # from MoneyModel import *
-    import mesa
-
-
-    def agent_portrayal(agent):
-        portrayal = {
-            "Shape": "circle",
-            "Filled": "true",
-            "Layer": 0,
-            "Color": "red",
-            "r": 0.5,
-        }
-        return portrayal
-
-
-    grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-    server = mesa.visualization.ModularServer(
-        MoneyModel, [grid], "Money Model", {"N": 100, "width": 10, "height": 10}
-    )
-    server.port = 8521  # The default
-    server.launch()
-
 Now we create and launch the actual server. We do this with the
 following arguments:
 
@@ -120,26 +92,26 @@ following arguments:
 -  Any inputs or arguments for the model itself. In this case, 100
    agents, and height and width of 10.
 
-Once we create the server, we set the port for it to listen on (you can
-treat this as just a piece of the URL you’ll open in the browser).
+Once we create the server, we set the port (use default 8521 here) for
+it to listen on (you can treat this as just a piece of the URL you’ll
+open in the browser).
+
+.. code:: ipython3
+
+    server = mesa.visualization.ModularServer(
+        MoneyModel, [grid], "Money Model", {"N": 100, "width": 10, "height": 10}
+    )
+    server.port = 8521  # the default
+
 Finally, when you’re ready to run the visualization, use the server’s
-``launch()`` method.
+launch() method.
+
+The full code for source file ``MoneyModel_Viz.py`` should now look
+like:
 
 .. code:: python
 
-   server = ModularServer(MoneyModel,
-                          [grid],
-                          "Money Model",
-                          {"N":100, "width":10, "height":10})
-   server.port = 8521 # The default
-   server.launch()
-
-The full code should now look like:
-
-.. code:: python
-
-   from MoneyModel import *
-   import mesa
+   from MoneyModel import mesa, MoneyModel
 
 
    def agent_portrayal(agent):
@@ -151,9 +123,7 @@ The full code should now look like:
        return portrayal
 
    grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-   server = mesa.visualization.ModularServer(
-       MoneyModel, [grid], "Money Model", {"N": 100, "width": 10, "height": 10}
-   )server = ModularServer(MoneyModel,
+   server = mesa.visualization.ModularServer(MoneyModel,
                           [grid],
                           "Money Model",
                           {"N":100, "width":10, "height":10})
@@ -166,29 +136,24 @@ open automatically, try pointing it at http://127.0.0.1:8521 manually.
 If this doesn’t show you the visualization, something may have gone
 wrong with the server launch.)
 
-You should see something like the figure below: the model title, an
-empty space where the grid will be, and a control panel off to the
-right.
-
-.. figure:: files/viz_empty.png
-   :alt: Empty Visualization
-
-   Empty Visualization
-
-Click the ‘reset’ button on the control panel, and you should see the
-grid fill up with red circles, representing agents.
+You should see something like the figure below: the model title, a grid
+filled up with red circles, representing agents, and a control panel off
+to the right:
 
 .. figure:: files/viz_redcircles.png
    :alt: Redcircles Visualization
 
    Redcircles Visualization
 
-Click ‘step’ to advance the model by one step, and the agents will move
-around. Click ‘run’ and the agents will keep moving around, at the rate
-set by the ‘fps’ (frames per second) slider at the top. Try moving it
-around and see how the speed of the model changes. Pressing ‘pause’ will
-(as you’d expect) pause the model; presing ‘run’ again will restart it.
-Finally, ‘reset’ will start a new instantiation of the model.
+Click the ``Reset`` button on the control panel, and you should see a
+new grid fill up with red circles.
+
+Click ``Step`` to advance the model by one step, and the agents will
+move around. Click ``Start`` and the agents will keep moving around, at
+the rate set by the ‘fps’ (frames per second) slider at the top. Try
+moving it around and see how the speed of the model changes. Pressing
+``Stop`` will pause the model; presing ``Start`` again will restart it.
+Finally, ``Reset`` will start a new instantiation of the model.
 
 To stop the visualization server, go back to the terminal where you
 launched it, and press Control+c.
@@ -202,29 +167,28 @@ change it so that agents who are broke (wealth 0) are drawn in grey,
 smaller, and above agents who still have money.
 
 To do this, we go back to our ``agent_portrayal`` code and add some code
-to change the portrayal based on the agent properties.
+to change the portrayal based on the agent properties and launch the
+server again.
 
-.. code:: python
+.. code:: ipython3
 
-   def agent_portrayal(agent):
-       portrayal = {"Shape": "circle",
-                    "Filled": "true",
-                    "r": 0.5}
+    def agent_portrayal(agent):
+        portrayal = {"Shape": "circle", "Filled": "true", "r": 0.5}
+    
+        if agent.wealth > 0:
+            portrayal["Color"] = "red"
+            portrayal["Layer"] = 0
+        else:
+            portrayal["Color"] = "grey"
+            portrayal["Layer"] = 1
+            portrayal["r"] = 0.2
+        return portrayal
 
-       if agent.wealth > 0:
-           portrayal["Color"] = "red"
-           portrayal["Layer"] = 0
-       else:
-           portrayal["Color"] = "grey"
-           portrayal["Layer"] = 1
-           portrayal["r"] = 0.2
-       return portrayal
-
-Now launch the server again - this will open a new browser window
-pointed at the updated visualization. Initially it looks the same, but
-advance the model and smaller grey circles start to appear. Note that
-since the zero-wealth agents have a higher layer number, they are drawn
-on top of the red agents.
+This will open a new browser window pointed at the updated
+visualization. Initially it looks the same, but advance the model and
+smaller grey circles start to appear. Note that since the zero-wealth
+agents have a higher layer number, they are drawn on top of the red
+agents.
 
 .. figure:: files/viz_greycircles.png
    :alt: Greycircles Visualization
@@ -250,20 +214,52 @@ Finally, we add the chart to the list of elements in the server. The
 elements are added to the visualization in the order they appear, so the
 chart will appear underneath the grid.
 
+.. code:: ipython3
+
+    chart = mesa.visualization.ChartModule(
+        [{"Label": "Gini", "Color": "Black"}], data_collector_name="datacollector"
+    )
+    
+    server = mesa.visualization.ModularServer(
+        MoneyModel, [grid, chart], "Money Model", {"N": 100, "width": 10, "height": 10}
+    )
+
+Launch the visualization and start a model run, either by launching the
+server here or through the full code for source file
+``MoneyModel_Viz.py``.
+
 .. code:: python
 
-   chart = mesa.visualization.ChartModule([{"Label": "Gini",
-                         "Color": "Black"}],
-                       data_collector_name='datacollector')
+   from MoneyModel import mesa, MoneyModel
 
-   server = mesa.visualization.ModularServer(MoneyModel,
-                          [grid, chart],
-                          "Money Model",
-                          {"N":100, "width":10, "height":10})
 
-Launch the visualization and start a model run, and you’ll see a line
-chart underneath the grid. Every step of the model, the line chart
-updates along with the grid. Reset the model, and the chart resets too.
+   def agent_portrayal(agent):
+       portrayal = {"Shape": "circle", "Filled": "true", "r": 0.5}
+
+       if agent.wealth > 0:
+           portrayal["Color"] = "red"
+           portrayal["Layer"] = 0
+       else:
+           portrayal["Color"] = "grey"
+           portrayal["Layer"] = 1
+           portrayal["r"] = 0.2
+       return portrayal
+
+
+   grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+   chart = mesa.visualization.ChartModule(
+       [{"Label": "Gini", "Color": "Black"}], data_collector_name="datacollector"
+   )
+
+   server = mesa.visualization.ModularServer(
+       MoneyModel, [grid, chart], "Money Model", {"N": 100, "width": 10, "height": 10}
+   )
+   server.port = 8521  # The default
+   server.launch()
+
+You’ll see a line chart underneath the grid. Every step of the model,
+the line chart updates along with the grid. Reset the model, and the
+chart resets too.
 
 .. figure:: files/viz_chart.png
    :alt: Chart Visualization
@@ -328,9 +324,9 @@ the class itself:
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-        // The actual code will go here.
-    };
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+       // The actual code will go here.
+   };
 
 Note that our object is instantiated with three arguments: the number of
 integer bins, and the width and height (in pixels) the chart will take
@@ -339,27 +335,26 @@ up in the visualization window.
 When the visualization object is instantiated, the first thing it needs
 to do is prepare to draw on the current page. To do so, it adds a
 `canvas <https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API>`__
-tag to the page. It also gets the canvas' context, which is required for doing
-anything with it.
+tag to the page. It also gets the canvas’ context, which is required for
+doing anything with it.
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-      // Create the canvas object:
-        const canvas = document.createElement("canvas");
-        Object.assign(canvas, {
-          width: canvas_width,
-          height: canvas_height,
-          style: "border:1px dotted",
-        });
-      // Append it to #elements:
-      const elements = document.getElementById("elements");
-      elements.appendChild(canvas);
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+     // Create the canvas object:
+       const canvas = document.createElement("canvas");
+       Object.assign(canvas, {
+         width: canvas_width,
+         height: canvas_height,
+         style: "border:1px dotted",
+       });
+     // Append it to #elements:
+     const elements = document.getElementById("elements");
+     elements.appendChild(canvas);
 
-      // Create the context and the drawing controller:
-      const context = canvas.getContext("2d");
-    };
-
+     // Create the context and the drawing controller:
+     const context = canvas.getContext("2d");
+   };
 
 Look at the Charts.js `bar chart
 documentation <http://www.chartjs.org/docs/#bar-chart-introduction>`__.
@@ -373,49 +368,49 @@ created, we can create the chart object.
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-      // Create the canvas object:
-        const canvas = document.createElement("canvas");
-        Object.assign(canvas, {
-          width: canvas_width,
-          height: canvas_height,
-          style: "border:1px dotted",
-        });
-      // Append it to #elements:
-      const elements = document.getElementById("elements");
-      elements.appendChild(canvas);
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+     // Create the canvas object:
+       const canvas = document.createElement("canvas");
+       Object.assign(canvas, {
+         width: canvas_width,
+         height: canvas_height,
+         style: "border:1px dotted",
+       });
+     // Append it to #elements:
+     const elements = document.getElementById("elements");
+     elements.appendChild(canvas);
 
-      // Create the context and the drawing controller:
-      const context = canvas.getContext("2d");
+     // Create the context and the drawing controller:
+     const context = canvas.getContext("2d");
 
-      // Prep the chart properties and series:
-      const datasets = [{
-        label: "Data",
-        fillColor: "rgba(151,187,205,0.5)",
-        strokeColor: "rgba(151,187,205,0.8)",
-        highlightFill: "rgba(151,187,205,0.75)",
-        highlightStroke: "rgba(151,187,205,1)",
-        data: []
-      }];
+     // Prep the chart properties and series:
+     const datasets = [{
+       label: "Data",
+       fillColor: "rgba(151,187,205,0.5)",
+       strokeColor: "rgba(151,187,205,0.8)",
+       highlightFill: "rgba(151,187,205,0.75)",
+       highlightStroke: "rgba(151,187,205,1)",
+       data: []
+     }];
 
-      // Add a zero value for each bin
-      for (var i in bins)
-        datasets[0].data.push(0);
+     // Add a zero value for each bin
+     for (var i in bins)
+       datasets[0].data.push(0);
 
-      const data = {
-        labels: bins,
-        datasets: datasets
-      };
+     const data = {
+       labels: bins,
+       datasets: datasets
+     };
 
-      const options = {
-        scaleBeginsAtZero: true
-      };
+     const options = {
+       scaleBeginsAtZero: true
+     };
 
-      // Create the chart object
-      const chart = new Chart(context, {type: 'bar', data: data, options: options});
+     // Create the chart object
+     const chart = new Chart(context, {type: 'bar', data: data, options: options});
 
-      // Now what?
-    };
+     // Now what?
+   };
 
 There are two methods every client-side visualization class must
 implement to be able to work: ``render(data)`` to render the incoming
@@ -433,18 +428,19 @@ With that in mind, we can add these two methods to the class:
 
 .. code:: javascript
 
-    const HistogramModule = function(bins, canvas_width, canvas_height) {
-      // ...Everything from above...
-      this.render = function(data) {
-        datasets[0].data = data;
-        chart.update();
-      };
+   const HistogramModule = function(bins, canvas_width, canvas_height) {
+     // ...Everything from above...
+     this.render = function(data) {
+       datasets[0].data = data;
+       chart.update();
+     };
 
-      this.reset = function() {
-        chart.destroy();
-        chart = new Chart(context, {type: 'bar', data: data, options: options});
-      };
-    };
+     this.reset = function() {
+       chart.destroy();
+       chart = new Chart(context, {type: 'bar', data: data, options: options});
+     };
+   };
+
 Note the ``this``. before the method names. This makes them public and
 ensures that they are accessible outside of the object itself. All the
 other variables inside the class are only accessible inside the object
@@ -479,8 +475,8 @@ inherit from, and create the new visualization class.
                self.canvas_width = canvas_width
                self.bins = bins
                new_element = "new HistogramModule({}, {}, {})"
-               new_element = new_element.format(bins,
-                                                canvas_width,
+               new_element = new_element.format(bins, 
+                                                canvas_width, 
                                                 canvas_height)
                self.js_code = "elements.push(" + new_element + ");"
 
@@ -531,9 +527,9 @@ Now, you can create your new HistogramModule and add it to the server:
 .. code:: python
 
        histogram = mesa.visualization.HistogramModule(list(range(10)), 200, 500)
-       server = mesa.visualization.ModularServer(MoneyModel,
-                              [grid, histogram, chart],
-                              "Money Model",
+       server = mesa.visualization.ModularServer(MoneyModel, 
+                              [grid, histogram, chart], 
+                              "Money Model", 
                               {"N":100, "width":10, "height":10})
        server.launch()
 
