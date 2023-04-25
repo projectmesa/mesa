@@ -6,117 +6,88 @@ Tutorial Description
 
 `Mesa <https://github.com/projectmesa/mesa>`__ is a Python framework for
 `agent-based
-modeling <https://en.wikipedia.org/wiki/Agent-based_model>`__. This
-tutorial will assist you in getting started. Working through the
-tutorial will help you discover the core features of Mesa. Through the
-tutorial, you are walked through creating a starter-level model.
-Functionality is added progressively as the process unfolds. Should
-anyone find any errors, bugs, have a suggestion, or just are looking for
-clarification, `let us
+modeling <https://en.wikipedia.org/wiki/Agent-based_model>`__. This tutorial will assist you in getting started.
+Working through the tutorial will help you discover the core features of Mesa.  Through the tutorial, you are walked
+through creating a starter-level model. Functionality is added progressively as the process unfolds. Should anyone
+find any errors, bugs, have a suggest or just are looking for clarification, `please let us
 know <https://github.com/projectmesa/mesa/issues>`__!
 
-The premise of this tutorial is to create a starter-level model
-representing agents exchanging money. This exchange of money affects
-wealth. Next, *space* is added to allow agents to move based on the
-change in wealth as time progresses.
+The premise of this tutorial is to create a a starter-level model representing agents exchanging
+money. This exchange of money affects wealth. Next, *space* is added to allow agents to move
+based on the change in wealth as time progresses.
 
-Two of Mesa’s analytic tools: the *data collector* and *batch runner*
-will be used to examine this movement. After that an *interactive
-visualization* is added which allows model viewing as it runs.
+Two of Mesa's analytic tools: the *data collector* and *batch runner* will be used to examine this movement.
+After that an *interactive visualization* is added which allows model viewing as it runs.
 
-Finally, the creation of a custom visualization module in JavaScript is
-explored.
+Finally, the creation of a custom visualization module in JavaScript is explored.
+
 
 Model Description
------------------
+------------------------
 
-This is a starter-level simulated agent-based economy. In an agent-based
-economy, the behavior of an individual economic agent, such as a
-consumer or producer, is studied in a market environment. This model is
-drawn from the field econophysics, specifically a paper prepared by
-Drăgulescu et al. for additional information on the modeling assumptions
-used in this model. [Drăgulescu, 2002].
-
-The assumption that govern this model are:
+The tutorial model is a very simple simulated agent-based economy, drawn
+from econophysics and presenting a statistical mechanics approach to
+wealth distribution [Dragulescu2002]. The rules of our tutorial model:
 
 1. There are some number of agents.
 2. All agents begin with 1 unit of money.
-3. At every step of the model, an agent with money gives 1 unit of
-   money.
+3. At every step of the model, an agent gives 1 unit of money (if they
+   have it) to some other agent.
 
-Even as a starter-level model the yielded results are both interesting
-and unexpected to individuals unfamiliar with it the specific topic. As
-such, this model is a good starting point to examine Mesa’s core
-features.
+Despite its simplicity, this model yields results that are often
+unexpected to those not familiar with it. For our purposes, it also
+easily demonstrates Mesa's core features.
+
+Let's get started.
 
 Installation
 ~~~~~~~~~~~~
 
-Create and activate a `virtual
-environment <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`__.
-*Python version 3.8 or higher is required*.
+To start, install Mesa. We recommend doing this in a `virtual
+environment <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`__,
+but make sure your environment is set up with Python 3. Mesa requires
+Python3 and does not work in Python 2 environments.
 
-Install Mesa:
-
-.. code:: bash
-
-   pip install mesa
-
-Install Jupyter Notebook (optional):
+To install Mesa, simply:
 
 .. code:: bash
 
-   pip install jupyter
+       pip install mesa
 
-Install matplotlib:
-
-.. code:: bash
-
-   pip install matplotlib
-
-Building the Sample Model
--------------------------
-
-After Mesa is installed a model can be built. A jupyter notebook is
-recommended for this tutorial, this allows for small segments of codes
-to be examined one at a time. As an option this can be created using
-python script files.
-
-**Good Practice:** Place a model in its own folder/directory. This is
-not specifically required for the starter_model, but as other models
-become more complicated and expand multiple python scripts,
-documentation, discussions and notebooks may be added.
-
-Create New Folder/Directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
--  Using operating system commands create a new folder/directory named
-   ‘starter_model’.
-
--  Change to the new folder/directory.
-
-Creating Model With Jupyter Notebook
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Write the model interactively in `Jupyter
-Notebook <http://jupyter.org/>`__ cells.
-
--  Start Jupyter Notebook:
+When you do that, it will install Mesa itself, as well as any
+dependencies that aren't in your setup yet. Additional dependencies
+required by this tutorial can be found in the
+**examples/boltzmann_wealth_model/requirements.txt** file, which can be
+installed directly form the github repository by running:
 
 .. code:: bash
 
-   jupyter notebook
+       pip install -r https://raw.githubusercontent.com/projectmesa/mesa-examples/main/examples/Boltzmann_Wealth_Model/requirements.txt
 
--  Create a new Notebook named ``money_model.ipynb`` (or whatever you
-   want to call it).
+| This will install the dependencies listed in the requirements.txt file
+  which are:
+| - jupyter (Ipython interactive notebook)
+| - matplotlib (Python's visualization library)
+| - mesa (this ABM library – if not installed)
+| - numpy (Python's numerical python library)
 
-Creating Model With Script File (IDE, Text Editor, Colab, etc.)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Building a sample model
+-----------------------
 
--  Create a new file called ``money_model.py`` (or whatever you want to
-   call it).
+Once Mesa is installed, you can start building our model. You can write
+models in two different ways:
 
-*Code will be added as the tutorial progresses.*
+1. Write the code in its own file with your favorite text editor, or
+2. Write the model interactively in `Jupyter
+   Notebook <http://jupyter.org/>`__ cells.
+
+Either way, it's good practice to put your model in its own folder –
+especially if the project will end up consisting of multiple files (for
+example, Python files for the model and the visualization, a Notebook
+for analysis, and a Readme with some documentation and discussion).
+
+Begin by creating a folder, and either launch a Notebook or create a new
+Python source file. We will use the name ``money_model.py`` here.
 
 Setting up the model
 ~~~~~~~~~~~~~~~~~~~~
@@ -127,7 +98,7 @@ model-level attributes, manages the agents, and generally handles the
 global level of our model. Each instantiation of the model class will be
 a specific model run. Each model will contain multiple agents, all of
 which are instantiations of the agent class. Both the model and agent
-classes are child classes of Mesa’s generic ``Model`` and ``Agent``
+classes are child classes of Mesa's generic ``Model`` and ``Agent``
 classes. This is seen in the code with ``class MoneyModel(mesa.Model)``
 or ``class MoneyAgent(mesa.Agent)``. If you want you can specifically
 the class being imported by looking at the
@@ -187,13 +158,13 @@ model uses, and see whether it changes the model behavior. This may not
 seem important, but scheduling patterns can have an impact on your
 results [Comer2014].
 
-For now, let’s use one of the simplest ones: ``RandomActivation``\ \*,
+For now, let's use one of the simplest ones: ``RandomActivation``\ \*,
 which activates all the agents once per step, in random order. Every
 agent is expected to have a ``step`` method. The step method is the
 action the agent takes when it is activated by the model schedule. We
 add an agent to the schedule using the ``add`` method; when we call the
-schedule’s ``step`` method, the model shuffles the order of the agents,
-then activates and executes each agent’s ``step`` method.
+schedule's ``step`` method, the model shuffles the order of the agents,
+then activates and executes each agent's ``step`` method.
 
 \*Unlike ``mesa.model`` or ``mesa.agent``, ``mesa.time`` has multiple
 classes (e.g. ``RandomActivation``, ``StagedActivation`` etc). To ensure
@@ -238,8 +209,8 @@ this:
             """Advance the model by one step."""
             self.schedule.step()
 
-At this point, we have a model which runs – it just doesn’t do anything.
-You can see for yourself with a few easy lines. If you’ve been working
+At this point, we have a model which runs – it just doesn't do anything.
+You can see for yourself with a few easy lines. If you've been working
 in an interactive session, you can create a model object directly.
 Otherwise, you need to open an interactive session in the same directory
 as your source code file, and import the classes. For example, if your
@@ -259,16 +230,16 @@ Then create the model object, and run it for one step:
 
 .. parsed-literal::
 
-    Hi, I am agent 5.
-    Hi, I am agent 0.
-    Hi, I am agent 1.
-    Hi, I am agent 7.
-    Hi, I am agent 8.
-    Hi, I am agent 2.
-    Hi, I am agent 4.
-    Hi, I am agent 9.
-    Hi, I am agent 3.
     Hi, I am agent 6.
+    Hi, I am agent 2.
+    Hi, I am agent 1.
+    Hi, I am agent 0.
+    Hi, I am agent 4.
+    Hi, I am agent 5.
+    Hi, I am agent 3.
+    Hi, I am agent 9.
+    Hi, I am agent 8.
+    Hi, I am agent 7.
 
 
 Exercise
@@ -285,12 +256,12 @@ Now we just need to have the agents do what we intend for them to do:
 check their wealth, and if they have the money, give one unit of it away
 to another random agent. To allow the agent to choose another agent at
 random, we use the ``model.random`` random-number generator. This works
-just like Python’s ``random`` module, but with a fixed seed set when the
+just like Python's ``random`` module, but with a fixed seed set when the
 model is instantiated, that can be used to replicate a specific model
 run later.
 
 To pick an agent at random, we need a list of all agents. Notice that
-there isn’t such a list explicitly in the model. The scheduler, however,
+there isn't such a list explicitly in the model. The scheduler, however,
 does have an internal list of all the agents it is scheduled to
 activate.
 
@@ -315,21 +286,21 @@ With that in mind, we rewrite the agent ``step`` method, like this:
 Running your first model
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-With that last piece in hand, it’s time for the first rudimentary run of
+With that last piece in hand, it's time for the first rudimentary run of
 the model.
 
-If you’ve written the code in its own file (``money_model.py`` or a
+If you've written the code in its own file (``money_model.py`` or a
 different name), launch an interpreter in the same directory as the file
 (either the plain Python command-line interpreter, or the IPython
 interpreter), or launch a Jupyter Notebook there. Then import the
 classes you created. (If you wrote the code in a Notebook, obviously
-this step isn’t necessary).
+this step isn't necessary).
 
 .. code:: python
 
    from money_model import *
 
-Now let’s create a model with 10 agents, and run it for 10 steps.
+Now let's create a model with 10 agents, and run it for 10 steps.
 
 .. code:: ipython3
 
@@ -338,11 +309,11 @@ Now let’s create a model with 10 agents, and run it for 10 steps.
         model.step()
 
 Next, we need to get some data out of the model. Specifically, we want
-to see the distribution of the agent’s wealth. We can get the wealth
+to see the distribution of the agent's wealth. We can get the wealth
 values with list comprehension, and then use matplotlib (or another
 graphics library) to visualize the data in a histogram.
 
-If you are running from a text editor or IDE, you’ll also need to add
+If you are running from a text editor or IDE, you'll also need to add
 this line, to make the graph appear.
 
 .. code:: python
@@ -365,17 +336,17 @@ this line, to make the graph appear.
 
 .. parsed-literal::
 
-    (array([6., 0., 1., 0., 0., 1., 0., 1., 0., 1.]),
-     array([0. , 0.4, 0.8, 1.2, 1.6, 2. , 2.4, 2.8, 3.2, 3.6, 4. ]),
+    (array([2., 0., 0., 0., 0., 6., 0., 0., 0., 2.]),
+     array([0. , 0.2, 0.4, 0.6, 0.8, 1. , 1.2, 1.4, 1.6, 1.8, 2. ]),
      <BarContainer object of 10 artists>)
 
 
 
 
-.. image:: intro_tutorial_files%5Cintro_tutorial_19_1.png
+.. image:: intro_tutorial_files/output_19_1.png
 
 
-You’ll should see something like the distribution above. Yours will
+You'll should see something like the distribution above. Yours will
 almost certainly look at least slightly different, since each run of the
 model is random, after all.
 
@@ -404,21 +375,21 @@ can do this with a nested for loop:
 
 .. parsed-literal::
 
-    (array([431., 303., 153.,  76.,  26.,   9.,   1.,   1.]),
-     array([0., 1., 2., 3., 4., 5., 6., 7., 8.]),
-     <BarContainer object of 8 artists>)
+    (array([433., 304., 150.,  71.,  29.,  13.]),
+     array([0, 1, 2, 3, 4, 5, 6]),
+     <BarContainer object of 6 artists>)
 
 
 
 
-.. image:: intro_tutorial_files%5Cintro_tutorial_22_1.png
+.. image:: intro_tutorial_files/output_22_1.png
 
 
 This runs 100 instantiations of the model, and runs each for 10 steps.
 (Notice that we set the histogram bins to be integers, since agents can
 only have whole numbers of wealth). This distribution looks a lot
 smoother. By running the model 100 times, we smooth out some of the
-‘noise’ of randomness, and get to the model’s overall expected behavior.
+‘noise'of randomness, and get to the model's overall expected behavior.
 
 This outcome might be surprising. Despite the fact that all agents, on
 average, give and receive one unit of money every step, the model
@@ -440,9 +411,9 @@ those on the left edge, and the top to the bottom. This prevents some
 cells having fewer neighbors than others, or agents being able to go off
 the edge of the environment.
 
-Let’s add a simple spatial element to our model by putting our agents on
+Let's add a simple spatial element to our model by putting our agents on
 a grid and make them walk around at random. Instead of giving their unit
-of money to any random agent, they’ll give it to an agent on the same
+of money to any random agent, they'll give it to an agent on the same
 cell.
 
 Mesa has two main types of grids: ``SingleGrid`` and ``MultiGrid``\ \*.
@@ -457,9 +428,9 @@ Similar to ``mesa.time`` context is retained with
 `mesa.space <https://github.com/projectmesa/mesa/blob/main/mesa/space.py>`__
 
 We instantiate a grid with width and height parameters, and a boolean as
-to whether the grid is toroidal. Let’s make width and height model
+to whether the grid is toroidal. Let's make width and height model
 parameters, in addition to the number of agents, and have the grid
-always be toroidal. We can place agents on a grid with the grid’s
+always be toroidal. We can place agents on a grid with the grid's
 ``place_agent`` method, which takes an agent and an (x, y) tuple of the
 coordinates to place the agent.
 
@@ -483,16 +454,16 @@ coordinates to place the agent.
                 y = self.random.randrange(self.grid.height)
                 self.grid.place_agent(a, (x, y))
 
-Under the hood, each agent’s position is stored in two ways: the agent
+Under the hood, each agent's position is stored in two ways: the agent
 is contained in the grid in the cell it is currently in, and the agent
 has a ``pos`` variable with an (x, y) coordinate tuple. The
 ``place_agent`` method adds the coordinate to the agent automatically.
 
-Now we need to add to the agents’ behaviors, letting them move around
+Now we need to add to the agents'behaviors, letting them move around
 and only give money to other agents in the same cell.
 
-First let’s handle movement, and have the agents move to a neighboring
-cell. The grid object provides a ``move_agent`` method, which like you’d
+First let's handle movement, and have the agents move to a neighboring
+cell. The grid object provides a ``move_agent`` method, which like you'd
 imagine, moves an agent to a given cell. That still leaves us to get the
 possible neighboring cells to move to. There are a couple ways to do
 this. One is to use the current coordinates, and loop over all
@@ -506,7 +477,7 @@ coordinates +/- 1 away from it. For example:
        for dy in [-1, 0, 1]:
            neighbors.append((x+dx, y+dy))
 
-But there’s an even simpler way, using the grid’s built-in
+But there's an even simpler way, using the grid's built-in
 ``get_neighborhood`` method, which returns all the neighbors of a given
 cell. This method can get two types of cell neighborhoods:
 `Moore <https://en.wikipedia.org/wiki/Moore_neighborhood>`__ (includes
@@ -515,7 +486,7 @@ Neumann <https://en.wikipedia.org/wiki/Von_Neumann_neighborhood>`__\ (only
 up/down/left/right). It also needs an argument as to whether to include
 the center cell itself as one of the neighbors.
 
-With that in mind, the agent’s ``move`` method looks like this:
+With that in mind, the agent's ``move`` method looks like this:
 
 .. code:: python
 
@@ -531,7 +502,7 @@ With that in mind, the agent’s ``move`` method looks like this:
 
 Next, we need to get all the other agents present in a cell, and give
 one of them some money. We can get the contents of one or more cells
-using the grid’s ``get_cell_list_contents`` method, or by accessing a
+using the grid's ``get_cell_list_contents`` method, or by accessing a
 cell directly. The method accepts a list of cell coordinate tuples, or a
 single tuple if we only care about one cell.
 
@@ -546,7 +517,7 @@ single tuple if we only care about one cell.
                other.wealth += 1
                self.wealth -= 1
 
-And with those two methods, the agent’s ``step`` method becomes:
+And with those two methods, the agent's ``step`` method becomes:
 
 .. code:: python
 
@@ -607,7 +578,7 @@ Now, putting that all together should look like this:
         def step(self):
             self.schedule.step()
 
-Let’s create a model with 50 agents on a 10x10 grid, and run it for 20
+Let's create a model with 50 agents on a 10x10 grid, and run it for 20
 steps.
 
 .. code:: ipython3
@@ -616,11 +587,11 @@ steps.
     for i in range(20):
         model.step()
 
-Now let’s use matplotlib and numpy to visualize the number of agents
+Now let's use matplotlib and numpy to visualize the number of agents
 residing in each cell. To do that, we create a numpy array of the same
-size as the grid, filled with zeros. Then we use the grid object’s
+size as the grid, filled with zeros. Then we use the grid object's
 ``coord_iter()`` feature, which lets us loop over every cell in the
-grid, giving us each cell’s coordinates and contents in turn.
+grid, giving us each cell's coordinates and contents in turn.
 
 .. code:: ipython3
 
@@ -642,21 +613,21 @@ grid, giving us each cell’s coordinates and contents in turn.
 
 .. parsed-literal::
 
-    <matplotlib.colorbar.Colorbar at 0x10e8950a0>
+    <matplotlib.colorbar.Colorbar at 0x2505197baf0>
 
 
 
 
-.. image:: intro_tutorial_files%5Cintro_tutorial_32_1.png
+.. image:: intro_tutorial_files/output_32_1.png
 
 
 Collecting Data
 ~~~~~~~~~~~~~~~
 
-So far, at the end of every model run, we’ve had to go and write our own
-code to get the data out of the model. This has two problems: it isn’t
+So far, at the end of every model run, we've had to go and write our own
+code to get the data out of the model. This has two problems: it isn't
 very efficient, and it only gives us end results. If we wanted to know
-the wealth of each agent at each step, we’d have to add that to the loop
+the wealth of each agent at each step, we'd have to add that to the loop
 of executing steps, and figure out some way to store the data.
 
 Since one of the main goals of agent-based modeling is generating data
@@ -670,19 +641,19 @@ collector along with a function for collecting them. Model-level
 collection functions take a model object as an input, while agent-level
 collection functions take an agent object as an input. Both then return
 a value computed from the model or each agent at their current state.
-When the data collector’s ``collect`` method is called, with a model
+When the data collector's ``collect`` method is called, with a model
 object as its argument, it applies each model-level collection function
 to the model, and stores the results in a dictionary, associating the
 current value with the current step of the model. Similarly, the method
 applies each agent-level collection function to each agent currently in
 the schedule, associating the resulting value with the step of the
-model, and the agent’s ``unique_id``.
+model, and the agent's ``unique_id``.
 
-Let’s add a DataCollector to the model with
-```mesa.DataCollector`` <https://github.com/projectmesa/mesa/blob/main/mesa/datacollection.py>`__,
+Let's add a DataCollector to the model with
+`mesa.DataCollector <https://github.com/projectmesa/mesa/blob/main/mesa/datacollection.py>`__,
 and collect two variables. At the agent level, we want to collect every
-agent’s wealth at every step. At the model level, let’s measure the
-model’s `Gini
+agent's wealth at every step. At the model level, let's measure the
+model's `Gini
 Coefficient <https://en.wikipedia.org/wiki/Gini_coefficient>`__, a
 measure of wealth inequality.
 
@@ -712,15 +683,10 @@ measure of wealth inequality.
 
         def give_money(self):
             cellmates = self.model.grid.get_cell_list_contents([self.pos])
-            cellmates.pop(
-                cellmates.index(self)
-            )  # Ensure agent is not giving money to itself
             if len(cellmates) > 1:
                 other = self.random.choice(cellmates)
                 other.wealth += 1
                 self.wealth -= 1
-                if other == self:
-                    print("I JUST GAVE MONEY TO MYSELF HEHEHE!")
 
         def step(self):
             self.move()
@@ -754,7 +720,7 @@ measure of wealth inequality.
             self.schedule.step()
 
 At every step of the model, the datacollector will collect and store the
-model-level current Gini coefficient, as well as each agent’s wealth,
+model-level current Gini coefficient, as well as each agent's wealth,
 associating each with the current step.
 
 We run the model just as we did above. Now is when an interactive
@@ -787,12 +753,12 @@ To get the series of Gini coefficients as a pandas DataFrame:
 
 .. parsed-literal::
 
-    <Axes: >
+    <AxesSubplot:>
 
 
 
 
-.. image:: intro_tutorial_files%5Cintro_tutorial_38_1.png
+.. image:: intro_tutorial_files/output_38_1.png
 
 
 Similarly, we can get the agent-wealth data:
@@ -862,9 +828,9 @@ Similarly, we can get the agent-wealth data:
 
 
 
-You’ll see that the DataFrame’s index is pairings of model step and
+You'll see that the DataFrame's index is pairings of model step and
 agent ID. You can analyze it the way you would any other DataFrame. For
-example, to get a histogram of agent wealth at the model’s end:
+example, to get a histogram of agent wealth at the model's end:
 
 .. code:: ipython3
 
@@ -876,12 +842,12 @@ example, to get a histogram of agent wealth at the model’s end:
 
 .. parsed-literal::
 
-    <Axes: >
+    <AxesSubplot:>
 
 
 
 
-.. image:: intro_tutorial_files%5Cintro_tutorial_42_1.png
+.. image:: intro_tutorial_files/output_42_1.png
 
 
 Or to plot the wealth of a given agent (in this example, agent 14):
@@ -896,12 +862,12 @@ Or to plot the wealth of a given agent (in this example, agent 14):
 
 .. parsed-literal::
 
-    <Axes: xlabel='Step'>
+    <AxesSubplot:xlabel='Step'>
 
 
 
 
-.. image:: intro_tutorial_files%5Cintro_tutorial_44_1.png
+.. image:: intro_tutorial_files/output_44_1.png
 
 
 You can also use pandas to export the data to a CSV (comma separated
@@ -923,12 +889,11 @@ directory. After you run the code below you will see two files appear
 Batch Run
 ~~~~~~~~~
 
-Like we mentioned above, you usually won’t run a model only once, but
+Like we mentioned above, you usually won't run a model only once, but
 multiple times, with fixed parameters to find the overall distributions
 the model generates, and with varying parameters to analyze how they
-drive the model’s outputs and behaviors. Instead of needing to write
-nested for-loops for each model, Mesa provides a
-```batch_run`` <https://github.com/projectmesa/mesa/blob/main/mesa/batchrunner.py>`__
+drive the model's outputs and behaviors. Instead of needing to write
+nested for-loops for each model, Mesa provides a `batch_run <https://github.com/projectmesa/mesa/blob/main/mesa/batchrunner.py>`__
 function which automates it for you.
 
 The batch runner also requires an additional variable ``self.running``
@@ -1012,7 +977,7 @@ of the model with each number of agents, and to run each for 100 steps.
 We want to keep track of
 
 1. the Gini coefficient value and
-2. the individual agent’s wealth development.
+2. the individual agent's wealth development.
 
 Since for the latter changes at each time step might be interesting, we
 set ``data_collection_period = 1``.
@@ -1026,9 +991,9 @@ iteration).
 **Note for Windows OS users:** If you are running this tutorial in
 Jupyter, make sure that you set ``number_processes = 1`` (single
 process). If ``number_processes`` is greater than 1, it is less
-straightforward to set up. You can read `Mesa’s collection of useful
+straightforward to set up. You can read `Mesa's collection of useful
 snippets <https://github.com/projectmesa/mesa/blob/main/docs/useful-snippets/snippets.rst>`__,
-in ‘Using multi-process ``batch_run`` on Windows’ section for how to do
+in ‘Using multi-process ``batch_run`` on Windows'section for how to do
 it.
 
 .. code:: ipython3
@@ -1048,7 +1013,7 @@ it.
 
 .. parsed-literal::
 
-    100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 245/245 [00:48<00:00,  5.10it/s]
+    245it [00:34,  7.02it/s]
 
 
 To further analyze the return of the ``batch_run`` function, we convert
@@ -1090,15 +1055,15 @@ calling the batch run.
 
 .. parsed-literal::
 
-    <matplotlib.collections.PathCollection at 0x120e038e0>
+    <matplotlib.collections.PathCollection at 0x250bd5b41c0>
 
 
 
 
-.. image:: intro_tutorial_files%5Cintro_tutorial_57_1.png
+.. image:: intro_tutorial_files/output_57_1.png
 
 
-Second, we want to display the agent’s wealth at each time step of one
+Second, we want to display the agent's wealth at each time step of one
 specific episode. To do this, we again filter our large data frame, this
 time with a fixed number of agents and only for a specific iteration of
 that population. To print the results, we convert the filtered data
@@ -1137,21 +1102,21 @@ can use the ``to_html()`` function which takes the same arguments as
         0        7       1
         0        8       1
         0        9       1
-        1        0       1
+        1        0       2
         1        1       1
-      ...      ...     ...
-       99        8       1
-       99        9       0
+    ...        ...     ...
+       99        8       4
+       99        9       1
       100        0       0
-      100        1       1
+      100        1       0
       100        2       1
-      100        3       1
+      100        3       0
       100        4       1
-      100        5       2
-      100        6       1
+      100        5       1
+      100        6       0
       100        7       2
-      100        8       1
-      100        9       0
+      100        8       4
+      100        9       1
 
 
 Lastly, we want to take a look at the development of the Gini
@@ -1171,30 +1136,30 @@ episode.
 
      Step  Gini
         0  0.00
-        1  0.00
-        2  0.00
-        3  0.00
-        4  0.00
-        5  0.00
-        6  0.00
-        7  0.00
-        8  0.00
-        9  0.00
-       10  0.00
-       11  0.00
-      ...   ...
-       89  0.18
-       90  0.18
-       91  0.18
-       92  0.18
-       93  0.18
-       94  0.18
-       95  0.18
-       96  0.18
-       97  0.18
-       98  0.18
-       99  0.18
-      100  0.18
+        1  0.18
+        2  0.18
+        3  0.18
+        4  0.18
+        5  0.32
+        6  0.32
+        7  0.32
+        8  0.42
+        9  0.42
+       10  0.42
+       11  0.42
+    ...     ...
+       89  0.66
+       90  0.66
+       91  0.66
+       92  0.66
+       93  0.56
+       94  0.56
+       95  0.56
+       96  0.56
+       97  0.56
+       98  0.56
+       99  0.56
+      100  0.56
 
 
 Happy Modeling!
@@ -1216,8 +1181,3 @@ http://mars.gmu.edu/bitstream/handle/1920/9070/Comer_gmu_0883E_10539.pdf
 “Statistical Mechanics of Money, Income, and Wealth: A Short Survey.”
 arXiv Preprint Cond-mat/0211175, 2002.
 http://arxiv.org/abs/cond-mat/0211175.
-
-
-
-
-
