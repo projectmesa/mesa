@@ -1,10 +1,10 @@
 import numpy as np
-import math
 
 
 import mesa
 from .trader_agents import Trader
 from .resource_agents import Sugar, Spice
+
 
 # Helper Functions
 def flatten(list_of_lists):
@@ -51,7 +51,6 @@ class SugarscapeG1mt(mesa.Model):
         vision_min=1,
         vision_max=5,
     ):
-
         # Initiate width and heigh of sugarscape
         self.width = width
         self.height = height
@@ -190,6 +189,5 @@ class SugarscapeG1mt(mesa.Model):
         self.datacollector.collect(self)
 
     def run_model(self, step_count=1000):
-
         for i in range(step_count):
             self.step()

@@ -28,7 +28,9 @@ class PDAgent(mesa.Agent):
         return self.move == "C"
 
     def step(self):
-        """Get the best neighbor's move, and change own move accordingly if better than own score."""
+        """Get the best neighbor's move, and change own move accordingly
+        if better than own score."""
+
         neighbors = self.model.grid.get_neighbors(self.pos, True, include_center=True)
         best_neighbor = max(neighbors, key=lambda a: a.score)
         self.next_move = best_neighbor.move

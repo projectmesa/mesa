@@ -114,7 +114,6 @@ class WolfSheep(mesa.Model):
         # Create grass patches
         if self.grass:
             for agent, x, y in self.grid.coord_iter():
-
                 fully_grown = self.random.choice([True, False])
 
                 if fully_grown:
@@ -144,7 +143,6 @@ class WolfSheep(mesa.Model):
             )
 
     def run_model(self, step_count=200):
-
         if self.verbose:
             print("Initial number wolves: ", self.schedule.get_type_count(Wolf))
             print("Initial number sheep: ", self.schedule.get_type_count(Sheep))

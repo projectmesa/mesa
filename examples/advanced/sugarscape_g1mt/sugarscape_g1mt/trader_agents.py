@@ -127,7 +127,8 @@ class Trader(mesa.Agent):
 
         # calculate total resources
         m_total = self.metabolism_sugar + self.metabolism_spice
-        # Cobb-Douglas functional form; starting on p. 97 on Growing Artificial Societies
+        # Cobb-Douglas functional form; starting on p. 97
+        # on Growing Artificial Societies
         return sugar ** (self.metabolism_sugar / m_total) * spice ** (
             self.metabolism_spice / m_total
         )

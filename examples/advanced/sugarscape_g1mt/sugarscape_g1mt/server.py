@@ -19,7 +19,7 @@ def Agent_portrayal(agent):
             "Filled": "true",
             "r": 0.5,
             "Layer": 0,
-            "Color": "#FF0A01"
+            "Color": "#FF0A01",
         }
 
     elif isinstance(agent, Sugar):

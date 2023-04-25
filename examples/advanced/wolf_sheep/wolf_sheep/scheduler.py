@@ -19,7 +19,8 @@ class RandomActivationByTypeFiltered(mesa.time.RandomActivationByType):
         filter_func: Callable[[mesa.Agent], bool] = None,
     ) -> int:
         """
-        Returns the current number of agents of certain type in the queue that satisfy the filter function.
+        Returns the current number of agents of certain type in the queue
+        that satisfy the filter function.
         """
         count = 0
         for agent in self.agents_by_type[type_class].values():

@@ -44,9 +44,9 @@ def assess_results(results, single_agent):
                 G.add_edge(row["AgentID"], agent)
 
     # Get Basic Network Statistics
-    print("Node Connectivity {}".format(nx.node_connectivity(G)))
-    print("Average Clustering {}".format(nx.average_clustering(G)))
-    print("Global Efficiency {}".format(nx.global_efficiency(G)))
+    print(f"Node Connectivity {nx.node_connectivity(G)}")
+    print(f"Average Clustering {nx.average_clustering(G)}")
+    print(f"Global Efficiency {nx.global_efficiency(G)}")
 
     # Plot histogram of degree distribution
     degree_sequence = sorted((d for n, d in G.degree()), reverse=True)
