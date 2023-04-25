@@ -49,8 +49,8 @@ and unexpected to individuals unfamiliar with it the specific topic. As
 such, this model is a good starting point to examine Mesa’s core
 features.
 
-Installation
-~~~~~~~~~~~~
+Prerequisites Setup
+~~~~~~~~~~~~~~~~~~~
 
 Create and activate a `virtual
 environment <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`__.
@@ -259,16 +259,16 @@ Then create the model object, and run it for one step:
 
 .. parsed-literal::
 
-    Hi, I am agent 5.
-    Hi, I am agent 0.
     Hi, I am agent 1.
     Hi, I am agent 7.
-    Hi, I am agent 8.
     Hi, I am agent 2.
-    Hi, I am agent 4.
     Hi, I am agent 9.
-    Hi, I am agent 3.
     Hi, I am agent 6.
+    Hi, I am agent 4.
+    Hi, I am agent 0.
+    Hi, I am agent 3.
+    Hi, I am agent 8.
+    Hi, I am agent 5.
 
 
 Exercise
@@ -365,8 +365,8 @@ this line, to make the graph appear.
 
 .. parsed-literal::
 
-    (array([6., 0., 1., 0., 0., 1., 0., 1., 0., 1.]),
-     array([0. , 0.4, 0.8, 1.2, 1.6, 2. , 2.4, 2.8, 3.2, 3.6, 4. ]),
+    (array([3., 0., 0., 5., 0., 0., 1., 0., 0., 1.]),
+     array([0. , 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 3. ]),
      <BarContainer object of 10 artists>)
 
 
@@ -404,9 +404,9 @@ can do this with a nested for loop:
 
 .. parsed-literal::
 
-    (array([431., 303., 153.,  76.,  26.,   9.,   1.,   1.]),
-     array([0., 1., 2., 3., 4., 5., 6., 7., 8.]),
-     <BarContainer object of 8 artists>)
+    (array([445., 297., 146.,  68.,  22.,  22.]),
+     array([0., 1., 2., 3., 4., 5., 6.]),
+     <BarContainer object of 6 artists>)
 
 
 
@@ -642,7 +642,7 @@ grid, giving us each cell’s coordinates and contents in turn.
 
 .. parsed-literal::
 
-    <matplotlib.colorbar.Colorbar at 0x10e8950a0>
+    <matplotlib.colorbar.Colorbar at 0x239a6873710>
 
 
 
@@ -1048,7 +1048,7 @@ it.
 
 .. parsed-literal::
 
-    100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 245/245 [00:48<00:00,  5.10it/s]
+    100%|██████████| 245/245 [00:20<00:00, 11.78it/s]
 
 
 To further analyze the return of the ``batch_run`` function, we convert
@@ -1090,7 +1090,7 @@ calling the batch run.
 
 .. parsed-literal::
 
-    <matplotlib.collections.PathCollection at 0x120e038e0>
+    <matplotlib.collections.PathCollection at 0x239a9ce0810>
 
 
 
@@ -1141,17 +1141,17 @@ can use the ``to_html()`` function which takes the same arguments as
         1        1       1
       ...      ...     ...
        99        8       1
-       99        9       0
-      100        0       0
-      100        1       1
+       99        9       1
+      100        0       1
+      100        1       0
       100        2       1
       100        3       1
       100        4       1
-      100        5       2
+      100        5       1
       100        6       1
       100        7       2
       100        8       1
-      100        9       0
+      100        9       1
 
 
 Lastly, we want to take a look at the development of the Gini
@@ -1183,18 +1183,18 @@ episode.
        10  0.00
        11  0.00
       ...   ...
-       89  0.18
-       90  0.18
-       91  0.18
-       92  0.18
-       93  0.18
-       94  0.18
-       95  0.18
-       96  0.18
-       97  0.18
-       98  0.18
-       99  0.18
-      100  0.18
+       89  0.32
+       90  0.32
+       91  0.32
+       92  0.32
+       93  0.32
+       94  0.32
+       95  0.32
+       96  0.32
+       97  0.32
+       98  0.32
+       99  0.32
+      100  0.32
 
 
 Happy Modeling!
@@ -1204,8 +1204,8 @@ This document is a work in progress. If you see any errors, exclusions
 or have any problems please contact
 `us <https://github.com/projectmesa/mesa/issues>`__.
 
-``virtual environment``:
-http://docs.python-guide.org/en/latest/dev/virtualenvs/
+### References
+--------------
 
 [Comer2014] Comer, Kenneth W. “Who Goes First? An Examination of the
 Impact of Activation on Outcome Behavior in AgentBased Models.” George
@@ -1216,8 +1216,3 @@ http://mars.gmu.edu/bitstream/handle/1920/9070/Comer_gmu_0883E_10539.pdf
 “Statistical Mechanics of Money, Income, and Wealth: A Short Survey.”
 arXiv Preprint Cond-mat/0211175, 2002.
 http://arxiv.org/abs/cond-mat/0211175.
-
-
-
-
-
