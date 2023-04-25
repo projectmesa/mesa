@@ -150,19 +150,19 @@ The beginning of both classes looks like this:
 .. code:: ipython3
 
     import mesa
-    
-    
+
+
     class MoneyAgent(mesa.Agent):
         """An agent with fixed initial wealth."""
-    
+
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.wealth = 1
-    
-    
+
+
     class MoneyModel(mesa.Model):
         """A model with some number of agents."""
-    
+
         def __init__(self, N):
             self.num_agents = N
             # Create agents
@@ -208,24 +208,24 @@ this:
 .. code:: ipython3
 
     import mesa
-    
-    
+
+
     class MoneyAgent(mesa.Agent):
         """An agent with fixed initial wealth."""
-    
+
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.wealth = 1
-    
+
         def step(self):
             # The agent's step will go here.
             # For demonstration purposes we will print the agent's unique_id
             print("Hi, I am agent " + str(self.unique_id) + ".")
-    
-    
+
+
     class MoneyModel(mesa.Model):
         """A model with some number of agents."""
-    
+
         def __init__(self, N):
             self.num_agents = N
             self.schedule = mesa.time.RandomActivation(self)
@@ -233,7 +233,7 @@ this:
             for i in range(self.num_agents):
                 a = MoneyAgent(i, self)
                 self.schedule.add(a)
-    
+
         def step(self):
             """Advance the model by one step."""
             self.schedule.step()
@@ -269,7 +269,7 @@ Then create the model object, and run it for one step:
     Hi, I am agent 9.
     Hi, I am agent 3.
     Hi, I am agent 6.
-    
+
 
 Exercise
 ^^^^^^^^
@@ -300,11 +300,11 @@ With that in mind, we rewrite the agent ``step`` method, like this:
 
     class MoneyAgent(mesa.Agent):
         """An agent with fixed initial wealth."""
-    
+
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.wealth = 1
-    
+
         def step(self):
             if self.wealth == 0:
                 return
@@ -353,10 +353,10 @@ this line, to make the graph appear.
 
     # For a jupyter notebook add the following line:
     %matplotlib inline
-    
+
     # The below is needed for both notebooks and scripts
     import matplotlib.pyplot as plt
-    
+
     agent_wealth = [a.wealth for a in model.schedule.agents]
     plt.hist(agent_wealth)
 
@@ -392,11 +392,11 @@ can do this with a nested for loop:
         model = MoneyModel(10)
         for i in range(10):
             model.step()
-    
+
         # Store the results
         for agent in model.schedule.agents:
             all_wealth.append(agent.wealth)
-    
+
     plt.hist(all_wealth, bins=range(max(all_wealth) + 1))
 
 
@@ -467,17 +467,17 @@ coordinates to place the agent.
 
     class MoneyModel(mesa.Model):
         """A model with some number of agents."""
-    
+
         def __init__(self, N, width, height):
             self.num_agents = N
             self.grid = mesa.space.MultiGrid(width, height, True)
             self.schedule = mesa.time.RandomActivation(self)
-    
+
             # Create agents
             for i in range(self.num_agents):
                 a = MoneyAgent(i, self)
                 self.schedule.add(a)
-    
+
                 # Add the agent to a random grid cell
                 x = self.random.randrange(self.grid.width)
                 y = self.random.randrange(self.grid.height)
@@ -563,34 +563,34 @@ Now, putting that all together should look like this:
 
     class MoneyAgent(mesa.Agent):
         """An agent with fixed initial wealth."""
-    
+
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.wealth = 1
-    
+
         def move(self):
             possible_steps = self.model.grid.get_neighborhood(
                 self.pos, moore=True, include_center=False
             )
             new_position = self.random.choice(possible_steps)
             self.model.grid.move_agent(self, new_position)
-    
+
         def give_money(self):
             cellmates = self.model.grid.get_cell_list_contents([self.pos])
             if len(cellmates) > 1:
                 other_agent = self.random.choice(cellmates)
                 other_agent.wealth += 1
                 self.wealth -= 1
-    
+
         def step(self):
             self.move()
             if self.wealth > 0:
                 self.give_money()
-    
-    
+
+
     class MoneyModel(mesa.Model):
         """A model with some number of agents."""
-    
+
         def __init__(self, N, width, height):
             self.num_agents = N
             self.grid = mesa.space.MultiGrid(width, height, True)
@@ -603,7 +603,7 @@ Now, putting that all together should look like this:
                 x = self.random.randrange(self.grid.width)
                 y = self.random.randrange(self.grid.height)
                 self.grid.place_agent(a, (x, y))
-    
+
         def step(self):
             self.schedule.step()
 
@@ -625,7 +625,7 @@ grid, giving us each cell’s coordinates and contents in turn.
 .. code:: ipython3
 
     import numpy as np
-    
+
     agent_counts = np.zeros((model.grid.width, model.grid.height))
     for cell in model.grid.coord_iter():
         cell_content, x, y = cell
@@ -633,7 +633,7 @@ grid, giving us each cell’s coordinates and contents in turn.
         agent_counts[x][y] = agent_count
     plt.imshow(agent_counts, interpolation="nearest")
     plt.colorbar()
-    
+
     # If running from a text editor or IDE, remember you'll need the following:
     # plt.show()
 
@@ -694,22 +694,22 @@ measure of wealth inequality.
         N = model.num_agents
         B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * sum(x))
         return 1 + (1 / N) - 2 * B
-    
-    
+
+
     class MoneyAgent(mesa.Agent):
         """An agent with fixed initial wealth."""
-    
+
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.wealth = 1
-    
+
         def move(self):
             possible_steps = self.model.grid.get_neighborhood(
                 self.pos, moore=True, include_center=False
             )
             new_position = self.random.choice(possible_steps)
             self.model.grid.move_agent(self, new_position)
-    
+
         def give_money(self):
             cellmates = self.model.grid.get_cell_list_contents([self.pos])
             cellmates.pop(
@@ -721,21 +721,21 @@ measure of wealth inequality.
                 self.wealth -= 1
                 if other == self:
                     print("I JUST GAVE MONEY TO MYSELF HEHEHE!")
-    
+
         def step(self):
             self.move()
             if self.wealth > 0:
                 self.give_money()
-    
-    
+
+
     class MoneyModel(mesa.Model):
         """A model with some number of agents."""
-    
+
         def __init__(self, N, width, height):
             self.num_agents = N
             self.grid = mesa.space.MultiGrid(width, height, True)
             self.schedule = mesa.time.RandomActivation(self)
-    
+
             # Create agents
             for i in range(self.num_agents):
                 a = MoneyAgent(i, self)
@@ -744,11 +744,11 @@ measure of wealth inequality.
                 x = self.random.randrange(self.grid.width)
                 y = self.random.randrange(self.grid.height)
                 self.grid.place_agent(a, (x, y))
-    
+
             self.datacollector = mesa.DataCollector(
                 model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
             )
-    
+
         def step(self):
             self.datacollector.collect(self)
             self.schedule.step()
@@ -812,11 +812,11 @@ Similarly, we can get the agent-wealth data:
         .dataframe tbody tr th:only-of-type {
             vertical-align: middle;
         }
-    
+
         .dataframe tbody tr th {
             vertical-align: top;
         }
-    
+
         .dataframe thead th {
             text-align: right;
         }
@@ -916,7 +916,7 @@ directory. After you run the code below you will see two files appear
 
     # save the model data (stored in the pandas gini object) to CSV
     gini.to_csv("model_data.csv")
-    
+
     # save the agent data (stored in the pandas agent_wealth object) to CSV
     agent_wealth.to_csv("agent_data.csv")
 
@@ -944,17 +944,17 @@ True indefinitely.
         N = model.num_agents
         B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * sum(x))
         return 1 + (1 / N) - 2 * B
-    
-    
+
+
     class MoneyModel(mesa.Model):
         """A model with some number of agents."""
-    
+
         def __init__(self, N, width, height):
             self.num_agents = N
             self.grid = mesa.space.MultiGrid(width, height, True)
             self.schedule = mesa.time.RandomActivation(self)
             self.running = True
-    
+
             # Create agents
             for i in range(self.num_agents):
                 a = MoneyAgent(i, self)
@@ -963,11 +963,11 @@ True indefinitely.
                 x = self.random.randrange(self.grid.width)
                 y = self.random.randrange(self.grid.height)
                 self.grid.place_agent(a, (x, y))
-    
+
             self.datacollector = mesa.DataCollector(
                 model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
             )
-    
+
         def step(self):
             self.datacollector.collect(self)
             self.schedule.step()
@@ -1034,7 +1034,7 @@ it.
 .. code:: ipython3
 
     params = {"width": 10, "height": 10, "N": range(10, 500, 10)}
-    
+
     results = mesa.batch_run(
         MoneyModel,
         parameters=params,
@@ -1049,7 +1049,7 @@ it.
 .. parsed-literal::
 
     100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 245/245 [00:48<00:00,  5.10it/s]
-    
+
 
 To further analyze the return of the ``batch_run`` function, we convert
 the list of dictionaries to a Pandas DataFrame and print its keys.
@@ -1057,7 +1057,7 @@ the list of dictionaries to a Pandas DataFrame and print its keys.
 .. code:: ipython3
 
     import pandas as pd
-    
+
     results_df = pd.DataFrame(results)
     print(results_df.keys())
 
@@ -1067,7 +1067,7 @@ the list of dictionaries to a Pandas DataFrame and print its keys.
     Index(['RunId', 'iteration', 'Step', 'width', 'height', 'N', 'Gini', 'AgentID',
            'Wealth'],
           dtype='object')
-    
+
 
 First, we want to take a closer look at how the Gini coefficient at the
 end of each episode changes as we increase the size of the population.
@@ -1152,7 +1152,7 @@ can use the ``to_html()`` function which takes the same arguments as
       100        7       2
       100        8       1
       100        9       0
-    
+
 
 Lastly, we want to take a look at the development of the Gini
 coefficient over the course of one iteration. Filtering and printing
@@ -1195,7 +1195,7 @@ episode.
        98  0.18
        99  0.18
       100  0.18
-    
+
 
 Happy Modeling!
 ~~~~~~~~~~~~~~~
