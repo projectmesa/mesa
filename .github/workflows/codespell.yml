@@ -15,4 +15,5 @@ jobs:
     - uses: codespell-project/actions-codespell@master
       with:
         ignore_words_file: .codespellignore
-        skip: .*bootstrap.*,*.js,.*bootstrap-theme.css.map,./docs/*.ipynb
+        skip: .*bootstrap.*,*.js,.*bootstrap-theme.css.map
+        IGNORE_REGEX: ^\s*"image\/png":\s.*
