@@ -223,19 +223,24 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         if self.application.verbose:
             print(message)
         msg = tornado.escape.json_decode(message)
+        try:
+            msg_type = msg["type"]
+        except KeyError:
+            print("Unexpected message. Key 'type' missing.")
+            return
 
-        if msg["type"] == "get_step":
+        if msg_type == "get_step":
             if not self.application.model.running:
                 self.write_message({"type": "end"})
             else:
                 self.application.model.step()
                 self.write_message(self.viz_state_message)
 
-        elif msg["type"] == "reset":
+        elif msg_type == "reset":
             self.application.reset_model()
             self.write_message(self.viz_state_message)
 
-        elif msg["type"] == "submit_params":
+        elif msg_type == "submit_params":
             param = msg["param"]
             value = msg["value"]
 
@@ -245,6 +250,10 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                     self.application.model_kwargs[param].value = value
                 else:
                     self.application.model_kwargs[param] = value
+
+        elif msg_type == "shut_down":
+            if self.application.is_debug_mode():
+                self.application.stop()
 
         else:
             if self.application.verbose:
@@ -407,7 +416,13 @@ class ModularServer(tornado.web.Application):
         try:
             tornado.ioloop.IOLoop.current().start()
         except KeyboardInterrupt:
-            tornado.ioloop.IOLoop.current().stop()
+            self.stop()
+
+    def stop(self):
+        tornado.ioloop.IOLoop.current().stop()
+
+    def is_debug_mode(self):
+        return bool(self.settings["debug"])
 
     @staticmethod
     def _is_stylesheet(filename):

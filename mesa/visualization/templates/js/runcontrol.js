@@ -14,6 +14,7 @@ const vizElements = [];
 const startModelButton = document.getElementById("play-pause");
 const stepModelButton = document.getElementById("step");
 const resetModelButton = document.getElementById("reset");
+const shutDownButton = document.getElementById("shut-down");
 const stepDisplay = document.getElementById("currentStep");
 
 /**
@@ -65,6 +66,16 @@ function ModelController(tick = 0, fps = 3, running = false, finished = false) {
     }
     clearTimeout(this.timeout);
     send({ type: "reset" });
+  };
+
+  this.shutDown = function shutDown() {
+    disableNavItem(startModelButton);
+    disableNavItem(stepModelButton);
+    disableNavItem(resetModelButton);
+    disableNavItem(shutDownButton);
+
+    addShutDownAlert();
+    send({ "type": "shut_down" });
   };
 
   /** Stops the model and put it into a finished state */
@@ -124,6 +135,8 @@ stepModelButton.onclick = () => {
 };
 resetModelButton.onclick = () => controller.reset();
 
+shutDownButton.onclick = () => controller.shutDown();
+
 /*
  * Websocket opening and message handling
  */
@@ -131,8 +144,8 @@ resetModelButton.onclick = () => controller.reset();
 /** Open the websocket connection; support TLS-specific URLs when appropriate */
 const ws = new WebSocket(
   (window.location.protocol === "https:" ? "wss://" : "ws://") +
-    location.host +
-    "/ws"
+  location.host +
+  "/ws"
 );
 
 /**
@@ -170,6 +183,19 @@ const send = function (message) {
   const msg = JSON.stringify(message);
   ws.send(msg);
 };
+
+const disableNavItem = function (navItem) {
+  const navLink = navItem.querySelector(".nav-link");
+  navLink.classList.add("disabled");
+  navItem.onclick = function () { };
+};
+
+const addShutDownAlert = function () {
+  const statusInfo = document.getElementById('status-info');
+  const alertElement = document.createElement('div');
+  alertElement.innerHTML = '<div class="alert alert-danger" role="alert">The server has been shut down.</div>';
+  statusInfo.appendChild(alertElement);
+}
 
 /*
  * GUI initialization (for input parameters)
