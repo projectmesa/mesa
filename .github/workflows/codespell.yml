@@ -16,3 +16,4 @@ jobs:
       with:
         ignore_words_file: .codespellignore
         skip: .*bootstrap.*,*.js,.*bootstrap-theme.css.map
+        ignore_regex: ^\s*"image\/png":\s.*
