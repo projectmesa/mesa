@@ -108,11 +108,23 @@ class TestSpaceToroidal(unittest.TestCase):
         self.assertEqual((10, 0), self.space.get_heading(pos_1, pos_2))
 
     def test_heading_near_center(self):
+        """Verify get_heading correct between points straddling the centerline
+
+        Points are near to each other, and the short vector between them should
+        be found, not the long vector found by wrapping around the space's edge.
+        """
         pos_1 = (self.space.center[0] + 1, self.space.center[1] + 1)
         pos_2 = (self.space.center[0] - 1, self.space.center[1] - 1)
         self.assertEqual((-2, -2), self.space.get_heading(pos_1, pos_2))
 
     def test_heading_near_edge(self):
+        """Verify get_heading correct between points near the edge
+
+        Points are near to each other, because the space is toroidal,
+        and the short vector between them should be found, wrapping around the edges,
+        not the long vector across the space.
+        """
+
         pos_1 = (self.space.x_min + 1, self.space.y_min + 1)
         pos_2 = (self.space.x_max - 1, self.space.y_max - 1)
         self.assertEqual((-2, -2), self.space.get_heading(pos_1, pos_2))
