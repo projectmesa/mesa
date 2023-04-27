@@ -412,7 +412,7 @@ created, we can create the chart object.
       };
 
       // Create the chart object
-      const chart = new Chart(context, {type: 'bar', data: data, options: options});
+      let chart = new Chart(context, {type: 'bar', data: data, options: options});
 
       // Now what?
     };
