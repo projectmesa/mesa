@@ -219,14 +219,22 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         return {"type": "viz_state", "data": self.application.render_model()}
 
     def on_message(self, message):
-        """Receiving a message from the websocket, parse, and act accordingly."""
+        """Receiving a message from the websocket, parse, and act accordingly.
+
+        Args:
+            message (dict): A dictionary containing a key 'type'.
+        """
         if self.application.verbose:
             print(message)
         msg = tornado.escape.json_decode(message)
         try:
             msg_type = msg["type"]
         except KeyError:
-            print("Unexpected message. Key 'type' missing.")
+            print(
+                "Unexpected message. Key 'type' missing. All messages have to contain the key 'type'."
+            )
+            if self.application.is_debug_mode():
+                print("see SocketHandler.on_message")
             return
 
         if msg_type == "get_step":
