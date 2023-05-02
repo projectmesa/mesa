@@ -9,7 +9,7 @@ repos:
       - id: black-jupyter
         exclude: ^mesa/cookiecutter-mesa/
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
+    rev: v3.3.2
     hooks:
     -   id: pyupgrade
         args: [--py38-plus]
