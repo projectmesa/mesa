@@ -187,6 +187,24 @@ class SugarscapeG1mt(mesa.Model):
 
         # collect model level data
         self.datacollector.collect(self)
+        """
+        Mesa is working on updating datacollector agent reporter
+        so it can collect information on specific agents from
+        mesa.time.RandomActivationByType.
+
+        Please see issue #1419 at
+        https://github.com/projectmesa/mesa/issues/1419
+        (contributions welcome)
+
+        Below is one way to update agent_records to get specific Trader agent data
+        """
+        # Need to remove excess data
+        # Create local variable to store trade data
+        agent_trades = self.datacollector._agent_records[self.schedule.steps]
+        # Get rid of all None to reduce data storage needs
+        agent_trades = [agent for agent in agent_trades if agent[2] is not None]
+        # Reassign the dictionary value with lean trade data
+        self.datacollector._agent_records[self.schedule.steps] = agent_trades
 
     def run_model(self, step_count=1000):
         for i in range(step_count):

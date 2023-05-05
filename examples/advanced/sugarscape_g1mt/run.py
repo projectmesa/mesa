@@ -88,8 +88,8 @@ else:
     params = {
         "width": 50,
         "height": 50,
-        "vision_min": range(1, 3),
-        "metabolism_max": [3, 5],
+        "vision_min": range(1, 4),
+        "metabolism_max": [2, 3, 4, 5],
     }
 
     results_batch = mesa.batch_run(
