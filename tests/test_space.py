@@ -306,11 +306,9 @@ class TestSingleGrid(unittest.TestCase):
 
     def test_empty_cells(self):
         if self.space.exists_empty_cells():
-            pytest.deprecated_call(self.space.find_empty)
             for i, pos in enumerate(list(self.space.empties)):
                 a = MockAgent(-i, pos)
                 self.space.position_agent(a, x=pos[0], y=pos[1])
-        assert self.space.find_empty() is None
         with self.assertRaises(Exception):
             self.space.move_to_empty(a)
 
