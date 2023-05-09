@@ -1006,11 +1006,21 @@ class ContinuousSpace:
         """
         one = np.array(pos_1)
         two = np.array(pos_2)
-        if self.torus:
-            one = (one - self.center) % self.size
-            two = (two - self.center) % self.size
         heading = two - one
-        if isinstance(pos_1, tuple):
+        if self.torus:
+            inverse_heading = heading - np.sign(heading) * self.size
+
+            def get_min_abs(x, y):
+                return x if abs(x) < abs(y) else y
+
+            # Choose the smaller heading based on their absolute value for
+            # each dimension independently.
+            heading = tuple(
+                get_min_abs(heading[i], inverse_heading[i]) for i in range(2)
+            )
+        if isinstance(pos_1, np.ndarray):
+            heading = np.ndarray(heading)
+        else:
             heading = tuple(heading)
         return heading
 
