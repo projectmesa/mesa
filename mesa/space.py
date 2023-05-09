@@ -495,42 +495,6 @@ class SingleGrid(_Grid):
         torus: Boolean which determines whether to treat the grid as a torus.
     """
 
-    def position_agent(
-        self, agent: Agent, x: int | str = "random", y: int | str = "random"
-    ) -> None:
-        """Position an agent on the grid.
-        This is used when first placing agents! Setting either x or y to "random"
-        gives the same behavior as 'move_to_empty()' to get a random position.
-        If x or y are positive, they are used.
-        Use 'swap_pos()' to swap agents positions.
-        """
-        warn(
-            (
-                "`position_agent` is being deprecated; use instead "
-                "`place_agent` to place an agent at a specified "
-                "location or `move_to_empty` to place an agent "
-                "at a random empty cell."
-            ),
-            DeprecationWarning,
-        )
-
-        if not (isinstance(x, int) or x == "random"):
-            raise Exception(
-                "x must be an integer or a string 'random'."
-                f" Actual type: {type(x)}. Actual value: {x}."
-            )
-        if not (isinstance(y, int) or y == "random"):
-            raise Exception(
-                "y must be an integer or a string 'random'."
-                f" Actual type: {type(y)}. Actual value: {y}."
-            )
-
-        if x == "random" or y == "random":
-            self.move_to_empty(agent)
-        else:
-            coords = (x, y)
-            self.place_agent(agent, coords)
-
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         if self.is_cell_empty(pos):
