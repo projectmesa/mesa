@@ -199,21 +199,6 @@ class _Grid:
             for col in range(self.height):
                 yield self._grid[row][col], row, col  # agent, x, y
 
-    def neighbor_iter(self, pos: Coordinate, moore: bool = True) -> Iterator[Agent]:
-        """Iterate over position neighbors.
-
-        Args:
-            pos: (x,y) coords tuple for the position to get the neighbors of.
-            moore: Boolean for whether to use Moore neighborhood (including
-                   diagonals) or Von Neumann (only up/down/left/right).
-        """
-
-        warn(
-            "`neighbor_iter` is deprecated in favor of `iter_neighbors` "
-            "and will be removed in the subsequent version."
-        )
-        return self.iter_neighbors(pos, moore)
-
     def iter_neighborhood(
         self,
         pos: Coordinate,
@@ -760,19 +745,6 @@ class _HexGrid:
         self._neighborhood_cache[cache_key] = neighborhood
 
         return neighborhood
-
-    def neighbor_iter(self, pos: Coordinate) -> Iterator[Agent]:
-        """Iterate over position neighbors.
-
-        Args:
-            pos: (x,y) coords tuple for the position to get the neighbors of.
-        """
-
-        warn(
-            "`neighbor_iter` is deprecated in favor of `iter_neighbors` "
-            "and will be removed in the subsequent version."
-        )
-        return self.iter_neighbors(pos)
 
     def iter_neighborhood(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
