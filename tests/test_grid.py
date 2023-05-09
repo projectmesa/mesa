@@ -119,11 +119,8 @@ class TestSingleGrid(unittest.TestCase):
         neighborhood = self.grid.get_neighborhood((0, 0), moore=False)
         assert len(neighborhood) == 2
 
-        neighbors = self.grid.get_neighbors((4, 1), moore=False)
-        assert len(neighbors) == 0
-
-        neighbors = self.grid.get_neighbors((4, 1), moore=True)
-        assert len(neighbors) == 0
+        with self.assertRaises(Exception):
+            neighbors = self.grid.get_neighbors((4, 1), moore=False)
 
         neighbors = self.grid.get_neighbors((1, 1), moore=False, include_center=True)
         assert len(neighbors) == 3
