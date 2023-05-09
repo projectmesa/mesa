@@ -1,5 +1,6 @@
+import mesa
 from mesa.agent import Agent
-from mesa.batchrunner import _make_model_kwargs, batch_run
+from mesa.batchrunner import _make_model_kwargs
 from mesa.datacollection import DataCollector
 from mesa.model import Model
 from mesa.time import BaseScheduler
@@ -87,7 +88,7 @@ class MockModel(Model):
 
 
 def test_batch_run():
-    result = batch_run(MockModel, {}, number_processes=2)
+    result = mesa.batch_run(MockModel, {}, number_processes=2)
     assert result == [
         {
             "RunId": 0,
@@ -120,7 +121,7 @@ def test_batch_run():
 
 
 def test_batch_run_with_params():
-    batch_run(
+    mesa.batch_run(
         MockModel,
         {
             "variable_model_params": range(5),
@@ -131,7 +132,9 @@ def test_batch_run_with_params():
 
 
 def test_batch_run_no_agent_reporters():
-    result = batch_run(MockModel, {"enable_agent_reporters": False}, number_processes=2)
+    result = mesa.batch_run(
+        MockModel, {"enable_agent_reporters": False}, number_processes=2
+    )
     print(result)
     assert result == [
         {
@@ -145,11 +148,11 @@ def test_batch_run_no_agent_reporters():
 
 
 def test_batch_run_single_core():
-    batch_run(MockModel, {}, number_processes=1, iterations=10)
+    mesa.batch_run(MockModel, {}, number_processes=1, iterations=10)
 
 
 def test_batch_run_unhashable_param():
-    result = batch_run(
+    result = mesa.batch_run(
         MockModel,
         {
             "n_agents": 2,

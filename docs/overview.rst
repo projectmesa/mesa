@@ -103,16 +103,18 @@ The data collector will collect the specified model- and agent-level data at eac
     agent_df = model.dc.get_agent_vars_dataframe()
 
 
-To batch-run the model while varying, for example, the n_agents parameter, you'd use the batchrunner:
+To batch-run the model while varying, for example, the n_agents parameter, you'd use the `batch_run` function:
 
 .. code:: python
 
-    from mesa.batchrunner import BatchRunner
+    import mesa
 
     parameters = {"n_agents": range(1, 20)}
-    batch_run = BatchRunner(MyModel, parameters, max_steps=10,
-                            model_reporters={"n_agents": lambda m: m.schedule.get_agent_count()})
-    batch_run.run_all()
+    mesa.batch_run(
+        MyModel,
+        parameters,
+        max_steps=10,
+    )
 
 
 As with the data collector, once the runs are all over, you can extract the data as a data frame.
@@ -152,5 +154,3 @@ To quickly spin up a model visualization, you might do something like:
     server.launch()
 
 This will launch the browser-based visualization, on the default port 8521.
-
-
