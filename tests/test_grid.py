@@ -5,7 +5,7 @@ import random
 import unittest
 from unittest.mock import Mock, patch
 
-from mesa.space import HexGrid, MultiGrid, SingleGrid
+from mesa.space import HexSingleGrid, MultiGrid, SingleGrid
 
 # Initial agent positions for testing
 #
@@ -153,7 +153,7 @@ class TestSingleGrid(unittest.TestCase):
         self.grid.move_agent(agent, (1, 0))
         assert agent.pos == (1, 0)
         # move it off the torus and check for the exception
-        if not self.torus:
+        if not self.grid.torus:
             with self.assertRaises(Exception):
                 self.grid.move_agent(agent, [-1, 1])
             with self.assertRaises(Exception):
@@ -397,7 +397,7 @@ class TestMultiGrid(unittest.TestCase):
         assert len(neighbors) == 11
 
 
-class TestHexGrid(unittest.TestCase):
+class TestHexSingleGrid(unittest.TestCase):
     """
     Testing a hexagonal singlegrid.
     """
@@ -408,7 +408,7 @@ class TestHexGrid(unittest.TestCase):
         """
         width = 3
         height = 5
-        self.grid = HexGrid(width, height, torus=False)
+        self.grid = HexSingleGrid(width, height, torus=False)
         self.agents = []
         counter = 0
         for x in range(width):
@@ -425,7 +425,6 @@ class TestHexGrid(unittest.TestCase):
         """
         Test the hexagonal neighborhood methods on the non-toroid.
         """
-
         neighborhood = self.grid.get_neighborhood((1, 1))
         assert len(neighborhood) == 6
 
@@ -452,12 +451,10 @@ class TestHexGrid(unittest.TestCase):
         assert sum(x + y for x, y in neighborhood) == 39
 
 
-class TestHexGridTorus(TestSingleGrid):
+class TestHexSingleGridTorus(TestSingleGrid):
     """
     Testing a hexagonal toroidal singlegrid.
     """
-
-    torus = True
 
     def setUp(self):
         """
@@ -465,7 +462,7 @@ class TestHexGridTorus(TestSingleGrid):
         """
         width = 3
         height = 5
-        self.grid = HexGrid(width, height, torus=True)
+        self.grid = HexSingleGrid(width, height, torus=True)
         self.agents = []
         counter = 0
         for x in range(width):
@@ -482,7 +479,6 @@ class TestHexGridTorus(TestSingleGrid):
         """
         Test the hexagonal neighborhood methods on the toroid.
         """
-
         neighborhood = self.grid.get_neighborhood((1, 1))
         assert len(neighborhood) == 6
 

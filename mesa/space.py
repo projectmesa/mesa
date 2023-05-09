@@ -646,8 +646,8 @@ class MultiGrid(_Grid):
         )
 
 
-class HexGrid(SingleGrid):
-    """Hexagonal Grid: Extends SingleGrid to handle hexagonal neighbors.
+class _HexGrid:
+    """Hexagonal Grid which handles hexagonal neighbors.
 
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
@@ -819,6 +819,55 @@ class HexGrid(SingleGrid):
             A list of non-None objects in the given neighborhood
         """
         return list(self.iter_neighbors(pos, include_center, radius))
+
+
+class HexSingleGrid(_HexGrid, SingleGrid):
+    """Hexagonal SingleGrid: a SingleGrid where neighbors are computed
+    according to a hexagonal tiling of the grid.
+
+    Functions according to odd-q rules.
+    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+
+    Properties:
+        width, height: The grid's width and height.
+        torus: Boolean which determines whether to treat the grid as a torus.
+    """
+
+
+class HexMultiGrid(_HexGrid, MultiGrid):
+    """Hexagonal MultiGrid: a MultiGrid where neighbors are computed
+    according to a hexagonal tiling of the grid.
+
+    Functions according to odd-q rules.
+    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+
+    Properties:
+        width, height: The grid's width and height.
+        torus: Boolean which determines whether to treat the grid as a torus.
+    """
+
+
+class HexGrid(HexSingleGrid):
+    """Hexagonal Grid: a Grid where neighbors are computed
+    according to a hexagonal tiling of the grid.
+
+    Functions according to odd-q rules.
+    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+
+    Properties:
+        width, height: The grid's width and height.
+        torus: Boolean which determines whether to treat the grid as a torus.
+    """
+
+    def __init__(self, width: int, height: int, torus: bool) -> None:
+        super().__init__(width, height, torus)
+        warn(
+            (
+                "HexGrid is being deprecated; use instead HexSingleGrid or HexMultiGrid "
+                "depending on your use case."
+            ),
+            DeprecationWarning,
+        )
 
 
 class ContinuousSpace:
