@@ -1,13 +1,29 @@
 from collections import defaultdict
 from unittest import TestCase
 
+import mesa
 from mesa.model import Model
 from mesa.space import MultiGrid
 from mesa.time import SimultaneousActivation
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
-from tests.test_batchrunner import MockAgent
+
+
+class MockAgent(mesa.Agent):
+    """
+    Minimalistic agent implementation for testing purposes
+    """
+
+    def __init__(self, unique_id, model, val):
+        super().__init__(unique_id, model)
+        self.unique_id = unique_id
+        self.val = val
+        self.local = 0
+
+    def step(self):
+        self.val += 1
+        self.local += 0.25
 
 
 class MockModel(Model):
