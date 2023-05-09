@@ -823,7 +823,7 @@ class _HexGrid:
 
 class HexSingleGrid(_HexGrid, SingleGrid):
     """Hexagonal SingleGrid: a SingleGrid where neighbors are computed
-    according to an hexagonal tiling of the grid.
+    according to a hexagonal tiling of the grid.
 
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
@@ -836,7 +836,7 @@ class HexSingleGrid(_HexGrid, SingleGrid):
 
 class HexMultiGrid(_HexGrid, MultiGrid):
     """Hexagonal MultiGrid: a MultiGrid where neighbors are computed
-    according to an hexagonal tiling of the grid.
+    according to a hexagonal tiling of the grid.
 
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
@@ -849,7 +849,7 @@ class HexMultiGrid(_HexGrid, MultiGrid):
 
 class HexGrid(HexSingleGrid):
     """Hexagonal Grid: a Grid where neighbors are computed
-    according to an hexagonal tiling of the grid.
+    according to a hexagonal tiling of the grid.
 
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
