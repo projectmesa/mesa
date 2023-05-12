@@ -106,7 +106,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 
-from mesa.visualization.UserParam import UserParam, UserSettableParameter
+from mesa.visualization.UserParam import UserParam
 
 # Suppress several pylint warnings for this file.
 # Attributes being defined outside of init is a Tornado feature.
@@ -121,9 +121,7 @@ CHART_JS_FILE = "external/chart-3.6.1.min.js"
 
 
 def is_user_param(val):
-    return isinstance(val, UserSettableParameter) or issubclass(
-        val.__class__, UserParam
-    )
+    return issubclass(val.__class__, UserParam)
 
 
 class VisualizationElement:
