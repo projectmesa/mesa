@@ -7,7 +7,10 @@ from mesa.space import MultiGrid
 from mesa.time import SimultaneousActivation
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, TextElement
-from mesa.visualization.UserParam import UserSettableParameter
+from mesa.visualization.UserParam import (
+    NumberInput,
+    Slider,
+)
 
 
 class MockAgent(mesa.Agent):
@@ -65,8 +68,8 @@ class TestModularServer(TestCase):
         self.user_params = {
             "width": 1,
             "height": 1,
-            "key1": UserSettableParameter("number", "Test Parameter", 101),
-            "key2": UserSettableParameter("slider", "Test Parameter", 200, 0, 300, 10),
+            "key1": NumberInput("Test Parameter", 101),
+            "key2": Slider("Test Parameter", 200, 0, 300, 10),
         }
 
         self.viz_elements = [
@@ -95,8 +98,6 @@ class TestModularServer(TestCase):
     def test_user_params(self):
         print(self.server.user_params)
         assert self.server.user_params == {
-            "key1": UserSettableParameter("number", "Test Parameter", 101).json,
-            "key2": UserSettableParameter(
-                "slider", "Test Parameter", 200, 0, 300, 10
-            ).json,
+            "key1": NumberInput("Test Parameter", 101).json,
+            "key2": Slider("Test Parameter", 200, 0, 300, 10).json,
         }
