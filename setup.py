@@ -21,7 +21,10 @@ extras_require = {
     ],
     # Constrain sphinx version until https://github.com/readthedocs/readthedocs.org/issues/10279
     # is fixed.
-    "docs": ["sphinx<7", "ipython", "nbsphinx"],
+    # Explicitly install ipykernel for Python 3.8.
+    # See https://stackoverflow.com/questions/28831854/how-do-i-add-python3-kernel-to-jupyter-ipython
+    # Could be removed in the future
+    "docs": ["sphinx<7", "ipython", "nbsphinx", "ipykernel"],
 }
 
 version = ""
