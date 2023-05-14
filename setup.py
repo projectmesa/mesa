@@ -19,7 +19,9 @@ extras_require = {
         "pytest-cov",
         "sphinx",
     ],
-    "docs": ["sphinx", "ipython", "nbsphinx"],
+    # Constrain sphinx version until https://github.com/readthedocs/readthedocs.org/issues/10279
+    # is fixed.
+    "docs": ["sphinx<7", "ipython", "nbsphinx"],
 }
 
 version = ""
