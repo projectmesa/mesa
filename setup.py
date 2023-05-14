@@ -19,7 +19,7 @@ extras_require = {
         "pytest-cov",
         "sphinx",
     ],
-    "docs": ["sphinx", "ipython"],
+    "docs": ["sphinx", "ipython", "nbsphinx"],
 }
 
 version = ""
