@@ -96,7 +96,7 @@ ABM features users have shared that you may want to use in your model
 
    Mesa Overview <overview>
    tutorials/intro_tutorial
-   tutorials/adv_tutorial
+   tutorials/adv_tutorial.ipynb
    Best Practices <best-practices>
    Useful Snippets <useful-snippets/snippets>
    API Documentation <apis/api_main>
