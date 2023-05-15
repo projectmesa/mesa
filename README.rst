@@ -130,4 +130,4 @@ Citing Mesa
 
 To cite Mesa in your publication, you can use the `CITATION.bib`_.
 
-.. _`CITATION.bib` : https://github.com/projectmesa/mesa/blob/main/CITATION.bib
+.. _`CITATION.bib` : https://github.com/projectmesa/mesa/blob/main/CITATION.bib 
