@@ -67,7 +67,7 @@ class BoidFlockers(mesa.Model):
                 velocity,
                 self.vision,
                 self.separation,
-                **self.factors
+                **self.factors,
             )
             self.space.place_agent(boid, pos)
             self.schedule.add(boid)
