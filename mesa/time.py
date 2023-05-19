@@ -28,7 +28,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 # mypy
-from typing import Iterator, Union
+from typing import Iterator, Union, Type
 
 from mesa.agent import Agent
 from mesa.model import Model
@@ -53,6 +53,7 @@ class BaseScheduler:
         self.steps = 0
         self.time: TimeT = 0
         self._agents: dict[int, Agent] = {}
+        self._agents_type: dict[Type[Agent], dict[int, Agent]] = {}
 
     def add(self, agent: Agent) -> None:
         """Add an Agent object to the schedule.
@@ -67,6 +68,9 @@ class BaseScheduler:
             )
 
         self._agents[agent.unique_id] = agent
+        if type(agent) not in self._agents_type:
+            self._agents_type[type(agent)] = {}
+        self._agents_type[type(agent)][agent.unique_id] = agent
 
     def remove(self, agent: Agent) -> None:
         """Remove all instances of a given agent from the schedule.
@@ -75,6 +79,7 @@ class BaseScheduler:
             agent: An agent object.
         """
         del self._agents[agent.unique_id]
+        del self._agents_type[type(agent)][agent.unique_id]
 
     def step(self) -> None:
         """Execute the step of all the agents, one at a time."""
@@ -90,6 +95,10 @@ class BaseScheduler:
     @property
     def agents(self) -> list[Agent]:
         return list(self._agents.values())
+
+    @property
+    def agents_type(self) -> dict[Type[Agent], list[Agent]]:
+        return dict((agent_class, list(agents.values())) for agent_class, agents in self._agents_type.items())
 
     def agent_buffer(self, shuffled: bool = False) -> Iterator[Agent]:
         """Simple generator that yields the agents while letting the user

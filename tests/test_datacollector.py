@@ -16,6 +16,7 @@ class MockAgent(Agent):
         super().__init__(unique_id, model)
         self.val = val
         self.val2 = val
+        self.val3 = val
 
     def step(self):
         """
@@ -23,6 +24,7 @@ class MockAgent(Agent):
         """
         self.val += 1
         self.val2 += 1
+        self.val3 += 1
 
     def write_final_values(self):
         """
@@ -31,6 +33,25 @@ class MockAgent(Agent):
         row = {"agent_id": self.unique_id, "final_value": self.val}
         self.model.datacollector.add_table_row("Final_Values", row)
 
+
+class DifferentMockAgent(Agent):
+    """
+    Minimalistic agent for testing purposes.
+    """
+
+    def __init__(self, unique_id, model, val=0):
+        super().__init__(unique_id, model)
+        self.val = val
+        self.val2 = val
+        self.val4 = val
+        self.val5 = val
+
+    def write_final_values(self):
+        """
+        Write the final value to the appropriate table.
+        """
+        row = {"agent_id": self.unique_id, "final_value": self.val}
+        self.model.datacollector.add_table_row("Final_Values", row)
 
 class MockModel(Model):
     """
@@ -43,9 +64,10 @@ class MockModel(Model):
         self.schedule = BaseScheduler(self)
         self.model_val = 100
 
-        for i in range(10):
-            a = MockAgent(i, self, val=i)
-            self.schedule.add(a)
+        n = 5
+        for i in range(n):
+            self.schedule.add(MockAgent(i, self, val=i))
+            self.schedule.add(DifferentMockAgent(n+i, self, val=i))
         self.initialize_data_collector(
             {
                 "total_agents": lambda m: m.schedule.get_agent_count(),
@@ -54,7 +76,7 @@ class MockModel(Model):
                 "model_calc_comp": [self.test_model_calc_comp, [3, 4]],
                 "model_calc_fail": [self.test_model_calc_comp, [12, 0]],
             },
-            {"value": lambda a: a.val, "value2": "val2"},
+            {"value": lambda a: a.val, "value2": "val2", MockAgent: {"value3": "val3"}, DifferentMockAgent: {"value4": "val4", "value5": lambda a: a.val5}},
             {"Final_Values": ["agent_id", "final_value"]},
         )
 
@@ -164,9 +186,11 @@ class TestDataCollector(unittest.TestCase):
         data_collector = self.model.datacollector
         model_vars = data_collector.get_model_vars_dataframe()
         agent_vars = data_collector.get_agent_vars_dataframe()
+        specific_agent_vars = data_collector.get_agent_specific_vars_dataframe()
         table_df = data_collector.get_table_dataframe("Final_Values")
         assert model_vars.shape == (8, 5)
         assert agent_vars.shape == (77, 2)
+        assert specific_agent_vars.shape == (77, 3)
         assert table_df.shape == (9, 2)
 
         with self.assertRaises(Exception):
