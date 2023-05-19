@@ -53,6 +53,7 @@ class DifferentMockAgent(Agent):
         row = {"agent_id": self.unique_id, "final_value": self.val}
         self.model.datacollector.add_table_row("Final_Values", row)
 
+
 class MockModel(Model):
     """
     Minimalistic model for testing purposes.
@@ -67,7 +68,7 @@ class MockModel(Model):
         n = 5
         for i in range(n):
             self.schedule.add(MockAgent(i, self, val=i))
-            self.schedule.add(DifferentMockAgent(n+i, self, val=i))
+            self.schedule.add(DifferentMockAgent(n + i, self, val=i))
         self.initialize_data_collector(
             {
                 "total_agents": lambda m: m.schedule.get_agent_count(),
@@ -76,7 +77,12 @@ class MockModel(Model):
                 "model_calc_comp": [self.test_model_calc_comp, [3, 4]],
                 "model_calc_fail": [self.test_model_calc_comp, [12, 0]],
             },
-            {"value": lambda a: a.val, "value2": "val2", MockAgent: {"value3": "val3"}, DifferentMockAgent: {"value4": "val4", "value5": lambda a: a.val5}},
+            {
+                "value": lambda a: a.val,
+                "value2": "val2",
+                MockAgent: {"value3": "val3"},
+                DifferentMockAgent: {"value4": "val4", "value5": lambda a: a.val5},
+            },
             {"Final_Values": ["agent_id", "final_value"]},
         )
 

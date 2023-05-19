@@ -53,7 +53,7 @@ class BaseScheduler:
         self.steps = 0
         self.time: TimeT = 0
         self._agents: dict[int, Agent] = {}
-        self._agents_type: dict[Type[Agent], dict[int, Agent]] = {}
+        self._agents_type: dict[type[Agent], dict[int, Agent]] = {}
 
     def add(self, agent: Agent) -> None:
         """Add an Agent object to the schedule.
@@ -97,8 +97,11 @@ class BaseScheduler:
         return list(self._agents.values())
 
     @property
-    def agents_type(self) -> dict[Type[Agent], list[Agent]]:
-        return dict((agent_class, list(agents.values())) for agent_class, agents in self._agents_type.items())
+    def agents_type(self) -> dict[type[Agent], list[Agent]]:
+        return {
+            agent_class: list(agents.values())
+            for agent_class, agents in self._agents_type.items()
+        }
 
     def agent_buffer(self, shuffled: bool = False) -> Iterator[Agent]:
         """Simple generator that yields the agents while letting the user
