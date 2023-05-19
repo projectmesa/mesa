@@ -310,9 +310,9 @@ class DataCollector:
             )
 
         return pd.DataFrame.from_dict({(i, j, k): self._agent_specific_records[i][j][k]
-                                       for i in self._agent_specific_records.keys()
-                                       for j in self._agent_specific_records[i].keys()
-                                       for k in self._agent_specific_records[i][j].keys()}, orient='index')
+                                       for i in self._agent_specific_records
+                                       for j in self._agent_specific_records[i]
+                                       for k in self._agent_specific_records[i][j]}, orient='index')
 
     def get_table_dataframe(self, table_name):
         """Create a pandas DataFrame from a particular table.
