@@ -206,7 +206,9 @@ class DataCollector:
                 report = get_reports(agent)
                 if not isinstance(report, tuple):
                     report = [report]
-                agent_records[agent_type][agent.unique_id] = dict(zip(self.agent_specific_reporters[agent_type].keys(), report))
+                agent_records[agent_type][agent.unique_id] = dict(
+                    zip(self.agent_specific_reporters[agent_type].keys(), report)
+                )
 
         return agent_records
 
@@ -309,10 +311,15 @@ class DataCollector:
                 "No agent reporters have been defined in the DataCollector, returning empty DataFrame."
             )
 
-        return pd.DataFrame.from_dict({(i, j, k): self._agent_specific_records[i][j][k]
-                                       for i in self._agent_specific_records
-                                       for j in self._agent_specific_records[i]
-                                       for k in self._agent_specific_records[i][j]}, orient='index')
+        return pd.DataFrame.from_dict(
+            {
+                (i, j, k): self._agent_specific_records[i][j][k]
+                for i in self._agent_specific_records
+                for j in self._agent_specific_records[i]
+                for k in self._agent_specific_records[i][j]
+            },
+            orient="index",
+        )
 
     def get_table_dataframe(self, table_name):
         """Create a pandas DataFrame from a particular table.

@@ -98,7 +98,10 @@ class BaseScheduler:
 
     @property
     def agents_type(self) -> dict[type[Agent], list[Agent]]:
-        return dict((agent_class, list(agents.values())) for agent_class, agents in self._agents_type.items())
+        return {
+            agent_class: list(agents.values())
+            for agent_class, agents in self._agents_type.items()
+        }
 
     def agent_buffer(self, shuffled: bool = False) -> Iterator[Agent]:
         """Simple generator that yields the agents while letting the user
