@@ -32,6 +32,14 @@ class MockAgent(Agent):
         self.model.datacollector.add_table_row("Final_Values", row)
 
 
+class DifferentMockAgent(MockAgent):
+    # We define a different MockAgent to test for attributes that are present
+    # only in 1 type of agent, but not the other.
+    def __init__(self, unique_id, model, val=0):
+        super().__init__(unique_id, model, val=val)
+        self.val3 = val + 42
+
+
 class MockModel(Model):
     """
     Minimalistic model for testing purposes.
@@ -39,13 +47,20 @@ class MockModel(Model):
 
     schedule = BaseScheduler(None)
 
-    def __init__(self):
+    def __init__(self, test_exclude_none_values=False):
         self.schedule = BaseScheduler(self)
         self.model_val = 100
 
-        for i in range(10):
-            a = MockAgent(i, self, val=i)
-            self.schedule.add(a)
+        self.n = 10
+        for i in range(self.n):
+            self.schedule.add(MockAgent(i, self, val=i))
+            if test_exclude_none_values:
+                self.schedule.add(DifferentMockAgent(self.n + i, self, val=i))
+        if test_exclude_none_values:
+            # Only DifferentMockAgent has val3.
+            agent_reporters = {"value": lambda a: a.val, "value3": "val3"}
+        else:
+            agent_reporters = {"value": lambda a: a.val, "value2": "val2"}
         self.initialize_data_collector(
             {
                 "total_agents": lambda m: m.schedule.get_agent_count(),
@@ -54,8 +69,9 @@ class MockModel(Model):
                 "model_calc_comp": [self.test_model_calc_comp, [3, 4]],
                 "model_calc_fail": [self.test_model_calc_comp, [12, 0]],
             },
-            {"value": lambda a: a.val, "value2": "val2"},
+            agent_reporters,
             {"Final_Values": ["agent_id", "final_value"]},
+            exclude_none_values=test_exclude_none_values,
         )
 
     def test_model_calc_comp(self, input1, input2):
@@ -193,6 +209,45 @@ class TestDataCollectorInitialization(unittest.TestCase):
             str(cm.exception),
             "You must add agents to the scheduler before initializing the data collector.",
         )
+
+
+class TestDataCollectorExcludeNone(unittest.TestCase):
+    def setUp(self):
+        """
+        Create the model and run it a set number of steps.
+        """
+        self.model = MockModel(test_exclude_none_values=True)
+        for i in range(7):
+            if i == 4:
+                self.model.schedule.remove(self.model.schedule._agents[3])
+            self.model.step()
+
+    def test_agent_records(self):
+        """
+        Test agent-level variable collection.
+        """
+        data_collector = self.model.datacollector
+        agent_table = data_collector.get_agent_vars_dataframe()
+
+        assert len(data_collector._agent_records) == 8
+        for step, records in data_collector._agent_records.items():
+            if step < 5:
+                assert len(records) == 20
+            else:
+                assert len(records) == 19
+
+            for values in records:
+                agent_id = values[1]
+                if agent_id < self.model.n:
+                    assert len(values) == 3
+                else:
+                    # Agents with agent_id >= self.model.n are
+                    # DifferentMockAgent, which additionally contains val3.
+                    assert len(values) == 4
+
+        assert "value" in list(agent_table.columns)
+        assert "value2" not in list(agent_table.columns)
+        assert "value3" in list(agent_table.columns)
 
 
 if __name__ == "__main__":

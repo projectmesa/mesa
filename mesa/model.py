@@ -66,7 +66,11 @@ class Model:
         self._seed = seed
 
     def initialize_data_collector(
-        self, model_reporters=None, agent_reporters=None, tables=None
+        self,
+        model_reporters=None,
+        agent_reporters=None,
+        tables=None,
+        exclude_none_values=False,
     ) -> None:
         if not hasattr(self, "schedule") or self.schedule is None:
             raise RuntimeError(
@@ -80,6 +84,7 @@ class Model:
             model_reporters=model_reporters,
             agent_reporters=agent_reporters,
             tables=tables,
+            exclude_none_values=exclude_none_values,
         )
         # Collect data for the first time during initialization.
         self.datacollector.collect(self)
