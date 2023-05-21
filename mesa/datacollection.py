@@ -36,7 +36,6 @@ The default DataCollector here makes several assumptions:
 """
 import itertools
 import types
-from functools import partial
 from operator import attrgetter
 
 import pandas as pd
@@ -132,7 +131,10 @@ class DataCollector:
         """
         if type(reporter) is str:
             attribute_name = reporter
-            reporter = partial(self._getattr, reporter)
+
+            def reporter(agent):
+                return getattr(agent, attribute_name, None)
+
             reporter.attribute_name = attribute_name
         self.agent_reporters[name] = reporter
 
@@ -204,11 +206,6 @@ class DataCollector:
                 self.tables[table_name][column].append(None)
             else:
                 raise Exception("Could not insert row with missing column")
-
-    @staticmethod
-    def _getattr(name, _object):
-        """Turn around arguments of getattr to make it partially callable."""
-        return getattr(_object, name, None)
 
     def get_model_vars_dataframe(self):
         """Create a pandas DataFrame from the model variables.
