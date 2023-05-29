@@ -43,7 +43,7 @@ The skeleton of a model might look like this:
     class MyModel(mesa.Model):
         def __init__(self, n_agents):
             super().__init__()
-            self.schedule = mesa.timeRandomActivation(self)
+            self.schedule = mesa.time.RandomActivation(self)
             self.grid = mesa.space.MultiGrid(10, 10, torus=True)
             for i in range(n_agents):
                 a = MyAgent(i, self)
