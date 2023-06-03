@@ -63,7 +63,7 @@ class BaseScheduler:
         """
         if agent.unique_id in self._agents:
             raise Exception(
-                f"Agent with unique id {repr(agent.unique_id)} already added to scheduler"
+                f"Agent with unique id {agent.unique_id!r} already added to scheduler"
             )
 
         self._agents[agent.unique_id] = agent
@@ -191,7 +191,10 @@ class StagedActivation(BaseScheduler):
         # it's necessary for the keys view to be a list.
         agent_keys = self.get_agent_keys(self.shuffle)
         for stage in self.stage_list:
-            self.do_each(stage, agent_keys=agent_keys)
+            if stage.startswith("model."):
+                getattr(self.model, stage[6:])()
+            else:
+                self.do_each(stage, agent_keys=agent_keys)
             # We recompute the keys because some agents might have been removed
             # in the previous loop.
             agent_keys = self.get_agent_keys(self.shuffle_between_stages)
