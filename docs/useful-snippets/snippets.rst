@@ -12,6 +12,16 @@ If you have `Multiple` type agents and one of them has time attribute you can st
   if self.model.schedule.time in self.discrete_time:
       self.model.space.move_agent(self, new_pos)
 
+Implementing Model Level Functions in Staged Activation
+-------------------------------------------------------
+In staged activation, if you may want a function to be implemented only on the model level and not at the level of agents.
+For such functions, include the prefix "model." before the model function name, when defining the function list.
+For example, consider a central employment exchange which adjust the wage rate common to all laborers
+in the direction of excess demand.
+
+.. code:: python
+    stage_list=[Send_Labour_Supply, Send_Labour_Demand, model.Adjust_Wage_Rate]
+    self.schedule = StagedActivation(self,stage_list,shuffle=True)
 
 Using ```numpy.random```
 -------------

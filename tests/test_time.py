@@ -75,7 +75,7 @@ class MockModel(Model):
 
         # Make scheduler
         if activation == STAGED:
-            model_stages = ["stage_one", "stage_two"]
+            model_stages = ["stage_one", "model.model_stage", "stage_two"]
             self.schedule = StagedActivation(self, model_stages, shuffle=shuffle)
         elif activation == RANDOM:
             self.schedule = RandomActivation(self)
@@ -94,13 +94,16 @@ class MockModel(Model):
     def step(self):
         self.schedule.step()
 
+    def model_stage(self):
+        self.log.append("model_stage")
+
 
 class TestStagedActivation(TestCase):
     """
     Test the staged activation.
     """
 
-    expected_output = ["A_1", "B_1", "A_2", "B_2"]
+    expected_output = ["A_1", "B_1", "model_stage", "A_2", "B_2"]
 
     def test_no_shuffle(self):
         """
@@ -109,7 +112,7 @@ class TestStagedActivation(TestCase):
         model = MockModel(shuffle=False)
         model.step()
         model.step()
-        assert all(i == j for i, j in zip(model.log[:4], model.log[4:]))
+        assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
 
     def test_shuffle(self):
         """
@@ -119,8 +122,9 @@ class TestStagedActivation(TestCase):
         model.step()
         for output in self.expected_output[:2]:
             assert output in model.log[:2]
-        for output in self.expected_output[2:]:
-            assert output in model.log[2:]
+        for output in self.expected_output[3:]:
+            assert output in model.log[3:]
+        assert self.expected_output[2] == model.log[2]
 
     def test_shuffle_shuffles_agents(self):
         model = MockModel(shuffle=True)
@@ -146,7 +150,7 @@ class TestStagedActivation(TestCase):
         """
         model = MockModel(shuffle=True, enable_kill_other_agent=True)
         model.step()
-        assert len(model.log) == 2
+        assert len(model.log) == 3
 
     def test_add_existing_agent(self):
         model = MockModel()
