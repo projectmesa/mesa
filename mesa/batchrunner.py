@@ -95,35 +95,59 @@ def batch_run(
     return results
 
 
+from typing import Any, Dict, Iterable, List, Mapping, Union
+import itertools
+
 def _make_model_kwargs(
-    parameters: Mapping[str, Union[Any, Iterable[Any]]]
+    parameters: Union[Mapping[str, Union[Any, Iterable[Any]]], List[Dict[str, Any]]]
 ) -> List[Dict[str, Any]]:
-    """Create model kwargs from parameters dictionary.
+    """
+    Create model kwargs from parameters dictionary or return a list of dictionaries.
+
+    This function is useful when you have a set of model parameters and you want to generate all possible combinations of these parameters.
 
     Parameters
     ----------
-    parameters : Mapping[str, Union[Any, Iterable[Any]]]
-        Single or multiple values for each model parameter name
+    parameters : Union[Mapping[str, Union[Any, Iterable[Any]]], List[Dict[str, Any]]]
+        Either:
+            - A dictionary where each key is a parameter name and each value is either a single value for the parameter or an iterable of multiple values.
+            - A list of dictionaries.
 
     Returns
     -------
     List[Dict[str, Any]]
-        A list of all kwargs combinations.
+        If `parameters` is a list of dictionaries, it is returned as is.
+        Otherwise, a list of dictionaries is returned where each dictionary represents a unique combination of parameter values.
     """
+    # If the input is a list of dictionaries, return it as is
+    if isinstance(parameters, list) and all(isinstance(param, dict) for param in parameters):
+        return parameters
+
     parameter_list = []
+
+    # Loop over each parameter and its values
     for param, values in parameters.items():
+        # If the values is a single string, we shouldn't iterate over it.
         if isinstance(values, str):
-            # The values is a single string, so we shouldn't iterate over it.
             all_values = [(param, values)]
         else:
+            # Try to iterate over values. If successful, create a tuple for each value.
+            # If not successful (i.e., values is not iterable), create a single tuple.
             try:
                 all_values = [(param, value) for value in values]
             except TypeError:
                 all_values = [(param, values)]
+        # Append the list of tuples to parameter_list
         parameter_list.append(all_values)
+
+    # Generate all combinations of parameter values
     all_kwargs = itertools.product(*parameter_list)
+
+    # Convert each combination to a dictionary
     kwargs_list = [dict(kwargs) for kwargs in all_kwargs]
+
     return kwargs_list
+
 
 
 def _model_run_func(
