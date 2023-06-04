@@ -91,15 +91,21 @@ class BaseScheduler:
     def agents(self) -> list[Agent]:
         return list(self._agents.values())
 
+    def get_agent_keys(self, shuffle: bool = False) -> list[int]:
+        # To be able to remove and/or add agents during stepping
+        # it's necessary to cast the keys view to a list.
+        agent_keys = list(self._agents.keys())
+        if shuffle:
+            self.model.random.shuffle(agent_keys)
+        return agent_keys
+
     def agent_buffer(self, shuffled: bool = False) -> Iterator[Agent]:
         """Simple generator that yields the agents while letting the user
         remove and/or add agents during stepping.
         """
         # To be able to remove and/or add agents during stepping
-        # it's necessary to cast the keys view to a list.
-        agent_keys = list(self._agents.keys())
-        if shuffled:
-            self.model.random.shuffle(agent_keys)
+        # it's necessary for the keys view to be a list.
+        agent_keys = self.get_agent_keys(shuffled)
 
         for agent_key in agent_keys:
             if agent_key in self._agents:
@@ -137,14 +143,12 @@ class SimultaneousActivation(BaseScheduler):
 
     def step(self) -> None:
         """Step all agents, then advance them."""
-        # To be able to remove and/or add agents during stepping
-        # it's necessary to cast the keys view to a list.
-        agent_keys = list(self._agents.keys())
+        agent_keys = self.get_agent_keys()
         for agent_key in agent_keys:
             self._agents[agent_key].step()
         # We recompute the keys because some agents might have been removed in
         # the previous loop.
-        agent_keys = list(self._agents.keys())
+        agent_keys = self.get_agent_keys()
         for agent_key in agent_keys:
             self._agents[agent_key].advance()
         self.steps += 1
@@ -190,19 +194,15 @@ class StagedActivation(BaseScheduler):
     def step(self) -> None:
         """Executes all the stages for all agents."""
         # To be able to remove and/or add agents during stepping
-        # it's necessary to cast the keys view to a list.
-        agent_keys = list(self._agents.keys())
-        if self.shuffle:
-            self.model.random.shuffle(agent_keys)
+        # it's necessary for the keys view to be a list.
+        agent_keys = self.get_agent_keys(self.shuffle)
         for stage in self.stage_list:
             for agent_key in agent_keys:
                 if agent_key in self._agents:
                     getattr(self._agents[agent_key], stage)()  # Run stage
             # We recompute the keys because some agents might have been removed
             # in the previous loop.
-            agent_keys = list(self._agents.keys())
-            if self.shuffle_between_stages:
-                self.model.random.shuffle(agent_keys)
+            agent_keys = self.get_agent_keys(self.shuffle_between_stages)
             self.time += self.stage_time
 
         self.steps += 1
