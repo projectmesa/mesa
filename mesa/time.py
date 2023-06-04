@@ -100,9 +100,11 @@ class BaseScheduler:
             self.model.random.shuffle(agent_keys)
         return agent_keys
 
-    def do_each(self, method, agent_keys=None):
+    def do_each(self, method, agent_keys=None, shuffle=False):
         if agent_keys is None:
             agent_keys = self.get_agent_keys()
+        if shuffle:
+            self.model.random.shuffle(agent_keys)
         for agent_key in agent_keys:
             if agent_key in self._agents:
                 getattr(self._agents[agent_key], method)()
@@ -123,8 +125,7 @@ class RandomActivation(BaseScheduler):
         random order.
 
         """
-        agent_keys = self.get_agent_keys(shuffle=True)
-        self.do_each("step", agent_keys=agent_keys)
+        self.do_each("step", shuffle=True)
         self.steps += 1
         self.time += 1
 
@@ -139,12 +140,11 @@ class SimultaneousActivation(BaseScheduler):
 
     def step(self) -> None:
         """Step all agents, then advance them."""
-        agent_keys = self.get_agent_keys()
-        self.do_each("step", agent_keys=agent_keys)
-        # We recompute the keys because some agents might have been removed in
+        self.do_each("step")
+        # do_each recomputes the agent_keys from scratch whenever it is called.
+        # It can handle the case when some agents might have been removed in
         # the previous loop.
-        agent_keys = self.get_agent_keys()
-        self.do_each("advance", agent_keys=agent_keys)
+        self.do_each("advance")
         self.steps += 1
         self.time += 1
 
