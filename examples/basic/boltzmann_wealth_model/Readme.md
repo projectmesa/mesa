@@ -33,6 +33,12 @@ If your browser doesn't open automatically, point it to [http://127.0.0.1:8521/]
 * ``boltzmann_wealth_model/server.py``: Code for the interactive visualization.
 * ``run.py``: Launches the server.
 
+## Optional
+
+*  ``boltzmann_wealth_model/app.py``: can be used to run the simulation via the streamlit interface.
+* For this some additional packages like ``streamlit`` and ``altair`` needs to be installed.
+* Once installed, the app can be opened in the browser using : ``streamlit run app.py``
+
 ## Further Reading
 
 The full tutorial describing how the model is built can be found at:
