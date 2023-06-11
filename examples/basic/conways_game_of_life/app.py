@@ -1,5 +1,4 @@
 import mesa
-
 import streamlit as st
 
 import time
