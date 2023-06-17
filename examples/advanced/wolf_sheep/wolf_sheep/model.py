@@ -11,8 +11,8 @@ Replication of the model found in NetLogo:
 
 import mesa
 
-from wolf_sheep.scheduler import RandomActivationByTypeFiltered
-from wolf_sheep.agents import Sheep, Wolf, GrassPatch
+from .scheduler import RandomActivationByTypeFiltered
+from .agents import Sheep, Wolf, GrassPatch
 
 
 class WolfSheep(mesa.Model):
