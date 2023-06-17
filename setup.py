@@ -24,7 +24,14 @@ extras_require = {
     # Explicitly install ipykernel for Python 3.8.
     # See https://stackoverflow.com/questions/28831854/how-do-i-add-python3-kernel-to-jupyter-ipython
     # Could be removed in the future
-    "docs": ["sphinx<7", "ipython", "nbsphinx", "ipykernel", "pydata_sphinx_theme"],
+    "docs": [
+        "sphinx<7",
+        "ipython",
+        "nbsphinx",
+        "ipykernel",
+        "pydata_sphinx_theme",
+        "seaborn",
+    ],
 }
 
 version = ""
