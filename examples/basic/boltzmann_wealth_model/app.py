@@ -1,13 +1,10 @@
-from boltzmann_wealth_model.model import BoltzmannWealthModel
-
-import streamlit as st
-
 import time
 
-import pandas as pd
-
 import altair as alt
+import pandas as pd
+import streamlit as st
 
+from boltzmann_wealth_model.model import BoltzmannWealthModel
 
 model = st.title("Boltzman Wealth Model")
 num_agents = st.slider(
