@@ -354,10 +354,10 @@ class TestSingleNetworkGrid(unittest.TestCase):
             assert a.pos == pos
 
     def test_get_neighbors(self):
-        assert len(self.space.get_neighbors(0, include_center=True)) == 3
-        assert len(self.space.get_neighbors(0, include_center=False)) == 2
-        assert len(self.space.get_neighbors(2, include_center=True, radius=3)) == 7
-        assert len(self.space.get_neighbors(2, include_center=False, radius=3)) == 6
+        assert len(self.space.get_neighborhood(0, include_center=True)) == 3
+        assert len(self.space.get_neighborhood(0, include_center=False)) == 2
+        assert len(self.space.get_neighborhood(2, include_center=True, radius=3)) == 7
+        assert len(self.space.get_neighborhood(2, include_center=False, radius=3)) == 6
 
     def test_move_agent(self):
         initial_pos = 1
@@ -426,11 +426,11 @@ class TestMultipleNetworkGrid(unittest.TestCase):
 
     def test_get_neighbors(self):
         assert (
-            len(self.space.get_neighbors(0, include_center=True))
+            len(self.space.get_neighborhood(0, include_center=True))
             == TestMultipleNetworkGrid.GRAPH_SIZE
         )
         assert (
-            len(self.space.get_neighbors(0, include_center=False))
+            len(self.space.get_neighborhood(0, include_center=False))
             == TestMultipleNetworkGrid.GRAPH_SIZE - 1
         )
 
