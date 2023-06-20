@@ -308,7 +308,7 @@ class TestSingleGrid(unittest.TestCase):
         if self.space.exists_empty_cells():
             for i, pos in enumerate(list(self.space.empties)):
                 a = MockAgent(-i, pos)
-                self.space.position_agent(a, x=pos[0], y=pos[1])
+                self.space.place_agent(a, pos)
         with self.assertRaises(Exception):
             self.space.move_to_empty(a)
 
