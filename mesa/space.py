@@ -478,26 +478,6 @@ class _Grid:
         self.remove_agent(agent)
         self.place_agent(agent, new_pos)
 
-    def find_empty(self) -> Coordinate | None:
-        """Pick a random empty cell."""
-        import random
-
-        warn(
-            (
-                "`find_empty` is being phased out since it uses the global "
-                "`random` instead of the model-level random-number generator. "
-                "Consider replacing it with having a model or agent object "
-                "explicitly pick one of the grid's list of empty cells."
-            ),
-            DeprecationWarning,
-        )
-
-        if self.exists_empty_cells():
-            pos = random.choice(sorted(self.empties))
-            return pos
-        else:
-            return None
-
     def exists_empty_cells(self) -> bool:
         """Return True if any cells empty else False."""
         return len(self.empties) > 0
