@@ -454,16 +454,8 @@ class _Grid:
         x, y = pos
         return self._grid[x][y] == self.default_val()
 
-    def move_to_empty(self, agent: Agent, num_agents: int | None = None) -> None:
+    def move_to_empty(self, agent: Agent) -> None:
         """Moves agent to a random empty cell, vacating agent's old cell."""
-        if num_agents is not None:
-            warn(
-                (
-                    "`num_agents` is being deprecated since it's no longer used "
-                    "inside `move_to_empty`. It shouldn't be passed as a parameter."
-                ),
-                DeprecationWarning,
-            )
         num_empty_cells = len(self.empties)
         if num_empty_cells == 0:
             raise Exception("ERROR: No empty cells")
