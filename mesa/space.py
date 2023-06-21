@@ -193,11 +193,11 @@ class _Grid:
         as if it is one list:"""
         return itertools.chain(*self._grid)
 
-    def coord_iter(self) -> Iterator[tuple[GridContent, int, int]]:
-        """An iterator that returns coordinates as well as cell contents."""
+    def coord_iter(self) -> Iterator[tuple[GridContent, Coordinate]]:
+        """An iterator that returns positions as well as cell contents."""
         for row in range(self.width):
             for col in range(self.height):
-                yield self._grid[row][col], row, col  # agent, x, y
+                yield self._grid[row][col], (row, col)  # agent, position
 
     def iter_neighborhood(
         self,
