@@ -26,7 +26,7 @@ def network_portrayal(G):
     def get_agents(source, target):
         return G.nodes[source]["agent"][0], G.nodes[target]["agent"][0]
 
-    portrayal = dict()
+    portrayal = {}
     portrayal["nodes"] = [
         {
             "size": 6,
@@ -103,7 +103,7 @@ model_params = {
         0.0,
         1.0,
         0.1,
-        description="Frequency the nodes check whether they are infected by " "a virus",
+        description="Frequency the nodes check whether they are infected by a virus",
     ),
     "recovery_chance": mesa.visualization.Slider(
         "Recovery Chance",

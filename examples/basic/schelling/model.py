@@ -64,10 +64,7 @@ class Schelling(mesa.Model):
             x = cell[1]
             y = cell[2]
             if self.random.random() < self.density:
-                if self.random.random() < self.minority_pc:
-                    agent_type = 1
-                else:
-                    agent_type = 0
+                agent_type = 1 if self.random.random() < self.minority_pc else 0
 
                 agent = SchellingAgent((x, y), self, agent_type)
                 self.grid.place_agent(agent, (x, y))

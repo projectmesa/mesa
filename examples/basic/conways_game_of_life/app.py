@@ -1,7 +1,6 @@
 import time
 
 import altair as alt
-import mesa
 import numpy as np
 import pandas as pd
 import streamlit as st
