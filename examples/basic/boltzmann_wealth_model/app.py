@@ -3,7 +3,6 @@ import time
 import altair as alt
 import pandas as pd
 import streamlit as st
-
 from boltzmann_wealth_model.model import BoltzmannWealthModel
 
 model = st.title("Boltzman Wealth Model")

@@ -1,8 +1,8 @@
 import math
 from enum import Enum
-import networkx as nx
 
 import mesa
+import networkx as nx
 
 
 class State(Enum):

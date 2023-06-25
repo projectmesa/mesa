@@ -2,7 +2,7 @@ import math
 
 import mesa
 
-from .model import VirusOnNetwork, State, number_infected
+from .model import State, VirusOnNetwork, number_infected
 
 
 def network_portrayal(G):
