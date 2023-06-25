@@ -113,11 +113,7 @@ class Trader(mesa.Agent):
             return False
         # get contents of each cell in neighborhood
         this_cell = self.model.grid.get_cell_list_contents(pos)
-        for a in this_cell:
-            # see if occupied by another agent
-            if isinstance(a, Trader):
-                return True
-        return False
+        return any(isinstance(a, Trader) for a in this_cell)
 
     def calculate_welfare(self, sugar, spice):
         """

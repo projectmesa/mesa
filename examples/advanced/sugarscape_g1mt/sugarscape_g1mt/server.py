@@ -22,14 +22,8 @@ def Agent_portrayal(agent):
         }
 
     elif isinstance(agent, Sugar):
-        if agent.amount != 0:
-            color = sugar_dic[agent.amount]
-        else:
-            color = "#D6F5D6"
-        if agent.amount > 2:
-            layer = 1
-        else:
-            layer = 0
+        color = sugar_dic[agent.amount] if agent.amount != 0 else "#D6F5D6"
+        layer = 1 if agent.amount > 2 else 0
         return {
             "Color": color,
             "Shape": "rect",
@@ -40,14 +34,8 @@ def Agent_portrayal(agent):
         }
 
     elif isinstance(agent, Spice):
-        if agent.amount != 0:
-            color = spice_dic[agent.amount]
-        else:
-            color = "#D6F5D6"
-        if agent.amount > 2:
-            layer = 1
-        else:
-            layer = 0
+        color = spice_dic[agent.amount] if agent.amount != 0 else "#D6F5D6"
+        layer = 1 if agent.amount > 2 else 0
         return {
             "Color": color,
             "Shape": "rect",

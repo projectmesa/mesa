@@ -7,6 +7,7 @@ from mesa import Model
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.visualization.TextVisualization import TextGrid, TextVisualization
+
 from wolf_sheep.random_walk import RandomWalker
 
 

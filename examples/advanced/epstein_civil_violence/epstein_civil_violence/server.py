@@ -36,16 +36,16 @@ def citizen_cop_portrayal(agent):
     return portrayal
 
 
-model_params = dict(
-    height=40,
-    width=40,
-    citizen_density=0.7,
-    cop_density=0.074,
-    citizen_vision=7,
-    cop_vision=7,
-    legitimacy=0.8,
-    max_jail_term=1000,
-)
+model_params = {
+    "height": 40,
+    "width": 40,
+    "citizen_density": 0.7,
+    "cop_density": 0.074,
+    "citizen_vision": 7,
+    "cop_vision": 7,
+    "legitimacy": 0.8,
+    "max_jail_term": 1000,
+}
 
 canvas_element = mesa.visualization.CanvasGrid(citizen_cop_portrayal, 40, 40, 480, 480)
 server = mesa.visualization.ModularServer(
