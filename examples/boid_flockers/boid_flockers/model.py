@@ -46,7 +46,7 @@ class BoidFlockers(mesa.Model):
         self.separation = separation
         self.schedule = mesa.time.RandomActivation(self)
         self.space = mesa.space.ContinuousSpace(width, height, True)
-        self.factors = dict(cohere=cohere, separate=separate, match=match)
+        self.factors = {"cohere": cohere, "separate": separate, "match": match}
         self.make_agents()
         self.running = True
 
