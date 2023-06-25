@@ -98,6 +98,7 @@ import asyncio
 import os
 import platform
 import webbrowser
+from typing import ClassVar
 
 import tornado.autoreload
 import tornado.escape
@@ -145,10 +146,10 @@ class VisualizationElement:
                 to the client.
     """
 
-    package_includes = []
-    local_includes = []
+    package_includes: ClassVar = []
+    local_includes: ClassVar = []
     js_code = ""
-    render_args = {}
+    render_args: ClassVar = {}
     local_dir = ""
 
     def __init__(self):
@@ -171,7 +172,7 @@ class TextElement(VisualizationElement):
     Module for drawing live-updating text.
     """
 
-    package_includes = ["TextModule.js"]
+    package_includes: ClassVar = ["TextModule.js"]
     js_code = "elements.push(new TextModule());"
 
 
@@ -283,7 +284,7 @@ class ModularServer(tornado.web.Application):
             self.port = port
         else:
             # Default port to listen on
-            self.port = int(os.getenv("PORT", 8521))
+            self.port = int(os.getenv("PORT", "8521"))
 
         # Handlers and other globals:
         page_handler = (r"/", PageHandler)

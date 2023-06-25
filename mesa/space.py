@@ -781,6 +781,7 @@ class HexGrid(HexSingleGrid):
                 "depending on your use case."
             ),
             DeprecationWarning,
+            stacklevel=2,
         )
 
 

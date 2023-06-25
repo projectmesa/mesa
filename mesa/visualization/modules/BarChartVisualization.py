@@ -5,6 +5,7 @@ Pie Chart Module
 Module for drawing live-updating bar charts using d3.js
 """
 import json
+from typing import ClassVar
 
 from mesa.visualization.ModularVisualization import D3_JS_FILE, VisualizationElement
 
@@ -26,7 +27,7 @@ class BarChartModule(VisualizationElement):
         data_collector_name: Name of the DataCollector object in the model to retrieve data from.
     """
 
-    package_includes = [D3_JS_FILE, "BarChartModule.js"]
+    package_includes: ClassVar = [D3_JS_FILE, "BarChartModule.js"]
 
     def __init__(
         self,
