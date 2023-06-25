@@ -44,4 +44,5 @@ extend-ignore = [
 ]
 extend-exclude = ["docs", "build"]
 # Hardcode to Python 3.8.
+# Reminder to update mesa-examples if the value below is changed.
 target-version = "py38"
