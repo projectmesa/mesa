@@ -5,29 +5,29 @@ def test_import():
     import mesa.flat as mf
     from mesa.time import RandomActivation
 
-    mesa.time.RandomActivation
-    RandomActivation
-    mf.RandomActivation
+    _ = mesa.time.RandomActivation
+    _ = RandomActivation
+    _ = mf.RandomActivation
 
     from mesa.space import MultiGrid
 
-    mesa.space.MultiGrid
-    MultiGrid
-    mf.MultiGrid
+    _ = mesa.space.MultiGrid
+    _ = MultiGrid
+    _ = mf.MultiGrid
 
     from mesa.visualization.ModularVisualization import ModularServer
 
-    mesa.visualization.ModularServer
-    ModularServer
-    mf.ModularServer
+    _ = mesa.visualization.ModularServer
+    _ = ModularServer
+    _ = mf.ModularServer
 
     from mesa.datacollection import DataCollector
 
-    DataCollector
-    mesa.DataCollector
-    mf.DataCollector
+    _ = DataCollector
+    _ = mesa.DataCollector
+    _ = mf.DataCollector
 
     from mesa.batchrunner import batch_run
 
-    batch_run
-    mesa.batch_run
+    _ = batch_run
+    _ = mesa.batch_run
