@@ -148,10 +148,10 @@ class VirusAgent(mesa.Agent):
             self.state = State.INFECTED
 
     def try_check_situation(self):
-        if self.random.random() < self.virus_check_frequency:
-            # Checking...
-            if self.state is State.INFECTED:
-                self.try_remove_infection()
+        if (self.random.random() < self.virus_check_frequency) and (
+            self.state is State.INFECTED
+        ):
+            self.try_remove_infection()
 
     def step(self):
         if self.state is State.INFECTED:
