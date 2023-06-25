@@ -1,4 +1,5 @@
 import mesa
+
 from .random_walk import RandomWalker
 
 

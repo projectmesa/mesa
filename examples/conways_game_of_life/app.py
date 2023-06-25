@@ -1,18 +1,11 @@
-import mesa
-import streamlit as st
-
 import time
 
-import pandas as pd
-
 import altair as alt
-
-
+import mesa
 import numpy as np
-from conways_game_of_life.model import ConwaysGameOfLife
-
 import pandas as pd
-
+import streamlit as st
+from conways_game_of_life.model import ConwaysGameOfLife
 
 model = st.title("Boltzman Wealth Model")
 num_ticks = st.slider("Select number of Steps", min_value=1, max_value=100, value=50)
