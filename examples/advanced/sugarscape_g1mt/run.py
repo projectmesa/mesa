@@ -1,8 +1,9 @@
 import sys
-import pandas as pd
+
 import matplotlib.pyplot as plt
-import networkx as nx
 import mesa
+import networkx as nx
+import pandas as pd
 from sugarscape_g1mt.model import SugarscapeG1mt
 from sugarscape_g1mt.server import server
 

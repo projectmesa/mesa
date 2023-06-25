@@ -1,8 +1,7 @@
 import mesa
 
-from .portrayal import portrayPDAgent
 from .model import PdGrid
-
+from .portrayal import portrayPDAgent
 
 # Make a world that is 50x50, on a 500x500 display.
 canvas_element = mesa.visualization.CanvasGrid(portrayPDAgent, 50, 50, 500, 500)

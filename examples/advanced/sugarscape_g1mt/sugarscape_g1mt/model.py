@@ -1,9 +1,8 @@
+import mesa
 import numpy as np
 
-
-import mesa
+from .resource_agents import Spice, Sugar
 from .trader_agents import Trader
-from .resource_agents import Sugar, Spice
 
 
 # Helper Functions

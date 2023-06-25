@@ -1,6 +1,6 @@
 import mesa
 
-from .agent import Cop, Citizen
+from .agent import Citizen, Cop
 
 
 class EpsteinCivilViolence(mesa.Model):

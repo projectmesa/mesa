@@ -1,9 +1,8 @@
 import mesa
 
-from .resource_agents import Sugar, Spice
-from .trader_agents import Trader
 from .model import SugarscapeG1mt
-
+from .resource_agents import Spice, Sugar
+from .trader_agents import Trader
 
 sugar_dic = {4: "#005C00", 3: "#008300", 2: "#00AA00", 1: "#00F800"}
 spice_dic = {4: "#acac00", 3: "#c5c500", 2: "#dfdf00", 1: "#f8f800"}

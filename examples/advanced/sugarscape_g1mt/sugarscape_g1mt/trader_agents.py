@@ -1,6 +1,8 @@
 import math
+
 import mesa
-from .resource_agents import Sugar, Spice
+
+from .resource_agents import Spice, Sugar
 
 
 # Helper function
