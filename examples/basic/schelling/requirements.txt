@@ -2,3 +2,4 @@ jupyter
 matplotlib
 mesa~=1.1
 solara
+git+https://github.com/projectmesa/mesa-examples
