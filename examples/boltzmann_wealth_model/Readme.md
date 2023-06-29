@@ -35,9 +35,9 @@ If your browser doesn't open automatically, point it to [http://127.0.0.1:8521/]
 
 ## Optional
 
-*  ``boltzmann_wealth_model/app.py``: can be used to run the simulation via the streamlit interface.
-* For this some additional packages like ``streamlit`` and ``altair`` needs to be installed.
-* Once installed, the app can be opened in the browser using : ``streamlit run app.py``
+*  ``boltzmann_wealth_model/app.py``: can be used to run the simulation via the Solara interface.
+* For this, an additional packages ``solara`` needs to be installed.
+* Once installed, the app can be opened in the browser after running ``solara run app.py``
 
 ## Further Reading
 
