@@ -101,6 +101,7 @@ ABM features users have shared that you may want to use in your model
    Useful Snippets <useful-snippets/snippets>
    API Documentation <apis/api_main>
    Mesa Packages <packages>
+   tutorials/adv_tutorial_experimental.ipynb
 
 Indices and tables
 ==================
