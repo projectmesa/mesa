@@ -1,5 +1,6 @@
 from mesa_models.experimental import JupyterViz
-from boltzmann_wealth_model.model import BoltzmannWealthModel
+
+from model import BoltzmannWealthModel
 
 model_params = {
     "N": {
@@ -17,3 +18,4 @@ model_params = {
 page = JupyterViz(
     BoltzmannWealthModel, model_params, measures=["Gini"], name="Money Model"
 )
+page
