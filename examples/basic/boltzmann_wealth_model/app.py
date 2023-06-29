@@ -2,6 +2,13 @@ from mesa_models.experimental import JupyterViz
 
 from model import BoltzmannWealthModel
 
+
+def agent_portrayal(agent):
+    if agent.wealth > 0:
+        return 50
+    return 10
+
+
 model_params = {
     "N": {
         "type": "SliderInt",
@@ -16,6 +23,10 @@ model_params = {
 }
 
 page = JupyterViz(
-    BoltzmannWealthModel, model_params, measures=["Gini"], name="Money Model"
+    BoltzmannWealthModel,
+    model_params,
+    measures=["Gini"],
+    name="Money Model",
+    agent_portrayal=agent_portrayal,
 )
 page
