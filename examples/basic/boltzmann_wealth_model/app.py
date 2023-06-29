@@ -4,9 +4,12 @@ from model import BoltzmannWealthModel
 
 
 def agent_portrayal(agent):
+    size = 10
+    color = "tab:red"
     if agent.wealth > 0:
-        return 50
-    return 10
+        size = 50
+        color = "tab:blue"
+    return {"size": size, "color": color}
 
 
 model_params = {
