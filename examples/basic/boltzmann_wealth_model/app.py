@@ -1,5 +1,4 @@
 from mesa_models.experimental import JupyterViz
-
 from model import BoltzmannWealthModel
 
 
@@ -32,4 +31,4 @@ page = JupyterViz(
     name="Money Model",
     agent_portrayal=agent_portrayal,
 )
-page
+page  # noqa

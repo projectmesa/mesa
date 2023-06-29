@@ -1,5 +1,4 @@
 from mesa_models.experimental import JupyterViz
-
 from model import Schelling
 
 
@@ -51,4 +50,4 @@ page = JupyterViz(
     name="Schelling",
     agent_portrayal=agent_portrayal,
 )
-page
+page  # noqa
