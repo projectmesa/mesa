@@ -60,10 +60,12 @@ class EpsteinCivilViolence(mesa.Model):
         self.iteration = 0
         self.schedule = mesa.time.RandomActivation(self)
         self.grid = mesa.space.SingleGrid(width, height, torus=True)
+
         model_reporters = {
             "Quiescent": lambda m: self.count_type_citizens(m, "Quiescent"),
             "Active": lambda m: self.count_type_citizens(m, "Active"),
             "Jailed": self.count_jailed,
+            "Cops": self.count_cops,
         }
         agent_reporters = {
             "x": lambda a: a.pos[0],
@@ -123,7 +125,7 @@ class EpsteinCivilViolence(mesa.Model):
         for agent in model.schedule.agents:
             if agent.breed == "cop":
                 continue
-            if exclude_jailed and agent.jail_sentence:
+            if exclude_jailed and agent.jail_sentence > 0:
                 continue
             if agent.condition == condition:
                 count += 1
@@ -136,6 +138,6 @@ class EpsteinCivilViolence(mesa.Model):
         """
         count = 0
         for agent in model.schedule.agents:
-            if agent.breed == "citizen" and agent.jail_sentence:
+            if agent.breed == "citizen" and agent.jail_sentence > 0:
                 count += 1
         return count
