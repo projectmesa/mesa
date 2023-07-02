@@ -3,6 +3,71 @@
 Release History
 ---------------
 
+2.0.0 (2023-04-15) Wellton
+++++++++++++++++++++++++++
+
+**Special notes**
+
+Mesa 2.0 includes:
+    * **an experimental pure python user interface/ visualization that is also jupyter compatible please see the** `visualization tutorial`_
+    * several breaking changes that provide significant improvements to Mesa.
+
+.. _visualization tutorial: https://mesa.readthedocs.io/en/latest/tutorials/visualization_tutorial.html
+**Breaking Changes:**
+
+* space: change `coord_iter` to return `(content,(x,y))` instead of `(content, x,y)`; this reduces known errors of scheduler to grid mismatch #1566, #1723
+* space: change NetworkGrid `get_neighbors` to `get_neighborhood`; improves performance #1542
+* space: raise exception when pos is out of bounds in `Grid.get_neighborhood` #1524
+* space: remove deprecations (#1520, #1687, #1688):
+    * `find_empty()`: convert this to `move_to_empty()`
+    * `num_agents`: removed parameter from `move_to_empty()`
+    * `position_agent()`: convert this to `place_agent`
+    * `neighbor_iter()`: convert this to `iter_neighborhood()`
+* batchrunner: remove deprecations #1627
+    * `class BatchRunner` and `class BatchRunnerMP`: convert these to `batch_run()`
+    * Please see this `batch_run() example`_ if you would like to see an an implementation.
+* visualization: easier visualization creation #1693
+    * `UserSettableParameter(['number', 'slider','checkbox', 'choice', 'StaticText'])`: convert to `NumberInput` , `Slider`, `CheckBox`, `Choice`, `StaticText`
+    * Please see this `visualization example`_ if you would like to see an implementation.
+
+.. _batch_run() example: https://github.com/projectmesa/mesa-examples/blob/db2ec0383eb3b1868e91c828101e84cce97bbb63/examples/bank_reserves/batch_run.py#L188-L221
+.. _visualization example: https://github.com/projectmesa/mesa-examples/blob/db2ec0383eb3b1868e91c828101e84cce97bbb63/examples/boltzmann_wealth_model/boltzmann_wealth_model/server.py#L25-L32.)
+
+
+**New Features:**
+
+* datacollector: can now handle data collection by agent type #1419, #1702
+* time: allows for model level `StageActivation` #1709
+* visualization: `ChartModule` can have dynamically named properties #1685
+* visualization: improved stop server to end visualizations #1646
+* *experimental* python front end option: integrated the initial prototype of the pure python front end option #1698, #1726
+
+
+**Improvements**
+
+
+* update HexGrid and create HexSingleGrid and HexMultiGrid #1581
+* correct `get_heading` for toroidal space #1686
+* update slider to start at 1FPS #1674
+* update links to examples repo due to creation of mesa_examples #1636, #1637
+* ** CI Improvements**
+    * update Ruff #1724
+    * remove Pipfile and Pipfile.lock #1692
+    * enable Codespell in Jupyter #1695
+    * improve regex for better build #1669, #1671
+    * exclude notebooks form linter #1670
+    * updated pip for zsh #1644
+    * CLI quality of life improvements #1640
+* **Docs Improvements**
+    * update to PyData theme #1699
+    * remove .rst to create simpler build #1363, #1624
+    * use seaborn in tutorials #1718
+    * fix types and errors in docs #1624, #1705, #1706, #1720
+    * improve tutorials #1636, #1637, #1639, #1641, #1647, #1648, #1650, #1656, #1658, #1659, #1695, #1697,
+    * add nbsphinx to adv_tutorial #1694
+    * replace `const chart` for `var chart` in advanced tutorial #1679
+* update LICENSE to 2023 #1683
+
 1.2.1 (2023-03-18)
 ++++++++++++++++++
 
