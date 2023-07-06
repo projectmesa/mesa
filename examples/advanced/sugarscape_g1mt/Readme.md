@@ -82,6 +82,7 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 * ``sugarscape_g1mt/sugar_map.txt``: Provides sugar and spice landscape in raster type format.
 * ``server.py``: Sets up and launches and interactive visualization server.
 * ``run.py``: Runs Server, Single Run or Batch Run  with data collection and basic analysis.
+* `app.py`: Runs a visualization server via Solara (`solara run app.py`).
 
 ## Additional Resources
 
