@@ -15,20 +15,19 @@ def space_drawer(viz):
             "trader": {"x": [], "y": [], "c": "tab:red", "marker": "o", "s": 10},
         }
 
-        for i in range(g.width):
-            for j in range(g.height):
-                content = g._grid[i][j]
-                for agent in content:
-                    if isinstance(agent, Trader):
-                        layers["trader"]["x"].append(i)
-                        layers["trader"]["y"].append(j)
+        # TODO update to Mesa 2.0 API
+        for content, i, j in g.coord_iter():
+            for agent in content:
+                if isinstance(agent, Trader):
+                    layers["trader"]["x"].append(i)
+                    layers["trader"]["y"].append(j)
+                else:
+                    # Don't visualize resource with value <= 1.
+                    value = agent.amount if agent.amount > 1 else np.nan
+                    if isinstance(agent, Sugar):
+                        layers["sugar"][i][j] = value
                     else:
-                        # Don't visualize resource with value <= 1.
-                        value = agent.amount if agent.amount > 1 else np.nan
-                        if isinstance(agent, Sugar):
-                            layers["sugar"][i][j] = value
-                        else:
-                            layers["spice"][i][j] = value
+                        layers["spice"][i][j] = value
         return layers
 
     fig = Figure()
