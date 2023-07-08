@@ -55,13 +55,13 @@ To launch an example model, clone the `repository <https://github.com/projectmes
 For more help on using Mesa, check out the following resources:
 
 * `Mesa Introductory Tutorial`_
-* `Mesa Advanced Tutorial`_
+* `Mesa Visualization Tutorial`_
 * `GitHub Issue Tracker`_
 * `Email list`_
 * `PyPI`_
 
 .. _`Mesa Introductory Tutorial` : tutorials/intro_tutorial.html
-.. _`Mesa Advanced Tutorial` : tutorials/adv_tutorial.html
+.. _`Mesa Visualization Tutorial` : tutorials/visualization_tutorial.html
 .. _`GitHub Issue Tracker` : https://github.com/projectmesa/mesa/issues
 .. _`Email list` : https://groups.google.com/d/forum/projectmesa
 .. _`PyPI` : https://pypi.python.org/pypi/Mesa/
@@ -96,7 +96,7 @@ ABM features users have shared that you may want to use in your model
 
    Mesa Overview <overview>
    tutorials/intro_tutorial.ipynb
-   tutorials/adv_tutorial.ipynb
+   tutorials/visualization_tutorial.ipynb
    Best Practices <best-practices>
    Useful Snippets <useful-snippets/snippets>
    API Documentation <apis/api_main>
