@@ -8,7 +8,16 @@ from codecs import open
 
 from setuptools import find_packages, setup
 
-requires = ["click", "cookiecutter", "networkx", "numpy", "pandas", "tornado", "tqdm"]
+requires = [
+    "click",
+    "cookiecutter",
+    "networkx",
+    "numpy",
+    "pandas",
+    "tornado",
+    "tqdm",
+    "mesa-models @ git+https://github.com/projectmesa/mesa-examples@53abc8dbd93b2dda817648544f554045f6491147",
+]
 
 extras_require = {
     "dev": [
