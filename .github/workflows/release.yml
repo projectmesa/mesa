@@ -4,6 +4,9 @@ on:
     types:
       - published
 
+permissions:
+  id-token: write
+
 jobs:
   release:
     name: Deploy release to PyPI
