@@ -113,7 +113,7 @@ class WolfSheep(mesa.Model):
 
         # Create grass patches
         if self.grass:
-            for agent, x, y in self.grid.coord_iter():
+            for agent, (x, y) in self.grid.coord_iter():
                 fully_grown = self.random.choice([True, False])
 
                 if fully_grown:

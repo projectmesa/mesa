@@ -49,7 +49,7 @@ if run:
         model.step()
         my_bar.progress((i / num_ticks), text="Simulation progress")
         placeholder.text("Step = %d" % i)
-        for contents, x, y in model.grid.coord_iter():
+        for contents, (x, y) in model.grid.coord_iter():
             # print('x:',x,'y:',y, 'state:',contents)
             selected_row = df_grid[(df_grid["x"] == x) & (df_grid["y"] == y)]
             df_grid.loc[
