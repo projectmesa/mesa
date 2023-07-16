@@ -68,7 +68,7 @@ if run:
         my_bar.progress((i / num_ticks), text="Simulation progress")
         placeholder.text("Step = %d" % i)
         for cell in model.grid.coord_iter():
-            cell_content, x, y = cell
+            cell_content, (x, y) = cell
             agent_count = len(cell_content)
             selected_row = df_grid[(df_grid["x"] == x) & (df_grid["y"] == y)]
             df_grid.loc[

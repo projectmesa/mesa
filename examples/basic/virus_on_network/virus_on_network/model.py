@@ -123,7 +123,9 @@ class VirusAgent(mesa.Agent):
         self.gain_resistance_chance = gain_resistance_chance
 
     def try_to_infect_neighbors(self):
-        neighbors_nodes = self.model.grid.get_neighbors(self.pos, include_center=False)
+        neighbors_nodes = self.model.grid.get_neighborhood(
+            self.pos, include_center=False
+        )
         susceptible_neighbors = [
             agent
             for agent in self.model.grid.get_cell_list_contents(neighbors_nodes)

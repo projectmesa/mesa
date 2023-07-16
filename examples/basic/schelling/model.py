@@ -61,8 +61,7 @@ class Schelling(mesa.Model):
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
         for cell in self.grid.coord_iter():
-            x = cell[1]
-            y = cell[2]
+            x, y = cell[1]
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
 
