@@ -81,7 +81,7 @@ class EpsteinCivilViolence(mesa.Model):
         unique_id = 0
         if self.cop_density + self.citizen_density > 1:
             raise ValueError("Cop density + citizen density must be less than 1")
-        for contents, x, y in self.grid.coord_iter():
+        for contents, (x, y) in self.grid.coord_iter():
             if self.random.random() < self.cop_density:
                 cop = Cop(unique_id, self, (x, y), vision=self.cop_vision)
                 unique_id += 1

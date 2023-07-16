@@ -15,8 +15,7 @@ def space_drawer(viz):
             "trader": {"x": [], "y": [], "c": "tab:red", "marker": "o", "s": 10},
         }
 
-        # TODO update to Mesa 2.0 API
-        for content, i, j in g.coord_iter():
+        for content, (i, j) in g.coord_iter():
             for agent in content:
                 if isinstance(agent, Trader):
                     layers["trader"]["x"].append(i)

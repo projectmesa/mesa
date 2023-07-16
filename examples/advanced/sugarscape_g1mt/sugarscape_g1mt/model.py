@@ -89,7 +89,7 @@ class SugarscapeG1mt(mesa.Model):
         spice_distribution = np.flip(sugar_distribution, 1)
 
         agent_id = 0
-        for _, x, y in self.grid.coord_iter():
+        for _, (x, y) in self.grid.coord_iter():
             max_sugar = sugar_distribution[x, y]
             if max_sugar > 0:
                 sugar = Sugar(agent_id, self, (x, y), max_sugar)
