@@ -1,7 +1,7 @@
 import numpy as np
 import solara
 from matplotlib.figure import Figure
-from mesa_models.experimental import JupyterViz
+from mesa.experimental import JupyterViz
 from sugarscape_g1mt.model import SugarscapeG1mt
 from sugarscape_g1mt.resource_agents import Sugar
 from sugarscape_g1mt.trader_agents import Trader
