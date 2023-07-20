@@ -3,13 +3,27 @@
 Release History
 ---------------
 
-2.0.0 (2023-04-15) Wellton
+2.1.0 (2023-07-22) Youngtown
++++++++++++++++++++++++++++++
+
+This release creates `mesa.experimental` namespace, this solves the issue that PyPI release will not allow git-based install.
+
+**Users should read the Mesa 2.0.0 release note (directly below this), as this contains the details about the breaking
+changes and other major changes that were part of Mesa 2.0 release.**
+
+Changes:
+   * Creates `mesa.experimental` namespace #1736
+   * Fix Ruff lint error #1737
+   * Update permissions for PyPI #1732
+
+2.0.0 (2023-07-15) Wellton
 ++++++++++++++++++++++++++
 
 **Special notes**
 
 Mesa 2.0 includes:
     * **an experimental pure python user interface/ visualization that is also jupyter compatible please see the** `visualization tutorial`_
+    * an improved `datacollector` that allows collection by agent type
     * several breaking changes that provide significant improvements to Mesa.
 
 .. _visualization tutorial: https://mesa.readthedocs.io/en/latest/tutorials/visualization_tutorial.html
