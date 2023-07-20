@@ -201,7 +201,7 @@ def MesaComponent(viz, space_drawer=None, play_interval=400):
         else:
             space_drawer(viz)
         # 5. Plots
-        for i, measure in enumerate(viz.measures):
+        for measure in viz.measures:
             if callable(measure):
                 # Is a custom object
                 measure(viz)
