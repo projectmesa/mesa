@@ -14,9 +14,9 @@ requires = [
     "networkx",
     "numpy",
     "pandas",
+    "solara",
     "tornado",
     "tqdm",
-    "mesa-models @ git+https://github.com/projectmesa/mesa-examples@db2ec0383eb3b1868e91c828101e84cce97bbb63",
 ]
 
 extras_require = {
