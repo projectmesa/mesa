@@ -21,6 +21,7 @@ __all__ = [
     "visualization",
     "DataCollector",
     "batch_run",
+    "experimental",
 ]
 
 __title__ = "mesa"
