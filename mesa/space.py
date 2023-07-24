@@ -934,7 +934,7 @@ class ContinuousSpace:
                 get_min_abs(heading[i], inverse_heading[i]) for i in range(2)
             )
         if isinstance(pos_1, np.ndarray):
-            heading = np.ndarray(heading)
+            heading = np.asarray(heading)
         else:
             heading = tuple(heading)
         return heading
