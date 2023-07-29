@@ -22,8 +22,7 @@ Mesa allows users to quickly create agent-based models using built-in core compo
    :alt: A screenshot of the Schelling Model in Mesa
 
 *Above: A Mesa implementation of the Schelling segregation model,
-being visualized in a browser window and analyzed in a Jupyter
-notebook.*
+this can be displayed in browser windows or Jupyter.*
 
 .. _`Mesa` : https://github.com/projectmesa/mesa/
 
