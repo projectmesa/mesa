@@ -160,7 +160,6 @@ def MesaComponent(viz, space_drawer=None, play_interval=400):
 
     def on_value_play(change):
         if viz.model.running:
-            playing.value = True
             viz.do_step()
         else:
             playing.value = False
@@ -183,7 +182,7 @@ def MesaComponent(viz, space_drawer=None, play_interval=400):
             show_repeat=False,
             on_value=on_value_play,
             playing=playing.value,
-            on_play=playing.set,
+            on_playing=playing.set,
         )
         # threaded_do_play is not used for now because it
         # doesn't work in Google colab. We use
