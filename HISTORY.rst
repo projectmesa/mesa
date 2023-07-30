@@ -3,6 +3,17 @@
 Release History
 ---------------
 
+2.1.1 (2023-08-02)
++++++++++++++++++++
+
+This release improves the introductory and visualization tutorial. Ensures both are Google Colab compatible with
+working badges.
+
+Changes:
+    * Update `intro_tutorial` to warn users to ensure up to date version, and make colab compatible #1739, #1744
+    * Improve new/experimental Solara based visualization to ensure pause button works #1745
+    * Fix bug in `space.py` -> `get_heading()` #1739
+
 2.1.0 (2023-07-22) Youngtown
 +++++++++++++++++++++++++++++
 
