@@ -11,6 +11,7 @@ from setuptools import find_packages, setup
 requires = [
     "click",
     "cookiecutter",
+    "matplotlib",
     "networkx",
     "numpy",
     "pandas",
