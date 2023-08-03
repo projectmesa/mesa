@@ -394,8 +394,9 @@ class _Grid:
         """
         # iter_cell_list_contents returns only non-empty contents.
         return (
-            self._grid[x][y]
-            for x, y in itertools.filterfalse(self.is_cell_empty, cell_list)
+            cell
+            for x, y in cell_list
+            if (cell := self._grid[x][y]) != self.default_val()
         )
 
     @accept_tuple_argument
@@ -568,8 +569,9 @@ class MultiGrid(_Grid):
             An iterator of the agents contained in the cells identified in `cell_list`.
         """
         return itertools.chain.from_iterable(
-            self._grid[x][y]
-            for x, y in itertools.filterfalse(self.is_cell_empty, cell_list)
+            cell
+            for x, y in cell_list
+            if (cell := self._grid[x][y]) != self.default_val()
         )
 
 
