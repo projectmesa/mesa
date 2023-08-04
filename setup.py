@@ -29,13 +29,11 @@ extras_require = {
         "pytest-cov",
         "sphinx",
     ],
-    # Constrain sphinx version until https://github.com/readthedocs/readthedocs.org/issues/10279
-    # is fixed.
     # Explicitly install ipykernel for Python 3.8.
     # See https://stackoverflow.com/questions/28831854/how-do-i-add-python3-kernel-to-jupyter-ipython
     # Could be removed in the future
     "docs": [
-        "sphinx<7",
+        "sphinx",
         "ipython",
         "nbsphinx",
         "ipykernel",
