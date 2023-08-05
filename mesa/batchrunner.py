@@ -13,7 +13,7 @@ from typing import (
     Union,
 )
 
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mesa.model import Model
 
