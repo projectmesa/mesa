@@ -41,6 +41,7 @@ extras_require = {
         "ipykernel",
         "pydata_sphinx_theme",
         "seaborn",
+        "myst-nb",
     ],
 }
 
