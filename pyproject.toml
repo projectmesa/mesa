@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 name = "Mesa"
 description = "Agent-based modeling (ABM) in Python 3+"
 license = { text = "Apache 2.0" }
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [
   { name = "Project Mesa Team", email = "projectmesa@googlegroups.com" },
 ]
@@ -28,7 +28,6 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Intended Audience :: Science/Research",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "License :: OSI Approved :: Apache Software License",
@@ -58,13 +57,9 @@ dev = [
   "pytest-cov",
   "sphinx",
 ]
-# Explicitly install ipykernel for Python 3.8.
-# See https://stackoverflow.com/questions/28831854/how-do-i-add-python3-kernel-to-jupyter-ipython
-# Could be removed in the future
 docs = [
   "sphinx",
   "ipython",
-  "ipykernel",
   "pydata_sphinx_theme",
   "seaborn",
   "myst-nb",
@@ -134,6 +129,6 @@ extend-ignore = [
     "ISC001",  # ruff format asks to disable this feature
 ]
 extend-exclude = ["docs", "build"]
-# Hardcode to Python 3.8.
+# Hardcode to Python 3.9.
 # Reminder to update mesa-examples if the value below is changed.
-target-version = "py38"
+target-version = "py39"
