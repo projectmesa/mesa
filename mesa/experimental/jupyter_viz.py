@@ -116,7 +116,10 @@ def make_text(renderer):
     return function
 
 
-def make_user_input(user_input, k, v):
+@solara.component
+def make_user_input(user_inputs, k, v):
+    user_input = solara.use_reactive(v["value"])
+    user_inputs[k] = user_input.value
     if v["type"] == "SliderInt":
         solara.SliderInt(
             v.get("label", "label"),
@@ -142,9 +145,7 @@ def MesaComponent(viz, space_drawer=None, play_interval=400):
     # 1. User inputs
     user_inputs = {}
     for k, v in viz.model_params_input.items():
-        user_input = solara.use_reactive(v["value"])
-        user_inputs[k] = user_input.value
-        make_user_input(user_input, k, v)
+        make_user_input(user_inputs, k, v)
 
     # 2. Model
     def make_model():
