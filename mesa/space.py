@@ -26,16 +26,14 @@ from numbers import Real
 from typing import (
     Any,
     Callable,
-    Iterable,
-    Iterator,
     List,
-    Sequence,
     Tuple,
     TypeVar,
     Union,
     cast,
     overload,
 )
+from collections.abc import Iterable, Iterator, Sequence
 from warnings import warn
 
 import networkx as nx
@@ -48,15 +46,15 @@ from .agent import Agent
 # for better performance, we calculate the tuple to use in the is_integer function
 _types_integer = (int, np.integer)
 
-Coordinate = Tuple[int, int]
+Coordinate = tuple[int, int]
 # used in ContinuousSpace
-FloatCoordinate = Union[Tuple[float, float], npt.NDArray[float]]
+FloatCoordinate = Union[tuple[float, float], npt.NDArray[float]]
 NetworkCoordinate = int
 
 Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
 
 GridContent = Union[Agent, None]
-MultiGridContent = List[Agent]
+MultiGridContent = list[Agent]
 
 F = TypeVar("F", bound=Callable[..., Any])
 
