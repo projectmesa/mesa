@@ -208,6 +208,9 @@ def MesaComponent(viz, space_drawer=None, play_interval=400):
                 make_plot(viz, measure)
 
 
+# JupyterViz has to be a Solara component, so that each browser tabs runs in
+# their own, separate simulation thread. See https://github.com/projectmesa/mesa/issues/856.
+@solara.component
 def JupyterViz(
     model_class,
     model_params,
