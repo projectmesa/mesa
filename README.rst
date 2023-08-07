@@ -85,21 +85,21 @@ If you are a Mesa developer, first `install Docker Compose <https://docs.docker.
     # If you want to make it run in the background, you instead run
     $ docker compose up -d
 
-This runs the wolf-sheep predation model, as an example.
+This runs the Schelling model, as an example.
 
 With the docker-compose.yml file in this Git repository, the `docker compose up` command does two important things:
 
 * It mounts the mesa root directory (relative to the docker-compose.yml file) into /opt/mesa and runs pip install -e on that directory so your changes to mesa should be reflected in the running container.
-* It binds the docker container's port 8521 to your host system's port 8521 so you can interact with the running model as usual by visiting localhost:8521 on your browser
+* It binds the docker container's port 8765 to your host system's port 8765 so you can interact with the running model as usual by visiting localhost:8765 on your browser
 
 
 If you are a model developer that wants to run Mesa on a model, you need to:
 
 * make sure that your model folder is inside the folder containing the docker-compose.yml file
 * change the ``MODEL_DIR`` variable in docker-compose.yml to point to the path of your model
-* make sure that the model folder contains a run.py file
+* make sure that the model folder contains an app.py file
 
-Then, you just need to run `docker compose up -d` to make it accessible from ``localhost:8521``.
+Then, you just need to run `docker compose up -d` to have it accessible from ``localhost:8765``.
 
 Contributing to Mesa
 ----------------------------
