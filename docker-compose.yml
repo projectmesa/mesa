@@ -12,6 +12,10 @@ services:
     volumes:
       - .:/opt/mesa
     environment:
-      MODEL_DIR: examples/wolf_sheep
+      # You may replace this with any model directory located
+      # within the current directory.
+      # E.g. if it is at my-model, then you specify it as
+      # /opt/mesa/my-model.
+      MODEL_DIR: /mesa-examples/examples/schelling_experimental
     ports:
-      - "127.0.0.1:8521:8521"
+      - 8765:8765
