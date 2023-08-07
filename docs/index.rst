@@ -95,8 +95,8 @@ ABM features users have shared that you may want to use in your model
    :maxdepth: 7
 
    Mesa Overview <overview>
-   tutorials/intro_tutorial.ipynb
-   tutorials/visualization_tutorial.ipynb
+   tutorials/intro_tutorial
+   tutorials/visualization_tutorial
    Best Practices <best-practices>
    Useful Snippets <useful-snippets/snippets>
    API Documentation <apis/api_main>

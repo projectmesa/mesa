@@ -37,7 +37,6 @@ extras_require = {
     "docs": [
         "sphinx<7",
         "ipython",
-        "nbsphinx",
         "ipykernel",
         "pydata_sphinx_theme",
         "seaborn",
