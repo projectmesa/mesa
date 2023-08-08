@@ -150,6 +150,12 @@ def make_user_input(user_input, k, v):
             max=v.get("max"),
             step=v.get("step"),
         )
+    elif v["type"] == "Select":
+        solara.Select(
+            v.get("label", "label"),
+            value=v.get("value"),
+            values=v.get("values"),
+        )
 
 
 @solara.component
