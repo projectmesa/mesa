@@ -261,53 +261,78 @@ class _Grid:
         if self.out_of_bounds(pos):
             raise Exception("The `pos` tuple passed is out of bounds.")
 
-        # We use a list instead of a dict for the neighborhood because it would
-        # be easier to port the code to Cython or Numba (for performance
-        # purpose), with minimal changes. To better understand how the
-        # algorithm was conceived, look at
-        # https://github.com/projectmesa/mesa/pull/1476#issuecomment-1306220403
-        # and the discussion in that PR in general.
-        neighborhood = []
+        neighborhood = set()
 
         x, y = pos
-        if self.torus:
-            x_max_radius, y_max_radius = self.width // 2, self.height // 2
-            x_radius, y_radius = min(radius, x_max_radius), min(radius, y_max_radius)
 
-            # For each dimension, in the edge case where the radius is as big as
-            # possible and the dimension is even, we need to shrink by one the range
-            # of values, to avoid duplicates in neighborhood. For example, if
-            # the width is 4, while x, x_radius, and x_max_radius are 2, then
-            # (x + dx) has a value from 0 to 4 (inclusive), but this means that
-            # the 0 position is repeated since 0 % 4 and 4 % 4 are both 0.
-            xdim_even, ydim_even = (self.width + 1) % 2, (self.height + 1) % 2
-            kx = int(x_radius == x_max_radius and xdim_even)
-            ky = int(y_radius == y_max_radius and ydim_even)
+        # First we check if the neighborhood is inside the grid
+        if (
+            x >= radius
+            and self.width - x > radius
+            and y >= radius
+            and self.height - y > radius
+        ):
+            # For the common case of radius 1, we can return neighborhood directly
+            if radius == 1:
+                if moore:
+                    neighborhood = [
+                        (x - 1, y - 1),
+                        (x - 1, y),
+                        (x - 1, y + 1),
+                        (x, y - 1),
+                        (x, y + 1),
+                        (x + 1, y - 1),
+                        (x + 1, y),
+                        (x + 1, y + 1),
+                    ]
+                else:
+                    neighborhood = [
+                        (x - 1, y),
+                        (x, y - 1),
+                        (x, y + 1),
+                        (x + 1, y),
+                    ]
+                if include_center:
+                    neighborhood.append(pos)
 
-            for dx in range(-x_radius, x_radius + 1 - kx):
-                for dy in range(-y_radius, y_radius + 1 - ky):
+            else:
+                # If the radius is smaller than the distance from the borders, we
+                # can skip boundary checks.
+                x_range = range(x - radius, x + radius + 1)
+                y_range = range(y - radius, y + radius + 1)
+
+                for new_x in x_range:
+                    for new_y in y_range:
+                        if not moore and abs(new_x - x) + abs(new_y - y) > radius:
+                            continue
+
+                        neighborhood.add((new_x, new_y))
+
+        else:
+            # If the radius is larger than the distance from the borders, we
+            # must use a slower method, that takes into account the borders
+            # and the torus property.
+            for dx in range(-radius, radius + 1):
+                for dy in range(-radius, radius + 1):
                     if not moore and abs(dx) + abs(dy) > radius:
                         continue
 
-                    nx, ny = (x + dx) % self.width, (y + dy) % self.height
-                    neighborhood.append((nx, ny))
-        else:
-            x_range = range(max(0, x - radius), min(self.width, x + radius + 1))
-            y_range = range(max(0, y - radius), min(self.height, y + radius + 1))
+                    new_x = x + dx
+                    new_y = y + dy
 
-            for nx in x_range:
-                for ny in y_range:
-                    if not moore and abs(nx - x) + abs(ny - y) > radius:
-                        continue
+                    if self.torus:
+                        new_x %= self.width
+                        new_y %= self.height
 
-                    neighborhood.append((nx, ny))
+                    if not self.out_of_bounds((new_x, new_y)):
+                        neighborhood.add((new_x, new_y))
 
-        if not include_center:
-            neighborhood.remove(pos)
+            if not include_center:
+                neighborhood.discard(pos)
 
-        self._neighborhood_cache[cache_key] = neighborhood
+        self._neighborhood_cache[cache_key] = list(neighborhood)
 
-        return neighborhood
+        return list(neighborhood)
 
     def iter_neighbors(
         self,
