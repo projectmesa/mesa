@@ -261,7 +261,8 @@ class _Grid:
         if self.out_of_bounds(pos):
             raise Exception("The `pos` tuple passed is out of bounds.")
 
-        neighborhood = set()
+        # we use a dict to keep insertion order
+        neighborhood = {}
 
         x, y = pos
 
@@ -306,7 +307,7 @@ class _Grid:
                         if not moore and abs(new_x - x) + abs(new_y - y) > radius:
                             continue
 
-                        neighborhood.add((new_x, new_y))
+                        neighborhood[(new_x, new_y)] = True
 
         else:
             # If the radius is larger than the distance from the borders, we
@@ -325,14 +326,14 @@ class _Grid:
                         new_y %= self.height
 
                     if not self.out_of_bounds((new_x, new_y)):
-                        neighborhood.add((new_x, new_y))
+                        neighborhood[(new_x, new_y)] = True
 
             if not include_center:
-                neighborhood.discard(pos)
+                neighborhood.pop(pos, None)
 
-        self._neighborhood_cache[cache_key] = list(neighborhood)
+        self._neighborhood_cache[cache_key] = list(neighborhood.keys())
 
-        return list(neighborhood)
+        return list(neighborhood.keys())
 
     def iter_neighbors(
         self,
