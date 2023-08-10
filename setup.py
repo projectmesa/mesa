@@ -29,8 +29,7 @@ extras_require = {
     # See https://stackoverflow.com/questions/28831854/how-do-i-add-python3-kernel-to-jupyter-ipython
     # Could be removed in the future
     "docs": [
-        "sphinx>=7",
-        "sphinx-rtd-theme>=1.3.0rc1",
+        "sphinx",
         "ipython",
         "ipykernel",
         "pydata_sphinx_theme",
