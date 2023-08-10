@@ -273,41 +273,17 @@ class _Grid:
             and y >= radius
             and self.height - y > radius
         ):
-            # For the common case of radius 1, we can return neighborhood directly
-            if radius == 1:
-                if moore:
-                    neighborhood = [
-                        (x - 1, y - 1),
-                        (x - 1, y),
-                        (x - 1, y + 1),
-                        (x, y - 1),
-                        (x, y + 1),
-                        (x + 1, y - 1),
-                        (x + 1, y),
-                        (x + 1, y + 1),
-                    ]
-                else:
-                    neighborhood = [
-                        (x - 1, y),
-                        (x, y - 1),
-                        (x, y + 1),
-                        (x + 1, y),
-                    ]
-                if include_center:
-                    neighborhood.append(pos)
+            # If the radius is smaller than the distance from the borders, we
+            # can skip boundary checks.
+            x_range = range(x - radius, x + radius + 1)
+            y_range = range(y - radius, y + radius + 1)
 
-            else:
-                # If the radius is smaller than the distance from the borders, we
-                # can skip boundary checks.
-                x_range = range(x - radius, x + radius + 1)
-                y_range = range(y - radius, y + radius + 1)
+            for new_x in x_range:
+                for new_y in y_range:
+                    if not moore and abs(new_x - x) + abs(new_y - y) > radius:
+                        continue
 
-                for new_x in x_range:
-                    for new_y in y_range:
-                        if not moore and abs(new_x - x) + abs(new_y - y) > radius:
-                            continue
-
-                        neighborhood[(new_x, new_y)] = True
+                    neighborhood[(new_x, new_y)] = True
 
         else:
             # If the radius is larger than the distance from the borders, we
@@ -328,8 +304,8 @@ class _Grid:
                     if not self.out_of_bounds((new_x, new_y)):
                         neighborhood[(new_x, new_y)] = True
 
-            if not include_center:
-                neighborhood.pop(pos, None)
+        if not include_center:
+            neighborhood.pop(pos, None)
 
         self._neighborhood_cache[cache_key] = list(neighborhood.keys())
 
