@@ -188,6 +188,16 @@ def _model_run_func(
     for step in steps:
         model_data, all_agents_data = _collect_data(model, step)
 
+
+        # Extract the list of keys to skip
+        keys_to_skip = kwargs.get('parameters_to_skip_in_archive', [])
+
+        # Filter out those keys from kwargs
+        filtered_kwargs = {k: v for k, v in kwargs.items() if k not in keys_to_skip}
+
+        # Now, you might also want to remove the 'parameters_to_skip_in_archive' key itself
+        filtered_kwargs.pop('parameters_to_skip_in_archive', None)
+
         # If there are agent_reporters, then create an entry for each agent
         if all_agents_data:
             stepdata = [
@@ -195,7 +205,7 @@ def _model_run_func(
                     "RunId": run_id,
                     "iteration": iteration,
                     "Step": step,
-                    **kwargs,
+                    **filtered_kwargs,
                     **model_data,
                     **agent_data,
                 }
@@ -208,7 +218,7 @@ def _model_run_func(
                     "RunId": run_id,
                     "iteration": iteration,
                     "Step": step,
-                    **kwargs,
+                    **filtered_kwargs,
                     **model_data,
                 }
             ]
