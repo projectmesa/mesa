@@ -1,10 +1,13 @@
 import threading
 
 import matplotlib.pyplot as plt
+import networkx as nx
 import reacton.ipywidgets as widgets
 import solara
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
+
+import mesa
 
 # Avoid interactive backend
 plt.switch_backend("agg")
@@ -91,10 +94,24 @@ class JupyterContainer:
         return out
 
 
+def _draw_network_grid(viz, space_ax):
+    graph = viz.model.grid.G
+    pos = nx.spring_layout(graph, seed=0)
+    nx.draw(
+        graph,
+        ax=space_ax,
+        pos=pos,
+        **viz.agent_portrayal(graph),
+    )
+
+
 def make_space(viz):
     space_fig = Figure()
     space_ax = space_fig.subplots()
-    space_ax.scatter(**viz.portray(viz.model.grid))
+    if isinstance(viz.model.grid, mesa.space.NetworkGrid):
+        _draw_network_grid(viz, space_ax)
+    else:
+        space_ax.scatter(**viz.portray(viz.model.grid))
     space_ax.set_axis_off()
     solara.FigureMatplotlib(space_fig, dependencies=[viz.model, viz.df])
 
