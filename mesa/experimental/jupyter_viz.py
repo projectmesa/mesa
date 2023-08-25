@@ -177,7 +177,7 @@ def MesaComponent(viz, space_drawer=None, play_interval=400):
 
     # 4. Status indicators
     #: current round step count
-    step = solara.use_reactive(False)
+    step = solara.use_reactive(True)
 
     def on_value_play(change):
         if viz.model.running:
@@ -206,12 +206,7 @@ def MesaComponent(viz, space_drawer=None, play_interval=400):
             playing=playing.value,
             on_playing=playing.set,
         )
-        widgets.IntText(
-            value=step.value,
-            description="Step:",
-            disabled=True,
-            interval=play_interval,
-        )
+        solara.Markdown(md_text="**Step:** %d" % step.value)
         # threaded_do_play is not used for now because it
         # doesn't work in Google colab. We use
         # ipywidgets.Play until it is fixed. The threading
