@@ -117,7 +117,7 @@ class _Grid:
         self._empties_built = False
 
         # Neighborhood Cache
-        self._neighborhood_cache: dict[Any, list[Coordinate]] = {}
+        self._neighborhood_cache: dict[Any, Sequence[Coordinate]] = {}
 
         # Cutoff used inside self.move_to_empty. The parameters are fitted on Python
         # 3.11 and it was verified that they are roughly the same for 3.10. Refer to
@@ -233,7 +233,7 @@ class _Grid:
         moore: bool,
         include_center: bool = False,
         radius: int = 1,
-    ) -> list[Coordinate]:
+    ) -> Sequence[Coordinate]:
         """Return a list of cells that are in the neighborhood of a
         certain point.
 
@@ -307,9 +307,9 @@ class _Grid:
         if not include_center:
             neighborhood.pop(pos, None)
 
-        self._neighborhood_cache[cache_key] = list(neighborhood.keys())
+        self._neighborhood_cache[cache_key] = tuple(neighborhood.keys())
 
-        return list(neighborhood.keys())
+        return tuple(neighborhood.keys())
 
     def iter_neighbors(
         self,
@@ -681,7 +681,7 @@ class _HexGrid:
         else:
             coordinates.discard(pos)
 
-        neighborhood = sorted(coordinates)
+        neighborhood = tuple(sorted(coordinates))
         self._neighborhood_cache[cache_key] = neighborhood
 
         return neighborhood
