@@ -133,28 +133,37 @@ def make_text(renderer):
     return function
 
 
-def make_user_input(user_input, k, v):
-    if v["type"] == "SliderInt":
+def make_user_input(user_input, options):
+    """Initialize a user input for configurable model parameters.
+    Currently supports :class:`solara.SliderInt`, :class:`solara.SliderFloat`,
+    and :class:`solara.Select`.
+
+    Args:
+        user_input: :class:`solara.reactive` object with initial value
+        options: dictionary with options for the input, including label,
+        min and max values, and other fields specific to the input type.
+    """
+    if options["type"] == "SliderInt":
         solara.SliderInt(
-            v.get("label", "label"),
+            options.get("label", "label"),
             value=user_input,
-            min=v.get("min"),
-            max=v.get("max"),
-            step=v.get("step"),
+            min=options.get("min"),
+            max=options.get("max"),
+            step=options.get("step"),
         )
-    elif v["type"] == "SliderFloat":
+    elif options["type"] == "SliderFloat":
         solara.SliderFloat(
-            v.get("label", "label"),
+            options.get("label", "label"),
             value=user_input,
-            min=v.get("min"),
-            max=v.get("max"),
-            step=v.get("step"),
+            min=options.get("min"),
+            max=options.get("max"),
+            step=options.get("step"),
         )
-    elif v["type"] == "Select":
+    elif options["type"] == "Select":
         solara.Select(
-            v.get("label", "label"),
-            value=v.get("value"),
-            values=v.get("values"),
+            options.get("label", "label"),
+            value=options.get("value"),
+            values=options.get("values"),
         )
 
 
@@ -164,10 +173,10 @@ def MesaComponent(viz, space_drawer=None, play_interval=400):
 
     # 1. User inputs
     user_inputs = {}
-    for k, v in viz.model_params_input.items():
-        user_input = solara.use_reactive(v["value"])
-        user_inputs[k] = user_input.value
-        make_user_input(user_input, k, v)
+    for name, options in viz.model_params_input.items():
+        user_input = solara.use_reactive(options["value"])
+        user_inputs[name] = user_input.value
+        make_user_input(user_input, options)
 
     # 2. Model
     def make_model():
