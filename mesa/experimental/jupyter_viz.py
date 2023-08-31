@@ -133,38 +133,44 @@ def make_text(renderer):
     return function
 
 
-def make_user_input(user_input, options):
+def make_user_input(user_input, name, options):
     """Initialize a user input for configurable model parameters.
     Currently supports :class:`solara.SliderInt`, :class:`solara.SliderFloat`,
     and :class:`solara.Select`.
 
     Args:
         user_input: :class:`solara.reactive` object with initial value
+        name: field name; used as fallback for label if 'label' is not in options
         options: dictionary with options for the input, including label,
         min and max values, and other fields specific to the input type.
     """
-    if options["type"] == "SliderInt":
+    # label for the input is "label" from options or name
+    label = options.get("label", name)
+    input_type = options.get("type")
+    if input_type == "SliderInt":
         solara.SliderInt(
-            options.get("label", "label"),
+            label,
             value=user_input,
             min=options.get("min"),
             max=options.get("max"),
             step=options.get("step"),
         )
-    elif options["type"] == "SliderFloat":
+    elif input_type == "SliderFloat":
         solara.SliderFloat(
-            options.get("label", "label"),
+            label,
             value=user_input,
             min=options.get("min"),
             max=options.get("max"),
             step=options.get("step"),
         )
-    elif options["type"] == "Select":
+    elif input_type == "Select":
         solara.Select(
-            options.get("label", "label"),
+            label,
             value=options.get("value"),
             values=options.get("values"),
         )
+    else:
+        raise ValueError(f"{input_type} is not a supported input type")
 
 
 @solara.component
@@ -176,7 +182,7 @@ def MesaComponent(viz, space_drawer=None, play_interval=400):
     for name, options in viz.model_params_input.items():
         user_input = solara.use_reactive(options["value"])
         user_inputs[name] = user_input.value
-        make_user_input(user_input, options)
+        make_user_input(user_input, name, options)
 
     # 2. Model
     def make_model():
