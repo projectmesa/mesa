@@ -8,10 +8,10 @@ class TestMakeUserInput(unittest.TestCase):
     def test_unsupported_type(self):
         """unsupported input type should raise ValueError"""
         # bogus type
-        with self.assertRaisesRegex(ValueError, "not a supported input type") as err:
+        with self.assertRaisesRegex(ValueError, "not a supported input type"):
             make_user_input(10, "input", {"type": "bogus"})
         # no type is specified
-        with self.assertRaisesRegex(ValueError, "not a supported input type") as err:
+        with self.assertRaisesRegex(ValueError, "not a supported input type"):
             make_user_input(10, "input", {})
 
     @patch("mesa.experimental.jupyter_viz.solara")
