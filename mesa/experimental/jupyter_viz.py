@@ -1,5 +1,6 @@
 import threading
 
+import matplotlib.pyplot as plt
 import networkx as nx
 import reacton.ipywidgets as widgets
 import solara
@@ -7,6 +8,9 @@ from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 
 import mesa
+
+# Avoid interactive backend
+plt.switch_backend("agg")
 
 
 @solara.component
@@ -60,6 +64,7 @@ def JupyterViz(
 @solara.component
 def ModelController(model, play_interval, current_step, set_current_step):
     playing = solara.use_reactive(False)
+    thread = solara.use_reactive(None)
 
     def on_value_play(change):
         if model.running:
@@ -71,22 +76,22 @@ def ModelController(model, play_interval, current_step, set_current_step):
         model.step()
         set_current_step(model.schedule.steps)
 
-    def do_play(self):
+    def do_play():
         model.running = True
         while model.running:
-            self.do_step()
+            do_step()
 
-    def threaded_do_play(self):
-        if self.thread is not None and self.thread.is_alive():
+    def threaded_do_play():
+        if thread is not None and thread.is_alive():
             return
-        self.thread = threading.Thread(target=self.do_play)
-        self.thread.start()
+        thread.value = threading.Thread(target=do_play)
+        thread.start()
 
-    def do_pause(self):
-        if (self.thread is None) or (not self.thread.is_alive()):
+    def do_pause():
+        if (thread is None) or (not thread.is_alive()):
             return
-        self.model.running = False
-        self.thread.join()
+        model.running = False
+        thread.join()
 
     with solara.Row():
         solara.Button(label="Step", color="primary", on_click=do_step)
