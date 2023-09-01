@@ -32,10 +32,10 @@ def JupyterViz(
 
     # 1. User inputs
     user_inputs = {}
-    for k, v in model_params_input.items():
-        user_input = solara.use_reactive(v["value"])
-        user_inputs[k] = user_input.value
-        make_user_input(user_input, k, v)
+    for name, options in model_params_input.items():
+        user_input = solara.use_reactive(options["value"])
+        user_inputs[name] = user_input.value
+        make_user_input(user_input, name, options)
 
     # 2. Model
     def make_model():
@@ -142,29 +142,44 @@ def check_param_is_fixed(param):
         return True
 
 
-def make_user_input(user_input, k, v):
-    if v["type"] == "SliderInt":
+def make_user_input(user_input, name, options):
+    """Initialize a user input for configurable model parameters.
+    Currently supports :class:`solara.SliderInt`, :class:`solara.SliderFloat`,
+    and :class:`solara.Select`.
+
+    Args:
+        user_input: :class:`solara.reactive` object with initial value
+        name: field name; used as fallback for label if 'label' is not in options
+        options: dictionary with options for the input, including label,
+        min and max values, and other fields specific to the input type.
+    """
+    # label for the input is "label" from options or name
+    label = options.get("label", name)
+    input_type = options.get("type")
+    if input_type == "SliderInt":
         solara.SliderInt(
-            v.get("label", "label"),
+            label,
             value=user_input,
-            min=v.get("min"),
-            max=v.get("max"),
-            step=v.get("step"),
+            min=options.get("min"),
+            max=options.get("max"),
+            step=options.get("step"),
         )
-    elif v["type"] == "SliderFloat":
+    elif input_type == "SliderFloat":
         solara.SliderFloat(
-            v.get("label", "label"),
+            label,
             value=user_input,
-            min=v.get("min"),
-            max=v.get("max"),
-            step=v.get("step"),
+            min=options.get("min"),
+            max=options.get("max"),
+            step=options.get("step"),
         )
-    elif v["type"] == "Select":
+    elif input_type == "Select":
         solara.Select(
-            v.get("label", "label"),
-            value=v.get("value"),
-            values=v.get("values"),
+            label,
+            value=options.get("value"),
+            values=options.get("values"),
         )
+    else:
+        raise ValueError(f"{input_type} is not a supported input type")
 
 
 def make_space(model, agent_portrayal):
