@@ -13,6 +13,9 @@ import mesa
 plt.switch_backend("agg")
 
 
+model_parameters = solara.reactive(None)
+
+
 @solara.component
 def JupyterViz(
     model_class,
@@ -39,25 +42,26 @@ def JupyterViz(
 
     current_step, set_current_step = solara.use_state(0)
 
-    solara.Markdown(name)
+    # 1. Set up model parameters
+    user_params, fixed_params = split_model_params(model_params)
+    if model_parameters.value is None:
+        model_parameters.value = fixed_params | {
+            k: v["value"] for k, v in user_params.items()
+        }
 
-    # 0. Split model params
-    model_params_input, model_params_fixed = split_model_params(model_params)
-
-    # 1. User inputs
-    user_inputs = {}
-    for name, options in model_params_input.items():
-        user_input = solara.use_reactive(options["value"])
-        user_inputs[name] = user_input.value
-        make_user_input(user_input, name, options)
-
-    # 2. Model
+    # 2. Set up Model
     def make_model():
-        return model_class(**user_inputs, **model_params_fixed)
+        model = model_class(**model_parameters.value)
+        set_current_step(0)
+        return model
 
-    model = solara.use_memo(make_model, dependencies=list(user_inputs.values()))
+    model = solara.use_memo(
+        make_model, dependencies=list(model_parameters.value.values())
+    )
 
-    # 3. Buttons
+    # 3. Set up UI
+    solara.Markdown(name)
+    UserInputs(user_params)
     ModelController(model, play_interval, current_step, set_current_step)
 
     with solara.GridFixed(columns=2):
@@ -160,44 +164,53 @@ def check_param_is_fixed(param):
         return True
 
 
-def make_user_input(user_input, name, options):
-    """Initialize a user input for configurable model parameters.
+@solara.component
+def UserInputs(user_params):
+    """Initialize user inputs for configurable model parameters.
     Currently supports :class:`solara.SliderInt`, :class:`solara.SliderFloat`,
     and :class:`solara.Select`.
 
-    Args:
-        user_input: :class:`solara.reactive` object with initial value
-        name: field name; used as fallback for label if 'label' is not in options
-        options: dictionary with options for the input, including label,
+    Props:
+        user_params: dictionary with options for the input, including label,
         min and max values, and other fields specific to the input type.
     """
-    # label for the input is "label" from options or name
-    label = options.get("label", name)
-    input_type = options.get("type")
-    if input_type == "SliderInt":
-        solara.SliderInt(
-            label,
-            value=user_input,
-            min=options.get("min"),
-            max=options.get("max"),
-            step=options.get("step"),
-        )
-    elif input_type == "SliderFloat":
-        solara.SliderFloat(
-            label,
-            value=user_input,
-            min=options.get("min"),
-            max=options.get("max"),
-            step=options.get("step"),
-        )
-    elif input_type == "Select":
-        solara.Select(
-            label,
-            value=options.get("value"),
-            values=options.get("values"),
-        )
-    else:
-        raise ValueError(f"{input_type} is not a supported input type")
+
+    def handle_change_value(name):
+        def change_value(change):
+            model_parameters.value = model_parameters.value | {name: change}
+
+        return change_value
+
+    for name, options in user_params.items():
+        # label for the input is "label" from options or name
+        label = options.get("label", name)
+        input_type = options.get("type")
+        if input_type == "SliderInt":
+            solara.SliderInt(
+                label,
+                value=model_parameters.value[name],
+                on_value=handle_change_value(name),
+                min=options.get("min"),
+                max=options.get("max"),
+                step=options.get("step"),
+            )
+        elif input_type == "SliderFloat":
+            solara.SliderFloat(
+                label,
+                value=model_parameters.value[name],
+                on_value=handle_change_value(name),
+                min=options.get("min"),
+                max=options.get("max"),
+                step=options.get("step"),
+            )
+        elif input_type == "Select":
+            solara.Select(
+                label,
+                value=model_parameters.value[name],
+                values=options.get("values"),
+            )
+        else:
+            raise ValueError(f"{input_type} is not a supported input type")
 
 
 def make_space(model, agent_portrayal):
