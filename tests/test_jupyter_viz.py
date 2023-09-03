@@ -1,53 +1,71 @@
 import unittest
 from unittest.mock import Mock, patch
 
+import ipyvuetify as vw
 import solara
 
-from mesa.experimental.jupyter_viz import JupyterViz, make_user_input
+from mesa.experimental.jupyter_viz import JupyterViz, UserInputs
 
 
 class TestMakeUserInput(unittest.TestCase):
     def test_unsupported_type(self):
+        @solara.component
+        def Test(user_params):
+            UserInputs(user_params)
+
         """unsupported input type should raise ValueError"""
         # bogus type
         with self.assertRaisesRegex(ValueError, "not a supported input type"):
-            make_user_input(10, "input", {"type": "bogus"})
+            solara.render(Test({"mock": {"type": "bogus"}}), handle_error=False)
+
         # no type is specified
         with self.assertRaisesRegex(ValueError, "not a supported input type"):
-            make_user_input(10, "input", {})
+            solara.render(Test({"mock": {}}), handle_error=False)
 
-    @patch("mesa.experimental.jupyter_viz.solara")
-    def test_slider_int(self, mock_solara):
-        value = 10
-        name = "num_agents"
+    def test_slider_int(self):
+        @solara.component
+        def Test(user_params):
+            UserInputs(user_params)
+
         options = {
             "type": "SliderInt",
+            "value": 10,
             "label": "number of agents",
             "min": 10,
             "max": 20,
             "step": 1,
         }
-        make_user_input(value, name, options)
-        mock_solara.SliderInt.assert_called_with(
-            options["label"],
-            value=value,
-            min=options["min"],
-            max=options["max"],
-            step=options["step"],
-        )
+        user_params = {"num_agents": options}
+        _, rc = solara.render(Test(user_params), handle_error=False)
+        slider_int = rc.find(vw.Slider).widget
 
-    @patch("mesa.experimental.jupyter_viz.solara")
-    def test_label_fallback(self, mock_solara):
+        assert slider_int.v_model == options["value"]
+        assert slider_int.label == options["label"]
+        assert slider_int.min == options["min"]
+        assert slider_int.max == options["max"]
+        assert slider_int.step == options["step"]
+
+    def test_label_fallback(self):
         """name should be used as fallback label"""
-        value = 10
-        name = "num_agents"
+
+        @solara.component
+        def Test(user_params):
+            UserInputs(user_params)
+
         options = {
             "type": "SliderInt",
+            "value": 10,
         }
-        make_user_input(value, name, options)
-        mock_solara.SliderInt.assert_called_with(
-            name, value=value, min=None, max=None, step=None
-        )
+
+        user_params = {"num_agents": options}
+        _, rc = solara.render(Test(user_params), handle_error=False)
+        slider_int = rc.find(vw.Slider).widget
+
+        assert slider_int.v_model == options["value"]
+        assert slider_int.label == "num_agents"
+        assert slider_int.min is None
+        assert slider_int.max is None
+        assert slider_int.step is None
 
 
 class TestJupyterViz(unittest.TestCase):
