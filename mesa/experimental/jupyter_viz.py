@@ -48,7 +48,7 @@ def JupyterViz(
 
     with solara.GridFixed(columns=2):
         # 4. Space
-        SpaceView(space_drawer, model, agent_portrayal)
+        SpaceView(space_drawer, model, agent_portrayal, current_step)
         # 5. Plots
         for measure in measures:
             if callable(measure):
@@ -180,7 +180,7 @@ def make_user_input(user_input, name, options):
 
 
 @solara.component
-def GridView(grid, agent_portrayal):
+def GridView(grid, agent_portrayal, dummy):
     def portray(grid):
         x = []
         y = []
@@ -217,25 +217,21 @@ def GridView(grid, agent_portrayal):
 
 
 @solara.component
-def SpaceView(
-    space_drawer,
-    model,
-    agent_portrayal,
-):
+def SpaceView(space_drawer, model, agent_portrayal, dummy):
     if space_drawer is not None:
         return space_drawer(model, agent_portrayal)
 
     if isinstance(model.grid, mesa.space.NetworkGrid):
-        return NetworkSpace(model.grid.G, agent_portrayal)
+        return NetworkView(model.grid.G, agent_portrayal, dummy)
 
     if isinstance(model.grid, mesa.space._Grid):
-        return GridView(model.grid, agent_portrayal)
+        return GridView(model.grid, agent_portrayal, dummy)
 
     raise ValueError(f"Unsupported space type: {type(model.grid)}")
 
 
 @solara.component
-def NetworkSpace(graph, agent_portrayal):
+def NetworkView(graph, agent_portrayal, dummy):
     space_fig = Figure()
     space_ax = space_fig.subplots()
     pos = nx.spring_layout(graph, seed=0)
