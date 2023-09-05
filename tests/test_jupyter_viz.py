@@ -1,7 +1,9 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
-from mesa.experimental.jupyter_viz import make_user_input
+import solara
+
+from mesa.experimental.jupyter_viz import JupyterViz, make_user_input
 
 
 class TestMakeUserInput(unittest.TestCase):
@@ -45,4 +47,55 @@ class TestMakeUserInput(unittest.TestCase):
         make_user_input(value, name, options)
         mock_solara.SliderInt.assert_called_with(
             name, value=value, min=None, max=None, step=None
+        )
+
+
+class TestJupyterViz(unittest.TestCase):
+    @patch("mesa.experimental.jupyter_viz.make_space")
+    def test_call_space_drawer(self, mock_make_space):
+        mock_model_class = Mock()
+        agent_portrayal = {
+            "Shape": "circle",
+            "color": "gray",
+        }
+        # initialize with space drawer unspecified (use default)
+        # component must be rendered for code to run
+        solara.render(
+            JupyterViz(
+                model_class=mock_model_class,
+                model_params={},
+                agent_portrayal=agent_portrayal,
+            )
+        )
+        # should call default method with class instance and agent portrayal
+        mock_make_space.assert_called_with(
+            mock_model_class.return_value, agent_portrayal
+        )
+
+        # specify no space should be drawn; any false value should work
+        for falsy_value in [None, False, 0]:
+            mock_make_space.reset_mock()
+            solara.render(
+                JupyterViz(
+                    model_class=mock_model_class,
+                    model_params={},
+                    agent_portrayal=agent_portrayal,
+                    space_drawer=falsy_value,
+                )
+            )
+            # should call default method with class instance and agent portrayal
+            assert mock_make_space.call_count == 0
+
+        # specify a custom space method
+        altspace_drawer = Mock()
+        solara.render(
+            JupyterViz(
+                model_class=mock_model_class,
+                model_params={},
+                agent_portrayal=agent_portrayal,
+                space_drawer=altspace_drawer,
+            )
+        )
+        altspace_drawer.assert_called_with(
+            mock_model_class.return_value, agent_portrayal
         )
