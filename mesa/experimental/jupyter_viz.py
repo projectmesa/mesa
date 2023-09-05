@@ -1,4 +1,4 @@
-import threading
+import time
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -58,70 +58,47 @@ def JupyterViz(
                 # Is a custom object
                 measure(model)
             else:
-                make_plot(model, measure)
+                pass
+                # make_plot(model, measure)
 
 
 @solara.component
 def ModelController(model, play_interval, current_step, set_current_step):
     playing = solara.use_reactive(False)
-    thread = solara.use_reactive(None)
-
-    def on_value_play(change):
-        if model.running:
-            do_step()
-        else:
-            playing.value = False
 
     def do_step():
         model.step()
         set_current_step(model.schedule.steps)
 
     def do_play():
-        model.running = True
-        while model.running:
+        if playing.value and model.running:
             do_step()
+            time.sleep(play_interval)
 
-    def threaded_do_play():
-        if thread is not None and thread.is_alive():
-            return
-        thread.value = threading.Thread(target=do_play)
-        thread.start()
+    solara.use_thread(
+        do_play, dependencies=[playing.value, model.running, current_step]
+    )
 
-    def do_pause():
-        if (thread is None) or (not thread.is_alive()):
-            return
-        model.running = False
-        thread.join()
+    def handle_click_start_pause():
+        playing.value = not playing.value
+
+    def handle_click_step():
+        do_step()
 
     with solara.Row():
-        solara.Button(label="Step", color="primary", on_click=do_step)
-        # This style is necessary so that the play widget has almost the same
-        # height as typical Solara buttons.
-        solara.Style(
-            """
-        .widget-play {
-            height: 30px;
-        }
-        """
+        solara.Button(
+            label="Start" if not playing.value else "Pause",
+            color="primary",
+            on_click=handle_click_start_pause,
         )
-        widgets.Play(
-            value=0,
-            interval=play_interval,
-            repeat=True,
-            show_repeat=False,
-            on_value=on_value_play,
-            playing=playing.value,
-            on_playing=playing.set,
+        solara.Button(
+            label="Step",
+            color="primary",
+            on_click=handle_click_step,
+            disabled=playing.value,
         )
-        solara.Markdown(md_text=f"**Step:** {current_step}")
-        # threaded_do_play is not used for now because it
-        # doesn't work in Google colab. We use
-        # ipywidgets.Play until it is fixed. The threading
-        # version is definite a much better implementation,
-        # if it works.
-        # solara.Button(label="▶", color="primary", on_click=viz.threaded_do_play)
-        # solara.Button(label="⏸︎", color="primary", on_click=viz.do_pause)
         # solara.Button(label="Reset", color="primary", on_click=do_reset)
+        solara.Markdown(md_text=f"**Step:** {current_step}")
 
 
 def split_model_params(model_params):
