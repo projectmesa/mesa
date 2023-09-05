@@ -20,9 +20,23 @@ def JupyterViz(
     measures=None,
     name="Mesa Model",
     agent_portrayal=None,
-    space_drawer=None,
+    space_drawer="default",
     play_interval=400,
 ):
+    """Initialize a component to visualize a model.
+    Args:
+        model_class: class of the model to instantiate
+        model_params: parameters for initializing the model
+        measures: list of callables or data attributes to plot
+        name: name for display
+        agent_portrayal: options for rendering agents (dictionary)
+        space_drawer: method to render the agent space for
+            the model; default implementation is :meth:`make_space`;
+            simulations with no space to visualize should
+            specify `space_drawer=False`
+        play_interval: play interval (default: 400)
+    """
+
     current_step, set_current_step = solara.use_state(0)
 
     solara.Markdown(name)
@@ -48,10 +62,14 @@ def JupyterViz(
 
     with solara.GridFixed(columns=2):
         # 4. Space
-        if space_drawer is None:
+        if space_drawer == "default":
+            # draw with the default implementation
             make_space(model, agent_portrayal)
-        else:
+        elif space_drawer:
+            # if specified, draw agent space with an alternate renderer
             space_drawer(model, agent_portrayal)
+        # otherwise, do nothing (do not draw space)
+
         # 5. Plots
         for measure in measures:
             if callable(measure):
