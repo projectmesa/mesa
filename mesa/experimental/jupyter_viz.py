@@ -42,7 +42,7 @@ def JupyterViz(
     # 1. Set up model parameters
     user_params, fixed_params = split_model_params(model_params)
     model_parameters, set_model_parameters = solara.use_state(
-        fixed_params | {k: v["value"] for k, v in user_params.items()}
+        {**fixed_params, **{k: v["value"] for k, v in user_params.items()}}
     )
 
     # 2. Set up Model
@@ -54,7 +54,7 @@ def JupyterViz(
     model = solara.use_memo(make_model, dependencies=list(model_parameters.values()))
 
     def handle_change_model_params(name: str, value: any):
-        set_model_parameters(model_parameters | {name: value})
+        set_model_parameters({**model_parameters, name: value})
 
     # 3. Set up UI
     solara.Markdown(name)
