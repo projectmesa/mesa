@@ -53,8 +53,8 @@ def JupyterViz(
 
     model = solara.use_memo(make_model, dependencies=list(model_parameters.values()))
 
-    def handle_change_model_params(name, change):
-        set_model_parameters(model_parameters | {name: change})
+    def handle_change_model_params(name: str, value: any):
+        set_model_parameters(model_parameters | {name: value})
 
     # 3. Set up UI
     solara.Markdown(name)
@@ -170,24 +170,22 @@ def UserInputs(user_params, on_change=None):
     Props:
         user_params: dictionary with options for the input, including label,
         min and max values, and other fields specific to the input type.
-        on_change: function to be called when the value of an input changes.
+        on_change: function to be called with (name, value) when the value of an input changes.
     """
-
-    def handle_change_value(name):
-        def change_value(change):
-            on_change(name, change)
-
-        return change_value
 
     for name, options in user_params.items():
         # label for the input is "label" from options or name
         label = options.get("label", name)
         input_type = options.get("type")
+
+        def change_handler(value, name=name):
+            on_change(name, value)
+
         if input_type == "SliderInt":
             solara.SliderInt(
                 label,
                 value=options.get("value"),
-                on_value=handle_change_value(name),
+                on_value=change_handler,
                 min=options.get("min"),
                 max=options.get("max"),
                 step=options.get("step"),
@@ -196,7 +194,7 @@ def UserInputs(user_params, on_change=None):
             solara.SliderFloat(
                 label,
                 value=options.get("value"),
-                on_value=handle_change_value(name),
+                on_value=change_handler,
                 min=options.get("min"),
                 max=options.get("max"),
                 step=options.get("step"),
@@ -205,6 +203,7 @@ def UserInputs(user_params, on_change=None):
             solara.Select(
                 label,
                 value=options.get("value"),
+                on_value=change_handler,
                 values=options.get("values"),
             )
         else:
