@@ -51,7 +51,10 @@ def JupyterViz(
         set_current_step(0)
         return model
 
-    model = solara.use_memo(make_model, dependencies=list(model_parameters.values()))
+    reset_counter = solara.use_reactive(0)
+    model = solara.use_memo(
+        make_model, dependencies=[*list(model_parameters.values()), reset_counter.value]
+    )
 
     def handle_change_model_params(name: str, value: any):
         set_model_parameters({**model_parameters, name: value})
@@ -59,7 +62,7 @@ def JupyterViz(
     # 3. Set up UI
     solara.Markdown(name)
     UserInputs(user_params, on_change=handle_change_model_params)
-    ModelController(model, play_interval, current_step, set_current_step)
+    ModelController(model, play_interval, current_step, set_current_step, reset_counter)
 
     with solara.GridFixed(columns=2):
         # 4. Space
@@ -81,7 +84,9 @@ def JupyterViz(
 
 
 @solara.component
-def ModelController(model, play_interval, current_step, set_current_step):
+def ModelController(
+    model, play_interval, current_step, set_current_step, reset_counter
+):
     playing = solara.use_reactive(False)
     thread = solara.use_reactive(None)
 
@@ -112,6 +117,9 @@ def ModelController(model, play_interval, current_step, set_current_step):
         model.running = False
         thread.join()
 
+    def do_reset():
+        reset_counter.value += 1
+
     with solara.Row():
         solara.Button(label="Step", color="primary", on_click=do_step)
         # This style is necessary so that the play widget has almost the same
@@ -132,6 +140,7 @@ def ModelController(model, play_interval, current_step, set_current_step):
             playing=playing.value,
             on_playing=playing.set,
         )
+        solara.Button(label="Reset", color="primary", on_click=do_reset)
         solara.Markdown(md_text=f"**Step:** {current_step}")
         # threaded_do_play is not used for now because it
         # doesn't work in Google colab. We use
