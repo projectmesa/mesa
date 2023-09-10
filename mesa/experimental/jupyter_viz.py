@@ -89,15 +89,25 @@ def ModelController(
 ):
     playing = solara.use_reactive(False)
     thread = solara.use_reactive(None)
+    # We track the previous step to detect if user resets the model via
+    # clicking the reset button or changing the parameters. If previous_step >
+    # current_step, it means a model reset happens while the simulation is
+    # still playing.
+    previous_step = solara.use_reactive(0)
 
     def on_value_play(change):
-        if model.running:
+        if previous_step.value > current_step and current_step == 0:
+            # We add extra checks for current_step == 0, just to be sure.
+            # We automatically stop the playing if a model is reset.
+            playing.value = False
+        elif model.running:
             do_step()
         else:
             playing.value = False
 
     def do_step():
         model.step()
+        previous_step.value = current_step
         set_current_step(model.schedule.steps)
 
     def do_play():
