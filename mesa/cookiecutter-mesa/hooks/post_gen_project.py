@@ -1,7 +1,7 @@
 import glob
 import os
 
-file_list = glob.glob('**/*.pytemplate', recursive=True)
+file_list = glob.glob("**/*.pytemplate", recursive=True)
 
 for file_path in file_list:
     # Check if the file is a regular file
