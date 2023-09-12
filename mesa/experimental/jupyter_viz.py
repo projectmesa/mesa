@@ -174,7 +174,7 @@ def check_param_is_fixed(param):
 def UserInputs(user_params, on_change=None):
     """Initialize user inputs for configurable model parameters.
     Currently supports :class:`solara.SliderInt`, :class:`solara.SliderFloat`,
-    and :class:`solara.Select`.
+    :class:`solara.Select`, and :class:`solara.Checkbox`.
 
     Props:
         user_params: dictionary with options for the input, including label,
@@ -214,6 +214,11 @@ def UserInputs(user_params, on_change=None):
                 value=options.get("value"),
                 on_value=change_handler,
                 values=options.get("values"),
+            )
+        elif input_type == "Checkbox":
+            solara.Checkbox(
+                label=label,
+                value=options.get("value"),
             )
         else:
             raise ValueError(f"{input_type} is not a supported input type")

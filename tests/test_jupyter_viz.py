@@ -45,6 +45,19 @@ class TestMakeUserInput(unittest.TestCase):
         assert slider_int.max == options["max"]
         assert slider_int.step == options["step"]
 
+    def test_checkbox(self):
+        @solara.component
+        def Test(user_params):
+            UserInputs(user_params)
+
+        options = {"type": "Checkbox", "value": True, "label": "On"}
+        user_params = {"num_agents": options}
+        _, rc = solara.render(Test(user_params), handle_error=False)
+        checkbox = rc.find(vw.Checkbox).widget
+
+        assert checkbox.v_model == options["value"]
+        assert checkbox.label == options["label"]
+
     def test_label_fallback(self):
         """name should be used as fallback label"""
 
