@@ -141,3 +141,14 @@ class EpsteinCivilViolence(mesa.Model):
             if agent.breed == "citizen" and agent.jail_sentence > 0:
                 count += 1
         return count
+
+    @staticmethod
+    def count_cops(model):
+        """
+        Helper method to count jailed agents.
+        """
+        count = 0
+        for agent in model.schedule.agents:
+            if agent.breed == "cop":
+                count += 1
+        return count
