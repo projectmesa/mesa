@@ -1,4 +1,4 @@
-import threading
+import copy
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -37,32 +37,53 @@ def JupyterViz(
         play_interval: play interval (default: 400)
     """
 
-    current_step, set_current_step = solara.use_state(0)
-
     # 1. Set up model parameters
     user_params, fixed_params = split_model_params(model_params)
     model_parameters, set_model_parameters = solara.use_state(
         {**fixed_params, **{k: v["value"] for k, v in user_params.items()}}
     )
 
+    model, set_model = solara.use_state(
+        model_class(**model_parameters),
+        eq=model_eq,
+    )
+    model_cache, set_model_cache = solara.use_state({0: model})
+
     # 2. Set up Model
     def make_model():
         model = model_class(**model_parameters)
-        set_current_step(0)
-        return model
+        set_model(model)
+        set_model_cache({0: model})
 
-    reset_counter = solara.use_reactive(0)
-    model = solara.use_memo(
-        make_model, dependencies=[*list(model_parameters.values()), reset_counter.value]
+    solara.use_memo(
+        make_model,
+        dependencies=[
+            list(model_parameters.values()),
+        ],
     )
 
     def handle_change_model_params(name: str, value: any):
         set_model_parameters({**model_parameters, name: value})
 
+    def handle_step(step: int):
+        if step in model_cache:
+            previous_model = model_cache[step]
+            set_model(previous_model)
+        else:
+            model.step()
+            set_model_cache({**model_cache, step: copy.deepcopy(model)})
+            set_model(model)
+
     # 3. Set up UI
     solara.Markdown(name)
     UserInputs(user_params, on_change=handle_change_model_params)
-    ModelController(model, play_interval, current_step, set_current_step, reset_counter)
+    ModelControls(
+        model,
+        play_interval,
+        max_step=max(model_cache.keys()),
+        on_step=handle_step,
+        on_reset=make_model,
+    )
 
     with solara.GridFixed(columns=2):
         # 4. Space
@@ -84,82 +105,82 @@ def JupyterViz(
 
 
 @solara.component
-def ModelController(
-    model, play_interval, current_step, set_current_step, reset_counter
-):
+def ModelControls(model, play_interval, max_step, on_step, on_reset):
+    current_step = model.schedule.steps
     playing = solara.use_reactive(False)
-    thread = solara.use_reactive(None)
-    # We track the previous step to detect if user resets the model via
-    # clicking the reset button or changing the parameters. If previous_step >
-    # current_step, it means a model reset happens while the simulation is
-    # still playing.
-    previous_step = solara.use_reactive(0)
 
-    def on_value_play(change):
-        if previous_step.value > current_step and current_step == 0:
-            # We add extra checks for current_step == 0, just to be sure.
-            # We automatically stop the playing if a model is reset.
-            playing.value = False
-        elif model.running:
-            do_step()
-        else:
-            playing.value = False
+    def on_value_play(_):
+        if model.running and playing.value:
+            on_step(current_step + 1)
 
-    def do_step():
-        model.step()
-        previous_step.value = current_step
-        set_current_step(model.schedule.steps)
+    def change_step(value):
+        return lambda: on_step(max(0, value))
 
-    def do_play():
-        model.running = True
-        while model.running:
-            do_step()
+    def reset():
+        playing.value = False
+        on_reset()
 
-    def threaded_do_play():
-        if thread is not None and thread.is_alive():
-            return
-        thread.value = threading.Thread(target=do_play)
-        thread.start()
+    with solara.Card(), solara.Column(
+        gap="40px",
+    ):
+        with solara.Row(gap="2px", style={"align-items": "center"}):
+            with solara.Tooltip("Reset the model"):
+                solara.Button(icon_name="mdi-reload", color="primary", on_click=reset)
+            with solara.Tooltip("Step backward to the beginning"):
+                solara.Button(
+                    icon_name="mdi-skip-backward",
+                    color="primary",
+                    on_click=change_step(0),
+                )
+            with solara.Tooltip("Step backward"):
+                solara.Button(
+                    label="|◀",
+                    color="primary",
+                    on_click=change_step(current_step - 1),
+                )
 
-    def do_pause():
-        if (thread is None) or (not thread.is_alive()):
-            return
-        model.running = False
-        thread.join()
-
-    def do_reset():
-        reset_counter.value += 1
-
-    with solara.Row():
-        solara.Button(label="Step", color="primary", on_click=do_step)
-        # This style is necessary so that the play widget has almost the same
-        # height as typical Solara buttons.
-        solara.Style(
-            """
-        .widget-play {
-            height: 30px;
-        }
-        """
+            # This style is necessary so that the play widget has the same
+            # height as typical Solara buttons.
+            solara.Style(
+                """
+                .widget-play {
+                    height: 36px;
+                }
+                """
+            )
+            with solara.Tooltip("Start/Stop the model"):
+                widgets.Play(
+                    interval=play_interval,
+                    show_repeat=False,
+                    on_value=on_value_play,
+                    playing=playing.value,
+                    on_playing=playing.set,
+                )
+            with solara.Tooltip("Step forward"):
+                solara.Button(
+                    label="▶|",
+                    color="primary",
+                    on_click=change_step(current_step + 1),
+                )
+            with solara.Tooltip("Step forward to the end"):
+                solara.Button(
+                    icon_name="mdi-skip-forward",
+                    color="primary",
+                    on_click=change_step(max_step),
+                )
+        solara.SliderInt(
+            label="Timeline (current step)",
+            value=current_step,
+            min=0,
+            max=max_step,
+            thumb_label="always",
+            step=1,
+            on_value=on_step,
         )
-        widgets.Play(
-            value=0,
-            interval=play_interval,
-            repeat=True,
-            show_repeat=False,
-            on_value=on_value_play,
-            playing=playing.value,
-            on_playing=playing.set,
-        )
-        solara.Button(label="Reset", color="primary", on_click=do_reset)
-        solara.Markdown(md_text=f"**Step:** {current_step}")
-        # threaded_do_play is not used for now because it
-        # doesn't work in Google colab. We use
-        # ipywidgets.Play until it is fixed. The threading
-        # version is definite a much better implementation,
-        # if it works.
-        # solara.Button(label="▶", color="primary", on_click=viz.threaded_do_play)
-        # solara.Button(label="⏸︎", color="primary", on_click=viz.do_pause)
-        # solara.Button(label="Reset", color="primary", on_click=do_reset)
+
+
+def model_eq(a, b):
+    return id(a) == id(b) or (a.schedule.steps == b.schedule.steps)
 
 
 def split_model_params(model_params):
