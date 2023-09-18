@@ -36,7 +36,6 @@ The default DataCollector here makes several assumptions:
 """
 import itertools
 import types
-from operator import attrgetter
 
 import pandas as pd
 
@@ -138,7 +137,7 @@ class DataCollector:
             reporter: Attribute string, or function object that returns the
                       variable when given a model instance.
         """
-        if type(reporter) is str:
+        if isinstance(reporter, str):
             attribute_name = reporter
 
             def reporter(agent):
@@ -175,17 +174,10 @@ class DataCollector:
             agent_records_without_none = (r for r in agent_records if r is not None)
             return agent_records_without_none
 
-        if all(hasattr(rep, "attribute_name") for rep in rep_funcs):
-            # This branch is for performance optimization purpose.
-            prefix = ["model.schedule.steps", "unique_id"]
-            attributes = [func.attribute_name for func in rep_funcs]
-            get_reports = attrgetter(*prefix + attributes)
-        else:
-
-            def get_reports(agent):
-                _prefix = (agent.model.schedule.steps, agent.unique_id)
-                reports = tuple(rep(agent) for rep in rep_funcs)
-                return _prefix + reports
+        def get_reports(agent):
+            _prefix = (agent.model.schedule.steps, agent.unique_id)
+            reports = tuple(rep(agent) for rep in rep_funcs)
+            return _prefix + reports
 
         agent_records = map(get_reports, model.schedule.agents)
         return agent_records
