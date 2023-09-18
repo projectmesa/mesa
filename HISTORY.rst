@@ -47,7 +47,7 @@ Mesa 2.0 includes:
     * `find_empty()`: convert this to `move_to_empty()`
     * `num_agents`: removed parameter from `move_to_empty()`
     * `position_agent()`: convert this to `place_agent`
-    * `neighbor_iter()`: convert this to `iter_neighborhood()`
+    * `neighbor_iter()`: convert this to `iter_neighbors()`
 * batchrunner: remove deprecations #1627
     * `class BatchRunner` and `class BatchRunnerMP`: convert these to `batch_run()`
     * Please see this `batch_run() example`_ if you would like to see an an implementation.
