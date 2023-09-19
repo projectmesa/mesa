@@ -3,6 +3,56 @@
 Release History
 ---------------
 
+2.1.2 (2023-09-20)
+++++++++++++++++++
+
+This release contains fixes, and several improvements and new features to
+the JupyterViz/Solara frontend. It's a patch release instead of a minor release
+because the JupyterViz frontend is still considered experimental.
+
+**Improvements**
+
+* perf: Access grid only once #1751
+* docs: compile notebooks at build time #1753
+* docs: Remove nbsphinx and explicit .ipynb suffix #1754
+* rtd: Use gruvbox-dark as style #1719
+* build(deps): bump actions/checkout from 3 to 4 #1790
+
+**Solara/JupyterViz**
+
+* solara: Implement visualization for network grid #1767
+* Add support for select input type #1779
+* Add step count display to JupyterViz #1775
+* Simplify solara code #1786
+* Add docstring for jupyterviz make_user_input that documents supported inputs #1784
+* Revise, test, & document JupyterViz options for drawing agent space #1783
+* Add UserInputs component #1788
+* Fix: Remove dict merge operator, python 3.8 compat #1793
+* feat: Add reset button to JupyterViz #1795
+* Add support for solara.Checkbox user input #1798
+* viz tutorial: Update custom plot to reflect new code #1799
+* fix: Don't continue playing when a model is reset #1796
+* Docker: Update to use Solara viz #1757
+
+**Refactors**
+
+* Move viz stuff to mesa-viz-tornado Git repo #1746
+* simplify get neighborhood #1760
+* remove attrgetter performance optimization #1809
+
+**Fixes**
+
+* fix: Add Matplotlib as dependency #1747
+* fix install for visualization tutorial in colab #1752
+* fix: Allow multiple connections in Solara #1759
+* Revert "Ensure sphinx>=7" #1762
+* fix README pic to remove line on left side #1763
+* space: Ensure get_neighborhood output & cache are immutable #1780
+* fix: Use .pytemplate for name for cookiecutter #1785
+* HISTORY.rst: Correct neighbor_iter() replacement in 2.0.0 #1807
+* docs: Always link to stable version #1810
+* Remove exclude_none_values #1813
+
 2.1.1 (2023-08-02)
 +++++++++++++++++++
 
