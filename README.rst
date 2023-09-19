@@ -65,10 +65,10 @@ For resources or help on using Mesa, check out the following:
 * `Discussions`_ (GitHub threaded discussions about Mesa)
 * `Matrix Chat`_ (Chat Forum via Matrix to talk about Mesa)
 
-.. _`Intro to Mesa Tutorial` : http://mesa.readthedocs.org/en/main/tutorials/intro_tutorial.html
+.. _`Intro to Mesa Tutorial` : http://mesa.readthedocs.org/en/stable/tutorials/intro_tutorial.html
 .. _`Complexity Explorer Tutorial` : https://www.complexityexplorer.org/courses/172-agent-based-models-with-python-an-introduction-to-mesa
 .. _`Mesa Examples` : https://github.com/projectmesa/mesa-examples/tree/main/examples
-.. _`Docs` : http://mesa.readthedocs.org/en/main/
+.. _`Docs` : http://mesa.readthedocs.org/
 .. _`Discussions` : https://github.com/projectmesa/mesa/discussions
 .. _`Matrix Chat` : https://matrix.to/#/#project-mesa:matrix.org
 

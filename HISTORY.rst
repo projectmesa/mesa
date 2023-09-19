@@ -37,7 +37,7 @@ Mesa 2.0 includes:
     * an improved `datacollector` that allows collection by agent type
     * several breaking changes that provide significant improvements to Mesa.
 
-.. _visualization tutorial: https://mesa.readthedocs.io/en/latest/tutorials/visualization_tutorial.html
+.. _visualization tutorial: https://mesa.readthedocs.io/en/stable/tutorials/visualization_tutorial.html
 **Breaking Changes:**
 
 * space: change `coord_iter` to return `(content,(x,y))` instead of `(content, x,y)`; this reduces known errors of scheduler to grid mismatch #1566, #1723
