@@ -21,7 +21,11 @@ class Model:
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """Create a new model object and instantiate its RNG automatically."""
         obj = object.__new__(cls)
-        obj._seed = kwargs.get("seed", None)
+        obj._seed = kwargs.get("seed")
+        if obj._seed is None:
+            # We explicitly specify the seed here so that we know its value in
+            # advance.
+            obj._seed = random.random()  # noqa: S311
         obj.random = random.Random(obj._seed)
         return obj
 
