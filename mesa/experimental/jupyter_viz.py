@@ -1,4 +1,5 @@
 import copy
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -22,6 +23,7 @@ def JupyterViz(
     agent_portrayal=None,
     space_drawer="default",
     play_interval=400,
+    timeline=False,
 ):
     """Initialize a component to visualize a model.
     Args:
@@ -35,6 +37,7 @@ def JupyterViz(
             simulations with no space to visualize should
             specify `space_drawer=False`
         play_interval: play interval (default: 400)
+        timeline: whether to display a scrubbable timeline (default: False)
     """
 
     # 1. Set up model parameters
@@ -43,10 +46,7 @@ def JupyterViz(
         {**fixed_params, **{k: v["value"] for k, v in user_params.items()}}
     )
 
-    model, set_model = solara.use_state(
-        model_class(**model_parameters),
-        eq=model_eq,
-    )
+    model, set_model = solara.use_state(model_class(**model_parameters))
     model_cache, set_model_cache = solara.use_state({0: model})
 
     # 2. Set up Model
@@ -57,32 +57,45 @@ def JupyterViz(
 
     solara.use_memo(
         make_model,
-        dependencies=[
-            list(model_parameters.values()),
-        ],
+        dependencies=list(model_parameters.values()),
     )
 
     def handle_change_model_params(name: str, value: any):
         set_model_parameters({**model_parameters, name: value})
 
-    def handle_step(step: int):
+    def handle_step(step: Optional[int] = None):
+        """Change the model to the next step, or to the specified step.
+
+        If step is specified, the model is cached at that step.
+
+        Args:
+            step: step to change the model to
+        """
         if not model.running:
             return
+
         if step in model_cache:
-            previous_model = model_cache[step]
-            set_model(previous_model)
+            updated_model = model_cache[step]
         else:
-            model.step()
-            set_model_cache({**model_cache, step: copy.deepcopy(model)})
-            set_model(model)
+            updated_model = copy.deepcopy(model)
+            updated_model.step()
+
+        if step is not None:
+            set_model_cache({**model_cache, step: updated_model})
+
+        set_model(updated_model)
 
     # 3. Set up UI
     solara.Markdown(name)
     UserInputs(user_params, on_change=handle_change_model_params)
-    ModelControls(
+    TimelineControls(
         play_interval=play_interval,
+        on_step=handle_step,
+        on_reset=make_model,
         current_step=model.schedule.steps,
         max_step=max(model_cache.keys()),
+    ) if timeline else BaseControls(
+        play_interval=play_interval,
         on_step=handle_step,
         on_reset=make_model,
     )
@@ -106,8 +119,37 @@ def JupyterViz(
                 make_plot(model, measure)
 
 
+def BaseControls(play_interval, on_step, on_reset):
+    playing = solara.use_reactive(False)
+
+    def on_value_play(_):
+        if playing.value:
+            on_step()
+
+    def reset():
+        playing.value = False
+        on_reset()
+
+    with solara.Card(), solara.Row(gap="2px", style={"align-items": "center"}):
+        with solara.Tooltip("Reset the model"):
+            solara.Button(icon_name="mdi-reload", color="primary", on_click=reset)
+
+        with solara.Tooltip("Step forward"):
+            solara.Button(label="+1", color="primary", on_click=on_step)
+
+        with solara.Tooltip("Start/Stop the model"):
+            widgets.Play(
+                interval=play_interval,
+                show_repeat=False,
+                on_value=on_value_play,
+                playing=playing.value,
+                on_playing=playing.set,
+                layout=widgets.Layout(height="36px"),
+            )
+
+
 @solara.component
-def ModelControls(play_interval, current_step, max_step, on_step, on_reset):
+def TimelineControls(play_interval, on_step, on_reset, current_step, max_step):
     playing = solara.use_reactive(False)
 
     def on_value_play(_):
@@ -135,20 +177,10 @@ def ModelControls(play_interval, current_step, max_step, on_step, on_reset):
                 )
             with solara.Tooltip("Step backward"):
                 solara.Button(
-                    label="|◀",
+                    label="-1",
                     color="primary",
                     on_click=change_step(current_step - 1),
                 )
-
-            # This style is necessary so that the play widget has the same
-            # height as typical Solara buttons.
-            solara.Style(
-                """
-                .widget-play {
-                    height: 36px;
-                }
-                """
-            )
             with solara.Tooltip("Start/Stop the model"):
                 widgets.Play(
                     interval=play_interval,
@@ -156,10 +188,11 @@ def ModelControls(play_interval, current_step, max_step, on_step, on_reset):
                     on_value=on_value_play,
                     playing=playing.value,
                     on_playing=playing.set,
+                    layout=widgets.Layout(height="36px"),
                 )
             with solara.Tooltip("Step forward"):
                 solara.Button(
-                    label="▶|",
+                    label="+1",
                     color="primary",
                     on_click=change_step(current_step + 1),
                 )
@@ -178,10 +211,6 @@ def ModelControls(play_interval, current_step, max_step, on_step, on_reset):
             step=1,
             on_value=on_step,
         )
-
-
-def model_eq(a, b):
-    return id(a) == id(b) and (a.schedule.steps == b.schedule.steps)
 
 
 def split_model_params(model_params):
