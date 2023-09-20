@@ -66,6 +66,8 @@ def JupyterViz(
         set_model_parameters({**model_parameters, name: value})
 
     def handle_step(step: int):
+        if not model.running:
+            return
         if step in model_cache:
             previous_model = model_cache[step]
             set_model(previous_model)
@@ -78,8 +80,8 @@ def JupyterViz(
     solara.Markdown(name)
     UserInputs(user_params, on_change=handle_change_model_params)
     ModelControls(
-        model,
-        play_interval,
+        play_interval=play_interval,
+        current_step=model.schedule.steps,
         max_step=max(model_cache.keys()),
         on_step=handle_step,
         on_reset=make_model,
@@ -105,12 +107,11 @@ def JupyterViz(
 
 
 @solara.component
-def ModelControls(model, play_interval, max_step, on_step, on_reset):
-    current_step = model.schedule.steps
+def ModelControls(play_interval, current_step, max_step, on_step, on_reset):
     playing = solara.use_reactive(False)
 
     def on_value_play(_):
-        if model.running and playing.value:
+        if playing.value:
             on_step(current_step + 1)
 
     def change_step(value):
@@ -180,7 +181,7 @@ def ModelControls(model, play_interval, max_step, on_step, on_reset):
 
 
 def model_eq(a, b):
-    return id(a) == id(b) or (a.schedule.steps == b.schedule.steps)
+    return id(a) == id(b) and (a.schedule.steps == b.schedule.steps)
 
 
 def split_model_params(model_params):
