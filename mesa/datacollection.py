@@ -55,7 +55,6 @@ class DataCollector:
         model_reporters=None,
         agent_reporters=None,
         tables=None,
-        exclude_none_values=False,
     ):
         """Instantiate a DataCollector with lists of model and agent reporters.
         Both model_reporters and agent_reporters accept a dictionary mapping a
@@ -79,8 +78,6 @@ class DataCollector:
             model_reporters: Dictionary of reporter names and attributes/funcs
             agent_reporters: Dictionary of reporter names and attributes/funcs.
             tables: Dictionary of table names to lists of column names.
-            exclude_none_values: Boolean of whether to drop records which values
-            are None, in the final result.
 
         Notes:
             If you want to pickle your model you must not use lambda functions.
@@ -104,7 +101,6 @@ class DataCollector:
         self.model_vars = {}
         self._agent_records = {}
         self.tables = {}
-        self.exclude_none_values = exclude_none_values
 
         if model_reporters is not None:
             for name, reporter in model_reporters.items():
@@ -159,20 +155,6 @@ class DataCollector:
     def _record_agents(self, model):
         """Record agents data in a mapping of functions and agents."""
         rep_funcs = self.agent_reporters.values()
-        if self.exclude_none_values:
-            # Drop records which values are None.
-
-            def get_reports(agent):
-                _prefix = (agent.model.schedule.steps, agent.unique_id)
-                reports = (rep(agent) for rep in rep_funcs)
-                reports_without_none = tuple(r for r in reports if r is not None)
-                if len(reports_without_none) == 0:
-                    return None
-                return _prefix + reports_without_none
-
-            agent_records = (get_reports(agent) for agent in model.schedule.agents)
-            agent_records_without_none = (r for r in agent_records if r is not None)
-            return agent_records_without_none
 
         def get_reports(agent):
             _prefix = (agent.model.schedule.steps, agent.unique_id)
