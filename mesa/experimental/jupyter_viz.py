@@ -1,5 +1,4 @@
 import copy
-from typing import Optional
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -63,40 +62,38 @@ def JupyterViz(
     def handle_change_model_params(name: str, value: any):
         set_model_parameters({**model_parameters, name: value})
 
-    def handle_step(step: Optional[int] = None):
-        """Change the model to the next step, or to the specified step.
-
-        If step is specified, the model is cached at that step.
-
-        Args:
-            step: step to change the model to
-        """
+    def do_step():
         if not model.running:
             return
 
-        if step in model_cache:
-            updated_model = model_cache[step]
-        else:
-            updated_model = copy.deepcopy(model)
-            updated_model.step()
-
-        if step is not None:
-            set_model_cache({**model_cache, step: updated_model})
-
+        updated_model = copy.deepcopy(model)
+        updated_model.step()
         set_model(updated_model)
+
+    def handle_step_timeline(step: int):
+        if step == model.schedule.steps:
+            return
+
+        set_model_cache({**model_cache, model.schedule.steps: model})
+
+        if step in model_cache:
+            previous_model = model_cache[step]
+            set_model(previous_model)
+        else:
+            do_step()
 
     # 3. Set up UI
     solara.Markdown(name)
     UserInputs(user_params, on_change=handle_change_model_params)
     TimelineControls(
         play_interval=play_interval,
-        on_step=handle_step,
+        on_step=handle_step_timeline,
         on_reset=make_model,
         current_step=model.schedule.steps,
-        max_step=max(model_cache.keys()),
+        max_step=max(*model_cache.keys(), model.schedule.steps),
     ) if timeline else BaseControls(
         play_interval=play_interval,
-        on_step=handle_step,
+        on_step=do_step,
         on_reset=make_model,
     )
 
@@ -119,6 +116,7 @@ def JupyterViz(
                 make_plot(model, measure)
 
 
+@solara.component
 def BaseControls(play_interval, on_step, on_reset):
     playing = solara.use_reactive(False)
 
