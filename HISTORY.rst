@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-2.1.2 (2023-09-20)
+2.1.2 (2023-09-23)
 ++++++++++++++++++
 
 This release contains fixes, and several improvements and new features to
