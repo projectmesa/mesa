@@ -8,7 +8,7 @@ requires = [
     "click",
     "cookiecutter",
     "matplotlib",
-    "mesa_viz_tornado,
+    "mesa_viz_tornado",
     "networkx",
     "numpy",
     "pandas",
