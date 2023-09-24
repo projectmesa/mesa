@@ -21,7 +21,7 @@ def JupyterViz(
     name="Mesa Model",
     agent_portrayal=None,
     space_drawer="default",
-    play_interval=400,
+    play_interval=150,
 ):
     """Initialize a component to visualize a model.
     Args:
@@ -34,7 +34,7 @@ def JupyterViz(
             the model; default implementation is :meth:`make_space`;
             simulations with no space to visualize should
             specify `space_drawer=False`
-        play_interval: play interval (default: 400)
+        play_interval: play interval (default: 150)
     """
 
     current_step, set_current_step = solara.use_state(0)
