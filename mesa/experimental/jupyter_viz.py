@@ -270,7 +270,7 @@ def make_space(model, agent_portrayal):
     else:
         space_ax.scatter(**portray(model.grid))
     space_ax.set_axis_off()
-    solara.FigureMatplotlib(space_fig)
+    solara.FigureMatplotlib(space_fig, format="png")
 
 
 def _draw_network_grid(model, space_ax, agent_portrayal):
