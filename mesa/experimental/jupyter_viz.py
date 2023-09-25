@@ -61,8 +61,8 @@ def JupyterViz(
         delta = 0
         if model_parameters["N"] > 50:
             new_agent_size = max(lower_limit, int(-0.9 * num_agents + 90))
+            print(new_agent_size)
             delta = new_agent_size - upper_limit
-
         return delta
 
     reset_counter = solara.use_reactive(0)
@@ -269,7 +269,7 @@ def make_space(model, agent_portrayal, delta=0):
                     x.append(i)
                     y.append(j)
                     if "size" in data:
-                        s.append(data["size"] + delta)
+                        s.append(max(data["size"] + delta, data["min_size"]))
                     if "color" in data:
                         c.append(data["color"])
         out = {"x": x, "y": y}
