@@ -51,6 +51,20 @@ def JupyterViz(
         set_current_step(0)
         return model
 
+    def calculate_space_size():
+        pass
+
+    def calculate_agent_size():
+        lower_limit = 5
+        upper_limit = 50
+        num_agents = model_parameters["N"]
+        delta = 0
+        if model_parameters["N"] > 50:
+            new_agent_size = max(lower_limit, int(-0.9 * num_agents + 90))
+            delta = new_agent_size - upper_limit
+
+        return delta
+
     reset_counter = solara.use_reactive(0)
     model = solara.use_memo(
         make_model, dependencies=[*list(model_parameters.values()), reset_counter.value]
@@ -61,6 +75,8 @@ def JupyterViz(
 
     # 3. Set up UI
     solara.Markdown(name)
+    # calculate agent size based on number of users
+    agent_size_delta = calculate_agent_size()
     UserInputs(user_params, on_change=handle_change_model_params)
     ModelController(model, play_interval, current_step, set_current_step, reset_counter)
 
@@ -68,7 +84,7 @@ def JupyterViz(
         # 4. Space
         if space_drawer == "default":
             # draw with the default implementation
-            make_space(model, agent_portrayal)
+            make_space(model, agent_portrayal, delta=agent_size_delta)
         elif space_drawer:
             # if specified, draw agent space with an alternate renderer
             space_drawer(model, agent_portrayal)
@@ -234,7 +250,7 @@ def UserInputs(user_params, on_change=None):
             raise ValueError(f"{input_type} is not a supported input type")
 
 
-def make_space(model, agent_portrayal):
+def make_space(model, agent_portrayal, delta=0):
     def portray(g):
         x = []
         y = []
@@ -253,7 +269,7 @@ def make_space(model, agent_portrayal):
                     x.append(i)
                     y.append(j)
                     if "size" in data:
-                        s.append(data["size"])
+                        s.append(data["size"] + delta)
                     if "color" in data:
                         c.append(data["color"])
         out = {"x": x, "y": y}
