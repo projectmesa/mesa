@@ -19,7 +19,7 @@ requires = [
 extras_require = {
     "dev": [
         "black",
-        "ruff==0.0.254",
+        "ruff==0.0.275",
         "coverage",
         "pytest >= 4.6",
         "pytest-cov",
