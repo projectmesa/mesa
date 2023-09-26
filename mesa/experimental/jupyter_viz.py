@@ -6,6 +6,7 @@ import reacton.ipywidgets as widgets
 import solara
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
+from solara.components.columns import Columns
 
 import mesa
 
@@ -74,13 +75,22 @@ def JupyterViz(
         set_model_parameters({**model_parameters, name: value})
 
     # 3. Set up UI
-    solara.Markdown(name)
+    with solara.AppBarTitle():
+        solara.Text(name)
     # calculate agent size based on number of users
     agent_size_delta = calculate_agent_size()
-    UserInputs(user_params, on_change=handle_change_model_params)
-    ModelController(model, play_interval, current_step, set_current_step, reset_counter)
 
-    with solara.GridFixed(columns=2):
+    with solara.Sidebar():
+        with solara.Card("Controls", margin=1, elevation=2):
+            UserInputs(user_params, on_change=handle_change_model_params)
+            ModelController(
+                model, play_interval, current_step, set_current_step, reset_counter
+            )
+        with solara.Card("Progress", margin=1, elevation=2):
+            # solara.ProgressLinear(True)
+            solara.Markdown(md_text=f"####Step - {current_step}")
+
+    with Columns(widths=[4, 4]):
         # 4. Space
         if space_drawer == "default":
             # draw with the default implementation
@@ -91,6 +101,7 @@ def JupyterViz(
         # otherwise, do nothing (do not draw space)
 
         # 5. Plots
+    with solara.GridFixed(columns=len(measures)):
         for measure in measures:
             if callable(measure):
                 # Is a custom object
@@ -146,28 +157,43 @@ def ModelController(
     def do_reset():
         reset_counter.value += 1
 
-    with solara.Row():
-        solara.Button(label="Step", color="primary", on_click=do_step)
-        # This style is necessary so that the play widget has almost the same
-        # height as typical Solara buttons.
-        solara.Style(
+    with solara.Column():
+        with solara.Row(gap="10px", justify="center"):
+            solara.Button(
+                label="Step",
+                color="primary",
+                text=True,
+                outlined=True,
+                on_click=do_step,
+            )
+            # This style is necessary so that the play widget has almost the same
+            # height as typical Solara buttons.
+            solara.Button(
+                label="Reset",
+                color="primary",
+                text=True,
+                outlined=True,
+                on_click=do_reset,
+            )
+
+            # with solara.Row(gap="10px", justify="center"):
+            solara.Style(
+                """
+            .widget-play {
+                height: 35px;
+            }
             """
-        .widget-play {
-            height: 30px;
-        }
-        """
-        )
-        widgets.Play(
-            value=0,
-            interval=play_interval,
-            repeat=True,
-            show_repeat=False,
-            on_value=on_value_play,
-            playing=playing.value,
-            on_playing=playing.set,
-        )
-        solara.Button(label="Reset", color="primary", on_click=do_reset)
-        solara.Markdown(md_text=f"**Step:** {current_step}")
+            )
+            widgets.Play(
+                value=0,
+                interval=play_interval,
+                repeat=True,
+                show_repeat=False,
+                on_value=on_value_play,
+                playing=playing.value,
+                on_playing=playing.set,
+            )
+
         # threaded_do_play is not used for now because it
         # doesn't work in Google colab. We use
         # ipywidgets.Play until it is fixed. The threading
@@ -216,6 +242,7 @@ def UserInputs(user_params, on_change=None):
         def change_handler(value, name=name):
             on_change(name, value)
 
+    with solara.Row(gap="10px", justify="center"):
         if input_type == "SliderInt":
             solara.SliderInt(
                 label,
