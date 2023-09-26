@@ -52,7 +52,9 @@ def JupyterViz(
         return model
 
     def calculate_space_size():
-        pass
+        if model_parameters["N"] > 50:
+            fixed_size = int(model_parameters["N"] / 5)
+            plt.rcParams["figure.figsize"] = (fixed_size, fixed_size)
 
     def calculate_agent_size():
         lower_limit = 5
@@ -76,21 +78,24 @@ def JupyterViz(
     # 3. Set up UI
     solara.Markdown(name)
     # calculate agent size based on number of users
-    agent_size_delta = calculate_agent_size()
+    # agent_size_delta = calculate_agent_size()
+    calculate_space_size()
+
     UserInputs(user_params, on_change=handle_change_model_params)
     ModelController(model, play_interval, current_step, set_current_step, reset_counter)
 
-    with solara.GridFixed(columns=2):
+    with solara.Row():
         # 4. Space
         if space_drawer == "default":
             # draw with the default implementation
-            make_space(model, agent_portrayal, delta=agent_size_delta)
+            make_space(model, agent_portrayal, delta=0)
         elif space_drawer:
             # if specified, draw agent space with an alternate renderer
             space_drawer(model, agent_portrayal)
         # otherwise, do nothing (do not draw space)
 
         # 5. Plots
+    with solara.Row():
         for measure in measures:
             if callable(measure):
                 # Is a custom object
