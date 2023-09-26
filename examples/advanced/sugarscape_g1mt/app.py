@@ -7,7 +7,7 @@ from sugarscape_g1mt.resource_agents import Sugar
 from sugarscape_g1mt.trader_agents import Trader
 
 
-def space_drawer(viz):
+def space_drawer(model, agent_portrayal):
     def portray(g):
         layers = {
             "sugar": [[np.nan for j in range(g.height)] for i in range(g.width)],
@@ -31,7 +31,7 @@ def space_drawer(viz):
 
     fig = Figure()
     ax = fig.subplots()
-    out = portray(viz.model.grid)
+    out = portray(model.grid)
     # Sugar
     # Important note: imshow by default draws from upper left. You have to
     # always explicitly specify origin="lower".
@@ -42,7 +42,7 @@ def space_drawer(viz):
     # Trader
     ax.scatter(**out["trader"])
     ax.set_axis_off()
-    solara.FigureMatplotlib(fig, dependencies=[viz.model, viz.df])
+    solara.FigureMatplotlib(fig)
 
 
 model_params = {
