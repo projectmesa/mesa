@@ -54,18 +54,19 @@ def JupyterViz(
     def calculate_space_size():
         if model_parameters["N"] > 50:
             fixed_size = int(model_parameters["N"] / 5)
+            model_parameters.update({"width": fixed_size, "height": fixed_size})
             plt.rcParams["figure.figsize"] = (fixed_size, fixed_size)
 
     def calculate_agent_size():
-        lower_limit = 5
-        upper_limit = 50
-        num_agents = model_parameters["N"]
-        delta = 0
-        if model_parameters["N"] > 50:
-            new_agent_size = max(lower_limit, int(-0.9 * num_agents + 90))
-            print(new_agent_size)
-            delta = new_agent_size - upper_limit
-        return delta
+        aspect_ratio_high = (
+            0.5  # maintain this aspect ration b/w agent size and space size
+        )
+        aspect_ratio_low = 0.1  #
+        print()
+        size_of_agent = aspect_ratio_high * (
+            model_parameters["width"] * model_parameters["height"]
+        )
+        return size_of_agent
 
     reset_counter = solara.use_reactive(0)
     model = solara.use_memo(
@@ -77,24 +78,27 @@ def JupyterViz(
 
     # 3. Set up UI
     solara.Markdown(name)
-    # calculate agent size based on number of users
-    # agent_size_delta = calculate_agent_size()
+
+    # 4. Calculate space size and scale agents
+
     calculate_space_size()
+    ag_size = calculate_agent_size()
+    print(ag_size)
 
     UserInputs(user_params, on_change=handle_change_model_params)
     ModelController(model, play_interval, current_step, set_current_step, reset_counter)
 
     with solara.Row():
-        # 4. Space
+        # 5. Space
         if space_drawer == "default":
             # draw with the default implementation
-            make_space(model, agent_portrayal, delta=0)
+            make_space(model, agent_portrayal, ag_size=ag_size)
         elif space_drawer:
             # if specified, draw agent space with an alternate renderer
             space_drawer(model, agent_portrayal)
         # otherwise, do nothing (do not draw space)
 
-        # 5. Plots
+        # 6. Plots
     with solara.Row():
         for measure in measures:
             if callable(measure):
@@ -255,7 +259,7 @@ def UserInputs(user_params, on_change=None):
             raise ValueError(f"{input_type} is not a supported input type")
 
 
-def make_space(model, agent_portrayal, delta=0):
+def make_space(model, agent_portrayal, ag_size=50):
     def portray(g):
         x = []
         y = []
@@ -274,7 +278,8 @@ def make_space(model, agent_portrayal, delta=0):
                     x.append(i)
                     y.append(j)
                     if "size" in data:
-                        s.append(max(data["size"] + delta, data["min_size"]))
+                        print(ag_size)
+                        s.append(ag_size)
                     if "color" in data:
                         c.append(data["color"])
         out = {"x": x, "y": y}
