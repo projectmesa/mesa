@@ -58,12 +58,12 @@ def JupyterViz(
             plt.rcParams["figure.figsize"] = (fixed_size, fixed_size)
 
     def calculate_agent_size():
-        aspect_ratio_high = (
+        fill_fraction_high = (
             0.5  # maintain this aspect ration b/w agent size and space size
         )
         aspect_ratio_low = 0.1  #
         print()
-        size_of_agent = aspect_ratio_high * (
+        size_of_agent = fill_fraction_high * (
             model_parameters["width"] * model_parameters["height"]
         )
         return size_of_agent
