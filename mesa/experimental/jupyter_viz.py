@@ -235,6 +235,23 @@ def UserInputs(user_params, on_change=None):
 
 
 def make_space(model, agent_portrayal):
+    space_fig = Figure()
+    space_ax = space_fig.subplots()
+    space = getattr(model, "grid", None)
+    if space is None:
+        # Sometimes the space is defined as model.space instead of model.grid
+        space = model.space
+    if isinstance(space, mesa.space.NetworkGrid):
+        _draw_network_grid(space, space_ax, agent_portrayal)
+    elif isinstance(space, mesa.space.ContinuousSpace):
+        _draw_continuous_space(space, space_ax, agent_portrayal)
+    else:
+        _draw_grid(space, space_ax, agent_portrayal)
+    space_ax.set_axis_off()
+    solara.FigureMatplotlib(space_fig, format="png")
+
+
+def _draw_grid(space, space_ax, agent_portrayal):
     def portray(g):
         x = []
         y = []
@@ -263,20 +280,7 @@ def make_space(model, agent_portrayal):
             out["c"] = c
         return out
 
-    space_fig = Figure()
-    space_ax = space_fig.subplots()
-    space = getattr(model, "grid", None)
-    if space is None:
-        # Sometimes the space is defined as model.space instead of model.grid
-        space = model.space
-    if isinstance(space, mesa.space.NetworkGrid):
-        _draw_network_grid(space, space_ax, agent_portrayal)
-    elif isinstance(space, mesa.space.ContinuousSpace):
-        _draw_continuous_space(space, space_ax, agent_portrayal)
-    else:
-        space_ax.scatter(**portray(space))
-    space_ax.set_axis_off()
-    solara.FigureMatplotlib(space_fig, format="png")
+    space_ax.scatter(**portray(space))
 
 
 def _draw_network_grid(space, space_ax, agent_portrayal):
