@@ -68,10 +68,9 @@ def accept_tuple_argument(wrapped_function: F) -> F:
     single-item list rather than forcing user to do it."""
 
     def wrapper(grid_instance, positions) -> Any:
-        if isinstance(positions, tuple) and len(positions) == 2:
-            return wrapped_function(grid_instance, [positions])
-        else:
-            return wrapped_function(grid_instance, positions)
+        if len(positions) == 2 and not isinstance(positions[0], tuple):
+            positions = [positions]
+        return wrapped_function(grid_instance, positions)
 
     return cast(F, wrapper)
 
