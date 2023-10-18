@@ -24,6 +24,9 @@ class MockAgent(Agent):
         self.val += 1
         self.val2 += 1
 
+    def double_val(self):
+        return self.val * 2
+
     def write_final_values(self):
         """
         Write the final value to the appropriate table.
@@ -31,6 +34,8 @@ class MockAgent(Agent):
         row = {"agent_id": self.unique_id, "final_value": self.val}
         self.model.datacollector.add_table_row("Final_Values", row)
 
+def agent_function_with_params(agent, multiplier, offset):
+    return (agent.val * multiplier) + offset
 
 class DifferentMockAgent(MockAgent):
     # We define a different MockAgent to test for attributes that are present
@@ -56,17 +61,20 @@ class MockModel(Model):
             self.schedule.add(MockAgent(i, self, val=i))
         agent_reporters = {"value": lambda a: a.val, "value2": "val2"}
         self.initialize_data_collector(
-            {
+            model_reporters={
                 "total_agents": lambda m: m.schedule.get_agent_count(),
                 "model_value": "model_val",
                 "model_calc": self.schedule.get_agent_count,
                 "model_calc_comp": [self.test_model_calc_comp, [3, 4]],
                 "model_calc_fail": [self.test_model_calc_comp, [12, 0]],
             },
-            agent_reporters,
-            {"Final_Values": ["agent_id", "final_value"]},
+            agent_reporters={
+                "value": lambda a: a.val,
+                "value2": "val2",
+                "double_value": MockAgent.double_val,
+                "value_with_params": [agent_function_with_params, [2, 3]]
+            }
         )
-
     def test_model_calc_comp(self, input1, input2):
         if input2 > 0:
             return (self.model_val * input1) / input2
@@ -131,6 +139,19 @@ class TestDataCollector(unittest.TestCase):
         """
         data_collector = self.model.datacollector
         agent_table = data_collector.get_agent_vars_dataframe()
+
+        assert "double_value" in list(agent_table.columns)
+        assert "value_with_params" in list(agent_table.columns)
+
+        # Check the double_value column
+        for step, agent_id, value in agent_table["double_value"].items():
+            expected_value = agent_id * 2
+            self.assertEqual(value, expected_value)
+
+        # Check the value_with_params column
+        for step, agent_id, value in agent_table["value_with_params"].items():
+            expected_value = (agent_id * 2) + 3
+            self.assertEqual(value, expected_value)
 
         assert len(data_collector._agent_records) == 8
         for step, records in data_collector._agent_records.items():
