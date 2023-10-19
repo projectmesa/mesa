@@ -98,7 +98,7 @@ ABM features users have shared that you may want to use in your model
    tutorials/intro_tutorial
    tutorials/visualization_tutorial
    Best Practices <best-practices>
-   Useful Snippets <useful-snippets/snippets>
+   How-to Guide <howto>
    API Documentation <apis/api_main>
    Mesa Packages <packages>
    tutorials/adv_tutorial_legacy.ipynb
