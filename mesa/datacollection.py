@@ -56,44 +56,49 @@ class DataCollector:
         agent_reporters=None,
         tables=None,
     ):
-        """Instantiate a DataCollector with lists of model and agent reporters.
+        """
+        Instantiate a DataCollector with lists of model and agent reporters.
         Both model_reporters and agent_reporters accept a dictionary mapping a
-        variable name to either an attribute name, or a method.
-        For example, if there was only one model-level reporter for number of
-        agents, it might look like:
-            {"agent_count": lambda m: m.schedule.get_agent_count() }
-        If there was only one agent-level reporter (e.g. the agent's energy),
-        it might look like this:
-            {"energy": "energy"}
-        or like this:
-            {"energy": lambda a: a.energy}
+        variable name to either an attribute name, a function, a method of a class/instance,
+        or a function with parameters placed in a list.
+
+        Model reporters can take four types of arguments:
+        1. Lambda function:
+           {"agent_count": lambda m: m.schedule.get_agent_count()}
+        2. Method of a class/instance:
+           {"agent_count": self.get_agent_count} # self here is a class instance
+           {"agent_count": Model.get_agent_count} # Model here is a class
+        3. Class attributes of a model:
+           {"model_attribute": "model_attribute"}
+        4. Functions with parameters that have been placed in a list:
+           {"Model_Function": [function, [param_1, param_2]]}
+
+        Agent reporters can similarly take:
+        1. Attribute name (string) referring to agent's attribute:
+           {"energy": "energy"}
+        2. Lambda function:
+           {"energy": lambda a: a.energy}
+        3. Method of an agent class/instance:
+           {"agent_action": self.do_action} # self here is an agent class instance
+           {"agent_action": Agent.do_action} # Agent here is a class
+        4. Functions with parameters placed in a list:
+           {"Agent_Function": [function, [param_1, param_2]]}
 
         The tables arg accepts a dictionary mapping names of tables to lists of
         columns. For example, if we want to allow agents to write their age
         when they are destroyed (to keep track of lifespans), it might look
         like:
-            {"Lifespan": ["unique_id", "age"]}
+           {"Lifespan": ["unique_id", "age"]}
 
         Args:
-            model_reporters: Dictionary of reporter names and attributes/funcs
-            agent_reporters: Dictionary of reporter names and attributes/funcs.
+            model_reporters: Dictionary of reporter names and attributes/funcs/methods.
+            agent_reporters: Dictionary of reporter names and attributes/funcs/methods.
             tables: Dictionary of table names to lists of column names.
 
         Notes:
-            If you want to pickle your model you must not use lambda functions.
-            If your model includes a large number of agents, you should *only*
-            use attribute names for the agent reporter, it will be much faster.
-
-            Model reporters can take four types of arguments:
-            lambda like above:
-            {"agent_count": lambda m: m.schedule.get_agent_count() }
-            method of a class/instance:
-            {"agent_count": self.get_agent_count} # self here is a class instance
-            {"agent_count": Model.get_agent_count} # Model here is a class
-            class attributes of a model
-            {"model_attribute": "model_attribute"}
-            functions with parameters that have placed in a list
-            {"Model_Function":[function, [param_1, param_2]]}
+            - If you want to pickle your model you must not use lambda functions.
+            - If your model includes a large number of agents, it is recommended to
+              use attribute names for the agent reporter, as it will be faster.
         """
         self.model_reporters = {}
         self.agent_reporters = {}
