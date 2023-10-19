@@ -125,37 +125,37 @@ class DataCollector:
         self.model_reporters[name] = reporter
         self.model_vars[name] = []
 
-def _new_agent_reporter(self, name, reporter):
-    """Add a new agent-level reporter to collect.
+    def _new_agent_reporter(self, name, reporter):
+        """Add a new agent-level reporter to collect.
 
-    Args:
-        name: Name of the agent-level variable to collect.
-        reporter: Attribute string, function object, method of a class/instance, or
-                  function with parameters placed in a list that returns the
-                  variable when given an agent instance.
-    """
-    # Check if the reporter is an attribute string
-    if isinstance(reporter, str):
-        attribute_name = reporter
+        Args:
+            name: Name of the agent-level variable to collect.
+            reporter: Attribute string, function object, method of a class/instance, or
+                      function with parameters placed in a list that returns the
+                      variable when given an agent instance.
+        """
+        # Check if the reporter is an attribute string
+        if isinstance(reporter, str):
+            attribute_name = reporter
 
-        def attr_reporter(agent):
-            return getattr(agent, attribute_name, None)
+            def attr_reporter(agent):
+                return getattr(agent, attribute_name, None)
 
-        reporter = attr_reporter
+            reporter = attr_reporter
 
-    # Check if the reporter is a function with arguments placed in a list
-    elif isinstance(reporter, list):
-        func, params = reporter[0], reporter[1]
+        # Check if the reporter is a function with arguments placed in a list
+        elif isinstance(reporter, list):
+            func, params = reporter[0], reporter[1]
 
-        def func_with_params(agent):
-            return func(agent, *params)
+            def func_with_params(agent):
+                return func(agent, *params)
 
-        reporter = func_with_params
+            reporter = func_with_params
 
-    # For other types (like lambda functions, method of a class/instance), 
-    # it's already suitable to be used as a reporter directly.
+        # For other types (like lambda functions, method of a class/instance),
+        # it's already suitable to be used as a reporter directly.
 
-    self.agent_reporters[name] = reporter
+        self.agent_reporters[name] = reporter
 
     def _new_table(self, table_name, table_columns):
         """Add a new table that objects can write to.
