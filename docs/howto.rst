@@ -1,7 +1,7 @@
-Useful Snippets
-===============
+How-to Guide
+============
 
-A collection of useful code snippets. Here you can find code that allows you to get to get started on common tasks in Mesa.
+Here you can find code that allows you to get to get started on common tasks in Mesa.
 
 Models with Discrete Time
 -------------------------
