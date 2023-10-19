@@ -34,8 +34,10 @@ class MockAgent(Agent):
         row = {"agent_id": self.unique_id, "final_value": self.val}
         self.model.datacollector.add_table_row("Final_Values", row)
 
+
 def agent_function_with_params(agent, multiplier, offset):
     return (agent.val * multiplier) + offset
+
 
 class DifferentMockAgent(MockAgent):
     # We define a different MockAgent to test for attributes that are present
@@ -59,7 +61,6 @@ class MockModel(Model):
         self.n = 10
         for i in range(self.n):
             self.schedule.add(MockAgent(i, self, val=i))
-        agent_reporters = {"value": lambda a: a.val, "value2": "val2"}
         self.initialize_data_collector(
             model_reporters={
                 "total_agents": lambda m: m.schedule.get_agent_count(),
@@ -72,9 +73,11 @@ class MockModel(Model):
                 "value": lambda a: a.val,
                 "value2": "val2",
                 "double_value": MockAgent.double_val,
-                "value_with_params": [agent_function_with_params, [2, 3]]
-            }
+                "value_with_params": [agent_function_with_params, [2, 3]],
+            },
+            tables={"Final_Values": ["agent_id", "final_value"]},
         )
+
     def test_model_calc_comp(self, input1, input2):
         if input2 > 0:
             return (self.model_val * input1) / input2
@@ -144,13 +147,13 @@ class TestDataCollector(unittest.TestCase):
         assert "value_with_params" in list(agent_table.columns)
 
         # Check the double_value column
-        for step, agent_id, value in agent_table["double_value"].items():
-            expected_value = agent_id * 2
+        for (step, agent_id), value in agent_table["double_value"].items():
+            expected_value = (step + agent_id) * 2
             self.assertEqual(value, expected_value)
 
         # Check the value_with_params column
-        for step, agent_id, value in agent_table["value_with_params"].items():
-            expected_value = (agent_id * 2) + 3
+        for (step, agent_id), value in agent_table["value_with_params"].items():
+            expected_value = ((step + agent_id) * 2) + 3
             self.assertEqual(value, expected_value)
 
         assert len(data_collector._agent_records) == 8
@@ -161,7 +164,7 @@ class TestDataCollector(unittest.TestCase):
                 assert len(records) == 9
 
             for values in records:
-                assert len(values) == 4
+                assert len(values) == 6
 
         assert "value" in list(agent_table.columns)
         assert "value2" in list(agent_table.columns)
@@ -196,7 +199,7 @@ class TestDataCollector(unittest.TestCase):
         agent_vars = data_collector.get_agent_vars_dataframe()
         table_df = data_collector.get_table_dataframe("Final_Values")
         assert model_vars.shape == (8, 5)
-        assert agent_vars.shape == (77, 2)
+        assert agent_vars.shape == (77, 4)
         assert table_df.shape == (9, 2)
 
         with self.assertRaises(Exception):
