@@ -74,7 +74,7 @@ jobs:
     - name: Lint with ruff
       # Include `--format=github` to enable automatic inline annotations.
       # Use settings from pyproject.toml.
-      run: ruff . --format=github --extend-exclude 'mesa/cookiecutter-mesa/*'
+      run: ruff . --output-format=github --extend-exclude 'mesa/cookiecutter-mesa/*'
 
   lint-black:
     runs-on: ubuntu-latest
