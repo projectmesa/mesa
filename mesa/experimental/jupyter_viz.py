@@ -228,6 +228,7 @@ def UserInputs(user_params, on_change=None):
         elif input_type == "Checkbox":
             solara.Checkbox(
                 label=label,
+                on_value=change_handler,
                 value=options.get("value"),
             )
         else:
