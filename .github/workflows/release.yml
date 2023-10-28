@@ -1,5 +1,17 @@
 name: Release
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches:
+    - main
+    - release**
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
+  workflow_dispatch:
 
 permissions:
   id-token: write
