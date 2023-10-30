@@ -31,6 +31,7 @@ jobs:
       matrix:
         os: [windows, ubuntu, macos]
         python-version: ["3.12"]
+        name: [""]
         include:
           - os: ubuntu
             python-version: "3.11"
@@ -40,6 +41,10 @@ jobs:
             python-version: "3.9"
           - os: ubuntu
             python-version: "3.8"
+          - os: ubuntu
+            python-version: "3.12"
+            pip-pre: "--pre"  # Installs pre-release versions of pip dependencies
+            name: "Pre-release dependencies"
           # Disabled for now. See https://github.com/projectmesa/mesa/issues/1253
           #- os: ubuntu
           #  python-version: 'pypy-3.8'
@@ -55,7 +60,7 @@ jobs:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('Pipfile.lock') }}
     - name: Install dependencies
-      run: pip install wheel && pip install .[dev]
+      run: pip install wheel && pip install .[dev] ${{ matrix.pip-pre }}
     - name: Test with pytest
       run: pytest --cov=mesa tests/ --cov-report=xml
     - if: matrix.os == 'ubuntu'
