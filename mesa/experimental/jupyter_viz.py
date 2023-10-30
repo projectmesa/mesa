@@ -184,6 +184,23 @@ def check_param_is_fixed(param):
 
 
 def make_space(model, agent_portrayal):
+    space_fig = Figure()
+    space_ax = space_fig.subplots()
+    space = getattr(model, "grid", None)
+    if space is None:
+        # Sometimes the space is defined as model.space instead of model.grid
+        space = model.space
+    if isinstance(space, mesa.space.NetworkGrid):
+        _draw_network_grid(space, space_ax, agent_portrayal)
+    elif isinstance(space, mesa.space.ContinuousSpace):
+        _draw_continuous_space(space, space_ax, agent_portrayal)
+    else:
+        _draw_grid(space, space_ax, agent_portrayal)
+    space_ax.set_axis_off()
+    solara.FigureMatplotlib(space_fig, format="png")
+
+
+def _draw_grid(space, space_ax, agent_portrayal):
     def portray(g):
         x = []
         y = []
@@ -212,18 +229,11 @@ def make_space(model, agent_portrayal):
             out["c"] = c
         return out
 
-    space_fig = Figure()
-    space_ax = space_fig.subplots()
-    if isinstance(model.grid, mesa.space.NetworkGrid):
-        _draw_network_grid(model, space_ax, agent_portrayal)
-    else:
-        space_ax.scatter(**portray(model.grid))
-    space_ax.set_axis_off()
-    solara.FigureMatplotlib(space_fig)
+    space_ax.scatter(**portray(space))
 
 
-def _draw_network_grid(model, space_ax, agent_portrayal):
-    graph = model.grid.G
+def _draw_network_grid(space, space_ax, agent_portrayal):
+    graph = space.G
     pos = nx.spring_layout(graph, seed=0)
     nx.draw(
         graph,
@@ -231,6 +241,31 @@ def _draw_network_grid(model, space_ax, agent_portrayal):
         pos=pos,
         **agent_portrayal(graph),
     )
+
+
+def _draw_continuous_space(space, space_ax, agent_portrayal):
+    def portray(space):
+        x = []
+        y = []
+        s = []  # size
+        c = []  # color
+        for agent in space._agent_to_index:
+            data = agent_portrayal(agent)
+            _x, _y = agent.pos
+            x.append(_x)
+            y.append(_y)
+            if "size" in data:
+                s.append(data["size"])
+            if "color" in data:
+                c.append(data["color"])
+        out = {"x": x, "y": y}
+        if len(s) > 0:
+            out["s"] = s
+        if len(c) > 0:
+            out["c"] = c
+        return out
+
+    space_ax.scatter(**portray(space))
 
 
 def make_plot(model, measure):
