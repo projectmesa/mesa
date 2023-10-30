@@ -204,6 +204,14 @@ def ModelController(
     def do_reset():
         reset_counter.value += 1
 
+    def do_set_playing(value):
+        if current_step == 0:
+            # This means the model has been recreated, and the step resets to
+            # 0. We want to avoid triggering the playing.value = False in the
+            # on_value_play function.
+            previous_step.value = current_step
+        playing.set(value)
+
     with solara.Row():
         solara.Button(label="Step", color="primary", on_click=do_step)
         # This style is necessary so that the play widget has almost the same
@@ -222,7 +230,7 @@ def ModelController(
             show_repeat=False,
             on_value=on_value_play,
             playing=playing.value,
-            on_playing=playing.set,
+            on_playing=do_set_playing,
         )
         solara.Button(label="Reset", color="primary", on_click=do_reset)
         # threaded_do_play is not used for now because it
