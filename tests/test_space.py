@@ -327,6 +327,28 @@ class TestSingleGrid(unittest.TestCase):
         assert self.space[initial_pos[0]][initial_pos[1]] is None
         assert self.space[final_pos[0]][final_pos[1]] == _agent
 
+    def test_iter_cell_list_contents(self):
+        """
+        Test neighborhood retrieval
+        """
+        cell_list_1 = list(self.space.iter_cell_list_contents(TEST_AGENTS_GRID[0]))
+        assert len(cell_list_1) == 1
+
+        cell_list_2 = list(
+            self.space.iter_cell_list_contents(
+                (TEST_AGENTS_GRID[0], TEST_AGENTS_GRID[1])
+            )
+        )
+        assert len(cell_list_2) == 2
+
+        cell_list_3 = list(self.space.iter_cell_list_contents(tuple(TEST_AGENTS_GRID)))
+        assert len(cell_list_3) == 3
+
+        cell_list_4 = list(
+            self.space.iter_cell_list_contents((TEST_AGENTS_GRID[0], (0, 0)))
+        )
+        assert len(cell_list_4) == 1
+
 
 class TestSingleNetworkGrid(unittest.TestCase):
     GRAPH_SIZE = 10
