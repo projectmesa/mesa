@@ -1,3 +1,4 @@
+import sys
 import threading
 
 import matplotlib.pyplot as plt
@@ -6,6 +7,7 @@ import reacton.ipywidgets as widgets
 import solara
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
+from solara.alias import rv
 
 import mesa
 
@@ -59,28 +61,106 @@ def JupyterViz(
     def handle_change_model_params(name: str, value: any):
         set_model_parameters({**model_parameters, name: value})
 
-    # 3. Set up UI
-    solara.Markdown(name)
-    UserInputs(user_params, on_change=handle_change_model_params)
-    ModelController(model, play_interval, current_step, set_current_step, reset_counter)
+    @solara.component
+    def ColorCard(title, color, layout_type="Grid"):
+        with rv.Card(
+            style_=f"background-color: {color}; width: 100%; height: 100%"
+        ) as main:
+            rv.CardTitle(children=[title])
+            if layout_type == "Grid":
+                if space_drawer == "default":
+                    # draw with the default implementation
+                    make_space(model, agent_portrayal)
+                elif space_drawer:
+                    # if specified, draw agent space with an alternate renderer
+                    space_drawer(model, agent_portrayal)
+            elif layout_type == "Measure":
+                for measure in measures:
+                    if callable(measure):
+                        # Is a custom object
+                        measure(model)
+                    else:
+                        make_plot(model, measure)
+        return main
 
-    with solara.GridFixed(columns=2):
-        # 4. Space
-        if space_drawer == "default":
-            # draw with the default implementation
-            make_space(model, agent_portrayal)
-        elif space_drawer:
-            # if specified, draw agent space with an alternate renderer
-            space_drawer(model, agent_portrayal)
-        # otherwise, do nothing (do not draw space)
+    # 3. Set up UI
+
+    with solara.AppBar():
+        solara.AppBarTitle(name)
+
+    grid_layout_initial = [
+        {"h": 12, "i": "0", "moved": False, "w": 5, "x": 0, "y": 0},
+        {"h": 12, "i": "1", "moved": False, "w": 5, "x": 7, "y": 0},
+    ]
+
+    # we need to store the state of the grid_layout ourselves, otherwise it will 'reset'
+    # each time we change resizable or draggable
+    grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
+
+    # render layout and plot
+
+    # jupyter
+    def render_in_jupyter():
+        with solara.Row():
+            with solara.Card("Controls", margin=1, elevation=2):
+                UserInputs(user_params, on_change=handle_change_model_params)
+                ModelController(
+                    model, play_interval, current_step, set_current_step, reset_counter
+                )
+            with solara.Card("Progress", margin=1, elevation=2):
+                # solara.ProgressLinear(True)
+                solara.Markdown(md_text=f"####Step - {current_step}")
+
+        with solara.Row():
+            # 4. Space
+            if space_drawer == "default":
+                # draw with the default implementation
+                make_space(model, agent_portrayal)
+            elif space_drawer:
+                # if specified, draw agent space with an alternate renderer
+                space_drawer(model, agent_portrayal)
+            # otherwise, do nothing (do not draw space)
 
         # 5. Plots
-        for measure in measures:
-            if callable(measure):
-                # Is a custom object
-                measure(model)
-            else:
-                make_plot(model, measure)
+        with solara.GridFixed(columns=len(measures)):
+            for measure in measures:
+                if callable(measure):
+                    # Is a custom object
+                    measure(model)
+                else:
+                    make_plot(model, measure)
+
+    def render_in_browser():
+        with solara.Sidebar():
+            with solara.Card("Controls", margin=1, elevation=2):
+                UserInputs(user_params, on_change=handle_change_model_params)
+                ModelController(
+                    model, play_interval, current_step, set_current_step, reset_counter
+                )
+            with solara.Card("Progress", margin=1, elevation=2):
+                # solara.ProgressLinear(True)
+                solara.Markdown(md_text=f"####Step - {current_step}")
+            resizable = solara.ui_checkbox("Allow resizing", value=True)
+            draggable = solara.ui_checkbox("Allow dragging", value=True)
+
+        layout_types = ["Grid", "Measure"]
+
+        items = [
+            ColorCard(title=layout_types[i], color="white", layout_type=layout_types[i])
+            for i in range(len(grid_layout))
+        ]
+        solara.GridDraggable(
+            items=items,
+            grid_layout=grid_layout,
+            resizable=resizable,
+            draggable=draggable,
+            on_grid_layout=set_grid_layout,
+        )
+
+    if "ipykernel" in sys.argv[0]:
+        render_in_jupyter()
+    else:
+        render_in_browser()
 
 
 @solara.component
@@ -151,7 +231,6 @@ def ModelController(
             on_playing=playing.set,
         )
         solara.Button(label="Reset", color="primary", on_click=do_reset)
-        solara.Markdown(md_text=f"**Step:** {current_step}")
         # threaded_do_play is not used for now because it
         # doesn't work in Google colab. We use
         # ipywidgets.Play until it is fixed. The threading
