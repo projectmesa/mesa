@@ -121,7 +121,7 @@ Don't forget to checkout the `Contributors guide`_.
 .. _`Mesa discussions` : https://github.com/projectmesa/mesa/discussions
 .. _`GitHub` : https://github.com/projectmesa/mesa/
 .. _`ticket` : https://github.com/projectmesa/mesa/issues
-.. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.rst
+.. _`Contributors guide` : https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md
 
 
 Citing Mesa
