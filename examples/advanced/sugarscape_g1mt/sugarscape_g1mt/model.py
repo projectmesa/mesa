@@ -1,3 +1,4 @@
+from pathlib import Path
 import mesa
 import numpy as np
 
@@ -87,7 +88,7 @@ class SugarscapeG1mt(mesa.Model):
         )
 
         # read in landscape file from supplmentary material
-        sugar_distribution = np.genfromtxt("sugarscape_g1mt/sugar-map.txt")
+        sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map.txt")
         spice_distribution = np.flip(sugar_distribution, 1)
 
         agent_id = 0
