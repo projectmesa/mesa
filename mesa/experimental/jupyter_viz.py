@@ -38,7 +38,6 @@ def JupyterViz(
             specify `space_drawer=False`
         play_interval: play interval (default: 150)
     """
-
     current_step, set_current_step = solara.use_state(0)
 
     # 1. Set up model parameters
@@ -62,40 +61,32 @@ def JupyterViz(
         set_model_parameters({**model_parameters, name: value})
 
     @solara.component
-    def ColorCard(title, color, layout_type="Grid"):
+    def ColorCard(color, layout_type):
         with rv.Card(
             style_=f"background-color: {color}; width: 100%; height: 100%"
         ) as main:
-            rv.CardTitle(children=[title])
-            if layout_type == "Grid":
+            if "Space" in layout_type:
+                rv.CardTitle(children=["Space"])
                 if space_drawer == "default":
                     # draw with the default implementation
                     make_space(model, agent_portrayal)
                 elif space_drawer:
                     # if specified, draw agent space with an alternate renderer
                     space_drawer(model, agent_portrayal)
-            elif layout_type == "Measure":
-                for measure in measures:
-                    if callable(measure):
-                        # Is a custom object
-                        measure(model)
-                    else:
-                        make_plot(model, measure)
+            elif "Measure" in layout_type:
+                rv.CardTitle(children=["Measure"])
+                measure = measures[layout_type["Measure"]]
+                if callable(measure):
+                    # Is a custom object
+                    measure(model)
+                else:
+                    make_plot(model, measure)
         return main
 
     # 3. Set up UI
 
     with solara.AppBar():
         solara.AppBarTitle(name)
-
-    grid_layout_initial = [
-        {"h": 12, "i": "0", "moved": False, "w": 5, "x": 0, "y": 0},
-        {"h": 12, "i": "1", "moved": False, "w": 5, "x": 7, "y": 0},
-    ]
-
-    # we need to store the state of the grid_layout ourselves, otherwise it will 'reset'
-    # each time we change resizable or draggable
-    grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
 
     # render layout and plot
 
@@ -108,7 +99,6 @@ def JupyterViz(
                     model, play_interval, current_step, set_current_step, reset_counter
                 )
             with solara.Card("Progress", margin=1, elevation=2):
-                # solara.ProgressLinear(True)
                 solara.Markdown(md_text=f"####Step - {current_step}")
 
         with solara.Row():
@@ -131,6 +121,12 @@ def JupyterViz(
                     make_plot(model, measure)
 
     def render_in_browser():
+        layout_types = [{"Space": "default"}] + [
+            {"Measure": elem} for elem in range(len(measures))
+        ]
+        grid_layout_initial = get_initial_grid_layout(layout_types=layout_types)
+        grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
+
         with solara.Sidebar():
             with solara.Card("Controls", margin=1, elevation=2):
                 UserInputs(user_params, on_change=handle_change_model_params)
@@ -138,16 +134,13 @@ def JupyterViz(
                     model, play_interval, current_step, set_current_step, reset_counter
                 )
             with solara.Card("Progress", margin=1, elevation=2):
-                # solara.ProgressLinear(True)
                 solara.Markdown(md_text=f"####Step - {current_step}")
             resizable = solara.ui_checkbox("Allow resizing", value=True)
             draggable = solara.ui_checkbox("Allow dragging", value=True)
 
-        layout_types = ["Grid", "Measure"]
-
         items = [
-            ColorCard(title=layout_types[i], color="white", layout_type=layout_types[i])
-            for i in range(len(grid_layout))
+            ColorCard(color="white", layout_type=layout_types[i])
+            for i in range(len(layout_types))
         ]
         solara.GridDraggable(
             items=items,
@@ -415,3 +408,22 @@ def make_text(renderer):
         solara.Markdown(renderer(model))
 
     return function
+
+
+def get_initial_grid_layout(layout_types):
+    grid_lay = []
+    cord_y = 0
+    for ii in range(len(layout_types)):
+        template_layout = {"h": 14, "i": 0, "moved": False, "w": 5, "y": 0, "x": 0}
+        if ii == 0:
+            grid_lay.append(template_layout)
+        else:
+            template_layout.update({"i": ii})
+            if ii % 2 == 0:
+                template_layout.update({"x": 0})
+                cord_y += 16
+            else:
+                template_layout.update({"x": 7})
+            template_layout.update({"y": cord_y})
+            grid_lay.append(template_layout)
+    return grid_lay
