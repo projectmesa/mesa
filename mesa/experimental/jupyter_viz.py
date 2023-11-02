@@ -121,9 +121,12 @@ def JupyterViz(
                     make_plot(model, measure)
 
     def render_in_browser():
-        layout_types = [{"Space": "default"}] + [
-            {"Measure": elem} for elem in range(len(measures))
-        ]
+        if measures:
+            layout_types = [{"Space": "default"}] + [
+                {"Measure": elem} for elem in range(len(measures))
+            ]
+        else:
+            layout_types = [{"Space": "default"}]
         grid_layout_initial = get_initial_grid_layout(layout_types=layout_types)
         grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
 
@@ -376,7 +379,7 @@ def make_text(renderer):
 
 def get_initial_grid_layout(layout_types):
     grid_lay = []
-    cord_y = 0
+    y_coord = 0
     for ii in range(len(layout_types)):
         template_layout = {"h": 14, "i": 0, "moved": False, "w": 5, "y": 0, "x": 0}
         if ii == 0:
@@ -385,9 +388,9 @@ def get_initial_grid_layout(layout_types):
             template_layout.update({"i": ii})
             if ii % 2 == 0:
                 template_layout.update({"x": 0})
-                cord_y += 16
+                y_coord += 16
             else:
                 template_layout.update({"x": 7})
-            template_layout.update({"y": cord_y})
+            template_layout.update({"y": y_coord})
             grid_lay.append(template_layout)
     return grid_lay
