@@ -3,6 +3,37 @@
 Release History
 ---------------
 
+2.1.3 (2023-11-2)
+++++++++++++++++++
+
+This release contains several improvements, fixes, and new features to
+the JupyterViz/Solara frontend. It's a patch release instead of a minor release
+because the JupyterViz frontend is still considered experimental.
+
+**Improvements**
+
+* model: ensure model is initiaitlized with random seed based #1814
+* space: check if position values are tuples #1831
+* datacollection: add agent collection by type, documentation, and tests #1838
+
+**Docs and Tutorial**
+
+* tutorial: explain how to set up reporter for multiple agents #1717
+* docs: rename useful snippets to how to guide #1839
+
+**CI and WorkFlows**
+
+* Release CI: update to run workflows on releases #1479
+* CI: Update GHA workflows with Python 3.12 #1840
+* update ruff version #1824, #1841
+
+**Solara/JupyterViz**
+
+* perf: increase speed of Solara render #1819
+* implement drawer for continuous space and refactor code #1830
+* fix: configure change handler for checkbox input #1844
+* fix: ensure playing starts after model param change #1851
+
 2.1.2 (2023-09-23)
 ++++++++++++++++++
 
