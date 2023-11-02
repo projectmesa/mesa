@@ -92,16 +92,14 @@ def JupyterViz(
 
     # jupyter
     def render_in_jupyter():
-        with solara.Row():
-            with solara.Card("Controls", margin=1, elevation=2):
-                UserInputs(user_params, on_change=handle_change_model_params)
-                ModelController(
-                    model, play_interval, current_step, set_current_step, reset_counter
-                )
-            with solara.Card("Progress", margin=1, elevation=2):
-                solara.Markdown(md_text=f"####Step - {current_step}")
+        with solara.Columns([3, 2]):
+            UserInputs(user_params, on_change=handle_change_model_params)
+            ModelController(
+                model, play_interval, current_step, set_current_step, reset_counter
+            )
+            solara.Markdown(md_text=f"###Step - {current_step}")
 
-        with solara.Row():
+        with solara.Columns([1, 1]):
             # 4. Space
             if space_drawer == "default":
                 # draw with the default implementation
@@ -111,8 +109,8 @@ def JupyterViz(
                 space_drawer(model, agent_portrayal)
             # otherwise, do nothing (do not draw space)
 
-        # 5. Plots
-        with solara.GridFixed(columns=len(measures)):
+            # 5. Plots
+
             for measure in measures:
                 if callable(measure):
                     # Is a custom object
