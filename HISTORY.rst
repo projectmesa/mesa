@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-2.1.3 (2023-11-2)
+2.1.3 (2023-11-5)
 ++++++++++++++++++
 
 This release contains several improvements, fixes, and new features to
@@ -12,7 +12,7 @@ because the JupyterViz frontend is still considered experimental.
 
 **Improvements**
 
-* model: ensure model is initiaitlized with random seed based #1814
+* model: ensure model is initialized with random seed based #1814
 * space: check if position values are tuples #1831
 * datacollection: add agent collection by type, documentation, and tests #1838
 
