@@ -26,6 +26,7 @@ because the JupyterViz frontend is still considered experimental.
 * Release CI: update to run workflows on releases #1479
 * CI: Update GHA workflows with Python 3.12 #1840
 * update ruff version #1824, #1841
+* Ensure mesa_viz_tornado>=0.1.2 #1860
 
 **Solara/JupyterViz**
 
