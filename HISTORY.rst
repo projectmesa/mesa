@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+2.1.4 (2023-11-7)
+++++++++++++++++++
+
+This release updates mesa-viz-tornado dependency v0.1.3. This removes the
+external JavaScript templates and `prevents 404 errors https://github.com/projectmesa/mesa-viz-tornado/issues/40`_
+
+* bugfix: ensure mesa_viz_tornado>=0.1.3 #1862
+
 2.1.3 (2023-11-5)
 ++++++++++++++++++
 
