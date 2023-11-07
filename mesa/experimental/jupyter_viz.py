@@ -92,7 +92,7 @@ def JupyterViz(
 
     # jupyter
     def render_in_jupyter():
-        with solara.Columns([3, 2]):
+        with solara.GridFixed(columns=2):
             UserInputs(user_params, on_change=handle_change_model_params)
             ModelController(
                 model, play_interval, current_step, set_current_step, reset_counter
