@@ -7,7 +7,7 @@ Release History
 ++++++++++++++++++
 
 This release updates mesa-viz-tornado dependency v0.1.3. This removes the
-external JavaScript templates and `prevents 404 errors https://github.com/projectmesa/mesa-viz-tornado/issues/40`_
+external JavaScript templates and ``prevents 404 errors https://github.com/projectmesa/mesa-viz-tornado/issues/40``_
 
 * bugfix: ensure mesa_viz_tornado>=0.1.3 #1862
 
@@ -100,20 +100,20 @@ This release improves the introductory and visualization tutorial. Ensures both 
 working badges.
 
 Changes:
-    * Update `intro_tutorial` to warn users to ensure up to date version, and make colab compatible #1739, #1744
+    * Update ``intro_tutorial`` to warn users to ensure up to date version, and make colab compatible #1739, #1744
     * Improve new/experimental Solara based visualization to ensure pause button works #1745
-    * Fix bug in `space.py` -> `get_heading()` #1739
+    * Fix bug in ``space.py`` -> ``get_heading()`` #1739
 
 2.1.0 (2023-07-22) Youngtown
 +++++++++++++++++++++++++++++
 
-This release creates `mesa.experimental` namespace, this solves the issue that PyPI release will not allow git-based install.
+This release creates ``mesa.experimental`` namespace, this solves the issue that PyPI release will not allow git-based install.
 
 **Users should read the Mesa 2.0.0 release note (directly below this), as this contains the details about the breaking
 changes and other major changes that were part of Mesa 2.0 release.**
 
 Changes:
-   * Creates `mesa.experimental` namespace #1736
+   * Creates ``mesa.experimental`` namespace #1736
    * Fix Ruff lint error #1737
    * Update permissions for PyPI #1732
 
@@ -123,27 +123,27 @@ Changes:
 **Special notes**
 
 Mesa 2.0 includes:
-    * **an experimental pure python user interface/ visualization that is also jupyter compatible please see the** `visualization tutorial`_
-    * an improved `datacollector` that allows collection by agent type
+    * **an experimental pure python user interface/ visualization that is also jupyter compatible please see the** ``visualization tutorial``_
+    * an improved ``datacollector`` that allows collection by agent type
     * several breaking changes that provide significant improvements to Mesa.
 
 .. _visualization tutorial: https://mesa.readthedocs.io/en/stable/tutorials/visualization_tutorial.html
 **Breaking Changes:**
 
-* space: change `coord_iter` to return `(content,(x,y))` instead of `(content, x,y)`; this reduces known errors of scheduler to grid mismatch #1566, #1723
-* space: change NetworkGrid `get_neighbors` to `get_neighborhood`; improves performance #1542
-* space: raise exception when pos is out of bounds in `Grid.get_neighborhood` #1524
+* space: change ``coord_iter`` to return ``(content,(x,y))`` instead of ``(content, x,y)``; this reduces known errors of scheduler to grid mismatch #1566, #1723
+* space: change NetworkGrid ``get_neighbors`` to ``get_neighborhood``; improves performance #1542
+* space: raise exception when pos is out of bounds in ``Grid.get_neighborhood`` #1524
 * space: remove deprecations (#1520, #1687, #1688):
-    * `find_empty()`: convert this to `move_to_empty()`
-    * `num_agents`: removed parameter from `move_to_empty()`
-    * `position_agent()`: convert this to `place_agent`
-    * `neighbor_iter()`: convert this to `iter_neighbors()`
+    * ``find_empty()``: convert this to ``move_to_empty()``
+    * ``num_agents``: removed parameter from ``move_to_empty()``
+    * ``position_agent()``: convert this to ``place_agent``
+    * ``neighbor_iter()``: convert this to ``iter_neighbors()``
 * batchrunner: remove deprecations #1627
-    * `class BatchRunner` and `class BatchRunnerMP`: convert these to `batch_run()`
-    * Please see this `batch_run() example`_ if you would like to see an an implementation.
+    * ``class BatchRunner`` and ``class BatchRunnerMP``: convert these to ``batch_run()``
+    * Please see this ``batch_run() example``_ if you would like to see an an implementation.
 * visualization: easier visualization creation #1693
-    * `UserSettableParameter(['number', 'slider','checkbox', 'choice', 'StaticText'])`: convert to `NumberInput` , `Slider`, `CheckBox`, `Choice`, `StaticText`
-    * Please see this `visualization example`_ if you would like to see an implementation.
+    * ``UserSettableParameter(['number', 'slider','checkbox', 'choice', 'StaticText'])``: convert to ``NumberInput`` , ``Slider``, ``CheckBox``, ``Choice``, ``StaticText``
+    * Please see this ``visualization example``_ if you would like to see an implementation.
 
 .. _batch_run() example: https://github.com/projectmesa/mesa-examples/blob/db2ec0383eb3b1868e91c828101e84cce97bbb63/examples/bank_reserves/batch_run.py#L188-L221
 .. _visualization example: https://github.com/projectmesa/mesa-examples/blob/db2ec0383eb3b1868e91c828101e84cce97bbb63/examples/boltzmann_wealth_model/boltzmann_wealth_model/server.py#L25-L32.)
@@ -152,8 +152,8 @@ Mesa 2.0 includes:
 **New Features:**
 
 * datacollector: can now handle data collection by agent type #1419, #1702
-* time: allows for model level `StageActivation` #1709
-* visualization: `ChartModule` can have dynamically named properties #1685
+* time: allows for model level ``StageActivation`` #1709
+* visualization: ``ChartModule`` can have dynamically named properties #1685
 * visualization: improved stop server to end visualizations #1646
 * *experimental* python front end option: integrated the initial prototype of the pure python front end option #1698, #1726
 
@@ -162,7 +162,7 @@ Mesa 2.0 includes:
 
 
 * update HexGrid and create HexSingleGrid and HexMultiGrid #1581
-* correct `get_heading` for toroidal space #1686
+* correct ``get_heading`` for toroidal space #1686
 * update slider to start at 1FPS #1674
 * update links to examples repo due to creation of mesa_examples #1636, #1637
 * ** CI Improvements**
@@ -180,13 +180,13 @@ Mesa 2.0 includes:
     * fix types and errors in docs #1624, #1705, #1706, #1720
     * improve tutorials #1636, #1637, #1639, #1641, #1647, #1648, #1650, #1656, #1658, #1659, #1695, #1697,
     * add nbsphinx to adv_tutorial #1694
-    * replace `const chart` for `var chart` in advanced tutorial #1679
+    * replace ``const chart`` for ``var chart`` in advanced tutorial #1679
 * update LICENSE to 2023 #1683
 
 1.2.1 (2023-03-18)
 ++++++++++++++++++
 
-This release fixes https://github.com/projectmesa/mesa/issues/1606, where `mesa startproject` doesn't work.
+This release fixes https://github.com/projectmesa/mesa/issues/1606, where ``mesa startproject`` doesn't work.
 
 Changes:
 
@@ -589,7 +589,7 @@ This release fixes https://github.com/projectmesa/mesa/issues/1461 where custom 
 * Fixed for #919, adding an exception for duplicate ids. #920
 * Batchrunner
     * Batch runner redux #917
-    * Fixed empty/None `variable_parameters` argument to BatchRunner (#861) #862
+    * Fixed empty/None ``variable_parameters`` argument to BatchRunner (#861) #862
     * Added ordereddict to BatchrunerMP for python 3.5 #893
     * Fixed python 3.5 fails bathrunnerMP (multiple tries) #897, #896, #895
     * Batchrunner_redux fixes #928
@@ -728,7 +728,7 @@ This release fixes https://github.com/projectmesa/mesa/issues/1461 where custom 
 * Change size and tooltip text of nodes in D3 network visualization #468
 * Multiprocessing BatchRunner with pathos #506
 * Schedule.agent.dict - Implement tracking the agents in the scheduler via OrderedDict #510
-* Use click and add `mesa run` #522
+* Use click and add ``mesa run`` #522
 * Add a code of conduct #530
 
 **Fixes**
@@ -1025,9 +1025,9 @@ Theme: Scipy Sprints ( ‘-’)人(ﾟ_ﾟ )
 ++++++++++++++++++
 
 * Fixes: Order of operations reversed: agent is removed first and then it is placed.
-* Improvement: `LICENSE`_ was updates from MIT to Apache 2.0.
+* Improvement: ``LICENSE``_ was updates from MIT to Apache 2.0.
 
-.. _`LICENSE` : https://github.com/projectmesa/mesa/blob/main/LICENSE
+.. _``LICENSE`` : https://github.com/projectmesa/mesa/blob/main/LICENSE
 
 
 0.6.0 (2015-06-21)
