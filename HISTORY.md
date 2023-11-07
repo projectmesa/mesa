@@ -148,7 +148,7 @@ Mesa 2.0 includes:
 -   space: raise exception when pos is out of bounds in
     `Grid.get_neighborhood` #1524
 
--   
+-
 
     space: remove deprecations (#1520, #1687, #1688):
 
@@ -157,7 +157,7 @@ Mesa 2.0 includes:
         -   `position_agent()`: convert this to `place_agent`
         -   `neighbor_iter()`: convert this to `iter_neighbors()`
 
--   
+-
 
     batchrunner: remove deprecations #1627
 
@@ -166,7 +166,7 @@ Mesa 2.0 includes:
         -   Please see this `batch_run() example`\_ if you would like to
             see an an implementation.
 
--   
+-
 
     visualization: easier visualization creation #1693
 
@@ -198,7 +198,7 @@ Mesa 2.0 includes:
 -   update links to examples repo due to creation of mesa_examples
     #1636, #1637
 
--   
+-
 
     \*\* CI Improvements\*\*
 
@@ -210,7 +210,7 @@ Mesa 2.0 includes:
         -   updated pip for zsh #1644
         -   CLI quality of life improvements #1640
 
--   
+-
 
     **Docs Improvements**
 
@@ -263,7 +263,7 @@ Some highlights for the perf improvements:
 
 -   Remove auto-update GH Actions for Pipfile.lock #1558
 
--   
+-
 
     ruff
 
@@ -339,7 +339,7 @@ Some highlights for the perf improvements:
 
 -   Update Pipfile.lock (dependencies) #1495 #1487
 
--   
+-
 
     build(deps):
 
@@ -413,7 +413,7 @@ visualization server.
 
 **Improvements**
 
--   
+-
 
     CI Updates
 
@@ -423,14 +423,14 @@ visualization server.
         -   Upgrade pre-commit CI (with pyupgrade and syntax checks)
             #1422
 
--   
+-
 
     Tests
 
     :   -   test: RandomActivationByType: Test adding agents with
             duplicate ID #1392
 
--   
+-
 
     Dependency updates
 
@@ -438,7 +438,7 @@ visualization server.
         -   Update Pipfile.lock (dependencies) #1408
         -   Update Pipfile.lock (dependencies) #1434
 
--   
+-
 
     Docs
 
@@ -449,7 +449,7 @@ visualization server.
         -   Docs: Remove trailing whitespaces #1421
         -   Fixes #1423 - fixes build badge in docs #1424
 
--   
+-
 
     Refactors
 
@@ -493,7 +493,7 @@ visualization server.
 
 **Improvements**
 
--   
+-
 
     Implement simplified namespace
 
@@ -513,7 +513,7 @@ visualization server.
         -   add batch_run to simple namespace #1316
         -   Implement simpler Mesa namespace #1294
 
--   
+-
 
     mypy
 
@@ -521,7 +521,7 @@ visualization server.
         -   mypy: Improve space.py annotation, part 2 #1219
         -   mypy: Improve annotations #1212
 
--   
+-
 
     Userparam class updates
 
@@ -533,14 +533,14 @@ visualization server.
 
         -   feat: Implement Checkbox UserParam class #1332
 
-        -   
+        -
 
             feat: Implement Slider UserParam class #1272
 
             :   -   examples: Convert to using Slider UserParam class
                     #1340
 
--   
+-
 
     Front-end updates
 
@@ -592,7 +592,7 @@ visualization server.
 
         -   Install JS dependencies using Fanstatic #1195
 
-        -   
+        -
 
             JQuery updates
 
@@ -608,7 +608,7 @@ visualization server.
                     BarChartModule.js #1326
                 -   visualization: Specify tooltip without jQuery #1308
 
--   
+-
 
     CI Updates
 
@@ -630,7 +630,7 @@ visualization server.
         -   Improve code quality with static analysis #1328
         -   CI test: Increase timeout to 10 minutes #1250
 
--   
+-
 
     Dependency updates
 
@@ -640,7 +640,7 @@ visualization server.
             #1224, #1203, #1135 by github-actions bot
         -   Migrate D3 from v4 to v7 #1088
 
--   
+-
 
     Other Improvements
 
@@ -687,7 +687,7 @@ visualization server.
 
 -   CI: the \"install dependencies\" step is slow #1163
 
--   
+-
 
     Readme related
 
@@ -753,7 +753,7 @@ visualization server.
 
 -   Re-Implementation of BatchRunner #924
 
--   
+-
 
     CI Related
 
@@ -763,7 +763,7 @@ visualization server.
         -   CI: Maintenance: Update to Python 3.10, split of lint jobs
             #1074
 
--   
+-
 
     Dependency updates
 
@@ -775,7 +775,7 @@ visualization server.
         -   Bump urllib3 from 1.26.2 to 1.26.5 #1043
         -   Update packages.rst #1068
 
--   
+-
 
     Docs
 
@@ -797,7 +797,7 @@ visualization server.
 
 -   Fix broken image on PyPI #1071
 
--   
+-
 
     Docs
 
@@ -813,7 +813,7 @@ visualization server.
 
 **Improvements**
 
--   
+-
 
     Master to Main change:
 
@@ -821,7 +821,7 @@ visualization server.
             branch #1012
         -   CI: Run on pushed to main and release branches #1011
 
--   
+-
 
     Github Actions
 
@@ -869,7 +869,7 @@ visualization server.
 
 -   MultiGrid: Set to using list for cell content #783
 
--   
+-
 
     Docs
 
@@ -912,7 +912,7 @@ visualization server.
 
 -   Fixed for #919, adding an exception for duplicate ids. #920
 
--   
+-
 
     Batchrunner
 
@@ -966,7 +966,7 @@ visualization server.
 
 -   Change grid empties from list to set #649 (improves speed)
 
--   
+-
 
     Adding mypy annotation
 
@@ -975,13 +975,13 @@ visualization server.
         -   space: Add mypy annotation to the remaining
             methods/functions #796
 
--   
+-
 
     Docs related
 
     :   -   Bulk merge of docs from \'docs\' to \'master\' #684
 
-        -   
+        -
 
             Created useful snippets code section in the docs #668 #669
 
@@ -990,7 +990,7 @@ visualization server.
 
         -   Add documentation for feature (pipenv) added in #678 #683
 
-        -   
+        -
 
             Add docs for BatchRunner to support Variable and Fixed Parameter Contribution #679 #683
 
@@ -1002,7 +1002,7 @@ visualization server.
 
         -   Updates formatting the readme Docs markdown #737
 
--   
+-
 
     Examples related
 
@@ -1024,7 +1024,7 @@ visualization server.
 
 -   Fixed pip install from github by specifying egg #802
 
--   
+-
 
     Compatibility fixes
 
@@ -1032,7 +1032,7 @@ visualization server.
             versions of Tornado #655
         -   Fixes #749 networkx incompatibility #750
 
--   
+-
 
     Fixing typos
 
@@ -1041,7 +1041,7 @@ visualization server.
         -   Fixed typo in BarChartModule line 100 #747
         -   Fix typo in documentation #809
 
--   
+-
 
     Doc fixes (not relating to typos)
 
@@ -1057,7 +1057,7 @@ visualization server.
         -   Fix histogram in advanced tutorial #794 #610
         -   Fixes Advanced Tutorial #elements #804 #803
 
--   
+-
 
     Fixes to examples
 
@@ -1194,7 +1194,7 @@ visualization server.
 
 -   \[hotfix!\] Disable e2e viz test for now. #414
 
--   
+-
 
     Fixing bug in release process. \[6a8ecb6\]
 
@@ -1210,7 +1210,7 @@ visualization server.
 
 -   Add best-practices document and describe models. #371
 
--   
+-
 
     Refactored & model standards related:
 
@@ -1432,7 +1432,7 @@ Theme: Scipy Sprints ( '-')人(ﾟ_ﾟ )
 
 -   Improvement: Adding a simultaneous activation scheduler.
 
--   
+-
 
     New models:
 
