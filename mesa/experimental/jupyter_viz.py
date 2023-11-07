@@ -99,7 +99,7 @@ def JupyterViz(
             )
             solara.Markdown(md_text=f"###Step - {current_step}")
 
-        with solara.Columns([1, 1]):
+        with solara.GridFixed(columns=2):
             # 4. Space
             if space_drawer == "default":
                 # draw with the default implementation
