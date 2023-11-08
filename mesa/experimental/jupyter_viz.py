@@ -60,8 +60,10 @@ def JupyterViz(
     def handle_change_model_params(name: str, value: any):
         set_model_parameters({**model_parameters, name: value})
 
-    @solara.component
     def ColorCard(color, layout_type):
+        # TODO: turn this into a Solara component, but must pass in current
+        # step as a dependency for the plots, so that there is no flickering
+        # due to rerender.
         with rv.Card(
             style_=f"background-color: {color}; width: 100%; height: 100%"
         ) as main:
