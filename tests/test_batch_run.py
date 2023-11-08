@@ -52,7 +52,7 @@ class MockModel(Model):
         schedule=None,
         enable_agent_reporters=True,
         n_agents=3,
-        **kwargs
+        **kwargs,
     ):
         super().__init__()
         self.schedule = BaseScheduler(self) if schedule is None else schedule
