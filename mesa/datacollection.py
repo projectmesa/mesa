@@ -36,6 +36,7 @@ The default DataCollector here makes several assumptions:
 """
 import itertools
 import types
+from functools import partial
 
 import pandas as pd
 
@@ -188,8 +189,8 @@ class DataCollector:
         """Collect all the data for the given model object."""
         if self.model_reporters:
             for var, reporter in self.model_reporters.items():
-                # Check if Lambda operator
-                if isinstance(reporter, types.LambdaType):
+                # Check if lambda or partial function
+                if isinstance(reporter, (types.LambdaType, partial)):
                     self.model_vars[var].append(reporter(model))
                 # Check if model attribute
                 elif isinstance(reporter, str):
