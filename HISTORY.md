@@ -6,7 +6,7 @@ title: Release History
 
 This release updates mesa-viz-tornado dependency v0.1.3. This removes
 the external JavaScript templates and
-`prevents 404 errors https://github.com/projectmesa/mesa-viz-tornado/issues/40`\_
+[prevents 404 errors](https://github.com/projectmesa/mesa-viz-tornado/issues/40)
 
 -   bugfix: ensure mesa_viz_tornado\>=0.1.3 #1862
 
@@ -200,7 +200,7 @@ Mesa 2.0 includes:
 
 -
 
-    \*\* CI Improvements\*\*
+    ** CI Improvements**
 
     :   -   update Ruff #1724
         -   remove Pipfile and Pipfile.lock #1692
