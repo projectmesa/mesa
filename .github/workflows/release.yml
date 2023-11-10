@@ -20,7 +20,7 @@ jobs:
   release:
     name: Deploy release to PyPI
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       id-token: write
     steps:
       - name: Checkout source
