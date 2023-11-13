@@ -152,8 +152,8 @@ class SimultaneousActivation(BaseScheduler):
     A scheduler that simulates the simultaneous activation of all agents.
 
     This scheduler is unique in that it requires agents to have both `step` and `advance` methods.
-    The `step` method is for activating the agent and staging any changes without applying them immediately.
-    The `advance` method then applies these changes, simulating simultaneous action.
+    - The `step` method is for activating the agent and staging any changes without applying them immediately.
+    - The `advance` method then applies these changes, simulating simultaneous action.
 
     This scheduler is useful in scenarios where the interactions between agents are sensitive to the order
     of execution, and a quasi-simultaneous execution is more realistic.
@@ -178,13 +178,13 @@ class SimultaneousActivation(BaseScheduler):
 class StagedActivation(BaseScheduler):
     """
     A scheduler allowing agent activation to be divided into several stages, with all agents executing one stage
-    before moving on to the next.
+    before moving on to the next. This class is a generalization of SimultaneousActivation.
 
     This scheduler is useful for complex models where actions need to be broken down into distinct phases
     for each agent in each time step. Agents must implement methods for each defined stage.
 
     The scheduler also tracks steps and time separately, allowing fractional time increments based on the number
-    of stages.
+    of stages. Time advances in fractional increments of 1 / (# of stages), meaning that 1 step = 1 unit of time.
 
     Inherits all attributes and methods from BaseScheduler.
 
