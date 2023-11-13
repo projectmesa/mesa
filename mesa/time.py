@@ -39,12 +39,24 @@ TimeT = Union[float, int]
 
 
 class BaseScheduler:
-    """Simplest scheduler; activates agents one at a time, in the order
-    they were added.
+    """
+    A simple scheduler that activates agents one at a time, in the order they were added.
 
-    Assumes that each agent added has a *step* method which takes no arguments.
+    This scheduler is designed to replicate the behavior of the scheduler in MASON, a multi-agent simulation toolkit.
+    It assumes that each agent added has a `step` method which takes no arguments and executes the agent's actions.
 
-    (This is explicitly meant to replicate the scheduler in MASON).
+    Attributes:
+        model (Model): The model instance associated with the scheduler.
+        steps (int): The number of steps the scheduler has taken.
+        time (TimeT): The current time in the simulation. Can be an integer or a float.
+        _agents (dict[int, Agent]): A private dictionary mapping agent IDs to agent instances.
+
+    Methods:
+        add: Adds an agent to the scheduler.
+        remove: Removes an agent from the scheduler.
+        step: Executes a step, which involves activating each agent once.
+        get_agent_count: Returns the number of agents in the scheduler.
+        agents (property): Returns a list of all agent instances.
     """
 
     def __init__(self, model: Model) -> None:
@@ -111,13 +123,19 @@ class BaseScheduler:
 
 
 class RandomActivation(BaseScheduler):
-    """A scheduler which activates each agent once per step, in random order,
-    with the order reshuffled every step.
+    """
+    A scheduler that activates each agent once per step, in a random order, with the order reshuffled each step.
 
-    This is equivalent to the NetLogo 'ask agents...' and is generally the
-    default behavior for an ABM.
+    This scheduler is equivalent to the NetLogo 'ask agents...' behavior and is a common default for ABMs.
+    It assumes that all agents have a `step` method.
 
-    Assumes that all agents have a step(model) method.
+    The random activation ensures that no single agent or sequence of agents consistently influences the model due
+    to ordering effects, which is crucial for certain types of simulations.
+
+    Inherits all attributes and methods from BaseScheduler.
+    
+    Methods:
+        step: Executes a step, activating each agent in a random order.
     """
 
     def step(self) -> None:
@@ -131,11 +149,20 @@ class RandomActivation(BaseScheduler):
 
 
 class SimultaneousActivation(BaseScheduler):
-    """A scheduler to simulate the simultaneous activation of all the agents.
+    """
+    A scheduler that simulates the simultaneous activation of all agents.
 
-    This scheduler requires that each agent have two methods: step and advance.
-    step() activates the agent and stages any necessary changes, but does not
-    apply them yet. advance() then applies the changes.
+    This scheduler is unique in that it requires agents to have both `step` and `advance` methods.
+    The `step` method is for activating the agent and staging any changes without applying them immediately.
+    The `advance` method then applies these changes, simulating simultaneous action.
+
+    This scheduler is useful in scenarios where the interactions between agents are sensitive to the order
+    of execution, and a quasi-simultaneous execution is more realistic.
+
+    Inherits all attributes and methods from BaseScheduler.
+
+    Methods:
+        step: Executes a step for all agents, first calling `step` then `advance` on each.
     """
 
     def step(self) -> None:
@@ -150,15 +177,25 @@ class SimultaneousActivation(BaseScheduler):
 
 
 class StagedActivation(BaseScheduler):
-    """A scheduler which allows agent activation to be divided into several
-    stages instead of a single `step` method. All agents execute one stage
+    """
+    A scheduler allowing agent activation to be divided into several stages, with all agents executing one stage
     before moving on to the next.
 
-    Agents must have all the stage methods implemented. Stage methods take a
-    model object as their only argument.
+    This scheduler is useful for complex models where actions need to be broken down into distinct phases
+    for each agent in each time step. Agents must implement methods for each defined stage.
 
-    This schedule tracks steps and time separately. Time advances in fractional
-    increments of 1 / (# of stages), meaning that 1 step = 1 unit of time.
+    The scheduler also tracks steps and time separately, allowing fractional time increments based on the number
+    of stages.
+
+    Inherits all attributes and methods from BaseScheduler.
+
+    Attributes:
+        stage_list (list[str]): A list of stage names that define the order of execution.
+        shuffle (bool): Determines whether to shuffle the order of agents each step.
+        shuffle_between_stages (bool): Determines whether to shuffle agents between each stage.
+
+    Methods:
+        step: Executes all the stages for all agents in the defined order.
     """
 
     def __init__(
@@ -205,22 +242,26 @@ class StagedActivation(BaseScheduler):
 
 class RandomActivationByType(BaseScheduler):
     """
-    A scheduler which activates each type of agent once per step, in random
-    order, with the order reshuffled every step.
+    A scheduler that activates each type of agent once per step, in random order, with the order reshuffled every step.
 
-    The `step_type` method is equivalent to the NetLogo 'ask [breed]...' and is
-    generally the default behavior for an ABM. The `step` method performs
-    `step_type` for each of the agent types.
+    This scheduler is useful for models with multiple types of agents, ensuring that each type is treated
+    equitably in terms of activation order. The randomness in activation order helps in reducing biases
+    due to ordering effects.
 
-    Assumes that all agents have a step() method.
-
-    This implementation assumes that the type of an agent doesn't change
-    throughout the simulation.
+    Inherits all attributes and methods from BaseScheduler.
 
     If you want to do some computations / data collections specific to an agent
     type, you can either:
     - loop through all agents, and filter by their type
     - access via `your_model.scheduler.agents_by_type[your_type_class]`
+
+    Attributes:
+        agents_by_type (defaultdict): A dictionary mapping agent types to dictionaries of agents.
+
+    Methods:
+        step: Executes the step of each agent type in a random order.
+        step_type: Activates all agents of a given type.
+        get_type_count: Returns the count of agents of a specific type.
     """
 
     def __init__(self, model: Model) -> None:
