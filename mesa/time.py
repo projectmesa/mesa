@@ -46,17 +46,16 @@ class BaseScheduler:
     It assumes that each agent added has a `step` method which takes no arguments and executes the agent's actions.
 
     Attributes:
-        model (Model): The model instance associated with the scheduler.
-        steps (int): The number of steps the scheduler has taken.
-        time (TimeT): The current time in the simulation. Can be an integer or a float.
-        _agents (dict[int, Agent]): A private dictionary mapping agent IDs to agent instances.
+        - model (Model): The model instance associated with the scheduler.
+        - steps (int): The number of steps the scheduler has taken.
+        - time (TimeT): The current time in the simulation. Can be an integer or a float.
 
     Methods:
-        add: Adds an agent to the scheduler.
-        remove: Removes an agent from the scheduler.
-        step: Executes a step, which involves activating each agent once.
-        get_agent_count: Returns the number of agents in the scheduler.
-        agents (property): Returns a list of all agent instances.
+        - add: Adds an agent to the scheduler.
+        - remove: Removes an agent from the scheduler.
+        - step: Executes a step, which involves activating each agent once.
+        - get_agent_count: Returns the number of agents in the scheduler.
+        - agents (property): Returns a list of all agent instances.
     """
 
     def __init__(self, model: Model) -> None:
@@ -135,7 +134,7 @@ class RandomActivation(BaseScheduler):
     Inherits all attributes and methods from BaseScheduler.
     
     Methods:
-        step: Executes a step, activating each agent in a random order.
+        - step: Executes a step, activating each agent in a random order.
     """
 
     def step(self) -> None:
@@ -162,7 +161,7 @@ class SimultaneousActivation(BaseScheduler):
     Inherits all attributes and methods from BaseScheduler.
 
     Methods:
-        step: Executes a step for all agents, first calling `step` then `advance` on each.
+        - step: Executes a step for all agents, first calling `step` then `advance` on each.
     """
 
     def step(self) -> None:
@@ -190,12 +189,12 @@ class StagedActivation(BaseScheduler):
     Inherits all attributes and methods from BaseScheduler.
 
     Attributes:
-        stage_list (list[str]): A list of stage names that define the order of execution.
-        shuffle (bool): Determines whether to shuffle the order of agents each step.
-        shuffle_between_stages (bool): Determines whether to shuffle agents between each stage.
+        - stage_list (list[str]): A list of stage names that define the order of execution.
+        - shuffle (bool): Determines whether to shuffle the order of agents each step.
+        - shuffle_between_stages (bool): Determines whether to shuffle agents between each stage.
 
     Methods:
-        step: Executes all the stages for all agents in the defined order.
+        - step: Executes all the stages for all agents in the defined order.
     """
 
     def __init__(
@@ -208,11 +207,11 @@ class StagedActivation(BaseScheduler):
         """Create an empty Staged Activation schedule.
 
         Args:
-            model: Model object associated with the schedule.
-            stage_list: List of strings of names of stages to run, in the
+            - model: Model object associated with the schedule.
+            - stage_list: List of strings of names of stages to run, in the
                          order to run them in.
-            shuffle: If True, shuffle the order of agents each step.
-            shuffle_between_stages: If True, shuffle the agents after each
+            - shuffle: If True, shuffle the order of agents each step.
+            - shuffle_between_stages: If True, shuffle the agents after each
                                     stage; otherwise, only shuffle at the start
                                     of each step.
         """
@@ -256,12 +255,12 @@ class RandomActivationByType(BaseScheduler):
     - access via `your_model.scheduler.agents_by_type[your_type_class]`
 
     Attributes:
-        agents_by_type (defaultdict): A dictionary mapping agent types to dictionaries of agents.
+        - agents_by_type (defaultdict): A dictionary mapping agent types to dictionaries of agents.
 
     Methods:
-        step: Executes the step of each agent type in a random order.
-        step_type: Activates all agents of a given type.
-        get_type_count: Returns the count of agents of a specific type.
+        - step: Executes the step of each agent type in a random order.
+        - step_type: Activates all agents of a given type.
+        - get_type_count: Returns the count of agents of a specific type.
     """
 
     def __init__(self, model: Model) -> None:
