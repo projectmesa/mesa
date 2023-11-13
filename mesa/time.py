@@ -132,7 +132,7 @@ class RandomActivation(BaseScheduler):
     to ordering effects, which is crucial for certain types of simulations.
 
     Inherits all attributes and methods from BaseScheduler.
-    
+
     Methods:
         - step: Executes a step, activating each agent in a random order.
     """
