@@ -2,6 +2,26 @@
 title: Release History
 ---
 
+# 2.1.5 (2023-11-16)
+
+This release has some critical fixes to JupyterViz/Solara frontend to prevent
+flickering and improve the display of the jupyter plots. It also has
+improvements to datacollection and the documentation.
+
+**Improvements**
+
+- datacollection: check if model reporters is a partial function (#1872)
+
+**Docs and Tutorial**
+
+- docs: convert HISTORY from `.rst` to `.md` (#1873)
+- docs: enhance docstrings for scheduler classes in `mesa.time` (#1866)
+
+**Solara/JupyterViz**
+
+- fix: optimize controller and plots to fill screen in jupyter (#1868)
+- fix: ensure space and plot subcomponent are not rendered on step (#1867)
+
 # 2.1.4 (2023-11-7)
 
 This release updates mesa-viz-tornado dependency v0.1.3. This removes
