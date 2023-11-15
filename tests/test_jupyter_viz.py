@@ -82,13 +82,15 @@ class TestMakeUserInput(unittest.TestCase):
 
 
 class TestJupyterViz(unittest.TestCase):
-    @patch("mesa.experimental.jupyter_viz.make_space")
-    def test_call_space_drawer(self, mock_make_space):
+    @patch("mesa.experimental.jupyter_viz.SpaceMatplotlib")
+    def test_call_space_drawer(self, mock_space_matplotlib):
         mock_model_class = Mock()
         agent_portrayal = {
             "Shape": "circle",
             "color": "gray",
         }
+        current_step = 0
+        dependencies = [current_step]
         # initialize with space drawer unspecified (use default)
         # component must be rendered for code to run
         solara.render(
@@ -99,13 +101,13 @@ class TestJupyterViz(unittest.TestCase):
             )
         )
         # should call default method with class instance and agent portrayal
-        mock_make_space.assert_called_with(
-            mock_model_class.return_value, agent_portrayal
+        mock_space_matplotlib.assert_called_with(
+            mock_model_class.return_value, agent_portrayal, dependencies=dependencies
         )
 
         # specify no space should be drawn; any false value should work
         for falsy_value in [None, False, 0]:
-            mock_make_space.reset_mock()
+            mock_space_matplotlib.reset_mock()
             solara.render(
                 JupyterViz(
                     model_class=mock_model_class,
@@ -115,7 +117,7 @@ class TestJupyterViz(unittest.TestCase):
                 )
             )
             # should call default method with class instance and agent portrayal
-            assert mock_make_space.call_count == 0
+            assert mock_space_matplotlib.call_count == 0
 
         # specify a custom space method
         altspace_drawer = Mock()
