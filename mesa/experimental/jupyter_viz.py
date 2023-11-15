@@ -1,5 +1,6 @@
 import sys
 import threading
+from typing import List, Optional
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -33,7 +34,7 @@ def JupyterViz(
         name: name for display
         agent_portrayal: options for rendering agents (dictionary)
         space_drawer: method to render the agent space for
-            the model; default implementation is :meth:`make_space`;
+            the model; default implementation is the `SpaceMatplotlib` component;
             simulations with no space to visualize should
             specify `space_drawer=False`
         play_interval: play interval (default: 150)
@@ -71,7 +72,9 @@ def JupyterViz(
                 rv.CardTitle(children=["Space"])
                 if space_drawer == "default":
                     # draw with the default implementation
-                    make_space(model, agent_portrayal)
+                    SpaceMatplotlib(
+                        model, agent_portrayal, dependencies=[current_step.value]
+                    )
                 elif space_drawer:
                     # if specified, draw agent space with an alternate renderer
                     space_drawer(model, agent_portrayal)
@@ -103,7 +106,9 @@ def JupyterViz(
             # 4. Space
             if space_drawer == "default":
                 # draw with the default implementation
-                make_space(model, agent_portrayal)
+                SpaceMatplotlib(
+                    model, agent_portrayal, dependencies=[current_step.value]
+                )
             elif space_drawer:
                 # if specified, draw agent space with an alternate renderer
                 space_drawer(model, agent_portrayal)
@@ -310,7 +315,8 @@ def UserInputs(user_params, on_change=None):
             raise ValueError(f"{input_type} is not a supported input type")
 
 
-def make_space(model, agent_portrayal):
+@solara.component
+def SpaceMatplotlib(model, agent_portrayal, dependencies: Optional[List[any]] = None):
     space_fig = Figure()
     space_ax = space_fig.subplots()
     space = getattr(model, "grid", None)
@@ -324,7 +330,7 @@ def make_space(model, agent_portrayal):
     else:
         _draw_grid(space, space_ax, agent_portrayal)
     space_ax.set_axis_off()
-    solara.FigureMatplotlib(space_fig, format="png")
+    solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
 
 
 def _draw_grid(space, space_ax, agent_portrayal):
