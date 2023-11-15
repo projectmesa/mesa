@@ -38,7 +38,7 @@ def JupyterViz(
             specify `space_drawer=False`
         play_interval: play interval (default: 150)
     """
-    current_step, set_current_step = solara.use_state(0)
+    current_step = solara.use_reactive(0)
 
     # 1. Set up model parameters
     user_params, fixed_params = split_model_params(model_params)
@@ -49,7 +49,7 @@ def JupyterViz(
     # 2. Set up Model
     def make_model():
         model = model_class(**model_parameters)
-        set_current_step(0)
+        current_step.value = 0
         return model
 
     reset_counter = solara.use_reactive(0)
@@ -96,9 +96,7 @@ def JupyterViz(
     def render_in_jupyter():
         with solara.GridFixed(columns=2):
             UserInputs(user_params, on_change=handle_change_model_params)
-            ModelController(
-                model, play_interval, current_step, set_current_step, reset_counter
-            )
+            ModelController(model, play_interval, current_step, reset_counter)
             solara.Markdown(md_text=f"###Step - {current_step}")
 
         with solara.GridFixed(columns=2):
@@ -133,9 +131,7 @@ def JupyterViz(
         with solara.Sidebar():
             with solara.Card("Controls", margin=1, elevation=2):
                 UserInputs(user_params, on_change=handle_change_model_params)
-                ModelController(
-                    model, play_interval, current_step, set_current_step, reset_counter
-                )
+                ModelController(model, play_interval, current_step, reset_counter)
             with solara.Card("Progress", margin=1, elevation=2):
                 solara.Markdown(md_text=f"####Step - {current_step}")
             resizable = solara.ui_checkbox("Allow resizing", value=True)
@@ -160,9 +156,7 @@ def JupyterViz(
 
 
 @solara.component
-def ModelController(
-    model, play_interval, current_step, set_current_step, reset_counter
-):
+def ModelController(model, play_interval, current_step, reset_counter):
     playing = solara.use_reactive(False)
     thread = solara.use_reactive(None)
     # We track the previous step to detect if user resets the model via
@@ -172,8 +166,8 @@ def ModelController(
     previous_step = solara.use_reactive(0)
 
     def on_value_play(change):
-        if previous_step.value > current_step and current_step == 0:
-            # We add extra checks for current_step == 0, just to be sure.
+        if previous_step.value > current_step.value and current_step.value == 0:
+            # We add extra checks for current_step.value == 0, just to be sure.
             # We automatically stop the playing if a model is reset.
             playing.value = False
         elif model.running:
@@ -183,8 +177,8 @@ def ModelController(
 
     def do_step():
         model.step()
-        previous_step.value = current_step
-        set_current_step(model.schedule.steps)
+        previous_step.value = current_step.value
+        current_step.value = model.schedule.steps
 
     def do_play():
         model.running = True
@@ -207,11 +201,11 @@ def ModelController(
         reset_counter.value += 1
 
     def do_set_playing(value):
-        if current_step == 0:
+        if current_step.value == 0:
             # This means the model has been recreated, and the step resets to
             # 0. We want to avoid triggering the playing.value = False in the
             # on_value_play function.
-            previous_step.value = current_step
+            previous_step.value = current_step.value
         playing.set(value)
 
     with solara.Row():
