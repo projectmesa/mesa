@@ -138,8 +138,6 @@ def JupyterViz(
                 )
             with solara.Card("Progress", margin=1, elevation=2):
                 solara.Markdown(md_text=f"####Step - {current_step}")
-            resizable = solara.ui_checkbox("Allow resizing", value=True)
-            draggable = solara.ui_checkbox("Allow dragging", value=True)
 
         items = [
             ColorCard(color="white", layout_type=layout_types[i])
@@ -148,8 +146,8 @@ def JupyterViz(
         solara.GridDraggable(
             items=items,
             grid_layout=grid_layout,
-            resizable=resizable,
-            draggable=draggable,
+            resizable=True,
+            draggable=True,
             on_grid_layout=set_grid_layout,
         )
 
