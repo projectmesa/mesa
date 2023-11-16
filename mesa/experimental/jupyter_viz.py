@@ -1,3 +1,4 @@
+import inspect
 import sys
 import threading
 
@@ -74,7 +75,18 @@ def JupyterViz(
                     make_space(model, agent_portrayal)
                 elif space_drawer:
                     # if specified, draw agent space with an alternate renderer
-                    space_drawer(model, agent_portrayal)
+                    num_arguments = len(inspect.signature(space_drawer).parameters)
+                    if num_arguments == 2:
+                        print(
+                            "Custom space_drawer that accepts 2 arguments is now deprecated, and won't be supported in the next patch release. You should instead define it as space_drawer(model), where agent_portrayal is defined within this function."
+                        )
+                        space_drawer(model, agent_portrayal)
+                    elif num_arguments == 1:
+                        space_drawer(model)
+                    else:
+                        raise Exception(
+                            f"space_drawer: Unsupported number of arguments ({num_arguments})"
+                        )
             elif "Measure" in layout_type:
                 rv.CardTitle(children=["Measure"])
                 measure = measures[layout_type["Measure"]]
