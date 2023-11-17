@@ -1,7 +1,6 @@
 include MANIFEST.in
 include LICENSE
 include HISTORY.rst
-include README.rst
 include setup.py
 graft mesa/cookiecutter-mesa
 global-exclude *.py[co]
