@@ -419,7 +419,7 @@ def get_initial_grid_layout(layout_types):
     grid_lay = []
     y_coord = 0
     for ii in range(len(layout_types)):
-        template_layout = {"h": 14, "i": 0, "moved": False, "w": 5, "y": 0, "x": 0}
+        template_layout = {"h": 10, "i": 0, "moved": False, "w": 6, "y": 0, "x": 0}
         if ii == 0:
             grid_lay.append(template_layout)
         else:
@@ -428,7 +428,7 @@ def get_initial_grid_layout(layout_types):
                 template_layout.update({"x": 0})
                 y_coord += 16
             else:
-                template_layout.update({"x": 7})
+                template_layout.update({"x": 6})
             template_layout.update({"y": y_coord})
             grid_lay.append(template_layout)
     return grid_lay
