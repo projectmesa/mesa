@@ -36,7 +36,7 @@ classifiers = [
   "Development Status :: 3 - Alpha",
   "Natural Language :: English",
 ]
-readme = "README.rst"
+readme = "README.md"
 dependencies = [
   "click",
   "cookiecutter",
@@ -69,6 +69,7 @@ docs = [
   "pydata_sphinx_theme",
   "seaborn",
   "myst-nb",
+  "myst-parser",  # Markdown in Sphinx
 ]
 
 [project.urls]
