@@ -52,7 +52,6 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
-  "black",
   "ruff~=0.1.1",  # Update periodically
   "coverage",
   "pytest >= 4.6",
@@ -131,6 +130,7 @@ extend-ignore = [
     "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar` TODO
     "S310",  # Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.
     "S603",  # `subprocess` call: check for execution of untrusted input
+    "ISC001",  # ruff format asks to disable this feature
 ]
 extend-exclude = ["docs", "build"]
 # Hardcode to Python 3.8.

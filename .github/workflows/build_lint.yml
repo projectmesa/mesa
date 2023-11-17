@@ -84,6 +84,6 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: "3.12"
-    - run: pip install black[jupyter]
-    - name: Lint with black
-      run: black --check --exclude=mesa/cookiecutter-mesa/* .
+    - run: pip install ruff~=0.1.1  # Update periodically
+    - name: Lint with ruff format
+      run: ruff format --check .
