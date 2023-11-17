@@ -30,9 +30,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install -U pip build wheel setuptools
+        run: pip install -U pip hatch
       - name: Build distributions
-        run: python -m build
+        run: hatch build
       - name: Upload package as artifact to GitHub
         if: github.repository == 'projectmesa/mesa' && startsWith(github.ref, 'refs/tags')
         uses: actions/upload-artifact@v3
