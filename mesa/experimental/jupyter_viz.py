@@ -152,7 +152,8 @@ def JupyterViz(
             on_grid_layout=set_grid_layout,
         )
 
-    if "ipykernel" in sys.argv[0]:
+    if ("ipykernel" in sys.argv[0]) or ("colab_kernel_launcher.py" in sys.argv[0]):
+        # When in Jupyter or Google Colab
         render_in_jupyter()
     else:
         render_in_browser()
