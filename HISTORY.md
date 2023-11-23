@@ -2,7 +2,7 @@
 title: Release History
 ---
 
-# 2.1.5 (2023-11-16)
+# 2.1.5 (2023-11-26)
 
 This release has some critical fixes to JupyterViz/Solara frontend to prevent
 flickering and improve the display of the jupyter plots. It also has
@@ -14,11 +14,23 @@ improvements to datacollection and the documentation.
 
 **Docs and Tutorial**
 
+- docs: convert README from `.rst` to `.md` (#1881)
 - docs: convert HISTORY from `.rst` to `.md` (#1873)
 - docs: enhance docstrings for scheduler classes in `mesa.time` (#1866)
 
+**CI and WorkFlows**
+
+- ci: Remove redundant Ruff workflow from GitHub Actions (#1880)
+- Replace Black with ruff format (#1880)
+- Migrate setup from `setup.py` to `pyproject.toml` (#1870)
+
 **Solara/JupyterViz**
 
+- fix: Do render_in_jupyter on Colab env (#1884)
+- Convert make_space into Solara component (#1877)
+- remove controls for dragging and resizing (#1878)
+- Improve ColorCard layout (#1876)
+- refactor: Define current_step as reactive (#1875)
 - fix: optimize controller and plots to fill screen in jupyter (#1868)
 - fix: ensure space and plot subcomponent are not rendered on step (#1867)
 
