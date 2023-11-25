@@ -32,7 +32,7 @@ Getting started quickly:
 pip install mesa
 ```
 
-You can also use [pip]{.title-ref} to install the github version:
+You can also use `pip` to install the github version:
 
 ``` bash
 pip install -U -e git+https://github.com/projectmesa/mesa@main#egg=mesa
@@ -91,7 +91,7 @@ to:
     the path of your model
 -   make sure that the model folder contains an app.py file
 
-Then, you just need to run [docker compose up -d]{.title-ref} to have it
+Then, you just need to run `docker compose up -d` to have it
 accessible from `localhost:8765`.
 
 ## Contributing to Mesa
