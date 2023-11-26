@@ -3,7 +3,7 @@
 ## Summary
 
 This is Epstein & Axtell's Sugarscape model with Traders, a detailed description is in Chapter four of
-*Growing Artificial Societies: Social Science from the Bottom Up.* (1996)
+*Growing Artificial Societies: Social Science from the Bottom Up.* (1996) The model shows an emergent price equilibrium can happen via a decentralized dynamics.
 
 This code generally matches the code in the Complexity Explorer Tutorial, but in `.py` instead of `.ipynb` format.
 
@@ -83,6 +83,7 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 * ``server.py``: Sets up and launches and interactive visualization server.
 * ``run.py``: Runs Server, Single Run or Batch Run  with data collection and basic analysis.
 * `app.py`: Runs a visualization server via Solara (`solara run app.py`).
+* `tests.py`: Has tests to ensure that the model reproduces the results in shown in Growing Artificial Societies.
 
 ## Additional Resources
 

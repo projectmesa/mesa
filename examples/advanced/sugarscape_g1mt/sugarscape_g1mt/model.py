@@ -49,6 +49,7 @@ class SugarscapeG1mt(mesa.Model):
         metabolism_max=5,
         vision_min=1,
         vision_max=5,
+        enable_trade=True,
     ):
         # Initiate width and heigh of sugarscape
         self.width = width
@@ -61,6 +62,7 @@ class SugarscapeG1mt(mesa.Model):
         self.metabolism_max = metabolism_max
         self.vision_min = vision_min
         self.vision_max = vision_max
+        self.enable_trade = enable_trade
         self.running = True
 
         # initiate activation schedule
@@ -174,6 +176,11 @@ class SugarscapeG1mt(mesa.Model):
             agent.move()
             agent.eat()
             agent.maybe_die()
+
+        if not self.enable_trade:
+            # If trade is not enabled, return early
+            self.datacollector.collect(self)
+            return
 
         trader_shuffle = self.randomize_traders()
 
