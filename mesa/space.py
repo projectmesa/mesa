@@ -535,12 +535,14 @@ class MultiGrid(_Grid):
     bottom-left and [width-1, height-1] is the top-right. If a grid is
     toroidal, the top and bottom, and left and right, edges wrap to each other.
 
-    Unlike SingleGrid, MultiGrid does not inherently track empty cells due to
-    the possibility of multiple agents occupying a single cell.
+    This class maintains an `empties` property, which is a set of coordinates
+    for all cells that currently contain no agents. This property is updated
+    automatically as agents are added to or removed from the grid.
 
     Properties:
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
+        empties: Returns a set of (x, y) tuples for all empty cells.
     """
 
     grid: list[list[MultiGridContent]]
@@ -774,12 +776,15 @@ class HexMultiGrid(_HexGrid, MultiGrid):
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
 
-    Similar to the standard MultiGrid, this grid does not automatically track
-    empty cells due to the possibility of multiple agents in one cell.
+    Similar to the standard MultiGrid, this class maintains an `empties` property,
+    which is a set of coordinates for all hexagonal cells that currently contain
+    no agents. This property is updated automatically as agents are added to or
+    removed from the grid.
 
     Properties:
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
+        empties: Returns a set of hexagonal coordinates for all empty cells.
     """
 
 
