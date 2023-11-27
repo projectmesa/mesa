@@ -359,6 +359,7 @@ class DiscreteEventScheduler(BaseScheduler):
 
     Methods:
         schedule_event(time, agent): Schedule an event for a specific time.
+        schedule_in(delay, agent): Schedule an event after a specified delay.
         step(): Execute all events within the next time_step period.
         get_next_event_time(): Returns the time of the next scheduled event.
     """
@@ -376,6 +377,11 @@ class DiscreteEventScheduler(BaseScheduler):
             agent,
         )  # Add a random value for secondary sorting
         heapq.heappush(self.event_queue, event)
+
+    def schedule_in(self, delay, agent):
+        """ Schedule an event for an agent after a specified delay. """
+        event_time = self.time + delay
+        self.schedule_event(event_time, agent)
 
     def step(self):
         """Execute the next event and advance the time."""
@@ -403,5 +409,3 @@ class DiscreteEventScheduler(BaseScheduler):
         if not self.event_queue:
             return None
         return self.event_queue[0][0]
-
-    # Other methods (add, remove, etc.) remain unchanged
