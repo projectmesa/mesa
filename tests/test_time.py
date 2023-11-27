@@ -12,6 +12,7 @@ from mesa.time import (
     RandomActivationByType,
     SimultaneousActivation,
     StagedActivation,
+    DiscreteEventScheduler,
 )
 
 RANDOM = "random"
@@ -272,6 +273,115 @@ class TestRandomActivationByType(TestCase):
         model.schedule.add(a)
         with self.assertRaises(Exception):
             model.schedule.add(b)
+
+
+class TestDiscreteEventScheduler(TestCase):
+    def setUp(self):
+        self.model = MockModel()
+        self.scheduler = DiscreteEventScheduler(self.model, time_step=1)
+        self.model.schedule = self.scheduler
+        self.agent1 = MockAgent(1, self.model)
+        self.agent2 = MockAgent(2, self.model)
+        self.model.schedule.add(self.agent1, schedule_now=False)
+        self.model.schedule.add(self.agent2, schedule_now=False)
+
+    # Testing Initialization and Attributes
+    def test_initialization(self):
+        self.assertIsInstance(self.scheduler.event_queue, list)
+        self.assertEqual(self.scheduler.time_step, 1)
+
+    # Testing Event Scheduling
+    def test_schedule_event(self):
+        self.scheduler.schedule_event(5, self.agent1)
+        self.assertEqual(len(self.scheduler.event_queue), 1)
+        event_time, _, event_agent = self.scheduler.event_queue[0]
+        self.assertEqual(event_time, 5)
+        self.assertEqual(event_agent, self.agent1)
+
+    def test_schedule_event_with_float_time(self):
+        self.scheduler.schedule_event(5.5, self.agent1)
+        self.assertEqual(len(self.scheduler.event_queue), 1)
+        event_time, _, event_agent = self.scheduler.event_queue[0]
+        self.assertEqual(event_time, 5.5)
+        self.assertEqual(event_agent, self.agent1)
+
+    def test_schedule_in(self):
+        self.scheduler.schedule_in(3, self.agent2)
+        _, _, event_agent = self.scheduler.event_queue[0]
+        self.assertEqual(event_agent, self.agent2)
+        self.assertEqual(self.scheduler.get_next_event_time(), self.scheduler.time + 3)
+
+    # Testing Event Execution and Time Advancement
+    def test_step_function(self):
+        self.scheduler.schedule_event(1, self.agent1)
+        self.scheduler.schedule_event(2, self.agent2)
+        self.scheduler.step()
+        self.assertEqual(self.scheduler.time, 1)
+        self.assertEqual(self.agent1.steps, 1)
+        self.assertEqual(self.agent2.steps, 0)
+
+    def test_time_advancement(self):
+        self.scheduler.schedule_event(5, self.agent1)
+        self.scheduler.step()
+        self.assertEqual(self.scheduler.time, 1)
+        self.scheduler.step()
+        self.assertEqual(self.scheduler.time, 2)
+
+    def test_no_events(self):
+        self.scheduler.step()
+        self.assertEqual(self.scheduler.time, 1)
+
+    # Testing Edge Cases and Error Handling
+    def test_invalid_event_time(self):
+        with self.assertRaises(ValueError):
+            self.scheduler.schedule_event(-1, self.agent1)
+
+    def test_immediate_event_execution(self):
+        # Current time of the scheduler
+        current_time = self.scheduler.time
+
+        # Schedule an event at the current time
+        self.scheduler.schedule_event(current_time, self.agent1)
+
+        # Step the scheduler and check if the event is executed immediately
+        self.scheduler.step()
+        self.assertEqual(self.agent1.steps, 1)
+
+        # The time should advance to the next time step after execution
+        self.assertEqual(self.scheduler.time, current_time + 1)
+
+    # Testing Utility Functions
+    def test_get_next_event_time(self):
+        self.scheduler.schedule_event(10, self.agent1)
+        self.assertEqual(self.scheduler.get_next_event_time(), 10)
+
+    # Test add() method with and without immediate scheduling
+    def test_add_with_immediate_scheduling(self):
+        # Add an agent with schedule_now set to True (default behavior)
+        new_agent = MockAgent(3, self.model)
+        self.scheduler.add(new_agent)
+
+        # Check if the agent's first event is scheduled immediately
+        self.assertEqual(len(self.scheduler.event_queue), 1)
+        event_time, _, event_agent = self.scheduler.event_queue[0]
+        self.assertEqual(event_time, self.scheduler.time)
+        self.assertEqual(event_agent, new_agent)
+
+        # Step the scheduler and check if the agent's step method is executed
+        self.scheduler.step()
+        self.assertEqual(new_agent.steps, 1)
+
+    def test_add_without_immediate_scheduling(self):
+        # Add an agent with schedule_now set to False
+        new_agent = MockAgent(4, self.model)
+        self.scheduler.add(new_agent, schedule_now=False)
+
+        # Check if the event queue is not updated
+        self.assertEqual(len(self.scheduler.event_queue), 0)
+
+        # Step the scheduler and verify that the agent's step method is not executed
+        self.scheduler.step()
+        self.assertEqual(new_agent.steps, 0)
 
 
 if __name__ == "__main__":
