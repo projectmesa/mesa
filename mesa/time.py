@@ -25,9 +25,9 @@ Key concepts:
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
-from collections import defaultdict
 import heapq
 import random
+from collections import defaultdict
 
 # mypy
 from typing import Union
@@ -394,7 +394,7 @@ class DiscreteEventScheduler(BaseScheduler):
     def schedule_in(self, delay: TimeT, agent: Agent) -> None:
         """ Schedule an event for an agent after a specified delay. """
         if delay < 0:
-            raise ValueError(f"Delay must be non-negative")
+            raise ValueError("Delay must be non-negative")
         event_time = self.time + delay
         self.schedule_event(event_time, agent)
 
