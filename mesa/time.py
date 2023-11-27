@@ -26,6 +26,8 @@ Key concepts:
 from __future__ import annotations
 
 from collections import defaultdict
+import heapq
+import random
 
 # mypy
 from typing import Union
@@ -327,3 +329,79 @@ class RandomActivationByType(BaseScheduler):
         Returns the current number of agents of certain type in the queue.
         """
         return len(self.agents_by_type[type_class])
+
+
+class DiscreteEventScheduler(BaseScheduler):
+    """
+    A scheduler for discrete event simulation in Mesa.
+
+    This scheduler manages events where each event is associated with a
+    specific time and agent. The scheduler advances time not in fixed
+    increments, but to the moment the next event is scheduled to occur.
+
+    This implementation uses a priority queue (heapq) to manage events. Each
+    event is a tuple of the form (time, random_value, agent), where:
+        - time (float): The scheduled time for the event.
+        - random_value (float): A secondary sorting criterion to randomize
+          the order of events that are scheduled for the same time.
+        - agent (Agent): The agent associated with the event.
+
+    The random value for secondary sorting ensures that when two events are
+    scheduled for the same time, their execution order is randomized, thus
+    preventing direct comparison issues between different types of agents and
+    maintaining the integrity of the simulation's randomness.
+
+    Attributes:
+        model (Model): The model instance associated with the scheduler.
+        event_queue (list): A priority queue of scheduled events.
+        time_step (int): The fixed time period by which the model advances on
+                         each step. Defaults to 1.
+
+    Methods:
+        schedule_event(time, agent): Schedule an event for a specific time.
+        step(): Execute all events within the next time_step period.
+        get_next_event_time(): Returns the time of the next scheduled event.
+    """
+
+    def __init__(self, model, time_step=1):
+        super().__init__(model)
+        self.event_queue = []
+        self.time_step = time_step  # Fixed time period for each step
+
+    def schedule_event(self, time, agent):
+        """Schedule an event for an agent at a specific time."""
+        event = (
+            time,
+            random.random(),
+            agent,
+        )  # Add a random value for secondary sorting
+        heapq.heappush(self.event_queue, event)
+
+    def step(self):
+        """Execute the next event and advance the time."""
+        end_time = self.time + self.time_step
+
+        while self.event_queue and self.event_queue[0][0] < end_time:
+            # Get the next event
+            time, _, agent = heapq.heappop(
+                self.event_queue
+            )  # Ignore the random value during unpacking
+
+            # Advance time to the event's time
+            self.time = time
+
+            # Execute the event
+            if agent.unique_id in self._agents:
+                agent.step()
+
+        # After processing events, advance time by the time_step
+        self.time = end_time
+        self.steps += 1
+
+    def get_next_event_time(self):
+        """Returns the time of the next scheduled event."""
+        if not self.event_queue:
+            return None
+        return self.event_queue[0][0]
+
+    # Other methods (add, remove, etc.) remain unchanged
