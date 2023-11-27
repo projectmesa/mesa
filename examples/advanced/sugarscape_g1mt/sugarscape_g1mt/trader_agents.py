@@ -2,7 +2,7 @@ import math
 
 import mesa
 
-from .resource_agents import Spice, Sugar
+from .resource_agents import Resource
 
 
 # Helper function
@@ -50,47 +50,12 @@ class Trader(mesa.Agent):
         self.prices = []
         self.trade_partners = []
 
-    def get_sugar(self, pos):
-        """
-        used in self.get_sugar_amount()
-        """
-
+    def get_resource(self, pos):
         this_cell = self.model.grid.get_cell_list_contents(pos)
         for agent in this_cell:
-            if type(agent) is Sugar:
+            if type(agent) is Resource:
                 return agent
-        return None
-
-    def get_sugar_amount(self, pos):
-        """
-        used in self.move() as part of self.calculate_welfare()
-        """
-
-        sugar_patch = self.get_sugar(pos)
-        if sugar_patch:
-            return sugar_patch.amount
-        return 0
-
-    def get_spice(self, pos):
-        """
-        used in self.get_spice_amount()
-        """
-
-        this_cell = self.model.grid.get_cell_list_contents(pos)
-        for agent in this_cell:
-            if type(agent) is Spice:
-                return agent
-        return None
-
-    def get_spice_amount(self, pos):
-        """
-        used in self.move() as part of self.calculate_welfare()
-        """
-
-        spice_patch = self.get_spice(pos)
-        if spice_patch:
-            return spice_patch.amount
-        return 0
+        raise Exception(f"Resource agent not found in the position {pos}")
 
     def get_trader(self, pos):
         """
@@ -292,8 +257,8 @@ class Trader(mesa.Agent):
 
         welfares = [
             self.calculate_welfare(
-                self.sugar + self.get_sugar_amount(pos),
-                self.spice + self.get_spice_amount(pos),
+                self.sugar + self.get_resource(pos).sugar_amount,
+                self.spice + self.get_resource(pos).spice_amount,
             )
             for pos in neighbors
         ]
@@ -323,20 +288,15 @@ class Trader(mesa.Agent):
         self.model.grid.move_agent(self, final_candidate)
 
     def eat(self):
-        # get sugar
-        sugar_patch = self.get_sugar(self.pos)
-
-        if sugar_patch:
-            self.sugar += sugar_patch.amount
-            sugar_patch.amount = 0
+        patch = self.get_resource(self.pos)
+        if patch.sugar_amount > 0:
+            self.sugar += patch.sugar_amount
+            patch.sugar_amount = 0
         self.sugar -= self.metabolism_sugar
 
-        # get_spice
-        spice_patch = self.get_spice(self.pos)
-
-        if spice_patch:
-            self.spice += spice_patch.amount
-            spice_patch.amount = 0
+        if patch.spice_amount > 0:
+            self.spice += patch.spice_amount
+            patch.spice_amount = 0
         self.spice -= self.metabolism_spice
 
     def maybe_die(self):

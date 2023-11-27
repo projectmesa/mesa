@@ -1,7 +1,7 @@
 import mesa
 import numpy as np
 
-from .resource_agents import Spice, Sugar
+from .resource_agents import Resource
 from .trader_agents import Trader
 
 
@@ -93,18 +93,11 @@ class SugarscapeG1mt(mesa.Model):
         agent_id = 0
         for _, (x, y) in self.grid.coord_iter():
             max_sugar = sugar_distribution[x, y]
-            if max_sugar > 0:
-                sugar = Sugar(agent_id, self, (x, y), max_sugar)
-                self.schedule.add(sugar)
-                self.grid.place_agent(sugar, (x, y))
-                agent_id += 1
-
             max_spice = spice_distribution[x, y]
-            if max_spice > 0:
-                spice = Spice(agent_id, self, (x, y), max_spice)
-                self.schedule.add(spice)
-                self.grid.place_agent(spice, (x, y))
-                agent_id += 1
+            resource = Resource(agent_id, self, (x, y), max_sugar, max_spice)
+            self.schedule.add(resource)
+            self.grid.place_agent(resource, (x, y))
+            agent_id += 1
 
         for i in range(self.initial_population):
             # get agent position
@@ -157,13 +150,9 @@ class SugarscapeG1mt(mesa.Model):
         Unique step function that does staged activation of sugar and spice
         and then randomly activates traders
         """
-        # step Sugar agents
-        for sugar in self.schedule.agents_by_type[Sugar].values():
-            sugar.step()
-
-        # step Spice agents
-        for spice in self.schedule.agents_by_type[Spice].values():
-            spice.step()
+        # step Resource agents
+        for resource in self.schedule.agents_by_type[Resource].values():
+            resource.step()
 
         # step trader agents
         # to account for agent death and removal we need a seperate data strcuture to

@@ -1,43 +1,26 @@
 import mesa
 
 
-class Sugar(mesa.Agent):
+class Resource(mesa.Agent):
     """
-    Sugar:
-    - contains an amount of sugar
+    Resource:
+    - contains an amount of sugar and spice
     - grows 1 amount of sugar at each turn
-    """
-
-    def __init__(self, unique_id, model, pos, max_sugar):
-        super().__init__(unique_id, model)
-        self.pos = pos
-        self.amount = max_sugar
-        self.max_sugar = max_sugar
-
-    def step(self):
-        """
-        Sugar growth function, adds one unit of sugar each step until
-        max amount
-        """
-        self.amount = min([self.max_sugar, self.amount + 1])
-
-
-class Spice(mesa.Agent):
-    """
-    Spice:
-    - contains an amount of spice
     - grows 1 amount of spice at each turn
     """
 
-    def __init__(self, unique_id, model, pos, max_spice):
+    def __init__(self, unique_id, model, pos, max_sugar, max_spice):
         super().__init__(unique_id, model)
         self.pos = pos
-        self.amount = max_spice
+        self.sugar_amount = max_sugar
+        self.max_sugar = max_sugar
+        self.spice_amount = max_spice
         self.max_spice = max_spice
 
     def step(self):
         """
-        Spice growth function, adds one unit of spice each step until
+        Growth function, adds one unit of sugar and spice each step up to
         max amount
         """
-        self.amount = min([self.max_spice, self.amount + 1])
+        self.sugar_amount = min([self.max_sugar, self.sugar_amount + 1])
+        self.spice_amount = min([self.max_spice, self.spice_amount + 1])
