@@ -362,6 +362,17 @@ class DiscreteEventScheduler(BaseScheduler):
         schedule_in(delay, agent): Schedule an event after a specified delay.
         step(): Execute all events within the next time_step period.
         get_next_event_time(): Returns the time of the next scheduled event.
+
+    Usage:
+        1. Instantiate the DiscreteEventScheduler with a model instance and a time_step period.
+        2. Add agents to the scheduler using schedule.add(). With schedule_now=True (default),
+              the first event for the agent will be scheduled immediately.
+        3. In the Agent step() method, schedule the next event for the agent
+              (using schedule_in or schedule_event).
+        3. Add self.schedule.step() to the model's step() method, as usual.
+
+    Now, with each model step, the scheduler will execute all events within the
+    next time_step period, and advance time one time_step forward.
     """
 
     def __init__(self, model: Model, time_step: TimeT = 1) -> None:
@@ -413,3 +424,16 @@ class DiscreteEventScheduler(BaseScheduler):
         if not self.event_queue:
             return None
         return self.event_queue[0][0]
+
+    def add(self, agent: Agent, schedule_now: bool = True) -> None:
+        """Add an Agent object to the schedule and optionally schedule its first event.
+
+        Args:
+            agent: An Agent to be added to the schedule. Must have a step() method.
+            schedule_now: If True, schedules the first event for the agent immediately.
+        """
+        super().add(agent)  # Call the add method from BaseScheduler
+
+        if schedule_now:
+            # Schedule the first event immediately
+            self.schedule_event(self.time, agent)
