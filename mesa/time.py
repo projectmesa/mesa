@@ -354,8 +354,8 @@ class DiscreteEventScheduler(BaseScheduler):
     Attributes:
         model (Model): The model instance associated with the scheduler.
         event_queue (list): A priority queue of scheduled events.
-        time_step (int): The fixed time period by which the model advances on
-                         each step. Defaults to 1.
+        time_step (int or float): The fixed time period by which the model advances
+                                  on each step. Defaults to 1.
 
     Methods:
         schedule_event(time, agent): Schedule an event for a specific time.
@@ -364,13 +364,15 @@ class DiscreteEventScheduler(BaseScheduler):
         get_next_event_time(): Returns the time of the next scheduled event.
     """
 
-    def __init__(self, model, time_step=1):
+    def __init__(self, model: Model, time_step: TimeT = 1) -> None:
         super().__init__(model)
-        self.event_queue = []
-        self.time_step = time_step  # Fixed time period for each step
+        self.event_queue: list[tuple[TimeT, float, Agent]] = []
+        self.time_step: TimeT = time_step  # Fixed time period for each step
 
-    def schedule_event(self, time, agent):
+    def schedule_event(self, time: TimeT, agent: Agent) -> None:
         """Schedule an event for an agent at a specific time."""
+        if time < self.time:
+            raise ValueError(f"Scheduled time ({time}) must be >= the current time ({self.time})")
         event = (
             time,
             random.random(),
@@ -378,16 +380,18 @@ class DiscreteEventScheduler(BaseScheduler):
         )  # Add a random value for secondary sorting
         heapq.heappush(self.event_queue, event)
 
-    def schedule_in(self, delay, agent):
+    def schedule_in(self, delay: TimeT, agent: Agent) -> None:
         """ Schedule an event for an agent after a specified delay. """
+        if delay < 0:
+            raise ValueError(f"Delay must be non-negative")
         event_time = self.time + delay
         self.schedule_event(event_time, agent)
 
-    def step(self):
+    def step(self) -> None:
         """Execute the next event and advance the time."""
         end_time = self.time + self.time_step
 
-        while self.event_queue and self.event_queue[0][0] < end_time:
+        while self.event_queue and self.event_queue[0][0] <= end_time:
             # Get the next event
             time, _, agent = heapq.heappop(
                 self.event_queue
@@ -404,7 +408,7 @@ class DiscreteEventScheduler(BaseScheduler):
         self.time = end_time
         self.steps += 1
 
-    def get_next_event_time(self):
+    def get_next_event_time(self) -> TimeT | None:
         """Returns the time of the next scheduled event."""
         if not self.event_queue:
             return None
