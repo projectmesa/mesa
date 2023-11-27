@@ -492,9 +492,18 @@ class SingleGrid(_Grid):
     bottom-left and [width-1, height-1] is the top-right. If a grid is
     toroidal, the top and bottom, and left and right, edges wrap to each other.
 
+    This class provides a property `empties` that returns a set of coordinates
+    for all empty cells in the grid. It is automatically updated whenever
+    agents are added or removed from the grid. The `empties` property should be
+    used for efficient access to current empty cells rather than manually
+    iterating over the grid to check for emptiness.
+
     Properties:
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
+        empties: Returns a set of (x, y) tuples for all empty cells. This set is
+                 maintained internally and provides a performant way to query
+                 the grid for empty spaces.
     """
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
@@ -525,6 +534,9 @@ class MultiGrid(_Grid):
     Grid cells are indexed by [x, y], where [0, 0] is assumed to be at
     bottom-left and [width-1, height-1] is the top-right. If a grid is
     toroidal, the top and bottom, and left and right, edges wrap to each other.
+
+    Unlike SingleGrid, MultiGrid does not inherently track empty cells due to
+    the possibility of multiple agents occupying a single cell.
 
     Properties:
         width, height: The grid's width and height.
@@ -745,9 +757,13 @@ class HexSingleGrid(_HexGrid, SingleGrid):
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
 
+    This class also maintains an `empties` property, similar to SingleGrid,
+    which provides a set of coordinates for all empty hexagonal cells.
+
     Properties:
         width, height: The grid's width and height.
         torus: Boolean which determines whether to treat the grid as a torus.
+        empties: Returns a set of hexagonal coordinates for all empty cells.
     """
 
 
@@ -757,6 +773,9 @@ class HexMultiGrid(_HexGrid, MultiGrid):
 
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
+
+    Similar to the standard MultiGrid, this grid does not automatically track
+    empty cells due to the possibility of multiple agents in one cell.
 
     Properties:
         width, height: The grid's width and height.
@@ -797,6 +816,9 @@ class ContinuousSpace:
     This class uses a numpy array internally to store agents in order to speed
     up neighborhood lookups. This array is calculated on the first neighborhood
     lookup, and is updated if agents are added or removed.
+
+    The concept of 'empty cells' is not directly applicable in continuous space,
+    as positions are not discretized.
     """
 
     def __init__(
