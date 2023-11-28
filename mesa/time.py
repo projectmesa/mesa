@@ -382,7 +382,9 @@ class DiscreteEventScheduler(BaseScheduler):
     def schedule_event(self, time: TimeT, agent: Agent) -> None:
         """Schedule an event for an agent at a specific time."""
         if time < self.time:
-            raise ValueError(f"Scheduled time ({time}) must be >= the current time ({self.time})")
+            raise ValueError(
+                f"Scheduled time ({time}) must be >= the current time ({self.time})"
+            )
         event = (
             time,
             self.model.random.random(),
@@ -391,7 +393,7 @@ class DiscreteEventScheduler(BaseScheduler):
         heapq.heappush(self.event_queue, event)
 
     def schedule_in(self, delay: TimeT, agent: Agent) -> None:
-        """ Schedule an event for an agent after a specified delay. """
+        """Schedule an event for an agent after a specified delay."""
         if delay < 0:
             raise ValueError("Delay must be non-negative")
         event_time = self.time + delay
