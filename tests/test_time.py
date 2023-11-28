@@ -8,11 +8,11 @@ from unittest import TestCase, mock
 from mesa import Agent, Model
 from mesa.time import (
     BaseScheduler,
+    DiscreteEventScheduler,
     RandomActivation,
     RandomActivationByType,
     SimultaneousActivation,
     StagedActivation,
-    DiscreteEventScheduler,
 )
 
 RANDOM = "random"
