@@ -26,7 +26,6 @@ Key concepts:
 from __future__ import annotations
 
 import heapq
-import random
 from collections import defaultdict
 
 # mypy
@@ -386,7 +385,7 @@ class DiscreteEventScheduler(BaseScheduler):
             raise ValueError(f"Scheduled time ({time}) must be >= the current time ({self.time})")
         event = (
             time,
-            random.random(),
+            self.model.random.random(),
             agent,
         )  # Add a random value for secondary sorting
         heapq.heappush(self.event_queue, event)
