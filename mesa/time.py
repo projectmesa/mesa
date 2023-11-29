@@ -385,11 +385,8 @@ class DiscreteEventScheduler(BaseScheduler):
             raise ValueError(
                 f"Scheduled time ({time}) must be >= the current time ({self.time})"
             )
-        event = (
-            time,
-            self.model.random.random(),
-            agent,
-        )  # Add a random value for secondary sorting
+        # Create an event, sorted first on time, secondary on a random value
+        event = (time, self.model.random.random(), agent)
         heapq.heappush(self.event_queue, event)
 
     def schedule_in(self, delay: TimeT, agent: Agent) -> None:
@@ -404,10 +401,8 @@ class DiscreteEventScheduler(BaseScheduler):
         end_time = self.time + self.time_step
 
         while self.event_queue and self.event_queue[0][0] <= end_time:
-            # Get the next event
-            time, _, agent = heapq.heappop(
-                self.event_queue
-            )  # Ignore the random value during unpacking
+            # Get the next event (ignore the random value during unpacking)
+            time, _, agent = heapq.heappop(self.event_queue)
 
             # Advance time to the event's time
             self.time = time
