@@ -8,6 +8,7 @@ Core Objects: Model
 from __future__ import annotations
 
 import random
+from collections import defaultdict
 
 # mypy
 from typing import Any
@@ -41,6 +42,12 @@ class Model:
         self.running = True
         self.schedule = None
         self.current_id = 0
+        self.agents: defaultdict[type, set] = defaultdict(set)
+
+    @property
+    def agent_types(self) -> list:
+        """Return a list of different agent types."""
+        return list(self.agents.keys())
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as
