@@ -732,6 +732,34 @@ class PropertyLayer:
 
 
 class _PropertyGrid(_Grid):
+    """
+    A private subclass of _Grid that supports the addition of property layers, enabling
+    the representation and manipulation of additional data layers on the grid. This class is
+    intended for internal use within the Mesa framework and is currently utilized by SingleGrid
+    and MultiGrid classes to provide enhanced grid functionality.
+
+    The `_PropertyGrid` extends the capabilities of a basic grid by allowing each cell
+    to have multiple properties, each represented by a separate PropertyLayer.
+    These properties can be used to model complex environments where each cell
+    has multiple attributes or states.
+
+    Attributes:
+        properties (dict): A dictionary mapping property layer names to PropertyLayer instances.
+
+    Methods:
+        add_property_layer(property_layer): Adds a new property layer to the grid.
+        remove_property_layer(property_name): Removes a property layer from the grid by its name.
+        get_neighborhood_mask(pos, moore, include_center, radius): Generates a boolean mask of the neighborhood.
+        select_cells_multi_properties(conditions, only_neighborhood, pos, moore, include_center, radius):
+            Selects cells based on multiple property conditions, optionally within a neighborhood.
+        move_agent_to_random_cell(agent, conditions, only_neighborhood, moore, include_center, radius):
+            Moves an agent to a random cell meeting specified property conditions, optionally within a neighborhood.
+        move_agent_to_extreme_value_cell(agent, property_name, mode, only_neighborhood, moore, include_center, radius):
+            Moves an agent to a cell with extreme value of a property, optionally within a neighborhood.
+
+    Note:
+        This class is not intended for direct use in user models but is currently used by the SingleGrid and MultiGrid.
+    """
     def __init__(
         self,
         width: int,
@@ -739,6 +767,19 @@ class _PropertyGrid(_Grid):
         torus: bool,
         property_layers: None | PropertyLayer | list[PropertyLayer] = None,
     ):
+        """
+        Initializes a new _PropertyGrid instance with specified dimensions and optional property layers.
+
+        Args:
+            width (int): The width of the grid (number of columns).
+            height (int): The height of the grid (number of rows).
+            torus (bool): A boolean indicating if the grid should behave like a torus.
+            property_layers (None | PropertyLayer | list[PropertyLayer], optional): A single PropertyLayer instance,
+                a list of PropertyLayer instances, or None to initialize without any property layers.
+
+        Raises:
+            ValueError: If a property layer's dimensions do not match the grid dimensions.
+        """
         super().__init__(width, height, torus)
         self.properties = {}
 
@@ -753,6 +794,16 @@ class _PropertyGrid(_Grid):
 
     # Add and remove properties to the grid
     def add_property_layer(self, property_layer: PropertyLayer):
+        """
+        Adds a new property layer to the grid.
+
+        Args:
+            property_layer (PropertyLayer): The PropertyLayer instance to be added to the grid.
+
+        Raises:
+            ValueError: If a property layer with the same name already exists in the grid.
+            ValueError: If the dimensions of the property layer do not match the grid's dimensions.
+        """
         if property_layer.name in self.properties:
             raise ValueError(f"Property layer {property_layer.name} already exists.")
         if property_layer.width != self.width or property_layer.height != self.height:
@@ -762,6 +813,15 @@ class _PropertyGrid(_Grid):
         self.properties[property_layer.name] = property_layer
 
     def remove_property_layer(self, property_name: str):
+        """
+        Removes a property layer from the grid by its name.
+
+        Args:
+            property_name (str): The name of the property layer to be removed.
+
+        Raises:
+            ValueError: If a property layer with the given name does not exist in the grid.
+        """
         if property_name not in self.properties:
             raise ValueError(f"Property layer {property_name} does not exist.")
         del self.properties[property_name]
@@ -771,6 +831,7 @@ class _PropertyGrid(_Grid):
     ) -> np.ndarray:
         """
         Generate a boolean mask representing the neighborhood.
+        Helper method for select_cells_multi_properties().
 
         Args:
             pos (Coordinate): Center of the neighborhood.
