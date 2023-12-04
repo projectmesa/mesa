@@ -710,17 +710,50 @@ class _PropertyGrid(_Grid):
             raise ValueError(f"Property layer {property_name} does not exist.")
         del self.properties[property_name]
 
-    def select_cells_multi_properties(self, conditions: dict) -> List[Coordinate]:
+    def get_neighborhood_mask(
+        self, pos: Coordinate, moore: bool, include_center: bool, radius: int
+    ) -> np.ndarray:
         """
-        Select cells based on multiple property conditions using NumPy.
+        Generate a boolean mask representing the neighborhood.
+
+        Args:
+            pos (Coordinate): Center of the neighborhood.
+            moore (bool): True for Moore neighborhood, False for Von Neumann.
+            include_center (bool): Include the central cell in the neighborhood.
+            radius (int): The radius of the neighborhood.
+
+        Returns:
+            np.ndarray: A boolean mask representing the neighborhood.
+        """
+        neighborhood = self.get_neighborhood(pos, moore, include_center, radius)
+        mask = np.zeros((self.width, self.height), dtype=bool)
+
+        # Convert the neighborhood list to a NumPy array and use advanced indexing
+        coords = np.array(neighborhood)
+        mask[coords[:, 0], coords[:, 1]] = True
+        return mask
+
+    def select_cells_multi_properties(
+        self,
+        conditions: dict,
+        only_neighborhood: bool = False,
+        pos: None | Coordinate = None,
+        moore: bool = True,
+        include_center: bool = False,
+        radius: int = 1,
+    ) -> list[Coordinate]:
+        """
+        Select cells based on multiple property conditions using NumPy, optionally within a neighborhood.
 
         Args:
             conditions (dict): A dictionary where keys are property names and values are
                                callables that take a single argument (the property value)
                                and return a boolean.
+            only_neighborhood (bool): If True, restrict selection to the neighborhood.
+            pos, moore, include_center, radius: Optional neighborhood parameters.
 
         Returns:
-            List[Coordinate]: A list of coordinates where the conditions are satisfied.
+            List[Coordinate]: Coordinates where conditions are satisfied.
         """
         # Start with a mask of all True values
         combined_mask = np.ones((self.width, self.height), dtype=bool)
@@ -732,50 +765,107 @@ class _PropertyGrid(_Grid):
             # Combine with the existing mask using logical AND
             combined_mask = np.logical_and(combined_mask, prop_mask)
 
+        if only_neighborhood and pos is not None:
+            neighborhood_mask = self.get_neighborhood_mask(
+                pos, moore, include_center, radius
+            )
+            combined_mask = np.logical_and(combined_mask, neighborhood_mask)
+
         # Extract coordinates from the combined mask
         selected_cells = list(zip(*np.where(combined_mask)))
         return selected_cells
 
-    def move_agent_to_random_cell(self, agent: Agent, conditions: dict) -> None:
+    def move_agent_to_random_cell(
+        self,
+        agent: Agent,
+        conditions: dict,
+        only_neighborhood: bool = False,
+        moore: bool = True,
+        include_center: bool = False,
+        radius: int = 1,
+    ) -> None:
         """
-        Move an agent to a random cell that meets specified property conditions.
+        Move an agent to a random cell that meets specified property conditions, optionally within a neighborhood.
         If no eligible cells are found, issue a warning and keep the agent in its current position.
 
         Args:
             agent (Agent): The agent to move.
             conditions (dict): Conditions for selecting the cell.
+            only_neighborhood, moore, include_center, radius: Optional neighborhood parameters.
         """
-        eligible_cells = self.select_cells_multi_properties(conditions)
+        pos = agent.pos if only_neighborhood else None
+        eligible_cells = self.select_cells_multi_properties(
+            conditions,
+            only_neighborhood,
+            pos,
+            moore,
+            include_center,
+            radius,
+        )
         if not eligible_cells:
-            warn(f"No eligible cells found. Agent {agent.unique_id} remains in the current position.", RuntimeWarning)
+            warn(
+                f"No eligible cells found. Agent {agent.unique_id} remains in the current position.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
             return  # Agent stays in the current position
 
         # Randomly choose one of the eligible cells and move the agent
         new_pos = agent.random.choice(eligible_cells)
         self.move_agent(agent, new_pos)
 
-    def move_agent_to_extreme_value_cell(self, agent: Agent, property_name: str, mode: str) -> None:
+    def move_agent_to_extreme_value_cell(
+        self,
+        agent: Agent,
+        property_name: str,
+        mode: str,
+        only_neighborhood: bool = False,
+        moore: bool = True,
+        include_center: bool = False,
+        radius: int = 1,
+    ) -> None:
         """
-        Move an agent to a cell with the highest, lowest, or closest property value.
+        Move an agent to a cell with the highest, lowest, or closest property value,
+        optionally within a neighborhood.
 
         Args:
             agent (Agent): The agent to move.
             property_name (str): The name of the property layer.
             mode (str): 'highest', 'lowest', or 'closest'.
+            only_neighborhood, moore, include_center, radius: Optional neighborhood parameters.
         """
+        pos = agent.pos if only_neighborhood else None
         prop_values = self.properties[property_name].data
-        if mode == 'highest':
-            target_value = np.max(prop_values)
-        elif mode == 'lowest':
-            target_value = np.min(prop_values)
-        elif mode == 'closest':
-            agent_value = prop_values[agent.pos]
-            target_value = prop_values[np.abs(prop_values - agent_value).argmin()]
-        else:
-            raise ValueError(f"Invalid mode {mode}. Choose from 'highest', 'lowest', or 'closest'.")
 
-        target_cells = list(zip(*np.where(prop_values == target_value)))
-        new_pos = agent.random.choice(target_cells)
+        if pos is not None:
+            # Mask out cells outside the neighborhood.
+            neighborhood_mask = self.get_neighborhood_mask(
+                pos, moore, include_center, radius
+            )
+            # Use NaN for out-of-neighborhood cells
+            masked_prop_values = np.where(neighborhood_mask, prop_values, np.nan)
+        else:
+            masked_prop_values = prop_values
+
+        # Find the target value
+        if mode == "highest":
+            target_value = np.nanmax(masked_prop_values)
+        elif mode == "lowest":
+            target_value = np.nanmin(masked_prop_values)
+        elif mode == "closest":
+            agent_value = prop_values[agent.pos]
+            target_value = masked_prop_values[
+                np.nanargmin(np.abs(masked_prop_values - agent_value))
+            ]
+        else:
+            raise ValueError(
+                f"Invalid mode {mode}. Choose from 'highest', 'lowest', or 'closest'."
+            )
+
+        # Find the coordinates of the target value(s)
+        target_cells = np.column_stack(np.where(masked_prop_values == target_value))
+        # If there are multiple target cells, randomly choose one
+        new_pos = tuple(agent.random.choice(target_cells, axis=0))
         self.move_agent(agent, new_pos)
 
 
