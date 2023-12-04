@@ -21,6 +21,7 @@ NetworkGrid: a network where each node contains zero or more agents.
 from __future__ import annotations
 
 import collections
+import inspect
 import itertools
 import math
 from numbers import Real
@@ -548,7 +549,153 @@ class _Grid:
         return len(self.empties) > 0
 
 
-class SingleGrid(_Grid):
+def is_lambda_function(function):
+    """Check if a function is a lambda function."""
+    return (
+        inspect.isfunction(function)
+        and len(inspect.signature(function).parameters) == 1
+    )
+
+
+class PropertyLayer:
+    def __init__(
+        self, name: str, width: int, height: int, default_value, dtype=np.float32
+    ):
+        self.name = name
+        self.width = width
+        self.height = height
+        self.data = np.full((width, height), default_value, dtype=dtype)
+
+    def set_cell(self, position: Coordinate, value):
+        """
+        Update a single cell's value in-place.
+        """
+        self.data[position] = value
+
+    def set_cells(self, value, condition=None):
+        """
+        Perform a batch update either on the entire grid or conditionally, in-place.
+
+        Args:
+            value: The value to be used for the update.
+            condition: (Optional) A callable that returns a boolean array when applied to the data.
+        """
+        if condition is None:
+            np.copyto(self.data, value)  # In-place update
+        else:
+            # Ensure condition is a boolean array of the same shape as self.data
+            if (
+                not isinstance(condition, np.ndarray)
+                or condition.shape != self.data.shape
+            ):
+                raise ValueError(
+                    "Condition must be a NumPy array with the same shape as the grid."
+                )
+            np.copyto(self.data, value, where=condition)  # Conditional in-place update
+
+    def modify_cell(self, position: Coordinate, operation, value=None):
+        """
+        Modify a single cell using an operation, which can be a lambda function or a NumPy ufunc.
+        If a NumPy ufunc is used, an additional value should be provided.
+
+        Args:
+            position: The grid coordinates of the cell to modify.
+            operation: A function to apply. Can be a lambda function or a NumPy ufunc.
+            value: The value to be used if the operation is a NumPy ufunc. Ignored for lambda functions.
+        """
+        current_value = self.data[position]
+
+        # Determine if the operation is a lambda function or a NumPy ufunc
+        if is_lambda_function(operation):
+            # Lambda function case
+            self.data[position] = operation(current_value)
+        elif value is not None:
+            # NumPy ufunc case
+            self.data[position] = operation(current_value, value)
+        else:
+            raise ValueError("Invalid operation or missing value for NumPy ufunc.")
+
+    def modify_cells(self, operation, value=None, condition_function=None):
+        """
+        Modify cells using an operation, which can be a lambda function or a NumPy ufunc.
+        If a NumPy ufunc is used, an additional value should be provided.
+
+        Args:
+            operation: A function to apply. Can be a lambda function or a NumPy ufunc.
+            value: The value to be used if the operation is a NumPy ufunc. Ignored for lambda functions.
+            condition_function: (Optional) A callable that returns a boolean array when applied to the data.
+        """
+        if condition_function is not None:
+            condition_array = np.vectorize(condition_function)(self.data)
+        else:
+            condition_array = np.ones_like(self.data, dtype=bool)  # All cells
+
+        # Check if the operation is a lambda function or a NumPy ufunc
+        if is_lambda_function(operation):
+            # Lambda function case
+            modified_data = np.vectorize(operation)(self.data)
+        elif value is not None:
+            # NumPy ufunc case
+            modified_data = operation(self.data, value)
+        else:
+            raise ValueError("Invalid operation or missing value for NumPy ufunc.")
+
+        self.data = np.where(condition_array, modified_data, self.data)
+
+    def select_cells(self, condition, return_list=True):
+        """
+        Find cells that meet a specified condition using NumPy's boolean indexing, in-place.
+
+        Args:
+            condition: A callable that returns a boolean array when applied to the data.
+            return_list: (Optional) If True, return a list of (x, y) tuples. Otherwise, return a boolean array.
+
+        Returns:
+            A list of (x, y) tuples or a boolean array.
+        """
+        condition_array = condition(self.data)
+        if return_list:
+            return list(zip(*np.where(condition_array)))
+        else:
+            return condition_array
+
+    def aggregate_property(self, operation):
+        """Perform an aggregate operation (e.g., sum, mean) on a property across all cells.
+
+        Args:
+            operation: A function to apply. Can be a lambda function or a NumPy ufunc.
+        """
+
+        # Check if the operation is a lambda function or a NumPy ufunc
+        if is_lambda_function(operation):
+            # Lambda function case
+            return operation(self.data)
+        else:
+            # NumPy ufunc case
+            return operation(self.data)
+
+
+class _PropertyGrid(_Grid):
+    def __init__(self, width: int, height: int, torus: bool):
+        super().__init__(width, height, torus)
+        self.properties = {}
+
+    # Add and remove properties to the grid
+    def add_property_layer(self, property_layer: PropertyLayer):
+        self.properties[property_layer.name] = property_layer
+
+    def remove_property_layer(self, property_name: str):
+        if property_name not in self.properties:
+            raise ValueError(f"Property layer {property_name} does not exist.")
+        del self.properties[property_name]
+
+    # TODO:
+    # - Select cells conditionally based on multiple properties
+    # - Move random cells conditionally based on multiple properties
+    # - Move to cell with highest/lowest/closest property value
+
+
+class SingleGrid(_PropertyGrid):
     """Rectangular grid where each cell contains exactly at most one agent.
 
     Grid cells are indexed by [x, y], where [0, 0] is assumed to be the
@@ -591,7 +738,7 @@ class SingleGrid(_Grid):
         agent.pos = None
 
 
-class MultiGrid(_Grid):
+class MultiGrid(_PropertyGrid):
     """Rectangular grid where each cell can contain more than one agent.
 
     Grid cells are indexed by [x, y], where [0, 0] is assumed to be at
