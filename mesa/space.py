@@ -564,6 +564,22 @@ class PropertyLayer:
         self.name = name
         self.width = width
         self.height = height
+
+        # Check that width and height are positive integers
+        if (not isinstance(width, int) or width < 1) or (
+            not isinstance(height, int) or height < 1
+        ):
+            raise ValueError(
+                f"Width and height must be positive integers, got {width} and {height}."
+            )
+        # Check if the dtype is suitable for the data
+        if not isinstance(default_value, dtype):
+            warn(
+                f"Default value {default_value} ({type(default_value).__name__}) might not be best suitable with dtype={dtype.__name__}.",
+                UserWarning,
+                stacklevel=2,
+            )
+
         self.data = np.full((width, height), default_value, dtype=dtype)
 
     def set_cell(self, position: Coordinate, value):
