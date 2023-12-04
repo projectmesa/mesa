@@ -760,6 +760,7 @@ class _PropertyGrid(_Grid):
     Note:
         This class is not intended for direct use in user models but is currently used by the SingleGrid and MultiGrid.
     """
+
     def __init__(
         self,
         width: int,
@@ -942,47 +943,41 @@ class _PropertyGrid(_Grid):
         radius: int = 1,
     ) -> None:
         """
-        Move an agent to a cell with the highest, lowest, or closest property value,
+        Move an agent to a cell with the highest or lowest property value,
         optionally within a neighborhood.
+
+        If multiple cells have the same extreme value, one of them is chosen randomly.
+        If no eligible cells are found, issue a warning and keep the agent in its current position.
 
         Args:
             agent (Agent): The agent to move.
             property_name (str): The name of the property layer.
-            mode (str): 'highest', 'lowest', or 'closest'.
+            mode (str): 'highest' or 'lowest'.
             only_neighborhood, moore, include_center, radius: Optional neighborhood parameters.
         """
-        pos = agent.pos if only_neighborhood else None
         prop_values = self.properties[property_name].data
-
-        if pos is not None:
-            # Mask out cells outside the neighborhood.
+        if only_neighborhood:
             neighborhood_mask = self._get_neighborhood_mask(
-                pos, moore, include_center, radius
+                agent.pos, moore, include_center, radius
             )
-            # Use NaN for out-of-neighborhood cells
             masked_prop_values = np.where(neighborhood_mask, prop_values, np.nan)
         else:
             masked_prop_values = prop_values
 
-        # Find the target value
+        # Find coordinates of target cells directly
         if mode == "highest":
-            target_value = np.nanmax(masked_prop_values)
-        elif mode == "lowest":
-            target_value = np.nanmin(masked_prop_values)
-        elif mode == "closest":
-            agent_value = prop_values[agent.pos]
-            target_value = masked_prop_values[
-                np.nanargmin(np.abs(masked_prop_values - agent_value))
-            ]
-        else:
-            raise ValueError(
-                f"Invalid mode {mode}. Choose from 'highest', 'lowest', or 'closest'."
+            target_cells = np.column_stack(
+                np.where(masked_prop_values == np.nanmax(masked_prop_values))
             )
+        elif mode == "lowest":
+            target_cells = np.column_stack(
+                np.where(masked_prop_values == np.nanmin(masked_prop_values))
+            )
+        else:
+            raise ValueError(f"Invalid mode {mode}. Choose from 'highest' or 'lowest'.")
 
-        # Find the coordinates of the target value(s)
-        target_cells = np.column_stack(np.where(masked_prop_values == target_value))
         # If there are multiple target cells, randomly choose one
-        new_pos = tuple(agent.random.choice(target_cells, axis=0))
+        new_pos = tuple(agent.random.choice(target_cells))
         self.move_agent(agent, new_pos)
 
 
