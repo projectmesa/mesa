@@ -676,12 +676,33 @@ class PropertyLayer:
 
 
 class _PropertyGrid(_Grid):
-    def __init__(self, width: int, height: int, torus: bool):
+    def __init__(
+        self,
+        width: int,
+        height: int,
+        torus: bool,
+        property_layers: None | PropertyLayer | list[PropertyLayer] = None,
+    ):
         super().__init__(width, height, torus)
         self.properties = {}
 
+        # Handle both single PropertyLayer instance and list of PropertyLayer instances
+        if property_layers:
+            # If a single PropertyLayer is passed, convert it to a list
+            if isinstance(property_layers, PropertyLayer):
+                property_layers = [property_layers]
+
+            for layer in property_layers:
+                self.add_property_layer(layer)
+
     # Add and remove properties to the grid
     def add_property_layer(self, property_layer: PropertyLayer):
+        if property_layer.name in self.properties:
+            raise ValueError(f"Property layer {property_layer.name} already exists.")
+        if property_layer.width != self.width or property_layer.height != self.height:
+            raise ValueError(
+                f"Property layer dimensions {property_layer.width}x{property_layer.height} do not match grid dimensions {self.width}x{self.height}."
+            )
         self.properties[property_layer.name] = property_layer
 
     def remove_property_layer(self, property_name: str):
