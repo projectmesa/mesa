@@ -558,9 +558,49 @@ def is_lambda_function(function):
 
 
 class PropertyLayer:
+    """
+    A class representing a layer of properties in a two-dimensional grid. Each cell in the grid
+    can store a value of a specified data type.
+
+    Attributes:
+        name (str): The name of the property layer.
+        width (int): The width of the grid (number of columns).
+        height (int): The height of the grid (number of rows).
+        data (numpy.ndarray): A NumPy array representing the grid data.
+
+    Methods:
+        set_cell(position, value): Sets the value of a single cell.
+        set_cells(value, condition): Sets the values of multiple cells, optionally based on a condition.
+        modify_cell(position, operation, value): Modifies the value of a single cell using an operation.
+        modify_cells(operation, value, condition_function): Modifies the values of multiple cells using an operation.
+        select_cells(condition, return_list): Selects cells that meet a specified condition.
+        aggregate_property(operation): Performs an aggregate operation over all cells.
+    """
+
     def __init__(
         self, name: str, width: int, height: int, default_value, dtype=np.float32
     ):
+        """
+        Initializes a new PropertyLayer instance.
+
+        Args:
+            name (str): The name of the property layer.
+            width (int): The width of the grid (number of columns). Must be a positive integer.
+            height (int): The height of the grid (number of rows). Must be a positive integer.
+            default_value: The default value to initialize each cell in the grid. Should ideally
+                           be of the same type as specified by the dtype parameter.
+            dtype (data-type, optional): The desired data-type for the grid's elements. Default is np.float32.
+
+        Raises:
+            ValueError: If width or height is not a positive integer.
+
+        Notes:
+            A UserWarning is raised if the default_value is not of a type compatible with dtype.
+            The dtype parameter can accept both Python data types (like bool, int or float) and NumPy data types
+            (like np.int16 or np.float32). Using NumPy data types is recommended (except for bool) for better control
+            over the precision and efficiency of data storage and computations, especially in cases of large data
+            volumes or specialized numerical operations.
+        """
         self.name = name
         self.width = width
         self.height = height
