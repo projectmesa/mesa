@@ -710,10 +710,73 @@ class _PropertyGrid(_Grid):
             raise ValueError(f"Property layer {property_name} does not exist.")
         del self.properties[property_name]
 
-    # TODO:
-    # - Select cells conditionally based on multiple properties
-    # - Move random cells conditionally based on multiple properties
-    # - Move to cell with highest/lowest/closest property value
+    def select_cells_multi_properties(self, conditions: dict) -> List[Coordinate]:
+        """
+        Select cells based on multiple property conditions using NumPy.
+
+        Args:
+            conditions (dict): A dictionary where keys are property names and values are
+                               callables that take a single argument (the property value)
+                               and return a boolean.
+
+        Returns:
+            List[Coordinate]: A list of coordinates where the conditions are satisfied.
+        """
+        # Start with a mask of all True values
+        combined_mask = np.ones((self.width, self.height), dtype=bool)
+
+        for prop_name, condition in conditions.items():
+            prop_layer = self.properties[prop_name].data
+            # Apply the condition to the property layer
+            prop_mask = condition(prop_layer)
+            # Combine with the existing mask using logical AND
+            combined_mask = np.logical_and(combined_mask, prop_mask)
+
+        # Extract coordinates from the combined mask
+        selected_cells = list(zip(*np.where(combined_mask)))
+        return selected_cells
+
+    def move_agent_to_random_cell(self, agent: Agent, conditions: dict) -> None:
+        """
+        Move an agent to a random cell that meets specified property conditions.
+        If no eligible cells are found, issue a warning and keep the agent in its current position.
+
+        Args:
+            agent (Agent): The agent to move.
+            conditions (dict): Conditions for selecting the cell.
+        """
+        eligible_cells = self.select_cells_multi_properties(conditions)
+        if not eligible_cells:
+            warn(f"No eligible cells found. Agent {agent.unique_id} remains in the current position.", RuntimeWarning)
+            return  # Agent stays in the current position
+
+        # Randomly choose one of the eligible cells and move the agent
+        new_pos = agent.random.choice(eligible_cells)
+        self.move_agent(agent, new_pos)
+
+    def move_agent_to_extreme_value_cell(self, agent: Agent, property_name: str, mode: str) -> None:
+        """
+        Move an agent to a cell with the highest, lowest, or closest property value.
+
+        Args:
+            agent (Agent): The agent to move.
+            property_name (str): The name of the property layer.
+            mode (str): 'highest', 'lowest', or 'closest'.
+        """
+        prop_values = self.properties[property_name].data
+        if mode == 'highest':
+            target_value = np.max(prop_values)
+        elif mode == 'lowest':
+            target_value = np.min(prop_values)
+        elif mode == 'closest':
+            agent_value = prop_values[agent.pos]
+            target_value = prop_values[np.abs(prop_values - agent_value).argmin()]
+        else:
+            raise ValueError(f"Invalid mode {mode}. Choose from 'highest', 'lowest', or 'closest'.")
+
+        target_cells = list(zip(*np.where(prop_values == target_value)))
+        new_pos = agent.random.choice(target_cells)
+        self.move_agent(agent, new_pos)
 
 
 class SingleGrid(_PropertyGrid):
