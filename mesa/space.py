@@ -634,20 +634,23 @@ class PropertyLayer:
 
         Args:
             value: The value to be used for the update.
-            condition: (Optional) A callable that returns a boolean array when applied to the data.
+            condition: (Optional) A callable (like a lambda function or a NumPy ufunc)
+                       that returns a boolean array when applied to the data.
         """
         if condition is None:
             np.copyto(self.data, value)  # In-place update
         else:
-            # Ensure condition is a boolean array of the same shape as self.data
+            # Call the condition and check if the result is a boolean array
+            condition_result = condition(self.data)
             if (
-                not isinstance(condition, np.ndarray)
-                or condition.shape != self.data.shape
+                not isinstance(condition_result, np.ndarray)
+                or condition_result.shape != self.data.shape
             ):
                 raise ValueError(
-                    "Condition must be a NumPy array with the same shape as the grid."
+                    "Result of condition must be a NumPy array with the same shape as the grid."
                 )
-            np.copyto(self.data, value, where=condition)  # Conditional in-place update
+            # Conditional in-place update
+            np.copyto(self.data, value, where=condition_result)
 
     def modify_cell(self, position: Coordinate, operation, value=None):
         """
