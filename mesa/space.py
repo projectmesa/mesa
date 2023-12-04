@@ -826,12 +826,12 @@ class _PropertyGrid(_Grid):
             raise ValueError(f"Property layer {property_name} does not exist.")
         del self.properties[property_name]
 
-    def get_neighborhood_mask(
+    def _get_neighborhood_mask(
         self, pos: Coordinate, moore: bool, include_center: bool, radius: int
     ) -> np.ndarray:
         """
         Generate a boolean mask representing the neighborhood.
-        Helper method for select_cells_multi_properties().
+        Helper method for select_cells_multi_properties() and move_agent_to_random_cell()
 
         Args:
             pos (Coordinate): Center of the neighborhood.
@@ -883,7 +883,7 @@ class _PropertyGrid(_Grid):
             combined_mask = np.logical_and(combined_mask, prop_mask)
 
         if only_neighborhood and pos is not None:
-            neighborhood_mask = self.get_neighborhood_mask(
+            neighborhood_mask = self._get_neighborhood_mask(
                 pos, moore, include_center, radius
             )
             combined_mask = np.logical_and(combined_mask, neighborhood_mask)
@@ -956,7 +956,7 @@ class _PropertyGrid(_Grid):
 
         if pos is not None:
             # Mask out cells outside the neighborhood.
-            neighborhood_mask = self.get_neighborhood_mask(
+            neighborhood_mask = self._get_neighborhood_mask(
                 pos, moore, include_center, radius
             )
             # Use NaN for out-of-neighborhood cells
