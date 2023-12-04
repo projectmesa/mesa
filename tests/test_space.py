@@ -4,7 +4,7 @@ import networkx as nx
 import numpy as np
 import pytest
 
-from mesa.space import ContinuousSpace, NetworkGrid, SingleGrid
+from mesa.space import ContinuousSpace, NetworkGrid, PropertyLayer, SingleGrid
 from tests.test_grid import MockAgent
 
 TEST_AGENTS = [(-20, -20), (-20, -20.05), (65, 18)]
@@ -276,6 +276,105 @@ class TestSpaceAgentMapping(unittest.TestCase):
         assert agent_to_remove.pos is None
         with self.assertRaises(Exception):
             self.space.remove_agent(agent_to_remove)
+
+
+class TestPropertyLayer(unittest.TestCase):
+    def setUp(self):
+        self.layer = PropertyLayer("test_layer", 10, 10, 0)
+
+    # Initialization Test
+    def test_initialization(self):
+        self.assertEqual(self.layer.name, "test_layer")
+        self.assertEqual(self.layer.width, 10)
+        self.assertEqual(self.layer.height, 10)
+        self.assertTrue(np.array_equal(self.layer.data, np.zeros((10, 10))))
+
+    # Set Cell Test
+    def test_set_cell(self):
+        self.layer.set_cell((5, 5), 1)
+        self.assertEqual(self.layer.data[5, 5], 1)
+
+    # Set Cells Tests
+    def test_set_cells_no_condition(self):
+        self.layer.set_cells(2)
+        np.testing.assert_array_equal(self.layer.data, np.full((10, 10), 2))
+
+    def test_set_cells_with_condition(self):
+        condition = np.full((10, 10), False)
+        condition[5, :] = True  # Only update the 5th row
+        self.layer.set_cells(3, condition)
+        self.assertEqual(np.sum(self.layer.data[5, :] == 3), 10)
+        self.assertEqual(np.sum(self.layer.data != 3), 90)
+
+    def test_set_cells_invalid_condition(self):
+        with self.assertRaises(ValueError):
+            self.layer.set_cells(4, condition=np.full((5, 5), False))  # Invalid shape
+
+    # Modify Cells Test
+    def test_modify_cell_lambda(self):
+        self.layer.data = np.zeros((10, 10))
+        self.layer.modify_cell((2, 2), lambda x: x + 5)
+        self.assertEqual(self.layer.data[2, 2], 5)
+
+    def test_modify_cell_ufunc(self):
+        self.layer.data = np.ones((10, 10))
+        self.layer.modify_cell((3, 3), np.add, 4)
+        self.assertEqual(self.layer.data[3, 3], 5)
+
+    def test_modify_cell_invalid_operation(self):
+        with self.assertRaises(ValueError):
+            self.layer.modify_cell((1, 1), np.add)  # Missing value for ufunc
+
+    # Select Cells Test
+    def test_modify_cells_lambda(self):
+        self.layer.data = np.zeros((10, 10))
+        self.layer.modify_cells(lambda x: x + 2)
+        np.testing.assert_array_equal(self.layer.data, np.full((10, 10), 2))
+
+    def test_modify_cells_ufunc(self):
+        self.layer.data = np.ones((10, 10))
+        self.layer.modify_cells(np.multiply, 3)
+        np.testing.assert_array_equal(self.layer.data, np.full((10, 10), 3))
+
+    def test_modify_cells_invalid_operation(self):
+        with self.assertRaises(ValueError):
+            self.layer.modify_cells(np.add)  # Missing value for ufunc
+
+    # Aggregate Property Test
+    def test_aggregate_property_lambda(self):
+        self.layer.data = np.arange(100).reshape(10, 10)
+        result = self.layer.aggregate_property(lambda x: np.sum(x))
+        self.assertEqual(result, np.sum(np.arange(100)))
+
+    def test_aggregate_property_ufunc(self):
+        self.layer.data = np.full((10, 10), 2)
+        result = self.layer.aggregate_property(np.mean)
+        self.assertEqual(result, 2)
+
+    # Edge Case: Negative or Zero Dimensions
+    def test_initialization_negative_dimensions(self):
+        with self.assertRaises(ValueError):
+            PropertyLayer("test_layer", -10, 10, 0)
+
+    def test_initialization_zero_dimensions(self):
+        with self.assertRaises(ValueError):
+            PropertyLayer("test_layer", 0, 10, 0)
+
+    # Edge Case: Out-of-Bounds Cell Access
+    def test_set_cell_out_of_bounds(self):
+        with self.assertRaises(IndexError):
+            self.layer.set_cell((10, 10), 1)
+
+    def test_modify_cell_out_of_bounds(self):
+        with self.assertRaises(IndexError):
+            self.layer.modify_cell((10, 10), lambda x: x + 5)
+
+    # Edge Case: Selecting Cells with Complex Conditions
+    def test_select_cells_complex_condition(self):
+        self.layer.data = np.random.rand(10, 10)
+        selected = self.layer.select_cells(lambda x: (x > 0.5) & (x < 0.75))
+        for c in selected:
+            self.assertTrue(0.5 < self.layer.data[c] < 0.75)
 
 
 class TestSingleGrid(unittest.TestCase):
