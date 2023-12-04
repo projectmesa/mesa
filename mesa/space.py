@@ -724,14 +724,7 @@ class PropertyLayer:
         Args:
             operation: A function to apply. Can be a lambda function or a NumPy ufunc.
         """
-
-        # Check if the operation is a lambda function or a NumPy ufunc
-        if is_lambda_function(operation):
-            # Lambda function case
-            return operation(self.data)
-        else:
-            # NumPy ufunc case
-            return operation(self.data)
+        return operation(self.data)
 
 
 class _PropertyGrid(_Grid):
