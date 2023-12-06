@@ -709,6 +709,28 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.grid.move_agent_to_extreme_value_cell(agent, "layer1", "invalid_mode")
 
+    # Test if coordinates means the same between the grid and the property layer
+    def test_property_layer_coordinates(self):
+        agent = MockAgent(0, self.grid)
+        correct_pos = (1, 8)
+        incorrect_pos = (8, 1)
+        self.grid.place_agent(agent, correct_pos)
+
+        # Simple check on layer 1: set by agent, check by layer
+        self.grid.properties["layer1"].set_cell(agent.pos, 2)
+        self.assertEqual(self.grid.properties["layer1"].data[agent.pos], 2)
+
+        # More complicated check on layer 2: set by layer, check by agent
+        self.grid.properties["layer2"].set_cell(correct_pos, 3)
+        self.grid.properties["layer2"].set_cell(incorrect_pos, 4)
+
+        correct_grid_value = self.grid.properties["layer2"].data[correct_pos]
+        incorrect_grid_value = self.grid.properties["layer2"].data[incorrect_pos]
+        agent_grid_value = self.grid.properties["layer2"].data[agent.pos]
+
+        self.assertEqual(correct_grid_value, agent_grid_value)
+        self.assertNotEqual(incorrect_grid_value, agent_grid_value)
+
 
 class TestSingleNetworkGrid(unittest.TestCase):
     GRAPH_SIZE = 10
