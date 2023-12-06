@@ -745,6 +745,7 @@ class _PropertyGrid(_Grid):
     Methods:
         add_property_layer(property_layer): Adds a new property layer to the grid.
         remove_property_layer(property_name): Removes a property layer from the grid by its name.
+        get_empty_mask(): Generates a boolean mask indicating empty cells on the grid.
         get_neighborhood_mask(pos, moore, include_center, radius): Generates a boolean mask of the neighborhood.
         select_cells_multi_properties(conditions, mask):
             Selects cells based on multiple property conditions, optionally with a mask.
@@ -830,6 +831,25 @@ class _PropertyGrid(_Grid):
         if property_name not in self.properties:
             raise ValueError(f"Property layer {property_name} does not exist.")
         del self.properties[property_name]
+
+    def get_empty_mask(self) -> np.ndarray:
+        """
+        Generate a boolean mask indicating empty cells on the grid.
+
+        Returns:
+            np.ndarray: A boolean mask where True represents an empty cell and False represents an occupied cell.
+        """
+        # Initialize a mask filled with False (indicating occupied cells)
+        empty_mask = np.full((self.width, self.height), False, dtype=bool)
+
+        # Convert the list of empty cell coordinates to a NumPy array
+        empty_cells = np.array(list(self.empties))
+
+        # Use advanced indexing to set empty cells to True
+        if empty_cells.size > 0:  # Check if there are any empty cells
+            empty_mask[empty_cells[:, 0], empty_cells[:, 1]] = True
+
+        return empty_mask
 
     def get_neighborhood_mask(
         self, pos: Coordinate, moore: bool, include_center: bool, radius: int
