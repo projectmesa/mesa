@@ -842,7 +842,7 @@ class _PropertyGrid(_Grid):
             np.ndarray: A boolean mask where True represents an empty cell and False represents an occupied cell.
         """
         # Initialize a mask filled with False (indicating occupied cells)
-        empty_mask = np.full((self.width, self.height), False, dtype=bool)
+        empty_mask = np.zeros((self.width, self.height), dtype=bool)
 
         # Convert the list of empty cell coordinates to a NumPy array
         empty_cells = np.array(list(self.empties))
@@ -996,7 +996,7 @@ class _PropertyGrid(_Grid):
         )
 
         # If no eligible cells are found, issue a warning and keep the agent in its current position.
-        if not target_cells.size:
+        if len(target_cells) == 0:
             warn(
                 f"No eligible cells found. Agent {agent.unique_id} remains in the current position.",
                 RuntimeWarning,
