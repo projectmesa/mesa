@@ -747,11 +747,11 @@ class _PropertyGrid(_Grid):
         remove_property_layer(property_name): Removes a property layer from the grid by its name.
         get_empty_mask(): Generates a boolean mask indicating empty cells on the grid.
         get_neighborhood_mask(pos, moore, include_center, radius): Generates a boolean mask of the neighborhood.
-        select_cells_multi_properties(conditions, mask, return_list): Selects cells based on multiple property conditions,
+        select_cells_by_properties(conditions, mask, return_list): Selects cells based on multiple property conditions,
             optionally with a mask, returning either a list of coordinates or a mask.
         select_extreme_value_cells(property_name, mode, mask, return_list): Selects cells with extreme values of a property,
             optionally with a mask, returning either a list of coordinates or a mask.
-        move_agent_to_random_cell(agent, conditions, mask): Moves an agent to a random cell meeting specified property
+        move_agent_to_cell_by_properties(agent, conditions, mask): Moves an agent to a random cell meeting specified property
             conditions, optionally with a mask.
         move_agent_to_extreme_value_cell(agent, property_name, mode, mask): Moves an agent to a cell with extreme value of
             a property, optionally with a mask.
@@ -877,7 +877,7 @@ class _PropertyGrid(_Grid):
         mask[coords[:, 0], coords[:, 1]] = True
         return mask
 
-    def select_cells_multi_properties(
+    def select_cells_by_properties(
         self, conditions: dict, mask: np.ndarray = None, return_list: bool = True
     ) -> list[Coordinate] | np.ndarray:
         """
@@ -910,7 +910,7 @@ class _PropertyGrid(_Grid):
         else:
             return combined_mask
 
-    def move_agent_to_random_cell(
+    def move_agent_to_cell_by_properties(
         self, agent: Agent, conditions: dict, mask: np.ndarray = None
     ) -> None:
         """
@@ -922,7 +922,7 @@ class _PropertyGrid(_Grid):
             conditions (dict): Conditions for selecting the cell.
             mask (np.ndarray, optional): A boolean mask to restrict the selection.
         """
-        eligible_cells = self.select_cells_multi_properties(
+        eligible_cells = self.select_cells_by_properties(
             conditions, mask, return_list=True
         )
 
