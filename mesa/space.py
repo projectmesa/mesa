@@ -915,22 +915,24 @@ class _PropertyGrid(_Grid):
         new_pos = agent.random.choice(eligible_cells)
         self.move_agent(agent, new_pos)
 
-    def move_agent_to_extreme_value_cell(
-        self, agent: Agent, property_name: str, mode: str, mask: np.ndarray = None
-    ) -> None:
+    def select_extreme_value_cells(
+        self,
+        property_name: str,
+        mode: str,
+        mask: np.ndarray = None,
+        return_list: bool = True,
+    ) -> list[Coordinate] | np.ndarray:
         """
-        Move an agent to a cell with the highest or lowest property value,
-        optionally with a mask.
-
-
-        If multiple cells have the same extreme value, one of them is chosen randomly.
-        If no eligible cells are found, issue a warning and keep the agent in its current position.
+        Select cells with the highest or lowest property value, optionally with a mask.
 
         Args:
-            agent (Agent): The agent to move.
             property_name (str): The name of the property layer.
             mode (str): 'highest' or 'lowest'.
             mask (np.ndarray, optional): A boolean mask to restrict the selection.
+            return_list (bool, optional): If True, return a list of coordinates, otherwise return an ndarray.
+
+        Returns:
+            list[Coordinate] or np.ndarray: Coordinates of cells with the extreme property value.
         """
         prop_values = self.properties[property_name].data
         if mask is not None:
@@ -938,7 +940,6 @@ class _PropertyGrid(_Grid):
         else:
             masked_prop_values = prop_values
 
-        # Find coordinates of target cells directly
         if mode == "highest":
             target_cells = np.column_stack(
                 np.where(masked_prop_values == np.nanmax(masked_prop_values))
@@ -950,7 +951,37 @@ class _PropertyGrid(_Grid):
         else:
             raise ValueError(f"Invalid mode {mode}. Choose from 'highest' or 'lowest'.")
 
-        # If there are multiple target cells, randomly choose one
+        if return_list:
+            return list(map(tuple, target_cells))
+        else:
+            return target_cells
+
+    def move_agent_to_extreme_value_cell(
+        self, agent: Agent, property_name: str, mode: str, mask: np.ndarray = None
+    ) -> None:
+        """
+        Move an agent to a cell with the highest or lowest property value,
+        optionally with a mask.
+
+        Args:
+            agent (Agent): The agent to move.
+            property_name (str): The name of the property layer.
+            mode (str): 'highest' or 'lowest'.
+            mask (np.ndarray, optional): A boolean mask to restrict the selection.
+        """
+        target_cells = self.select_extreme_value_cells(
+            property_name, mode, mask, return_list=True
+        )
+
+        # If no eligible cells are found, issue a warning and keep the agent in its current position.
+        if not target_cells.size:
+            warn(
+                f"No eligible cells found. Agent {agent.unique_id} remains in the current position.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            return  # Agent stays in the current position
+
         new_pos = tuple(agent.random.choice(target_cells))
         self.move_agent(agent, new_pos)
 
