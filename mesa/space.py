@@ -747,12 +747,14 @@ class _PropertyGrid(_Grid):
         remove_property_layer(property_name): Removes a property layer from the grid by its name.
         get_empty_mask(): Generates a boolean mask indicating empty cells on the grid.
         get_neighborhood_mask(pos, moore, include_center, radius): Generates a boolean mask of the neighborhood.
-        select_cells_multi_properties(conditions, mask):
-            Selects cells based on multiple property conditions, optionally with a mask.
-        move_agent_to_random_cell(agent, conditions, mask):
-            Moves an agent to a random cell meeting specified property conditions, optionally with a mask.
-        move_agent_to_extreme_value_cell(agent, property_name, mode, mask):
-            Moves an agent to a cell with extreme value of a property, optionally with a mask.
+        select_cells_multi_properties(conditions, mask, return_list): Selects cells based on multiple property conditions,
+            optionally with a mask, returning either a list of coordinates or a mask.
+        select_extreme_value_cells(property_name, mode, mask, return_list): Selects cells with extreme values of a property,
+            optionally with a mask, returning either a list of coordinates or a mask.
+        move_agent_to_random_cell(agent, conditions, mask): Moves an agent to a random cell meeting specified property
+            conditions, optionally with a mask.
+        move_agent_to_extreme_value_cell(agent, property_name, mode, mask): Moves an agent to a cell with extreme value of
+            a property, optionally with a mask.
 
     Mask Usage:
         Several methods in this class accept a mask as an input, which is a NumPy ndarray of boolean values. This mask
