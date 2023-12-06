@@ -753,6 +753,14 @@ class _PropertyGrid(_Grid):
         move_agent_to_extreme_value_cell(agent, property_name, mode, mask):
             Moves an agent to a cell with extreme value of a property, optionally with a mask.
 
+    Mask Usage:
+        Several methods in this class accept a mask as an input, which is a NumPy ndarray of boolean values. This mask
+        specifies the cells to be considered (True) or ignored (False) in operations. Users can create custom masks,
+        including neighborhood masks, to apply specific conditions or constraints. Additionally, methods that deal with
+        cell selection or agent movement can return either a list of cell coordinates or a mask, based on the 'return_list'
+        parameter. This flexibility allows for more nuanced control and customization of grid operations, catering to a wide
+        range of modeling requirements and scenarios.
+
     Note:
         This class is not intended for direct use in user models but is currently used by the SingleGrid and MultiGrid.
     """
@@ -848,8 +856,8 @@ class _PropertyGrid(_Grid):
         return mask
 
     def select_cells_multi_properties(
-        self, conditions: dict, mask: np.ndarray = None
-    ) -> list[Coordinate]:
+        self, conditions: dict, mask: np.ndarray = None, return_list: bool = True
+    ) -> list[Coordinate] | np.ndarray:
         """
         Select cells based on multiple property conditions using NumPy, optionally with a mask.
 
@@ -858,25 +866,27 @@ class _PropertyGrid(_Grid):
                                callables that take a single argument (the property value)
                                and return a boolean.
             mask (np.ndarray, optional): A boolean mask to restrict the selection.
+            return_list (bool, optional): If True, return a list of coordinates, otherwise return the mask.
 
         Returns:
-            List[Coordinate]: Coordinates where conditions are satisfied.
+            Union[list[Coordinate], np.ndarray]: Coordinates where conditions are satisfied or the combined mask.
         """
-        # If no mask is provided, use a default mask of all True values
-        if mask is None:
-            mask = np.ones((self.width, self.height), dtype=bool)
-
-        combined_mask = mask
+        # Start with a mask of all True values
+        combined_mask = np.ones((self.width, self.height), dtype=bool)
 
         for prop_name, condition in conditions.items():
             prop_layer = self.properties[prop_name].data
-            # Apply the condition to the property layer
             prop_mask = condition(prop_layer)
-            # Combine with the existing mask using logical AND
             combined_mask = np.logical_and(combined_mask, prop_mask)
 
-        selected_cells = list(zip(*np.where(combined_mask)))
-        return selected_cells
+        if mask is not None:
+            combined_mask = np.logical_and(combined_mask, mask)
+
+        if return_list:
+            selected_cells = list(zip(*np.where(combined_mask)))
+            return selected_cells
+        else:
+            return combined_mask
 
     def move_agent_to_random_cell(
         self, agent: Agent, conditions: dict, mask: np.ndarray = None
@@ -890,7 +900,10 @@ class _PropertyGrid(_Grid):
             conditions (dict): Conditions for selecting the cell.
             mask (np.ndarray, optional): A boolean mask to restrict the selection.
         """
-        eligible_cells = self.select_cells_multi_properties(conditions, mask)
+        eligible_cells = self.select_cells_multi_properties(
+            conditions, mask, return_list=True
+        )
+
         if not eligible_cells:
             warn(
                 f"No eligible cells found. Agent {agent.unique_id} remains in the current position.",
