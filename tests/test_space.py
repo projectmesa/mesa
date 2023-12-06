@@ -567,28 +567,101 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.grid.remove_property_layer("nonexistent_layer")
 
-    # Test selecting cells
-    def test_select_cells_multi_properties(self):
-        condition = lambda x: x == 0
-        selected_cells = self.grid.select_cells_multi_properties({"layer1": condition})
-        self.assertEqual(len(selected_cells), 100)  # All cells should be selected
+    # Test getting masks
+    def test_get_empty_mask(self):
+        empty_mask = self.grid.get_empty_mask()
+        self.assertTrue(np.all(empty_mask == np.ones((10, 10), dtype=bool)))
 
-    def test_select_cells_with_multiple_properties(self):
-        condition1 = lambda x: x == 0
-        condition2 = lambda x: x == 1
-        selected_cells = self.grid.select_cells_multi_properties(
-            {"layer1": condition1, "layer2": condition2}
-        )
-        self.assertEqual(
-            len(selected_cells), 100
-        )  # All cells should meet both conditions
+    def test_get_empty_mask_with_agent(self):
+        agent = MockAgent(0, self.grid)
+        self.grid.place_agent(agent, (4, 6))
 
-    def test_select_cells_with_neighborhood(self):
+        empty_mask = self.grid.get_empty_mask()
+        expected_mask = np.ones((10, 10), dtype=bool)
+        expected_mask[4, 6] = False
+
+        self.assertTrue(np.all(empty_mask == expected_mask))
+
+    def test_get_neighborhood_mask(self):
+        agent = MockAgent(0, self.grid)
+        agent2 = MockAgent(1, self.grid)
+        self.grid.place_agent(agent, (5, 5))
+        self.grid.place_agent(agent2, (5, 6))
+        neighborhood_mask = self.grid.get_neighborhood_mask((5, 5), True, False, 1)
+        expected_mask = np.zeros((10, 10), dtype=bool)
+        expected_mask[4:7, 4:7] = True
+        expected_mask[5, 5] = False
+        self.assertTrue(np.all(neighborhood_mask == expected_mask))
+
+    # Test selecting and moving to cells based on multiple conditions
+    def test_select_cells_by_properties(self):
         condition = lambda x: x == 0
-        selected_cells = self.grid.select_cells_multi_properties(
-            {"layer1": condition}, only_neighborhood=True, pos=(5, 5), radius=1
+        selected_cells = self.grid.select_cells_by_properties({"layer1": condition})
+        self.assertEqual(len(selected_cells), 100)
+
+    def test_select_cells_by_properties_return_mask(self):
+        condition = lambda x: x == 0
+        selected_mask = self.grid.select_cells_by_properties(
+            {"layer1": condition}, return_list=False
         )
-        # Expect a selection of cells around (5, 5)
+        self.assertTrue(isinstance(selected_mask, np.ndarray))
+        self.assertTrue(selected_mask.all())
+
+    def test_move_agent_to_cell_by_properties(self):
+        agent = MockAgent(1, self.grid)
+        self.grid.place_agent(agent, (5, 5))
+        conditions = {"layer1": lambda x: x == 0}
+        self.grid.move_agent_to_cell_by_properties(agent, conditions)
+        self.assertNotEqual(agent.pos, (5, 5))
+
+    def test_move_agent_no_eligible_cells(self):
+        agent = MockAgent(3, self.grid)
+        self.grid.place_agent(agent, (5, 5))
+        conditions = {"layer1": lambda x: x != 0}
+        self.grid.move_agent_to_cell_by_properties(agent, conditions)
+        self.assertEqual(agent.pos, (5, 5))
+
+    # Test selecting and moving to cells based on extreme values
+    def test_select_extreme_value_cells(self):
+        self.grid.properties["layer2"].set_cell((3, 1), 1.1)
+        target_cells = self.grid.select_extreme_value_cells("layer2", "highest")
+        self.assertIn((3, 1), target_cells)
+
+    def test_select_extreme_value_cells_return_mask(self):
+        self.grid.properties["layer2"].set_cell((3, 1), 1.1)
+        target_mask = self.grid.select_extreme_value_cells(
+            "layer2", "highest", return_list=False
+        )
+        self.assertTrue(isinstance(target_mask, np.ndarray))
+        self.assertTrue(target_mask[3, 1])
+
+    def test_move_agent_to_extreme_value_cell(self):
+        agent = MockAgent(2, self.grid)
+        self.grid.place_agent(agent, (5, 5))
+        self.grid.properties["layer2"].set_cell((3, 1), 1.1)
+        self.grid.move_agent_to_extreme_value_cell(agent, "layer2", "highest")
+        self.assertEqual(agent.pos, (3, 1))
+
+    # Test using masks
+    def test_select_cells_by_properties_with_empty_mask(self):
+        self.grid.place_agent(
+            MockAgent(0, self.grid), (5, 5)
+        )  # Placing an agent to ensure some cells are not empty
+        empty_mask = self.grid.get_empty_mask()
+        condition = lambda x: x == 0
+        selected_cells = self.grid.select_cells_by_properties(
+            {"layer1": condition}, mask=empty_mask
+        )
+        self.assertNotIn(
+            (5, 5), selected_cells
+        )  # (5, 5) should not be in the selection as it's not empty
+
+    def test_select_cells_by_properties_with_neighborhood_mask(self):
+        neighborhood_mask = self.grid.get_neighborhood_mask((5, 5), True, False, 1)
+        condition = lambda x: x == 0
+        selected_cells = self.grid.select_cells_by_properties(
+            {"layer1": condition}, mask=neighborhood_mask
+        )
         expected_selection = [
             (4, 4),
             (4, 5),
@@ -598,54 +671,39 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
             (6, 4),
             (6, 5),
             (6, 6),
-        ]
+        ]  # Cells in the neighborhood of (5, 5)
         self.assertCountEqual(selected_cells, expected_selection)
 
-    def test_select_no_cells_due_to_conflicting_conditions(self):
-        condition1 = lambda x: x == 0  # All cells in layer1 meet this
-        condition2 = lambda x: x != 1  # No cells in layer2 meet this
-        selected_cells = self.grid.select_cells_multi_properties(
-            {"layer1": condition1, "layer2": condition2}
-        )
-        self.assertEqual(len(selected_cells), 0)
-
-    # Test moving agents to cells
-    def test_move_agent_to_random_cell(self):
+    def test_move_agent_to_cell_by_properties_with_empty_mask(self):
         agent = MockAgent(1, self.grid)
         self.grid.place_agent(agent, (5, 5))
+        self.grid.place_agent(
+            MockAgent(2, self.grid), (4, 5)
+        )  # Placing another agent to create a non-empty cell
+        empty_mask = self.grid.get_empty_mask()
         conditions = {"layer1": lambda x: x == 0}
-        self.grid.move_agent_to_random_cell(agent, conditions)
-        self.assertNotEqual(agent.pos, (5, 5))
+        self.grid.move_agent_to_cell_by_properties(agent, conditions, mask=empty_mask)
+        self.assertNotEqual(
+            agent.pos, (4, 5)
+        )  # Agent should not move to (4, 5) as it's not empty
 
-    def test_move_agent_no_eligible_cells(self):
-        agent = MockAgent(3, self.grid)
+    def test_move_agent_to_cell_by_properties_with_neighborhood_mask(self):
+        agent = MockAgent(1, self.grid)
         self.grid.place_agent(agent, (5, 5))
-        conditions = {"layer1": lambda x: x != 0}  # No cell meets this condition
-        self.grid.move_agent_to_random_cell(agent, conditions)
-        # Agent should not move
-        self.assertEqual(agent.pos, (5, 5))
+        neighborhood_mask = self.grid.get_neighborhood_mask((5, 5), True, False, 1)
+        conditions = {"layer1": lambda x: x == 0}
+        self.grid.move_agent_to_cell_by_properties(
+            agent, conditions, mask=neighborhood_mask
+        )
+        self.assertIn(
+            agent.pos, [(4, 4), (4, 5), (4, 6), (5, 4), (5, 6), (6, 4), (6, 5), (6, 6)]
+        )  # Agent should move within the neighborhood
 
-    # Move to cells with the highest or lowest value in a layer
-    def test_move_agent_to_extreme_value_cell(self):
-        agent = MockAgent(2, self.grid)
-        self.grid.place_agent(agent, (5, 5))
-        self.grid.properties["layer2"].set_cell((3, 1), 1.1)
-        self.grid.move_agent_to_extreme_value_cell(agent, "layer2", "highest")
-        self.assertEqual(agent.pos, (3, 1))
-
-    def test_move_agent_to_extreme_value_cell_lowest(self):
-        agent = MockAgent(4, self.grid)
-        self.grid.place_agent(agent, (5, 5))
-        self.grid.properties["layer2"].set_cell((6, 7), 0)
-        self.grid.move_agent_to_extreme_value_cell(agent, "layer2", "lowest")
-        # Agent should move to a cell with the lowest value in layer2 (which is 1 for all cells, so position should not change)
-        self.assertEqual(agent.pos, (6, 7))
-
-    # Edge Cases: Invalid property name or mode
+    # Test invalid inputs
     def test_invalid_property_name_in_conditions(self):
         condition = lambda x: x == 0
         with self.assertRaises(KeyError):
-            self.grid.select_cells_multi_properties({"nonexistent_layer": condition})
+            self.grid.select_cells_by_properties({"nonexistent_layer": condition})
 
     def test_invalid_mode_in_move_to_extreme(self):
         agent = MockAgent(6, self.grid)
