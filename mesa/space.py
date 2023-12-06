@@ -951,32 +951,29 @@ class _PropertyGrid(_Grid):
             property_name (str): The name of the property layer.
             mode (str): 'highest' or 'lowest'.
             mask (np.ndarray, optional): A boolean mask to restrict the selection.
-            return_list (bool, optional): If True, return a list of coordinates, otherwise return an ndarray.
+            return_list (bool, optional): If True, return a list of coordinates, otherwise return a mask.
 
         Returns:
-            list[Coordinate] or np.ndarray: Coordinates of cells with the extreme property value.
+            Union[list[Coordinate], np.ndarray]: List of coordinates or a boolean mask of cells with the extreme property value.
         """
         prop_values = self.properties[property_name].data
         if mask is not None:
-            masked_prop_values = np.where(mask, prop_values, np.nan)
-        else:
-            masked_prop_values = prop_values
+            prop_values = np.where(mask, prop_values, np.nan)
 
         if mode == "highest":
-            target_cells = np.column_stack(
-                np.where(masked_prop_values == np.nanmax(masked_prop_values))
-            )
+            extreme_value = np.nanmax(prop_values)
         elif mode == "lowest":
-            target_cells = np.column_stack(
-                np.where(masked_prop_values == np.nanmin(masked_prop_values))
-            )
+            extreme_value = np.nanmin(prop_values)
         else:
             raise ValueError(f"Invalid mode {mode}. Choose from 'highest' or 'lowest'.")
 
+        # Optimize the mask creation using numpy's inherent functions
+        target_mask = prop_values == extreme_value
+
         if return_list:
-            return list(map(tuple, target_cells))
+            return list(zip(*np.where(target_mask)))
         else:
-            return target_cells
+            return target_mask
 
     def move_agent_to_extreme_value_cell(
         self, agent: Agent, property_name: str, mode: str, mask: np.ndarray = None
