@@ -11,6 +11,7 @@ from matplotlib.ticker import MaxNLocator
 from solara.alias import rv
 
 import mesa
+from mesa.experimental.altair_grid import create_grid
 
 # Avoid interactive backend
 plt.switch_backend("agg")
@@ -75,6 +76,12 @@ def JupyterViz(
                     SpaceMatplotlib(
                         model, agent_portrayal, dependencies=[current_step.value]
                     )
+                elif space_drawer == "altair":
+                    # draw with the altair implementation
+                    SpaceAltair(
+                        model, agent_portrayal, dependencies=[current_step.value]
+                    )
+
                 elif space_drawer:
                     # if specified, draw agent space with an alternate renderer
                     space_drawer(model, agent_portrayal)
@@ -109,6 +116,9 @@ def JupyterViz(
                 SpaceMatplotlib(
                     model, agent_portrayal, dependencies=[current_step.value]
                 )
+            elif space_drawer == "altair":
+                # draw with the default implementation
+                SpaceAltair(model, agent_portrayal, dependencies=[current_step.value])
             elif space_drawer:
                 # if specified, draw agent space with an alternate renderer
                 space_drawer(model, agent_portrayal)
@@ -332,6 +342,12 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: Optional[List[any]] = 
         _draw_grid(space, space_ax, agent_portrayal)
     space_ax.set_axis_off()
     solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
+
+
+@solara.component
+def SpaceAltair(model, agent_portrayal, dependencies: Optional[List[any]] = None):
+    grid = create_grid(color="wealth")
+    grid(model)
 
 
 def _draw_grid(space, space_ax, agent_portrayal):
