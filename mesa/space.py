@@ -557,6 +557,16 @@ def is_lambda_function(function):
     )
 
 
+def is_numpy_ufunc(function):
+    return isinstance(function, np.ufunc)
+
+
+def ufunc_requires_additional_input(ufunc):
+    # NumPy ufuncs have a 'nargs' attribute indicating the number of input arguments
+    # For binary ufuncs (like np.add), nargs is 2
+    return ufunc.nargs > 1
+
+
 class PropertyLayer:
     """
     A class representing a layer of properties in a two-dimensional grid. Each cell in the grid
@@ -640,16 +650,17 @@ class PropertyLayer:
         if condition is None:
             np.copyto(self.data, value)  # In-place update
         else:
-            # Call the condition and check if the result is a boolean array
-            condition_result = condition(self.data)
-            if (
-                not isinstance(condition_result, np.ndarray)
-                or condition_result.shape != self.data.shape
-            ):
-                raise ValueError(
-                    "Result of condition must be a NumPy array with the same shape as the grid."
-                )
-            # Conditional in-place update
+            if is_numpy_ufunc(condition):
+                # Directly apply NumPy ufunc
+                condition_result = condition(self.data)
+            else:
+                # Vectorize non-ufunc conditions
+                vectorized_condition = np.vectorize(condition)
+                condition_result = vectorized_condition(self.data)
+
+            if not isinstance(condition_result, np.ndarray) or condition_result.shape != self.data.shape:
+                raise ValueError("Result of condition must be a NumPy array with the same shape as the grid.")
+
             np.copyto(self.data, value, where=condition_result)
 
     def modify_cell(self, position: Coordinate, operation, value=None):
@@ -684,20 +695,25 @@ class PropertyLayer:
             value: The value to be used if the operation is a NumPy ufunc. Ignored for lambda functions.
             condition_function: (Optional) A callable that returns a boolean array when applied to the data.
         """
+        condition_array = np.ones_like(self.data, dtype=bool)  # Default condition (all cells)
         if condition_function is not None:
-            condition_array = np.vectorize(condition_function)(self.data)
-        else:
-            condition_array = np.ones_like(self.data, dtype=bool)  # All cells
+            if is_numpy_ufunc(condition_function):
+                condition_array = condition_function(self.data)
+            else:
+                vectorized_condition = np.vectorize(condition_function)
+                condition_array = vectorized_condition(self.data)
 
         # Check if the operation is a lambda function or a NumPy ufunc
-        if is_lambda_function(operation):
-            # Lambda function case
-            modified_data = np.vectorize(operation)(self.data)
-        elif value is not None:
-            # NumPy ufunc case
-            modified_data = operation(self.data, value)
+        if is_numpy_ufunc(operation):
+            # Check if the ufunc requires an additional input
+            if ufunc_requires_additional_input(operation):
+                if value is None:
+                    raise ValueError("This ufunc requires an additional input value.")
+                modified_data = operation(self.data, value)
         else:
-            raise ValueError("Invalid operation or missing value for NumPy ufunc.")
+            # Vectorize non-ufunc operations
+            vectorized_operation = np.vectorize(operation)
+            modified_data = vectorized_operation(self.data)
 
         self.data = np.where(condition_array, modified_data, self.data)
 

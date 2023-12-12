@@ -308,7 +308,30 @@ class TestPropertyLayer(unittest.TestCase):
         # Check if the sum is correct
         self.assertEqual(np.sum(self.layer.data), 3 * 99 + 1)
 
-    # Modify Cells Test
+    def test_set_cells_with_random_condition(self):
+        # Probability for a cell to be updated
+        update_probability = 0.5
+
+        # Define a condition with a random part
+        condition = lambda val: np.random.rand() < update_probability
+
+        # Apply set_cells
+        self.layer.set_cells(True, condition)
+
+        # Count the number of cells that were set to True
+        true_count = np.sum(self.layer.data)
+
+        width = self.layer.width
+        height = self.layer.height
+
+        # Calculate expected range (with some tolerance for randomness)
+        expected_min = width * height * update_probability * 0.8
+        expected_max = width * height * update_probability * 1.2
+
+        # Check if the true_count falls within the expected range
+        assert expected_min <= true_count <= expected_max
+
+    # Modify Cell Test
     def test_modify_cell_lambda(self):
         self.layer.data = np.zeros((10, 10))
         self.layer.modify_cell((2, 2), lambda x: x + 5)
@@ -323,7 +346,7 @@ class TestPropertyLayer(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.layer.modify_cell((1, 1), np.add)  # Missing value for ufunc
 
-    # Select Cells Test
+    # Modify Cells Test
     def test_modify_cells_lambda(self):
         self.layer.data = np.zeros((10, 10))
         self.layer.modify_cells(lambda x: x + 2)
@@ -373,6 +396,42 @@ class TestPropertyLayer(unittest.TestCase):
         selected = self.layer.select_cells(lambda x: (x > 0.5) & (x < 0.75))
         for c in selected:
             self.assertTrue(0.5 < self.layer.data[c] < 0.75)
+
+    # More edge cases
+    def test_set_cells_with_numpy_ufunc(self):
+        # Set some cells to a specific value
+        self.layer.data[0:5, 0:5] = 5
+
+        # Use a numpy ufunc as a condition. Here, we're using `np.greater`
+        # which will return True for cells with values greater than 2.
+        condition = np.greater
+        self.layer.set_cells(10, lambda x: condition(x, 2))
+
+        # Check if cells that had value greater than 2 are now set to 10
+        updated_cells = self.layer.data[0:5, 0:5]
+        np.testing.assert_array_equal(updated_cells, np.full((5, 5), 10))
+
+        # Check if cells that had value 0 (less than or equal to 2) remain unchanged
+        unchanged_cells = self.layer.data[5:, 5:]
+        np.testing.assert_array_equal(unchanged_cells, np.zeros((5, 5)))
+
+    def test_modify_cell_boundary_condition(self):
+        self.layer.data = np.zeros((10, 10))
+        self.layer.modify_cell((0, 0), lambda x: x + 5)
+        self.layer.modify_cell((9, 9), lambda x: x + 5)
+        self.assertEqual(self.layer.data[0, 0], 5)
+        self.assertEqual(self.layer.data[9, 9], 5)
+
+    def test_aggregate_property_std_dev(self):
+        self.layer.data = np.arange(100).reshape(10, 10)
+        result = self.layer.aggregate_property(np.std)
+        self.assertAlmostEqual(result, np.std(np.arange(100)), places=5)
+
+    def test_data_type_consistency(self):
+        self.layer.data = np.zeros((10, 10), dtype=int)
+        self.layer.set_cell((5, 5), 5.5)
+        self.assertIsInstance(self.layer.data[5, 5], self.layer.data.dtype.type)
+
 
 
 class TestSingleGrid(unittest.TestCase):
