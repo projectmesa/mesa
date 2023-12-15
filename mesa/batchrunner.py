@@ -1,3 +1,4 @@
+import inspect
 import itertools
 from functools import partial
 from multiprocessing import Pool
@@ -198,3 +199,123 @@ def _collect_data(
         agent_dict.update(zip(dc.agent_reporters, data[2:]))
         all_agents_data.append(agent_dict)
     return model_data, all_agents_data
+
+
+def local_sensitivity_analysis(
+    model_cls: Type[Model],
+    custom_ranges: Optional[Dict[str, Tuple[Any, Any]]] = None,
+    variation_percent: float = 0.25,
+    variation_steps: int = 1,
+    variation_type: str = "relative",
+    num_replications: int = 25,
+    max_steps: int = 1000,
+    data_collection_period: int = -1,
+    display_progress: bool = True,
+) -> List[Dict[str, Any]]:
+    """
+    Conducts a local sensitivity analysis on a Mesa agent-based model, examining the effects of parameter
+    variations on model behavior. It supports both absolute and relative variations, and can handle custom
+    parameter ranges. The function also includes a default run with the model's baseline parameters for comparison.
+
+    Parameters
+    ----------
+    model_cls : Type[Model]
+        The Mesa model class to be analyzed. Must be a subclass of mesa.Model.
+
+    custom_ranges : Optional[Dict[str, Tuple[Any, Any]]], optional
+        Custom parameter range tuples (min, max) for each parameter. Overrides default ranges calculated using
+        variation_percent and variation_type.
+
+    variation_percent : float, optional
+        Percentage of the baseline parameter value used to calculate variation range. Represents fixed variation
+        for 'absolute' type and percentage variation for 'relative' type.
+
+    variation_steps : int, optional
+        Number of incremental steps to vary each parameter above and below its baseline value, defining the
+        granularity of the sensitivity analysis.
+
+    variation_type : str, optional
+        Specifies the variation method: 'absolute' for fixed amount variations or 'relative' for percentage-based
+        variations of the parameter value.
+
+    num_replications : int, optional
+        Number of repetitions for each parameter configuration to address model stochasticity.
+
+    max_steps : int, optional
+        Maximum simulation steps for each parameter configuration run.
+
+    data_collection_period : int, optional
+        Interval of simulation steps for data collection. A value of -1 indicates end-of-simulation data collection.
+
+    display_progress : bool, optional
+        Enables a progress bar during the execution of the batch runs.
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        A collection of dictionaries, each representing the results from a single model run. Includes parameter
+        values and collected data.
+
+    Notes
+    -----
+    - Designed primarily for numeric parameters. Non-numeric parameters remain at their default values.
+    - Automatically calculates step sizes for parameter variations based on the parameter type and specified range.
+    - Custom ranges are recommended for parameters with extreme baseline values to prevent unrealistic values.
+    - Includes a default run with baseline parameters to serve as a reference point for assessing the impact of
+      parameter variations.
+    """
+
+    # Validate the variation type
+    if variation_type not in ["absolute", "relative"]:
+        raise ValueError("variation_type must be 'absolute' or 'relative'")
+
+    # Retrieve default parameter values from the model's constructor
+    base_params = {
+        k: v.default
+        for k, v in inspect.signature(model_cls.__init__).parameters.items()
+        if v.default is not inspect.Parameter.empty
+    }
+
+    # Generate parameter variations including a default run
+    parameter_variations = {'default_run': 'default'}  # Initialize with a default run entry
+    for param, default_value in base_params.items():
+        # Skip non-numeric parameters
+        if not isinstance(default_value, (int, float)):
+            continue
+
+        # Initialize a set to hold the variation steps for the parameter
+        steps = set()
+
+        # Calculate variations based on the specified variation type
+        if variation_type == "absolute":
+            for step in range(-variation_steps, variation_steps + 1):
+                variation = 1 + step * (variation_percent / variation_steps)
+                new_value = default_value * variation
+                steps.add(new_value)
+        elif variation_type == "relative":
+            for step in range(-variation_steps, variation_steps + 1):
+                variation_amount = default_value * (variation_percent * step)
+                new_value = default_value + variation_amount
+                steps.add(new_value)
+
+        # Sort and store the calculated steps for the parameter
+        parameter_variations[param] = sorted(steps)
+
+    # Print the configurations being run
+    for param, values in parameter_variations.items():
+        print(f"Running {param}: {values}")
+
+    # Prepare parameters for batch_run, including the default run
+    parameters = {param: list(values) if param != 'default_run' else base_params
+                  for param, values in parameter_variations.items()}
+
+    # Execute batch run using the Mesa batch_run function
+    return batch_run(
+        model_cls=model_cls,
+        parameters=parameters,
+        number_processes=None,  # Use all CPUs
+        iterations=num_replications,
+        max_steps=max_steps,
+        data_collection_period=data_collection_period,
+        display_progress=display_progress,
+    )
