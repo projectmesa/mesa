@@ -202,120 +202,111 @@ def _collect_data(
 
 
 def local_sensitivity_analysis(
-    model_cls: Type[Model],
-    custom_ranges: Optional[Dict[str, Tuple[Any, Any]]] = None,
-    variation_percent: float = 0.25,
-    variation_steps: int = 1,
-    variation_type: str = "relative",
-    num_replications: int = 25,
-    max_steps: int = 1000,
-    data_collection_period: int = -1,
-    display_progress: bool = True,
+        model_cls: Type[Model],
+        common_range: List[float] = [0.8, 1.25],
+        specific_ranges: Optional[Dict[str, List[float]]] = None,
+        ignore_parameters: Optional[List[str]] = None,
+        relative_range: bool = True,
+        iterations: int = 10,
+        **kwargs
 ) -> List[Dict[str, Any]]:
     """
-    Conducts a local sensitivity analysis on a Mesa agent-based model, examining the effects of parameter
-    variations on model behavior. It supports both absolute and relative variations, and can handle custom
-    parameter ranges. The function also includes a default run with the model's baseline parameters for comparison.
+    Performs a sensitivity analysis on a given Mesa agent-based model class,
+    exploring how changes in model parameters affect the model's behavior.
+    This function allows for both relative and absolute variations in parameter values.
 
     Parameters
     ----------
     model_cls : Type[Model]
         The Mesa model class to be analyzed. Must be a subclass of mesa.Model.
 
-    custom_ranges : Optional[Dict[str, Tuple[Any, Any]]], optional
-        Custom parameter range tuples (min, max) for each parameter. Overrides default ranges calculated using
-        variation_percent and variation_type.
+    common_range : List[float], default=[0.8, 1.25]
+        A list of multipliers (for relative range) or values (for absolute range)
+        to be applied to each numeric parameter, unless overridden by specific_ranges.
 
-    variation_percent : float, optional
-        Percentage of the baseline parameter value used to calculate variation range. Represents fixed variation
-        for 'absolute' type and percentage variation for 'relative' type.
+    specific_ranges : Optional[Dict[str, List[float]]], default=None
+        A dictionary mapping parameter names to lists of multipliers or values.
+        These specific ranges override the common_range for the respective parameters.
 
-    variation_steps : int, optional
-        Number of incremental steps to vary each parameter above and below its baseline value, defining the
-        granularity of the sensitivity analysis.
+    ignore_parameters : Optional[List[str]], default=None
+        A list of parameter names to be excluded from the sensitivity analysis.
 
-    variation_type : str, optional
-        Specifies the variation method: 'absolute' for fixed amount variations or 'relative' for percentage-based
-        variations of the parameter value.
+    relative_range : bool, default=True
+        Determines whether the values in common_range and specific_ranges are
+        treated as relative multipliers (True) or absolute values (False).
+        Relative multipliers are multiplied by the default parameter value,
+        while absolute values are used as-is.
 
-    num_replications : int, optional
-        Number of repetitions for each parameter configuration to address model stochasticity.
+    iterations : int, default=10
+        The number of iterations to run for each parameter value. Is passed directly
+        to the Mesa batch_run function.
 
-    max_steps : int, optional
-        Maximum simulation steps for each parameter configuration run.
-
-    data_collection_period : int, optional
-        Interval of simulation steps for data collection. A value of -1 indicates end-of-simulation data collection.
-
-    display_progress : bool, optional
-        Enables a progress bar during the execution of the batch runs.
+    **kwargs
+        Additional keyword arguments to be passed directly to the Mesa batch_run function.
+        These can include 'iterations', 'max_steps', 'data_collection_period', etc.
 
     Returns
     -------
     List[Dict[str, Any]]
-        A collection of dictionaries, each representing the results from a single model run. Includes parameter
-        values and collected data.
+        A list of dictionaries, each representing the results of one model run.
+        Each dictionary includes the parameter values used for that run and the
+        data collected during the simulation.
 
     Notes
     -----
-    - Designed primarily for numeric parameters. Non-numeric parameters remain at their default values.
-    - Automatically calculates step sizes for parameter variations based on the parameter type and specified range.
-    - Custom ranges are recommended for parameters with extreme baseline values to prevent unrealistic values.
-    - Includes a default run with baseline parameters to serve as a reference point for assessing the impact of
-      parameter variations.
+    - Only numeric parameters (integers and floats) are varied. Non-numeric parameters
+      are ignored and set to their default values.
+    - All input arguments of the Model should have default values.
+    - For integer parameters, resulting values from relative variations are rounded
+      to the nearest integer, and duplicate values are eliminated.
+    - The function includes a default run (using the model's baseline parameters)
+      for comparison with varied parameter runs.
     """
+    # Check if all parameters of the model have default values
+    model_parameters = inspect.signature(model_cls.__init__).parameters
+    for name, param in model_parameters.items():
+        if param.default is inspect.Parameter.empty and name != 'self':
+            raise ValueError(f"All model parameters must have default values. "
+                             f"The parameter '{name}' does not have a default value.")
 
-    # Validate the variation type
-    if variation_type not in ["absolute", "relative"]:
-        raise ValueError("variation_type must be 'absolute' or 'relative'")
-
-    # Retrieve default parameter values from the model's constructor
-    base_params = {
-        k: v.default
-        for k, v in inspect.signature(model_cls.__init__).parameters.items()
-        if v.default is not inspect.Parameter.empty
-    }
-
-    # Generate parameter variations including a default run
-    parameter_variations = {'default_run': 'default'}  # Initialize with a default run entry
-    for param, default_value in base_params.items():
-        # Skip non-numeric parameters
-        if not isinstance(default_value, (int, float)):
+    # Retrieve default parameter values from the model's constructor and check for missing defaults
+    base_params = {}
+    for k, v in inspect.signature(model_cls.__init__).parameters.items():
+        if k == 'self' or k in (ignore_parameters or []):
             continue
+        if v.default is inspect.Parameter.empty:
+            raise ValueError(f"Input parameter '{k}' of {model_cls.__name__} does not have a default value, which is required for this local sensitivity analysis function.")
+        base_params[k] = v.default
 
-        # Initialize a set to hold the variation steps for the parameter
-        steps = set()
+    # Filter out non-numeric parameters
+    numeric_params = {k: v for k, v in base_params.items() if isinstance(v, (int, float))}
 
-        # Calculate variations based on the specified variation type
-        if variation_type == "absolute":
-            for step in range(-variation_steps, variation_steps + 1):
-                variation = 1 + step * (variation_percent / variation_steps)
-                new_value = default_value * variation
-                steps.add(new_value)
-        elif variation_type == "relative":
-            for step in range(-variation_steps, variation_steps + 1):
-                variation_amount = default_value * (variation_percent * step)
-                new_value = default_value + variation_amount
-                steps.add(new_value)
+    # Generate parameter variations
+    parameter_variations = {'default': base_params}  # Special entry for default run
+    for param, default_value in numeric_params.items():
+        # Apply specific range if available, otherwise use common range
+        ranges = specific_ranges.get(param, common_range)
 
-        # Sort and store the calculated steps for the parameter
-        parameter_variations[param] = sorted(steps)
+        if relative_range:
+            # Relative range: multiply the default value by each value in the range
+            varied_values = {default_value * multiplier for multiplier in ranges}
+        else:
+            # Absolute range: use the values directly
+            varied_values = set(ranges)
 
-    # Print the configurations being run
-    for param, values in parameter_variations.items():
-        print(f"Running {param}: {values}")
+        # Round integers and remove duplicates
+        if isinstance(default_value, int):
+            varied_values = {round(val) for val in varied_values}
 
-    # Prepare parameters for batch_run, including the default run
-    parameters = {param: list(values) if param != 'default_run' else base_params
-                  for param, values in parameter_variations.items()}
+        parameter_variations[param] = sorted(varied_values)
+
+    # Prepare parameters for batch_run
+    parameters = {param: values for param, values in parameter_variations.items()}
 
     # Execute batch run using the Mesa batch_run function
     return batch_run(
         model_cls=model_cls,
         parameters=parameters,
-        number_processes=None,  # Use all CPUs
-        iterations=num_replications,
-        max_steps=max_steps,
-        data_collection_period=data_collection_period,
-        display_progress=display_progress,
+        iterations=iterations,
+        **kwargs
     )
