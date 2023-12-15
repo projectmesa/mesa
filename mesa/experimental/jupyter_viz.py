@@ -149,6 +149,12 @@ def JupyterViz(
                 ModelController(model, play_interval, current_step, reset_counter)
             with solara.Card("Progress", margin=1, elevation=2):
                 solara.Markdown(md_text=f"####Step - {current_step}")
+            with solara.Card("Analytics", margin=1, elevation=2):
+                df = model.datacollector.get_model_vars_dataframe()
+                for col in list(df.columns):
+                    solara.Markdown(
+                        md_text=f"####Avg. {col} - {df.loc[:, f'{col}'].mean()}"
+                    )
 
         items = [
             ColorCard(color="white", layout_type=layout_types[i])
@@ -440,7 +446,7 @@ def get_initial_grid_layout(layout_types):
     grid_lay = []
     y_coord = 0
     for ii in range(len(layout_types)):
-        template_layout = {"h": 10, "i": 0, "moved": False, "w": 6, "y": 0, "x": 0}
+        template_layout = {"h": 20, "i": 0, "moved": False, "w": 6, "y": 0, "x": 0}
         if ii == 0:
             grid_lay.append(template_layout)
         else:

@@ -10,7 +10,6 @@ import mesa
 def get_agent_data_from_coord_iter(data):
     for agent, (x, y) in data:
         if agent:
-            print(agent[0], x, y)
             agent_data = json.loads(
                 json.dumps(agent[0].__dict__, skipkeys=True, default=str)
             )
@@ -40,7 +39,6 @@ def Grid(model, color=None, on_click=None):
     data = solara.reactive(
         list(get_agent_data_from_coord_iter(model.grid.coord_iter()))
     )
-    print("data-- ", data)
 
     def update_data():
         data.value = list(get_agent_data_from_coord_iter(model.grid.coord_iter()))
