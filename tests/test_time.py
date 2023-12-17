@@ -71,6 +71,7 @@ class MockModel(Model):
                               'staged' creates a StagedActivation scheduler.
                               The default scheduler is a BaseScheduler.
         """
+        super().__init__()
         self.log = []
         self.enable_kill_other_agent = enable_kill_other_agent
 
