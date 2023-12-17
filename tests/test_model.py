@@ -1,3 +1,4 @@
+from mesa.agent import Agent
 from mesa.model import Model
 
 
@@ -40,3 +41,13 @@ def test_reset_randomizer(newseed=42):
     assert model._seed == oldseed
     model.reset_randomizer(seed=newseed)
     assert model._seed == newseed
+
+
+def test_agent_types():
+    class TestAgent(Agent):
+        pass
+
+    model = Model()
+    test_agent = TestAgent(model.next_id(), model)
+    assert test_agent in model.agents[type(test_agent)]
+    assert type(test_agent) in model.agent_types
