@@ -42,11 +42,11 @@ class Agent:
         self.pos: Position | None = None
 
         # Register the agent with the model using defaultdict
-        self.model.agents[type(self)].add(self)
+        self.model.agents[type(self)].append(self)
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
-        self.model.agents[type(self)].discard(self)
+        self.model.agents[type(self)].remove(self)
 
     def step(self) -> None:
         """A single step of the agent."""
