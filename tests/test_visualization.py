@@ -33,6 +33,7 @@ class MockModel(Model):
     """Test model for testing"""
 
     def __init__(self, width, height, key1=103, key2=104):
+        super().__init__()
         self.width = width
         self.height = height
         self.key1 = (key1,)
