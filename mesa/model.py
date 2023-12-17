@@ -17,7 +17,18 @@ from mesa.datacollection import DataCollector
 
 
 class Model:
-    """Base class for models."""
+    """Base class for models in the Mesa ABM library.
+
+    This class serves as a foundational structure for creating agent-based models.
+    It includes the basic attributes and methods necessary for initializing and
+    running a simulation model.
+
+    Attributes:
+        running: A boolean indicating if the model should continue running.
+        schedule: An object to manage the order and execution of agent steps.
+        current_id: A counter for assigning unique IDs to agents.
+        agents: A defaultdict mapping each agent type to a set of its instances.
+    """
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """Create a new model object and instantiate its RNG automatically."""
@@ -32,11 +43,8 @@ class Model:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a new model. Overload this method with the actual code to
-        start the model.
-
-        Attributes:
-            schedule: schedule object
-            running: a bool indicating if the model should continue running
+        start the model. Always start with super().__init__() to initialize the
+        model object properly.
         """
 
         self.running = True
