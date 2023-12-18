@@ -27,7 +27,8 @@ class Model:
         running: A boolean indicating if the model should continue running.
         schedule: An object to manage the order and execution of agent steps.
         current_id: A counter for assigning unique IDs to agents.
-        agents: A defaultdict mapping each agent type to a list of its instances.
+        agents: A defaultdict mapping each agent type to a dict of its instances.
+                Agent instances are saved in the nested dict keys, with the values being None.
     """
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
@@ -50,7 +51,7 @@ class Model:
         self.running = True
         self.schedule = None
         self.current_id = 0
-        self.agents: defaultdict[type, list] = defaultdict(list)
+        self.agents: defaultdict[type, dict] = defaultdict(dict)
 
     @property
     def agent_types(self) -> list:
