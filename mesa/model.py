@@ -11,7 +11,7 @@ import random
 from collections import defaultdict
 
 # mypy
-from typing import Any
+from typing import Any, Callable
 
 from mesa.datacollection import DataCollector
 
@@ -106,3 +106,74 @@ class Model:
         )
         # Collect data for the first time during initialization.
         self.datacollector.collect(self)
+
+    def select_agents(
+        self,
+        n: int | None = None,
+        sort: list[str] | None = None,
+        direction: list[str] | None = None,
+        filter_func: Callable[[Any], bool] | None = None,
+        agent_type: type[Any] | list[type[Any]] | None = None,
+        up_to: bool = True,
+    ) -> list[Any]:
+        """
+        Select agents based on various criteria including type, attributes, and custom filters.
+
+        Args:
+            n: Number of agents to select.
+            sort: Attributes to sort by.
+            direction: Sort direction for each attribute in `sort`.
+            filter_func: A callable to further filter agents.
+            agent_type: Type(s) of agents to include.
+            up_to: If True, allows returning up to `n` agents.
+
+        Returns:
+            A list of selected agents.
+        """
+
+        # If agent_type is specified, fetch only those agents; otherwise, fetch all
+        if agent_type:
+            if not isinstance(agent_type, list):
+                agent_type = [agent_type]
+            agent_type_set = set(agent_type)
+            agents_iter = (
+                agent
+                for type_key, agents in self.agents.items()
+                if type_key in agent_type_set
+                for agent in agents
+            )
+        else:
+            agents_iter = (agent for agents in self.agents.values() for agent in agents)
+
+        # Apply functional filter if provided
+        if filter_func:
+            agents_iter = filter(filter_func, agents_iter)
+
+        # Convert to list if sorting is needed or n is specified
+        if sort and direction or n is not None:
+            agents_iter = list(agents_iter)
+
+        # If only a specific number of agents is needed without sorting, limit early
+        if n is not None and not (sort and direction):
+            agents_iter = (
+                agents_iter[: min(n, len(agents_iter))] if up_to else agents_iter[:n]
+            )
+
+        # Sort agents if needed
+        if sort and direction:
+
+            def sort_key(agent):
+                return tuple(
+                    getattr(agent, attr)
+                    if dir.lower() == "lowest"
+                    else -getattr(agent, attr)
+                    for attr, dir in zip(sort, direction)
+                )
+
+            agents_iter.sort(key=sort_key)
+
+        # Select the desired number of agents after sorting
+        if n is not None and sort and direction:
+            return agents_iter[: min(n, len(agents_iter))] if up_to else agents_iter[:n]
+
+        return list(agents_iter)
