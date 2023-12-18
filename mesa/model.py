@@ -152,6 +152,8 @@ class Model:
         # Convert to list if sorting is needed or n is specified
         if sort and direction or n is not None:
             agents_iter = list(agents_iter)
+            # If n is specified, shuffle the agents to avoid bias
+            self.random.shuffle(agents_iter)
 
         # If only a specific number of agents is needed without sorting, limit early
         if n is not None and not (sort and direction):
