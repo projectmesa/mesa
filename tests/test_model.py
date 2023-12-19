@@ -49,5 +49,5 @@ def test_agent_types():
 
     model = Model()
     test_agent = TestAgent(model.next_id(), model)
-    assert test_agent in model.agents[type(test_agent)]
+    assert test_agent in model.agents
     assert type(test_agent) in model.agent_types
