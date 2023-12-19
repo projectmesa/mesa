@@ -64,11 +64,14 @@ class Agent:
 
 
 class AgentSet:
+    """Ordered set of agents"""
+
     def __init__(self, agents: Iterable[Agent], model: Model):
         self._agents = weakref.WeakKeyDictionary()
-
+        self._indices = []
         for agent in agents:
             self._agents[agent] = None
+            self._indices.append(weakref.ref(agent))
 
         self.model = model
 
@@ -76,31 +79,28 @@ class AgentSet:
         return len(self._agents)
 
     def __iter__(self) -> Iterator[Agent]:
-        return iter(self._agents.keys())
+        return self._agents.keys()
 
     def __contains__(self, agent: Agent) -> bool:
         """Check if an agent is in the AgentSet."""
         return agent in self._agents
 
-    def select(self, filter_func: Callable[[Agent], bool] | None = None, inplace: bool = False) -> AgentSet:
+    def select(self, filter_func: Callable[[Agent], bool] | None = None, inplace: bool = False):
         if filter_func is None:
-            if inplace:
-                return self
-            else:
-                return AgentSet(list(self._agents.keys()), self.model)
+            return self if inplace else AgentSet(list(self._agents.keys()), self.model)
+
+        agents = [agent for agent in self._agents.keys() if filter_func(agent)]
+
+        if inplace:
+            self._reorder(agents)
+            return self
         else:
-            agents = [agent for agent in self._agents.keys() if filter_func(agent)]
+            return AgentSet(
+                agents,
+                self.model
+            )
 
-            if inplace:
-                self._reorder(agents)
-                return self
-            else:
-                return AgentSet(
-                    agents,
-                    self.model
-                )
-
-    def shuffle(self, inplace: bool = False) -> AgentSet:
+    def shuffle(self, inplace: bool = False):
         shuffled_agents = list(self._agents.keys())
         self.model.random.shuffle(shuffled_agents)
 
@@ -110,8 +110,8 @@ class AgentSet:
         else:
             return AgentSet(shuffled_agents, self.model)
 
-    def sort(self, key: Callable[[Agent], Any], reverse: bool = False, inplace: bool = False) -> AgentSet:
-        sorted_agents = sorted(list(self._agents.keys()), key=key, reverse=reverse)
+    def sort(self, key: Callable[[Agent], Any], reverse: bool = False, inplace: bool = False):
+        sorted_agents = sorted(self._agents.keys(), key=key, reverse=reverse)
 
         if inplace:
             self._reorder(sorted_agents)
@@ -121,13 +121,30 @@ class AgentSet:
 
     def _reorder(self, agents: Iterable[Agent]):
         _agents = weakref.WeakKeyDictionary()
+        _indices = []
         for agent in agents:
             _agents[agent] = None
+            _indices.append(weakref.ref(agent))
         self._agents = _agents
+        self._indices = _indices
 
     def do_each(self, method_name: str, *args, **kwargs) -> list[Any]:
+        """invoke method on each agent"""
         return [getattr(agent, method_name)(*args, **kwargs) for agent in self._agents]
 
+    def get_each(self, attr_name: str) -> list[Any]:
+        """get attribute value on each agent"""
+        return [getattr(agent, attr_name) for agent in self._agents]
 
+    def __getitem__(self, item: int) -> Agent:
+        # TODO::
+        # TBD:: it is a bit tricky to make this work
+        # part of the problem is that there is no weakreflist
+        agent = self._indices[item]()
+        if agent is None:
+            # the agent has been garbage collected
+            return None
+        else:
+            return self._agents[agent]
 
     # Additional methods like union, intersection, difference, etc., can be added as needed.
