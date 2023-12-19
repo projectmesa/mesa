@@ -13,6 +13,7 @@ from collections import defaultdict
 # mypy
 from typing import Any
 
+from mesa.agent import AgentSet
 from mesa.datacollection import DataCollector
 
 
@@ -51,12 +52,22 @@ class Model:
         self.running = True
         self.schedule = None
         self.current_id = 0
-        self.agents: defaultdict[type, dict] = defaultdict(dict)
+        self._agents: defaultdict[type, dict] = defaultdict(dict)
+
+    @property
+    def agents(self) -> AgentSet:
+        all_agents = set()
+        for agent_type in self._agents:
+            all_agents.update(self._agents[agent_type])
+        return AgentSet(all_agents, self)
 
     @property
     def agent_types(self) -> list:
         """Return a list of different agent types."""
-        return list(self.agents.keys())
+        return list(self._agents.keys())
+
+    def select_agents(self, *args, **kwargs) -> AgentSet:
+        return self.agents.select(*args, **kwargs)
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as

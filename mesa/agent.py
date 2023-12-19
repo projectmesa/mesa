@@ -10,7 +10,7 @@ from __future__ import annotations
 from random import Random
 
 # mypy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable, Iterator
 
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
@@ -41,12 +41,15 @@ class Agent:
         self.model = model
         self.pos: Position | None = None
 
-        # Register the agent with the model using defaultdict
-        self.model.agents[type(self)][self] = None
+        # Directly register the agent with the model
+        if type(self) not in self.model._agents:
+            self.model._agents[type(self)] = set()
+        self.model._agents[type(self)].add(self)
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
-        self.model.agents[type(self)].pop(self)
+        if type(self) in self.model._agents:
+            self.model._agents[type(self)].discard(self)
 
     def step(self) -> None:
         """A single step of the agent."""
@@ -57,3 +60,41 @@ class Agent:
     @property
     def random(self) -> Random:
         return self.model.random
+
+
+class AgentSet:
+    def __init__(self, agents: set[Agent], model: Model):
+        self._agents = agents
+        self.model = model
+
+    def __len__(self):
+        return len(self._agents)
+
+    def __iter__(self) -> Iterator[Agent]:
+        return iter(self._agents)
+
+    def __contains__(self, agent: Agent) -> bool:
+        """Check if an agent is in the AgentSet."""
+        return agent in self._agents
+
+    def select(self, filter_func: Callable[[Agent], bool] | None = None) -> AgentSet:
+        if filter_func is None:
+            return AgentSet(set(self._agents), self.model)
+        return AgentSet(
+            {agent for agent in self._agents if filter_func(agent)}, self.model
+        )
+
+    def shuffle(self) -> AgentSet:
+        shuffled_agents = list(self._agents)
+        self.model.random.shuffle(shuffled_agents)
+        return AgentSet(set(shuffled_agents), self.model)
+
+    def sort(self, key: Callable[[Agent], Any], reverse: bool = False) -> AgentSet:
+        sorted_agents = sorted(self._agents, key=key, reverse=reverse)
+        return AgentSet(set(sorted_agents), self.model)
+
+    def do_each(self, method_name: str):
+        for agent in self._agents:
+            getattr(agent, method_name)()
+
+    # Additional methods like union, intersection, difference, etc., can be added as needed.
