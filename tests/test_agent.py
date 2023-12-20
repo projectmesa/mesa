@@ -1,4 +1,5 @@
 import pytest
+import pickle
 
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model
@@ -60,3 +61,6 @@ def test_agentset():
 
     agentset.add(agents[0])
     assert agents[0] in agentset
+
+    anotherset = pickle.loads(pickle.dumps(agents))
+    assert all(a1.unique_id==a2.unique_id for a1, a2 in zip(anotherset, agents))
