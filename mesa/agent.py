@@ -159,5 +159,5 @@ class AgentSet(MutableSet):
         return dict(agents=list(self._agents.keys()), model=self.model)
 
     def __setstate__(self, state):
-        self.model = model
-        self._reorder(agents)
+        self.model = state['model']
+        self._reorder(state['agents'])
