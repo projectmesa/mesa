@@ -42,15 +42,16 @@ class Agent:
         self.model = model
         self.pos: Position | None = None
 
-        # Directly register the agent with the model
-        if type(self) not in self.model._agents:
-            self.model._agents[type(self)] = set()
-        self.model._agents[type(self)].add(self)
+        # register agent
+        self.model._agents[type(self)][self] = None
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
-        if type(self) in self.model._agents:
-            self.model._agents[type(self)].discard(self)
+        try:
+            # remove agent
+            self.model._agents[type(self)].pop(self)
+        except KeyError:
+            pass
 
     def step(self) -> None:
         """A single step of the agent."""
@@ -140,6 +141,9 @@ class AgentSet:
         # TODO::
         # TBD:: it is a bit tricky to make this work
         # part of the problem is that there is no weakreflist
+        #  might also be fixable through weakref.finalize
+        # TODO:: make slice also work
+        # item can be int or slice
         agent = self._indices[item]()
         if agent is None:
             # the agent has been garbage collected

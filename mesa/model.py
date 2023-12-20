@@ -8,6 +8,7 @@ Core Objects: Model
 from __future__ import annotations
 
 import random
+import itertools
 from collections import defaultdict
 
 # mypy
@@ -56,9 +57,7 @@ class Model:
 
     @property
     def agents(self) -> AgentSet:
-        all_agents = set()
-        for agent_type in self._agents:
-            all_agents.update(self._agents[agent_type])
+        all_agents = itertools.chain(*[agents_by_type.values() for agents_by_type in self._agents.values()])
         return AgentSet(all_agents, self)
 
     @property
@@ -66,8 +65,11 @@ class Model:
         """Return a list of different agent types."""
         return list(self._agents.keys())
 
-    def select_agents(self, *args, **kwargs) -> AgentSet:
-        return self.agents.select(*args, **kwargs)
+    def get_agents_of_type(self, agenttype:type) -> AgentSet:
+        return AgentSet(self._agents[agenttype].values(), self)
+
+    # def select_agents(self, *args, **kwargs) -> AgentSet:
+    #     return self.agents.select(*args, **kwargs)
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as
