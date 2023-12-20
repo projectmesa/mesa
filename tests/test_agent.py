@@ -62,5 +62,7 @@ def test_agentset():
     agentset.add(agents[0])
     assert agents[0] in agentset
 
-    anotherset = pickle.loads(pickle.dumps(agents))
-    assert all(a1.unique_id==a2.unique_id for a1, a2 in zip(anotherset, agents))
+    # because AgentSet uses weakrefs, we need hard refs as well....
+    other_agents, another_set = pickle.loads(pickle.dumps([agents, AgentSet(agents, model)]))
+    assert all(a1.unique_id==a2.unique_id for a1, a2 in zip(another_set, other_agents))
+    assert len(another_set) == len(other_agents)
