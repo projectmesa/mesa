@@ -101,7 +101,7 @@ class AgentSet(MutableSet):
             )
 
     def shuffle(self, inplace: bool = False)-> AgentSet:
-        shuffled_agents = list(self._agents.keys())
+        shuffled_agents = list(self)
         self.model.random.shuffle(shuffled_agents)
 
         if inplace:
