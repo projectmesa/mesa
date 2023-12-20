@@ -8,6 +8,7 @@ Core Objects: Agent
 from __future__ import annotations
 
 import weakref
+from collections.abc import MutableSet
 from random import Random
 
 # mypy
@@ -64,15 +65,13 @@ class Agent:
         return self.model.random
 
 
-class AgentSet:
+class AgentSet(MutableSet):
     """Ordered set of agents"""
 
     def __init__(self, agents: Iterable[Agent], model: Model):
         self._agents = weakref.WeakKeyDictionary()
-        self._indices = []
         for agent in agents:
             self._agents[agent] = None
-            self._indices.append(weakref.ref(agent))
 
         self.model = model
 
@@ -86,7 +85,7 @@ class AgentSet:
         """Check if an agent is in the AgentSet."""
         return agent in self._agents
 
-    def select(self, filter_func: Callable[[Agent], bool] | None = None, inplace: bool = False):
+    def select(self, filter_func: Callable[[Agent], bool] | None = None, inplace: bool = False) -> AgentSet:
         if filter_func is None:
             return self if inplace else AgentSet(list(self._agents.keys()), self.model)
 
@@ -101,7 +100,7 @@ class AgentSet:
                 self.model
             )
 
-    def shuffle(self, inplace: bool = False):
+    def shuffle(self, inplace: bool = False)-> AgentSet:
         shuffled_agents = list(self._agents.keys())
         self.model.random.shuffle(shuffled_agents)
 
@@ -111,7 +110,7 @@ class AgentSet:
         else:
             return AgentSet(shuffled_agents, self.model)
 
-    def sort(self, key: Callable[[Agent], Any], reverse: bool = False, inplace: bool = False):
+    def sort(self, key: Callable[[Agent], Any], reverse: bool = False, inplace: bool = False)-> AgentSet:
         sorted_agents = sorted(self._agents.keys(), key=key, reverse=reverse)
 
         if inplace:
@@ -122,12 +121,10 @@ class AgentSet:
 
     def _reorder(self, agents: Iterable[Agent]):
         _agents = weakref.WeakKeyDictionary()
-        _indices = []
         for agent in agents:
             _agents[agent] = None
-            _indices.append(weakref.ref(agent))
+
         self._agents = _agents
-        self._indices = _indices
 
     def do_each(self, method_name: str, *args, **kwargs) -> list[Any]:
         """invoke method on each agent"""
@@ -137,18 +134,23 @@ class AgentSet:
         """get attribute value on each agent"""
         return [getattr(agent, attr_name) for agent in self._agents]
 
-    def __getitem__(self, item: int) -> Agent:
-        # TODO::
-        # TBD:: it is a bit tricky to make this work
-        # part of the problem is that there is no weakreflist
-        #  might also be fixable through weakref.finalize
-        # TODO:: make slice also work
-        # item can be int or slice
-        agent = self._indices[item]()
-        if agent is None:
-            # the agent has been garbage collected
-            return None
-        else:
-            return self._agents[agent]
+    def __getitem__(self, item: int | slice) -> Agent:
+        return list(self._agents.keys())[item]
 
-    # Additional methods like union, intersection, difference, etc., can be added as needed.
+    def add(self, agent: Agent):
+        # abstract method from MutableSet
+        self._agents[agent] = None
+
+    def discard(self, agent: Agent):
+        # abstract method from MutableSet
+        # discard should not raise an error when
+        # item is not in set
+        try:
+            del self._agents[agent]
+        except KeyError:
+            pass
+
+    def remove(self, agent: Agent):
+        # remove should raise an error when
+        # item is not in set
+        del self._agents[agent]
