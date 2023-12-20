@@ -154,3 +154,10 @@ class AgentSet(MutableSet):
         # remove should raise an error when
         # item is not in set
         del self._agents[agent]
+
+    def __getstate__(self):
+        return dict(agents=list(self._agents.keys()), model=self.model)
+
+    def __setstate__(self, state):
+        self.model = model
+        self._reorder(agents)
