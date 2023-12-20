@@ -57,7 +57,7 @@ class Model:
 
     @property
     def agents(self) -> AgentSet:
-        all_agents = itertools.chain(*[agents_by_type.values() for agents_by_type in self._agents.values()])
+        all_agents = itertools.chain(*[agents_by_type.keys() for agents_by_type in self._agents.values()])
         return AgentSet(all_agents, self)
 
     @property
