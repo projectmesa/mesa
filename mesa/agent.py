@@ -87,7 +87,7 @@ class AgentSet(MutableSet):
 
     def select(self, filter_func: Callable[[Agent], bool] | None = None, inplace: bool = False) -> AgentSet:
         if filter_func is None:
-            return self if inplace else AgentSet(list(self._agents.keys()), self.model)
+            return self if inplace else AgentSet(iter(self), self.model)
 
         agents = [agent for agent in self._agents.keys() if filter_func(agent)]
 
