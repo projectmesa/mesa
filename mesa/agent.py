@@ -115,6 +115,7 @@ class AgentSet(MutableSet, Sequence):
         filter_func: Callable[[Agent], bool] | None = None,
         n: int = 0,
         inplace: bool = False,
+        agent_type: type[Agent] | None = None,
     ) -> AgentSet:
         """
         Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
@@ -124,14 +125,18 @@ class AgentSet(MutableSet, Sequence):
                 agent should be included in the result. Defaults to None, meaning no filtering is applied.
             n (int, optional): The number of agents to select. If 0, all matching agents are selected. Defaults to 0.
             inplace (bool, optional): If True, modifies the current AgentSet; otherwise, returns a new AgentSet. Defaults to False.
+            agent_type (type[Agent], optional): The class type of the agents to select. Defaults to None, meaning no type filtering is applied.
 
         Returns:
             AgentSet: A new AgentSet containing the selected agents, unless inplace is True, in which case the current AgentSet is updated.
         """
+        agents = list(self._agents.keys())
+
         if filter_func is not None:
-            agents = [agent for agent in self._agents if filter_func(agent)]
-        else:
-            agents = list(self._agents.keys())
+            agents = [agent for agent in agents if filter_func(agent)]
+
+        if agent_type is not None:
+            agents = [agent for agent in agents if isinstance(agent, agent_type)]
 
         if n:
             agents = agents[:n]
