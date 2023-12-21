@@ -29,8 +29,20 @@ class Model:
         running: A boolean indicating if the model should continue running.
         schedule: An object to manage the order and execution of agent steps.
         current_id: A counter for assigning unique IDs to agents.
-        agents: A defaultdict mapping each agent type to a dict of its instances.
-                Agent instances are saved in the nested dict keys, with the values being None.
+        _agents: A defaultdict mapping each agent type to a dict of its instances.
+                 This private attribute is used internally to manage agents.
+
+    Properties:
+        agents: An AgentSet containing all agents in the model, generated from the _agents attribute.
+        agent_types: A list of different agent types present in the model.
+
+    Methods:
+        get_agents_of_type: Returns an AgentSet of agents of the specified type.
+        run_model: Runs the model's simulation until a defined end condition is reached.
+        step: Executes a single step of the model's simulation process.
+        next_id: Generates and returns the next unique identifier for an agent.
+        reset_randomizer: Resets the model's random number generator with a new or existing seed.
+        initialize_data_collector: Sets up the data collector for the model, requiring an initialized scheduler and agents.
     """
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
@@ -57,6 +69,7 @@ class Model:
 
     @property
     def agents(self) -> AgentSet:
+        """Provides an AgentSet of all agents in the model, combining agents from all types."""
         all_agents = itertools.chain(
             *[agents_by_type.keys() for agents_by_type in self._agents.values()]
         )
@@ -68,10 +81,8 @@ class Model:
         return list(self._agents.keys())
 
     def get_agents_of_type(self, agenttype: type) -> AgentSet:
+        """Retrieves an AgentSet containing all agents of the specified type."""
         return AgentSet(self._agents[agenttype].values(), self)
-
-    # def select_agents(self, *args, **kwargs) -> AgentSet:
-    #     return self.agents.select(*args, **kwargs)
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as
