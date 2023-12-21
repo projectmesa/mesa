@@ -431,6 +431,54 @@ class _Grid:
         self.remove_agent(agent)
         self.place_agent(agent, pos)
 
+    def move_agent_to_one_of(
+        self,
+        agent: Agent,
+        pos: list[Coordinate],
+        selection: str = "random",
+    ) -> None:
+        """
+        Move an agent to one of the given positions.
+
+        Args:
+            agent: Agent object to move. Assumed to have its current location stored in a 'pos' tuple.
+            pos: List of possible positions.
+            selection: String, either "random" (default) or "closest". If "closest" is selected and multiple
+                       cells are the same distance, one is chosen randomly.
+        """
+        # Handle list of positions
+        if selection == "random":
+            chosen_pos = agent.random.choice(pos)
+        elif selection == "closest":
+            current_pos = agent.pos
+            # Find the closest position without sorting all positions
+            closest_pos = None
+            min_distance = float("inf")
+            for p in pos:
+                distance = self._distance_squared(p, current_pos)
+                if distance < min_distance:
+                    min_distance = distance
+                    closest_pos = p
+            chosen_pos = closest_pos
+        else:
+            raise ValueError(
+                f"Invalid selection method {selection}. Choose 'random' or 'closest'."
+            )
+
+        # Move agent
+        self.move_agent(agent, chosen_pos)
+
+    def _distance_squared(self, pos1: Coordinate, pos2: Coordinate) -> float:
+        """
+        Calculate the squared Euclidean distance between two points for performance.
+        """
+        # Use squared Euclidean distance to avoid sqrt operation
+        dx, dy = abs(pos1[0] - pos2[0]), abs(pos1[1] - pos2[1])
+        if self.torus:
+            dx = min(dx, self.width - dx)
+            dy = min(dy, self.height - dy)
+        return dx**2 + dy**2
+
     def swap_pos(self, agent_a: Agent, agent_b: Agent) -> None:
         """Swap agents positions"""
         agents_no_pos = []
