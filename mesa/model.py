@@ -7,8 +7,8 @@ Core Objects: Model
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
-import random
 import itertools
+import random
 from collections import defaultdict
 
 # mypy

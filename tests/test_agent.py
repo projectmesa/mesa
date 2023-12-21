@@ -1,5 +1,6 @@
-import pytest
 import pickle
+
+import pytest
 
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model

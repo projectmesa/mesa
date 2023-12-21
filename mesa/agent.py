@@ -7,13 +7,14 @@ Core Objects: Agent
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
+import contextlib
 import operator
 import weakref
 from collections.abc import MutableSet, Sequence
 from random import Random
 
 # mypy
-from typing import TYPE_CHECKING, Any, Callable, Iterator, Iterable
+from typing import TYPE_CHECKING, Any, Callable, Iterable, Iterator
 
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
@@ -103,7 +104,7 @@ class AgentSet(MutableSet, Sequence):
 
         """
         if filter_func is not None:
-            agents = [agent for agent in self._agents.keys() if filter_func(agent)]
+            agents = [agent for agent in self._agents if filter_func(agent)]
         else:
             agents = list(self._agents.keys())
 
@@ -185,10 +186,8 @@ class AgentSet(MutableSet, Sequence):
         # abstract method from MutableSet
         # discard should not raise an error when
         # item is not in set
-        try:
+        with contextlib.suppress(KeyError):
             del self._agents[agent]
-        except KeyError:
-            pass
 
     def remove(self, agent: Agent):
         # remove should raise an error when
@@ -196,7 +195,7 @@ class AgentSet(MutableSet, Sequence):
         del self._agents[agent]
 
     def __getstate__(self):
-        return dict(agents=list(self._agents.keys()), model=self.model)
+        return {"agents": list(self._agents.keys()), "model": self.model}
 
     def __setstate__(self, state):
         self.model = state["model"]
