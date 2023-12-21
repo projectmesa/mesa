@@ -109,7 +109,7 @@ class AgentSet(MutableSet, Sequence):
 
     def shuffle(self, inplace: bool = False) -> AgentSet:
         shuffled_agents = list(self)
-        self.model.random.shuffle(shuffled_agents)
+        self.random.shuffle(shuffled_agents)
 
         return AgentSet(shuffled_agents, self.model) if not inplace else self._update(shuffled_agents)
 
@@ -181,6 +181,10 @@ class AgentSet(MutableSet, Sequence):
     def __setstate__(self, state):
         self.model = state['model']
         self._update(state['agents'])
+
+    @property
+    def random(self) -> Random:
+        return self.model.random
 
 
 # consider adding for performance reasons
