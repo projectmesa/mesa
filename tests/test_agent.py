@@ -175,3 +175,34 @@ def test_agentset_get_attribute():
 
     with pytest.raises(AttributeError):
         agentset.get("non_existing_attribute")
+
+
+class OtherAgentType(Agent):
+    def get_unique_identifier(self):
+        return self.unique_id
+
+
+def test_agentset_select_by_type():
+    model = Model()
+    # Create a mix of agents of two different types
+    test_agents = [TestAgent(model.next_id(), model) for _ in range(4)]
+    other_agents = [OtherAgentType(model.next_id(), model) for _ in range(6)]
+
+    # Combine the two types of agents
+    mixed_agents = test_agents + other_agents
+    agentset = AgentSet(mixed_agents, model)
+
+    # Test selection by type
+    selected_test_agents = agentset.select(agent_type=TestAgent)
+    assert len(selected_test_agents) == len(test_agents)
+    assert all(isinstance(agent, TestAgent) for agent in selected_test_agents)
+    assert len(selected_test_agents) == 4
+
+    selected_other_agents = agentset.select(agent_type=OtherAgentType)
+    assert len(selected_other_agents) == len(other_agents)
+    assert all(isinstance(agent, OtherAgentType) for agent in selected_other_agents)
+    assert len(selected_other_agents) == 6
+
+    # Test with no type specified (should select all agents)
+    all_agents = agentset.select()
+    assert len(all_agents) == len(mixed_agents)
