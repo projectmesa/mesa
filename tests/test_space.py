@@ -327,6 +327,33 @@ class TestSingleGrid(unittest.TestCase):
         assert self.space[initial_pos[0]][initial_pos[1]] is None
         assert self.space[final_pos[0]][final_pos[1]] == _agent
 
+    def test_move_agent_random_selection(self):
+        agent = self.agents[0]
+        possible_positions = [(10, 10), (20, 20), (30, 30)]
+        self.space.move_agent_to_one_of(agent, possible_positions, selection="random")
+        assert agent.pos in possible_positions
+
+    def test_move_agent_closest_selection(self):
+        agent = self.agents[0]
+        agent.pos = (5, 5)
+        possible_positions = [(6, 6), (10, 10), (20, 20)]
+        self.space.move_agent_to_one_of(agent, possible_positions, selection="closest")
+        assert agent.pos == (6, 6)
+
+    def test_move_agent_invalid_selection(self):
+        agent = self.agents[0]
+        possible_positions = [(10, 10), (20, 20), (30, 30)]
+        with self.assertRaises(ValueError):
+            self.space.move_agent_to_one_of(
+                agent, possible_positions, selection="invalid_option"
+            )
+
+    def test_distance_squared(self):
+        pos1 = (3, 4)
+        pos2 = (0, 0)
+        expected_distance_squared = 3**2 + 4**2
+        assert self.space._distance_squared(pos1, pos2) == expected_distance_squared
+
     def test_iter_cell_list_contents(self):
         """
         Test neighborhood retrieval
@@ -348,6 +375,44 @@ class TestSingleGrid(unittest.TestCase):
             self.space.iter_cell_list_contents((TEST_AGENTS_GRID[0], (0, 0)))
         )
         assert len(cell_list_4) == 1
+
+
+class TestSingleGridTorus(unittest.TestCase):
+    def setUp(self):
+        self.space = SingleGrid(50, 50, True)  # Torus is True here
+        self.agents = []
+        for i, pos in enumerate(TEST_AGENTS_GRID):
+            a = MockAgent(i, None)
+            self.agents.append(a)
+            self.space.place_agent(a, pos)
+
+    def test_move_agent_random_selection(self):
+        agent = self.agents[0]
+        possible_positions = [(49, 49), (1, 1), (25, 25)]
+        self.space.move_agent_to_one_of(agent, possible_positions, selection="random")
+        assert agent.pos in possible_positions
+
+    def test_move_agent_closest_selection(self):
+        agent = self.agents[0]
+        agent.pos = (0, 0)
+        possible_positions = [(3, 3), (49, 49), (25, 25)]
+        self.space.move_agent_to_one_of(agent, possible_positions, selection="closest")
+        # Expecting (49, 49) to be the closest in a torus grid
+        assert agent.pos == (49, 49)
+
+    def test_move_agent_invalid_selection(self):
+        agent = self.agents[0]
+        possible_positions = [(10, 10), (20, 20), (30, 30)]
+        with self.assertRaises(ValueError):
+            self.space.move_agent_to_one_of(
+                agent, possible_positions, selection="invalid_option"
+            )
+
+    def test_distance_squared_torus(self):
+        pos1 = (0, 0)
+        pos2 = (49, 49)
+        expected_distance_squared = 1**2 + 1**2  # In torus, these points are close
+        assert self.space._distance_squared(pos1, pos2) == expected_distance_squared
 
 
 class TestSingleNetworkGrid(unittest.TestCase):
