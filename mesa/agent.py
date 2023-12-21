@@ -165,7 +165,7 @@ class AgentSet(MutableSet, Sequence):
     def sort(
         self,
         key: Callable[[Agent], Any] | str,
-        reverse: bool = False,
+        ascending: bool = False,
         inplace: bool = False,
     ) -> AgentSet:
         """
@@ -173,7 +173,7 @@ class AgentSet(MutableSet, Sequence):
 
         Args:
             key (Callable[[Agent], Any] | str): A function or attribute name based on which the agents are sorted.
-            reverse (bool, optional): If True, the agents are sorted in descending order. Defaults to False.
+            ascending (bool, optional): If True, the agents are sorted in ascending order. Defaults to False.
             inplace (bool, optional): If True, sorts the agents in the current AgentSet; otherwise, returns a new sorted AgentSet. Defaults to False.
 
         Returns:
@@ -182,7 +182,7 @@ class AgentSet(MutableSet, Sequence):
         if isinstance(key, str):
             key = operator.attrgetter(key)
 
-        sorted_agents = sorted(self._agents.keys(), key=key, reverse=reverse)
+        sorted_agents = sorted(self._agents.keys(), key=key, reverse=not ascending)
 
         return (
             AgentSet(sorted_agents, self.model)
