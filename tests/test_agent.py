@@ -53,11 +53,11 @@ def test_agentset():
 
     assert all(
         a1 == a2
-        for a1, a2 in zip(agentset.sort(test_function, reverse=True), agentset[::-1])
+        for a1, a2 in zip(agentset.sort(test_function, ascending=False), agentset[::-1])
     )
     assert all(
         a1 == a2
-        for a1, a2 in zip(agentset.sort("unique_id", reverse=True), agentset[::-1])
+        for a1, a2 in zip(agentset.sort("unique_id", ascending=False), agentset[::-1])
     )
 
     assert all(
