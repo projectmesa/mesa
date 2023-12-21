@@ -50,11 +50,8 @@ class Agent:
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
-        try:
-            # remove agent
+        with contextlib.suppress(KeyError):
             self.model._agents[type(self)].pop(self)
-        except KeyError:
-            pass
 
     def step(self) -> None:
         """A single step of the agent."""

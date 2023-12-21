@@ -82,7 +82,7 @@ def test_agentset():
     assert agents[0] in agentset
 
     # because AgentSet uses weakrefs, we need hard refs as well....
-    other_agents, another_set = pickle.loads(
+    other_agents, another_set = pickle.loads(  # noqa: S301
         pickle.dumps([agents, AgentSet(agents, model)])
     )
     assert all(
