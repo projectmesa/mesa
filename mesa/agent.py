@@ -7,8 +7,9 @@ Core Objects: Agent
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
+import operator
 import weakref
-from collections.abc import MutableSet
+from collections.abc import MutableSet, Sequence
 from random import Random
 
 # mypy
@@ -65,7 +66,7 @@ class Agent:
         return self.model.random
 
 
-class AgentSet(MutableSet):
+class AgentSet(MutableSet, Sequence):
     """Ordered set of agents"""
 
     def __init__(self, agents: Iterable[Agent], model: Model):
@@ -85,53 +86,72 @@ class AgentSet(MutableSet):
         """Check if an agent is in the AgentSet."""
         return agent in self._agents
 
-    def select(self, filter_func: Callable[[Agent], bool] | None = None, inplace: bool = False) -> AgentSet:
-        if filter_func is None:
-            return self if inplace else AgentSet(iter(self), self.model)
+    def select(self, filter_func: Callable[[Agent], bool] | None = None, n: int = 0, inplace: bool = False) -> AgentSet:
+        """select agents from AgentSet
 
-        agents = [agent for agent in self._agents.keys() if filter_func(agent)]
+        Args:
+            filter_func (Callable[[Agent]]): function to filter agents. Function should return True if agent is to be
+                                             included, false otherwise
+            n (int, optional): number of agents to return. Defaults to 0, meaning all agents are returned
+            inplace (bool, optional): updates agentset inplace if True, else return new Agentset. Defaults to False.
 
-        if inplace:
-            self._reorder(agents)
-            return self
+
+        """
+        if filter_func is not None:
+            agents = [agent for agent in self._agents.keys() if filter_func(agent)]
         else:
-            return AgentSet(
-                agents,
-                self.model
-            )
+            agents = list(self._agents.keys())
 
-    def shuffle(self, inplace: bool = False)-> AgentSet:
+        if n:
+            agents = agents[:n]
+
+        return AgentSet(agents, self.model) if not inplace else self._update(agents)
+
+    def shuffle(self, inplace: bool = False) -> AgentSet:
         shuffled_agents = list(self)
         self.model.random.shuffle(shuffled_agents)
 
-        if inplace:
-            self._reorder(shuffled_agents)
-            return self
-        else:
-            return AgentSet(shuffled_agents, self.model)
+        return AgentSet(shuffled_agents, self.model) if not inplace else self._update(shuffled_agents)
 
-    def sort(self, key: Callable[[Agent], Any], reverse: bool = False, inplace: bool = False)-> AgentSet:
+    def sort(self, key: Callable[[Agent], Any]|str, reverse: bool = False, inplace: bool = False) -> AgentSet:
+        if isinstance(key, str):
+            key = operator.attrgetter(key)
+
         sorted_agents = sorted(self._agents.keys(), key=key, reverse=reverse)
 
-        if inplace:
-            self._reorder(sorted_agents)
-            return self
-        else:
-            return AgentSet(sorted_agents, self.model)
+        return AgentSet(sorted_agents, self.model) if not inplace else self._update(sorted_agents)
 
-    def _reorder(self, agents: Iterable[Agent]):
+    def _update(self, agents: Iterable[Agent]):
         _agents = weakref.WeakKeyDictionary()
         for agent in agents:
             _agents[agent] = None
 
         self._agents = _agents
+        return self
 
-    def do_each(self, method_name: str, *args, **kwargs) -> list[Any]:
-        """invoke method on each agent"""
-        return [getattr(agent, method_name)(*args, **kwargs) for agent in self._agents]
+    def do(self, method_name: str, *args, return_results: bool = False, **kwargs) -> AgentSet | list[Any]:
+        """invoke method on each agent
 
-    def get_each(self, attr_name: str) -> list[Any]:
-        """get attribute value on each agent"""
+        Args:
+            method_name (str): name of the method to call on each agent
+            return_results (bool): whether to return the result from the method call or
+                                   return the AgentSet itself. Defaults to False, so you can
+                                   continue method chaining
+
+        Additional arguments and keyword arguments will be passed to the method being called
+
+        """
+        res = [getattr(agent, method_name)(*args, **kwargs) for agent in self._agents]
+
+        return res if return_results else self
+
+    def get(self, attr_name: str) -> list[Any]:
+        """get attribute value on each agent
+
+        Args:
+            attr_name (str): name of the attribute to get from eahc agent in the set
+
+        """
         return [getattr(agent, attr_name) for agent in self._agents]
 
     def __getitem__(self, item: int | slice) -> Agent:
@@ -160,4 +180,9 @@ class AgentSet(MutableSet):
 
     def __setstate__(self, state):
         self.model = state['model']
-        self._reorder(state['agents'])
+        self._update(state['agents'])
+
+
+# consider adding for performance reasons
+# for Sequence: __reversed__, index, and count
+# for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__

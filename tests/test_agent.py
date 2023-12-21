@@ -40,17 +40,24 @@ def test_agentset():
         return agent.unique_id > 5
 
     assert len(agentset.select(test_function)) == 5
+    assert len(agentset.select(test_function, n=2)) == 2
     assert len(agentset.select(test_function, inplace=True)) == 5
     assert agentset.select(inplace=True) == agentset
     assert all(a1 == a2 for a1, a2 in zip(agentset.select(), agentset))
+    assert all(a1 == a2 for a1, a2 in zip(agentset.select(n=5), agentset[:5]))
+
+    assert len(agentset.shuffle().select(n=5)) == 5
 
     def test_function(agent):
         return agent.unique_id
 
     assert all(a1 == a2 for a1, a2 in zip(agentset.sort(test_function, reverse=True), agentset[::-1]))
+    assert all(a1 == a2 for a1, a2 in zip(agentset.sort("unique_id", reverse=True), agentset[::-1]))
 
-    assert all(a1 == a2.unique_id for a1, a2 in zip(agentset.get_each("unique_id"), agentset))
-    assert all(a1 == a2.unique_id for a1, a2 in zip(agentset.do_each("get_unique_identifier"), agentset))
+    assert all(a1 == a2.unique_id for a1, a2 in zip(agentset.get("unique_id"), agentset))
+    assert all(a1 == a2.unique_id for a1, a2 in zip(agentset.do("get_unique_identifier", return_results=True), agentset))
+    assert agentset == agentset.do("get_unique_identifier")
+
 
     agentset.discard(agents[0])
     assert agents[0] not in agentset
