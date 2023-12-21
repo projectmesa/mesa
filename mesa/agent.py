@@ -86,7 +86,12 @@ class AgentSet(MutableSet, Sequence):
         """Check if an agent is in the AgentSet."""
         return agent in self._agents
 
-    def select(self, filter_func: Callable[[Agent], bool] | None = None, n: int = 0, inplace: bool = False) -> AgentSet:
+    def select(
+        self,
+        filter_func: Callable[[Agent], bool] | None = None,
+        n: int = 0,
+        inplace: bool = False,
+    ) -> AgentSet:
         """select agents from AgentSet
 
         Args:
@@ -111,15 +116,28 @@ class AgentSet(MutableSet, Sequence):
         shuffled_agents = list(self)
         self.random.shuffle(shuffled_agents)
 
-        return AgentSet(shuffled_agents, self.model) if not inplace else self._update(shuffled_agents)
+        return (
+            AgentSet(shuffled_agents, self.model)
+            if not inplace
+            else self._update(shuffled_agents)
+        )
 
-    def sort(self, key: Callable[[Agent], Any]|str, reverse: bool = False, inplace: bool = False) -> AgentSet:
+    def sort(
+        self,
+        key: Callable[[Agent], Any] | str,
+        reverse: bool = False,
+        inplace: bool = False,
+    ) -> AgentSet:
         if isinstance(key, str):
             key = operator.attrgetter(key)
 
         sorted_agents = sorted(self._agents.keys(), key=key, reverse=reverse)
 
-        return AgentSet(sorted_agents, self.model) if not inplace else self._update(sorted_agents)
+        return (
+            AgentSet(sorted_agents, self.model)
+            if not inplace
+            else self._update(sorted_agents)
+        )
 
     def _update(self, agents: Iterable[Agent]):
         _agents = weakref.WeakKeyDictionary()
@@ -129,7 +147,9 @@ class AgentSet(MutableSet, Sequence):
         self._agents = _agents
         return self
 
-    def do(self, method_name: str, *args, return_results: bool = False, **kwargs) -> AgentSet | list[Any]:
+    def do(
+        self, method_name: str, *args, return_results: bool = False, **kwargs
+    ) -> AgentSet | list[Any]:
         """invoke method on each agent
 
         Args:
@@ -179,8 +199,8 @@ class AgentSet(MutableSet, Sequence):
         return dict(agents=list(self._agents.keys()), model=self.model)
 
     def __setstate__(self, state):
-        self.model = state['model']
-        self._update(state['agents'])
+        self.model = state["model"]
+        self._update(state["agents"])
 
     @property
     def random(self) -> Random:

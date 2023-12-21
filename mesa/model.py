@@ -57,7 +57,9 @@ class Model:
 
     @property
     def agents(self) -> AgentSet:
-        all_agents = itertools.chain(*[agents_by_type.keys() for agents_by_type in self._agents.values()])
+        all_agents = itertools.chain(
+            *[agents_by_type.keys() for agents_by_type in self._agents.values()]
+        )
         return AgentSet(all_agents, self)
 
     @property
@@ -65,7 +67,7 @@ class Model:
         """Return a list of different agent types."""
         return list(self._agents.keys())
 
-    def get_agents_of_type(self, agenttype:type) -> AgentSet:
+    def get_agents_of_type(self, agenttype: type) -> AgentSet:
         return AgentSet(self._agents[agenttype].values(), self)
 
     # def select_agents(self, *args, **kwargs) -> AgentSet:
