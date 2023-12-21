@@ -67,6 +67,9 @@ class Model:
         self.current_id = 0
         self._agents: defaultdict[type, dict] = defaultdict(dict)
 
+        # Warning flags for current experimental features. These make sure a warning is only printed once per model.
+        self.agentset_experimental_warning_given = False
+
     @property
     def agents(self) -> AgentSet:
         """Provides an AgentSet of all agents in the model, combining agents from all types."""
