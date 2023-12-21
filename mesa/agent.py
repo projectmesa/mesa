@@ -149,7 +149,7 @@ class AgentSet(MutableSet, Sequence):
         """get attribute value on each agent
 
         Args:
-            attr_name (str): name of the attribute to get from eahc agent in the set
+            attr_name (str): name of the attribute to get from each agent in the set
 
         """
         return [getattr(agent, attr_name) for agent in self._agents]
