@@ -65,9 +65,33 @@ class Agent:
 
 
 class AgentSet(MutableSet, Sequence):
-    """Ordered set of agents"""
+    """
+    A collection class that represents an ordered set of agents within an agent-based model (ABM). This class
+    extends both MutableSet and Sequence, providing set-like functionality with order preservation and
+    sequence operations.
+
+    Attributes:
+        model (Model): The ABM model instance to which this AgentSet belongs.
+
+    Methods:
+        __len__, __iter__, __contains__, select, shuffle, sort, _update, do, get, __getitem__,
+        add, discard, remove, __getstate__, __setstate__, random
+
+    Note:
+        The AgentSet maintains weak references to agents, allowing for efficient management of agent lifecycles
+        without preventing garbage collection. It is associated with a specific model instance, enabling
+        interactions with the model's environment and other agents.The implementation uses a WeakKeyDictionary to store agents,
+        which means that agents not referenced elsewhere in the program may be automatically removed from the AgentSet.
+    """
 
     def __init__(self, agents: Iterable[Agent], model: Model):
+        """
+        Initializes the AgentSet with a collection of agents and a reference to the model.
+
+        Args:
+            agents (Iterable[Agent]): An iterable of Agent objects to be included in the set.
+            model (Model): The ABM model instance to which this AgentSet belongs.
+        """
         self._agents = weakref.WeakKeyDictionary()
         for agent in agents:
             self._agents[agent] = None
@@ -75,13 +99,15 @@ class AgentSet(MutableSet, Sequence):
         self.model = model
 
     def __len__(self) -> int:
+        """Return the number of agents in the AgentSet."""
         return len(self._agents)
 
     def __iter__(self) -> Iterator[Agent]:
+        """Provide an iterator over the agents in the AgentSet."""
         return self._agents.keys()
 
     def __contains__(self, agent: Agent) -> bool:
-        """Check if an agent is in the AgentSet."""
+        """Check if an agent is in the AgentSet. Can be used like `agent in agentset`."""
         return agent in self._agents
 
     def select(
@@ -90,15 +116,17 @@ class AgentSet(MutableSet, Sequence):
         n: int = 0,
         inplace: bool = False,
     ) -> AgentSet:
-        """select agents from AgentSet
+        """
+        Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
 
         Args:
-            filter_func (Callable[[Agent]]): function to filter agents. Function should return True if agent is to be
-                                             included, false otherwise
-            n (int, optional): number of agents to return. Defaults to 0, meaning all agents are returned
-            inplace (bool, optional): updates agentset inplace if True, else return new Agentset. Defaults to False.
+            filter_func (Callable[[Agent], bool], optional): A function that takes an Agent and returns True if the
+                agent should be included in the result. Defaults to None, meaning no filtering is applied.
+            n (int, optional): The number of agents to select. If 0, all matching agents are selected. Defaults to 0.
+            inplace (bool, optional): If True, modifies the current AgentSet; otherwise, returns a new AgentSet. Defaults to False.
 
-
+        Returns:
+            AgentSet: A new AgentSet containing the selected agents, unless inplace is True, in which case the current AgentSet is updated.
         """
         if filter_func is not None:
             agents = [agent for agent in self._agents if filter_func(agent)]
@@ -111,6 +139,15 @@ class AgentSet(MutableSet, Sequence):
         return AgentSet(agents, self.model) if not inplace else self._update(agents)
 
     def shuffle(self, inplace: bool = False) -> AgentSet:
+        """
+        Randomly shuffle the order of agents in the AgentSet.
+
+        Args:
+            inplace (bool, optional): If True, shuffles the agents in the current AgentSet; otherwise, returns a new shuffled AgentSet. Defaults to False.
+
+        Returns:
+            AgentSet: A shuffled AgentSet. Returns the current AgentSet if inplace is True.
+        """
         shuffled_agents = list(self)
         self.random.shuffle(shuffled_agents)
 
@@ -126,6 +163,17 @@ class AgentSet(MutableSet, Sequence):
         reverse: bool = False,
         inplace: bool = False,
     ) -> AgentSet:
+        """
+        Sort the agents in the AgentSet based on a specified attribute or custom function.
+
+        Args:
+            key (Callable[[Agent], Any] | str): A function or attribute name based on which the agents are sorted.
+            reverse (bool, optional): If True, the agents are sorted in descending order. Defaults to False.
+            inplace (bool, optional): If True, sorts the agents in the current AgentSet; otherwise, returns a new sorted AgentSet. Defaults to False.
+
+        Returns:
+            AgentSet: A sorted AgentSet. Returns the current AgentSet if inplace is True.
+        """
         if isinstance(key, str):
             key = operator.attrgetter(key)
 
@@ -138,6 +186,9 @@ class AgentSet(MutableSet, Sequence):
         )
 
     def _update(self, agents: Iterable[Agent]):
+        """Update the AgentSet with a new set of agents.
+        This is a private method primarily used internally by other methods like select, shuffle, and sort.
+        """
         _agents = weakref.WeakKeyDictionary()
         for agent in agents:
             _agents[agent] = None
@@ -148,58 +199,114 @@ class AgentSet(MutableSet, Sequence):
     def do(
         self, method_name: str, *args, return_results: bool = False, **kwargs
     ) -> AgentSet | list[Any]:
-        """invoke method on each agent
+        """
+        Invoke a method on each agent in the AgentSet.
 
         Args:
-            method_name (str): name of the method to call on each agent
-            return_results (bool): whether to return the result from the method call or
-                                   return the AgentSet itself. Defaults to False, so you can
-                                   continue method chaining
+            method_name (str): The name of the method to call on each agent.
+            return_results (bool, optional): If True, returns the results of the method calls; otherwise, returns the AgentSet itself. Defaults to False, so you can chain method calls.
+            *args: Variable length argument list passed to the method being called.
+            **kwargs: Arbitrary keyword arguments passed to the method being called.
 
-        Additional arguments and keyword arguments will be passed to the method being called
-
+        Returns:
+            AgentSet | list[Any]: The results of the method calls if return_results is True, otherwise the AgentSet itself.
         """
         res = [getattr(agent, method_name)(*args, **kwargs) for agent in self._agents]
 
         return res if return_results else self
 
     def get(self, attr_name: str) -> list[Any]:
-        """get attribute value on each agent
+        """
+        Retrieve a specified attribute from each agent in the AgentSet.
 
         Args:
-            attr_name (str): name of the attribute to get from each agent in the set
+            attr_name (str): The name of the attribute to retrieve from each agent.
 
+        Returns:
+            list[Any]: A list of attribute values from each agent in the set.
         """
         return [getattr(agent, attr_name) for agent in self._agents]
 
     def __getitem__(self, item: int | slice) -> Agent:
+        """
+        Retrieve an agent or a slice of agents from the AgentSet.
+
+        Args:
+            item (int | slice): The index or slice for selecting agents.
+
+        Returns:
+            Agent | list[Agent]: The selected agent or list of agents based on the index or slice provided.
+        """
         return list(self._agents.keys())[item]
 
     def add(self, agent: Agent):
-        # abstract method from MutableSet
+        """
+        Add an agent to the AgentSet.
+
+        Args:
+            agent (Agent): The agent to add to the set.
+
+        Note:
+            This method is an implementation of the abstract method from MutableSet.
+        """
         self._agents[agent] = None
 
     def discard(self, agent: Agent):
-        # abstract method from MutableSet
-        # discard should not raise an error when
-        # item is not in set
+        """
+        Remove an agent from the AgentSet if it exists.
+
+        This method does not raise an error if the agent is not present.
+
+        Args:
+            agent (Agent): The agent to remove from the set.
+
+        Note:
+            This method is an implementation of the abstract method from MutableSet.
+        """
         with contextlib.suppress(KeyError):
             del self._agents[agent]
 
     def remove(self, agent: Agent):
-        # remove should raise an error when
-        # item is not in set
+        """
+        Remove an agent from the AgentSet.
+
+        This method raises an error if the agent is not present.
+
+        Args:
+            agent (Agent): The agent to remove from the set.
+
+        Note:
+            This method is an implementation of the abstract method from MutableSet.
+        """
         del self._agents[agent]
 
     def __getstate__(self):
+        """
+        Retrieve the state of the AgentSet for serialization.
+
+        Returns:
+            dict: A dictionary representing the state of the AgentSet.
+        """
         return {"agents": list(self._agents.keys()), "model": self.model}
 
     def __setstate__(self, state):
+        """
+        Set the state of the AgentSet during deserialization.
+
+        Args:
+            state (dict): A dictionary representing the state to restore.
+        """
         self.model = state["model"]
         self._update(state["agents"])
 
     @property
     def random(self) -> Random:
+        """
+        Provide access to the model's random number generator.
+
+        Returns:
+            Random: The random number generator associated with the model.
+        """
         return self.model.random
 
 
