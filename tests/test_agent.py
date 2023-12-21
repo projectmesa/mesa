@@ -89,3 +89,89 @@ def test_agentset():
         a1.unique_id == a2.unique_id for a1, a2 in zip(another_set, other_agents)
     )
     assert len(another_set) == len(other_agents)
+
+
+def test_agentset_initialization():
+    model = Model()
+    empty_agentset = AgentSet([], model)
+    assert len(empty_agentset) == 0
+
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+    assert len(agentset) == 10
+
+
+def test_agentset_serialization():
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(5)]
+    agentset = AgentSet(agents, model)
+
+    serialized = pickle.dumps(agentset)
+    deserialized = pickle.loads(serialized)  # noqa: S301
+
+    original_ids = [agent.unique_id for agent in agents]
+    deserialized_ids = [agent.unique_id for agent in deserialized]
+
+    assert deserialized_ids == original_ids
+
+
+def test_agent_membership():
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(5)]
+    agentset = AgentSet(agents, model)
+
+    assert agents[0] in agentset
+    assert TestAgent(model.next_id(), model) not in agentset
+
+
+def test_agent_add_remove_discard():
+    model = Model()
+    agent = TestAgent(model.next_id(), model)
+    agentset = AgentSet([], model)
+
+    agentset.add(agent)
+    assert agent in agentset
+
+    agentset.remove(agent)
+    assert agent not in agentset
+
+    agentset.add(agent)
+    agentset.discard(agent)
+    assert agent not in agentset
+
+    with pytest.raises(KeyError):
+        agentset.remove(agent)
+
+
+def test_agentset_get_item():
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+
+    assert agentset[0] == agents[0]
+    assert agentset[-1] == agents[-1]
+    assert agentset[1:3] == agents[1:3]
+
+    with pytest.raises(IndexError):
+        _ = agentset[20]
+
+
+def test_agentset_do_method():
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+
+    with pytest.raises(AttributeError):
+        agentset.do("non_existing_method")
+
+
+def test_agentset_get_attribute():
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+
+    unique_ids = agentset.get("unique_id")
+    assert unique_ids == [agent.unique_id for agent in agents]
+
+    with pytest.raises(AttributeError):
+        agentset.get("non_existing_attribute")
