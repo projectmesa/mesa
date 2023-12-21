@@ -6,7 +6,6 @@ from mesa.model import Model
 
 
 class TestAgent(Agent):
-
     def get_unique_identifier(self):
         return self.unique_id
 
@@ -51,13 +50,25 @@ def test_agentset():
     def test_function(agent):
         return agent.unique_id
 
-    assert all(a1 == a2 for a1, a2 in zip(agentset.sort(test_function, reverse=True), agentset[::-1]))
-    assert all(a1 == a2 for a1, a2 in zip(agentset.sort("unique_id", reverse=True), agentset[::-1]))
+    assert all(
+        a1 == a2
+        for a1, a2 in zip(agentset.sort(test_function, reverse=True), agentset[::-1])
+    )
+    assert all(
+        a1 == a2
+        for a1, a2 in zip(agentset.sort("unique_id", reverse=True), agentset[::-1])
+    )
 
-    assert all(a1 == a2.unique_id for a1, a2 in zip(agentset.get("unique_id"), agentset))
-    assert all(a1 == a2.unique_id for a1, a2 in zip(agentset.do("get_unique_identifier", return_results=True), agentset))
+    assert all(
+        a1 == a2.unique_id for a1, a2 in zip(agentset.get("unique_id"), agentset)
+    )
+    assert all(
+        a1 == a2.unique_id
+        for a1, a2 in zip(
+            agentset.do("get_unique_identifier", return_results=True), agentset
+        )
+    )
     assert agentset == agentset.do("get_unique_identifier")
-
 
     agentset.discard(agents[0])
     assert agents[0] not in agentset
@@ -70,6 +81,10 @@ def test_agentset():
     assert agents[0] in agentset
 
     # because AgentSet uses weakrefs, we need hard refs as well....
-    other_agents, another_set = pickle.loads(pickle.dumps([agents, AgentSet(agents, model)]))
-    assert all(a1.unique_id==a2.unique_id for a1, a2 in zip(another_set, other_agents))
+    other_agents, another_set = pickle.loads(
+        pickle.dumps([agents, AgentSet(agents, model)])
+    )
+    assert all(
+        a1.unique_id == a2.unique_id for a1, a2 in zip(another_set, other_agents)
+    )
     assert len(another_set) == len(other_agents)
