@@ -146,16 +146,21 @@ class AgentSet(MutableSet, Sequence):
         Returns:
             AgentSet: A new AgentSet containing the selected agents, unless inplace is True, in which case the current AgentSet is updated.
         """
-        agents = list(self._agents.keys())
 
-        if filter_func is not None:
-            agents = [agent for agent in agents if filter_func(agent)]
+        def agent_generator():
+            count = 0
+            for agent in self:
+                if filter_func and not filter_func(agent):
+                    continue
+                if agent_type and not isinstance(agent, agent_type):
+                    continue
+                yield agent
+                count += 1
+                # default of n is zero, zo evaluates to False
+                if n and count >= n:
+                    break
 
-        if agent_type is not None:
-            agents = [agent for agent in agents if isinstance(agent, agent_type)]
-
-        if n:
-            agents = agents[:n]
+        agents = agent_generator()
 
         return AgentSet(agents, self.model) if not inplace else self._update(agents)
 
