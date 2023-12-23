@@ -55,6 +55,7 @@ class MockModel(Model):
     schedule = BaseScheduler(None)
 
     def __init__(self):
+        super().__init__()
         self.schedule = BaseScheduler(self)
         self.model_val = 100
 

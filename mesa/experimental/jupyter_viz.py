@@ -134,12 +134,12 @@ def JupyterViz(
                     make_plot(model, measure)
 
     def render_in_browser():
+        # if space drawer is disabled, do not include it
+        layout_types = [{"Space": "default"}] if space_drawer else []
+
         if measures:
-            layout_types = [{"Space": "default"}] + [
-                {"Measure": elem} for elem in range(len(measures))
-            ]
-        else:
-            layout_types = [{"Space": "default"}]
+            layout_types += [{"Measure": elem} for elem in range(len(measures))]
+
         grid_layout_initial = get_initial_grid_layout(layout_types=layout_types)
         grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
 

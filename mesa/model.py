@@ -8,6 +8,7 @@ Core Objects: Model
 from __future__ import annotations
 
 import random
+from collections import defaultdict
 
 # mypy
 from typing import Any
@@ -16,7 +17,19 @@ from mesa.datacollection import DataCollector
 
 
 class Model:
-    """Base class for models."""
+    """Base class for models in the Mesa ABM library.
+
+    This class serves as a foundational structure for creating agent-based models.
+    It includes the basic attributes and methods necessary for initializing and
+    running a simulation model.
+
+    Attributes:
+        running: A boolean indicating if the model should continue running.
+        schedule: An object to manage the order and execution of agent steps.
+        current_id: A counter for assigning unique IDs to agents.
+        agents: A defaultdict mapping each agent type to a dict of its instances.
+                Agent instances are saved in the nested dict keys, with the values being None.
+    """
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """Create a new model object and instantiate its RNG automatically."""
@@ -31,16 +44,19 @@ class Model:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a new model. Overload this method with the actual code to
-        start the model.
-
-        Attributes:
-            schedule: schedule object
-            running: a bool indicating if the model should continue running
+        start the model. Always start with super().__init__() to initialize the
+        model object properly.
         """
 
         self.running = True
         self.schedule = None
         self.current_id = 0
+        self.agents: defaultdict[type, dict] = defaultdict(dict)
+
+    @property
+    def agent_types(self) -> list:
+        """Return a list of different agent types."""
+        return list(self.agents.keys())
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as

@@ -20,18 +20,33 @@ if TYPE_CHECKING:
 
 
 class Agent:
-    """Base class for a model agent."""
+    """
+    Base class for a model agent in Mesa.
+
+    Attributes:
+        unique_id (int): A unique identifier for this agent.
+        model (Model): A reference to the model instance.
+        self.pos: Position | None = None
+    """
 
     def __init__(self, unique_id: int, model: Model) -> None:
-        """Create a new agent.
+        """
+        Create a new agent.
 
         Args:
-            unique_id (int): A unique numeric identified for the agent
-            model: (Model): Instance of the model that contains the agent
+            unique_id (int): A unique identifier for this agent.
+            model (Model): The model instance in which the agent exists.
         """
         self.unique_id = unique_id
         self.model = model
         self.pos: Position | None = None
+
+        # Register the agent with the model using defaultdict
+        self.model.agents[type(self)][self] = None
+
+    def remove(self) -> None:
+        """Remove and delete the agent from the model."""
+        self.model.agents[type(self)].pop(self)
 
     def step(self) -> None:
         """A single step of the agent."""
