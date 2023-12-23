@@ -77,7 +77,9 @@ class MockModel(Model):
         # Make scheduler
         if activation == STAGED:
             model_stages = ["stage_one", "model.model_stage", "stage_two"]
-            self.schedule = StagedActivation(self, stage_list=model_stages, shuffle=shuffle)
+            self.schedule = StagedActivation(
+                self, stage_list=model_stages, shuffle=shuffle
+            )
         elif activation == RANDOM:
             self.schedule = RandomActivation(self)
         elif activation == SIMULTANEOUS:
@@ -265,7 +267,7 @@ class TestRandomActivationByType(TestCase):
     #     """
     #     Test that adding agent with duplicate ids result in an error.
     #     TODO: we need to run this test on all schedulers, not just
-    #     TODO:: identical IDs is something fo the agent, not the scheduler adn should be tested there
+    #     TODO:: identical IDs is something for the agent, not the scheduler and should be tested there
     #     RandomActivationByType.
     #     """
     #     model = MockModel(activation=RANDOM_BY_TYPE)

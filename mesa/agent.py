@@ -90,6 +90,7 @@ class AgentSet(MutableSet, Sequence):
         interactions with the model's environment and other agents.The implementation uses a WeakKeyDictionary to store agents,
         which means that agents not referenced elsewhere in the program may be automatically removed from the AgentSet.
     """
+
     agentset_experimental_warning_given = False
 
     def __init__(self, agents: Iterable[Agent], model: Model):

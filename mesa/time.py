@@ -224,12 +224,12 @@ class StagedActivation(BaseScheduler):
     """
 
     def __init__(
-            self,
-            model: Model,
-            agents: Iterable[Agent] = None,
-            stage_list: list[str] | None = None,
-            shuffle: bool = False,
-            shuffle_between_stages: bool = False,
+        self,
+        model: Model,
+        agents: Iterable[Agent] = None,
+        stage_list: list[str] | None = None,
+        shuffle: bool = False,
+        shuffle_between_stages: bool = False,
     ) -> None:
         """Create an empty Staged Activation schedule.
 
@@ -371,8 +371,6 @@ class RandomActivationByType(BaseScheduler):
         return len(self.agents_by_type[agenttype])
 
 
-
-
 class DiscreteEventScheduler(BaseScheduler):
     """
     A scheduler for discrete event simulation in Mesa.
@@ -437,7 +435,9 @@ class DiscreteEventScheduler(BaseScheduler):
                 f"Scheduled time ({time}) must be >= the current time ({self.time})"
             )
         if agent not in self._agents:
-            raise ValueError("trying to schedule an event for agent which is not known to the scheduler")
+            raise ValueError(
+                "trying to schedule an event for agent which is not known to the scheduler"
+            )
 
         # Create an event, sorted first on time, secondary on a random value
         event = (time, self.model.random.random(), weakref.ref(agent))
@@ -457,7 +457,7 @@ class DiscreteEventScheduler(BaseScheduler):
         while self.event_queue and self.event_queue[0][0] <= end_time:
             # Get the next event (ignore the random value during unpacking)
             time, _, agent = heapq.heappop(self.event_queue)
-            agent = agent() # unpack weakref
+            agent = agent()  # unpack weakref
 
             if agent:
                 # Advance time to the event's time
