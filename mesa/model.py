@@ -14,7 +14,7 @@ from collections import defaultdict
 # mypy
 from typing import Any
 
-from mesa.agent import AgentSet
+from mesa.agent import AgentSet, Agent
 from mesa.datacollection import DataCollector
 
 
@@ -83,7 +83,7 @@ class Model:
         """Return a list of different agent types."""
         return list(self._agents.keys())
 
-    def get_agents_of_type(self, agenttype: type) -> AgentSet:
+    def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
         """Retrieves an AgentSet containing all agents of the specified type."""
         return AgentSet(self._agents[agenttype].values(), self)
 
