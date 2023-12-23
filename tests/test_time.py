@@ -297,19 +297,19 @@ class TestDiscreteEventScheduler(TestCase):
         self.assertEqual(len(self.scheduler.event_queue), 1)
         event_time, _, event_agent = self.scheduler.event_queue[0]
         self.assertEqual(event_time, 5)
-        self.assertEqual(event_agent, self.agent1)
+        self.assertEqual(event_agent(), self.agent1)
 
     def test_schedule_event_with_float_time(self):
         self.scheduler.schedule_event(5.5, self.agent1)
         self.assertEqual(len(self.scheduler.event_queue), 1)
         event_time, _, event_agent = self.scheduler.event_queue[0]
         self.assertEqual(event_time, 5.5)
-        self.assertEqual(event_agent, self.agent1)
+        self.assertEqual(event_agent(), self.agent1)
 
     def test_schedule_in(self):
         self.scheduler.schedule_in(3, self.agent2)
         _, _, event_agent = self.scheduler.event_queue[0]
-        self.assertEqual(event_agent, self.agent2)
+        self.assertEqual(event_agent(), self.agent2)
         self.assertEqual(self.scheduler.get_next_event_time(), self.scheduler.time + 3)
 
     # Testing Event Execution and Time Advancement
@@ -366,7 +366,7 @@ class TestDiscreteEventScheduler(TestCase):
         self.assertEqual(len(self.scheduler.event_queue), 1)
         event_time, _, event_agent = self.scheduler.event_queue[0]
         self.assertEqual(event_time, self.scheduler.time)
-        self.assertEqual(event_agent, new_agent)
+        self.assertEqual(event_agent(), new_agent)
 
         # Step the scheduler and check if the agent's step method is executed
         self.scheduler.step()
