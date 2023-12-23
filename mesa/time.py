@@ -26,6 +26,7 @@ Key concepts:
 from __future__ import annotations
 
 import heapq
+import warnings
 from collections import defaultdict
 
 # mypy
@@ -378,6 +379,13 @@ class DiscreteEventScheduler(BaseScheduler):
         super().__init__(model)
         self.event_queue: list[tuple[TimeT, float, Agent]] = []
         self.time_step: TimeT = time_step  # Fixed time period for each step
+
+        warnings.warn(
+            "The DiscreteEventScheduler is experimental. It may be changed or removed in any and all future releases, including patch releases.\n"
+            "We would love to hear what you think about this new feature. If you have any thoughts, share them with us here: https://github.com/projectmesa/mesa/discussions/1923",
+            FutureWarning,
+            stacklevel=2,
+        )
 
     def schedule_event(self, time: TimeT, agent: Agent) -> None:
         """Schedule an event for an agent at a specific time."""
