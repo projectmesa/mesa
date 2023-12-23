@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import heapq
 import warnings
+import weakref
 
 # mypy
 from typing import Union, Iterable
@@ -370,6 +371,8 @@ class RandomActivationByType(BaseScheduler):
         return len(self.agents_by_type[agenttype])
 
 
+
+
 class DiscreteEventScheduler(BaseScheduler):
     """
     A scheduler for discrete event simulation in Mesa.
@@ -417,7 +420,7 @@ class DiscreteEventScheduler(BaseScheduler):
     def __init__(self, model: Model, time_step: TimeT = 1) -> None:
         super().__init__(model)
         # TODO:: should go to weakrefs as well...
-        self.event_queue: list[tuple[TimeT, float, Agent]] = []
+        self.event_queue: list[tuple[TimeT, float, weakref.ref]] = []
         self.time_step: TimeT = time_step  # Fixed time period for each step
 
         warnings.warn(
@@ -433,8 +436,11 @@ class DiscreteEventScheduler(BaseScheduler):
             raise ValueError(
                 f"Scheduled time ({time}) must be >= the current time ({self.time})"
             )
+        if agent not in self._agents:
+            raise ValueError("trying to schedule an event for agent which is not known to the scheduler")
+
         # Create an event, sorted first on time, secondary on a random value
-        event = (time, self.model.random.random(), agent)
+        event = (time, self.model.random.random(), weakref.ref(agent))
         heapq.heappush(self.event_queue, event)
 
     def schedule_in(self, delay: TimeT, agent: Agent) -> None:
@@ -451,12 +457,12 @@ class DiscreteEventScheduler(BaseScheduler):
         while self.event_queue and self.event_queue[0][0] <= end_time:
             # Get the next event (ignore the random value during unpacking)
             time, _, agent = heapq.heappop(self.event_queue)
+            agent = agent() # unpack weakref
 
-            # Advance time to the event's time
-            self.time = time
-
-            # Execute the event
-            if agent in self._agents:
+            if agent:
+                # Advance time to the event's time
+                self.time = time
+                # Execute the event
                 agent.step()
 
         # After processing events, advance time by the time_step

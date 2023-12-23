@@ -90,6 +90,7 @@ class AgentSet(MutableSet, Sequence):
         interactions with the model's environment and other agents.The implementation uses a WeakKeyDictionary to store agents,
         which means that agents not referenced elsewhere in the program may be automatically removed from the AgentSet.
     """
+    agentset_experimental_warning_given = False
 
     def __init__(self, agents: Iterable[Agent], model: Model):
         """
@@ -101,8 +102,8 @@ class AgentSet(MutableSet, Sequence):
         """
         self.model = model
 
-        if not self.model.agentset_experimental_warning_given:
-            self.model.agentset_experimental_warning_given = True
+        if not self.__class__.agentset_experimental_warning_given:
+            self.__class__.agentset_experimental_warning_given = True
             warnings.warn(
                 "The AgentSet is experimental. It may be changed or removed in any and all future releases, including patch releases.\n"
                 "We would love to hear what you think about this new feature. If you have any thoughts, share them with us here: https://github.com/projectmesa/mesa/discussions/1919",
