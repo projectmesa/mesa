@@ -113,7 +113,7 @@ class BaseScheduler:
 
     @property
     def agents(self) -> AgentSet:
-        # a bit dirty, but returns a copy of the internal agentset
+        # a bit dirty, but returns a copy of the internal agent set
         return self._agents.select()
 
     def get_agent_keys(self, shuffle: bool = False) -> list[int]:
@@ -134,9 +134,6 @@ class BaseScheduler:
         return agent_keys
 
     def do_each(self, method, shuffle=False):
-        # if agent_keys is None:
-        #     agent_keys = self.get_agent_keys()
-
         if shuffle:
             self.agents.shuffle(inplace=True)
         self.agents.do(method)
@@ -245,21 +242,15 @@ class StagedActivation(BaseScheduler):
 
     def step(self) -> None:
         """Executes all the stages for all agents."""
-        # FIXME:: NOT NEEDED ANYMORE BECAUSE OF WEAKREFS?
-        # To be able to remove and/or add agents during stepping
-        # it's necessary for the keys view to be a list.
-        # agent_keys = self.get_agent_keys(self.shuffle)
-
         shuffle = self.shuffle
         for stage in self.stage_list:
             if stage.startswith("model."):
                 getattr(self.model, stage[6:])()
             else:
                 self.do_each(stage, shuffle=shuffle)
-            # We recompute the keys because some agents might have been removed
-            # in the previous loop.
-            # FIXME:: I think this is correct behavior
-            shuffle = self.shuffle_between_stages
+
+            if self.shuffle_between_stages:
+                shuffle = False
             self.time += self.stage_time
 
         self.steps += 1
@@ -316,14 +307,12 @@ class RandomActivationByType(BaseScheduler):
         except KeyError:
             self.agents_by_type[type(agent)] = AgentSet([agent], self.model)
 
-    # def remove(self, agent: Agent) -> None:
-    #     """
-    #     Remove all instances of a given agent from the schedule.
-    #     """
-    #     super().remove(agent)
-    #     # redundant because of weakrefs. super call only done because of warning
-    #     # agent_class: type[Agent] = type(agent)
-    #     # del self.agents_by_type[agent_class][agent.unique_id]
+    def remove(self, agent: Agent) -> None:
+        """
+        Remove all instances of a given agent from the schedule.
+        """
+        super().remove(agent)
+        self.agents_by_type[type(agent)].remove(agent)
 
     def step(self, shuffle_types: bool = True, shuffle_agents: bool = True) -> None:
         """
