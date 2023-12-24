@@ -249,8 +249,7 @@ class StagedActivation(BaseScheduler):
             else:
                 self.do_each(stage, shuffle=shuffle)
 
-            if self.shuffle_between_stages:
-                shuffle = False
+            shuffle = self.shuffle_between_stages
             self.time += self.stage_time
 
         self.steps += 1
