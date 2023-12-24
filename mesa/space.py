@@ -436,6 +436,7 @@ class _Grid:
         agent: Agent,
         pos: list[Coordinate],
         selection: str = "random",
+        handle_empty: str | None = None,
     ) -> None:
         """
         Move an agent to one of the given positions.
@@ -445,28 +446,42 @@ class _Grid:
             pos: List of possible positions.
             selection: String, either "random" (default) or "closest". If "closest" is selected and multiple
                        cells are the same distance, one is chosen randomly.
+            handle_empty: String, either "warning", "error" or None (default). If "warning" or "error" is selected
+                          and no positions are given (an empty list), a warning or error is raised respectively.
         """
-        # Handle list of positions
-        if selection == "random":
-            chosen_pos = agent.random.choice(pos)
-        elif selection == "closest":
-            current_pos = agent.pos
-            # Find the closest position without sorting all positions
-            closest_pos = None
-            min_distance = float("inf")
-            for p in pos:
-                distance = self._distance_squared(p, current_pos)
-                if distance < min_distance:
-                    min_distance = distance
-                    closest_pos = p
-            chosen_pos = closest_pos
-        else:
-            raise ValueError(
-                f"Invalid selection method {selection}. Choose 'random' or 'closest'."
-            )
+        # Only move agent if there are positions given (non-empty list)
+        if pos:
+            if selection == "random":
+                chosen_pos = agent.random.choice(pos)
+            elif selection == "closest":
+                current_pos = agent.pos
+                # Find the closest position without sorting all positions
+                closest_pos = None
+                min_distance = float("inf")
+                for p in pos:
+                    distance = self._distance_squared(p, current_pos)
+                    if distance < min_distance:
+                        min_distance = distance
+                        closest_pos = p
+                chosen_pos = closest_pos
+            else:
+                raise ValueError(
+                    f"Invalid selection method {selection}. Choose 'random' or 'closest'."
+                )
+            #  Move agent to chosen position
+            self.move_agent(agent, chosen_pos)
 
-        # Move agent
-        self.move_agent(agent, chosen_pos)
+        # If no positions are given, throw warning/error if selected
+        elif handle_empty == "warning":
+            warn(
+                f"No positions given, could not move agent {agent.unique_id}.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+        elif handle_empty == "error":
+            raise ValueError(
+                f"No positions given, could not move agent {agent.unique_id}."
+            )
 
     def _distance_squared(self, pos1: Coordinate, pos2: Coordinate) -> float:
         """
