@@ -252,6 +252,15 @@ class TestRandomActivationByType(TestCase):
     does step for one type of agents, not the entire agents.
     """
 
+    def test_init(self):
+        model = Model()
+        agents = [MockAgent(model.next_id(), model) for _ in range(10)]
+        agents += [Agent(model.next_id(), model) for _ in range(10)]
+
+        scheduler = RandomActivationByType(model, agents)
+        assert all(agent in scheduler.agents for agent in agents)
+
+
     def test_random_activation_step_shuffles(self):
         """
         Test the random activation by type step
