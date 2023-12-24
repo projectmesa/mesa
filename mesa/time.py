@@ -90,18 +90,13 @@ class BaseScheduler:
     def remove(self, agent: Agent) -> None:
         """Remove all instances of a given agent from the schedule.
 
+        Note:
+            It is only necessary to explicitly remove agents from the schedule if
+            the agent is not removed from the model.
+
         Args:
             agent: An agent object.
         """
-        if not self._remove_warning_given:
-            self._remove_warning_given = True
-        warnings.warn(
-            "Because of the shift to using weakrefs, it is no longer needed to explicitly remove"
-            "agents from a scheduler",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
         self._agents.remove(agent)
 
     def step(self) -> None:
