@@ -30,7 +30,7 @@ import warnings
 import weakref
 
 # mypy
-from typing import Union, Iterable
+from typing import Iterable, Union
 
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model
@@ -60,7 +60,7 @@ class BaseScheduler:
         - agents (property): Returns a list of all agent instances.
     """
 
-    def __init__(self, model: Model, agents: Iterable[Agent] = None) -> None:
+    def __init__(self, model: Model, agents: Iterable[Agent] | None = None) -> None:
         """Create a new, empty BaseScheduler."""
         self.model = model
         self.steps = 0
@@ -226,7 +226,7 @@ class StagedActivation(BaseScheduler):
     def __init__(
         self,
         model: Model,
-        agents: Iterable[Agent] = None,
+        agents: Iterable[Agent] | None = None,
         stage_list: list[str] | None = None,
         shuffle: bool = False,
         shuffle_between_stages: bool = False,
@@ -294,7 +294,7 @@ class RandomActivationByType(BaseScheduler):
         - get_type_count: Returns the count of agents of a specific type.
     """
 
-    def __init__(self, model: Model, agents: Iterable[Agent] = None) -> None:
+    def __init__(self, model: Model, agents: Iterable[Agent] | None = None) -> None:
         super().__init__(model, agents)
 
         # can't be a defaultdict because we need to pass model to AgentSet
@@ -321,14 +321,14 @@ class RandomActivationByType(BaseScheduler):
         except KeyError:
             self.agents_by_type[type(agent)] = AgentSet([agent], self.model)
 
-    def remove(self, agent: Agent) -> None:
-        """
-        Remove all instances of a given agent from the schedule.
-        """
-        super().remove(agent)
-        # redundant because of weakrefs. super call only done because of warning
-        # agent_class: type[Agent] = type(agent)
-        # del self.agents_by_type[agent_class][agent.unique_id]
+    # def remove(self, agent: Agent) -> None:
+    #     """
+    #     Remove all instances of a given agent from the schedule.
+    #     """
+    #     super().remove(agent)
+    #     # redundant because of weakrefs. super call only done because of warning
+    #     # agent_class: type[Agent] = type(agent)
+    #     # del self.agents_by_type[agent_class][agent.unique_id]
 
     def step(self, shuffle_types: bool = True, shuffle_agents: bool = True) -> None:
         """

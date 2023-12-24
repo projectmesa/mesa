@@ -14,7 +14,7 @@ from collections import defaultdict
 # mypy
 from typing import Any
 
-from mesa.agent import AgentSet, Agent
+from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
 
 

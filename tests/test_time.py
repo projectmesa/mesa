@@ -167,6 +167,14 @@ class TestRandomActivation(TestCase):
     Test the random activation.
     """
 
+    def test_init(self):
+        model = Model()
+        agents = [MockAgent(model.next_id(), model) for _ in range(10)]
+
+        scheduler = RandomActivation(model, agents)
+        assert all(agent in scheduler.agents for agent in agents)
+
+
     def test_random_activation_step_shuffles(self):
         """
         Test the random activation step
@@ -205,6 +213,18 @@ class TestRandomActivation(TestCase):
         model = MockModel(activation=RANDOM, enable_kill_other_agent=True)
         model.step()
         assert len(model.log) == 1
+
+    def test_get_agent_keys(self):
+        model = MockModel(activation=RANDOM)
+
+        keys = model.schedule.get_agent_keys()
+        agent_ids = [agent.unique_id for agent in model.agents]
+        assert all(entry_i == entry_j for entry_i, entry_j in zip(keys, agent_ids))
+
+        keys = model.schedule.get_agent_keys(shuffle=True)
+        agent_ids = {agent.unique_id for agent in model.agents}
+        assert all(entry in agent_ids for entry in keys)
+
 
 
 class TestSimultaneousActivation(TestCase):
@@ -262,6 +282,17 @@ class TestRandomActivationByType(TestCase):
         agent_steps = [i.steps for i in model.schedule.agents]
         # one step for each of 2 agents
         assert all(x == 1 for x in agent_steps)
+
+    def test_random_activation_counts(self):
+        """
+        Test the random activation by type step causes each agent to step
+        """
+
+        model = MockModel(activation=RANDOM_BY_TYPE)
+
+        agent_types = model.agent_types
+        for agent_type in agent_types:
+            assert model.schedule.get_type_count(agent_type) == len(model.get_agents_of_type(agent_type))
 
     # def test_add_non_unique_ids(self):
     #     """
@@ -338,6 +369,11 @@ class TestDiscreteEventScheduler(TestCase):
     def test_invalid_event_time(self):
         with self.assertRaises(ValueError):
             self.scheduler.schedule_event(-1, self.agent1)
+
+    def test_invalid_aget_time(self):
+        with self.assertRaises(ValueError):
+            agent3 = MockAgent(3, self.model)
+            self.scheduler.schedule_event(2, agent3)
 
     def test_immediate_event_execution(self):
         # Current time of the scheduler
