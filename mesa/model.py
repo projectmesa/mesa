@@ -14,7 +14,7 @@ from collections import defaultdict
 # mypy
 from typing import Any
 
-from mesa.agent import AgentSet, Agent
+from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
 
 
@@ -85,7 +85,7 @@ class Model:
 
     def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
         """Retrieves an AgentSet containing all agents of the specified type."""
-        return AgentSet(self._agents[agenttype].values(), self)
+        return AgentSet(self._agents[agenttype].keys(), self)
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as
