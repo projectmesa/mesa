@@ -408,6 +408,30 @@ class TestSingleGridTorus(unittest.TestCase):
                 agent, possible_positions, selection="invalid_option"
             )
 
+    def test_move_agent_empty_list(self):
+        agent = self.agents[0]
+        possible_positions = []
+        agent.pos = (3, 3)
+        self.space.move_agent_to_one_of(agent, possible_positions, selection="random")
+        assert agent.pos == (3, 3)
+
+    def test_move_agent_empty_list_warning(self):
+        agent = self.agents[0]
+        possible_positions = []
+        # Should assert RuntimeWarning
+        with self.assertWarns(RuntimeWarning):
+            self.space.move_agent_to_one_of(
+                agent, possible_positions, selection="random", handle_empty="warning"
+            )
+
+    def test_move_agent_empty_list_error(self):
+        agent = self.agents[0]
+        possible_positions = []
+        with self.assertRaises(ValueError):
+            self.space.move_agent_to_one_of(
+                agent, possible_positions, selection="random", handle_empty="error"
+            )
+
     def test_distance_squared_torus(self):
         pos1 = (0, 0)
         pos2 = (49, 49)
