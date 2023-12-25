@@ -61,7 +61,13 @@ class BaseScheduler:
     """
 
     def __init__(self, model: Model, agents: Iterable[Agent] | None = None) -> None:
-        """Create a new, empty BaseScheduler."""
+        """Create a new BaseScheduler.
+
+        Args:
+            model (Model): The model to which the schedule belongs
+            agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
+
+        """
         self.model = model
         self.steps = 0
         self.time: TimeT = 0
@@ -226,11 +232,12 @@ class StagedActivation(BaseScheduler):
         """Create an empty Staged Activation schedule.
 
         Args:
-            - model: Model object associated with the schedule.
-            - stage_list: List of strings of names of stages to run, in the
+            model (Model): The model to which the schedule belongs
+            agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
+            stage_list (:obj:`list` of :obj:`str`): List of strings of names of stages to run, in the
                          order to run them in.
-            - shuffle: If True, shuffle the order of agents each step.
-            - shuffle_between_stages: If True, shuffle the agents after each
+            shuffle (bool, optional): If True, shuffle the order of agents each step.
+            shuffle_between_stages (bool, optional): If True, shuffle the agents after each
                                     stage; otherwise, only shuffle at the start
                                     of each step.
         """
@@ -281,6 +288,12 @@ class RandomActivationByType(BaseScheduler):
 
     def __init__(self, model: Model, agents: Iterable[Agent] | None = None) -> None:
         super().__init__(model, agents)
+        """
+
+        Args:
+            model (Model): The model to which the schedule belongs
+            agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
+        """
 
         # can't be a defaultdict because we need to pass model to AgentSet
         self.agents_by_type: [type, AgentSet] = {}
@@ -399,8 +412,14 @@ class DiscreteEventScheduler(BaseScheduler):
     """
 
     def __init__(self, model: Model, time_step: TimeT = 1) -> None:
+        """
+
+        Args:
+            model (Model): The model to which the schedule belongs
+            time_step (TimeT): The fixed time step between steps
+
+        """
         super().__init__(model)
-        # TODO:: should go to weakrefs as well...
         self.event_queue: list[tuple[TimeT, float, weakref.ref]] = []
         self.time_step: TimeT = time_step  # Fixed time period for each step
 
