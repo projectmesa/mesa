@@ -767,10 +767,6 @@ class _PropertyGrid(_Grid):
             optionally with a mask, returning either a list of coordinates or a mask.
         select_extreme_value_cells(property_name, mode, mask, return_list): Selects cells with extreme values of a property,
             optionally with a mask, returning either a list of coordinates or a mask.
-        move_agent_to_cell_by_properties(agent, conditions, mask): Moves an agent to a random cell meeting specified property
-            conditions, optionally with a mask.
-        move_agent_to_extreme_value_cell(agent, property_name, mode, mask): Moves an agent to a cell with extreme value of
-            a property, optionally with a mask.
 
     Mask Usage:
         Several methods in this class accept a mask as an input, which is a NumPy ndarray of boolean values. This mask
@@ -926,33 +922,6 @@ class _PropertyGrid(_Grid):
         else:
             return combined_mask
 
-    def move_agent_to_cell_by_properties(
-        self, agent: Agent, conditions: dict, mask: np.ndarray = None
-    ) -> None:
-        """
-        Move an agent to a random cell that meets specified property conditions, optionally with a mask.
-        If no eligible cells are found, issue a warning and keep the agent in its current position.
-
-        Args:
-            agent (Agent): The agent to move.
-            conditions (dict): Conditions for selecting the cell.
-            mask (np.ndarray, optional): A boolean mask to restrict the selection.
-        """
-        eligible_cells = self.select_cells_by_properties(
-            conditions, mask, return_list=True
-        )
-
-        if not eligible_cells:
-            warn(
-                f"No eligible cells found. Agent {agent.unique_id} remains in the current position.",
-                RuntimeWarning,
-                stacklevel=2,
-            )
-            return  # Agent stays in the current position
-
-        new_pos = agent.random.choice(eligible_cells)
-        self.move_agent(agent, new_pos)
-
     def select_extreme_value_cells(
         self,
         property_name: str,
@@ -990,35 +959,6 @@ class _PropertyGrid(_Grid):
             return list(zip(*np.where(target_mask)))
         else:
             return target_mask
-
-    def move_agent_to_extreme_value_cell(
-        self, agent: Agent, property_name: str, mode: str, mask: np.ndarray = None
-    ) -> None:
-        """
-        Move an agent to a cell with the highest or lowest property value,
-        optionally with a mask.
-
-        Args:
-            agent (Agent): The agent to move.
-            property_name (str): The name of the property layer.
-            mode (str): 'highest' or 'lowest'.
-            mask (np.ndarray, optional): A boolean mask to restrict the selection.
-        """
-        target_cells = self.select_extreme_value_cells(
-            property_name, mode, mask, return_list=True
-        )
-
-        # If no eligible cells are found, issue a warning and keep the agent in its current position.
-        if len(target_cells) == 0:
-            warn(
-                f"No eligible cells found. Agent {agent.unique_id} remains in the current position.",
-                RuntimeWarning,
-                stacklevel=2,
-            )
-            return  # Agent stays in the current position
-
-        new_pos = tuple(agent.random.choice(target_cells))
-        self.move_agent(agent, new_pos)
 
 
 class SingleGrid(_PropertyGrid):

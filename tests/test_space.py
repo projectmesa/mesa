@@ -433,7 +433,6 @@ class TestPropertyLayer(unittest.TestCase):
         self.assertIsInstance(self.layer.data[5, 5], self.layer.data.dtype.type)
 
 
-
 class TestSingleGrid(unittest.TestCase):
     def setUp(self):
         self.space = SingleGrid(50, 50, False)
@@ -668,14 +667,17 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         agent = MockAgent(1, self.grid)
         self.grid.place_agent(agent, (5, 5))
         conditions = {"layer1": lambda x: x == 0}
-        self.grid.move_agent_to_cell_by_properties(agent, conditions)
+        target_cells = self.grid.select_cells_by_properties(conditions)
+        self.grid.move_agent_to_one_of(agent, target_cells)
+        # Agent should move, since none of the cells match the condition
         self.assertNotEqual(agent.pos, (5, 5))
 
     def test_move_agent_no_eligible_cells(self):
         agent = MockAgent(3, self.grid)
         self.grid.place_agent(agent, (5, 5))
         conditions = {"layer1": lambda x: x != 0}
-        self.grid.move_agent_to_cell_by_properties(agent, conditions)
+        target_cells = self.grid.select_cells_by_properties(conditions)
+        self.grid.move_agent_to_one_of(agent, target_cells)
         self.assertEqual(agent.pos, (5, 5))
 
     # Test selecting and moving to cells based on extreme values
@@ -696,7 +698,8 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         agent = MockAgent(2, self.grid)
         self.grid.place_agent(agent, (5, 5))
         self.grid.properties["layer2"].set_cell((3, 1), 1.1)
-        self.grid.move_agent_to_extreme_value_cell(agent, "layer2", "highest")
+        target_cells = self.grid.select_extreme_value_cells("layer2", "highest")
+        self.grid.move_agent_to_one_of(agent, target_cells)
         self.assertEqual(agent.pos, (3, 1))
 
     # Test using masks
@@ -739,7 +742,8 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         )  # Placing another agent to create a non-empty cell
         empty_mask = self.grid.get_empty_mask()
         conditions = {"layer1": lambda x: x == 0}
-        self.grid.move_agent_to_cell_by_properties(agent, conditions, mask=empty_mask)
+        target_cells = self.grid.select_cells_by_properties(conditions, mask=empty_mask)
+        self.grid.move_agent_to_one_of(agent, target_cells)
         self.assertNotEqual(
             agent.pos, (4, 5)
         )  # Agent should not move to (4, 5) as it's not empty
@@ -749,9 +753,10 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         self.grid.place_agent(agent, (5, 5))
         neighborhood_mask = self.grid.get_neighborhood_mask((5, 5), True, False, 1)
         conditions = {"layer1": lambda x: x == 0}
-        self.grid.move_agent_to_cell_by_properties(
-            agent, conditions, mask=neighborhood_mask
+        target_cells = self.grid.select_cells_by_properties(
+            conditions, mask=neighborhood_mask
         )
+        self.grid.move_agent_to_one_of(agent, target_cells)
         self.assertIn(
             agent.pos, [(4, 4), (4, 5), (4, 6), (5, 4), (5, 6), (6, 4), (6, 5), (6, 6)]
         )  # Agent should move within the neighborhood
@@ -761,12 +766,6 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         condition = lambda x: x == 0
         with self.assertRaises(KeyError):
             self.grid.select_cells_by_properties({"nonexistent_layer": condition})
-
-    def test_invalid_mode_in_move_to_extreme(self):
-        agent = MockAgent(6, self.grid)
-        self.grid.place_agent(agent, (5, 5))
-        with self.assertRaises(ValueError):
-            self.grid.move_agent_to_extreme_value_cell(agent, "layer1", "invalid_mode")
 
     # Test if coordinates means the same between the grid and the property layer
     def test_property_layer_coordinates(self):
