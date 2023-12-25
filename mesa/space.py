@@ -658,8 +658,13 @@ class PropertyLayer:
                 vectorized_condition = np.vectorize(condition)
                 condition_result = vectorized_condition(self.data)
 
-            if not isinstance(condition_result, np.ndarray) or condition_result.shape != self.data.shape:
-                raise ValueError("Result of condition must be a NumPy array with the same shape as the grid.")
+            if (
+                not isinstance(condition_result, np.ndarray)
+                or condition_result.shape != self.data.shape
+            ):
+                raise ValueError(
+                    "Result of condition must be a NumPy array with the same shape as the grid."
+                )
 
             np.copyto(self.data, value, where=condition_result)
 
@@ -695,7 +700,9 @@ class PropertyLayer:
             value: The value to be used if the operation is a NumPy ufunc. Ignored for lambda functions.
             condition_function: (Optional) A callable that returns a boolean array when applied to the data.
         """
-        condition_array = np.ones_like(self.data, dtype=bool)  # Default condition (all cells)
+        condition_array = np.ones_like(
+            self.data, dtype=bool
+        )  # Default condition (all cells)
         if condition_function is not None:
             if is_numpy_ufunc(condition_function):
                 condition_array = condition_function(self.data)

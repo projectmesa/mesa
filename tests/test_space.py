@@ -301,7 +301,10 @@ class TestPropertyLayer(unittest.TestCase):
 
     def test_set_cells_with_condition(self):
         self.layer.set_cell((5, 5), 1)
-        condition = lambda x: x == 0
+
+        def condition(x):
+            return x == 0
+
         self.layer.set_cells(3, condition)
         self.assertEqual(self.layer.data[5, 5], 1)
         self.assertEqual(self.layer.data[0, 0], 3)
@@ -313,7 +316,8 @@ class TestPropertyLayer(unittest.TestCase):
         update_probability = 0.5
 
         # Define a condition with a random part
-        condition = lambda val: np.random.rand() < update_probability
+        def condition(val):
+            return np.random.rand() < update_probability
 
         # Apply set_cells
         self.layer.set_cells(True, condition)
@@ -651,12 +655,16 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
 
     # Test selecting and moving to cells based on multiple conditions
     def test_select_cells_by_properties(self):
-        condition = lambda x: x == 0
+        def condition(x):
+            return x == 0
+
         selected_cells = self.grid.select_cells_by_properties({"layer1": condition})
         self.assertEqual(len(selected_cells), 100)
 
     def test_select_cells_by_properties_return_mask(self):
-        condition = lambda x: x == 0
+        def condition(x):
+            return x == 0
+
         selected_mask = self.grid.select_cells_by_properties(
             {"layer1": condition}, return_list=False
         )
@@ -708,7 +716,10 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
             MockAgent(0, self.grid), (5, 5)
         )  # Placing an agent to ensure some cells are not empty
         empty_mask = self.grid.get_empty_mask()
-        condition = lambda x: x == 0
+
+        def condition(x):
+            return x == 0
+
         selected_cells = self.grid.select_cells_by_properties(
             {"layer1": condition}, mask=empty_mask
         )
@@ -718,7 +729,10 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
 
     def test_select_cells_by_properties_with_neighborhood_mask(self):
         neighborhood_mask = self.grid.get_neighborhood_mask((5, 5), True, False, 1)
-        condition = lambda x: x == 0
+
+        def condition(x):
+            return x == 0
+
         selected_cells = self.grid.select_cells_by_properties(
             {"layer1": condition}, mask=neighborhood_mask
         )
@@ -763,7 +777,9 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
 
     # Test invalid inputs
     def test_invalid_property_name_in_conditions(self):
-        condition = lambda x: x == 0
+        def condition(x):
+            return x == 0
+
         with self.assertRaises(KeyError):
             self.grid.select_cells_by_properties({"nonexistent_layer": condition})
 
