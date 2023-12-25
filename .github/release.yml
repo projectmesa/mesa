@@ -7,6 +7,9 @@ changelog:
     - title: ⚠️ Breaking changes
       labels:
         - breaking
+    - title: 🧪 Experimental features
+      labels:
+        - experimental
     - title: 🎉 New features added
       labels:
         - feature
