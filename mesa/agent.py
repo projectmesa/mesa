@@ -56,7 +56,7 @@ class Agent:
             self.model.agentset_experimental_warning_given = False
 
             warnings.warn(
-                "In the future, you need to explicitly initialize the model by calling super().__init__",
+                "The Mesa Model class wasn’t initialized. In the future, you need to explicitly initialize the Model by calling super().__init__() on initialization.",
                 FutureWarning,
                 stacklevel=2,
             )
