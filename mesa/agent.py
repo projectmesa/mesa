@@ -11,6 +11,7 @@ import contextlib
 import operator
 import warnings
 import weakref
+from collections import defaultdict
 from collections.abc import MutableSet, Sequence
 from random import Random
 
@@ -47,12 +48,25 @@ class Agent:
         self.pos: Position | None = None
 
         # register agent
-        self.model._agents[type(self)][self] = None
+        try:
+            self.model._agents[type(self)][self] = None
+        except AttributeError:
+            # model super has not been called
+            self.model._agents = defaultdict(dict)
+            self.model.agentset_experimental_warning_given = False
+
+            warnings.warn(
+                "In the future, you need to explicitly initialize the model by calling super().__init__",
+                FutureWarning,
+                stacklevel=2,
+            )
+
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
         with contextlib.suppress(KeyError):
             self.model._agents[type(self)].pop(self)
+
 
     def step(self) -> None:
         """A single step of the agent."""
