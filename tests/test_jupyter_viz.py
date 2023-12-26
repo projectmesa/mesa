@@ -100,6 +100,14 @@ class TestJupyterViz(unittest.TestCase):
                 agent_portrayal=agent_portrayal,
             )
         )
+        solara.render(
+            JupyterViz(
+                model_class=mock_model_class,
+                model_params={},
+                agent_portrayal=agent_portrayal,
+                space_drawer="altair",
+            )
+        )
         # should call default method with class instance and agent portrayal
         mock_space_matplotlib.assert_called_with(
             mock_model_class.return_value, agent_portrayal, dependencies=dependencies
@@ -132,3 +140,8 @@ class TestJupyterViz(unittest.TestCase):
         altspace_drawer.assert_called_with(
             mock_model_class.return_value, agent_portrayal
         )
+
+
+if __name__ == "__main__":
+    tjv = TestJupyterViz()
+    tjv.test_call_space_drawer()
