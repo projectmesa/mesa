@@ -133,7 +133,7 @@ def JupyterViz(
                 else:
                     make_plot(model, measure)
 
-    def render_in_browser():
+    def render_in_browser(statistics=False):
         # if space drawer is disabled, do not include it
         layout_types = [{"Space": "default"}] if space_drawer else []
 
@@ -150,11 +150,12 @@ def JupyterViz(
             with solara.Card("Progress", margin=1, elevation=2):
                 solara.Markdown(md_text=f"####Step - {current_step}")
             with solara.Card("Analytics", margin=1, elevation=2):
-                df = model.datacollector.get_model_vars_dataframe()
-                for col in list(df.columns):
-                    solara.Markdown(
-                        md_text=f"####Avg. {col} - {df.loc[:, f'{col}'].mean()}"
-                    )
+                if statistics:
+                    df = model.datacollector.get_model_vars_dataframe()
+                    for col in list(df.columns):
+                        solara.Markdown(
+                            md_text=f"####Avg. {col} - {df.loc[:, f'{col}'].mean()}"
+                        )
 
         items = [
             ColorCard(color="white", layout_type=layout_types[i])
