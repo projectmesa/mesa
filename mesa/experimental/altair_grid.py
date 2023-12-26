@@ -1,5 +1,5 @@
 import json
-from typing import Callable
+from typing import Callable, Optional
 
 import altair as alt
 import solara
@@ -21,8 +21,8 @@ def get_agent_data_from_coord_iter(data):
 
 
 def create_grid(
-    color: str | None = None,
-    on_click: Callable[[mesa.Model, mesa.space.Coordinate], None] | None = None,
+    color: Optional[str] = None,
+    on_click: Optional[Callable[[mesa.Model, mesa.space.Coordinate], None]] = None,
 ) -> Callable[[mesa.Model], solara.component]:
     return lambda model: Grid(model, color, on_click)
 
