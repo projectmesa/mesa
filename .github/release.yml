@@ -1,0 +1,34 @@
+# Docs: https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: ⚠️ Breaking changes
+      labels:
+        - breaking
+    - title: 🧪 Experimental features
+      labels:
+        - experimental
+    - title: 🎉 New features added
+      labels:
+        - feature
+    - title: 🛠 Enhancements made
+      labels:
+        - enhancement
+    - title: 🐛 Bugs fixed
+      labels:
+        - bug
+    - title: 📜 Documentation improvements
+      labels:
+        - docs
+    - title: 🔧 Maintenance
+      labels:
+        - ci
+        - testing
+        - dependency
+        - maintenance
+        - packaging
+    - title: Other changes
+      labels:
+        - "*"
