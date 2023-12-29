@@ -764,11 +764,11 @@ class _PropertyGrid(_Grid):
 
     Attributes:
         properties (dict): A dictionary mapping property layer names to PropertyLayer instances.
+        empty_mask: Returns a boolean mask indicating empty cells on the grid.
 
     Methods:
         add_property_layer(property_layer): Adds a new property layer to the grid.
         remove_property_layer(property_name): Removes a property layer from the grid by its name.
-        get_empty_mask(): Generates a boolean mask indicating empty cells on the grid.
         get_neighborhood_mask(pos, moore, include_center, radius): Generates a boolean mask of the neighborhood.
         select_cells_by_properties(conditions, mask, return_list): Selects cells based on multiple property conditions,
             optionally with a mask, returning either a list of coordinates or a mask.
@@ -810,6 +810,10 @@ class _PropertyGrid(_Grid):
         super().__init__(width, height, torus)
         self.properties = {}
 
+        # Initialize an empty mask as a boolean NumPy array
+        self._empty_mask = np.ones((self.width, self.height), dtype=bool)
+        print(self._empty_mask)
+
         # Handle both single PropertyLayer instance and list of PropertyLayer instances
         if property_layers:
             # If a single PropertyLayer is passed, convert it to a list
@@ -818,6 +822,13 @@ class _PropertyGrid(_Grid):
 
             for layer in property_layers:
                 self.add_property_layer(layer)
+
+    @property
+    def empty_mask(self) -> np.ndarray:
+        """
+        Returns a boolean mask indicating empty cells on the grid.
+        """
+        return self._empty_mask
 
     # Add and remove properties to the grid
     def add_property_layer(self, property_layer: PropertyLayer):
@@ -852,25 +863,6 @@ class _PropertyGrid(_Grid):
         if property_name not in self.properties:
             raise ValueError(f"Property layer {property_name} does not exist.")
         del self.properties[property_name]
-
-    def get_empty_mask(self) -> np.ndarray:
-        """
-        Generate a boolean mask indicating empty cells on the grid.
-
-        Returns:
-            np.ndarray: A boolean mask where True represents an empty cell and False represents an occupied cell.
-        """
-        # Initialize a mask filled with False (indicating occupied cells)
-        empty_mask = np.zeros((self.width, self.height), dtype=bool)
-
-        # Convert the list of empty cell coordinates to a NumPy array
-        empty_cells = np.array(list(self.empties))
-
-        # Use advanced indexing to set empty cells to True
-        if empty_cells.size > 0:  # Check if there are any empty cells
-            empty_mask[empty_cells[:, 0], empty_cells[:, 1]] = True
-
-        return empty_mask
 
     def get_neighborhood_mask(
         self, pos: Coordinate, moore: bool, include_center: bool, radius: int
@@ -930,8 +922,7 @@ class _PropertyGrid(_Grid):
 
         # Apply the empty mask if only_empty is True
         if only_empty:
-            empty_mask = self.get_empty_mask()
-            combined_mask = np.logical_and(combined_mask, empty_mask)
+            combined_mask = np.logical_and(combined_mask, self.empty_mask)
 
         # Apply conditions
         if conditions:
@@ -944,10 +935,14 @@ class _PropertyGrid(_Grid):
         if extreme_values:
             for property_name, mode in extreme_values.items():
                 prop_values = self.properties[property_name].data
+
+                # Create a masked array using the combined_mask
+                masked_values = np.ma.masked_array(prop_values, mask=~combined_mask)
+
                 if mode == "highest":
-                    target_value = np.nanmax(prop_values)
+                    target_value = masked_values.max()
                 elif mode == "lowest":
-                    target_value = np.nanmin(prop_values)
+                    target_value = masked_values.min()
                 else:
                     raise ValueError(
                         f"Invalid mode {mode}. Choose from 'highest' or 'lowest'."
@@ -992,6 +987,7 @@ class SingleGrid(_PropertyGrid):
             self._grid[x][y] = agent
             if self._empties_built:
                 self._empties.discard(pos)
+            self._empty_mask[pos] = False
             agent.pos = pos
         else:
             raise Exception("Cell not empty")
@@ -1004,6 +1000,7 @@ class SingleGrid(_PropertyGrid):
         self._grid[x][y] = self.default_val()
         if self._empties_built:
             self._empties.add(pos)
+        self._empty_mask[agent.pos] = True
         agent.pos = None
 
 
@@ -1039,6 +1036,7 @@ class MultiGrid(_PropertyGrid):
             agent.pos = pos
             if self._empties_built:
                 self._empties.discard(pos)
+                self._empty_mask[agent.pos] = True
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the given location and set its pos attribute to None."""
@@ -1047,6 +1045,7 @@ class MultiGrid(_PropertyGrid):
         self._grid[x][y].remove(agent)
         if self._empties_built and self.is_cell_empty(pos):
             self._empties.add(pos)
+            self._empty_mask[agent.pos] = False
         agent.pos = None
 
     @accept_tuple_argument

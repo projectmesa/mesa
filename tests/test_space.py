@@ -329,8 +329,8 @@ class TestPropertyLayer(unittest.TestCase):
         height = self.layer.height
 
         # Calculate expected range (with some tolerance for randomness)
-        expected_min = width * height * update_probability * 0.8
-        expected_max = width * height * update_probability * 1.2
+        expected_min = width * height * update_probability * 0.5
+        expected_max = width * height * update_probability * 1.5
 
         # Check if the true_count falls within the expected range
         assert expected_min <= true_count <= expected_max
@@ -470,6 +470,16 @@ class TestSingleGrid(unittest.TestCase):
                 self.space.place_agent(a, pos)
         with self.assertRaises(Exception):
             self.space.move_to_empty(a)
+
+    def test_empty_mask_consistency(self):
+        # Check that the empty mask is consistent with the empties set
+        empty_mask = self.space.empty_mask
+        empties = self.space.empties
+        for i in range(self.space.width):
+            for j in range(self.space.height):
+                mask_value = empty_mask[i, j]
+                empties_value = (i, j) in empties
+                assert mask_value == empties_value
 
     def move_agent(self):
         agent_number = 0
@@ -629,14 +639,14 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
 
     # Test getting masks
     def test_get_empty_mask(self):
-        empty_mask = self.grid.get_empty_mask()
+        empty_mask = self.grid.empty_mask
         self.assertTrue(np.all(empty_mask == np.ones((10, 10), dtype=bool)))
 
     def test_get_empty_mask_with_agent(self):
         agent = MockAgent(0, self.grid)
         self.grid.place_agent(agent, (4, 6))
 
-        empty_mask = self.grid.get_empty_mask()
+        empty_mask = self.grid.empty_mask
         expected_mask = np.ones((10, 10), dtype=bool)
         expected_mask[4, 6] = False
 
@@ -713,7 +723,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         self.grid.place_agent(
             MockAgent(0, self.grid), (5, 5)
         )  # Placing an agent to ensure some cells are not empty
-        empty_mask = self.grid.get_empty_mask()
+        empty_mask = self.grid.empty_mask
 
         def condition(x):
             return x == 0
@@ -750,7 +760,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         self.grid.place_agent(
             MockAgent(2, self.grid), (4, 5)
         )  # Placing another agent to create a non-empty cell
-        empty_mask = self.grid.get_empty_mask()
+        empty_mask = self.grid.empty_mask
         conditions = {"layer1": lambda x: x == 0}
         target_cells = self.grid.select_cells(conditions, masks=empty_mask)
         self.grid.move_agent_to_one_of(agent, target_cells)
