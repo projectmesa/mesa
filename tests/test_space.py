@@ -658,16 +658,14 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         def condition(x):
             return x == 0
 
-        selected_cells = self.grid.select_cells_by_properties({"layer1": condition})
+        selected_cells = self.grid.select_cells({"layer1": condition})
         self.assertEqual(len(selected_cells), 100)
 
     def test_select_cells_by_properties_return_mask(self):
         def condition(x):
             return x == 0
 
-        selected_mask = self.grid.select_cells_by_properties(
-            {"layer1": condition}, return_list=False
-        )
+        selected_mask = self.grid.select_cells({"layer1": condition}, return_list=False)
         self.assertTrue(isinstance(selected_mask, np.ndarray))
         self.assertTrue(selected_mask.all())
 
@@ -675,7 +673,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         agent = MockAgent(1, self.grid)
         self.grid.place_agent(agent, (5, 5))
         conditions = {"layer1": lambda x: x == 0}
-        target_cells = self.grid.select_cells_by_properties(conditions)
+        target_cells = self.grid.select_cells(conditions)
         self.grid.move_agent_to_one_of(agent, target_cells)
         # Agent should move, since none of the cells match the condition
         self.assertNotEqual(agent.pos, (5, 5))
@@ -684,20 +682,20 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         agent = MockAgent(3, self.grid)
         self.grid.place_agent(agent, (5, 5))
         conditions = {"layer1": lambda x: x != 0}
-        target_cells = self.grid.select_cells_by_properties(conditions)
+        target_cells = self.grid.select_cells(conditions)
         self.grid.move_agent_to_one_of(agent, target_cells)
         self.assertEqual(agent.pos, (5, 5))
 
     # Test selecting and moving to cells based on extreme values
     def test_select_extreme_value_cells(self):
         self.grid.properties["layer2"].set_cell((3, 1), 1.1)
-        target_cells = self.grid.select_extreme_value_cells("layer2", "highest")
+        target_cells = self.grid.select_cells(extreme_values={"layer2": "highest"})
         self.assertIn((3, 1), target_cells)
 
     def test_select_extreme_value_cells_return_mask(self):
         self.grid.properties["layer2"].set_cell((3, 1), 1.1)
-        target_mask = self.grid.select_extreme_value_cells(
-            "layer2", "highest", return_list=False
+        target_mask = self.grid.select_cells(
+            extreme_values={"layer2": "highest"}, return_list=False
         )
         self.assertTrue(isinstance(target_mask, np.ndarray))
         self.assertTrue(target_mask[3, 1])
@@ -706,7 +704,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         agent = MockAgent(2, self.grid)
         self.grid.place_agent(agent, (5, 5))
         self.grid.properties["layer2"].set_cell((3, 1), 1.1)
-        target_cells = self.grid.select_extreme_value_cells("layer2", "highest")
+        target_cells = self.grid.select_cells(extreme_values={"layer2": "highest"})
         self.grid.move_agent_to_one_of(agent, target_cells)
         self.assertEqual(agent.pos, (3, 1))
 
@@ -720,9 +718,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         def condition(x):
             return x == 0
 
-        selected_cells = self.grid.select_cells_by_properties(
-            {"layer1": condition}, mask=empty_mask
-        )
+        selected_cells = self.grid.select_cells({"layer1": condition}, masks=empty_mask)
         self.assertNotIn(
             (5, 5), selected_cells
         )  # (5, 5) should not be in the selection as it's not empty
@@ -733,8 +729,8 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         def condition(x):
             return x == 0
 
-        selected_cells = self.grid.select_cells_by_properties(
-            {"layer1": condition}, mask=neighborhood_mask
+        selected_cells = self.grid.select_cells(
+            {"layer1": condition}, masks=neighborhood_mask
         )
         expected_selection = [
             (4, 4),
@@ -756,7 +752,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         )  # Placing another agent to create a non-empty cell
         empty_mask = self.grid.get_empty_mask()
         conditions = {"layer1": lambda x: x == 0}
-        target_cells = self.grid.select_cells_by_properties(conditions, mask=empty_mask)
+        target_cells = self.grid.select_cells(conditions, masks=empty_mask)
         self.grid.move_agent_to_one_of(agent, target_cells)
         self.assertNotEqual(
             agent.pos, (4, 5)
@@ -767,9 +763,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         self.grid.place_agent(agent, (5, 5))
         neighborhood_mask = self.grid.get_neighborhood_mask((5, 5), True, False, 1)
         conditions = {"layer1": lambda x: x == 0}
-        target_cells = self.grid.select_cells_by_properties(
-            conditions, mask=neighborhood_mask
-        )
+        target_cells = self.grid.select_cells(conditions, masks=neighborhood_mask)
         self.grid.move_agent_to_one_of(agent, target_cells)
         self.assertIn(
             agent.pos, [(4, 4), (4, 5), (4, 6), (5, 4), (5, 6), (6, 4), (6, 5), (6, 6)]
@@ -781,7 +775,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
             return x == 0
 
         with self.assertRaises(KeyError):
-            self.grid.select_cells_by_properties({"nonexistent_layer": condition})
+            self.grid.select_cells(conditions={"nonexistent_layer": condition})
 
     # Test if coordinates means the same between the grid and the property layer
     def test_property_layer_coordinates(self):
@@ -804,6 +798,40 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
 
         self.assertEqual(correct_grid_value, agent_grid_value)
         self.assertNotEqual(incorrect_grid_value, agent_grid_value)
+
+    # Test selecting cells with only_empty parameter
+    def test_select_cells_only_empty(self):
+        self.grid.place_agent(MockAgent(0, self.grid), (5, 5))  # Occupying a cell
+        selected_cells = self.grid.select_cells(only_empty=True)
+        self.assertNotIn(
+            (5, 5), selected_cells
+        )  # The occupied cell should not be selected
+
+    def test_select_cells_only_empty_with_conditions(self):
+        self.grid.place_agent(MockAgent(1, self.grid), (5, 5))
+        self.grid.properties["layer1"].set_cell((5, 5), 2)
+        self.grid.properties["layer1"].set_cell((6, 6), 2)
+
+        def condition(x):
+            return x == 2
+
+        selected_cells = self.grid.select_cells({"layer1": condition}, only_empty=True)
+        self.assertIn((6, 6), selected_cells)
+        self.assertNotIn((5, 5), selected_cells)
+
+    # Test selecting cells with multiple extreme values
+    def test_select_cells_multiple_extreme_values(self):
+        self.grid.properties["layer1"].set_cell((1, 1), 3)
+        self.grid.properties["layer1"].set_cell((2, 2), 3)
+        self.grid.properties["layer2"].set_cell((2, 2), 0.5)
+        self.grid.properties["layer2"].set_cell((3, 3), 0.5)
+        selected_cells = self.grid.select_cells(
+            extreme_values={"layer1": "highest", "layer2": "lowest"}
+        )
+        self.assertIn((2, 2), selected_cells)
+        self.assertNotIn((1, 1), selected_cells)
+        self.assertNotIn((3, 3), selected_cells)
+        self.assertEqual(len(selected_cells), 1)
 
 
 class TestSingleNetworkGrid(unittest.TestCase):

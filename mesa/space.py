@@ -896,76 +896,72 @@ class _PropertyGrid(_Grid):
         mask[coords[:, 0], coords[:, 1]] = True
         return mask
 
-    def select_cells_by_properties(
-        self, conditions: dict, mask: np.ndarray = None, return_list: bool = True
+    def select_cells(
+        self,
+        conditions: dict | None = None,
+        extreme_values: dict | None = None,
+        masks: np.ndarray | list[np.ndarray] = None,
+        only_empty: bool = False,
+        return_list: bool = True,
     ) -> list[Coordinate] | np.ndarray:
         """
-        Select cells based on multiple property conditions using NumPy, optionally with a mask.
+        Select cells based on property conditions, extreme values, and/or masks, with an option to only select empty cells.
 
         Args:
-            conditions (dict): A dictionary where keys are property names and values are
-                               callables that take a single argument (the property value)
-                               and return a boolean.
-            mask (np.ndarray, optional): A boolean mask to restrict the selection.
-            return_list (bool, optional): If True, return a list of coordinates, otherwise return the mask.
+            conditions (dict): A dictionary where keys are property names and values are callables that return a boolean when applied.
+            extreme_values (dict): A dictionary where keys are property names and values are either 'highest' or 'lowest'.
+            masks (np.ndarray | list[np.ndarray], optional): A mask or list of masks to restrict the selection.
+            only_empty (bool, optional): If True, only select cells that are empty. Default is False.
+            return_list (bool, optional): If True, return a list of coordinates, otherwise return a mask.
 
         Returns:
             Union[list[Coordinate], np.ndarray]: Coordinates where conditions are satisfied or the combined mask.
         """
-        # Start with a mask of all True values
+        # Initialize the combined mask
         combined_mask = np.ones((self.width, self.height), dtype=bool)
 
-        for prop_name, condition in conditions.items():
-            prop_layer = self.properties[prop_name].data
-            prop_mask = condition(prop_layer)
-            combined_mask = np.logical_and(combined_mask, prop_mask)
+        # Apply the masks
+        if masks is not None:
+            if isinstance(masks, list):
+                for mask in masks:
+                    combined_mask = np.logical_and(combined_mask, mask)
+            else:
+                combined_mask = np.logical_and(combined_mask, masks)
 
-        if mask is not None:
-            combined_mask = np.logical_and(combined_mask, mask)
+        # Apply the empty mask if only_empty is True
+        if only_empty:
+            empty_mask = self.get_empty_mask()
+            combined_mask = np.logical_and(combined_mask, empty_mask)
 
+        # Apply conditions
+        if conditions:
+            for prop_name, condition in conditions.items():
+                prop_layer = self.properties[prop_name].data
+                prop_mask = condition(prop_layer)
+                combined_mask = np.logical_and(combined_mask, prop_mask)
+
+        # Apply extreme values
+        if extreme_values:
+            for property_name, mode in extreme_values.items():
+                prop_values = self.properties[property_name].data
+                if mode == "highest":
+                    target_value = np.nanmax(prop_values)
+                elif mode == "lowest":
+                    target_value = np.nanmin(prop_values)
+                else:
+                    raise ValueError(
+                        f"Invalid mode {mode}. Choose from 'highest' or 'lowest'."
+                    )
+
+                extreme_value_mask = prop_values == target_value
+                combined_mask = np.logical_and(combined_mask, extreme_value_mask)
+
+        # Generate output
         if return_list:
             selected_cells = list(zip(*np.where(combined_mask)))
             return selected_cells
         else:
             return combined_mask
-
-    def select_extreme_value_cells(
-        self,
-        property_name: str,
-        mode: str,
-        mask: np.ndarray = None,
-        return_list: bool = True,
-    ) -> list[Coordinate] | np.ndarray:
-        """
-        Select cells with the highest or lowest property value, optionally with a mask.
-
-        Args:
-            property_name (str): The name of the property layer.
-            mode (str): 'highest' or 'lowest'.
-            mask (np.ndarray, optional): A boolean mask to restrict the selection.
-            return_list (bool, optional): If True, return a list of coordinates, otherwise return a mask.
-
-        Returns:
-            Union[list[Coordinate], np.ndarray]: List of coordinates or a boolean mask of cells with the extreme property value.
-        """
-        prop_values = self.properties[property_name].data
-        if mask is not None:
-            prop_values = np.where(mask, prop_values, np.nan)
-
-        if mode == "highest":
-            extreme_value = np.nanmax(prop_values)
-        elif mode == "lowest":
-            extreme_value = np.nanmin(prop_values)
-        else:
-            raise ValueError(f"Invalid mode {mode}. Choose from 'highest' or 'lowest'.")
-
-        # Optimize the mask creation using numpy's inherent functions
-        target_mask = prop_values == extreme_value
-
-        if return_list:
-            return list(zip(*np.where(target_mask)))
-        else:
-            return target_mask
 
 
 class SingleGrid(_PropertyGrid):
