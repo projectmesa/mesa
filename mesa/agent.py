@@ -61,12 +61,10 @@ class Agent:
                 stacklevel=2,
             )
 
-
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
         with contextlib.suppress(KeyError):
             self.model._agents[type(self)].pop(self)
-
 
     def step(self) -> None:
         """A single step of the agent."""
