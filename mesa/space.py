@@ -821,7 +821,6 @@ class _PropertyGrid(_Grid):
 
         # Initialize an empty mask as a boolean NumPy array
         self._empty_mask = np.ones((self.width, self.height), dtype=bool)
-        print(self._empty_mask)
 
         # Handle both single PropertyLayer instance and list of PropertyLayer instances
         if property_layers:
