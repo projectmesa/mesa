@@ -720,11 +720,12 @@ class PropertyLayer:
 
         # Check if the operation is a lambda function or a NumPy ufunc
         if isinstance(operation, np.ufunc):
-            # Check if the ufunc requires an additional input
             if ufunc_requires_additional_input(operation):
                 if value is None:
                     raise ValueError("This ufunc requires an additional input value.")
                 modified_data = operation(self.data, value)
+            else:
+                modified_data = operation(self.data)
         else:
             # Vectorize non-ufunc operations
             vectorized_operation = np.vectorize(operation)
