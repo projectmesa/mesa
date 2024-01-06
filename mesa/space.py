@@ -550,8 +550,8 @@ class _Grid:
         return len(self.empties) > 0
 
 
-def is_lambda_function(function):
-    """Check if a function is a lambda function."""
+def is_single_argument_function(function):
+    """Check if a function is a single argument function."""
     return (
         inspect.isfunction(function)
         and len(inspect.signature(function).parameters) == 1
@@ -693,7 +693,7 @@ class PropertyLayer:
         current_value = self.data[position]
 
         # Determine if the operation is a lambda function or a NumPy ufunc
-        if is_lambda_function(operation):
+        if is_single_argument_function(operation):
             # Lambda function case
             self.data[position] = operation(current_value)
         elif value is not None:
