@@ -48,20 +48,6 @@ class Model:
         initialize_data_collector: Sets up the data collector for the model, requiring an initialized scheduler and agents.
     """
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> Any:
-        """Create a new model object and instantiate its RNG automatically."""
-        obj = object.__new__(cls)
-        obj._seed = kwargs.get("seed")
-        if obj._seed is None:
-            # We explicitly specify the seed here so that we know its value in
-            # advance.
-            obj._seed = random.random()
-        obj.random = random.Random(obj._seed)
-        # TODO: Remove these 2 lines just before Mesa 3.0
-        obj._steps = 0
-        obj._time = 0
-        return obj
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a new model. Overload this method with the actual code to
         start the model. Always start with super().__init__() to initialize the
@@ -72,6 +58,13 @@ class Model:
         self.schedule = None
         self.current_id = 0
         self.agents_: defaultdict[type, dict] = defaultdict(dict)
+
+        self._seed = kwargs.get("seed")
+        if self._seed is None:
+            # We explicitly specify the seed here so that we know its value in
+            # advance.
+            self._seed = random.random()
+        self.random = random.Random(self._seed)
 
         self._steps: int = 0
         self._time: TimeT = 0  # the model's clock
