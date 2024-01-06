@@ -574,7 +574,7 @@ class PropertyLayer:
 
     Methods:
         set_cell(position, value): Sets the value of a single cell.
-        set_cells(value, condition): Sets the values of multiple cells, optionally based on a condition.
+        set_cells(value, condition=None): Sets the values of multiple cells, optionally based on a condition.
         modify_cell(position, operation, value): Modifies the value of a single cell using an operation.
         modify_cells(operation, value, condition_function): Modifies the values of multiple cells using an operation.
         select_cells(condition, return_list): Selects cells that meet a specified condition.
