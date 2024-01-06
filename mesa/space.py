@@ -558,10 +558,6 @@ def is_single_argument_function(function):
     )
 
 
-def is_numpy_ufunc(function):
-    return isinstance(function, np.ufunc)
-
-
 def ufunc_requires_additional_input(ufunc):
     # NumPy ufuncs have a 'nargs' attribute indicating the number of input arguments
     # For binary ufuncs (like np.add), nargs is 2
@@ -662,7 +658,7 @@ class PropertyLayer:
         if condition is None:
             np.copyto(self.data, value)  # In-place update
         else:
-            if is_numpy_ufunc(condition):
+            if isinstance(condition, np.ufunc):
                 # Directly apply NumPy ufunc
                 condition_result = condition(self.data)
             else:
@@ -716,14 +712,14 @@ class PropertyLayer:
             self.data, dtype=bool
         )  # Default condition (all cells)
         if condition_function is not None:
-            if is_numpy_ufunc(condition_function):
+            if isinstance(condition_function, np.ufunc):
                 condition_array = condition_function(self.data)
             else:
                 vectorized_condition = np.vectorize(condition_function)
                 condition_array = vectorized_condition(self.data)
 
         # Check if the operation is a lambda function or a NumPy ufunc
-        if is_numpy_ufunc(operation):
+        if isinstance(operation, np.ufunc):
             # Check if the ufunc requires an additional input
             if ufunc_requires_additional_input(operation):
                 if value is None:
