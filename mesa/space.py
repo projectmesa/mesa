@@ -12,9 +12,6 @@ ContinuousSpace: a two-dimensional space where each agent has an arbitrary
                  position of `float`'s.
 NetworkGrid: a network where each node contains zero or more agents.
 """
-# Instruction for PyLint to suppress variable name errors, since we have a
-# good reason to use one-character variable names for x and y.
-# pylint: disable=invalid-name
 
 # Mypy; for the `|` operator purpose
 # Remove this __future__ import once the oldest supported Python is 3.10
