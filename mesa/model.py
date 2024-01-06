@@ -54,6 +54,11 @@ class Model:
             # advance.
             obj._seed = random.random()  # noqa: S311
         obj.random = random.Random(obj._seed)
+
+        obj._agents: defaultdict[type, dict] = defaultdict(dict)
+        # Warning flags for current experimental features. These make sure a warning is only printed once per model.
+        obj.agentset_experimental_warning_given = False
+
         return obj
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -65,10 +70,6 @@ class Model:
         self.running = True
         self.schedule = None
         self.current_id = 0
-        self._agents: defaultdict[type, dict] = defaultdict(dict)
-
-        # Warning flags for current experimental features. These make sure a warning is only printed once per model.
-        self.agentset_experimental_warning_given = False
 
     @property
     def agents(self) -> AgentSet:
