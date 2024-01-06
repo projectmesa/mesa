@@ -584,7 +584,7 @@ class PropertyLayer:
     agentset_experimental_warning_given = False
 
     def __init__(
-        self, name: str, width: int, height: int, default_value, dtype=np.float32
+        self, name: str, width: int, height: int, default_value, dtype=np.float64
     ):
         """
         Initializes a new PropertyLayer instance.
@@ -595,7 +595,7 @@ class PropertyLayer:
             height (int): The height of the grid (number of rows). Must be a positive integer.
             default_value: The default value to initialize each cell in the grid. Should ideally
                            be of the same type as specified by the dtype parameter.
-            dtype (data-type, optional): The desired data-type for the grid's elements. Default is np.float32.
+            dtype (data-type, optional): The desired data-type for the grid's elements. Default is np.float64.
 
         Raises:
             ValueError: If width or height is not a positive integer.
@@ -603,7 +603,7 @@ class PropertyLayer:
         Notes:
             A UserWarning is raised if the default_value is not of a type compatible with dtype.
             The dtype parameter can accept both Python data types (like bool, int or float) and NumPy data types
-            (like np.int16 or np.float32). Using NumPy data types is recommended (except for bool) for better control
+            (like np.int64 or np.float64). Using NumPy data types is recommended (except for bool) for better control
             over the precision and efficiency of data storage and computations, especially in cases of large data
             volumes or specialized numerical operations.
         """
