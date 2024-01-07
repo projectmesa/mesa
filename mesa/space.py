@@ -24,14 +24,7 @@ import math
 import warnings
 from collections.abc import Iterable, Iterator, Sequence
 from numbers import Real
-from typing import (
-    Any,
-    Callable,
-    TypeVar,
-    Union,
-    cast,
-    overload,
-)
+from typing import Any, Callable, TypeVar, Union, cast, overload
 from warnings import warn
 
 import networkx as nx
