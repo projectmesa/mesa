@@ -28,9 +28,10 @@ from __future__ import annotations
 import heapq
 import warnings
 import weakref
+from collections.abc import Iterable
 
 # mypy
-from typing import Iterable, Union
+from typing import Union
 
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model

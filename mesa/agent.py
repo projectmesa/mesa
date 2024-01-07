@@ -12,11 +12,11 @@ import operator
 import warnings
 import weakref
 from collections import defaultdict
-from collections.abc import MutableSet, Sequence
+from collections.abc import Iterable, Iterator, MutableSet, Sequence
 from random import Random
 
 # mypy
-from typing import TYPE_CHECKING, Any, Callable, Iterable, Iterator
+from typing import TYPE_CHECKING, Any, Callable
 
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic

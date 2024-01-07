@@ -1,16 +1,12 @@
 import itertools
+from collections.abc import Iterable, Mapping
 from functools import partial
 from multiprocessing import Pool
 from typing import (
     Any,
-    Dict,
-    List,
     Optional,
-    Tuple,
-    Type,
     Union,
 )
-from collections.abc import Iterable, Mapping
 
 from tqdm.auto import tqdm
 
