@@ -14,8 +14,7 @@ name.
 
 When the collect() method is called, each model-level function is called, with
 the model as the argument, and the results associated with the relevant
-variable. Then the agent-level functions are called on each agent in the model
-scheduler.
+variable. Then the agent-level functions are called on each agent.
 
 Additionally, other objects can write directly to tables by passing in an
 appropriate dictionary object for a table row.
@@ -30,8 +29,7 @@ The DataCollector then stores the data it collects in dictionaries:
 Finally, DataCollector can create a pandas DataFrame from each collection.
 
 The default DataCollector here makes several assumptions:
-    * The model has a schedule object called 'schedule'
-    * The schedule has an agent list called agents
+    * The model has an agent list called agents
     * For collecting agent-level variables, agents must have a unique_id
 """
 import contextlib
@@ -67,7 +65,7 @@ class DataCollector:
 
         Model reporters can take four types of arguments:
         1. Lambda function:
-           {"agent_count": lambda m: m.schedule.get_agent_count()}
+           {"agent_count": lambda m: len(m.agents)}
         2. Method of a class/instance:
            {"agent_count": self.get_agent_count} # self here is a class instance
            {"agent_count": Model.get_agent_count} # Model here is a class
@@ -180,11 +178,11 @@ class DataCollector:
         rep_funcs = self.agent_reporters.values()
 
         def get_reports(agent):
-            _prefix = (agent.model.schedule.steps, agent.unique_id)
+            _prefix = (agent.model.steps, agent.unique_id)
             reports = tuple(rep(agent) for rep in rep_funcs)
             return _prefix + reports
 
-        agent_records = map(get_reports, model.schedule.agents)
+        agent_records = map(get_reports, model.agents)
         return agent_records
 
     def collect(self, model):
@@ -207,7 +205,7 @@ class DataCollector:
 
         if self.agent_reporters:
             agent_records = self._record_agents(model)
-            self._agent_records[model.schedule.steps] = list(agent_records)
+            self._agent_records[model.steps] = list(agent_records)
 
     def add_table_row(self, table_name, row, ignore_missing=False):
         """Add a row dictionary to a specific table.
