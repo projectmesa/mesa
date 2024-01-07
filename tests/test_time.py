@@ -96,6 +96,7 @@ class MockModel(Model):
 
     def step(self):
         self.schedule.step()
+        self.advance_time()
 
     def model_stage(self):
         self.log.append("model_stage")
