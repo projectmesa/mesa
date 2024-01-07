@@ -2,11 +2,7 @@ import itertools
 from collections.abc import Iterable, Mapping
 from functools import partial
 from multiprocessing import Pool
-from typing import (
-    Any,
-    Optional,
-    Union,
-)
+from typing import Any, Optional, Union
 
 from tqdm.auto import tqdm
 
