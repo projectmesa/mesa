@@ -1,6 +1,6 @@
 import sys
 import threading
-from typing import List, Optional
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -317,7 +317,7 @@ def UserInputs(user_params, on_change=None):
 
 
 @solara.component
-def SpaceMatplotlib(model, agent_portrayal, dependencies: Optional[List[any]] = None):
+def SpaceMatplotlib(model, agent_portrayal, dependencies: Optional[list[any]] = None):
     space_fig = Figure()
     space_ax = space_fig.subplots()
     space = getattr(model, "grid", None)

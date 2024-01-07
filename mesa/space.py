@@ -22,18 +22,16 @@ import inspect
 import itertools
 import math
 import warnings
+from collections.abc import Iterable, Iterator, Sequence
 from numbers import Real
 from typing import (
     Any,
     Callable,
-    List,
-    Tuple,
     TypeVar,
     Union,
     cast,
     overload,
 )
-from collections.abc import Iterable, Iterator, Sequence
 from warnings import warn
 
 import networkx as nx
