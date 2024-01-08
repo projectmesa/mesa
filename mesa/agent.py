@@ -56,17 +56,15 @@ class Agent:
             self.model.agentset_experimental_warning_given = False
 
             warnings.warn(
-                "The Mesa Model class wasn’t initialized. In the future, you need to explicitly initialize the Model by calling super().__init__() on initialization.",
+                "The Mesa Model class was not initialized. In the future, you need to explicitly initialize the Model by calling super().__init__() on initialization.",
                 FutureWarning,
                 stacklevel=2,
             )
-
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
         with contextlib.suppress(KeyError):
             self.model._agents[type(self)].pop(self)
-
 
     def step(self) -> None:
         """A single step of the agent."""

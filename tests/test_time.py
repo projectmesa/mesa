@@ -174,7 +174,6 @@ class TestRandomActivation(TestCase):
         scheduler = RandomActivation(model, agents)
         assert all(agent in scheduler.agents for agent in agents)
 
-
     def test_random_activation_step_shuffles(self):
         """
         Test the random activation step
@@ -226,7 +225,6 @@ class TestRandomActivation(TestCase):
         assert all(entry in agent_ids for entry in keys)
 
 
-
 class TestSimultaneousActivation(TestCase):
     """
     Test the simultaneous activation.
@@ -259,7 +257,6 @@ class TestRandomActivationByType(TestCase):
 
         scheduler = RandomActivationByType(model, agents)
         assert all(agent in scheduler.agents for agent in agents)
-
 
     def test_random_activation_step_shuffles(self):
         """
@@ -301,7 +298,9 @@ class TestRandomActivationByType(TestCase):
 
         agent_types = model.agent_types
         for agent_type in agent_types:
-            assert model.schedule.get_type_count(agent_type) == len(model.get_agents_of_type(agent_type))
+            assert model.schedule.get_type_count(agent_type) == len(
+                model.get_agents_of_type(agent_type)
+            )
 
     # def test_add_non_unique_ids(self):
     #     """
