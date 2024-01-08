@@ -31,9 +31,7 @@ class TestMakeUserInput(unittest.TestCase):
             "type": "SliderInt",
             "value": 10,
             "label": "number of agents",
-            "min": 10,
-            "max": 20,
-            "step": 1,
+            "values": slice(10, 20, 1),
         }
         user_params = {"num_agents": options}
         _, rc = solara.render(Test(user_params), handle_error=False)
@@ -41,9 +39,9 @@ class TestMakeUserInput(unittest.TestCase):
 
         assert slider_int.v_model == options["value"]
         assert slider_int.label == options["label"]
-        assert slider_int.min == options["min"]
-        assert slider_int.max == options["max"]
-        assert slider_int.step == options["step"]
+        assert slider_int.min == options["values"].start
+        assert slider_int.max == options["values"].stop
+        assert slider_int.step == options["values"].step
 
     def test_checkbox(self):
         @solara.component

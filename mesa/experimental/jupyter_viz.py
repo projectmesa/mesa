@@ -282,22 +282,30 @@ def UserInputs(user_params, on_change=None):
             on_change(name, value)
 
         if input_type == "SliderInt":
+            values = options.get("values")
+            min, max, step = None, None, None
+            if values:
+                min, max, step = values.start, values.stop, values.step
             solara.SliderInt(
                 label,
                 value=options.get("value"),
                 on_value=change_handler,
-                min=options.get("min"),
-                max=options.get("max"),
-                step=options.get("step"),
+                min=min,
+                max=max,
+                step=step,
             )
         elif input_type == "SliderFloat":
+            values = options.get("values")
+            min, max, step = None, None, None
+            if values:
+                min, max, step = values.start, values.stop, values.step
             solara.SliderFloat(
                 label,
                 value=options.get("value"),
                 on_value=change_handler,
-                min=options.get("min"),
-                max=options.get("max"),
-                step=options.get("step"),
+                min=min,
+                max=max,
+                step=step,
             )
         elif input_type == "Select":
             solara.Select(
