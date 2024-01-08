@@ -76,7 +76,7 @@ def batch_run(
 
 
 def _make_model_kwargs(
-    parameters: Mapping[str, Union[Any, Iterable[Any]]]
+    parameters: Mapping[str, Union[Any, Iterable[Any]]],
 ) -> list[dict[str, Any]]:
     """Create model kwargs from parameters dictionary.
 

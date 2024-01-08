@@ -2,6 +2,44 @@
 title: Release History
 ---
 
+# 2.2.0 (2024-01-09)
+
+# Highlights
+This release incorporates several majors changes to Mesa. Notably, this provides two experimental features. (1) It reimagines Mesa's agent handling to have agents in the model class and store them in sets (you may submit feedback at https://github.com/projectmesa/mesa/discussions/1919). The intent is to make Mesa more efficient and give users more control over agent scheduling to allow for innumerable options. (2) It adds property layer and property grid so users can layer on multiple grids making Mesa and Geo-Mesa more similar (you may submit feedback at https://github.com/projectmesa/mesa/discussions/1932).
+
+# What's Changed
+
+## 🧪 Experimental features
+* Introduce AgentSet class by @EwoutH in https://github.com/projectmesa/mesa/pull/1916
+* Reimplement schedulers to use AgentSet by @quaquel in https://github.com/projectmesa/mesa/pull/1926
+* Work around for initializing model._agent by @quaquel in https://github.com/projectmesa/mesa/pull/1928
+* space: Implement PropertyLayer and _PropertyGrid by @EwoutH in https://github.com/projectmesa/mesa/pull/1898
+
+## 🛠 Enhancements made
+* Native support for multiple agent types by @EwoutH in https://github.com/projectmesa/mesa/pull/1894
+* Document empties property by @EwoutH in https://github.com/projectmesa/mesa/pull/1888
+* Add DiscreteEventScheduler by @EwoutH in https://github.com/projectmesa/mesa/pull/1890
+* space: Let move_agent choose from multiple positions by @EwoutH in https://github.com/projectmesa/mesa/pull/1920
+
+## 🐛 Bugs fixed
+* Honor disabled space drawer option when rendering in the browser by @rlskoeser in https://github.com/projectmesa/mesa/pull/1907
+
+## 📜 Documentation improvements
+* docs: Fix README.md inline code formatting by @rht in https://github.com/projectmesa/mesa/pull/1887
+* Add experimental warning to DiscreteEventScheduler by @EwoutH in https://github.com/projectmesa/mesa/pull/1924
+
+## 🔧 Maintenance
+* ci: Speed up pip install by caching deps install output by @rht in https://github.com/projectmesa/mesa/pull/1885
+* [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in https://github.com/projectmesa/mesa/pull/1899
+* build(deps): bump actions/setup-python from 4 to 5 by @dependabot in https://github.com/projectmesa/mesa/pull/1904
+* Create release.yml file for automatic release notes generation by @EwoutH in https://github.com/projectmesa/mesa/pull/1925
+* Drop support for Python 3.8 by @rht in https://github.com/projectmesa/mesa/pull/1756
+
+## New Contributors
+* @quaquel made their first contribution in https://github.com/projectmesa/mesa/pull/1928
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.1.5...v2.2.0
+
 # 2.1.5 (2023-11-26)
 
 This release has some critical fixes to JupyterViz/Solara frontend to prevent
