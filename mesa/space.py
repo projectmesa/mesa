@@ -18,6 +18,7 @@ NetworkGrid: a network where each node contains zero or more agents.
 from __future__ import annotations
 
 import collections
+import contextlib
 import inspect
 import itertools
 import math
@@ -27,7 +28,9 @@ from numbers import Real
 from typing import Any, Callable, TypeVar, Union, cast, overload
 from warnings import warn
 
-import networkx as nx
+with contextlib.suppress(ImportError):
+    import networkx as nx
+
 import numpy as np
 import numpy.typing as npt
 
