@@ -53,6 +53,7 @@ class SugarscapeG1mt(mesa.Model):
         vision_max=5,
         enable_trade=True,
     ):
+        super().__init__()
         # Initiate width and heigh of sugarscape
         self.width = width
         self.height = height
