@@ -29,7 +29,7 @@ class Sheep(RandomWalker):
 
             # If there is grass available, eat it
             this_cell = self.model.grid.get_cell_list_contents([self.pos])
-            grass_patch = [obj for obj in this_cell if isinstance(obj, GrassPatch)][0]
+            grass_patch = next(obj for obj in this_cell if isinstance(obj, GrassPatch))
             if grass_patch.fully_grown:
                 self.energy += self.model.sheep_gain_from_food
                 grass_patch.fully_grown = False
