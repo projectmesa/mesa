@@ -77,3 +77,37 @@ jobs:
     - if: matrix.os == 'ubuntu'
       name: Codecov
       uses: codecov/codecov-action@v3
+
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - uses: actions/cache@v3
+      with:
+        path: ${{ env.pythonLocation }}
+        key: test-examples-pip-${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
+    - name: Install dependencies
+      # Only if the cache misses
+      # Based on https://github.com/pypa/pip/issues/8049#issuecomment-633845028
+      # read_requirements.py should be removed once
+      # https://github.com/pypa/pip/issues/11440 is resolved.
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        pip install toml
+        python tests/read_requirements.py > requirements.txt
+        pip install -r requirements.txt
+    - name: Install Mesa
+      run: pip install --no-deps .
+    - name: Checkout mesa-examples
+      uses: actions/checkout@v4
+      with:
+        repository: projectmesa/mesa-examples
+        path: mesa-examples
+    - name: Test examples
+      run: |
+        cd mesa-examples
+        pytest test_examples.py
