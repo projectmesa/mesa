@@ -13,6 +13,7 @@ class ConwaysGameOfLife(mesa.Model):
         """
         Create a new playing area of (width, height) cells.
         """
+        super().__init__()
 
         # Set up the grid and schedule.
 

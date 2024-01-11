@@ -38,8 +38,7 @@ class Schelling(mesa.Model):
     """
 
     def __init__(self, width=20, height=20, density=0.8, minority_pc=0.2, homophily=3):
-        """ """
-
+        super().__init__()
         self.width = width
         self.height = height
         self.density = density
