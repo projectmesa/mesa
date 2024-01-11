@@ -1,5 +1,4 @@
 import mesa
-
 from wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from wolf_sheep.model import WolfSheep
 
