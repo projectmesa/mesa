@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "Mesa"
-description = "Agent-based modeling (ABM) in Python 3+"
+description = "Agent-based modeling (ABM) in Python"
 license = { text = "Apache 2.0" }
 requires-python = ">=3.9"
 authors = [
