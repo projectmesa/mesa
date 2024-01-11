@@ -77,13 +77,10 @@ class SugarscapeG1mt(mesa.Model):
             model_reporters={
                 "Trader": lambda m: m.schedule.get_type_count(Trader),
                 "Trade Volume": lambda m: sum(
-                    len(a.trade_partners)
-                    for a in m.schedule.agents_by_type[Trader]
+                    len(a.trade_partners) for a in m.schedule.agents_by_type[Trader]
                 ),
                 "Price": lambda m: geometric_mean(
-                    flatten(
-                        [a.prices for a in m.schedule.agents_by_type[Trader]]
-                    )
+                    flatten([a.prices for a in m.schedule.agents_by_type[Trader]])
                 ),
             },
             agent_reporters={"Trade Network": lambda a: get_trade(a)},
