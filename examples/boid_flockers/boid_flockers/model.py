@@ -40,6 +40,7 @@ class BoidFlockers(mesa.Model):
                     keep from any other
             cohere, separate, match: factors for the relative importance of
                     the three drives."""
+        super().__init__()
         self.population = population
         self.vision = vision
         self.speed = speed
