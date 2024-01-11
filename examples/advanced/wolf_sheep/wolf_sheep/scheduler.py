@@ -22,6 +22,8 @@ class RandomActivationByTypeFiltered(mesa.time.RandomActivationByType):
         Returns the current number of agents of certain type in the queue
         that satisfy the filter function.
         """
+        if type_class not in self.agents_by_type:
+            return 0
         count = 0
         for agent in self.agents_by_type[type_class]:
             if filter_func is None or filter_func(agent):
