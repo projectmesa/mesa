@@ -251,7 +251,11 @@ class AgentSet(MutableSet, Sequence):
         Returns:
             AgentSet | list[Any]: The results of the method calls if return_results is True, otherwise the AgentSet itself.
         """
-        res = [getattr(agent, method_name)(*args, **kwargs) for agent in self._agents]
+        res = [
+            getattr(agent, method_name)(*args, **kwargs)
+            for agent in list(self._agents)
+            if agent in self._agents
+        ]
 
         return res if return_results else self
 
