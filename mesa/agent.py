@@ -252,7 +252,7 @@ class AgentSet(MutableSet, Sequence):
             AgentSet | list[Any]: The results of the method calls if return_results is True, otherwise the AgentSet itself.
         """
         # we iterate over the actual weakref keys and check if weakref is alive before calling the method
-        res = [getattr(agent(), method_name)(*args, **kwargs) for agent in self._agents.keyrefs() if agent()]
+        res = [getattr(agentref(), method_name)(*args, **kwargs) for agentref in self._agents.keyrefs() if agentref()]
 
         return res if return_results else self
 
