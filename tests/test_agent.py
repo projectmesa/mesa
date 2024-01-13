@@ -12,10 +12,14 @@ class TestAgent(Agent):
 
 
 class TestAgentDo(Agent):
-
-    def __init__(self, unique_id, model,):
+    def __init__(
+        self,
+        unique_id,
+        model,
+    ):
         super().__init__(unique_id, model)
         self.agent_set = None
+
     def get_unique_identifier(self):
         return self.unique_id
 
@@ -25,6 +29,7 @@ class TestAgentDo(Agent):
 
     def do_remove(self):
         self.agent_set.remove(self)
+
 
 def test_agent_removal():
     model = Model()
@@ -183,7 +188,7 @@ def test_agentset_do_method():
     # do iterates, so no error should be raised to change size while iterating
     # related to issue #1595
 
-    #setup
+    # setup
     n = 10
     model = Model()
     agents = [TestAgentDo(model.next_id(), model) for _ in range(n)]
@@ -194,7 +199,7 @@ def test_agentset_do_method():
     agentset.do("do_add")
     assert len(agentset) == 2 * n
 
-    #setup
+    # setup
     model = Model()
     agents = [TestAgentDo(model.next_id(), model) for _ in range(10)]
     agentset = AgentSet(agents, model)
