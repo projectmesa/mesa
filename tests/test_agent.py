@@ -11,6 +11,21 @@ class TestAgent(Agent):
         return self.unique_id
 
 
+class TestAgentDo(Agent):
+
+    def __init__(self, unique_id, model,):
+        super().__init__(unique_id, model)
+        self.agent_set = None
+    def get_unique_identifier(self):
+        return self.unique_id
+
+    def do_add(self):
+        agent = TestAgentDo(self.model.next_id(), self.model)
+        self.agent_set.add(agent)
+
+    def do_remove(self):
+        self.agent_set.remove(self)
+
 def test_agent_removal():
     model = Model()
     agent = TestAgent(model.next_id(), model)
@@ -163,6 +178,31 @@ def test_agentset_do_method():
 
     with pytest.raises(AttributeError):
         agentset.do("non_existing_method")
+
+    # tests for addition and removal in do
+    # do iterates, so no error should be raised to change size while iterating
+    # related to issue #1595
+
+    #setup
+    n = 10
+    model = Model()
+    agents = [TestAgentDo(model.next_id(), model) for _ in range(n)]
+    agentset = AgentSet(agents, model)
+    for agent in agents:
+        agent.agent_set = agentset
+
+    agentset.do("do_add")
+    assert len(agentset) == 2 * n
+
+    #setup
+    model = Model()
+    agents = [TestAgentDo(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+    for agent in agents:
+        agent.agent_set = agentset
+
+    agentset.do("do_remove")
+    assert len(agentset) == 0
 
 
 def test_agentset_get_attribute():
