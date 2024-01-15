@@ -1,0 +1,11 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 90%
+        threshold: 1%
+
+ignore:
+  - "**experimental/"
+
+comment: off
