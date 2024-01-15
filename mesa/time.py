@@ -28,6 +28,7 @@ from __future__ import annotations
 import heapq
 import warnings
 import weakref
+from collections import defaultdict
 from collections.abc import Iterable
 
 # mypy
@@ -287,6 +288,22 @@ class RandomActivationByType(BaseScheduler):
         - get_type_count: Returns the count of agents of a specific type.
     """
 
+    @property
+    def agents_by_type(self):
+        warnings.warn(
+            "Because of the shift to using AgentSet, in the future this attribute will return a dict with"
+            "type as key as AgentSet as value",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+        agentsbytype = defaultdict(dict)
+        for k, v in self._agents_by_type.items():
+            agentsbytype[k] = {agent: agent.unique_id for agent in v}
+
+        return agentsbytype
+
+
     def __init__(self, model: Model, agents: Iterable[Agent] | None = None) -> None:
         super().__init__(model, agents)
         """
@@ -297,14 +314,14 @@ class RandomActivationByType(BaseScheduler):
         """
 
         # can't be a defaultdict because we need to pass model to AgentSet
-        self.agents_by_type: [type, AgentSet] = {}
+        self._agents_by_type: [type, AgentSet] = {}
 
         if agents is not None:
             for agent in agents:
                 try:
-                    self.agents_by_type[type(agent)].add(agent)
+                    self._agents_by_type[type(agent)].add(agent)
                 except KeyError:
-                    self.agents_by_type[type(agent)] = AgentSet([agent], self.model)
+                    self._agents_by_type[type(agent)] = AgentSet([agent], self.model)
 
     def add(self, agent: Agent) -> None:
         """
@@ -316,16 +333,16 @@ class RandomActivationByType(BaseScheduler):
         super().add(agent)
 
         try:
-            self.agents_by_type[type(agent)].add(agent)
+            self._agents_by_type[type(agent)].add(agent)
         except KeyError:
-            self.agents_by_type[type(agent)] = AgentSet([agent], self.model)
+            self._agents_by_type[type(agent)] = AgentSet([agent], self.model)
 
     def remove(self, agent: Agent) -> None:
         """
         Remove all instances of a given agent from the schedule.
         """
         super().remove(agent)
-        self.agents_by_type[type(agent)].remove(agent)
+        self._agents_by_type[type(agent)].remove(agent)
 
     def step(self, shuffle_types: bool = True, shuffle_agents: bool = True) -> None:
         """
@@ -339,7 +356,7 @@ class RandomActivationByType(BaseScheduler):
         """
         # To be able to remove and/or add agents during stepping
         # it's necessary to cast the keys view to a list.
-        type_keys: list[type[Agent]] = list(self.agents_by_type.keys())
+        type_keys: list[type[Agent]] = list(self._agents_by_type.keys())
         if shuffle_types:
             self.model.random.shuffle(type_keys)
         for agent_class in type_keys:
@@ -355,7 +372,7 @@ class RandomActivationByType(BaseScheduler):
         Args:
             agenttype: Class object of the type to run.
         """
-        agents = self.agents_by_type[agenttype]
+        agents = self._agents_by_type[agenttype]
 
         if shuffle_agents:
             agents.shuffle(inplace=True)
@@ -365,7 +382,7 @@ class RandomActivationByType(BaseScheduler):
         """
         Returns the current number of agents of certain type in the queue.
         """
-        return len(self.agents_by_type[agenttype])
+        return len(self._agents_by_type[agenttype])
 
 
 class DiscreteEventScheduler(BaseScheduler):
