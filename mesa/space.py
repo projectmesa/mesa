@@ -326,8 +326,10 @@ class _Grid:
             at most 9 if Moore, 5 if Von-Neumann
             (8 and 4 if not including the center).
         """
-        neighborhood = self.get_neighborhood(pos, moore, include_center, radius)
-        return self.iter_cell_list_contents(neighborhood)
+        default_val = self.default_val()
+        for x, y in self.get_neighborhood(pos, moore, include_center, radius):
+            if (cell := self._grid[x][y]) != default_val:
+                yield cell
 
     def get_neighbors(
         self,
@@ -385,11 +387,10 @@ class _Grid:
             An iterator of the agents contained in the cells identified in `cell_list`.
         """
         # iter_cell_list_contents returns only non-empty contents.
-        return (
-            cell
-            for x, y in cell_list
-            if (cell := self._grid[x][y]) != self.default_val()
-        )
+        default_val = self.default_val()
+        for x, y in cell_list:
+            if (cell := self._grid[x][y]) != default_val:
+                yield cell
 
     @accept_tuple_argument
     def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> list[Agent]:
@@ -1045,6 +1046,17 @@ class MultiGrid(_PropertyGrid):
             self._empty_mask[agent.pos] = False
         agent.pos = None
 
+    def iter_neighbors(
+        self,
+        pos: Coordinate,
+        moore: bool,
+        include_center: bool = False,
+        radius: int = 1,
+    ) -> Iterator[Agent]:
+        return itertools.chain.from_iterable(
+            super().iter_neighbors(pos, moore, include_center, radius)
+        )
+
     @accept_tuple_argument
     def iter_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
@@ -1058,10 +1070,9 @@ class MultiGrid(_PropertyGrid):
         Returns:
             An iterator of the agents contained in the cells identified in `cell_list`.
         """
+        default_val = self.default_val()
         return itertools.chain.from_iterable(
-            cell
-            for x, y in cell_list
-            if (cell := self._grid[x][y]) != self.default_val()
+            cell for x, y in cell_list if (cell := self._grid[x][y]) != default_val
         )
 
 
