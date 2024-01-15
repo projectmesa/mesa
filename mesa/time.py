@@ -292,7 +292,7 @@ class RandomActivationByType(BaseScheduler):
     def agents_by_type(self):
         warnings.warn(
             "Because of the shift to using AgentSet, in the future this attribute will return a dict with"
-            "type as key as AgentSet as value",
+            "type as key as AgentSet as value. Future behavior is available via RandomActivationByType._agents_by_type",
             DeprecationWarning,
             stacklevel=2,
         )
