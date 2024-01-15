@@ -303,7 +303,6 @@ class RandomActivationByType(BaseScheduler):
 
         return agentsbytype
 
-
     def __init__(self, model: Model, agents: Iterable[Agent] | None = None) -> None:
         super().__init__(model, agents)
         """
