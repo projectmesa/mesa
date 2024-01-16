@@ -8,6 +8,7 @@ Core Objects: Agent
 from __future__ import annotations
 
 import contextlib
+import copy
 import operator
 import warnings
 import weakref
@@ -124,9 +125,7 @@ class AgentSet(MutableSet, Sequence):
                 stacklevel=2,
             )
 
-        self._agents = weakref.WeakKeyDictionary()
-        for agent in agents:
-            self._agents[agent] = None
+        self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
 
     def __len__(self) -> int:
         """Return the number of agents in the AgentSet."""
@@ -161,20 +160,21 @@ class AgentSet(MutableSet, Sequence):
             AgentSet: A new AgentSet containing the selected agents, unless inplace is True, in which case the current AgentSet is updated.
         """
 
-        def agent_generator():
+        if filter_func is None and agent_type is None and n == 0:
+            return self if inplace else copy.copy(self)
+
+        def agent_generator(filter_func=None, agent_type=None, n=0):
             count = 0
             for agent in self:
-                if filter_func and not filter_func(agent):
-                    continue
-                if agent_type and not isinstance(agent, agent_type):
-                    continue
-                yield agent
-                count += 1
-                # default of n is zero, zo evaluates to False
-                if n and count >= n:
-                    break
+                if (not filter_func or filter_func(agent)) and (
+                    not agent_type or isinstance(agent, agent_type)
+                ):
+                    yield agent
+                    count += 1
+                    if 0 < n <= count:
+                        break
 
-        agents = agent_generator()
+        agents = agent_generator(filter_func, agent_type, n)
 
         return AgentSet(agents, self.model) if not inplace else self._update(agents)
 
@@ -229,11 +229,8 @@ class AgentSet(MutableSet, Sequence):
         """Update the AgentSet with a new set of agents.
         This is a private method primarily used internally by other methods like select, shuffle, and sort.
         """
-        _agents = weakref.WeakKeyDictionary()
-        for agent in agents:
-            _agents[agent] = None
 
-        self._agents = _agents
+        self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
         return self
 
     def do(

@@ -82,7 +82,7 @@ class TestMakeUserInput(unittest.TestCase):
 
 
 class TestJupyterViz(unittest.TestCase):
-    @patch("mesa.experimental.jupyter_viz.SpaceMatplotlib")
+    @patch("mesa.experimental.components.matplotlib.SpaceMatplotlib")
     def test_call_space_drawer(self, mock_space_matplotlib):
         mock_model_class = Mock()
         agent_portrayal = {
