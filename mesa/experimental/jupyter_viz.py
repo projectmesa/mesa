@@ -1,6 +1,5 @@
 import sys
 import threading
-from typing import Optional
 
 import matplotlib.pyplot as plt
 import reacton.ipywidgets as widgets
