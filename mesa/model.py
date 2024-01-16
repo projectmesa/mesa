@@ -117,7 +117,7 @@ class Model:
     def step(self) -> None:
         """A single step. Fill in here."""
 
-    def advance_time(self, deltat: TimeT = 1):
+    def _advance_time(self, deltat: TimeT = 1):
         """Increment the model's steps counter and clock."""
         self._steps += 1
         self._time += deltat

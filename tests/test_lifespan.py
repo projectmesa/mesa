@@ -43,7 +43,7 @@ class LifeTimeModel(Model):
                 self.schedule.add(
                     FiniteLifeAgent(self.next_id(), self.agent_lifetime, self)
                 )
-        self.advance_time()
+        self._advance_time()
 
     def run_model(self, step_count=100):
         for _ in range(step_count):

@@ -89,7 +89,7 @@ class MockModel(Model):
     def step(self):
         self.schedule.step()
         self.datacollector.collect(self)
-        self.advance_time()
+        self._advance_time()
 
 
 class TestDataCollector(unittest.TestCase):
