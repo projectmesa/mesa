@@ -10,11 +10,8 @@ import mesa
 def get_agent_data_from_coord_iter(data):
     for agent, (x, y) in data:
         if agent:
-            agent_data = json.loads(
-                json.dumps(agent[0].__dict__, skipkeys=True, default=str)
-            )
-            agent_data["x"] = x
-            agent_data["y"] = y
+            agent_data = agent[0].__dict__.copy()
+            agent_data.update({"x": x, "y": y})
             agent_data.pop("model", None)
             agent_data.pop("pos", None)
             yield agent_data
@@ -24,7 +21,10 @@ def create_grid(
     color: Optional[str] = None,
     on_click: Optional[Callable[[mesa.Model, mesa.space.Coordinate], None]] = None,
 ) -> Callable[[mesa.Model], solara.component]:
-    return lambda model: Grid(model, color, on_click)
+    def create_grid_function(model: mesa.Model) -> solara.component:
+        return solara.component.Grid(model, color, on_click)
+
+    return create_grid_function
 
 
 def Grid(model, color=None, on_click=None):
@@ -49,7 +49,9 @@ def Grid(model, color=None, on_click=None):
         on_click(model, datum["x"], datum["y"])
         update_data()
 
-    default_tooltip = [f"{key}:N" for key in data.value[0]]
+    default_tooltip = [
+        f"{key}:N" for key in data.value[0]
+    ]  # add all agent attributes to tooltip
     chart = (
         alt.Chart(alt.Data(values=data.value))
         .mark_rect()

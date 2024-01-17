@@ -24,7 +24,7 @@ def JupyterViz(
     measures=None,
     name="Mesa Model",
     agent_portrayal=None,
-    space_drawer="default",
+    space_drawer="altair",
     play_interval=150,
 ):
     """Initialize a component to visualize a model.
