@@ -3,16 +3,6 @@ on:
   push:
     tags:
     - '*'
-    branches:
-    - main
-    - release**
-    paths-ignore:
-      - '**.md'
-      - '**.rst'
-  pull_request:
-    paths-ignore:
-      - '**.md'
-      - '**.rst'
   workflow_dispatch:
 
 permissions:
@@ -36,11 +26,10 @@ jobs:
       - name: Build distributions
         run: hatch build
       - name: Upload package as artifact to GitHub
-        if: github.repository == 'projectmesa/mesa' && startsWith(github.ref, 'refs/tags')
+        if: github.repository == 'projectmesa/mesa'
         uses: actions/upload-artifact@v4
         with:
           name: package
           path: dist/
       - name: Publish package to PyPI
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
