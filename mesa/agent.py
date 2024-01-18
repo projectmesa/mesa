@@ -50,10 +50,10 @@ class Agent:
 
         # register agent
         try:
-            self.model._agents[type(self)][self] = None
+            self.model.agents_[type(self)][self] = None
         except AttributeError:
             # model super has not been called
-            self.model._agents = defaultdict(dict)
+            self.model.agents_ = defaultdict(dict)
             self.model.agentset_experimental_warning_given = False
 
             warnings.warn(
@@ -65,7 +65,7 @@ class Agent:
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
         with contextlib.suppress(KeyError):
-            self.model._agents[type(self)].pop(self)
+            self.model.agents_[type(self)].pop(self)
 
     def step(self) -> None:
         """A single step of the agent."""
