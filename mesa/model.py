@@ -78,9 +78,7 @@ class Model:
         if hasattr(self, "_agents"):
             return self._agents
         else:
-            all_agents = itertools.chain.from_iterable(
-                *(agents_by_type.keys() for agents_by_type in self.agents_.values())
-            )
+            all_agents = itertools.chain.from_iterable(self.agents_.values())
             return AgentSet(all_agents, self)
 
     @agents.setter
