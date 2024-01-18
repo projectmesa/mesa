@@ -7,6 +7,7 @@ import solara
 from solara.alias import rv
 
 import mesa.experimental.components.matplotlib as components_matplotlib
+from mesa.experimental.UserParam import Slider
 
 # Avoid interactive backend
 plt.switch_backend("agg")
@@ -43,7 +44,7 @@ def JupyterViz(
     # 1. Set up model parameters
     user_params, fixed_params = split_model_params(model_params)
     model_parameters, set_model_parameters = solara.use_state(
-        {**fixed_params, **{k: v["value"] for k, v in user_params.items()}}
+        {**fixed_params, **{k: v.get("value") for k, v in user_params.items()}}
     )
 
     # 2. Set up Model
@@ -254,6 +255,8 @@ def split_model_params(model_params):
 
 
 def check_param_is_fixed(param):
+    if isinstance(param, Slider):
+        return False
     if not isinstance(param, dict):
         return True
     if "type" not in param:
@@ -273,13 +276,26 @@ def UserInputs(user_params, on_change=None):
     """
 
     for name, options in user_params.items():
-        # label for the input is "label" from options or name
-        label = options.get("label", name)
-        input_type = options.get("type")
 
         def change_handler(value, name=name):
             on_change(name, value)
 
+        if isinstance(options, Slider):
+            slider_class = (
+                solara.SliderFloat if options.is_float_slider else solara.SliderInt
+            )
+            slider_class(
+                options.label,
+                on_value=change_handler,
+                min=options.min,
+                max=options.max,
+                step=options.step,
+            )
+            continue
+
+        # label for the input is "label" from options or name
+        label = options.get("label", name)
+        input_type = options.get("type")
         if input_type == "SliderInt":
             solara.SliderInt(
                 label,
