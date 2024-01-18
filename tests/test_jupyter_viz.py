@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import ipyvuetify as vw
 import solara
 
-from mesa.experimental.jupyter_viz import JupyterViz, UserInputs
+from mesa.experimental.jupyter_viz import JupyterViz, Slider, UserInputs
 
 
 class TestMakeUserInput(unittest.TestCase):
@@ -132,3 +132,17 @@ class TestJupyterViz(unittest.TestCase):
         altspace_drawer.assert_called_with(
             mock_model_class.return_value, agent_portrayal
         )
+
+
+def test_slider():
+    slider_float = Slider("Agent density", 0.8, 0.1, 1.0, 0.1)
+    assert slider_float.is_float_slider
+    assert slider_float.value == 0.8
+    assert slider_float.get("value") == 0.8
+    assert slider_float.min == 0.1
+    assert slider_float.max == 1.0
+    assert slider_float.step == 0.1
+    slider_int = Slider("Homophily", 3, 0, 8, 1)
+    assert not slider_int.is_float_slider
+    slider_dtype_float = Slider("Homophily", 3, 0, 8, 1, dtype=float)
+    assert slider_dtype_float.is_float_slider
