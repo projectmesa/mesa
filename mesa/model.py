@@ -78,7 +78,6 @@ class Model:
         if hasattr(self, "_agents"):
             return self._agents
         else:
-
             all_agents = itertools.chain.from_iterable(
                 *(agents_by_type.keys() for agents_by_type in self.agents_.values())
             )
@@ -86,10 +85,13 @@ class Model:
 
     @agents.setter
     def agents(self, agents: Any) -> None:
-        warnings.warn("You are trying to set model.agents. In a next release, this attribute is used "
-                      "by MESA itself so you cannot use it directly anymore."
-                      "Please adjust your code to use a different attribute name for custom agent storage"
-                      , UserWarning, stacklevel=2)
+        warnings.warn(
+            "You are trying to set model.agents. In a next release, this attribute is used "
+            "by MESA itself so you cannot use it directly anymore."
+            "Please adjust your code to use a different attribute name for custom agent storage",
+            UserWarning,
+            stacklevel=2,
+        )
 
         self._agents = agents
 
