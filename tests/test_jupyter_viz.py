@@ -85,6 +85,7 @@ class TestJupyterViz(unittest.TestCase):
     @patch("mesa.experimental.components.matplotlib.SpaceMatplotlib")
     def test_call_space_drawer(self, mock_space_matplotlib):
         mock_model_class = Mock()
+        mock_model_class.__name__ = "MockModelClass"
         agent_portrayal = {
             "Shape": "circle",
             "color": "gray",
