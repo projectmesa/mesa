@@ -26,9 +26,9 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}  # Replace with main once merged into main
-      - name: Run benchmarks on main branch
-        run: python benchmarks/global_benchmark.py
+          ref: main
+#      - name: Run benchmarks on main branch
+#        run: python benchmarks/global_benchmark.py
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
