@@ -1,23 +1,24 @@
-import timeit
-import os
-import sys
 import gc
+import os
 import pickle
+import sys
 import time
+import timeit
 
 from configurations import configurations
+
 
 # Generic function to initialize and run a model
 def run_model(model_class, seed, parameters):
     start_init = timeit.default_timer()
     model = model_class(seed=seed, **parameters)
- #   time.sleep(0.001)
+    #   time.sleep(0.001)
 
     end_init_start_run = timeit.default_timer()
 
-    for _ in range(config['steps']):
+    for _ in range(config["steps"]):
         model.step()
- #       time.sleep(0.0001)
+    #       time.sleep(0.0001)
     end_run = timeit.default_timer()
 
     return (end_init_start_run - start_init), (end_run - end_init_start_run)
@@ -30,10 +31,10 @@ def run_experiments(model_class, config):
 
     init_times = []
     run_times = []
-    for seed in range(1, config['seeds'] + 1):
-        fastest_init = float('inf')
-        fastest_run = float('inf')
-        for replication in range(1, config['replications'] + 1):
+    for seed in range(1, config["seeds"] + 1):
+        fastest_init = float("inf")
+        fastest_run = float("inf")
+        for replication in range(1, config["replications"] + 1):
             init_time, run_time = run_model(model_class, seed, config["parameters"])
             if init_time < fastest_init:
                 fastest_init = init_time
@@ -59,13 +60,13 @@ for model, model_config in configurations.items():
         results_dict[model, size] = results
 
 # Change this name to anything you like
-save_name = 'timings'
+save_name = "timings"
 
 i = 1
-while os.path.exists(f'{save_name}_{i}.pickle'):
+while os.path.exists(f"{save_name}_{i}.pickle"):
     i += 1
 
-with open(f'{save_name}_{i}.pickle', 'wb') as handle:
+with open(f"{save_name}_{i}.pickle", "wb") as handle:
     pickle.dump(results_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 print(f"Done benchmarking. Saved results to {save_name}_{i}.pickle.")
