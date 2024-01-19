@@ -24,7 +24,7 @@ jobs:
       - name: Add project directory to PYTHONPATH
         run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
       - name: Install dependencies
-        run: pip install numpy pandas
+        run: pip install numpy pandas tqdm
 #      - name: Checkout main branch
 #        uses: actions/checkout@v4
 #        with:
