@@ -22,8 +22,7 @@ jobs:
         with:
           python-version: '3.12'  # Adjust as per your project's requirements
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt  # Replace with your project's dependency installation commands
+        run: pip install numpy pandas
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
