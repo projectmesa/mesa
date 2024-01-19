@@ -20,7 +20,9 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'  # Adjust as per your project's requirements
+          python-version: '3.12'
+      - name: Add project directory to PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
       - name: Install dependencies
         run: pip install numpy pandas
 #      - name: Checkout main branch
