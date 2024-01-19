@@ -1,0 +1,56 @@
+name: Performance benchmarks
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+    branches:
+      - main
+  issue_comment:
+    types: [created]
+
+jobs:
+  run-benchmarks:
+    if: >
+      github.event_name == 'pull_request' || 
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/rerun-benchmarks'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'  # Adjust as per your project's requirements
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt  # Replace with your project's dependency installation commands
+      - name: Checkout main branch
+        uses: actions/checkout@v5
+        with:
+          ref: main
+      - name: Run benchmarks on main branch
+        run: python benchmarks/global_benchmark.py
+      - name: Checkout PR branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Run benchmarks on PR branch
+        run: python benchmarks/global_benchmark.py
+      - name: Run compare timings
+        id: compare_timings
+        run: |
+          echo "::set-output name=TIMING_COMPARISON::$(python benchmarks/compare_timings.py)"
+      - name: Comment PR
+        if: github.event_name == 'pull_request' || (github.event_name == 'issue_comment' && github.event.issue.pull_request)
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const output = `${{ steps.compare_timings.outputs.TIMING_COMPARISON }}`;
+            const issue_number = context.issue.number;
+            github.rest.issues.createComment({
+              issue_number: issue_number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Performance benchmark:\n' + output
+            });
