@@ -34,6 +34,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
       - name: Run benchmarks on PR branch
         run: python benchmarks/global_benchmark.py
       - name: Run compare timings
