@@ -31,14 +31,16 @@ jobs:
 #          ref: main
 #          repository: projectmesa/mesa
       - name: Run benchmarks on main branch
-        run: python benchmarks/global_benchmark.py
+        working-directory: benchmarks
+        run: python global_benchmark.py
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
       - name: Run benchmarks on PR branch
-        run: python benchmarks/global_benchmark.py
+        working-directory: benchmarks
+        run: python global_benchmark.py
       - name: Run compare timings
         id: compare_timings
         working-directory: benchmarks
