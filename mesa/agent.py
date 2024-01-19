@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Any, Callable
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
     # dependency.
+    from mesa.gridspace import Cell
     from mesa.model import Model
     from mesa.space import Position
 
@@ -46,7 +47,7 @@ class Agent:
         """
         self.unique_id = unique_id
         self.model = model
-        self.pos: Position | None = None
+        self.cell: Cell | None = None
 
         # register agent
         try:
@@ -61,6 +62,10 @@ class Agent:
                 FutureWarning,
                 stacklevel=2,
             )
+
+    @property
+    def pos(self):
+        return self.cell.coords
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
