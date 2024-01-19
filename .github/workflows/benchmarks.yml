@@ -23,14 +23,14 @@ jobs:
           python-version: '3.12'  # Adjust as per your project's requirements
       - name: Install dependencies
         run: pip install numpy pandas
-      - name: Checkout main branch
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          repository: projectmesa/mesa
+#      - name: Checkout main branch
+#        uses: actions/checkout@v4
+#        with:
+#          ref: main
+#          repository: projectmesa/mesa
       - name: Run benchmarks on main branch
         run: python global_benchmark.py
-        working-directory: ./benchmarks
+        working-directory: benchmarks
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
@@ -38,10 +38,10 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
       - name: Run benchmarks on PR branch
         run: python global_benchmark.py
-        working-directory: ./benchmarks
+        working-directory: benchmarks
       - name: Run compare timings
         id: compare_timings
-        working-directory: ./benchmarks
+        working-directory: benchmarks
         run: |
           echo "::set-output name=TIMING_COMPARISON::$(python compare_timings.py)"
       - name: Comment PR
