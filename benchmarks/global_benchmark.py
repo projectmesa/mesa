@@ -46,7 +46,7 @@ def run_experiments(model_class, config):
     return init_times, run_times
 
 
-print(f"{time.strftime("%H:%M:%S", time.localtime())} starting benchmarks.")
+print(f"{time.strftime('%H:%M:%S', time.localtime())} starting benchmarks.")
 results_dict = {}
 for model, model_config in configurations.items():
     for size, config in model_config.items():
