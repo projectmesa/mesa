@@ -33,11 +33,21 @@ jobs:
       - name: Run benchmarks on main branch
         working-directory: benchmarks
         run: python global_benchmark.py
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: timings-main
+          path: benchmarks/timings_1.pickle
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
+      - name: Download benchmark results
+        uses: actions/download-artifact@v2
+        with:
+          name: timings-main
+          path: benchmarks/timings_1.pickle
       - name: Run benchmarks on PR branch
         working-directory: benchmarks
         run: python global_benchmark.py
