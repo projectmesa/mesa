@@ -1,9 +1,8 @@
 name: Performance benchmarks
 
 on:
-  push:  # Remove!
   pull_request:
-    types: [opened, ready_for_review]
+    # types: [opened, ready_for_review]
     branches:
       - main
   issue_comment:
