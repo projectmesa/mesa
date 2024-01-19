@@ -25,7 +25,6 @@ jobs:
         run: |
           pip install -r requirements.txt  # Replace with your project's dependency installation commands
       - name: Checkout main branch
-        uses: actions/checkout@v5
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}  # Replace with main once merged into main
