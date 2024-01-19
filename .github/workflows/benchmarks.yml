@@ -52,21 +52,22 @@ jobs:
       - name: Run benchmarks on PR branch
         working-directory: benchmarks
         run: python global_benchmark.py
-      - name: Run compare timings
+      - name: Run compare timings and encode output
         working-directory: benchmarks
         run: |
-          echo "TIMING_COMPARISON=$(python compare_timings.py)" >> $GITHUB_ENV
+          TIMING_COMPARISON=$(python compare_timings.py | base64 -w 0)  # Base64 encode the output
+          echo "TIMING_COMPARISON=$TIMING_COMPARISON" >> $GITHUB_ENV
+
       - name: Comment PR
-        if: github.event_name == 'pull_request' || (github.event_name == 'issue_comment' && github.event.issue.pull_request)
-        uses: actions/github-script@v7
+        uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = process.env.TIMING_COMPARISON;
+            const output = Buffer.from(process.env.TIMING_COMPARISON, 'base64').toString('utf-8');
             const issue_number = context.issue.number;
             github.rest.issues.createComment({
               issue_number: issue_number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Benchmark Comparison:\n' + output
+              body: 'Benchmark Comparison:\n\n' + output
             });
