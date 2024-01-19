@@ -1,6 +1,7 @@
 name: Performance benchmarks
 
 on:
+  push:  # Remove!
   pull_request:
     types: [opened, ready_for_review]
     branches:
@@ -27,6 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
+          repository: projectmesa/mesa
 #      - name: Run benchmarks on main branch
 #        run: python benchmarks/global_benchmark.py
       - name: Checkout PR branch
