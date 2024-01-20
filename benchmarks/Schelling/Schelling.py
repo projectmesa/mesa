@@ -1,8 +1,8 @@
 import random
 
-from mesa import Model, Agent
-from mesa.time import RandomActivation
+from mesa import Agent, Model
 from mesa.space import SingleGrid
+from mesa.time import RandomActivation
 
 
 class SchellingAgent(Agent):

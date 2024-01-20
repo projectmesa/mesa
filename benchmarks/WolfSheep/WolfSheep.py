@@ -10,10 +10,10 @@ Replication of the model found in NetLogo:
 """
 
 import mesa
-
-from .agents import Sheep, Wolf, GrassPatch
 from mesa.space import MultiGrid
 from mesa.time import RandomActivationByType
+
+from .agents import GrassPatch, Sheep, Wolf
 
 
 class WolfSheep(mesa.Model):
