@@ -63,8 +63,8 @@ class SchellingModel(Model):
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
         for _cont, pos in self.grid.coord_iter():
-            if random.random() < self.density:
-                agent_type = 1 if random.random() < self.minority_pc else 0
+            if random.random() < self.density:  # noqa: S311
+                agent_type = 1 if random.random() < self.minority_pc else 0  # noqa: S311
                 agent = SchellingAgent(pos, self, agent_type)
                 self.grid.place_agent(agent, pos)
                 self.schedule.add(agent)

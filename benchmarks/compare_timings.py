@@ -7,10 +7,10 @@ filename1 = "timings_1"
 filename2 = "timings_2"
 
 with open(f"{filename1}.pickle", "rb") as handle:
-    timings_1 = pickle.load(handle)
+    timings_1 = pickle.load(handle)  # noqa: S301
 
 with open(f"{filename2}.pickle", "rb") as handle:
-    timings_2 = pickle.load(handle)
+    timings_2 = pickle.load(handle)  # noqa: S301
 
 
 # Function to calculate the percentage change and perform bootstrap to estimate the confidence interval

@@ -62,20 +62,20 @@ class Boid(Agent):
         """
 
         neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
-        N = 0
+        n = 0
         match_vector, separation_vector, cohere = np.zeros((3, 2))
         for neighbor in neighbors:
-            N += 1
+            n += 1
             heading = self.model.space.get_heading(self.pos, neighbor.pos)
             cohere += heading
             if self.model.space.get_distance(self.pos, neighbor.pos) < self.separation:
                 separation_vector -= heading
             match_vector += neighbor.velocity
-        N = max(N, 1)
+        n = max(n, 1)
         cohere = cohere * self.cohere_factor
         separation_vector = separation_vector * self.separate_factor
         match_vector = match_vector * self.match_factor
-        self.velocity += (cohere + separation_vector + match_vector) / N
+        self.velocity += (cohere + separation_vector + match_vector) / n
         self.velocity /= np.linalg.norm(self.velocity)
         new_pos = self.pos + self.velocity * self.speed
         self.model.space.move_agent(self, new_pos)
