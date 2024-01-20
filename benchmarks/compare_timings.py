@@ -43,7 +43,7 @@ def performance_emoji(lower, upper):
 
 
 # Iterate over the models and sizes, perform analysis, and populate the DataFrame
-for model, size in timings_1.keys():
+for model, size in timings_1:
     model_name = model.__name__
 
     # Calculate percentage change and confidence interval for init times

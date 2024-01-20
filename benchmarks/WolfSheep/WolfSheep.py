@@ -66,7 +66,7 @@ class WolfSheep(mesa.Model):
         self.grid = MultiGrid(self.height, self.width, torus=False)
 
         # Create sheep:
-        for i in range(self.initial_sheep):
+        for _i in range(self.initial_sheep):
             pos = (
                 self.random.randrange(self.width),
                 self.random.randrange(self.height),
@@ -77,7 +77,7 @@ class WolfSheep(mesa.Model):
             self.schedule.add(sheep)
 
         # Create wolves
-        for i in range(self.initial_wolves):
+        for _i in range(self.initial_wolves):
             pos = (
                 self.random.randrange(self.width),
                 self.random.randrange(self.height),
@@ -89,7 +89,7 @@ class WolfSheep(mesa.Model):
 
         # Create grass patches
         possibly_fully_grown = [True, False]
-        for agent, pos in self.grid.coord_iter():
+        for _agent, pos in self.grid.coord_iter():
             fully_grown = self.random.choice(possibly_fully_grown)
             if fully_grown:
                 countdown = self.grass_regrowth_time

@@ -34,7 +34,7 @@ def run_experiments(model_class, config):
     for seed in range(1, config["seeds"] + 1):
         fastest_init = float("inf")
         fastest_run = float("inf")
-        for replication in range(1, config["replications"] + 1):
+        for _replication in range(1, config["replications"] + 1):
             init_time, run_time = run_model(model_class, seed, config["parameters"])
             if init_time < fastest_init:
                 fastest_init = init_time

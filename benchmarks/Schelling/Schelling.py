@@ -62,12 +62,9 @@ class SchellingModel(Model):
         # We use a grid iterator that returns
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
-        for cont, pos in self.grid.coord_iter():
+        for _cont, pos in self.grid.coord_iter():
             if random.random() < self.density:
-                if random.random() < self.minority_pc:
-                    agent_type = 1
-                else:
-                    agent_type = 0
+                agent_type = 1 if random.random() < self.minority_pc else 0
                 agent = SchellingAgent(pos, self, agent_type)
                 self.grid.place_agent(agent, pos)
                 self.schedule.add(agent)

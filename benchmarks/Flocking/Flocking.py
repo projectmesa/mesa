@@ -51,7 +51,7 @@ class BoidFlockers(Model):
         self.separation = separation
         self.schedule = RandomActivation(self)
         self.space = ContinuousSpace(width, height, True)
-        self.factors = dict(cohere=cohere, separate=separate, match=match)
+        self.factors = {"cohere": cohere, "separate": separate, "match": match}
         self.make_agents()
 
     def make_agents(self):
