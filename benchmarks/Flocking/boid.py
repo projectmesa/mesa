@@ -35,7 +35,7 @@ class Boid(Agent):
         Create a new Boid flocker agent.
 
         Args:
-            unique_id: Unique agent identifyer.
+            unique_id: Unique agent identifier.
             pos: Starting position
             speed: Distance to move per step.
             heading: numpy vector for the Boid's direction of movement.
