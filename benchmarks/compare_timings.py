@@ -31,6 +31,7 @@ def bootstrap_percentage_change_confidence_interval(data1, data2, n=1000):
 # DataFrame to store the results
 results_df = pd.DataFrame()
 
+
 # Function to determine the emoji based on change and confidence interval
 def performance_emoji(lower, upper):
     if upper < -3:
@@ -40,23 +41,32 @@ def performance_emoji(lower, upper):
     else:
         return "🔵"  # Emoji for insignificant change
 
+
 # Iterate over the models and sizes, perform analysis, and populate the DataFrame
 for model, size in timings_1.keys():
     model_name = model.__name__
 
     # Calculate percentage change and confidence interval for init times
-    init_change, init_lower, init_upper = bootstrap_percentage_change_confidence_interval(
+    (
+        init_change,
+        init_lower,
+        init_upper,
+    ) = bootstrap_percentage_change_confidence_interval(
         timings_1[(model, size)][0], timings_2[(model, size)][0]
     )
     init_emoji = performance_emoji(init_lower, init_upper)
-    init_summary = f"{init_emoji} {init_change:+.1f}% [{init_lower:+.1f}%, {init_upper:+.1f}%]"
+    init_summary = (
+        f"{init_emoji} {init_change:+.1f}% [{init_lower:+.1f}%, {init_upper:+.1f}%]"
+    )
 
     # Calculate percentage change and confidence interval for run times
     run_change, run_lower, run_upper = bootstrap_percentage_change_confidence_interval(
         timings_1[(model, size)][1], timings_2[(model, size)][1]
     )
     run_emoji = performance_emoji(run_lower, run_upper)
-    run_summary = f"{run_emoji} {run_change:+.1f}% [{run_lower:+.1f}%, {run_upper:+.1f}%]"
+    run_summary = (
+        f"{run_emoji} {run_change:+.1f}% [{run_lower:+.1f}%, {run_upper:+.1f}%]"
+    )
 
     # Append results to DataFrame
     row = pd.DataFrame(

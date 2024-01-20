@@ -15,10 +15,11 @@ from .agents import Sheep, Wolf, GrassPatch
 from mesa.space import MultiGrid
 from mesa.time import RandomActivationByType
 
+
 class WolfSheep(mesa.Model):
     """
     Wolf-Sheep Predation Model
-    
+
     A model for simulating wolf and sheep (predator-prey) ecosystem modelling.
     """
 
@@ -66,7 +67,10 @@ class WolfSheep(mesa.Model):
 
         # Create sheep:
         for i in range(self.initial_sheep):
-            pos = (self.random.randrange(self.width), self.random.randrange(self.height))
+            pos = (
+                self.random.randrange(self.width),
+                self.random.randrange(self.height),
+            )
             energy = self.random.randrange(2 * self.sheep_gain_from_food)
             sheep = Sheep(self.next_id(), pos, self, True, energy)
             self.grid.place_agent(sheep, pos)
@@ -74,12 +78,15 @@ class WolfSheep(mesa.Model):
 
         # Create wolves
         for i in range(self.initial_wolves):
-            pos = (self.random.randrange(self.width), self.random.randrange(self.height))
+            pos = (
+                self.random.randrange(self.width),
+                self.random.randrange(self.height),
+            )
             energy = self.random.randrange(2 * self.wolf_gain_from_food)
             wolf = Wolf(self.next_id(), pos, self, True, energy)
             self.grid.place_agent(wolf, pos)
             self.schedule.add(wolf)
-        
+
         # Create grass patches
         possibly_fully_grown = [True, False]
         for agent, pos in self.grid.coord_iter():

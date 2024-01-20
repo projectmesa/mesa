@@ -6,17 +6,18 @@ from mesa.space import SingleGrid
 
 
 class SchellingAgent(Agent):
-    '''
+    """
     Schelling segregation agent
-    '''
+    """
+
     def __init__(self, pos, model, agent_type):
-        '''
-         Create a new Schelling agent.
-         Args:
-            unique_id: Unique identifier for the agent.
-            x, y: Agent initial location.
-            agent_type: Indicator for the agent's type (minority=1, majority=0)
-        '''
+        """
+        Create a new Schelling agent.
+        Args:
+           unique_id: Unique identifier for the agent.
+           x, y: Agent initial location.
+           agent_type: Indicator for the agent's type (minority=1, majority=0)
+        """
         super().__init__(pos, model)
         self.pos = pos
         self.type = agent_type
@@ -36,13 +37,14 @@ class SchellingAgent(Agent):
 
 
 class SchellingModel(Model):
-    '''
+    """
     Model class for the Schelling segregation model.
-    '''
+    """
 
-    def __init__(self, seed, height, width, homophily, radius, density, minority_pc=0.5):
-        '''
-        '''
+    def __init__(
+        self, seed, height, width, homophily, radius, density, minority_pc=0.5
+    ):
+        """ """
         super().__init__(seed=seed)
         self.height = height
         self.width = width
@@ -71,8 +73,8 @@ class SchellingModel(Model):
                 self.schedule.add(agent)
 
     def step(self):
-        '''
+        """
         Run one step of the model.
-        '''
+        """
         self.happy = 0  # Reset counter of happy agents
         self.schedule.step()

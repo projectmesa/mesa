@@ -8,7 +8,7 @@ class Sheep(RandomWalker):
 
     The init is the same as the RandomWalker.
     """
-    
+
     def __init__(self, unique_id, pos, model, moore, energy=None):
         super().__init__(unique_id, pos, model, moore=moore)
         self.energy = energy
@@ -47,7 +47,7 @@ class Wolf(RandomWalker):
     """
     A wolf that walks around, reproduces (asexually) and eats sheep.
     """
-    
+
     def __init__(self, unique_id, pos, model, moore, energy=None):
         super().__init__(unique_id, pos, model, moore=moore)
         self.energy = energy
@@ -76,8 +76,8 @@ class Wolf(RandomWalker):
             # Create a new wolf cub
             self.energy /= 2
             cub = Wolf(
-                    self.model.next_id(), self.pos, self.model, self.moore, self.energy
-                )
+                self.model.next_id(), self.pos, self.model, self.moore, self.energy
+            )
             self.model.grid.place_agent(cub, cub.pos)
             self.model.schedule.add(cub)
 

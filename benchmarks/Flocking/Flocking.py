@@ -43,7 +43,7 @@ class BoidFlockers(Model):
             separation: What's the minimum distance each Boid will attempt to
                     keep from any other
             cohere, separate, match: factors for the relative importance of
-                    the three drives.        """
+                    the three drives."""
         super().__init__(seed=seed)
         self.population = population
         self.vision = vision
@@ -71,7 +71,7 @@ class BoidFlockers(Model):
                 velocity,
                 self.vision,
                 self.separation,
-                **self.factors
+                **self.factors,
             )
             self.space.place_agent(boid, pos)
             self.schedule.add(boid)

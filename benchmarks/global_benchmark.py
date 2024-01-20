@@ -55,7 +55,9 @@ for model, model_config in configurations.items():
         mean_init = sum(results[0]) / len(results[0])
         mean_run = sum(results[1]) / len(results[1])
 
-        print(f"{time.strftime("%H:%M:%S", time.localtime())} {model.__name__:<14} ({size}) timings: Init {mean_init:.5f} s; Run {mean_run:.4f} s")
+        print(
+            f"{time.strftime("%H:%M:%S", time.localtime())} {model.__name__:<14} ({size}) timings: Init {mean_init:.5f} s; Run {mean_run:.4f} s"
+        )
 
         results_dict[model, size] = results
 
