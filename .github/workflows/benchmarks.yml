@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
-          repository: EwoutH/mesa
+          repository: projectmesa/mesa
       - name: Run benchmarks on main branch
         working-directory: benchmarks
         run: python global_benchmark.py
