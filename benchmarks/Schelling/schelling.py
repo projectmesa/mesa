@@ -79,7 +79,8 @@ class Schelling(Model):
 if __name__ == '__main__':
     import time
 
-    model = Schelling
+    # model = Schelling(15, 40, 40, 3, 1, 0.625)
+    model = Schelling(15, 100, 100, 8, 2, 0.8)
 
     start_time = time.perf_counter()
     for _ in range(100):
