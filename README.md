@@ -1,5 +1,6 @@
 # Mesa: Agent-based modeling in Python
 
+[![PyPi](https://img.shields.io/pypi/v/mesa.svg)](https://pypi.python.org/pypi/Mesa)
 [![GitHub Actions build status](https://github.com/projectmesa/mesa/workflows/build/badge.svg)](https://github.com/projectmesa/mesa/actions)
 [![Coverage status](https://codecov.io/gh/projectmesa/mesa/branch/main/graph/badge.svg)](https://codecov.io/gh/projectmesa/mesa)
 [![code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)

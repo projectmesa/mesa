@@ -1,44 +1,133 @@
 ---
 title: Release History
 ---
+# 2.2.1 (2024-01-16)
+
+## Highlights
+After the huge 2.2.0 release we are releasing 2.2.1 which addresses a few bugs, unintended behaviors and a performance regression. #1960 makes sure agent addition and removal is handled correct, #1965 fixed an unintended behavior change in `RandomActivationByType.agents_by_type` and #1964 makes sure we're at least as fast as before 2.2.0, if not faster. The [introduction tutorial](https://mesa.readthedocs.io/en/stable/tutorials/intro_tutorial.html) is also extended with #1955.
+
+We highly recommend updating to 2.2.1 if you're using 2.2.0.
+
+## What's Changed
+### 🧪 Experimental features
+* jupyter_viz: Implement multiline plot by @rht in https://github.com/projectmesa/mesa/pull/1941
+### 🛠 Enhancements made
+* make mesa runable without some dependencies by @Corvince in https://github.com/projectmesa/mesa/pull/1950
+* Improve performance of AgentSet and iter_cell_list_contents by @Corvince in https://github.com/projectmesa/mesa/pull/1964
+### 🐛 Bugs fixed
+* Bugfix in agentset to handle addition and removal correctly by @quaquel in https://github.com/projectmesa/mesa/pull/1960
+* Make RandomActivationByType.agents_by_type backward compatible by @quaquel in https://github.com/projectmesa/mesa/pull/1965
+### 📜 Documentation improvements
+* Refer to just Python instead of Python 3 by @rht in https://github.com/projectmesa/mesa/pull/1957
+* intro tutorial: Analysing model reporters by @EwoutH in https://github.com/projectmesa/mesa/pull/1955
+### 🔧 Maintenance
+* Migrate from setuptools to hatch by @rht in https://github.com/projectmesa/mesa/pull/1882
+* ci: Add tests for mesa-examples by @rht in https://github.com/projectmesa/mesa/pull/1956
+* refactor: Move Matplotlib-specific Solara components to separate file by @rht in https://github.com/projectmesa/mesa/pull/1943
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.0...v2.2.1
+
 
 # 2.2.0 (2024-01-09)
 
-# Highlights
-This release incorporates several majors changes to Mesa. Notably, this provides two experimental features. (1) It reimagines Mesa's agent handling to have agents in the model class and store them in sets (you may submit feedback at https://github.com/projectmesa/mesa/discussions/1919). The intent is to make Mesa more efficient and give users more control over agent scheduling to allow for innumerable options. (2) It adds property layer and property grid so users can layer on multiple grids making Mesa and Geo-Mesa more similar (you may submit feedback at https://github.com/projectmesa/mesa/discussions/1932).
+## Highlights
+The 2.2.0 release of the Mesa library introduces several updates and new features for managing and scheduling agents and modelling the environment, along with an experimental release policy aimed at enhancing development speed and community feedback. Below are key highlights of the new (experimental) features in this release. Mesa 2.2.0 supports Python 3.9+.
 
-# What's Changed
+Despite the minor version number, this is one of our biggest releases yet.
 
-## 🧪 Experimental features
-* Introduce AgentSet class by @EwoutH in https://github.com/projectmesa/mesa/pull/1916
-* Reimplement schedulers to use AgentSet by @quaquel in https://github.com/projectmesa/mesa/pull/1926
-* Work around for initializing model._agent by @quaquel in https://github.com/projectmesa/mesa/pull/1928
-* space: Implement PropertyLayer and _PropertyGrid by @EwoutH in https://github.com/projectmesa/mesa/pull/1898
+### Experimental feature policy (discussion #1909)
+This release introduces an experimental feature policy aimed at accelerating development and gathering community feedback. Features like #1890, #1898, and #1916 are marked as experimental under this policy.
 
-## 🛠 Enhancements made
+**Policy overview:**
+- Experimental features can be added or changed in any release, even patch releases.
+- They don’t need a diligent review for every change, allowing for quicker development cycles.
+- Community feedback is encouraged through discussion threads.
+
+### Native support for multiple Agent types (PR #1894)
+This update introduces a `agents` variable to the Mesa `Model` class, offering a first step in supporting multiple agent types as first class citizens. Each `Model` is now initialized with an `self.agents` variable (an `AgentSet`) in which all the agents are tracked. You can now always ask which agents are in the model with `model.agents`. It's the foundation which will allow us to solve problems with scheduling, data collection and visualisation of multiple agent types in the future.
+
+### 🧪 AgentSet class (PR #1916)
+The new `AgentSet` class encapsulates and manages collections of agents, streamlining the process of selecting, sorting, and applying actions to groups of agents.
+
+**Key features:**
+- Flexible and efficient agent management and manipulation.
+- Methods like `select`, `shuffle`, `sort`, and `do` for intuitive operations.
+
+**Example:**
+```Python
+# Applying a method to each agent
+model.agents.do('step')
+
+# Filtering and shuffling agents
+shuffled_agents = model.agents.select(lambda agent: agent.attribute > threshold).shuffle()
+```
+_The AgentSet is an experimental feature. We would love feedback on it in #1919._
+
+### 🧪 PropertyLayer and _PropertyGrid (PR #1898)
+The introduction of `PropertyLayer` and the extension of `SingleGrid` and `MultiGrid` classes to support cell properties mark a significant enhancement in Mesa's environmental modeling capabilities. It allows to add different layers of variables to grids, that can be used to represent spatial environmental properties, such as elevation, pollution, flood levels or foliage.
+
+**Key features:**
+- Efficient management of environmental properties like terrain types and resources.
+- Dynamic interaction between agents and their environment.
+- Fast modification and selection of cells based on one or multiple properties
+
+**Example:**
+```Python
+from mesa.space import SingleGrid, PropertyLayer
+
+grid = SingleGrid(10, 10, False)
+property_layer = PropertyLayer("elevation", 10, 10, default_value=0)
+grid.add_property_layer(property_layer)
+
+# Modify multiple cells values
+grid.properties["elevation"].modify_cells(np.multiply, 2)
+
+# Select cells that have an elevation of at least 50
+high_elevation_cells = grid.properties["elevation"].select_cells(condition=lambda x: x > 50)
+```
+_The PropertyLayer is an experimental feature. We would love feedback on it in #1932._
+
+### 🧪 DiscreteEventScheduler (PR #1890)
+The `DiscreteEventScheduler` is an innovative addition to the Mesa time module, tailored for discrete event simulations. This scheduler advances simulations based on specific event timings rather than regular intervals, providing more flexibility in modeling complex systems.
+
+**Key Features:**
+- Efficient handling of events scheduled for specific simulation times.
+- Randomized execution order for events scheduled at the same time.
+
+_The DiscreteEventScheduler is an experimental feature. We would love feedback on it in #1923._
+
+## What's Changed
+
+### 🧪 Experimental features
 * Native support for multiple agent types by @EwoutH in https://github.com/projectmesa/mesa/pull/1894
-* Document empties property by @EwoutH in https://github.com/projectmesa/mesa/pull/1888
+* space: Implement PropertyLayer and _PropertyGrid by @EwoutH in https://github.com/projectmesa/mesa/pull/1898
 * Add DiscreteEventScheduler by @EwoutH in https://github.com/projectmesa/mesa/pull/1890
+
+### 🎉 New features added
+* Introduce AgentSet class by @EwoutH in https://github.com/projectmesa/mesa/pull/1916
+
+### 🛠 Enhancements made
+* Reimplement schedulers to use AgentSet by @quaquel in https://github.com/projectmesa/mesa/pull/1926
 * space: Let move_agent choose from multiple positions by @EwoutH in https://github.com/projectmesa/mesa/pull/1920
 
-## 🐛 Bugs fixed
+### 🐛 Bugs fixed
+* Work around for initializing model._agent by @quaquel in https://github.com/projectmesa/mesa/pull/1928
 * Honor disabled space drawer option when rendering in the browser by @rlskoeser in https://github.com/projectmesa/mesa/pull/1907
 
-## 📜 Documentation improvements
+### 📜 Documentation improvements
+* Document empties property by @EwoutH in https://github.com/projectmesa/mesa/pull/1888
 * docs: Fix README.md inline code formatting by @rht in https://github.com/projectmesa/mesa/pull/1887
-* Add experimental warning to DiscreteEventScheduler by @EwoutH in https://github.com/projectmesa/mesa/pull/1924
 
-## 🔧 Maintenance
+### 🔧 Maintenance
 * ci: Speed up pip install by caching deps install output by @rht in https://github.com/projectmesa/mesa/pull/1885
-* [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in https://github.com/projectmesa/mesa/pull/1899
-* build(deps): bump actions/setup-python from 4 to 5 by @dependabot in https://github.com/projectmesa/mesa/pull/1904
 * Create release.yml file for automatic release notes generation by @EwoutH in https://github.com/projectmesa/mesa/pull/1925
 * Drop support for Python 3.8 by @rht in https://github.com/projectmesa/mesa/pull/1756
 
-## New Contributors
+### New Contributors
 * @quaquel made their first contribution in https://github.com/projectmesa/mesa/pull/1928
 
 **Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.1.5...v2.2.0
+
 
 # 2.1.5 (2023-11-26)
 

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import itertools
 import random
+import warnings
 from collections import defaultdict
 
 # mypy
@@ -29,7 +30,7 @@ class Model:
         running: A boolean indicating if the model should continue running.
         schedule: An object to manage the order and execution of agent steps.
         current_id: A counter for assigning unique IDs to agents.
-        _agents: A defaultdict mapping each agent type to a dict of its instances.
+        agents_: A defaultdict mapping each agent type to a dict of its instances.
                  This private attribute is used internally to manage agents.
 
     Properties:
@@ -65,7 +66,7 @@ class Model:
         self.running = True
         self.schedule = None
         self.current_id = 0
-        self._agents: defaultdict[type, dict] = defaultdict(dict)
+        self.agents_: defaultdict[type, dict] = defaultdict(dict)
 
         # Warning flags for current experimental features. These make sure a warning is only printed once per model.
         self.agentset_experimental_warning_given = False
@@ -73,19 +74,33 @@ class Model:
     @property
     def agents(self) -> AgentSet:
         """Provides an AgentSet of all agents in the model, combining agents from all types."""
-        all_agents = itertools.chain(
-            *(agents_by_type.keys() for agents_by_type in self._agents.values())
+
+        if hasattr(self, "_agents"):
+            return self._agents
+        else:
+            all_agents = itertools.chain.from_iterable(self.agents_.values())
+            return AgentSet(all_agents, self)
+
+    @agents.setter
+    def agents(self, agents: Any) -> None:
+        warnings.warn(
+            "You are trying to set model.agents. In a next release, this attribute is used "
+            "by MESA itself so you cannot use it directly anymore."
+            "Please adjust your code to use a different attribute name for custom agent storage",
+            UserWarning,
+            stacklevel=2,
         )
-        return AgentSet(all_agents, self)
+
+        self._agents = agents
 
     @property
     def agent_types(self) -> list[type]:
         """Return a list of different agent types."""
-        return list(self._agents.keys())
+        return list(self.agents_.keys())
 
     def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
         """Retrieves an AgentSet containing all agents of the specified type."""
-        return AgentSet(self._agents[agenttype].keys(), self)
+        return AgentSet(self.agents_[agenttype].keys(), self)
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as

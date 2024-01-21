@@ -1,6 +1,5 @@
 import sys
 import threading
-from typing import Optional
 
 import matplotlib.pyplot as plt
 import reacton.ipywidgets as widgets
@@ -18,7 +17,7 @@ def JupyterViz(
     model_class,
     model_params,
     measures=None,
-    name="Mesa Model",
+    name=None,
     agent_portrayal=None,
     space_drawer="default",
     play_interval=150,
@@ -36,6 +35,9 @@ def JupyterViz(
             specify `space_drawer=False`
         play_interval: play interval (default: 150)
     """
+    if name is None:
+        name = model_class.__name__
+
     current_step = solara.use_reactive(0)
 
     # 1. Set up model parameters
