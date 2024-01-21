@@ -74,3 +74,15 @@ class Schelling(Model):
         """
         self.happy = 0  # Reset counter of happy agents
         self.schedule.step()
+
+
+if __name__ == '__main__':
+    import time
+
+    model = Schelling
+
+    start_time = time.perf_counter()
+    for _ in range(100):
+        model.step()
+
+    print(time.perf_counter() - start_time)
