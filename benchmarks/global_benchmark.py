@@ -5,6 +5,10 @@ import sys
 import time
 import timeit
 
+# making sure we use this version of mesa and not one
+# also installed in site_packages or so.
+sys.path.insert(0, os.path.abspath('..'))
+
 from configurations import configurations
 
 
@@ -56,7 +60,7 @@ for model, model_config in configurations.items():
         mean_run = sum(results[1]) / len(results[1])
 
         print(
-            f"{time.strftime("%H:%M:%S", time.localtime())} {model.__name__:<14} ({size}) timings: Init {mean_init:.5f} s; Run {mean_run:.4f} s"
+            f"{time.strftime('%H:%M:%S', time.localtime())} {model.__name__:<14} ({size}) timings: Init {mean_init:.5f} s; Run {mean_run:.4f} s"
         )
 
         results_dict[model, size] = results
