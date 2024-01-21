@@ -1,4 +1,4 @@
-from wolf_sheep import WolfSheep
+from .wolf_sheep import WolfSheep
 
 if __name__ == "__main__":
     # for profiling this benchmark model
