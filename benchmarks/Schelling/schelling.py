@@ -10,7 +10,7 @@ class SchellingAgent(Agent):
     Schelling segregation agent
     """
 
-    def __init__(self, pos, model, agent_type):
+    def __init__(self, unique_id, model, agent_type):
         """
         Create a new Schelling agent.
         Args:
@@ -18,8 +18,7 @@ class SchellingAgent(Agent):
            x, y: Agent initial location.
            agent_type: Indicator for the agent's type (minority=1, majority=0)
         """
-        super().__init__(pos, model)
-        self.pos = pos
+        super().__init__(unique_id, model)
         self.type = agent_type
 
     def step(self):
@@ -36,7 +35,7 @@ class SchellingAgent(Agent):
             self.model.happy += 1
 
 
-class SchellingModel(Model):
+class Schelling(Model):
     """
     Model class for the Schelling segregation model.
     """
@@ -65,7 +64,7 @@ class SchellingModel(Model):
         for _cont, pos in self.grid.coord_iter():
             if random.random() < self.density:  # noqa: S311
                 agent_type = 1 if random.random() < self.minority_pc else 0  # noqa: S311
-                agent = SchellingAgent(pos, self, agent_type)
+                agent = SchellingAgent(self.next_id(), self, agent_type)
                 self.grid.place_agent(agent, pos)
                 self.schedule.add(agent)
 

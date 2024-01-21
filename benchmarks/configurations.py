@@ -1,10 +1,10 @@
 from Flocking.Flocking import BoidFlockers
-from Schelling.Schelling import SchellingModel
-from WolfSheep.WolfSheep import WolfSheep
+from Schelling.schelling import Schelling
+from WolfSheep.wolf_sheep import WolfSheep
 
 configurations = {
     # Schelling Model Configurations
-    SchellingModel: {
+    Schelling: {
         "small": {
             "seeds": 50,
             "replications": 5,
