@@ -23,8 +23,7 @@ class SchellingAgent(Agent):
 
     def step(self):
         similar = 0
-        r = self.model.radius
-        for neighbor in self.model.grid.iter_neighbors(self.pos, moore=True, radius=r):
+        for neighbor in self.model.grid.iter_neighbors(self.pos, moore=True, radius=self.model.radius):
             if neighbor.type == self.type:
                 similar += 1
 
