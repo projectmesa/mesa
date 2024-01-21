@@ -55,6 +55,8 @@ def _draw_grid(space, space_ax, agent_portrayal):
             out["c"] = c
         return out
 
+    space_ax.set_xlim(-1, space.width)
+    space_ax.set_ylim(-1, space.height)
     space_ax.scatter(**portray(space))
 
 
@@ -90,6 +92,14 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
         if len(c) > 0:
             out["c"] = c
         return out
+
+    width = space.x_max - space.x_min
+    x_padding = width / 20
+    height = space.y_max - space.y_min
+    y_padding = height / 20
+    space_ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
+    space_ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
+    space_ax.scatter(**portray(space))
 
     space_ax.scatter(**portray(space))
 
