@@ -1,4 +1,4 @@
-from Flocking.Flocking import BoidFlockers
+from Flocking.flocking import BoidFlockers
 from Schelling.schelling import Schelling
 from WolfSheep.wolf_sheep import WolfSheep
 

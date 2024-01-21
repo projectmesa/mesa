@@ -7,7 +7,7 @@ import timeit
 
 # making sure we use this version of mesa and not one
 # also installed in site_packages or so.
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(".."))
 
 from configurations import configurations
 

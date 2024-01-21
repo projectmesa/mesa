@@ -1,4 +1,3 @@
-import random
 
 from mesa import Agent, Model
 from mesa.space import SingleGrid
@@ -61,8 +60,8 @@ class Schelling(Model):
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
         for _cont, pos in self.grid.coord_iter():
-            if self.random.random() < self.density:  # noqa: S311
-                agent_type = 1 if self.random.random() < self.minority_pc else 0  # noqa: S311
+            if self.random.random() < self.density:
+                agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(self.next_id(), self, agent_type)
                 self.grid.place_agent(agent, pos)
                 self.schedule.add(agent)
@@ -75,7 +74,7 @@ class Schelling(Model):
         self.schedule.step()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import time
 
     # model = Schelling(15, 40, 40, 3, 1, 0.625)
