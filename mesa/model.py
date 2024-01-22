@@ -70,7 +70,7 @@ class Model:
         self.current_id = 0
         self.agents_: defaultdict[type, dict] = defaultdict(dict)
 
-        self._steps = 0
+        self._steps: int = 0
         self._time: TimeT = 0  # the model's clock
 
         # Warning flags for current experimental features. These make sure a warning is only printed once per model.
