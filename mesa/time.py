@@ -106,6 +106,7 @@ class BaseScheduler:
             agent: An agent object.
         """
         self._agents.remove(agent)
+        agent.remove()
 
     def step(self) -> None:
         """Execute the step of all the agents, one at a time."""
