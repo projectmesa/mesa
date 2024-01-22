@@ -22,7 +22,6 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: Optional[list[any]] = 
         _draw_continuous_space(space, space_ax, agent_portrayal)
     else:
         _draw_grid(space, space_ax, agent_portrayal)
-    space_ax.set_axis_off()
     solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
 
 
