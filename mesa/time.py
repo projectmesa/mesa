@@ -114,8 +114,6 @@ class BaseScheduler:
         self.do_each("step")
         self.steps += 1
         self.time += 1
-        if self.model.steps_ < self.steps:
-            self.model._advance_time()
 
     def get_agent_count(self) -> int:
         """Returns the current number of agents in the queue."""
@@ -173,8 +171,6 @@ class RandomActivation(BaseScheduler):
         self.do_each("step", shuffle=True)
         self.steps += 1
         self.time += 1
-        if self.model.steps_ < self.steps:
-            self.model._advance_time()
 
 
 class SimultaneousActivation(BaseScheduler):
@@ -203,8 +199,6 @@ class SimultaneousActivation(BaseScheduler):
         self.do_each("advance")
         self.steps += 1
         self.time += 1
-        if self.model.steps_ < self.steps:
-            self.model._advance_time()
 
 
 class StagedActivation(BaseScheduler):
@@ -268,8 +262,6 @@ class StagedActivation(BaseScheduler):
             self.time += self.stage_time
 
         self.steps += 1
-        if self.model.steps_ < self.steps:
-            self.model._advance_time()
 
 
 class RandomActivationByType(BaseScheduler):
@@ -370,8 +362,6 @@ class RandomActivationByType(BaseScheduler):
             self.step_type(agent_class, shuffle_agents=shuffle_agents)
         self.steps += 1
         self.time += 1
-        if self.model.steps_ < self.steps:
-            self.model._advance_time()
 
     def step_type(self, agenttype: type[Agent], shuffle_agents: bool = True) -> None:
         """
@@ -497,8 +487,6 @@ class DiscreteEventScheduler(BaseScheduler):
         # After processing events, advance time by the time_step
         self.time = end_time
         self.steps += 1
-        if self.model.steps_ < self.steps:
-            self.model._advance_time()
 
     def get_next_event_time(self) -> TimeT | None:
         """Returns the time of the next scheduled event."""
