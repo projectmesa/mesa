@@ -71,7 +71,7 @@ class Model:
         self.agents_: defaultdict[type, dict] = defaultdict(dict)
 
         self._steps: int = 0
-        self._time: TimeT = 0  # the model's clock
+        self.time_: TimeT = 0  # the model's clock
 
         # Warning flags for current experimental features. These make sure a warning is only printed once per model.
         self.agentset_experimental_warning_given = False
@@ -120,7 +120,7 @@ class Model:
     def _advance_time(self, deltat: TimeT = 1):
         """Increment the model's steps counter and clock."""
         self._steps += 1
-        self._time += deltat
+        self.time_ += deltat
 
     def next_id(self) -> int:
         """Return the next unique ID for agents, increment current_id"""
