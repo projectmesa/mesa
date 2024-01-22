@@ -92,9 +92,6 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
             out["c"] = c
         return out
 
-    # Set light grey background
-    space_ax.set_facecolor('lightgrey')
-
     # Determine border style based on space.torus
     border_style = 'solid' if not space.torus else (0, (5, 10))
 
