@@ -1,6 +1,19 @@
 ---
 title: Release History
 ---
+# 2.2.2 (2024-01-22)
+
+## Highlights
+
+Mesa 2.2.2 is a small bugfix release, for models in which users had defined  `Model.agents` (`self.agents` in a Model (sub)class). This is deprecated, but for now allowed. See [#1919 (comment)](https://github.com/projectmesa/mesa/discussions/1919#discussioncomment-8141844).
+
+## What's Changed
+### 🐛 Bugs fixed
+* Allow user models to assign `Model.agents` for now, but add warning by @quaquel in [#1976](https://github.com/projectmesa/mesa/pull/1976)
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.1...v2.2.2
+
+
 # 2.2.1 (2024-01-16)
 
 ## Highlights
