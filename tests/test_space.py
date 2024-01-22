@@ -280,7 +280,7 @@ class TestSpaceAgentMapping(unittest.TestCase):
 
 class TestPropertyLayer(unittest.TestCase):
     def setUp(self):
-        self.layer = PropertyLayer("test_layer", 10, 10, 0)
+        self.layer = PropertyLayer("test_layer", 10, 10, 0, dtype=int)
 
     # Initialization Test
     def test_initialization(self):
@@ -379,11 +379,11 @@ class TestPropertyLayer(unittest.TestCase):
     # Edge Case: Negative or Zero Dimensions
     def test_initialization_negative_dimensions(self):
         with self.assertRaises(ValueError):
-            PropertyLayer("test_layer", -10, 10, 0)
+            PropertyLayer("test_layer", -10, 10, 0, dtype=int)
 
     def test_initialization_zero_dimensions(self):
         with self.assertRaises(ValueError):
-            PropertyLayer("test_layer", 0, 10, 0)
+            PropertyLayer("test_layer", 0, 10, 0, dtype=int)
 
     # Edge Case: Out-of-Bounds Cell Access
     def test_set_cell_out_of_bounds(self):
@@ -611,8 +611,8 @@ class TestSingleGridTorus(unittest.TestCase):
 class TestSingleGridWithPropertyGrid(unittest.TestCase):
     def setUp(self):
         self.grid = SingleGrid(10, 10, False)
-        self.property_layer1 = PropertyLayer("layer1", 10, 10, 0)
-        self.property_layer2 = PropertyLayer("layer2", 10, 10, 1)
+        self.property_layer1 = PropertyLayer("layer1", 10, 10, 0, dtype=int)
+        self.property_layer2 = PropertyLayer("layer2", 10, 10, 1.0, dtype=float)
         self.grid.add_property_layer(self.property_layer1)
         self.grid.add_property_layer(self.property_layer2)
 
@@ -627,7 +627,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
 
     def test_add_property_layer_mismatched_dimensions(self):
         with self.assertRaises(ValueError):
-            self.grid.add_property_layer(PropertyLayer("layer3", 5, 5, 0))
+            self.grid.add_property_layer(PropertyLayer("layer3", 5, 5, 0, dtype=int))
 
     def test_add_existing_property_layer(self):
         with self.assertRaises(ValueError):
