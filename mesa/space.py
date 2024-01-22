@@ -1539,9 +1539,11 @@ class NetworkGrid:
             neighborhood = sorted(neighbors_with_distance.keys())
         return neighborhood
 
-    def get_neighbors(self, node_id: int, include_center: bool = False) -> list[Agent]:
-        """Get all agents in adjacent nodes."""
-        neighborhood = self.get_neighborhood(node_id, include_center)
+    def get_neighbors(
+        self, node_id: int, include_center: bool = False, radius: int = 1
+    ) -> list[Agent]:
+        """Get all agents in adjacent nodes (within a certain radius)."""
+        neighborhood = self.get_neighborhood(node_id, include_center, radius)
         return self.get_cell_list_contents(neighborhood)
 
     def move_agent(self, agent: Agent, node_id: int) -> None:

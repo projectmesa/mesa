@@ -280,7 +280,7 @@ class TestSpaceAgentMapping(unittest.TestCase):
 
 class TestPropertyLayer(unittest.TestCase):
     def setUp(self):
-        self.layer = PropertyLayer("test_layer", 10, 10, 0)
+        self.layer = PropertyLayer("test_layer", 10, 10, 0, dtype=int)
 
     # Initialization Test
     def test_initialization(self):
@@ -379,11 +379,11 @@ class TestPropertyLayer(unittest.TestCase):
     # Edge Case: Negative or Zero Dimensions
     def test_initialization_negative_dimensions(self):
         with self.assertRaises(ValueError):
-            PropertyLayer("test_layer", -10, 10, 0)
+            PropertyLayer("test_layer", -10, 10, 0, dtype=int)
 
     def test_initialization_zero_dimensions(self):
         with self.assertRaises(ValueError):
-            PropertyLayer("test_layer", 0, 10, 0)
+            PropertyLayer("test_layer", 0, 10, 0, dtype=int)
 
     # Edge Case: Out-of-Bounds Cell Access
     def test_set_cell_out_of_bounds(self):
@@ -611,8 +611,8 @@ class TestSingleGridTorus(unittest.TestCase):
 class TestSingleGridWithPropertyGrid(unittest.TestCase):
     def setUp(self):
         self.grid = SingleGrid(10, 10, False)
-        self.property_layer1 = PropertyLayer("layer1", 10, 10, 0)
-        self.property_layer2 = PropertyLayer("layer2", 10, 10, 1)
+        self.property_layer1 = PropertyLayer("layer1", 10, 10, 0, dtype=int)
+        self.property_layer2 = PropertyLayer("layer2", 10, 10, 1.0, dtype=float)
         self.grid.add_property_layer(self.property_layer1)
         self.grid.add_property_layer(self.property_layer2)
 
@@ -627,7 +627,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
 
     def test_add_property_layer_mismatched_dimensions(self):
         with self.assertRaises(ValueError):
-            self.grid.add_property_layer(PropertyLayer("layer3", 5, 5, 0))
+            self.grid.add_property_layer(PropertyLayer("layer3", 5, 5, 0, dtype=int))
 
     def test_add_existing_property_layer(self):
         with self.assertRaises(ValueError):
@@ -867,11 +867,53 @@ class TestSingleNetworkGrid(unittest.TestCase):
             a = self.agents[i]
             assert a.pos == pos
 
-    def test_get_neighbors(self):
+    def test_get_neighborhood(self):
         assert len(self.space.get_neighborhood(0, include_center=True)) == 3
         assert len(self.space.get_neighborhood(0, include_center=False)) == 2
         assert len(self.space.get_neighborhood(2, include_center=True, radius=3)) == 7
         assert len(self.space.get_neighborhood(2, include_center=False, radius=3)) == 6
+
+    def test_get_neighbors(self):
+        """
+        Test the get_neighbors method with varying radius and include_center values. Note there are agents on node 0, 1 and 5.
+        """
+        # Test with default radius (1) and include_center = False
+        neighbors_default = self.space.get_neighbors(0, include_center=False)
+        self.assertEqual(
+            len(neighbors_default),
+            1,
+            "Should have 1 neighbors with default radius and exclude center",
+        )
+
+        # Test with default radius (1) and include_center = True
+        neighbors_include_center = self.space.get_neighbors(0, include_center=True)
+        self.assertEqual(
+            len(neighbors_include_center),
+            2,
+            "Should have 2 neighbors (including center) with default radius",
+        )
+
+        # Test with radius = 2 and include_center = False
+        neighbors_radius_2 = self.space.get_neighbors(0, include_center=False, radius=5)
+        expected_count_radius_2 = 2
+        self.assertEqual(
+            len(neighbors_radius_2),
+            expected_count_radius_2,
+            f"Should have {expected_count_radius_2} neighbors with radius 2 and exclude center",
+        )
+
+        # Test with radius = 2 and include_center = True
+        neighbors_radius_2_include_center = self.space.get_neighbors(
+            0, include_center=True, radius=5
+        )
+        expected_count_radius_2_include_center = (
+            3  # Adjust this based on your network structure
+        )
+        self.assertEqual(
+            len(neighbors_radius_2_include_center),
+            expected_count_radius_2_include_center,
+            f"Should have {expected_count_radius_2_include_center} neighbors (including center) with radius 2",
+        )
 
     def test_move_agent(self):
         initial_pos = 1
