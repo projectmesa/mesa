@@ -72,8 +72,6 @@ class Model:
 
         self.steps_: int = 0
         self.time_: TimeT = 0  # the model's clock
-        self._original_step = self.step
-        self.step = self._wrapped_step
 
         # Warning flags for current experimental features. These make sure a warning is only printed once per model.
         self.agentset_experimental_warning_given = False
@@ -118,11 +116,6 @@ class Model:
 
     def step(self) -> None:
         """A single step. Fill in here."""
-
-    def _wrapped_step(self):
-        """Wrapper for the step method to include time and step updating."""
-        self._original_step()
-        self._advance_time()
 
     def _advance_time(self, deltat: TimeT = 1):
         """Increment the model's steps counter and clock."""
