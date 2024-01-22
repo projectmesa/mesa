@@ -1,6 +1,21 @@
 ---
 title: Release History
 ---
+
+# 2.2.3 (2024-01-22)
+
+## Highlights
+Mesa 2.2.3 is a small release with two improvements to the experimental Solara visualisation, on request of one of our contributors. No stable features have changed.
+
+## What's Changed
+### 🧪 Experimental features
+* solara_viz: Add borders around ContinuousSpace by @EwoutH in https://github.com/projectmesa/mesa/pull/1988
+### 🐛 Bugs fixed
+* fix: Explicitly specify JupyterViz space view limits by @rht in https://github.com/projectmesa/mesa/pull/1984
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.2...v2.2.3
+
+
 # 2.2.2 (2024-01-22)
 
 ## Highlights
