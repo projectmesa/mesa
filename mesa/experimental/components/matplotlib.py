@@ -93,14 +93,26 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
             out["c"] = c
         return out
 
+    # Set light grey background
+    space_ax.set_facecolor('lightgrey')
+
+    # Determine border style based on space.torus
+    border_style = 'solid' if not space.torus else 'dotted'
+
+    # Set the border of the plot
+    for spine in space_ax.spines.values():
+        spine.set_linewidth(1.5)
+        spine.set_color('black')
+        spine.set_linestyle(border_style)
+
     width = space.x_max - space.x_min
     x_padding = width / 20
     height = space.y_max - space.y_min
     y_padding = height / 20
     space_ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
     space_ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
-    space_ax.scatter(**portray(space))
 
+    # Portray and scatter the agents in the space
     space_ax.scatter(**portray(space))
 
 
