@@ -85,7 +85,6 @@ class MockModel(Model):
     def step(self):
         self.datacollector.collect(self)
         self.schedule.step()
-        self._advance_time()
 
 
 def test_batch_run():
