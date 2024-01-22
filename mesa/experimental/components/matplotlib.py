@@ -96,7 +96,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
     space_ax.set_facecolor('lightgrey')
 
     # Determine border style based on space.torus
-    border_style = 'solid' if not space.torus else 'dotted'
+    border_style = 'solid' if not space.torus else (0, (5, 10))
 
     # Set the border of the plot
     for spine in space_ax.spines.values():
