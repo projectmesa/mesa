@@ -1,27 +1,27 @@
 import itertools
 import random
-from functools import cache
-from typing import Any
+from functools import cache, cached_property
+from typing import Any, Callable, Optional
 
-from mesa import Agent
+from .agent import Agent
 
-Coordinates = tuple[int, int]
+Coordinate = tuple[int, int]
 
 
 def create_neighborhood_getter(moore=True, include_center=False, radius=1):
     @cache
     def of(cell: Cell):
         if radius == 0:
-            return {cell: cell.content}
+            return {cell: cell.agents}
 
         neighborhood = {}
-        for neighbor in cell.connections:
+        for neighbor in cell._connections:
             if (
                 moore
-                or neighbor.coords[0] == cell.coords[0]
-                or neighbor.coords[1] == cell.coords[1]
+                or neighbor.coordinate[0] == cell.coordinate[0]
+                or neighbor.coordinate[1] == cell.coordinate[1]
             ):
-                neighborhood[neighbor] = neighbor.content
+                neighborhood[neighbor] = neighbor.agents
 
         if radius > 1:
             for neighbor in list(neighborhood.keys()):
@@ -40,125 +40,129 @@ def create_neighborhood_getter(moore=True, include_center=False, radius=1):
 
 
 class Cell:
-    __slots__ = ["coords", "connections", "content"]
+    __slots__ = ["coordinate", "_connections", "agents", "capacity", "properties"]
 
-    def __init__(self, i: int, j: int) -> None:
-        self.coords = (i, j)
-        self.connections: list[Cell] = []
-        self.content: list[Agent] = []
+    def __init__(self, i: int, j: int, capacity: int = 1) -> None:
+        self.coordinate = (i, j)
+        self._connections: list[Cell] = []
+        self.agents: list[Agent] = []
+        self.capacity = capacity
+        self.properties: dict[str, Any] = {}
 
     def connect(self, other) -> None:
         """Connects this cell to another cell."""
-        self.connections.append(other)
+        self._connections.append(other)
 
     def disconnect(self, other) -> None:
         """Disconnects this cell from another cell."""
-        self.connections.remove(other)
+        self._connections.remove(other)
 
     def add_agent(self, agent: Agent) -> None:
         """Adds an agent to the cell."""
-        self.content.append(agent)
+        if len(self.agents) >= self.capacity:
+            raise Exception("ERROR: Cell is full")
+        if isinstance(agent.cell, Cell):
+            agent.cell.remove_agent(agent)
+        self.agents.append(agent)
         agent.cell = self
 
     def remove_agent(self, agent: Agent) -> None:
         """Removes an agent from the cell."""
-        if agent in self.content:
-            self.content.remove(agent)
+        self.agents.remove(agent)
+        agent.cell = None
+
+    @property
+    def is_empty(self) -> bool:
+        """Returns a bool of the contents of a cell."""
+        return len(self.agents) == 0
+
+    @property
+    def is_full(self) -> bool:
+        """Returns a bool of the contents of a cell."""
+        return len(self.agents) == self.capacity
 
     def __repr__(self):
-        return f"Cell({self.coords})"
+        return f"Cell({self.coordinate}, {self.agents})"
 
 
 class CellCollection:
     def __init__(self, cells: dict[Cell, list[Agent]]) -> None:
-        self.cells = cells
+        self._cells = cells
 
     def __iter__(self):
-        return iter(self.cells)
+        return iter(self._cells)
 
     def __getitem__(self, key):
-        return self.cells[key]
+        return self._cells[key]
 
     def __len__(self):
-        return len(self.cells)
+        return len(self._cells)
 
     def __repr__(self):
-        return f"CellCollection({self.cells})"
+        return f"CellCollection({self._cells})"
+
+    @cached_property
+    def cells(self):
+        return list(self._cells.keys())
 
     @property
     def agents(self):
-        return itertools.chain.from_iterable(self.cells.values())
+        return itertools.chain.from_iterable(self._cells.values())
 
-    def select_random(self):
-        return random.choice(list(self.cells.keys()))
+    def select_random_cell(self):
+        return random.choice(self.cells)
+
+    def select_random_agent(self):
+        return random.choice(list(self.agents))
+
+    def select(self, filter_func: Optional[Callable[[Cell], bool]] = None, n=0):
+        if filter_func is None and n == 0:
+            return self
+
+        return CellCollection(
+            {
+                cell: agents
+                for cell, agents in self._cells.items()
+                if filter_func is None or filter_func(cell)
+            }
+        )
 
 
 class Space:
-    cells: dict[Coordinates, Cell]
+    cells: dict[Coordinate, Cell] = {}
 
-    def _connect_single_cell(self, cell):  # <= different for every concrete Space
+    def _connect_single_cell(self, cell):
         ...
+
+    @cached_property
+    def all_cells(self):
+        return CellCollection({cell: cell.agents for cell in self.cells.values()})
 
     def __iter__(self):
         return iter(self.cells.values())
 
-    def get_neighborhood(self, coords: Coordinates, neighborhood_getter: Any):
-        return neighborhood_getter(self.cells[coords])
+    def __getitem__(self, key):
+        return self.cells[key]
 
     def move_agent(self, agent: Agent, pos) -> None:
         """Move an agent from its current position to a new position."""
         if (old_cell := agent.cell) is not None:
             old_cell.remove_agent(agent)
-            if self._empties_built:
-                self._empties.add(old_cell.coords)
 
         new_cell = self.cells[pos]
         new_cell.add_agent(agent)
-        if self._empties_built:
-            self._empties.discard(new_cell.coords)
 
     @property
     def empties(self) -> CellCollection:
-        if not self._empties_built:
-            self.build_empties()
-
-        return CellCollection(
-            {
-                self.cells[coords]: self.cells[coords].content
-                for coords in sorted(self._empties)
-            }
-        )
-
-    def build_empties(self) -> None:
-        self._empties = set(filter(self.is_cell_empty, self.cells.keys()))
-        self._empties_built = True
+        return self.all_cells.select(lambda cell: cell.is_empty)
 
     def move_to_empty(self, agent: Agent) -> None:
-        """Moves agent to a random empty cell, vacating agent's old cell."""
-        num_empty_cells = len(self.empties)
-        if num_empty_cells == 0:
-            raise Exception("ERROR: No empty cells")
-
-        # This method is based on Agents.jl's random_empty() implementation. See
-        # https://github.com/JuliaDynamics/Agents.jl/pull/541. For the discussion, see
-        # https://github.com/projectmesa/mesa/issues/1052 and
-        # https://github.com/projectmesa/mesa/pull/1565. The cutoff value provided
-        # is the break-even comparison with the time taken in the else branching point.
-        if num_empty_cells > self.cutoff_empties:
-            while True:
-                new_pos = (
-                    agent.random.randrange(self.width),
-                    agent.random.randrange(self.height),
-                )
-                if self.is_cell_empty(new_pos):
-                    break
-        else:
-            new_pos = self.empties.select_random().coords
-        self.move_agent(agent, new_pos)
-
-    def is_cell_empty(self, pos) -> bool:
-        """Returns a bool of the contents of a cell."""
-        return len(self.cells[pos].content) == 0
+        # TODO: Add Heuristic for almost full grids
+        while True:
+            new_cell = self.all_cells.select_random_cell()
+            if new_cell.is_empty:
+                new_cell.add_agent(agent)
+                return
 
 
 class Grid(Space):
@@ -175,7 +179,7 @@ class Grid(Space):
             self._connect_single_cell(cell)
 
     def _connect_single_cell(self, cell):
-        i, j = cell.coords
+        i, j = cell.coordinate
         directions = [
             (-1, -1),
             (-1, 0),
@@ -192,6 +196,3 @@ class Grid(Space):
                 ni, nj = ni % self.height, nj % self.width
             if 0 <= ni < self.height and 0 <= nj < self.width:
                 cell.connect(self.cells[ni, nj])
-
-    def get_neighborhood(self, coords, neighborhood_getter: Any) -> CellCollection:
-        return neighborhood_getter(self.cells[coords])

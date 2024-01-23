@@ -7,7 +7,7 @@ class SchellingAgent(mesa.Agent):
     Schelling segregation agent
     """
 
-    def __init__(self, pos, model, agent_type, cell):
+    def __init__(self, pos, model, agent_type):
         """
         Create a new Schelling agent.
 
@@ -18,7 +18,6 @@ class SchellingAgent(mesa.Agent):
         """
         super().__init__(pos, model)
         self.pos = pos
-        self.cell = cell
         self.type = agent_type
         self.get_neighborhood = create_neighborhood_getter()
 
@@ -66,8 +65,8 @@ class Schelling(mesa.Model):
         for cell in self.grid:
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
-                agent = SchellingAgent(None, self, agent_type, cell)
-                self.grid.move_agent(agent, cell.coords)
+                agent = SchellingAgent(None, self, agent_type)
+                cell.add_agent(agent)
                 self.schedule.add(agent)
 
         self.running = True

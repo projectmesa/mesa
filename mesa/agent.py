@@ -48,6 +48,7 @@ class Agent:
         self.unique_id = unique_id
         self.model = model
         self.cell: Cell | None = None
+        self.pos: Position | None = None
 
         # register agent
         try:
@@ -62,10 +63,6 @@ class Agent:
                 FutureWarning,
                 stacklevel=2,
             )
-
-    @property
-    def pos(self):
-        return self.cell.coords
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
