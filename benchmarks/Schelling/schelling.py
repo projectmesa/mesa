@@ -1,6 +1,6 @@
 from mesa import Agent, Model
-from mesa.space import SingleGrid
 from mesa.time import RandomActivation
+from mesa.experimental import Grid
 
 
 class SchellingAgent(Agent):
@@ -21,9 +21,7 @@ class SchellingAgent(Agent):
 
     def step(self):
         similar = 0
-        for neighbor in self.model.grid.iter_neighbors(
-            self.pos, moore=True, radius=self.model.radius
-        ):
+        for neighbor in self.cell.neighborhood().agents:
             if neighbor.type == self.type:
                 similar += 1
 
@@ -52,7 +50,7 @@ class Schelling(Model):
         self.radius = radius
 
         self.schedule = RandomActivation(self)
-        self.grid = SingleGrid(height, width, torus=True)
+        self.grid = Grid(height, width, torus=True)
 
         self.happy = 0
 
@@ -60,11 +58,11 @@ class Schelling(Model):
         # We use a grid iterator that returns
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
-        for _cont, pos in self.grid.coord_iter():
+        for cell in self.grid:
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(self.next_id(), self, agent_type)
-                self.grid.place_agent(agent, pos)
+                cell.add_agent(agent)
                 self.schedule.add(agent)
 
     def step(self):

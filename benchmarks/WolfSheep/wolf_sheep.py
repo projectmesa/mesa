@@ -10,7 +10,7 @@ Replication of the model found in NetLogo:
 """
 
 import mesa
-from mesa.space import MultiGrid
+from mesa.experimental import Grid
 from mesa.time import RandomActivationByType
 
 from .agents import GrassPatch, Sheep, Wolf
@@ -63,40 +63,34 @@ class WolfSheep(mesa.Model):
         self.sheep_gain_from_food = sheep_gain_from_food
 
         self.schedule = RandomActivationByType(self)
-        self.grid = MultiGrid(self.height, self.width, torus=False)
+        self.grid = Grid(self.height, self.width, torus=False, capacity=None)
 
         # Create sheep:
         for _i in range(self.initial_sheep):
-            pos = (
-                self.random.randrange(self.width),
-                self.random.randrange(self.height),
-            )
+            cell = self.grid.all_cells.select_random_cell()
             energy = self.random.randrange(2 * self.sheep_gain_from_food)
-            sheep = Sheep(self.next_id(), pos, self, True, energy)
-            self.grid.place_agent(sheep, pos)
+            sheep = Sheep(self.next_id(), None, self, True, energy)
+            cell.add_agent(sheep)
             self.schedule.add(sheep)
 
         # Create wolves
         for _i in range(self.initial_wolves):
-            pos = (
-                self.random.randrange(self.width),
-                self.random.randrange(self.height),
-            )
+            cell = self.grid.all_cells.select_random_cell()
             energy = self.random.randrange(2 * self.wolf_gain_from_food)
-            wolf = Wolf(self.next_id(), pos, self, True, energy)
-            self.grid.place_agent(wolf, pos)
+            wolf = Wolf(self.next_id(), None, self, True, energy)
+            cell.add_agent(wolf)
             self.schedule.add(wolf)
 
         # Create grass patches
         possibly_fully_grown = [True, False]
-        for _agent, pos in self.grid.coord_iter():
+        for cell in self.grid:
             fully_grown = self.random.choice(possibly_fully_grown)
             if fully_grown:
                 countdown = self.grass_regrowth_time
             else:
                 countdown = self.random.randrange(self.grass_regrowth_time)
-            patch = GrassPatch(self.next_id(), pos, self, fully_grown, countdown)
-            self.grid.place_agent(patch, pos)
+            patch = GrassPatch(self.next_id(), None, self, fully_grown, countdown)
+            cell.add_agent(patch)
             self.schedule.add(patch)
 
     def step(self):

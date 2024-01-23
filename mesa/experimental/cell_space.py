@@ -4,8 +4,7 @@ from collections.abc import Iterable
 from functools import cache, cached_property
 from typing import TYPE_CHECKING, Callable, Optional
 
-if TYPE_CHECKING:
-    from mesa import Agent
+from .. import Agent
 
 Coordinate = tuple[int, int]
 
