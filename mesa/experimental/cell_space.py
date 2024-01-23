@@ -1,53 +1,24 @@
 import itertools
 import random
+from collections.abc import Iterable
 from functools import cache, cached_property
-from typing import Any, Callable, Optional
+from typing import TYPE_CHECKING, Callable, Optional
 
-from .agent import Agent
+if TYPE_CHECKING:
+    from mesa import Agent
 
 Coordinate = tuple[int, int]
-
-
-def create_neighborhood_getter(moore=True, include_center=False, radius=1):
-    @cache
-    def of(cell: Cell):
-        if radius == 0:
-            return {cell: cell.agents}
-
-        neighborhood = {}
-        for neighbor in cell._connections:
-            if (
-                moore
-                or neighbor.coordinate[0] == cell.coordinate[0]
-                or neighbor.coordinate[1] == cell.coordinate[1]
-            ):
-                neighborhood[neighbor] = neighbor.agents
-
-        if radius > 1:
-            for neighbor in list(neighborhood.keys()):
-                neighborhood.update(
-                    create_neighborhood_getter(moore, include_center, radius - 1)(
-                        neighbor
-                    )
-                )
-
-        if not include_center:
-            neighborhood.pop(cell, None)
-
-        return CellCollection(neighborhood)
-
-    return of
 
 
 class Cell:
     __slots__ = ["coordinate", "_connections", "agents", "capacity", "properties"]
 
-    def __init__(self, i: int, j: int, capacity: int = 1) -> None:
+    def __init__(self, i: int, j: int, capacity: int | None = 1) -> None:
         self.coordinate = (i, j)
         self._connections: list[Cell] = []
         self.agents: list[Agent] = []
         self.capacity = capacity
-        self.properties: dict[str, Any] = {}
+        self.properties: dict[str, object] = {}
 
     def connect(self, other) -> None:
         """Connects this cell to another cell."""
@@ -59,7 +30,7 @@ class Cell:
 
     def add_agent(self, agent: Agent) -> None:
         """Adds an agent to the cell."""
-        if len(self.agents) >= self.capacity:
+        if self.capacity and len(self.agents) >= self.capacity:
             raise Exception("ERROR: Cell is full")
         if isinstance(agent.cell, Cell):
             agent.cell.remove_agent(agent)
@@ -84,10 +55,29 @@ class Cell:
     def __repr__(self):
         return f"Cell({self.coordinate}, {self.agents})"
 
+    @cache
+    def neighborhood(self, radius=1, include_center=False):
+        if radius == 0:
+            return {self: self.agents}
+        if radius == 1:
+            return CellCollection(
+                {neighbor: neighbor.agents for neighbor in self._connections}
+            )
+        else:
+            neighborhood = {}
+            for neighbor in self._connections:
+                neighborhood.update(neighbor.neighorhood(radius - 1, include_center))
+            if not include_center:
+                neighborhood.pop(self, None)
+            return CellCollection(neighborhood)
+
 
 class CellCollection:
-    def __init__(self, cells: dict[Cell, list[Agent]]) -> None:
-        self._cells = cells
+    def __init__(self, cells: dict[Cell, list[Agent]] | Iterable[Cell]) -> None:
+        if isinstance(cells, dict):
+            self._cells = cells
+        else:
+            self._cells = {cell: cell.agents for cell in cells}
 
     def __iter__(self):
         return iter(self._cells)
@@ -95,6 +85,7 @@ class CellCollection:
     def __getitem__(self, key):
         return self._cells[key]
 
+    @cached_property
     def __len__(self):
         return len(self._cells)
 
@@ -144,52 +135,68 @@ class Space:
     def __getitem__(self, key):
         return self.cells[key]
 
-    def move_agent(self, agent: Agent, pos) -> None:
+    def move_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Move an agent from its current position to a new position."""
-        if (old_cell := agent.cell) is not None:
-            old_cell.remove_agent(agent)
-
-        new_cell = self.cells[pos]
-        new_cell.add_agent(agent)
+        self.cells[pos].add_agent(agent)
 
     @property
     def empties(self) -> CellCollection:
         return self.all_cells.select(lambda cell: cell.is_empty)
 
     def move_to_empty(self, agent: Agent) -> None:
-        # TODO: Add Heuristic for almost full grids
         while True:
             new_cell = self.all_cells.select_random_cell()
             if new_cell.is_empty:
                 new_cell.add_agent(agent)
                 return
 
+        # TODO: Adjust cutoff value for performance
+        for _ in range(len(self.all_cells) // 10):
+            new_cell = self.all_cells.select_random_cell()
+            if new_cell.is_empty:
+                new_cell.add_agent(agent)
+                return
+
+        try:
+            self.empties.select_random_cell().add_agent(agent)
+        except IndexError as err:
+            raise Exception("ERROR: No empty cell found") from err
+
 
 class Grid(Space):
-    def __init__(self, width: int, height: int, torus: bool = False) -> None:
+    def __init__(
+        self, width: int, height: int, torus: bool = False, moore=True, capacity=1
+    ) -> None:
         self.width = width
         self.height = height
         self.torus = torus
-        self.cells = {(i, j): Cell(i, j) for j in range(width) for i in range(height)}
+        self.moore = moore
+        self.capacity = capacity
+        self.cells = {
+            (i, j): Cell(i, j, capacity) for j in range(width) for i in range(height)
+        }
 
-        self._empties_built = False
-        self.cutoff_empties = 7.953 * len(self.cells) ** 0.384
-
-        for cell in self.cells.values():
+        for cell in self.all_cells:
             self._connect_single_cell(cell)
 
     def _connect_single_cell(self, cell):
         i, j = cell.coordinate
-        directions = [
-            (-1, -1),
-            (-1, 0),
-            (-1, 1),
-            (0, -1),
-            (0, 1),
-            (1, -1),
-            (1, 0),
-            (1, 1),
-        ]
+
+        # fmt: off
+        if self.moore:
+            directions = [
+                (-1, -1), (-1, 0), (-1, 1),
+                ( 0, -1),          ( 0, 1),
+                ( 1, -1), ( 1, 0), ( 1, 1),
+            ]
+        else: # Von Neumann neighborhood
+            directions = [
+                          (-1, 0),
+                ( 0, -1),          (0, 1),
+                          ( 1, 0),
+            ]
+        # fmt: on
+
         for di, dj in directions:
             ni, nj = (i + di, j + dj)
             if self.torus:
