@@ -9,7 +9,7 @@ import mesa
 
 
 @solara.component
-def SpaceMatplotlib(model, agent_portrayal, dependencies: Optional[list[any]] = None):
+def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any]|None = None):
     space_fig = Figure()
     space_ax = space_fig.subplots()
     space = getattr(model, "grid", None)
