@@ -42,12 +42,12 @@ _types_integer = (int, np.integer)
 
 Coordinate = tuple[int, int]
 # used in ContinuousSpace
-FloatCoordinate = Union[tuple[float, float], npt.NDArray[float]]
+FloatCoordinate = tuple[float, float] | npt.NDArray[float]
 NetworkCoordinate = int
 
-Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
+Position = Coordinate | FloatCoordinate | NetworkCoordinate
 
-GridContent = Union[Agent, None]
+GridContent = Agent | None
 MultiGridContent = list[Agent]
 
 F = TypeVar("F", bound=Callable[..., Any])
