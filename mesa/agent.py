@@ -125,7 +125,7 @@ class AgentSet(MutableSet, Sequence):
                 stacklevel=2,
             )
 
-        self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
+        self._agents = {agent: None for agent in agents}
 
     def __len__(self) -> int:
         """Return the number of agents in the AgentSet."""
@@ -133,7 +133,7 @@ class AgentSet(MutableSet, Sequence):
 
     def __iter__(self) -> Iterator[Agent]:
         """Provide an iterator over the agents in the AgentSet."""
-        return self._agents.keys()
+        return iter(self._agents.keys())
 
     def __contains__(self, agent: Agent) -> bool:
         """Check if an agent is in the AgentSet. Can be used like `agent in agentset`."""
@@ -230,7 +230,7 @@ class AgentSet(MutableSet, Sequence):
         This is a private method primarily used internally by other methods like select, shuffle, and sort.
         """
 
-        self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
+        self._agents = {agent: None for agent in agents}
         return self
 
     def do(
@@ -250,9 +250,9 @@ class AgentSet(MutableSet, Sequence):
         """
         # we iterate over the actual weakref keys and check if weakref is alive before calling the method
         res = [
-            getattr(agentref(), method_name)(*args, **kwargs)
-            for agentref in self._agents.keyrefs()
-            if agentref()
+            getattr(agent, method_name)(*args, **kwargs)
+            for agent in list(self._agents.keys())
+            if agent
         ]
 
         return res if return_results else self
