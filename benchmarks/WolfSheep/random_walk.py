@@ -3,7 +3,7 @@ Generalized behavior for random walking, one grid cell at a time.
 """
 
 from mesa import Agent
-from mesa.experimental import Cell
+from mesa.experimental.cell_space import Cell
 
 
 class RandomWalker(Agent):

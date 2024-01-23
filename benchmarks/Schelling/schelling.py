@@ -1,6 +1,6 @@
 from mesa import Agent, Model
+from mesa.experimental.cell_space import Grid
 from mesa.time import RandomActivation
-from mesa.experimental import Grid
 
 
 class SchellingAgent(Agent):

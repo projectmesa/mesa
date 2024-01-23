@@ -2,7 +2,7 @@ import itertools
 import random
 from collections.abc import Iterable
 from functools import cache, cached_property
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import Callable, Optional
 
 from .. import Agent
 
