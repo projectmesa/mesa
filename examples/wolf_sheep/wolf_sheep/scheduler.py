@@ -25,7 +25,7 @@ class RandomActivationByTypeFiltered(mesa.time.RandomActivationByType):
         if type_class not in self.agents_by_type:
             return 0
         count = 0
-        for agent in self.agents_by_type[type_class]:
+        for agent in self.agents_by_type[type_class].values():
             if filter_func is None or filter_func(agent):
                 count += 1
         return count
