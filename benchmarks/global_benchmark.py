@@ -1,11 +1,11 @@
-from configurations import configurations
-import gc
 import os
-import pickle
 import sys
+import gc
+import pickle
 import time
 import timeit
 
+from configurations import configurations
 
 # making sure we use this version of mesa and not one
 # also installed in site_packages or so.
