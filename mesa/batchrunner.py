@@ -2,7 +2,7 @@ import itertools
 from collections.abc import Iterable, Mapping
 from functools import partial
 from multiprocessing import Pool
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from tqdm.auto import tqdm
 
@@ -25,7 +25,7 @@ def batch_run(
     ----------
     model_cls : Type[Model]
         The model class to batch-run
-    parameters : Mapping[str, Union[Any, Iterable[Any]]],
+    parameters : Mapping[str, Any | Iterable[Any]],
         Dictionary with model parameters over which to run the model. You can either pass single values or iterables.
     number_processes : int, optional
         Number of processes used, by default 1. Set this to None if you want to use all CPUs.
@@ -76,13 +76,13 @@ def batch_run(
 
 
 def _make_model_kwargs(
-    parameters: Mapping[str, Union[Any, Iterable[Any]]],
+    parameters: Mapping[str, Any | Iterable[Any]],
 ) -> list[dict[str, Any]]:
     """Create model kwargs from parameters dictionary.
 
     Parameters
     ----------
-    parameters : Mapping[str, Union[Any, Iterable[Any]]]
+    parameters : Mapping[str, [Any | Iterable[Any]]
         Single or multiple values for each model parameter name
 
     Returns
