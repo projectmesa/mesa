@@ -67,7 +67,7 @@ class Cell:
         else:
             neighborhood = {}
             for neighbor in self._connections:
-                neighborhood.update(neighbor.neighorhood(radius - 1, include_center))
+                neighborhood.update(neighbor.neighborhood(radius - 1, include_center))
             if not include_center:
                 neighborhood.pop(self, None)
             return CellCollection(neighborhood)
