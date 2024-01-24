@@ -171,9 +171,7 @@ class SugarscapeG1mt(mesa.Model):
 
         if not self.enable_trade:
             # If trade is not enabled, return early
-            self.schedule.steps += (
-                1  # important for data collector to track number of steps
-            )
+            self._steps += 1
             self.datacollector.collect(self)
             return
 
@@ -182,10 +180,7 @@ class SugarscapeG1mt(mesa.Model):
         for agent in trader_shuffle:
             agent.trade_with_neighbors()
 
-        self.schedule.steps += (
-            1  # important for data collector to track number of steps
-        )
-
+        self._steps += 1
         # collect model level data
         self.datacollector.collect(self)
         """
@@ -201,11 +196,11 @@ class SugarscapeG1mt(mesa.Model):
         """
         # Need to remove excess data
         # Create local variable to store trade data
-        agent_trades = self.datacollector._agent_records[self.schedule.steps]
+        agent_trades = self.datacollector._agent_records[self._steps]
         # Get rid of all None to reduce data storage needs
         agent_trades = [agent for agent in agent_trades if agent[2] is not None]
         # Reassign the dictionary value with lean trade data
-        self.datacollector._agent_records[self.schedule.steps] = agent_trades
+        self.datacollector._agent_records[self._steps] = agent_trades
 
     def run_model(self, step_count=1000):
         for i in range(step_count):
