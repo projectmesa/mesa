@@ -11,8 +11,6 @@ from configurations import configurations
 sys.path.insert(0, os.path.abspath(".."))
 
 
-
-
 # Generic function to initialize and run a model
 def run_model(model_class, seed, parameters):
     start_init = timeit.default_timer()
