@@ -4,12 +4,13 @@ import pickle
 import sys
 import time
 import timeit
+from configurations import configurations
 
 # making sure we use this version of mesa and not one
 # also installed in site_packages or so.
 sys.path.insert(0, os.path.abspath(".."))
 
-from configurations import configurations
+
 
 
 # Generic function to initialize and run a model

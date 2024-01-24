@@ -23,7 +23,7 @@ Key concepts:
 
 # Mypy; for the `|` operator purpose
 # Remove this __future__ import once the oldest supported Python is 3.10
-from __future__ import annotations
+
 
 import heapq
 import warnings
