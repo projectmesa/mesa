@@ -1,7 +1,7 @@
 import mesa
 
 from .model import SugarscapeG1mt
-from .resource_agents import Spice, Sugar
+from .resource_agents import Resource
 from .trader_agents import Trader
 
 sugar_dic = {4: "#005C00", 3: "#008300", 2: "#00AA00", 1: "#00F800"}
@@ -21,26 +21,23 @@ def Agent_portrayal(agent):
             "Color": "#FF0A01",
         }
 
-    elif isinstance(agent, Sugar):
-        color = sugar_dic[agent.amount] if agent.amount != 0 else "#D6F5D6"
-        layer = 1 if agent.amount > 2 else 0
+    elif isinstance(agent, Resource):
+        resource_type = "sugar" if agent.max_sugar > agent.max_spice else "spice"
+        if resource_type == "sugar":
+            color = (
+                sugar_dic[agent.sugar_amount] if agent.sugar_amount != 0 else "#D6F5D6"
+            )
+            layer = 1 if agent.sugar_amount > 2 else 0
+        else:
+            color = (
+                spice_dic[agent.spice_amount] if agent.spice_amount != 0 else "#D6F5D6"
+            )
+            layer = 1 if agent.spice_amount > 2 else 0
         return {
             "Color": color,
             "Shape": "rect",
             "Filled": "true",
             "Layer": layer,
-            "w": 1,
-            "h": 1,
-        }
-
-    elif isinstance(agent, Spice):
-        color = spice_dic[agent.amount] if agent.amount != 0 else "#D6F5D6"
-        layer = 1 if agent.amount > 2 else 0
-        return {
-            "Color": color,
-            "Shape": "rect",
-            "Filled": "true",
-            "Layer": 0,
             "w": 1,
             "h": 1,
         }
