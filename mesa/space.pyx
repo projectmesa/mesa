@@ -67,7 +67,7 @@ def is_integer(x: Real) -> bool:
     return isinstance(x, _types_integer)
 
 
-class _Grid:
+cdef class _Grid:
     """Base class for a rectangular grid.
 
     Grid cells are indexed by [x, y], where [0, 0] is assumed to be the
@@ -390,8 +390,8 @@ class _Grid:
             if cell != default_val:
                 yield cell
 
-    @accept_tuple_argument
-    def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> list[Agent]:
+    # @accept_tuple_argument
+    cpdef object get_cell_list_contents(self, cell_list: Iterable[Coordinate]):
         """Returns an iterator of the agents contained in the cells identified
         in `cell_list`; cells with empty content are excluded.
 
