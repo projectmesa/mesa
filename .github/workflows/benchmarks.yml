@@ -50,9 +50,33 @@ jobs:
           path: benchmarks/timings_1.pickle
       - name: Checkout PR branch
         uses: actions/checkout@v4
+        if: github.event_name == 'pull_request_target'
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+          persist-credentials: false
+          clean: false
+      - name: Checkout PR branch from issue comment
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const issue_number = context.issue.number;
+            const repository = context.repo.repo;
+            const owner = context.repo.owner;
+            const pr = await github.rest.pulls.get({ owner, repo: repository, pull_number: issue_number });
+            const ref = pr.data.head.ref;
+            const repoFullName = pr.data.head.repo.full_name;
+            console.log(`::set-output name=ref::${ref}`);
+            console.log(`::set-output name=repo::${repoFullName}`);
+          result-encoding: string
+      - name: Actual Checkout for Issue Comment
+        if: github.event_name == 'issue_comment'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.checkout-pr-branch-from-issue-comment.outputs.repo }}
+          ref: ${{ steps.checkout-pr-branch-from-issue-comment.outputs.ref }}
           fetch-depth: 0
           persist-credentials: false
           clean: false
