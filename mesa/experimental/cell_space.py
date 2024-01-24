@@ -56,8 +56,10 @@ class Cell:
 
     @cache
     def neighborhood(self, radius=1, include_center=False):
-        if radius == 0:
-            return {self: self.agents}
+        # if radius == 0:
+        #     return {self: self.agents}
+        if radius < 1:
+            raise ValueError("radius must be larger than one")
         if radius == 1:
             return CellCollection(
                 {neighbor: neighbor.agents for neighbor in self._connections}
