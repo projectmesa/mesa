@@ -13,10 +13,6 @@ ContinuousSpace: a two-dimensional space where each agent has an arbitrary
 NetworkGrid: a network where each node contains zero or more agents.
 """
 
-# Mypy; for the `|` operator purpose
-# Remove this __future__ import once the oldest supported Python is 3.10
-from __future__ import annotations
-
 import collections
 import contextlib
 import inspect
