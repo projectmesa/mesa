@@ -1,7 +1,7 @@
-import os
-import sys
 import gc
+import os
 import pickle
+import sys
 import time
 import timeit
 
