@@ -31,7 +31,6 @@ import weakref
 from collections import defaultdict
 from collections.abc import Iterable
 
-
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
