@@ -166,7 +166,7 @@ class Space:
 
 class Grid(Space):
     def __init__(
-        self, width: int, height: int, torus: bool = False, moore=True, capacity=1
+        self, width: int, height: int, torus: bool = False, moore: bool = True, capacity=1
     ) -> None:
         self.width = width
         self.height = height
@@ -195,6 +195,47 @@ class Grid(Space):
                           (-1, 0),
                 ( 0, -1),          (0, 1),
                           ( 1, 0),
+            ]
+        # fmt: on
+
+        for di, dj in directions:
+            ni, nj = (i + di, j + dj)
+            if self.torus:
+                ni, nj = ni % self.height, nj % self.width
+            if 0 <= ni < self.height and 0 <= nj < self.width:
+                cell.connect(self.cells[ni, nj])
+
+
+class HexGrid(Space):
+    def __init__(
+        self, width: int, height: int, torus: bool = False, capacity=1
+    ) -> None:
+        self.width = width
+        self.height = height
+        self.torus = torus
+        self.capacity = capacity
+        self.cells = {
+            (i, j): Cell(i, j, capacity) for j in range(width) for i in range(height)
+        }
+
+        for cell in self.all_cells:
+            self._connect_single_cell(cell)
+
+    def _connect_single_cell(self, cell):
+        i, j = cell.coordinate
+
+        # fmt: off
+        if i%2 == 0:
+            directions = [
+                     (-1, -1), (-1, 0),
+                  (0, -1),         (0, 1),
+                     ( 1, -1), ( 1, 0),
+            ]
+        else:
+            directions = [
+                     (-1, 0), (-1, 1),
+                  (0, -1),        (0, 1),
+                     ( 1, 0), ( 1, 1),
             ]
         # fmt: on
 
