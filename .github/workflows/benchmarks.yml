@@ -57,29 +57,35 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           clean: false
-      - name: Checkout PR branch from issue comment
+      - name: Get PR info for Issue Comment
         if: github.event_name == 'issue_comment'
-        uses: actions/github-script@v5
+        id: get-pr-info
+        uses: actions/github-script@v7
         with:
           script: |
             const issue_number = context.issue.number;
             const repository = context.repo.repo;
             const owner = context.repo.owner;
-            const pr = await github.rest.pulls.get({ owner, repo: repository, pull_number: issue_number });
-            const ref = pr.data.head.ref;
-            const repoFullName = pr.data.head.repo.full_name;
-            console.log(`::set-output name=ref::${ref}`);
-            console.log(`::set-output name=repo::${repoFullName}`);
-          result-encoding: string
-      - name: Actual Checkout for Issue Comment
+            const pr = await github.rest.pulls.list({
+              owner,
+              repo: repository,
+              head: owner + ":" + issue_number
+            });
+            if (pr.data.length === 0) {
+              throw new Error('No PR found for issue number ' + issue_number);
+            }
+            const headRepo = pr.data[0].head.repo.full_name;
+            const headRef = pr.data[0].head.ref;
+            return { headRepo, headRef };
+      - name: Checkout PR branch for Issue Comment
         if: github.event_name == 'issue_comment'
         uses: actions/checkout@v4
         with:
-          repository: ${{ steps.checkout-pr-branch-from-issue-comment.outputs.repo }}
-          ref: ${{ steps.checkout-pr-branch-from-issue-comment.outputs.ref }}
+          repository: ${{ steps.get-pr-info.outputs.headRepo }}
+          ref: ${{ steps.get-pr-info.outputs.headRef }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
           persist-credentials: false
-          clean: false
       - name: Download benchmark results
         uses: actions/download-artifact@v4
         with:
