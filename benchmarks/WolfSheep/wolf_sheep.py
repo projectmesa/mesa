@@ -64,8 +64,7 @@ class Sheep(Animal):
 
     def feed(self):
         # If there is grass available, eat it
-        this_cell = self.cell.agents
-        grass_patch = next(obj for obj in this_cell if isinstance(obj, GrassPatch))
+        grass_patch = next(obj for obj in  self.cell.agents if isinstance(obj, GrassPatch))
         if grass_patch.fully_grown:
             self.energy += self.energy_from_food
             grass_patch.fully_grown = False
@@ -76,8 +75,7 @@ class Wolf(Animal):
     """
 
     def feed(self):
-        this_cell = self.cell.agents
-        sheep = [obj for obj in this_cell if isinstance(obj, Sheep)]
+        sheep = [obj for obj in  self.cell.agents if isinstance(obj, Sheep)]
         if len(sheep) > 0:
             sheep_to_eat = self.random.choice(sheep)
             self.energy += self.energy
