@@ -93,12 +93,12 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
         return out
 
     # Determine border style based on space.torus
-    border_style = 'solid' if not space.torus else (0, (5, 10))
+    border_style = "solid" if not space.torus else (0, (5, 10))
 
     # Set the border of the plot
     for spine in space_ax.spines.values():
         spine.set_linewidth(1.5)
-        spine.set_color('black')
+        spine.set_color("black")
         spine.set_linestyle(border_style)
 
     width = space.x_max - space.x_min
