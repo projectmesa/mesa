@@ -5,8 +5,14 @@ on:
     types: [opened, ready_for_review]
     branches:
       - main
+    paths:
+      - '**.py'
+      - '.github/workflows/benchmarks.yml'
   issue_comment:
     types: [created]
+    paths:
+      - '**.py'
+      - '.github/workflows/benchmarks.yml'
 
 permissions:
   issues: write
