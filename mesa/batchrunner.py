@@ -11,7 +11,7 @@ from mesa.model import Model
 
 def batch_run(
     model_cls: type[Model],
-    parameters: Mapping[str, Any | Iterable[Any]]],
+    parameters: Mapping[str, Any | Iterable[Any]],
     # We still retain the Optional[int] because users may set it to None (i.e. use all CPUs)
     number_processes: Optional[int]= 1,
     iterations: int = 1,
