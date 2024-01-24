@@ -171,6 +171,9 @@ class SugarscapeG1mt(mesa.Model):
 
         if not self.enable_trade:
             # If trade is not enabled, return early
+            self.schedule.steps += (
+                1  # important for data collector to track number of steps
+            )
             self.datacollector.collect(self)
             return
 
