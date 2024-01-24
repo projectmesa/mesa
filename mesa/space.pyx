@@ -324,7 +324,8 @@ class _Grid:
         """
         default_val = self.default_val()
         for x, y in self.get_neighborhood(pos, moore, include_center, radius):
-            if (cell := self._grid[x][y]) != default_val:
+            cell = self._grid[x][y]
+            if cell != default_val:
                 yield cell
 
     def get_neighbors(
@@ -385,7 +386,8 @@ class _Grid:
         # iter_cell_list_contents returns only non-empty contents.
         default_val = self.default_val()
         for x, y in cell_list:
-            if (cell := self._grid[x][y]) != default_val:
+            cell = self._grid[x][y]
+            if cell != default_val:
                 yield cell
 
     @accept_tuple_argument
@@ -485,9 +487,11 @@ class _Grid:
     def swap_pos(self, agent_a: Agent, agent_b: Agent) -> None:
         """Swap agents positions"""
         agents_no_pos = []
-        if (pos_a := agent_a.pos) is None:
+        pos_a = agent_a.pos
+        if pos_a is None:
             agents_no_pos.append(agent_a)
-        if (pos_b := agent_b.pos) is None:
+        pos_b = agent_b.pos
+        if pos_b is None:
             agents_no_pos.append(agent_b)
         if agents_no_pos:
             agents_no_pos = [f"<Agent id: {a.unique_id}>" for a in agents_no_pos]
@@ -988,7 +992,8 @@ class SingleGrid(_PropertyGrid):
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the grid and set its pos attribute to None."""
-        if (pos := agent.pos) is None:
+        pos = agent.pos
+        if pos is None:
             return
         x, y = pos
         self._grid[x][y] = self.default_val()
@@ -1068,7 +1073,7 @@ class MultiGrid(_PropertyGrid):
         """
         default_val = self.default_val()
         return itertools.chain.from_iterable(
-            cell for x, y in cell_list if (cell := self._grid[x][y]) != default_val
+            self._grid[x][y] for x, y in cell_list if self._grid[x][y] != default_val
         )
 
 
