@@ -5,13 +5,12 @@ import sys
 import time
 import timeit
 
-from configurations import configurations
+from configurations import configurations # noqa: E402
 
 # making sure we use this version of mesa and not one
 # also installed in site_packages or so.
 sys.path.insert(0, os.path.abspath(".."))
 
-from configurations import configurations  # noqa: E402
 
 # Generic function to initialize and run a model
 def run_model(model_class, seed, parameters):
