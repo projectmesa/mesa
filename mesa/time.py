@@ -21,10 +21,6 @@ Key concepts:
     model has taken.
 """
 
-# Mypy; for the `|` operator purpose
-# Remove this __future__ import once the oldest supported Python is 3.10
-
-
 import heapq
 import warnings
 import weakref
