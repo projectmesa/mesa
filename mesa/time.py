@@ -23,7 +23,7 @@ Key concepts:
 
 # Mypy; for the `|` operator purpose
 # Remove this __future__ import once the oldest supported Python is 3.10
-from __future__ import annotations
+
 
 import heapq
 import warnings
@@ -31,15 +31,12 @@ import weakref
 from collections import defaultdict
 from collections.abc import Iterable
 
-# mypy
-from typing import Union
-
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
 # BaseScheduler has a self.time of int, while
 # StagedActivation has a self.time of float
-TimeT = Union[float, int]
+TimeT = float | int
 
 
 class BaseScheduler:
@@ -299,7 +296,7 @@ class RandomActivationByType(BaseScheduler):
 
         agentsbytype = defaultdict(dict)
         for k, v in self._agents_by_type.items():
-            agentsbytype[k] = {agent: agent.unique_id for agent in v}
+            agentsbytype[k] = {agent.unique_id: agent for agent in v}
 
         return agentsbytype
 

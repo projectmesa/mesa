@@ -25,7 +25,7 @@ import math
 import warnings
 from collections.abc import Iterable, Iterator, Sequence
 from numbers import Real
-from typing import Any, Callable, TypeVar, Union, cast, overload
+from typing import Any, Callable, TypeVar, cast, overload
 from warnings import warn
 
 with contextlib.suppress(ImportError):
@@ -42,12 +42,12 @@ _types_integer = (int, np.integer)
 
 Coordinate = tuple[int, int]
 # used in ContinuousSpace
-FloatCoordinate = Union[tuple[float, float], npt.NDArray[float]]
+FloatCoordinate = tuple[float, float] | npt.NDArray[float]
 NetworkCoordinate = int
 
-Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
+Position = Coordinate | FloatCoordinate | NetworkCoordinate
 
-GridContent = Union[Agent, None]
+GridContent = Agent | None
 MultiGridContent = list[Agent]
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -905,7 +905,7 @@ class _PropertyGrid(_Grid):
             return_list (bool, optional): If True, return a list of coordinates, otherwise return a mask.
 
         Returns:
-            Union[list[Coordinate], np.ndarray]: Coordinates where conditions are satisfied or the combined mask.
+            list[Coordinate] | np.ndarray: Coordinates where conditions are satisfied or the combined mask.
         """
         # Initialize the combined mask
         combined_mask = np.ones((self.width, self.height), dtype=bool)
