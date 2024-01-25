@@ -5,7 +5,7 @@ import sys
 import time
 import timeit
 
-from configurations import configurations # noqa: E402
+from configurations import configurations  # noqa: E402
 
 # making sure we use this version of mesa and not one
 # also installed in site_packages or so.

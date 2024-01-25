@@ -1,5 +1,3 @@
-
-
 import networkx as nx
 import solara
 from matplotlib.figure import Figure
@@ -9,7 +7,7 @@ import mesa
 
 
 @solara.component
-def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any]|None = None):
+def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = None):
     space_fig = Figure()
     space_ax = space_fig.subplots()
     space = getattr(model, "grid", None)
