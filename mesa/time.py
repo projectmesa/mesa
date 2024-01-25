@@ -296,7 +296,7 @@ class RandomActivationByType(BaseScheduler):
 
         agentsbytype = defaultdict(dict)
         for k, v in self._agents_by_type.items():
-            agentsbytype[k] = {agent: agent.unique_id for agent in v}
+            agentsbytype[k] = {agent.unique_id: agent for agent in v}
 
         return agentsbytype
 
