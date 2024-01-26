@@ -45,6 +45,7 @@ Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
 
 GridContent = Union[Agent, None]
 MultiGridContent = list[Agent]
+GridIndex = tuple[int | slice, int | slice] | int | Sequence[Coordinate]
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -60,6 +61,13 @@ def accept_tuple_argument(wrapped_function: F) -> F:
         return wrapped_function(grid_instance, positions)
 
     return cast(F, wrapper)
+
+
+def ensure_positions_as_list(positions):
+    if len(positions) == 2 and not isinstance(positions[0], tuple):
+        return [positions]
+    return positions
+
 
 
 def is_integer(x: Real) -> bool:
@@ -130,17 +138,7 @@ cdef class _Grid:
         )
         self._empties_built = True
 
-    @overload
-    def __getitem__(self, index: int | Sequence[Coordinate]) -> list[GridContent]:
-        ...
-
-    @overload
-    def __getitem__(
-        self, index: tuple[int | slice, int | slice]
-    ) -> GridContent | list[GridContent]:
-        ...
-
-    def __getitem__(self, index):
+    def __getitem__(self, index: GridIndex) -> GridContent | list[GridContent]:
         """Access contents from the grid."""
 
         if isinstance(index, int):
@@ -390,7 +388,6 @@ cdef class _Grid:
             if cell != default_val:
                 yield cell
 
-    # @accept_tuple_argument
     cpdef object get_cell_list_contents(self, cell_list: Iterable[Coordinate]):
         """Returns an iterator of the agents contained in the cells identified
         in `cell_list`; cells with empty content are excluded.
@@ -401,7 +398,7 @@ cdef class _Grid:
         Returns:
             A list of the agents contained in the cells identified in `cell_list`.
         """
-        return list(self.iter_cell_list_contents(cell_list))
+        return list(self.iter_cell_list_contents(ensure_positions_as_list(cell_list)))
 
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         ...
