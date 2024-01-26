@@ -182,7 +182,10 @@ class DataCollector:
             reports = tuple(rep(agent) for rep in rep_funcs)
             return _prefix + reports
 
-        agent_records = map(get_reports, model.agents)
+        agent_records = map(
+            get_reports,
+            model.schedule.agents if hasattr(model, "schedule") else model.agents,
+        )
         return agent_records
 
     def collect(self, model):
