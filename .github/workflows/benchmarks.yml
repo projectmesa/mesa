@@ -2,14 +2,9 @@ name: Performance benchmarks
 
 on:
   pull_request_target:
-    types: [opened, ready_for_review]
+    types: [opened, ready_for_review, labeled]
     branches:
       - main
-    paths:
-      - '**.py'
-      - '.github/workflows/benchmarks.yml'
-  issue_comment:
-    types: [created]
     paths:
       - '**.py'
       - '.github/workflows/benchmarks.yml'
@@ -21,12 +16,12 @@ permissions:
 jobs:
   run-benchmarks:
     if: >
-      github.event_name == 'pull_request_target' ||
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/rerun-benchmarks'))
+      github.event.action == 'labeled' && contains(github.event.pull_request.labels.*.name, 'trigger-benchmarks') ||
+      github.event.action == 'opened' ||
+      github.event.action == 'ready_for_review'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
+      # Python and dependency setup
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -35,6 +30,7 @@ jobs:
         run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
       - name: Install dependencies
         run: pip install numpy pandas tqdm tabulate
+      # Benchmarks on the projectmesa main branch
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
@@ -43,6 +39,7 @@ jobs:
       - name: Run benchmarks on main branch
         working-directory: benchmarks
         run: python global_benchmark.py
+      # Upload benchmarks, checkout PR branch, download benchmarks
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
         with:
@@ -57,43 +54,16 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           clean: false
-      - name: Get PR info for Issue Comment
-        if: github.event_name == 'issue_comment'
-        id: get-pr-info
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const issue_number = context.issue.number;
-            const repository = context.repo.repo;
-            const owner = context.repo.owner;
-            const pr = await github.rest.pulls.list({
-              owner,
-              repo: repository,
-              head: owner + ":" + issue_number
-            });
-            if (pr.data.length === 0) {
-              throw new Error('No PR found for issue number ' + issue_number);
-            }
-            const headRepo = pr.data[0].head.repo.full_name;
-            const headRef = pr.data[0].head.ref;
-            return { headRepo, headRef };
-      - name: Checkout PR branch for Issue Comment
-        if: github.event_name == 'issue_comment'
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ steps.get-pr-info.outputs.headRepo }}
-          ref: ${{ steps.get-pr-info.outputs.headRef }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-          persist-credentials: false
       - name: Download benchmark results
         uses: actions/download-artifact@v4
         with:
           name: timings-main
           path: benchmarks
+      # Run benchmarks on the PR branch
       - name: Run benchmarks on PR branch
         working-directory: benchmarks
         run: python global_benchmark.py
+      # Run compare script and create comment
       - name: Run compare timings and encode output
         working-directory: benchmarks
         run: |
