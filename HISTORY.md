@@ -2,6 +2,22 @@
 title: Release History
 ---
 
+# 2.2.4 (2024-01-26)
+
+## Highlights
+Mesa v2.2.4 is a small but important bugfix release for the 2.2 release series. It fixes an essential bug in where agents weren't shuffled in the `RandomActivation` scheduler (effectively making it sequential activation)([#2007](https://github.com/projectmesa/mesa/pull/2007)). It also fixes a small behaviour change in `RandomActivationByType.agents_by_type()` ([#1996](https://github.com/projectmesa/mesa/pull/1996)). Furthermore, this release adds an internal clock to the `Model`, which allows to use a Mesa model without a scheduler (using the `AgentSet` API)([#1942](https://github.com/projectmesa/mesa/pull/1942)).
+
+Updating from previous 2.2 releases is highly recommended, especially when using the `RandomActivation` scheduler.
+
+## What's Changed
+### 🛠 Enhancements made
+* refactor: Remove dependence on model.schedule, add clock to Model by @rht in https://github.com/projectmesa/mesa/pull/1942
+### 🐛 Bugs fixed
+* Fix AgentSet inplace shuffle (and thus RandomActivation), add tests by @EwoutH in https://github.com/projectmesa/mesa/pull/2007
+* fix: Reverse dict key and value for agents_by_type by @rht in https://github.com/projectmesa/mesa/pull/1996
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.3...v2.2.4
+
 # 2.2.3 (2024-01-22)
 
 ## Highlights
