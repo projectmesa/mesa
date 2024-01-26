@@ -178,7 +178,7 @@ class AgentSet(MutableSet, Sequence):
 
         return AgentSet(agents, self.model) if not inplace else self._update(agents)
 
-    def shuffle(self, inplace: bool = False) -> AgentSet:
+    def shuffle(self, inplace: bool = True) -> AgentSet:
         """
         Randomly shuffle the order of agents in the AgentSet.
 
@@ -188,14 +188,23 @@ class AgentSet(MutableSet, Sequence):
         Returns:
             AgentSet: A shuffled AgentSet. Returns the current AgentSet if inplace is True.
         """
-        shuffled_agents = list(self)
-        self.random.shuffle(shuffled_agents)
+        weakrefs = list(self._agents.keyrefs())
+        self.random.shuffle(weakrefs)
 
-        return (
-            AgentSet(shuffled_agents, self.model)
-            if not inplace
-            else self._update(shuffled_agents)
-        )
+        if inplace:
+            self._agents.data = {entry:None for entry in weakrefs}
+            return self
+        else:
+            return AgentSet((agent for ref in weakrefs if (agent:=ref()) is not None), self.model)
+
+        # shuffled_agents = list(self)
+        # self.random.shuffle(shuffled_agents)
+        #
+        # return (
+        #     AgentSet(shuffled_agents, self.model)
+        #     if not inplace
+        #     else self._update(shuffled_agents)
+        # )
 
     def sort(
         self,

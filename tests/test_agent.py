@@ -66,7 +66,7 @@ def test_agentset():
     assert all(a1 == a2 for a1, a2 in zip(agentset.select(), agentset))
     assert all(a1 == a2 for a1, a2 in zip(agentset.select(n=5), agentset[:5]))
 
-    assert len(agentset.shuffle().select(n=5)) == 5
+    assert len(agentset.shuffle(inplace=False).select(n=5)) == 5
 
     def test_function(agent):
         return agent.unique_id
