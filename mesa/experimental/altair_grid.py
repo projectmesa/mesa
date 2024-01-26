@@ -42,7 +42,7 @@ def create_grid(
     """
 
     def create_grid_function(model: mesa.Model) -> solara.component:
-        return solara.component.Grid(model, color, on_click)
+        return Grid(model, color, on_click)
 
     return create_grid_function
 
