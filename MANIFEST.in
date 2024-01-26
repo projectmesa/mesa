@@ -1,9 +1,0 @@
-include MANIFEST.in
-include LICENSE
-include HISTORY.rst
-include setup.py
-graft mesa/cookiecutter-mesa
-global-exclude *.py[co]
-global-exclude __pycache__
-global-exclude *~
-global-exclude *.ipynb_checkpoints/*

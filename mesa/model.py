@@ -7,12 +7,15 @@ Core Objects: Model
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
+import itertools
 import random
+import warnings
 from collections import defaultdict
 
 # mypy
 from typing import Any
 
+from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
 
 
@@ -27,8 +30,20 @@ class Model:
         running: A boolean indicating if the model should continue running.
         schedule: An object to manage the order and execution of agent steps.
         current_id: A counter for assigning unique IDs to agents.
-        agents: A defaultdict mapping each agent type to a dict of its instances.
-                Agent instances are saved in the nested dict keys, with the values being None.
+        agents_: A defaultdict mapping each agent type to a dict of its instances.
+                 This private attribute is used internally to manage agents.
+
+    Properties:
+        agents: An AgentSet containing all agents in the model, generated from the _agents attribute.
+        agent_types: A list of different agent types present in the model.
+
+    Methods:
+        get_agents_of_type: Returns an AgentSet of agents of the specified type.
+        run_model: Runs the model's simulation until a defined end condition is reached.
+        step: Executes a single step of the model's simulation process.
+        next_id: Generates and returns the next unique identifier for an agent.
+        reset_randomizer: Resets the model's random number generator with a new or existing seed.
+        initialize_data_collector: Sets up the data collector for the model, requiring an initialized scheduler and agents.
     """
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
@@ -51,12 +66,41 @@ class Model:
         self.running = True
         self.schedule = None
         self.current_id = 0
-        self.agents: defaultdict[type, dict] = defaultdict(dict)
+        self.agents_: defaultdict[type, dict] = defaultdict(dict)
+
+        # Warning flags for current experimental features. These make sure a warning is only printed once per model.
+        self.agentset_experimental_warning_given = False
 
     @property
-    def agent_types(self) -> list:
+    def agents(self) -> AgentSet:
+        """Provides an AgentSet of all agents in the model, combining agents from all types."""
+
+        if hasattr(self, "_agents"):
+            return self._agents
+        else:
+            all_agents = itertools.chain.from_iterable(self.agents_.values())
+            return AgentSet(all_agents, self)
+
+    @agents.setter
+    def agents(self, agents: Any) -> None:
+        warnings.warn(
+            "You are trying to set model.agents. In a next release, this attribute is used "
+            "by MESA itself so you cannot use it directly anymore."
+            "Please adjust your code to use a different attribute name for custom agent storage",
+            UserWarning,
+            stacklevel=2,
+        )
+
+        self._agents = agents
+
+    @property
+    def agent_types(self) -> list[type]:
         """Return a list of different agent types."""
-        return list(self.agents.keys())
+        return list(self.agents_.keys())
+
+    def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
+        """Retrieves an AgentSet containing all agents of the specified type."""
+        return AgentSet(self.agents_[agenttype].keys(), self)
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as

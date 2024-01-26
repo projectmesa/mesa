@@ -1,17 +1,8 @@
 import itertools
+from collections.abc import Iterable, Mapping
 from functools import partial
 from multiprocessing import Pool
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    List,
-    Mapping,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import Any, Optional, Union
 
 from tqdm.auto import tqdm
 
@@ -19,7 +10,7 @@ from mesa.model import Model
 
 
 def batch_run(
-    model_cls: Type[Model],
+    model_cls: type[Model],
     parameters: Mapping[str, Union[Any, Iterable[Any]]],
     # We still retain the Optional[int] because users may set it to None (i.e. use all CPUs)
     number_processes: Optional[int] = 1,
@@ -27,7 +18,7 @@ def batch_run(
     data_collection_period: int = -1,
     max_steps: int = 1000,
     display_progress: bool = True,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Batch run a mesa model with a set of parameter values.
 
     Parameters
@@ -67,7 +58,7 @@ def batch_run(
         data_collection_period=data_collection_period,
     )
 
-    results: List[Dict[str, Any]] = []
+    results: list[dict[str, Any]] = []
 
     with tqdm(total=len(runs_list), disable=not display_progress) as pbar:
         if number_processes == 1:
@@ -85,8 +76,8 @@ def batch_run(
 
 
 def _make_model_kwargs(
-    parameters: Mapping[str, Union[Any, Iterable[Any]]]
-) -> List[Dict[str, Any]]:
+    parameters: Mapping[str, Union[Any, Iterable[Any]]],
+) -> list[dict[str, Any]]:
     """Create model kwargs from parameters dictionary.
 
     Parameters
@@ -116,11 +107,11 @@ def _make_model_kwargs(
 
 
 def _model_run_func(
-    model_cls: Type[Model],
-    run: Tuple[int, int, Dict[str, Any]],
+    model_cls: type[Model],
+    run: tuple[int, int, dict[str, Any]],
     max_steps: int,
     data_collection_period: int,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Run a single model run and collect model and agent data.
 
     Parameters
@@ -185,7 +176,7 @@ def _model_run_func(
 def _collect_data(
     model: Model,
     step: int,
-) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Collect model and agent data from a model using mesas datacollector."""
     dc = model.datacollector
 
