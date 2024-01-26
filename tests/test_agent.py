@@ -255,7 +255,7 @@ def test_agentset_select_by_type():
 
 def test_agentset_shuffle():
     model = Model()
-    test_agents = [TestAgent(model.next_id(), model) for _ in range(4)]
+    test_agents = [TestAgent(model.next_id(), model) for _ in range(12)]
 
     agentset = AgentSet(test_agents, model=model)
     agentset = agentset.shuffle()
