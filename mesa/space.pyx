@@ -1097,7 +1097,7 @@ class _HexGrid:
 
     def get_neighborhood(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
-    ) -> list[Coordinate]:
+    ) -> Sequence[Coordinate]:
         """Return a list of coordinates that are in the
         neighborhood of a certain point. To calculate the neighborhood
         for a HexGrid the parity of the x coordinate of the point is
