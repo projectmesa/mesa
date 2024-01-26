@@ -13,10 +13,12 @@ import warnings
 from collections import defaultdict
 
 # mypy
-from typing import Any
+from typing import Any, Union
 
 from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
+
+TimeT = Union[float, int]
 
 
 class Model:
@@ -68,6 +70,9 @@ class Model:
         self.current_id = 0
         self.agents_: defaultdict[type, dict] = defaultdict(dict)
 
+        self._steps: int = 0
+        self._time: TimeT = 0  # the model's clock
+
         # Warning flags for current experimental features. These make sure a warning is only printed once per model.
         self.agentset_experimental_warning_given = False
 
@@ -111,6 +116,11 @@ class Model:
 
     def step(self) -> None:
         """A single step. Fill in here."""
+
+    def _advance_time(self, deltat: TimeT = 1):
+        """Increment the model's steps counter and clock."""
+        self._steps += 1
+        self._time += deltat
 
     def next_id(self) -> int:
         """Return the next unique ID for agents, increment current_id"""
