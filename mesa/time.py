@@ -150,8 +150,8 @@ class BaseScheduler:
 
     def do_each(self, method, shuffle=False):
         if shuffle:
-            self.agents.shuffle(inplace=True)
-        self.agents.do(method)
+            self._agents.shuffle(inplace=True)
+        self._agents.do(method)
 
 
 class RandomActivation(BaseScheduler):
