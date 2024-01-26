@@ -178,7 +178,7 @@ def ModelController(model, play_interval, current_step, reset_counter):
     def do_step():
         model.step()
         previous_step.value = current_step.value
-        current_step.value += 1
+        current_step.value = model._steps
 
     def do_play():
         model.running = True
