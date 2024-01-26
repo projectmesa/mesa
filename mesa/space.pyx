@@ -1559,7 +1559,7 @@ class NetworkGrid:
         """Returns a bool of the contents of a cell."""
         return self.G.nodes[node_id]["agent"] == self.default_val()
 
-    def get_cell_list_contents(self, cell_list: list[int]) -> list[Agent]:
+    def get_cell_list_contents(self, cell_list: list[int] | nx.Graph) -> list[Agent]:
         """Returns a list of the agents contained in the nodes identified
         in `cell_list`; nodes with empty content are excluded.
         """
@@ -1569,7 +1569,7 @@ class NetworkGrid:
         """Returns a list of all the agents in the network."""
         return self.get_cell_list_contents(self.G)
 
-    def iter_cell_list_contents(self, cell_list: list[int]) -> Iterator[Agent]:
+    def iter_cell_list_contents(self, cell_list: list[int] | nx.Graph) -> Iterator[Agent]:
         """Returns an iterator of the agents contained in the nodes identified
         in `cell_list`; nodes with empty content are excluded.
         """
