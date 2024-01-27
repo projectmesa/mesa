@@ -55,6 +55,7 @@ class Agent:
         except AttributeError:
             # model super has not been called
             self.model.agents_ = defaultdict(dict)
+            self.model.agents_[type(self)][self] = None
             self.model.agentset_experimental_warning_given = False
 
             warnings.warn(

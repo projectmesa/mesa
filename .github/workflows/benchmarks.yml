@@ -2,11 +2,12 @@ name: Performance benchmarks
 
 on:
   pull_request_target:
-    types: [opened, ready_for_review]
+    types: [opened, ready_for_review, labeled]
     branches:
       - main
-  issue_comment:
-    types: [created]
+    paths:
+      - '**.py'
+      - '.github/workflows/benchmarks.yml'
 
 permissions:
   issues: write
@@ -15,12 +16,12 @@ permissions:
 jobs:
   run-benchmarks:
     if: >
-      github.event_name == 'pull_request_target' ||
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/rerun-benchmarks'))
+      github.event.action == 'labeled' && contains(github.event.pull_request.labels.*.name, 'trigger-benchmarks') ||
+      github.event.action == 'opened' ||
+      github.event.action == 'ready_for_review'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
+      # Python and dependency setup
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -29,6 +30,7 @@ jobs:
         run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
       - name: Install dependencies
         run: pip install numpy pandas tqdm tabulate
+      # Benchmarks on the projectmesa main branch
       - name: Checkout main branch
         uses: actions/checkout@v4
         with:
@@ -37,6 +39,7 @@ jobs:
       - name: Run benchmarks on main branch
         working-directory: benchmarks
         run: python global_benchmark.py
+      # Upload benchmarks, checkout PR branch, download benchmarks
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
         with:
@@ -44,6 +47,7 @@ jobs:
           path: benchmarks/timings_1.pickle
       - name: Checkout PR branch
         uses: actions/checkout@v4
+        if: github.event_name == 'pull_request_target'
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
@@ -55,9 +59,11 @@ jobs:
         with:
           name: timings-main
           path: benchmarks
+      # Run benchmarks on the PR branch
       - name: Run benchmarks on PR branch
         working-directory: benchmarks
         run: python global_benchmark.py
+      # Run compare script and create comment
       - name: Run compare timings and encode output
         working-directory: benchmarks
         run: |
