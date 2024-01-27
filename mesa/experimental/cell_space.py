@@ -2,7 +2,7 @@ import itertools
 from random import Random
 from collections.abc import Iterable
 from functools import cache, cached_property
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 
 from .. import Agent, Model
 
@@ -44,8 +44,8 @@ class CellAgent(Agent):
 class Cell:
     __slots__ = ["coordinate", "_connections", "agents", "capacity", "properties"]
 
-    def __init__(self, i: int, j: int, capacity: int | None = 1) -> None:
-        self.coordinate = (i, j)
+    def __init__(self, coordinate, capacity: int | None = 1) -> None:
+        self.coordinate = coordinate
         self._connections: list[Cell] = []
         self.agents: list[Agent] = []
         self.capacity = capacity
@@ -204,7 +204,7 @@ class Grid(DiscreteSpace):
         self.moore = moore
         self.capacity = capacity
         self.cells = {
-            (i, j): Cell(i, j, capacity) for j in range(width) for i in range(height)
+            (i, j): Cell((i, j), capacity) for j in range(width) for i in range(height)
         }
 
         for cell in self.all_cells:
@@ -275,3 +275,25 @@ class HexGrid(DiscreteSpace):
                 ni, nj = ni % self.height, nj % self.width
             if 0 <= ni < self.height and 0 <= nj < self.width:
                 cell.connect(self.cells[ni, nj])
+
+class NetworkGrid(DiscreteSpace):
+    def __init__(self, g: Any, capacity: int = 1) -> None:
+        """Create a new network.
+
+        Args:
+            G: a NetworkX graph instance.
+        """
+        super().__init__()
+        self.G = g
+        self.capacity = capacity
+
+        self.cells = {}
+        for node_id in self.G.nodes:
+            self.cells[node_id] = Cell(node_id, capacity)
+
+        for cell in self.all_cells:
+            self._connect_single_cell(cell)
+
+    def _connect_single_cell(self, cell):
+        neighbors = [self.cells[node_id] for node_id in self.G.neighbors(cell.coordinate)]
+        cell.connect(neighbors)
