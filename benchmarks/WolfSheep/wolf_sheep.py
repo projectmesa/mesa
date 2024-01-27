@@ -8,15 +8,13 @@ Replication of the model found in NetLogo:
     Center for Connected Learning and Computer-Based Modeling,
     Northwestern University, Evanston, IL.
 """
-import math
 
-from mesa import Model, Agent
+from mesa import Agent, Model
 from mesa.space import MultiGrid
 from mesa.time import RandomActivationByType
 
 
 class Animal(Agent):
-
     def __init__(self, unique_id, model, moore, energy, p_reproduce, energy_from_food):
         super().__init__(unique_id, model)
         self.energy = energy
@@ -33,7 +31,12 @@ class Animal(Agent):
     def spawn_offspring(self):
         self.energy /= 2
         offspring = self.__class__(
-            self.model.next_id(), self.model, self.moore, self.energy, self.p_reproduce, self.energy_from_food
+            self.model.next_id(),
+            self.model,
+            self.moore,
+            self.energy,
+            self.p_reproduce,
+            self.energy_from_food,
         )
         self.model.grid.place_agent(offspring, self.pos)
         self.model.schedule.add(offspring)
@@ -71,6 +74,7 @@ class Sheep(Animal):
         if grass_patch.fully_grown:
             self.energy += self.energy_from_food
             grass_patch.fully_grown = False
+
 
 class Wolf(Animal):
     """
@@ -123,18 +127,18 @@ class WolfSheep(Model):
     """
 
     def __init__(
-            self,
-            seed,
-            height,
-            width,
-            initial_sheep,
-            initial_wolves,
-            sheep_reproduce,
-            wolf_reproduce,
-            grass_regrowth_time,
-            wolf_gain_from_food=13,
-            sheep_gain_from_food=5,
-            moore=False
+        self,
+        seed,
+        height,
+        width,
+        initial_sheep,
+        initial_wolves,
+        sheep_reproduce,
+        wolf_reproduce,
+        grass_regrowth_time,
+        wolf_gain_from_food=13,
+        sheep_gain_from_food=5,
+        moore=False,
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
@@ -168,7 +172,14 @@ class WolfSheep(Model):
                 self.random.randrange(self.height),
             )
             energy = self.random.randrange(2 * sheep_gain_from_food)
-            sheep = Sheep(self.next_id(), self, moore, energy, sheep_reproduce, sheep_gain_from_food)
+            sheep = Sheep(
+                self.next_id(),
+                self,
+                moore,
+                energy,
+                sheep_reproduce,
+                sheep_gain_from_food,
+            )
             self.grid.place_agent(sheep, pos)
             self.schedule.add(sheep)
 
@@ -179,7 +190,9 @@ class WolfSheep(Model):
                 self.random.randrange(self.height),
             )
             energy = self.random.randrange(2 * wolf_gain_from_food)
-            wolf = Wolf(self.next_id(), self, moore, energy, wolf_reproduce, wolf_gain_from_food)
+            wolf = Wolf(
+                self.next_id(), self, moore, energy, wolf_reproduce, wolf_gain_from_food
+            )
             self.grid.place_agent(wolf, pos)
             self.schedule.add(wolf)
 
