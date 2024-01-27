@@ -1,9 +1,9 @@
-from mesa import Agent, Model
-from mesa.experimental.cell_space import Grid
+from mesa import Model
+from mesa.experimental.cell_space import Grid, CellAgent
 from mesa.time import RandomActivation
 
 
-class SchellingAgent(Agent):
+class SchellingAgent(CellAgent):
     """
     Schelling segregation agent
     """
@@ -27,7 +27,7 @@ class SchellingAgent(Agent):
 
         # If unhappy, move:
         if similar < self.model.homophily:
-            self.model.grid.move_to_empty(self)
+            self.move_to(self.model.grid.select_random_empty(self))
         else:
             self.model.happy += 1
 
@@ -62,7 +62,7 @@ class Schelling(Model):
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(self.next_id(), self, agent_type)
-                cell.add_agent(agent)
+                agent.move_to(cell)
                 self.schedule.add(agent)
 
     def step(self):

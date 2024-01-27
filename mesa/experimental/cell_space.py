@@ -1,12 +1,44 @@
 import itertools
-import random
+from random import Random
 from collections.abc import Iterable
 from functools import cache, cached_property
 from typing import Callable, Optional
 
-from .. import Agent
+from .. import Agent, Model
 
 Coordinate = tuple[int, int]
+
+
+class CellAgent(Agent):
+    """
+    Base class for a model agent in Mesa.
+
+    Attributes:
+        unique_id (int): A unique identifier for this agent.
+        model (Model): A reference to the model instance.
+        self.pos: Position | None = None
+    """
+
+    def __init__(self, unique_id: int, model: Model) -> None:
+        """
+        Create a new agent.
+
+        Args:
+            unique_id (int): A unique identifier for this agent.
+            model (Model): The model instance in which the agent exists.
+        """
+        super().__init__(unique_id, model)
+        self.cell: Cell | None = None
+
+    @property
+    def random(self) -> Random:
+        return self.model.random
+
+    def move_to(self, cell) -> None:
+        if self.cell is not None:
+            self.cell.remove_agent(self)
+        self.cell = cell
+        cell.add_agent(self)
 
 
 class Cell:
@@ -31,10 +63,7 @@ class Cell:
         """Adds an agent to the cell."""
         if self.capacity and len(self.agents) >= self.capacity:
             raise Exception("ERROR: Cell is full")
-        if isinstance(agent.cell, Cell):
-            agent.cell.remove_agent(agent)
         self.agents.append(agent)
-        agent.cell = self
 
     def remove_agent(self, agent: Agent) -> None:
         """Removes an agent from the cell."""
@@ -56,22 +85,23 @@ class Cell:
 
     @cache
     def neighborhood(self, radius=1, include_center=False):
+        return CellCollection(self._neighborhood(radius=radius, include_center=include_center))
+
+    @cache
+    def _neighborhood(self, radius=1, include_center=False):
         # if radius == 0:
         #     return {self: self.agents}
         if radius < 1:
             raise ValueError("radius must be larger than one")
         if radius == 1:
-            return CellCollection(
-                {neighbor: neighbor.agents for neighbor in self._connections}
-            )
+            return {neighbor: neighbor.agents for neighbor in self._connections}
         else:
             neighborhood = {}
             for neighbor in self._connections:
-                neighborhood.update(neighbor.neighborhood(radius - 1, include_center))
+                neighborhood.update(neighbor._neighborhood(radius - 1, include_center))
             if not include_center:
                 neighborhood.pop(self, None)
-            return CellCollection(neighborhood)
-
+            return neighborhood
 
 class CellCollection:
     def __init__(self, cells: dict[Cell, list[Agent]] | Iterable[Cell]) -> None:
@@ -79,6 +109,7 @@ class CellCollection:
             self._cells = cells
         else:
             self._cells = {cell: cell.agents for cell in cells}
+        self.random = Random() # FIXME
 
     def __iter__(self):
         return iter(self._cells)
@@ -102,10 +133,10 @@ class CellCollection:
         return itertools.chain.from_iterable(self._cells.values())
 
     def select_random_cell(self):
-        return random.choice(self.cells)
+        return self.random.choice(self.cells)
 
     def select_random_agent(self):
-        return random.choice(list(self.agents))
+        return self.random.choice(list(self.agents))
 
     def select(self, filter_func: Optional[Callable[[Cell], bool]] = None, n=0):
         if filter_func is None and n == 0:
@@ -120,7 +151,7 @@ class CellCollection:
         )
 
 
-class Space:
+class DiscreteSpace:
     cells: dict[Coordinate, Cell] = {}
 
     def _connect_single_cell(self, cell):
@@ -144,12 +175,11 @@ class Space:
     def empties(self) -> CellCollection:
         return self.all_cells.select(lambda cell: cell.is_empty)
 
-    def move_to_empty(self, agent: Agent) -> None:
+    def select_random_empty(self, agent: Agent) -> None:
         while True:
-            new_cell = self.all_cells.select_random_cell()
-            if new_cell.is_empty:
-                new_cell.add_agent(agent)
-                return
+            cell = self.all_cells.select_random_cell()
+            if cell.is_empty:
+                return cell
 
         # TODO: Adjust cutoff value for performance
         for _ in range(len(self.all_cells) // 10):
@@ -164,7 +194,7 @@ class Space:
             raise Exception("ERROR: No empty cell found") from err
 
 
-class Grid(Space):
+class Grid(DiscreteSpace):
     def __init__(
         self, width: int, height: int, torus: bool = False, moore: bool = True, capacity=1
     ) -> None:
@@ -206,7 +236,7 @@ class Grid(Space):
                 cell.connect(self.cells[ni, nj])
 
 
-class HexGrid(Space):
+class HexGrid(DiscreteSpace):
     def __init__(
         self, width: int, height: int, torus: bool = False, capacity=1
     ) -> None:

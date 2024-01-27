@@ -47,7 +47,6 @@ class Agent:
         """
         self.unique_id = unique_id
         self.model = model
-        self.cell: Cell | None = None
         self.pos: Position | None = None
 
         # register agent
@@ -78,6 +77,8 @@ class Agent:
     @property
     def random(self) -> Random:
         return self.model.random
+
+
 
 
 class AgentSet(MutableSet, Sequence):

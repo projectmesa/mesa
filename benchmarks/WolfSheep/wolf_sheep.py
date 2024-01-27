@@ -10,12 +10,12 @@ Replication of the model found in NetLogo:
 """
 import math
 
-from mesa import Model, Agent
-from mesa.experimental.cell_space import Grid
+from mesa import Model
+from mesa.experimental.cell_space import Grid, CellAgent
 from mesa.time import RandomActivationByType
 
 
-class Animal(Agent):
+class Animal(CellAgent):
 
     def __init__(self, unique_id, model, energy, p_reproduce, energy_from_food):
         super().__init__(unique_id, model)
@@ -24,16 +24,14 @@ class Animal(Agent):
         self.energy_from_food = energy_from_food
 
     def random_move(self):
-        new_cell = self.cell.neighborhood().select_random_cell()
-        self.cell.remove_agent(self)
-        new_cell.add_agent(self)
+        self.move_to(self.cell.neighborhood().select_random_cell())
 
     def spawn_offspring(self):
         self.energy /= 2
         offspring = self.__class__(
             self.model.next_id(), self.model, self.energy, self.p_reproduce, self.energy_from_food
         )
-        self.cell.add_agent(offspring)
+        offspring.move_to(self.cell)
         self.model.schedule.add(offspring)
 
     def feed(self):
@@ -84,7 +82,7 @@ class Wolf(Animal):
             sheep_to_eat.die()
 
 
-class GrassPatch(Agent):
+class GrassPatch(CellAgent):
     """
     A patch of grass that grows at a fixed rate and it is eaten by sheep
     """
@@ -166,7 +164,7 @@ class WolfSheep(Model):
             )
             energy = self.random.randrange(2 * sheep_gain_from_food)
             sheep = Sheep(self.next_id(), self, energy, sheep_reproduce, sheep_gain_from_food)
-            self.grid.cells[pos].add_agent(sheep)
+            sheep.move_to(self.grid.cells[pos])
             self.schedule.add(sheep)
 
         # Create wolves
@@ -177,7 +175,7 @@ class WolfSheep(Model):
             )
             energy = self.random.randrange(2 * wolf_gain_from_food)
             wolf = Wolf(self.next_id(), self, energy, wolf_reproduce, wolf_gain_from_food)
-            self.grid.cells[pos].add_agent(wolf)
+            wolf.move_to(self.grid.cells[pos])
             self.schedule.add(wolf)
 
         # Create grass patches
@@ -189,7 +187,7 @@ class WolfSheep(Model):
             else:
                 countdown = self.random.randrange(self.grass_regrowth_time)
             patch = GrassPatch(self.next_id(), self, fully_grown, countdown)
-            cell.add_agent(patch)
+            patch.move_to(cell)
             self.schedule.add(patch)
 
     def step(self):
