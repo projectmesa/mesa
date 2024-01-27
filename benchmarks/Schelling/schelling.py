@@ -27,7 +27,7 @@ class SchellingAgent(CellAgent):
 
         # If unhappy, move:
         if similar < self.model.homophily:
-            self.move_to(self.model.grid.select_random_empty(self))
+            self.move_to(self.model.grid.select_random_empty_cell(self))
         else:
             self.model.happy += 1
 
