@@ -1,8 +1,8 @@
 import itertools
-from random import Random
 from collections.abc import Iterable
 from functools import cache, cached_property
-from typing import Callable, Optional, Any
+from random import Random
+from typing import Any, Callable, Optional
 
 from .. import Agent, Model
 
@@ -103,13 +103,14 @@ class Cell:
                 neighborhood.pop(self, None)
             return neighborhood
 
+
 class CellCollection:
     def __init__(self, cells: dict[Cell, list[Agent]] | Iterable[Cell]) -> None:
         if isinstance(cells, dict):
             self._cells = cells
         else:
             self._cells = {cell: cell.agents for cell in cells}
-        self.random = Random() # FIXME
+        self.random = Random()  # FIXME
 
     def __iter__(self):
         return iter(self._cells)
@@ -196,8 +197,19 @@ class DiscreteSpace:
 
 class Grid(DiscreteSpace):
     def __init__(
-        self, width: int, height: int, torus: bool = False, moore: bool = True, capacity=1
+            self, width: int, height: int, torus: bool = False, moore: bool = True, capacity=1
     ) -> None:
+        """Rectangular grid
+
+        Args:
+            width (int): width of the grid
+            height (int): height of the grid
+            torus (bool): whether the space is a torus
+            moore (bool): whether the space used Moore or von Neumann neighborhood
+            capacity (int): the number of agents that can simultaneously occupy a cell
+
+
+        """
         self.width = width
         self.height = height
         self.torus = torus
@@ -217,14 +229,14 @@ class Grid(DiscreteSpace):
         if self.moore:
             directions = [
                 (-1, -1), (-1, 0), (-1, 1),
-                ( 0, -1),          ( 0, 1),
-                ( 1, -1), ( 1, 0), ( 1, 1),
+                (0, -1), (0, 1),
+                (1, -1), (1, 0), (1, 1),
             ]
-        else: # Von Neumann neighborhood
+        else:  # Von Neumann neighborhood
             directions = [
-                          (-1, 0),
-                ( 0, -1),          (0, 1),
-                          ( 1, 0),
+                (-1, 0),
+                (0, -1), (0, 1),
+                (1, 0),
             ]
         # fmt: on
 
@@ -238,8 +250,17 @@ class Grid(DiscreteSpace):
 
 class HexGrid(DiscreteSpace):
     def __init__(
-        self, width: int, height: int, torus: bool = False, capacity=1
+            self, width: int, height: int, torus: bool = False, capacity=1
     ) -> None:
+        """Hexagonal Grid
+
+        Args:
+            width (int): width of the grid
+            height (int): height of the grid
+            torus (bool): whether the space is a torus
+            capacity (int): the number of agents that can simultaneously occupy a cell
+
+        """
         self.width = width
         self.height = height
         self.torus = torus
@@ -255,17 +276,17 @@ class HexGrid(DiscreteSpace):
         i, j = cell.coordinate
 
         # fmt: off
-        if i%2 == 0:
+        if i % 2 == 0:
             directions = [
-                     (-1, -1), (-1, 0),
-                  (0, -1),         (0, 1),
-                     ( 1, -1), ( 1, 0),
+                (-1, -1), (-1, 0),
+                (0, -1), (0, 1),
+                (1, -1), (1, 0),
             ]
         else:
             directions = [
-                     (-1, 0), (-1, 1),
-                  (0, -1),        (0, 1),
-                     ( 1, 0), ( 1, 1),
+                (-1, 0), (-1, 1),
+                (0, -1), (0, 1),
+                (1, 0), (1, 1),
             ]
         # fmt: on
 
@@ -276,12 +297,15 @@ class HexGrid(DiscreteSpace):
             if 0 <= ni < self.height and 0 <= nj < self.width:
                 cell.connect(self.cells[ni, nj])
 
+
 class NetworkGrid(DiscreteSpace):
     def __init__(self, g: Any, capacity: int = 1) -> None:
-        """Create a new network.
+        """A Networked grid
 
         Args:
-            G: a NetworkX graph instance.
+            G: a NetworkX Graph instance.
+            capacity (int) : the capacity of the cell
+
         """
         super().__init__()
         self.G = g
