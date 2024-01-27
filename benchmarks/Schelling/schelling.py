@@ -1,5 +1,5 @@
 from mesa import Model
-from mesa.experimental.cell_space import OrthogonalGrid, CellAgent
+from mesa.experimental.cell_space import CellAgent, OrthogonalGrid
 from mesa.time import RandomActivation
 
 

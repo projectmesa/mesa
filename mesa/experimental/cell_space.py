@@ -42,7 +42,14 @@ class CellAgent(Agent):
 
 
 class Cell:
-    __slots__ = ["coordinate", "_connections", "owner", "agents", "capacity", "properties"]
+    __slots__ = [
+        "coordinate",
+        "_connections",
+        "owner",
+        "agents",
+        "capacity",
+        "properties",
+    ]
 
     def __init__(self, coordinate, owner, capacity: int | None = 1) -> None:
         self.coordinate = coordinate
@@ -66,7 +73,9 @@ class Cell:
             self.owner._empties.pop(self, None)
 
         if self.capacity and len(self.agents) >= self.capacity:
-            raise Exception("ERROR: Cell is full")  # FIXME we need MESA errors or a proper error
+            raise Exception(
+                "ERROR: Cell is full"
+            )  # FIXME we need MESA errors or a proper error
 
         self.agents.append(agent)
 
@@ -91,7 +100,9 @@ class Cell:
 
     @cache
     def neighborhood(self, radius=1, include_center=False):
-        return CellCollection(self._neighborhood(radius=radius, include_center=include_center))
+        return CellCollection(
+            self._neighborhood(radius=radius, include_center=include_center)
+        )
 
     @cache
     def _neighborhood(self, radius=1, include_center=False):
@@ -159,7 +170,6 @@ class CellCollection:
 
 
 class DiscreteSpace:
-
     def __init__(self, capacity):
         super().__init__()
         self.capacity = capacity
@@ -177,7 +187,9 @@ class DiscreteSpace:
         ...
 
     def _initialize_empties(self):
-        self._empties = self._empties = {cell: None for cell in self.cells.values() if cell.is_empty}
+        self._empties = self._empties = {
+            cell: None for cell in self.cells.values() if cell.is_empty
+        }
         self.cutoff_empties = 7.953 * len(self.cells) ** 0.384
         self.empties_initialized = True
 
@@ -197,8 +209,9 @@ class DiscreteSpace:
 
 
 class Grid(DiscreteSpace):
-
-    def __init__(self, width: int, height: int, torus: bool = False, capacity: int = 1) -> None:
+    def __init__(
+        self, width: int, height: int, torus: bool = False, capacity: int = 1
+    ) -> None:
         super().__init__(capacity)
         self.torus = torus
         self.width = width
@@ -234,7 +247,12 @@ class Grid(DiscreteSpace):
 
 class OrthogonalGrid(Grid):
     def __init__(
-            self, width: int, height: int, torus: bool = False, moore: bool = True, capacity: int = 1
+        self,
+        width: int,
+        height: int,
+        torus: bool = False,
+        moore: bool = True,
+        capacity: int = 1,
     ) -> None:
         """Rectangular grid
 
@@ -250,7 +268,9 @@ class OrthogonalGrid(Grid):
         super().__init__(width, height, torus, capacity)
         self.moore = moore
         self.cells = {
-            (i, j): Cell((i, j), self, capacity) for j in range(width) for i in range(height)
+            (i, j): Cell((i, j), self, capacity)
+            for j in range(width)
+            for i in range(height)
         }
 
         for cell in self.all_cells:
@@ -284,7 +304,7 @@ class OrthogonalGrid(Grid):
 
 class HexGrid(Grid):
     def __init__(
-            self, width: int, height: int, torus: bool = False, capacity=1
+        self, width: int, height: int, torus: bool = False, capacity=1
     ) -> None:
         """Hexagonal Grid
 
@@ -297,7 +317,9 @@ class HexGrid(Grid):
         """
         super().__init__(width, height, torus, capacity)
         self.cells = {
-            (i, j): Cell(i, j, self, capacity) for j in range(width) for i in range(height)
+            (i, j): Cell(i, j, self, capacity)
+            for j in range(width)
+            for i in range(height)
         }
 
         for cell in self.all_cells:
@@ -348,7 +370,9 @@ class NetworkGrid(DiscreteSpace):
             self._connect_single_cell(cell)
 
     def _connect_single_cell(self, cell):
-        neighbors = [self.cells[node_id] for node_id in self.G.neighbors(cell.coordinate)]
+        neighbors = [
+            self.cells[node_id] for node_id in self.G.neighbors(cell.coordinate)
+        ]
         cell.connect(neighbors)
 
     def select_random_empty_cell(self) -> Cell:

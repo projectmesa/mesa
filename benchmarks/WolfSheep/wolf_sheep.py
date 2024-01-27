@@ -11,12 +11,11 @@ Replication of the model found in NetLogo:
 import math
 
 from mesa import Model
-from mesa.experimental.cell_space import OrthogonalGrid, CellAgent
+from mesa.experimental.cell_space import CellAgent, OrthogonalGrid
 from mesa.time import RandomActivationByType
 
 
 class Animal(CellAgent):
-
     def __init__(self, unique_id, model, energy, p_reproduce, energy_from_food):
         super().__init__(unique_id, model)
         self.energy = energy
@@ -29,7 +28,11 @@ class Animal(CellAgent):
     def spawn_offspring(self):
         self.energy /= 2
         offspring = self.__class__(
-            self.model.next_id(), self.model, self.energy, self.p_reproduce, self.energy_from_food
+            self.model.next_id(),
+            self.model,
+            self.energy,
+            self.p_reproduce,
+            self.energy_from_food,
         )
         offspring.move_to(self.cell)
         self.model.schedule.add(offspring)
@@ -62,10 +65,13 @@ class Sheep(Animal):
 
     def feed(self):
         # If there is grass available, eat it
-        grass_patch = next(obj for obj in  self.cell.agents if isinstance(obj, GrassPatch))
+        grass_patch = next(
+            obj for obj in self.cell.agents if isinstance(obj, GrassPatch)
+        )
         if grass_patch.fully_grown:
             self.energy += self.energy_from_food
             grass_patch.fully_grown = False
+
 
 class Wolf(Animal):
     """
@@ -73,7 +79,7 @@ class Wolf(Animal):
     """
 
     def feed(self):
-        sheep = [obj for obj in  self.cell.agents if isinstance(obj, Sheep)]
+        sheep = [obj for obj in self.cell.agents if isinstance(obj, Sheep)]
         if len(sheep) > 0:
             sheep_to_eat = self.random.choice(sheep)
             self.energy += self.energy
@@ -117,18 +123,18 @@ class WolfSheep(Model):
     """
 
     def __init__(
-            self,
-            seed,
-            height,
-            width,
-            initial_sheep,
-            initial_wolves,
-            sheep_reproduce,
-            wolf_reproduce,
-            grass_regrowth_time,
-            wolf_gain_from_food=13,
-            sheep_gain_from_food=5,
-            moore=False
+        self,
+        seed,
+        height,
+        width,
+        initial_sheep,
+        initial_wolves,
+        sheep_reproduce,
+        wolf_reproduce,
+        grass_regrowth_time,
+        wolf_gain_from_food=13,
+        sheep_gain_from_food=5,
+        moore=False,
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
@@ -154,7 +160,9 @@ class WolfSheep(Model):
         self.grass_regrowth_time = grass_regrowth_time
 
         self.schedule = RandomActivationByType(self)
-        self.grid = OrthogonalGrid(self.height, self.width, moore=moore, torus=False, capacity=math.inf)
+        self.grid = OrthogonalGrid(
+            self.height, self.width, moore=moore, torus=False, capacity=math.inf
+        )
 
         # Create sheep:
         for _ in range(self.initial_sheep):
@@ -163,7 +171,9 @@ class WolfSheep(Model):
                 self.random.randrange(self.height),
             )
             energy = self.random.randrange(2 * sheep_gain_from_food)
-            sheep = Sheep(self.next_id(), self, energy, sheep_reproduce, sheep_gain_from_food)
+            sheep = Sheep(
+                self.next_id(), self, energy, sheep_reproduce, sheep_gain_from_food
+            )
             sheep.move_to(self.grid.cells[pos])
             self.schedule.add(sheep)
 
@@ -174,7 +184,9 @@ class WolfSheep(Model):
                 self.random.randrange(self.height),
             )
             energy = self.random.randrange(2 * wolf_gain_from_food)
-            wolf = Wolf(self.next_id(), self, energy, wolf_reproduce, wolf_gain_from_food)
+            wolf = Wolf(
+                self.next_id(), self, energy, wolf_reproduce, wolf_gain_from_food
+            )
             wolf.move_to(self.grid.cells[pos])
             self.schedule.add(wolf)
 
