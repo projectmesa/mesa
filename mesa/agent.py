@@ -196,7 +196,7 @@ class AgentSet(MutableSet, Sequence):
             self._agents.data = {entry:None for entry in weakrefs}
             return self
         else:
-            return AgentSet((agent for ref in weakrefs if (agent:=ref()) is not None), self.model)
+            return AgentSet((agent for ref in weakrefs if (agent := ref()) is not None), self.model)
 
         # shuffled_agents = list(self)
         # self.random.shuffle(shuffled_agents)
@@ -260,9 +260,9 @@ class AgentSet(MutableSet, Sequence):
         """
         # we iterate over the actual weakref keys and check if weakref is alive before calling the method
         res = [
-            getattr(agentref(), method_name)(*args, **kwargs)
+            getattr(agent, method_name)(*args, **kwargs)
             for agentref in self._agents.keyrefs()
-            if agentref()
+            if (agent := agentref()) is not None
         ]
 
         return res if return_results else self
