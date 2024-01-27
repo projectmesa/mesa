@@ -197,10 +197,12 @@ class AgentSet(MutableSet, Sequence):
         self.random.shuffle(weakrefs)
 
         if inplace:
-            self._agents.data = {entry:None for entry in weakrefs}
+            self._agents.data = {entry: None for entry in weakrefs}
             return self
         else:
-            return AgentSet((agent for ref in weakrefs if (agent := ref()) is not None), self.model)
+            return AgentSet(
+                (agent for ref in weakrefs if (agent := ref()) is not None), self.model
+            )
 
         # shuffled_agents = list(self)
         # self.random.shuffle(shuffled_agents)
