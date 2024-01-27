@@ -11,7 +11,7 @@ Replication of the model found in NetLogo:
 import math
 
 from mesa import Model
-from mesa.experimental.cell_space import Grid, CellAgent
+from mesa.experimental.cell_space import OrthogonalGrid, CellAgent
 from mesa.time import RandomActivationByType
 
 
@@ -154,7 +154,7 @@ class WolfSheep(Model):
         self.grass_regrowth_time = grass_regrowth_time
 
         self.schedule = RandomActivationByType(self)
-        self.grid = Grid(self.height, self.width, moore=moore, torus=False, capacity=math.inf)
+        self.grid = OrthogonalGrid(self.height, self.width, moore=moore, torus=False, capacity=math.inf)
 
         # Create sheep:
         for _ in range(self.initial_sheep):

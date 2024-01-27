@@ -66,7 +66,7 @@ class Cell:
             self.owner._empties.pop(self, None)
 
         if self.capacity and len(self.agents) >= self.capacity:
-            raise Exception("ERROR: Cell is full") # FIXME we need MESA errors or a proper error
+            raise Exception("ERROR: Cell is full")  # FIXME we need MESA errors or a proper error
 
         self.agents.append(agent)
 
@@ -75,7 +75,6 @@ class Cell:
         self.agents.remove(agent)
         if len(self.agents) == 0:
             self.owner._empties[self] = None
-
 
     @property
     def is_empty(self) -> bool:
@@ -161,11 +160,11 @@ class CellCollection:
 
 class DiscreteSpace:
 
-
     def __init__(self, capacity):
         super().__init__()
         self.capacity = capacity
-        cells: dict[Coordinate, Cell] = {}
+        self.cells: dict[Coordinate, Cell] = {}
+        self.random = Random()  # FIXME
 
         self._empties = {}
         self.cutoff_empties = -1
@@ -178,8 +177,8 @@ class DiscreteSpace:
         ...
 
     def _initialize_empties(self):
-        self._empties = self._empties = {cell:None for cell in self.cells.values() if cell.is_empty}
-        self.cutoff_empties = 7.953 *len(self.cells) ** 0.384
+        self._empties = self._empties = {cell: None for cell in self.cells.values() if cell.is_empty}
+        self.cutoff_empties = 7.953 * len(self.cells) ** 0.384
         self.empties_initialized = True
 
     @cached_property
@@ -198,8 +197,44 @@ class DiscreteSpace:
 
 
 class Grid(DiscreteSpace):
+
+    def __init__(self, width: int, height: int, torus: bool = False, capacity: int = 1) -> None:
+        super().__init__(capacity)
+        self.torus = torus
+        self.width = width
+        self.height = height
+
+    def select_random_empty_cell(self) -> Cell:
+        if not self.empties_initialized:
+            self._initialize_empties()
+
+        num_empty_cells = len(self._empties)
+        if num_empty_cells == 0:
+            raise Exception("ERROR: No empty cells")
+
+        # This method is based on Agents.jl's random_empty() implementation. See
+        # https://github.com/JuliaDynamics/Agents.jl/pull/541. For the discussion, see
+        # https://github.com/projectmesa/mesa/issues/1052 and
+        # https://github.com/projectmesa/mesa/pull/1565. The cutoff value provided
+        # is the break-even comparison with the time taken in the else branching point.
+        if num_empty_cells > self.cutoff_empties:
+            while True:
+                new_pos = (
+                    self.random.randrange(self.width),
+                    self.random.randrange(self.height),
+                )
+                cell = self.cells[new_pos]
+                if cell.is_empty:
+                    break
+        else:
+            cell = self.random.choice(sorted(self._empties))
+
+        return cell
+
+
+class OrthogonalGrid(Grid):
     def __init__(
-            self, width: int, height: int, torus: bool = False, moore: bool = True, capacity=1
+            self, width: int, height: int, torus: bool = False, moore: bool = True, capacity: int = 1
     ) -> None:
         """Rectangular grid
 
@@ -212,10 +247,7 @@ class Grid(DiscreteSpace):
 
 
         """
-        super().__init__(capacity)
-        self.width = width
-        self.height = height
-        self.torus = torus
+        super().__init__(width, height, torus, capacity)
         self.moore = moore
         self.cells = {
             (i, j): Cell((i, j), self, capacity) for j in range(width) for i in range(height)
@@ -249,36 +281,8 @@ class Grid(DiscreteSpace):
             if 0 <= ni < self.height and 0 <= nj < self.width:
                 cell.connect(self.cells[ni, nj])
 
-    def select_random_empty_cell(self, agent: Agent) -> None:
-        # FIXME I now copy paste this code into HexGrid and Grid
-        if not self.empties_initialized:
-            self._initialize_empties()
 
-        num_empty_cells = len(self._empties)
-        if num_empty_cells == 0:
-            raise Exception("ERROR: No empty cells")
-
-        # This method is based on Agents.jl's random_empty() implementation. See
-        # https://github.com/JuliaDynamics/Agents.jl/pull/541. For the discussion, see
-        # https://github.com/projectmesa/mesa/issues/1052 and
-        # https://github.com/projectmesa/mesa/pull/1565. The cutoff value provided
-        # is the break-even comparison with the time taken in the else branching point.
-        if num_empty_cells > self.cutoff_empties:
-            while True:
-                new_pos = (
-                    agent.random.randrange(self.width),
-                    agent.random.randrange(self.height),
-                )
-                cell = self.cells[new_pos]
-                if cell.is_empty:
-                    break
-        else:
-            cell = agent.random.choice(sorted(self.empties))
-
-        return cell
-
-
-class HexGrid(DiscreteSpace):
+class HexGrid(Grid):
     def __init__(
             self, width: int, height: int, torus: bool = False, capacity=1
     ) -> None:
@@ -291,10 +295,7 @@ class HexGrid(DiscreteSpace):
             capacity (int): the number of agents that can simultaneously occupy a cell
 
         """
-        super().__init__(capacity)
-        self.width = width
-        self.height = height
-        self.torus = torus
+        super().__init__(width, height, torus, capacity)
         self.cells = {
             (i, j): Cell(i, j, self, capacity) for j in range(width) for i in range(height)
         }
@@ -327,33 +328,6 @@ class HexGrid(DiscreteSpace):
             if 0 <= ni < self.height and 0 <= nj < self.width:
                 cell.connect(self.cells[ni, nj])
 
-    def select_random_emtpy_cell(self, agent: Agent) -> Cell:
-        # FIXME I now copy paste this code
-        if not self.empties_initialized:
-            self._initialize_empties()
-
-        num_empty_cells = len(self._empties)
-        if num_empty_cells == 0:
-            raise Exception("ERROR: No empty cells")
-
-        # This method is based on Agents.jl's random_empty() implementation. See
-        # https://github.com/JuliaDynamics/Agents.jl/pull/541. For the discussion, see
-        # https://github.com/projectmesa/mesa/issues/1052 and
-        # https://github.com/projectmesa/mesa/pull/1565. The cutoff value provided
-        # is the break-even comparison with the time taken in the else branching point.
-        if num_empty_cells > self.cutoff_empties:
-            while True:
-                new_pos = (
-                    agent.random.randrange(self.width),
-                    agent.random.randrange(self.height),
-                )
-                cell = self.cells[new_pos]
-                if cell.is_empty:
-                    break
-        else:
-            cell = agent.random.choice(sorted(self.empties))
-
-        return cell
 
 class NetworkGrid(DiscreteSpace):
     def __init__(self, g: Any, capacity: int = 1) -> None:
@@ -377,5 +351,8 @@ class NetworkGrid(DiscreteSpace):
         neighbors = [self.cells[node_id] for node_id in self.G.neighbors(cell.coordinate)]
         cell.connect(neighbors)
 
-    def select_random_empty_cell(self, agent: Agent) -> Cell:
-        raise NotImplementedError
+    def select_random_empty_cell(self) -> Cell:
+        if not self.empties_initialized:
+            self._initialize_empties()
+
+        return self.random.choice(self._empties)

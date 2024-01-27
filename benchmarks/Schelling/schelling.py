@@ -1,5 +1,5 @@
 from mesa import Model
-from mesa.experimental.cell_space import Grid, CellAgent
+from mesa.experimental.cell_space import OrthogonalGrid, CellAgent
 from mesa.time import RandomActivation
 
 
@@ -27,7 +27,7 @@ class SchellingAgent(CellAgent):
 
         # If unhappy, move:
         if similar < self.model.homophily:
-            self.move_to(self.model.grid.select_random_empty_cell(self))
+            self.move_to(self.model.grid.select_random_empty_cell())
         else:
             self.model.happy += 1
 
@@ -50,7 +50,7 @@ class Schelling(Model):
         self.radius = radius
 
         self.schedule = RandomActivation(self)
-        self.grid = Grid(height, width, torus=True)
+        self.grid = OrthogonalGrid(height, width, torus=True)
 
         self.happy = 0
 
