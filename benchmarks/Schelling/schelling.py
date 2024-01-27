@@ -8,7 +8,7 @@ class SchellingAgent(CellAgent):
     Schelling segregation agent
     """
 
-    def __init__(self, unique_id, model, agent_type):
+    def __init__(self, unique_id, model, agent_type, radius):
         """
         Create a new Schelling agent.
         Args:
@@ -18,10 +18,11 @@ class SchellingAgent(CellAgent):
         """
         super().__init__(unique_id, model)
         self.type = agent_type
+        self.radius = radius
 
     def step(self):
         similar = 0
-        for neighbor in self.cell.neighborhood().agents:
+        for neighbor in self.cell.neighborhood(radius=self.radius).agents:
             if neighbor.type == self.type:
                 similar += 1
 
@@ -47,7 +48,6 @@ class Schelling(Model):
         self.density = density
         self.minority_pc = minority_pc
         self.homophily = homophily
-        self.radius = radius
 
         self.schedule = RandomActivation(self)
         self.grid = OrthogonalGrid(height, width, torus=True)
@@ -61,7 +61,7 @@ class Schelling(Model):
         for cell in self.grid:
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
-                agent = SchellingAgent(self.next_id(), self, agent_type)
+                agent = SchellingAgent(self.next_id(), self, agent_type, radius)
                 agent.move_to(cell)
                 self.schedule.add(agent)
 
