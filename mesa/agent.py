@@ -204,15 +204,6 @@ class AgentSet(MutableSet, Sequence):
                 (agent for ref in weakrefs if (agent := ref()) is not None), self.model
             )
 
-        # shuffled_agents = list(self)
-        # self.random.shuffle(shuffled_agents)
-        #
-        # return (
-        #     AgentSet(shuffled_agents, self.model)
-        #     if not inplace
-        #     else self._update(shuffled_agents)
-        # )
-
     def sort(
         self,
         key: Callable[[Agent], Any] | str,
