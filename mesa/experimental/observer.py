@@ -45,13 +45,13 @@ class DataCollector:
             elif callable(group):
                 group_object = group()
             data = {
-                name: self._collect_element(group_object, collector)
+                name: self._collect_group(group_object, collector)
                 for name, collector in group_collector.items()
             }
             self.data_collection[group].append(data)
         return self
 
-    def _collect_element(self, group, collector):
+    def _collect_group(self, group, collector):
         def _get_or_apply(obj, value):
             # get
             if isinstance(value, str):
