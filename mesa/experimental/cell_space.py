@@ -47,7 +47,7 @@ class Cell:
         "properties",
     ]
 
-    def __init__(self, coordinate, owner, capacity: int | None = 1) -> None:
+    def __init__(self, coordinate, owner, capacity: int | None = None) -> None:
         self.coordinate = coordinate
         self._connections: list[Cell] = []  # TODO: change to CellCollection?
         self.agents: dict[
@@ -65,7 +65,7 @@ class Cell:
         """Disconnects this cell from another cell."""
         self._connections.remove(other)
 
-    def add_agent(self, agent: Agent) -> None:
+    def add_agent(self, agent: CellAgent) -> None:
         """Adds an agent to the cell."""
         n = len(self.agents)
 
@@ -79,7 +79,7 @@ class Cell:
 
         self.agents[agent] = None
 
-    def remove_agent(self, agent: Agent) -> None:
+    def remove_agent(self, agent: CellAgent) -> None:
         """Removes an agent from the cell."""
         self.agents.pop(agent, None)
         agent.cell = None
@@ -161,6 +161,7 @@ class CellCollection:
         return self.random.choice(list(self.agents))
 
     def select(self, filter_func: Optional[Callable[[Cell], bool]] = None, n=0):
+        # FIXME: n is not considered
         if filter_func is None and n == 0:
             return self
 
@@ -178,7 +179,10 @@ class DiscreteSpace:
     # FIXME:: defaulting to the same rng as model.random.
     # FIXME:: all children should be also like that.
 
-    def __init__(self, capacity):
+    def __init__(
+        self,
+        capacity: int | None = None,
+    ):
         super().__init__()
         self.capacity = capacity
         self.cells: dict[Coordinate, Cell] = {}
@@ -195,7 +199,7 @@ class DiscreteSpace:
         ...
 
     def _initialize_empties(self):
-        self._empties = self._empties = {
+        self._empties = {
             cell.coordinate: None for cell in self.cells.values() if cell.is_empty
         }
         self.cutoff_empties = 7.953 * len(self.cells) ** 0.384
@@ -240,11 +244,7 @@ class Grid(DiscreteSpace):
         # is the break-even comparison with the time taken in the else branching point.
         if num_empty_cells > self.cutoff_empties:
             while True:
-                new_pos = (
-                    self.random.randrange(self.width),
-                    self.random.randrange(self.height),
-                )
-                cell = self.cells[new_pos]
+                cell = self.all_cells.select_random_cell()
                 if cell.is_empty:
                     break
         else:
@@ -261,7 +261,7 @@ class OrthogonalGrid(Grid):
         height: int,
         torus: bool = False,
         moore: bool = True,
-        capacity: int = 1,
+        capacity: int | None = None,
     ) -> None:
         """Orthogonal grid
 
@@ -325,7 +325,7 @@ class HexGrid(Grid):
         """
         super().__init__(width, height, torus, capacity)
         self.cells = {
-            (i, j): Cell(i, j, self, capacity)
+            (i, j): Cell((i, j), self, capacity)
             for j in range(width)
             for i in range(height)
         }
@@ -360,7 +360,7 @@ class HexGrid(Grid):
 
 
 class NetworkGrid(DiscreteSpace):
-    def __init__(self, G: Any, capacity: int = 1) -> None:
+    def __init__(self, G: Any, capacity: int | None = None) -> None:
         """A Networked grid
 
         Args:
