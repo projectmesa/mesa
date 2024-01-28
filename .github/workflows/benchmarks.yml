@@ -36,6 +36,8 @@ jobs:
         with:
           ref: main
           repository: projectmesa/mesa
+      - name: Install Mesa
+        run: pip install --no-deps .
       - name: Run benchmarks on main branch
         working-directory: benchmarks
         run: python global_benchmark.py
@@ -54,6 +56,8 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           clean: false
+      - name: Install Mesa of the PR branch
+        run: pip install --no-deps .
       - name: Download benchmark results
         uses: actions/download-artifact@v4
         with:
