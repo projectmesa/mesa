@@ -49,8 +49,10 @@ class Cell:
 
     def __init__(self, coordinate, owner, capacity: int | None = 1) -> None:
         self.coordinate = coordinate
-        self._connections: list[Cell] = [] # TODO: change to CellCollection?
-        self.agents: dict[Agent, None] = {} # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
+        self._connections: list[Cell] = []  # TODO: change to CellCollection?
+        self.agents: dict[
+            Agent, None
+        ] = {}  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
         self.properties: dict[str, object] = {}
         self.owner = owner
@@ -67,7 +69,7 @@ class Cell:
         """Adds an agent to the cell."""
         n = len(self.agents)
 
-        if n  == 0:
+        if n == 0:
             self.owner._empties.pop(self.coordinate, None)
 
         if self.capacity and n >= self.capacity:
@@ -134,7 +136,7 @@ class CellCollection:
     def __iter__(self):
         return iter(self._cells)
 
-    def __getitem__(self, key:Cell) -> Iterable[Agent]:
+    def __getitem__(self, key: Cell) -> Iterable[Agent]:
         return self._cells[key]
 
     @cached_property
