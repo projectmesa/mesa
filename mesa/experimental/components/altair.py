@@ -44,9 +44,16 @@ def _draw_grid(space, agent_portrayal):
             x=alt.X("x", axis=None),
             # no y-axis label
             y=alt.Y("y", axis=None),
-            size=alt.Size("size"),
-            color=alt.Color("color"),
         )
         # .configure_view(strokeOpacity=0)  # hide grid/chart lines
     )
+
+    has_color = hasattr(all_agent_data[0], "color")
+    if has_color:
+        chart = chart.encode(color=alt.Color("color"))
+
+    has_size = hasattr(all_agent_data[0], "size")
+    if has_size:
+        chart = chart.encode(size=alt.Size("size"))
+
     return chart
