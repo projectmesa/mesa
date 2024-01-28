@@ -54,7 +54,7 @@ class Cell:
     def __init__(self, coordinate, owner, capacity: int | None = 1) -> None:
         self.coordinate = coordinate
         self._connections: list[Cell] = []
-        self.agents: list[Agent] = []
+        self.agents: dict[Agent, None] = {}
         self.capacity = capacity
         self.properties: dict[str, object] = {}
         self.owner = owner
@@ -69,21 +69,23 @@ class Cell:
 
     def add_agent(self, agent: Agent) -> None:
         """Adds an agent to the cell."""
-        if len(self.agents) == 0:
-            self.owner._empties.pop(self, None)
+        n = len(self.agents)
 
-        if self.capacity and len(self.agents) >= self.capacity:
+        if n  == 0:
+            self.owner._empties.pop(self.coordinate, None)
+
+        if self.capacity and n >= self.capacity:
             raise Exception(
                 "ERROR: Cell is full"
             )  # FIXME we need MESA errors or a proper error
 
-        self.agents.append(agent)
+        self.agents[agent] = None
 
     def remove_agent(self, agent: Agent) -> None:
         """Removes an agent from the cell."""
-        self.agents.remove(agent)
+        self.agents.pop(agent, None)
         if len(self.agents) == 0:
-            self.owner._empties[self] = None
+            self.owner._empties[self.coordinate] = None
 
     @property
     def is_empty(self) -> bool:
@@ -240,7 +242,8 @@ class Grid(DiscreteSpace):
                 if cell.is_empty:
                     break
         else:
-            cell = self.random.choice(sorted(self._empties))
+            coordinate = self.random.choice(list(self._empties))
+            cell = self.cells[coordinate]
 
         return cell
 
