@@ -30,11 +30,14 @@ def runserver(project):
     PROJECT is the path to the directory containing `run.py`, or the current
     directory if not specified.
     """
-    run_path = Path(project) / "run.py"
-    if not run_path.exists():
-        sys.exit(f"ERROR: file {run_path} does not exist")
-    args = [sys.executable, str(run_path)]
-    call(args)
+    run_files = ["run.py", "server.py"]
+    for run_file in run_files:
+        run_path = Path(project) / run_file
+        if not run_path.exists():
+            continue
+        args = [sys.executable, str(run_path)]
+        call(args)
+    sys.exit(f"ERROR: file run.py or server.py (in {Path(project)}) does not exist")
 
 
 @click.command()
