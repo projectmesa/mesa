@@ -7,6 +7,7 @@ import solara
 with contextlib.suppress(ImportError):
     import altair as alt
 
+
 @solara.component
 def SpaceAltair(model, agent_portrayal, dependencies: Optional[list[any]] = None):
     space = getattr(model, "grid", None)
