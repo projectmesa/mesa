@@ -1,7 +1,7 @@
 import itertools
+import random
 from collections.abc import Iterable
 from functools import cache, cached_property
-from random import Random
 from typing import Any, Callable, Optional
 
 from .. import Agent, Model
@@ -30,10 +30,6 @@ class CellAgent(Agent):
         super().__init__(unique_id, model)
         self.cell: Cell | None = None
 
-    @property
-    def random(self) -> Random:
-        return self.model.random
-
     def move_to(self, cell) -> None:
         if self.cell is not None:
             self.cell.remove_agent(self)
@@ -53,8 +49,8 @@ class Cell:
 
     def __init__(self, coordinate, owner, capacity: int | None = 1) -> None:
         self.coordinate = coordinate
-        self._connections: list[Cell] = []
-        self.agents: dict[Agent, None] = {}
+        self._connections: list[Cell] = [] # TODO: change to CellCollection?
+        self.agents: dict[Agent, None] = {} # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
         self.properties: dict[str, object] = {}
         self.owner = owner
@@ -84,6 +80,7 @@ class Cell:
     def remove_agent(self, agent: Agent) -> None:
         """Removes an agent from the cell."""
         self.agents.pop(agent, None)
+        agent.cell = None
         if len(self.agents) == 0:
             self.owner._empties[self.coordinate] = None
 
@@ -122,6 +119,9 @@ class Cell:
                 neighborhood.pop(self, None)
             return neighborhood
 
+    def __repr__(self):
+        return f"Cell({self.coords})"
+
 
 class CellCollection:
     def __init__(self, cells: dict[Cell, list[Agent]] | Iterable[Cell]) -> None:
@@ -129,16 +129,16 @@ class CellCollection:
             self._cells = cells
         else:
             self._cells = {cell: cell.agents for cell in cells}
-        self.random = Random()  # FIXME
+        self.random = random  # FIXME
 
     def __iter__(self):
         return iter(self._cells)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key:Cell) -> Iterable[Agent]:
         return self._cells[key]
 
     @cached_property
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._cells)
 
     def __repr__(self):
@@ -149,7 +149,7 @@ class CellCollection:
         return list(self._cells.keys())
 
     @property
-    def agents(self):
+    def agents(self) -> Iterable[Agent]:
         return itertools.chain.from_iterable(self._cells.values())
 
     def select_random_cell(self):
@@ -172,11 +172,15 @@ class CellCollection:
 
 
 class DiscreteSpace:
+    # FIXME:: random should become a keyword argument
+    # FIXME:: defaulting to the same rng as model.random.
+    # FIXME:: all children should be also like that.
+
     def __init__(self, capacity):
         super().__init__()
         self.capacity = capacity
         self.cells: dict[Coordinate, Cell] = {}
-        self.random = Random()  # FIXME
+        self.random = random  # FIXME
 
         self._empties = {}
         self.cutoff_empties = -1
@@ -190,7 +194,7 @@ class DiscreteSpace:
 
     def _initialize_empties(self):
         self._empties = self._empties = {
-            cell: None for cell in self.cells.values() if cell.is_empty
+            cell.coordinate: None for cell in self.cells.values() if cell.is_empty
         }
         self.cutoff_empties = 7.953 * len(self.cells) ** 0.384
         self.empties_initialized = True
@@ -257,7 +261,7 @@ class OrthogonalGrid(Grid):
         moore: bool = True,
         capacity: int = 1,
     ) -> None:
-        """Rectangular grid
+        """Orthogonal grid
 
         Args:
             width (int): width of the grid
@@ -265,7 +269,6 @@ class OrthogonalGrid(Grid):
             torus (bool): whether the space is a torus
             moore (bool): whether the space used Moore or von Neumann neighborhood
             capacity (int): the number of agents that can simultaneously occupy a cell
-
 
         """
         super().__init__(width, height, torus, capacity)
@@ -286,14 +289,14 @@ class OrthogonalGrid(Grid):
         if self.moore:
             directions = [
                 (-1, -1), (-1, 0), (-1, 1),
-                (0, -1), (0, 1),
-                (1, -1), (1, 0), (1, 1),
+                ( 0, -1),           ( 0, 1),
+                ( 1, -1),  ( 1, 0), ( 1, 1),
             ]
         else:  # Von Neumann neighborhood
             directions = [
-                (-1, 0),
-                (0, -1), (0, 1),
-                (1, 0),
+                         (-1, 0),
+                (0, -1),          (0, 1),
+                         ( 1, 0),
             ]
         # fmt: on
 
@@ -334,15 +337,15 @@ class HexGrid(Grid):
         # fmt: off
         if i % 2 == 0:
             directions = [
-                (-1, -1), (-1, 0),
-                (0, -1), (0, 1),
-                (1, -1), (1, 0),
+                   (-1, -1), (-1, 0),
+                (0, -1),         (0, 1),
+                   ( 1, -1),  (1, 0),
             ]
         else:
             directions = [
-                (-1, 0), (-1, 1),
-                (0, -1), (0, 1),
-                (1, 0), (1, 1),
+                   (-1, 0), (-1, 1),
+                (0, -1),        (0, 1),
+                   ( 1, 0),  (1, 1),
             ]
         # fmt: on
 
@@ -355,7 +358,7 @@ class HexGrid(Grid):
 
 
 class NetworkGrid(DiscreteSpace):
-    def __init__(self, g: Any, capacity: int = 1) -> None:
+    def __init__(self, G: Any, capacity: int = 1) -> None:
         """A Networked grid
 
         Args:
@@ -364,7 +367,7 @@ class NetworkGrid(DiscreteSpace):
 
         """
         super().__init__(capacity)
-        self.G = g
+        self.G = G
 
         for node_id in self.G.nodes:
             self.cells[node_id] = Cell(node_id, self, capacity)

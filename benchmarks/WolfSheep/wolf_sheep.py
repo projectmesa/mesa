@@ -98,7 +98,7 @@ class GrassPatch(CellAgent):
         Creates a new patch of grass
 
         Args:
-            grown: (boolean) Whether the patch of grass is fully grown or not
+            fully_grown: (boolean) Whether the patch of grass is fully grown or not
             countdown: Time for the patch of grass to be fully grown again
         """
         super().__init__(unique_id, model)
