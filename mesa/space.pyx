@@ -21,7 +21,7 @@ import math
 import warnings
 from collections.abc import Iterable, Iterator, Sequence
 from numbers import Real
-from typing import Any, Callable, TypeVar, Union, cast, overload
+from typing import Any, Callable, TypeVar, Union, cast
 from warnings import warn
 
 with contextlib.suppress(ImportError):
@@ -67,7 +67,6 @@ def ensure_positions_as_list(positions):
     if len(positions) == 2 and not isinstance(positions[0], tuple):
         return [positions]
     return positions
-
 
 
 def is_integer(x: Real) -> bool:
