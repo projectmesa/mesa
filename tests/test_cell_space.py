@@ -1,3 +1,4 @@
+import pytest
 
 from mesa.experimental.cell_space import CellAgent, CellCollection, OrthogonalGrid, HexGrid, NetworkGrid
 
@@ -71,6 +72,9 @@ def test_cell_neighborhood():
         neighborhood = grid.cells[(0, 0)].neighborhood(radius=radius)
         assert len(neighborhood) == n
 
+    with pytest.raises(ValueError):
+        grid.cells[(0, 0)].neighborhood(radius=0)
+
     ## Moore
 
 
@@ -116,6 +120,19 @@ def test_hexgrid():
         assert connection.coordinate in {(3, 3), (3, 4),
                                       (4, 3),       (4, 5),
                                          (5, 3), (5, 4)}
+
+        # fmt: on
+
+    grid = HexGrid(width, height, torus=True)
+    assert len(grid.cells) == width * height
+
+    # first row
+    assert len(grid.cells[(0, 0)]._connections) == 6
+    for connection in grid.cells[(0, 0)]._connections:
+        # fmt: off
+        assert connection.coordinate in {(9, 9), (9, 0),
+                                      (0, 9),       (0, 1),
+                                         (1, 9), (1, 0)}
 
         # fmt: on
 
