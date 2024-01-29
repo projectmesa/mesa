@@ -1,7 +1,6 @@
 import contextlib
 from typing import Optional
 
-import pandas as pd
 import solara
 
 with contextlib.suppress(ImportError):
@@ -36,25 +35,24 @@ def _draw_grid(space, agent_portrayal):
         return all_agent_data
 
     all_agent_data = portray(space)
-    df = pd.DataFrame(all_agent_data)
+    encoding_dict = {
+        # no x-axis label
+        "x": alt.X("x", axis=None, type="ordinal"),
+        # no y-axis label
+        "y": alt.Y("y", axis=None, type="ordinal"),
+    }
+    has_color = "color" in all_agent_data[0]
+    if has_color:
+        encoding_dict["color"] = alt.Color("color", type="nominal")
+    has_size = "size" in all_agent_data[0]
+    if has_size:
+        encoding_dict["size"] = alt.Size("size", type="quantitative")
+
     chart = (
-        alt.Chart(df)
+        alt.Chart(alt.Data(values=all_agent_data), encoding=alt.Encoding(**encoding_dict))
         .mark_point(filled=True)
-        .encode(
-            # no x-axis label
-            x=alt.X("x", axis=None),
-            # no y-axis label
-            y=alt.Y("y", axis=None),
-        )
+        .properties(width=space.width * 15, height=space.height * 15)
         # .configure_view(strokeOpacity=0)  # hide grid/chart lines
     )
-
-    has_color = hasattr(all_agent_data[0], "color")
-    if has_color:
-        chart = chart.encode(color=alt.Color("color"))
-
-    has_size = hasattr(all_agent_data[0], "size")
-    if has_size:
-        chart = chart.encode(size=alt.Size("size"))
 
     return chart
