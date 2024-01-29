@@ -18,6 +18,11 @@ repos:
     hooks:
     -   id: pyupgrade
         args: [--py38-plus]
+-   repo: https://github.com/MarcoGorelli/cython-lint
+    rev: v0.16.0
+    hooks:
+    -   id: cython-lint
+    -   id: double-quote-cython-strings
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0  # Use the ref you want to point at
     hooks:
