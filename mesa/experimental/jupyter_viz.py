@@ -286,6 +286,7 @@ def UserInputs(user_params, on_change=None):
             )
             slider_class(
                 options.label,
+                value=options.value,
                 on_value=change_handler,
                 min=options.min,
                 max=options.max,
