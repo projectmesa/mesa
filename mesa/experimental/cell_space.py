@@ -112,17 +112,22 @@ class Cell:
         if radius < 1:
             raise ValueError("radius must be larger than one")
         if radius == 1:
-            return {neighbor: neighbor.agents for neighbor in self._connections}
+            neighborhood = {neighbor: neighbor.agents for neighbor in self._connections}
+            if not include_center:
+                return neighborhood
+            else:
+                neighborhood[self] = self.agents
+                return neighborhood
         else:
             neighborhood = {}
             for neighbor in self._connections:
-                neighborhood.update(neighbor._neighborhood(radius - 1, include_center))
+                neighborhood.update(neighbor._neighborhood(radius - 1, include_center=True))
             if not include_center:
                 neighborhood.pop(self, None)
             return neighborhood
 
     def __repr__(self):
-        return f"Cell({self.coords})"
+        return f"Cell({self.coordinate})"
 
 
 class CellCollection:
@@ -139,7 +144,7 @@ class CellCollection:
     def __getitem__(self, key: Cell) -> Iterable[Agent]:
         return self._cells[key]
 
-    @cached_property
+    # @cached_property
     def __len__(self) -> int:
         return len(self._cells)
 
@@ -218,6 +223,12 @@ class DiscreteSpace:
     @property
     def empties(self) -> CellCollection:
         return self.all_cells.select(lambda cell: cell.is_empty)
+
+    def select_random_empty_cell(self) -> Cell:
+        if not self.empties_initialized:
+            self._initialize_empties()
+
+        return self.random.choice(self._empties)
 
 
 class Grid(DiscreteSpace):
@@ -383,8 +394,4 @@ class NetworkGrid(DiscreteSpace):
         ]
         cell.connect(neighbors)
 
-    def select_random_empty_cell(self) -> Cell:
-        if not self.empties_initialized:
-            self._initialize_empties()
 
-        return self.random.choice(self._empties)
