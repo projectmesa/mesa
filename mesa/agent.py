@@ -25,6 +25,8 @@ if TYPE_CHECKING:
     from mesa.model import Model
     from mesa.space import Position
 
+from mesa.rng import get_rng
+
 
 class Agent:
     """
@@ -107,7 +109,7 @@ class AgentSet(MutableSet, Sequence):
 
     agentset_experimental_warning_given = False
 
-    def __init__(self, agents: Iterable[Agent], model: Model):
+    def __init__(self, agents: Iterable[Agent], model: Model, random=get_rng()):
         """
         Initializes the AgentSet with a collection of agents and a reference to the model.
 
@@ -116,6 +118,7 @@ class AgentSet(MutableSet, Sequence):
             model (Model): The ABM model instance to which this AgentSet belongs.
         """
         self.model = model
+        self.random = random
 
         if not self.__class__.agentset_experimental_warning_given:
             self.__class__.agentset_experimental_warning_given = True
