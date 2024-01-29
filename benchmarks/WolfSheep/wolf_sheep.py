@@ -9,12 +9,10 @@ Replication of the model found in NetLogo:
     Northwestern University, Evanston, IL.
 """
 
-from mesa import Agent, Model
-from mesa.space import MultiGrid
-from mesa.time import RandomActivationByType
+import mesa
 
 
-class Animal(Agent):
+class Animal(mesa.Agent):
     def __init__(self, unique_id, model, moore, energy, p_reproduce, energy_from_food):
         super().__init__(unique_id, model)
         self.energy = energy
@@ -92,7 +90,7 @@ class Wolf(Animal):
             sheep_to_eat.die()
 
 
-class GrassPatch(Agent):
+class GrassPatch(mesa.Agent):
     """
     A patch of grass that grows at a fixed rate and it is eaten by sheep
     """
@@ -119,7 +117,7 @@ class GrassPatch(Agent):
                 self.countdown -= 1
 
 
-class WolfSheep(Model):
+class WolfSheep(mesa.Model):
     """
     Wolf-Sheep Predation Model
 
@@ -163,8 +161,8 @@ class WolfSheep(Model):
         self.initial_wolves = initial_wolves
         self.grass_regrowth_time = grass_regrowth_time
 
-        self.schedule = RandomActivationByType(self)
-        self.grid = MultiGrid(self.height, self.width, torus=False)
+        self.schedule = mesa.time.RandomActivationByType(self)
+        self.grid = mesa.space.MultiGrid(self.height, self.width, torus=False)
 
         for _ in range(self.initial_sheep):
             pos = (
