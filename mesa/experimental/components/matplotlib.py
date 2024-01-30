@@ -112,7 +112,8 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
     space_ax.scatter(**portray(space))
 
 
-def make_plot(model, measure):
+@solara.component
+def PlotMatplotlib(model, measure, dependencies: Optional[list[any]] = None):
     fig = Figure()
     ax = fig.subplots()
     df = model.datacollector.get_model_vars_dataframe()
@@ -129,4 +130,4 @@ def make_plot(model, measure):
         fig.legend()
     # Set integer x axis
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    solara.FigureMatplotlib(fig)
+    solara.FigureMatplotlib(fig, dependencies=dependencies)

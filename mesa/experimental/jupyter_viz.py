@@ -37,7 +37,9 @@ def Card(
                 # Is a custom object
                 measure(model)
             else:
-                components_matplotlib.make_plot(model, measure)
+                components_matplotlib.PlotMatplotlib(
+                    model, measure, dependencies=[current_step.value]
+                )
     return main
 
 
@@ -116,13 +118,14 @@ def JupyterViz(
             # otherwise, do nothing (do not draw space)
 
             # 5. Plots
-
             for measure in measures:
                 if callable(measure):
                     # Is a custom object
                     measure(model)
                 else:
-                    components_matplotlib.make_plot(model, measure)
+                    components_matplotlib.PlotMatplotlib(
+                        model, measure, dependencies=[current_step.value]
+                    )
 
     def render_in_browser():
         # if space drawer is disabled, do not include it
