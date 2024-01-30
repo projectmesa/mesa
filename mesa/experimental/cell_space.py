@@ -126,9 +126,6 @@ class Cell:
                 neighborhood.pop(self, None)
             return neighborhood
 
-    def __repr__(self):
-        return f"Cell({self.coordinate})"
-
 
 class CellCollection:
     def __init__(self, cells: dict[Cell, list[Agent]] | Iterable[Cell]) -> None:
@@ -159,10 +156,10 @@ class CellCollection:
     def agents(self) -> Iterable[Agent]:
         return itertools.chain.from_iterable(self._cells.values())
 
-    def select_random_cell(self):
+    def select_random_cell(self) -> Cell:
         return self.random.choice(self.cells)
 
-    def select_random_agent(self):
+    def select_random_agent(self) -> CellAgent:
         return self.random.choice(list(self.agents))
 
     def select(self, filter_func: Optional[Callable[[Cell], bool]] = None, n=0):
@@ -200,9 +197,6 @@ class DiscreteSpace:
     def _connect_single_cell(self, cell):
         ...
 
-    def select_random_empty_cell(self) -> Cell:
-        ...
-
     def _initialize_empties(self):
         self._empties = {
             cell.coordinate: None for cell in self.cells.values() if cell.is_empty
@@ -228,7 +222,7 @@ class DiscreteSpace:
         if not self.empties_initialized:
             self._initialize_empties()
 
-        return self.random.choice(self._empties)
+        return self.cells[self.random.choice(list(self._empties))]
 
 
 class Grid(DiscreteSpace):
@@ -389,9 +383,7 @@ class NetworkGrid(DiscreteSpace):
             self._connect_single_cell(cell)
 
     def _connect_single_cell(self, cell):
-        neighbors = [
-            self.cells[node_id] for node_id in self.G.neighbors(cell.coordinate)
-        ]
-        cell.connect(neighbors)
+        for node_id in self.G.neighbors(cell.coordinate):
+            cell.connect(  self.cells[node_id])
 
 
