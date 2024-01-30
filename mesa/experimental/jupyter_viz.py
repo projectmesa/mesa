@@ -13,7 +13,8 @@ from mesa.experimental.UserParam import Slider
 plt.switch_backend("agg")
 
 
-@solara.component
+# TODO: Turn this function into a Solara component once the current_step.value
+# dependency is passed to measure()
 def Card(
     model, measures, agent_portrayal, space_drawer, current_step, color, layout_type
 ):
