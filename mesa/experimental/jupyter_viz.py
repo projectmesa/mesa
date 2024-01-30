@@ -14,6 +14,34 @@ plt.switch_backend("agg")
 
 
 @solara.component
+def Card(
+    model, measures, agent_portrayal, space_drawer, current_step, color, layout_type
+):
+    with rv.Card(
+        style_=f"background-color: {color}; width: 100%; height: 100%"
+    ) as main:
+        if "Space" in layout_type:
+            rv.CardTitle(children=["Space"])
+            if space_drawer == "default":
+                # draw with the default implementation
+                components_matplotlib.SpaceMatplotlib(
+                    model, agent_portrayal, dependencies=[current_step.value]
+                )
+            elif space_drawer:
+                # if specified, draw agent space with an alternate renderer
+                space_drawer(model, agent_portrayal)
+        elif "Measure" in layout_type:
+            rv.CardTitle(children=["Measure"])
+            measure = measures[layout_type["Measure"]]
+            if callable(measure):
+                # Is a custom object
+                measure(model)
+            else:
+                components_matplotlib.make_plot(model, measure)
+    return main
+
+
+@solara.component
 def JupyterViz(
     model_class,
     model_params,
@@ -60,33 +88,6 @@ def JupyterViz(
 
     def handle_change_model_params(name: str, value: any):
         set_model_parameters({**model_parameters, name: value})
-
-    def ColorCard(color, layout_type):
-        # TODO: turn this into a Solara component, but must pass in current
-        # step as a dependency for the plots, so that there is no flickering
-        # due to rerender.
-        with rv.Card(
-            style_=f"background-color: {color}; width: 100%; height: 100%"
-        ) as main:
-            if "Space" in layout_type:
-                rv.CardTitle(children=["Space"])
-                if space_drawer == "default":
-                    # draw with the default implementation
-                    components_matplotlib.SpaceMatplotlib(
-                        model, agent_portrayal, dependencies=[current_step.value]
-                    )
-                elif space_drawer:
-                    # if specified, draw agent space with an alternate renderer
-                    space_drawer(model, agent_portrayal)
-            elif "Measure" in layout_type:
-                rv.CardTitle(children=["Measure"])
-                measure = measures[layout_type["Measure"]]
-                if callable(measure):
-                    # Is a custom object
-                    measure(model)
-                else:
-                    components_matplotlib.make_plot(model, measure)
-        return main
 
     # 3. Set up UI
 
@@ -141,7 +142,15 @@ def JupyterViz(
                 solara.Markdown(md_text=f"####Step - {current_step}")
 
         items = [
-            ColorCard(color="white", layout_type=layout_types[i])
+            Card(
+                model,
+                measures,
+                agent_portrayal,
+                space_drawer,
+                current_step,
+                color="white",
+                layout_type=layout_types[i],
+            )
             for i in range(len(layout_types))
         ]
         solara.GridDraggable(
