@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from mesa.model import Model
     from mesa.space import Position
 
-from mesa.rng import get_rng
+from mesa.rng import RandomDescriptor
 
 
 class Agent:
@@ -37,6 +37,7 @@ class Agent:
         model (Model): A reference to the model instance.
         self.pos: Position | None = None
     """
+    random = RandomDescriptor()
 
     def __init__(self, unique_id: int, model: Model) -> None:
         """
@@ -49,6 +50,7 @@ class Agent:
         self.unique_id = unique_id
         self.model = model
         self.pos: Position | None = None
+        self.random = self.model.random
 
         # register agent
         try:
@@ -75,10 +77,6 @@ class Agent:
 
     def advance(self) -> None:
         pass
-
-    @property
-    def random(self) -> Random:
-        return self.model.random
 
 
 class AgentSet(MutableSet, Sequence):
@@ -108,8 +106,9 @@ class AgentSet(MutableSet, Sequence):
     """
 
     agentset_experimental_warning_given = False
+    random = RandomDescriptor()
 
-    def __init__(self, agents: Iterable[Agent], model: Model, random=get_rng()):
+    def __init__(self, agents: Iterable[Agent], model: Model, random=None):
         """
         Initializes the AgentSet with a collection of agents and a reference to the model.
 
@@ -351,15 +350,15 @@ class AgentSet(MutableSet, Sequence):
         self.model = state["model"]
         self._update(state["agents"])
 
-    @property
-    def random(self) -> Random:
-        """
-        Provide access to the model's random number generator.
-
-        Returns:
-            Random: The random number generator associated with the model.
-        """
-        return self.model.random
+    # @property
+    # def random(self) -> Random:
+    #     """
+    #     Provide access to the model's random number generator.
+    #
+    #     Returns:
+    #         Random: The random number generator associated with the model.
+    #     """
+    #     return self.model.random
 
 
 # consider adding for performance reasons

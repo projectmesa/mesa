@@ -1,5 +1,6 @@
 import numpy.random as np_random
 import random
+from numbers import Number
 
 _rng = None
 
@@ -7,7 +8,8 @@ def get_default_rng():
     """get the default random number generator"""
     global _rng
     if _rng is None:
-        raise ValueError("random number generator not initialized")
+        _rng = random.Random()
+        # raise ValueError("random number generator not initialized")
     return _rng
 
 
@@ -23,24 +25,25 @@ def set_default_rng(seed):
     _rng = random.Random(seed)
 
 
-def get_rng(seed=None):
-    """get a random number generator. If seed is None, return
-    the default random number generator.
+class RandomDescriptor:
+    # solve the problem through a descriptor
 
-    Args:
-        seed (int, optional):
+    def __set__(self, instance, value):
+        # check if value is instance of Random
+        # or number
+        if value is None:
+            value = get_default_rng()
+        elif isinstance(value, Number):
+            value = random.Random(value)
+        elif (not isinstance(value, random.Random)) and (not isinstance(value, np_random.Generator)):
+            raise ValueError("some descriptive text")
+        setattr(instance, self.private_name, value)
 
-    """
+        pass
+    def __get__(self, instance, owner):
+        return getattr(instance, self.private_name)
 
-    if seed is None:
-        return get_default_rng()
-    else:
-        return random.Random(seed)
+    def __set_name__(self, owner, name):
+        self.public_name = name
+        self.private_name = f"_{name}"
 
-
-
-from typing import Any, Callable, List, String
-
-class Collector:
-    def __init__(self, name : str, obj : Any, attrs: str | List[str], func: Callable = None ):
-        ...
