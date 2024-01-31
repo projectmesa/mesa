@@ -57,7 +57,6 @@ class Model:
             # We explicitly specify the seed here so that we know its value in
             # advance.
             obj._seed = random.random()  # noqa: S311
-        obj.random = random.Random(obj._seed)
         set_default_rng(obj._seed)
         obj.random = get_default_rng()
         return obj
