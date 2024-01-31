@@ -14,7 +14,6 @@ import warnings
 import weakref
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, MutableSet, Sequence
-from random import Random
 
 # mypy
 from typing import TYPE_CHECKING, Any, Callable
@@ -37,6 +36,7 @@ class Agent:
         model (Model): A reference to the model instance.
         self.pos: Position | None = None
     """
+
     random = RandomDescriptor()
 
     def __init__(self, unique_id: int, model: Model) -> None:

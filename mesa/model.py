@@ -17,7 +17,7 @@ from typing import Any, Union
 
 from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
-from mesa.rng import set_default_rng, get_default_rng
+from mesa.rng import get_default_rng, set_default_rng
 
 TimeT = Union[float, int]
 
