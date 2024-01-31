@@ -1,8 +1,12 @@
 import pytest
 
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, CellCollection, OrthogonalGrid, HexGrid, NetworkGrid
-
+from mesa.experimental.cell_space import (
+    CellAgent,
+    HexGrid,
+    Network,
+    OrthogonalGrid,
+)
 
 
 def test_orthogonal_grid():
@@ -20,20 +24,19 @@ def test_orthogonal_grid():
     # von neumann neighborhood middle of grid
     assert len(grid.cells[(5, 5)]._connections) == 4
     for connection in grid.cells[(5, 5)]._connections:
-        assert connection.coordinate in {(4, 5), (5, 4), (5,6), (6,5)}
+        assert connection.coordinate in {(4, 5), (5, 4), (5, 6), (6, 5)}
 
     # von neumann neighborhood, torus True, top corner
     grid = OrthogonalGrid(width, height, torus=True, moore=False, capacity=None)
     assert len(grid.cells[(0, 0)]._connections) == 4
     for connection in grid.cells[(0, 0)]._connections:
-        assert connection.coordinate in {(0, 1), (1, 0), (0, 9), (9,0)}
-
+        assert connection.coordinate in {(0, 1), (1, 0), (0, 9), (9, 0)}
 
     # Moore neighborhood, torus false, top corner
     grid = OrthogonalGrid(width, height, torus=False, moore=True, capacity=None)
     assert len(grid.cells[(0, 0)]._connections) == 3
     for connection in grid.cells[(0, 0)]._connections:
-        assert connection.coordinate in {(0, 1), (1, 0), (1,1)}
+        assert connection.coordinate in {(0, 1), (1, 0), (1, 1)}
 
     # Moore neighborhood middle of grid
     assert len(grid.cells[(5, 5)]._connections) == 8
@@ -54,15 +57,15 @@ def test_orthogonal_grid():
                                          (1, 9), (1, 0), (1, 1)}
         # fmt: on
 
+
 def test_cell_neighborhood():
     # orthogonal grid
-
 
     ## von Neumann
     width = 10
     height = 10
     grid = OrthogonalGrid(width, height, torus=False, moore=False, capacity=None)
-    for radius, n in zip(range(1, 4), [2,  5, 9]):
+    for radius, n in zip(range(1, 4), [2, 5, 9]):
         neighborhood = grid.cells[(0, 0)].neighborhood(radius=radius)
         assert len(neighborhood) == n
 
@@ -70,7 +73,7 @@ def test_cell_neighborhood():
     width = 10
     height = 10
     grid = OrthogonalGrid(width, height, torus=False, moore=True, capacity=None)
-    for radius, n in zip(range(1, 4), [3,  8, 15]):
+    for radius, n in zip(range(1, 4), [3, 8, 15]):
         neighborhood = grid.cells[(0, 0)].neighborhood(radius=radius)
         assert len(neighborhood) == n
 
@@ -81,14 +84,14 @@ def test_cell_neighborhood():
     width = 10
     height = 10
     grid = HexGrid(width, height, torus=False, capacity=None)
-    for radius, n in zip(range(1, 4), [2,  6, 11]):
+    for radius, n in zip(range(1, 4), [2, 6, 11]):
         neighborhood = grid.cells[(0, 0)].neighborhood(radius=radius)
         assert len(neighborhood) == n
 
     width = 10
     height = 10
     grid = HexGrid(width, height, torus=False, capacity=None)
-    for radius, n in zip(range(1, 4), [5,  10, 17]):
+    for radius, n in zip(range(1, 4), [5, 10, 17]):
         neighborhood = grid.cells[(1, 0)].neighborhood(radius=radius)
         assert len(neighborhood) == n
 
@@ -148,6 +151,7 @@ def test_hexgrid():
 
         # fmt: on
 
+
 def test_networkgrid():
     import networkx as nx
 
@@ -155,7 +159,7 @@ def test_networkgrid():
     m = 20
     seed = 42
     G = nx.gnm_random_graph(n, m, seed=seed)
-    grid = NetworkGrid(G)
+    grid = Network(G)
 
     assert len(grid.cells) == n
 
@@ -171,10 +175,9 @@ def test_empties_space():
     m = 20
     seed = 42
     G = nx.gnm_random_graph(n, m, seed=seed)
-    grid = NetworkGrid(G)
+    grid = Network(G)
 
     assert len(grid.empties) == n
-
 
     model = Model()
     for i in range(8):
