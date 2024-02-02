@@ -1,4 +1,5 @@
-import random
+import numbers
+from random import Random
 from functools import cached_property
 
 from mesa.experimental.cell_space.cell import Cell
@@ -8,17 +9,20 @@ from mesa.space import Coordinate
 
 class DiscreteSpace:
     # FIXME:: random should become a keyword argument
-    # FIXME:: defaulting to the same rng as model.random.
-    # FIXME:: all children should be also like that.
 
     def __init__(
         self,
         capacity: int | None = None,
+        CellKlass: type[Cell] = Cell,
+        random: Random = None
     ):
         super().__init__()
         self.capacity = capacity
         self.cells: dict[Coordinate, Cell] = {}
-        self.random = random  # FIXME
+        if random is None:
+            random = Random()  # FIXME should default to default rng from model
+        self.random = random
+        self.CellKlass = CellKlass
 
         self._empties: dict[Coordinate, None] = {}
         self.cutoff_empties = -1

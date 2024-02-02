@@ -161,7 +161,7 @@ class WolfSheep(Model):
 
         self.schedule = RandomActivationByType(self)
         self.grid = OrthogonalGrid(
-            self.height, self.width, moore=moore, torus=False, capacity=math.inf
+            self.height, self.width, moore=moore, torus=False, capacity=math.inf, random=self.random
         )
 
         # Create sheep:

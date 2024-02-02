@@ -1,11 +1,21 @@
 from mesa.experimental.cell_space import Cell, DiscreteSpace
-
+from random import Random
 
 class Grid(DiscreteSpace):
+    """Base class for all grid and network classes
+
+
+    """
     def __init__(
-        self, width: int, height: int, torus: bool = False, capacity: int | None = None
+            self,
+            width: int,
+            height: int,
+            torus: bool = False,
+            capacity: int | None = None,
+            random: Random = None,
+            CellKlass: type[Cell] = Cell,
     ) -> None:
-        super().__init__(capacity)
+        super().__init__(capacity=capacity, random=random, CellKlass=CellKlass)
         self.torus = torus
         self.width = width
         self.height = height
@@ -43,6 +53,8 @@ class OrthogonalGrid(Grid):
         torus: bool = False,
         moore: bool = True,
         capacity: int | None = None,
+        random: Random = None,
+        CellKlass: type[Cell] = Cell
     ) -> None:
         """Orthogonal grid
 
@@ -52,12 +64,15 @@ class OrthogonalGrid(Grid):
             torus (bool): whether the space is a torus
             moore (bool): whether the space used Moore or von Neumann neighborhood
             capacity (int): the number of agents that can simultaneously occupy a cell
+            random (random):
+            CellKlass (type[Cell]): The Cell class to use in the OrthogonalGrid
+
 
         """
-        super().__init__(width, height, torus, capacity)
+        super().__init__(width, height, torus, capacity=capacity, CellKlass=CellKlass, random=random)
         self.moore = moore
         self.cells = {
-            (i, j): Cell((i, j), self, capacity)
+            (i, j): self.CellKlass((i, j), capacity, random=self.random)
             for j in range(width)
             for i in range(height)
         }
@@ -93,7 +108,13 @@ class OrthogonalGrid(Grid):
 
 class HexGrid(Grid):
     def __init__(
-        self, width: int, height: int, torus: bool = False, capacity=1
+            self,
+            width: int,
+            height: int,
+            torus: bool = False,
+            capacity: int = None,
+            random: Random = None,
+            CellKlass: type[Cell] = Cell
     ) -> None:
         """Hexagonal Grid
 
@@ -102,11 +123,12 @@ class HexGrid(Grid):
             height (int): height of the grid
             torus (bool): whether the space is a torus
             capacity (int): the number of agents that can simultaneously occupy a cell
-
+            random (random):
+            CellKlass (type[Cell]): The Cell class to use in the HexGrid
         """
-        super().__init__(width, height, torus, capacity)
+        super().__init__(width, height, torus, capacity=capacity, random=random, CellKlass=CellKlass)
         self.cells = {
-            (i, j): Cell((i, j), self, capacity)
+            (i, j): self.CellKlass((i, j), capacity,  random=self.random)
             for j in range(width)
             for i in range(height)
         }

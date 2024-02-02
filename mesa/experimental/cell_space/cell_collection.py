@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import itertools
-import random
+from random import Random
 from collections.abc import Iterable
 from functools import cached_property
 from typing import TYPE_CHECKING, Callable, Optional
@@ -12,12 +12,15 @@ if TYPE_CHECKING:
 
 
 class CellCollection:
-    def __init__(self, cells: dict[Cell, list[CellAgent]] | Iterable[Cell]) -> None:
+    def __init__(self, cells: dict[Cell, list[CellAgent]] | Iterable[Cell], random: Random = None) -> None:
         if isinstance(cells, dict):
             self._cells = cells
         else:
             self._cells = {cell: cell.agents for cell in cells}
-        self.random = random  # FIXME
+
+        if random is None:
+            random = Random()  # FIXME
+        self.random = random
 
     def __iter__(self):
         return iter(self._cells)
@@ -33,7 +36,7 @@ class CellCollection:
         return f"CellCollection({self._cells})"
 
     @cached_property
-    def cells(self):
+    def cells(self) -> list[Cell]:
         return list(self._cells.keys())
 
     @property

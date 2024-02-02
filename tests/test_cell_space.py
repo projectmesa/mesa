@@ -1,3 +1,5 @@
+import random
+
 import pytest
 
 from mesa import Model
@@ -6,6 +8,8 @@ from mesa.experimental.cell_space import (
     HexGrid,
     Network,
     OrthogonalGrid,
+    Cell,
+    CellCollection
 )
 
 
@@ -185,3 +189,79 @@ def test_empties_space():
 
     cell = grid.select_random_empty_cell()
     assert cell.coordinate in {8, 9}
+
+
+def test_cell():
+
+    cell1 = Cell(1, capacity=None, random=random.Random())
+    cell2 = Cell(2, capacity=None, random=random.Random())
+
+    # connect
+    cell1.connect(cell2)
+    assert cell2 in cell1._connections
+
+    # disconnect
+    cell1.disconnect(cell2)
+    assert cell2 not in cell1._connections
+
+    # remove cell not in connections
+    with pytest.raises(ValueError):
+        cell1.disconnect(cell2)
+
+    # add_agent
+    model = Model()
+    agent = CellAgent(1, model)
+
+    cell1.add_agent(agent)
+    assert agent in cell1.agents
+
+    # remove_agent
+    cell1.remove_agent(agent)
+    assert agent not in cell1.agents
+
+    with pytest.raises(ValueError):
+        cell1.remove_agent(agent)
+
+    cell1 =  Cell(1, capacity=1, random=random.Random())
+    cell1.add_agent(CellAgent(1, model))
+    assert cell1.is_full
+
+    with pytest.raises(Exception):
+        cell1.add_agent(CellAgent(2, model))
+
+
+def test_cell_collection():
+    cell1 = Cell(1, capacity=None, random=random.Random())
+
+    collection = CellCollection({cell1:cell1.agents}, random=random.Random())
+    assert len(collection) == 1
+    assert cell1 in collection
+
+
+    rng = random.Random()
+    n = 10
+    collection = CellCollection([Cell(i, random=rng) for i in range(n)], random=rng)
+    assert len(collection) == n
+
+    cell = collection.select_random_cell()
+    assert cell in collection
+
+    cells = collection.cells
+    assert len(cells) == n
+
+    agents = collection.agents
+    assert len(list(agents)) == 0
+
+    cells = collection.cells
+    model = Model()
+    cells[0].add_agent(CellAgent(1, model))
+    cells[3].add_agent(CellAgent(2, model))
+    cells[7].add_agent(CellAgent(3, model))
+    agents = collection.agents
+    assert len(list(agents)) == 3
+
+    agent = collection.select_random_agent()
+    assert agent in set(collection.agents)
+
+    agents = collection[cells[0]]
+    assert agents == cells[0].agents

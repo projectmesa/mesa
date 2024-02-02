@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from random import Random
 from functools import cache
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from mesa.agent import Agent
 from mesa.experimental.cell_space.cell_collection import CellCollection
@@ -14,50 +15,72 @@ class Cell:
     __slots__ = [
         "coordinate",
         "_connections",
-        "owner",
         "agents",
         "capacity",
         "properties",
+        "random"
     ]
 
-    def __init__(self, coordinate, owner, capacity: int | None = None) -> None:
+    def __init__(self, coordinate: Any, capacity: int | None = None, random: Random = None) -> None:
+        """"
+
+        Args:
+            coordinate:
+            capacity (int) : the capacity of the cell. If None, the capacity is infinite
+            random (Random) : the random number generator to use
+
+        """
+        super().__init__()
         self.coordinate = coordinate
         self._connections: list[Cell] = []  # TODO: change to CellCollection?
-        self.agents: dict[
-            Agent, None
-        ] = {}  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
+        self.agents = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
         self.properties: dict[str, object] = {}
-        self.owner = owner
+        self.random = random
 
     def connect(self, other) -> None:
-        """Connects this cell to another cell."""
+        """Connects this cell to another cell.
+
+        Args:
+            other (Cell): other cell to connect to
+
+        """
         self._connections.append(other)
 
     def disconnect(self, other) -> None:
-        """Disconnects this cell from another cell."""
+        """Disconnects this cell from another cell.
+
+        Args:
+            other (Cell): other cell to remove from connections
+
+        """
         self._connections.remove(other)
 
     def add_agent(self, agent: CellAgent) -> None:
-        """Adds an agent to the cell."""
-        n = len(self.agents)
+        """Adds an agent to the cell.
 
-        if n == 0:
-            self.owner._empties.pop(self.coordinate, None)
+        Args:
+            agent (CellAgent): agent to add to this Cell
+
+        """
+        n = len(self.agents)
 
         if self.capacity and n >= self.capacity:
             raise Exception(
                 "ERROR: Cell is full"
             )  # FIXME we need MESA errors or a proper error
 
-        self.agents[agent] = None
+        self.agents.append(agent)
 
     def remove_agent(self, agent: CellAgent) -> None:
-        """Removes an agent from the cell."""
-        self.agents.pop(agent, None)
+        """Removes an agent from the cell.
+
+        Args:
+            agent (CellAgent): agent to remove from this cell
+
+        """
+        self.agents.remove(agent)
         agent.cell = None
-        if len(self.agents) == 0:
-            self.owner._empties[self.coordinate] = None
 
     @property
     def is_empty(self) -> bool:
@@ -75,7 +98,7 @@ class Cell:
     @cache
     def neighborhood(self, radius=1, include_center=False):
         return CellCollection(
-            self._neighborhood(radius=radius, include_center=include_center)
+            self._neighborhood(radius=radius, include_center=include_center),  random=self.random
         )
 
     @cache
