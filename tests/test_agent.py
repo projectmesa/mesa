@@ -66,7 +66,7 @@ def test_agentset():
     assert all(a1 == a2 for a1, a2 in zip(agentset.select(), agentset))
     assert all(a1 == a2 for a1, a2 in zip(agentset.select(n=5), agentset[:5]))
 
-    assert len(agentset.shuffle().select(n=5)) == 5
+    assert len(agentset.shuffle(inplace=False).select(n=5)) == 5
 
     def test_function(agent):
         return agent.unique_id
@@ -251,3 +251,16 @@ def test_agentset_select_by_type():
     # Test with no type specified (should select all agents)
     all_agents = agentset.select()
     assert len(all_agents) == len(mixed_agents)
+
+
+def test_agentset_shuffle():
+    model = Model()
+    test_agents = [TestAgent(model.next_id(), model) for _ in range(12)]
+
+    agentset = AgentSet(test_agents, model=model)
+    agentset = agentset.shuffle()
+    assert not all(a1 == a2 for a1, a2 in zip(test_agents, agentset))
+
+    agentset = AgentSet(test_agents, model=model)
+    agentset.shuffle(inplace=True)
+    assert not all(a1 == a2 for a1, a2 in zip(test_agents, agentset))

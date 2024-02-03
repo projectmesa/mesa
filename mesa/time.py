@@ -66,6 +66,8 @@ class BaseScheduler:
         self.model = model
         self.steps = 0
         self.time: TimeT = 0
+        self._original_step = self.step
+        self.step = self._wrapped_step
 
         if agents is None:
             agents = []
@@ -108,6 +110,11 @@ class BaseScheduler:
         self.steps += 1
         self.time += 1
 
+    def _wrapped_step(self):
+        """Wrapper for the step method to include time and step updating."""
+        self._original_step()
+        self.model._advance_time()
+
     def get_agent_count(self) -> int:
         """Returns the current number of agents in the queue."""
         return len(self._agents)
@@ -136,8 +143,8 @@ class BaseScheduler:
 
     def do_each(self, method, shuffle=False):
         if shuffle:
-            self.agents.shuffle(inplace=True)
-        self.agents.do(method)
+            self._agents.shuffle(inplace=True)
+        self._agents.do(method)
 
 
 class RandomActivation(BaseScheduler):

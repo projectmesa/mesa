@@ -224,6 +224,28 @@ class TestRandomActivation(TestCase):
         agent_ids = {agent.unique_id for agent in model.agents}
         assert all(entry in agent_ids for entry in keys)
 
+    def test_not_sequential(self):
+        model = MockModel(activation=RANDOM)
+        # Create 10 agents
+        for _ in range(10):
+            model.schedule.add(MockAgent(model.next_id(), model))
+        # Run 3 steps
+        for _ in range(3):
+            model.step()
+        # Filter out non-integer elements from the log
+        filtered_log = [item for item in model.log if isinstance(item, int)]
+
+        # Check that there are no 18 consecutive agents id's in the filtered log
+        total_agents = 10
+        assert not any(
+            all(
+                (filtered_log[(i + j) % total_agents] - filtered_log[i]) % total_agents
+                == j % total_agents
+                for j in range(18)
+            )
+            for i in range(len(filtered_log))
+        ), f"Agents are activated sequentially:\n{filtered_log}"
+
 
 class TestSimultaneousActivation(TestCase):
     """
