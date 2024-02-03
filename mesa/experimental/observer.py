@@ -8,46 +8,59 @@ class DataCollector:
     Example: a model consisting of a hybrid of Boltzmann wealth model and
     Epstein civil violence.
     ```
-    def get_citizen():
-        return model.get_agents_of_type(Citizen)
+    groups = {
+        "quiescents": lambda model: model.agents.select(
+            agent_type=Citizen, filter_func=lambda a: a.condition == "Quiescent"
+        ),
+        "citizens": lambda model: model.get_agents_of_type(Citizen),
+        # These are available by default. Your custom specification of these
+        # will be ignored.
+        "agents": lambda model: model.agents
+        "model": lambda model: model
+    }
 
     collectors = {
-        model: {
-            "n_quiescent": lambda model: len(
-                model.agents.select(
-                    agent_type=Citizen,
-                    filter_func=lambda a: a.condition == "Quiescent"
-                )
-            ),
-            "gini": lambda model: calculate_gini(model.agents.get("wealth"))
-        },
-        get_citizen: {"condition": condition},
-        # This is a string, because model.agents may refer to a different
-        # object, over time.
-        "agents": {"wealth": "wealth"}
+        ("n_quiescent", "quiescents"): len,
+        ("gini", "model"): lambda model: calculate_gini(model.agents.get("wealth")),
+        # A better way to do the former:
+        ("gini", "agents"): lambda agents: calculate_gini(agents.get("wealth")),
+        ("gini_quiescent", "quiescents"): lambda agents: calculate_gini(
+            agents.get("wealth")
+        ),
+        ("condition", "citizens"): "condition",
+        # "agents" is a string, because model.agents may refer to a different
+        # object, over time, when accessed from scratch each time.
+        ("wealth", "agents"): "wealth",
     }
+
     # Then finally
-    model.datacollector = DataCollector(model, collectors=collectors).collect()
+    model.datacollector = DataCollector(model, groups=groups, collectors=collectors).collect()
     ```
     """
 
-    def __init__(self, model, collectors=None) -> "DataCollector":
+    def __init__(self, model, groups=None, collectors=None) -> "DataCollector":
         self.model = model
+        self.groups = groups
         self.collectors = collectors
         self.data_collection = defaultdict(list)
         return self
 
     def collect(self) -> "DataCollector":
-        for group, group_collector in self.collectors.items():
+        group_data = defaultdict(dict)
+        for (name, group), collector in self.collectors.items():
             group_object = group
             if group == "agents":
                 group_object = self.model.agents
+            elif group == "model":
+                group_object = self.model
             elif callable(group):
-                group_object = group()
-            data = {
-                name: self._collect_group(group_object, collector)
-                for name, collector in group_collector.items()
-            }
+                group_object = group(self.model)
+            elif isinstance(group, str):
+                group_object = self.groups[group]
+
+            group_data[group][name] = self._collect_group(group_object, collector)
+
+        for group, data in group_data.items():
             self.data_collection[group].append(data)
         return self
 
