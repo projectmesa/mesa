@@ -72,11 +72,13 @@ class DataCollector:
     def __init__(self, model, attributes):
         self.model = model
         self.attributes = attributes
-        self.data_collection = defaultdict(list)
+        self.data_collection = defaultdict(lambda: defaultdict(list))
 
     def collect(self):
         for name in self.attributes:
             attribute = getattr(self.model, name)
+            group = "model"
             if isinstance(attribute, Measure):
+                group = attribute.group
                 attribute = attribute.value
-            self.data_collection[name] = attribute
+            self.data_collection[group][name].append(attribute)
