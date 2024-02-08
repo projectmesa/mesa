@@ -92,6 +92,7 @@ class TestJupyterViz(unittest.TestCase):
         }
         current_step = 0
         dependencies = [current_step]
+
         # initialize with space drawer unspecified (use default)
         # component must be rendered for code to run
         solara.render(
@@ -99,16 +100,11 @@ class TestJupyterViz(unittest.TestCase):
                 model_class=mock_model_class,
                 model_params={},
                 agent_portrayal=agent_portrayal,
+                space_drawer="default",
             )
         )
-        solara.render(
-            JupyterViz(
-                model_class=mock_model_class,
-                model_params={},
-                agent_portrayal=agent_portrayal,
-                space_drawer="altair",
-            )
-        )
+
+      
         # should call default method with class instance and agent portrayal
         mock_space_matplotlib.assert_called_with(
             mock_model_class.return_value, agent_portrayal, dependencies=dependencies

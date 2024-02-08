@@ -21,7 +21,7 @@ def JupyterViz(
     measures=None,
     name=None,
     agent_portrayal=None,
-    space_drawer="altair",
+    space_drawer="default",
     play_interval=150,
 ):
     """Initialize a component to visualize a model.
