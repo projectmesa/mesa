@@ -104,7 +104,6 @@ class TestJupyterViz(unittest.TestCase):
             )
         )
 
-      
         # should call default method with class instance and agent portrayal
         mock_space_matplotlib.assert_called_with(
             mock_model_class.return_value, agent_portrayal, dependencies=dependencies
