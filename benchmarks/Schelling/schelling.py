@@ -1,9 +1,7 @@
-from mesa import Agent, Model
-from mesa.space import SingleGrid
-from mesa.time import RandomActivation
+import mesa
 
 
-class SchellingAgent(Agent):
+class SchellingAgent(mesa.Agent):
     """
     Schelling segregation agent
     """
@@ -34,7 +32,7 @@ class SchellingAgent(Agent):
             self.model.happy += 1
 
 
-class Schelling(Model):
+class Schelling(mesa.Model):
     """
     Model class for the Schelling segregation model.
     """
@@ -51,8 +49,8 @@ class Schelling(Model):
         self.homophily = homophily
         self.radius = radius
 
-        self.schedule = RandomActivation(self)
-        self.grid = SingleGrid(height, width, torus=True)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.grid = mesa.space.SingleGrid(height, width, torus=True)
 
         self.happy = 0
 

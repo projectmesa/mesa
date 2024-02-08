@@ -43,6 +43,7 @@ class MoneyModel(mesa.Model):
     """A model with some number of agents."""
 
     def __init__(self, N, width, height):
+        super().__init__()
         self.num_agents = N
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.schedule = mesa.time.RandomActivation(self)

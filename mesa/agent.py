@@ -54,6 +54,7 @@ class Agent:
         except AttributeError:
             # model super has not been called
             self.model.agents_ = defaultdict(dict)
+            self.model.agents_[type(self)][self] = None
             self.model.agentset_experimental_warning_given = False
 
             warnings.warn(
@@ -187,15 +188,21 @@ class AgentSet(MutableSet, Sequence):
 
         Returns:
             AgentSet: A shuffled AgentSet. Returns the current AgentSet if inplace is True.
-        """
-        shuffled_agents = list(self)
-        self.random.shuffle(shuffled_agents)
 
-        return (
-            AgentSet(shuffled_agents, self.model)
-            if not inplace
-            else self._update(shuffled_agents)
-        )
+        Note:
+            Using inplace = True is more performant
+
+        """
+        weakrefs = list(self._agents.keyrefs())
+        self.random.shuffle(weakrefs)
+
+        if inplace:
+            self._agents.data = {entry: None for entry in weakrefs}
+            return self
+        else:
+            return AgentSet(
+                (agent for ref in weakrefs if (agent := ref()) is not None), self.model
+            )
 
     def sort(
         self,
@@ -250,9 +257,9 @@ class AgentSet(MutableSet, Sequence):
         """
         # we iterate over the actual weakref keys and check if weakref is alive before calling the method
         res = [
-            getattr(agentref(), method_name)(*args, **kwargs)
+            getattr(agent, method_name)(*args, **kwargs)
             for agentref in self._agents.keyrefs()
-            if agentref()
+            if (agent := agentref()) is not None
         ]
 
         return res if return_results else self
