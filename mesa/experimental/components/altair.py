@@ -53,7 +53,7 @@ def _draw_grid(space, agent_portrayal):
             alt.Data(values=all_agent_data), encoding=alt.Encoding(**encoding_dict)
         )
         .mark_point(filled=True)
-        .properties(width=space.width * 15, height=space.height * 15)
+        .properties(width=280, height=280)
         # .configure_view(strokeOpacity=0)  # hide grid/chart lines
     )
 
