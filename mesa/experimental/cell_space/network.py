@@ -7,11 +7,11 @@ from mesa.experimental.cell_space.discrete_space import DiscreteSpace
 
 class Network(DiscreteSpace):
     def __init__(
-        self,
-        G: Any,
-        capacity: int | None = None,
-        random: Random = None,
-        CellKlass: type[Cell] = Cell,
+            self,
+            G: Any,
+            capacity: int | None = None,
+            random: Random | None = None,
+            cell_klass: type[Cell] = Cell
     ) -> None:
         """A Networked grid
 
@@ -22,11 +22,11 @@ class Network(DiscreteSpace):
             CellKlass (type[Cell]): The base Cell class to use in the Network
 
         """
-        super().__init__(capacity=capacity, random=random, CellKlass=CellKlass)
+        super().__init__(capacity=capacity,random=random, cell_klass=cell_klass)
         self.G = G
 
         for node_id in self.G.nodes:
-            self.cells[node_id] = self.CellKlass(node_id, capacity, random=self.random)
+            self.cells[node_id] = self.cell_klass(node_id, capacity, random=self.random)
 
         for cell in self.all_cells:
             self._connect_single_cell(cell)

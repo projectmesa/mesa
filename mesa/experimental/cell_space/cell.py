@@ -20,10 +20,9 @@ class Cell:
         "random",
     ]
 
-    def __init__(
-        self, coordinate: Any, capacity: int | None = None, random: Random = None
-    ) -> None:
-        """ "
+
+    def __init__(self, coordinate: Any, capacity: int | None = None, random: Random | None = None) -> None:
+        """"
 
         Args:
             coordinate:

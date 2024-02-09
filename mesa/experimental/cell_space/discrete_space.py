@@ -11,9 +11,9 @@ class DiscreteSpace:
 
     def __init__(
         self,
-        capacity: int | None = None,
-        CellKlass: type[Cell] = Cell,
-        random: Random = None,
+        capacity: Optional[int] = None,
+        cell_klass: type[Cell] = Cell,
+        random: Optional[Random] = None
     ):
         super().__init__()
         self.capacity = capacity
@@ -21,7 +21,7 @@ class DiscreteSpace:
         if random is None:
             random = Random()  # FIXME should default to default rng from model
         self.random = random
-        self.CellKlass = CellKlass
+        self.cell_klass = cell_klass
 
         self._empties: dict[Coordinate, None] = {}
         self.empties_initialized = False
