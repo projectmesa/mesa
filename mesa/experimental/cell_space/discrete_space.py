@@ -13,7 +13,7 @@ class DiscreteSpace:
         self,
         capacity: Optional[int] = None,
         cell_klass: type[Cell] = Cell,
-        random: Optional[Random] = None
+        random: Optional[Random] = None,
     ):
         super().__init__()
         self.capacity = capacity
