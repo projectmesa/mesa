@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import itertools
-from random import Random
 from collections.abc import Iterable
 from functools import cached_property
+from random import Random
 from typing import TYPE_CHECKING, Callable, Optional
 
 if TYPE_CHECKING:
@@ -12,7 +12,9 @@ if TYPE_CHECKING:
 
 
 class CellCollection:
-    def __init__(self, cells: dict[Cell, list[CellAgent]] | Iterable[Cell], random: Random = None) -> None:
+    def __init__(
+        self, cells: dict[Cell, list[CellAgent]] | Iterable[Cell], random: Random = None
+    ) -> None:
         if isinstance(cells, dict):
             self._cells = cells
         else:
@@ -49,7 +51,7 @@ class CellCollection:
     def select_random_agent(self) -> CellAgent:
         return self.random.choice(list(self.agents))
 
-    def select(self, filter_func: Optional[Callable[[Cell], bool]] = None, n=0):
+    def select(self, filter_func: Callable[[Cell], bool] | None = None, n=0):
         # FIXME: n is not considered
         if filter_func is None and n == 0:
             return self

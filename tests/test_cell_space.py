@@ -4,12 +4,12 @@ import pytest
 
 from mesa import Model
 from mesa.experimental.cell_space import (
+    Cell,
     CellAgent,
+    CellCollection,
     HexGrid,
     Network,
     OrthogonalGrid,
-    Cell,
-    CellCollection
 )
 
 
@@ -26,17 +26,19 @@ def test_orthogonal_grid_neumann():
         assert connection.coordinate in {(0, 1), (1, 0)}
 
     # von neumann neighborhood, torus false, top right corner
-    for connection in grid.cells[(0, width-1)]._connections:
-        assert connection.coordinate in {(0, width-2), (1, width-1)}
+    for connection in grid.cells[(0, width - 1)]._connections:
+        assert connection.coordinate in {(0, width - 2), (1, width - 1)}
 
     # von neumann neighborhood, torus false, bottom left corner
-    for connection in grid.cells[(height-1, 0)]._connections:
-        assert connection.coordinate in {(height-1, 1), (height-2, 0)}
+    for connection in grid.cells[(height - 1, 0)]._connections:
+        assert connection.coordinate in {(height - 1, 1), (height - 2, 0)}
 
     # von neumann neighborhood, torus false, bottom right corner
-    for connection in grid.cells[(height-1, width-1)]._connections:
-        assert connection.coordinate in {(height-1, width-2), (height-2, width-1)}
-
+    for connection in grid.cells[(height - 1, width - 1)]._connections:
+        assert connection.coordinate in {
+            (height - 1, width - 2),
+            (height - 2, width - 1),
+        }
 
     # von neumann neighborhood middle of grid
     assert len(grid.cells[(5, 5)]._connections) == 4
@@ -50,16 +52,17 @@ def test_orthogonal_grid_neumann():
         assert connection.coordinate in {(0, 1), (1, 0), (0, 9), (9, 0)}
 
     # von neumann neighborhood, torus True, top right corner
-    for connection in grid.cells[(0, width-1)]._connections:
+    for connection in grid.cells[(0, width - 1)]._connections:
         assert connection.coordinate in {(0, 8), (0, 0), (1, 9), (9, 9)}
 
     # von neumann neighborhood, torus True, bottom left corner
     for connection in grid.cells[(9, 0)]._connections:
-        assert connection.coordinate in {(9, 1), (9, 9),  (0, 0), (8, 0)}
+        assert connection.coordinate in {(9, 1), (9, 9), (0, 0), (8, 0)}
 
     # von neumann neighborhood, torus True, bottom right corner
     for connection in grid.cells[(9, 9)]._connections:
         assert connection.coordinate in {(9, 0), (9, 8), (8, 9), (0, 9)}
+
 
 def test_orthogonal_grid_moore():
     width = 10
@@ -221,7 +224,6 @@ def test_empties_space():
 
 
 def test_cell():
-
     cell1 = Cell(1, capacity=None, random=random.Random())
     cell2 = Cell(2, capacity=None, random=random.Random())
 
@@ -251,7 +253,7 @@ def test_cell():
     with pytest.raises(ValueError):
         cell1.remove_agent(agent)
 
-    cell1 =  Cell(1, capacity=1, random=random.Random())
+    cell1 = Cell(1, capacity=1, random=random.Random())
     cell1.add_agent(CellAgent(1, model))
     assert cell1.is_full
 
@@ -262,10 +264,9 @@ def test_cell():
 def test_cell_collection():
     cell1 = Cell(1, capacity=None, random=random.Random())
 
-    collection = CellCollection({cell1:cell1.agents}, random=random.Random())
+    collection = CellCollection({cell1: cell1.agents}, random=random.Random())
     assert len(collection) == 1
     assert cell1 in collection
-
 
     rng = random.Random()
     n = 10

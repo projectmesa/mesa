@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from random import Random
 from functools import cache
+from random import Random
 from typing import TYPE_CHECKING, Any
 
-from mesa.agent import Agent
 from mesa.experimental.cell_space.cell_collection import CellCollection
 
 if TYPE_CHECKING:
@@ -18,11 +17,13 @@ class Cell:
         "agents",
         "capacity",
         "properties",
-        "random"
+        "random",
     ]
 
-    def __init__(self, coordinate: Any, capacity: int | None = None, random: Random = None) -> None:
-        """"
+    def __init__(
+        self, coordinate: Any, capacity: int | None = None, random: Random = None
+    ) -> None:
+        """ "
 
         Args:
             coordinate:
@@ -98,7 +99,8 @@ class Cell:
     @cache
     def neighborhood(self, radius=1, include_center=False):
         return CellCollection(
-            self._neighborhood(radius=radius, include_center=include_center),  random=self.random
+            self._neighborhood(radius=radius, include_center=include_center),
+            random=self.random,
         )
 
     @cache

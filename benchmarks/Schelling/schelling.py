@@ -50,7 +50,9 @@ class Schelling(Model):
         self.homophily = homophily
 
         self.schedule = RandomActivation(self)
-        self.grid = OrthogonalGrid(height, width, torus=True, capacity=1, random=self.random)
+        self.grid = OrthogonalGrid(
+            height, width, torus=True, capacity=1, random=self.random
+        )
 
         self.happy = 0
 

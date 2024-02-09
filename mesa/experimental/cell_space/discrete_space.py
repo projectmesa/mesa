@@ -1,6 +1,5 @@
-import numbers
-from random import Random
 from functools import cached_property
+from random import Random
 
 from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.cell_collection import CellCollection
@@ -14,7 +13,7 @@ class DiscreteSpace:
         self,
         capacity: int | None = None,
         CellKlass: type[Cell] = Cell,
-        random: Random = None
+        random: Random = None,
     ):
         super().__init__()
         self.capacity = capacity
@@ -30,6 +29,7 @@ class DiscreteSpace:
     @property
     def cutoff_empties(self):
         return 7.953 * len(self.cells) ** 0.384
+
     def _connect_single_cell(self, cell):
         ...
 
