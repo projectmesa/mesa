@@ -57,6 +57,9 @@ class Model:
             # advance.
             obj._seed = random.random()  # noqa: S311
         obj.random = random.Random(obj._seed)
+        # TODO: Remove these 2 lines just before Mesa 3.0
+        obj._steps = 0
+        obj._time = 0
         return obj
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
