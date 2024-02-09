@@ -25,18 +25,13 @@ class DiscreteSpace:
         self.CellKlass = CellKlass
 
         self._empties: dict[Coordinate, None] = {}
-        self.cutoff_empties = -1
         self.empties_initialized = False
 
+    @property
+    def cutoff_empties(self):
+        return 7.953 * len(self.cells) ** 0.384
     def _connect_single_cell(self, cell):
         ...
-
-    def _initialize_empties(self):
-        self._empties = {
-            cell.coordinate: None for cell in self.cells.values() if cell.is_empty
-        }
-        self.cutoff_empties = 7.953 * len(self.cells) ** 0.384
-        self.empties_initialized = True
 
     @cached_property
     def all_cells(self):
@@ -53,7 +48,5 @@ class DiscreteSpace:
         return self.all_cells.select(lambda cell: cell.is_empty)
 
     def select_random_empty_cell(self) -> Cell:
-        if not self.empties_initialized:
-            self._initialize_empties()
-
-        return self.cells[self.random.choice(list(self._empties))]
+        """select random empty cell"""
+        return self.random.choice(list(self.empties))

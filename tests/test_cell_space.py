@@ -13,17 +13,30 @@ from mesa.experimental.cell_space import (
 )
 
 
-def test_orthogonal_grid():
+def test_orthogonal_grid_neumann():
     width = 10
     height = 10
     grid = OrthogonalGrid(width, height, torus=False, moore=False, capacity=None)
 
     assert len(grid.cells) == width * height
 
-    # von neumann neighborhood, torus false, top corner
+    # von neumann neighborhood, torus false, top left corner
     assert len(grid.cells[(0, 0)]._connections) == 2
     for connection in grid.cells[(0, 0)]._connections:
         assert connection.coordinate in {(0, 1), (1, 0)}
+
+    # von neumann neighborhood, torus false, top right corner
+    for connection in grid.cells[(0, width-1)]._connections:
+        assert connection.coordinate in {(0, width-2), (1, width-1)}
+
+    # von neumann neighborhood, torus false, bottom left corner
+    for connection in grid.cells[(height-1, 0)]._connections:
+        assert connection.coordinate in {(height-1, 1), (height-2, 0)}
+
+    # von neumann neighborhood, torus false, bottom right corner
+    for connection in grid.cells[(height-1, width-1)]._connections:
+        assert connection.coordinate in {(height-1, width-2), (height-2, width-1)}
+
 
     # von neumann neighborhood middle of grid
     assert len(grid.cells[(5, 5)]._connections) == 4
@@ -35,6 +48,22 @@ def test_orthogonal_grid():
     assert len(grid.cells[(0, 0)]._connections) == 4
     for connection in grid.cells[(0, 0)]._connections:
         assert connection.coordinate in {(0, 1), (1, 0), (0, 9), (9, 0)}
+
+    # von neumann neighborhood, torus True, top right corner
+    for connection in grid.cells[(0, width-1)]._connections:
+        assert connection.coordinate in {(0, 8), (0, 0), (1, 9), (9, 9)}
+
+    # von neumann neighborhood, torus True, bottom left corner
+    for connection in grid.cells[(9, 0)]._connections:
+        assert connection.coordinate in {(9, 1), (9, 9),  (0, 0), (8, 0)}
+
+    # von neumann neighborhood, torus True, bottom right corner
+    for connection in grid.cells[(9, 9)]._connections:
+        assert connection.coordinate in {(9, 0), (9, 8), (8, 9), (0, 9)}
+
+def test_orthogonal_grid_moore():
+    width = 10
+    height = 10
 
     # Moore neighborhood, torus false, top corner
     grid = OrthogonalGrid(width, height, torus=False, moore=True, capacity=None)

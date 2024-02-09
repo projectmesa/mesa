@@ -1,11 +1,18 @@
 from mesa.experimental.cell_space import Cell, DiscreteSpace
 from random import Random
 
+
 class Grid(DiscreteSpace):
     """Base class for all grid and network classes
 
+    Attributes:
+        width (int): width of the grid
+        height (int): height of the grid
+        torus (bool): whether the grid is a torus
+        _try_random (bool): whether to get empty cell be repeatedly trying random cell
 
     """
+
     def __init__(
             self,
             width: int,
@@ -19,42 +26,37 @@ class Grid(DiscreteSpace):
         self.torus = torus
         self.width = width
         self.height = height
+        self._try_random = True
 
     def select_random_empty_cell(self) -> Cell:
-        if not self.empties_initialized:
-            self._initialize_empties()
-
-        num_empty_cells = len(self._empties)
-        if num_empty_cells == 0:
-            raise Exception("ERROR: No empty cells")
-
+        # FIXME:: currently just a simple boolean to control behavior
+        # FIXME:: basically if grid is close to 99% full, creating empty list can be faster
+        # FIXME:: note however that the old results don't apply because in this implementation
+        # FIXME:: because empties list needs to be rebuild each time
         # This method is based on Agents.jl's random_empty() implementation. See
         # https://github.com/JuliaDynamics/Agents.jl/pull/541. For the discussion, see
         # https://github.com/projectmesa/mesa/issues/1052 and
         # https://github.com/projectmesa/mesa/pull/1565. The cutoff value provided
         # is the break-even comparison with the time taken in the else branching point.
-        if num_empty_cells > self.cutoff_empties:
+        if self._try_random:
             while True:
                 cell = self.all_cells.select_random_cell()
                 if cell.is_empty:
-                    break
+                    return cell
         else:
-            coordinate = self.random.choice(list(self._empties))
-            cell = self.cells[coordinate]
-
-        return cell
+            return super().select_random_empty_cell()
 
 
 class OrthogonalGrid(Grid):
     def __init__(
-        self,
-        width: int,
-        height: int,
-        torus: bool = False,
-        moore: bool = True,
-        capacity: int | None = None,
-        random: Random = None,
-        CellKlass: type[Cell] = Cell
+            self,
+            width: int,
+            height: int,
+            torus: bool = False,
+            moore: bool = True,
+            capacity: int | None = None,
+            random: Random = None,
+            CellKlass: type[Cell] = Cell
     ) -> None:
         """Orthogonal grid
 
@@ -87,14 +89,14 @@ class OrthogonalGrid(Grid):
         if self.moore:
             directions = [
                 (-1, -1), (-1, 0), (-1, 1),
-                ( 0, -1),           ( 0, 1),
-                ( 1, -1),  ( 1, 0), ( 1, 1),
+                (0, -1), (0, 1),
+                (1, -1), (1, 0), (1, 1),
             ]
         else:  # Von Neumann neighborhood
             directions = [
-                         (-1, 0),
-                (0, -1),          (0, 1),
-                         ( 1, 0),
+                (-1, 0),
+                (0, -1), (0, 1),
+                (1, 0),
             ]
         # fmt: on
 
@@ -128,7 +130,7 @@ class HexGrid(Grid):
         """
         super().__init__(width, height, torus, capacity=capacity, random=random, CellKlass=CellKlass)
         self.cells = {
-            (i, j): self.CellKlass((i, j), capacity,  random=self.random)
+            (i, j): self.CellKlass((i, j), capacity, random=self.random)
             for j in range(width)
             for i in range(height)
         }
@@ -142,15 +144,15 @@ class HexGrid(Grid):
         # fmt: off
         if i % 2 == 0:
             directions = [
-                   (-1, -1), (-1, 0),
-                (0, -1),         (0, 1),
-                   ( 1, -1),  (1, 0),
+                (-1, -1), (-1, 0),
+                (0, -1), (0, 1),
+                (1, -1), (1, 0),
             ]
         else:
             directions = [
-                   (-1, 0), (-1, 1),
-                (0, -1),        (0, 1),
-                   ( 1, 0),  (1, 1),
+                (-1, 0), (-1, 1),
+                (0, -1), (0, 1),
+                (1, 0), (1, 1),
             ]
         # fmt: on
 
