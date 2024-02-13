@@ -223,12 +223,9 @@ class WolfSheep(mesa.Model):
 
         self.simulator.schedule_event_relative(self.step, 1)
 
-
-
     def step(self):
         self.get_agents_of_type(Sheep).shuffle(inplace=True).do("step")
         self.get_agents_of_type(Wolf).shuffle(inplace=True).do("step")
-        self.simulator.schedule_event_relative(self.step, 1)
 
 
 if __name__ == "__main__":
