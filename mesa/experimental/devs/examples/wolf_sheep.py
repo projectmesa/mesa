@@ -104,7 +104,7 @@ class GrassPatch(mesa.Agent):
         self._fully_grown = value
 
         if value == False:
-            self.model.simulator.schedule_event_relative(self.set_fully_grown, self.grass_regrowth_time)
+            self.model.simulator.schedule_event_relative(self.set_fully_grown, self.grass_regrowth_time, function_args=[type(self), self.unique_id])
 
 
     def __init__(self, unique_id, model, fully_grown, countdown, grass_regrowth_time):
@@ -120,7 +120,7 @@ class GrassPatch(mesa.Agent):
         self.grass_regrowth_time = grass_regrowth_time
 
         if not self.fully_grown:
-            self.model.simulator.schedule_event_relative(self.set_fully_grown, countdown)
+            self.model.simulator.schedule_event_relative(self.set_fully_grown, countdown, function_args=[type(self), self.unique_id])
 
     def set_fully_grown(self):
         self.fully_grown = True

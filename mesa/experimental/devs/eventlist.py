@@ -1,6 +1,7 @@
 import itertools
 from enum import IntEnum
 from heapq import heapify, heappop, heappush
+from weakref import ref
 
 
 class InstanceCounterMeta(type):
@@ -28,7 +29,7 @@ class SimEvent(metaclass=InstanceCounterMeta):
     def __init__(self, time, function, priority=Priority.DEFAULT, function_args=None, function_kwargs=None):
         super().__init__()
         self.time = time
-        self.priority = priority
+        self.priority = priority.value
         self.fn = function
         self.unique_id = next(self._ids)
         self.function_args = function_args if function_args else []
@@ -38,6 +39,7 @@ class SimEvent(metaclass=InstanceCounterMeta):
             raise Exception()
 
     def execute(self):
+        # FIXME handle None correctly
         self.fn(*self.function_args, **self.function_kwargs)
 
     def __cmp__(self, other):
@@ -68,7 +70,7 @@ class EventList:
         heapify(self._event_list)
 
     def add_event(self, event: SimEvent):
-        heappush(self._event_list, (event.time, event.priority, event.unique_id, event))
+        heappush(self._event_list, (event.time, -event.priority, event.unique_id, event))
 
     def peek_ahead(self, n: int = 1) -> list[SimEvent]:
         # look n events ahead, or delta time ahead
@@ -78,19 +80,24 @@ class EventList:
 
     def pop(self) -> SimEvent:
         # return next event
-        return heappop(self._event_list)[3]
+        event = heappop(self._event_list)
+        try:
+            return event[3]
+        except IndexError:
+            pass
+
 
     def is_empty(self) -> bool:
         return len(self) == 0
 
     def __contains__(self, event: SimEvent) -> bool:
-        return (event.time, event.priority, event.unique_id, event) in self._event_list
+        return (event.time, -event.priority, event.unique_id, event) in self._event_list
 
     def __len__(self) -> int:
         return len(self._event_list)
 
     def remove(self, event):
-        self._event_list.remove((event.time, event.priority, event.unique_id, event))
+        self._event_list.remove((event.time, -event.priority, event.unique_id, event))
 
     def clear(self):
         self._event_list.clear()
