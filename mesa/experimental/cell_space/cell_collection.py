@@ -12,9 +12,11 @@ if TYPE_CHECKING:
 
 
 class CellCollection:
-    def __init__(self,
-                 cells: dict[Cell, list[CellAgent]] | Iterable[Cell],
-                 random: Random | None = None) -> None:
+    def __init__(
+        self,
+        cells: dict[Cell, list[CellAgent]] | Iterable[Cell],
+        random: Random | None = None,
+    ) -> None:
         if isinstance(cells, dict):
             self._cells = cells
         else:
