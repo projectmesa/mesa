@@ -18,11 +18,11 @@ For such functions, include the prefix "model." before the model function name, 
 For example, consider a central employment exchange which adjust the wage rate common to all laborers
 in the direction of excess demand.
 
-```python stage_list=[Send_Labour_Supply, Send_Labour_Demand, model.Adjust_Wage_Rate] self.schedule = StagedActivation(self,stage_list,shuffle=True)
-
+```python
+stage_list=[Send_Labour_Supply, Send_Labour_Demand, model.Adjust_Wage_Rate] self.schedule = StagedActivation(self,stage_list,shuffle=True)
 ```
 
-## Using `` `numpy.random` ``
+## Using `numpy.random`
 
 Sometimes you need to use `numpy`'s `random` library, for example to get a Poisson distribution.
 
@@ -35,7 +35,7 @@ class MyModel(Model):
 
 And just use `numpy`'s random as usual, e.g. `self.random.poisson()`.
 
-## Using multi-process `` `batch_run` `` on Windows
+## Using multi-process `batch_run` on Windows
 
 You will have an issue with `batch_run` and `number_processes = None`. Your cell will
 show no progress, and in your terminal you will receive *AttributeError: Can't get attribute 'MoneyModel' on
@@ -61,5 +61,5 @@ if __name__ == '__main__':
 ```
 
 If you would still like to run your code in Jupyter you will need to adjust the cell as noted above. Then you can
-you can add the [nbmultitask library](<(https://nbviewer.org/github/micahscopes/nbmultitask/blob/39b6f31b047e8a51a0fcb5c93ae4572684f877ce/examples.ipynb)>)
+you can add the [nbmultitask library](https://nbviewer.org/github/micahscopes/nbmultitask/blob/39b6f31b047e8a51a0fcb5c93ae4572684f877ce/examples.ipynb)
 or look at this [stackoverflow](https://stackoverflow.com/questions/50937362/multiprocessing-on-python-3-jupyter).
