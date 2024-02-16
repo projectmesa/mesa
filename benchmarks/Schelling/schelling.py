@@ -39,7 +39,7 @@ class Schelling(Model):
     """
 
     def __init__(
-        self, seed, height, width, homophily, radius, density, minority_pc=0.5
+        self, height, width, homophily, radius, density, minority_pc=0.5, seed=None
     ):
         """ """
         super().__init__(seed=seed)
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     import time
 
     # model = Schelling(15, 40, 40, 3, 1, 0.625)
-    model = Schelling(15, 100, 100, 8, 2, 0.8)
+    model = Schelling(100, 100, 8, 2, 0.8, seed=15)
 
     start_time = time.perf_counter()
     for _ in range(100):

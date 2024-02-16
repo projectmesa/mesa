@@ -124,7 +124,6 @@ class WolfSheep(Model):
 
     def __init__(
         self,
-        seed,
         height,
         width,
         initial_sheep,
@@ -135,6 +134,7 @@ class WolfSheep(Model):
         wolf_gain_from_food=13,
         sheep_gain_from_food=5,
         moore=False,
+        seed=None
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
@@ -150,6 +150,7 @@ class WolfSheep(Model):
                                  once it is eaten
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
             moore:
+            seed
         """
         super().__init__(seed=seed)
         # Set parameters
@@ -214,7 +215,7 @@ class WolfSheep(Model):
 if __name__ == "__main__":
     import time
 
-    model = WolfSheep(15, 25, 25, 60, 40, 0.2, 0.1, 20)
+    model = WolfSheep(25, 25, 60, 40, 0.2, 0.1, 20, seed=15)
 
     start_time = time.perf_counter()
     for _ in range(100):
