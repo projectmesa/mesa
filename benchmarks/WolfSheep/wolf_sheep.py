@@ -134,7 +134,7 @@ class WolfSheep(Model):
         wolf_gain_from_food=13,
         sheep_gain_from_food=5,
         moore=False,
-        seed=None
+        seed=None,
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
