@@ -7,7 +7,7 @@
 | Meta | [![linting - Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) [![code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch) |
 | Chat | [![chat](https://img.shields.io/matrix/project-mesa:matrix.org?label=chat&logo=Matrix)](https://matrix.to/#/#project-mesa:matrix.org) |
 
-Mesa alllows ussers to quickly create agent-based models using built-in
+Mesa allows users to quickly create agent-based models using built-in
 core components (such as spatial grids and agent schedulers) or
 customized implementations; visualize them using a browser-based
 interface; and analyze their results using Python's data analysis
