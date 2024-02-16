@@ -104,7 +104,7 @@ class GrassPatch(mesa.Agent):
         self._fully_grown = value
 
         if value == False:
-            self.model.simulator.schedule_event_relative(self.set_fully_grown, self.grass_regrowth_time, function_args=[type(self), self.unique_id])
+            self.model.simulator.schedule_event_relative(self.set_fully_grown, self.grass_regrowth_time)
 
 
     def __init__(self, unique_id, model, fully_grown, countdown, grass_regrowth_time):
@@ -120,7 +120,7 @@ class GrassPatch(mesa.Agent):
         self.grass_regrowth_time = grass_regrowth_time
 
         if not self.fully_grown:
-            self.model.simulator.schedule_event_relative(self.set_fully_grown, countdown, function_args=[type(self), self.unique_id])
+            self.model.simulator.schedule_event_relative(self.set_fully_grown, countdown )
 
     def set_fully_grown(self):
         self.fully_grown = True
@@ -136,7 +136,6 @@ class WolfSheep(mesa.Model):
 
     def __init__(
         self,
-        seed,
         height,
         width,
         initial_sheep,
@@ -148,6 +147,7 @@ class WolfSheep(mesa.Model):
         sheep_gain_from_food=5,
         moore=False,
         simulator=None,
+        seed=None,
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
@@ -233,11 +233,12 @@ if __name__ == "__main__":
 
     simulator = ABMSimulator()
 
-    model = WolfSheep(15, 25, 25, 60, 40, 0.2, 0.1, 20,
-                      simulator=simulator)
+    model = WolfSheep(25, 25, 60, 40, 0.2, 0.1, 20,
+                      simulator=simulator, seed=15)
 
     simulator.setup(model)
 
     start_time = time.perf_counter()
     simulator.run(until=100)
+    print(simulator.time)
     print("Time:", time.perf_counter() - start_time)
