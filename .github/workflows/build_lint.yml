@@ -73,7 +73,7 @@ jobs:
     - name: Install Mesa
       run: pip install --no-deps .
     - name: Test with pytest
-      run: pytest --cov=mesa tests/ --cov-report=xml
+      run: pytest --durations=10 --cov=mesa tests/ --cov-report=xml
     - if: matrix.os == 'ubuntu'
       name: Codecov
       uses: codecov/codecov-action@v4
