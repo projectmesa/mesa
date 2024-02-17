@@ -1,19 +1,17 @@
-import math
 import enum
+import math
 
-import mesa.agent
-
-from mesa.agent import AgentSet
-from mesa.space import SingleGrid
 from mesa import Agent, Model
-
+from mesa.agent import AgentSet
 from mesa.experimental.devs.simulator import ABMSimulator
+from mesa.space import SingleGrid
 
 
 class EpsteinAgent(Agent):
-    def __init__(self, unique_id, model, vision):
+    def __init__(self, unique_id, model, vision, movement):
         super().__init__(unique_id, model)
         self.vision = vision
+        self.movement = movement
 
 
 class AgentState(enum.IntEnum):
@@ -47,19 +45,13 @@ class Citizen(EpsteinAgent):
             rebellion
     """
 
-    @property
-    def jail_sentence(self):
-        return self._jail_sentence
 
-    @jail_sentence.setter
-    def jail_sentence(self, value):
+    def sent_to_jail(self, value):
         self.model.active_agents.remove(self)
-        self.model.simulator.schedule_event_relative(self.release_from_jail, value)
-        self._jail_sentence = value
         self.condition = AgentState.ARRESTED
+        self.model.simulator.schedule_event_relative(self.release_from_jail, value)
 
     def release_from_jail(self):
-        self._jail_sentence = 0
         self.model.active_agents.add(self)
         self.condition = AgentState.QUIESCENT
 
@@ -67,11 +59,13 @@ class Citizen(EpsteinAgent):
             self,
             unique_id,
             model,
+            vision,
+            movement,
             hardship,
             regime_legitimacy,
             risk_aversion,
             threshold,
-            vision,
+            arrest_prob_constant,
     ):
         """
         Create a new Citizen.
@@ -88,7 +82,7 @@ class Citizen(EpsteinAgent):
             vision: number of cells in each direction (N, S, E and W) that
                 agent can inspect. Exogenous.
         """
-        super().__init__(unique_id, model, vision)
+        super().__init__(unique_id, model, vision, movement)
         self.hardship = hardship
         self.regime_legitimacy = regime_legitimacy
         self.risk_aversion = risk_aversion
@@ -96,7 +90,7 @@ class Citizen(EpsteinAgent):
         self.condition = AgentState.QUIESCENT
         self.grievance = self.hardship * (1 - self.regime_legitimacy)
         self.arrest_probability = None
-        self._jail_sentence = 0
+        self.arrest_prob_constant = arrest_prob_constant
 
     def step(self):
         """
@@ -109,7 +103,7 @@ class Citizen(EpsteinAgent):
             self.condition = AgentState.ACTIVE
         else:
             self.condition = AgentState.QUIESCENT
-        if self.model.movement and self.empty_neighbors:
+        if self.movement and self.empty_neighbors:
             new_pos = self.random.choice(self.empty_neighbors)
             self.model.grid.move_agent(self, new_pos)
 
@@ -139,7 +133,7 @@ class Citizen(EpsteinAgent):
             ):
                 actives_in_vision += 1
         self.arrest_probability = 1 - math.exp(
-            -1 * self.model.arrest_prob_constant * (cops_in_vision / actives_in_vision)
+            -1 * self.arrest_prob_constant * (cops_in_vision / actives_in_vision)
         )
 
 
@@ -154,6 +148,10 @@ class Cop(EpsteinAgent):
         vision: number of cells in each direction (N, S, E and W) that cop is
             able to inspect
     """
+
+    def __init__(self, unique_id, model, vision, movement, max_jail_term):
+        super().__init__(unique_id, model, vision, movement)
+        self.max_jail_term = max_jail_term
 
     def step(self):
         """
@@ -170,8 +168,8 @@ class Cop(EpsteinAgent):
                 active_neighbors.append(agent)
         if active_neighbors:
             arrestee = self.random.choice(active_neighbors)
-            arrestee.jail_sentence = self.random.randint(0, self.model.max_jail_term)
-        if self.model.movement and self.empty_neighbors:
+            arrestee.sent_to_jail(self.random.randint(0, self.max_jail_term))
+        if self.movement and self.empty_neighbors:
             new_pos = self.random.choice(self.empty_neighbors)
             self.model.grid.move_agent(self, new_pos)
 
@@ -249,23 +247,23 @@ class EpsteinCivilViolence(Model):
         self.active_agents: AgentSet | None = None
         self.grid = None
 
-
-
     def setup(self):
         self.grid = SingleGrid(self.width, self.height, torus=True)
 
-        for contents, pos in self.grid.coord_iter():
+        for _, pos in self.grid.coord_iter():
             if self.random.random() < self.cop_density:
-                agent = Cop(self.next_id(), self, vision=self.cop_vision)
+                agent = Cop(self.next_id(), self, self.cop_vision, self.movement, self.max_jail_term)
             elif self.random.random() < (self.cop_density + self.citizen_density):
                 agent = Citizen(
                     self.next_id(),
                     self,
+                    self.citizen_vision,
+                    self.movement,
                     hardship=self.random.random(),
                     regime_legitimacy=self.legitimacy,
                     risk_aversion=self.random.random(),
                     threshold=self.active_threshold,
-                    vision=self.citizen_vision,
+                    arrest_prob_constant=self.arrest_prob_constant
                 )
             else:
                 continue
@@ -277,7 +275,7 @@ class EpsteinCivilViolence(Model):
         self.active_agents.shuffle(inplace=True).do("step")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     model = EpsteinCivilViolence(seed=15)
     simulator = ABMSimulator()
 
