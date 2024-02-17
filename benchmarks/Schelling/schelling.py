@@ -1,5 +1,5 @@
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, OrthogonalGrid
+from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
 from mesa.time import RandomActivation
 
 
@@ -50,7 +50,7 @@ class Schelling(Model):
         self.homophily = homophily
 
         self.schedule = RandomActivation(self)
-        self.grid = OrthogonalGrid(
+        self.grid = OrthogonalMooreGrid(
             height, width, torus=True, capacity=1, random=self.random
         )
 

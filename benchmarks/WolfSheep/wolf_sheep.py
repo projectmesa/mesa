@@ -8,10 +8,11 @@ Replication of the model found in NetLogo:
     Center for Connected Learning and Computer-Based Modeling,
     Northwestern University, Evanston, IL.
 """
+
 import math
 
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, OrthogonalGrid
+from mesa.experimental.cell_space import CellAgent, OrthogonalVonNeumannGrid
 from mesa.time import RandomActivationByType
 
 
@@ -37,8 +38,7 @@ class Animal(CellAgent):
         offspring.move_to(self.cell)
         self.model.schedule.add(offspring)
 
-    def feed(self):
-        ...
+    def feed(self): ...
 
     def die(self):
         self.cell.remove_agent(self)
@@ -133,7 +133,6 @@ class WolfSheep(Model):
         grass_regrowth_time,
         wolf_gain_from_food=13,
         sheep_gain_from_food=5,
-        moore=False,
         seed=None,
     ):
         """
@@ -161,10 +160,9 @@ class WolfSheep(Model):
         self.grass_regrowth_time = grass_regrowth_time
 
         self.schedule = RandomActivationByType(self)
-        self.grid = OrthogonalGrid(
+        self.grid = OrthogonalVonNeumannGrid(
             self.height,
             self.width,
-            moore=moore,
             torus=False,
             capacity=math.inf,
             random=self.random,

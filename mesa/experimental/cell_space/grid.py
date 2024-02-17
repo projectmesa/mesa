@@ -1,4 +1,5 @@
 from random import Random
+from typing import Callable
 
 from mesa.experimental.cell_space import Cell, DiscreteSpace
 
@@ -22,12 +23,31 @@ class Grid(DiscreteSpace):
         capacity: int | None = None,
         random: Random | None = None,
         cell_klass: type[Cell] = Cell,
+        neighborhood_func: Callable[[Cell], list[tuple[int, int]]] | None = None,
     ) -> None:
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
         self.torus = torus
         self.width = width
         self.height = height
         self._try_random = True
+        if neighborhood_func is not None:
+            self.neighborhood_func = neighborhood_func
+        else:
+            self.neighborhood_func = self._default_neighborhood_func
+
+        self._cells = {
+            (i, j): self.cell_klass((i, j), capacity, random=self.random)
+            for j in range(width)
+            for i in range(height)
+        }
+
+        for cell in self.all_cells:
+            self._connect_single_cell(cell)
+
+    @staticmethod
+    def _default_neighborhood_func(cell: Cell) -> list[tuple[int, int]]:
+        # Default implementation
+        return []
 
     def select_random_empty_cell(self) -> Cell:
         # FIXME:: currently just a simple boolean to control behavior
@@ -47,68 +67,10 @@ class Grid(DiscreteSpace):
         else:
             return super().select_random_empty_cell()
 
-
-class OrthogonalGrid(Grid):
-    def __init__(
-        self,
-        width: int,
-        height: int,
-        torus: bool = False,
-        moore: bool = True,
-        capacity: int | None = None,
-        random: Random | None = None,
-        cell_klass: type[Cell] = Cell,
-    ) -> None:
-        """Orthogonal grid
-
-        Args:
-            width (int): width of the grid
-            height (int): height of the grid
-            torus (bool): whether the space is a torus
-            moore (bool): whether the space used Moore or von Neumann neighborhood
-            capacity (int): the number of agents that can simultaneously occupy a cell
-            random (random):
-            cell_klass (type[Cell]): The Cell class to use in the OrthogonalGrid
-
-
-        """
-        super().__init__(
-            width,
-            height,
-            torus,
-            capacity=capacity,
-            cell_klass=cell_klass,
-            random=random,
-        )
-        self.moore = moore
-        self._cells = {
-            (i, j): self.cell_klass((i, j), capacity, random=self.random)
-            for j in range(width)
-            for i in range(height)
-        }
-
-        for cell in self.all_cells:
-            self._connect_single_cell(cell)
-
     def _connect_single_cell(self, cell):
         i, j = cell.coordinate
 
-        # fmt: off
-        if self.moore:
-            directions = [
-                (-1, -1), (-1, 0), (-1, 1),
-                ( 0, -1),          ( 0, 1),
-                ( 1, -1), ( 1, 0), ( 1, 1),
-            ]
-        else:  # Von Neumann neighborhood
-            directions = [
-                          (-1, 0),
-                ( 0, -1),          (0, 1),
-                          ( 1,  0),
-            ]
-        # fmt: on
-
-        for di, dj in directions:
+        for di, dj in self.neighborhood_func(cell):
             ni, nj = (i + di, j + dj)
             if self.torus:
                 ni, nj = ni % self.height, nj % self.width
@@ -116,44 +78,38 @@ class OrthogonalGrid(Grid):
                 cell.connect(self._cells[ni, nj])
 
 
+class OrthogonalMooreGrid(Grid):
+
+    @staticmethod
+    def _default_neighborhood_func(cell):
+        # fmt: off
+        directions = [
+            (-1, -1), (-1, 0), (-1, 1),
+            ( 0, -1),          ( 0, 1),
+            ( 1, -1), ( 1, 0), ( 1, 1),
+        ]
+        # fmt: on
+        return directions
+
+
+class OrthogonalVonNeumannGrid(Grid):
+
+    @staticmethod
+    def _default_neighborhood_func(cell):
+        # fmt: off
+        directions = [
+                    (0, -1),
+            (-1, 0),         ( 1, 0),
+                    (0,  1),
+        ]
+        # fmt: on
+        return directions
+
+
 class HexGrid(Grid):
-    def __init__(
-        self,
-        width: int,
-        height: int,
-        torus: bool = False,
-        capacity: int | None = None,
-        random: Random | None = None,
-        cell_klass: type[Cell] = Cell,
-    ) -> None:
-        """Hexagonal Grid
 
-        Args:
-            width (int): width of the grid
-            height (int): height of the grid
-            torus (bool): whether the space is a torus
-            capacity (int): the number of agents that can simultaneously occupy a cell
-            random (random):
-            cell_klass (type[Cell]): The Cell class to use in the HexGrid
-        """
-        super().__init__(
-            width,
-            height,
-            torus,
-            capacity=capacity,
-            random=random,
-            cell_klass=cell_klass,
-        )
-        self._cells = {
-            (i, j): self.cell_klass((i, j), capacity, random=self.random)
-            for j in range(width)
-            for i in range(height)
-        }
-
-        for cell in self.all_cells:
-            self._connect_single_cell(cell)
-
-    def _connect_single_cell(self, cell):
+    @staticmethod
+    def _default_neighborhood_func(cell):
         i, j = cell.coordinate
 
         # fmt: off
@@ -171,9 +127,4 @@ class HexGrid(Grid):
             ]
         # fmt: on
 
-        for di, dj in directions:
-            ni, nj = (i + di, j + dj)
-            if self.torus:
-                ni, nj = ni % self.height, nj % self.width
-            if 0 <= ni < self.height and 0 <= nj < self.width:
-                cell.connect(self._cells[ni, nj])
+        return directions
