@@ -88,7 +88,6 @@ class Grid(DiscreteSpace):
 
 
 class OrthogonalMooreGrid(Grid):
-
     @staticmethod
     def _default_neighborhood_func(cell):
         # fmt: off
@@ -102,7 +101,6 @@ class OrthogonalMooreGrid(Grid):
 
 
 class OrthogonalVonNeumannGrid(Grid):
-
     @staticmethod
     def _default_neighborhood_func(cell):
         # fmt: off
@@ -116,7 +114,6 @@ class OrthogonalVonNeumannGrid(Grid):
 
 
 class HexGrid(Grid):
-
     @staticmethod
     def _default_neighborhood_func(cell):
         i, j = cell.coordinate
