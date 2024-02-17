@@ -81,7 +81,7 @@ class OrthogonalGrid(Grid):
             random=random,
         )
         self.moore = moore
-        self.cells = {
+        self._cells = {
             (i, j): self.cell_klass((i, j), capacity, random=self.random)
             for j in range(width)
             for i in range(height)
@@ -97,14 +97,14 @@ class OrthogonalGrid(Grid):
         if self.moore:
             directions = [
                 (-1, -1), (-1, 0), (-1, 1),
-                (0, -1), (0, 1),
-                (1, -1), (1, 0), (1, 1),
+                ( 0, -1),          ( 0, 1),
+                ( 1, -1), ( 1, 0), ( 1, 1),
             ]
         else:  # Von Neumann neighborhood
             directions = [
-                (-1, 0),
-                (0, -1), (0, 1),
-                (1, 0),
+                          (-1, 0),
+                ( 0, -1),          (0, 1),
+                          ( 1,  0),
             ]
         # fmt: on
 
@@ -113,7 +113,7 @@ class OrthogonalGrid(Grid):
             if self.torus:
                 ni, nj = ni % self.height, nj % self.width
             if 0 <= ni < self.height and 0 <= nj < self.width:
-                cell.connect(self.cells[ni, nj])
+                cell.connect(self._cells[ni, nj])
 
 
 class HexGrid(Grid):
@@ -144,7 +144,7 @@ class HexGrid(Grid):
             random=random,
             cell_klass=cell_klass,
         )
-        self.cells = {
+        self._cells = {
             (i, j): self.cell_klass((i, j), capacity, random=self.random)
             for j in range(width)
             for i in range(height)
@@ -159,15 +159,15 @@ class HexGrid(Grid):
         # fmt: off
         if i % 2 == 0:
             directions = [
-                (-1, -1), (-1, 0),
-                (0, -1), (0, 1),
-                (1, -1), (1, 0),
+                    (-1, -1), (-1, 0),
+                ( 0, -1),        ( 0, 1),
+                    ( 1, -1), ( 1, 0),
             ]
         else:
             directions = [
-                (-1, 0), (-1, 1),
-                (0, -1), (0, 1),
-                (1, 0), (1, 1),
+                    (-1, 0), (-1, 1),
+                ( 0, -1),       ( 0, 1),
+                    ( 1, 0), ( 1, 1),
             ]
         # fmt: on
 
@@ -176,4 +176,4 @@ class HexGrid(Grid):
             if self.torus:
                 ni, nj = ni % self.height, nj % self.width
             if 0 <= ni < self.height and 0 <= nj < self.width:
-                cell.connect(self.cells[ni, nj])
+                cell.connect(self._cells[ni, nj])
