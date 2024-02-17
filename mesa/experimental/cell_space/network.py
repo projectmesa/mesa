@@ -28,7 +28,9 @@ class Network(DiscreteSpace):
         self.G = G
 
         for node_id in self.G.nodes:
-            self._cells[node_id] = self.cell_klass(node_id, capacity, random=self.random)
+            self._cells[node_id] = self.cell_klass(
+                node_id, capacity, random=self.random
+            )
 
         for cell in self.all_cells:
             self._connect_single_cell(cell)

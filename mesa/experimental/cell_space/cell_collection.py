@@ -20,6 +20,7 @@ class CellCollection:
         random (Random) : The random number generator
 
     """
+
     def __init__(
         self,
         cells: dict[Cell, list[CellAgent]] | Iterable[Cell],
