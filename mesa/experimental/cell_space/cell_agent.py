@@ -3,13 +3,14 @@ from mesa.experimental.cell_space.cell import Cell
 
 
 class CellAgent(Agent):
-    """
-    Base class for a model agent in Mesa.
+    """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces
+
 
     Attributes:
         unique_id (int): A unique identifier for this agent.
-        model (Model): A reference to the model instance.
-        self.pos: Position | None = None
+        model (Model): The model instance to which the agent belongs
+        pos: (Position | None): The position of the agent in the space
+        cell: (Cell | None): the cell which the agent occupies
     """
 
     def __init__(self, unique_id: int, model: Model) -> None:

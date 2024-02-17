@@ -197,9 +197,9 @@ def test_networkgrid():
     G = nx.gnm_random_graph(n, m, seed=seed)
     grid = Network(G)
 
-    assert len(grid.cells) == n
+    assert len(grid._cells) == n
 
-    for i, cell in grid.cells.items():
+    for i, cell in grid._cells.items():
         for connection in cell._connections:
             assert connection.coordinate in G.neighbors(i)
 
@@ -217,7 +217,7 @@ def test_empties_space():
 
     model = Model()
     for i in range(8):
-        grid.cells[i].add_agent(CellAgent(i, model))
+        grid._cells[i].add_agent(CellAgent(i, model))
 
     cell = grid.select_random_empty_cell()
     assert cell.coordinate in {8, 9}

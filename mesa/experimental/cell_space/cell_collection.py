@@ -12,6 +12,14 @@ if TYPE_CHECKING:
 
 
 class CellCollection:
+    """An immutable collection of cells
+
+    Attributes:
+        cells (List[Cell]): The list of cells this collection represents
+        agents (List[CellAgent]) : List of agents occupying the cells in this collection
+        random (Random) : The random number generator
+
+    """
     def __init__(
         self,
         cells: dict[Cell, list[CellAgent]] | Iterable[Cell],

@@ -9,7 +9,16 @@ from mesa.space import Coordinate
 
 
 class DiscreteSpace:
-    # FIXME:: random should become a keyword argument
+    """Base class for all discrete spaces.
+
+    Attributes:
+        capacity (int): The capacity of the cells in the discrete space
+        all_cells (CellCollection): The cells composing the discrete space
+        random (Random): The random number generator
+        cell_klass (Type) : the type of cell class
+        empties (CellCollection) : collecction of all cells that are empty
+
+    """
 
     def __init__(
         self,
@@ -19,31 +28,31 @@ class DiscreteSpace:
     ):
         super().__init__()
         self.capacity = capacity
-        self.cells: dict[Coordinate, Cell] = {}
+        self._cells: dict[Coordinate, Cell] = {}
         if random is None:
             random = Random()  # FIXME should default to default rng from model
         self.random = random
         self.cell_klass = cell_klass
 
         self._empties: dict[Coordinate, None] = {}
-        self.empties_initialized = False
+        self._empties_initialized = False
 
     @property
     def cutoff_empties(self):
-        return 7.953 * len(self.cells) ** 0.384
+        return 7.953 * len(self._cells) ** 0.384
 
     def _connect_single_cell(self, cell):
         ...
 
     @cached_property
     def all_cells(self):
-        return CellCollection({cell: cell.agents for cell in self.cells.values()})
+        return CellCollection({cell: cell.agents for cell in self._cells.values()})
 
     def __iter__(self):
-        return iter(self.cells.values())
+        return iter(self._cells.values())
 
     def __getitem__(self, key):
-        return self.cells[key]
+        return self._cells[key]
 
     @property
     def empties(self) -> CellCollection:

@@ -11,6 +11,17 @@ if TYPE_CHECKING:
 
 
 class Cell:
+    """The cell represents a position in a discrete space.
+
+    Attributes:
+        coordinate (Tuple[int, int]) : the position of the cell in the discrete space
+        agents (List[Agent]): the agents occupying the cell
+        capacity (int): the maximum number of agents that can simultaneously occupy the cell
+        properties (dict[str, Any]): the properties of the cell
+        random (Random): the random number generator
+
+    """
+
     __slots__ = [
         "coordinate",
         "_connections",

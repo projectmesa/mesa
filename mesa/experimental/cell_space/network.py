@@ -6,6 +6,8 @@ from mesa.experimental.cell_space.discrete_space import DiscreteSpace
 
 
 class Network(DiscreteSpace):
+    """A networked discrete space"""
+
     def __init__(
         self,
         G: Any,
@@ -26,11 +28,11 @@ class Network(DiscreteSpace):
         self.G = G
 
         for node_id in self.G.nodes:
-            self.cells[node_id] = self.cell_klass(node_id, capacity, random=self.random)
+            self._cells[node_id] = self.cell_klass(node_id, capacity, random=self.random)
 
         for cell in self.all_cells:
             self._connect_single_cell(cell)
 
     def _connect_single_cell(self, cell):
         for node_id in self.G.neighbors(cell.coordinate):
-            cell.connect(self.cells[node_id])
+            cell.connect(self._cells[node_id])

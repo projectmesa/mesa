@@ -4,7 +4,7 @@ from mesa.experimental.cell_space import Cell, DiscreteSpace
 
 
 class Grid(DiscreteSpace):
-    """Base class for all grid and network classes
+    """Base class for all grid classes
 
     Attributes:
         width (int): width of the grid
