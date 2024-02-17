@@ -51,7 +51,7 @@ class Schelling(Model):
 
         self.schedule = RandomActivation(self)
         self.grid = OrthogonalMooreGrid(
-            height, width, torus=True, capacity=1, random=self.random
+            [height, width], torus=True, capacity=1, random=self.random
         )
 
         self.happy = 0

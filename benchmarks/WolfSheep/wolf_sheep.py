@@ -161,8 +161,7 @@ class WolfSheep(Model):
 
         self.schedule = RandomActivationByType(self)
         self.grid = OrthogonalVonNeumannGrid(
-            self.height,
-            self.width,
+            [self.height, self.width],
             torus=False,
             capacity=math.inf,
             random=self.random,

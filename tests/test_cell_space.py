@@ -17,7 +17,7 @@ from mesa.experimental.cell_space import (
 def test_orthogonal_grid_neumann():
     width = 10
     height = 10
-    grid = OrthogonalVonNeumannGrid(width, height, torus=False, capacity=None)
+    grid = OrthogonalVonNeumannGrid([width, height], torus=False, capacity=None)
 
     assert len(grid._cells) == width * height
 
@@ -47,7 +47,7 @@ def test_orthogonal_grid_neumann():
         assert connection.coordinate in {(4, 5), (5, 4), (5, 6), (6, 5)}
 
     # von neumann neighborhood, torus True, top corner
-    grid = OrthogonalVonNeumannGrid(width, height, torus=True, capacity=None)
+    grid = OrthogonalVonNeumannGrid([width, height], torus=True, capacity=None)
     assert len(grid._cells[(0, 0)]._connections) == 4
     for connection in grid._cells[(0, 0)]._connections:
         assert connection.coordinate in {(0, 1), (1, 0), (0, 9), (9, 0)}
@@ -70,7 +70,7 @@ def test_orthogonal_grid_moore():
     height = 10
 
     # Moore neighborhood, torus false, top corner
-    grid = OrthogonalMooreGrid(width, height, torus=False, capacity=None)
+    grid = OrthogonalMooreGrid([width, height], torus=False, capacity=None)
     assert len(grid._cells[(0, 0)]._connections) == 3
     for connection in grid._cells[(0, 0)]._connections:
         assert connection.coordinate in {(0, 1), (1, 0), (1, 1)}
@@ -85,7 +85,7 @@ def test_orthogonal_grid_moore():
         # fmt: on
 
     # Moore neighborhood, torus True, top corner
-    grid = OrthogonalMooreGrid(10, 10, torus=True, capacity=None)
+    grid = OrthogonalMooreGrid([10, 10], torus=True, capacity=None)
     assert len(grid._cells[(0, 0)]._connections) == 8
     for connection in grid._cells[(0, 0)]._connections:
         # fmt: off
@@ -101,7 +101,7 @@ def test_cell_neighborhood():
     ## von Neumann
     width = 10
     height = 10
-    grid = OrthogonalVonNeumannGrid(width, height, torus=False, capacity=None)
+    grid = OrthogonalVonNeumannGrid([width, height], torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [2, 5, 9]):
         neighborhood = grid._cells[(0, 0)].neighborhood(radius=radius)
         assert len(neighborhood) == n
@@ -109,7 +109,7 @@ def test_cell_neighborhood():
     ## Moore
     width = 10
     height = 10
-    grid = OrthogonalMooreGrid(width, height, torus=False, capacity=None)
+    grid = OrthogonalMooreGrid([width, height], torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [3, 8, 15]):
         neighborhood = grid._cells[(0, 0)].neighborhood(radius=radius)
         assert len(neighborhood) == n
@@ -120,14 +120,14 @@ def test_cell_neighborhood():
     # hexgrid
     width = 10
     height = 10
-    grid = HexGrid(width, height, torus=False, capacity=None)
+    grid = HexGrid([width, height], torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [2, 6, 11]):
         neighborhood = grid._cells[(0, 0)].neighborhood(radius=radius)
         assert len(neighborhood) == n
 
     width = 10
     height = 10
-    grid = HexGrid(width, height, torus=False, capacity=None)
+    grid = HexGrid([width, height], torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [5, 10, 17]):
         neighborhood = grid._cells[(1, 0)].neighborhood(radius=radius)
         assert len(neighborhood) == n
@@ -139,7 +139,7 @@ def test_hexgrid():
     width = 10
     height = 10
 
-    grid = HexGrid(width, height, torus=False)
+    grid = HexGrid([width, height], torus=False)
     assert len(grid._cells) == width * height
 
     # first row
@@ -175,7 +175,7 @@ def test_hexgrid():
 
         # fmt: on
 
-    grid = HexGrid(width, height, torus=True)
+    grid = HexGrid([width, height], torus=True)
     assert len(grid._cells) == width * height
 
     # first row

@@ -1,3 +1,4 @@
+from itertools import product
 from random import Random
 from typing import Callable
 
@@ -17,8 +18,7 @@ class Grid(DiscreteSpace):
 
     def __init__(
         self,
-        width: int,
-        height: int,
+        dimensions: list[int],
         torus: bool = False,
         capacity: int | None = None,
         random: Random | None = None,
@@ -27,18 +27,18 @@ class Grid(DiscreteSpace):
     ) -> None:
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
         self.torus = torus
-        self.width = width
-        self.height = height
+        self.dimensions = dimensions
         self._try_random = True
         if neighborhood_func is not None:
             self.neighborhood_func = neighborhood_func
         else:
             self.neighborhood_func = self._default_neighborhood_func
 
+        coordinates = product(*(range(dim) for dim in self.dimensions))
+
         self._cells = {
-            (i, j): self.cell_klass((i, j), capacity, random=self.random)
-            for j in range(width)
-            for i in range(height)
+            coord: cell_klass(coord, capacity, random=self.random)
+            for coord in coordinates
         }
 
         for cell in self.all_cells:
@@ -68,14 +68,23 @@ class Grid(DiscreteSpace):
             return super().select_random_empty_cell()
 
     def _connect_single_cell(self, cell):
-        i, j = cell.coordinate
+        coord = cell.coordinate
 
-        for di, dj in self.neighborhood_func(cell):
-            ni, nj = (i + di, j + dj)
+        for d_coord in self.neighborhood_func(cell):
+            n_coord = tuple(c + dc for c, dc in zip(coord, d_coord))
             if self.torus:
-                ni, nj = ni % self.height, nj % self.width
-            if 0 <= ni < self.height and 0 <= nj < self.width:
-                cell.connect(self._cells[ni, nj])
+                n_coord = tuple(nc % d for nc, d in zip(n_coord, self.dimensions))
+            if all(0 <= nc < d for nc, d in zip(n_coord, self.dimensions)):
+                cell.connect(self._cells[n_coord])
+
+        # i, j = cell.coordinate
+
+        # for di, dj in self.neighborhood_func(cell):
+        #     ni, nj = (i + di, j + dj)
+        #     if self.torus:
+        #         ni, nj = ni % self.height, nj % self.width
+        #     if 0 <= ni < self.height and 0 <= nj < self.width:
+        #         cell.connect(self._cells[ni, nj])
 
 
 class OrthogonalMooreGrid(Grid):
