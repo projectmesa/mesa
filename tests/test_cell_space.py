@@ -65,6 +65,69 @@ def test_orthogonal_grid_neumann():
         assert connection.coordinate in {(9, 0), (9, 8), (8, 9), (0, 9)}
 
 
+def test_orthogonal_grid_neumann_3d():
+    width = 10
+    height = 10
+    depth = 10
+    grid = OrthogonalVonNeumannGrid([width, height, depth], torus=False, capacity=None)
+
+    assert len(grid._cells) == width * height * depth
+
+    # von neumann neighborhood, torus false, top left corner
+    assert len(grid._cells[(0, 0, 0)]._connections) == 3
+    for connection in grid._cells[(0, 0, 0)]._connections:
+        assert connection.coordinate in {(0, 0, 1), (0, 1, 0), (1, 0, 0)}
+
+    # von neumann neighborhood, torus false, top right corner
+    for connection in grid._cells[(0, width - 1, 0)]._connections:
+        assert connection.coordinate in {
+            (0, width - 1, 1),
+            (0, width - 2, 0),
+            (1, width - 1, 0),
+        }
+
+    # von neumann neighborhood, torus false, bottom left corner
+    for connection in grid._cells[(height - 1, 0, 0)]._connections:
+        assert connection.coordinate in {
+            (height - 1, 0, 1),
+            (height - 1, 1, 0),
+            (height - 2, 0, 0),
+        }
+
+    # von neumann neighborhood, torus false, bottom right corner
+    for connection in grid._cells[(height - 1, width - 1, 0)]._connections:
+        assert connection.coordinate in {
+            (height - 1, width - 1, 1),
+            (height - 1, width - 2, 0),
+            (height - 2, width - 1, 0),
+        }
+
+    # von neumann neighborhood middle of grid
+    assert len(grid._cells[(5, 5, 5)]._connections) == 6
+    for connection in grid._cells[(5, 5, 5)]._connections:
+        assert connection.coordinate in {
+            (4, 5, 5),
+            (5, 4, 5),
+            (5, 5, 4),
+            (5, 5, 6),
+            (5, 6, 5),
+            (6, 5, 5),
+        }
+
+    # von neumann neighborhood, torus True, top corner
+    grid = OrthogonalVonNeumannGrid([width, height, depth], torus=True, capacity=None)
+    assert len(grid._cells[(0, 0, 0)]._connections) == 6
+    for connection in grid._cells[(0, 0, 0)]._connections:
+        assert connection.coordinate in {
+            (0, 0, 1),
+            (0, 1, 0),
+            (1, 0, 0),
+            (0, 0, 9),
+            (0, 9, 0),
+            (9, 0, 0),
+        }
+
+
 def test_orthogonal_grid_moore():
     width = 10
     height = 10
@@ -92,6 +155,89 @@ def test_orthogonal_grid_moore():
         assert connection.coordinate in {(9, 9), (9, 0), (9, 1),
                                          (0, 9),         (0, 1),
                                          (1, 9), (1, 0), (1, 1)}
+        # fmt: on
+
+
+def test_orthogonal_grid_moore_3d():
+    width = 10
+    height = 10
+    depth = 10
+
+    # Moore neighborhood, torus false, top corner
+    grid = OrthogonalMooreGrid([width, height, depth], torus=False, capacity=None)
+    assert len(grid._cells[(0, 0, 0)]._connections) == 7
+    for connection in grid._cells[(0, 0, 0)]._connections:
+        assert connection.coordinate in {
+            (0, 0, 1),
+            (0, 1, 0),
+            (0, 1, 1),
+            (1, 0, 0),
+            (1, 0, 1),
+            (1, 1, 0),
+            (1, 1, 1),
+        }
+
+    # Moore neighborhood middle of grid
+    assert len(grid._cells[(5, 5, 5)]._connections) == 26
+    for connection in grid._cells[(5, 5, 5)]._connections:
+        # fmt: off
+        assert connection.coordinate in {(4, 4, 4), (4, 4, 5), (4, 4, 6), (4, 5, 4), (4, 5, 5), (4, 5, 6), (4, 6, 4), (4, 6, 5), (4, 6, 6),
+                                         (5, 4, 4), (5, 4, 5), (5, 4, 6), (5, 5, 4),             (5, 5, 6), (5, 6, 4), (5, 6, 5), (5, 6, 6),
+                                         (6, 4, 4), (6, 4, 5), (6, 4, 6), (6, 5, 4), (6, 5, 5), (6, 5, 6), (6, 6, 4), (6, 6, 5), (6, 6, 6)}
+        # fmt: on
+
+    # Moore neighborhood, torus True, top corner
+    grid = OrthogonalMooreGrid([width, height, depth], torus=True, capacity=None)
+    assert len(grid._cells[(0, 0, 0)]._connections) == 26
+    for connection in grid._cells[(0, 0, 0)]._connections:
+        # fmt: off
+        assert connection.coordinate in {(9, 9, 9), (9, 9, 0), (9, 9, 1), (9, 0, 9), (9, 0, 0), (9, 0, 1), (9, 1, 9), (9, 1, 0), (9, 1, 1),
+                                         (0, 9, 9), (0, 9, 0), (0, 9, 1), (0, 0, 9),             (0, 0, 1), (0, 1, 9), (0, 1, 0), (0, 1, 1),
+                                         (1, 9, 9), (1, 9, 0), (1, 9, 1), (1, 0, 9), (1, 0, 0), (1, 0, 1), (1, 1, 9), (1, 1, 0), (1, 1, 1)}
+        # fmt: on
+
+
+def test_orthogonal_grid_moore_4d():
+    width = 10
+    height = 10
+    depth = 10
+    time = 10
+
+    # Moore neighborhood, torus false, top corner
+    grid = OrthogonalMooreGrid([width, height, depth, time], torus=False, capacity=None)
+    assert len(grid._cells[(0, 0, 0, 0)]._connections) == 15
+    for connection in grid._cells[(0, 0, 0, 0)]._connections:
+        assert connection.coordinate in {
+            (0, 0, 0, 1),
+            (0, 0, 1, 0),
+            (0, 0, 1, 1),
+            (0, 1, 0, 0),
+            (0, 1, 0, 1),
+            (0, 1, 1, 0),
+            (0, 1, 1, 1),
+            (1, 0, 0, 0),
+            (1, 0, 0, 1),
+            (1, 0, 1, 0),
+            (1, 0, 1, 1),
+            (1, 1, 0, 0),
+            (1, 1, 0, 1),
+            (1, 1, 1, 0),
+            (1, 1, 1, 1),
+        }
+
+    # Moore neighborhood middle of grid
+    assert len(grid._cells[(5, 5, 5, 5)]._connections) == 80
+    for connection in grid._cells[(5, 5, 5, 5)]._connections:
+        # fmt: off
+        assert connection.coordinate in {(4, 4, 4, 4), (4, 4, 4, 5), (4, 4, 4, 6), (4, 4, 5, 4), (4, 4, 5, 5), (4, 4, 5, 6), (4, 4, 6, 4), (4, 4, 6, 5), (4, 4, 6, 6),
+                                         (4, 5, 4, 4), (4, 5, 4, 5), (4, 5, 4, 6), (4, 5, 5, 4), (4, 5, 5, 5), (4, 5, 5, 6), (4, 5, 6, 4), (4, 5, 6, 5), (4, 5, 6, 6),
+                                            (4, 6, 4, 4), (4, 6, 4, 5), (4, 6, 4, 6), (4, 6, 5, 4), (4, 6, 5, 5), (4, 6, 5, 6), (4, 6, 6, 4), (4, 6, 6, 5), (4, 6, 6, 6),
+                                            (5, 4, 4, 4), (5, 4, 4, 5), (5, 4, 4, 6), (5, 4, 5, 4), (5, 4, 5, 5), (5, 4, 5, 6), (5, 4, 6, 4), (5, 4, 6, 5), (5, 4, 6, 6),
+                                            (5, 5, 4, 4), (5, 5, 4, 5), (5, 5, 4, 6), (5, 5, 5, 4),             (5, 5, 5, 6), (5, 5, 6, 4), (5, 5, 6, 5), (5, 5, 6, 6),
+                                            (5, 6, 4, 4), (5, 6, 4, 5), (5, 6, 4, 6), (5, 6, 5, 4), (5, 6, 5, 5), (5, 6, 5, 6), (5, 6, 6, 4), (5, 6, 6, 5), (5, 6, 6, 6),
+                                            (6, 4, 4, 4), (6, 4, 4, 5), (6, 4, 4, 6), (6, 4, 5, 4), (6, 4, 5, 5), (6, 4, 5, 6), (6, 4, 6, 4), (6, 4, 6, 5), (6, 4, 6, 6),
+                                            (6, 5, 4, 4), (6, 5, 4, 5), (6, 5, 4, 6), (6, 5, 5, 4), (6, 5, 5, 5), (6, 5, 5, 6), (6, 5, 6, 4), (6, 5, 6, 5), (6, 5, 6, 6),
+                                            (6, 6, 4, 4), (6, 6, 4, 5), (6, 6, 4, 6), (6, 6, 5, 4), (6, 6, 5, 5), (6, 6, 5, 6), (6, 6, 6, 4), (6, 6, 6, 5), (6, 6, 6, 6)}
         # fmt: on
 
 

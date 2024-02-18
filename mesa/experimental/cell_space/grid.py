@@ -23,16 +23,13 @@ class Grid(DiscreteSpace):
         capacity: int | None = None,
         random: Random | None = None,
         cell_klass: type[Cell] = Cell,
-        neighborhood_func: Callable[[Cell], list[tuple[int, int]]] | None = None,
     ) -> None:
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
         self.torus = torus
         self.dimensions = dimensions
         self._try_random = True
-        if neighborhood_func is not None:
-            self.neighborhood_func = neighborhood_func
-        else:
-            self.neighborhood_func = self._default_neighborhood_func
+
+        self._validate_parameters()
 
         coordinates = product(*(range(dim) for dim in self.dimensions))
 
@@ -44,8 +41,15 @@ class Grid(DiscreteSpace):
         for cell in self.all_cells:
             self._connect_single_cell(cell)
 
-    @staticmethod
-    def _default_neighborhood_func(cell: Cell) -> list[tuple[int, int]]:
+    def _validate_parameters(self):
+        if not all(isinstance(dim, int) and dim > 0 for dim in self.dimensions):
+            raise ValueError("Dimensions must be a list of positive integers.")
+        if not isinstance(self.torus, bool):
+            raise ValueError("Torus must be a boolean.")
+        if self.capacity is not None and not isinstance(self.capacity, int):
+            raise ValueError("Capacity must be an integer or None.")
+
+    def _calculate_neighborhood_offsets(self, cell: Cell) -> list[tuple[int, int]]:
         # Default implementation
         return []
 
@@ -70,67 +74,88 @@ class Grid(DiscreteSpace):
     def _connect_single_cell(self, cell):
         coord = cell.coordinate
 
-        for d_coord in self.neighborhood_func(cell):
+        for d_coord in self._calculate_neighborhood_offsets(cell):
             n_coord = tuple(c + dc for c, dc in zip(coord, d_coord))
             if self.torus:
                 n_coord = tuple(nc % d for nc, d in zip(n_coord, self.dimensions))
             if all(0 <= nc < d for nc, d in zip(n_coord, self.dimensions)):
                 cell.connect(self._cells[n_coord])
 
-        # i, j = cell.coordinate
-
-        # for di, dj in self.neighborhood_func(cell):
-        #     ni, nj = (i + di, j + dj)
-        #     if self.torus:
-        #         ni, nj = ni % self.height, nj % self.width
-        #     if 0 <= ni < self.height and 0 <= nj < self.width:
-        #         cell.connect(self._cells[ni, nj])
-
 
 class OrthogonalMooreGrid(Grid):
-    @staticmethod
-    def _default_neighborhood_func(cell):
-        # fmt: off
-        directions = [
-            (-1, -1), (-1, 0), (-1, 1),
-            ( 0, -1),          ( 0, 1),
-            ( 1, -1), ( 1, 0), ( 1, 1),
-        ]
-        # fmt: on
-        return directions
+    """Grid where cells are connected to their 8 neighbors.
+
+    Example for two dimensions:
+    directions = [
+        (-1, -1), (-1, 0), (-1, 1),
+        ( 0, -1),          ( 0, 1),
+        ( 1, -1), ( 1, 0), ( 1, 1),
+    ]
+    """
+
+    def _calculate_neighborhood_offsets(self, cell):
+
+        offsets = list(product([-1, 0, 1], repeat=len(self.dimensions)))
+        offsets.remove((0,) * len(self.dimensions))  # Remove the central cell
+        return offsets
 
 
 class OrthogonalVonNeumannGrid(Grid):
-    @staticmethod
-    def _default_neighborhood_func(cell):
-        # fmt: off
-        directions = [
-                    (0, -1),
-            (-1, 0),         ( 1, 0),
-                    (0,  1),
-        ]
-        # fmt: on
-        return directions
+    """Grid where cells are connected to their 4 neighbors.
+
+    Example for two dimensions:
+    directions = [
+                (0, -1),
+        (-1, 0),         ( 1, 0),
+                (0,  1),
+    ]
+    """
+
+    def _calculate_neighborhood_offsets(self, cell: Cell):
+        """
+        Calculates the offsets for a Von Neumann neighborhood in an n-dimensional grid.
+        This neighborhood includes all cells that are one step away in any single dimension.
+
+        Returns:
+            A list of tuples representing the relative positions of neighboring cells.
+        """
+        offsets = []
+        dimensions = len(self.dimensions)
+        for dim in range(dimensions):
+            for delta in [
+                -1,
+                1,
+            ]:  # Move one step in each direction for the current dimension
+                offset = [0] * dimensions
+                offset[dim] = delta
+                offsets.append(tuple(offset))
+        return offsets
 
 
 class HexGrid(Grid):
+
+    def _validate_parameters(self):
+        super()._validate_parameters()
+        if len(self.dimensions) != 2:
+            raise ValueError("HexGrid must have exactly 2 dimensions.")
+
     @staticmethod
-    def _default_neighborhood_func(cell):
+    def _calculate_neighborhood_offsets(cell):
         i, j = cell.coordinate
 
         # fmt: off
         if i % 2 == 0:
-            directions = [
+            offsets = [
                     (-1, -1), (-1, 0),
                 ( 0, -1),        ( 0, 1),
                     ( 1, -1), ( 1, 0),
             ]
         else:
-            directions = [
+            offsets = [
                     (-1, 0), (-1, 1),
                 ( 0, -1),       ( 0, 1),
                     ( 1, 0), ( 1, 1),
             ]
         # fmt: on
 
-        return directions
+        return offsets
