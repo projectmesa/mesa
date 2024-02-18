@@ -1,6 +1,5 @@
 from itertools import product
 from random import Random
-from typing import Callable
 
 from mesa.experimental.cell_space import Cell, DiscreteSpace
 
@@ -94,7 +93,6 @@ class OrthogonalMooreGrid(Grid):
     """
 
     def _calculate_neighborhood_offsets(self, cell):
-
         offsets = list(product([-1, 0, 1], repeat=len(self.dimensions)))
         offsets.remove((0,) * len(self.dimensions))  # Remove the central cell
         return offsets
@@ -133,7 +131,6 @@ class OrthogonalVonNeumannGrid(Grid):
 
 
 class HexGrid(Grid):
-
     def _validate_parameters(self):
         super()._validate_parameters()
         if len(self.dimensions) != 2:
