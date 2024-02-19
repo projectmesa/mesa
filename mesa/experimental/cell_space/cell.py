@@ -34,8 +34,8 @@ class Cell:
     def __init__(
         self,
         coordinate: tuple[int, ...],
-        capacity: Optional[int] = None,
-        random: Optional[Random] = None,
+        capacity: int | None = None,
+        random: Random | None = None,
     ) -> None:
         """ "
 
@@ -48,9 +48,7 @@ class Cell:
         super().__init__()
         self.coordinate = coordinate
         self._connections: list[Cell] = []  # TODO: change to CellCollection?
-        self.agents = (
-            []
-        )  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
+        self.agents = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
         self.properties: dict[str, object] = {}
         self.random = random

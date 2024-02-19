@@ -63,7 +63,7 @@ class CellCollection(Generic[T]):
     def select_random_agent(self) -> CellAgent:
         return self.random.choice(list(self.agents))
 
-    def select(self, filter_func: Optional[Callable[[T], bool]] = None, n=0):
+    def select(self, filter_func: Callable[[T], bool] | None = None, n=0):
         # FIXME: n is not considered
         if filter_func is None and n == 0:
             return self
