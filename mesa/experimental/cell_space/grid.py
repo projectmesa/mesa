@@ -140,7 +140,6 @@ class OrthogonalVonNeumannGrid(Grid[T]):
 
 
 class HexGrid(Grid[T]):
-
     def _validate_parameters(self):
         super()._validate_parameters()
         if len(self.dimensions) != 2:
