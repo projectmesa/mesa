@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 import itertools
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from functools import cached_property
 from random import Random
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Generic, Optional, TypeVar
 
 if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell import Cell
     from mesa.experimental.cell_space.cell_agent import CellAgent
 
+T = TypeVar("T", bound=Cell)
 
-class CellCollection:
+
+class CellCollection(Generic[T]):
     """An immutable collection of cells
 
     Attributes:
@@ -23,7 +25,7 @@ class CellCollection:
 
     def __init__(
         self,
-        cells: dict[Cell, list[CellAgent]] | Iterable[Cell],
+        cells: Mapping[T, list[CellAgent]] | Iterable[T],
         random: Random | None = None,
     ) -> None:
         if isinstance(cells, dict):
@@ -38,7 +40,7 @@ class CellCollection:
     def __iter__(self):
         return iter(self._cells)
 
-    def __getitem__(self, key: Cell) -> Iterable[CellAgent]:
+    def __getitem__(self, key: T) -> Iterable[CellAgent]:
         return self._cells[key]
 
     # @cached_property
@@ -49,20 +51,20 @@ class CellCollection:
         return f"CellCollection({self._cells})"
 
     @cached_property
-    def cells(self) -> list[Cell]:
+    def cells(self) -> list[T]:
         return list(self._cells.keys())
 
     @property
     def agents(self) -> Iterable[CellAgent]:
         return itertools.chain.from_iterable(self._cells.values())
 
-    def select_random_cell(self) -> Cell:
+    def select_random_cell(self) -> T:
         return self.random.choice(self.cells)
 
     def select_random_agent(self) -> CellAgent:
         return self.random.choice(list(self.agents))
 
-    def select(self, filter_func: [Callable[[Cell], bool]] = None, n=0):
+    def select(self, filter_func: Optional[Callable[[T], bool]] = None, n=0):
         # FIXME: n is not considered
         if filter_func is None and n == 0:
             return self

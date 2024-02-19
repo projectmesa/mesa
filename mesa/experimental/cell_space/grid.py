@@ -1,10 +1,14 @@
+from collections.abc import Sequence
 from itertools import product
 from random import Random
+from typing import Generic, Optional, TypeVar
 
 from mesa.experimental.cell_space import Cell, DiscreteSpace
 
+T = TypeVar("T", bound=Cell)
 
-class Grid(DiscreteSpace):
+
+class Grid(DiscreteSpace, Generic[T]):
     """Base class for all grid classes
 
     Attributes:
@@ -17,11 +21,11 @@ class Grid(DiscreteSpace):
 
     def __init__(
         self,
-        dimensions: list[int],
+        dimensions: Sequence[int],
         torus: bool = False,
-        capacity: int | None = None,
-        random: Random | None = None,
-        cell_klass: type[Cell] = Cell,
+        capacity: Optional[int] = None,
+        random: Optional[Random] = None,
+        cell_klass: type[T] = Cell,
     ) -> None:
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
         self.torus = torus
@@ -48,11 +52,11 @@ class Grid(DiscreteSpace):
         if self.capacity is not None and not isinstance(self.capacity, int):
             raise ValueError("Capacity must be an integer or None.")
 
-    def _calculate_neighborhood_offsets(self, cell: Cell) -> list[tuple[int, int]]:
+    def _calculate_neighborhood_offsets(self, cell: T) -> list[tuple[int, ...]]:
         # Default implementation
         return []
 
-    def select_random_empty_cell(self) -> Cell:
+    def select_random_empty_cell(self) -> T:
         # FIXME:: currently just a simple boolean to control behavior
         # FIXME:: basically if grid is close to 99% full, creating empty list can be faster
         # FIXME:: note however that the old results don't apply because in this implementation
@@ -70,7 +74,7 @@ class Grid(DiscreteSpace):
         else:
             return super().select_random_empty_cell()
 
-    def _connect_single_cell(self, cell):
+    def _connect_single_cell(self, cell: T) -> None:
         coord = cell.coordinate
 
         for d_coord in self._calculate_neighborhood_offsets(cell):
@@ -81,7 +85,7 @@ class Grid(DiscreteSpace):
                 cell.connect(self._cells[n_coord])
 
 
-class OrthogonalMooreGrid(Grid):
+class OrthogonalMooreGrid(Grid[T]):
     """Grid where cells are connected to their 8 neighbors.
 
     Example for two dimensions:
@@ -92,13 +96,18 @@ class OrthogonalMooreGrid(Grid):
     ]
     """
 
-    def _calculate_neighborhood_offsets(self, cell):
+    def _calculate_neighborhood_offsets(self, cell: T) -> list[tuple[int, ...]]:
+        """
+        Calculates the offsets for a Moore neighborhood in an n-dimensional grid.
+        This neighborhood includes all cells that are one step away in any dimension.
+        """
+
         offsets = list(product([-1, 0, 1], repeat=len(self.dimensions)))
         offsets.remove((0,) * len(self.dimensions))  # Remove the central cell
         return offsets
 
 
-class OrthogonalVonNeumannGrid(Grid):
+class OrthogonalVonNeumannGrid(Grid[T]):
     """Grid where cells are connected to their 4 neighbors.
 
     Example for two dimensions:
@@ -109,7 +118,7 @@ class OrthogonalVonNeumannGrid(Grid):
     ]
     """
 
-    def _calculate_neighborhood_offsets(self, cell: Cell):
+    def _calculate_neighborhood_offsets(self, cell: T) -> list[tuple[int, ...]]:
         """
         Calculates the offsets for a Von Neumann neighborhood in an n-dimensional grid.
         This neighborhood includes all cells that are one step away in any single dimension.
@@ -130,14 +139,15 @@ class OrthogonalVonNeumannGrid(Grid):
         return offsets
 
 
-class HexGrid(Grid):
+class HexGrid(Grid[T]):
+
     def _validate_parameters(self):
         super()._validate_parameters()
         if len(self.dimensions) != 2:
             raise ValueError("HexGrid must have exactly 2 dimensions.")
 
     @staticmethod
-    def _calculate_neighborhood_offsets(cell):
+    def _calculate_neighborhood_offsets(cell: T) -> list[tuple[int, int]]:
         i, j = cell.coordinate
 
         # fmt: off

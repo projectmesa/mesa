@@ -1,8 +1,12 @@
+from typing import Generic, TypeVar
+
 from mesa import Agent, Model
 from mesa.experimental.cell_space.cell import Cell
 
+T = TypeVar("T", bound=Cell)
 
-class CellAgent(Agent):
+
+class CellAgent(Agent, Generic[T]):
     """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces
 
 
@@ -22,7 +26,7 @@ class CellAgent(Agent):
             model (Model): The model instance in which the agent exists.
         """
         super().__init__(unique_id, model)
-        self.cell: Cell | None = None
+        self.cell: T | None = None
 
     def move_to(self, cell) -> None:
         if self.cell is not None:
