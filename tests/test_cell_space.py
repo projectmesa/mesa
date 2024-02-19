@@ -385,7 +385,7 @@ def test_empties_space():
 
     model = Model()
     for i in range(8):
-        grid._cells[(i,)].add_agent(CellAgent(i, model))
+        grid._cells[i].add_agent(CellAgent(i, model))
 
     cell = grid.select_random_empty_cell()
     assert cell.coordinate in {8, 9}

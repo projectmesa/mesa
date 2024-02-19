@@ -6,10 +6,10 @@ from functools import cached_property
 from random import Random
 from typing import Callable, Generic, Optional, TypeVar
 
-from mesa.experimental.cell_space.cell import Cell
+# from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.cell_agent import CellAgent
 
-T = TypeVar("T", bound=Cell)
+T = TypeVar("T", bound="Cell")
 
 
 class CellCollection(Generic[T]):
