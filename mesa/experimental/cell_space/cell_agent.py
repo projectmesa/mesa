@@ -1,8 +1,9 @@
-from typing import Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from mesa import Agent, Model
 
-# from mesa.experimental.cell_space.cell import Cell
+if TYPE_CHECKING:
+    from mesa.experimental.cell_space.cell import Cell
 
 T = TypeVar("T", bound="Cell")
 
