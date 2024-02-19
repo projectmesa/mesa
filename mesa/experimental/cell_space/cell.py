@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import cache
 from random import Random
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from mesa.experimental.cell_space.cell_collection import CellCollection
 

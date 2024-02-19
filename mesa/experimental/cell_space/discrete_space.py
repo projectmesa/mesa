@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import cached_property
 from random import Random
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.cell_collection import CellCollection

@@ -4,7 +4,7 @@ import itertools
 from collections.abc import Iterable, Mapping
 from functools import cached_property
 from random import Random
-from typing import Callable, Generic, Optional, TypeVar
+from typing import Callable, Generic, TypeVar
 
 # from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.cell_agent import CellAgent

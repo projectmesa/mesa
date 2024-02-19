@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar
 
 from mesa import Agent, Model
+
 # from mesa.experimental.cell_space.cell import Cell
 
 T = TypeVar("T", bound="Cell")
