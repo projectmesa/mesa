@@ -24,9 +24,9 @@ class DiscreteSpace(Generic[T]):
 
     def __init__(
         self,
-        capacity: int | None = None,
+        capacity: Optional[int] = None,
         cell_klass: type[T] = Cell,
-        random: Random | None = None,
+        random: Optional[Random] = None,
     ):
         super().__init__()
         self.capacity = capacity
@@ -43,8 +43,7 @@ class DiscreteSpace(Generic[T]):
     def cutoff_empties(self):
         return 7.953 * len(self._cells) ** 0.384
 
-    def _connect_single_cell(self, cell: T):
-        ...
+    def _connect_single_cell(self, cell: T): ...
 
     @cached_property
     def all_cells(self):

@@ -10,7 +10,7 @@ class Network(DiscreteSpace):
 
     def __init__(
         self,
-        G: Any,
+        G: Any,  # noqa: N803
         capacity: int | None = None,
         random: Random | None = None,
         cell_klass: type[Cell] = Cell,

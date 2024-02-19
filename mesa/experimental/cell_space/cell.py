@@ -34,8 +34,8 @@ class Cell:
     def __init__(
         self,
         coordinate: tuple[int, ...],
-        capacity: int | None = None,
-        random: Random | None = None,
+        capacity: Optional[int] = None,
+        random: Optional[Random] = None,
     ) -> None:
         """ "
 
@@ -48,7 +48,9 @@ class Cell:
         super().__init__()
         self.coordinate = coordinate
         self._connections: list[Cell] = []  # TODO: change to CellCollection?
-        self.agents = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
+        self.agents = (
+            []
+        )  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
         self.properties: dict[str, object] = {}
         self.random = random
@@ -110,14 +112,16 @@ class Cell:
     def __repr__(self):
         return f"Cell({self.coordinate}, {self.agents})"
 
-    @cache
+    # FIXME: Revisit caching strategy on methods
+    @cache  # noqa: B019
     def neighborhood(self, radius=1, include_center=False):
         return CellCollection(
             self._neighborhood(radius=radius, include_center=include_center),
             random=self.random,
         )
 
-    @cache
+    # FIXME: Revisit caching strategy on methods
+    @cache  # noqa: B019
     def _neighborhood(self, radius=1, include_center=False):
         # if radius == 0:
         #     return {self: self.agents}
