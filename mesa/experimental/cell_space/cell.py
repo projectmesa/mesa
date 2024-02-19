@@ -34,7 +34,7 @@ class Cell:
     def __init__(
         self,
         coordinate: tuple[int, ...],
-        capacity: int | None = None,
+        capacity: float | None = None,
         random: Random | None = None,
     ) -> None:
         """ "

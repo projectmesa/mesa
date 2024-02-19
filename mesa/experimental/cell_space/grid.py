@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from collections.abc import Sequence
 from itertools import product
 from random import Random
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from mesa.experimental.cell_space import Cell, DiscreteSpace
 
@@ -23,8 +25,8 @@ class Grid(DiscreteSpace, Generic[T]):
         self,
         dimensions: Sequence[int],
         torus: bool = False,
-        capacity: Optional[int] = None,
-        random: Optional[Random] = None,
+        capacity: float | None = None,
+        random: Random | None = None,
         cell_klass: type[T] = Cell,
     ) -> None:
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
@@ -49,8 +51,8 @@ class Grid(DiscreteSpace, Generic[T]):
             raise ValueError("Dimensions must be a list of positive integers.")
         if not isinstance(self.torus, bool):
             raise ValueError("Torus must be a boolean.")
-        if self.capacity is not None and not isinstance(self.capacity, int):
-            raise ValueError("Capacity must be an integer or None.")
+        if self.capacity is not None and not isinstance(self.capacity, (float, int)):
+            raise ValueError("Capacity must be a number or None.")
 
     def _calculate_neighborhood_offsets(self, cell: T) -> list[tuple[int, ...]]:
         # Default implementation
