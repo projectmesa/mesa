@@ -272,7 +272,8 @@ class AgentSet(MutableSet, Sequence):
             attr_names (str | List[str]): The name(s) of the attribute(s) to retrieve from each agent.
 
         Returns:
-            list[Any]: A list of attribute values for each agent in the set.
+            list[Any]: A list with the attribute value for each agent in the set if attr_names is a str
+            List[List[Any]]: A list with a list of attribute values for each agent in the set if attr_names is a list of str
         """
 
         if isinstance(attr_names, str):
