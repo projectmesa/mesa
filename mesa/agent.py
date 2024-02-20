@@ -17,7 +17,7 @@ from collections.abc import Iterable, Iterator, MutableSet, Sequence
 from random import Random
 
 # mypy
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, List
 
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
@@ -264,17 +264,21 @@ class AgentSet(MutableSet, Sequence):
 
         return res if return_results else self
 
-    def get(self, attr_name: str) -> list[Any]:
+    def get(self, attr_names: str | List[str]) -> list[Any]:
         """
-        Retrieve a specified attribute from each agent in the AgentSet.
+        Retrieve the specified attribute(s) from each agent in the AgentSet.
 
         Args:
-            attr_name (str): The name of the attribute to retrieve from each agent.
+            attr_names (str | List[str]): The name(s) of the attribute(s) to retrieve from each agent.
 
         Returns:
-            list[Any]: A list of attribute values from each agent in the set.
+            list[Any]: A list of attribute values for each agent in the set.
         """
-        return [getattr(agent, attr_name) for agent in self._agents]
+
+        if isinstance(attr_names, str):
+            return [getattr(agent, attr_names) for agent in self._agents]
+        else:
+            return [[getattr(agent, attr_name) for attr_name in attr_names] for agent in self._agents]
 
     def __getitem__(self, item: int | slice) -> Agent:
         """

@@ -222,6 +222,23 @@ def test_agentset_get_attribute():
         agentset.get("non_existing_attribute")
 
 
+    model = Model()
+    agents = []
+    for i in range(10):
+        agent = TestAgent(model.next_id(), model)
+        agent.i = i**2
+        agents.append(agent)
+    agentset = AgentSet(agents, model)
+
+    values = agentset.get(["unique_id", "i"])
+
+    for value, agent in zip(values, agents):
+        unique_id, i, = value
+        assert agent.unique_id == unique_id
+        assert agent.i == i
+
+
+
 class OtherAgentType(Agent):
     def get_unique_identifier(self):
         return self.unique_id
