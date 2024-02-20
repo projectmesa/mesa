@@ -38,8 +38,7 @@ class Animal(CellAgent):
         offspring.move_to(self.cell)
         self.model.schedule.add(offspring)
 
-    def feed(self):
-        ...
+    def feed(self): ...
 
     def die(self):
         self.cell.remove_agent(self)
@@ -178,7 +177,7 @@ class WolfSheep(Model):
             sheep = Sheep(
                 self.next_id(), self, energy, sheep_reproduce, sheep_gain_from_food
             )
-            sheep.move_to(self.grid.cells[pos])
+            sheep.move_to(self.grid[pos])
             self.schedule.add(sheep)
 
         # Create wolves
@@ -191,7 +190,7 @@ class WolfSheep(Model):
             wolf = Wolf(
                 self.next_id(), self, energy, wolf_reproduce, wolf_gain_from_food
             )
-            wolf.move_to(self.grid.cells[pos])
+            wolf.move_to(self.grid[pos])
             self.schedule.add(wolf)
 
         # Create grass patches
