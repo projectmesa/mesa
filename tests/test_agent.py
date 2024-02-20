@@ -221,7 +221,6 @@ def test_agentset_get_attribute():
     with pytest.raises(AttributeError):
         agentset.get("non_existing_attribute")
 
-
     model = Model()
     agents = []
     for i in range(10):
@@ -233,10 +232,12 @@ def test_agentset_get_attribute():
     values = agentset.get(["unique_id", "i"])
 
     for value, agent in zip(values, agents):
-        unique_id, i, = value
+        (
+            unique_id,
+            i,
+        ) = value
         assert agent.unique_id == unique_id
         assert agent.i == i
-
 
 
 class OtherAgentType(Agent):

@@ -264,7 +264,7 @@ class AgentSet(MutableSet, Sequence):
 
         return res if return_results else self
 
-    def get(self, attr_names: str | List[str]) -> list[Any]:
+    def get(self, attr_names: str | list[str]) -> list[Any]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
 
@@ -278,7 +278,10 @@ class AgentSet(MutableSet, Sequence):
         if isinstance(attr_names, str):
             return [getattr(agent, attr_names) for agent in self._agents]
         else:
-            return [[getattr(agent, attr_name) for attr_name in attr_names] for agent in self._agents]
+            return [
+                [getattr(agent, attr_name) for attr_name in attr_names]
+                for agent in self._agents
+            ]
 
     def __getitem__(self, item: int | slice) -> Agent:
         """
