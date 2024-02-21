@@ -213,8 +213,7 @@ class WolfSheep(Model):
 if __name__ == "__main__":
     import time
 
-    model = WolfSheep(25, 25, 60, 40, 0.2,
-                      0.1, 20, seed=15)
+    model = WolfSheep(25, 25, 60, 40, 0.2, 0.1, 20, seed=15)
 
     start_time = time.perf_counter()
     for _ in range(100):

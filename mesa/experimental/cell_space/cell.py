@@ -53,7 +53,7 @@ class Cell:
         self.properties: dict[str, object] = {}
         self.random = random
 
-    def connect(self, other: "Cell") -> None:
+    def connect(self, other: Cell) -> None:
         """Connects this cell to another cell.
 
         Args:
@@ -62,7 +62,7 @@ class Cell:
         """
         self._connections.append(other)
 
-    def disconnect(self, other: "Cell") -> None:
+    def disconnect(self, other: Cell) -> None:
         """Disconnects this cell from another cell.
 
         Args:

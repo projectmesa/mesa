@@ -23,12 +23,12 @@ class Grid(DiscreteSpace, Generic[T]):
     """
 
     def __init__(
-            self,
-            dimensions: Sequence[int],
-            torus: bool = False,
-            capacity: float | None = None,
-            random: Random | None = None,
-            cell_klass: type[T] = Cell,
+        self,
+        dimensions: Sequence[int],
+        torus: bool = False,
+        capacity: float | None = None,
+        random: Random | None = None,
+        cell_klass: type[T] = Cell,
     ) -> None:
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
         self.torus = torus
@@ -36,7 +36,6 @@ class Grid(DiscreteSpace, Generic[T]):
         self._try_random = True
         self._ndims = len(dimensions)
         self._validate_parameters()
-
 
         coordinates = product(*(range(dim) for dim in self.dimensions))
 
@@ -65,7 +64,6 @@ class Grid(DiscreteSpace, Generic[T]):
             raise ValueError("Torus must be a boolean.")
         if self.capacity is not None and not isinstance(self.capacity, (float, int)):
             raise ValueError("Capacity must be a number or None.")
-
 
     def select_random_empty_cell(self) -> T:
         # FIXME:: currently just a simple boolean to control behavior
@@ -118,7 +116,7 @@ class OrthogonalMooreGrid(Grid[T]):
     ]
     """
 
-    def _connect_cells_2d(self) ->None:
+    def _connect_cells_2d(self) -> None:
         # fmt: off
         offsets = [
             (-1, -1), (-1, 0), (-1, 1),
@@ -137,6 +135,7 @@ class OrthogonalMooreGrid(Grid[T]):
 
         for cell in self.all_cells:
             self._connect_single_cell_nd(cell, offsets)
+
 
 class OrthogonalVonNeumannGrid(Grid[T]):
     """Grid where cells are connected to their 4 neighbors.
@@ -166,19 +165,19 @@ class OrthogonalVonNeumannGrid(Grid[T]):
         offsets = []
         dimensions = len(self.dimensions)
         for dim in range(dimensions):
-             for delta in [
-                 -1,
-                 1,
-             ]:  # Move one step in each direction for the current dimension
-                 offset = [0] * dimensions
-                 offset[dim] = delta
-                 offsets.append(tuple(offset))
+            for delta in [
+                -1,
+                1,
+            ]:  # Move one step in each direction for the current dimension
+                offset = [0] * dimensions
+                offset[dim] = delta
+                offsets.append(tuple(offset))
 
         for cell in self.all_cells:
             self._connect_single_cell_nd(cell, offsets)
 
-class HexGrid(Grid[T]):
 
+class HexGrid(Grid[T]):
     def _connect_cells_2d(self) -> None:
         # fmt: off
         even_offsets = [
@@ -202,8 +201,10 @@ class HexGrid(Grid[T]):
                 offsets = odd_offsets
 
             self._connect_single_cell_2d(cell, offsets=offsets)
+
     def _connect_cells_nd(self) -> None:
         raise NotImplementedError("HexGrids are only defined for 2 dimensions")
+
     def _validate_parameters(self):
         super()._validate_parameters()
         if len(self.dimensions) != 2:

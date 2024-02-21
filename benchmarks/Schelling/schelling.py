@@ -63,7 +63,9 @@ class Schelling(Model):
         for cell in self.grid:
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
-                agent = SchellingAgent(self.next_id(), self, agent_type, radius, homophily)
+                agent = SchellingAgent(
+                    self.next_id(), self, agent_type, radius, homophily
+                )
                 agent.move_to(cell)
                 self.schedule.add(agent)
 
