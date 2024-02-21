@@ -274,6 +274,10 @@ class AgentSet(MutableSet, Sequence):
         Returns:
             list[Any]: A list with the attribute value for each agent in the set if attr_names is a str
             List[List[Any]]: A list with a list of attribute values for each agent in the set if attr_names is a list of str
+
+        Raises:
+            AttributeError if an agent does not have the specified attribute(s)
+
         """
 
         if isinstance(attr_names, str):
