@@ -8,7 +8,7 @@ class SchellingAgent(CellAgent):
     Schelling segregation agent
     """
 
-    def __init__(self, unique_id, model, agent_type, radius):
+    def __init__(self, unique_id, model, agent_type, radius, homophily):
         """
         Create a new Schelling agent.
         Args:
@@ -19,6 +19,7 @@ class SchellingAgent(CellAgent):
         super().__init__(unique_id, model)
         self.type = agent_type
         self.radius = radius
+        self.homophily = homophily
 
     def step(self):
         similar = 0
@@ -27,7 +28,7 @@ class SchellingAgent(CellAgent):
                 similar += 1
 
         # If unhappy, move:
-        if similar < self.model.homophily:
+        if similar < self.homophily:
             self.move_to(self.model.grid.select_random_empty_cell())
         else:
             self.model.happy += 1
@@ -47,7 +48,6 @@ class Schelling(Model):
         self.width = width
         self.density = density
         self.minority_pc = minority_pc
-        self.homophily = homophily
 
         self.schedule = RandomActivation(self)
         self.grid = OrthogonalMooreGrid(
@@ -63,7 +63,7 @@ class Schelling(Model):
         for cell in self.grid:
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
-                agent = SchellingAgent(self.next_id(), self, agent_type, radius)
+                agent = SchellingAgent(self.next_id(), self, agent_type, radius, homophily)
                 agent.move_to(cell)
                 self.schedule.add(agent)
 
@@ -78,11 +78,11 @@ class Schelling(Model):
 if __name__ == "__main__":
     import time
 
-    # model = Schelling(15, 40, 40, 3, 1, 0.625)
+    # model = Schelling(40, 40, 3, 1, 0.625, seed=15)
     model = Schelling(100, 100, 8, 2, 0.8, seed=15)
 
     start_time = time.perf_counter()
-    for _ in range(100):
+    for _ in range(20):
         model.step()
 
     print(time.perf_counter() - start_time)
