@@ -269,7 +269,7 @@ class AgentSet(MutableSet, Sequence):
         Retrieve the specified attribute(s) from each agent in the AgentSet.
 
         Args:
-            attr_names (str | List[str]): The name(s) of the attribute(s) to retrieve from each agent.
+            attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
 
         Returns:
             list[Any]: A list with the attribute value for each agent in the set if attr_names is a str
