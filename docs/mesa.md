@@ -1,77 +1,82 @@
-mesa package
-============
+# mesa package
 
-Subpackages
------------
+## Subpackages
 
-.. toctree::
+```{toctree}
+mesa.visualization
+```
 
-    mesa.visualization
+## Submodules
 
-Submodules
-----------
+## mesa.agent module
 
-mesa.agent module
------------------
-
+```{eval-rst}
 .. automodule:: mesa.agent
     :members:
     :undoc-members:
     :show-inheritance:
+```
 
-mesa.batchrunner module
------------------------
+## mesa.batchrunner module
 
+```{eval-rst}
 .. automodule:: mesa.batchrunner
     :members:
     :undoc-members:
     :show-inheritance:
+```
 
-mesa.datacollection module
---------------------------
+## mesa.datacollection module
 
+```{eval-rst}
 .. automodule:: mesa.datacollection
     :members:
     :undoc-members:
     :show-inheritance:
+```
 
-mesa.main module
-----------------
+## mesa.main module
 
+```{eval-rst}
 .. automodule:: mesa.main
     :members:
     :undoc-members:
     :show-inheritance:
+```
 
-mesa.model module
------------------
+## mesa.model module
 
+```{eval-rst}
 .. automodule:: mesa.model
     :members:
     :undoc-members:
     :show-inheritance:
+```
 
-mesa.space module
------------------
+## mesa.space module
 
+```{eval-rst}
 .. automodule:: mesa.space
     :members:
     :undoc-members:
     :show-inheritance:
+```
 
-mesa.time module
-----------------
+## mesa.time module
 
+```{eval-rst}
 .. automodule:: mesa.time
     :members:
     :undoc-members:
     :show-inheritance:
 
+```
 
-Module contents
----------------
+## Module contents
 
+```{eval-rst}
 .. automodule:: mesa
     :members:
     :undoc-members:
     :show-inheritance:
+```

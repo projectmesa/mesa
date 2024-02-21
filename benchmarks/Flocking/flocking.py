@@ -7,12 +7,10 @@ Uses numpy arrays to represent vectors.
 
 import numpy as np
 
-from mesa import Agent, Model
-from mesa.space import ContinuousSpace
-from mesa.time import RandomActivation
+import mesa
 
 
-class Boid(Agent):
+class Boid(mesa.Agent):
     """
     A Boid-style flocker agent.
 
@@ -90,7 +88,7 @@ class Boid(Agent):
         self.model.space.move_agent(self, new_pos)
 
 
-class BoidFlockers(Model):
+class BoidFlockers(mesa.Model):
     """
     Flocker model class. Handles agent creation, placement and scheduling.
     """
@@ -125,8 +123,8 @@ class BoidFlockers(Model):
         self.vision = vision
         self.speed = speed
         self.separation = separation
-        self.schedule = RandomActivation(self)
-        self.space = ContinuousSpace(width, height, True)
+        self.schedule = mesa.time.RandomActivation(self)
+        self.space = mesa.space.ContinuousSpace(width, height, True)
         self.factors = {"cohere": cohere, "separate": separate, "match": match}
         self.make_agents()
 

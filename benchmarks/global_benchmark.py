@@ -9,7 +9,7 @@ import timeit
 # also installed in site_packages or so.
 sys.path.insert(0, os.path.abspath(".."))
 
-from configurations import configurations  # noqa: E402
+from configurations import configurations
 
 
 # Generic function to initialize and run a model
