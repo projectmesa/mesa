@@ -1,7 +1,9 @@
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
+from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid, SingleAgentCell
 from mesa.time import RandomActivation
 
+
+from line_profiler_pycharm import profile
 
 class SchellingAgent(CellAgent):
     """
@@ -21,9 +23,11 @@ class SchellingAgent(CellAgent):
         self.radius = radius
         self.homophily = homophily
 
+    @profile
     def step(self):
         similar = 0
-        for neighbor in self.cell.neighborhood(radius=self.radius).agents:
+        neighborhood = self.cell.neighborhood(radius=self.radius)
+        for neighbor in neighborhood.agents:
             if neighbor.type == self.type:
                 similar += 1
 
@@ -51,7 +55,7 @@ class Schelling(Model):
 
         self.schedule = RandomActivation(self)
         self.grid = OrthogonalMooreGrid(
-            [height, width], torus=True, capacity=1, random=self.random
+            [height, width], torus=True, capacity=1, random=self.random, cell_klass=SingleAgentCell
         )
 
         self.happy = 0
@@ -84,7 +88,6 @@ if __name__ == "__main__":
     model = Schelling(100, 100, 8, 2, 0.8, seed=15)
 
     start_time = time.perf_counter()
-    for _ in range(20):
+    for _ in range(100):
         model.step()
-
     print(time.perf_counter() - start_time)

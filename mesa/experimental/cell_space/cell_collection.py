@@ -28,10 +28,14 @@ class CellCollection(Generic[T]):
         cells: Mapping[T, list[CellAgent]] | Iterable[T],
         random: Random | None = None,
     ) -> None:
+
         if isinstance(cells, dict):
             self._cells = cells
         else:
             self._cells = {cell: cell.agents for cell in cells}
+
+        #
+        self._capacity: int = next(iter(self._cells.keys())).capacity
 
         if random is None:
             random = Random()  # FIXME
@@ -56,7 +60,10 @@ class CellCollection(Generic[T]):
 
     @property
     def agents(self) -> Iterable[CellAgent]:
-        return itertools.chain.from_iterable(self._cells.values())
+        if self._capacity == 1:
+            return (entry for entry in self._cells.values() if entry is not None)
+        else:
+            return itertools.chain.from_iterable(self._cells.values())
 
     def select_random_cell(self) -> T:
         return self.random.choice(self.cells)

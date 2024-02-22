@@ -31,6 +31,15 @@ class Cell:
         "random",
     ]
 
+    # def __new__(cls,
+    #     coordinate: tuple[int, ...],
+    #     capacity: float | None = None,
+    #     random: Random | None = None,):
+    #     if capacity != 1:
+    #         return object.__new__(cls)
+    #     else:
+    #         return object.__new__(SingleAgentCell)
+
     def __init__(
         self,
         coordinate: tuple[int, ...],
@@ -141,3 +150,49 @@ class Cell:
             if not include_center:
                 neighborhood.pop(self, None)
             return neighborhood
+
+
+class SingleAgentCell(Cell):
+    def __init__(
+        self,
+        coordinate: tuple[int, ...],
+        capacity: float | None = None,
+        random: Random | None = None,
+    ) -> None:
+        super().__init__(coordinate, capacity, random)
+        self.agents = None
+
+    def add_agent(self, agent: CellAgent) -> None:
+        """Adds an agent to the cell.
+
+        Args:
+            agent (CellAgent): agent to add to this Cell
+
+        """
+
+        if self.agents is not None:
+            raise Exception(
+                "ERROR: Cell is full"
+            )  # FIXME we need MESA errors or a proper error
+
+        self.agents = agent
+
+    def remove_agent(self, agent: CellAgent) -> None:
+        """Removes an agent from the cell.
+
+        Args:
+            agent (CellAgent): agent to remove from this cell
+
+        """
+        self.agents = None
+        agent.cell = None
+
+    @property
+    def is_empty(self) -> bool:
+        """Returns a bool of the contents of a cell."""
+        return self.agents is None
+
+    @property
+    def is_full(self) -> bool:
+        """Returns a bool of the contents of a cell."""
+        return self.agents is not None
