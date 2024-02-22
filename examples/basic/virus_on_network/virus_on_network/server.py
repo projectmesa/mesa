@@ -49,7 +49,11 @@ def network_portrayal(G):
     return portrayal
 
 
-network = mesa.visualization.NetworkModule(network_portrayal, 500, 500)
+network = mesa.visualization.NetworkModule(
+    portrayal_method=network_portrayal,
+    canvas_height=500,
+    canvas_width=500,
+)
 chart = mesa.visualization.ChartModule(
     [
         {"Label": "Infected", "Color": "#FF0000"},
@@ -71,63 +75,68 @@ def get_resistant_susceptible_ratio(model):
 
 model_params = {
     "num_nodes": mesa.visualization.Slider(
-        "Number of agents",
-        10,
-        10,
-        100,
-        1,
+        name="Number of agents",
+        value=10,
+        min_value=10,
+        max_value=100,
+        step=1,
         description="Choose how many agents to include in the model",
     ),
     "avg_node_degree": mesa.visualization.Slider(
-        "Avg Node Degree", 3, 3, 8, 1, description="Avg Node Degree"
+        name="Avg Node Degree",
+        value=3,
+        min_value=3,
+        max_value=8,
+        step=1,
+        description="Avg Node Degree",
     ),
     "initial_outbreak_size": mesa.visualization.Slider(
-        "Initial Outbreak Size",
-        1,
-        1,
-        10,
-        1,
+        name="Initial Outbreak Size",
+        value=1,
+        min_value=1,
+        max_value=10,
+        step=1,
         description="Initial Outbreak Size",
     ),
     "virus_spread_chance": mesa.visualization.Slider(
-        "Virus Spread Chance",
-        0.4,
-        0.0,
-        1.0,
-        0.1,
+        name="Virus Spread Chance",
+        value=0.4,
+        min_value=0.0,
+        max_value=1.0,
+        step=0.1,
         description="Probability that susceptible neighbor will be infected",
     ),
     "virus_check_frequency": mesa.visualization.Slider(
-        "Virus Check Frequency",
-        0.4,
-        0.0,
-        1.0,
-        0.1,
+        name="Virus Check Frequency",
+        value=0.4,
+        min_value=0.0,
+        max_value=1.0,
+        step=0.1,
         description="Frequency the nodes check whether they are infected by a virus",
     ),
     "recovery_chance": mesa.visualization.Slider(
-        "Recovery Chance",
-        0.3,
-        0.0,
-        1.0,
-        0.1,
+        name="Recovery Chance",
+        value=0.3,
+        min_value=0.0,
+        max_value=1.0,
+        step=0.1,
         description="Probability that the virus will be removed",
     ),
     "gain_resistance_chance": mesa.visualization.Slider(
-        "Gain Resistance Chance",
-        0.5,
-        0.0,
-        1.0,
-        0.1,
+        name="Gain Resistance Chance",
+        value=0.5,
+        min_value=0.0,
+        max_value=1.0,
+        step=0.1,
         description="Probability that a recovered agent will become "
         "resistant to this virus in the future",
     ),
 }
 
 server = mesa.visualization.ModularServer(
-    VirusOnNetwork,
-    [network, get_resistant_susceptible_ratio, chart],
-    "Virus Model",
-    model_params,
+    model_cls=VirusOnNetwork,
+    visualization_elements=[network, get_resistant_susceptible_ratio, chart],
+    name="Virus on Network Model",
+    model_params=model_params,
 )
 server.port = 8521

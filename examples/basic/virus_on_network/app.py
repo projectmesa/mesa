@@ -48,7 +48,6 @@ def get_resistant_susceptible_ratio(model):
 
 def make_plot(model):
     # This is for the case when we want to plot multiple measures in 1 figure.
-    # We could incorporate this into core Mesa.
     fig = Figure()
     ax = fig.subplots()
     measures = ["Infected", "Susceptible", "Resistant"]

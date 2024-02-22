@@ -28,7 +28,9 @@ def number_resistant(model):
 
 
 class VirusOnNetwork(mesa.Model):
-    """A virus model with some number of agents"""
+    """
+    A virus model with some number of agents
+    """
 
     def __init__(
         self,
@@ -104,6 +106,10 @@ class VirusOnNetwork(mesa.Model):
 
 
 class VirusAgent(mesa.Agent):
+    """
+    Individual Agent definition and its properties/interaction methods
+    """
+
     def __init__(
         self,
         unique_id,
