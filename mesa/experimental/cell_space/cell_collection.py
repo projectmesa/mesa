@@ -28,7 +28,6 @@ class CellCollection(Generic[T]):
         cells: Mapping[T, list[CellAgent]] | Iterable[T],
         random: Random | None = None,
     ) -> None:
-
         if isinstance(cells, dict):
             self._cells = cells
         else:

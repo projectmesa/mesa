@@ -20,5 +20,5 @@ __all__ = [
     "OrthogonalMooreGrid",
     "OrthogonalVonNeumannGrid",
     "Network",
-    "SingleAgentCell"
+    "SingleAgentCell",
 ]
