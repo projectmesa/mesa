@@ -1,9 +1,9 @@
+from line_profiler_pycharm import profile
+
 from mesa import Model
 from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid, SingleAgentCell
 from mesa.time import RandomActivation
 
-
-from line_profiler_pycharm import profile
 
 class SchellingAgent(CellAgent):
     """
@@ -55,7 +55,11 @@ class Schelling(Model):
 
         self.schedule = RandomActivation(self)
         self.grid = OrthogonalMooreGrid(
-            [height, width], torus=True, capacity=1, random=self.random, cell_klass=SingleAgentCell
+            [height, width],
+            torus=True,
+            capacity=1,
+            random=self.random,
+            cell_klass=SingleAgentCell,
         )
 
         self.happy = 0
