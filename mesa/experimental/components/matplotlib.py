@@ -48,6 +48,9 @@ def _draw_grid(space, space_ax, agent_portrayal):
                     if "color" in data:
                         c.append(data["color"])
         out = {"x": x, "y": y}
+        # This is the default value for the marker size, which auto-scales
+        # according to the grid area.
+        out["s"] = (180 / min(g.width, g.height)) ** 2
         if len(s) > 0:
             out["s"] = s
         if len(c) > 0:
