@@ -1,5 +1,4 @@
-Modular Visualization - An In-Depth Look
-========================================
+# Modular Visualization - An In-Depth Look
 
 Modular visualization is one of Mesa's core features. Mesa is designed
 to provide predefined visualization modules, which can be easily
@@ -7,8 +6,7 @@ subclassed for your needs, and mixed-and-matched to visualize your
 particular model. (Some day, Mesa hopes to host a wide variety.) This
 document describes how to use and create new visualization modules.
 
-Overview
---------
+## Overview
 
 An interactive modular visualization is a set of **Elements**, each of
 which is an instance of a visualization **Module**. To visualize a
@@ -16,22 +14,22 @@ model, create a new ModularServer with a list of the elements you want
 to visualize, in the order you want them to appear on the visualization
 web page.
 
-For example, if you have a model ``MyModel``, and two elements,
-*canvas\_vis* and *graph\_vis*, you would create a visualization with
+For example, if you have a model `MyModel`, and two elements,
+*canvas_vis* and *graph_vis*, you would create a visualization with
 them via:
 
-.. code:: python
-
-        server = ModularServer(MyModel, [canvas_vis, graph_vis])
-        server.launch()
+```python
+server = ModularServer(MyModel, [canvas_vis, graph_vis])
+server.launch()
+```
 
 Then you will be able to view the elements in your browser at
-http://127.0.0.1:8521/. If you prefer a different port, for example
+<http://127.0.0.1:8521/>. If you prefer a different port, for example
 8887, you can pass it to the server as an argument.
 
-.. code:: python
-
-        server.launch(8887)
+```python
+server.launch(8887)
+```
 
 Under the hood, each visualization module consists of two parts:
 
@@ -41,8 +39,7 @@ Under the hood, each visualization module consists of two parts:
    from the Python render (via the ModularServer) and actually draws it
    in the browser.
 
-Using Pre-Built Modules
------------------------
+## Using Pre-Built Modules
 
 Mesa already comes with some pre-built modules. Using the built-ins
 allow you to build a visualization without worrying about the HTML and
@@ -55,43 +52,43 @@ agent-based models, particularly the simpler ones.
 CanvasGrid iterates over every object in every cell of your model's grid
 (it assumes that your model has a grid named **grid**) and converts it
 into a dictionary which defines how it will be drawn. It does this via a
-**portrayal\_method**: a function which the user defines, which takes an
+**portrayal_method**: a function which the user defines, which takes an
 object as an input and outputs a dictionary with the following keys:
 
-::
-
-    "Shape": Can be "circle", "rect" or "arrowHead"
-        For Circles:
-            "r": The radius, defined as a fraction of cell size. r=1 will fill the entire cell.
-        For rectangles:
-            "w", "h": The width and height of the rectangle, which are in fractions of cell width and height.
-        For arrowHead:
-            "scale": Proportion scaling as a fraction of cell size.
-            "heading_x": represents x direction unit vector.
-            "heading_y": represents y direction unit vector.
-    "Color": The color to draw the shape in; needs to be a valid HTML color, e.g."Red" or "#AA08F8"
-    "Filled": either "true" or "false", and determines whether the shape is filled or not.
-    "Layer": Layer number of 0 or above; higher-numbered layers are drawn above lower-numbered layers.
-    "text": Text to overlay on top of the shape. Normally, agent's unique_id is used .
-    "text_color": Color of the text overlay.
-    (Shapes also have "x" and "y" coordinates, for the x and y of the grid cell in which it is, but CanvasGrid adds those automatically).
+```
+"Shape": Can be "circle", "rect" or "arrowHead"
+    For Circles:
+        "r": The radius, defined as a fraction of cell size. r=1 will fill the entire cell.
+    For rectangles:
+        "w", "h": The width and height of the rectangle, which are in fractions of cell width and height.
+    For arrowHead:
+        "scale": Proportion scaling as a fraction of cell size.
+        "heading_x": represents x direction unit vector.
+        "heading_y": represents y direction unit vector.
+"Color": The color to draw the shape in; needs to be a valid HTML color, e.g."Red" or "#AA08F8"
+"Filled": either "true" or "false", and determines whether the shape is filled or not.
+"Layer": Layer number of 0 or above; higher-numbered layers are drawn above lower-numbered layers.
+"text": Text to overlay on top of the shape. Normally, agent's unique_id is used .
+"text_color": Color of the text overlay.
+(Shapes also have "x" and "y" coordinates, for the x and y of the grid cell in which it is, but CanvasGrid adds those automatically).
+```
 
 For example, suppose for a Schelling model, we want to draw all agents
 as circles; red ones for the majority (agent type=0), and blue ones for
 the minority (agent type=1). The function to do this might look like
 this:
 
-.. code:: python
-
-        def schelling_draw(agent):
-            if agent is None:
-                return
-            portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
-            if agent.type == 0:
-                portrayal["Color"] = "Red"
-            else:
-                portrayal["Color"] = "Blue"
-            return portrayal
+```python
+def schelling_draw(agent):
+    if agent is None:
+        return
+    portrayal = {"Shape": "circle", "r": 0.5, "Filled": "true", "Layer": 0}
+    if agent.type == 0:
+        portrayal["Color"] = "Red"
+    else:
+        portrayal["Color"] = "Blue"
+    return portrayal
+```
 
 In addition, a CanvasGrid needs to know the width and height of the grid
 (in number of cells), and the width and height in pixels of the grid to
@@ -102,20 +99,19 @@ with a grid of 10x10, which we want to draw at 500px X 500px. using the
 portrayal function we wrote above, we would instantiate our
 visualization element as follows:
 
-.. code:: python
-
-        canvas_element = CanvasGrid(schelling_draw, 10, 10, 500, 500)
+```python
+canvas_element = CanvasGrid(schelling_draw, 10, 10, 500, 500)
+```
 
 Then, to launch a server with this grid as the only visualization
 element:
 
-.. code:: python
+```python
+server = ModularServer(SchellingModel, [canvas_element], "Schelling")
+server.launch()
+```
 
-        server = ModularServer(SchellingModel, [canvas_element], "Schelling")
-        server.launch()
-
-Sub-Classing Modules
---------------------
+## Sub-Classing Modules
 
 In some cases, you may want to customize the internals of an existing
 visualization module. The best way to do this is to create a subclass of
@@ -130,42 +126,41 @@ model object.
 Suppose we want a module which can get an arbitrary variable out of a
 model, and display its name and value. Let's create a new subclass:
 
-.. code:: python
+```python
+from mesa.visualization.ModularTextVisualization import TextElement
 
-        from mesa.visualization.ModularTextVisualization import TextElement
+class AttributeElement(TextElement):
+    def __init__(self, attr_name):
+        '''
+        Create a new text attribute element.
 
-        class AttributeElement(TextElement):
-            def __init__(self, attr_name):
-                '''
-                Create a new text attribute element.
+        Args:
+            attr_name: The name of the attribute to extract from the model.
 
-                Args:
-                    attr_name: The name of the attribute to extract from the model.
+        Example return: "happy: 10"
+        '''
+        self.attr_name = attr_name
 
-                Example return: "happy: 10"
-                '''
-                self.attr_name = attr_name
-
-            def render(self, model):
-                val = getattr(model, self.attr_name)
-                return attr_name + ": " + str(val)
+    def render(self, model):
+        val = getattr(model, self.attr_name)
+        return attr_name + ": " + str(val)
+```
 
 Now, if we wanted to use our new AttributeElement to add the number of
 happy agents to our Schelling visualization, it might look something
 like this:
 
-.. code:: python
-
-        happy_element = AttributeElement("happy")
-        server = ModularServer(SchellingModel, [canvas_element, happy_element], "Schelling")
-        server.launch()
+```python
+happy_element = AttributeElement("happy")
+server = ModularServer(SchellingModel, [canvas_element, happy_element], "Schelling")
+server.launch()
+```
 
 Note that, in this case, we only wanted to change the Python-side render
 method. We're still using the parent module's HTML and JavaScript
 template.
 
-Creating a new browser display
-------------------------------
+## Creating a new browser display
 
 But what if we want more than just a different Python renderer; we want
 to substantially change how a module displays in the browser, or create
@@ -175,23 +170,23 @@ as well:
 Let's take a look at the internals of **TextModule.js**, the JavaScript
 for the TextVisualization. Here it is, in all its glory:
 
-.. code:: javascript
+```javascript
+const TextModule = function () {
+  const text = document.createElement("p");
+  text.className = "lead";
 
-    const TextModule = function () {
-      const text = document.createElement("p");
-      text.className = "lead";
+  // Append text tag to #elements:
+  document.getElementById("elements").appendChild(text);
 
-      // Append text tag to #elements:
-      document.getElementById("elements").appendChild(text);
+  this.render = function (data) {
+    text.innerHTML = data;
+  };
 
-      this.render = function (data) {
-        text.innerHTML = data;
-      };
-
-      this.reset = function () {
-        text.innerHTML = "";
-      };
-    };
+  this.reset = function () {
+    text.innerHTML = "";
+  };
+};
+```
 
 This code is the JavaScript equivalent of defining a class. When
 instantiated, a TextModule object will create a new paragraph tag and
@@ -209,20 +204,20 @@ Now let's take a look at the TextModule's Python counterpart,
 **TextElement** (which resides in **TextVisualization.py**). Again,
 here's the whole thing:
 
-.. code:: python
+```python
+from mesa.visualization.ModularVisualization import VisualizationElement
 
-        from mesa.visualization.ModularVisualization import VisualizationElement
-
-        class TextElement(VisualizationElement):
-            js_includes = ["TextModule.js"]
-            js_code = "elements.push(new TextModule());"
+class TextElement(VisualizationElement):
+    js_includes = ["TextModule.js"]
+    js_code = "elements.push(new TextModule());"
+```
 
 That's it! Notice that it is lacking a *render()* method, like the one
-we defined above. Look at what is there: *js\_includes* is a list of
+we defined above. Look at what is there: *js_includes* is a list of
 JavaScript files to import into the page when this element is present.
 In this case, it just imports **TextModule.js**.
 
-Next, *js\_code* is some JavaScript code, in Python string form, to run
+Next, *js_code* is some JavaScript code, in Python string form, to run
 when the visualization page loads. In this case, *new TextModule()*
 creates a new TextModule object as defined above (which, remember, also
 appends a new paragraph to the page body) which is then appended to the
@@ -233,12 +228,12 @@ To help understand why it looks like this, here's a snippet of
 JavaScript from the overall visualization template itself, on how to
 handle incoming data:
 
-.. code:: javascript
-
-        data = msg["data"]
-        for (var i in elements) {
-            elements[i].render(data[i]);
-        }
+```javascript
+data = msg["data"]
+for (var i in elements) {
+    elements[i].render(data[i]);
+}
+```
 
 Data to visualize arrive over the websocket as a list. For each index of
 the list, the code passes that element of the data to the *render*
