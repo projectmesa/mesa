@@ -184,7 +184,9 @@ class DataCollector:
 
         agent_records = map(
             get_reports,
-            model.schedule.agents if hasattr(model, "schedule") else model.agents,
+            model.schedule.agents
+            if hasattr(model, "schedule") and model.schedule is not None
+            else model.agents,
         )
         return agent_records
 
