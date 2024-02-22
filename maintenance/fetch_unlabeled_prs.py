@@ -7,7 +7,9 @@ import requests
 # Your GitHub Personal Access Token
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 if GITHUB_TOKEN is None:
-    print("Please specify your GitHub Personal Access Token as GITHUB_TOKEN in your .bashrc")
+    print(
+        "Please specify your GitHub Personal Access Token as GITHUB_TOKEN in your .bashrc"
+    )
     exit()
 GITHUB_USERNAME = "projectmesa"
 GITHUB_REPO = "mesa"
