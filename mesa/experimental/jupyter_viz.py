@@ -1,5 +1,6 @@
 import sys
 import threading
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import reacton.ipywidgets as widgets
@@ -7,6 +8,7 @@ import solara
 from solara.alias import rv
 
 import mesa.experimental.components.matplotlib as components_matplotlib
+from mesa.experimental.altair_grid import create_grid
 from mesa.experimental.UserParam import Slider
 
 # Avoid interactive backend
@@ -113,6 +115,9 @@ def JupyterViz(
                 components_matplotlib.SpaceMatplotlib(
                     model, agent_portrayal, dependencies=[current_step.value]
                 )
+            elif space_drawer == "altair":
+                # draw with the default implementation
+                SpaceAltair(model, agent_portrayal, dependencies=[current_step.value])
             elif space_drawer:
                 # if specified, draw agent space with an alternate renderer
                 space_drawer(model, agent_portrayal)
@@ -128,7 +133,7 @@ def JupyterViz(
                         model, measure, dependencies=[current_step.value]
                     )
 
-    def render_in_browser():
+    def render_in_browser(statistics=False):
         # if space drawer is disabled, do not include it
         layout_types = [{"Space": "default"}] if space_drawer else []
 
@@ -144,6 +149,13 @@ def JupyterViz(
                 ModelController(model, play_interval, current_step, reset_counter)
             with solara.Card("Progress", margin=1, elevation=2):
                 solara.Markdown(md_text=f"####Step - {current_step}")
+            with solara.Card("Analytics", margin=1, elevation=2):
+                if statistics:
+                    df = model.datacollector.get_model_vars_dataframe()
+                    for col in list(df.columns):
+                        solara.Markdown(
+                            md_text=f"####Avg. {col} - {df.loc[:, f'{col}'].mean()}"
+                        )
 
         items = [
             Card(
@@ -345,6 +357,12 @@ def UserInputs(user_params, on_change=None):
             raise ValueError(f"{input_type} is not a supported input type")
 
 
+@solara.component
+def SpaceAltair(model, agent_portrayal, dependencies: Optional[list[any]] = None):
+    grid = create_grid(color="wealth")
+    grid(model)
+
+
 def make_text(renderer):
     def function(model):
         solara.Markdown(renderer(model))
@@ -356,7 +374,7 @@ def get_initial_grid_layout(layout_types):
     grid_lay = []
     y_coord = 0
     for ii in range(len(layout_types)):
-        template_layout = {"h": 10, "i": 0, "moved": False, "w": 6, "y": 0, "x": 0}
+        template_layout = {"h": 20, "i": 0, "moved": False, "w": 6, "y": 0, "x": 0}
         if ii == 0:
             grid_lay.append(template_layout)
         else:
