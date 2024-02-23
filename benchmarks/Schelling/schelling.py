@@ -1,5 +1,3 @@
-from line_profiler_pycharm import profile
-
 from mesa import Model
 from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
 from mesa.time import RandomActivation
