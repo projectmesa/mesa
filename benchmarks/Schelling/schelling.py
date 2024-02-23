@@ -1,7 +1,7 @@
 from line_profiler_pycharm import profile
 
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid, SingleAgentCell
+from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
 from mesa.time import RandomActivation
 
 
@@ -23,7 +23,6 @@ class SchellingAgent(CellAgent):
         self.radius = radius
         self.homophily = homophily
 
-    @profile
     def step(self):
         similar = 0
         neighborhood = self.cell.neighborhood(radius=self.radius)
@@ -59,7 +58,6 @@ class Schelling(Model):
             torus=True,
             capacity=1,
             random=self.random,
-            cell_klass=SingleAgentCell,
         )
 
         self.happy = 0

@@ -59,10 +59,7 @@ class CellCollection(Generic[T]):
 
     @property
     def agents(self) -> Iterable[CellAgent]:
-        if self._capacity == 1:
-            return (entry for entry in self._cells.values() if entry is not None)
-        else:
-            return itertools.chain.from_iterable(self._cells.values())
+        return itertools.chain.from_iterable(self._cells.values())
 
     def select_random_cell(self) -> T:
         return self.random.choice(self.cells)

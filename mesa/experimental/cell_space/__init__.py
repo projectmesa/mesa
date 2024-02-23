@@ -1,4 +1,4 @@
-from mesa.experimental.cell_space.cell import Cell, SingleAgentCell
+from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.cell_agent import CellAgent
 from mesa.experimental.cell_space.cell_collection import CellCollection
 from mesa.experimental.cell_space.discrete_space import DiscreteSpace
@@ -20,5 +20,4 @@ __all__ = [
     "OrthogonalMooreGrid",
     "OrthogonalVonNeumannGrid",
     "Network",
-    "SingleAgentCell",
 ]
