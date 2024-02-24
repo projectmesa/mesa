@@ -11,7 +11,6 @@ import contextlib
 import copy
 import operator
 import warnings
-import weakref
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, MutableSet, Sequence
 from random import Random
