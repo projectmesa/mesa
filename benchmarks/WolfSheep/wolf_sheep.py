@@ -44,6 +44,7 @@ class Animal(mesa.Agent):
 
     def die(self):
         self.model.grid.remove_agent(self)
+        self.model.schedule.remove(self)
         self.remove()
 
     def step(self):
