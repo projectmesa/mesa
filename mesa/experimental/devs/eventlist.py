@@ -8,7 +8,7 @@ from types import MethodType
 class InstanceCounterMeta(type):
     """ Metaclass to make instance counter not share count with descendants
 
-    FIXME:: can also be used for agents
+    TODO:: can also be used for agents.unique_id
     """
 
     def __init__(cls, name, bases, attrs):
@@ -22,11 +22,18 @@ class Priority(IntEnum):
     HIGH = 1
 
 
-
 class SimulationEvent(metaclass=InstanceCounterMeta):
-    # fixme:: how do we want to handle function?
-    # should be a callable, possibly on an object
-    # also we want only weakrefs to agents
+    """A simulation event
+
+    Attributes:
+        time (float): The simulation time of the event
+        priority (Priority): The priority of the event
+        fn  (Callable): The function to execute for this event
+        unique_id (int) the unique identifier of the event
+        function_args (list[Any]): Argument for the function
+        function_kwargs (Dict[str, Any]): Keyword arguments for the function
+
+    """
 
     def __init__(self, time, function, priority: Priority = Priority.DEFAULT, function_args=None, function_kwargs=None):
         super().__init__()
@@ -76,21 +83,48 @@ class SimulationEvent(metaclass=InstanceCounterMeta):
 
 
 class EventList:
+    """An event list
+
+    This is a heap queue sorted list of events. Events are allways removed from the left. The events are sorted
+    based on their time stamp, their priority, and their unique_id, guaranteeing a complete ordering.
+
+    """
+
     def __init__(self):
         super().__init__()
         self._event_list: list[tuple] = []
         heapify(self._event_list)
 
     def add_event(self, event: SimulationEvent):
+        """Add the event to the event list
+
+        Args:
+            event (SimulationEvent): The event to be added
+
+        """
+
         heappush(self._event_list, event.to_tuple())
 
     def peek_ahead(self, n: int = 1) -> list[SimulationEvent]:
-        # look n events ahead, or delta time ahead
+        """Look at the first n event in the event list
+
+        Args:
+            n (int): The number of events to look ahead
+
+        Returns:
+            list[SimulationEvent]
+
+        """
+        # look n events ahead
         if self.is_empty():
             raise IndexError("event list is empty")
         return [entry[3] for entry in self._event_list[0:n]]
 
     def pop(self) -> SimulationEvent:
+        """pop the first element from the event list
+
+        """
+
         try:
             return heappop(self._event_list)[3]
         except IndexError:
@@ -107,6 +141,7 @@ class EventList:
         return len(self._event_list)
 
     def remove(self, event):
+        """remove an event from the event list"""
         self._event_list.remove(event.to_tuple)
 
     def clear(self):

@@ -6,8 +6,21 @@ import numbers
 
 
 class Simulator:
-    # FIXME add replication support
-    # FIXME add experimentation support
+    """The Simulator controls the time advancement of the model.
+
+    The simulator uses next event time progression to advance the simulation time, and execute the next event
+
+    Attributes:
+        event_list (EventList): The list of events to execute
+        time (float | int): The current simulation time
+        time_unit (type) : The unit of the simulation time
+        model (Model): The model to simulate
+
+
+    """
+
+    # TODO: add replication support
+    # TODO: add experimentation support
 
     def __init__(self, time_unit: type, start_time: int | float):
         # should model run in a separate thread,
@@ -17,21 +30,40 @@ class Simulator:
         self.time_unit = time_unit
         self.model = None
 
-    def check_time_unit(self, time):
+    def check_time_unit(self, time: int | float) -> bool:
         ...
 
-    def setup(self, model):
+    def setup(self, model: "Model") -> None:
+        """Setup the model to simulate
+
+        Args:
+            model (Model): The model to simulate
+
+        Notes:
+            The basic assumption of the simulator is that a Model has a model.setup method that sets up the
+            model.
+
+        """
+
         self.event_list.clear()
         self.model = model
         model.setup()
 
     def reset(self):
-        raise NotImplementedError
+        """Reset the simulator by clearing the event list and removing the model to simulate"""
+        self.event_list.clear()
+        self.model = None
 
-    def run(self, until: int | float | None = None):
-        # run indefinitely? or until is reached
+    def run(self, time_delta: int | float):
+        """run the simulator for time delta
 
-        end_time = self.time + until
+        Args:
+            time_delta (float| int): The time delta. The simulator is run from the current time to the current time
+                                     plus the time delta
+
+        """
+
+        end_time = self.time + time_delta
         while self.time < end_time:
             self.step()
 
@@ -43,16 +75,43 @@ class Simulator:
     def schedule_event_now(self, function: Callable, priority: Priority = Priority.DEFAULT,
                            function_args: List[Any] | None = None,
                            function_kwargs: Dict[str, Any] | None = None) -> SimulationEvent:
+        """Schedule event for the current time instant
+
+        Args:
+            function (Callable): The callable to execute for this event
+            priority (Priority): the priority of the event, optional
+            function_args (List[Any]): list of arguments for function
+            function_kwargs (Dict[str, Any]):  dict of keyword arguments for function
+
+        Returns:
+            SimulationEvent: the simulation event that is scheduled
+
+        """
+
         event = SimulationEvent(self.time, function, priority=priority, function_args=function_args,
                                 function_kwargs=function_kwargs)
         self._schedule_event(event)
         return event
 
     def schedule_event_absolute(self,
-                                function: Callable, time: int | float,
+                                function: Callable,
+                                time: int | float,
                                 priority: Priority = Priority.DEFAULT,
                                 function_args: List[Any] | None = None,
                                 function_kwargs: Dict[str, Any] | None = None) -> SimulationEvent:
+        """Schedule event for the specified time instant
+
+        Args:
+            function (Callable): The callable to execute for this event
+            time (int | float): the time for which to schedule the event
+            priority (Priority): the priority of the event, optional
+            function_args (List[Any]): list of arguments for function
+            function_kwargs (Dict[str, Any]):  dict of keyword arguments for function
+
+        Returns:
+            SimulationEvent: the simulation event that is scheduled
+
+        """
         event = SimulationEvent(time, function, priority=priority, function_args=function_args,
                                 function_kwargs=function_kwargs)
         self._schedule_event(event)
@@ -63,12 +122,32 @@ class Simulator:
                                 priority: Priority = Priority.DEFAULT,
                                 function_args: List[Any] | None = None,
                                 function_kwargs: Dict[str, Any] | None = None) -> SimulationEvent:
+        """Schedule event for the current time plus the time delta
+
+        Args:
+            function (Callable): The callable to execute for this event
+            time_delta (int | float): the time delta
+            priority (Priority): the priority of the event, optional
+            function_args (List[Any]): list of arguments for function
+            function_kwargs (Dict[str, Any]):  dict of keyword arguments for function
+
+        Returns:
+            SimulationEvent: the simulation event that is scheduled
+
+        """
         event = SimulationEvent(self.time + time_delta, function, priority=priority, function_args=function_args,
                                 function_kwargs=function_kwargs)
         self._schedule_event(event)
         return event
 
     def cancel_event(self, event: SimulationEvent) -> None:
+        """remove the event from the event list
+
+        Args:
+            event (SimulationEvent): The simulation event to remove
+
+        """
+
         self.event_list.remove(event)
 
     def _schedule_event(self, event: SimulationEvent):
