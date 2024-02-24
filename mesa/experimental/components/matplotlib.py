@@ -48,6 +48,9 @@ def _draw_grid(space, space_ax, agent_portrayal):
                     if "color" in data:
                         c.append(data["color"])
         out = {"x": x, "y": y}
+        # This is the default value for the marker size, which auto-scales
+        # according to the grid area.
+        out["s"] = (180 / min(g.width, g.height)) ** 2
         if len(s) > 0:
             out["s"] = s
         if len(c) > 0:
@@ -93,12 +96,12 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
         return out
 
     # Determine border style based on space.torus
-    border_style = 'solid' if not space.torus else (0, (5, 10))
+    border_style = "solid" if not space.torus else (0, (5, 10))
 
     # Set the border of the plot
     for spine in space_ax.spines.values():
         spine.set_linewidth(1.5)
-        spine.set_color('black')
+        spine.set_color("black")
         spine.set_linestyle(border_style)
 
     width = space.x_max - space.x_min
@@ -112,7 +115,8 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
     space_ax.scatter(**portray(space))
 
 
-def make_plot(model, measure):
+@solara.component
+def PlotMatplotlib(model, measure, dependencies: Optional[list[any]] = None):
     fig = Figure()
     ax = fig.subplots()
     df = model.datacollector.get_model_vars_dataframe()
@@ -129,4 +133,4 @@ def make_plot(model, measure):
         fig.legend()
     # Set integer x axis
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    solara.FigureMatplotlib(fig)
+    solara.FigureMatplotlib(fig, dependencies=dependencies)
