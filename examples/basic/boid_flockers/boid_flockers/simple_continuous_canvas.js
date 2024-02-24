@@ -6,7 +6,6 @@ const ContinuousVisualization = function(width, height, context) {
 			if (p.Shape == "circle")
 				this.drawCircle(p.x, p.y, p.r, p.Color, p.Filled);
 		};
-
 	};
 
 	this.drawCircle = function(x, y, radius, color, fill) {
