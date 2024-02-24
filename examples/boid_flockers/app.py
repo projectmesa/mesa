@@ -16,8 +16,8 @@ model_params = {
 }
 
 page = JupyterViz(
-    BoidFlockers,
-    model_params,
+    model_class=BoidFlockers,
+    model_params=model_params,
     measures=[],
     name="BoidFlockers",
     agent_portrayal=boid_draw,
