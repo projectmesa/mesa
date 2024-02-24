@@ -24,3 +24,11 @@ repos:
     -   id: trailing-whitespace
     -   id: check-toml
     -   id: check-yaml
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.2.6
+  hooks:
+    - id: codespell
+      args: [
+        "--ignore-words",
+        ".codespellignore",
+      ]

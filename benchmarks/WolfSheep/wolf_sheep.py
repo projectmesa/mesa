@@ -84,7 +84,7 @@ class Wolf(Animal):
         sheep = [obj for obj in agents if isinstance(obj, Sheep)]
         if len(sheep) > 0:
             sheep_to_eat = self.random.choice(sheep)
-            self.energy += self.energy
+            self.energy += self.energy_from_food
 
             # Kill the sheep
             sheep_to_eat.die()
