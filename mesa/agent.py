@@ -257,8 +257,7 @@ class AgentSet(MutableSet, Sequence):
         # we iterate over the actual weakref keys and check if weakref is alive before calling the method
         res = [
             getattr(agent, method_name)(*args, **kwargs)
-            for agentref in self._agents.keyrefs()
-            if (agent := agentref()) is not None
+            for agent in list(self._agents.keys())
         ]
 
         return res if return_results else self
