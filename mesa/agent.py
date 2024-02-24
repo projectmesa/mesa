@@ -192,16 +192,20 @@ class AgentSet(MutableSet, Sequence):
             Using inplace = True is more performant
 
         """
-        weakrefs = list(self._agents.keyrefs())
-        self.random.shuffle(weakrefs)
-
+        agents = list(self._agents)
+        self.random.shuffle(agents)
         if inplace:
-            self._agents.data = {entry: None for entry in weakrefs}
-            return self
+            self._update(agents)
         else:
-            return AgentSet(
-                (agent for ref in weakrefs if (agent := ref()) is not None), self.model
-            )
+            return AgentSet(agents, self.model)
+
+        # if inplace:
+        #     self._agents.data = {entry: None for entry in weakrefs}
+        #     return self
+        # else:
+        #     return AgentSet(
+        #         (agent for ref in weakrefs if (agent := ref()) is not None), self.model
+        #     )
 
     def sort(
         self,
