@@ -5,6 +5,7 @@ from weakref import ref, WeakMethod
 
 from types import MethodType
 
+
 class InstanceCounterMeta(type):
     """ Metaclass to make instance counter not share count with descendants
 
@@ -34,6 +35,17 @@ class SimulationEvent(metaclass=InstanceCounterMeta):
         function_kwargs (Dict[str, Any]): Keyword arguments for the function
 
     """
+
+    @property
+    def CANCELED(self) -> bool:
+        return self._canceled
+
+    @CANCELED.setter
+    def CANCELED(self, bool: bool) -> None:
+        self._canceled = bool
+        self.fn = None
+        self.function_args = []
+        self.function_kwargs = {}
 
     def __init__(self, time, function, priority: Priority = Priority.DEFAULT, function_args=None, function_kwargs=None):
         super().__init__()
@@ -106,7 +118,7 @@ class EventList:
         heappush(self._event_list, event.to_tuple())
 
     def peek_ahead(self, n: int = 1) -> list[SimulationEvent]:
-        """Look at the first n event in the event list
+        """Look at the first n non-canceled event in the event list
 
         Args:
             n (int): The number of events to look ahead
@@ -114,11 +126,26 @@ class EventList:
         Returns:
             list[SimulationEvent]
 
+        Raises:
+            IndexError: If the eventlist is empty
+
+        Notes:
+            this method can return a list shorted then n if the number of non-canceled events on the event list
+            is less than n.
+
         """
         # look n events ahead
         if self.is_empty():
             raise IndexError("event list is empty")
-        return [entry[3] for entry in self._event_list[0:n]]
+
+        peek: list[SimulationEvent] = []
+        for entry in self._event_list:
+            sim_event: SimulationEvent = entry[3]
+            if not sim_event.CANCELED:
+                peek.append(sim_event)
+            if len(peek) >= n:
+                return peek
+        return peek
 
     def pop(self) -> SimulationEvent:
         """pop the first element from the event list
@@ -126,10 +153,12 @@ class EventList:
         """
 
         try:
-            return heappop(self._event_list)[3]
+            while True:
+                sim_event = heappop(self._event_list)[3]
+                if not sim_event.CANCELED:
+                    return sim_event
         except IndexError:
             raise Exception("event list is empty")
-
 
     def is_empty(self) -> bool:
         return len(self) == 0
@@ -140,9 +169,13 @@ class EventList:
     def __len__(self) -> int:
         return len(self._event_list)
 
-    def remove(self, event):
+    def remove(self, event: SimulationEvent) -> None:
         """remove an event from the event list"""
-        self._event_list.remove(event.to_tuple)
+        # we cannot simply remove items from _eventlist because this breaks
+        # heap structure invariant. So, we use a form of lazy deletion.
+        # SimEvents have a CANCELED flag that we set to True, while poping and peak_ahead
+        # silently ignore canceled events
+        event.CANCELED = True
 
     def clear(self):
         self._event_list.clear()
