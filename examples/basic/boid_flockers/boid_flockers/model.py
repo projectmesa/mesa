@@ -33,15 +33,15 @@ class Boid(mesa.Agent):
         direction,
         vision,
         separation,
-        cohere=0.025,
-        separate=0.25,
-        match=0.04,
+        cohere=0.03,
+        separate=0.015,
+        match=0.05,
     ):
         """
         Create a new Boid flocker agent.
 
         Args:
-            unique_id: Unique agent identifyer.
+            unique_id: Unique agent identifier.
             pos: Starting position
             speed: Distance to move per step.
             direction: numpy vector for the Boid's direction of movement.
@@ -62,51 +62,26 @@ class Boid(mesa.Agent):
         self.match_factor = match
         self.neighbors = None
 
-    def cohere(self):
-        """
-        Return the vector toward the center of mass of the local neighbors.
-        """
-        cohere = np.zeros(2)
-        if self.neighbors:
-            for neighbor in self.neighbors:
-                cohere += self.model.space.get_heading(self.pos, neighbor.pos)
-            cohere /= len(self.neighbors)
-        return cohere
-
-    def separate(self):
-        """
-        Return a vector away from any neighbors closer than separation dist.
-        """
-        me = self.pos
-        them = (n.pos for n in self.neighbors)
-        separation_vector = np.zeros(2)
-        for other in them:
-            if self.model.space.get_distance(me, other) < self.separation:
-                separation_vector -= self.model.space.get_heading(me, other)
-        return separation_vector
-
-    def match_heading(self):
-        """
-        Return a vector of the neighbors' average heading.
-        """
-        match_vector = np.zeros(2)
-        if self.neighbors:
-            for neighbor in self.neighbors:
-                match_vector += neighbor.direction
-            match_vector /= len(self.neighbors)
-        return match_vector
-
     def step(self):
         """
         Get the Boid's neighbors, compute the new vector, and move accordingly.
         """
 
         self.neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
-        self.direction += (
-            self.cohere() * self.cohere_factor
-            + self.separate() * self.separate_factor
-            + self.match_heading() * self.match_factor
-        ) / 2
+        n = 0
+        match_vector, separation_vector, cohere = np.zeros((3, 2))
+        for neighbor in self.neighbors:
+            n += 1
+            heading = self.model.space.get_heading(self.pos, neighbor.pos)
+            cohere += heading
+            if self.model.space.get_distance(self.pos, neighbor.pos) < self.separation:
+                separation_vector -= heading
+            match_vector += neighbor.direction
+        n = max(n, 1)
+        cohere = cohere * self.cohere_factor
+        separation_vector = separation_vector * self.separate_factor
+        match_vector = match_vector * self.match_factor
+        self.direction += (cohere + separation_vector + match_vector) / n
         self.direction /= np.linalg.norm(self.direction)
         new_pos = self.pos + self.direction * self.speed
         self.model.space.move_agent(self, new_pos)
@@ -119,15 +94,16 @@ class BoidFlockers(mesa.Model):
 
     def __init__(
         self,
+        seed=None,
         population=100,
         width=100,
         height=100,
-        speed=1,
         vision=10,
-        separation=2,
-        cohere=0.025,
-        separate=0.25,
-        match=0.04,
+        speed=1,
+        separation=1,
+        cohere=0.03,
+        separate=0.015,
+        match=0.05,
     ):
         """
         Create a new Flockers model.
@@ -142,7 +118,7 @@ class BoidFlockers(mesa.Model):
             cohere, separate, match: factors for the relative importance of
                     the three drives.
         """
-        super().__init__()
+        super().__init__(seed=seed)
         self.population = population
         self.vision = vision
         self.speed = speed
