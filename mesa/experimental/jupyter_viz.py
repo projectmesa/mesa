@@ -6,6 +6,7 @@ import reacton.ipywidgets as widgets
 import solara
 from solara.alias import rv
 
+import mesa.experimental.components.altair as components_altair
 import mesa.experimental.components.matplotlib as components_matplotlib
 from mesa.experimental.UserParam import Slider
 
@@ -26,6 +27,10 @@ def Card(
             if space_drawer == "default":
                 # draw with the default implementation
                 components_matplotlib.SpaceMatplotlib(
+                    model, agent_portrayal, dependencies=[current_step.value]
+                )
+            elif space_drawer == "altair":
+                components_altair.SpaceAltair(
                     model, agent_portrayal, dependencies=[current_step.value]
                 )
             elif space_drawer:
@@ -111,6 +116,10 @@ def JupyterViz(
             if space_drawer == "default":
                 # draw with the default implementation
                 components_matplotlib.SpaceMatplotlib(
+                    model, agent_portrayal, dependencies=[current_step.value]
+                )
+            elif space_drawer == "altair":
+                components_altair.SpaceAltair(
                     model, agent_portrayal, dependencies=[current_step.value]
                 )
             elif space_drawer:

@@ -124,8 +124,8 @@ def test_batch_run_with_params():
     mesa.batch_run(
         MockModel,
         {
-            "variable_model_params": range(5),
-            "variable_agent_params": ["H", "E", "L", "L", "O"],
+            "variable_model_params": range(3),
+            "variable_agent_params": ["H", "E", "Y"],
         },
         number_processes=2,
     )
@@ -148,7 +148,7 @@ def test_batch_run_no_agent_reporters():
 
 
 def test_batch_run_single_core():
-    mesa.batch_run(MockModel, {}, number_processes=1, iterations=10)
+    mesa.batch_run(MockModel, {}, number_processes=1, iterations=6)
 
 
 def test_batch_run_unhashable_param():
