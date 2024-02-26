@@ -67,7 +67,7 @@ class Schelling(mesa.Model):
         self.radius = radius
 
         self.schedule = mesa.time.RandomActivation(self)
-        self.grid = mesa.space.SingleGrid(height, width, torus=True)
+        self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
         self.happy = 0
 
@@ -75,7 +75,7 @@ class Schelling(mesa.Model):
         # We use a grid iterator that returns
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
-        for _cont, pos in self.grid.coord_iter():
+        for _, pos in self.grid.coord_iter():
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(self.next_id(), self, agent_type)
