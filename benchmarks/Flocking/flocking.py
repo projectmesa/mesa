@@ -50,7 +50,7 @@ class Boid(mesa.Agent):
             separation: Minimum distance to maintain from other Boids.
             cohere: the relative importance of matching neighbors' positions
             separate: the relative importance of avoiding close neighbors
-            match: the relative importance of matching neighbors' headings
+            match: the relative importance of matching neighbors' directions
 
         """
         super().__init__(unique_id, model)
@@ -131,7 +131,7 @@ class BoidFlockers(mesa.Model):
 
     def make_agents(self):
         """
-        Create self.population agents, with random positions and starting headings.
+        Create self.population agents, with random positions and starting directions.
         """
         for i in range(self.population):
             x = self.random.random() * self.space.x_max
