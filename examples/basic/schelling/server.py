@@ -26,20 +26,35 @@ def schelling_draw(agent):
     return portrayal
 
 
-canvas_element = mesa.visualization.CanvasGrid(schelling_draw, 20, 20, 500, 500)
+canvas_element = mesa.visualization.CanvasGrid(
+    portrayal_method=schelling_draw,
+    grid_width=20,
+    grid_height=20,
+    canvas_width=500,
+    canvas_height=500,
+)
 happy_chart = mesa.visualization.ChartModule([{"Label": "happy", "Color": "Black"}])
 
 model_params = {
     "height": 20,
     "width": 20,
-    "density": mesa.visualization.Slider("Agent density", 0.8, 0.1, 1.0, 0.1),
-    "minority_pc": mesa.visualization.Slider("Fraction minority", 0.2, 0.00, 1.0, 0.05),
-    "homophily": mesa.visualization.Slider("Homophily", 3, 0, 8, 1),
+    "density": mesa.visualization.Slider(
+        name="Agent density", value=0.8, min_value=0.1, max_value=1.0, step=0.1
+    ),
+    "minority_pc": mesa.visualization.Slider(
+        name="Fraction minority", value=0.2, min_value=0.00, max_value=1.0, step=0.05
+    ),
+    "homophily": mesa.visualization.Slider(
+        name="Homophily", value=3, min_value=0, max_value=8, step=1
+    ),
+    "radius": mesa.visualization.Slider(
+        name="Search Radius", value=1, min_value=1, max_value=5, step=1
+    ),
 }
 
 server = mesa.visualization.ModularServer(
-    Schelling,
-    [canvas_element, get_happy_agents, happy_chart],
-    "Schelling",
-    model_params,
+    model_cls=Schelling,
+    visualization_elements=[canvas_element, get_happy_agents, happy_chart],
+    name="Schelling Segregation Model",
+    model_params=model_params,
 )
