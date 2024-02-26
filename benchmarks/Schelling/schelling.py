@@ -39,8 +39,8 @@ class Schelling(mesa.Model):
 
     def __init__(
         self,
-        height=40,
         width=40,
+        height=40,
         homophily=3,
         radius=1,
         density=0.8,
@@ -59,8 +59,8 @@ class Schelling(mesa.Model):
             seed: Seed for Reproducibility
         """
         super().__init__(seed=seed)
-        self.height = height
         self.width = width
+        self.height = height
         self.density = density
         self.minority_pc = minority_pc
         self.homophily = homophily
@@ -93,9 +93,9 @@ class Schelling(mesa.Model):
 if __name__ == "__main__":
     import time
 
-    # model = Schelling(seed=15, height=40, width=40, homophily=3, radius=1, density=0.625)
+    # model = Schelling(seed=15, width=40, height=40, homophily=3, radius=1, density=0.625)
     model = Schelling(
-        seed=15, height=100, width=100, homophily=8, radius=2, density=0.8
+        seed=15, width=100, height=100, homophily=8, radius=2, density=0.8
     )
 
     start_time = time.perf_counter()
