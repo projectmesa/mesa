@@ -38,19 +38,36 @@ class Schelling(mesa.Model):
     """
 
     def __init__(
-        self, seed, height, width, homophily, radius, density, minority_pc=0.5
+        self,
+        width=40,
+        height=40,
+        homophily=3,
+        radius=1,
+        density=0.8,
+        minority_pc=0.5,
+        seed=None,
     ):
-        """ """
+        """
+        Create a new Schelling model.
+
+        Args:
+            width, height: Size of the space.
+            density: Initial Chance for a cell to populated
+            minority_pc: Chances for an agent to be in minority class
+            homophily: Minimum number of agents of same class needed to be happy
+            radius: Search radius for checking similarity
+            seed: Seed for Reproducibility
+        """
         super().__init__(seed=seed)
-        self.height = height
         self.width = width
+        self.height = height
         self.density = density
         self.minority_pc = minority_pc
         self.homophily = homophily
         self.radius = radius
 
         self.schedule = mesa.time.RandomActivation(self)
-        self.grid = mesa.space.SingleGrid(height, width, torus=True)
+        self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
         self.happy = 0
 
@@ -58,7 +75,7 @@ class Schelling(mesa.Model):
         # We use a grid iterator that returns
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
-        for _cont, pos in self.grid.coord_iter():
+        for _, pos in self.grid.coord_iter():
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(self.next_id(), self, agent_type)
@@ -76,8 +93,10 @@ class Schelling(mesa.Model):
 if __name__ == "__main__":
     import time
 
-    # model = Schelling(15, 40, 40, 3, 1, 0.625)
-    model = Schelling(15, 100, 100, 8, 2, 0.8)
+    # model = Schelling(seed=15, width=40, height=40, homophily=3, radius=1, density=0.625)
+    model = Schelling(
+        seed=15, width=100, height=100, homophily=8, radius=2, density=0.8
+    )
 
     start_time = time.perf_counter()
     for _ in range(100):
