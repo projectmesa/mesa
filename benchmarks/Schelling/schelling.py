@@ -41,9 +41,26 @@ class Schelling(Model):
     """
 
     def __init__(
-        self, height, width, homophily, radius, density, minority_pc=0.5, seed=None
+        self,
+        height=40,
+        width=40,
+        homophily=3,
+        radius=1,
+        density=0.8,
+        minority_pc=0.5,
+        seed=None,
     ):
-        """ """
+        """
+        Create a new Schelling model.
+
+        Args:
+            height, width: Size of the space.
+            density: Initial Chance for a cell to populated
+            minority_pc: Chances for an agent to be in minority class
+            homophily: Minimum number of agents of same class needed to be happy
+            radius: Search radius for checking similarity
+            seed: Seed for Reproducibility
+        """
         super().__init__(seed=seed)
         self.height = height
         self.width = width
@@ -84,8 +101,8 @@ class Schelling(Model):
 if __name__ == "__main__":
     import time
 
-    # model = Schelling(40, 40, 3, 1, 0.625, seed=15)
-    model = Schelling(100, 100, 8, 2, 0.8, seed=15)
+    # model = Schelling(seed=15, height=40, width=40, homophily=3, radius=1, density=0.625)
+    model = Schelling(seed=15, height=100, width=100, homophily=8, radius=2, density=0.8)
 
     start_time = time.perf_counter()
     for _ in range(100):

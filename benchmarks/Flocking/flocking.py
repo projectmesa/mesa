@@ -20,7 +20,7 @@ class Boid(mesa.Agent):
         - Alignment: try to fly in the same direction as the neighbors.
 
     Boids have a vision that defines the radius in which they look for their
-    neighbors to flock with. Their speed (a scalar) and velocity (a vector)
+    neighbors to flock with. Their speed (a scalar) and direction (a vector)
     define their movement. Separation is their desired minimum distance from
     any other Boid.
     """
@@ -31,7 +31,7 @@ class Boid(mesa.Agent):
         model,
         pos,
         speed,
-        velocity,
+        direction,
         vision,
         separation,
         cohere=0.03,
@@ -45,18 +45,18 @@ class Boid(mesa.Agent):
             unique_id: Unique agent identifier.
             pos: Starting position
             speed: Distance to move per step.
-            heading: numpy vector for the Boid's direction of movement.
+            direction: numpy vector for the Boid's direction of movement.
             vision: Radius to look around for nearby Boids.
             separation: Minimum distance to maintain from other Boids.
             cohere: the relative importance of matching neighbors' positions
             separate: the relative importance of avoiding close neighbors
-            match: the relative importance of matching neighbors' headings
+            match: the relative importance of matching neighbors' directions
 
         """
         super().__init__(unique_id, model)
         self.pos = np.array(pos)
         self.speed = speed
-        self.velocity = velocity
+        self.direction = direction
         self.vision = vision
         self.separation = separation
         self.cohere_factor = cohere
@@ -77,14 +77,14 @@ class Boid(mesa.Agent):
             cohere += heading
             if self.model.space.get_distance(self.pos, neighbor.pos) < self.separation:
                 separation_vector -= heading
-            match_vector += neighbor.velocity
+            match_vector += neighbor.direction
         n = max(n, 1)
         cohere = cohere * self.cohere_factor
         separation_vector = separation_vector * self.separate_factor
         match_vector = match_vector * self.match_factor
-        self.velocity += (cohere + separation_vector + match_vector) / n
-        self.velocity /= np.linalg.norm(self.velocity)
-        new_pos = self.pos + self.velocity * self.speed
+        self.direction += (cohere + separation_vector + match_vector) / n
+        self.direction /= np.linalg.norm(self.direction)
+        new_pos = self.pos + self.direction * self.speed
         self.model.space.move_agent(self, new_pos)
 
 
@@ -95,11 +95,11 @@ class BoidFlockers(mesa.Model):
 
     def __init__(
         self,
-        seed,
-        population,
-        width,
-        height,
-        vision,
+        seed=None,
+        population=100,
+        width=100,
+        height=100,
+        vision=10,
         speed=1,
         separation=1,
         cohere=0.03,
@@ -117,7 +117,8 @@ class BoidFlockers(mesa.Model):
             separation: What's the minimum distance each Boid will attempt to
                     keep from any other
             cohere, separate, match: factors for the relative importance of
-                    the three drives."""
+                    the three drives.
+        """
         super().__init__(seed=seed)
         self.population = population
         self.vision = vision
@@ -130,21 +131,21 @@ class BoidFlockers(mesa.Model):
 
     def make_agents(self):
         """
-        Create self.population agents, with random positions and starting headings.
+        Create self.population agents, with random positions and starting directions.
         """
         for i in range(self.population):
             x = self.random.random() * self.space.x_max
             y = self.random.random() * self.space.y_max
             pos = np.array((x, y))
-            velocity = np.random.random(2) * 2 - 1
+            direction = np.random.random(2) * 2 - 1
             boid = Boid(
-                i,
-                self,
-                pos,
-                self.speed,
-                velocity,
-                self.vision,
-                self.separation,
+                unique_id=i,
+                model=self,
+                pos=pos,
+                speed=self.speed,
+                direction=direction,
+                vision=self.vision,
+                separation=self.separation,
                 **self.factors,
             )
             self.space.place_agent(boid, pos)
@@ -157,8 +158,8 @@ class BoidFlockers(mesa.Model):
 if __name__ == "__main__":
     import time
 
-    # model = BoidFlockers(15, 200, 100, 100, 5)
-    model = BoidFlockers(15, 400, 100, 100, 15)
+    # model = BoidFlockers(seed=15, population=200, width=100, height=100, vision=5)
+    model = BoidFlockers(seed=15, population=400, width=100, height=100, vision=15)
 
     start_time = time.perf_counter()
     for _ in range(100):
