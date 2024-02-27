@@ -9,41 +9,40 @@ Replication of the model found in NetLogo:
     Northwestern University, Evanston, IL.
 """
 
-import mesa
+import math
+
+from mesa import Model
+from mesa.experimental.cell_space import CellAgent, OrthogonalVonNeumannGrid
+from mesa.time import RandomActivationByType
 
 
-class Animal(mesa.Agent):
-    def __init__(self, unique_id, model, moore, energy, p_reproduce, energy_from_food):
+class Animal(CellAgent):
+    def __init__(self, unique_id, model, energy, p_reproduce, energy_from_food):
         super().__init__(unique_id, model)
         self.energy = energy
         self.p_reproduce = p_reproduce
         self.energy_from_food = energy_from_food
-        self.moore = moore
 
     def random_move(self):
-        next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
-        next_move = self.random.choice(next_moves)
-        # Now move:
-        self.model.grid.move_agent(self, next_move)
+        self.move_to(self.cell.neighborhood().select_random_cell())
 
     def spawn_offspring(self):
         self.energy /= 2
         offspring = self.__class__(
             self.model.next_id(),
             self.model,
-            self.moore,
             self.energy,
             self.p_reproduce,
             self.energy_from_food,
         )
-        self.model.grid.place_agent(offspring, self.pos)
+        offspring.move_to(self.cell)
         self.model.schedule.add(offspring)
 
     def feed(self):
         ...
 
     def die(self):
-        self.model.grid.remove_agent(self)
+        self.cell.remove_agent(self)
         self.remove()
 
     def step(self):
@@ -67,8 +66,9 @@ class Sheep(Animal):
 
     def feed(self):
         # If there is grass available, eat it
-        agents = self.model.grid.get_cell_list_contents(self.pos)
-        grass_patch = next(obj for obj in agents if isinstance(obj, GrassPatch))
+        grass_patch = next(
+            obj for obj in self.cell.agents if isinstance(obj, GrassPatch)
+        )
         if grass_patch.fully_grown:
             self.energy += self.energy_from_food
             grass_patch.fully_grown = False
@@ -80,8 +80,7 @@ class Wolf(Animal):
     """
 
     def feed(self):
-        agents = self.model.grid.get_cell_list_contents(self.pos)
-        sheep = [obj for obj in agents if isinstance(obj, Sheep)]
+        sheep = [obj for obj in self.cell.agents if isinstance(obj, Sheep)]
         if len(sheep) > 0:
             sheep_to_eat = self.random.choice(sheep)
             self.energy += self.energy_from_food
@@ -90,7 +89,7 @@ class Wolf(Animal):
             sheep_to_eat.die()
 
 
-class GrassPatch(mesa.Agent):
+class GrassPatch(CellAgent):
     """
     A patch of grass that grows at a fixed rate and it is eaten by sheep
     """
@@ -100,7 +99,7 @@ class GrassPatch(mesa.Agent):
         Creates a new patch of grass
 
         Args:
-            grown: (boolean) Whether the patch of grass is fully grown or not
+            fully_grown: (boolean) Whether the patch of grass is fully grown or not
             countdown: Time for the patch of grass to be fully grown again
         """
         super().__init__(unique_id, model)
@@ -117,7 +116,7 @@ class GrassPatch(mesa.Agent):
                 self.countdown -= 1
 
 
-class WolfSheep(mesa.Model):
+class WolfSheep(Model):
     """
     Wolf-Sheep Predation Model
 
@@ -126,7 +125,6 @@ class WolfSheep(mesa.Model):
 
     def __init__(
         self,
-        seed,
         height,
         width,
         initial_sheep,
@@ -136,7 +134,7 @@ class WolfSheep(mesa.Model):
         grass_regrowth_time,
         wolf_gain_from_food=13,
         sheep_gain_from_food=5,
-        moore=False,
+        seed=None,
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
@@ -152,6 +150,7 @@ class WolfSheep(mesa.Model):
                                  once it is eaten
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
             moore:
+            seed
         """
         super().__init__(seed=seed)
         # Set parameters
@@ -161,9 +160,15 @@ class WolfSheep(mesa.Model):
         self.initial_wolves = initial_wolves
         self.grass_regrowth_time = grass_regrowth_time
 
-        self.schedule = mesa.time.RandomActivationByType(self)
-        self.grid = mesa.space.MultiGrid(self.height, self.width, torus=False)
+        self.schedule = RandomActivationByType(self)
+        self.grid = OrthogonalVonNeumannGrid(
+            [self.height, self.width],
+            torus=False,
+            capacity=math.inf,
+            random=self.random,
+        )
 
+        # Create sheep:
         for _ in range(self.initial_sheep):
             pos = (
                 self.random.randrange(self.width),
@@ -171,14 +176,9 @@ class WolfSheep(mesa.Model):
             )
             energy = self.random.randrange(2 * sheep_gain_from_food)
             sheep = Sheep(
-                self.next_id(),
-                self,
-                moore,
-                energy,
-                sheep_reproduce,
-                sheep_gain_from_food,
+                self.next_id(), self, energy, sheep_reproduce, sheep_gain_from_food
             )
-            self.grid.place_agent(sheep, pos)
+            sheep.move_to(self.grid[pos])
             self.schedule.add(sheep)
 
         # Create wolves
@@ -189,21 +189,21 @@ class WolfSheep(mesa.Model):
             )
             energy = self.random.randrange(2 * wolf_gain_from_food)
             wolf = Wolf(
-                self.next_id(), self, moore, energy, wolf_reproduce, wolf_gain_from_food
+                self.next_id(), self, energy, wolf_reproduce, wolf_gain_from_food
             )
-            self.grid.place_agent(wolf, pos)
+            wolf.move_to(self.grid[pos])
             self.schedule.add(wolf)
 
         # Create grass patches
         possibly_fully_grown = [True, False]
-        for _agent, pos in self.grid.coord_iter():
+        for cell in self.grid:
             fully_grown = self.random.choice(possibly_fully_grown)
             if fully_grown:
                 countdown = self.grass_regrowth_time
             else:
                 countdown = self.random.randrange(self.grass_regrowth_time)
             patch = GrassPatch(self.next_id(), self, fully_grown, countdown)
-            self.grid.place_agent(patch, pos)
+            patch.move_to(cell)
             self.schedule.add(patch)
 
     def step(self):
@@ -213,7 +213,7 @@ class WolfSheep(mesa.Model):
 if __name__ == "__main__":
     import time
 
-    model = WolfSheep(15, 25, 25, 60, 40, 0.2, 0.1, 20)
+    model = WolfSheep(25, 25, 60, 40, 0.2, 0.1, 20, seed=15)
 
     start_time = time.perf_counter()
     for _ in range(100):
