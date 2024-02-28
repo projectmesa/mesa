@@ -94,7 +94,7 @@ tutorials/adv_tutorial_legacy.ipynb
 - {ref}`modindex`
 - {ref}`search`
 
-[contributors guide]: https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.rst
+[contributors guide]: https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md
 [email list]: https://groups.google.com/d/forum/projectmesa
 [github]: https://github.com/projectmesa/mesa/
 [github issue tracker]: https://github.com/projectmesa/mesa/issues
