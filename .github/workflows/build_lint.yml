@@ -7,11 +7,9 @@ on:
     - release**
     paths-ignore:
       - '**.md'
-      - '**.rst'
   pull_request:
     paths-ignore:
       - '**.md'
-      - '**.rst'
 
 # This will cancel previous run if a newer job that obsoletes the said previous
 # run, is started.
