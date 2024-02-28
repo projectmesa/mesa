@@ -24,7 +24,7 @@ class Cell:
 
     __slots__ = [
         "coordinate",
-        "_connections",
+        "connections",
         "agents",
         "capacity",
         "properties",
@@ -56,7 +56,7 @@ class Cell:
         """
         super().__init__()
         self.coordinate = coordinate
-        self._connections: list[Cell] = []  # TODO: change to CellCollection?
+        self.connections: dict[str, Cell] = {}  # TODO: change to CellCollection?
         self.agents = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
         self.properties: dict[str, object] = {}
@@ -69,7 +69,7 @@ class Cell:
             other (Cell): other cell to connect to
 
         """
-        self._connections.append(other)
+        self.connections.append(other)
 
     def disconnect(self, other: Cell) -> None:
         """Disconnects this cell from another cell.
@@ -78,7 +78,7 @@ class Cell:
             other (Cell): other cell to remove from connections
 
         """
-        self._connections.remove(other)
+        self.connections.remove(other)
 
     def add_agent(self, agent: CellAgent) -> None:
         """Adds an agent to the cell.
