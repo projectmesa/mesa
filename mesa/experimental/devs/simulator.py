@@ -71,9 +71,13 @@ class Simulator:
         self.time = event.time
         event.execute()
 
-    def schedule_event_now(self, function: Callable, priority: Priority = Priority.DEFAULT,
-                           function_args: list[Any] | None = None,
-                           function_kwargs: dict[str, Any] | None = None) -> SimulationEvent:
+    def schedule_event_now(
+        self,
+        function: Callable,
+        priority: Priority = Priority.DEFAULT,
+        function_args: list[Any] | None = None,
+        function_kwargs: dict[str, Any] | None = None,
+    ) -> SimulationEvent:
         """Schedule event for the current time instant
 
         Args:
@@ -87,17 +91,24 @@ class Simulator:
 
         """
 
-        event = SimulationEvent(self.time, function, priority=priority, function_args=function_args,
-                                function_kwargs=function_kwargs)
+        event = SimulationEvent(
+            self.time,
+            function,
+            priority=priority,
+            function_args=function_args,
+            function_kwargs=function_kwargs,
+        )
         self._schedule_event(event)
         return event
 
-    def schedule_event_absolute(self,
-                                function: Callable,
-                                time: int | float,
-                                priority: Priority = Priority.DEFAULT,
-                                function_args: list[Any] | None = None,
-                                function_kwargs: dict[str, Any] | None = None) -> SimulationEvent:
+    def schedule_event_absolute(
+        self,
+        function: Callable,
+        time: int | float,
+        priority: Priority = Priority.DEFAULT,
+        function_args: list[Any] | None = None,
+        function_kwargs: dict[str, Any] | None = None,
+    ) -> SimulationEvent:
         """Schedule event for the specified time instant
 
         Args:
@@ -114,16 +125,24 @@ class Simulator:
         if self.time > time:
             raise ValueError("trying to schedule an event in the past")
 
-        event = SimulationEvent(time, function, priority=priority, function_args=function_args,
-                                function_kwargs=function_kwargs)
+        event = SimulationEvent(
+            time,
+            function,
+            priority=priority,
+            function_args=function_args,
+            function_kwargs=function_kwargs,
+        )
         self._schedule_event(event)
         return event
 
-    def schedule_event_relative(self, function: Callable,
-                                time_delta: int | float,
-                                priority: Priority = Priority.DEFAULT,
-                                function_args: list[Any] | None = None,
-                                function_kwargs: dict[str, Any] | None = None) -> SimulationEvent:
+    def schedule_event_relative(
+        self,
+        function: Callable,
+        time_delta: int | float,
+        priority: Priority = Priority.DEFAULT,
+        function_args: list[Any] | None = None,
+        function_kwargs: dict[str, Any] | None = None,
+    ) -> SimulationEvent:
         """Schedule event for the current time plus the time delta
 
         Args:
@@ -137,8 +156,13 @@ class Simulator:
             SimulationEvent: the simulation event that is scheduled
 
         """
-        event = SimulationEvent(self.time + time_delta, function, priority=priority, function_args=function_args,
-                                function_kwargs=function_kwargs)
+        event = SimulationEvent(
+            self.time + time_delta,
+            function,
+            priority=priority,
+            function_args=function_args,
+            function_kwargs=function_kwargs,
+        )
         self._schedule_event(event)
         return event
 
@@ -154,7 +178,9 @@ class Simulator:
 
     def _schedule_event(self, event: SimulationEvent):
         if not self.check_time_unit(event.time):
-            raise ValueError(f"time unit mismatch {event.time} is not of time unit {self.time_unit}")
+            raise ValueError(
+                f"time unit mismatch {event.time} is not of time unit {self.time_unit}"
+            )
 
         # check timeunit of events
         self.event_list.add_event(event)
@@ -185,11 +211,13 @@ class ABMSimulator(Simulator):
         else:
             return False
 
-    def schedule_event_next_tick(self,
-                                 function: Callable,
-                                 priority: Priority = Priority.DEFAULT,
-                                 function_args: list[Any] | None = None,
-                                 function_kwargs: dict[str, Any] | None = None) -> SimulationEvent:
+    def schedule_event_next_tick(
+        self,
+        function: Callable,
+        priority: Priority = Priority.DEFAULT,
+        function_args: list[Any] | None = None,
+        function_kwargs: dict[str, Any] | None = None,
+    ) -> SimulationEvent:
         """Schedule a SimulationEvent for the next tick
 
         Args
@@ -199,10 +227,13 @@ class ABMSimulator(Simulator):
             function_kwargs (Dict[str, Any]): List of keyword arguments to pass to the callable
 
         """
-        return self.schedule_event_relative(function, 1,
-                                            priority=priority,
-                                            function_args=function_args,
-                                            function_kwargs=function_kwargs)
+        return self.schedule_event_relative(
+            function,
+            1,
+            priority=priority,
+            function_args=function_args,
+            function_kwargs=function_kwargs,
+        )
 
     def step(self):
         """get the next event from the event list and execute it.

@@ -102,7 +102,9 @@ class GrassPatch(CellAgent):
         self._fully_grown = value
 
         if not value:
-            self.model.simulator.schedule_event_relative(self.set_fully_grown, self.grass_regrowth_time)
+            self.model.simulator.schedule_event_relative(
+                self.set_fully_grown, self.grass_regrowth_time
+            )
 
     def __init__(self, unique_id, model, fully_grown, countdown, grass_regrowth_time):
         """
@@ -117,7 +119,9 @@ class GrassPatch(CellAgent):
         self.grass_regrowth_time = grass_regrowth_time
 
         if not self.fully_grown:
-            self.model.simulator.schedule_event_relative(self.set_fully_grown, countdown)
+            self.model.simulator.schedule_event_relative(
+                self.set_fully_grown, countdown
+            )
 
     def set_fully_grown(self):
         self.fully_grown = True
@@ -131,18 +135,18 @@ class WolfSheep(Model):
     """
 
     def __init__(
-            self,
-            simulator,
-            height,
-            width,
-            initial_sheep,
-            initial_wolves,
-            sheep_reproduce,
-            wolf_reproduce,
-            grass_regrowth_time,
-            wolf_gain_from_food=13,
-            sheep_gain_from_food=5,
-            seed=None,
+        self,
+        simulator,
+        height,
+        width,
+        initial_sheep,
+        initial_wolves,
+        sheep_reproduce,
+        wolf_reproduce,
+        grass_regrowth_time,
+        wolf_gain_from_food=13,
+        sheep_gain_from_food=5,
+        seed=None,
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
@@ -194,7 +198,11 @@ class WolfSheep(Model):
             )
             energy = self.random.randrange(2 * self.sheep_gain_from_food)
             sheep = Sheep(
-                self.next_id(), self, energy, self.sheep_reproduce, self.sheep_gain_from_food
+                self.next_id(),
+                self,
+                energy,
+                self.sheep_reproduce,
+                self.sheep_gain_from_food,
             )
             sheep.move_to(self.grid[pos])
 
@@ -206,7 +214,11 @@ class WolfSheep(Model):
             )
             energy = self.random.randrange(2 * self.wolf_gain_from_food)
             wolf = Wolf(
-                self.next_id(), self, energy, self.wolf_reproduce, self.wolf_gain_from_food
+                self.next_id(),
+                self,
+                energy,
+                self.wolf_reproduce,
+                self.wolf_gain_from_food,
             )
             wolf.move_to(self.grid[pos])
 
@@ -218,7 +230,9 @@ class WolfSheep(Model):
                 countdown = self.grass_regrowth_time
             else:
                 countdown = self.random.randrange(self.grass_regrowth_time)
-            patch = GrassPatch(self.next_id(), self, fully_grown, countdown, self.grass_regrowth_time)
+            patch = GrassPatch(
+                self.next_id(), self, fully_grown, countdown, self.grass_regrowth_time
+            )
             patch.move_to(cell)
 
     def step(self):
@@ -230,7 +244,17 @@ if __name__ == "__main__":
     import time
 
     simulator = ABMSimulator()
-    model = WolfSheep(simulator,25, 25, 60, 40, 0.2, 0.1, 20, seed=15,)
+    model = WolfSheep(
+        simulator,
+        25,
+        25,
+        60,
+        40,
+        0.2,
+        0.1,
+        20,
+        seed=15,
+    )
 
     simulator.setup(model)
 

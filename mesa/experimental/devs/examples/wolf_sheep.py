@@ -104,8 +104,9 @@ class GrassPatch(mesa.Agent):
         self._fully_grown = value
 
         if not value:
-            self.model.simulator.schedule_event_relative(self.set_fully_grown, self.grass_regrowth_time)
-
+            self.model.simulator.schedule_event_relative(
+                self.set_fully_grown, self.grass_regrowth_time
+            )
 
     def __init__(self, unique_id, model, fully_grown, countdown, grass_regrowth_time):
         """
@@ -120,11 +121,12 @@ class GrassPatch(mesa.Agent):
         self.grass_regrowth_time = grass_regrowth_time
 
         if not self.fully_grown:
-            self.model.simulator.schedule_event_relative(self.set_fully_grown, countdown )
+            self.model.simulator.schedule_event_relative(
+                self.set_fully_grown, countdown
+            )
 
     def set_fully_grown(self):
         self.fully_grown = True
-
 
 
 class WolfSheep(mesa.Model):
@@ -206,7 +208,12 @@ class WolfSheep(mesa.Model):
             )
             energy = self.random.randrange(2 * self.wolf_gain_from_food)
             wolf = Wolf(
-                self.next_id(), self, self.moore, energy, self.wolf_reproduce, self.wolf_gain_from_food
+                self.next_id(),
+                self,
+                self.moore,
+                energy,
+                self.wolf_reproduce,
+                self.wolf_gain_from_food,
             )
             self.grid.place_agent(wolf, pos)
 
@@ -218,7 +225,9 @@ class WolfSheep(mesa.Model):
                 countdown = self.grass_regrowth_time
             else:
                 countdown = self.random.randrange(self.grass_regrowth_time)
-            patch = GrassPatch(self.next_id(), self, fully_grown, countdown, self.grass_regrowth_time)
+            patch = GrassPatch(
+                self.next_id(), self, fully_grown, countdown, self.grass_regrowth_time
+            )
             self.grid.place_agent(patch, pos)
 
         self.simulator.schedule_event_relative(self.step, 1)
@@ -233,8 +242,7 @@ if __name__ == "__main__":
 
     simulator = ABMSimulator()
 
-    model = WolfSheep(25, 25, 60, 40, 0.2, 0.1, 20,
-                      simulator=simulator, seed=15)
+    model = WolfSheep(25, 25, 60, 40, 0.2, 0.1, 20, simulator=simulator, seed=15)
 
     simulator.setup(model)
 

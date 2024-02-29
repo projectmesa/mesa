@@ -45,7 +45,6 @@ class Citizen(EpsteinAgent):
             rebellion
     """
 
-
     def sent_to_jail(self, value):
         self.model.active_agents.remove(self)
         self.condition = AgentState.ARRESTED
@@ -56,16 +55,16 @@ class Citizen(EpsteinAgent):
         self.condition = AgentState.QUIESCENT
 
     def __init__(
-            self,
-            unique_id,
-            model,
-            vision,
-            movement,
-            hardship,
-            regime_legitimacy,
-            risk_aversion,
-            threshold,
-            arrest_prob_constant,
+        self,
+        unique_id,
+        model,
+        vision,
+        movement,
+        hardship,
+        regime_legitimacy,
+        risk_aversion,
+        threshold,
+        arrest_prob_constant,
     ):
         """
         Create a new Citizen.
@@ -127,10 +126,7 @@ class Citizen(EpsteinAgent):
         cops_in_vision = len([c for c in self.neighbors if isinstance(c, Cop)])
         actives_in_vision = 1.0  # citizen counts herself
         for c in self.neighbors:
-            if (
-                    isinstance(c, Citizen)
-                    and c.condition == AgentState.ACTIVE
-            ):
+            if isinstance(c, Citizen) and c.condition == AgentState.ACTIVE:
                 actives_in_vision += 1
         self.arrest_probability = 1 - math.exp(
             -1 * self.arrest_prob_constant * (cops_in_vision / actives_in_vision)
@@ -161,10 +157,7 @@ class Cop(EpsteinAgent):
         self.update_neighbors()
         active_neighbors = []
         for agent in self.neighbors:
-            if (
-                    isinstance(agent, Citizen)
-                    and agent.condition == "Active"
-            ):
+            if isinstance(agent, Citizen) and agent.condition == "Active":
                 active_neighbors.append(agent)
         if active_neighbors:
             arrestee = self.random.choice(active_neighbors)
@@ -213,20 +206,20 @@ class EpsteinCivilViolence(Model):
     """
 
     def __init__(
-            self,
-            width=40,
-            height=40,
-            citizen_density=0.7,
-            cop_density=0.074,
-            citizen_vision=7,
-            cop_vision=7,
-            legitimacy=0.8,
-            max_jail_term=1000,
-            active_threshold=0.1,
-            arrest_prob_constant=2.3,
-            movement=True,
-            max_iters=1000,
-            seed=None
+        self,
+        width=40,
+        height=40,
+        citizen_density=0.7,
+        cop_density=0.074,
+        citizen_vision=7,
+        cop_vision=7,
+        legitimacy=0.8,
+        max_jail_term=1000,
+        active_threshold=0.1,
+        arrest_prob_constant=2.3,
+        movement=True,
+        max_iters=1000,
+        seed=None,
     ):
         super().__init__(seed)
         if cop_density + citizen_density > 1:
@@ -252,7 +245,13 @@ class EpsteinCivilViolence(Model):
 
         for _, pos in self.grid.coord_iter():
             if self.random.random() < self.cop_density:
-                agent = Cop(self.next_id(), self, self.cop_vision, self.movement, self.max_jail_term)
+                agent = Cop(
+                    self.next_id(),
+                    self,
+                    self.cop_vision,
+                    self.movement,
+                    self.max_jail_term,
+                )
             elif self.random.random() < (self.cop_density + self.citizen_density):
                 agent = Citizen(
                     self.next_id(),
@@ -263,7 +262,7 @@ class EpsteinCivilViolence(Model):
                     regime_legitimacy=self.legitimacy,
                     risk_aversion=self.random.random(),
                     threshold=self.active_threshold,
-                    arrest_prob_constant=self.arrest_prob_constant
+                    arrest_prob_constant=self.arrest_prob_constant,
                 )
             else:
                 continue

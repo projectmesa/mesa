@@ -7,7 +7,7 @@ from weakref import WeakMethod, ref
 
 
 class InstanceCounterMeta(type):
-    """ Metaclass to make instance counter not share count with descendants
+    """Metaclass to make instance counter not share count with descendants
 
     TODO:: can also be used for agents.unique_id
     """
@@ -43,8 +43,14 @@ class SimulationEvent(metaclass=InstanceCounterMeta):
     def CANCELED(self) -> bool:
         return self._canceled
 
-    def __init__(self, time: int|float, function: Callable, priority: Priority = Priority.DEFAULT,
-                 function_args: list[Any] | None = None, function_kwargs: dict[str, Any] | None =None) -> None:
+    def __init__(
+        self,
+        time: int | float,
+        function: Callable,
+        priority: Priority = Priority.DEFAULT,
+        function_args: list[Any] | None = None,
+        function_kwargs: dict[str, Any] | None = None,
+    ) -> None:
         super().__init__()
         self.time = time
         self.priority = priority.value
