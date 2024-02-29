@@ -56,5 +56,10 @@ def _draw_grid(space, agent_portrayal):
         .properties(width=280, height=280)
         # .configure_view(strokeOpacity=0)  # hide grid/chart lines
     )
+    # This is the default value for the marker size, which auto-scales
+    # according to the grid area.
+    if not has_size:
+        length = min(space.width, space.height)
+        chart = chart.mark_point(size=30000 / length**2, filled=True)
 
     return chart
