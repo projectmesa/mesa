@@ -1,9 +1,9 @@
 import itertools
 from enum import IntEnum
 from heapq import heapify, heappop, heappush
-from weakref import ref, WeakMethod
-
 from types import MethodType
+from typing import Any, Callable
+from weakref import WeakMethod, ref
 
 
 class InstanceCounterMeta(type):
@@ -26,10 +26,13 @@ class Priority(IntEnum):
 class SimulationEvent(metaclass=InstanceCounterMeta):
     """A simulation event
 
+    the callable is wrapped using weakrefs, so there is no need to explicitly cancel event if e.g., an agent
+    is removed from the simulation.
+
     Attributes:
         time (float): The simulation time of the event
+        function  (Callable): The function to execute for this event
         priority (Priority): The priority of the event
-        fn  (Callable): The function to execute for this event
         unique_id (int) the unique identifier of the event
         function_args (list[Any]): Argument for the function
         function_kwargs (Dict[str, Any]): Keyword arguments for the function
@@ -40,17 +43,12 @@ class SimulationEvent(metaclass=InstanceCounterMeta):
     def CANCELED(self) -> bool:
         return self._canceled
 
-    @CANCELED.setter
-    def CANCELED(self, bool: bool) -> None:
-        self._canceled = bool
-        self.fn = None
-        self.function_args = []
-        self.function_kwargs = {}
-
-    def __init__(self, time, function, priority: Priority = Priority.DEFAULT, function_args=None, function_kwargs=None):
+    def __init__(self, time: int|float, function: Callable, priority: Priority = Priority.DEFAULT,
+                 function_args: list[Any] | None = None, function_kwargs: dict[str, Any] | None =None) -> None:
         super().__init__()
         self.time = time
         self.priority = priority.value
+        self._canceled = False
 
         if isinstance(function, MethodType):
             function = WeakMethod(function)
@@ -66,9 +64,17 @@ class SimulationEvent(metaclass=InstanceCounterMeta):
             raise Exception()
 
     def execute(self):
+        """execute this event"""
         fn = self.fn()
         if fn is not None:
             fn(*self.function_args, **self.function_kwargs)
+
+    def cancel(self) -> None:
+        """cancel this event"""
+        self._canceled = True
+        self.fn = None
+        self.function_args = []
+        self.function_kwargs = {}
 
     def __cmp__(self, other):
         if self.time < other.time:
@@ -90,7 +96,7 @@ class SimulationEvent(metaclass=InstanceCounterMeta):
         # exact same event
         return 0
 
-    def to_tuple(self):
+    def _to_tuple(self):
         return self.time, self.priority, self.unique_id, self
 
 
@@ -115,7 +121,7 @@ class EventList:
 
         """
 
-        heappush(self._event_list, event.to_tuple())
+        heappush(self._event_list, event._to_tuple())
 
     def peek_ahead(self, n: int = 1) -> list[SimulationEvent]:
         """Look at the first n non-canceled event in the event list
@@ -148,23 +154,21 @@ class EventList:
         return peek
 
     def pop(self) -> SimulationEvent:
-        """pop the first element from the event list
-
-        """
+        """pop the first element from the event list"""
 
         try:
             while True:
                 sim_event = heappop(self._event_list)[3]
                 if not sim_event.CANCELED:
                     return sim_event
-        except IndexError:
-            raise Exception("event list is empty")
+        except IndexError as e:
+            raise Exception("event list is empty") from e
 
     def is_empty(self) -> bool:
         return len(self) == 0
 
     def __contains__(self, event: SimulationEvent) -> bool:
-        return event.to_tuple() in self._event_list
+        return event._to_tuple() in self._event_list
 
     def __len__(self) -> int:
         return len(self._event_list)
@@ -175,7 +179,7 @@ class EventList:
         # heap structure invariant. So, we use a form of lazy deletion.
         # SimEvents have a CANCELED flag that we set to True, while poping and peak_ahead
         # silently ignore canceled events
-        event.CANCELED = True
+        event.cancel()
 
     def clear(self):
         self._event_list.clear()

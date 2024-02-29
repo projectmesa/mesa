@@ -1,8 +1,7 @@
-from typing import List, Any, Dict, Callable
-
-from .eventlist import EventList, SimulationEvent, Priority
-
 import numbers
+from typing import Any, Callable
+
+from .eventlist import EventList, Priority, SimulationEvent
 
 
 class Simulator:
@@ -55,7 +54,7 @@ class Simulator:
         self.model = None
 
     def run(self, time_delta: int | float):
-        """run the simulator for time delta
+        """run the simulator for the specified time delta
 
         Args:
             time_delta (float| int): The time delta. The simulator is run from the current time to the current time
@@ -73,8 +72,8 @@ class Simulator:
         event.execute()
 
     def schedule_event_now(self, function: Callable, priority: Priority = Priority.DEFAULT,
-                           function_args: List[Any] | None = None,
-                           function_kwargs: Dict[str, Any] | None = None) -> SimulationEvent:
+                           function_args: list[Any] | None = None,
+                           function_kwargs: dict[str, Any] | None = None) -> SimulationEvent:
         """Schedule event for the current time instant
 
         Args:
@@ -97,8 +96,8 @@ class Simulator:
                                 function: Callable,
                                 time: int | float,
                                 priority: Priority = Priority.DEFAULT,
-                                function_args: List[Any] | None = None,
-                                function_kwargs: Dict[str, Any] | None = None) -> SimulationEvent:
+                                function_args: list[Any] | None = None,
+                                function_kwargs: dict[str, Any] | None = None) -> SimulationEvent:
         """Schedule event for the specified time instant
 
         Args:
@@ -112,6 +111,9 @@ class Simulator:
             SimulationEvent: the simulation event that is scheduled
 
         """
+        if self.time > time:
+            raise ValueError("trying to schedule an event in the past")
+
         event = SimulationEvent(time, function, priority=priority, function_args=function_args,
                                 function_kwargs=function_kwargs)
         self._schedule_event(event)
@@ -120,8 +122,8 @@ class Simulator:
     def schedule_event_relative(self, function: Callable,
                                 time_delta: int | float,
                                 priority: Priority = Priority.DEFAULT,
-                                function_args: List[Any] | None = None,
-                                function_kwargs: Dict[str, Any] | None = None) -> SimulationEvent:
+                                function_args: list[Any] | None = None,
+                                function_kwargs: dict[str, Any] | None = None) -> SimulationEvent:
         """Schedule event for the current time plus the time delta
 
         Args:
@@ -163,7 +165,7 @@ class ABMSimulator(Simulator):
 
     The basic time unit of this simulator is an integer. It schedules `model.step` for each tick with the
     highest priority. This implies that by default, `model.step` is the first event executed at a specific tick.
-    In addition, discrete event scheduling, using integers as the time unit is fully supported, paving the way
+    In addition, discrete event scheduling, using integer as the time unit is fully supported, paving the way
     for hybrid ABM-DEVS simulations.
 
     """
@@ -186,8 +188,8 @@ class ABMSimulator(Simulator):
     def schedule_event_next_tick(self,
                                  function: Callable,
                                  priority: Priority = Priority.DEFAULT,
-                                 function_args: List[Any] | None = None,
-                                 function_kwargs: Dict[str, Any] | None = None) -> SimulationEvent:
+                                 function_args: list[Any] | None = None,
+                                 function_kwargs: dict[str, Any] | None = None) -> SimulationEvent:
         """Schedule a SimulationEvent for the next tick
 
         Args
@@ -221,6 +223,11 @@ class ABMSimulator(Simulator):
 
 
 class DEVSimulator(Simulator):
+    """A simulator where the unit of time is a float. Can be used for full-blown discrete event simulating using
+    event scheduling.
+
+    """
+
     def __init__(self):
         super().__init__(float, 0.0)
 

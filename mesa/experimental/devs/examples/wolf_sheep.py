@@ -96,14 +96,14 @@ class GrassPatch(mesa.Agent):
     """
 
     @property
-    def fully_grown(self):
+    def fully_grown(self) -> bool:
         return self._fully_grown
 
     @fully_grown.setter
-    def fully_grown(self, value):
+    def fully_grown(self, value: bool):
         self._fully_grown = value
 
-        if value == False:
+        if not value:
             self.model.simulator.schedule_event_relative(self.set_fully_grown, self.grass_regrowth_time)
 
 

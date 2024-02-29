@@ -13,7 +13,7 @@ import math
 
 from mesa import Model
 from mesa.experimental.cell_space import CellAgent, OrthogonalVonNeumannGrid
-from mesa.time import RandomActivationByType
+from mesa.experimental.devs import ABMSimulator
 
 
 class Animal(CellAgent):
@@ -36,7 +36,6 @@ class Animal(CellAgent):
             self.energy_from_food,
         )
         offspring.move_to(self.cell)
-        self.model.schedule.add(offspring)
 
     def feed(self):
         ...
@@ -94,26 +93,34 @@ class GrassPatch(CellAgent):
     A patch of grass that grows at a fixed rate and it is eaten by sheep
     """
 
-    def __init__(self, unique_id, model, fully_grown, countdown):
+    @property
+    def fully_grown(self):
+        return self._fully_grown
+
+    @fully_grown.setter
+    def fully_grown(self, value: bool) -> None:
+        self._fully_grown = value
+
+        if not value:
+            self.model.simulator.schedule_event_relative(self.set_fully_grown, self.grass_regrowth_time)
+
+    def __init__(self, unique_id, model, fully_grown, countdown, grass_regrowth_time):
         """
         Creates a new patch of grass
 
         Args:
-            fully_grown: (boolean) Whether the patch of grass is fully grown or not
+            grown: (boolean) Whether the patch of grass is fully grown or not
             countdown: Time for the patch of grass to be fully grown again
         """
         super().__init__(unique_id, model)
-        self.fully_grown = fully_grown
-        self.countdown = countdown
+        self._fully_grown = fully_grown
+        self.grass_regrowth_time = grass_regrowth_time
 
-    def step(self):
         if not self.fully_grown:
-            if self.countdown <= 0:
-                # Set as fully grown
-                self.fully_grown = True
-                self.countdown = self.model.grass_regrowth_time
-            else:
-                self.countdown -= 1
+            self.model.simulator.schedule_event_relative(self.set_fully_grown, countdown)
+
+    def set_fully_grown(self):
+        self.fully_grown = True
 
 
 class WolfSheep(Model):
@@ -124,22 +131,24 @@ class WolfSheep(Model):
     """
 
     def __init__(
-        self,
-        height,
-        width,
-        initial_sheep,
-        initial_wolves,
-        sheep_reproduce,
-        wolf_reproduce,
-        grass_regrowth_time,
-        wolf_gain_from_food=13,
-        sheep_gain_from_food=5,
-        seed=None,
+            self,
+            simulator,
+            height,
+            width,
+            initial_sheep,
+            initial_wolves,
+            sheep_reproduce,
+            wolf_reproduce,
+            grass_regrowth_time,
+            wolf_gain_from_food=13,
+            sheep_gain_from_food=5,
+            seed=None,
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
 
         Args:
+            simulator: ABMSimulator instance
             initial_sheep: Number of sheep to start with
             initial_wolves: Number of wolves to start with
             sheep_reproduce: Probability of each sheep reproducing each step
@@ -149,18 +158,27 @@ class WolfSheep(Model):
             grass_regrowth_time: How long it takes for a grass patch to regrow
                                  once it is eaten
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
-            moore:
-            seed
+            seed : the random seed
         """
         super().__init__(seed=seed)
         # Set parameters
         self.height = height
         self.width = width
+        self.simulator = simulator
+
         self.initial_sheep = initial_sheep
         self.initial_wolves = initial_wolves
         self.grass_regrowth_time = grass_regrowth_time
 
-        self.schedule = RandomActivationByType(self)
+        self.sheep_reproduce = sheep_reproduce
+        self.wolf_reproduce = wolf_reproduce
+        self.grass_regrowth_time = grass_regrowth_time
+        self.wolf_gain_from_food = wolf_gain_from_food
+        self.sheep_gain_from_food = sheep_gain_from_food
+
+        self.grid = None
+
+    def setup(self):
         self.grid = OrthogonalVonNeumannGrid(
             [self.height, self.width],
             torus=False,
@@ -174,12 +192,11 @@ class WolfSheep(Model):
                 self.random.randrange(self.width),
                 self.random.randrange(self.height),
             )
-            energy = self.random.randrange(2 * sheep_gain_from_food)
+            energy = self.random.randrange(2 * self.sheep_gain_from_food)
             sheep = Sheep(
-                self.next_id(), self, energy, sheep_reproduce, sheep_gain_from_food
+                self.next_id(), self, energy, self.sheep_reproduce, self.sheep_gain_from_food
             )
             sheep.move_to(self.grid[pos])
-            self.schedule.add(sheep)
 
         # Create wolves
         for _ in range(self.initial_wolves):
@@ -187,12 +204,11 @@ class WolfSheep(Model):
                 self.random.randrange(self.width),
                 self.random.randrange(self.height),
             )
-            energy = self.random.randrange(2 * wolf_gain_from_food)
+            energy = self.random.randrange(2 * self.wolf_gain_from_food)
             wolf = Wolf(
-                self.next_id(), self, energy, wolf_reproduce, wolf_gain_from_food
+                self.next_id(), self, energy, self.wolf_reproduce, self.wolf_gain_from_food
             )
             wolf.move_to(self.grid[pos])
-            self.schedule.add(wolf)
 
         # Create grass patches
         possibly_fully_grown = [True, False]
@@ -202,20 +218,22 @@ class WolfSheep(Model):
                 countdown = self.grass_regrowth_time
             else:
                 countdown = self.random.randrange(self.grass_regrowth_time)
-            patch = GrassPatch(self.next_id(), self, fully_grown, countdown)
+            patch = GrassPatch(self.next_id(), self, fully_grown, countdown, self.grass_regrowth_time)
             patch.move_to(cell)
-            self.schedule.add(patch)
 
     def step(self):
-        self.schedule.step()
+        self.get_agents_of_type(Sheep).shuffle(inplace=True).do("step")
+        self.get_agents_of_type(Wolf).shuffle(inplace=True).do("step")
 
 
 if __name__ == "__main__":
     import time
 
-    model = WolfSheep(25, 25, 60, 40, 0.2, 0.1, 20, seed=15)
+    simulator = ABMSimulator()
+    model = WolfSheep(simulator,25, 25, 60, 40, 0.2, 0.1, 20, seed=15,)
+
+    simulator.setup(model)
 
     start_time = time.perf_counter()
-    for _ in range(100):
-        model.step()
+    simulator.run(100)
     print("Time:", time.perf_counter() - start_time)

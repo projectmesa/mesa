@@ -1,6 +1,5 @@
-from simulator import ABMSimulator, DEVSimulator
-from eventlist import SimulationEvent, Priority
-
+from .eventlist import Priority, SimulationEvent
+from .simulator import ABMSimulator, DEVSimulator
 
 __all__ = ["ABMSimulator",
            "DEVSimulator",
