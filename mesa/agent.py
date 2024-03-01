@@ -249,27 +249,36 @@ class AgentSet(MutableSet, Sequence):
 
         return res if return_results else self
 
-    def get(self, attr_names: str | list[str]) -> list[Any]:
+    def get(self, attr_names: str | list[str], handle_undefined: bool = True, fallback_value=None) -> list[Any]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
-
+        
         Args:
             attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
+            handle_undefined (bool, optional): If False, use fallback_value for undefined attributes. Defaults to True.
+            fallback_value (Any, optional): The value to return if the attribute is not found and handle_undefined is False.
 
         Returns:
             list[Any]: A list with the attribute value for each agent in the set if attr_names is a str
             list[list[Any]]: A list with a list of attribute values for each agent in the set if attr_names is a list of str
 
         Raises:
-            AttributeError if an agent does not have the specified attribute(s)
+            AttributeError if an agent does not have the specified attribute(s) and handle_undefined is True
 
         """
+        def get_attr(agent, attr_name):
+            try:
+                return getattr(agent, attr_name)
+            except AttributeError:
+                if not handle_undefined:
+                    return fallback_value
+                raise
 
         if isinstance(attr_names, str):
-            return [getattr(agent, attr_names) for agent in self._agents]
+            return [get_attr(agent, attr_names) for agent in self._agents]
         else:
             return [
-                [getattr(agent, attr_name) for attr_name in attr_names]
+                [get_attr(agent, attr_name) for attr_name in attr_names]
                 for agent in self._agents
             ]
 
