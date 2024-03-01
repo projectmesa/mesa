@@ -249,10 +249,15 @@ class AgentSet(MutableSet, Sequence):
 
         return res if return_results else self
 
-    def get(self, attr_names: str | list[str], handle_undefined: bool = True, fallback_value=None) -> list[Any]:
+    def get(
+        self,
+        attr_names: str | list[str],
+        handle_undefined: bool = True,
+        fallback_value=None,
+    ) -> list[Any]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
-        
+
         Args:
             attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
             handle_undefined (bool, optional): If False, use fallback_value for undefined attributes. Defaults to True.
@@ -266,6 +271,7 @@ class AgentSet(MutableSet, Sequence):
             AttributeError if an agent does not have the specified attribute(s) and handle_undefined is True
 
         """
+
         def get_attr(agent, attr_name):
             try:
                 return getattr(agent, attr_name)
