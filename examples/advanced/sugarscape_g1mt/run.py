@@ -64,11 +64,10 @@ def assess_results(results, single_agent):
 
 args = sys.argv[1:]
 
-
-if args[0] == "runserver":
+if len(args) == 0:
     server.launch()
 
-elif "s" in args[0] or "Single" in args[0]:
+elif args[0] == "-s":
     print("Running Single Model")
     # instantiate the model
     model = SugarscapeG1mt()
@@ -83,7 +82,7 @@ elif "s" in args[0] or "Single" in args[0]:
     # assess the results
     assess_results(model_results, agent_results)
 
-else:
+elif args[0] == "-b":
     print("Conducting a Batch Run")
     # Batch Run
     params = {
@@ -103,3 +102,6 @@ else:
     )
 
     assess_results(results_batch, None)
+
+else:
+    raise Exception("Option not found")
