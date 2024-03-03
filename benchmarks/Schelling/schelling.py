@@ -70,7 +70,6 @@ class Schelling(Model):
         self.homophily = homophily
         self.happy = 0
 
-
     def setup(self):
         self.schedule = RandomActivation(self)
         self.grid = OrthogonalMooreGrid(

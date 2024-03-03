@@ -136,7 +136,11 @@ class BoidFlockers(mesa.Model):
     def setup(self):
         self.schedule = mesa.time.RandomActivation(self)
         self.space = mesa.space.ContinuousSpace(self.width, self.height, True)
-        self.factors = {"cohere": self.cohere, "separate": self.separate, "match": self.match}
+        self.factors = {
+            "cohere": self.cohere,
+            "separate": self.separate,
+            "match": self.match,
+        }
 
         for i in range(self.population):
             x = self.random.random() * self.space.x_max
