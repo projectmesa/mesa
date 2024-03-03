@@ -251,10 +251,15 @@ class AgentSet(MutableSet, Sequence):
 
     sentinel = object()
 
-    def get(self, attr_names: str | list[str], error_when_undefined: bool = True, fallback_value=sentinel) -> list[Any]:
+    def get(
+        self,
+        attr_names: str | list[str],
+        error_when_undefined: bool = True,
+        fallback_value=sentinel,
+    ) -> list[Any]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
-        
+
         Args:
             attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
             error_when_undefined (bool, optional): If True, raise an error for undefined attributes. Defaults to True.
@@ -267,6 +272,7 @@ class AgentSet(MutableSet, Sequence):
         Raises:
             AttributeError if an agent does not have the specified attribute(s) and fallback_value is the sentinel object.
         """
+
         def get_attr(agent, attr_name):
             try:
                 return getattr(agent, attr_name)
