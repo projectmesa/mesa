@@ -108,11 +108,15 @@ class GrassPatch(CellAgent):
 
     def __init__(self, unique_id, model, fully_grown, countdown, grass_regrowth_time):
         """
+        TODO:: fully grown can just be an int --> so one less param (i.e. countdown)
+
         Creates a new patch of grass
 
         Args:
-            grown: (boolean) Whether the patch of grass is fully grown or not
+            fully_grown: (boolean) Whether the patch of grass is fully grown or not
             countdown: Time for the patch of grass to be fully grown again
+            grass_regrowth_time : time to fully regrow grass
+            countdown : Time for the patch of grass to be fully regrown if fully grown is False
         """
         super().__init__(unique_id, model)
         self._fully_grown = fully_grown

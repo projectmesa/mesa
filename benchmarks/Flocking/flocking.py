@@ -124,15 +124,20 @@ class BoidFlockers(mesa.Model):
         self.vision = vision
         self.speed = speed
         self.separation = separation
-        self.schedule = mesa.time.RandomActivation(self)
-        self.space = mesa.space.ContinuousSpace(width, height, True)
-        self.factors = {"cohere": cohere, "separate": separate, "match": match}
-        self.make_agents()
+        self.schedule = None
+        self.space = None
+        self.width = width
+        self.height = height
+        self.speed = speed
+        self.cohere = cohere
+        self.separate = separate
+        self.match = match
 
-    def make_agents(self):
-        """
-        Create self.population agents, with random positions and starting directions.
-        """
+    def setup(self):
+        self.schedule = mesa.time.RandomActivation(self)
+        self.space = mesa.space.ContinuousSpace(self.width, self.height, True)
+        self.factors = {"cohere": self.cohere, "separate": self.separate, "match": self.match}
+
         for i in range(self.population):
             x = self.random.random() * self.space.x_max
             y = self.random.random() * self.space.y_max

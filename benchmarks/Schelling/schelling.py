@@ -66,16 +66,19 @@ class Schelling(Model):
         self.width = width
         self.density = density
         self.minority_pc = minority_pc
+        self.radius = radius
+        self.homophily = homophily
+        self.happy = 0
 
+
+    def setup(self):
         self.schedule = RandomActivation(self)
         self.grid = OrthogonalMooreGrid(
-            [height, width],
+            [self.height, self.width],
             torus=True,
             capacity=1,
             random=self.random,
         )
-
-        self.happy = 0
 
         # Set up agents
         # We use a grid iterator that returns
@@ -85,7 +88,7 @@ class Schelling(Model):
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(
-                    self.next_id(), self, agent_type, radius, homophily
+                    self.next_id(), self, agent_type, self.radius, self.homophily
                 )
                 agent.move_to(cell)
                 self.schedule.add(agent)
