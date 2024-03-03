@@ -105,7 +105,7 @@ class BoidFlockers(mesa.Model):
         cohere=0.03,
         separate=0.015,
         match=0.05,
-        simulator=None
+        simulator=None,
     ):
         """
         Create a new Flockers model.

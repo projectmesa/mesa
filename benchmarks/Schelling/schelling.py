@@ -70,7 +70,7 @@ class Schelling(Model):
         self.radius = radius
         self.homophily = homophily
         self.happy = 0
-        self.simulator=simulator
+        self.simulator = simulator
 
     def setup(self):
         self.schedule = RandomActivation(self)
