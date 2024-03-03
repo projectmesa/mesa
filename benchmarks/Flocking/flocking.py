@@ -105,6 +105,7 @@ class BoidFlockers(mesa.Model):
         cohere=0.03,
         separate=0.015,
         match=0.05,
+        simulator=None
     ):
         """
         Create a new Flockers model.
@@ -132,6 +133,7 @@ class BoidFlockers(mesa.Model):
         self.cohere = cohere
         self.separate = separate
         self.match = match
+        self.simulator = simulator
 
     def setup(self):
         self.schedule = mesa.time.RandomActivation(self)

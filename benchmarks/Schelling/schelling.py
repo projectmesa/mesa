@@ -49,6 +49,7 @@ class Schelling(Model):
         density=0.8,
         minority_pc=0.5,
         seed=None,
+        simulator=None,
     ):
         """
         Create a new Schelling model.
@@ -69,6 +70,7 @@ class Schelling(Model):
         self.radius = radius
         self.homophily = homophily
         self.happy = 0
+        self.simulator=simulator
 
     def setup(self):
         self.schedule = RandomActivation(self)

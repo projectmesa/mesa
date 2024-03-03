@@ -247,6 +247,6 @@ if __name__ == "__main__":
     simulator.setup(model)
 
     start_time = time.perf_counter()
-    simulator.run(until=100)
+    simulator.run(100)
     print(simulator.time)
     print("Time:", time.perf_counter() - start_time)
