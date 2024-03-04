@@ -5,8 +5,8 @@ from itertools import product
 from random import Random
 from typing import Generic, TypeVar
 
-from mesa.space import PropertyLayer
 from mesa.experimental.cell_space import Cell, DiscreteSpace
+from mesa.space import PropertyLayer
 
 T = TypeVar("T", bound=Cell)
 
@@ -90,8 +90,7 @@ class Grid(DiscreteSpace, Generic[T]):
         for d_coord in offsets:
             n_coord = tuple(c + dc for c, dc in zip(coord, d_coord))
             if self.torus:
-                n_coord = tuple(nc % d for nc, d in zip(
-                    n_coord, self.dimensions))
+                n_coord = tuple(nc % d for nc, d in zip(n_coord, self.dimensions))
             if all(0 <= nc < d for nc, d in zip(n_coord, self.dimensions)):
                 cell.connect(self._cells[n_coord])
 
@@ -140,8 +139,13 @@ class _PropertyGrid(Grid, Generic[T]):
         cell_klass: type[T] = Cell,
         property_layers: None | PropertyLayer | list[PropertyLayer] = None,
     ) -> None:
-        super().__init__(dimensions=dimensions, torus=torus,
-                         capacity=capacity, random=random, cell_klass=cell_klass)
+        super().__init__(
+            dimensions=dimensions,
+            torus=torus,
+            capacity=capacity,
+            random=random,
+            cell_klass=cell_klass,
+        )
 
         self.properties = {}
 
@@ -166,9 +170,11 @@ class _PropertyGrid(Grid, Generic[T]):
             ValueError: If the dimensions of the property layer do not match the grid's dimensions.
         """
         if property_layer.name in self.properties:
-            raise ValueError(
-                f"Property layer {property_layer.name} already exists.")
-        if property_layer.width != self.dimensions[0] or property_layer.height != self.dimensions[1]:
+            raise ValueError(f"Property layer {property_layer.name} already exists.")
+        if (
+            property_layer.width != self.dimensions[0]
+            or property_layer.height != self.dimensions[1]
+        ):
             raise ValueError(
                 f"Property layer dimensions {property_layer.width}x{property_layer.height} do not match grid dimensions {self.dimensions[0]}x{self.dimensions[1]}."
             )
