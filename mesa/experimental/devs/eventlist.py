@@ -56,10 +56,10 @@ class SimulationEvent(metaclass=InstanceCounterMeta):
         self.priority = priority.value
         self._canceled = False
 
-        if isinstance(function, MethodType):
-            function = WeakMethod(function)
-        else:
-            function = ref(function)
+        # if isinstance(function, MethodType):
+        #     function = WeakMethod(function)
+        # else:
+        #     function = ref(function)
 
         self.fn = function
         self.unique_id = next(self._ids)

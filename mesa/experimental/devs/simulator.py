@@ -29,8 +29,7 @@ class Simulator:
         self.time_unit = time_unit
         self.model = None
 
-    def check_time_unit(self, time: int | float) -> bool:
-        ...
+    def check_time_unit(self, time: int | float) -> bool: ...
 
     def setup(self, model: "Model") -> None:
         """Setup the model to simulate
@@ -245,11 +244,11 @@ class ABMSimulator(Simulator):
 
         """
         event = self.event_list.pop()
+        self.time = event.time
 
-        if event.fn() == self.model.step:
+        if event.fn == self.model.step:
             self.schedule_event_next_tick(self.model.step, priority=Priority.HIGH)
 
-        self.time = event.time
         event.execute()
 
 
