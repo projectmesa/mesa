@@ -5,6 +5,7 @@ from itertools import product
 from random import Random
 from typing import Generic, TypeVar
 
+from mesa.space import PropertyLayer
 from mesa.experimental.cell_space import Cell, DiscreteSpace
 
 T = TypeVar("T", bound=Cell)
@@ -89,7 +90,8 @@ class Grid(DiscreteSpace, Generic[T]):
         for d_coord in offsets:
             n_coord = tuple(c + dc for c, dc in zip(coord, d_coord))
             if self.torus:
-                n_coord = tuple(nc % d for nc, d in zip(n_coord, self.dimensions))
+                n_coord = tuple(nc % d for nc, d in zip(
+                    n_coord, self.dimensions))
             if all(0 <= nc < d for nc, d in zip(n_coord, self.dimensions)):
                 cell.connect(self._cells[n_coord])
 
@@ -105,7 +107,96 @@ class Grid(DiscreteSpace, Generic[T]):
                 cell.connect(self._cells[ni, nj])
 
 
-class OrthogonalMooreGrid(Grid[T]):
+class _PropertyGrid(Grid, Generic[T]):
+    """
+    A private subclass of Grid that supports the addition of property layers, enabling
+    the representation and manipulation of additional data layers on the grid. This class is
+    intended for internal use within the Mesa framework.
+
+    The `_PropertyGrid` extends the capabilities of a basic grid by allowing each cell
+    to have multiple properties, each represented by a separate PropertyLayer.
+    These properties can be used to model complex environments where each cell
+    has multiple attributes or states.
+
+    Attributes:
+        properties (dict): A dictionary mapping property layer names to PropertyLayer instances.
+
+    Methods:
+        add_property_layer(property_layer): Adds a new property layer to the grid.
+        remove_property_layer(property_name): Removes a property layer from the grid by its name.
+        select_random_empty_cell(self): Returns an empty random cell instance from the grid.
+
+
+    Note:
+        This class is not intended for direct use in user models but is currently used by the OrthogonalMooreGrid and OrthogonalVonNeumannGrid.
+    """
+
+    def __init__(
+        self,
+        dimensions: Sequence[int],
+        torus: bool = False,
+        capacity: float | None = None,
+        random: Random | None = None,
+        cell_klass: type[T] = Cell,
+        property_layers: None | PropertyLayer | list[PropertyLayer] = None,
+    ) -> None:
+        super().__init__(dimensions=dimensions, torus=torus,
+                         capacity=capacity, random=random, cell_klass=cell_klass)
+
+        self.properties = {}
+
+        # Handle both single PropertyLayer instance and list of PropertyLayer instances
+        if property_layers:
+            # If a single PropertyLayer is passed, convert it to a list
+            if isinstance(property_layers, PropertyLayer):
+                property_layers = [property_layers]
+
+            for layer in property_layers:
+                self.add_property_layer(layer)
+
+    def add_property_layer(self, property_layer: PropertyLayer):
+        """
+        Adds a new property layer to the grid.
+
+        Args:
+            property_layer (PropertyLayer): The PropertyLayer instance to be added to the grid.
+
+        Raises:
+            ValueError: If a property layer with the same name already exists in the grid.
+            ValueError: If the dimensions of the property layer do not match the grid's dimensions.
+        """
+        if property_layer.name in self.properties:
+            raise ValueError(
+                f"Property layer {property_layer.name} already exists.")
+        if property_layer.width != self.dimensions[0] or property_layer.height != self.dimensions[1]:
+            raise ValueError(
+                f"Property layer dimensions {property_layer.width}x{property_layer.height} do not match grid dimensions {self.dimensions[0]}x{self.dimensions[1]}."
+            )
+        self.properties[property_layer.name] = property_layer
+
+    def remove_property_layer(self, property_name: str):
+        """
+        Removes a property layer from the grid by its name.
+
+        Args:
+            property_name (str): The name of the property layer to be removed.
+
+        Raises:
+            ValueError: If a property layer with the given name does not exist in the grid.
+        """
+        if property_name not in self.properties:
+            raise ValueError(f"Property layer {property_name} does not exist.")
+        del self.properties[property_name]
+
+    def select_random_empty_cell(self) -> T:
+        """select random empty cell and add the property to the cell"""
+        cell = super().select_random_empty_cell()
+        for property in self.properties:
+            cell.properties[property] = self.properties[property].data[cell.coordinate]
+        return cell
+
+
+class OrthogonalMooreGrid(_PropertyGrid[T]):
     """Grid where cells are connected to their 8 neighbors.
 
     Example for two dimensions:
@@ -137,7 +228,7 @@ class OrthogonalMooreGrid(Grid[T]):
             self._connect_single_cell_nd(cell, offsets)
 
 
-class OrthogonalVonNeumannGrid(Grid[T]):
+class OrthogonalVonNeumannGrid(_PropertyGrid[T]):
     """Grid where cells are connected to their 4 neighbors.
 
     Example for two dimensions:
