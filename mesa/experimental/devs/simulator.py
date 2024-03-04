@@ -67,7 +67,7 @@ class Simulator:
             self.step()
 
     def step(self):
-        event = self.event_list.pop()
+        event = self.event_list.pop_event()
         self.time = event.time
         event.execute()
 
@@ -244,10 +244,9 @@ class ABMSimulator(Simulator):
             incremental time progression.
 
         """
-        event = self.event_list.pop()
+        event = self.event_list.pop_event()
         self.time = event.time
-
-        if event.fn == self.model.step:
+        if event.fn() == self.model.step:
             self.schedule_event_next_tick(self.model.step, priority=Priority.HIGH)
 
         event.execute()

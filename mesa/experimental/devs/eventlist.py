@@ -4,24 +4,13 @@ from heapq import heapify, heappop, heappush
 from typing import Any, Callable
 
 
-class InstanceCounterMeta(type):
-    """Metaclass to make instance counter not share count with descendants
-
-    TODO:: can also be used for agents.unique_id
-    """
-
-    def __init__(cls, name, bases, attrs):
-        super().__init__(name, bases, attrs)
-        cls._ids = itertools.count(1)
-
-
 class Priority(IntEnum):
     LOW = 10
     DEFAULT = 5
     HIGH = 1
 
 
-class SimulationEvent(metaclass=InstanceCounterMeta):
+class SimulationEvent:
     """A simulation event
 
     the callable is wrapped using weakrefs, so there is no need to explicitly cancel event if e.g., an agent
@@ -36,6 +25,8 @@ class SimulationEvent(metaclass=InstanceCounterMeta):
         function_kwargs (Dict[str, Any]): Keyword arguments for the function
 
     """
+
+    _ids = itertools.count(1)
 
     @property
     def CANCELED(self) -> bool:
@@ -54,10 +45,10 @@ class SimulationEvent(metaclass=InstanceCounterMeta):
         self.priority = priority.value
         self._canceled = False
 
-        # if isinstance(function, MethodType):
-        #     function = WeakMethod(function)
-        # else:
-        #     function = ref(function)
+        if isinstance(function, MethodType):
+            function = WeakMethod(function)
+        else:
+            function = ref(function)
 
         self.fn = function
         self.unique_id = next(self._ids)
@@ -80,28 +71,13 @@ class SimulationEvent(metaclass=InstanceCounterMeta):
         self.function_args = []
         self.function_kwargs = {}
 
-    def __cmp__(self, other):
-        if self.time < other.time:
-            return -1
-        if self.time > other.time:
-            return 1
-
-        if self.priority > other.priority:
-            return -1
-        if self.priority < other.priority:
-            return 1
-
-        if self.unique_id < other.unique_id:
-            return -1
-        if self.unique_id > other.unique_id:
-            return 1
-
-        # theoretically this should be impossible unless it is the
-        # exact same event
-        return 0
-
-    def _to_tuple(self):
-        return self.time, self.priority, self.unique_id, self
+    def __lt__(self, other):
+        # Define a total ordering for events to be used by the heapq
+        return (self.time, self.priority, self.unique_id) < (
+            other.time,
+            other.priority,
+            other.unique_id,
+        )
 
 
 class EventList:
@@ -113,9 +89,8 @@ class EventList:
     """
 
     def __init__(self):
-        super().__init__()
-        self._event_list: list[tuple] = []
-        heapify(self._event_list)
+        self._events: list[SimulationEvent] = []
+        heapify(self._events)
 
     def add_event(self, event: SimulationEvent):
         """Add the event to the event list
@@ -125,7 +100,7 @@ class EventList:
 
         """
 
-        heappush(self._event_list, event._to_tuple())
+        heappush(self._events, event)
 
     def peek_ahead(self, n: int = 1) -> list[SimulationEvent]:
         """Look at the first n non-canceled event in the event list
@@ -149,33 +124,29 @@ class EventList:
             raise IndexError("event list is empty")
 
         peek: list[SimulationEvent] = []
-        for entry in self._event_list:
-            sim_event: SimulationEvent = entry[3]
-            if not sim_event.CANCELED:
-                peek.append(sim_event)
+        for event in self._events:
+            if not event.CANCELED:
+                peek.append(event)
             if len(peek) >= n:
                 return peek
         return peek
 
-    def pop(self) -> SimulationEvent:
+    def pop_event(self) -> SimulationEvent:
         """pop the first element from the event list"""
-
-        try:
-            while True:
-                sim_event = heappop(self._event_list)[3]
-                if not sim_event.CANCELED:
-                    return sim_event
-        except IndexError as e:
-            raise Exception("event list is empty") from e
+        while self._events:
+            event = heappop(self._events)
+            if not event.CANCELED:
+                return event
+        raise IndexError("Event list is empty")
 
     def is_empty(self) -> bool:
         return len(self) == 0
 
     def __contains__(self, event: SimulationEvent) -> bool:
-        return event._to_tuple() in self._event_list
+        return event in self._events
 
     def __len__(self) -> int:
-        return len(self._event_list)
+        return len(self._events)
 
     def remove(self, event: SimulationEvent) -> None:
         """remove an event from the event list"""
@@ -186,4 +157,4 @@ class EventList:
         event.cancel()
 
     def clear(self):
-        self._event_list.clear()
+        self._events.clear()
