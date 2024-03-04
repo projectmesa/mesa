@@ -1,9 +1,7 @@
 import itertools
 from enum import IntEnum
 from heapq import heapify, heappop, heappush
-from types import MethodType
 from typing import Any, Callable
-from weakref import WeakMethod, ref
 
 
 class InstanceCounterMeta(type):
