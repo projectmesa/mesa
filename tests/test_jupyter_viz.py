@@ -91,7 +91,8 @@ class TestJupyterViz(unittest.TestCase):
             "color": "gray",
         }
         current_step = 0
-        dependencies = [current_step]
+        seed = 0
+        dependencies = [current_step, seed]
         # initialize with space drawer unspecified (use default)
         # component must be rendered for code to run
         solara.render(
