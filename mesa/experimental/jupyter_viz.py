@@ -17,7 +17,7 @@ plt.switch_backend("agg")
 # TODO: Turn this function into a Solara component once the current_step.value
 # dependency is passed to measure()
 def Card(
-    model, measures, agent_portrayal, space_drawer, current_step, color, layout_type
+    model, measures, agent_portrayal, space_drawer, dependencies, color, layout_type
 ):
     with rv.Card(
         style_=f"background-color: {color}; width: 100%; height: 100%"
@@ -27,11 +27,11 @@ def Card(
             if space_drawer == "default":
                 # draw with the default implementation
                 components_matplotlib.SpaceMatplotlib(
-                    model, agent_portrayal, dependencies=[current_step.value]
+                    model, agent_portrayal, dependencies=dependencies
                 )
             elif space_drawer == "altair":
                 components_altair.SpaceAltair(
-                    model, agent_portrayal, dependencies=[current_step.value]
+                    model, agent_portrayal, dependencies=dependencies
                 )
             elif space_drawer:
                 # if specified, draw agent space with an alternate renderer
@@ -44,7 +44,7 @@ def Card(
                 measure(model)
             else:
                 components_matplotlib.PlotMatplotlib(
-                    model, measure, dependencies=[current_step.value]
+                    model, measure, dependencies=dependencies
                 )
     return main
 
@@ -58,6 +58,7 @@ def JupyterViz(
     agent_portrayal=None,
     space_drawer="default",
     play_interval=150,
+    seed=None,
 ):
     """Initialize a component to visualize a model.
     Args:
@@ -71,6 +72,7 @@ def JupyterViz(
             simulations with no space to visualize should
             specify `space_drawer=False`
         play_interval: play interval (default: 150)
+        seed: the random seed used to initialize the model
     """
     if name is None:
         name = model_class.__name__
@@ -78,6 +80,7 @@ def JupyterViz(
     current_step = solara.use_reactive(0)
 
     # 1. Set up model parameters
+    reactive_seed = solara.use_reactive(0)
     user_params, fixed_params = split_model_params(model_params)
     model_parameters, set_model_parameters = solara.use_state(
         {**fixed_params, **{k: v.get("value") for k, v in user_params.items()}}
@@ -85,13 +88,18 @@ def JupyterViz(
 
     # 2. Set up Model
     def make_model():
-        model = model_class(**model_parameters)
+        model = model_class(**model_parameters, seed=reactive_seed.value)
         current_step.value = 0
         return model
 
     reset_counter = solara.use_reactive(0)
     model = solara.use_memo(
-        make_model, dependencies=[*list(model_parameters.values()), reset_counter.value]
+        make_model,
+        dependencies=[
+            *list(model_parameters.values()),
+            reset_counter.value,
+            reactive_seed.value,
+        ],
     )
 
     def handle_change_model_params(name: str, value: any):
@@ -103,8 +111,12 @@ def JupyterViz(
         solara.AppBarTitle(name)
 
     # render layout and plot
+    def do_reseed():
+        reactive_seed.value = model.random.random()
 
     # jupyter
+    dependencies = [current_step.value, reactive_seed.value]
+
     def render_in_jupyter():
         with solara.GridFixed(columns=2):
             UserInputs(user_params, on_change=handle_change_model_params)
@@ -116,11 +128,11 @@ def JupyterViz(
             if space_drawer == "default":
                 # draw with the default implementation
                 components_matplotlib.SpaceMatplotlib(
-                    model, agent_portrayal, dependencies=[current_step.value]
+                    model, agent_portrayal, dependencies=dependencies
                 )
             elif space_drawer == "altair":
                 components_altair.SpaceAltair(
-                    model, agent_portrayal, dependencies=[current_step.value]
+                    model, agent_portrayal, dependencies=dependencies
                 )
             elif space_drawer:
                 # if specified, draw agent space with an alternate renderer
@@ -134,7 +146,7 @@ def JupyterViz(
                     measure(model)
                 else:
                     components_matplotlib.PlotMatplotlib(
-                        model, measure, dependencies=[current_step.value]
+                        model, measure, dependencies=dependencies
                     )
 
     def render_in_browser():
@@ -149,10 +161,18 @@ def JupyterViz(
 
         with solara.Sidebar():
             with solara.Card("Controls", margin=1, elevation=2):
+                solara.InputText(
+                    label="Seed",
+                    value=reactive_seed,
+                    continuous_update=True,
+                )
                 UserInputs(user_params, on_change=handle_change_model_params)
                 ModelController(model, play_interval, current_step, reset_counter)
-            with solara.Card("Progress", margin=1, elevation=2):
-                solara.Markdown(md_text=f"####Step - {current_step}")
+                solara.Button(label="Reseed", color="primary", on_click=do_reseed)
+            with solara.Card("Information", margin=1, elevation=2):
+                solara.Markdown(
+                    md_text=f"Step - {current_step}"
+                )
 
         items = [
             Card(
@@ -160,7 +180,7 @@ def JupyterViz(
                 measures,
                 agent_portrayal,
                 space_drawer,
-                current_step,
+                dependencies,
                 color="white",
                 layout_type=layout_types[i],
             )
