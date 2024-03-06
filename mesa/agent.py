@@ -254,7 +254,7 @@ class AgentSet(MutableSet, Sequence):
     def get(self, attr_names: str | list[str], fallback_value=sentinel) -> list[Any]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
-        
+
         Args:
             attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
             fallback_value (Any, optional): The value to return if the attribute is not found. If not provided, an AttributeError is raised.
@@ -266,6 +266,7 @@ class AgentSet(MutableSet, Sequence):
         Raises:
             AttributeError if an agent does not have the specified attribute(s) and no fallback_value is provided.
         """
+
         def get_attr(agent, attr_name):
             try:
                 return getattr(agent, attr_name)
