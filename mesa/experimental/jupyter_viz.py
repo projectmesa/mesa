@@ -259,10 +259,13 @@ def ModelController(model, play_interval, current_step, reset_counter):
         solara.Button(label="Step", color="primary", on_click=do_step)
         # This style is necessary so that the play widget has almost the same
         # height as typical Solara buttons.
-        solara.Style(
-            """
+        solara.Style("""
         .widget-play {
-            height: 30px;
+            height: 35px;
+        }
+        .widget-play button {
+            color: white;
+            background-color: #1976D2;  // Solara blue color
         }
         """
         )
