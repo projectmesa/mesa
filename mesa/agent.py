@@ -90,7 +90,7 @@ class AgentSet(MutableSet, Sequence):
 
     Methods:
         __len__, __iter__, __contains__, select, shuffle, sort, _update, do, get, __getitem__,
-        add, discard, remove, __getstate__, __setstate__, random
+        add, discard, remove, __getstate__, __setstate__, random, group_by
 
     Note:
         The AgentSet maintains weak references to agents, allowing for efficient management of agent lifecycles
@@ -251,35 +251,28 @@ class AgentSet(MutableSet, Sequence):
 
     sentinel = object()
 
-    def get(
-        self,
-        attr_names: str | list[str],
-        error_when_undefined: bool = True,
-        fallback_value=sentinel,
-    ) -> list[Any]:
+    def get(self, attr_names: str | list[str], fallback_value=sentinel) -> list[Any]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
-
+        
         Args:
             attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
-            error_when_undefined (bool, optional): If True, raise an error for undefined attributes. Defaults to True.
-            fallback_value (Any, optional): The value to return if the attribute is not found and fallback_value is not sentinel. Defaults to sentinel.
+            fallback_value (Any, optional): The value to return if the attribute is not found. If not provided, an AttributeError is raised.
 
         Returns:
             list[Any]: A list with the attribute value for each agent in the set if attr_names is a str
             list[list[Any]]: A list with a list of attribute values for each agent in the set if attr_names is a list of str
 
         Raises:
-            AttributeError if an agent does not have the specified attribute(s) and fallback_value is the sentinel object.
+            AttributeError if an agent does not have the specified attribute(s) and no fallback_value is provided.
         """
-
         def get_attr(agent, attr_name):
             try:
                 return getattr(agent, attr_name)
             except AttributeError:
                 if fallback_value is not self.sentinel:
                     return fallback_value
-                if error_when_undefined:
+                else:
                     raise
 
         if isinstance(attr_names, str):
