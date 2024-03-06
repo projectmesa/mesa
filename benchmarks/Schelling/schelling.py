@@ -3,7 +3,7 @@ from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
 from mesa.time import RandomActivation
 
 
-class SchellingAgent(CellAgent):
+class SchellingAgent(CellAgent["Schelling"]):
     """
     Schelling segregation agent
     """

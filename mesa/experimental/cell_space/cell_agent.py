@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from mesa import Agent, Model
 
 if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell import Cell
 
+T = TypeVar("T", bound=Model)
 
-class CellAgent(Agent):
+
+class CellAgent(Agent[T], Generic[T]):
     """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces
 
 
@@ -19,7 +21,7 @@ class CellAgent(Agent):
         cell: (Cell | None): the cell which the agent occupies
     """
 
-    def __init__(self, unique_id: int, model: Model) -> None:
+    def __init__(self, unique_id: int, model: T) -> None:
         """
         Create a new agent.
 
