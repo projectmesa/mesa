@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import cache
 from random import Random
-from typing import TYPE_CHECKING, TypeVar, Generic
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from mesa.experimental.cell_space.cell_collection import CellCollection
 
@@ -59,9 +59,7 @@ class Cell(Generic[U]):
         super().__init__()
         self.coordinate = coordinate
         self._connections: list[Cell[U]] = []  # TODO: change to CellCollection?
-        self.agents = (
-            []
-        )  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
+        self.agents = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
         self.properties: dict[str, object] = {}
         self.random = random
