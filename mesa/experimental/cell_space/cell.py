@@ -9,7 +9,7 @@ from mesa.experimental.cell_space.cell_collection import CellCollection
 if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell_agent import CellAgent
 
-U = TypeVar("U", bound=CellAgent)
+U = TypeVar("U", bound="CellAgent")
 
 
 class Cell(Generic[U]):

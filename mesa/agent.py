@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from mesa.model import Model
     from mesa.space import Position
 
-T = TypeVar("T", bound=Model)
+T = TypeVar("T", bound="Model")
 
 
 class Agent(Generic[T]):

@@ -110,7 +110,7 @@ class Grid(DiscreteSpace[T, U], Generic[T, U]):
                 cell.connect(self._cells[ni, nj])
 
 
-class OrthogonalMooreGrid(Grid[T]):
+class OrthogonalMooreGrid(Grid[T, U]):
     """Grid where cells are connected to their 8 neighbors.
 
     Example for two dimensions:
@@ -142,7 +142,7 @@ class OrthogonalMooreGrid(Grid[T]):
             self._connect_single_cell_nd(cell, offsets)
 
 
-class OrthogonalVonNeumannGrid(Grid[T]):
+class OrthogonalVonNeumannGrid(Grid[T, U]):
     """Grid where cells are connected to their 4 neighbors.
 
     Example for two dimensions:
@@ -182,7 +182,7 @@ class OrthogonalVonNeumannGrid(Grid[T]):
             self._connect_single_cell_nd(cell, offsets)
 
 
-class HexGrid(Grid[T]):
+class HexGrid(Grid[T, U]):
     def _connect_cells_2d(self) -> None:
         # fmt: off
         even_offsets = [
