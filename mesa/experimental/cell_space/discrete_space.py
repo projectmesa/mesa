@@ -4,13 +4,14 @@ from functools import cached_property
 from random import Random
 from typing import Generic, TypeVar
 
-from mesa.experimental.cell_space.cell import Cell
+from mesa.experimental.cell_space import Cell, CellAgent
 from mesa.experimental.cell_space.cell_collection import CellCollection
 
 T = TypeVar("T", bound=Cell)
+U = TypeVar("U", bound=CellAgent)
 
 
-class DiscreteSpace(Generic[T]):
+class DiscreteSpace(Generic[T, U]):
     """Base class for all discrete spaces.
 
     Attributes:
@@ -25,8 +26,9 @@ class DiscreteSpace(Generic[T]):
     def __init__(
         self,
         capacity: int | None = None,
-        cell_klass: type[T] = Cell,
+        cell_klass: type[T] = Cell[U],
         random: Random | None = None,
+        agent_class: type[U] = CellAgent,
     ):
         super().__init__()
         self.capacity = capacity
@@ -43,8 +45,7 @@ class DiscreteSpace(Generic[T]):
     def cutoff_empties(self):
         return 7.953 * len(self._cells) ** 0.384
 
-    def _connect_single_cell(self, cell: T):
-        ...
+    def _connect_single_cell(self, cell: T): ...
 
     @cached_property
     def all_cells(self):

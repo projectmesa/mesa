@@ -2,15 +2,17 @@ from __future__ import annotations
 
 from functools import cache
 from random import Random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar, Generic
 
 from mesa.experimental.cell_space.cell_collection import CellCollection
 
 if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell_agent import CellAgent
 
+U = TypeVar("U", bound=CellAgent)
 
-class Cell:
+
+class Cell(Generic[U]):
     """The cell represents a position in a discrete space.
 
     Attributes:
@@ -56,8 +58,10 @@ class Cell:
         """
         super().__init__()
         self.coordinate = coordinate
-        self._connections: list[Cell] = []  # TODO: change to CellCollection?
-        self.agents = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
+        self._connections: list[Cell[U]] = []  # TODO: change to CellCollection?
+        self.agents = (
+            []
+        )  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
         self.properties: dict[str, object] = {}
         self.random = random
@@ -121,7 +125,9 @@ class Cell:
 
     # FIXME: Revisit caching strategy on methods
     @cache  # noqa: B019
-    def neighborhood(self, radius=1, include_center=False):
+    def neighborhood(
+        self, radius=1, include_center=False
+    ) -> CellCollection[Cell[U], U]:
         return CellCollection(
             self._neighborhood(radius=radius, include_center=include_center),
             random=self.random,

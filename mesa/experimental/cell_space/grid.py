@@ -5,12 +5,13 @@ from itertools import product
 from random import Random
 from typing import Generic, TypeVar
 
-from mesa.experimental.cell_space import Cell, DiscreteSpace
+from mesa.experimental.cell_space import Cell, CellAgent, DiscreteSpace
 
 T = TypeVar("T", bound=Cell)
+U = TypeVar("U", bound=CellAgent)
 
 
-class Grid(DiscreteSpace, Generic[T]):
+class Grid(DiscreteSpace[T, U], Generic[T, U]):
     """Base class for all grid classes
 
     Attributes:
@@ -29,8 +30,14 @@ class Grid(DiscreteSpace, Generic[T]):
         capacity: float | None = None,
         random: Random | None = None,
         cell_klass: type[T] = Cell,
+        agent_class: type[U] = CellAgent,
     ) -> None:
-        super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
+        super().__init__(
+            capacity=capacity,
+            random=random,
+            cell_klass=cell_klass,
+            agent_class=agent_class,
+        )
         self.torus = torus
         self.dimensions = dimensions
         self._try_random = True
@@ -51,11 +58,9 @@ class Grid(DiscreteSpace, Generic[T]):
         else:
             self._connect_cells_nd()
 
-    def _connect_cells_2d(self) -> None:
-        ...
+    def _connect_cells_2d(self) -> None: ...
 
-    def _connect_cells_nd(self) -> None:
-        ...
+    def _connect_cells_nd(self) -> None: ...
 
     def _validate_parameters(self):
         if not all(isinstance(dim, int) and dim > 0 for dim in self.dimensions):

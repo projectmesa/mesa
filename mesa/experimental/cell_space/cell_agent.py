@@ -8,9 +8,10 @@ if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell import Cell
 
 T = TypeVar("T", bound=Model)
+U = TypeVar("U", bound="CellAgent")
 
 
-class CellAgent(Agent[T], Generic[T]):
+class CellAgent(Agent[T], Generic[T, U]):
     """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces
 
 
@@ -30,9 +31,9 @@ class CellAgent(Agent[T], Generic[T]):
             model (Model): The model instance in which the agent exists.
         """
         super().__init__(unique_id, model)
-        self.cell: Cell | None = None
+        self.cell: Cell[U] | None = None
 
-    def move_to(self, cell) -> None:
+    def move_to(self, cell: Cell[U]) -> None:
         if self.cell is not None:
             self.cell.remove_agent(self)
         self.cell = cell

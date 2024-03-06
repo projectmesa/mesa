@@ -11,9 +11,10 @@ if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell_agent import CellAgent
 
 T = TypeVar("T", bound="Cell")
+U = TypeVar("U", bound="CellAgent")
 
 
-class CellCollection(Generic[T]):
+class CellCollection(Generic[T, U]):
     """An immutable collection of cells
 
     Attributes:
@@ -25,7 +26,7 @@ class CellCollection(Generic[T]):
 
     def __init__(
         self,
-        cells: Mapping[T, list[CellAgent]] | Iterable[T],
+        cells: Mapping[T, list[U]] | Iterable[T],
         random: Random | None = None,
     ) -> None:
         if isinstance(cells, dict):
@@ -43,7 +44,7 @@ class CellCollection(Generic[T]):
     def __iter__(self):
         return iter(self._cells)
 
-    def __getitem__(self, key: T) -> Iterable[CellAgent]:
+    def __getitem__(self, key: T) -> Iterable[U]:
         return self._cells[key]
 
     # @cached_property
@@ -58,13 +59,13 @@ class CellCollection(Generic[T]):
         return list(self._cells.keys())
 
     @property
-    def agents(self) -> Iterable[CellAgent]:
+    def agents(self) -> Iterable[U]:
         return itertools.chain.from_iterable(self._cells.values())
 
     def select_random_cell(self) -> T:
         return self.random.choice(self.cells)
 
-    def select_random_agent(self) -> CellAgent:
+    def select_random_agent(self) -> U:
         return self.random.choice(list(self.agents))
 
     def select(self, filter_func: Callable[[T], bool] | None = None, n=0):
