@@ -88,7 +88,8 @@ def JupyterViz(
 
     # 2. Set up Model
     def make_model():
-        model = model_class(**model_parameters, seed=reactive_seed.value)
+        model = model_class.__new__(model_class, **model_parameters, seed=reactive_seed.value)
+        model.__init__(**model_parameters)
         current_step.value = 0
         return model
 
