@@ -157,7 +157,7 @@ def JupyterViz(
         if measures:
             layout_types += [{"Measure": elem} for elem in range(len(measures))]
 
-        grid_layout_initial = get_initial_grid_layout(layout_types=layout_types)
+        grid_layout_initial = make_initial_grid_layout(layout_types=layout_types)
         grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
 
         with solara.Sidebar():
@@ -385,20 +385,15 @@ def make_text(renderer):
     return function
 
 
-def get_initial_grid_layout(layout_types):
-    grid_lay = []
-    y_coord = 0
-    for ii in range(len(layout_types)):
-        template_layout = {"h": 10, "i": 0, "moved": False, "w": 6, "y": 0, "x": 0}
-        if ii == 0:
-            grid_lay.append(template_layout)
-        else:
-            template_layout.update({"i": ii})
-            if ii % 2 == 0:
-                template_layout.update({"x": 0})
-                y_coord += 16
-            else:
-                template_layout.update({"x": 6})
-            template_layout.update({"y": y_coord})
-            grid_lay.append(template_layout)
-    return grid_lay
+def make_initial_grid_layout(layout_types):
+    return [
+        {
+            "i": i,
+            "w": 6,
+            "h": 10,
+            "moved": False,
+            "x": 6 * (i % 2),
+            "y": 16 * (i - i % 2),
+        }
+        for i in range(len(layout_types))
+    ]
