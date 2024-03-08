@@ -90,7 +90,7 @@ class AgentSet(MutableSet, Sequence):
 
     Methods:
         __len__, __iter__, __contains__, select, shuffle, sort, _update, do, get, __getitem__,
-        add, discard, remove, __getstate__, __setstate__, random, group_by
+        add, discard, remove, __getstate__, __setstate__, random
 
     Note:
         The AgentSet maintains weak references to agents, allowing for efficient management of agent lifecycles
@@ -254,7 +254,7 @@ class AgentSet(MutableSet, Sequence):
     def get(self, attr_names: str | list[str], fallback_value=sentinel) -> list[Any]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
-
+        
         Args:
             attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
             fallback_value (Any, optional): The value to return if the attribute is not found. If not provided, an AttributeError is raised.
@@ -266,21 +266,17 @@ class AgentSet(MutableSet, Sequence):
         Raises:
             AttributeError if an agent does not have the specified attribute(s) and no fallback_value is provided.
         """
-
-        def get_attr(agent, attr_name):
-            try:
+        def get_attr(agent, attr_name, fallback_value=None):
+            if hasattr(agent, attr_name):
                 return getattr(agent, attr_name)
-            except AttributeError:
-                if fallback_value is not self.sentinel:
-                    return fallback_value
-                else:
-                    raise
+            else:
+                return fallback_value if fallback_value is not self.sentinel else None
 
         if isinstance(attr_names, str):
-            return [get_attr(agent, attr_names) for agent in self._agents]
+            return [get_attr(agent, attr_names, fallback_value) for agent in self._agents]
         else:
             return [
-                [get_attr(agent, attr_name) for attr_name in attr_names]
+                [get_attr(agent, attr_name, fallback_value) for attr_name in attr_names]
                 for agent in self._agents
             ]
 
