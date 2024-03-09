@@ -194,13 +194,6 @@ class _PropertyGrid(Grid, Generic[T]):
             raise ValueError(f"Property layer {property_name} does not exist.")
         del self.properties[property_name]
 
-    def select_random_empty_cell(self) -> T:
-        """select random empty cell and add the property to the cell"""
-        cell = super().select_random_empty_cell()
-        for property in self.properties:
-            cell.properties[property] = self.properties[property].data[cell.coordinate]
-        return cell
-
 
 class OrthogonalMooreGrid(_PropertyGrid[T]):
     """Grid where cells are connected to their 8 neighbors.
