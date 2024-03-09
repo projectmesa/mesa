@@ -763,16 +763,14 @@ class _PropertyGrid(_Grid):
 
     Attributes:
         properties (dict): A dictionary mapping property layer names to PropertyLayer instances.
-        empty_mask: Returns a boolean mask indicating empty cells on the grid.
+        empty_mask (np.ndarray): A boolean array indicating empty cells on the grid.
 
     Methods:
         add_property_layer(property_layer): Adds a new property layer to the grid.
         remove_property_layer(property_name): Removes a property layer from the grid by its name.
         get_neighborhood_mask(pos, moore, include_center, radius): Generates a boolean mask of the neighborhood.
-        select_cells_by_properties(conditions, mask, return_list): Selects cells based on multiple property conditions,
-            optionally with a mask, returning either a list of coordinates or a mask.
-        select_extreme_value_cells(property_name, mode, mask, return_list): Selects cells with extreme values of a property,
-            optionally with a mask, returning either a list of coordinates or a mask.
+        select_cells(conditions, extreme_values, masks, only_empty, return_list): Selects cells based on multiple conditions,
+            extreme values, masks, with an option to select only empty cells, returning either a list of coordinates or a mask.
 
     Mask Usage:
         Several methods in this class accept a mask as an input, which is a NumPy ndarray of boolean values. This mask
