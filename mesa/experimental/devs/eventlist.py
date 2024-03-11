@@ -85,8 +85,9 @@ class SimulationEvent:
 class EventList:
     """An event list
 
-    This is a heap queue sorted list of events. Events are allways removed from the left. The events are sorted
-    based on their time stamp, their priority, and their unique_id, guaranteeing a complete ordering.
+    This is a heap queue sorted list of events. Events are allways removed from the left, so heapq is a performant and
+    appropriate data structure. Events are sorted based on their time stamp, their priority, and their unique_id
+    as a tie-breaker, guaranteeing a complete ordering.
 
     """
 
