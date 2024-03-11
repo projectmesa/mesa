@@ -121,7 +121,7 @@ class Citizen(EpsteinAgent):
         self.arrest_probability = 1 - math.exp(
             -1 * self.arrest_prob_constant * (cops_in_vision / actives_in_vision)
         )
-        
+
     def sent_to_jail(self, value):
         self.model.active_agents.remove(self)
         self.condition = AgentState.ARRESTED

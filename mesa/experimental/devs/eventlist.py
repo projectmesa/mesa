@@ -15,12 +15,12 @@ class Priority(IntEnum):
 class SimulationEvent:
     """A simulation event
 
-    the callable is wrapped using weakrefs, so there is no need to explicitly cancel event if e.g., an agent
+    the callable is wrapped using weakref, so there is no need to explicitly cancel event if e.g., an agent
     is removed from the simulation.
 
     Attributes:
         time (float): The simulation time of the event
-        function  (Callable): The function to execute for this event
+        fn (Callable): The function to execute for this event
         priority (Priority): The priority of the event
         unique_id (int) the unique identifier of the event
         function_args (list[Any]): Argument for the function
@@ -155,7 +155,7 @@ class EventList:
         """remove an event from the event list"""
         # we cannot simply remove items from _eventlist because this breaks
         # heap structure invariant. So, we use a form of lazy deletion.
-        # SimEvents have a CANCELED flag that we set to True, while poping and peak_ahead
+        # SimEvents have a CANCELED flag that we set to True, while popping and peak_ahead
         # silently ignore canceled events
         event.cancel()
 
