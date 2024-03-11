@@ -122,26 +122,16 @@ class BoidFlockers(mesa.Model):
         """
         super().__init__(seed=seed)
         self.population = population
-        self.vision = vision
-        self.speed = speed
-        self.separation = separation
-        self.schedule = None
-        self.space = None
         self.width = width
         self.height = height
-        self.speed = speed
-        self.cohere = cohere
-        self.separate = separate
-        self.match = match
         self.simulator = simulator
 
-    def setup(self):
         self.schedule = mesa.time.RandomActivation(self)
         self.space = mesa.space.ContinuousSpace(self.width, self.height, True)
         self.factors = {
-            "cohere": self.cohere,
-            "separate": self.separate,
-            "match": self.match,
+            "cohere": cohere,
+            "separate": separate,
+            "match": match,
         }
 
         for i in range(self.population):
@@ -153,10 +143,10 @@ class BoidFlockers(mesa.Model):
                 unique_id=i,
                 model=self,
                 pos=pos,
-                speed=self.speed,
+                speed=speed,
                 direction=direction,
-                vision=self.vision,
-                separation=self.separation,
+                vision=vision,
+                separation=separation,
                 **self.factors,
             )
             self.space.place_agent(boid, pos)

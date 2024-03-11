@@ -33,20 +33,14 @@ class Simulator:
         ...
 
     def setup(self, model: "Model") -> None:
-        """Setup the model to simulate
+        """Setup the simulator with the model to simulate
 
         Args:
             model (Model): The model to simulate
 
-        Notes:
-            The basic assumption of the simulator is that a Model has a model.setup method that sets up the
-            model.
-
         """
-
         self.event_list.clear()
         self.model = model
-        model.setup()
 
     def reset(self):
         """Reset the simulator by clearing the event list and removing the model to simulate"""

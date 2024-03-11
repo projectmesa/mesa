@@ -162,7 +162,6 @@ class WolfSheep(Model):
             sheep_reproduce: Probability of each sheep reproducing each step
             wolf_reproduce: Probability of each wolf reproducing each step
             wolf_gain_from_food: Energy a wolf gains from eating a sheep
-            grass: Whether to have the sheep eat grass for energy
             grass_regrowth_time: How long it takes for a grass patch to regrow
                                  once it is eaten
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
@@ -176,17 +175,7 @@ class WolfSheep(Model):
 
         self.initial_sheep = initial_sheep
         self.initial_wolves = initial_wolves
-        self.grass_regrowth_time = grass_regrowth_time
 
-        self.sheep_reproduce = sheep_reproduce
-        self.wolf_reproduce = wolf_reproduce
-        self.grass_regrowth_time = grass_regrowth_time
-        self.wolf_gain_from_food = wolf_gain_from_food
-        self.sheep_gain_from_food = sheep_gain_from_food
-
-        self.grid = None
-
-    def setup(self):
         self.grid = OrthogonalVonNeumannGrid(
             [self.height, self.width],
             torus=False,
@@ -200,13 +189,13 @@ class WolfSheep(Model):
                 self.random.randrange(self.width),
                 self.random.randrange(self.height),
             )
-            energy = self.random.randrange(2 * self.sheep_gain_from_food)
+            energy = self.random.randrange(2 * sheep_gain_from_food)
             sheep = Sheep(
                 self.next_id(),
                 self,
                 energy,
-                self.sheep_reproduce,
-                self.sheep_gain_from_food,
+                sheep_reproduce,
+                sheep_gain_from_food,
             )
             sheep.move_to(self.grid[pos])
 
@@ -216,13 +205,13 @@ class WolfSheep(Model):
                 self.random.randrange(self.width),
                 self.random.randrange(self.height),
             )
-            energy = self.random.randrange(2 * self.wolf_gain_from_food)
+            energy = self.random.randrange(2 * wolf_gain_from_food)
             wolf = Wolf(
                 self.next_id(),
                 self,
                 energy,
-                self.wolf_reproduce,
-                self.wolf_gain_from_food,
+                wolf_reproduce,
+                wolf_gain_from_food,
             )
             wolf.move_to(self.grid[pos])
 
@@ -231,11 +220,11 @@ class WolfSheep(Model):
         for cell in self.grid:
             fully_grown = self.random.choice(possibly_fully_grown)
             if fully_grown:
-                countdown = self.grass_regrowth_time
+                countdown = grass_regrowth_time
             else:
-                countdown = self.random.randrange(self.grass_regrowth_time)
+                countdown = self.random.randrange(grass_regrowth_time)
             patch = GrassPatch(
-                self.next_id(), self, fully_grown, countdown, self.grass_regrowth_time
+                self.next_id(), self, fully_grown, countdown, grass_regrowth_time
             )
             patch.move_to(cell)
 

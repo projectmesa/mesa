@@ -63,19 +63,12 @@ class Schelling(Model):
             seed: Seed for Reproducibility
         """
         super().__init__(seed=seed)
-        self.height = height
-        self.width = width
-        self.density = density
         self.minority_pc = minority_pc
-        self.radius = radius
-        self.homophily = homophily
-        self.happy = 0
         self.simulator = simulator
 
-    def setup(self):
         self.schedule = RandomActivation(self)
         self.grid = OrthogonalMooreGrid(
-            [self.height, self.width],
+            [height, width],
             torus=True,
             capacity=1,
             random=self.random,
@@ -86,10 +79,10 @@ class Schelling(Model):
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
         for cell in self.grid:
-            if self.random.random() < self.density:
+            if self.random.random() < density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(
-                    self.next_id(), self, agent_type, self.radius, self.homophily
+                    self.next_id(), self, agent_type, radius, homophily
                 )
                 agent.move_to(cell)
                 self.schedule.add(agent)

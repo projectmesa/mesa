@@ -174,14 +174,13 @@ class WolfSheep(mesa.Model):
         self.initial_wolves = initial_wolves
         self.simulator = simulator
 
-        self.sheep_reproduce = sheep_reproduce
-        self.wolf_reproduce = wolf_reproduce
-        self.grass_regrowth_time = grass_regrowth_time
-        self.wolf_gain_from_food = wolf_gain_from_food
-        self.sheep_gain_from_food = sheep_gain_from_food
-        self.moore = moore
+        # self.sheep_reproduce = sheep_reproduce
+        # self.wolf_reproduce = wolf_reproduce
+        # self.grass_regrowth_time = grass_regrowth_time
+        # self.wolf_gain_from_food = wolf_gain_from_food
+        # self.sheep_gain_from_food = sheep_gain_from_food
+        # self.moore = moore
 
-    def setup(self):
         self.grid = mesa.space.MultiGrid(self.height, self.width, torus=False)
 
         for _ in range(self.initial_sheep):
@@ -189,14 +188,14 @@ class WolfSheep(mesa.Model):
                 self.random.randrange(self.width),
                 self.random.randrange(self.height),
             )
-            energy = self.random.randrange(2 * self.sheep_gain_from_food)
+            energy = self.random.randrange(2 * sheep_gain_from_food)
             sheep = Sheep(
                 self.next_id(),
                 self,
-                self.moore,
+                moore,
                 energy,
-                self.sheep_reproduce,
-                self.sheep_gain_from_food,
+                sheep_reproduce,
+                sheep_gain_from_food,
             )
             self.grid.place_agent(sheep, pos)
 
@@ -206,14 +205,14 @@ class WolfSheep(mesa.Model):
                 self.random.randrange(self.width),
                 self.random.randrange(self.height),
             )
-            energy = self.random.randrange(2 * self.wolf_gain_from_food)
+            energy = self.random.randrange(2 * wolf_gain_from_food)
             wolf = Wolf(
                 self.next_id(),
                 self,
-                self.moore,
+                moore,
                 energy,
-                self.wolf_reproduce,
-                self.wolf_gain_from_food,
+                wolf_reproduce,
+                wolf_gain_from_food,
             )
             self.grid.place_agent(wolf, pos)
 
@@ -222,15 +221,13 @@ class WolfSheep(mesa.Model):
         for _agent, pos in self.grid.coord_iter():
             fully_grown = self.random.choice(possibly_fully_grown)
             if fully_grown:
-                countdown = self.grass_regrowth_time
+                countdown = grass_regrowth_time
             else:
-                countdown = self.random.randrange(self.grass_regrowth_time)
+                countdown = self.random.randrange(grass_regrowth_time)
             patch = GrassPatch(
-                self.next_id(), self, fully_grown, countdown, self.grass_regrowth_time
+                self.next_id(), self, fully_grown, countdown, grass_regrowth_time
             )
             self.grid.place_agent(patch, pos)
-
-        self.simulator.schedule_event_relative(self.step, 1)
 
     def step(self):
         self.get_agents_of_type(Sheep).shuffle(inplace=True).do("step")
