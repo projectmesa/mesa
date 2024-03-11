@@ -28,7 +28,7 @@ class SimulationEvent:
 
     """
 
-    _ids = itertools.count(1)
+    _ids = itertools.count()
 
     @property
     def CANCELED(self) -> bool:
