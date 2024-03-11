@@ -44,15 +44,6 @@ class Citizen(EpsteinAgent):
             rebellion
     """
 
-    def sent_to_jail(self, value):
-        self.model.active_agents.remove(self)
-        self.condition = AgentState.ARRESTED
-        self.model.simulator.schedule_event_relative(self.release_from_jail, value)
-
-    def release_from_jail(self):
-        self.model.active_agents.add(self)
-        self.condition = AgentState.QUIESCENT
-
     def __init__(
         self,
         unique_id,
@@ -130,6 +121,15 @@ class Citizen(EpsteinAgent):
         self.arrest_probability = 1 - math.exp(
             -1 * self.arrest_prob_constant * (cops_in_vision / actives_in_vision)
         )
+        
+    def sent_to_jail(self, value):
+        self.model.active_agents.remove(self)
+        self.condition = AgentState.ARRESTED
+        self.model.simulator.schedule_event_relative(self.release_from_jail, value)
+
+    def release_from_jail(self):
+        self.model.active_agents.add(self)
+        self.condition = AgentState.QUIESCENT
 
 
 class Cop(EpsteinAgent):
