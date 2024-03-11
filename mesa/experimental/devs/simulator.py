@@ -25,8 +25,10 @@ class Simulator:
         # should model run in a separate thread,
         # and we can then interact with start, stop, run_until, and step?
         self.event_list = EventList()
-        self.time = start_time
+        self.start_time = start_time
         self.time_unit = time_unit
+
+        self.time = self.start_time
         self.model = None
 
     def check_time_unit(self, time: int | float) -> bool:
@@ -46,6 +48,7 @@ class Simulator:
         """Reset the simulator by clearing the event list and removing the model to simulate"""
         self.event_list.clear()
         self.model = None
+        self.time = self.start_time
 
     def run(self, time_delta: int | float):
         """run the simulator for the specified time delta
@@ -84,16 +87,8 @@ class Simulator:
             SimulationEvent: the simulation event that is scheduled
 
         """
-
-        event = SimulationEvent(
-            self.time,
-            function,
-            priority=priority,
-            function_args=function_args,
-            function_kwargs=function_kwargs,
-        )
-        self._schedule_event(event)
-        return event
+        return self.schedule_event_relative(function, 0, priority=priority,
+                                     function_args=function_args, function_kwargs=function_kwargs)
 
     def schedule_event_absolute(
         self,
