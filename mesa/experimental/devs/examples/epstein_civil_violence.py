@@ -55,16 +55,16 @@ class Citizen(EpsteinAgent):
         self.condition = AgentState.QUIESCENT
 
     def __init__(
-        self,
-        unique_id,
-        model,
-        vision,
-        movement,
-        hardship,
-        regime_legitimacy,
-        risk_aversion,
-        threshold,
-        arrest_prob_constant,
+            self,
+            unique_id,
+            model,
+            vision,
+            movement,
+            hardship,
+            regime_legitimacy,
+            risk_aversion,
+            threshold,
+            arrest_prob_constant,
     ):
         """
         Create a new Citizen.
@@ -206,20 +206,20 @@ class EpsteinCivilViolence(Model):
     """
 
     def __init__(
-        self,
-        width=40,
-        height=40,
-        citizen_density=0.7,
-        cop_density=0.074,
-        citizen_vision=7,
-        cop_vision=7,
-        legitimacy=0.8,
-        max_jail_term=1000,
-        active_threshold=0.1,
-        arrest_prob_constant=2.3,
-        movement=True,
-        max_iters=1000,
-        seed=None,
+            self,
+            width=40,
+            height=40,
+            citizen_density=0.7,
+            cop_density=0.074,
+            citizen_vision=7,
+            cop_vision=7,
+            legitimacy=0.8,
+            max_jail_term=1000,
+            active_threshold=0.1,
+            arrest_prob_constant=2.3,
+            movement=True,
+            max_iters=1000,
+            seed=None,
     ):
         super().__init__(seed)
         if cop_density + citizen_density > 1:
@@ -229,18 +229,9 @@ class EpsteinCivilViolence(Model):
         self.height = height
         self.citizen_density = citizen_density
         self.cop_density = cop_density
-        self.legitimacy = legitimacy
-        self.max_jail_term = max_jail_term
-        self.active_threshold = active_threshold
-        self.arrest_prob_constant = arrest_prob_constant
-        self.movement = movement
-        self.max_iters = max_iters
-        self.cop_vision = cop_vision
-        self.citizen_vision = citizen_vision
-        self.active_agents: AgentSet | None = None
-        self.grid = None
 
-    def setup(self):
+        self.max_iters = max_iters
+
         self.grid = SingleGrid(self.width, self.height, torus=True)
 
         for _, pos in self.grid.coord_iter():
@@ -248,21 +239,21 @@ class EpsteinCivilViolence(Model):
                 agent = Cop(
                     self.next_id(),
                     self,
-                    self.cop_vision,
-                    self.movement,
-                    self.max_jail_term,
+                    cop_vision,
+                    movement,
+                    max_jail_term,
                 )
             elif self.random.random() < (self.cop_density + self.citizen_density):
                 agent = Citizen(
                     self.next_id(),
                     self,
-                    self.citizen_vision,
-                    self.movement,
+                    citizen_vision,
+                    movement,
                     hardship=self.random.random(),
-                    regime_legitimacy=self.legitimacy,
+                    regime_legitimacy=legitimacy,
                     risk_aversion=self.random.random(),
-                    threshold=self.active_threshold,
-                    arrest_prob_constant=self.arrest_prob_constant,
+                    threshold=active_threshold,
+                    arrest_prob_constant=arrest_prob_constant,
                 )
             else:
                 continue
@@ -280,4 +271,4 @@ if __name__ == "__main__":
 
     simulator.setup(model)
 
-    simulator.run(until=100)
+    simulator.run(time_delta=100)
