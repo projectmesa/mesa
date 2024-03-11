@@ -2,7 +2,6 @@ import enum
 import math
 
 from mesa import Agent, Model
-from mesa.agent import AgentSet
 from mesa.experimental.devs.simulator import ABMSimulator
 from mesa.space import SingleGrid
 
@@ -55,16 +54,16 @@ class Citizen(EpsteinAgent):
         self.condition = AgentState.QUIESCENT
 
     def __init__(
-            self,
-            unique_id,
-            model,
-            vision,
-            movement,
-            hardship,
-            regime_legitimacy,
-            risk_aversion,
-            threshold,
-            arrest_prob_constant,
+        self,
+        unique_id,
+        model,
+        vision,
+        movement,
+        hardship,
+        regime_legitimacy,
+        risk_aversion,
+        threshold,
+        arrest_prob_constant,
     ):
         """
         Create a new Citizen.
@@ -206,20 +205,20 @@ class EpsteinCivilViolence(Model):
     """
 
     def __init__(
-            self,
-            width=40,
-            height=40,
-            citizen_density=0.7,
-            cop_density=0.074,
-            citizen_vision=7,
-            cop_vision=7,
-            legitimacy=0.8,
-            max_jail_term=1000,
-            active_threshold=0.1,
-            arrest_prob_constant=2.3,
-            movement=True,
-            max_iters=1000,
-            seed=None,
+        self,
+        width=40,
+        height=40,
+        citizen_density=0.7,
+        cop_density=0.074,
+        citizen_vision=7,
+        cop_vision=7,
+        legitimacy=0.8,
+        max_jail_term=1000,
+        active_threshold=0.1,
+        arrest_prob_constant=2.3,
+        movement=True,
+        max_iters=1000,
+        seed=None,
     ):
         super().__init__(seed)
         if cop_density + citizen_density > 1:

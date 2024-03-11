@@ -87,8 +87,13 @@ class Simulator:
             SimulationEvent: the simulation event that is scheduled
 
         """
-        return self.schedule_event_relative(function, 0, priority=priority,
-                                     function_args=function_args, function_kwargs=function_kwargs)
+        return self.schedule_event_relative(
+            function,
+            0,
+            priority=priority,
+            function_args=function_args,
+            function_kwargs=function_kwargs,
+        )
 
     def schedule_event_absolute(
         self,
