@@ -1,3 +1,4 @@
+import inspect
 import itertools
 from collections.abc import Iterable, Mapping
 from functools import partial
@@ -189,3 +190,114 @@ def _collect_data(
         agent_dict.update(zip(dc.agent_reporters, data[2:]))
         all_agents_data.append(agent_dict)
     return model_data, all_agents_data
+
+
+def local_sensitivity_analysis(
+        model_cls: Type[Model],
+        common_range: List[float] = [0.8, 1.25],
+        specific_ranges: Optional[Dict[str, List[float]]] = None,
+        ignore_parameters: Optional[List[str]] = None,
+        relative_range: bool = True,
+        iterations: int = 10,
+        **kwargs
+) -> List[Dict[str, Any]]:
+    """
+    Performs a sensitivity analysis on a given Mesa agent-based model class,
+    exploring how changes in model parameters affect the model's behavior.
+    This function allows for both relative and absolute variations in parameter values.
+
+    Parameters
+    ----------
+    model_cls : Type[Model]
+        The Mesa model class to be analyzed. Must be a subclass of mesa.Model.
+
+    common_range : List[float], default=[0.8, 1.25]
+        A list of multipliers (for relative range) or values (for absolute range)
+        to be applied to each numeric parameter, unless overridden by specific_ranges.
+
+    specific_ranges : Optional[Dict[str, List[float]]], default=None
+        A dictionary mapping parameter names to lists of multipliers or values.
+        These specific ranges override the common_range for the respective parameters.
+
+    ignore_parameters : Optional[List[str]], default=None
+        A list of parameter names to be excluded from the sensitivity analysis.
+
+    relative_range : bool, default=True
+        Determines whether the values in common_range and specific_ranges are
+        treated as relative multipliers (True) or absolute values (False).
+        Relative multipliers are multiplied by the default parameter value,
+        while absolute values are used as-is.
+
+    iterations : int, default=10
+        The number of iterations to run for each parameter value. Is passed directly
+        to the Mesa batch_run function.
+
+    **kwargs
+        Additional keyword arguments to be passed directly to the Mesa batch_run function.
+        These can include 'iterations', 'max_steps', 'data_collection_period', etc.
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        A list of dictionaries, each representing the results of one model run.
+        Each dictionary includes the parameter values used for that run and the
+        data collected during the simulation.
+
+    Notes
+    -----
+    - Only numeric parameters (integers and floats) are varied. Non-numeric parameters
+      are ignored and set to their default values.
+    - All input arguments of the Model should have default values.
+    - For integer parameters, resulting values from relative variations are rounded
+      to the nearest integer, and duplicate values are eliminated.
+    - The function includes a default run (using the model's baseline parameters)
+      for comparison with varied parameter runs.
+    """
+    # Check if all parameters of the model have default values
+    model_parameters = inspect.signature(model_cls.__init__).parameters
+    for name, param in model_parameters.items():
+        if param.default is inspect.Parameter.empty and name != 'self':
+            raise ValueError(f"All model parameters must have default values. "
+                             f"The parameter '{name}' does not have a default value.")
+
+    # Retrieve default parameter values from the model's constructor and check for missing defaults
+    base_params = {}
+    for k, v in inspect.signature(model_cls.__init__).parameters.items():
+        if k == 'self' or k in (ignore_parameters or []):
+            continue
+        if v.default is inspect.Parameter.empty:
+            raise ValueError(f"Input parameter '{k}' of {model_cls.__name__} does not have a default value, which is required for this local sensitivity analysis function.")
+        base_params[k] = v.default
+
+    # Filter out non-numeric parameters
+    numeric_params = {k: v for k, v in base_params.items() if isinstance(v, (int, float))}
+
+    # Generate parameter variations
+    parameter_variations = {'default': base_params}  # Special entry for default run
+    for param, default_value in numeric_params.items():
+        # Apply specific range if available, otherwise use common range
+        ranges = specific_ranges.get(param, common_range)
+
+        if relative_range:
+            # Relative range: multiply the default value by each value in the range
+            varied_values = {default_value * multiplier for multiplier in ranges}
+        else:
+            # Absolute range: use the values directly
+            varied_values = set(ranges)
+
+        # Round integers and remove duplicates
+        if isinstance(default_value, int):
+            varied_values = {round(val) for val in varied_values}
+
+        parameter_variations[param] = sorted(varied_values)
+
+    # Prepare parameters for batch_run
+    parameters = {param: values for param, values in parameter_variations.items()}
+
+    # Execute batch run using the Mesa batch_run function
+    return batch_run(
+        model_cls=model_cls,
+        parameters=parameters,
+        iterations=iterations,
+        **kwargs
+    )
