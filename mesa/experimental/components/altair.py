@@ -1,6 +1,6 @@
 import contextlib
-from typing import Optional
 import datetime
+from typing import Optional
 
 import solara
 
@@ -38,9 +38,9 @@ def _draw_grid(space, agent_portrayal):
     def detect_type(key):
         key_type = type(all_agent_data[0][key])
         tooltip_type = ""
-        if (key_type == int):
+        if key_type == int:
             tooltip_type = "quantitative"
-        elif (key_type == datetime.datetime):
+        elif key_type == datetime.datetime:
             tooltip_type = "temporal"
         else:
             tooltip_type = "nominal"
@@ -49,7 +49,6 @@ def _draw_grid(space, agent_portrayal):
             # change tooltip_type to "temporal"
 
         return tooltip_type
-
 
     all_agent_data = portray(space)
     invalid_tooltips = ["color", "size", "x", "y"]
@@ -65,8 +64,10 @@ def _draw_grid(space, agent_portrayal):
         # no y-axis label
         "y": alt.Y("y", axis=None, type="ordinal"),
         "tooltip": [
-            alt.Tooltip(key, type=tooltip_types[key]) for key in all_agent_data[0].keys() if key not in invalid_tooltips
-        ]
+            alt.Tooltip(key, type=tooltip_types[key])
+            for key in all_agent_data[0].keys()
+            if key not in invalid_tooltips
+        ],
     }
     has_color = "color" in all_agent_data[0]
     if has_color:
