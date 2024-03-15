@@ -88,7 +88,9 @@ def JupyterViz(
 
     # 2. Set up Model
     def make_model():
-        model = model_class.__new__(model_class, **model_parameters, seed=reactive_seed.value)
+        model = model_class.__new__(
+            model_class, **model_parameters, seed=reactive_seed.value
+        )
         model.__init__(**model_parameters)
         current_step.value = 0
         return model
@@ -171,9 +173,7 @@ def JupyterViz(
                 ModelController(model, play_interval, current_step, reset_counter)
                 solara.Button(label="Reseed", color="primary", on_click=do_reseed)
             with solara.Card("Information", margin=1, elevation=2):
-                solara.Markdown(
-                    md_text=f"Step - {current_step}"
-                )
+                solara.Markdown(md_text=f"Step - {current_step}")
 
         items = [
             Card(
@@ -259,7 +259,8 @@ def ModelController(model, play_interval, current_step, reset_counter):
         solara.Button(label="Step", color="primary", on_click=do_step)
         # This style is necessary so that the play widget has almost the same
         # height as typical Solara buttons.
-        solara.Style("""
+        solara.Style(
+            """
         .widget-play {
             height: 35px;
         }

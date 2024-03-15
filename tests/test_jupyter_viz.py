@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import ipyvuetify as vw
 import solara
@@ -83,7 +83,9 @@ class TestMakeUserInput(unittest.TestCase):
 
 
 def test_call_space_drawer(mocker):
-    mock_space_matplotlib = mocker.patch("mesa.experimental.components.matplotlib.SpaceMatplotlib")
+    mock_space_matplotlib = mocker.patch(
+        "mesa.experimental.components.matplotlib.SpaceMatplotlib"
+    )
 
     model = mesa.Model()
     mocker.patch.object(mesa.Model, "__new__", return_value=model)
@@ -134,9 +136,7 @@ def test_call_space_drawer(mocker):
             space_drawer=altspace_drawer,
         )
     )
-    altspace_drawer.assert_called_with(
-        model, agent_portrayal
-    )
+    altspace_drawer.assert_called_with(model, agent_portrayal)
 
 
 def test_slider():
