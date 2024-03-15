@@ -55,6 +55,7 @@ dev = [
   "pytest >= 4.6",
   "pytest-cov",
   "sphinx",
+  "pytest-mock",
 ]
 docs = [
   "sphinx",
