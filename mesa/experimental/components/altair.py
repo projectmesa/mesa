@@ -34,7 +34,6 @@ def _draw_grid(space, agent_portrayal):
                 all_agent_data.append(agent_data)
         return all_agent_data
 
-
     all_agent_data = portray(space)
     invalid_tooltips = ["color", "size", "x", "y"]
 
@@ -44,9 +43,12 @@ def _draw_grid(space, agent_portrayal):
         # no y-axis label
         "y": alt.Y("y", axis=None, type="ordinal"),
         "tooltip": [
-            alt.Tooltip(key, type=alt.utils.infer_vegalite_type([all_agent_data[0][key]])) 
-                for key in all_agent_data[0] if key not in invalid_tooltips
-        ]
+            alt.Tooltip(
+                key, type=alt.utils.infer_vegalite_type([all_agent_data[0][key]])
+            )
+            for key in all_agent_data[0]
+            if key not in invalid_tooltips
+        ],
     }
     has_color = "color" in all_agent_data[0]
     if has_color:
