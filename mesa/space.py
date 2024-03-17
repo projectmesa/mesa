@@ -71,6 +71,21 @@ def is_integer(x: Real) -> bool:
     return isinstance(x, _types_integer)
 
 
+def warn_if_agent_has_position_already(placement_func):
+    def wrapper(self, agent, *args, **kwargs):
+        if agent.pos is not None:
+            warnings.warn(
+                f"""Agent {agent.unique_id} is being placed with
+place_agent() despite already having the position {agent.pos}. In most
+cases, you'd want to clear the current position with remove_agent()
+before placing the agent again.""",
+                stacklevel=2,
+            )
+        placement_func(self, agent, *args, **kwargs)
+
+    return wrapper
+
+
 class _Grid:
     """Base class for a rectangular grid.
 
@@ -976,6 +991,7 @@ class SingleGrid(_PropertyGrid):
                  the grid for empty spaces.
     """
 
+    @warn_if_agent_has_position_already
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         if self.is_cell_empty(pos):
@@ -1024,6 +1040,7 @@ class MultiGrid(_PropertyGrid):
         """Default value for new cell elements."""
         return []
 
+    @warn_if_agent_has_position_already
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         x, y = pos
@@ -1355,6 +1372,7 @@ class ContinuousSpace:
         self._agent_points = None
         self._index_to_agent = {}
 
+    @warn_if_agent_has_position_already
     def place_agent(self, agent: Agent, pos: FloatCoordinate) -> None:
         """Place a new agent in the space.
 
@@ -1515,6 +1533,7 @@ class NetworkGrid:
         """Default value for a new node."""
         return []
 
+    @warn_if_agent_has_position_already
     def place_agent(self, agent: Agent, node_id: int) -> None:
         """Place an agent in a node."""
         self.G.nodes[node_id]["agent"].append(agent)
