@@ -3,7 +3,6 @@ import solara
 from matplotlib.figure import Figure
 from mesa.experimental import JupyterViz
 from sugarscape_g1mt.model import SugarscapeG1mt
-from sugarscape_g1mt.resource_agents import Sugar
 from sugarscape_g1mt.trader_agents import Trader
 
 
@@ -22,11 +21,12 @@ def space_drawer(model, agent_portrayal):
                     layers["trader"]["y"].append(j)
                 else:
                     # Don't visualize resource with value <= 1.
-                    value = agent.amount if agent.amount > 1 else np.nan
-                    if isinstance(agent, Sugar):
-                        layers["sugar"][i][j] = value
-                    else:
-                        layers["spice"][i][j] = value
+                    layers["sugar"][i][j] = (
+                        agent.sugar_amount if agent.sugar_amount > 1 else np.nan
+                    )
+                    layers["spice"][i][j] = (
+                        agent.spice_amount if agent.spice_amount > 1 else np.nan
+                    )
         return layers
 
     fig = Figure()
