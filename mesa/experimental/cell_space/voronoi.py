@@ -3,8 +3,6 @@ from itertools import combinations
 from random import Random
 from typing import Optional
 
-from numpy import array as np_array
-from numpy.random import uniform as np_uniform
 from pyhull.delaunay import DelaunayTri
 
 from mesa.experimental.cell_space.cell import Cell
@@ -14,8 +12,7 @@ from mesa.experimental.cell_space.discrete_space import DiscreteSpace
 class VoronoiGrid(DiscreteSpace):
     def __init__(
         self,
-        dimensions: Optional[Sequence[int]] = None,
-        density: Optional[float] = None,
+        centroids_coordinates: Optional[Sequence[Sequence[float]]] = None,
         capacity: float | None = None,
         random: Optional[Random] = None,
         cell_klass: type[Cell] = Cell,
@@ -31,24 +28,22 @@ class VoronoiGrid(DiscreteSpace):
 
         """
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
-        self.dimensions = dimensions
-        self.density = density
-        self._ndims = len(dimensions)
+        self.centroids_coordinates = centroids_coordinates
         self._validate_parameters()
 
-        _grid_total_space = 1
-        for dim in self.dimensions:
-            _grid_total_space *= dim
+        # _grid_total_space = 1
+        # for dim in self.dimensions:
+        #     _grid_total_space *= dim
 
-        self.number_cells = _grid_total_space * density
+        # self.number_cells = _grid_total_space * density
 
-        self.np_coordinates = np_array(
-            [np_uniform(0, dim, self.number_cells) for dim in self.dimensions]
-        ).T
+        # self.np_coordinates = np_array(
+        #     [np_uniform(0, dim, self.number_cells) for dim in self.dimensions]
+        # ).T
 
         self._cells = {
-            i: cell_klass(self.np_coordinates[i], capacity, random=self.random)
-            for i in range(self.number_cells)
+            i: cell_klass(self.centroids_coordinates[i], capacity, random=self.random)
+            for i in range(len(self.centroids_coordinates))
         }
 
         self._connect_cells()
@@ -57,7 +52,7 @@ class VoronoiGrid(DiscreteSpace):
         self._connect_cells_nd()
 
     def _connect_cells_nd(self):
-        triangulation = DelaunayTri(self.np_coordinates)
+        triangulation = DelaunayTri(self.centroids_coordinates)
 
         for p in triangulation.vertices:
             for i, j in combinations(p, 2):
@@ -65,9 +60,13 @@ class VoronoiGrid(DiscreteSpace):
                 self._cells[j].connect(self._cells[i])
 
     def _validate_parameters(self):
-        if not isinstance(self.density, float) and not (self.density > 0):
-            raise ValueError("Density should be a positive float.")
-        if not all(isinstance(dim, int) and dim > 0 for dim in self.dimensions):
-            raise ValueError("Dimensions must be a list of positive integers.")
         if self.capacity is not None and not isinstance(self.capacity, (float, int)):
             raise ValueError("Capacity must be a number or None.")
+        if not isinstance(self.centroids_coordinates, Sequence) and not isinstance(
+            self.centroids_coordinates[0], Sequence
+        ):
+            raise ValueError("Centroids should be a list of lists")
+        dimension_1 = len(self.centroids_coordinates[0])
+        for coordinate in self.centroids_coordinates:
+            if dimension_1 != len(coordinate):
+                raise ValueError("Centroid coordinates should be a homogeneous array")
