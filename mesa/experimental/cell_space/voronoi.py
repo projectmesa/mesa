@@ -31,16 +31,6 @@ class VoronoiGrid(DiscreteSpace):
         self.centroids_coordinates = centroids_coordinates
         self._validate_parameters()
 
-        # _grid_total_space = 1
-        # for dim in self.dimensions:
-        #     _grid_total_space *= dim
-
-        # self.number_cells = _grid_total_space * density
-
-        # self.np_coordinates = np_array(
-        #     [np_uniform(0, dim, self.number_cells) for dim in self.dimensions]
-        # ).T
-
         self._cells = {
             i: cell_klass(self.centroids_coordinates[i], capacity, random=self.random)
             for i in range(len(self.centroids_coordinates))
