@@ -56,7 +56,7 @@ class Model:
         if obj._seed is None:
             # We explicitly specify the seed here so that we know its value in
             # advance.
-            obj._seed = random.random()  # noqa: S311
+            obj._seed = random.random()
         obj.random = random.Random(obj._seed)
         # TODO: Remove these 2 lines just before Mesa 3.0
         obj._steps = 0
