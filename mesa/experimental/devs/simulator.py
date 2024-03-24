@@ -239,6 +239,12 @@ class ABMSimulator(Simulator):
         )
 
     def run_until(self, end_time: int) -> None:
+        """run the simulator up to and included the specified end time
+
+        Args:
+            end_time (float| int): The end_time delta. The simulator is until the specified end time
+
+        """
         while True:
             try:
                 event = self.event_list.pop_event()

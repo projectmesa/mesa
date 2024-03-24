@@ -23,7 +23,7 @@ def run_model(model_class, seed, parameters):
 
     end_init_start_run = timeit.default_timer()
 
-    simulator.run(config["steps"])
+    simulator.run_for(config["steps"])
 
     # for _ in range(config["steps"]):
     #     model.step()
