@@ -56,7 +56,7 @@ def test_simulation_event():
     event.execute()
     some_test_function.assert_called_once_with("1", x=2)
 
-    # check if we pass over deletion of callable silenty because of weakrefs
+    # check if we pass over deletion of callable silently because of weakrefs
     some_test_function = lambda x, y: x + y
     event = SimulationEvent(time, some_test_function, priority=Priority.DEFAULT)
     del some_test_function

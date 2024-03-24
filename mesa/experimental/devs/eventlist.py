@@ -62,9 +62,10 @@ class SimulationEvent:
 
     def execute(self):
         """execute this event"""
-        fn = self.fn()
-        if fn is not None:
-            fn(*self.function_args, **self.function_kwargs)
+        if not self._canceled:
+            fn = self.fn()
+            if fn is not None:
+                fn(*self.function_args, **self.function_kwargs)
 
     def cancel(self) -> None:
         """cancel this event"""
@@ -85,7 +86,7 @@ class SimulationEvent:
 class EventList:
     """An event list
 
-    This is a heap queue sorted list of events. Events are allways removed from the left, so heapq is a performant and
+    This is a heap queue sorted list of events. Events are always removed from the left, so heapq is a performant and
     appropriate data structure. Events are sorted based on their time stamp, their priority, and their unique_id
     as a tie-breaker, guaranteeing a complete ordering.
 
