@@ -50,16 +50,7 @@ class Simulator:
         self.model = None
         self.time = self.start_time
 
-    def run_for(self, time_delta: int | float):
-        """run the simulator for the specified time delta
-
-        Args:
-            time_delta (float| int): The time delta. The simulator is run from the current time to the current time
-                                     plus the time delta
-
-        """
-
-        end_time = self.time + time_delta
+    def run_until(self, end_time: int | float) -> None:
         while True:
             try:
                 event = self.event_list.pop_event()
@@ -74,6 +65,19 @@ class Simulator:
                 self.time = end_time
                 self._schedule_event(event)  # reschedule event
                 break
+
+
+    def run_for(self, time_delta: int | float):
+        """run the simulator for the specified time delta
+
+        Args:
+            time_delta (float| int): The time delta. The simulator is run from the current time to the current time
+                                     plus the time delta
+
+        """
+        end_time = self.time + time_delta
+        self.run_until(end_time)
+
 
     def schedule_event_now(
         self,
@@ -236,16 +240,7 @@ class ABMSimulator(Simulator):
             function_kwargs=function_kwargs,
         )
 
-    def run_for(self, time_delta: int | float):
-        """run the simulator for the specified time delta
-
-        Args:
-            time_delta (float| int): The time delta. The simulator is run from the current time to the current time
-                                     plus the time delta
-
-        """
-
-        end_time = self.time + time_delta
+    def run_until(self, end_time: int) -> None:
         while True:
             try:
                 event = self.event_list.pop_event()
@@ -253,8 +248,7 @@ class ABMSimulator(Simulator):
                 self.time = end_time
                 break
 
-            ## FIXME:: do we want to run up to and including?
-            if event.time < end_time:
+            if event.time <= end_time:
                 self.time = event.time
                 if event.fn() == self.model.step:
                     self.schedule_event_next_tick(
@@ -266,6 +260,18 @@ class ABMSimulator(Simulator):
                 self.time = end_time
                 self._schedule_event(event)
                 break
+
+    def run_for(self, time_delta: int ):
+        """run the simulator for the specified time delta
+
+        Args:
+            time_delta (float| int): The time delta. The simulator is run from the current time to the current time
+                                     plus the time delta
+
+        """
+        end_time = self.time + time_delta - 1
+        self.run_until(end_time)
+
 
 
 class DEVSimulator(Simulator):

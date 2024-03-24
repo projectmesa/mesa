@@ -82,7 +82,7 @@ def test_abm_simulator():
 
     simulator.run_for(3)
     assert model.step.call_count == 3
-    assert simulator.time == 3
+    assert simulator.time == 2
 
 
 def test_simulation_event():
