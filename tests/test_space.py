@@ -42,7 +42,7 @@ class TestSpacePerformance(unittest.TestCase):
         """
         positions = np.random.rand(TEST_AGENTS_PERF, 2)
         for i in range(TEST_AGENTS_PERF):
-            a = MockAgent(i, None)
+            a = MockAgent(i)
             pos = [positions[i, 0], positions[i, 1]]
             self.space.place_agent(a, pos)
 
@@ -59,7 +59,7 @@ class TestSpaceToroidal(unittest.TestCase):
         self.space = ContinuousSpace(70, 20, True, -30, -30)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS):
-            a = MockAgent(i, None)
+            a = MockAgent(i)
             self.agents.append(a)
             self.space.place_agent(a, pos)
 
@@ -126,7 +126,7 @@ class TestSpaceToroidal(unittest.TestCase):
         """
         boundary_agents = []
         for i, pos in enumerate(OUTSIDE_POSITIONS):
-            a = MockAgent(len(self.agents) + i, None)
+            a = MockAgent(len(self.agents) + i)
             boundary_agents.append(a)
             self.space.place_agent(a, pos)
 
@@ -152,7 +152,7 @@ class TestSpaceNonToroidal(unittest.TestCase):
         self.space = ContinuousSpace(70, 20, False, -30, -30)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS):
-            a = MockAgent(i, None)
+            a = MockAgent(i)
             self.agents.append(a)
             self.space.place_agent(a, pos)
 
@@ -208,7 +208,7 @@ class TestSpaceNonToroidal(unittest.TestCase):
         Test positions outside of boundary
         """
         for i, pos in enumerate(OUTSIDE_POSITIONS):
-            a = MockAgent(len(self.agents) + i, None)
+            a = MockAgent(len(self.agents) + i)
             with self.assertRaises(Exception):
                 self.space.place_agent(a, pos)
 
@@ -231,7 +231,7 @@ class TestSpaceAgentMapping(unittest.TestCase):
         self.space = ContinuousSpace(70, 50, False, -30, -30)
         self.agents = []
         for i, pos in enumerate(REMOVAL_TEST_AGENTS):
-            a = MockAgent(i, None)
+            a = MockAgent(i)
             self.agents.append(a)
             self.space.place_agent(a, pos)
 
@@ -442,7 +442,7 @@ class TestSingleGrid(unittest.TestCase):
         self.space = SingleGrid(50, 50, False)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS_GRID):
-            a = MockAgent(i, None)
+            a = MockAgent(i)
             self.agents.append(a)
             self.space.place_agent(a, pos)
 
@@ -466,7 +466,7 @@ class TestSingleGrid(unittest.TestCase):
     def test_empty_cells(self):
         if self.space.exists_empty_cells():
             for i, pos in enumerate(list(self.space.empties)):
-                a = MockAgent(-i, pos)
+                a = MockAgent(-i)
                 self.space.place_agent(a, pos)
         with self.assertRaises(Exception):
             self.space.move_to_empty(a)
@@ -551,7 +551,7 @@ class TestSingleGridTorus(unittest.TestCase):
         self.space = SingleGrid(50, 50, True)  # Torus is True here
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS_GRID):
-            a = MockAgent(i, None)
+            a = MockAgent(i)
             self.agents.append(a)
             self.space.place_agent(a, pos)
 
@@ -643,7 +643,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         self.assertTrue(np.all(empty_mask == np.ones((10, 10), dtype=bool)))
 
     def test_get_empty_mask_with_agent(self):
-        agent = MockAgent(0, self.grid)
+        agent = MockAgent(0)
         self.grid.place_agent(agent, (4, 6))
 
         empty_mask = self.grid.empty_mask
@@ -653,8 +653,8 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         self.assertTrue(np.all(empty_mask == expected_mask))
 
     def test_get_neighborhood_mask(self):
-        agent = MockAgent(0, self.grid)
-        agent2 = MockAgent(1, self.grid)
+        agent = MockAgent(0)
+        agent2 = MockAgent(1)
         self.grid.place_agent(agent, (5, 5))
         self.grid.place_agent(agent2, (5, 6))
         neighborhood_mask = self.grid.get_neighborhood_mask((5, 5), True, False, 1)
@@ -680,7 +680,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         self.assertTrue(selected_mask.all())
 
     def test_move_agent_to_cell_by_properties(self):
-        agent = MockAgent(1, self.grid)
+        agent = MockAgent(1)
         self.grid.place_agent(agent, (5, 5))
         conditions = {"layer1": lambda x: x == 0}
         target_cells = self.grid.select_cells(conditions)
@@ -689,7 +689,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         self.assertNotEqual(agent.pos, (5, 5))
 
     def test_move_agent_no_eligible_cells(self):
-        agent = MockAgent(3, self.grid)
+        agent = MockAgent(3)
         self.grid.place_agent(agent, (5, 5))
         conditions = {"layer1": lambda x: x != 0}
         target_cells = self.grid.select_cells(conditions)
@@ -711,7 +711,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         self.assertTrue(target_mask[3, 1])
 
     def test_move_agent_to_extreme_value_cell(self):
-        agent = MockAgent(2, self.grid)
+        agent = MockAgent(2)
         self.grid.place_agent(agent, (5, 5))
         self.grid.properties["layer2"].set_cell((3, 1), 1.1)
         target_cells = self.grid.select_cells(extreme_values={"layer2": "highest"})
@@ -721,7 +721,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
     # Test using masks
     def test_select_cells_by_properties_with_empty_mask(self):
         self.grid.place_agent(
-            MockAgent(0, self.grid), (5, 5)
+            MockAgent(0), (5, 5)
         )  # Placing an agent to ensure some cells are not empty
         empty_mask = self.grid.empty_mask
 
@@ -755,10 +755,10 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         self.assertCountEqual(selected_cells, expected_selection)
 
     def test_move_agent_to_cell_by_properties_with_empty_mask(self):
-        agent = MockAgent(1, self.grid)
+        agent = MockAgent(1)
         self.grid.place_agent(agent, (5, 5))
         self.grid.place_agent(
-            MockAgent(2, self.grid), (4, 5)
+            MockAgent(2), (4, 5)
         )  # Placing another agent to create a non-empty cell
         empty_mask = self.grid.empty_mask
         conditions = {"layer1": lambda x: x == 0}
@@ -769,7 +769,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
         )  # Agent should not move to (4, 5) as it's not empty
 
     def test_move_agent_to_cell_by_properties_with_neighborhood_mask(self):
-        agent = MockAgent(1, self.grid)
+        agent = MockAgent(1)
         self.grid.place_agent(agent, (5, 5))
         neighborhood_mask = self.grid.get_neighborhood_mask((5, 5), True, False, 1)
         conditions = {"layer1": lambda x: x == 0}
@@ -789,7 +789,7 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
 
     # Test if coordinates means the same between the grid and the property layer
     def test_property_layer_coordinates(self):
-        agent = MockAgent(0, self.grid)
+        agent = MockAgent(0)
         correct_pos = (1, 8)
         incorrect_pos = (8, 1)
         self.grid.place_agent(agent, correct_pos)
@@ -811,14 +811,14 @@ class TestSingleGridWithPropertyGrid(unittest.TestCase):
 
     # Test selecting cells with only_empty parameter
     def test_select_cells_only_empty(self):
-        self.grid.place_agent(MockAgent(0, self.grid), (5, 5))  # Occupying a cell
+        self.grid.place_agent(MockAgent(0), (5, 5))  # Occupying a cell
         selected_cells = self.grid.select_cells(only_empty=True)
         self.assertNotIn(
             (5, 5), selected_cells
         )  # The occupied cell should not be selected
 
     def test_select_cells_only_empty_with_conditions(self):
-        self.grid.place_agent(MockAgent(1, self.grid), (5, 5))
+        self.grid.place_agent(MockAgent(1), (5, 5))
         self.grid.properties["layer1"].set_cell((5, 5), 2)
         self.grid.properties["layer1"].set_cell((6, 6), 2)
 
@@ -855,7 +855,7 @@ class TestSingleNetworkGrid(unittest.TestCase):
         self.space = NetworkGrid(G)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS_NETWORK_SINGLE):
-            a = MockAgent(i, None)
+            a = MockAgent(i)
             self.agents.append(a)
             self.space.place_agent(a, pos)
 
@@ -968,7 +968,7 @@ class TestMultipleNetworkGrid(unittest.TestCase):
         self.space = NetworkGrid(G)
         self.agents = []
         for i, pos in enumerate(TEST_AGENTS_NETWORK_MULTIPLE):
-            a = MockAgent(i, None)
+            a = MockAgent(i)
             self.agents.append(a)
             self.space.place_agent(a, pos)
 
