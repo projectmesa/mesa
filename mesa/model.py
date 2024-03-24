@@ -3,6 +3,7 @@ The model class for Mesa framework.
 
 Core Objects: Model
 """
+
 # Mypy; for the `|` operator purpose
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
