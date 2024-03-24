@@ -43,6 +43,9 @@ class SimulationEvent:
         function_kwargs: dict[str, Any] | None = None,
     ) -> None:
         super().__init__()
+        if not callable(function):
+            raise Exception()
+
         self.time = time
         self.priority = priority.value
         self._canceled = False
@@ -57,8 +60,6 @@ class SimulationEvent:
         self.function_args = function_args if function_args else []
         self.function_kwargs = function_kwargs if function_kwargs else {}
 
-        if self.fn is None:
-            raise Exception()
 
     def execute(self):
         """execute this event"""
@@ -105,7 +106,7 @@ class EventList:
 
         heappush(self._events, event)
 
-    def peek_ahead(self, n: int = 1) -> list[SimulationEvent]:
+    def peak_ahead(self, n: int = 1) -> list[SimulationEvent]:
         """Look at the first n non-canceled event in the event list
 
         Args:
