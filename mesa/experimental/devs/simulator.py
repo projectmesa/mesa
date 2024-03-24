@@ -236,7 +236,6 @@ class ABMSimulator(Simulator):
             function_kwargs=function_kwargs,
         )
 
-
     def run_for(self, time_delta: int | float):
         """run the simulator for the specified time delta
 
@@ -254,12 +253,13 @@ class ABMSimulator(Simulator):
                 self.time = end_time
                 break
 
-
             ## FIXME:: do we want to run up to and including?
             if event.time < end_time:
                 self.time = event.time
                 if event.fn() == self.model.step:
-                    self.schedule_event_next_tick(self.model.step, priority=Priority.HIGH)
+                    self.schedule_event_next_tick(
+                        self.model.step, priority=Priority.HIGH
+                    )
 
                 event.execute()
             else:

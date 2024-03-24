@@ -1,10 +1,11 @@
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock
 
 import pytest
 
 from mesa import Model
 from mesa.experimental.devs.eventlist import EventList, Priority, SimulationEvent
-from mesa.experimental.devs.simulator import Simulator, DEVSimulator, ABMSimulator
+from mesa.experimental.devs.simulator import ABMSimulator, DEVSimulator
+
 
 def test_devs_simulator():
     simulator = DEVSimulator()
@@ -51,7 +52,6 @@ def test_devs_simulator():
     with pytest.raises(ValueError):
         simulator.schedule_event_absolute(fn2, 0.5)
 
-
     # cancel_event
     simulator = DEVSimulator()
     model = MagicMock(spec=Model)
@@ -66,7 +66,6 @@ def test_devs_simulator():
     assert len(simulator.event_list) == 0
     assert simulator.model is None
     assert simulator.time == 0.0
-
 
 
 def test_abm_simulator():
@@ -84,10 +83,6 @@ def test_abm_simulator():
     simulator.run_for(3)
     assert model.step.call_count == 3
     assert simulator.time == 3
-
-
-
-
 
 
 def test_simulation_event():
