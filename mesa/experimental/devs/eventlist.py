@@ -60,7 +60,6 @@ class SimulationEvent:
         self.function_args = function_args if function_args else []
         self.function_kwargs = function_kwargs if function_kwargs else {}
 
-
     def execute(self):
         """execute this event"""
         fn = self.fn()

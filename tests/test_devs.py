@@ -1,18 +1,17 @@
-import pytest
-
 from unittest.mock import MagicMock
 
-from mesa.experimental.devs.simulator import ABMSimulator, DEVSimulator, Simulator
-from mesa.experimental.devs.eventlist import EventList, SimulationEvent, Priority
+import pytest
 
+from mesa.experimental.devs.eventlist import EventList, Priority, SimulationEvent
 
-from mesa import Model
 
 def test_simulator():
     pass
 
+
 def test_abms_simulator():
     pass
+
 
 def test_devs_simulator():
     pass
@@ -22,7 +21,13 @@ def test_simulation_event():
     some_test_function = MagicMock()
 
     time = 10
-    event = SimulationEvent(time, some_test_function, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
+    event = SimulationEvent(
+        time,
+        some_test_function,
+        priority=Priority.DEFAULT,
+        function_args=[],
+        function_kwargs={},
+    )
 
     assert event.time == time
     assert event.fn() is some_test_function
@@ -35,14 +40,21 @@ def test_simulation_event():
     some_test_function.assert_called_once()
 
     with pytest.raises(Exception):
-        SimulationEvent(time, None, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
+        SimulationEvent(
+            time, None, priority=Priority.DEFAULT, function_args=[], function_kwargs={}
+        )
 
     # check calling with arguments
     some_test_function = MagicMock()
-    event = SimulationEvent(time, some_test_function, priority=Priority.DEFAULT, function_args=['1'], function_kwargs={'x':2})
+    event = SimulationEvent(
+        time,
+        some_test_function,
+        priority=Priority.DEFAULT,
+        function_args=["1"],
+        function_kwargs={"x": 2},
+    )
     event.execute()
-    some_test_function.assert_called_once_with('1', x=2)
-
+    some_test_function.assert_called_once_with("1", x=2)
 
     # check if we pass over deletion of callable silenty because of weakrefs
     some_test_function = lambda x, y: x + y
@@ -52,8 +64,13 @@ def test_simulation_event():
 
     # cancel
     some_test_function = MagicMock()
-    event = SimulationEvent(time, some_test_function, priority=Priority.DEFAULT, function_args=['1'],
-                            function_kwargs={'x': 2})
+    event = SimulationEvent(
+        time,
+        some_test_function,
+        priority=Priority.DEFAULT,
+        function_args=["1"],
+        function_kwargs={"x": 2},
+    )
     event.cancel()
     assert event.fn is None
     assert event.function_args == []
@@ -62,17 +79,54 @@ def test_simulation_event():
     assert event.CANCELED
 
     # comparison for sorting
-    event1 = SimulationEvent(10, some_test_function, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
-    event2 = SimulationEvent(10, some_test_function, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
+    event1 = SimulationEvent(
+        10,
+        some_test_function,
+        priority=Priority.DEFAULT,
+        function_args=[],
+        function_kwargs={},
+    )
+    event2 = SimulationEvent(
+        10,
+        some_test_function,
+        priority=Priority.DEFAULT,
+        function_args=[],
+        function_kwargs={},
+    )
     assert event1 < event2  # based on just unique_id as tiebraker
 
-    event1 = SimulationEvent(11, some_test_function, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
-    event2 = SimulationEvent(10, some_test_function, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
+    event1 = SimulationEvent(
+        11,
+        some_test_function,
+        priority=Priority.DEFAULT,
+        function_args=[],
+        function_kwargs={},
+    )
+    event2 = SimulationEvent(
+        10,
+        some_test_function,
+        priority=Priority.DEFAULT,
+        function_args=[],
+        function_kwargs={},
+    )
     assert event1 > event2
 
-    event1 = SimulationEvent(10, some_test_function, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
-    event2 = SimulationEvent(10, some_test_function, priority=Priority.HIGH, function_args=[], function_kwargs={})
+    event1 = SimulationEvent(
+        10,
+        some_test_function,
+        priority=Priority.DEFAULT,
+        function_args=[],
+        function_kwargs={},
+    )
+    event2 = SimulationEvent(
+        10,
+        some_test_function,
+        priority=Priority.HIGH,
+        function_args=[],
+        function_kwargs={},
+    )
     assert event1 > event2
+
 
 def test_eventlist():
     event_list = EventList()
@@ -83,7 +137,13 @@ def test_eventlist():
 
     # add event
     some_test_function = MagicMock()
-    event = SimulationEvent(1, some_test_function, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
+    event = SimulationEvent(
+        1,
+        some_test_function,
+        priority=Priority.DEFAULT,
+        function_args=[],
+        function_kwargs={},
+    )
     event_list.add_event(event)
     assert len(event_list) == 1
     assert event in event_list
@@ -96,7 +156,13 @@ def test_eventlist():
     # peak ahead
     event_list = EventList()
     for i in range(10):
-        event = SimulationEvent(i, some_test_function, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
+        event = SimulationEvent(
+            i,
+            some_test_function,
+            priority=Priority.DEFAULT,
+            function_args=[],
+            function_kwargs={},
+        )
         event_list.add_event(event)
     events = event_list.peak_ahead(2)
     assert len(events) == 2
@@ -117,13 +183,25 @@ def test_eventlist():
     # pop event
     event_list = EventList()
     for i in range(10):
-        event = SimulationEvent(i, some_test_function, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
+        event = SimulationEvent(
+            i,
+            some_test_function,
+            priority=Priority.DEFAULT,
+            function_args=[],
+            function_kwargs={},
+        )
         event_list.add_event(event)
     event = event_list.pop_event()
     assert event.time == 0
 
     event_list = EventList()
-    event = SimulationEvent(9, some_test_function, priority=Priority.DEFAULT, function_args=[], function_kwargs={})
+    event = SimulationEvent(
+        9,
+        some_test_function,
+        priority=Priority.DEFAULT,
+        function_args=[],
+        function_kwargs={},
+    )
     event_list.add_event(event)
     event.cancel()
     with pytest.raises(Exception):
