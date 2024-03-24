@@ -1,20 +1,93 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 import pytest
 
+from mesa import Model
 from mesa.experimental.devs.eventlist import EventList, Priority, SimulationEvent
-
-
-def test_simulator():
-    pass
-
-
-def test_abms_simulator():
-    pass
-
+from mesa.experimental.devs.simulator import Simulator, DEVSimulator, ABMSimulator
 
 def test_devs_simulator():
-    pass
+    simulator = DEVSimulator()
+
+    # setup
+    model = MagicMock(spec=Model)
+    simulator.setup(model)
+
+    assert len(simulator.event_list) == 0
+    assert simulator.model == model
+    assert simulator.time == 0
+
+    # schedule_event_now
+    fn1 = MagicMock()
+    event1 = simulator.schedule_event_now(fn1)
+    assert event1 in simulator.event_list
+    assert len(simulator.event_list) == 1
+
+    # schedule_event_absolute
+    fn2 = MagicMock()
+    event2 = simulator.schedule_event_absolute(fn2, 1.0)
+    assert event2 in simulator.event_list
+    assert len(simulator.event_list) == 2
+
+    # schedule_event_relative
+    fn3 = MagicMock()
+    event3 = simulator.schedule_event_relative(fn3, 0.5)
+    assert event3 in simulator.event_list
+    assert len(simulator.event_list) == 3
+
+    # run_for
+    simulator.run_for(0.8)
+    fn1.assert_called_once()
+    fn3.assert_called_once()
+    assert simulator.time == 0.8
+
+    simulator.run_for(0.2)
+    fn2.assert_called_once()
+    assert simulator.time == 1.0
+
+    simulator.run_for(0.2)
+    assert simulator.time == 1.2
+
+    with pytest.raises(ValueError):
+        simulator.schedule_event_absolute(fn2, 0.5)
+
+
+    # cancel_event
+    simulator = DEVSimulator()
+    model = MagicMock(spec=Model)
+    simulator.setup(model)
+    fn = MagicMock()
+    event = simulator.schedule_event_relative(fn, 0.5)
+    simulator.cancel_event(event)
+    assert event.CANCELED
+
+    # simulator reset
+    simulator.reset()
+    assert len(simulator.event_list) == 0
+    assert simulator.model is None
+    assert simulator.time == 0.0
+
+
+
+def test_abm_simulator():
+    simulator = ABMSimulator()
+
+    # setup
+    model = MagicMock(spec=Model)
+    simulator.setup(model)
+
+    # schedule_event_next_tick
+    fn = MagicMock()
+    simulator.schedule_event_next_tick(fn)
+    assert len(simulator.event_list) == 2
+
+    simulator.run_for(3)
+    assert model.step.call_count == 3
+    assert simulator.time == 3
+
+
+
+
 
 
 def test_simulation_event():

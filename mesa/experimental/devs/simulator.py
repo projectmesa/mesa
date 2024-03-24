@@ -50,7 +50,7 @@ class Simulator:
         self.model = None
         self.time = self.start_time
 
-    def run(self, time_delta: int | float):
+    def run_for(self, time_delta: int | float):
         """run the simulator for the specified time delta
 
         Args:
@@ -60,13 +60,20 @@ class Simulator:
         """
 
         end_time = self.time + time_delta
-        while self.time < end_time:
-            self.step()
+        while True:
+            try:
+                event = self.event_list.pop_event()
+            except IndexError:  # event list is empty
+                self.time = end_time
+                break
 
-    def step(self):
-        event = self.event_list.pop_event()
-        self.time = event.time
-        event.execute()
+            if event.time <= end_time:
+                self.time = event.time
+                event.execute()
+            else:
+                self.time = end_time
+                self._schedule_event(event)  # reschedule event
+                break
 
     def schedule_event_now(
         self,
@@ -89,7 +96,7 @@ class Simulator:
         """
         return self.schedule_event_relative(
             function,
-            0,
+            0.0,
             priority=priority,
             function_args=function_args,
             function_kwargs=function_kwargs,
@@ -229,21 +236,36 @@ class ABMSimulator(Simulator):
             function_kwargs=function_kwargs,
         )
 
-    def step(self):
-        """get the next event from the event list and execute it.
 
-        Note
-            if the event to execute is `model.step`, this method automatically also
-            schedules a new `model.step` event for the next time tick. This ensures
-            incremental time progression.
+    def run_for(self, time_delta: int | float):
+        """run the simulator for the specified time delta
+
+        Args:
+            time_delta (float| int): The time delta. The simulator is run from the current time to the current time
+                                     plus the time delta
 
         """
-        event = self.event_list.pop_event()
-        self.time = event.time
-        if event.fn() == self.model.step:
-            self.schedule_event_next_tick(self.model.step, priority=Priority.HIGH)
 
-        event.execute()
+        end_time = self.time + time_delta
+        while True:
+            try:
+                event = self.event_list.pop_event()
+            except IndexError:
+                self.time = end_time
+                break
+
+
+            ## FIXME:: do we want to run up to and including?
+            if event.time < end_time:
+                self.time = event.time
+                if event.fn() == self.model.step:
+                    self.schedule_event_next_tick(self.model.step, priority=Priority.HIGH)
+
+                event.execute()
+            else:
+                self.time = end_time
+                self._schedule_event(event)
+                break
 
 
 class DEVSimulator(Simulator):

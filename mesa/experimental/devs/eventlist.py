@@ -1,3 +1,4 @@
+from __future__ import annotations
 import itertools
 from enum import IntEnum
 from heapq import heapify, heappop, heappush
