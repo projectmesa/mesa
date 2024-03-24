@@ -20,7 +20,7 @@ def SpaceAltair(model, agent_portrayal, dependencies: Optional[list[any]] = None
 def _draw_grid(space, agent_portrayal):
     def portray(g):
         all_agent_data = []
-        for content, (x, y) in space.coord_iter():
+        for content, (x, y) in g.coord_iter():
             if not content:
                 continue
             if not hasattr(content, "__iter__"):
@@ -35,11 +35,18 @@ def _draw_grid(space, agent_portrayal):
         return all_agent_data
 
     all_agent_data = portray(space)
+    invalid_tooltips = ["color", "size", "x", "y"]
+
     encoding_dict = {
         # no x-axis label
         "x": alt.X("x", axis=None, type="ordinal"),
         # no y-axis label
         "y": alt.Y("y", axis=None, type="ordinal"),
+        "tooltip": [
+            alt.Tooltip(key, type=alt.utils.infer_vegalite_type([value]))
+            for key, value in all_agent_data[0].items()
+            if key not in invalid_tooltips
+        ],
     }
     has_color = "color" in all_agent_data[0]
     if has_color:
