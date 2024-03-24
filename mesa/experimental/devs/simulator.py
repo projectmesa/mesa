@@ -66,7 +66,6 @@ class Simulator:
                 self._schedule_event(event)  # reschedule event
                 break
 
-
     def run_for(self, time_delta: int | float):
         """run the simulator for the specified time delta
 
@@ -77,7 +76,6 @@ class Simulator:
         """
         end_time = self.time + time_delta
         self.run_until(end_time)
-
 
     def schedule_event_now(
         self,
@@ -261,7 +259,7 @@ class ABMSimulator(Simulator):
                 self._schedule_event(event)
                 break
 
-    def run_for(self, time_delta: int ):
+    def run_for(self, time_delta: int):
         """run the simulator for the specified time delta
 
         Args:
@@ -271,7 +269,6 @@ class ABMSimulator(Simulator):
         """
         end_time = self.time + time_delta - 1
         self.run_until(end_time)
-
 
 
 class DEVSimulator(Simulator):
