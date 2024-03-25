@@ -11,6 +11,7 @@ from mesa.experimental.cell_space import (
     Network,
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
+    VoronoiGrid,
 )
 
 
@@ -370,6 +371,19 @@ def test_networkgrid():
     for i, cell in grid._cells.items():
         for connection in cell._connections:
             assert connection.coordinate in G.neighbors(i)
+
+
+def test_voronoigrid():
+    points = [[0, 1], [1, 3], [1.1, 1], [1, 1]]
+
+    grid = VoronoiGrid(points)
+
+    assert len(grid._cells) == len(points)
+
+    # Check cell neighborhood
+    assert len(grid._cells[0]._connections) == 2
+    for connection in grid._cells[0]._connections:
+        assert connection.coordinate in [[1, 1], [1, 3]]
 
 
 def test_empties_space():

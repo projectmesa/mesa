@@ -45,6 +45,7 @@ dependencies = [
   "pandas",
   "solara",
   "tqdm",
+  "pyhull",
 ]
 dynamic = ["version"]
 
