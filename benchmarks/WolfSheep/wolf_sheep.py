@@ -38,8 +38,7 @@ class Animal(CellAgent):
         offspring.move_to(self.cell)
         self.model.schedule.add(offspring)
 
-    def feed(self):
-        ...
+    def feed(self): ...
 
     def die(self):
         self.cell.remove_agent(self)
