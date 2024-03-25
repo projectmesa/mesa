@@ -382,6 +382,7 @@ class AgentSet(MutableSet, Sequence):
                 groups[key].append(agent)
         return groups
 
+
 # consider adding for performance reasons
 # for Sequence: __reversed__, index, and count
 # for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__
