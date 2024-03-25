@@ -150,14 +150,12 @@ class _Grid:
         self._empties_built = True
 
     @overload
-    def __getitem__(self, index: int | Sequence[Coordinate]) -> list[GridContent]:
-        ...
+    def __getitem__(self, index: int | Sequence[Coordinate]) -> list[GridContent]: ...
 
     @overload
     def __getitem__(
         self, index: tuple[int | slice, int | slice]
-    ) -> GridContent | list[GridContent]:
-        ...
+    ) -> GridContent | list[GridContent]: ...
 
     def __getitem__(self, index):
         """Access contents from the grid."""
@@ -420,11 +418,9 @@ class _Grid:
         """
         return list(self.iter_cell_list_contents(cell_list))
 
-    def place_agent(self, agent: Agent, pos: Coordinate) -> None:
-        ...
+    def place_agent(self, agent: Agent, pos: Coordinate) -> None: ...
 
-    def remove_agent(self, agent: Agent) -> None:
-        ...
+    def remove_agent(self, agent: Agent) -> None: ...
 
     def move_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Move an agent from its current position to a new position.

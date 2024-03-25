@@ -1,6 +1,7 @@
 """
 Test the Grid objects.
 """
+
 import random
 import unittest
 from unittest.mock import Mock, patch
