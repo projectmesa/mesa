@@ -90,7 +90,7 @@ class AgentSet(MutableSet, Sequence):
 
     Methods:
         __len__, __iter__, __contains__, select, shuffle, sort, _update, do, get, __getitem__,
-        add, discard, remove, __getstate__, __setstate__, random
+        add, discard, remove, __getstate__, __setstate__, random, group_by
 
     Note:
         The AgentSet maintains weak references to agents, allowing for efficient management of agent lifecycles
@@ -365,6 +365,22 @@ class AgentSet(MutableSet, Sequence):
         """
         return self.model.random
 
+    def group_by(self, attribute: str) -> dict:
+        """
+        Group agents in the AgentSet by a specified attribute.
+
+        Args:
+            attribute (str): The attribute name to group agents by.
+
+        Returns:
+            dict: A dictionary where keys are attribute values and values are lists of agents with that attribute value.
+        """
+        groups = defaultdict(list)
+        for agent in self:
+            key = getattr(agent, attribute, None)
+            if key is not None:
+                groups[key].append(agent)
+        return groups
 
 # consider adding for performance reasons
 # for Sequence: __reversed__, index, and count
