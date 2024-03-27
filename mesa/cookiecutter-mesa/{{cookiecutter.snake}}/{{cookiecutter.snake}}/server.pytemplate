@@ -21,14 +21,14 @@ def circle_portrayal_example(agent):
     return portrayal
 
 
-canvas_element = mesa.visualization.CanvasGrid(
+canvas_element = mesa.visualization_old.CanvasGrid(
     circle_portrayal_example, 20, 20, 500, 500
 )
-chart_element = mesa.visualization.ChartModule([{"Label": "{{ cookiecutter.camel }}", "Color": "Pink"}])
+chart_element = mesa.visualization_old.ChartModule([{"Label": "{{ cookiecutter.camel }}", "Color": "Pink"}])
 
 model_kwargs = {"num_agents": 10, "width": 10, "height": 10}
 
-server = mesa.visualization.ModularServer(
+server = mesa.visualization_old.ModularServer(
     {{cookiecutter.model}},
     [canvas_element, chart_element],
     "{{ cookiecutter.camel }}",

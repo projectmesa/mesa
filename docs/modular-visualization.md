@@ -1,4 +1,4 @@
-# Modular Visualization - An In-Depth Look
+# Modular Visualization - An In-Depth Look (Deprecated)
 
 Modular visualization is one of Mesa's core features. Mesa is designed
 to provide predefined visualization modules, which can be easily
@@ -127,7 +127,7 @@ Suppose we want a module which can get an arbitrary variable out of a
 model, and display its name and value. Let's create a new subclass:
 
 ```python
-from mesa.visualization.ModularTextVisualization import TextElement
+from mesa.visualization_old.ModularTextVisualization import TextElement
 
 class AttributeElement(TextElement):
     def __init__(self, attr_name):
@@ -205,7 +205,7 @@ Now let's take a look at the TextModule's Python counterpart,
 here's the whole thing:
 
 ```python
-from mesa.visualization.ModularVisualization import VisualizationElement
+from mesa.visualization_old.ModularVisualization import VisualizationElement
 
 class TextElement(VisualizationElement):
     js_includes = ["TextModule.js"]
@@ -240,8 +240,8 @@ the list, the code passes that element of the data to the *render*
 function of the corresponding element, in the elements array.
 
 Currently, module JavaScript files live in the
-*mesa/visualization/templates* directory, and the Python files live in
-*mesa/visualization/modules*.
+*mesa/visualization_old/templates* directory, and the Python files live in
+*mesa/visualization_old/modules*.
 
 When creating a new module, the Python and JavaScript code need to be
 written in synch: the module Python-side **render** method needs to

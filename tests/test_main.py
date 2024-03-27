@@ -24,7 +24,7 @@ class TestCli(unittest.TestCase):
         "Skipping test_run, because examples folder was moved. More discussion needed."
     )
     def test_run(self):
-        with patch("mesa.visualization.ModularServer") as ModularServer:  # noqa: N806
+        with patch("mesa.visualization_old.ModularServer") as ModularServer:  # noqa: N806
             example_dir = os.path.abspath(
                 os.path.join(os.path.dirname(__file__), "../examples/wolf_sheep")
             )
