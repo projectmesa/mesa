@@ -51,12 +51,12 @@ class TestExamples(unittest.TestCase):
             print(f"testing example {example!r}")
             with self.active_example_dir(example):
                 try:
-                    # model.py at the top level
+                    # epstein_civil_violence.py at the top level
                     mod = importlib.import_module("model")
                     server = importlib.import_module("server")
                     server.server.render_model()
                 except ImportError:
-                    # <example>/model.py
+                    # <example>/epstein_civil_violence.py
                     mod = importlib.import_module(f"{example.replace('-', '_')}.model")
                     server = importlib.import_module(
                         f"{example.replace('-', '_')}.server"

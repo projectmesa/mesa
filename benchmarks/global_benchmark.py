@@ -7,6 +7,8 @@ import timeit
 
 from configurations import configurations
 
+from mesa.experimental.devs.simulator import ABMSimulator
+
 # making sure we use this version of mesa and not one
 # also installed in site_packages or so.
 sys.path.insert(0, os.path.abspath(".."))
@@ -15,13 +17,16 @@ sys.path.insert(0, os.path.abspath(".."))
 # Generic function to initialize and run a model
 def run_model(model_class, seed, parameters):
     start_init = timeit.default_timer()
-    model = model_class(seed=seed, **parameters)
-    #   time.sleep(0.001)
+    simulator = ABMSimulator()
+    model = model_class(simulator=simulator, seed=seed, **parameters)
+    simulator.setup(model)
 
     end_init_start_run = timeit.default_timer()
 
-    for _ in range(config["steps"]):
-        model.step()
+    simulator.run_for(config["steps"])
+
+    # for _ in range(config["steps"]):
+    #     model.step()
     #       time.sleep(0.0001)
     end_run = timeit.default_timer()
 

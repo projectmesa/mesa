@@ -49,6 +49,7 @@ class Schelling(Model):
         density=0.8,
         minority_pc=0.5,
         seed=None,
+        simulator=None,
     ):
         """
         Create a new Schelling model.
@@ -62,10 +63,8 @@ class Schelling(Model):
             seed: Seed for Reproducibility
         """
         super().__init__(seed=seed)
-        self.height = height
-        self.width = width
-        self.density = density
         self.minority_pc = minority_pc
+        self.simulator = simulator
 
         self.schedule = RandomActivation(self)
         self.grid = OrthogonalMooreGrid(
@@ -75,14 +74,12 @@ class Schelling(Model):
             random=self.random,
         )
 
-        self.happy = 0
-
         # Set up agents
         # We use a grid iterator that returns
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
         for cell in self.grid:
-            if self.random.random() < self.density:
+            if self.random.random() < density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(
                     self.next_id(), self, agent_type, radius, homophily
