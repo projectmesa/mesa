@@ -5,7 +5,7 @@ import ipyvuetify as vw
 import solara
 
 import mesa
-from mesa.experimental.jupyter_viz import JupyterViz, Slider, UserInputs
+from mesa.visualization.jupyter_viz import JupyterViz, Slider, UserInputs
 
 
 class TestMakeUserInput(unittest.TestCase):
@@ -84,7 +84,7 @@ class TestMakeUserInput(unittest.TestCase):
 
 def test_call_space_drawer(mocker):
     mock_space_matplotlib = mocker.patch(
-        "mesa.experimental.components.matplotlib.SpaceMatplotlib"
+        "mesa.visualization.components.matplotlib.SpaceMatplotlib"
     )
 
     model = mesa.Model()
