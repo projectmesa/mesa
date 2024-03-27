@@ -119,8 +119,8 @@ batch_df = batch_run.get_model_vars_dataframe()
 
 Finally, you may want to directly observe your model as it runs. Mesa's main visualization tool uses a small local web server to render the model in a browser, using JavaScript. There are different components for drawing different types of data: for example, grids for drawing agents moving around on a grid, or charts for showing how some data changes as the model runs. A few core modules are:
 
-- mesa.visualization.ModularVisualization
-- mesa.visualization.modules
+- mesa.visualization_old.ModularVisualization
+- mesa.visualization_old.modules
 
 To quickly spin up a model visualization, you might do something like:
 
@@ -135,8 +135,8 @@ def agent_portrayal(agent):
                  "r": 0.5}
     return portrayal
 
-grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-server = mesa.visualization.ModularServer(MyModel,
+grid = mesa.visualization_old.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+server = mesa.visualization_old.ModularServer(MyModel,
                        [grid],
                        "My Model",
                        {'n_agents': 10})
