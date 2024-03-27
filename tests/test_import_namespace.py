@@ -15,9 +15,9 @@ def test_import():
     _ = MultiGrid
     _ = mf.MultiGrid
 
-    from mesa.visualization.ModularVisualization import ModularServer
+    from mesa.visualization_old.ModularVisualization import ModularServer
 
-    _ = mesa.visualization.ModularServer
+    _ = mesa.visualization_old.ModularServer
     _ = ModularServer
     _ = mf.ModularServer
 
