@@ -3,7 +3,7 @@
 ## Subpackages
 
 ```{toctree}
-mesa.visualization
+mesa.visualization_old
 ```
 
 ## Submodules

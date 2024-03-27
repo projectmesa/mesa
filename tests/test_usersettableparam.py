@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from mesa.visualization.UserParam import (
+from mesa.visualization_old.UserParam import (
     Checkbox,
     Choice,
     NumberInput,

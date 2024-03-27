@@ -4,7 +4,7 @@ import tornado
 from tornado.testing import AsyncHTTPTestCase
 
 from mesa import Model
-from mesa.visualization.ModularVisualization import ModularServer
+from mesa.visualization_old.ModularVisualization import ModularServer
 
 
 class TestServer(AsyncHTTPTestCase):
