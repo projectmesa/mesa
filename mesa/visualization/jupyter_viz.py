@@ -6,9 +6,9 @@ import reacton.ipywidgets as widgets
 import solara
 from solara.alias import rv
 
-import mesa.experimental.components.altair as components_altair
-import mesa.experimental.components.matplotlib as components_matplotlib
-from mesa.experimental.UserParam import Slider
+import mesa.visualization.components.altair as components_altair
+import mesa.visualization.components.matplotlib as components_matplotlib
+from mesa.visualization.UserParam import Slider
 
 # Avoid interactive backend
 plt.switch_backend("agg")
