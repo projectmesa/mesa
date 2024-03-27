@@ -132,4 +132,5 @@ extend-ignore = [
   "S310",   # Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.
   "S603",   # `subprocess` call: check for execution of untrusted input
   "ISC001", # ruff format asks to disable this feature
+  "S311",   # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]

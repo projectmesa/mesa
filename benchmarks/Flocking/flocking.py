@@ -29,7 +29,6 @@ class Boid(mesa.Agent):
         self,
         unique_id,
         model,
-        pos,
         speed,
         direction,
         vision,
@@ -43,7 +42,6 @@ class Boid(mesa.Agent):
 
         Args:
             unique_id: Unique agent identifier.
-            pos: Starting position
             speed: Distance to move per step.
             direction: numpy vector for the Boid's direction of movement.
             vision: Radius to look around for nearby Boids.
@@ -54,7 +52,6 @@ class Boid(mesa.Agent):
 
         """
         super().__init__(unique_id, model)
-        self.pos = np.array(pos)
         self.speed = speed
         self.direction = direction
         self.vision = vision

@@ -3,6 +3,7 @@ Mesa Agent-Based Modeling Framework
 
 Core Objects: Model, and Agent.
 """
+
 import datetime
 
 import mesa.space as space

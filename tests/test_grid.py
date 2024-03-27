@@ -1,6 +1,7 @@
 """
 Test the Grid objects.
 """
+
 import random
 import unittest
 from unittest.mock import Mock, patch
@@ -24,10 +25,10 @@ class MockAgent:
     Minimalistic agent for testing purposes.
     """
 
-    def __init__(self, unique_id, pos):
+    def __init__(self, unique_id):
         self.random = random.Random(0)
         self.unique_id = unique_id
-        self.pos = pos
+        self.pos = None
 
 
 class TestSingleGrid(unittest.TestCase):
@@ -53,7 +54,7 @@ class TestSingleGrid(unittest.TestCase):
                     continue
                 counter += 1
                 # Create and place the mock agent
-                a = MockAgent(counter, None)
+                a = MockAgent(counter)
                 self.agents.append(a)
                 self.grid.place_agent(a, (x, y))
 
@@ -258,7 +259,7 @@ class TestSingleGridEnforcement(unittest.TestCase):
                     continue
                 counter += 1
                 # Create and place the mock agent
-                a = MockAgent(counter, None)
+                a = MockAgent(counter)
                 self.agents.append(a)
                 self.grid.place_agent(a, (x, y))
         self.num_agents = len(self.agents)
@@ -270,7 +271,7 @@ class TestSingleGridEnforcement(unittest.TestCase):
         """
 
         assert len(self.grid.empties) == 9
-        a = MockAgent(100, None)
+        a = MockAgent(100)
         with self.assertRaises(Exception):
             self.grid.place_agent(a, (0, 1))
 
@@ -288,12 +289,12 @@ class TestSingleGridEnforcement(unittest.TestCase):
         # Place agents until the grid is full
         empty_cells = len(self.grid.empties)
         for i in range(empty_cells):
-            a = MockAgent(101 + i, None)
+            a = MockAgent(101 + i)
             self.grid.move_to_empty(a)
             self.num_agents += 1
         assert len(self.grid.empties) == 0
 
-        a = MockAgent(110, None)
+        a = MockAgent(110)
         with self.assertRaises(Exception):
             self.grid.move_to_empty(a)
         with self.assertRaises(Exception):
@@ -334,7 +335,7 @@ class TestMultiGrid(unittest.TestCase):
                 for _i in range(TEST_MULTIGRID[x][y]):
                     counter += 1
                     # Create and place the mock agent
-                    a = MockAgent(counter, None)
+                    a = MockAgent(counter)
                     self.agents.append(a)
                     self.grid.place_agent(a, (x, y))
 
@@ -393,7 +394,7 @@ class TestHexSingleGrid(unittest.TestCase):
                     continue
                 counter += 1
                 # Create and place the mock agent
-                a = MockAgent(counter, None)
+                a = MockAgent(counter)
                 self.agents.append(a)
                 self.grid.place_agent(a, (x, y))
 
@@ -447,7 +448,7 @@ class TestHexSingleGridTorus(TestSingleGrid):
                     continue
                 counter += 1
                 # Create and place the mock agent
-                a = MockAgent(counter, None)
+                a = MockAgent(counter)
                 self.agents.append(a)
                 self.grid.place_agent(a, (x, y))
 
