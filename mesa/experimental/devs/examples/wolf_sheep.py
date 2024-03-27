@@ -39,8 +39,7 @@ class Animal(mesa.Agent):
         )
         self.model.grid.place_agent(offspring, self.pos)
 
-    def feed(self):
-        ...
+    def feed(self): ...
 
     def die(self):
         self.model.grid.remove_agent(self)

@@ -31,8 +31,7 @@ class Simulator:
         self.time = self.start_time
         self.model = None
 
-    def check_time_unit(self, time: int | float) -> bool:
-        ...
+    def check_time_unit(self, time: int | float) -> bool: ...
 
     def setup(self, model: "Model") -> None:
         """Setup the simulator with the model to simulate
