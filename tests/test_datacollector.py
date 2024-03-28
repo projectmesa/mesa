@@ -107,8 +107,8 @@ class TestDataCollector(unittest.TestCase):
             agent.write_final_values()
 
     def step_assertion(self, model_var):
-        for element in model_var:
-            if model_var.index(element) < 4:
+        for index, element in enumerate(model_var.values()):
+            if index <= 4:
                 assert element == 10
             else:
                 assert element == 9
@@ -129,12 +129,12 @@ class TestDataCollector(unittest.TestCase):
         assert len(data_collector.model_vars["model_calc"]) == length
         assert len(data_collector.model_vars["model_calc_comp"]) == length
         self.step_assertion(data_collector.model_vars["total_agents"])
-        for element in data_collector.model_vars["model_value"]:
+        for element in data_collector.model_vars["model_value"].values():
             assert element == 100
         self.step_assertion(data_collector.model_vars["model_calc"])
-        for element in data_collector.model_vars["model_calc_comp"]:
+        for element in data_collector.model_vars["model_calc_comp"].values():
             assert element == 75
-        for element in data_collector.model_vars["model_calc_fail"]:
+        for element in data_collector.model_vars["model_calc_fail"].values():
             assert element is None
 
     def test_agent_records(self):

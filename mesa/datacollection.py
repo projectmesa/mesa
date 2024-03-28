@@ -20,7 +20,8 @@ Additionally, other objects can write directly to tables by passing in an
 appropriate dictionary object for a table row.
 
 The DataCollector then stores the data it collects in dictionaries:
-    * model_vars maps each reporter to a list of its values
+    * model_vars maps each reporter to a dictionary of its values, where the keys
+      represent the step of the simulation the values were captured at
     * tables maps each table to a dictionary, with each column as a key with a
       list as its value.
     * _agent_records maps each model step to a list of each agents id
@@ -129,7 +130,7 @@ class DataCollector:
                       variable when given a model instance.
         """
         self.model_reporters[name] = reporter
-        self.model_vars[name] = []
+        self.model_vars[name] = {}
 
     def _new_agent_reporter(self, name, reporter):
         """Add a new agent-level reporter to collect.
@@ -196,17 +197,17 @@ class DataCollector:
             for var, reporter in self.model_reporters.items():
                 # Check if lambda or partial function
                 if isinstance(reporter, (types.LambdaType, partial)):
-                    self.model_vars[var].append(reporter(model))
+                    self.model_vars[var][model._steps] = reporter(model)
                 # Check if model attribute
                 elif isinstance(reporter, str):
-                    self.model_vars[var].append(getattr(model, reporter, None))
+                    self.model_vars[var][model._steps] = getattr(model, reporter, None)
                 # Check if function with arguments
                 elif isinstance(reporter, list):
-                    self.model_vars[var].append(reporter[0](*reporter[1]))
+                    self.model_vars[var][model._steps] = reporter[0](*reporter[1])
                 # TODO: Check if method of a class, as of now it is assumed
                 # implicitly if the other checks fail.
                 else:
-                    self.model_vars[var].append(reporter())
+                    self.model_vars[var][model._steps] = reporter()
 
         if self.agent_reporters:
             agent_records = self._record_agents(model)
