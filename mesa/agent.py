@@ -360,7 +360,7 @@ class AgentSet(MutableSet, Sequence):
             attr_value = getattr(agent, attr_name, None)
             grouped_agents[attr_value].append(agent)
         return grouped_agents
-    
+
     @property
     def random(self) -> Random:
         """
