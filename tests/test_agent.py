@@ -283,6 +283,7 @@ def test_agentset_shuffle():
     agentset.shuffle(inplace=True)
     assert not all(a1 == a2 for a1, a2 in zip(test_agents, agentset))
 
+
 def test_agentset_group_by():
     model = Model()
     agents = [TestAgent(model.next_id(), model) for _ in range(10)]
