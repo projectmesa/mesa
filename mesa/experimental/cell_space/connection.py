@@ -42,6 +42,24 @@ class Connection:
                 raise IndexError("The connection id is out of range.")
         
         raise TypeError(f"The connection key must be either str or int, but {type(key)} is found.")
+    
+    def __contains__(self, key: Cell | str | int) -> Cell:
+        """Get the specified cell in the list of connections based on id or key
+
+        Arg:
+            key (str or int): the specific name or id of the connection
+
+        """
+        if isinstance(key, str):
+            return key in self._naming
+            
+        if isinstance(key, int):
+            return key in range(len(self._connections))
+        
+        if isinstance(key, _cell.Cell):
+            return key in self._connections
+        
+        raise TypeError(f"The connection key must be either Cell or str or int, but {type(key)} is found.")
         
     def append(self, cell: Cell, name: str | None=None) -> None:
         """Add the new connection to the list of connections with an optional name
