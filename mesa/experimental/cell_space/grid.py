@@ -91,12 +91,17 @@ class Grid(DiscreteSpace, Generic[T]):
             if all(0 <= nc < d for nc, d in zip(n_coord, self.dimensions)):
                 cell.connect(self._cells[n_coord])
 
-    def _connect_single_cell_2d(self, cell: T, offsets: list[tuple[int, int]], conn_names: list[str] | None=None) -> None:
+    def _connect_single_cell_2d(
+        self,
+        cell: T,
+        offsets: list[tuple[int, int]],
+        conn_names: list[str] | None = None,
+    ) -> None:
         i, j = cell.coordinate
         height, width = self.dimensions
 
         for idx, (di, dj) in enumerate(offsets):
-            name = conn_names[idx] if conn_names is not None  else None
+            name = conn_names[idx] if conn_names is not None else None
             ni, nj = (i + di, j + dj)
             if self.torus:
                 ni, nj = ni % height, nj % width
@@ -160,9 +165,9 @@ class OrthogonalVonNeumannGrid(Grid[T]):
                     ( 1, 0),
         ]
         conn_names = [
-                      "top",    
+                      "top",
             "left",            "right",
-                    "bottom", 
+                    "bottom",
         ]
         # fmt: on
         height, width = self.dimensions

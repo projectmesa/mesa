@@ -157,7 +157,7 @@ def test_orthogonal_grid_moore():
                                          (1, 9), (1, 0), (1, 1)}
         # fmt: on
 
-    # Traverse diagonally using names    
+    # Traverse diagonally using names
     current_cell = (9, 9)
     assert "top left" in grid._cells[current_cell]._connections
     while current_cell[0] > 0 and current_cell[1] > 0:
