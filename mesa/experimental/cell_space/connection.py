@@ -30,14 +30,14 @@ class Connection:
             try:
                 conn_id = self._naming[key]
                 return self._connections[conn_id]
-            except KeyError:
-                raise KeyError("The connection name is not found.")
+            except KeyError as e:
+                raise KeyError("The connection name is not found.") from e
 
         if isinstance(key, int):
             try:
                 return self._connections[key]
-            except IndexError:
-                raise IndexError("The connection id is out of range.")
+            except IndexError as e:
+                raise IndexError("The connection id is out of range.") from e
 
         raise TypeError(
             f"The connection key must be either str or int, but {type(key)} is found."
