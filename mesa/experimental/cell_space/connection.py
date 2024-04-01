@@ -9,7 +9,7 @@ import mesa.experimental.cell_space.cell as _cell
 
 
 class Connection:
-    """An immutable collection of connetions"""
+    """An immutable collection of connections"""
 
     def __init__(self) -> None:
         self._naming: dict[str, int] = {}
