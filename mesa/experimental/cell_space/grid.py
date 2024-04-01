@@ -159,11 +159,16 @@ class OrthogonalVonNeumannGrid(Grid[T]):
             (0, -1),         (0, 1),
                     ( 1, 0),
         ]
+        conn_names = [
+                      "top",    
+            "left",            "right",
+                    "bottom", 
+        ]
         # fmt: on
         height, width = self.dimensions
 
         for cell in self.all_cells:
-            self._connect_single_cell_2d(cell, offsets)
+            self._connect_single_cell_2d(cell, offsets, conn_names)
 
     def _connect_cells_nd(self) -> None:
         offsets = []
