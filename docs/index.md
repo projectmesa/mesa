@@ -52,6 +52,7 @@ mesa runserver examples/wolf_sheep
 
 For more help on using Mesa, check out the following resources:
 
+- [Mesa Overview]
 - [Mesa Introductory Tutorial]
 - [Mesa Visualization Tutorial]
 - [GitHub Issue Tracker]
@@ -99,6 +100,7 @@ tutorials/adv_tutorial_legacy.ipynb
 [github]: https://github.com/projectmesa/mesa/
 [github issue tracker]: https://github.com/projectmesa/mesa/issues
 [mesa]: https://github.com/projectmesa/mesa/
+[mesa overview]: https://github.com/projectmesa/mesa/blob/main/docs/overview.md
 [mesa introductory tutorial]: https://github.com/projectmesa/mesa/blob/main/docs/tutorials/intro_tutorial.ipynb
 [mesa visualization tutorial]: https://github.com/projectmesa/mesa/blob/main/docs/tutorials/visualization_tutorial.ipynb
 [pypi]: https://pypi.python.org/pypi/Mesa/
