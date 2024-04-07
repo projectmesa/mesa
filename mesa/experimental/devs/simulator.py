@@ -3,6 +3,8 @@ from __future__ import annotations
 import numbers
 from typing import Any, Callable
 
+from mesa import Model
+
 from .eventlist import EventList, Priority, SimulationEvent
 
 

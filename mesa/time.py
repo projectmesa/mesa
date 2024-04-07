@@ -25,9 +25,7 @@ Key concepts:
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
-import heapq
 import warnings
-import weakref
 from collections import defaultdict
 from collections.abc import Iterable
 
@@ -393,46 +391,7 @@ class RandomActivationByType(BaseScheduler):
 
 class DiscreteEventScheduler(BaseScheduler):
     """
-    A scheduler for discrete event simulation in Mesa.
-
-    This scheduler manages events where each event is associated with a
-    specific time and agent. The scheduler advances time not in fixed
-    increments, but to the moment the next event is scheduled to occur.
-
-    This implementation uses a priority queue (heapq) to manage events. Each
-    event is a tuple of the form (time, random_value, agent), where:
-        - time (float): The scheduled time for the event.
-        - random_value (float): A secondary sorting criterion to randomize
-          the order of events that are scheduled for the same time.
-        - agent (Agent): The agent associated with the event.
-
-    The random value for secondary sorting ensures that when two events are
-    scheduled for the same time, their execution order is randomized, thus
-    preventing direct comparison issues between different types of agents and
-    maintaining the integrity of the simulation's randomness.
-
-    Attributes:
-        model (Model): The model instance associated with the scheduler.
-        event_queue (list): A priority queue of scheduled events.
-        time_step (int or float): The fixed time period by which the model advances
-                                  on each step. Defaults to 1.
-
-    Methods:
-        schedule_event(time, agent): Schedule an event for a specific time.
-        schedule_in(delay, agent): Schedule an event after a specified delay.
-        step(): Execute all events within the next time_step period.
-        get_next_event_time(): Returns the time of the next scheduled event.
-
-    Usage:
-        1. Instantiate the DiscreteEventScheduler with a model instance and a time_step period.
-        2. Add agents to the scheduler using schedule.add(). With schedule_now=True (default),
-              the first event for the agent will be scheduled immediately.
-        3. In the Agent step() method, schedule the next event for the agent
-              (using schedule_in or schedule_event).
-        3. Add self.schedule.step() to the model's step() method, as usual.
-
-    Now, with each model step, the scheduler will execute all events within the
-    next time_step period, and advance time one time_step forward.
+    This class has been deprecated and replaced by the functionality provided by experimental.devs
     """
 
     def __init__(self, model: Model, time_step: TimeT = 1) -> None:
@@ -444,72 +403,4 @@ class DiscreteEventScheduler(BaseScheduler):
 
         """
         super().__init__(model)
-        self.event_queue: list[tuple[TimeT, float, weakref.ref]] = []
-        self.time_step: TimeT = time_step  # Fixed time period for each step
-
-        warnings.warn(
-            "The DiscreteEventScheduler is experimental. It may be changed or removed in any and all future releases, including patch releases.\n"
-            "We would love to hear what you think about this new feature. If you have any thoughts, share them with us here: https://github.com/projectmesa/mesa/discussions/1923",
-            FutureWarning,
-            stacklevel=2,
-        )
-
-    def schedule_event(self, time: TimeT, agent: Agent) -> None:
-        """Schedule an event for an agent at a specific time."""
-        if time < self.time:
-            raise ValueError(
-                f"Scheduled time ({time}) must be >= the current time ({self.time})"
-            )
-        if agent not in self._agents:
-            raise ValueError(
-                "trying to schedule an event for agent which is not known to the scheduler"
-            )
-
-        # Create an event, sorted first on time, secondary on a random value
-        event = (time, self.model.random.random(), weakref.ref(agent))
-        heapq.heappush(self.event_queue, event)
-
-    def schedule_in(self, delay: TimeT, agent: Agent) -> None:
-        """Schedule an event for an agent after a specified delay."""
-        if delay < 0:
-            raise ValueError("Delay must be non-negative")
-        event_time = self.time + delay
-        self.schedule_event(event_time, agent)
-
-    def step(self) -> None:
-        """Execute the next event and advance the time."""
-        end_time = self.time + self.time_step
-
-        while self.event_queue and self.event_queue[0][0] <= end_time:
-            # Get the next event (ignore the random value during unpacking)
-            time, _, agent = heapq.heappop(self.event_queue)
-            agent = agent()  # unpack weakref
-
-            if agent:
-                # Advance time to the event's time
-                self.time = time
-                # Execute the event
-                agent.step()
-
-        # After processing events, advance time by the time_step
-        self.time = end_time
-        self.steps += 1
-
-    def get_next_event_time(self) -> TimeT | None:
-        """Returns the time of the next scheduled event."""
-        if not self.event_queue:
-            return None
-        return self.event_queue[0][0]
-
-    def add(self, agent: Agent, schedule_now: bool = True) -> None:
-        """Add an Agent object to the schedule and optionally schedule its first event.
-
-        Args:
-            agent: An Agent to be added to the schedule. Must have a step() method.
-            schedule_now: If True, schedules the first event for the agent immediately.
-        """
-        super().add(agent)  # Call the add method from BaseScheduler
-
-        if schedule_now:
-            # Schedule the first event immediately
-            self.schedule_event(self.time, agent)
+        raise Exception("DiscreteEventScheduler is deprecated in favor of the functionality provided by experimental.devs")
