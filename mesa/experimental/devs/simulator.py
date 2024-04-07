@@ -1,3 +1,4 @@
+from __future__ import annotations
 import numbers
 from typing import Any, Callable
 
@@ -34,7 +35,7 @@ class Simulator:
     def check_time_unit(self, time: int | float) -> bool: ...
 
     def setup(self, model: "Model") -> None:
-        """Setup the simulator with the model to simulate
+        """Set up the simulator with the model to simulate
 
         Args:
             model (Model): The model to simulate
