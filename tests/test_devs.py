@@ -127,6 +127,7 @@ def test_simulation_event():
     # check if we pass over deletion of callable silently because of weakrefs
     def some_test_function(x, y):
         return x + y
+
     event = SimulationEvent(time, some_test_function, priority=Priority.DEFAULT)
     del some_test_function
     event.execute()

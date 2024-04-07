@@ -403,4 +403,6 @@ class DiscreteEventScheduler(BaseScheduler):
 
         """
         super().__init__(model)
-        raise Exception("DiscreteEventScheduler is deprecated in favor of the functionality provided by experimental.devs")
+        raise Exception(
+            "DiscreteEventScheduler is deprecated in favor of the functionality provided by experimental.devs"
+        )
