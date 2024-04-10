@@ -102,6 +102,7 @@ class BoidFlockers(mesa.Model):
         cohere=0.03,
         separate=0.015,
         match=0.05,
+        simulator=None,
     ):
         """
         Create a new Flockers model.
@@ -118,18 +119,18 @@ class BoidFlockers(mesa.Model):
         """
         super().__init__(seed=seed)
         self.population = population
-        self.vision = vision
-        self.speed = speed
-        self.separation = separation
-        self.schedule = mesa.time.RandomActivation(self)
-        self.space = mesa.space.ContinuousSpace(width, height, True)
-        self.factors = {"cohere": cohere, "separate": separate, "match": match}
-        self.make_agents()
+        self.width = width
+        self.height = height
+        self.simulator = simulator
 
-    def make_agents(self):
-        """
-        Create self.population agents, with random positions and starting directions.
-        """
+        self.schedule = mesa.time.RandomActivation(self)
+        self.space = mesa.space.ContinuousSpace(self.width, self.height, True)
+        self.factors = {
+            "cohere": cohere,
+            "separate": separate,
+            "match": match,
+        }
+
         for i in range(self.population):
             x = self.random.random() * self.space.x_max
             y = self.random.random() * self.space.y_max
@@ -138,10 +139,11 @@ class BoidFlockers(mesa.Model):
             boid = Boid(
                 unique_id=i,
                 model=self,
-                speed=self.speed,
+                pos=pos,
+                speed=speed,
                 direction=direction,
-                vision=self.vision,
-                separation=self.separation,
+                vision=vision,
+                separation=separation,
                 **self.factors,
             )
             self.space.place_agent(boid, pos)
