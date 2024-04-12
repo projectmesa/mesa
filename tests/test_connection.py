@@ -1,17 +1,9 @@
-import random
-
 import pytest
 
-from mesa import Model
 from mesa.experimental.cell_space import (
     Cell,
-    CellAgent,
-    CellCollection,
-    HexGrid,
-    Network,
-    OrthogonalMooreGrid,
-    OrthogonalVonNeumannGrid,
 )
+
 
 def test_get_connection():
     cell = Cell(coordinate=(0, 0))
@@ -22,7 +14,7 @@ def test_get_connection():
 
     assert cell._connections["right"].coordinate == right_cell.coordinate
     assert cell._connections[0].coordinate == right_cell.coordinate
-    
+
     with pytest.raises(KeyError):
         left = cell._connections["left"]
 
@@ -31,7 +23,8 @@ def test_get_connection():
             "name": "right",
         }
         random_cell = cell._connections[obj]
-    
+
+
 def test_in_connection():
     cell = Cell(coordinate=(0, 0))
     right_cell = Cell(coordinate=(1, 0))
@@ -51,6 +44,7 @@ def test_in_connection():
         }
         is_in = obj in cell._connections
 
+
 def test_add_connection():
     cell = Cell(coordinate=(0, 0))
     right_cell = Cell(coordinate=(1, 0))
@@ -61,6 +55,7 @@ def test_add_connection():
     # Raises exception when adding duplicated name
     with pytest.raises(ValueError):
         cell.connect(left_cell, "right")
+
 
 def test_remove_connection():
     cell = Cell(coordinate=(0, 0))
@@ -87,7 +82,7 @@ def test_remove_connection():
     # Raises exception when removing non-exsistent name
     with pytest.raises(ValueError):
         cell._connections.remove("top")
-    
+
     with pytest.raises(ValueError):
         cell._connections.remove(123)
 
