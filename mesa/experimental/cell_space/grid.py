@@ -199,17 +199,28 @@ class HexGrid(Grid[T]):
                     ( 0, -1),        ( 0, 1),
                         ( 1, -1), ( 1, 0),
                 ]
+        even_names = [
+                        "top left",     "top", 
+                "left",                          "right",
+                        "bottom left", "bottom",
+        ]
         odd_offsets = [
                         (-1, 0), (-1, 1),
                     ( 0, -1),       ( 0, 1),
                         ( 1, 0), ( 1, 1),
                 ]
+        odd_names = [
+                        "top",     "top right", 
+                "left",                          "right",
+                        "bottom", "bottom right",
+        ]
         # fmt: on
 
         for cell in self.all_cells:
             i = cell.coordinate[0]
             offsets = even_offsets if i % 2 == 0 else odd_offsets
-            self._connect_single_cell_2d(cell, offsets=offsets)
+            names = even_names if i % 2 == 0 else odd_names
+            self._connect_single_cell_2d(cell, offsets=offsets, conn_names=names)
 
     def _connect_cells_nd(self) -> None:
         raise NotImplementedError("HexGrids are only defined for 2 dimensions")
