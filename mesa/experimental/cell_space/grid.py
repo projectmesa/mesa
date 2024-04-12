@@ -200,7 +200,7 @@ class HexGrid(Grid[T]):
                         ( 1, -1), ( 1, 0),
                 ]
         even_names = [
-                        "top left",     "top", 
+                        "top left",     "top",
                 "left",                          "right",
                         "bottom left", "bottom",
         ]
@@ -210,7 +210,7 @@ class HexGrid(Grid[T]):
                         ( 1, 0), ( 1, 1),
                 ]
         odd_names = [
-                        "top",     "top right", 
+                        "top",     "top right",
                 "left",                          "right",
                         "bottom", "bottom right",
         ]
