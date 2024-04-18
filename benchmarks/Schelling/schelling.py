@@ -1,9 +1,10 @@
 from mesa import Model
 from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
+from mesa.experimental.cell_space.cell import Cell
 from mesa.time import RandomActivation
 
 
-class SchellingAgent(CellAgent):
+class SchellingAgent(CellAgent["Schelling", "SchellingAgent"]):
     """
     Schelling segregation agent
     """
@@ -72,6 +73,8 @@ class Schelling(Model):
             torus=True,
             capacity=1,
             random=self.random,
+            cell_klass=Cell[SchellingAgent],
+            agent_class=SchellingAgent,
         )
 
         # Set up agents

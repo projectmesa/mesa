@@ -18,7 +18,7 @@ from collections.abc import Iterable, Iterator, MutableSet, Sequence
 from random import Random
 
 # mypy
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar
 
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
@@ -26,8 +26,10 @@ if TYPE_CHECKING:
     from mesa.model import Model
     from mesa.space import Position
 
+T = TypeVar("T", bound="Model")
 
-class Agent:
+
+class Agent(Generic[T]):
     """
     Base class for a model agent in Mesa.
 
@@ -37,7 +39,7 @@ class Agent:
         self.pos: Position | None = None
     """
 
-    def __init__(self, unique_id: int, model: Model) -> None:
+    def __init__(self, unique_id: int, model: T) -> None:
         """
         Create a new agent.
 

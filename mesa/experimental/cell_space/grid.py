@@ -5,12 +5,13 @@ from itertools import product
 from random import Random
 from typing import Generic, TypeVar
 
-from mesa.experimental.cell_space import Cell, DiscreteSpace
+from mesa.experimental.cell_space import Cell, CellAgent, DiscreteSpace
 
 T = TypeVar("T", bound=Cell)
+U = TypeVar("U", bound=CellAgent)
 
 
-class Grid(DiscreteSpace, Generic[T]):
+class Grid(DiscreteSpace[T, U], Generic[T, U]):
     """Base class for all grid classes
 
     Attributes:
@@ -29,8 +30,14 @@ class Grid(DiscreteSpace, Generic[T]):
         capacity: float | None = None,
         random: Random | None = None,
         cell_klass: type[T] = Cell,
+        agent_class: type[U] = CellAgent,
     ) -> None:
-        super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
+        super().__init__(
+            capacity=capacity,
+            random=random,
+            cell_klass=cell_klass,
+            agent_class=agent_class,
+        )
         self.torus = torus
         self.dimensions = dimensions
         self._try_random = True
@@ -103,7 +110,7 @@ class Grid(DiscreteSpace, Generic[T]):
                 cell.connect(self._cells[ni, nj])
 
 
-class OrthogonalMooreGrid(Grid[T]):
+class OrthogonalMooreGrid(Grid[T, U]):
     """Grid where cells are connected to their 8 neighbors.
 
     Example for two dimensions:
@@ -135,7 +142,7 @@ class OrthogonalMooreGrid(Grid[T]):
             self._connect_single_cell_nd(cell, offsets)
 
 
-class OrthogonalVonNeumannGrid(Grid[T]):
+class OrthogonalVonNeumannGrid(Grid[T, U]):
     """Grid where cells are connected to their 4 neighbors.
 
     Example for two dimensions:
@@ -175,7 +182,7 @@ class OrthogonalVonNeumannGrid(Grid[T]):
             self._connect_single_cell_nd(cell, offsets)
 
 
-class HexGrid(Grid[T]):
+class HexGrid(Grid[T, U]):
     def _connect_cells_2d(self) -> None:
         # fmt: off
         even_offsets = [
