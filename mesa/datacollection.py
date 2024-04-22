@@ -32,6 +32,7 @@ The default DataCollector here makes several assumptions:
     * The model has an agent list called agents
     * For collecting agent-level variables, agents must have a unique_id
 """
+
 import contextlib
 import itertools
 import types
@@ -184,7 +185,9 @@ class DataCollector:
 
         agent_records = map(
             get_reports,
-            model.schedule.agents if hasattr(model, "schedule") else model.agents,
+            model.schedule.agents
+            if hasattr(model, "schedule") and model.schedule is not None
+            else model.agents,
         )
         return agent_records
 

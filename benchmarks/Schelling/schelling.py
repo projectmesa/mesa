@@ -1,12 +1,14 @@
-import mesa
+from mesa import Model
+from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
+from mesa.time import RandomActivation
 
 
-class SchellingAgent(mesa.Agent):
+class SchellingAgent(CellAgent):
     """
     Schelling segregation agent
     """
 
-    def __init__(self, unique_id, model, agent_type):
+    def __init__(self, unique_id, model, agent_type, radius, homophily):
         """
         Create a new Schelling agent.
         Args:
@@ -16,53 +18,73 @@ class SchellingAgent(mesa.Agent):
         """
         super().__init__(unique_id, model)
         self.type = agent_type
+        self.radius = radius
+        self.homophily = homophily
 
     def step(self):
         similar = 0
-        for neighbor in self.model.grid.iter_neighbors(
-            self.pos, moore=True, radius=self.model.radius
-        ):
+        neighborhood = self.cell.neighborhood(radius=self.radius)
+        for neighbor in neighborhood.agents:
             if neighbor.type == self.type:
                 similar += 1
 
         # If unhappy, move:
-        if similar < self.model.homophily:
-            self.model.grid.move_to_empty(self)
+        if similar < self.homophily:
+            self.move_to(self.model.grid.select_random_empty_cell())
         else:
             self.model.happy += 1
 
 
-class Schelling(mesa.Model):
+class Schelling(Model):
     """
     Model class for the Schelling segregation model.
     """
 
     def __init__(
-        self, seed, height, width, homophily, radius, density, minority_pc=0.5
+        self,
+        height=40,
+        width=40,
+        homophily=3,
+        radius=1,
+        density=0.8,
+        minority_pc=0.5,
+        seed=None,
+        simulator=None,
     ):
-        """ """
+        """
+        Create a new Schelling model.
+
+        Args:
+            height, width: Size of the space.
+            density: Initial Chance for a cell to populated
+            minority_pc: Chances for an agent to be in minority class
+            homophily: Minimum number of agents of same class needed to be happy
+            radius: Search radius for checking similarity
+            seed: Seed for Reproducibility
+        """
         super().__init__(seed=seed)
-        self.height = height
-        self.width = width
-        self.density = density
         self.minority_pc = minority_pc
-        self.homophily = homophily
-        self.radius = radius
+        self.simulator = simulator
 
-        self.schedule = mesa.time.RandomActivation(self)
-        self.grid = mesa.space.SingleGrid(height, width, torus=True)
-
-        self.happy = 0
+        self.schedule = RandomActivation(self)
+        self.grid = OrthogonalMooreGrid(
+            [height, width],
+            torus=True,
+            capacity=1,
+            random=self.random,
+        )
 
         # Set up agents
         # We use a grid iterator that returns
         # the coordinates of a cell as well as
         # its contents. (coord_iter)
-        for _cont, pos in self.grid.coord_iter():
-            if self.random.random() < self.density:
+        for cell in self.grid:
+            if self.random.random() < density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
-                agent = SchellingAgent(self.next_id(), self, agent_type)
-                self.grid.place_agent(agent, pos)
+                agent = SchellingAgent(
+                    self.next_id(), self, agent_type, radius, homophily
+                )
+                agent.move_to(cell)
                 self.schedule.add(agent)
 
     def step(self):
@@ -76,11 +98,12 @@ class Schelling(mesa.Model):
 if __name__ == "__main__":
     import time
 
-    # model = Schelling(15, 40, 40, 3, 1, 0.625)
-    model = Schelling(15, 100, 100, 8, 2, 0.8)
+    # model = Schelling(seed=15, height=40, width=40, homophily=3, radius=1, density=0.625)
+    model = Schelling(
+        seed=15, height=100, width=100, homophily=8, radius=2, density=0.8
+    )
 
     start_time = time.perf_counter()
     for _ in range(100):
         model.step()
-
     print(time.perf_counter() - start_time)

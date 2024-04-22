@@ -3,6 +3,7 @@ Mesa Agent-Based Modeling Framework
 
 Core Objects: Model, and Agent.
 """
+
 import datetime
 
 import mesa.space as space
@@ -25,7 +26,7 @@ __all__ = [
 ]
 
 __title__ = "mesa"
-__version__ = "2.3.0-dev"
+__version__ = "2.3.0-rc1"
 __license__ = "Apache 2.0"
 _this_year = datetime.datetime.now(tz=datetime.timezone.utc).date().year
 __copyright__ = f"Copyright {_this_year} Project Mesa Team"

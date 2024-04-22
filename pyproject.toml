@@ -50,11 +50,12 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
-  "ruff~=0.1.1",  # Update periodically
+  "ruff~=0.1.1",   # Update periodically
   "coverage",
   "pytest >= 4.6",
   "pytest-cov",
   "sphinx",
+  "pytest-mock",
 ]
 docs = [
   "sphinx",
@@ -62,7 +63,7 @@ docs = [
   "pydata_sphinx_theme",
   "seaborn",
   "myst-nb",
-  "myst-parser",  # Markdown in Sphinx
+  "myst-parser",         # Markdown in Sphinx
 ]
 
 [project.urls]
@@ -80,30 +81,36 @@ path = "mesa/__init__.py"
 
 [tool.ruff]
 # See https://github.com/charliermarsh/ruff#rules for error code definitions.
+# Hardcode to Python 3.9.
+# Reminder to update mesa-examples if the value below is changed.
+target-version = "py39"
+extend-exclude = ["docs", "build"]
+
+[tool.ruff.lint]
 select = [
-    # "ANN", # annotations TODO
-    "B", # bugbear
-    "C4", # comprehensions
-    "DTZ", # naive datetime
-    "E", # style errors
-    "F", # flakes
-    "I", # import sorting
-    "ISC", # string concatenation
-    "N", # naming
-    "PGH", # pygrep-hooks
-    "PIE", # miscellaneous
-    "PLC", # pylint convention
-    "PLE", # pylint error
-    # "PLR", # pylint refactor TODO
-    "PLW", # pylint warning
-    "Q", # quotes
-    "RUF", # Ruff
-    "S", # security
-    "SIM", # simplify
-    "T10", # debugger
-    "UP", # upgrade
-    "W", # style warnings
-    "YTT", # sys.version
+  # "ANN", # annotations TODO
+  "B",   # bugbear
+  "C4",  # comprehensions
+  "DTZ", # naive datetime
+  "E",   # style errors
+  "F",   # flakes
+  "I",   # import sorting
+  "ISC", # string concatenation
+  "N",   # naming
+  "PGH", # pygrep-hooks
+  "PIE", # miscellaneous
+  "PLC", # pylint convention
+  "PLE", # pylint error
+  # "PLR", # pylint refactor TODO
+  "PLW", # pylint warning
+  "Q",   # quotes
+  "RUF", # Ruff
+  "S",   # security
+  "SIM", # simplify
+  "T10", # debugger
+  "UP",  # upgrade
+  "W",   # style warnings
+  "YTT", # sys.version
 ]
 # Ignore list taken from https://github.com/psf/black/blob/master/.flake8
 # E203	Whitespace before ':'
@@ -114,19 +121,16 @@ select = [
 # checks for it.
 # See https://github.com/charliermarsh/ruff/issues/1842#issuecomment-1381210185
 extend-ignore = [
-    "E501",
-    "S101", # Use of `assert` detected
-    "B017", # `assertRaises(Exception)` should be considered evil TODO
-    "PGH004", # Use specific rule codes when using `noqa` TODO
-    "B905", # `zip()` without an explicit `strict=` parameter
-    "N802", # Function name should be lowercase
-    "N999",  # Invalid module name. We should revisit this in the future, TODO
-    "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar` TODO
-    "S310",  # Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.
-    "S603",  # `subprocess` call: check for execution of untrusted input
-    "ISC001",  # ruff format asks to disable this feature
+  "E501",
+  "S101",   # Use of `assert` detected
+  "B017",   # `assertRaises(Exception)` should be considered evil TODO
+  "PGH004", # Use specific rule codes when using `noqa` TODO
+  "B905",   # `zip()` without an explicit `strict=` parameter
+  "N802",   # Function name should be lowercase
+  "N999",   # Invalid module name. We should revisit this in the future, TODO
+  "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar` TODO
+  "S310",   # Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.
+  "S603",   # `subprocess` call: check for execution of untrusted input
+  "ISC001", # ruff format asks to disable this feature
+  "S311",   # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]
-extend-exclude = ["docs", "build"]
-# Hardcode to Python 3.9.
-# Reminder to update mesa-examples if the value below is changed.
-target-version = "py39"

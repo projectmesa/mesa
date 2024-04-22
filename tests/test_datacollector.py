@@ -1,6 +1,7 @@
 """
 Test the DataCollector
 """
+
 import unittest
 
 from mesa import Agent, Model

@@ -71,6 +71,21 @@ def is_integer(x: Real) -> bool:
     return isinstance(x, _types_integer)
 
 
+def warn_if_agent_has_position_already(placement_func):
+    def wrapper(self, agent, *args, **kwargs):
+        if agent.pos is not None:
+            warnings.warn(
+                f"""Agent {agent.unique_id} is being placed with
+place_agent() despite already having the position {agent.pos}. In most
+cases, you'd want to clear the current position with remove_agent()
+before placing the agent again.""",
+                stacklevel=2,
+            )
+        placement_func(self, agent, *args, **kwargs)
+
+    return wrapper
+
+
 class _Grid:
     """Base class for a rectangular grid.
 
@@ -135,14 +150,12 @@ class _Grid:
         self._empties_built = True
 
     @overload
-    def __getitem__(self, index: int | Sequence[Coordinate]) -> list[GridContent]:
-        ...
+    def __getitem__(self, index: int | Sequence[Coordinate]) -> list[GridContent]: ...
 
     @overload
     def __getitem__(
         self, index: tuple[int | slice, int | slice]
-    ) -> GridContent | list[GridContent]:
-        ...
+    ) -> GridContent | list[GridContent]: ...
 
     def __getitem__(self, index):
         """Access contents from the grid."""
@@ -405,11 +418,9 @@ class _Grid:
         """
         return list(self.iter_cell_list_contents(cell_list))
 
-    def place_agent(self, agent: Agent, pos: Coordinate) -> None:
-        ...
+    def place_agent(self, agent: Agent, pos: Coordinate) -> None: ...
 
-    def remove_agent(self, agent: Agent) -> None:
-        ...
+    def remove_agent(self, agent: Agent) -> None: ...
 
     def move_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Move an agent from its current position to a new position.
@@ -763,16 +774,14 @@ class _PropertyGrid(_Grid):
 
     Attributes:
         properties (dict): A dictionary mapping property layer names to PropertyLayer instances.
-        empty_mask: Returns a boolean mask indicating empty cells on the grid.
+        empty_mask (np.ndarray): A boolean array indicating empty cells on the grid.
 
     Methods:
         add_property_layer(property_layer): Adds a new property layer to the grid.
         remove_property_layer(property_name): Removes a property layer from the grid by its name.
         get_neighborhood_mask(pos, moore, include_center, radius): Generates a boolean mask of the neighborhood.
-        select_cells_by_properties(conditions, mask, return_list): Selects cells based on multiple property conditions,
-            optionally with a mask, returning either a list of coordinates or a mask.
-        select_extreme_value_cells(property_name, mode, mask, return_list): Selects cells with extreme values of a property,
-            optionally with a mask, returning either a list of coordinates or a mask.
+        select_cells(conditions, extreme_values, masks, only_empty, return_list): Selects cells based on multiple conditions,
+            extreme values, masks, with an option to select only empty cells, returning either a list of coordinates or a mask.
 
     Mask Usage:
         Several methods in this class accept a mask as an input, which is a NumPy ndarray of boolean values. This mask
@@ -978,6 +987,7 @@ class SingleGrid(_PropertyGrid):
                  the grid for empty spaces.
     """
 
+    @warn_if_agent_has_position_already
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         if self.is_cell_empty(pos):
@@ -1026,6 +1036,7 @@ class MultiGrid(_PropertyGrid):
         """Default value for new cell elements."""
         return []
 
+    @warn_if_agent_has_position_already
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         x, y = pos
@@ -1357,6 +1368,7 @@ class ContinuousSpace:
         self._agent_points = None
         self._index_to_agent = {}
 
+    @warn_if_agent_has_position_already
     def place_agent(self, agent: Agent, pos: FloatCoordinate) -> None:
         """Place a new agent in the space.
 
@@ -1517,6 +1529,7 @@ class NetworkGrid:
         """Default value for a new node."""
         return []
 
+    @warn_if_agent_has_position_already
     def place_agent(self, agent: Agent, node_id: int) -> None:
         """Place an agent in a node."""
         self.G.nodes[node_id]["agent"].append(agent)

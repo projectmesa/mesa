@@ -3,6 +3,7 @@ The agent class for Mesa framework.
 
 Core Objects: Agent
 """
+
 # Mypy; for the `|` operator purpose
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
@@ -81,12 +82,6 @@ class Agent:
 
 class AgentSet(MutableSet, Sequence):
     """
-    .. warning::
-        The AgentSet is experimental. It may be changed or removed in any and all future releases, including
-        patch releases.
-        We would love to hear what you think about this new feature. If you have any thoughts, share them with
-        us here: https://github.com/projectmesa/mesa/discussions/1919
-
     A collection class that represents an ordered set of agents within an agent-based model (ABM). This class
     extends both MutableSet and Sequence, providing set-like functionality with order preservation and
     sequence operations.
@@ -115,17 +110,8 @@ class AgentSet(MutableSet, Sequence):
             agents (Iterable[Agent]): An iterable of Agent objects to be included in the set.
             model (Model): The ABM model instance to which this AgentSet belongs.
         """
+
         self.model = model
-
-        if not self.__class__.agentset_experimental_warning_given:
-            self.__class__.agentset_experimental_warning_given = True
-            warnings.warn(
-                "The AgentSet is experimental. It may be changed or removed in any and all future releases, including patch releases.\n"
-                "We would love to hear what you think about this new feature. If you have any thoughts, share them with us here: https://github.com/projectmesa/mesa/discussions/1919",
-                FutureWarning,
-                stacklevel=2,
-            )
-
         self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
 
     def __len__(self) -> int:

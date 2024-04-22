@@ -114,7 +114,7 @@ If you would like to add a feature, please reach out via [ticket](https://github
 join a dev session (see [Mesa discussions](https://github.com/projectmesa/mesa/discussions)). A feature is most likely
 to be added if you build it!
 
-Don't forget to checkout the [Contributors guide](https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.rst).
+Don't forget to checkout the [Contributors guide](https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md).
 
 ## Citing Mesa
 

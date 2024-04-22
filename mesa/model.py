@@ -3,6 +3,7 @@ The model class for Mesa framework.
 
 Core Objects: Model
 """
+
 # Mypy; for the `|` operator purpose
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
@@ -55,7 +56,7 @@ class Model:
         if obj._seed is None:
             # We explicitly specify the seed here so that we know its value in
             # advance.
-            obj._seed = random.random()  # noqa: S311
+            obj._seed = random.random()
         obj.random = random.Random(obj._seed)
         # TODO: Remove these 2 lines just before Mesa 3.0
         obj._steps = 0
@@ -75,9 +76,6 @@ class Model:
 
         self._steps: int = 0
         self._time: TimeT = 0  # the model's clock
-
-        # Warning flags for current experimental features. These make sure a warning is only printed once per model.
-        self.agentset_experimental_warning_given = False
 
     @property
     def agents(self) -> AgentSet:
