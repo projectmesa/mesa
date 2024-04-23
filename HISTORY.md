@@ -1,9 +1,9 @@
 ---
 title: Release History
 ---
-# 2.3.0-rc1 (2024-04-18)
+# 2.3.0 (2024-04-18)
 ## Highlights
-The 2.3.0-rc1 release is our first release candidate pre-release, meant to test all the new features and enhancement for the upcoming 2.3.0 release.
+Mesa 2.3.0 is a big feature release and the last feature release before 3.0.
 
 There are two main new features:
 - The experimental cell-centric discrete spaces, as added in #1994. It allows having cells with not only properties but also active behaviors: the `CellAgent`. Its inspired by NetLogo's [patches](https://ccl.northwestern.edu/netlogo/bind/primitive/patches.html) but extend and generalize this concept further.
@@ -13,11 +13,11 @@ There are a lot of other features: The Jupyter visualisation now supports easier
 
 Finally, 2.3.0 stabilizes the `AgentSet` (including `model.agents`), making it the first experimental Mesa feature that is taken out of it's experimental phase.
 
-Install this pre-release with:
+Install this release with:
 ```
-pip install --pre mesa
+pip install --upgrade mesa
 ```
-We would love feedback before we release 2.3.0 stable in ~1 week.
+The Mesa 2.3.x-series supports Python 3.9 to 3.12. The next major release will require Python 3.10.
 
 ## What's Changed
 ### 🧪 Experimental features
@@ -87,7 +87,10 @@ We would love feedback before we release 2.3.0 stable in ~1 week.
 * @FoFFolo made their first contribution in https://github.com/projectmesa/mesa/pull/2082
 * @puer-robustus made their first contribution in https://github.com/projectmesa/mesa/pull/2083
 
-**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.4...2.3.0-rc1
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.4...2.3.0
+
+# 2.3.0-rc1 (2024-04-18)
+Mesa 2.3.0-rc1 is pre-release in preperation for 2.3.0 stable. It had the same release notes as 2.3.0. 
 
 # 2.2.4 (2024-01-26)
 ## Highlights
