@@ -1,7 +1,7 @@
 ---
 title: Release History
 ---
-# 2.3.0 (2024-04-18)
+# 2.3.0 (2024-04-23)
 ## Highlights
 Mesa 2.3.0 is a big feature release and the last feature release before 3.0.
 
