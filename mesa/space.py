@@ -461,7 +461,8 @@ class _Grid:
                 # Find the closest position without sorting all positions
                 closest_pos = None
                 min_distance = float("inf")
-                for p in agent.random.shuffle(pos):
+                agent.random.shuffle(pos)
+                for p in pos:
                     distance = self._distance_squared(p, current_pos)
                     if distance < min_distance:
                         min_distance = distance
