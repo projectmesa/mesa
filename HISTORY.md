@@ -34,7 +34,7 @@ The Mesa 2.3.x-series supports Python 3.9 to 3.12. The next major release will r
 * feat: Let mesa runserver detect server.py as fallback by @rht in https://github.com/projectmesa/mesa/pull/2015
 * JupyterViz: {Convert make_plot & prepare ColorCard} to become Solara component by @rht in https://github.com/projectmesa/mesa/pull/2020
 * new feature: AgentSet.get can retrieve one or more then one attribute by @quaquel in https://github.com/projectmesa/mesa/pull/2044
-* Update CODE_OF_CONDUCT.md to version 2+ of contrib convenant by @jackiekazil in https://github.com/projectmesa/mesa/pull/2052
+* Update CODE_OF_CONDUCT.md to version 2+ of contrib covenant by @jackiekazil in https://github.com/projectmesa/mesa/pull/2052
 * Improve flocking benchmark  by @coderbeta1 in https://github.com/projectmesa/mesa/pull/2054
 * Remove JupyterViz Altair marker overlap for huge grid size by @rht in https://github.com/projectmesa/mesa/pull/2062
 * Add tooltip option to Altair chart by @FoFFolo in https://github.com/projectmesa/mesa/pull/2082
@@ -90,7 +90,7 @@ The Mesa 2.3.x-series supports Python 3.9 to 3.12. The next major release will r
 **Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.4...2.3.0
 
 # 2.3.0-rc1 (2024-04-18)
-Mesa 2.3.0-rc1 is pre-release in preperation for 2.3.0 stable. It had the same release notes as 2.3.0.
+Mesa 2.3.0-rc1 is pre-release in preparation for 2.3.0 stable. It had the same release notes as 2.3.0.
 
 # 2.2.4 (2024-01-26)
 ## Highlights
