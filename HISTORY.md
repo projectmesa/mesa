@@ -1,6 +1,121 @@
 ---
 title: Release History
 ---
+# 2.3.0-rc1 (2024-04-18)
+## Highlights
+The 2.3.0-rc1 release is our first release candidate pre-release, meant to test all the new features and enhancement for the upcoming 2.3.0 release.
+
+There are two main new features:
+- The experimental cell-centric discrete spaces, as added in #1994. It allows having cells with not only properties but also active behaviors: the `CellAgent`. Its inspired by NetLogo's [patches](https://ccl.northwestern.edu/netlogo/bind/primitive/patches.html) but extend and generalize this concept further.
+- Full support for discrete event scheduling, as added in #2066. It allows scheduling events (like Agent actions) at any time, including non-integer timesteps.
+
+There are a lot of other features: The Jupyter visualisation now supports easier way to specify sliders, `NetworkGrid.get_neighbors()` supports a radius, `AgentSet.get()` can retrieve multiple attributes and there are now benchmarks to track Mesa performance during development.
+
+Finally, 2.3.0 stabilizes the `AgentSet` (including `model.agents`), making it the first experimental Mesa feature that is taken out of it's experimental phase.
+
+Install this pre-release with:
+```
+pip install --pre mesa
+```
+We would love feedback before we release 2.3.0 stable in ~1 week.
+
+## What's Changed
+### 🧪 Experimental features
+* Add cell-centric discrete spaces (experimental) by @Corvince in https://github.com/projectmesa/mesa/pull/1994
+### 🎉 New features added
+* Add performance benchmarking scripts by @EwoutH in https://github.com/projectmesa/mesa/pull/1979
+* feat: Implement Slider class for JupyterViz by @rht in https://github.com/projectmesa/mesa/pull/1972
+* Stabilize AgentSet by @EwoutH in https://github.com/projectmesa/mesa/pull/2065
+* Support discrete event scheduling by @quaquel in https://github.com/projectmesa/mesa/pull/2066
+### 🛠 Enhancements made
+* JupyterViz: Automatically deduce display name from model class by @rht in https://github.com/projectmesa/mesa/pull/1975
+* Add radius argument to NetworkGrid.get_neighbors() by @EwoutH in https://github.com/projectmesa/mesa/pull/1973
+* Speedup of Agentset.shuffle by @quaquel in https://github.com/projectmesa/mesa/pull/2010
+* feat: Let mesa runserver detect server.py as fallback by @rht in https://github.com/projectmesa/mesa/pull/2015
+* JupyterViz: {Convert make_plot & prepare ColorCard} to become Solara component by @rht in https://github.com/projectmesa/mesa/pull/2020
+* new feature: AgentSet.get can retrieve one or more then one attribute by @quaquel in https://github.com/projectmesa/mesa/pull/2044
+* Update CODE_OF_CONDUCT.md to version 2+ of contrib convenant by @jackiekazil in https://github.com/projectmesa/mesa/pull/2052
+* Improve flocking benchmark  by @coderbeta1 in https://github.com/projectmesa/mesa/pull/2054
+* Remove JupyterViz Altair marker overlap for huge grid size by @rht in https://github.com/projectmesa/mesa/pull/2062
+* Add tooltip option to Altair chart by @FoFFolo in https://github.com/projectmesa/mesa/pull/2082
+* feat: Display model seed & allow user to specify it in JupyterViz by @rht in https://github.com/projectmesa/mesa/pull/2069
+* warn if placing already placed agent by @puer-robustus in https://github.com/projectmesa/mesa/pull/2083
+### 🐛 Bugs fixed
+* fix: Apply default value to slider by @rht in https://github.com/projectmesa/mesa/pull/2016
+* fix: Initialize model _steps and _time during __new__ by @rht in https://github.com/projectmesa/mesa/pull/2026
+* fix: Use model.schedule only when it is not None by @rht in https://github.com/projectmesa/mesa/pull/2050
+* fix: Remove JupyterViz grid marker overlap for huge grid size by @rht in https://github.com/projectmesa/mesa/pull/2049
+### 📜 Documentation improvements
+* Improve readability of badges by @rht in https://github.com/projectmesa/mesa/pull/2009
+* More pythonic implementation of wolf sheep by @quaquel in https://github.com/projectmesa/mesa/pull/2011
+* Adding super().__init__() to MoneyModel tutorial by @sw23 in https://github.com/projectmesa/mesa/pull/2025
+* docs: Convert howto.rst -> howto.md via rst2myst by @rht in https://github.com/projectmesa/mesa/pull/2033
+* docs: Convert best-practices,overview,packages,mesa,index to .md via rst2myst by @rht in https://github.com/projectmesa/mesa/pull/2034
+* docs: Convert api/*.rst -> api/*.md via rst2myst by @rht in https://github.com/projectmesa/mesa/pull/2035
+* docs: Rewrite howto.md using ChatGPT for clarity and conciseness by @rht in https://github.com/projectmesa/mesa/pull/2037
+* docs: Corrected Contributing Guide Link to Ensure Accessibility by @sahusiddharth in https://github.com/projectmesa/mesa/pull/2057
+* Rename links to internal .rst files to .md by @rht in https://github.com/projectmesa/mesa/pull/2058
+* docs: improve introductory tutorial by @puer-robustus in https://github.com/projectmesa/mesa/pull/2087
+### 🔧 Maintenance
+* Quality of Life: Make codecov less meticulous by @Corvince in https://github.com/projectmesa/mesa/pull/1966
+* Add CI workflow for performance benchmarks by @EwoutH in https://github.com/projectmesa/mesa/pull/1983
+* tests: Resolve warnings by defining PropertyLayer dtypes by @EwoutH in https://github.com/projectmesa/mesa/pull/1987
+* benchmarks.yml: Fix PR branch checkout when triggered by comment by @EwoutH in https://github.com/projectmesa/mesa/pull/1998
+* Quality of life: automatically fix ruff errors by @Corvince in https://github.com/projectmesa/mesa/pull/2004
+* benchmarks.yml: Run on addition of label instead of comment by @EwoutH in https://github.com/projectmesa/mesa/pull/2002
+* ci: Move codespell to pre-commit by @rht in https://github.com/projectmesa/mesa/pull/2040
+* Schelling by @coderbeta1 in https://github.com/projectmesa/mesa/pull/2053
+* Move ruff lint settings into dedicated section by @Corvince in https://github.com/projectmesa/mesa/pull/2073
+* ci: Use uv pip for faster build by @rht in https://github.com/projectmesa/mesa/pull/2038
+* test: Remove place_agent duplicate warnings by @rht in https://github.com/projectmesa/mesa/pull/2086
+### Other changes
+* Minor edits to benchmarking code by @quaquel in https://github.com/projectmesa/mesa/pull/1985
+* build(deps): bump codecov/codecov-action from 3 to 4 by @dependabot in https://github.com/projectmesa/mesa/pull/2030
+* [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in https://github.com/projectmesa/mesa/pull/2029
+* tests: Speed up test_batch_run by @rht in https://github.com/projectmesa/mesa/pull/2039
+* Update benchmarks.yml by @Corvince in https://github.com/projectmesa/mesa/pull/2043
+* docs: Convert visualization .rst -> .md via rst2myst by @rht in https://github.com/projectmesa/mesa/pull/2036
+* docs: Convert CONTRIBUTING .rst -> .md via rst2myst by @rht in https://github.com/projectmesa/mesa/pull/2041
+* Correct wolf energy gained from eating sheep by @JackAtOmenApps in https://github.com/projectmesa/mesa/pull/2048
+* feat: Implement Altair version of grid visualization by @rht in https://github.com/projectmesa/mesa/pull/1991
+
+## New Contributors
+* @sw23 made their first contribution in https://github.com/projectmesa/mesa/pull/2025
+* @JackAtOmenApps made their first contribution in https://github.com/projectmesa/mesa/pull/2048
+* @coderbeta1 made their first contribution in https://github.com/projectmesa/mesa/pull/2054
+* @sahusiddharth made their first contribution in https://github.com/projectmesa/mesa/pull/2057
+* @FoFFolo made their first contribution in https://github.com/projectmesa/mesa/pull/2082
+* @puer-robustus made their first contribution in https://github.com/projectmesa/mesa/pull/2083
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.4...2.3.0-rc1
+
+# 2.2.4 (2024-01-26)
+## Highlights
+Mesa v2.2.4 is a small but important bugfix release for the 2.2 release series. It fixes an essential bug in where agents weren't shuffled in the `BaseScheduler`, affecting mainly the `RandomActivation` scheduler (effectively making it sequential activation)([#2007](https://github.com/projectmesa/mesa/pull/2007)). It also fixes a small behaviour change in `RandomActivationByType.agents_by_type()` ([#1996](https://github.com/projectmesa/mesa/pull/1996)). Furthermore, this release adds an internal clock to the `Model`, which allows to use a Mesa model without a scheduler (using the `AgentSet` API)([#1942](https://github.com/projectmesa/mesa/pull/1942)).
+
+Updating from previous 2.2 releases is highly recommended, especially when using the `RandomActivation` scheduler.
+
+## What's Changed
+### 🛠 Enhancements made
+* refactor: Remove dependence on model.schedule, add clock to Model by @rht in https://github.com/projectmesa/mesa/pull/1942
+### 🐛 Bugs fixed
+* Fix AgentSet inplace shuffle (and thus RandomActivation), add tests by @EwoutH and @quaquel in https://github.com/projectmesa/mesa/pull/2007
+* fix: Reverse dict key and value for agents_by_type by @rht in https://github.com/projectmesa/mesa/pull/1996
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.3...v2.2.4
+
+# 2.2.3 (2024-01-22)
+## Highlights
+Mesa 2.2.3 is a small release with two improvements to the experimental Solara visualisation, on request of one of our contributors. No stable features have changed.
+
+## What's Changed
+### 🧪 Experimental features
+* solara_viz: Add borders around ContinuousSpace by @EwoutH in https://github.com/projectmesa/mesa/pull/1988
+### 🐛 Bugs fixed
+* fix: Explicitly specify JupyterViz space view limits by @rht in https://github.com/projectmesa/mesa/pull/1984
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.2...v2.2.3
+
 # 2.2.2 (2024-01-22)
 
 ## Highlights
