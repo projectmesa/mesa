@@ -90,7 +90,7 @@ The Mesa 2.3.x-series supports Python 3.9 to 3.12. The next major release will r
 **Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.2.4...2.3.0
 
 # 2.3.0-rc1 (2024-04-18)
-Mesa 2.3.0-rc1 is pre-release in preperation for 2.3.0 stable. It had the same release notes as 2.3.0. 
+Mesa 2.3.0-rc1 is pre-release in preperation for 2.3.0 stable. It had the same release notes as 2.3.0.
 
 # 2.2.4 (2024-01-26)
 ## Highlights
