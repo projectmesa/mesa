@@ -100,8 +100,8 @@ tutorials/adv_tutorial_legacy.ipynb
 [github]: https://github.com/projectmesa/mesa/
 [github issue tracker]: https://github.com/projectmesa/mesa/issues
 [mesa]: https://github.com/projectmesa/mesa/
-[mesa overview]: https://github.com/projectmesa/mesa/blob/main/docs/overview.md
-[mesa introductory tutorial]: https://github.com/projectmesa/mesa/blob/main/docs/tutorials/intro_tutorial.ipynb
-[mesa visualization tutorial]: https://github.com/projectmesa/mesa/blob/main/docs/tutorials/visualization_tutorial.ipynb
+[mesa overview]: https://mesa.readthedocs.io/en/stable/overview.html
+[mesa introductory tutorial]: https://mesa.readthedocs.io/en/stable/tutorials/intro_tutorial.html
+[mesa visualization tutorial]: https://mesa.readthedocs.io/en/stable/tutorials/visualization_tutorial.html
 [pypi]: https://pypi.python.org/pypi/Mesa/
 [ticket]: https://github.com/projectmesa/mesa/issues
