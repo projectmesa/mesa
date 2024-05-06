@@ -10,6 +10,9 @@ on:
   pull_request:
     paths-ignore:
       - '**.md'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
 
 # This will cancel previous run if a newer job that obsoletes the said previous
 # run, is started.
