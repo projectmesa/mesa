@@ -71,9 +71,9 @@ if run:
             cell_content, (x, y) = cell
             agent_count = len(cell_content)
             selected_row = df_grid[(df_grid["x"] == x) & (df_grid["y"] == y)]
-            df_grid.loc[
-                selected_row.index, "agent_count"
-            ] = agent_count  # random.choice([1,2])
+            df_grid.loc[selected_row.index, "agent_count"] = (
+                agent_count  # random.choice([1,2])
+            )
 
         df_gini = pd.concat(
             [
