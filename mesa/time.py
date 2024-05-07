@@ -30,14 +30,12 @@ from collections import defaultdict
 from collections.abc import Iterable
 
 # mypy
-from typing import Union
-
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
 # BaseScheduler has a self.time of int, while
 # StagedActivation has a self.time of float
-TimeT = Union[float, int]
+TimeT = float | int
 
 
 class BaseScheduler:
