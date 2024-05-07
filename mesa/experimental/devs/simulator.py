@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import numbers
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from mesa import Model
 

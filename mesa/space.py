@@ -23,9 +23,9 @@ import inspect
 import itertools
 import math
 import warnings
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from numbers import Real
-from typing import Any, Callable, TypeVar, Union, cast, overload
+from typing import Any, TypeVar, Union, cast, overload
 from warnings import warn
 
 with contextlib.suppress(ImportError):
