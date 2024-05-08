@@ -17,7 +17,7 @@ repos:
     rev: v3.15.2
     hooks:
     -   id: pyupgrade
-        args: [--py38-plus]
+        args: [--py310-plus]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0  # Use the ref you want to point at
     hooks:
