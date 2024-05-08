@@ -198,6 +198,8 @@ class DataCollector:
             for var, reporter in self.model_reporters.items():
                 # Check if lambda or partial function
                 if isinstance(reporter, (types.LambdaType, partial)):
+                    # Use deepcopy to store a copy of the data,
+                    # preventing references from being updated across steps.
                     self.model_vars[var].append(deepcopy(reporter(model)))
                 # Check if model attribute
                 elif isinstance(reporter, str):
