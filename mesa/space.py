@@ -23,9 +23,9 @@ import inspect
 import itertools
 import math
 import warnings
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from numbers import Real
-from typing import Any, Callable, TypeVar, Union, cast, overload
+from typing import Any, TypeVar, cast, overload
 from warnings import warn
 
 with contextlib.suppress(ImportError):
@@ -42,12 +42,12 @@ _types_integer = (int, np.integer)
 
 Coordinate = tuple[int, int]
 # used in ContinuousSpace
-FloatCoordinate = Union[tuple[float, float], npt.NDArray[float]]
+FloatCoordinate = tuple[float, float] | npt.NDArray[float]
 NetworkCoordinate = int
 
-Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
+Position = Coordinate | FloatCoordinate | NetworkCoordinate
 
-GridContent = Union[Agent, None]
+GridContent = Agent | None
 MultiGridContent = list[Agent]
 
 F = TypeVar("F", bound=Callable[..., Any])

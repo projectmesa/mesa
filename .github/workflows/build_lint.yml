@@ -10,6 +10,9 @@ on:
   pull_request:
     paths-ignore:
       - '**.md'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
 
 # This will cancel previous run if a newer job that obsoletes the said previous
 # run, is started.
@@ -34,8 +37,6 @@ jobs:
             python-version: "3.11"
           - os: ubuntu
             python-version: "3.10"
-          - os: ubuntu
-            python-version: "3.9"
           # Disabled for now. See https://github.com/projectmesa/mesa/issues/1253
           #- os: ubuntu
           #  python-version: 'pypy-3.8'

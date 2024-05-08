@@ -1,7 +1,3 @@
-import contextlib
+from .jupyter_viz import JupyterViz, Slider, make_text
 
-with contextlib.suppress(ImportError):
-    from mesa_viz_tornado.ModularVisualization import *  # noqa
-    from mesa_viz_tornado.modules import *  # noqa
-    from mesa_viz_tornado.UserParam import *  # noqa
-    from mesa_viz_tornado.TextVisualization import *  # noqa
+__all__ = ["JupyterViz", "make_text", "Slider"]
