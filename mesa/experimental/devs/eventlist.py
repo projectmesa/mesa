@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import itertools
+from collections.abc import Callable
 from enum import IntEnum
 from heapq import heapify, heappop, heappush
 from types import MethodType
-from typing import Any, Callable
+from typing import Any
 from weakref import WeakMethod, ref
 
 

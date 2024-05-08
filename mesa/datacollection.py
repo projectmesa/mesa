@@ -196,7 +196,7 @@ class DataCollector:
         if self.model_reporters:
             for var, reporter in self.model_reporters.items():
                 # Check if lambda or partial function
-                if isinstance(reporter, (types.LambdaType, partial)):
+                if isinstance(reporter, types.LambdaType | partial):
                     self.model_vars[var].append(reporter(model))
                 # Check if model attribute
                 elif isinstance(reporter, str):

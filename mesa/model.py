@@ -14,12 +14,12 @@ import warnings
 from collections import defaultdict
 
 # mypy
-from typing import Any, Union
+from typing import Any
 
 from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
 
-TimeT = Union[float, int]
+TimeT = float | int
 
 
 class Model:
