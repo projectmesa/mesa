@@ -20,11 +20,9 @@
 
 Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python-based counterpart to NetLogo, Repast, or MASON.
 
-```{image} https://raw.githubusercontent.com/projectmesa/mesa/main/docs/images/Mesa_Screenshot.png
-:alt: A screenshot of the Schelling Model in Mesa
-:scale: 100%
-:width: 100%
-```
+
+![A screenshot of the Schelling Model in Mesa|100%](https://raw.githubusercontent.com/projectmesa/mesa/main/docs/images/Mesa_Screenshot.png)
+
 
 *Above: A Mesa implementation of the Schelling segregation model,
 being visualized in a browser window and analyzed in a Jupyter
