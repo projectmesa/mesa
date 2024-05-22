@@ -53,7 +53,7 @@ For more help on using Mesa, check out the following resources:
 - [Mesa Introductory Tutorial]
 - [Mesa Visualization Tutorial]
 - [GitHub Issue Tracker]
-- [Email list]
+- [Matrix chat room]
 - [PyPI]
 
 ## Contributing back to Mesa
@@ -93,9 +93,9 @@ tutorials/adv_tutorial_legacy.ipynb
 - {ref}`search`
 
 [contributors guide]: https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md
-[email list]: https://groups.google.com/d/forum/projectmesa
 [github]: https://github.com/projectmesa/mesa/
 [github issue tracker]: https://github.com/projectmesa/mesa/issues
+[matrix chat room]: https://matrix.to/#/#project-mesa:matrix.org
 [mesa]: https://github.com/projectmesa/mesa/
 [mesa introductory tutorial]: tutorials/intro_tutorial.html
 [mesa visualization tutorial]: tutorials/visualization_tutorial.html
