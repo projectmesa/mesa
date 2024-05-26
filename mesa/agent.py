@@ -84,8 +84,12 @@ class Agent:
 
     def move_forward_or_backward(self, amount, sign):
         """Does the calculation to find  the agent's next move and is used within the forward and backward functions"""
-        new_x = float(self.pos[0]) + sign * math.cos(self.heading * math.pi / 180) * amount
-        new_y = float(self.pos[1]) + sign * math.sin(self.heading * math.pi / -180) * amount
+        new_x = (
+            float(self.pos[0]) + sign * math.cos(self.heading * math.pi / 180) * amount
+        )
+        new_y = (
+            float(self.pos[1]) + sign * math.sin(self.heading * math.pi / -180) * amount
+        )
         next_pos = (new_x, new_y)
 
         try:
@@ -93,8 +97,10 @@ class Agent:
         except AttributeError as exc:
             raise AttributeError("Agent's model does not define space") from exc
         except Exception as exc:
-            raise UserWarning(f"agent.py (forward_backwards): could not move agent "
-                  f"{self.unique_id} within self.model.space") from exc
+            raise UserWarning(
+                f"agent.py (forward_backwards): could not move agent "
+                f"{self.unique_id} within self.model.space"
+            ) from exc
 
     def move_forward(self, amount=1):
         """Moves the agent forward by the amount given"""
