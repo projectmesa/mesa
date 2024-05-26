@@ -97,10 +97,10 @@ class Agent:
         except AttributeError as exc:
             raise AttributeError("Agent's model does not define space") from exc
         except Exception as exc:
-            raise UserWarning(
+            warnings.warn(
                 f"agent.py (forward_backwards): could not move agent "
-                f"{self.unique_id} within self.model.space"
-            ) from exc
+                f"{self.unique_id} within self.model.space\n{exc}"
+            )
 
     def move_forward(self, amount=1):
         """Moves the agent forward by the amount given"""
