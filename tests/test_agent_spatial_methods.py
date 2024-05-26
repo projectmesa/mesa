@@ -16,7 +16,6 @@ def agent_in_space():
 
 
 def test_move_forward(agent_in_space):
-
     agent_in_space.heading = 90
     agent_in_space.move_forward(1)
     assert agent_in_space.pos[0] == pytest.approx(2)
@@ -24,7 +23,6 @@ def test_move_forward(agent_in_space):
 
 
 def test_turn_right(agent_in_space):
-
     agent_in_space.heading = 0
     agent_in_space.turn_right(60)
     assert agent_in_space.heading == 300
@@ -68,7 +66,6 @@ def test_facexy(agent_in_space):
 
 
 def test_face(agent_in_space):
-
     agent2 = Agent(2, agent_in_space.model)
     agent2.pos = (5, 1)
     agent_in_space.face(agent2)
