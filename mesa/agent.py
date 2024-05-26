@@ -80,12 +80,15 @@ class Agent:
         """Removes the agent from the schedule and the grid """
         try:
             self.model.schedule.remove(self)
-        except:
-            print("agent.py (die): could not remove agent from self.model.schedule")
+        except Exception as exc:
+            warnings.warn(f"agent.py (die): could not remove agent {self.id} "
+                          f"from self.model.schedule.  Not removing from space.\n{exc}")
+            return
         try:
             self.model.space.remove_agent(self)
-        except:
-            print("agent.py (die): could not remove agent from self.model.space")
+        except Exception as exc:
+            warnings.warn(f"agent.py (die): could not remove agent {self.id} "
+ .                        f"from self.model.space.\n{exc}")
 
     @property
     def random(self) -> Random:
