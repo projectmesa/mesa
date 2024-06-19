@@ -153,6 +153,7 @@ def test_slider():
     assert slider_dtype_float.is_float_slider
 
 class TestJupyterViz(unittest.TestCase):
+    # test for section 1.
     # testing for correct init
     @patch('solara.use_reactive') 
     @patch('solara.use_state')
@@ -166,6 +167,7 @@ class TestJupyterViz(unittest.TestCase):
         
         solara.render(Test(), handle_error = False)
     
+    # test for section 2.
     # testing for solara.AppBar() condition
     def test_name_parameter(self):
         @solara.component
@@ -188,8 +190,20 @@ class TestJupyterViz(unittest.TestCase):
         component = Test()
 
         model_instance = component().make_model()
-        model_class.__new__.assert_called_with(model_class)
+        model_class.__new__.assert_called_with(model_class, mock_key = 10, seed = 0)
         model_class.__init__.assert_called_with(mock_key = 10)
+
+    # testing for handle_change_model_params
+    def test_handle_change_model_params(self):
+        @solara.component
+        def Test():
+            return JupyterViz(model_class = Mock(), model_params={"mock_key" : {"mock_value" : 10}})
+        
+        component = Test()
+        component().handle_change_model_params("mock_key", 20)
+        self.assertEqual(component().model_parameters["mock_key"], 20)
+
+    # test for section 3.
 
 if __name__ == '__main__':
     unittest.main()
