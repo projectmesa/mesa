@@ -1,11 +1,11 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import ipyvuetify as vw
 import solara
 
 import mesa
-from mesa.visualization.jupyter_viz import JupyterViz, Slider, UserInputs
+from mesa.visualization.jupyter_viz import JupyterViz, Slider, UserInputs, ModelController, split_model_params
 
 
 class TestMakeUserInput(unittest.TestCase):
@@ -151,3 +151,48 @@ def test_slider():
     assert not slider_int.is_float_slider
     slider_dtype_float = Slider("Homophily", 3, 0, 8, 1, dtype=float)
     assert slider_dtype_float.is_float_slider
+
+class TestJupyterViz(unittest.TestCase):
+    # testing for correct init
+    @patch('solara.use_reactive') 
+    @patch('solara.use_state')
+    def test_initialization(self, mock_use_state, mock_use_reactive):
+        mock_use_reactive.side_effect = [Mock(), Mock()]
+        mock_use_state.return_value = ({}, Mock())
+
+        @solara.component
+        def Test():
+            JupyterViz(model_class=Mock(), model_params = {})
+        
+        solara.render(Test(), handle_error = False)
+    
+    # testing for solara.AppBar() condition
+    def test_name_parameter(self):
+        @solara.component
+        def Test():
+            return JupyterViz(model_class = Mock(__name__ = 'TestModel'), model_params={})
+        
+        with patch('solara.AppBarTitle') as mock_app_bar_title:
+            solara.render(Test(), handle_error=False)
+            mock_app_bar_title.assert_called_with('TestModel')
+    
+    # testing for make_model
+    def test_make_model(self):
+        model_class = Mock()
+        model_params={"mock_key" : {"mock_value" : 10}}    
+
+        @solara.component
+        def Test():
+            return JupyterViz(model_class = model_class, model_params=model_params)
+        
+        component = Test()
+
+        model_instance = component().make_model()
+        model_class.__new__.assert_called_with(model_class)
+        model_class.__init__.assert_called_with(mock_key = 10)
+
+if __name__ == '__main__':
+    unittest.main()
+        
+    
+
