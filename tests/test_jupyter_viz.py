@@ -260,6 +260,7 @@ class TestJupyterViz(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    # Make sure to remove this codeblock before submitting
     loader = unittest.TestLoader()
     suite = loader.discover("../mesa")
     runner = unittest.TextTestRunner()
