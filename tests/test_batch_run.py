@@ -67,8 +67,7 @@ class MockModel(Model):
         else:
             agent_reporters = None
         self.datacollector = DataCollector(
-            model_reporters={
-                "reported_model_param": self.get_local_model_param},
+            model_reporters={"reported_model_param": self.get_local_model_param},
             agent_reporters=agent_reporters,
         )
         self.running = True
