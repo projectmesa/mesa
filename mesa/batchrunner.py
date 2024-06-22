@@ -95,6 +95,9 @@ def _make_model_kwargs(
         if isinstance(values, str):
             # The values is a single string, so we shouldn't iterate over it.
             all_values = [(param, values)]
+        elif isinstance(values, Iterable) and len(values) == 0:
+            # The values is an empty iterable, so we shouldn't iterate over it.
+            all_values = [(param, values)]
         else:
             try:
                 all_values = [(param, value) for value in values]
