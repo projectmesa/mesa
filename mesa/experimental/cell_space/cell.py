@@ -5,6 +5,7 @@ from random import Random
 from typing import TYPE_CHECKING
 
 from mesa.experimental.cell_space.cell_collection import CellCollection
+from mesa.experimental.cell_space.connection import Connection
 
 if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell_agent import CellAgent
@@ -56,20 +57,20 @@ class Cell:
         """
         super().__init__()
         self.coordinate = coordinate
-        self._connections: list[Cell] = []  # TODO: change to CellCollection?
+        self._connections: Connection = Connection()  # TODO: change to CellCollection?
         self.agents = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
         self.properties: dict[str, object] = {}
         self.random = random
 
-    def connect(self, other: Cell) -> None:
+    def connect(self, other: Cell, name: str | None = None) -> None:
         """Connects this cell to another cell.
 
         Args:
             other (Cell): other cell to connect to
 
         """
-        self._connections.append(other)
+        self._connections.append(other, name)
 
     def disconnect(self, other: Cell) -> None:
         """Disconnects this cell from another cell.

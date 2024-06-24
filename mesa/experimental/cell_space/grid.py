@@ -91,16 +91,22 @@ class Grid(DiscreteSpace, Generic[T]):
             if all(0 <= nc < d for nc, d in zip(n_coord, self.dimensions)):
                 cell.connect(self._cells[n_coord])
 
-    def _connect_single_cell_2d(self, cell: T, offsets: list[tuple[int, int]]) -> None:
+    def _connect_single_cell_2d(
+        self,
+        cell: T,
+        offsets: list[tuple[int, int]],
+        conn_names: list[str] | None = None,
+    ) -> None:
         i, j = cell.coordinate
         height, width = self.dimensions
 
-        for di, dj in offsets:
+        for idx, (di, dj) in enumerate(offsets):
+            name = conn_names[idx] if conn_names is not None else None
             ni, nj = (i + di, j + dj)
             if self.torus:
                 ni, nj = ni % height, nj % width
             if 0 <= ni < height and 0 <= nj < width:
-                cell.connect(self._cells[ni, nj])
+                cell.connect(self._cells[ni, nj], name)
 
 
 class OrthogonalMooreGrid(Grid[T]):
@@ -121,11 +127,16 @@ class OrthogonalMooreGrid(Grid[T]):
             ( 0, -1),          ( 0, 1),
             ( 1, -1), ( 1, 0), ( 1, 1),
         ]
+        conn_names = [
+            "top left",    "top",    "top right",
+            "left",                  "right",
+            "bottom left", "bottom", "bottom right",
+        ]
         # fmt: on
         height, width = self.dimensions
 
         for cell in self.all_cells:
-            self._connect_single_cell_2d(cell, offsets)
+            self._connect_single_cell_2d(cell, offsets, conn_names)
 
     def _connect_cells_nd(self) -> None:
         offsets = list(product([-1, 0, 1], repeat=len(self.dimensions)))
@@ -153,11 +164,16 @@ class OrthogonalVonNeumannGrid(Grid[T]):
             (0, -1),         (0, 1),
                     ( 1, 0),
         ]
+        conn_names = [
+                      "top",
+            "left",            "right",
+                    "bottom",
+        ]
         # fmt: on
         height, width = self.dimensions
 
         for cell in self.all_cells:
-            self._connect_single_cell_2d(cell, offsets)
+            self._connect_single_cell_2d(cell, offsets, conn_names)
 
     def _connect_cells_nd(self) -> None:
         offsets = []
@@ -183,17 +199,28 @@ class HexGrid(Grid[T]):
                     ( 0, -1),        ( 0, 1),
                         ( 1, -1), ( 1, 0),
                 ]
+        even_names = [
+                        "top left",     "top",
+                "left",                          "right",
+                        "bottom left", "bottom",
+        ]
         odd_offsets = [
                         (-1, 0), (-1, 1),
                     ( 0, -1),       ( 0, 1),
                         ( 1, 0), ( 1, 1),
                 ]
+        odd_names = [
+                        "top",     "top right",
+                "left",                          "right",
+                        "bottom", "bottom right",
+        ]
         # fmt: on
 
         for cell in self.all_cells:
             i = cell.coordinate[0]
             offsets = even_offsets if i % 2 == 0 else odd_offsets
-            self._connect_single_cell_2d(cell, offsets=offsets)
+            names = even_names if i % 2 == 0 else odd_names
+            self._connect_single_cell_2d(cell, offsets=offsets, conn_names=names)
 
     def _connect_cells_nd(self) -> None:
         raise NotImplementedError("HexGrids are only defined for 2 dimensions")

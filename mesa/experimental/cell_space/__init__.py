@@ -1,6 +1,7 @@
 from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.cell_agent import CellAgent
 from mesa.experimental.cell_space.cell_collection import CellCollection
+from mesa.experimental.cell_space.connection import Connection
 from mesa.experimental.cell_space.discrete_space import DiscreteSpace
 from mesa.experimental.cell_space.grid import (
     Grid,
@@ -14,6 +15,7 @@ __all__ = [
     "CellCollection",
     "Cell",
     "CellAgent",
+    "Connection",
     "DiscreteSpace",
     "Grid",
     "HexGrid",
