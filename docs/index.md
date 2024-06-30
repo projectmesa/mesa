@@ -16,7 +16,9 @@
 :target: https://matrix.to/#/#project-mesa:matrix.orgs
 ```
 
-[Mesa] is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
+[Mesa] is an Apache2 licensed agent-based modeling (or ABM) framework in Python. 
+
+For the original conference paper click here: http://conference.scipy.org.s3-website-us-east-1.amazonaws.com/proceedings/scipy2015/jacqueline_kazil.html
 
 Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python-based counterpart to NetLogo, Repast, or MASON.
 
