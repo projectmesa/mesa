@@ -16,7 +16,7 @@
 :target: https://matrix.to/#/#project-mesa:matrix.orgs
 ```
 
-[Mesa] is an Apache2 licensed agent-based modeling (or ABM) framework in Python. 
+[Mesa] is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
 
 For the original conference paper click here: http://conference.scipy.org.s3-website-us-east-1.amazonaws.com/proceedings/scipy2015/jacqueline_kazil.html
 
