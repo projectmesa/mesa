@@ -47,7 +47,7 @@ class {{cookiecutter.model}}(mesa.Model):
             self.grid.place_agent(agent, (x, y))
 
         # example data collector
-        self.datacollector = mesa.datacollection.DataCollector()
+        self.datacollector = mesa.datacollection.DataCollector({"num_agents": "num_agents"})
 
         self.running = True
         self.datacollector.collect(self)
