@@ -8,7 +8,6 @@ import datetime
 
 import mesa.space as space
 import mesa.time as time
-import mesa.visualization_old as visualization_old
 from mesa.agent import Agent
 from mesa.batchrunner import batch_run
 from mesa.datacollection import DataCollector
@@ -19,7 +18,6 @@ __all__ = [
     "Agent",
     "time",
     "space",
-    "visualization_old",
     "DataCollector",
     "batch_run",
     "experimental",
