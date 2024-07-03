@@ -471,6 +471,7 @@ def make_text(renderer):
     Returns:
         function: A function that renders the text as Markdown
     """
+
     def function(model):
         solara.Markdown(renderer(model))
 
