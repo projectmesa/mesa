@@ -1,8 +1,8 @@
 """
 Mesa visualization module for creating interactive model visualizations.
 
-This module provides components to create browser-based visualizations of Mesa models,
-allowing users to watch models run step-by-step and interact with model parameters.
+This module provides components to create browser- and Jupyter notebook-based visualizations of
+Mesa models, allowing users to watch models run step-by-step and interact with model parameters.
 
 Key features:
     - JupyterViz: Main component for creating visualizations, supporting grid displays and plots
