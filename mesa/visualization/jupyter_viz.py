@@ -26,7 +26,6 @@ See the Visualization Tutorial and example models for more details.
 import sys
 import threading
 
-import matplotlib.pyplot as plt
 import reacton.ipywidgets as widgets
 import solara
 from solara.alias import rv
