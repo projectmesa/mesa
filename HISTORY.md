@@ -1,6 +1,18 @@
 ---
 title: Release History
 ---
+# 2.3.1 (2024-07-03)
+## Highlights
+Mesa 2.3.1 is a small patch release with a datacollector bug fixed and improved documentation.
+
+## What's Changed
+### 🐛 Bugs fixed
+* datacollector: store separate snapshots of model data per step by @EwoutH in https://github.com/projectmesa/mesa/pull/2129
+### 📜 Documentation improvements
+* Add experimental features to documentation as per #2122 by @stephenfmann in https://github.com/projectmesa/mesa/pull/2154
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.0...v2.3.1
+
 # 2.3.0 (2024-04-23)
 ## Highlights
 Mesa 2.3.0 is a big feature release and the last feature release before 3.0.
