@@ -5,22 +5,22 @@ This module provides components to create browser-based visualizations of Mesa m
 allowing users to watch models run step-by-step and interact with model parameters.
 
 Key features:
-- JupyterViz: Main component for creating visualizations, supporting grid displays and plots
-- ModelController: Handles model execution controls (step, play, pause, reset)
-- UserInputs: Generates UI elements for adjusting model parameters
-- Card: Renders individual visualization elements (space, measures)
+    - JupyterViz: Main component for creating visualizations, supporting grid displays and plots
+    - ModelController: Handles model execution controls (step, play, pause, reset)
+    - UserInputs: Generates UI elements for adjusting model parameters
+    - Card: Renders individual visualization elements (space, measures)
 
 The module uses Solara for rendering in Jupyter notebooks or as standalone web applications.
 It supports various types of visualizations including matplotlib plots, agent grids, and
 custom visualization components.
 
 Usage:
-1. Define an agent_portrayal function to specify how agents should be displayed
-2. Set up model_params to define adjustable parameters
-3. Create a JupyterViz instance with your model, parameters, and desired measures
-4. Display the visualization in a Jupyter notebook or run as a Solara app
+    1. Define an agent_portrayal function to specify how agents should be displayed
+    2. Set up model_params to define adjustable parameters
+    3. Create a JupyterViz instance with your model, parameters, and desired measures
+    4. Display the visualization in a Jupyter notebook or run as a Solara app
 
-See the Mesa documentation for more detailed usage instructions and examples.
+See the Visualization Tutorial and example models for more details.
 """
 
 import sys
