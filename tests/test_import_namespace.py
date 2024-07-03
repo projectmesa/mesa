@@ -12,11 +12,6 @@ def test_import():
     _ = mesa.space.MultiGrid
     _ = MultiGrid
 
-    from mesa.visualization_old.ModularVisualization import ModularServer
-
-    _ = mesa.visualization_old.ModularServer
-    _ = ModularServer
-
     from mesa.datacollection import DataCollector
 
     _ = DataCollector
