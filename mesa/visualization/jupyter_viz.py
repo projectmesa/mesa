@@ -26,7 +26,6 @@ See the Visualization Tutorial and example models for more details.
 import sys
 import threading
 
-import matplotlib.pyplot as plt
 import reacton.ipywidgets as widgets
 import solara
 from solara.alias import rv
@@ -34,9 +33,6 @@ from solara.alias import rv
 import mesa.visualization.components.altair as components_altair
 import mesa.visualization.components.matplotlib as components_matplotlib
 from mesa.visualization.UserParam import Slider
-
-# Avoid interactive backend
-plt.switch_backend("agg")
 
 
 # TODO: Turn this function into a Solara component once the current_step.value
