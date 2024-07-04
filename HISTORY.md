@@ -1,6 +1,55 @@
 ---
 title: Release History
 ---
+# 3.0.0a0 (2024-07-04)
+## Highlights
+This is the first pre-release in the Mesa 3.0 series, which is still in active development. The `v3.0.0a0` pre-release can help active Mesa developers help starting to test the latest features in their models.
+
+Since it's in active development, more breaking changes may follow and it's not recommended for general usage.
+
+There are two major breaking changes at this point:
+- The old visualisation is removed, in favor of the new, Solara based, Jupyter Viz. This was already available in the 2.3.x release series, but is now stabilized. Checkout out our new [Visualization Tutorial](https://mesa.readthedocs.io/en/latest/tutorials/visualization_tutorial.html). More examples and a migration guide will follow later in the Mesa 3.0 development.
+- The `mesa.flat` namespace is removed, since was not used very often.
+
+Mesa 3.0 will require Python 3.10+.
+
+This pre-release can be installed with `pip install mesa --upgrade --pre`.
+
+## What's Changed
+### ⚠️ Breaking changes
+* Remove mesa.flat namespace by @rht in https://github.com/projectmesa/mesa/pull/2091
+* breaking: Remove visualization_old (mesa-viz-tornado) by @rht in https://github.com/projectmesa/mesa/pull/2133
+### 🎉 New features added
+* Set JupyterViz as stable by @rht in https://github.com/projectmesa/mesa/pull/2090
+### 🐛 Bugs fixed
+* Jupyter_viz: Allow measures to be None by @EwoutH in https://github.com/projectmesa/mesa/pull/2163
+* Jupyter Viz: Don't avoid interactive backend by @EwoutH in https://github.com/projectmesa/mesa/pull/2165
+### 📜 Documentation improvements
+* Fix image on landing page of docs. by @jackiekazil in https://github.com/projectmesa/mesa/pull/2146
+* Replace links in docs - google group to matrix. by @jackiekazil in https://github.com/projectmesa/mesa/pull/2148
+* Update visualisation docs by @EwoutH in https://github.com/projectmesa/mesa/pull/2162
+### 🔧 Maintenance
+* CI: Add weekly scheduled run to all CI workflows by @EwoutH in https://github.com/projectmesa/mesa/pull/2130
+* Drop support for Python 3.9, require Python >= 3.10  by @EwoutH in https://github.com/projectmesa/mesa/pull/2132
+* Add script to list unlabeled PR's since latest release by @rht in https://github.com/projectmesa/mesa/pull/2047
+
+## New Contributors
+* @stephenfmann made their first contribution in https://github.com/projectmesa/mesa/pull/2154
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.1...v3.0.0a0
+
+# 2.3.1 (2024-07-03)
+## Highlights
+Mesa 2.3.1 is a small patch release with a datacollector bug fixed and improved documentation.
+
+## What's Changed
+### 🐛 Bugs fixed
+* datacollector: store separate snapshots of model data per step by @EwoutH in https://github.com/projectmesa/mesa/pull/2129
+### 📜 Documentation improvements
+* Add experimental features to documentation as per #2122 by @stephenfmann in https://github.com/projectmesa/mesa/pull/2154
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.0...v2.3.1
+
 # 2.3.0 (2024-04-23)
 ## Highlights
 Mesa 2.3.0 is a big feature release and the last feature release before 3.0.
