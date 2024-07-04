@@ -68,9 +68,7 @@ def get_resistant_susceptible_ratio(model):
     ratio_text = "&infin;" if ratio is math.inf else f"{ratio:.2f}"
     infected_text = str(number_infected(model))
 
-    return "Resistant/Susceptible Ratio: {}<br>Infected Remaining: {}".format(
-        ratio_text, infected_text
-    )
+    return f"Resistant/Susceptible Ratio: {ratio_text}<br>Infected Remaining: {infected_text}"
 
 
 model_params = {
