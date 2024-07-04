@@ -11,8 +11,8 @@ class SimpleCanvas(mesa.visualization.VisualizationElement):
         self.portrayal_method = portrayal_method
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
-        new_element = "new Simple_Continuous_Module({}, {})".format(
-            self.canvas_width, self.canvas_height
+        new_element = (
+            f"new Simple_Continuous_Module({self.canvas_width}, {self.canvas_height})"
         )
         self.js_code = "elements.push(" + new_element + ");"
 
