@@ -53,6 +53,12 @@ def _draw_grid(space, agent_portrayal):
     has_size = "size" in all_agent_data[0]
     if has_size:
         encoding_dict["size"] = alt.Size("size", type="quantitative")
+    has_shape = "shape" in all_agent_data[0]
+    if has_shape:
+        encoding_dict["shape"] = agent_data["shape"]
+    has_fill = "fill" in all_agent_data[0]
+    if has_shape:
+        encoding_dict["fill"] = agent_data["fill"]
 
     chart = (
         alt.Chart(
