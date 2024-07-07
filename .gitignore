@@ -90,3 +90,5 @@ pythonenv*/
 mesa/visualization/templates/external/
 mesa/visualization/templates/js/external/
 
+# Virtual environments
+.venv/
