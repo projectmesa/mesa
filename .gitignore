@@ -85,9 +85,6 @@ target/
 .dmypy.json
 dmypy.json
 
-# pythonenv
-
-
 # JS dependencies
 mesa/visualization/templates/external/
 mesa/visualization/templates/js/external/
