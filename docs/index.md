@@ -85,7 +85,6 @@ Best Practices <best-practices>
 How-to Guide <howto>
 API Documentation <apis/api_main>
 Mesa Packages <packages>
-tutorials/adv_tutorial_legacy.ipynb
 ```
 
 # Indices and tables

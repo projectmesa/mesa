@@ -1,7 +1,31 @@
+"""
+Mesa visualization module for creating interactive model visualizations.
+
+This module provides components to create browser- and Jupyter notebook-based visualizations of
+Mesa models, allowing users to watch models run step-by-step and interact with model parameters.
+
+Key features:
+    - JupyterViz: Main component for creating visualizations, supporting grid displays and plots
+    - ModelController: Handles model execution controls (step, play, pause, reset)
+    - UserInputs: Generates UI elements for adjusting model parameters
+    - Card: Renders individual visualization elements (space, measures)
+
+The module uses Solara for rendering in Jupyter notebooks or as standalone web applications.
+It supports various types of visualizations including matplotlib plots, agent grids, and
+custom visualization components.
+
+Usage:
+    1. Define an agent_portrayal function to specify how agents should be displayed
+    2. Set up model_params to define adjustable parameters
+    3. Create a JupyterViz instance with your model, parameters, and desired measures
+    4. Display the visualization in a Jupyter notebook or run as a Solara app
+
+See the Visualization Tutorial and example models for more details.
+"""
+
 import sys
 import threading
 
-import matplotlib.pyplot as plt
 import reacton.ipywidgets as widgets
 import solara
 from solara.alias import rv
@@ -10,15 +34,27 @@ import mesa.visualization.components.altair as components_altair
 import mesa.visualization.components.matplotlib as components_matplotlib
 from mesa.visualization.UserParam import Slider
 
-# Avoid interactive backend
-plt.switch_backend("agg")
-
 
 # TODO: Turn this function into a Solara component once the current_step.value
 # dependency is passed to measure()
 def Card(
     model, measures, agent_portrayal, space_drawer, dependencies, color, layout_type
 ):
+    """
+    Create a card component for visualizing model space or measures.
+
+    Args:
+        model: The Mesa model instance
+        measures: List of measures to be plotted
+        agent_portrayal: Function to define agent appearance
+        space_drawer: Method to render agent space
+        dependencies: List of dependencies for updating the visualization
+        color: Background color of the card
+        layout_type: Type of layout (Space or Measure)
+
+    Returns:
+        rv.Card: A card component containing the visualization
+    """
     with rv.Card(
         style_=f"background-color: {color}; width: 100%; height: 100%"
     ) as main:
@@ -60,19 +96,21 @@ def JupyterViz(
     play_interval=150,
     seed=None,
 ):
-    """Initialize a component to visualize a model.
+    """
+    Initialize a component to visualize a model.
+
     Args:
-        model_class: class of the model to instantiate
-        model_params: parameters for initializing the model
-        measures: list of callables or data attributes to plot
-        name: name for display
-        agent_portrayal: options for rendering agents (dictionary)
-        space_drawer: method to render the agent space for
+        model_class: Class of the model to instantiate
+        model_params: Parameters for initializing the model
+        measures: List of callables or data attributes to plot
+        name: Name for display
+        agent_portrayal: Options for rendering agents (dictionary)
+        space_drawer: Method to render the agent space for
             the model; default implementation is the `SpaceMatplotlib` component;
             simulations with no space to visualize should
             specify `space_drawer=False`
-        play_interval: play interval (default: 150)
-        seed: the random seed used to initialize the model
+        play_interval: Play interval (default: 150)
+        seed: The random seed used to initialize the model
     """
     if name is None:
         name = model_class.__name__
@@ -88,6 +126,7 @@ def JupyterViz(
 
     # 2. Set up Model
     def make_model():
+        """Create a new model instance with current parameters and seed."""
         model = model_class.__new__(
             model_class, **model_parameters, seed=reactive_seed.value
         )
@@ -106,6 +145,7 @@ def JupyterViz(
     )
 
     def handle_change_model_params(name: str, value: any):
+        """Update model parameters when user input changes."""
         set_model_parameters({**model_parameters, name: value})
 
     # 3. Set up UI
@@ -115,12 +155,14 @@ def JupyterViz(
 
     # render layout and plot
     def do_reseed():
+        """Update the random seed for the model."""
         reactive_seed.value = model.random.random()
 
     # jupyter
     dependencies = [current_step.value, reactive_seed.value]
 
     def render_in_jupyter():
+        """Render the visualization components in Jupyter notebook."""
         with solara.GridFixed(columns=2):
             UserInputs(user_params, on_change=handle_change_model_params)
             ModelController(model, play_interval, current_step, reset_counter)
@@ -143,16 +185,18 @@ def JupyterViz(
             # otherwise, do nothing (do not draw space)
 
             # 5. Plots
-            for measure in measures:
-                if callable(measure):
-                    # Is a custom object
-                    measure(model)
-                else:
-                    components_matplotlib.PlotMatplotlib(
-                        model, measure, dependencies=dependencies
-                    )
+            if measures:
+                for measure in measures:
+                    if callable(measure):
+                        # Is a custom object
+                        measure(model)
+                    else:
+                        components_matplotlib.PlotMatplotlib(
+                            model, measure, dependencies=dependencies
+                        )
 
     def render_in_browser():
+        """Render the visualization components in a web browser."""
         # if space drawer is disabled, do not include it
         layout_types = [{"Space": "default"}] if space_drawer else []
 
@@ -204,6 +248,15 @@ def JupyterViz(
 
 @solara.component
 def ModelController(model, play_interval, current_step, reset_counter):
+    """
+    Create controls for model execution (step, play, pause, reset).
+
+    Args:
+        model: The model being visualized
+        play_interval: Interval between steps during play
+        current_step: Reactive value for the current step
+        reset_counter: Counter to trigger model reset
+    """
     playing = solara.use_reactive(False)
     thread = solara.use_reactive(None)
     # We track the previous step to detect if user resets the model via
@@ -213,6 +266,7 @@ def ModelController(model, play_interval, current_step, reset_counter):
     previous_step = solara.use_reactive(0)
 
     def on_value_play(change):
+        """Handle play/pause state changes."""
         if previous_step.value > current_step.value and current_step.value == 0:
             # We add extra checks for current_step.value == 0, just to be sure.
             # We automatically stop the playing if a model is reset.
@@ -223,31 +277,37 @@ def ModelController(model, play_interval, current_step, reset_counter):
             playing.value = False
 
     def do_step():
+        """Advance the model by one step."""
         model.step()
         previous_step.value = current_step.value
         current_step.value = model._steps
 
     def do_play():
+        """Run the model continuously."""
         model.running = True
         while model.running:
             do_step()
 
     def threaded_do_play():
+        """Start a new thread for continuous model execution."""
         if thread is not None and thread.is_alive():
             return
         thread.value = threading.Thread(target=do_play)
         thread.start()
 
     def do_pause():
+        """Pause the model execution."""
         if (thread is None) or (not thread.is_alive()):
             return
         model.running = False
         thread.join()
 
     def do_reset():
+        """Reset the model."""
         reset_counter.value += 1
 
     def do_set_playing(value):
+        """Set the playing state."""
         if current_step.value == 0:
             # This means the model has been recreated, and the step resets to
             # 0. We want to avoid triggering the playing.value = False in the
@@ -291,6 +351,15 @@ def ModelController(model, play_interval, current_step, reset_counter):
 
 
 def split_model_params(model_params):
+    """
+    Split model parameters into user-adjustable and fixed parameters.
+
+    Args:
+        model_params: Dictionary of all model parameters
+
+    Returns:
+        tuple: (user_adjustable_params, fixed_params)
+    """
     model_params_input = {}
     model_params_fixed = {}
     for k, v in model_params.items():
@@ -302,6 +371,15 @@ def split_model_params(model_params):
 
 
 def check_param_is_fixed(param):
+    """
+    Check if a parameter is fixed (not user-adjustable).
+
+    Args:
+        param: Parameter to check
+
+    Returns:
+        bool: True if parameter is fixed, False otherwise
+    """
     if isinstance(param, Slider):
         return False
     if not isinstance(param, dict):
@@ -312,14 +390,15 @@ def check_param_is_fixed(param):
 
 @solara.component
 def UserInputs(user_params, on_change=None):
-    """Initialize user inputs for configurable model parameters.
+    """
+    Initialize user inputs for configurable model parameters.
     Currently supports :class:`solara.SliderInt`, :class:`solara.SliderFloat`,
     :class:`solara.Select`, and :class:`solara.Checkbox`.
 
-    Props:
-        user_params: dictionary with options for the input, including label,
+    Args:
+        user_params: Dictionary with options for the input, including label,
         min and max values, and other fields specific to the input type.
-        on_change: function to be called with (name, value) when the value of an input changes.
+        on_change: Function to be called with (name, value) when the value of an input changes.
     """
 
     for name, options in user_params.items():
@@ -380,6 +459,16 @@ def UserInputs(user_params, on_change=None):
 
 
 def make_text(renderer):
+    """
+    Create a function that renders text using Markdown.
+
+    Args:
+        renderer: Function that takes a model and returns a string
+
+    Returns:
+        function: A function that renders the text as Markdown
+    """
+
     def function(model):
         solara.Markdown(renderer(model))
 
@@ -387,6 +476,15 @@ def make_text(renderer):
 
 
 def make_initial_grid_layout(layout_types):
+    """
+    Create an initial grid layout for visualization components.
+
+    Args:
+        layout_types: List of layout types (Space or Measure)
+
+    Returns:
+        list: Initial grid layout configuration
+    """
     return [
         {
             "i": i,
