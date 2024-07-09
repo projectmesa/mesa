@@ -33,11 +33,15 @@ The default DataCollector here makes several assumptions:
     * For collecting agent-level variables, agents must have a unique_id
 """
 
+import os
 import contextlib
 import itertools
 import types
 from copy import deepcopy
 from functools import partial
+import pyarrow as pa
+import pyarrow.parquet as pq
+
 
 with contextlib.suppress(ImportError):
     import pandas as pd
@@ -58,6 +62,7 @@ class DataCollector:
         model_reporters=None,
         agent_reporters=None,
         tables=None,
+        output_dir='output_dir',
     ):
         """
         Instantiate a DataCollector with lists of model and agent reporters.
@@ -107,8 +112,18 @@ class DataCollector:
         self.agent_reporters = {}
 
         self.model_vars = {}
+        self.model_vars_cache = {}
         self._agent_records = {}
         self.tables = {}
+
+        self.cache_interval = 100
+        self.output_dir = output_dir
+
+        if not output_dir:
+            raise ValueError('output_dir cannot be None')
+        if not os.path.exists(output_dir):
+            print("Creating output directory {}".format(output_dir))
+            os.makedirs(output_dir)
 
         if model_reporters is not None:
             for name, reporter in model_reporters.items():
@@ -132,6 +147,7 @@ class DataCollector:
         """
         self.model_reporters[name] = reporter
         self.model_vars[name] = []
+        self.model_vars_cache[name] = []
 
     def _new_agent_reporter(self, name, reporter):
         """Add a new agent-level reporter to collect.
@@ -201,22 +217,32 @@ class DataCollector:
                     # Use deepcopy to store a copy of the data,
                     # preventing references from being updated across steps.
                     self.model_vars[var].append(deepcopy(reporter(model)))
+                    self.model_vars_cache[var].append(deepcopy(reporter(model)))
                 # Check if model attribute
                 elif isinstance(reporter, str):
                     self.model_vars[var].append(
                         deepcopy(getattr(model, reporter, None))
                     )
+                    self.model_vars_cache[var].append(
+                        deepcopy(getattr(model, reporter, None))
+                    )
                 # Check if function with arguments
                 elif isinstance(reporter, list):
                     self.model_vars[var].append(deepcopy(reporter[0](*reporter[1])))
+                    self.model_vars_cache[var].append(deepcopy(reporter[0](*reporter[1])))
                 # Assume it's a callable otherwise (e.g., method)
                 # TODO: Check if method of a class explicitly
                 else:
                     self.model_vars[var].append(deepcopy(reporter()))
+                    self.model_vars_cache[var].append(deepcopy(reporter()))
 
         if self.agent_reporters:
             agent_records = self._record_agents(model)
             self._agent_records[model._steps] = list(agent_records)
+
+        print(f"{model._steps=}")
+        if model._steps % self.cache_interval == 0 and model._steps != 0:
+            self._save_to_parquet(model)
 
     def add_table_row(self, table_name, row, ignore_missing=False):
         """Add a row dictionary to a specific table.
@@ -252,6 +278,20 @@ class DataCollector:
 
         return pd.DataFrame(self.model_vars)
 
+    def get_model_vars_cache_dataframe(self):
+        """Create a pandas DataFrame from the model variables.
+
+        The DataFrame has one column for each model variable, and the index is
+        (implicitly) the model tick.
+        """
+        # Check if self.model_reporters dictionary is empty, if so raise warning
+        if not self.model_reporters:
+            raise UserWarning(
+                "No model reporters have been defined in the DataCollector, returning empty DataFrame."
+            )
+
+        return pd.DataFrame(self.model_vars_cache)
+
     def get_agent_vars_dataframe(self):
         """Create a pandas DataFrame from the agent variables.
 
@@ -283,3 +323,39 @@ class DataCollector:
         if table_name not in self.tables:
             raise Exception("No such table.")
         return pd.DataFrame(self.tables[table_name])
+
+    def _save_to_parquet(self, model):
+        """Save the current cache of data to a Parquet file and clear the cache."""
+        model_df = self.get_model_vars_cache_dataframe()
+        agent_df = self.get_agent_vars_dataframe()
+
+        model_file = f"{self.output_dir}/model_data_{model._steps // self.cache_interval}.parquet"
+        agent_file = f"{self.output_dir}/agent_data_{model._steps // self.cache_interval}.parquet"
+        print(f"Saving model to {model_file}")
+        print(f"{model_file=}")
+        absolute_path = os.path.abspath(model_file)
+        print(f"{absolute_path=}")
+        if os.path.exists(absolute_path):
+            raise FileExistsError(f"A directory with the name {model_file} already exists.")
+        if os.path.exists(model_file):
+            raise FileExistsError(f"A directory with the name {model_file} already exists.")
+        if os.path.exists(agent_file):
+            raise FileExistsError(f"A directory with the name {agent_file} already exists.")
+
+        if not model_df.empty:
+            model_table = pa.Table.from_pandas(model_df)
+            pq.write_table(model_table, model_file)
+
+        if not agent_df.empty:
+            agent_table = pa.Table.from_pandas(agent_df)
+            pq.write_table(agent_table, agent_file)
+
+        # Clear the cache
+        self.model_vars_cache = {var: [] for var in self.model_vars_cache}
+        self._agent_records = {}
+
+    def cache_remaining_data(self, model):
+        """Cache the remaining data in model_vars_cache and _agent_records."""
+        if not self.model_vars_cache:
+            print("No model vars cached yet.")
+        self._save_to_parquet(model)
