@@ -509,6 +509,23 @@ class TestSingleGrid(unittest.TestCase):
         self.space.move_agent_to_one_of(agent, possible_positions, selection="closest")
         assert agent.pos == (6, 6)
 
+    def test_move_agent_closest_selection_multiple(self):
+        random_locations = []
+        agent = self.agents[0]
+        agent.pos = (5, 5)
+        repetititions = 10
+
+        for _ in range(repetititions):
+            possible_positions = [(4, 4), (6, 6), (10, 10), (20, 20)]
+            self.space.move_agent_to_one_of(
+                agent, possible_positions, selection="closest"
+            )
+            random_locations.append(agent.pos)
+            assert agent.pos in possible_positions
+            self.space.move_agent_to_one_of(agent, [(5, 5)], selection="closest")
+        non_random_locations = [random_locations[0]] * repetititions
+        assert random_locations != non_random_locations
+
     def test_move_agent_invalid_selection(self):
         agent = self.agents[0]
         possible_positions = [(10, 10), (20, 20), (30, 30)]

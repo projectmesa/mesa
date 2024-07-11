@@ -459,15 +459,20 @@ class _Grid:
             elif selection == "closest":
                 current_pos = agent.pos
                 # Find the closest position without sorting all positions
-                closest_pos = None
+                closest_pos = []
                 min_distance = float("inf")
                 agent.random.shuffle(pos)
                 for p in pos:
                     distance = self._distance_squared(p, current_pos)
                     if distance < min_distance:
                         min_distance = distance
-                        closest_pos = p
-                chosen_pos = closest_pos
+                        closest_pos.clear()
+                        closest_pos.append(p)
+                    elif distance == min_distance:
+                        closest_pos.append(p)
+
+                chosen_pos = agent.random.choice(closest_pos)
+
             else:
                 raise ValueError(
                     f"Invalid selection method {selection}. Choose 'random' or 'closest'."
