@@ -13,6 +13,7 @@ from tqdm.auto import tqdm
 from mesa import Model
 from mesa.datacollection import DataCollector
 
+
 def batch_run(
     model_cls: type[Model],
     parameters: Mapping[str, Any | Iterable[Any]],
@@ -77,6 +78,7 @@ def batch_run(
 
     return results
 
+
 def _make_model_kwargs(
     parameters: Mapping[str, Any | Iterable[Any]],
 ) -> list[dict[str, Any]]:
@@ -106,6 +108,7 @@ def _make_model_kwargs(
     all_kwargs = itertools.product(*parameter_list)
     kwargs_list = [dict(kwargs) for kwargs in all_kwargs]
     return kwargs_list
+
 
 def _model_run_func(
     model_cls: type[Model],
@@ -172,6 +175,7 @@ def _model_run_func(
 
     return data
 
+
 def _collect_data(
     datacollector: DataCollector,
     step: int,
@@ -191,7 +195,9 @@ def _collect_data(
     tuple[dict[str, Any], list[dict[str, Any]]]
         A tuple containing the model data and a list of agent data dictionaries.
     """
-    model_data = {param: values[step] for param, values in datacollector.model_vars.items()}
+    model_data = {
+        param: values[step] for param, values in datacollector.model_vars.items()
+    }
 
     all_agents_data = []
     raw_agent_data = datacollector._agent_records.get(step, [])
