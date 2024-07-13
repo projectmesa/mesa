@@ -1,3 +1,7 @@
+"""
+This module provides a command-line interface for the Mesa Agent-Based Modeling Framework.
+"""
+
 import os
 import sys
 from pathlib import Path
