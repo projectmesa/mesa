@@ -6,7 +6,7 @@ Core Objects: Model, and Agent.
 
 import datetime
 
-import mesa.space as space
+from mesa import space
 import mesa.time as time
 from mesa.agent import Agent
 from mesa.batchrunner import batch_run
