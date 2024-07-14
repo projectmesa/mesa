@@ -23,7 +23,6 @@ Usage:
 See the Visualization Tutorial and example models for more details.
 """
 
-import sys
 import threading
 
 import reacton.ipywidgets as widgets
