@@ -115,6 +115,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
     # Portray and scatter the agents in the space
     space_ax.scatter(**portray(space))
 
+
 def _draw_voronoi(space, space_ax, agent_portrayal):
     def portray(g):
         x = []
@@ -163,6 +164,7 @@ def _draw_voronoi(space, space_ax, agent_portrayal):
             c="red",
         )  # Plot filled polygon
         space_ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in red
+
 
 @solara.component
 def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
