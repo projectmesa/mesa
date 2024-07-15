@@ -1,9 +1,5 @@
 from collections.abc import Sequence
 from itertools import combinations
-
-# from pyhull.delaunay import DelaunayTri
-# from pyhull.voronoi import VoronoiTess
-from math import sqrt
 from random import Random
 
 import numpy as np
@@ -45,9 +41,9 @@ class Delaunay:
 
         # Compute circumcenters and circumradius for each triangle
         for t in self.triangles:
-            self.circles[t] = self.circumcenter(t)
+            self.circles[t] = self._circumcenter(t)
 
-    def circumcenter(self, triangle: list) -> tuple:
+    def _circumcenter(self, triangle: list) -> tuple:
         """
         Compute circumcenter and circumradius of a triangle in 2D.
         """
@@ -63,7 +59,7 @@ class Delaunay:
         radius = np.sum(np.square(points[0] - center))  # squared distance
         return (center, radius)
 
-    def in_circle(self, triangle: list, point: list) -> bool:
+    def _in_circle(self, triangle: list, point: list) -> bool:
         """
         Check if point p is inside of precomputed circumcircle of triangle.
         """
@@ -79,7 +75,7 @@ class Delaunay:
 
         bad_triangles = []
         for triangle in self.triangles:
-            if self.in_circle(triangle, point):
+            if self._in_circle(triangle, point):
                 bad_triangles.append(triangle)
 
         boundary = []
@@ -110,7 +106,7 @@ class Delaunay:
         new_triangles = []
         for e0, e1, opposite_triangle in boundary:
             triangle = (point_index, e0, e1)
-            self.circles[triangle] = self.circumcenter(triangle)
+            self.circles[triangle] = self._circumcenter(triangle)
             self.triangles[triangle] = [opposite_triangle, None, None]
             if opposite_triangle:
                 for i, neighbor in enumerate(self.triangles[opposite_triangle]):
@@ -124,7 +120,7 @@ class Delaunay:
             self.triangles[triangle][1] = new_triangles[(i + 1) % n]  # next
             self.triangles[triangle][2] = new_triangles[(i - 1) % n]  # previous
 
-    def exportTriangles(self) -> list:
+    def export_triangles(self) -> list:
         """
         Export the current list of Delaunay triangles
         """
@@ -135,37 +131,7 @@ class Delaunay:
         ]
         return triangles_list
 
-    def exportCircles(self) -> list:
-        """
-        Export the circumcircles as a list of (center, radius)
-        """
-        circles_list = [
-            (self.circles[(a, b, c)][0], sqrt(self.circles[(a, b, c)][1]))
-            for (a, b, c) in self.triangles
-            if a > 3 and b > 3 and c > 3
-        ]
-        return circles_list
-
-    def exportDT(self) -> tuple[list, list]:
-        """
-        Export the current set of Delaunay coordinates and triangles.
-        """
-        coord = self.coords[4:]
-
-        tris = [
-            (a - 4, b - 4, c - 4)
-            for (a, b, c) in self.triangles
-            if a > 3 and b > 3 and c > 3
-        ]
-        return coord, tris
-
-    def exportExtendedDT(self):
-        """
-        Export the Extended Delaunay Triangulation (with the frame vertex).
-        """
-        return self.coords, list(self.triangles)
-
-    def exportVoronoiRegions(self):
+    def export_voronoi_regions(self):
         """
         Export coordinates and regions of Voronoi diagram as indexed data.
         """
@@ -198,7 +164,7 @@ class Delaunay:
 
 
 def round_float(x: float) -> int:
-    return int(np.ceil(x)) * 2000
+    return int(x * 500)
 
 
 class VoronoiGrid(DiscreteSpace):
@@ -213,15 +179,22 @@ class VoronoiGrid(DiscreteSpace):
         random: Random | None = None,
         cell_klass: type[Cell] = Cell,
         capacity_function: callable = round_float,
-        cell_coloring_attribute: str | None = None,
+        cell_coloring_property: str | None = None,
     ) -> None:
-        """A Voronoi Tessellation Grid
+        """
+        A Voronoi Tessellation Grid.
+
+        Given a set of points, this class creates a grid where a cell is centered in each point,
+        its neighbors are given by Voronoi Tessellation cells neighbors
+        and the capacity by the polygon area.
 
         Args:
             centroids_coordinates: coordinates of centroids to build the tessellation space
             capacity (int) : capacity of the cells in the discrete space
             random (Random): random number generator
             CellKlass (type[Cell]): type of cell class
+            capacity_function (Callable): function to compute (int) capacity according to (float) area
+            cell_coloring_property (str): voronoi visualization polygon fill property
         """
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
         self.centroids_coordinates = centroids_coordinates
@@ -236,18 +209,20 @@ class VoronoiGrid(DiscreteSpace):
         self.triangulation = None
         self.voronoi_coordinates = None
         self.capacity_function = capacity_function
-        self.cell_coloring_attribute = cell_coloring_attribute
+        self.cell_coloring_property = cell_coloring_property
 
         self._connect_cells()
         self._build_cell_polygons()
 
     def _connect_cells(self) -> None:
-        """Connect cells to neighbors based on given centroids and using Delaunay Triangulation"""
+        """
+        Connect cells to neighbors based on given centroids and using Delaunay Triangulation
+        """
         self.triangulation = Delaunay()
         for centroid in self.centroids_coordinates:
             self.triangulation.add_point(centroid)
 
-        for point in self.triangulation.exportTriangles():
+        for point in self.triangulation.export_triangles():
             for i, j in combinations(point, 2):
                 self._cells[i].connect(self._cells[j])
                 self._cells[j].connect(self._cells[i])
@@ -267,7 +242,7 @@ class VoronoiGrid(DiscreteSpace):
     def _get_voronoi_regions(self) -> tuple:
         if self.voronoi_coordinates is None or self.regions is None:
             self.voronoi_coordinates, self.regions = (
-                self.triangulation.exportVoronoiRegions()
+                self.triangulation.export_voronoi_regions()
             )
         return self.voronoi_coordinates, self.regions
 
@@ -286,4 +261,4 @@ class VoronoiGrid(DiscreteSpace):
             polygon_area = self._compute_polygon_area(polygon)
             self._cells[region].properties["area"] = polygon_area
             self._cells[region].capacity = self.capacity_function(polygon_area)
-            self._cells[region].properties[self.cell_coloring_attribute] = 0
+            self._cells[region].properties[self.cell_coloring_property] = 0
