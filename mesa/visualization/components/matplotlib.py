@@ -161,7 +161,7 @@ def _draw_voronoi(space, space_ax, agent_portrayal):
         polygon = cell.properties["polygon"]
         space_ax.fill(
             *zip(*polygon),
-            alpha=min(1, cell.properties[space.cell_coloring_attribute]),
+            alpha=min(1, cell.properties[space.cell_coloring_property]),
             c="red",
         )  # Plot filled polygon
         space_ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in red
