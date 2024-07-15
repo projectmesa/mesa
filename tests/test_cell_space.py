@@ -385,6 +385,15 @@ def test_voronoigrid():
     for connection in grid._cells[0]._connections:
         assert connection.coordinate in [[1, 1], [1, 3]]
 
+    with pytest.raises(ValueError):
+        VoronoiGrid(points, capacity="str")
+
+    with pytest.raises(ValueError):
+        VoronoiGrid((1, 1))
+
+    with pytest.raises(ValueError):
+        VoronoiGrid([[0, 1], [0, 1, 1]])
+
 
 def test_empties_space():
     import networkx as nx

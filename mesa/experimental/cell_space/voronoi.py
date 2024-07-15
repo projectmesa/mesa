@@ -230,7 +230,7 @@ class VoronoiGrid(DiscreteSpace):
     def _validate_parameters(self) -> None:
         if self.capacity is not None and not isinstance(self.capacity, float | int):
             raise ValueError("Capacity must be a number or None.")
-        if not isinstance(self.centroids_coordinates, Sequence) and not isinstance(
+        if not isinstance(self.centroids_coordinates, Sequence) or not isinstance(
             self.centroids_coordinates[0], Sequence
         ):
             raise ValueError("Centroids should be a list of lists")
