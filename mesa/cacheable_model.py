@@ -4,7 +4,7 @@ import itertools
 import types
 from copy import deepcopy
 from functools import partial
-from typing import Any
+from typing import Any, Callable
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -32,9 +32,10 @@ class CacheableModel:
         self,
         model: Model,
         cache_file_path: str | Path,
-        cache_state: CacheState,
+        # cache_state: CacheState,
         total_steps: int,
-        cache_step_rate: int = 1,
+        # cache_step_rate: int = 1,
+        condition_function=None,
     ) -> None:
         """Create a new caching wrapper around an existing mesa model instance.
 
@@ -49,8 +50,8 @@ class CacheableModel:
 
         self.model = model
         self.cache_file_path = Path(cache_file_path)
-        self._cache_state = cache_state
-        self._cache_step_rate = cache_step_rate
+        # self._cache_state = cache_state
+        # self._cache_step_rate = cache_step_rate
         self._total_steps = total_steps
         # self.cache: list[Any] = []
         self.step_count: int = 0
@@ -63,8 +64,10 @@ class CacheableModel:
         self._agent_records = {}
 
         self._cache_interval = 100
-        self.output_dir = 'output_dir'
+        # self.output_dir = 'output_dir'
 
+        self._last_cached_step = 0 # inclusive since it is the bottom bound of slicing
+        self.condition_function = condition_function
     def get_agent_vars_dataframe(self):
         """Create a pandas DataFrame from the agent variables.
 
@@ -101,8 +104,8 @@ class CacheableModel:
 
         print(f" TEST {self.model._steps=}")
         print(f" TEST {self._cache_interval=}")
-        print(pd.DataFrame(self.model.datacollector.model_vars)[self.model._steps-self._cache_interval:self.model._steps])
-        return pd.DataFrame(self.model.datacollector.model_vars)[self.model._steps-self._cache_interval:self.model._steps]
+        print(pd.DataFrame(self.model.datacollector.model_vars)[self._last_cached_step:self.model._steps])
+        return pd.DataFrame(self.model.datacollector.model_vars)[self._last_cached_step:self.model._steps]
 
     # def get_table_dataframe(self, table_name):
     #     """Create a pandas DataFrame from a particular table.
@@ -120,8 +123,12 @@ class CacheableModel:
         agent_df = self.get_agent_vars_dataframe()
         padding = len(str(self._total_steps)) - 1
         print(padding)
-        model_file = f"{self.output_dir}/model_data_{self.model._steps // self._cache_interval:0{padding}}.parquet"
-        agent_file = f"{self.output_dir}/agent_data_{self.model._steps // self._cache_interval:0{padding}}.parquet"
+
+        # ceiling function
+        model_file = f"{self.cache_file_path}/model_data_{-(self.model._steps // -self._cache_interval):0{padding}}.parquet"
+        agent_file = f"{self.cache_file_path}/agent_data_{-(self.model._steps // -self._cache_interval):0{padding}}.parquet"
+
+        self.cache_file_path.mkdir(parents=True, exist_ok=True)
 
         print(f"{model_file=}")
         absolute_path = os.path.abspath(model_file)
@@ -154,3 +161,52 @@ class CacheableModel:
             print("CALLED")
             print(f"{self.model._steps=}")
             self._save_to_parquet(self.model)
+            self._last_cached_step = self.model._steps
+        elif self.model._steps == self._total_steps:
+            print("FINAL CALLED")
+            print(f"{self.model._steps=}")
+            self._save_to_parquet(self.model)
+            self._last_cached_step = self.model._steps
+
+        if self.condition_function and self.save_special_results(self.condition_function):
+            # print("CHECK SPECIAL RESULTS CONDITION")
+            pass
+
+    def save_special_results(self, condition_function: Callable[[dict], bool]):
+
+        model_vars = self.model.datacollector.model_vars
+        # print(f"{model_vars=}")
+        print(f"{model_vars.get('Gini', 0)[-1]=}")
+        self.cache_file_path.mkdir(parents=True, exist_ok=True)
+        # if condition_function(model_vars):
+        #     special_results_df = pd.DataFrame(model_vars)
+        #     special_results_file = f"{self.cache_file_path}/special_results.parquet"
+        #
+        #
+        #     if not special_results_df.empty:
+        #         print(f"Condition met. Saving special results to {special_results_file}")
+        #         special_results_table = pa.Table.from_pandas(special_results_df)
+        #         pq.write_table(special_results_table, special_results_file)
+        #     else:
+        #         print("Condition met but no data to save.")
+
+        current_step = self.model._steps
+        special_results_file = f"{self.cache_file_path}/special_results.parquet"
+        if condition_function(model_vars):
+            step_data = {key: [value[-1]] for key, value in model_vars.items()}
+            step_data['Step'] = current_step
+            special_results_df = pd.DataFrame(step_data)
+
+            # Append the current step data to the Parquet file
+            if os.path.exists(special_results_file):
+                existing_data = pq.read_table(special_results_file).to_pandas()
+                combined_data = pd.concat([existing_data, special_results_df], ignore_index=True)
+                special_results_table = pa.Table.from_pandas(combined_data)
+            else:
+                special_results_table = pa.Table.from_pandas(special_results_df)
+
+            pq.write_table(special_results_table, special_results_file)
+
+            print(f"Condition met. Appended special results for step {current_step} to {special_results_file}")
+        else:
+            print(f"Condition not met at step {current_step}. No data to save.")
