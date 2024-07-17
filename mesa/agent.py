@@ -346,6 +346,22 @@ class AgentSet(MutableSet, Sequence):
         self.model = state["model"]
         self._update(state["agents"])
 
+    def group_by(self, attr_name: str) -> dict:
+        """
+        Group agents in the AgentSet based on the specified attribute.
+
+        Args:
+            attr_name (str): The name of the attribute to group agents by.
+
+        Returns:
+            dict: A dictionary where keys are attribute values and values are lists of agents with those attribute values.
+        """
+        grouped_agents = defaultdict(list)
+        for agent in self:
+            attr_value = getattr(agent, attr_name, None)
+            grouped_agents[attr_value].append(agent)
+        return grouped_agents
+
     @property
     def random(self) -> Random:
         """

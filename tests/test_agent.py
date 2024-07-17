@@ -282,3 +282,17 @@ def test_agentset_shuffle():
     agentset = AgentSet(test_agents, model=model)
     agentset.shuffle(inplace=True)
     assert not all(a1 == a2 for a1, a2 in zip(test_agents, agentset))
+
+
+def test_agentset_group_by():
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    for i, agent in enumerate(agents):
+        agent.category = i % 2  # Assign categories 0 or 1
+    agentset = AgentSet(agents, model)
+
+    grouped = agentset.group_by("category")
+    assert len(grouped[0]) == 5
+    assert len(grouped[1]) == 5
+    assert all(agent.category == 0 for agent in grouped[0])
+    assert all(agent.category == 1 for agent in grouped[1])
