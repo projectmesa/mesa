@@ -66,3 +66,13 @@ class TestExamples(unittest.TestCase):
                 model = model_class()
                 for _ in range(10):
                     model.step()
+
+    def test_batch_run(self):
+        examples_to_test = {
+            'bank_reserves': 'batch_run',
+            'sugarscape_g1mt': 'run'
+        }
+        for example, script in examples_to_test.items():
+            with self.active_example_dir(example):
+                script_module = importlib.import_module(script)
+                script_module.main()  # Assuming the scripts have a main function
