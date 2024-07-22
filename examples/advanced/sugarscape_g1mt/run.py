@@ -61,47 +61,45 @@ def assess_results(results, single_agent):
 
 
 # Run the model
+def main():
+    args = sys.argv[1:]
 
-args = sys.argv[1:]
+    if len(args) == 0:
+        server.launch()
 
-if len(args) == 0:
-    server.launch()
+    elif args[0] == "-s":
+        print("Running Single Model")
+        model = SugarscapeG1mt()
+        model.run_model()
+        model_results = model.datacollector.get_model_vars_dataframe()
+        model_results["Step"] = model_results.index
+        agent_results = model.datacollector.get_agent_vars_dataframe()
+        agent_results = agent_results.reset_index()
+        assess_results(model_results, agent_results)
 
-elif args[0] == "-s":
-    print("Running Single Model")
-    # instantiate the model
-    model = SugarscapeG1mt()
-    # run the model
-    model.run_model()
-    # Get results
-    model_results = model.datacollector.get_model_vars_dataframe()
-    # Convert to make similar to batch_run_results
-    model_results["Step"] = model_results.index
-    agent_results = model.datacollector.get_agent_vars_dataframe()
-    agent_results = agent_results.reset_index()
-    # assess the results
-    assess_results(model_results, agent_results)
+    elif args[0] == "-b":
+        print("Conducting a Batch Run")
+        params = {
+            "width": 50,
+            "height": 50,
+            "vision_min": range(1, 4),
+            "metabolism_max": [2, 3, 4, 5],
+        }
 
-elif args[0] == "-b":
-    print("Conducting a Batch Run")
-    # Batch Run
-    params = {
-        "width": 50,
-        "height": 50,
-        "vision_min": range(1, 4),
-        "metabolism_max": [2, 3, 4, 5],
-    }
+        results_batch = mesa.batch_run(
+            SugarscapeG1mt,
+            parameters=params,
+            iterations=1,
+            number_processes=1,
+            data_collection_period=1,
+            display_progress=True,
+        )
 
-    results_batch = mesa.batch_run(
-        SugarscapeG1mt,
-        parameters=params,
-        iterations=1,
-        number_processes=1,
-        data_collection_period=1,
-        display_progress=True,
-    )
+        assess_results(results_batch, None)
 
-    assess_results(results_batch, None)
+    else:
+        raise Exception("Option not found")
 
-else:
-    raise Exception("Option not found")
+
+if __name__ == "__main__":
+    main()
