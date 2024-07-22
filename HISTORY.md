@@ -1,6 +1,17 @@
 ---
 title: Release History
 ---
+# 2.3.2 (2024-07-22)
+## Highlights
+Mesa 2.3.2 is a small patch release which fixes two bugs, one to the batch_run function still depending on `schedule.steps`, and one in the agent marker visualisation.
+
+## What's Changed
+### 🐛 Bugs fixed
+* fix: Render agent marker radius correctly by @rht in https://github.com/projectmesa/mesa/pull/2181
+* fix: Use model.schedule.steps -> mode._steps for batch_run by @rht in https://github.com/projectmesa/mesa/pull/2183
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.1...v2.3.2
+
 # 2.3.1 (2024-07-03)
 ## Highlights
 Mesa 2.3.1 is a small patch release with a datacollector bug fixed and improved documentation.
