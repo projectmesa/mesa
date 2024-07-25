@@ -21,6 +21,8 @@ def test_make_model_kwargs():
     ]
     # If the value is a single string, do not iterate over it.
     assert _make_model_kwargs({"a": "value"}) == [{"a": "value"}]
+    # If the values is an empty iterable, don't iterate over it.
+    assert _make_model_kwargs({"a": []}) == [{"a": []}]
 
 
 class MockAgent(Agent):
