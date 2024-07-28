@@ -4,7 +4,7 @@ from mesa.batchrunner import _make_model_kwargs
 from mesa.datacollection import DataCollector
 from mesa.model import Model
 from mesa.time import BaseScheduler
-from mesa import batch_run
+
 
 def test_make_model_kwargs():
     assert _make_model_kwargs({"a": 3, "b": 5}) == [{"a": 3, "b": 5}]
