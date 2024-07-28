@@ -206,3 +206,5 @@ def _collect_data(
         agent_dict.update(zip(datacollector.agent_reporters, data[2:]))
         all_agents_data.append(agent_dict)
     return model_data, all_agents_data
+
+__all__ = ['batch_run']
