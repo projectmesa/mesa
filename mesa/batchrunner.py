@@ -207,4 +207,5 @@ def _collect_data(
         all_agents_data.append(agent_dict)
     return model_data, all_agents_data
 
-__all__ = ['batch_run']
+
+__all__ = ["batch_run"]
