@@ -2,15 +2,20 @@
 Mesa Agent-Based Modeling Framework
 Core Objects: Model, and Agent.
 """
+
 import datetime
+
 from mesa import space, time
 from mesa.agent import Agent
 from mesa.datacollection import DataCollector
 from mesa.model import Model
 
+
 def batch_run(*args, **kwargs):
     from mesa.batchrunner import batch_run as _batch_run
+
     return _batch_run(*args, **kwargs)
+
 
 __all__ = [
     "Model",
