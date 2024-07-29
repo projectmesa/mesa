@@ -20,3 +20,7 @@ class ScaffoldTest(unittest.TestCase):
             assert not os.path.isdir("example_project")
             self.runner.invoke(cli, ["startproject", "--no-input"])
             assert os.path.isdir("example_project")
+
+    def get_cli():
+    from mesa.main import cli
+    return cli
