@@ -207,8 +207,10 @@ def _collect_data(
         all_agents_data.append(agent_dict)
     return model_data, all_agents_data
 
+
 def get_Model():
     from mesa import Model
+
     return Model
 
 
