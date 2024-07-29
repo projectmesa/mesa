@@ -90,6 +90,13 @@ class TestAgentLifespan(unittest.TestCase):
         lifetimes = self.df.groupby(["AgentID"]).agg({"Step": len})
         assert lifetimes.Step.max() == 2
 
+    def get_Agent():
+     from mesa import Agent
+     return Agent
+
+   def get_Model():
+     from mesa import Model
+     return Model
 
 if __name__ == "__main__":
     unittest.main()
