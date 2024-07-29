@@ -1,3 +1,3 @@
-from .jupyter_viz import JupyterViz, Slider, make_text
+from .jupyter_viz import JupyterViz, Slider, SolaraViz, make_text
 
-__all__ = ["JupyterViz", "make_text", "Slider"]
+__all__ = ["JupyterViz", "make_text", "Slider", "SolaraViz"]
