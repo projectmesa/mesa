@@ -1,7 +1,7 @@
 """
 Configure visualization elements and instantiate a server
 """
-from mesa.visualization import JupyterViz
+from mesa.visualization import SolaraViz
 
 from {{ cookiecutter.snake }}.model import {{ cookiecutter.model }}, {{ cookiecutter.agent }}  # noqa
 
@@ -18,7 +18,7 @@ def circle_portrayal_example(agent):
 
 model_params = {"num_agents": 10, "width": 10, "height": 10}
 
-page = JupyterViz(
+page = SolaraViz(
     {{cookiecutter.model}},
     model_params,
     measures=["num_agents"],

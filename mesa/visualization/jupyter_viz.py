@@ -5,7 +5,7 @@ This module provides components to create browser- and Jupyter notebook-based vi
 Mesa models, allowing users to watch models run step-by-step and interact with model parameters.
 
 Key features:
-    - JupyterViz: Main component for creating visualizations, supporting grid displays and plots
+    - SolaraViz: Main component for creating visualizations, supporting grid displays and plots
     - ModelController: Handles model execution controls (step, play, pause, reset)
     - UserInputs: Generates UI elements for adjusting model parameters
     - Card: Renders individual visualization elements (space, measures)
@@ -17,7 +17,7 @@ custom visualization components.
 Usage:
     1. Define an agent_portrayal function to specify how agents should be displayed
     2. Set up model_params to define adjustable parameters
-    3. Create a JupyterViz instance with your model, parameters, and desired measures
+    3. Create a SolaraViz instance with your model, parameters, and desired measures
     4. Display the visualization in a Jupyter notebook or run as a Solara app
 
 See the Visualization Tutorial and example models for more details.
@@ -85,7 +85,7 @@ def Card(
 
 
 @solara.component
-def JupyterViz(
+def SolaraViz(
     model_class,
     model_params,
     measures=None,
@@ -200,6 +200,9 @@ def JupyterViz(
         draggable=True,
         on_grid_layout=set_grid_layout,
     )
+
+
+JupyterViz = SolaraViz
 
 
 @solara.component
