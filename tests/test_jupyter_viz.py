@@ -152,6 +152,8 @@ def test_slider():
     slider_dtype_float = Slider("Homophily", 3, 0, 8, 1, dtype=float)
     assert slider_dtype_float.is_float_slider
 
+
 def get_batch_run():
     from mesa.batchrunner import batch_run
+
     return batch_run
