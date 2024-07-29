@@ -5,7 +5,7 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
 ## Jupyter Visualization
 
 ```{eval-rst}
-.. automodule:: mesa.visualization.jupyter_viz
+.. automodule:: mesa.visualization.solara_viz
    :members:
    :undoc-members:
    :show-inheritance:
