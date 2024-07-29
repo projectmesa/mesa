@@ -199,6 +199,8 @@ def test_batch_run_unhashable_param():
         },
     ]
 
+
 def get_batch_run():
     from mesa.batchrunner import batch_run
+
     return batch_run
