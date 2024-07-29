@@ -323,15 +323,16 @@ class TestRandomActivationByType(TestCase):
                 model.get_agents_of_type(agent_type)
             )
 
-
     def get_Agent():
         from mesa import Agent
+
         return Agent
 
     def get_Model():
         from mesa import Model
+
         return Model
-        
+
     # def test_add_non_unique_ids(self):
     #     """
     #     Test that adding agent with duplicate ids result in an error.
