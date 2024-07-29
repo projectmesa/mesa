@@ -207,7 +207,9 @@ def _collect_data(
         all_agents_data.append(agent_dict)
     return model_data, all_agents_data
 
+
 __all__ = ["batch_run"]
+
 
 def get_Model():
     from mesa import Model
