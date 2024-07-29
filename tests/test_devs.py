@@ -280,3 +280,7 @@ def test_eventlist():
     # clear
     event_list.clear()
     assert len(event_list) == 0
+
+def get_Model():
+    from mesa import Model
+    return Model
