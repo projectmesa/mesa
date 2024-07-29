@@ -282,3 +282,11 @@ def test_agentset_shuffle():
     agentset = AgentSet(test_agents, model=model)
     agentset.shuffle(inplace=True)
     assert not all(a1 == a2 for a1, a2 in zip(test_agents, agentset))
+
+def get_Agent():
+    from mesa.agent import Agent
+    return Agent
+
+def get_AgentSet():
+    from mesa.agent import AgentSet
+    return AgentSet
