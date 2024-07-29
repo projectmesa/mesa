@@ -229,6 +229,13 @@ class TestDataCollectorInitialization(unittest.TestCase):
             "You must add agents to the scheduler before initializing the data collector.",
         )
 
+def get_Agent():
+    from mesa import Agent
+    return Agent
+
+def get_Model():
+    from mesa import Model
+    return Model
 
 if __name__ == "__main__":
     unittest.main()
