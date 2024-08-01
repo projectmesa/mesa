@@ -8,9 +8,9 @@ Mesa 3.0 alpha 1 (`v3.0.0a1`) is another step towards our next major version. Th
 ## What's Changed
 ### ⚠️ Breaking changes
 * viz: Combine code for rendering in browser and Jupyter by @rht in https://github.com/projectmesa/mesa/pull/2180
-* refactor: Rename jupyter_viz namespace to solara_viz by @rht in https://github.com/projectmesa/mesa/pull/2188
 ### 🛠 Enhancements made
 * Rename JupyterViz to SolaraViz by @rht in https://github.com/projectmesa/mesa/pull/2187
+* refactor: Rename jupyter_viz namespace to solara_viz by @rht in https://github.com/projectmesa/mesa/pull/2188
 ### 🐛 Bugs fixed
 * fix: Render agent marker radius correctly by @rht in https://github.com/projectmesa/mesa/pull/2181
 * fix: Use model.schedule.steps -> mode._steps for batch_run by @rht in https://github.com/projectmesa/mesa/pull/2183
