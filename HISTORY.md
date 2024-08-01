@@ -1,6 +1,27 @@
 ---
 title: Release History
 ---
+# 3.0.0a1 (2024-08-01)
+## Highlights
+Mesa 3.0 alpha 1 (`v3.0.0a1`) is another step towards our next major version. This release introduces a name change from JupyterViz (jupyter_viz) to SolaraViz (solara_viz), to better represent the tech stack being used. It also includes two bugfixes also present in 2.3.2.
+
+## What's Changed
+### ⚠️ Breaking changes
+* viz: Combine code for rendering in browser and Jupyter by @rht in https://github.com/projectmesa/mesa/pull/2180
+### 🛠 Enhancements made
+* Rename JupyterViz to SolaraViz by @rht in https://github.com/projectmesa/mesa/pull/2187
+* refactor: Rename jupyter_viz namespace to solara_viz by @rht in https://github.com/projectmesa/mesa/pull/2188
+### 🐛 Bugs fixed
+* fix: Render agent marker radius correctly by @rht in https://github.com/projectmesa/mesa/pull/2181
+* fix: Use model.schedule.steps -> mode._steps for batch_run by @rht in https://github.com/projectmesa/mesa/pull/2183
+### 📜 Documentation improvements
+* Add original conference paper link to docs by @ENUMERA8OR in https://github.com/projectmesa/mesa/pull/2160
+
+## New Contributors
+* @ENUMERA8OR made their first contribution in https://github.com/projectmesa/mesa/pull/2160
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a0...v3.0.0a1
+
 # 3.0.0a0 (2024-07-04)
 ## Highlights
 This is the first pre-release in the Mesa 3.0 series, which is still in active development. The `v3.0.0a0` pre-release can help active Mesa developers help starting to test the latest features in their models.
@@ -37,6 +58,17 @@ This pre-release can be installed with `pip install mesa --upgrade --pre`.
 * @stephenfmann made their first contribution in https://github.com/projectmesa/mesa/pull/2154
 
 **Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.1...v3.0.0a0
+
+# 2.3.2 (2024-07-22)
+## Highlights
+Mesa 2.3.2 is a small patch release which fixes two bugs, one to the batch_run function still depending on `schedule.steps`, and one in the agent marker visualisation.
+
+## What's Changed
+### 🐛 Bugs fixed
+* fix: Render agent marker radius correctly by @rht in https://github.com/projectmesa/mesa/pull/2181
+* fix: Use model.schedule.steps -> mode._steps for batch_run by @rht in https://github.com/projectmesa/mesa/pull/2183
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.1...v2.3.2
 
 # 2.3.1 (2024-07-03)
 ## Highlights
