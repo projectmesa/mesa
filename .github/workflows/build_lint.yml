@@ -79,6 +79,7 @@ jobs:
       with:
         repository: projectmesa/mesa-examples
         path: mesa-examples
+        ref: mesa-2.x  # Legacy branch for mesa-examples that work with Mesa 2.x
     - name: Test examples
       run: |
         cd mesa-examples
