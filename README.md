@@ -7,6 +7,8 @@
 | Meta | [![linting - Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) [![code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch) |
 | Chat | [![chat](https://img.shields.io/matrix/project-mesa:matrix.org?label=chat&logo=Matrix)](https://matrix.to/#/#project-mesa:matrix.org) |
 
+*This is the `2.3.x-maintenance` branch. Example models for Mesa 2.x can be found [here](https://github.com/projectmesa/mesa-examples/tree/mesa-2.x/examples).*
+
 Mesa allows users to quickly create agent-based models using built-in
 core components (such as spatial grids and agent schedulers) or
 customized implementations; visualize them using a browser-based
@@ -52,7 +54,7 @@ For resources or help on using Mesa, check out the following:
     Wealth Model, for beginners or those new to Mesa.)
 -   [Complexity Explorer Tutorial](https://www.complexityexplorer.org/courses/172-agent-based-models-with-python-an-introduction-to-mesa) (An advanced-beginner model,
     SugarScape with Traders, with instructional videos)
--   [Mesa Examples](https://github.com/projectmesa/mesa-examples/tree/main/examples) (A repository of seminal ABMs using Mesa and
+-   [Mesa Examples](https://github.com/projectmesa/mesa-examples/tree/mesa-2.x/examples) (A repository of seminal ABMs using Mesa and
     examples of employing specific Mesa Features)
 -   [Docs](http://mesa.readthedocs.org/) (Mesa's documentation, API and useful snippets)
 -   [Discussions](https://github.com/projectmesa/mesa/discussions) (GitHub threaded discussions about Mesa)
