@@ -67,12 +67,17 @@ class CacheableModel:
 
         all_records = itertools.chain.from_iterable(self.model.datacollector._agent_records.values())
         rep_names = list(self.model.datacollector.agent_reporters)
+        print(f"{all_records=}")
+        print(f"{rep_names=}")
 
         df = pd.DataFrame.from_records(
             data=all_records,
             columns=["Step", "AgentID", *rep_names],
             index=["Step", "AgentID"],
         )
+
+
+
         sliced_df = df.loc[self._last_cached_step:self.model._steps]
 
         return sliced_df
