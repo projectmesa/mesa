@@ -12,17 +12,10 @@ from pathlib import Path
 from enum import Enum
 from mesa import Model
 
+import glob
+
 with contextlib.suppress(ImportError):
     import pandas as pd
-
-
-class CacheState(Enum):
-    """When using 'RECORD', with every simulation step the actual simulation will be performed and the model state
-    written to the cache (also called simulation mode).
-    When using 'REPLAY', with every step the model state will be read from the cache (also called replay mode)."""
-
-    RECORD = (1,)
-    REPLAY = 2
 
 
 class CacheableModel:
@@ -32,9 +25,7 @@ class CacheableModel:
         self,
         model: Model,
         cache_file_path: str | Path,
-        # cache_state: CacheState,
         total_steps: int,
-        # cache_step_rate: int = 1,
         condition_function=None,
     ) -> None:
         """Create a new caching wrapper around an existing mesa model instance.
@@ -50,21 +41,15 @@ class CacheableModel:
 
         self.model = model
         self.cache_file_path = Path(cache_file_path)
-        # self._cache_state = cache_state
-        # self._cache_step_rate = cache_step_rate
         self._total_steps = total_steps
-        # self.cache: list[Any] = []
         self.step_count: int = 0
         self.run_finished = False
 
         # temporary dicts to be flushed
         self.model_vars_cache = {}
-
-
         self._agent_records = {}
 
         self._cache_interval = 100
-        # self.output_dir = 'output_dir'
 
         self._last_cached_step = 0 # inclusive since it is the bottom bound of slicing
         self.condition_function = condition_function
@@ -80,7 +65,7 @@ class CacheableModel:
                 "No agent reporters have been defined in the DataCollector, returning empty DataFrame."
             )
 
-        all_records = itertools.chain.from_iterable(self._agent_records.values())
+        all_records = itertools.chain.from_iterable(self.model.datacollector._agent_records.values())
         rep_names = list(self.model.datacollector.agent_reporters)
 
         df = pd.DataFrame.from_records(
@@ -88,7 +73,9 @@ class CacheableModel:
             columns=["Step", "AgentID", *rep_names],
             index=["Step", "AgentID"],
         )
-        return df
+        sliced_df = df.loc[self._last_cached_step:self.model._steps]
+
+        return sliced_df
 
     def get_model_vars_dataframe(self):
         """Create a pandas DataFrame from the model variables.
@@ -102,27 +89,13 @@ class CacheableModel:
                 "No model reporters have been defined in the DataCollector, returning empty DataFrame."
             )
 
-        print(f" TEST {self.model._steps=}")
-        print(f" TEST {self._cache_interval=}")
-        print(pd.DataFrame(self.model.datacollector.model_vars)[self._last_cached_step:self.model._steps])
         return pd.DataFrame(self.model.datacollector.model_vars)[self._last_cached_step:self.model._steps]
-
-    # def get_table_dataframe(self, table_name):
-    #     """Create a pandas DataFrame from a particular table.
-    #
-    #     Args:
-    #         table_name: The name of the table to convert.
-    #     """
-    #     if table_name not in self.tables:
-    #         raise Exception("No such table.")
-    #     return pd.DataFrame(self.tables[table_name])
 
     def _save_to_parquet(self, model):
         """Save the current cache of data to a Parquet file and clear the cache."""
         model_df = self.get_model_vars_dataframe()
         agent_df = self.get_agent_vars_dataframe()
         padding = len(str(self._total_steps)) - 1
-        print(padding)
 
         # ceiling function
         model_file = f"{self.cache_file_path}/model_data_{-(self.model._steps // -self._cache_interval):0{padding}}.parquet"
@@ -130,9 +103,7 @@ class CacheableModel:
 
         self.cache_file_path.mkdir(parents=True, exist_ok=True)
 
-        print(f"{model_file=}")
         absolute_path = os.path.abspath(model_file)
-        print(f"{absolute_path=}")
         if os.path.exists(absolute_path):
             raise FileExistsError(f"A directory with the name {model_file} already exists.")
         if os.path.exists(model_file):
@@ -141,54 +112,31 @@ class CacheableModel:
             raise FileExistsError(f"A directory with the name {agent_file} already exists.")
 
         if not model_df.empty:
-            print(f"Saving model to {model_file}")
             model_table = pa.Table.from_pandas(model_df)
             pq.write_table(model_table, model_file)
 
         if not agent_df.empty:
-            print(f"Saving agent to {agent_file}")
             agent_table = pa.Table.from_pandas(agent_df)
             pq.write_table(agent_table, agent_file)
-
-        # Clear the cache
-
 
     def cache(self):
         """Custom collect method to extend the original collect behavior."""
         # Implement your custom logic here
         # For example, let's say we want to write collected data to a cache file every `cache_step_rate` steps
         if self.model._steps % self._cache_interval == 0:
-            print("CALLED")
-            print(f"{self.model._steps=}")
             self._save_to_parquet(self.model)
             self._last_cached_step = self.model._steps
         elif self.model._steps == self._total_steps:
-            print("FINAL CALLED")
-            print(f"{self.model._steps=}")
             self._save_to_parquet(self.model)
             self._last_cached_step = self.model._steps
 
         if self.condition_function and self.save_special_results(self.condition_function):
-            # print("CHECK SPECIAL RESULTS CONDITION")
             pass
 
     def save_special_results(self, condition_function: Callable[[dict], bool]):
 
         model_vars = self.model.datacollector.model_vars
-        # print(f"{model_vars=}")
-        print(f"{model_vars.get('Gini', 0)[-1]=}")
         self.cache_file_path.mkdir(parents=True, exist_ok=True)
-        # if condition_function(model_vars):
-        #     special_results_df = pd.DataFrame(model_vars)
-        #     special_results_file = f"{self.cache_file_path}/special_results.parquet"
-        #
-        #
-        #     if not special_results_df.empty:
-        #         print(f"Condition met. Saving special results to {special_results_file}")
-        #         special_results_table = pa.Table.from_pandas(special_results_df)
-        #         pq.write_table(special_results_table, special_results_file)
-        #     else:
-        #         print("Condition met but no data to save.")
 
         current_step = self.model._steps
         special_results_file = f"{self.cache_file_path}/special_results.parquet"
@@ -210,3 +158,88 @@ class CacheableModel:
             print(f"Condition met. Appended special results for step {current_step} to {special_results_file}")
         else:
             print(f"Condition not met at step {current_step}. No data to save.")
+
+    def read_model_data(self):
+        """Read and combine all model data Parquet files into a single DataFrame."""
+        model_files = glob.glob(f'{self.cache_file_path}/model_data_*.parquet')
+        model_dfs = []
+
+        for model_file in model_files:
+            table = pq.read_table(model_file)
+            df = table.to_pandas()
+            model_dfs.append(df)
+
+        if model_dfs:
+            model_df = pd.concat(model_dfs, ignore_index=True)
+            return model_df
+        else:
+            raise FileNotFoundError("No model data files found.")
+
+    def read_agent_data(self):
+        """Read and combine all agent data Parquet files into a single DataFrame."""
+        agent_files = glob.glob(f'{self.cache_file_path}/agent_data_*.parquet')
+        agent_dfs = []
+
+        for agent_file in agent_files:
+            table = pq.read_table(agent_file)
+            df = table.to_pandas()
+            agent_dfs.append(df)
+
+        if agent_dfs:
+            agent_df = pd.concat(agent_dfs)
+            return agent_df
+        else:
+            raise FileNotFoundError("No agent data files found.")
+
+    def combine_dataframes(self):
+        """Combine and return the model and agent DataFrames."""
+        try:
+            model_df = self.read_model_data()
+            agent_df = self.read_agent_data()
+
+            # Sort agent DataFrame by the multi-index (Step, AgentID) to ensure order
+            agent_df = agent_df.sort_index()
+
+            return model_df, agent_df
+        except FileNotFoundError as e:
+            print(e)
+            return None, None
+
+
+# FOR GRID KIV IGNORE NOW
+import pandas as pd
+from typing import Dict, List, Any
+from random import Random
+from mesa.agent import Agent
+class AgentSerializer:
+    @staticmethod
+    def agent_to_dict(agent: Agent) -> Dict[str, Any]:
+        """Convert an Agent instance to a dictionary."""
+        return {
+            'unique_id': agent.unique_id,
+            'model': str(agent.model),  # Convert model to a string or identifier
+            'pos': str(agent.pos) if agent.pos else None,  # Convert position to a string or identifier
+        }
+
+    @staticmethod
+    def dict_to_agent(agent_dict: Dict[str, Any], model: Any) -> Agent:
+        """Convert a dictionary to an Agent instance."""
+        unique_id = agent_dict['unique_id']
+        pos = agent_dict['pos'] if agent_dict['pos'] != 'None' else None
+        agent = Agent(unique_id=unique_id, model=model)
+        agent.pos = pos
+        return agent
+
+    @staticmethod
+    def save_agents_to_parquet(agents: List[Agent], filename: str) -> None:
+        """Save a list of agents to a Parquet file."""
+        agent_dicts = [AgentSerializer.agent_to_dict(agent) for agent in agents]
+        df = pd.DataFrame(agent_dicts)
+        df.to_parquet(filename)
+
+    @staticmethod
+    def load_agents_from_parquet(filename: str, model: Any) -> List[Agent]:
+        """Load agents from a Parquet file."""
+        df = pd.read_parquet(filename)
+        agents = [AgentSerializer.dict_to_agent(row.to_dict(), model) for _, row in df.iterrows()]
+        return agents
