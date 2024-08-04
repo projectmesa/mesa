@@ -33,15 +33,15 @@ The default DataCollector here makes several assumptions:
     * For collecting agent-level variables, agents must have a unique_id
 """
 
-import os
 import contextlib
 import itertools
+import os
 import types
 from copy import deepcopy
 from functools import partial
+
 import pyarrow as pa
 import pyarrow.parquet as pq
-
 
 with contextlib.suppress(ImportError):
     import pandas as pd
@@ -62,7 +62,7 @@ class DataCollector:
         model_reporters=None,
         agent_reporters=None,
         tables=None,
-        output_dir='output_dir',
+        output_dir="output_dir",
     ):
         """
         Instantiate a DataCollector with lists of model and agent reporters.
@@ -120,9 +120,9 @@ class DataCollector:
         self.output_dir = output_dir
 
         if not output_dir:
-            raise ValueError('output_dir cannot be None')
+            raise ValueError("output_dir cannot be None")
         if not os.path.exists(output_dir):
-            print("Creating output directory {}".format(output_dir))
+            print(f"Creating output directory {output_dir}")
             os.makedirs(output_dir)
 
         if model_reporters is not None:
@@ -229,7 +229,9 @@ class DataCollector:
                 # Check if function with arguments
                 elif isinstance(reporter, list):
                     self.model_vars[var].append(deepcopy(reporter[0](*reporter[1])))
-                    self.model_vars_cache[var].append(deepcopy(reporter[0](*reporter[1])))
+                    self.model_vars_cache[var].append(
+                        deepcopy(reporter[0](*reporter[1]))
+                    )
                 # Assume it's a callable otherwise (e.g., method)
                 # TODO: Check if method of a class explicitly
                 else:
@@ -336,11 +338,17 @@ class DataCollector:
         absolute_path = os.path.abspath(model_file)
         print(f"{absolute_path=}")
         if os.path.exists(absolute_path):
-            raise FileExistsError(f"A directory with the name {model_file} already exists.")
+            raise FileExistsError(
+                f"A directory with the name {model_file} already exists."
+            )
         if os.path.exists(model_file):
-            raise FileExistsError(f"A directory with the name {model_file} already exists.")
+            raise FileExistsError(
+                f"A directory with the name {model_file} already exists."
+            )
         if os.path.exists(agent_file):
-            raise FileExistsError(f"A directory with the name {agent_file} already exists.")
+            raise FileExistsError(
+                f"A directory with the name {agent_file} already exists."
+            )
 
         if not model_df.empty:
             model_table = pa.Table.from_pandas(model_df)
