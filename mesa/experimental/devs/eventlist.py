@@ -155,7 +155,7 @@ class EventList:
     def __len__(self) -> int:
         return len(self._events)
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         """Return a string representation of the event list"""
         events_str = ", ".join(
             [
@@ -165,9 +165,6 @@ class EventList:
             ]
         )
         return f"EventList([{events_str}])"
-
-    def __repr__(self) -> str:
-        return self.__str__()
 
     def remove(self, event: SimulationEvent) -> None:
         """remove an event from the event list"""
