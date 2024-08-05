@@ -157,7 +157,13 @@ class EventList:
 
     def __str__(self) -> str:
         """Return a string representation of the event list"""
-        events_str = ', '.join([f"Event(time={e.time}, priority={e.priority}, id={e.unique_id})" for e in self._events if not e.CANCELED])
+        events_str = ", ".join(
+            [
+                f"Event(time={e.time}, priority={e.priority}, id={e.unique_id})"
+                for e in self._events
+                if not e.CANCELED
+            ]
+        )
         return f"EventList([{events_str}])"
 
     def __repr__(self) -> str:
