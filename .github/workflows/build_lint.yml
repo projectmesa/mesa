@@ -55,7 +55,7 @@ jobs:
       run: pip install uv
     - name: Install Mesa
       # See https://github.com/astral-sh/uv/issues/1945
-      run: uv pip install --system .[dev]
+      run: pip install --system .[dev]
     - name: Test with pytest
       run: pytest --durations=10 --cov=mesa tests/ --cov-report=xml
     - if: matrix.os == 'ubuntu'
