@@ -117,7 +117,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
 def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
     fig = Figure()
     ax = fig.subplots()
-    df = model.datacollector.get_model_vars_dataframe()
+    df = model.datacollector.to_df("model")
     if isinstance(measure, str):
         ax.plot(df.loc[:, measure])
         ax.set_ylabel(measure)
