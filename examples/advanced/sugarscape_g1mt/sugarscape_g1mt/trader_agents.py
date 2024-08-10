@@ -31,7 +31,6 @@ class Trader(mesa.Agent):
         self,
         unique_id,
         model,
-        pos,
         moore=False,
         sugar=0,
         spice=0,
@@ -40,7 +39,6 @@ class Trader(mesa.Agent):
         vision=0,
     ):
         super().__init__(unique_id, model)
-        self.pos = pos
         self.moore = moore
         self.sugar = sugar
         self.spice = spice

@@ -97,7 +97,7 @@ class SugarscapeG1mt(mesa.Model):
         for _, (x, y) in self.grid.coord_iter():
             max_sugar = sugar_distribution[x, y]
             max_spice = spice_distribution[x, y]
-            resource = Resource(agent_id, self, (x, y), max_sugar, max_spice)
+            resource = Resource(agent_id, self, max_sugar, max_spice)
             self.schedule.add(resource)
             self.grid.place_agent(resource, (x, y))
             agent_id += 1
@@ -123,7 +123,6 @@ class SugarscapeG1mt(mesa.Model):
             trader = Trader(
                 agent_id,
                 self,
-                (x, y),
                 moore=False,
                 sugar=sugar,
                 spice=spice,

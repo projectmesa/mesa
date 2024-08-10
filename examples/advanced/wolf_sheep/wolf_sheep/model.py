@@ -98,7 +98,7 @@ class WolfSheep(mesa.Model):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             energy = self.random.randrange(2 * self.sheep_gain_from_food)
-            sheep = Sheep(self.next_id(), (x, y), self, True, energy)
+            sheep = Sheep(self.next_id(), self, True, energy)
             self.grid.place_agent(sheep, (x, y))
             self.schedule.add(sheep)
 
@@ -107,7 +107,7 @@ class WolfSheep(mesa.Model):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             energy = self.random.randrange(2 * self.wolf_gain_from_food)
-            wolf = Wolf(self.next_id(), (x, y), self, True, energy)
+            wolf = Wolf(self.next_id(), self, True, energy)
             self.grid.place_agent(wolf, (x, y))
             self.schedule.add(wolf)
 
@@ -121,7 +121,7 @@ class WolfSheep(mesa.Model):
                 else:
                     countdown = self.random.randrange(self.grass_regrowth_time)
 
-                patch = GrassPatch(self.next_id(), (x, y), self, fully_grown, countdown)
+                patch = GrassPatch(self.next_id(), self, fully_grown, countdown)
                 self.grid.place_agent(patch, (x, y))
                 self.schedule.add(patch)
 

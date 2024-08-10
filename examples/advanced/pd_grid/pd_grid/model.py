@@ -37,7 +37,7 @@ class PdGrid(mesa.Model):
         # Create agents
         for x in range(width):
             for y in range(height):
-                agent = PDAgent((x, y), self)
+                agent = PDAgent(self.next_id(), self)
                 self.grid.place_agent(agent, (x, y))
                 self.schedule.add(agent)
 

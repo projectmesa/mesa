@@ -12,8 +12,8 @@ class Sheep(RandomWalker):
 
     energy = None
 
-    def __init__(self, unique_id, pos, model, moore, energy=None):
-        super().__init__(unique_id, pos, model, moore=moore)
+    def __init__(self, unique_id, model, moore, energy=None):
+        super().__init__(unique_id, model, moore=moore)
         self.energy = energy
 
     def step(self):
@@ -44,9 +44,7 @@ class Sheep(RandomWalker):
             # Create a new sheep:
             if self.model.grass:
                 self.energy /= 2
-            lamb = Sheep(
-                self.model.next_id(), self.pos, self.model, self.moore, self.energy
-            )
+            lamb = Sheep(self.model.next_id(), self.model, self.moore, self.energy)
             self.model.grid.place_agent(lamb, self.pos)
             self.model.schedule.add(lamb)
 
@@ -58,8 +56,8 @@ class Wolf(RandomWalker):
 
     energy = None
 
-    def __init__(self, unique_id, pos, model, moore, energy=None):
-        super().__init__(unique_id, pos, model, moore=moore)
+    def __init__(self, unique_id, model, moore, energy=None):
+        super().__init__(unique_id, model, moore=moore)
         self.energy = energy
 
     def step(self):
@@ -86,10 +84,8 @@ class Wolf(RandomWalker):
             if self.random.random() < self.model.wolf_reproduce:
                 # Create a new wolf cub
                 self.energy /= 2
-                cub = Wolf(
-                    self.model.next_id(), self.pos, self.model, self.moore, self.energy
-                )
-                self.model.grid.place_agent(cub, cub.pos)
+                cub = Wolf(self.model.next_id(), self.model, self.moore, self.energy)
+                self.model.grid.place_agent(cub, self.pos)
                 self.model.schedule.add(cub)
 
 
@@ -98,7 +94,7 @@ class GrassPatch(mesa.Agent):
     A patch of grass that grows at a fixed rate and it is eaten by sheep
     """
 
-    def __init__(self, unique_id, pos, model, fully_grown, countdown):
+    def __init__(self, unique_id, model, fully_grown, countdown):
         """
         Creates a new patch of grass
 
@@ -109,7 +105,6 @@ class GrassPatch(mesa.Agent):
         super().__init__(unique_id, model)
         self.fully_grown = fully_grown
         self.countdown = countdown
-        self.pos = pos
 
     def step(self):
         if not self.fully_grown:
