@@ -37,7 +37,7 @@ class Sheep(RandomWalker):
             # Death
             if self.energy < 0:
                 self.model.grid.remove_agent(self)
-                self.model.schedule.remove(self)
+                self.remove()
                 living = False
 
         if living and self.random.random() < self.model.sheep_reproduce:
@@ -46,7 +46,6 @@ class Sheep(RandomWalker):
                 self.energy /= 2
             lamb = Sheep(self.model.next_id(), self.model, self.moore, self.energy)
             self.model.grid.place_agent(lamb, self.pos)
-            self.model.schedule.add(lamb)
 
 
 class Wolf(RandomWalker):
@@ -74,19 +73,18 @@ class Wolf(RandomWalker):
 
             # Kill the sheep
             self.model.grid.remove_agent(sheep_to_eat)
-            self.model.schedule.remove(sheep_to_eat)
+            sheep_to_eat.remove()
 
         # Death or reproduction
         if self.energy < 0:
             self.model.grid.remove_agent(self)
-            self.model.schedule.remove(self)
+            self.remove()
         else:
             if self.random.random() < self.model.wolf_reproduce:
                 # Create a new wolf cub
                 self.energy /= 2
                 cub = Wolf(self.model.next_id(), self.model, self.moore, self.energy)
                 self.model.grid.place_agent(cub, self.pos)
-                self.model.schedule.add(cub)
 
 
 class GrassPatch(mesa.Agent):
