@@ -51,7 +51,6 @@ dynamic = ["version"]
 [project.optional-dependencies]
 dev = [
   "ruff~=0.1.1",   # Update periodically
-  "coverage",
   "pytest >= 4.6",
   "pytest-cov",
   "sphinx",
