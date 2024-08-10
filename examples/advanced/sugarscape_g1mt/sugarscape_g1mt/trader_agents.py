@@ -304,7 +304,7 @@ class Trader(mesa.Agent):
 
         if self.is_starved():
             self.model.grid.remove_agent(self)
-            self.model.schedule.remove(self)
+            self.remove()
 
     def trade_with_neighbors(self):
         """

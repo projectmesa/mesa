@@ -68,22 +68,17 @@ class SugarscapeG1mt(mesa.Model):
         self.enable_trade = enable_trade
         self.running = True
 
-        # initiate activation schedule
-        self.schedule = mesa.time.RandomActivationByType(self)
         # initiate mesa grid class
         self.grid = mesa.space.MultiGrid(self.width, self.height, torus=False)
         # initiate datacollector
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "Trader": lambda m: m.schedule.get_type_count(Trader),
+                "Trader": lambda m: len(m.agents.select(agent_type=Trader)),
                 "Trade Volume": lambda m: sum(
-                    len(a.trade_partners)
-                    for a in m.schedule.agents_by_type[Trader].values()
+                    len(a.trade_partners) for a in self.agents.select(agent_type=Trader)
                 ),
                 "Price": lambda m: geometric_mean(
-                    flatten(
-                        [a.prices for a in m.schedule.agents_by_type[Trader].values()]
-                    )
+                    flatten([a.prices for a in self.agents.select(agent_type=Trader)])
                 ),
             },
             agent_reporters={"Trade Network": lambda a: get_trade(a)},
@@ -98,7 +93,6 @@ class SugarscapeG1mt(mesa.Model):
             max_sugar = sugar_distribution[x, y]
             max_spice = spice_distribution[x, y]
             resource = Resource(agent_id, self, max_sugar, max_spice)
-            self.schedule.add(resource)
             self.grid.place_agent(resource, (x, y))
             agent_id += 1
 
@@ -132,20 +126,7 @@ class SugarscapeG1mt(mesa.Model):
             )
             # place agent
             self.grid.place_agent(trader, (x, y))
-            self.schedule.add(trader)
             agent_id += 1
-
-    def randomize_traders(self):
-        """
-        helper function for self.step()
-
-        puts traders in randomized list for step function
-        """
-
-        traders_shuffle = list(self.schedule.agents_by_type[Trader].values())
-        self.random.shuffle(traders_shuffle)
-
-        return traders_shuffle
 
     def step(self):
         """
@@ -153,13 +134,12 @@ class SugarscapeG1mt(mesa.Model):
         and then randomly activates traders
         """
         # step Resource agents
-        for resource in self.schedule.agents_by_type[Resource].values():
-            resource.step()
+        self.agents.select(agent_type=Resource).do("step")
 
         # step trader agents
         # to account for agent death and removal we need a seperate data strcuture to
         # iterate
-        trader_shuffle = self.randomize_traders()
+        trader_shuffle = self.agents.select(agent_type=Trader).shuffle()
 
         for agent in trader_shuffle:
             agent.prices = []
@@ -174,7 +154,7 @@ class SugarscapeG1mt(mesa.Model):
             self.datacollector.collect(self)
             return
 
-        trader_shuffle = self.randomize_traders()
+        trader_shuffle = self.agents.select(agent_type=Trader).shuffle()
 
         for agent in trader_shuffle:
             agent.trade_with_neighbors()
