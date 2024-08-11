@@ -1,5 +1,5 @@
 from boid_flockers.model import BoidFlockers
-from mesa.experimental import JupyterViz
+from mesa.visualization import SolaraViz
 
 
 def boid_draw(agent):
@@ -15,7 +15,7 @@ model_params = {
     "separation": 2,
 }
 
-page = JupyterViz(
+page = SolaraViz(
     model_class=BoidFlockers,
     model_params=model_params,
     measures=[],
