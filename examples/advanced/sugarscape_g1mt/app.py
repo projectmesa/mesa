@@ -1,7 +1,7 @@
 import numpy as np
 import solara
 from matplotlib.figure import Figure
-from mesa.experimental import JupyterViz
+from mesa.visualization import SolaraViz
 from sugarscape_g1mt.model import SugarscapeG1mt
 from sugarscape_g1mt.trader_agents import Trader
 
@@ -50,7 +50,7 @@ model_params = {
     "height": 50,
 }
 
-page = JupyterViz(
+page = SolaraViz(
     SugarscapeG1mt,
     model_params,
     measures=["Trader", "Price"],
