@@ -73,12 +73,12 @@ class SugarscapeG1mt(mesa.Model):
         # initiate datacollector
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "Trader": lambda m: len(m.agents.select(agent_type=Trader)),
+                "Trader": lambda m: len(m.get_agents_of_type(Trader)),
                 "Trade Volume": lambda m: sum(
-                    len(a.trade_partners) for a in self.agents.select(agent_type=Trader)
+                    len(a.trade_partners) for a in m.get_agents_of_type(Trader)
                 ),
                 "Price": lambda m: geometric_mean(
-                    flatten([a.prices for a in self.agents.select(agent_type=Trader)])
+                    flatten([a.prices for a in m.get_agents_of_type(Trader)])
                 ),
             },
             agent_reporters={"Trade Network": lambda a: get_trade(a)},
@@ -134,12 +134,12 @@ class SugarscapeG1mt(mesa.Model):
         and then randomly activates traders
         """
         # step Resource agents
-        self.agents.select(agent_type=Resource).do("step")
+        self.get_agents_of_type(Resource).do("step")
 
         # step trader agents
         # to account for agent death and removal we need a seperate data strcuture to
         # iterate
-        trader_shuffle = self.agents.select(agent_type=Trader).shuffle()
+        trader_shuffle = self.get_agents_of_type(Trader).shuffle()
 
         for agent in trader_shuffle:
             agent.prices = []
@@ -154,7 +154,7 @@ class SugarscapeG1mt(mesa.Model):
             self.datacollector.collect(self)
             return
 
-        trader_shuffle = self.agents.select(agent_type=Trader).shuffle()
+        trader_shuffle = self.get_agents_of_type(Trader).shuffle()
 
         for agent in trader_shuffle:
             agent.trade_with_neighbors()
