@@ -123,7 +123,8 @@ html_theme = "pydata_sphinx_theme"
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
+# See https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/styling.html#configure-pygments-theme
+html_theme_options = {"pygments_light_style": "gruvbox-light", "pygments_dark_style": "gruvbox-dark"}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
