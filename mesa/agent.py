@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import contextlib
 import copy
+import math
 import operator
 import warnings
 import weakref
@@ -68,6 +69,8 @@ class Agent:
         """Remove and delete the agent from the model."""
         with contextlib.suppress(KeyError):
             self.model.agents_[type(self)].pop(self)
+        self.pos: Position | None
+        self.heading = 90
 
     def step(self) -> None:
         """A single step of the agent."""
@@ -78,6 +81,73 @@ class Agent:
     @property
     def random(self) -> Random:
         return self.model.random
+
+    def move_forward_or_backward(self, amount, sign):
+        """Does the calculation to find  the agent's next move and is used within the forward and backward functions"""
+        new_x = (
+            float(self.pos[0]) + sign * math.cos(self.heading * math.pi / 180) * amount
+        )
+        new_y = (
+            float(self.pos[1]) + sign * math.sin(self.heading * math.pi / -180) * amount
+        )
+        next_pos = (new_x, new_y)
+
+        try:
+            self.model.space.move_agent(self, next_pos)
+        except AttributeError as exc:
+            raise AttributeError("Agent's model does not define space") from exc
+        except Exception as exc:
+            warnings.warn(
+                f"agent.py (forward_backwards): could not move agent "
+                f"{self.unique_id} within self.model.space\n{exc}"
+            )
+
+    def move_forward(self, amount=1):
+        """Moves the agent forward by the amount given"""
+        self.move_forward_or_backward(amount, 1)
+
+    def move_backward(self, amount=1):
+        """Moves the agent backwards from where its facing by the given amount"""
+        self.move_forward_or_backward(amount, -1)
+
+    def turn_right(self, degree=90):
+        """Turns the agent right by the given degree"""
+        self.heading = (self.heading - degree) % 360
+
+    def turn_left(self, degree=90):
+        """Turns the agent left by the given degree"""
+        self.heading = (self.heading + degree) % 360
+
+    def distancexy(self, x, y):
+        """Gives you the distance of the agent and the given coordinate"""
+
+        return math.dist(self.pos, (x, y))
+
+    def distance(self, another_agent):
+        """Gives you the distance between the agent and another agent"""
+        return self.distancexy(**(another_agent.pos))
+
+    def towardsxy(self, x, y):
+        """Calculates angle between a given coordinate and horizon as if the current position is the origin"""
+        dx = x - float(self.pos[0])
+        dy = float(self.pos[1]) - y
+        if dx == 0:
+            return 90 if dy > 0 else 270
+        else:
+            return math.degrees(math.atan2(dy, dx))
+
+    def towards(self, another_agent):
+        """Calculates angle between an agent and horizon as if the current position is the origin"""
+        return self.towardsxy(*another_agent.pos)
+
+    def facexy(self, x, y):
+        """Makes agent face a given coordinate"""
+        self.heading = self.towardsxy(x, y)
+
+    def face(self, another_agent):
+        """Makes agent face another agent"""
+        x, y = another_agent.pos
+        self.facexy(x, y)
 
 
 class AgentSet(MutableSet, Sequence):
