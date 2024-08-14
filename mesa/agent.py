@@ -18,7 +18,7 @@ from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
 from random import Random
 
 # mypy
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, List
 
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
@@ -127,11 +127,11 @@ class AgentSet(MutableSet, Sequence):
         return agent in self._agents
 
     def select(
-        self,
-        filter_func: Callable[[Agent], bool] | None = None,
-        n: int = 0,
-        inplace: bool = False,
-        agent_type: type[Agent] | None = None,
+            self,
+            filter_func: Callable[[Agent], bool] | None = None,
+            n: int = 0,
+            inplace: bool = False,
+            agent_type: type[Agent] | None = None,
     ) -> AgentSet:
         """
         Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
@@ -154,7 +154,7 @@ class AgentSet(MutableSet, Sequence):
             count = 0
             for agent in self:
                 if (not filter_func or filter_func(agent)) and (
-                    not agent_type or isinstance(agent, agent_type)
+                        not agent_type or isinstance(agent, agent_type)
                 ):
                     yield agent
                     count += 1
@@ -191,10 +191,10 @@ class AgentSet(MutableSet, Sequence):
             )
 
     def sort(
-        self,
-        key: Callable[[Agent], Any] | str,
-        ascending: bool = False,
-        inplace: bool = False,
+            self,
+            key: Callable[[Agent], Any] | str,
+            ascending: bool = False,
+            inplace: bool = False,
     ) -> AgentSet:
         """
         Sort the agents in the AgentSet based on a specified attribute or custom function.
@@ -227,7 +227,7 @@ class AgentSet(MutableSet, Sequence):
         return self
 
     def do(
-        self, method_name: str, *args, return_results: bool = False, **kwargs
+            self, method_name: str, *args, return_results: bool = False, **kwargs
     ) -> AgentSet | list[Any]:
         """
         Invoke a method on each agent in the AgentSet.
@@ -355,6 +355,37 @@ class AgentSet(MutableSet, Sequence):
             Random: The random number generator associated with the model.
         """
         return self.model.random
+
+    def apply(self, func: Callable, axis: str = "agent", args=(), result_type=None, **kwargs) -> List[Any] | Any:
+        """
+        Apply a function to all agents in the AgentSet either to each agent individually or to the entire agentset.
+
+        Args:
+            func (Callable): The function to apply to each individual agent or the entire agentset
+            axis (str): {'agent', 'agetset'} The axis along which to apply the function.
+
+                         * 'agent' means apply the function to each agent.
+                         * 'agentset' means apply the function to the entire agentset.
+
+            args (list or tuple):Positional arguments to pass to the function.
+            kwargs (dict): Additional keyword arguments to pass as keywords arguments to the function.
+
+        Returns:
+            the result of applying the function along the specified axis. In case of axis=agent, it will be a list with
+            the return of func for each agent. In case of axis=agentset, it is the return of func.
+
+        Notes:
+            To maintain method chaining in case of axis=agentset, func should return an agentset
+
+        """
+        if axis == "agent":
+            # TODO:: add a results_type to make it trivial to return a dataframe with agent.id and func results?
+            # TODO:: this is a good idea, but tricky because you don't know all column names
+            return [func(agent, *args, **kwargs) for agent in self]
+        elif axis == "agentset":
+            return func(self, *args, **kwargs)
+        else:
+            raise ValueError(f"axis should be `agent` or `agentset` not {axis}")
 
 
 # consider adding for performance reasons
