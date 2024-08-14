@@ -373,11 +373,11 @@ class AgentSet(MutableSet, Sequence):
             kwargs (dict): Additional keyword arguments to pass as keywords arguments to the function.
 
         Returns:
-            the result of applying the function along the specified axis. In case of axis=agent, it will be a list with
-            the return of func for each agent. In case of axis=agentset, it is the return of func.
+            the result of applying the function along the specified axis. In case of ``axis='agent'``, it will be a list
+            with the return of `func` for each agent. In case of ``axis='agentset'``, it is the return of ``func``.
 
         Notes:
-            To maintain method chaining in case of axis=agentset, func should return an agentset
+            To maintain method chaining in case of axis=agentset, func should return an AgentSet
 
         """
         if axis == "agent":
