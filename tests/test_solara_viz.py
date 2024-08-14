@@ -136,7 +136,9 @@ def test_call_space_drawer(mocker):
             space_drawer=altspace_drawer,
         )
     )
-    altspace_drawer.assert_called_with(model, agent_portrayal)
+    altspace_drawer.assert_called_with(
+        model, agent_portrayal, dependencies=dependencies
+    )
 
 
 def test_slider():
