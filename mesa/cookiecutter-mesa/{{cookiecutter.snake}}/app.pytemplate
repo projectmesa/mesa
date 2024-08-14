@@ -1,0 +1,27 @@
+"""
+Configure visualization elements and instantiate a server
+"""
+from mesa.visualization import SolaraViz
+
+from {{ cookiecutter.snake }}.model import {{ cookiecutter.model }}, {{ cookiecutter.agent }}  # noqa
+
+import mesa
+
+
+def circle_portrayal_example(agent):
+    return {
+        "size": 40,
+        # This is Matplotlib's color
+        "color": "tab:pink",
+    }
+
+
+model_params = {"num_agents": 10, "width": 10, "height": 10}
+
+page = SolaraViz(
+    {{cookiecutter.model}},
+    model_params,
+    measures=["num_agents"],
+    agent_portrayal=circle_portrayal_example
+)
+page  # noqa

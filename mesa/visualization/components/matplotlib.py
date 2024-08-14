@@ -1,5 +1,3 @@
-from typing import Optional
-
 import networkx as nx
 import solara
 from matplotlib.figure import Figure
@@ -9,7 +7,7 @@ import mesa
 
 
 @solara.component
-def SpaceMatplotlib(model, agent_portrayal, dependencies: Optional[list[any]] = None):
+def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = None):
     space_fig = Figure()
     space_ax = space_fig.subplots()
     space = getattr(model, "grid", None)
@@ -50,7 +48,7 @@ def _draw_grid(space, space_ax, agent_portrayal):
         out = {"x": x, "y": y}
         # This is the default value for the marker size, which auto-scales
         # according to the grid area.
-        out["s"] = (180 / min(g.width, g.height)) ** 2
+        out["s"] = (180 / max(g.width, g.height)) ** 2
         if len(s) > 0:
             out["s"] = s
         if len(c) > 0:
@@ -116,7 +114,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
 
 
 @solara.component
-def PlotMatplotlib(model, measure, dependencies: Optional[list[any]] = None):
+def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
     fig = Figure()
     ax = fig.subplots()
     df = model.datacollector.get_model_vars_dataframe()
@@ -127,7 +125,7 @@ def PlotMatplotlib(model, measure, dependencies: Optional[list[any]] = None):
         for m, color in measure.items():
             ax.plot(df.loc[:, m], label=m, color=color)
         fig.legend()
-    elif isinstance(measure, (list, tuple)):
+    elif isinstance(measure, list | tuple):
         for m in measure:
             ax.plot(df.loc[:, m], label=m)
         fig.legend()

@@ -1,11 +1,5 @@
 # mesa package
 
-## Subpackages
-
-```{toctree}
-mesa.visualization
-```
-
 ## Submodules
 
 ## mesa.agent module

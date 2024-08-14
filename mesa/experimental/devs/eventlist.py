@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import itertools
+from collections.abc import Callable
 from enum import IntEnum
 from heapq import heapify, heappop, heappush
 from types import MethodType
-from typing import Any, Callable
+from typing import Any
 from weakref import WeakMethod, ref
 
 
@@ -153,6 +154,17 @@ class EventList:
 
     def __len__(self) -> int:
         return len(self._events)
+
+    def __repr__(self) -> str:
+        """Return a string representation of the event list"""
+        events_str = ", ".join(
+            [
+                f"Event(time={e.time}, priority={e.priority}, id={e.unique_id})"
+                for e in self._events
+                if not e.CANCELED
+            ]
+        )
+        return f"EventList([{events_str}])"
 
     def remove(self, event: SimulationEvent) -> None:
         """remove an event from the event list"""

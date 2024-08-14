@@ -139,7 +139,6 @@ class BoidFlockers(mesa.Model):
             boid = Boid(
                 unique_id=i,
                 model=self,
-                pos=pos,
                 speed=speed,
                 direction=direction,
                 vision=vision,

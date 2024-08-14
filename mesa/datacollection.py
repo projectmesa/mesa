@@ -36,6 +36,7 @@ The default DataCollector here makes several assumptions:
 import contextlib
 import itertools
 import types
+from copy import deepcopy
 from functools import partial
 
 with contextlib.suppress(ImportError):
@@ -196,18 +197,22 @@ class DataCollector:
         if self.model_reporters:
             for var, reporter in self.model_reporters.items():
                 # Check if lambda or partial function
-                if isinstance(reporter, (types.LambdaType, partial)):
-                    self.model_vars[var].append(reporter(model))
+                if isinstance(reporter, types.LambdaType | partial):
+                    # Use deepcopy to store a copy of the data,
+                    # preventing references from being updated across steps.
+                    self.model_vars[var].append(deepcopy(reporter(model)))
                 # Check if model attribute
                 elif isinstance(reporter, str):
-                    self.model_vars[var].append(getattr(model, reporter, None))
+                    self.model_vars[var].append(
+                        deepcopy(getattr(model, reporter, None))
+                    )
                 # Check if function with arguments
                 elif isinstance(reporter, list):
-                    self.model_vars[var].append(reporter[0](*reporter[1]))
-                # TODO: Check if method of a class, as of now it is assumed
-                # implicitly if the other checks fail.
+                    self.model_vars[var].append(deepcopy(reporter[0](*reporter[1])))
+                # Assume it's a callable otherwise (e.g., method)
+                # TODO: Check if method of a class explicitly
                 else:
-                    self.model_vars[var].append(reporter())
+                    self.model_vars[var].append(deepcopy(reporter()))
 
         if self.agent_reporters:
             agent_records = self._record_agents(model)
