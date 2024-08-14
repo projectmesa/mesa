@@ -389,7 +389,7 @@ class AgentSet(MutableSet, Sequence):
         else:
             raise ValueError(f"axis should be `agent` or `agentset` not {axis}")
 
-    def group_by(self, by: Callable | str) -> dict[str, AgentSet]:
+    def group_by(self, by: Callable | str, return_agentset=False) -> dict[str, list] | dict[str, AgentSet]:
         """
         Group agents by the specified attribute
 
@@ -400,8 +400,19 @@ class AgentSet(MutableSet, Sequence):
                                   for grouping
                                 * if ``by`` is a str, it should refer to an attribute on the agent and the value
                                   of this attribute will be used for grouping
+
+            return_agentset (bool, optional): Controls the datatype of the values in the return dictionary. Given
+                                              the performance overhead of creating an AgentSet, it defaults to
+                                              returning a list. Only set to true if you need the advanced
+                                              functionality of AgentSet.
+
+                                                * If False, values will be a list
+                                                * If True, values will be an AgentSet
+
+
         Returns:
-            dictionary with the group identifier (i.e., attribute value) as key and an AgentSet as value
+            dictionary with the group identifier (i.e., callable return or attribute value) as key and an AgentSet as
+            value
 
         """
         groups = defaultdict(list)
@@ -413,7 +424,9 @@ class AgentSet(MutableSet, Sequence):
             for agent in self:
                 groups[getattr(agent, by)].append(agent)
 
-        return {k: AgentSet(v) for k, v in groups.items()}
+        if return_agentset:
+            return {k: AgentSet(v) for k, v in groups.items()}
+        return groups
 
 
 # consider adding for performance reasons
