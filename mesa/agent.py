@@ -389,7 +389,9 @@ class AgentSet(MutableSet, Sequence):
         else:
             raise ValueError(f"axis should be `agent` or `agentset` not {axis}")
 
-    def group_by(self, by: Callable | str, return_agentset=False) -> dict[str, list] | dict[str, AgentSet]:
+    def group_by(
+        self, by: Callable | str, return_agentset=False
+    ) -> dict[str, list] | dict[str, AgentSet]:
         """
         Group agents by the specified attribute
 
