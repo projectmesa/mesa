@@ -2,6 +2,7 @@ import networkx as nx
 import solara
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
+from collections import defaultdict
 
 import mesa
 
@@ -23,12 +24,43 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = Non
     solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
 
 
+# matplotlib scatter does not allow for multiple shapes in one call
+def _split_and_scatter(portray_data, space_ax):
+    grouped_data = defaultdict(lambda: {"x": [], "y": [], "s": [], "c": []})
+
+    if "marker" not in portray_data:
+        # standard scatter is fine, default marker
+        space_ax.scatter(**portray_data)
+        return
+
+    # Extract data from the dictionary
+    markers = portray_data["marker"]
+    x = portray_data["x"]
+    y = portray_data["y"]
+    s = portray_data["s"]
+    c = portray_data["c"]
+
+    # Group the data by marker
+    for i in range(len(x)):
+        marker = markers[i]
+        grouped_data[marker]["x"].append(x[i])
+        grouped_data[marker]["y"].append(y[i])
+        grouped_data[marker]["s"].append(s[i])
+        grouped_data[marker]["c"].append(c[i])
+
+    # Plot each group with the same marker
+    for marker, data in grouped_data.items():
+        space_ax.scatter(data["x"], data["y"], s=data["s"],
+                         c=data["c"], marker=marker)
+
+
 def _draw_grid(space, space_ax, agent_portrayal):
     def portray(g):
         x = []
         y = []
         s = []  # size
         c = []  # color
+        marker = []  # shape
         for i in range(g.width):
             for j in range(g.height):
                 content = g._grid[i][j]
@@ -45,6 +77,8 @@ def _draw_grid(space, space_ax, agent_portrayal):
                         s.append(data["size"])
                     if "color" in data:
                         c.append(data["color"])
+                    if "shape" in data:
+                        marker.append(data["shape"])
         out = {"x": x, "y": y}
         # This is the default value for the marker size, which auto-scales
         # according to the grid area.
@@ -53,11 +87,13 @@ def _draw_grid(space, space_ax, agent_portrayal):
             out["s"] = s
         if len(c) > 0:
             out["c"] = c
+        if len(marker) > 0:
+            out["marker"] = marker
         return out
 
     space_ax.set_xlim(-1, space.width)
     space_ax.set_ylim(-1, space.height)
-    space_ax.scatter(**portray(space))
+    _split_and_scatter(portray(space), space_ax)
 
 
 def _draw_network_grid(space, space_ax, agent_portrayal):
@@ -77,6 +113,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
         y = []
         s = []  # size
         c = []  # color
+        marker = []  # shape
         for agent in space._agent_to_index:
             data = agent_portrayal(agent)
             _x, _y = agent.pos
@@ -86,11 +123,15 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
                 s.append(data["size"])
             if "color" in data:
                 c.append(data["color"])
+            if "shape" in data:
+                marker.append(data["shape"])
         out = {"x": x, "y": y}
         if len(s) > 0:
             out["s"] = s
         if len(c) > 0:
             out["c"] = c
+        if len(marker) > 0:
+            out["marker"] = marker
         return out
 
     # Determine border style based on space.torus
@@ -110,7 +151,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
     space_ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
     # Portray and scatter the agents in the space
-    space_ax.scatter(**portray(space))
+    _split_and_scatter(portray(space), space_ax)
 
 
 @solara.component
