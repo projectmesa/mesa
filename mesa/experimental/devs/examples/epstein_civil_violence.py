@@ -2,10 +2,10 @@ import enum
 import math
 
 from mesa import Agent, Model
-from mesa.visualization.solara_viz import SolaraViz, make_text
 from mesa.experimental.devs.simulator import ABMSimulator
-from mesa.time import RandomActivation
 from mesa.space import SingleGrid
+from mesa.time import RandomActivation
+from mesa.visualization.solara_viz import SolaraViz, make_text
 
 
 class EpsteinAgent(Agent):
@@ -295,6 +295,7 @@ class EpsteinCivilViolence(Model):
         if not self.unhappy:
             self.running = False
 
+
 def agent_portrayal(agent):
     if isinstance(agent, Citizen):
         if agent.condition == AgentState.QUIESCENT:
@@ -313,6 +314,7 @@ def agent_portrayal(agent):
         "size": 50,
     }
 
+
 def get_citizen_cop_ratio(model):
     if model.schedule is None:
         return "Citizen/Cop Ratio: N/A"
@@ -320,6 +322,7 @@ def get_citizen_cop_ratio(model):
     cop_count = sum(isinstance(agent, Cop) for agent in model.schedule.agents)
     ratio = citizen_count / cop_count if cop_count > 0 else float("inf")
     return f"Citizen/Cop Ratio: {ratio:.2f}"
+
 
 page = SolaraViz(
     model_class=EpsteinCivilViolence,
@@ -344,14 +347,16 @@ page = SolaraViz(
     agent_portrayal=agent_portrayal,
 )
 
+
 @solara.component
 def App():
     solara.Title("Epstein Civil Violence Model")
     page.show()
 
+
 if __name__ == "__main__":
     model = EpsteinCivilViolence(seed=15)
     simulator = ABMSimulator()
     simulator.setup(model)
-    simulator.run_for(time_delta=100)  
+    simulator.run_for(time_delta=100)
     App()
