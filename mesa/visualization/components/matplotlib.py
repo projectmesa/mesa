@@ -36,7 +36,12 @@ def _split_and_scatter(portray_data, space_ax):
     c = portray_data["c"]
     m = portray_data["m"]
 
-    assert len(x) == len(y) == len(s) == len(c) == len(m)
+    if not (len(x) == len(y) == len(s) == len(c) == len(m)):
+        raise ValueError(
+            "Length mismatch in portrayal data lists: "
+            f"x: {len(x)}, y: {len(y)}, s: {len(s)}, "
+            f"c: {len(c)}, m: {len(m)}"
+        )
 
     # Group the data by marker
     for i in range(len(x)):
