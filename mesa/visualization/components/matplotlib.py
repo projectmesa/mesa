@@ -29,21 +29,18 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = Non
 def _split_and_scatter(portray_data, space_ax):
     grouped_data = defaultdict(lambda: {"x": [], "y": [], "s": [], "c": []})
 
-    if "marker" not in portray_data:
-        # standard scatter is fine, default marker
-        space_ax.scatter(**portray_data)
-        return
-
     # Extract data from the dictionary
-    markers = portray_data["marker"]
     x = portray_data["x"]
     y = portray_data["y"]
     s = portray_data["s"]
     c = portray_data["c"]
+    m = portray_data["m"]
+
+    assert len(x) == len(y) == len(s) == len(c) == len(m)
 
     # Group the data by marker
     for i in range(len(x)):
-        marker = markers[i]
+        marker = m[i]
         grouped_data[marker]["x"].append(x[i])
         grouped_data[marker]["y"].append(y[i])
         grouped_data[marker]["s"].append(s[i])
@@ -60,7 +57,7 @@ def _draw_grid(space, space_ax, agent_portrayal):
         y = []
         s = []  # size
         c = []  # color
-        marker = []  # shape
+        m = []  # shape
         for i in range(g.width):
             for j in range(g.height):
                 content = g._grid[i][j]
@@ -73,22 +70,18 @@ def _draw_grid(space, space_ax, agent_portrayal):
                     data = agent_portrayal(agent)
                     x.append(i)
                     y.append(j)
-                    if "size" in data:
-                        s.append(data["size"])
-                    if "color" in data:
-                        c.append(data["color"])
-                    if "shape" in data:
-                        marker.append(data["shape"])
-        out = {"x": x, "y": y}
-        # This is the default value for the marker size, which auto-scales
-        # according to the grid area.
-        out["s"] = (180 / max(g.width, g.height)) ** 2
-        if len(s) > 0:
-            out["s"] = s
-        if len(c) > 0:
-            out["c"] = c
-        if len(marker) > 0:
-            out["marker"] = marker
+
+                    # This is the default value for the marker size, which auto-scales
+                    # according to the grid area.
+                    default_size = (180 / max(g.width, g.height)) ** 2
+                    # establishing a default prevents misalignment if some agents are not given size, color, etc.
+                    size = data.get("size", default_size)
+                    s.append(size)
+                    color = data.get("color", "b")
+                    c.append(color)
+                    mark = data.get("shape", ".")
+                    m.append(mark)
+        out = {"x": x, "y": y, "s": s, "c": c, "m": m}
         return out
 
     space_ax.set_xlim(-1, space.width)
@@ -113,25 +106,23 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
         y = []
         s = []  # size
         c = []  # color
-        marker = []  # shape
+        m = []  # shape
         for agent in space._agent_to_index:
             data = agent_portrayal(agent)
             _x, _y = agent.pos
             x.append(_x)
             y.append(_y)
-            if "size" in data:
-                s.append(data["size"])
-            if "color" in data:
-                c.append(data["color"])
-            if "shape" in data:
-                marker.append(data["shape"])
-        out = {"x": x, "y": y}
-        if len(s) > 0:
-            out["s"] = s
-        if len(c) > 0:
-            out["c"] = c
-        if len(marker) > 0:
-            out["marker"] = marker
+
+            # This is matplotlib's default marker size
+            default_size = 20
+            # establishing a default prevents misalignment if some agents are not given size, color, etc.
+            size = data.get("size", default_size)
+            s.append(size)
+            color = data.get("color", "b")
+            c.append(color)
+            mark = data.get("shape", ".")
+            m.append(mark)
+        out = {"x": x, "y": y, "s": s, "c": c, "m": m}
         return out
 
     # Determine border style based on space.torus
