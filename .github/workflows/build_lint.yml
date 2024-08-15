@@ -80,4 +80,4 @@ jobs:
     - name: Test examples
       run: |
         cd mesa-examples
-        pytest test_examples.py
+        pytest -rA -Werror test_examples.py
