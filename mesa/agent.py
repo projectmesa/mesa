@@ -127,11 +127,11 @@ class AgentSet(MutableSet, Sequence):
         return agent in self._agents
 
     def select(
-        self,
-        filter_func: Callable[[Agent], bool] | None = None,
-        n: int = 0,
-        inplace: bool = False,
-        agent_type: type[Agent] | None = None,
+            self,
+            filter_func: Callable[[Agent], bool] | None = None,
+            n: int = 0,
+            inplace: bool = False,
+            agent_type: type[Agent] | None = None,
     ) -> AgentSet:
         """
         Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
@@ -154,7 +154,7 @@ class AgentSet(MutableSet, Sequence):
             count = 0
             for agent in self:
                 if (not filter_func or filter_func(agent)) and (
-                    not agent_type or isinstance(agent, agent_type)
+                        not agent_type or isinstance(agent, agent_type)
                 ):
                     yield agent
                     count += 1
@@ -191,10 +191,10 @@ class AgentSet(MutableSet, Sequence):
             )
 
     def sort(
-        self,
-        key: Callable[[Agent], Any] | str,
-        ascending: bool = False,
-        inplace: bool = False,
+            self,
+            key: Callable[[Agent], Any] | str,
+            ascending: bool = False,
+            inplace: bool = False,
     ) -> AgentSet:
         """
         Sort the agents in the AgentSet based on a specified attribute or custom function.
@@ -368,8 +368,8 @@ class AgentSet(MutableSet, Sequence):
         return self.model.random
 
     def group_by(
-        self, by: Callable | str, return_agentset=False
-    ) -> dict[str, list] | dict[str, AgentSet]:
+            self, by: Callable | str,
+    ) -> AgentSetGroupBy:
         """
         Group agents by the specified attribute
 
@@ -381,18 +381,8 @@ class AgentSet(MutableSet, Sequence):
                                 * if ``by`` is a str, it should refer to an attribute on the agent and the value
                                   of this attribute will be used for grouping
 
-            return_agentset (bool, optional): Controls the datatype of the values in the return dictionary. Given
-                                              the performance overhead of creating an AgentSet, it defaults to
-                                              returning a list. Only set to true if you need the advanced
-                                              functionality of AgentSet.
-
-                                                * If False, values will be a list
-                                                * If True, values will be an AgentSet
-
-
         Returns:
-            dictionary with the group identifier (i.e., callable return or attribute value) as key and an AgentSet as
-            value
+            AgentSetGroupBy
 
         """
         groups = defaultdict(list)
@@ -408,6 +398,25 @@ class AgentSet(MutableSet, Sequence):
             return {k: AgentSet(v) for k, v in groups.items()}
         return groups
 
+
+class AgentSetGroupBy:
+    # Helper class to enable pandas style split, apply, combine syntax
+
+    def __init__(self, groups: dict[Any, list]):
+        self.groups: dict[Any, list] = groups
+
+    def get_group(self, name: Any, agentset=True):
+        # return group for specified name
+        if agentset:
+            return AgentSet(self.groups[name])
+        else:
+            return self.groups[name]
+
+    def apply(self, callable: Callable):
+        # apply callable to each group and return dict {group_name, return of callable for group}
+        return {k: callable(v) for k, v in self.groups}
+
+    # add iteration
 
 # consider adding for performance reasons
 # for Sequence: __reversed__, index, and count
