@@ -1,6 +1,7 @@
 import enum
 import math
 
+import mesa
 from mesa import Agent, Model
 from mesa.experimental.devs.simulator import ABMSimulator
 from mesa.space import SingleGrid
