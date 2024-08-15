@@ -2,7 +2,9 @@ import enum
 import math
 
 from mesa import Agent, Model
+from mesa.visualization.solara_viz import SolaraViz, make_text
 from mesa.experimental.devs.simulator import ABMSimulator
+from mesa.time import RandomActivation
 from mesa.space import SingleGrid
 
 
@@ -14,9 +16,9 @@ class EpsteinAgent(Agent):
 
 
 class AgentState(enum.IntEnum):
-    QUIESCENT = enum.auto()
-    ARRESTED = enum.auto()
-    ACTIVE = enum.auto()
+    QUIESCENT = 0
+    ARRESTED = 1
+    ACTIVE = 2
 
 
 class Citizen(EpsteinAgent):
@@ -80,11 +82,18 @@ class Citizen(EpsteinAgent):
         self.grievance = self.hardship * (1 - self.regime_legitimacy)
         self.arrest_probability = None
         self.arrest_prob_constant = arrest_prob_constant
+        self.jail_time_remaining = 0
 
     def step(self):
         """
         Decide whether to activate, then move if applicable.
         """
+        if self.condition == AgentState.ARRESTED:
+            self.jail_time_remaining -= 1
+            if self.jail_time_remaining <= 0:
+                self.release_from_jail()
+            return
+
         self.update_neighbors()
         self.update_estimated_arrest_probability()
         net_risk = self.risk_aversion * self.arrest_probability
@@ -123,12 +132,12 @@ class Citizen(EpsteinAgent):
         )
 
     def sent_to_jail(self, value):
-        self.model.active_agents.remove(self)
+        self.model.schedule.remove(self)
         self.condition = AgentState.ARRESTED
-        self.model.simulator.schedule_event_relative(self.release_from_jail, value)
+        self.jail_time_remaining = jail_time
 
     def release_from_jail(self):
-        self.model.active_agents.add(self)
+        self.model.schedule.add(self)
         self.condition = AgentState.QUIESCENT
 
 
@@ -156,7 +165,7 @@ class Cop(EpsteinAgent):
         self.update_neighbors()
         active_neighbors = []
         for agent in self.neighbors:
-            if isinstance(agent, Citizen) and agent.condition == "Active":
+            if isinstance(agent, Citizen) and agent.condition == AgentState.ACTIVE:
                 active_neighbors.append(agent)
         if active_neighbors:
             arrestee = self.random.choice(active_neighbors)
@@ -232,6 +241,7 @@ class EpsteinCivilViolence(Model):
         self.max_iters = max_iters
 
         self.grid = SingleGrid(self.width, self.height, torus=True)
+        self.schedule = RandomActivation(self)
 
         for _, pos in self.grid.coord_iter():
             if self.random.random() < self.cop_density:
@@ -257,17 +267,91 @@ class EpsteinCivilViolence(Model):
             else:
                 continue
             self.grid.place_agent(agent, pos)
+            self.schedule.add(agent)
 
-        self.active_agents = self.agents
+        self.datacollector = mesa.DataCollector(
+            {"unhappy": "unhappy", "happy": "happy"}
+        )
+        self.datacollector.collect(self)
+
+        self.running = True
+
+    @property
+    def unhappy(self):
+        num_unhappy = 0
+        for agent in self.schedule.agents:
+            if isinstance(agent, Citizen) and agent.condition == AgentState.ACTIVE:
+                num_unhappy += 1
+        return num_unhappy
+
+    @property
+    def happy(self):
+        return len(self.schedule.agents) - self.unhappy
 
     def step(self):
-        self.active_agents.shuffle(inplace=True).do("step")
+        self.schedule.step()
+        self.datacollector.collect(self)
 
+        if not self.unhappy:
+            self.running = False
+
+def agent_portrayal(agent):
+    if isinstance(agent, Citizen):
+        if agent.condition == AgentState.QUIESCENT:
+            color = "tab:blue"
+        elif agent.condition == AgentState.ACTIVE:
+            color = "tab:red"
+        else:  # ARRESTED
+            color = "tab:gray"
+    elif isinstance(agent, Cop):
+        color = "tab:green"
+    else:
+        color = "tab:purple"  # Fallback color
+
+    return {
+        "color": color,
+        "size": 50,
+    }
+
+def get_citizen_cop_ratio(model):
+    if model.schedule is None:
+        return "Citizen/Cop Ratio: N/A"
+    citizen_count = sum(isinstance(agent, Citizen) for agent in model.schedule.agents)
+    cop_count = sum(isinstance(agent, Cop) for agent in model.schedule.agents)
+    ratio = citizen_count / cop_count if cop_count > 0 else float("inf")
+    return f"Citizen/Cop Ratio: {ratio:.2f}"
+
+page = SolaraViz(
+    model_class=EpsteinCivilViolence,
+    model_params={
+        "width": 40,
+        "height": 40,
+        "citizen_density": 0.7,
+        "cop_density": 0.074,
+        "citizen_vision": 7,
+        "cop_vision": 7,
+        "legitimacy": 0.8,
+        "max_jail_term": 1000,
+        "active_threshold": 0.1,
+        "arrest_prob_constant": 2.3,
+        "movement": True,
+        "max_iters": 1000,
+    },
+    measures=[
+        make_text(get_citizen_cop_ratio),
+    ],
+    name="Epstein Civil Violence Model",
+    agent_portrayal=agent_portrayal,
+)
+
+@solara.component
+def App():
+    solara.Title("Epstein Civil Violence Model")
+    page.show()
 
 if __name__ == "__main__":
     model = EpsteinCivilViolence(seed=15)
     simulator = ABMSimulator()
-
     simulator.setup(model)
-
-    simulator.run(time_delta=100)
+    simulator.run_for(time_delta=100)  
+    App()
