@@ -227,7 +227,7 @@ class AgentSet(MutableSet, Sequence):
         return self
 
     def do(
-        self, callable: str|Callable, *args, return_results: bool = False, **kwargs
+        self, callable: str | Callable, *args, return_results: bool = False, **kwargs
     ) -> AgentSet | list[Any]:
         """
         Invoke a method or function on each agent in the AgentSet.
@@ -258,7 +258,6 @@ class AgentSet(MutableSet, Sequence):
                 for agentref in self._agents.keyrefs()
                 if (agent := agentref()) is not None
             ]
-
 
         return res if return_results else self
 
