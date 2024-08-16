@@ -39,8 +39,8 @@ def _split_and_scatter(portray_data, space_ax):
     if not (len(x) == len(y) == len(s) == len(c) == len(m)):
         raise ValueError(
             "Length mismatch in portrayal data lists: "
-            f"x: {len(x)}, y: {len(y)}, s: {len(s)}, "
-            f"c: {len(c)}, m: {len(m)}"
+            f"x: {len(x)}, y: {len(y)}, size: {len(s)}, "
+            f"color: {len(c)}, marker: {len(m)}"
         )
 
     # Group the data by marker
@@ -53,7 +53,8 @@ def _split_and_scatter(portray_data, space_ax):
 
     # Plot each group with the same marker
     for marker, data in grouped_data.items():
-        space_ax.scatter(data["x"], data["y"], s=data["s"], c=data["c"], marker=marker)
+        space_ax.scatter(data["x"], data["y"], s=data["s"],
+                         c=data["c"], marker=marker)
 
 
 def _draw_grid(space, space_ax, agent_portrayal):
@@ -82,9 +83,9 @@ def _draw_grid(space, space_ax, agent_portrayal):
                     # establishing a default prevents misalignment if some agents are not given size, color, etc.
                     size = data.get("size", default_size)
                     s.append(size)
-                    color = data.get("color", "b")
+                    color = data.get("color", "tab:blue")
                     c.append(color)
-                    mark = data.get("shape", ".")
+                    mark = data.get("shape", "o")
                     m.append(mark)
         out = {"x": x, "y": y, "s": s, "c": c, "m": m}
         return out
@@ -123,9 +124,9 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
             # establishing a default prevents misalignment if some agents are not given size, color, etc.
             size = data.get("size", default_size)
             s.append(size)
-            color = data.get("color", "b")
+            color = data.get("color", "tab:blue")
             c.append(color)
-            mark = data.get("shape", ".")
+            mark = data.get("shape", "o")
             m.append(mark)
         out = {"x": x, "y": y, "s": s, "c": c, "m": m}
         return out
