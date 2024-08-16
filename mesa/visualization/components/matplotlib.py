@@ -53,8 +53,7 @@ def _split_and_scatter(portray_data, space_ax):
 
     # Plot each group with the same marker
     for marker, data in grouped_data.items():
-        space_ax.scatter(data["x"], data["y"], s=data["s"],
-                         c=data["c"], marker=marker)
+        space_ax.scatter(data["x"], data["y"], s=data["s"], c=data["c"], marker=marker)
 
 
 def _draw_grid(space, space_ax, agent_portrayal):
