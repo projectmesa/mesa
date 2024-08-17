@@ -358,8 +358,7 @@ class AgentSet(MutableSet, Sequence):
         return self.model.random
 
     def group_by(
-            self, by: Callable | str,
-            result_type: str = "agentset"
+        self, by: Callable | str, result_type: str = "agentset"
     ) -> BaseGroupBy:
         """
         Group agents by the specified attribute
@@ -386,7 +385,7 @@ class AgentSet(MutableSet, Sequence):
                 groups[getattr(agent, by)].append(agent)
 
         if result_type == "agentset":
-           return AgentSetGroupBy(groups)
+            return AgentSetGroupBy(groups)
         else:
             return ListGroupBy(groups)
 
@@ -394,9 +393,10 @@ class AgentSet(MutableSet, Sequence):
     # for Sequence: __reversed__, index, and count
     # for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__
 
+
 class BaseGroupBy:
     def __init__(self, groups: dict[Any, list | AgentSet]):
-        self.groups: dict[Any, list|AgentSet] = groups
+        self.groups: dict[Any, list | AgentSet] = groups
 
     def get_group(self, name: Any):
         # return group for specified name
@@ -410,14 +410,17 @@ class BaseGroupBy:
     def __iter__(self):
         return iter(self.groups.items())
 
+
 class AgentSetGroupBy(BaseGroupBy):
     # Helper class to enable pandas style split, apply, combine syntax
 
     def __init__(self, groups: dict[Any, list]):
-        super().__init__({k:AgentSet(v) for k,v in groups.items()})
+        super().__init__({k: AgentSet(v) for k, v in groups.items()})
+
     def do(self, method: str | Callable, *args, **kwargs):
         # fixme what about return type here and enabling method chaining?
         return {k: v.do(method, *args, **kwargs) for k, v in self.groups}
+
 
 class ListGroupBy(BaseGroupBy):
     # Helper class to enable pandas style split, apply, combine syntax
