@@ -120,7 +120,7 @@ class BoidFlockers(mesa.Model):
         self.vision = vision
         self.speed = speed
         self.separation = separation
-        self.schedule = mesa.time.RandomActivation(self)
+
         self.space = mesa.space.ContinuousSpace(width, height, True)
         self.factors = {"cohere": cohere, "separate": separate, "match": match}
         self.make_agents()
@@ -147,4 +147,4 @@ class BoidFlockers(mesa.Model):
             self.schedule.add(boid)
 
     def step(self):
-        self.schedule.step()
+        self.agents.shuffle().do("step")

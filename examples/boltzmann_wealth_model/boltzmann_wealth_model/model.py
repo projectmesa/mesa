@@ -21,7 +21,7 @@ class BoltzmannWealthModel(mesa.Model):
         super().__init__()
         self.num_agents = N
         self.grid = mesa.space.MultiGrid(width, height, True)
-        self.schedule = mesa.time.RandomActivation(self)
+
         self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
         )
@@ -38,7 +38,7 @@ class BoltzmannWealthModel(mesa.Model):
         self.datacollector.collect(self)
 
     def step(self):
-        self.schedule.step()
+        self.agents.shuffle().do("step")
         # collect data
         self.datacollector.collect(self)
 
