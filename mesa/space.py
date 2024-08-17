@@ -586,7 +586,7 @@ class PropertyLayer:
         aggregate_property(operation): Performs an aggregate operation over all cells.
     """
 
-    agentset_experimental_warning_given = False
+    propertylayer_experimental_warning_given = False
 
     def __init__(
         self, name: str, width: int, height: int, default_value, dtype=np.float64
@@ -633,14 +633,14 @@ class PropertyLayer:
 
         self.data = np.full((width, height), default_value, dtype=dtype)
 
-        if not self.__class__.agentset_experimental_warning_given:
+        if not self.__class__.propertylayer_experimental_warning_given:
             warnings.warn(
                 "The new PropertyLayer and _PropertyGrid classes experimental. It may be changed or removed in any and all future releases, including patch releases.\n"
                 "We would love to hear what you think about this new feature. If you have any thoughts, share them with us here: https://github.com/projectmesa/mesa/discussions/1932",
                 FutureWarning,
                 stacklevel=2,
             )
-            self.__class__.agentset_experimental_warning_given = True
+            self.__class__.propertylayer_experimental_warning_given = True
 
     def set_cell(self, position: Coordinate, value):
         """
