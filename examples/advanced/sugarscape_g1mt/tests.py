@@ -40,7 +40,7 @@ def test_carrying_capacity():
         for vision_max in visions:
             model = SugarscapeG1mt(vision_max=vision_max, enable_trade=enable_trade)
             model.run_model(step_count=50)
-            carrying_capacities.append(len(model.agents_by_type[Trader]))
+            carrying_capacities.append(len(model.schedule.agents_by_type[Trader]))
         return carrying_capacities
 
     # Carrying capacity should increase over mean vision (figure IV-6).
