@@ -127,11 +127,11 @@ class AgentSet(MutableSet, Sequence):
         return agent in self._agents
 
     def select(
-            self,
-            filter_func: Callable[[Agent], bool] | None = None,
-            n: int = 0,
-            inplace: bool = False,
-            agent_type: type[Agent] | None = None,
+        self,
+        filter_func: Callable[[Agent], bool] | None = None,
+        n: int = 0,
+        inplace: bool = False,
+        agent_type: type[Agent] | None = None,
     ) -> AgentSet:
         """
         Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
@@ -154,7 +154,7 @@ class AgentSet(MutableSet, Sequence):
             count = 0
             for agent in self:
                 if (not filter_func or filter_func(agent)) and (
-                        not agent_type or isinstance(agent, agent_type)
+                    not agent_type or isinstance(agent, agent_type)
                 ):
                     yield agent
                     count += 1
@@ -191,10 +191,10 @@ class AgentSet(MutableSet, Sequence):
             )
 
     def sort(
-            self,
-            key: Callable[[Agent], Any] | str,
-            ascending: bool = False,
-            inplace: bool = False,
+        self,
+        key: Callable[[Agent], Any] | str,
+        ascending: bool = False,
+        inplace: bool = False,
     ) -> AgentSet:
         """
         Sort the agents in the AgentSet based on a specified attribute or custom function.
@@ -368,7 +368,8 @@ class AgentSet(MutableSet, Sequence):
         return self.model.random
 
     def group_by(
-            self, by: Callable | str,
+        self,
+        by: Callable | str,
     ) -> AgentSetGroupBy:
         """
         Group agents by the specified attribute
@@ -416,6 +417,7 @@ class AgentSetGroupBy:
         return {k: callable(v) for k, v in self.groups}
 
     # add iteration
+
 
 # consider adding for performance reasons
 # for Sequence: __reversed__, index, and count
