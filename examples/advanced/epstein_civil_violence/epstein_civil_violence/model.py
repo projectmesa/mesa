@@ -122,7 +122,7 @@ class EpsteinCivilViolence(mesa.Model):
         Helper method to count agents by Quiescent/Active.
         """
         count = 0
-        for agent in model.schedule.agents:
+        for agent in model.agents:
             if agent.breed == "cop":
                 continue
             if exclude_jailed and agent.jail_sentence > 0:
@@ -137,7 +137,7 @@ class EpsteinCivilViolence(mesa.Model):
         Helper method to count jailed agents.
         """
         count = 0
-        for agent in model.schedule.agents:
+        for agent in model.agents:
             if agent.breed == "citizen" and agent.jail_sentence > 0:
                 count += 1
         return count
@@ -148,7 +148,7 @@ class EpsteinCivilViolence(mesa.Model):
         Helper method to count jailed agents.
         """
         count = 0
-        for agent in model.schedule.agents:
+        for agent in model.agents:
             if agent.breed == "cop":
                 count += 1
         return count
