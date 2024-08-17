@@ -68,7 +68,6 @@ class Schelling(mesa.Model):
         self.homophily = homophily
         self.radius = radius
 
-        self.schedule = mesa.time.RandomActivation(self)
         self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
         self.happy = 0
@@ -94,7 +93,7 @@ class Schelling(mesa.Model):
         Run one step of the model.
         """
         self.happy = 0  # Reset counter of happy agents
-        self.schedule.step()
+        self.agents.shuffle().do("step")
 
         self.datacollector.collect(self)
 

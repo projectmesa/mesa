@@ -47,7 +47,7 @@ class VirusOnNetwork(mesa.Model):
         prob = avg_node_degree / self.num_nodes
         self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=prob)
         self.grid = mesa.space.NetworkGrid(self.G)
-        self.schedule = mesa.time.RandomActivation(self)
+
         self.initial_outbreak_size = (
             initial_outbreak_size if initial_outbreak_size <= num_nodes else num_nodes
         )
@@ -96,7 +96,7 @@ class VirusOnNetwork(mesa.Model):
             return math.inf
 
     def step(self):
-        self.schedule.step()
+        self.agents.shuffle().do("step")
         # collect data
         self.datacollector.collect(self)
 
