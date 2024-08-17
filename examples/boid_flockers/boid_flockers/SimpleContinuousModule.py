@@ -18,7 +18,7 @@ class SimpleCanvas(mesa.visualization.VisualizationElement):
 
     def render(self, model):
         space_state = []
-        for obj in model.schedule.agents:
+        for obj in model.agents:
             portrayal = self.portrayal_method(obj)
             x, y = obj.pos
             x = (x - model.space.x_min) / (model.space.x_max - model.space.x_min)
