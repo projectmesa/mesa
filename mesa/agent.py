@@ -394,9 +394,7 @@ class AgentSet(MutableSet, Sequence):
             for agent in self:
                 groups[getattr(agent, by)].append(agent)
 
-        if return_agentset:
-            return {k: AgentSet(v) for k, v in groups.items()}
-        return groups
+        return AgentSetGroupBy(groups)
 
 
 class AgentSetGroupBy:
@@ -413,6 +411,7 @@ class AgentSetGroupBy:
             return self.groups[name]
 
     def apply(self, callable: Callable):
+        # fixme, we have callable over the entire group and callable on each group member
         # apply callable to each group and return dict {group_name, return of callable for group}
         return {k: callable(v) for k, v in self.groups}
 
