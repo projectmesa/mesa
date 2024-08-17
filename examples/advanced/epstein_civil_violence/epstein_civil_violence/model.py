@@ -86,7 +86,7 @@ class EpsteinCivilViolence(mesa.Model):
                 cop = Cop(unique_id, self, (x, y), vision=self.cop_vision)
                 unique_id += 1
                 self.grid[x][y] = cop
-                self.schedule.add(cop)
+
             elif self.random.random() < (self.cop_density + self.citizen_density):
                 citizen = Citizen(
                     unique_id,
@@ -100,7 +100,6 @@ class EpsteinCivilViolence(mesa.Model):
                 )
                 unique_id += 1
                 self.grid[x][y] = citizen
-                self.schedule.add(citizen)
 
         self.running = True
         self.datacollector.collect(self)

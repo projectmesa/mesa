@@ -39,7 +39,6 @@ class PdGrid(mesa.Model):
             for y in range(height):
                 agent = PDAgent(self.next_id(), self)
                 self.grid.place_agent(agent, (x, y))
-                self.schedule.add(agent)
 
         self.datacollector = mesa.DataCollector(
             {
