@@ -14,15 +14,6 @@ class ConwaysGameOfLife(mesa.Model):
         Create a new playing area of (width, height) cells.
         """
         super().__init__()
-
-        # Set up the grid and schedule.
-
-        # Use SimultaneousActivation which simulates all the cells
-        # computing their next state simultaneously.  This needs to
-        # be done because each cell's next state depends on the current
-        # state of all its neighbors -- before they've changed.
-        self.schedule = mesa.time.SimultaneousActivation(self)
-
         # Use a simple grid, where edges wrap around.
         self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
@@ -39,6 +30,9 @@ class ConwaysGameOfLife(mesa.Model):
 
     def step(self):
         """
-        Have the scheduler advance each cell by one step
+        Perform the model step in two stages:
+        - First, all cells assume their next state (whether they will be dead or alive)
+        - Then, all cells change state to their next state
         """
-        self.schedule.step()
+        self.agents.do("determine_state")
+        self.agents.do("assume_state")
