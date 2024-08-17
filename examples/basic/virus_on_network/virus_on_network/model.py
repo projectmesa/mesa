@@ -75,7 +75,7 @@ class VirusOnNetwork(mesa.Model):
                 self.recovery_chance,
                 self.gain_resistance_chance,
             )
-            self.schedule.add(a)
+
             # Add the agent to the node
             self.grid.place_agent(a, node)
 

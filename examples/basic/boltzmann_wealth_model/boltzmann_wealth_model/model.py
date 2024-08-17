@@ -28,7 +28,7 @@ class BoltzmannWealthModel(mesa.Model):
         # Create agents
         for i in range(self.num_agents):
             a = MoneyAgent(i, self)
-            self.schedule.add(a)
+
             # Add the agent to a random grid cell
             x = self.random.randrange(self.grid.width)
             y = self.random.randrange(self.grid.height)

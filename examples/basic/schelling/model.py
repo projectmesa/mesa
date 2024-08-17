@@ -84,7 +84,6 @@ class Schelling(mesa.Model):
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(self.next_id(), self, agent_type)
                 self.grid.place_agent(agent, pos)
-                self.schedule.add(agent)
 
         self.datacollector.collect(self)
 
