@@ -11,9 +11,7 @@ from __future__ import annotations
 import contextlib
 import copy
 import operator
-import warnings
 import weakref
-from collections import defaultdict
 from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
 from random import Random
 
@@ -50,19 +48,7 @@ class Agent:
         self.pos: Position | None = None
 
         # register agent
-        try:
-            self.model.agents_[type(self)][self] = None
-        except AttributeError:
-            # model super has not been called
-            self.model.agents_ = defaultdict(dict)
-            self.model.agents_[type(self)][self] = None
-            self.model.agentset_experimental_warning_given = False
-
-            warnings.warn(
-                "The Mesa Model class was not initialized. In the future, you need to explicitly initialize the Model by calling super().__init__() on initialization.",
-                FutureWarning,
-                stacklevel=2,
-            )
+        self.model.agents_[type(self)][self] = None
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
@@ -99,8 +85,6 @@ class AgentSet(MutableSet, Sequence):
         interactions with the model's environment and other agents.The implementation uses a WeakKeyDictionary to store agents,
         which means that agents not referenced elsewhere in the program may be automatically removed from the AgentSet.
     """
-
-    agentset_experimental_warning_given = False
 
     def __init__(self, agents: Iterable[Agent], model: Model):
         """
