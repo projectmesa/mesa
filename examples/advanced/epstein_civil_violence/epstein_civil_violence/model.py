@@ -58,7 +58,7 @@ class EpsteinCivilViolence(mesa.Model):
         self.movement = movement
         self.max_iters = max_iters
         self.iteration = 0
-        self.schedule = mesa.time.RandomActivation(self)
+
         self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
         model_reporters = {
@@ -109,7 +109,7 @@ class EpsteinCivilViolence(mesa.Model):
         """
         Advance the model by one step and collect data.
         """
-        self.schedule.step()
+        self.agents.shuffle().do("step")
         # collect data
         self.datacollector.collect(self)
         self.iteration += 1
