@@ -357,7 +357,68 @@ class AgentSet(MutableSet, Sequence):
         """
         return self.model.random
 
+    def group_by(
+            self, by: Callable | str,
+            result_type: str = "agentset"
+    ) -> BaseGroupBy:
+        """
+        Group agents by the specified attribute
 
-# consider adding for performance reasons
-# for Sequence: __reversed__, index, and count
-# for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__
+        Args:
+            by (Callable, str): used to determine what to group agents by
+
+                                * if ``by`` is a callable, it will be called for each agent and the return is used
+                                  for grouping
+                                * if ``by`` is a str, it should refer to an attribute on the agent and the value
+                                  of this attribute will be used for grouping
+            result_type (str): The datatype for the resutling groups {"agentset", "list"}
+        Returns:
+            AgentSetGroupBy
+
+        """
+        groups = defaultdict(list)
+
+        if isinstance(by, Callable):
+            for agent in self:
+                groups[by(agent)].append(agent)
+        else:
+            for agent in self:
+                groups[getattr(agent, by)].append(agent)
+
+        if result_type == "agentset":
+           return AgentSetGroupBy(groups)
+        else:
+            return ListGroupBy(groups)
+
+    # consider adding for performance reasons
+    # for Sequence: __reversed__, index, and count
+    # for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__
+
+class BaseGroupBy:
+    def __init__(self, groups: dict[Any, list | AgentSet]):
+        self.groups: dict[Any, list|AgentSet] = groups
+
+    def get_group(self, name: Any):
+        # return group for specified name
+        return self.groups[name]
+
+    def apply(self, callable: Callable):
+        # fixme, we have callable over the entire group and callable on each group member
+        # apply callable to each group and return dict {group_name, return of callable for group}
+        return {k: callable(v) for k, v in self.groups}
+
+    def __iter__(self):
+        return iter(self.groups.items())
+
+class AgentSetGroupBy(BaseGroupBy):
+    # Helper class to enable pandas style split, apply, combine syntax
+
+    def __init__(self, groups: dict[Any, list]):
+        super().__init__({k:AgentSet(v) for k,v in groups.items()})
+    def do(self, method: str | Callable, *args, **kwargs):
+        # fixme what about return type here and enabling method chaining?
+        return {k: v.do(method, *args, **kwargs) for k, v in self.groups}
+
+class ListGroupBy(BaseGroupBy):
+    # Helper class to enable pandas style split, apply, combine syntax
+    pass
