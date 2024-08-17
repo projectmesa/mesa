@@ -24,7 +24,6 @@ class ConwaysGameOfLife(mesa.Model):
             if self.random.random() < 0.1:
                 cell.state = cell.ALIVE
             self.grid.place_agent(cell, (x, y))
-            self.schedule.add(cell)
 
         self.running = True
 
