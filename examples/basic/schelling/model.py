@@ -96,5 +96,5 @@ class Schelling(mesa.Model):
 
         self.datacollector.collect(self)
 
-        if self.happy == self.schedule.get_agent_count():
+        if self.happy == len(self.agents):
             self.running = False
