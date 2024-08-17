@@ -227,13 +227,13 @@ class AgentSet(MutableSet, Sequence):
         return self
 
     def do(
-        self, callable: str | Callable, *args, return_results: bool = False, **kwargs
+        self, method: str | Callable, *args, return_results: bool = False, **kwargs
     ) -> AgentSet | list[Any]:
         """
         Invoke a method or function on each agent in the AgentSet.
 
         Args:
-            callable (str, callable): the callable to do on each agents
+            method (str, callable): the callable to do on each agents
 
                                         * in case of str, the name of the method to call on each agent.
                                         * in case of callable, the function to be called with each agent as first argument
@@ -246,15 +246,15 @@ class AgentSet(MutableSet, Sequence):
             AgentSet | list[Any]: The results of the callable calls if return_results is True, otherwise the AgentSet itself.
         """
         # we iterate over the actual weakref keys and check if weakref is alive before calling the method
-        if isinstance(callable, str):
+        if isinstance(method, str):
             res = [
-                getattr(agent, callable)(*args, **kwargs)
+                getattr(agent, method)(*args, **kwargs)
                 for agentref in self._agents.keyrefs()
                 if (agent := agentref()) is not None
             ]
         else:
             res = [
-                callable(agent, *args, **kwargs)
+                method(agent, *args, **kwargs)
                 for agentref in self._agents.keyrefs()
                 if (agent := agentref()) is not None
             ]
@@ -366,57 +366,6 @@ class AgentSet(MutableSet, Sequence):
             Random: The random number generator associated with the model.
         """
         return self.model.random
-
-    def group_by(
-        self,
-        by: Callable | str,
-    ) -> AgentSetGroupBy:
-        """
-        Group agents by the specified attribute
-
-        Args:
-            by (Callable, str): used to determine what to group agents by
-
-                                * if ``by`` is a callable, it will be called for each agent and the return is used
-                                  for grouping
-                                * if ``by`` is a str, it should refer to an attribute on the agent and the value
-                                  of this attribute will be used for grouping
-
-        Returns:
-            AgentSetGroupBy
-
-        """
-        groups = defaultdict(list)
-
-        if isinstance(by, Callable):
-            for agent in self:
-                groups[by(agent)].append(agent)
-        else:
-            for agent in self:
-                groups[getattr(agent, by)].append(agent)
-
-        return AgentSetGroupBy(groups)
-
-
-class AgentSetGroupBy:
-    # Helper class to enable pandas style split, apply, combine syntax
-
-    def __init__(self, groups: dict[Any, list]):
-        self.groups: dict[Any, list] = groups
-
-    def get_group(self, name: Any, agentset=True):
-        # return group for specified name
-        if agentset:
-            return AgentSet(self.groups[name])
-        else:
-            return self.groups[name]
-
-    def apply(self, callable: Callable):
-        # fixme, we have callable over the entire group and callable on each group member
-        # apply callable to each group and return dict {group_name, return of callable for group}
-        return {k: callable(v) for k, v in self.groups}
-
-    # add iteration
 
 
 # consider adding for performance reasons
