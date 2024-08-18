@@ -176,7 +176,7 @@ def test_agentset_get_item():
         _ = agentset[20]
 
 
-def test_agentset_do_method():
+def test_agentset_do_str():
     model = Model()
     agents = [TestAgent(model.next_id(), model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -207,6 +207,72 @@ def test_agentset_do_method():
         agent.agent_set = agentset
 
     agentset.do("do_remove")
+    assert len(agentset) == 0
+
+
+def test_agentset_do_callable():
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+
+    # Test callable with non-existent function
+    with pytest.raises(AttributeError):
+        agentset.do(lambda agent: agent.non_existing_method())
+
+    # tests for addition and removal in do using callables
+    # do iterates, so no error should be raised to change size while iterating
+    # related to issue #1595
+
+    # setup for lambda function tests
+    n = 10
+    model = Model()
+    agents = [TestAgentDo(model.next_id(), model) for _ in range(n)]
+    agentset = AgentSet(agents, model)
+    for agent in agents:
+        agent.agent_set = agentset
+
+    # Lambda for addition
+    agentset.do(lambda agent: agent.do_add())
+    assert len(agentset) == 2 * n
+
+    # setup again for lambda function tests
+    model = Model()
+    agents = [TestAgentDo(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+    for agent in agents:
+        agent.agent_set = agentset
+
+    # Lambda for removal
+    agentset.do(lambda agent: agent.do_remove())
+    assert len(agentset) == 0
+
+    # setup for actual function tests
+    def add_function(agent):
+        agent.do_add()
+
+    def remove_function(agent):
+        agent.do_remove()
+
+    # setup again for actual function tests
+    model = Model()
+    agents = [TestAgentDo(model.next_id(), model) for _ in range(n)]
+    agentset = AgentSet(agents, model)
+    for agent in agents:
+        agent.agent_set = agentset
+
+    # Actual function for addition
+    agentset.do(add_function)
+    assert len(agentset) == 2 * n
+
+    # setup again for actual function tests
+    model = Model()
+    agents = [TestAgentDo(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+    for agent in agents:
+        agent.agent_set = agentset
+
+    # Actual function for removal
+    agentset.do(remove_function)
     assert len(agentset) == 0
 
 
