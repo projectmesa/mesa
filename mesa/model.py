@@ -83,6 +83,20 @@ class Model:
         self._steps: int = 0
         self._time: TimeT = 0  # the model's clock
 
+        # Wrap the user-defined step method
+        if hasattr(self, "step"):
+            self._user_step = self.step
+            self.step = self._wrapped_step
+
+    def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
+        """Automatically increments time and steps after calling the user's step method."""
+        # Automatically increment time and step counters
+        self._time += kwargs.get("time", 1)
+        self._steps += kwargs.get("step", 1)
+        # Call the original user-defined step method
+        if self._user_step:
+            self._user_step(*args, **kwargs)
+
     @property
     def agents(self) -> AgentSet:
         """Provides an AgentSet of all agents in the model, combining agents from all types."""
@@ -179,11 +193,6 @@ class Model:
 
     def step(self) -> None:
         """A single step. Fill in here."""
-
-    def _advance_time(self, deltat: TimeT = 1):
-        """Increment the model's steps counter and clock."""
-        self._steps += 1
-        self._time += deltat
 
     def next_id(self) -> int:
         """Return the next unique ID for agents, increment current_id"""
