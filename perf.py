@@ -1,7 +1,7 @@
 import mesa
 import numpy as np
 import perfplot
-
+import itertools
 
 
 # Mesa implementation
@@ -23,7 +23,7 @@ class MoneyAgent(mesa.Agent):
     def step(self):
         # Verify agent has some wealth
         if self.wealth > 0:
-            other_agent = self.random.choice(self.model.schedule.agents)
+            other_agent = self.random.choice(list(itertools.chain.from_iterable(self.model.agents_.values())))
             if other_agent is not None:
                 other_agent.wealth += 1
                 self.wealth -= 1
@@ -157,15 +157,15 @@ class MoneyListAgent(mesa.Agent):
 def main():
     out = perfplot.bench(
         setup=lambda n: n,
-        kernels=[mesa_test_implementation, mesa_list_implementation],
-        labels=["test", "list"],
+        kernels=[mesa_original_implementation, mesa_test_implementation, mesa_list_implementation],
+        labels=["itertools", "test", "list"],
         n_range=[k for k in range(10, 10000, 500)],
         xlabel="Number of agents",
         equality_check=None,
         title="100 steps of the Boltzmann Wealth model",
     )
     out.show()
-    out.save("readme_plot3.png")
+    out.save("readme_plot4.png")
 
 
 if __name__ == "__main__":
