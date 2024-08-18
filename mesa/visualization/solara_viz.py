@@ -70,7 +70,7 @@ def Card(
                 )
             elif space_drawer:
                 # if specified, draw agent space with an alternate renderer
-                space_drawer(model, agent_portrayal)
+                space_drawer(model, agent_portrayal, dependencies=dependencies)
         elif "Measure" in layout_type:
             rv.CardTitle(children=["Measure"])
             measure = measures[layout_type["Measure"]]
