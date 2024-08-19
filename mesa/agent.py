@@ -369,7 +369,7 @@ class AgentSet(MutableSet, Sequence):
                                   for grouping
                                 * if ``by`` is a str, it should refer to an attribute on the agent and the value
                                   of this attribute will be used for grouping
-            result_type (str): The datatype for the resutling groups {"agentset", "list"}
+            result_type (str, optional): The datatype for the resulting groups {"agentset", "list"}
         Returns:
             GroupBy
 
@@ -396,17 +396,31 @@ class AgentSet(MutableSet, Sequence):
 
 
 class GroupBy:
+    """Helper class for AgentSet.groupby"""
+
     def __init__(self, groups: dict[Any, list | AgentSet]):
         self.groups: dict[Any, list | AgentSet] = groups
 
     def get_group(self, name: Any):
+        """
+        Retrieve the specified group by name.
+        """
+
         # return group for specified name
         return self.groups[name]
 
-    def apply(self, callable: Callable):
-        # fixme, we have callable over the entire group and callable on each group member
-        # apply callable to each group and return dict {group_name, return of callable for group}
-        return {k: callable(v) for k, v in self.groups.items()}
+    def apply(self, callable: Callable, *args, **kwargs):
+        """Apply the specified callable to each group
+
+        Args:
+            callable (Callable): The callable to apply to each group, it will be called with the group as first argument
+                                 Additional arguments and keyword arguments will be passed on to the callable.
+
+        Returns:
+            dict with group_name as key and the return of the callable as value
+
+        """
+        return {k: callable(v, *args, **kwargs) for k, v in self.groups.items()}
 
     def __iter__(self):
         return iter(self.groups.items())
