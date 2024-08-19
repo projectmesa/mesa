@@ -352,13 +352,12 @@ def test_agentset_shuffle():
 
 def test_agentset_groupby():
     class TestAgent(Agent):
-
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
-            self.even = self.unique_id%2 == 0
+            self.even = self.unique_id % 2 == 0
+
         def get_unique_identifier(self):
             return self.unique_id
-
 
     model = Model()
     agents = [TestAgent(model.next_id(), model) for _ in range(10)]
@@ -373,6 +372,3 @@ def test_agentset_groupby():
 
     sizes = agentset.group_by("even", result_type="list").apply(len)
     assert sizes == {True: 5, False: 5}
-
-
-

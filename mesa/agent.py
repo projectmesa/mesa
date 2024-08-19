@@ -386,7 +386,9 @@ class AgentSet(MutableSet, Sequence):
                 groups[getattr(agent, by)].append(agent)
 
         if result_type == "agentset":
-            return GroupBy({k:AgentSet(v, model=self.model) for k,v in groups.items()})
+            return GroupBy(
+                {k: AgentSet(v, model=self.model) for k, v in groups.items()}
+            )
         else:
             return GroupBy(groups)
 
@@ -410,5 +412,3 @@ class GroupBy:
 
     def __iter__(self):
         return iter(self.groups.items())
-
-
