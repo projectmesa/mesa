@@ -358,9 +358,7 @@ class AgentSet(MutableSet, Sequence):
         """
         return self.model.random
 
-    def group_by(
-        self, by: Callable | str, result_type: str = "agentset"
-    ) -> GroupBy:
+    def group_by(self, by: Callable | str, result_type: str = "agentset") -> GroupBy:
         """
         Group agents by the specified attribute
 
