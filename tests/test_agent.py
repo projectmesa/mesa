@@ -348,3 +348,26 @@ def test_agentset_shuffle():
     agentset = AgentSet(test_agents, model=model)
     agentset.shuffle(inplace=True)
     assert not all(a1 == a2 for a1, a2 in zip(test_agents, agentset))
+
+
+def test_agentset_groupby():
+    class TestAgent(Agent):
+
+        def __init__(self, unique_id, model):
+            super().__init__(unique_id, model)
+            self.even = self.unique_id%2 == 0
+        def get_unique_identifier(self):
+            return self.unique_id
+
+
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+
+    groups = agentset.group_by("even")
+    assert len(groups.get_group(True)) == 5
+    assert len(groups.get_group(False)) == 5
+
+    sizes = agentset.group_by("even", result_type="list").apply(len)
+    assert sizes == {True: 5, False: 5}
+

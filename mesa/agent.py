@@ -386,16 +386,16 @@ class AgentSet(MutableSet, Sequence):
                 groups[getattr(agent, by)].append(agent)
 
         if result_type == "agentset":
-            return AgentSetGroupBy(groups)
+            return GroupBy({k:AgentSet(v, model=self.model) for k,v in groups.items()})
         else:
-            return ListGroupBy(groups)
+            return GroupBy(groups)
 
     # consider adding for performance reasons
     # for Sequence: __reversed__, index, and count
     # for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__
 
 
-class BaseGroupBy:
+class GroupBy:
     def __init__(self, groups: dict[Any, list | AgentSet]):
         self.groups: dict[Any, list | AgentSet] = groups
 
@@ -406,23 +406,9 @@ class BaseGroupBy:
     def apply(self, callable: Callable):
         # fixme, we have callable over the entire group and callable on each group member
         # apply callable to each group and return dict {group_name, return of callable for group}
-        return {k: callable(v) for k, v in self.groups}
+        return {k: callable(v) for k, v in self.groups.items()}
 
     def __iter__(self):
         return iter(self.groups.items())
 
 
-class AgentSetGroupBy(BaseGroupBy):
-    # Helper class to enable pandas style split, apply, combine syntax
-
-    def __init__(self, groups: dict[Any, list]):
-        super().__init__({k: AgentSet(v) for k, v in groups.items()})
-
-    def do(self, method: str | Callable, *args, **kwargs):
-        # fixme what about return type here and enabling method chaining?
-        return {k: v.do(method, *args, **kwargs) for k, v in self.groups}
-
-
-class ListGroupBy(BaseGroupBy):
-    # Helper class to enable pandas style split, apply, combine syntax
-    pass
