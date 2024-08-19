@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import itertools
 import random
-import warnings
 from collections import defaultdict
 
 # mypy
