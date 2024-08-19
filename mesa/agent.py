@@ -12,8 +12,8 @@ import contextlib
 import copy
 import operator
 import weakref
-from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
 from collections import defaultdict
+from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
 from random import Random
 
 # mypy
