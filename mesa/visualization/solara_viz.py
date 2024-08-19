@@ -103,7 +103,8 @@ def SolaraViz(
         model_params: Parameters for initializing the model
         measures: List of callables or data attributes to plot
         name: Name for display
-        agent_portrayal: Options for rendering agents (dictionary)
+        agent_portrayal: Options for rendering agents (dictionary);
+            Default drawer supports custom `"size"`, `"color"`, and `"shape"`.
         space_drawer: Method to render the agent space for
             the model; default implementation is the `SpaceMatplotlib` component;
             simulations with no space to visualize should
