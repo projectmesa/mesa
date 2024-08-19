@@ -360,7 +360,7 @@ class AgentSet(MutableSet, Sequence):
 
     def group_by(
         self, by: Callable | str, result_type: str = "agentset"
-    ) -> BaseGroupBy:
+    ) -> GroupBy:
         """
         Group agents by the specified attribute
 
@@ -373,7 +373,7 @@ class AgentSet(MutableSet, Sequence):
                                   of this attribute will be used for grouping
             result_type (str): The datatype for the resutling groups {"agentset", "list"}
         Returns:
-            AgentSetGroupBy
+            GroupBy
 
         """
         groups = defaultdict(list)
