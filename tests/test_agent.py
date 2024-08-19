@@ -368,6 +368,11 @@ def test_agentset_groupby():
     assert len(groups.get_group(True)) == 5
     assert len(groups.get_group(False)) == 5
 
+    for group_name, group in groups:
+        assert len(group) == 5
+
     sizes = agentset.group_by("even", result_type="list").apply(len)
     assert sizes == {True: 5, False: 5}
+
+
 
