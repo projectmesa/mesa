@@ -367,6 +367,12 @@ def test_agentset_groupby():
     assert len(groups.get_group(True)) == 5
     assert len(groups.get_group(False)) == 5
 
+
+    groups = agentset.group_by(lambda a: a.unique_id % 2 == 0)
+    assert len(groups.get_group(True)) == 5
+    assert len(groups.get_group(False)) == 5
+
+
     for group_name, group in groups:
         assert len(group) == 5
         assert group_name in {True, False}
