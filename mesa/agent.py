@@ -11,6 +11,7 @@ from __future__ import annotations
 import contextlib
 import copy
 import operator
+import warnings
 import weakref
 from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
 from random import Random
@@ -35,16 +36,43 @@ class Agent:
         self.pos: Position | None = None
     """
 
-    def __init__(self, unique_id: int, model: Model) -> None:
+    def __init__(
+        self,
+        model: Model = None,
+        fallback: None = None,
+    ) -> None:
         """
         Create a new agent.
 
         Args:
-            unique_id (int): A unique identifier for this agent.
             model (Model): The model instance in which the agent exists.
+            fallback (None): A fallback parameter for the old way of initializing agents. Deprecated.
+
+        Note:
+            Previously, agents were initialized with a unique_id and a model instance. The unique_id is now
+            automatically assigned, so only the model instance is now required (as the first argument).
         """
-        self.unique_id = unique_id
-        self.model = model
+        from .model import Model  # avoid circular import
+
+        # If the first argument is a model, that's the correct new way to initialize the agent.
+        if isinstance(model, Model):
+            self.model = model
+        else:
+            # If the fallback is a Mesa model, assign that to the model attribute
+            if isinstance(fallback, Model):
+                self.model = fallback
+                warnings.warn(
+                    "The unique_id parameter is now generated automatically and doesn't need to be passed in Agent() anymore.\n"
+                    "Please initialize agents with the model instance only: Agent(model, ...), instead of Agent(unique_id, model, ...)",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+            else:
+                raise ValueError(
+                    "The model parameter is required to initialize an Agent object. Initialize the agent with Agent(model, ...)."
+                )
+
+        self.unique_id = self.model._next_id
         self.pos: Position | None = None
 
         # register agent

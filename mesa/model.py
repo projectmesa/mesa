@@ -123,10 +123,23 @@ class Model:
         self._steps += 1
         self._time += deltat
 
-    def next_id(self) -> int:
-        """Return the next unique ID for agents, increment current_id"""
+    @property
+    def _next_id(self) -> int:
+        """Return the next unique ID for agents. Starts at 0."""
+        return_id = self.current_id
         self.current_id += 1
-        return self.current_id
+        return return_id
+
+    def next_id(self) -> int:
+        """Old version of next_id, kept for compatibility."""
+        warnings.warn(
+            "Model.next_id() is deprecated and will be removed in a future version.\n"
+            "The Agent.unique_id parameter is now generated automatically and doesn't need to be passed in Agent() anymore.\n"
+            "Please initialize agents with the model instance only: Agent(model, ...), instead of Agent(unique_id, model, ...)",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return 0  # This is a dummy return value, but some functions might expect an int. It isn't used in agent creation anyway.
 
     def reset_randomizer(self, seed: int | None = None) -> None:
         """Reset the model random number generator.

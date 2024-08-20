@@ -11,6 +11,46 @@ class TestAgent(Agent):
         return self.unique_id
 
 
+class PositionalAgent(Agent):
+    """Old behavior of Agent creation with unique_id and model as positional arguments.
+    Can be removed in the future."""
+
+    def __init__(self, unique_id, model):
+        super().__init__(unique_id, model)
+
+
+class NewAgent(Agent):
+    def __init__(self, model, some_other, arguments=1):
+        super().__init__(model)
+        self.some_other = some_other
+        self.arguments = arguments
+
+
+@pytest.fixture
+def model():
+    """Fixture to create a Model instance."""
+    model = Model()
+    return model
+
+
+def test_creation_with_positional_arguments(model):
+    """Old behavior of Agent creation with unique_id and model as positional arguments.
+    Can be removed/updated in the future."""
+    agent = PositionalAgent(1, model)
+    assert isinstance(agent.unique_id, int)
+    assert agent.model == model
+    assert isinstance(agent.model, Model)
+
+
+def test_creation_with_new_arguments(model):
+    """New behavior of Agent creation with model as the first argument and additional arguments."""
+    agent = NewAgent(model, "some_other", 2)
+    assert agent.model == model
+    assert isinstance(agent.model, Model)
+    assert agent.some_other == "some_other"
+    assert agent.arguments == 2
+
+
 class TestAgentDo(Agent):
     def __init__(
         self,
@@ -45,7 +85,7 @@ def test_agent_removal():
 def test_agentset():
     # create agentset
     model = Model()
-    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agents = [TestAgent(model) for _ in range(10)]
 
     agentset = AgentSet(agents, model)
 
@@ -57,7 +97,7 @@ def test_agentset():
         assert a1 == a2
 
     def test_function(agent):
-        return agent.unique_id > 5
+        return agent.unique_id >= 5
 
     assert len(agentset.select(test_function)) == 5
     assert len(agentset.select(test_function, n=2)) == 2
