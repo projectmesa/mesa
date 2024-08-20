@@ -363,11 +363,11 @@ def test_agentset_groupby():
     agents = [TestAgent(model.next_id(), model) for _ in range(10)]
     agentset = AgentSet(agents, model)
 
-    groups = agentset.group_by("even")
+    groups = agentset.groupby("even")
     assert len(groups.get_group(True)) == 5
     assert len(groups.get_group(False)) == 5
 
-    groups = agentset.group_by(lambda a: a.unique_id % 2 == 0)
+    groups = agentset.groupby(lambda a: a.unique_id % 2 == 0)
     assert len(groups.get_group(True)) == 5
     assert len(groups.get_group(False)) == 5
 
@@ -375,5 +375,5 @@ def test_agentset_groupby():
         assert len(group) == 5
         assert group_name in {True, False}
 
-    sizes = agentset.group_by("even", result_type="list").apply(len)
+    sizes = agentset.groupby("even", result_type="list").apply(len)
     assert sizes == {True: 5, False: 5}

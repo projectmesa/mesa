@@ -358,9 +358,9 @@ class AgentSet(MutableSet, Sequence):
         """
         return self.model.random
 
-    def group_by(self, by: Callable | str, result_type: str = "agentset") -> GroupBy:
+    def groupby(self, by: Callable | str, result_type: str = "agentset") -> GroupBy:
         """
-        Group agents by the specified attribute
+        Group agents by the specified attribute or return from the callable
 
         Args:
             by (Callable, str): used to determine what to group agents by
@@ -372,6 +372,12 @@ class AgentSet(MutableSet, Sequence):
             result_type (str, optional): The datatype for the resulting groups {"agentset", "list"}
         Returns:
             GroupBy
+
+
+        Nptes
+        -----
+        There might be performance benefits to using `result_type='list'` if you don't need the advanced functionality
+        of an AgentSet.
 
         """
         groups = defaultdict(list)
