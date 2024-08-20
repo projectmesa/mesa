@@ -374,8 +374,7 @@ class AgentSet(MutableSet, Sequence):
             GroupBy
 
 
-        Nptes
-        -----
+        Nptes:
         There might be performance benefits to using `result_type='list'` if you don't need the advanced functionality
         of an AgentSet.
 
