@@ -401,7 +401,13 @@ class AgentSet(MutableSet, Sequence):
 
 
 class GroupBy:
-    """Helper class for AgentSet.groupby"""
+    """Helper class for AgentSet.groupby
+
+
+    Attributes:
+        groups (dict): A dictionary with the group_name as key and group as values
+
+    """
 
     def __init__(self, groups: dict[Any, list | AgentSet]):
         self.groups: dict[Any, list | AgentSet] = groups
@@ -436,5 +442,32 @@ class GroupBy:
         else:
             return {k: method(v, *args, **kwargs) for k, v in self.groups.items()}
 
+    def do(self, method: Callable | str, *args, **kwargs) -> GroupBy:
+        """Apply the specified callable to each group
+
+        Args:
+            method (Callable, str): The callable to apply to each group,
+
+                                    * if ``method`` is a callable, it will be called it will be called with the group as first argument
+                                    * if ``method`` is a str, it should refer to a method on the group
+
+                                    Additional arguments and keyword arguments will be passed on to the callable.
+
+        Returns:
+            GroupBy
+
+        """
+        if isinstance(method, str):
+            for v in self.groups.values():
+                getattr(v, method)(*args, **kwargs)
+        else:
+           for v in self.groups.values():
+               method(v, *args, **kwargs)
+
+        return self
+
     def __iter__(self):
         return iter(self.groups.items())
+
+    def __len__(self):
+        return len(self.groups)
