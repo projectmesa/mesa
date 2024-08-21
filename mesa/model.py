@@ -32,7 +32,7 @@ class Model:
         running: A boolean indicating if the model should continue running.
         schedule: An object to manage the order and execution of agent steps.
         current_id: A counter for assigning unique IDs to agents.
-        agents_: A defaultdict mapping each agent type to a dict of its instances.
+        agents_by_type: A defaultdict mapping each agent type to a dict of its instances.
                  This private attribute is used internally to manage agents.
 
     Properties:
@@ -71,10 +71,18 @@ class Model:
         self.running = True
         self.schedule = None
         self.current_id = 0
-        self.agents_: defaultdict[type, dict] = defaultdict(dict)
+
+        self._setup_agent_registration()
 
         self._steps: int = 0
         self._time: TimeT = 0  # the model's clock
+
+    def _setup_agent_registration(self):
+        self._agents_by_type: defaultdict[type, dict] = defaultdict(dict)
+        self.agents_by_type: dict[type, AgentSet] = {}
+        self._all_agents = set()
+        self.all_agents = None
+        self._agent_added_flag = True
 
     @property
     def agents(self) -> AgentSet:
@@ -83,8 +91,9 @@ class Model:
         if hasattr(self, "_agents"):
             return self._agents
         else:
-            all_agents = itertools.chain.from_iterable(self.agents_.values())
-            return AgentSet(all_agents, self)
+            if self._agent_added_flag:
+                self.all_agents = AgentSet(itertools.chain.from_iterable(self.agents_by_type.values(), self))
+            return self.all_agents
 
     @agents.setter
     def agents(self, agents: Any) -> None:
@@ -99,11 +108,30 @@ class Model:
     @property
     def agent_types(self) -> list[type]:
         """Return a list of different agent types."""
-        return list(self.agents_.keys())
+        return list(self.agents_by_type.keys())
 
     def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
         """Retrieves an AgentSet containing all agents of the specified type."""
-        return AgentSet(self.agents_[agenttype].keys(), self)
+        if self._agent_added_flag:
+            self.agents_by_type = {k:AgentSet(v.keys(), self) for k,v in self._agents_by_type.items()}
+
+        return self.agents_by_type[agenttype]
+
+
+    def register_agent(self, agent):
+        if not hasattr(self, "_agent_added_flag"):
+            self._setup_agent_registration()
+
+            warnings.warn(
+                "The Mesa Model class was not initialized. In the future, you need to explicitly initialize the Model by calling super().__init__() on initialization.",
+                FutureWarning,
+                stacklevel=2,
+            )
+
+        self._agents_by_type[type(agent)][agent] = None
+        self.agentset_experimental_warning_given = False
+        self._agent_added_flag = True
+
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as
