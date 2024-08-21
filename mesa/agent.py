@@ -217,9 +217,7 @@ class AgentSet(MutableSet, Sequence):
         self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
         return self
 
-    def do(
-        self, method: str | Callable, *args, **kwargs
-    ) -> AgentSet:
+    def do(self, method: str | Callable, *args, **kwargs) -> AgentSet:
         """
         Invoke a method or function on each agent in the AgentSet.
 
@@ -240,12 +238,14 @@ class AgentSet(MutableSet, Sequence):
         except KeyError:
             return_results = False
         else:
-            warnings.warn("Using return_results is deprecated. Use AgenSet.do in case of return_results=False, and "
-                          "AgentSet.apply in case of return_results=True", stacklevel=2)
+            warnings.warn(
+                "Using return_results is deprecated. Use AgenSet.do in case of return_results=False, and "
+                "AgentSet.apply in case of return_results=True",
+                stacklevel=2,
+            )
 
         if return_results:
             return self.apply(method, *args, **kwargs)
-
 
         # we iterate over the actual weakref keys and check if weakref is alive before calling the method
         if isinstance(method, str):
@@ -259,10 +259,7 @@ class AgentSet(MutableSet, Sequence):
 
         return self
 
-
-    def apply(
-        self, method: str | Callable, *args, **kwargs
-    ) -> list[Any]:
+    def apply(self, method: str | Callable, *args, **kwargs) -> list[Any]:
         """
         Invoke a method or function on each agent in the AgentSet.
 
@@ -293,7 +290,6 @@ class AgentSet(MutableSet, Sequence):
             ]
 
         return res
-
 
     def get(self, attr_names: str | list[str]) -> list[Any]:
         """

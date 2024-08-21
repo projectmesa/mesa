@@ -270,7 +270,6 @@ def test_agentset_do_callable():
     assert len(agentset) == 0
 
 
-
 def test_agentset_apply_str():
     model = Model()
     agents = [TestAgent(model.next_id(), model) for _ in range(10)]
@@ -281,6 +280,7 @@ def test_agentset_apply_str():
 
     results = agentset.apply("get_unique_identifier")
     assert all(i == entry for i, entry in zip(results, range(1, 11)))
+
 
 def test_agentset_apply_callable():
     model = Model()
@@ -297,7 +297,6 @@ def test_agentset_apply_callable():
 
     results = agentset.apply(lambda agent: agent.unique_id)
     assert all(i == entry for i, entry in zip(results, range(1, 11)))
-
 
 
 def test_agentset_get_attribute():
