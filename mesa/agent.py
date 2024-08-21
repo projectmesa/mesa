@@ -374,7 +374,7 @@ class AgentSet(MutableSet, Sequence):
             GroupBy
 
 
-        Nptes:
+        Notes:
         There might be performance benefits to using `result_type='list'` if you don't need the advanced functionality
         of an AgentSet.
 
@@ -414,18 +414,25 @@ class GroupBy:
         # return group for specified name
         return self.groups[name]
 
-    def apply(self, callable: Callable, *args, **kwargs):
+    def apply(self, method: Callable | str, *args, **kwargs) -> dict[Any, Any]:
         """Apply the specified callable to each group
 
         Args:
-            callable (Callable): The callable to apply to each group, it will be called with the group as first argument
-                                 Additional arguments and keyword arguments will be passed on to the callable.
+            method (Callable, str): The callable to apply to each group,
+
+                                    * if ``method`` is a callable, it will be called it will be called with the group as first argument
+                                    * if ``method`` is a str, it should refer to a method on the group
+
+                                    Additional arguments and keyword arguments will be passed on to the callable.
 
         Returns:
-            dict with group_name as key and the return of the callable as value
+            dict with group_name as key and the return of the method as value
 
         """
-        return {k: callable(v, *args, **kwargs) for k, v in self.groups.items()}
+        if isinstance(method, str):
+            return {k: getattr(v, method)(*args, **kwargs) for k, v in self.groups.items()}
+        else:
+            return {k: method(v, *args, **kwargs) for k, v in self.groups.items()}
 
     def __iter__(self):
         return iter(self.groups.items())

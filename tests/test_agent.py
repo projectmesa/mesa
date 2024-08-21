@@ -13,9 +13,9 @@ class TestAgent(Agent):
 
 class TestAgentDo(Agent):
     def __init__(
-        self,
-        unique_id,
-        model,
+            self,
+            unique_id,
+            model,
     ):
         super().__init__(unique_id, model)
         self.agent_set = None
@@ -291,7 +291,7 @@ def test_agentset_get_attribute():
     agents = []
     for i in range(10):
         agent = TestAgent(model.next_id(), model)
-        agent.i = i**2
+        agent.i = i ** 2
         agents.append(agent)
     agentset = AgentSet(agents, model)
 
@@ -377,3 +377,7 @@ def test_agentset_groupby():
 
     sizes = agentset.groupby("even", result_type="list").apply(len)
     assert sizes == {True: 5, False: 5}
+
+    attributes = agentset.groupby("even", result_type="agentset").apply("get", "even")
+    for group_name, group in attributes.items():
+        assert all([group_name == entry for entry in group])
