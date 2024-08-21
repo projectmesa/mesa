@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import itertools
 import random
-import warnings
 from collections import defaultdict
 
 # mypy
@@ -89,12 +88,10 @@ class Model:
 
     @agents.setter
     def agents(self, agents: Any) -> None:
-        warnings.warn(
-            "You are trying to set model.agents. In a next release, this attribute is used "
-            "by MESA itself so you cannot use it directly anymore."
-            "Please adjust your code to use a different attribute name for custom agent storage",
-            UserWarning,
-            stacklevel=2,
+        raise AttributeError(
+            "You are trying to set model.agents. In Mesa 3.0 and higher, this attribute will be "
+            "used by Mesa itself, so you cannot use it directly anymore."
+            "Please adjust your code to use a different attribute name for custom agent storage."
         )
 
         self._agents = agents
