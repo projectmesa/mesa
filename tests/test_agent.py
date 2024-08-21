@@ -380,4 +380,4 @@ def test_agentset_groupby():
 
     attributes = agentset.groupby("even", result_type="agentset").apply("get", "even")
     for group_name, group in attributes.items():
-        assert all([group_name == entry for entry in group])
+        assert all(group_name == entry for entry in group)
