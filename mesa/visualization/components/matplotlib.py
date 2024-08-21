@@ -22,6 +22,7 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = Non
         _draw_continuous_space(space, space_ax, agent_portrayal)
     else:
         _draw_grid(space, space_ax, agent_portrayal)
+
     solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
 
 
@@ -94,6 +95,7 @@ def _draw_grid(space, space_ax, agent_portrayal):
     _split_and_scatter(portray(space), space_ax)
 
 
+# draws using networkx's matplotlib integration
 def _draw_network_grid(space, space_ax, agent_portrayal):
     graph = space.G
     pos = nx.spring_layout(graph, seed=0)
