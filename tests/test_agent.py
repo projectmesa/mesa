@@ -390,4 +390,3 @@ def test_agentset_groupby():
     groups = agentset.groupby("even", result_type="agentset")
     another_ref_to_groups = groups.do(lambda x: x.do("step"))
     assert groups == another_ref_to_groups
-
