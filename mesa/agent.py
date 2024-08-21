@@ -118,11 +118,11 @@ class AgentSet(MutableSet, Sequence):
         return agent in self._agents
 
     def select(
-        self,
-        filter_func: Callable[[Agent], bool] | None = None,
-        n: int = 0,
-        inplace: bool = False,
-        agent_type: type[Agent] | None = None,
+            self,
+            filter_func: Callable[[Agent], bool] | None = None,
+            n: int = 0,
+            inplace: bool = False,
+            agent_type: type[Agent] | None = None,
     ) -> AgentSet:
         """
         Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
@@ -145,7 +145,7 @@ class AgentSet(MutableSet, Sequence):
             count = 0
             for agent in self:
                 if (not filter_func or filter_func(agent)) and (
-                    not agent_type or isinstance(agent, agent_type)
+                        not agent_type or isinstance(agent, agent_type)
                 ):
                     yield agent
                     count += 1
@@ -182,10 +182,10 @@ class AgentSet(MutableSet, Sequence):
             )
 
     def sort(
-        self,
-        key: Callable[[Agent], Any] | str,
-        ascending: bool = False,
-        inplace: bool = False,
+            self,
+            key: Callable[[Agent], Any] | str,
+            ascending: bool = False,
+            inplace: bool = False,
     ) -> AgentSet:
         """
         Sort the agents in the AgentSet based on a specified attribute or custom function.
@@ -218,7 +218,7 @@ class AgentSet(MutableSet, Sequence):
         return self
 
     def do(
-        self, method: str | Callable, *args, return_results: bool = False, **kwargs
+            self, method: str | Callable, *args, return_results: bool = False, **kwargs
     ) -> AgentSet | list[Any]:
         """
         Invoke a method or function on each agent in the AgentSet.
@@ -412,14 +412,6 @@ class GroupBy:
     def __init__(self, groups: dict[Any, list | AgentSet]):
         self.groups: dict[Any, list | AgentSet] = groups
 
-    def get_group(self, name: Any):
-        """
-        Retrieve the specified group by name.
-        """
-
-        # return group for specified name
-        return self.groups[name]
-
     def apply(self, method: Callable | str, *args, **kwargs) -> dict[Any, Any]:
         """Apply the specified callable to each group
 
@@ -433,6 +425,10 @@ class GroupBy:
 
         Returns:
             dict with group_name as key and the return of the method as value
+
+        Notes:
+            this method is useful for methods or functions that do return something. It
+            will break method chaining. For that, use ``do`` instead. 
 
         """
         if isinstance(method, str):
@@ -454,15 +450,19 @@ class GroupBy:
                                     Additional arguments and keyword arguments will be passed on to the callable.
 
         Returns:
-            GroupBy
+            the original GroupBy instance
+
+        Notes:
+            this method is useful for methods or functions that don't return anything and/or
+            if you want to chain multiple do calls
 
         """
         if isinstance(method, str):
             for v in self.groups.values():
                 getattr(v, method)(*args, **kwargs)
         else:
-           for v in self.groups.values():
-               method(v, *args, **kwargs)
+            for v in self.groups.values():
+                method(v, *args, **kwargs)
 
         return self
 

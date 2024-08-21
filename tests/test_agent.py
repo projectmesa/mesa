@@ -364,12 +364,13 @@ def test_agentset_groupby():
     agentset = AgentSet(agents, model)
 
     groups = agentset.groupby("even")
-    assert len(groups.get_group(True)) == 5
-    assert len(groups.get_group(False)) == 5
+    assert len(groups.groups[True]) == 5
+    assert len(groups.groups[False]) == 5
 
     groups = agentset.groupby(lambda a: a.unique_id % 2 == 0)
-    assert len(groups.get_group(True)) == 5
-    assert len(groups.get_group(False)) == 5
+    assert len(groups.groups[True]) == 5
+    assert len(groups.groups[False]) == 5
+    assert len(groups) == 2
 
     for group_name, group in groups:
         assert len(group) == 5
@@ -381,3 +382,12 @@ def test_agentset_groupby():
     attributes = agentset.groupby("even", result_type="agentset").apply("get", "even")
     for group_name, group in attributes.items():
         assert all(group_name == entry for entry in group)
+
+    groups = agentset.groupby("even", result_type="agentset")
+    another_ref_to_groups = groups.do("do", "step")
+    assert groups == another_ref_to_groups
+
+    groups = agentset.groupby("even", result_type="agentset")
+    another_ref_to_groups = groups.do(lambda x: x.do("step"))
+    assert groups == another_ref_to_groups
+
