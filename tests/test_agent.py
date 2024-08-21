@@ -13,9 +13,9 @@ class TestAgent(Agent):
 
 class TestAgentDo(Agent):
     def __init__(
-            self,
-            unique_id,
-            model,
+        self,
+        unique_id,
+        model,
     ):
         super().__init__(unique_id, model)
         self.agent_set = None
@@ -291,7 +291,7 @@ def test_agentset_get_attribute():
     agents = []
     for i in range(10):
         agent = TestAgent(model.next_id(), model)
-        agent.i = i ** 2
+        agent.i = i**2
         agents.append(agent)
     agentset = AgentSet(agents, model)
 

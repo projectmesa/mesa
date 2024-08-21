@@ -430,7 +430,9 @@ class GroupBy:
 
         """
         if isinstance(method, str):
-            return {k: getattr(v, method)(*args, **kwargs) for k, v in self.groups.items()}
+            return {
+                k: getattr(v, method)(*args, **kwargs) for k, v in self.groups.items()
+            }
         else:
             return {k: method(v, *args, **kwargs) for k, v in self.groups.items()}
 
