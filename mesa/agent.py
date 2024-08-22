@@ -259,9 +259,9 @@ class AgentSet(MutableSet, Sequence):
 
         return self
 
-    def apply(self, method: str | Callable, *args, **kwargs) -> list[Any]:
+    def map(self, method: str | Callable, *args, **kwargs) -> list[Any]:
         """
-        Invoke a method or function on each agent in the AgentSet.
+        Invoke a method or function on each agent in the AgentSet and return the results.
 
         Args:
             method (str, callable): the callable to apply on each agent
