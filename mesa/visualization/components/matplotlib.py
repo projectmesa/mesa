@@ -4,6 +4,7 @@ import networkx as nx
 import solara
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
+from matplotlib.pyplot import get_cmap
 
 import mesa
 
@@ -27,71 +28,80 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = Non
 
 
 # matplotlib scatter does not allow for multiple shapes in one call
-def _split_and_scatter(portray_data, space_ax):
-    grouped_data = defaultdict(lambda: {"x": [], "y": [], "s": [], "c": []})
+def _split_and_scatter(space_ax, portray_data) -> None:
+    cmap = portray_data.pop("cmap", None)
 
-    # Extract data from the dictionary
-    x = portray_data["x"]
-    y = portray_data["y"]
-    s = portray_data["s"]
-    c = portray_data["c"]
-    m = portray_data["m"]
+    # enforce marker iterability
+    markers = portray_data.pop("marker", ["o"] * len(portray_data["x"]))
 
-    if not (len(x) == len(y) == len(s) == len(c) == len(m)):
-        raise ValueError(
-            "Length mismatch in portrayal data lists: "
-            f"x: {len(x)}, y: {len(y)}, size: {len(s)}, "
-            f"color: {len(c)}, marker: {len(m)}"
-        )
+    # enforce default color
+    # if no 'color' or 'facecolor' or 'c' then default to "tab:blue" color
+    if (
+        "color" not in portray_data
+        and "facecolor" not in portray_data
+        and "c" not in portray_data
+    ):
+        portray_data["color"] = ["tab:blue"] * len(portray_data["x"])
 
-    # Group the data by marker
-    for i in range(len(x)):
-        marker = m[i]
-        grouped_data[marker]["x"].append(x[i])
-        grouped_data[marker]["y"].append(y[i])
-        grouped_data[marker]["s"].append(s[i])
-        grouped_data[marker]["c"].append(c[i])
+    grouped_data = defaultdict(lambda: {key: [] for key in portray_data})
 
-    # Plot each group with the same marker
-    for marker, data in grouped_data.items():
-        space_ax.scatter(data["x"], data["y"], s=data["s"], c=data["c"], marker=marker)
+    for i, marker in enumerate(markers):
+        for key in portray_data:
+            # apply colormap
+            if cmap and key == "c":
+                color = portray_data[key][i]
+
+                # TODO: break into helper functions for readability
+                # apply color map if not RGB(A) format or color string (mimicking default matplotlib behavior)
+                if not (
+                    isinstance(color, str)  # str format
+                    or (
+                        (len(color) == 3 or len(color) == 4)  # RGB(A)
+                        and (
+                            all(
+                                # all floats, valid RGB(A)
+                                isinstance(c, (int, float)) and 0 <= c <= 1
+                                for c in color
+                            )
+                        )
+                    )
+                ):
+                    color = get_cmap(cmap[i])(color)
+
+                grouped_data[marker][key].append(color)
+            elif key != "cmap":  # do nothing special, don't pass on color maps
+                grouped_data[marker][key].append(portray_data[key][i])
+
+    print(grouped_data)
 
 
 def _draw_grid(space, space_ax, agent_portrayal):
     def portray(g):
-        x = []
-        y = []
-        s = []  # size
-        c = []  # color
-        m = []  # shape
-        for i in range(g.width):
-            for j in range(g.height):
-                content = g._grid[i][j]
-                if not content:
-                    continue
-                if not hasattr(content, "__iter__"):
-                    # Is a single grid
-                    content = [content]
-                for agent in content:
-                    data = agent_portrayal(agent)
-                    x.append(i)
-                    y.append(j)
 
-                    # This is the default value for the marker size, which auto-scales
-                    # according to the grid area.
-                    default_size = (180 / max(g.width, g.height)) ** 2
-                    # establishing a default prevents misalignment if some agents are not given size, color, etc.
-                    size = data.get("size", default_size)
-                    s.append(size)
-                    color = data.get("color", "tab:blue")
-                    c.append(color)
-                    mark = data.get("shape", "o")
-                    m.append(mark)
-        out = {"x": x, "y": y, "s": s, "c": c, "m": m}
+        default_values = {
+            "size": (180 / max(g.width, g.height)) ** 2,
+        }
+
+        out = {}
+
+        # used to initialize lists for alignment purposes
+        num_agents = len(space._agent_to_index)
+
+        for i, agent in enumerate(space._agent_to_index):
+            data = agent_portrayal(agent)
+
+            for key, value in data.items():
+                if key not in out:
+                    # initialize list
+                    out[key] = [default_values.get(key, default=None)] * num_agents
+                out[key][i] = value
+
         return out
 
     space_ax.set_xlim(-1, space.width)
     space_ax.set_ylim(-1, space.height)
+
+    # portray and scatter the agents in the space
     _split_and_scatter(portray(space), space_ax)
 
 
@@ -109,27 +119,25 @@ def _draw_network_grid(space, space_ax, agent_portrayal):
 
 def _draw_continuous_space(space, space_ax, agent_portrayal):
     def portray(space):
-        x = []
-        y = []
-        s = []  # size
-        c = []  # color
-        m = []  # shape
-        for agent in space._agent_to_index:
-            data = agent_portrayal(agent)
-            _x, _y = agent.pos
-            x.append(_x)
-            y.append(_y)
 
-            # This is matplotlib's default marker size
-            default_size = 20
-            # establishing a default prevents misalignment if some agents are not given size, color, etc.
-            size = data.get("size", default_size)
-            s.append(size)
-            color = data.get("color", "tab:blue")
-            c.append(color)
-            mark = data.get("shape", "o")
-            m.append(mark)
-        out = {"x": x, "y": y, "s": s, "c": c, "m": m}
+        default_values = {
+            "size": 20,
+        }
+
+        out = {}
+
+        # used to initialize lists for alignment purposes
+        num_agents = len(space._agent_to_index)
+
+        for i, agent in enumerate(space._agent_to_index):
+            data = agent_portrayal(agent)
+
+            for key, value in data.items():
+                if key not in out:
+                    # initialize list
+                    out[key] = [default_values.get(key, default=None)] * num_agents
+                out[key][i] = value
+
         return out
 
     # Determine border style based on space.torus
@@ -148,7 +156,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
     space_ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
     space_ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
-    # Portray and scatter the agents in the space
+    # portray and scatter the agents in the space
     _split_and_scatter(portray(space), space_ax)
 
 
