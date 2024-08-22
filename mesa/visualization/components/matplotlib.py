@@ -27,8 +27,15 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = Non
     solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
 
 
+# used to make non(less?)-breaking change
+# this *does* however block the matplotlib 'color' param which is distinct from 'c'.
+def _translate_old_keywords(dict):
+    key_mapping: dict[str, str] = {"size": "s", "color": "c", "shape": "marker"}
+    return {key_mapping.get(key, key): val for (key, val) in dict.items()}
+
+
 # matplotlib scatter does not allow for multiple shapes in one call
-def _split_and_scatter(space_ax, portray_data) -> None:
+def _split_and_scatter(portray_data, space_ax) -> None:
     cmap = portray_data.pop("cmap", None)
 
     # enforce marker iterability
@@ -51,16 +58,16 @@ def _split_and_scatter(space_ax, portray_data) -> None:
             if cmap and key == "c":
                 color = portray_data[key][i]
 
-                # TODO: break into helper functions for readability
-                # apply color map if not RGB(A) format or color string (mimicking default matplotlib behavior)
+                # TODO: somehow format differently, black formatter makes this very ugly
+                # apply color map if not RGB(A) or string format (mimicking default matplotlib behavior)
                 if not (
-                    isinstance(color, str)  # str format
+                    isinstance(color, str)  # string format color ('tab:blue')
                     or (
-                        (len(color) == 3 or len(color) == 4)  # RGB(A)
+                        (len(color) in {3, 4})
                         and (
                             all(
-                                # all floats, valid RGB(A)
-                                isinstance(c, (int, float)) and 0 <= c <= 1
+                                # all floats, then RGB(A)
+                                isinstance(c, (int, float))
                                 for c in color
                             )
                         )
@@ -72,7 +79,8 @@ def _split_and_scatter(space_ax, portray_data) -> None:
             elif key != "cmap":  # do nothing special, don't pass on color maps
                 grouped_data[marker][key].append(portray_data[key][i])
 
-    print(grouped_data)
+    for marker, data in grouped_data.items():
+        space_ax.scatter(marker=marker, **data)
 
 
 def _draw_grid(space, space_ax, agent_portrayal):
@@ -84,19 +92,40 @@ def _draw_grid(space, space_ax, agent_portrayal):
 
         out = {}
 
+        # TODO: find way to avoid iterating twice
         # used to initialize lists for alignment purposes
-        num_agents = len(space._agent_to_index)
+        num_agents = 0
+        for i in range(g.width):
+            for j in range(g.height):
+                content = g._grid[i][j]
+                if not content:
+                    continue
+                if not hasattr(content, "__iter__"):
+                    num_agents += 1
+                    continue
+                num_agents += len(content)
 
-        for i, agent in enumerate(space._agent_to_index):
-            data = agent_portrayal(agent)
+        index = 0
+        for i in range(g.width):
+            for j in range(g.height):
+                content = g._grid[i][j]
+                if not content:
+                    continue
+                if not hasattr(content, "__iter__"):
+                    # Is a single grid
+                    content = [content]
+                for agent in content:
+                    data = agent_portrayal(agent)
+                    data["x"] = i
+                    data["y"] = j
 
-            for key, value in data.items():
-                if key not in out:
-                    # initialize list
-                    out[key] = [default_values.get(key, default=None)] * num_agents
-                out[key][i] = value
-
-        return out
+                    for key, value in data.items():
+                        if key not in out:
+                            # initialize list
+                            out[key] = [default_values.get(key, None)] * num_agents
+                        out[key][index] = value
+                    index += 1
+        return _translate_old_keywords(out)
 
     space_ax.set_xlim(-1, space.width)
     space_ax.set_ylim(-1, space.height)
@@ -120,8 +149,11 @@ def _draw_network_grid(space, space_ax, agent_portrayal):
 def _draw_continuous_space(space, space_ax, agent_portrayal):
     def portray(space):
 
+        # TODO: look into if more default values are needed
+        #   especially relating to 'color', 'facecolor', and 'c' params &
+        #   interactions w/ the current implementation of _split_and_scatter
         default_values = {
-            "size": 20,
+            "s": 20,
         }
 
         out = {}
@@ -131,6 +163,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
 
         for i, agent in enumerate(space._agent_to_index):
             data = agent_portrayal(agent)
+            data["x"], data["y"] = agent.pos
 
             for key, value in data.items():
                 if key not in out:
@@ -138,7 +171,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
                     out[key] = [default_values.get(key, default=None)] * num_agents
                 out[key][i] = value
 
-        return out
+        return _translate_old_keywords(out)
 
     # Determine border style based on space.torus
     border_style = "solid" if not space.torus else (0, (5, 10))
