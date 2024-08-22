@@ -226,24 +226,63 @@ class AgentSet(MutableSet, Sequence):
         self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
         return self
 
-    def do(
-        self, method: str | Callable, *args, return_results: bool = False, **kwargs
-    ) -> AgentSet | list[Any]:
+    def do(self, method: str | Callable, *args, **kwargs) -> AgentSet:
         """
         Invoke a method or function on each agent in the AgentSet.
 
         Args:
-            method (str, callable): the callable to do on each agents
+            method (str, callable): the callable to do on each agent
 
                                         * in case of str, the name of the method to call on each agent.
                                         * in case of callable, the function to be called with each agent as first argument
 
-            return_results (bool, optional): If True, returns the results of the method calls; otherwise, returns the AgentSet itself. Defaults to False, so you can chain method calls.
             *args: Variable length argument list passed to the callable being called.
             **kwargs: Arbitrary keyword arguments passed to the callable being called.
 
         Returns:
             AgentSet | list[Any]: The results of the callable calls if return_results is True, otherwise the AgentSet itself.
+        """
+        try:
+            return_results = kwargs.pop("return_results")
+        except KeyError:
+            return_results = False
+        else:
+            warnings.warn(
+                "Using return_results is deprecated. Use AgenSet.do in case of return_results=False, and "
+                "AgentSet.map in case of return_results=True",
+                stacklevel=2,
+            )
+
+        if return_results:
+            return self.map(method, *args, **kwargs)
+
+        # we iterate over the actual weakref keys and check if weakref is alive before calling the method
+        if isinstance(method, str):
+            for agentref in self._agents.keyrefs():
+                if (agent := agentref()) is not None:
+                    getattr(agent, method)(*args, **kwargs)
+        else:
+            for agentref in self._agents.keyrefs():
+                if (agent := agentref()) is not None:
+                    method(agent, *args, **kwargs)
+
+        return self
+
+    def map(self, method: str | Callable, *args, **kwargs) -> list[Any]:
+        """
+        Invoke a method or function on each agent in the AgentSet and return the results.
+
+        Args:
+            method (str, callable): the callable to apply on each agent
+
+                                        * in case of str, the name of the method to call on each agent.
+                                        * in case of callable, the function to be called with each agent as first argument
+
+            *args: Variable length argument list passed to the callable being called.
+            **kwargs: Arbitrary keyword arguments passed to the callable being called.
+
+        Returns:
+           list[Any]: The results of the callable calls
         """
         # we iterate over the actual weakref keys and check if weakref is alive before calling the method
         if isinstance(method, str):
@@ -259,7 +298,7 @@ class AgentSet(MutableSet, Sequence):
                 if (agent := agentref()) is not None
             ]
 
-        return res if return_results else self
+        return res
 
     def get(self, attr_names: str | list[str]) -> list[Any]:
         """
