@@ -24,7 +24,7 @@ class Cell(mesa.Agent):
     def neighbors(self):
         return self.model.grid.iter_neighbors((self.x, self.y), True)
 
-    def determine_state(self):
+    def step(self):
         """
         Compute if the cell will be dead or alive at the next tick.  This is
         based on the number of alive or dead neighbors.  The state is not
@@ -46,7 +46,7 @@ class Cell(mesa.Agent):
             if live_neighbors == 3:
                 self._nextState = self.ALIVE
 
-    def assume_state(self):
+    def advance(self):
         """
         Set the state to the new computed state -- computed in step().
         """
