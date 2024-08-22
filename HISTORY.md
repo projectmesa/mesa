@@ -1,6 +1,37 @@
 ---
 title: Release History
 ---
+# 3.0.0a2 (2024-08-21)
+## Highlights
+In Mesa 3.0 alpha 2 (`v3.0.0a2`) we've done more clean-up in preparation for Mesa 3.0. We now [require](https://github.com/projectmesa/mesa/pull/2218) `super().__init__()`  to run on initializing a Mesa model subclass, `Model.agents` is now fully reserved for the Model's internal AgentSet and we fixed a bug in our Solara space_drawer.
+
+A new feature was added in [#2219](https://github.com/projectmesa/mesa/pull/2219), which now also allows `AgentSet.do()` to take any callable function, instead of only a string referencing to an Agent method. The argument name was changed from `method_name` to `method`.
+
+The new Solara visualisation now allows portraying agents in different shapes, checkout some examples in [#2214](https://github.com/projectmesa/mesa/pull/2214).
+
+We're also working hard on our [example models](https://github.com/projectmesa/mesa-examples). All model warnings were [resolved](https://github.com/projectmesa/mesa-examples/pull/153) and we've [replaced](https://github.com/projectmesa/mesa-examples/pull/161) a lot of schedulers with simpler and more flexible AgentSet functionality. Checkout our [open issues](https://github.com/projectmesa/mesa-examples/issues) if you want to help improve our example models further!
+
+## What's Changed
+### ⚠️ Breaking changes
+* breaking: Add dependencies argument to custom space_drawer by @rht in https://github.com/projectmesa/mesa/pull/2209
+* Require Mesa models to be initialized with `super().__init__()` by @EwoutH in https://github.com/projectmesa/mesa/pull/2218
+* Allow AgentSet.do() to take Callable function by @quaquel in https://github.com/projectmesa/mesa/pull/2219
+* Change warning when setting model.agents to error by @EwoutH in https://github.com/projectmesa/mesa/pull/2225
+### 🧪 Experimental features
+* devs/eventlist: Add repr method to print EventList pretty by @EwoutH in https://github.com/projectmesa/mesa/pull/2195
+### 🛠 Enhancements made
+* Visualisation: Allow specifying Agent shapes in agent_portrayal by @rmhopkins4 in https://github.com/projectmesa/mesa/pull/2214
+### 📜 Documentation improvements
+* docs/conf.py: Use modern `intersphinx_mapping` format by @EwoutH in https://github.com/projectmesa/mesa/pull/2206
+* docs: Update Readme and tutorials to mention Mesa 3.0 pre-releases by @EwoutH in https://github.com/projectmesa/mesa/pull/2203
+### 🔧 Maintenance
+* CI: Let pytest treat warnings as errors for examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2204
+
+## New Contributors
+* @rmhopkins4 made their first contribution in https://github.com/projectmesa/mesa/pull/2214
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a1...v3.0.0a2
+
 # 3.0.0a1 (2024-08-01)
 ## Highlights
 Mesa 3.0 alpha 1 (`v3.0.0a1`) is another step towards our next major version. This release introduces a name change from JupyterViz (jupyter_viz) to SolaraViz (solara_viz), to better represent the tech stack being used. It also includes two bugfixes also present in 2.3.2.
