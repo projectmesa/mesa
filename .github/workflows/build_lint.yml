@@ -34,6 +34,8 @@ jobs:
         python-version: ["3.12"]
         include:
           - os: ubuntu
+            python-version: "3.13"
+          - os: ubuntu
             python-version: "3.11"
           - os: ubuntu
             python-version: "3.10"
@@ -47,12 +49,16 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
         cache: 'pip'
     - name: Install uv
       run: pip install uv
-    - name: Install Mesa
-      # See https://github.com/astral-sh/uv/issues/1945
+    - name: Install Mesa with uv pip
       run: uv pip install --system .[dev]
+      if: matrix.python-version != '3.13'
+    - name: Install Mesa with pip
+      run: pip install .[dev]
+      if: matrix.python-version == '3.13'
     - name: Test with pytest
       run: pytest --durations=10 --cov=mesa tests/ --cov-report=xml
     - if: matrix.os == 'ubuntu'
