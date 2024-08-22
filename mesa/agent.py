@@ -240,12 +240,12 @@ class AgentSet(MutableSet, Sequence):
         else:
             warnings.warn(
                 "Using return_results is deprecated. Use AgenSet.do in case of return_results=False, and "
-                "AgentSet.apply in case of return_results=True",
+                "AgentSet.map in case of return_results=True",
                 stacklevel=2,
             )
 
         if return_results:
-            return self.apply(method, *args, **kwargs)
+            return self.map(method, *args, **kwargs)
 
         # we iterate over the actual weakref keys and check if weakref is alive before calling the method
         if isinstance(method, str):
