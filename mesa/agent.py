@@ -412,8 +412,8 @@ class GroupBy:
     def __init__(self, groups: dict[Any, list | AgentSet]):
         self.groups: dict[Any, list | AgentSet] = groups
 
-    def apply(self, method: Callable | str, *args, **kwargs) -> dict[Any, Any]:
-        """Apply the specified callable to each group
+    def map(self, method: Callable | str, *args, **kwargs) -> dict[Any, Any]:
+        """Apply the specified callable to each group and return the results.
 
         Args:
             method (Callable, str): The callable to apply to each group,
