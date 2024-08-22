@@ -421,7 +421,116 @@ class AgentSet(MutableSet, Sequence):
         """
         return self.model.random
 
+    def groupby(self, by: Callable | str, result_type: str = "agentset") -> GroupBy:
+        """
+        Group agents by the specified attribute or return from the callable
 
-# consider adding for performance reasons
-# for Sequence: __reversed__, index, and count
-# for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__
+        Args:
+            by (Callable, str): used to determine what to group agents by
+
+                                * if ``by`` is a callable, it will be called for each agent and the return is used
+                                  for grouping
+                                * if ``by`` is a str, it should refer to an attribute on the agent and the value
+                                  of this attribute will be used for grouping
+            result_type (str, optional): The datatype for the resulting groups {"agentset", "list"}
+        Returns:
+            GroupBy
+
+
+        Notes:
+        There might be performance benefits to using `result_type='list'` if you don't need the advanced functionality
+        of an AgentSet.
+
+        """
+        groups = defaultdict(list)
+
+        if isinstance(by, Callable):
+            for agent in self:
+                groups[by(agent)].append(agent)
+        else:
+            for agent in self:
+                groups[getattr(agent, by)].append(agent)
+
+        if result_type == "agentset":
+            return GroupBy(
+                {k: AgentSet(v, model=self.model) for k, v in groups.items()}
+            )
+        else:
+            return GroupBy(groups)
+
+    # consider adding for performance reasons
+    # for Sequence: __reversed__, index, and count
+    # for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__
+
+
+class GroupBy:
+    """Helper class for AgentSet.groupby
+
+
+    Attributes:
+        groups (dict): A dictionary with the group_name as key and group as values
+
+    """
+
+    def __init__(self, groups: dict[Any, list | AgentSet]):
+        self.groups: dict[Any, list | AgentSet] = groups
+
+    def map(self, method: Callable | str, *args, **kwargs) -> dict[Any, Any]:
+        """Apply the specified callable to each group and return the results.
+
+        Args:
+            method (Callable, str): The callable to apply to each group,
+
+                                    * if ``method`` is a callable, it will be called it will be called with the group as first argument
+                                    * if ``method`` is a str, it should refer to a method on the group
+
+                                    Additional arguments and keyword arguments will be passed on to the callable.
+
+        Returns:
+            dict with group_name as key and the return of the method as value
+
+        Notes:
+            this method is useful for methods or functions that do return something. It
+            will break method chaining. For that, use ``do`` instead.
+
+        """
+        if isinstance(method, str):
+            return {
+                k: getattr(v, method)(*args, **kwargs) for k, v in self.groups.items()
+            }
+        else:
+            return {k: method(v, *args, **kwargs) for k, v in self.groups.items()}
+
+    def do(self, method: Callable | str, *args, **kwargs) -> GroupBy:
+        """Apply the specified callable to each group
+
+        Args:
+            method (Callable, str): The callable to apply to each group,
+
+                                    * if ``method`` is a callable, it will be called it will be called with the group as first argument
+                                    * if ``method`` is a str, it should refer to a method on the group
+
+                                    Additional arguments and keyword arguments will be passed on to the callable.
+
+        Returns:
+            the original GroupBy instance
+
+        Notes:
+            this method is useful for methods or functions that don't return anything and/or
+            if you want to chain multiple do calls
+
+        """
+        if isinstance(method, str):
+            for v in self.groups.values():
+                getattr(v, method)(*args, **kwargs)
+        else:
+            for v in self.groups.values():
+                method(v, *args, **kwargs)
+
+        return self
+
+    def __iter__(self):
+        return iter(self.groups.items())
+
+    def __len__(self):
+        return len(self.groups)

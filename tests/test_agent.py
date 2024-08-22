@@ -395,3 +395,45 @@ def test_agentset_shuffle():
     agentset = AgentSet(test_agents, model=model)
     agentset.shuffle(inplace=True)
     assert not all(a1 == a2 for a1, a2 in zip(test_agents, agentset))
+
+
+def test_agentset_groupby():
+    class TestAgent(Agent):
+        def __init__(self, unique_id, model):
+            super().__init__(unique_id, model)
+            self.even = self.unique_id % 2 == 0
+
+        def get_unique_identifier(self):
+            return self.unique_id
+
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+
+    groups = agentset.groupby("even")
+    assert len(groups.groups[True]) == 5
+    assert len(groups.groups[False]) == 5
+
+    groups = agentset.groupby(lambda a: a.unique_id % 2 == 0)
+    assert len(groups.groups[True]) == 5
+    assert len(groups.groups[False]) == 5
+    assert len(groups) == 2
+
+    for group_name, group in groups:
+        assert len(group) == 5
+        assert group_name in {True, False}
+
+    sizes = agentset.groupby("even", result_type="list").map(len)
+    assert sizes == {True: 5, False: 5}
+
+    attributes = agentset.groupby("even", result_type="agentset").map("get", "even")
+    for group_name, group in attributes.items():
+        assert all(group_name == entry for entry in group)
+
+    groups = agentset.groupby("even", result_type="agentset")
+    another_ref_to_groups = groups.do("do", "step")
+    assert groups == another_ref_to_groups
+
+    groups = agentset.groupby("even", result_type="agentset")
+    another_ref_to_groups = groups.do(lambda x: x.do("step"))
+    assert groups == another_ref_to_groups
