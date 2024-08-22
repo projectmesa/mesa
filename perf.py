@@ -23,7 +23,7 @@ class MoneyAgent(mesa.Agent):
     def step(self):
         # Verify agent has some wealth
         if self.wealth > 0:
-            other_agent = self.random.choice(list(itertools.chain.from_iterable(self.model.agents_by_type.values())))
+            other_agent = self.random.choice(self.model.schedule.agents)
             if other_agent is not None:
                 other_agent.wealth += 1
                 self.wealth -= 1
@@ -74,7 +74,7 @@ class MoneyTestAgent(mesa.Agent):
     def step(self):
         # Verify agent has some wealth
         if self.wealth > 0:
-            other_agent = self.random.choice(self.model.my_agents)
+            other_agent = self.random.choice(self.model.agents)
             if other_agent is not None:
                 other_agent.wealth += 1
                 self.wealth -= 1
@@ -158,8 +158,8 @@ def main():
     out = perfplot.bench(
         setup=lambda n: n,
         kernels=[mesa_original_implementation, mesa_test_implementation, mesa_list_implementation],
-        labels=["itertools", "test", "list"],
-        n_range=[k for k in range(10, 1000, 500)],
+        labels=["original", "updated", "list"],
+        n_range=[k for k in range(10, 1000, 100)],
         xlabel="Number of agents",
         equality_check=None,
         title="100 steps of the Boltzmann Wealth model",

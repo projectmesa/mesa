@@ -9,6 +9,7 @@ Core Objects: Model
 from __future__ import annotations
 
 import itertools
+import functools
 import random
 from collections import defaultdict
 
@@ -79,10 +80,14 @@ class Model:
 
     def _setup_agent_registration(self):
         self._agents_by_type: defaultdict[type, dict] = defaultdict(dict)
-        self.agents_by_type: dict[type, AgentSet] = {}
+
+        def hack():
+            return AgentSet([], self)
+
+        self.agents_by_type: defaultdict[type, AgentSet] = defaultdict(hack)
         self._all_agents = set()
-        self.all_agents = None
-        self._agent_added_flag = True
+        self.all_agents = AgentSet([], self)
+
 
     @property
     def agents(self) -> AgentSet:
@@ -91,8 +96,6 @@ class Model:
         if hasattr(self, "_agents"):
             return self._agents
         else:
-            if self._agent_added_flag:
-                self.all_agents = AgentSet(itertools.chain.from_iterable(self.agents_by_type.values(), self))
             return self.all_agents
 
     @agents.setter
@@ -112,14 +115,11 @@ class Model:
 
     def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
         """Retrieves an AgentSet containing all agents of the specified type."""
-        if self._agent_added_flag:
-            self.agents_by_type = {k:AgentSet(v.keys(), self) for k,v in self._agents_by_type.items()}
-
         return self.agents_by_type[agenttype]
 
 
     def register_agent(self, agent):
-        if not hasattr(self, "_agent_added_flag"):
+        if not hasattr(self, "_all_agents"):
             self._setup_agent_registration()
 
             warnings.warn(
@@ -130,7 +130,9 @@ class Model:
 
         self._agents_by_type[type(agent)][agent] = None
         self.agentset_experimental_warning_given = False
-        self._agent_added_flag = True
+
+        self.agents_by_type[type(agent)].add(agent)
+        self.all_agents.add(agent)
 
 
     def run_model(self) -> None:
