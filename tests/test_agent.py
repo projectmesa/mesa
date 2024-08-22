@@ -270,7 +270,7 @@ def test_agentset_do_callable():
     assert len(agentset) == 0
 
 
-def test_agentset_apply_str():
+def test_agentset_map_str():
     model = Model()
     agents = [TestAgent(model.next_id(), model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -278,24 +278,24 @@ def test_agentset_apply_str():
     with pytest.raises(AttributeError):
         agentset.do("non_existing_method")
 
-    results = agentset.apply("get_unique_identifier")
+    results = agentset.map("get_unique_identifier")
     assert all(i == entry for i, entry in zip(results, range(1, 11)))
 
 
-def test_agentset_apply_callable():
+def test_agentset_map_callable():
     model = Model()
     agents = [TestAgent(model.next_id(), model) for _ in range(10)]
     agentset = AgentSet(agents, model)
 
     # Test callable with non-existent function
     with pytest.raises(AttributeError):
-        agentset.apply(lambda agent: agent.non_existing_method())
+        agentset.map(lambda agent: agent.non_existing_method())
 
     # tests for addition and removal in do using callables
     # do iterates, so no error should be raised to change size while iterating
     # related to issue #1595
 
-    results = agentset.apply(lambda agent: agent.unique_id)
+    results = agentset.map(lambda agent: agent.unique_id)
     assert all(i == entry for i, entry in zip(results, range(1, 11)))
 
 
