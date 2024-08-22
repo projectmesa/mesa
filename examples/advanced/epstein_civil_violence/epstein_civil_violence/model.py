@@ -58,7 +58,7 @@ class EpsteinCivilViolence(mesa.Model):
         self.movement = movement
         self.max_iters = max_iters
         self.iteration = 0
-
+        self.schedule = mesa.time.RandomActivation(self)
         self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
         model_reporters = {
@@ -86,7 +86,7 @@ class EpsteinCivilViolence(mesa.Model):
                 cop = Cop(unique_id, self, (x, y), vision=self.cop_vision)
                 unique_id += 1
                 self.grid[x][y] = cop
-
+                self.schedule.add(cop)
             elif self.random.random() < (self.cop_density + self.citizen_density):
                 citizen = Citizen(
                     unique_id,
@@ -100,6 +100,7 @@ class EpsteinCivilViolence(mesa.Model):
                 )
                 unique_id += 1
                 self.grid[x][y] = citizen
+                self.schedule.add(citizen)
 
         self.running = True
         self.datacollector.collect(self)
@@ -108,7 +109,7 @@ class EpsteinCivilViolence(mesa.Model):
         """
         Advance the model by one step and collect data.
         """
-        self.agents.shuffle().do("step")
+        self.schedule.step()
         # collect data
         self.datacollector.collect(self)
         self.iteration += 1
@@ -121,7 +122,7 @@ class EpsteinCivilViolence(mesa.Model):
         Helper method to count agents by Quiescent/Active.
         """
         count = 0
-        for agent in model.agents:
+        for agent in model.schedule.agents:
             if agent.breed == "cop":
                 continue
             if exclude_jailed and agent.jail_sentence > 0:
@@ -136,7 +137,7 @@ class EpsteinCivilViolence(mesa.Model):
         Helper method to count jailed agents.
         """
         count = 0
-        for agent in model.agents:
+        for agent in model.schedule.agents:
             if agent.breed == "citizen" and agent.jail_sentence > 0:
                 count += 1
         return count
@@ -147,7 +148,7 @@ class EpsteinCivilViolence(mesa.Model):
         Helper method to count jailed agents.
         """
         count = 0
-        for agent in model.agents:
+        for agent in model.schedule.agents:
             if agent.breed == "cop":
                 count += 1
         return count
