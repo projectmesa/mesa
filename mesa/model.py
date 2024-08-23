@@ -48,7 +48,7 @@ class Model:
         initialize_data_collector: Sets up the data collector for the model, requiring an initialized scheduler and agents.
     """
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, seed: float | None = None, **kwargs: Any) -> None:
         """Create a new model. Overload this method with the actual code to
         start the model. Always start with super().__init__() to initialize the
         model object properly.
@@ -59,7 +59,7 @@ class Model:
         self.current_id = 0
         self.agents_: defaultdict[type, dict] = defaultdict(dict)
 
-        self._seed = kwargs.get("seed")
+        self._seed = seed
         if self._seed is None:
             # We explicitly specify the seed here so that we know its value in
             # advance.
