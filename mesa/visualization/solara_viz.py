@@ -58,7 +58,6 @@ def Card(
         style_=f"background-color: {color}; width: 100%; height: 100%"
     ) as main:
         if "Space" in layout_type:
-            rv.CardTitle(children=["Space"])
             if space_drawer == "default":
                 # draw with the default implementation
                 components_matplotlib.SpaceMatplotlib(
@@ -72,7 +71,6 @@ def Card(
                 # if specified, draw agent space with an alternate renderer
                 space_drawer(model, agent_portrayal, dependencies=dependencies)
         elif "Measure" in layout_type:
-            rv.CardTitle(children=["Measure"])
             measure = measures[layout_type["Measure"]]
             if callable(measure):
                 # Is a custom object
