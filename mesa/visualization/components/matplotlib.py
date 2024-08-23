@@ -29,7 +29,8 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = Non
 
 
 # used to make non(less?)-breaking change
-# this *does* however block the matplotlib 'color' param which is distinct from 'c'.
+# this *does* however block the matplotlib 'color' param which is somewhat distinct from 'c'.
+# maybe translate 'size' and 'shape' but not 'color'?
 def _translate_old_keywords(data):
     """
     Translates old keyword names in the given dictionary to the new names.
