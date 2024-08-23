@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-from matplotlib.pylab import norm
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 from matplotlib.figure import Figure
@@ -8,6 +7,7 @@ from matplotlib.ticker import MaxNLocator
 import networkx as nx
 import solara
 import mesa
+from mesa.space import GridContent
 
 
 @solara.component
@@ -110,16 +110,14 @@ def _draw_grid(space, space_ax, agent_portrayal):
         }
 
         out = {}
-        num_agents = 0  # TODO: find way to avoid iterating twice
-        for i in range(g.width):
-            for j in range(g.height):
-                content = g._grid[i][j]
-                if not content:
-                    continue
-                if not hasattr(content, "__iter__"):
-                    num_agents += 1
-                    continue
-                num_agents += len(content)
+        num_agents = 0
+        for content in g:
+            if not content:
+                continue
+            if isinstance(content, GridContent):  # one agent
+                num_agents += 1
+                continue
+            num_agents += len(content)
 
         index = 0
         for i in range(g.width):
