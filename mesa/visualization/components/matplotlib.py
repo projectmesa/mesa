@@ -1,12 +1,11 @@
 from collections import defaultdict
 
+import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
-import networkx as nx
-import solara
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
-from matplotlib.pyplot import get_cmap
-
+import networkx as nx
+import solara
 import mesa
 
 
@@ -30,21 +29,23 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = Non
 
 # used to make non(less?)-breaking change
 # this *does* however block the matplotlib 'color' param which is distinct from 'c'.
-def _translate_old_keywords(dict):
-    key_mapping: dict[str, str] = {"size": "s", "color": "c", "shape": "marker"}
-    return {key_mapping.get(key, key): val for (key, val) in dict.items()}
+def _translate_old_keywords(data):
+    """
+    Translates old keyword names in the given dictionary to the new names.
+    """
+    key_mapping = {"size": "s", "color": "c", "shape": "marker"}
+    return {key_mapping.get(key, key): val for (key, val) in data.items()}
 
 
 # matplotlib scatter does not allow for multiple shapes in one call
-def _split_and_scatter(portray_data, space_ax) -> None:
+def _split_and_scatter(portray_data: dict, space_ax) -> None:
     cmap = portray_data.pop("cmap", None)
     norm = portray_data.pop("norm", None)
 
     # enforce marker iterability
     markers = portray_data.pop("marker", ["o"] * len(portray_data["x"]))
     # enforce default color
-    # if no 'color' or 'facecolor' or 'c' then default to "tab:blue" color
-    if (
+    if (  # if no 'color' or 'facecolor' or 'c' then default to "tab:blue" color
         "color" not in portray_data
         and "facecolor" not in portray_data
         and "c" not in portray_data
@@ -64,16 +65,16 @@ def _split_and_scatter(portray_data, space_ax) -> None:
                     if norm:
                         if not isinstance(
                             norm[i], Normalize
-                        ):  # does not support string norms (yet?)
+                        ):  # string param norms not yet supported
                             raise TypeError(
-                                "'norm' param must be of type Normalize or a subclass."
+                                "'norm' must be an instance of Normalize or its subclasses."
                             )
-                        else:
-                            color = norm[i](color)
-                    color = get_cmap(cmap[i])(color)
+                        color = norm[i](color)
+                    color = plt.get_cmap(cmap[i])(color)
                 grouped_data[marker][key].append(color)
-            elif (
-                key != "cmap" and key != "norm"
+            elif key not in (
+                "cmap",
+                "norm",
             ):  # do nothing special, don't pass on color maps
                 grouped_data[marker][key].append(portray_data[key][i])
 
@@ -89,10 +90,7 @@ def _draw_grid(space, space_ax, agent_portrayal):
         }
 
         out = {}
-
-        # TODO: find way to avoid iterating twice
-        # used to initialize lists for alignment purposes
-        num_agents = 0
+        num_agents = 0  # TODO: find way to avoid iterating twice
         for i in range(g.width):
             for j in range(g.height):
                 content = g._grid[i][j]
@@ -129,7 +127,6 @@ def _draw_grid(space, space_ax, agent_portrayal):
     space_ax.set_xlim(-1, space.width)
     space_ax.set_ylim(-1, space.height)
 
-    # portray and scatter the agents in the space
     _split_and_scatter(portray(space), space_ax)
 
 
@@ -151,13 +148,8 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
         # TODO: look into if more default values are needed
         #   especially relating to 'color', 'facecolor', and 'c' params &
         #   interactions w/ the current implementation of _split_and_scatter
-        default_values = {
-            "s": 20,
-        }
-
+        default_values = {"s": 20}
         out = {}
-
-        # used to initialize lists for alignment purposes
         num_agents = len(space._agent_to_index)
 
         for i, agent in enumerate(space._agent_to_index):
@@ -165,8 +157,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
             data["x"], data["y"] = agent.pos
 
             for key, value in data.items():
-                if key not in out:
-                    # initialize list
+                if key not in out:  # initialize list
                     out[key] = [default_values.get(key, default=None)] * num_agents
                 out[key][i] = value
 
@@ -188,7 +179,6 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
     space_ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
     space_ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
-    # portray and scatter the agents in the space
     _split_and_scatter(portray(space), space_ax)
 
 
