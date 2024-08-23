@@ -1,11 +1,12 @@
 from collections import defaultdict
 
 import matplotlib.pyplot as plt
+import networkx as nx
+import solara
 from matplotlib.colors import Normalize
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
-import networkx as nx
-import solara
+
 import mesa
 from mesa.space import GridContent
 
@@ -83,7 +84,6 @@ def _split_and_scatter(portray_data: dict, space_ax) -> None:
     grouped_data = defaultdict(lambda: {key: [] for key in portray_data})
 
     for i, marker in enumerate(markers):
-
         for key in portray_data:
             if key == "c":  # apply colormap if possible
                 # prepare arguments
@@ -104,7 +104,6 @@ def _split_and_scatter(portray_data: dict, space_ax) -> None:
 
 def _draw_grid(space, space_ax, agent_portrayal):
     def portray(g):
-
         default_values = {
             "size": (180 / max(g.width, g.height)) ** 2,
         }
@@ -136,7 +135,7 @@ def _draw_grid(space, space_ax, agent_portrayal):
                     for key, value in data.items():
                         if key not in out:
                             # initialize list
-                            out[key] = [default_values.get(key, None)] * num_agents
+                            out[key] = [default_values.get(key)] * num_agents
                         out[key][index] = value
                     index += 1
 
@@ -162,7 +161,6 @@ def _draw_network_grid(space, space_ax, agent_portrayal):
 
 def _draw_continuous_space(space, space_ax, agent_portrayal):
     def portray(space):
-
         # TODO: look into if more default values are needed
         #   especially relating to 'color', 'facecolor', and 'c' params &
         #   interactions w/ the current implementation of _split_and_scatter
