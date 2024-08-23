@@ -127,10 +127,8 @@ def SolaraViz(
     # 2. Set up Model
     def make_model():
         """Create a new model instance with current parameters and seed."""
-        model = model_class.__new__(
-            model_class, **model_parameters, seed=reactive_seed.value
-        )
-        model.__init__(**model_parameters)
+        model = model_class(**model_parameters)
+        model._seed = reactive_seed.value
         current_step.value = 0
         return model
 
