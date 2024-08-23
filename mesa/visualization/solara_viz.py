@@ -158,7 +158,11 @@ def SolaraViz(
         """Update the random seed for the model."""
         reactive_seed.value = model.random.random()
 
-    dependencies = [current_step.value, reactive_seed.value]
+    dependencies = [
+        *list(model_parameters.values()),
+        current_step.value,
+        reactive_seed.value,
+    ]
 
     # if space drawer is disabled, do not include it
     layout_types = [{"Space": "default"}] if space_drawer else []
