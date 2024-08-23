@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from matplotlib.colors import Normalize
 import networkx as nx
 import solara
 from matplotlib.figure import Figure
@@ -37,10 +38,10 @@ def _translate_old_keywords(dict):
 # matplotlib scatter does not allow for multiple shapes in one call
 def _split_and_scatter(portray_data, space_ax) -> None:
     cmap = portray_data.pop("cmap", None)
+    norm = portray_data.pop("norm", None)
 
     # enforce marker iterability
     markers = portray_data.pop("marker", ["o"] * len(portray_data["x"]))
-
     # enforce default color
     # if no 'color' or 'facecolor' or 'c' then default to "tab:blue" color
     if (
@@ -57,26 +58,23 @@ def _split_and_scatter(portray_data, space_ax) -> None:
             # apply colormap
             if cmap and key == "c":
                 color = portray_data[key][i]
-
-                # TODO: somehow format differently, black formatter makes this very ugly
-                # apply color map if not RGB(A) or string format (mimicking default matplotlib behavior)
-                if not (
-                    isinstance(color, str)  # string format color ('tab:blue')
-                    or (
-                        (len(color) in {3, 4})
-                        and (
-                            all(
-                                # all floats, then RGB(A)
-                                isinstance(c, (int, float))
-                                for c in color
+                # apply color map only if the color is numerical representation
+                # this ignores RGB(A) and string formats (mimicking default matplotlib behavior)
+                if isinstance(color, (int, float)):
+                    if norm:
+                        if not isinstance(
+                            norm[i], Normalize
+                        ):  # does not support string norms (yet?)
+                            raise TypeError(
+                                "'norm' param must be of type Normalize or a subclass."
                             )
-                        )
-                    )
-                ):
+                        else:
+                            color = norm[i](color)
                     color = get_cmap(cmap[i])(color)
-
                 grouped_data[marker][key].append(color)
-            elif key != "cmap":  # do nothing special, don't pass on color maps
+            elif (
+                key != "cmap" and key != "norm"
+            ):  # do nothing special, don't pass on color maps
                 grouped_data[marker][key].append(portray_data[key][i])
 
     for marker, data in grouped_data.items():
@@ -125,6 +123,7 @@ def _draw_grid(space, space_ax, agent_portrayal):
                             out[key] = [default_values.get(key, None)] * num_agents
                         out[key][index] = value
                     index += 1
+
         return _translate_old_keywords(out)
 
     space_ax.set_xlim(-1, space.width)
