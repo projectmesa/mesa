@@ -39,8 +39,11 @@ def _translate_old_keywords(data):
 
 # matplotlib scatter does not allow for multiple shapes in one call
 def _split_and_scatter(portray_data: dict, space_ax) -> None:
-    cmap = portray_data.pop("cmap", None)
-    norm = portray_data.pop("norm", None)
+    # if any cmaps are passed, this is true
+    cmap_exists = portray_data.get("cmap", None)
+    cmap = None
+    # if any norms are passed, this is true
+    norm_exists = portray_data.get("norm", None)
 
     # enforce marker iterability
     markers = portray_data.pop("marker", ["o"] * len(portray_data["x"]))
@@ -55,26 +58,32 @@ def _split_and_scatter(portray_data: dict, space_ax) -> None:
     grouped_data = defaultdict(lambda: {key: [] for key in portray_data})
 
     for i, marker in enumerate(markers):
+        if cmap_exists:
+            cmap = portray_data.get("cmap")[i]
         for key in portray_data:
-            # apply colormap
+            # apply colormap if applicable for this index
             if cmap and key == "c":
                 color = portray_data[key][i]
                 # apply color map only if the color is numerical representation
                 # this ignores RGB(A) and string formats (mimicking default matplotlib behavior)
                 if isinstance(color, (int, float)):
-                    if norm:
-                        if not isinstance(
-                            norm[i], Normalize
-                        ):  # string param norms not yet supported
-                            raise TypeError(
-                                "'norm' must be an instance of Normalize or its subclasses."
-                            )
-                        color = norm[i](color)
+                    if norm_exists:
+                        norm = portray_data.get("norm")[i]
+                        if norm:
+                            if not isinstance(
+                                norm, Normalize
+                            ):  # string param norms not yet supported
+                                raise TypeError(
+                                    "'norm' must be an instance of Normalize or its subclasses."
+                                )
+                            color = norm(color)
                     color = plt.get_cmap(cmap[i])(color)
                 grouped_data[marker][key].append(color)
             elif key not in (
                 "cmap",
                 "norm",
+                "vmin",
+                "vmax",
             ):  # do nothing special, don't pass on color maps
                 grouped_data[marker][key].append(portray_data[key][i])
 
