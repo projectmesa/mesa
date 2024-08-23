@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from matplotlib.pylab import norm
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 from matplotlib.figure import Figure
@@ -37,13 +38,36 @@ def _translate_old_keywords(data):
     return {key_mapping.get(key, key): val for (key, val) in data.items()}
 
 
+def _apply_color_map(color, cmap=None, norm=None, vmin=None, vmax=None):
+    """
+    Given parameters for manual colormap application, applies color map
+    according to default implementation in matplotlib
+    """
+    if not cmap:  # if no colormap is provided, return original color
+        return color
+    color_map = plt.get_cmap(cmap)
+    if norm:  # check if norm is provided and apply it
+        if not isinstance(norm, Normalize):
+            raise TypeError(
+                "'norm' must be an instance of Normalize or its subclasses."
+            )
+        return color_map(norm(color))
+    if not (vmin == None or vmax == None):  # check for custom norm params
+        new_norm = Normalize(vmin, vmax)
+        return color_map(new_norm(color))
+    try:
+        return color_map(color)
+    except Exception as e:
+        raise ValueError("Color mapping failed due to invalid arguments") from e
+
+
 # matplotlib scatter does not allow for multiple shapes in one call
 def _split_and_scatter(portray_data: dict, space_ax) -> None:
-    # if any cmaps are passed, this is true
-    cmap_exists = portray_data.get("cmap", None)
-    cmap = None
-    # if any norms are passed, this is true
-    norm_exists = portray_data.get("norm", None)
+    # if any of the following params are passed into portray(), this is true
+    cmap_exists = portray_data.pop("cmap", None)
+    norm_exists = portray_data.pop("norm", None)
+    vmin_exists = portray_data.pop("vmin", None)
+    vmax_exists = portray_data.pop("vmax", None)
 
     # enforce marker iterability
     markers = portray_data.pop("marker", ["o"] * len(portray_data["x"]))
@@ -58,34 +82,20 @@ def _split_and_scatter(portray_data: dict, space_ax) -> None:
     grouped_data = defaultdict(lambda: {key: [] for key in portray_data})
 
     for i, marker in enumerate(markers):
-        if cmap_exists:
-            cmap = portray_data.get("cmap")[i]
+
         for key in portray_data:
-            # apply colormap if applicable for this index
-            if cmap and key == "c":
-                color = portray_data[key][i]
-                # apply color map only if the color is numerical representation
-                # this ignores RGB(A) and string formats (mimicking default matplotlib behavior)
-                if isinstance(color, (int, float)):
-                    if norm_exists:
-                        norm = portray_data.get("norm")[i]
-                        if norm:
-                            if not isinstance(
-                                norm, Normalize
-                            ):  # string param norms not yet supported
-                                raise TypeError(
-                                    "'norm' must be an instance of Normalize or its subclasses."
-                                )
-                            color = norm(color)
-                    color = plt.get_cmap(cmap[i])(color)
-                grouped_data[marker][key].append(color)
-            elif key not in (
-                "cmap",
-                "norm",
-                "vmin",
-                "vmax",
-            ):  # do nothing special, don't pass on color maps
-                grouped_data[marker][key].append(portray_data[key][i])
+            if key == "c":  # apply colormap if possible
+                # prepare arguments
+                cmap = cmap_exists[i] if cmap_exists else None
+                norm = norm_exists[i] if norm_exists else None
+                vmin = vmin_exists[i] if vmin_exists else None
+                vmax = vmax_exists[i] if vmax_exists else None
+                # apply colormap with prepared arguments
+                portray_data["c"][i] = _apply_color_map(
+                    portray_data["c"][i], cmap, norm, vmin, vmax
+                )
+
+            grouped_data[marker][key].append(portray_data[key][i])
 
     for marker, data in grouped_data.items():
         space_ax.scatter(marker=marker, **data)
