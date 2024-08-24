@@ -449,7 +449,7 @@ def make_initial_grid_layout(layout_types):
         {
             "i": i,
             "w": 6,
-            "h": 10,
+            "h": 14,
             "moved": False,
             "x": 6 * (i % 2),
             "y": 16 * (i - i % 2),
