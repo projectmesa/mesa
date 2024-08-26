@@ -33,7 +33,6 @@ class Simulator:
         self.start_time = start_time
         self.time_unit = time_unit
 
-        self.time = self.start_time
         self.model = None
 
     def check_time_unit(self, time: int | float) -> bool: ...
@@ -47,11 +46,6 @@ class Simulator:
         """
         self.event_list.clear()
         self.model = model
-
-    def reset(self):
-        """Reset the simulator by clearing the event list and removing the model to simulate"""
-        self.event_list.clear()
-        self.model = None
         self.time = self.start_time
 
     def run_until(self, end_time: int | float) -> None:
@@ -59,15 +53,15 @@ class Simulator:
             try:
                 event = self.event_list.pop_event()
             except IndexError:  # event list is empty
-                self.time = end_time
+                self.model._time = end_time
                 break
 
             if event.time <= end_time:
-                self.time = event.time
+                self.model._time = event.time
                 event.execute()
             else:
-                self.time = end_time
-                self._schedule_event(event)  # reschedule event
+                self.model._time = end_time
+                self._schedule_event(event)
                 break
 
     def run_for(self, time_delta: int | float):
@@ -78,7 +72,7 @@ class Simulator:
                                      plus the time delta
 
         """
-        end_time = self.time + time_delta
+        end_time = self.model._time + time_delta
         self.run_until(end_time)
 
     def schedule_event_now(
@@ -129,15 +123,14 @@ class Simulator:
             SimulationEvent: the simulation event that is scheduled
 
         """
-        if self.time > time:
+        if self.model._time > time:
             raise ValueError("trying to schedule an event in the past")
 
         event = SimulationEvent(
             time,
             function,
             priority=priority,
-            function_args=function_args,
-            function_kwargs=function_kwargs,
+            ...
         )
         self._schedule_event(event)
         return event
@@ -164,7 +157,7 @@ class Simulator:
 
         """
         event = SimulationEvent(
-            self.time + time_delta,
+            self.model._time + time_delta,
             function,
             priority=priority,
             function_args=function_args,
@@ -253,19 +246,18 @@ class ABMSimulator(Simulator):
             try:
                 event = self.event_list.pop_event()
             except IndexError:
-                self.time = end_time
+                self.model._time = end_time
                 break
 
             if event.time <= end_time:
-                self.time = event.time
+                self.model._time = event.time
                 if event.fn() == self.model.step:
                     self.schedule_event_next_tick(
                         self.model.step, priority=Priority.HIGH
                     )
-
                 event.execute()
             else:
-                self.time = end_time
+                self.model._time = end_time
                 self._schedule_event(event)
                 break
 
@@ -277,7 +269,7 @@ class ABMSimulator(Simulator):
                                      plus the time delta
 
         """
-        end_time = self.time + time_delta - 1
+        end_time = self.model._time + time_delta - 1
         self.run_until(end_time)
 
 
