@@ -435,13 +435,25 @@ class AgentSet(MutableSet, Sequence):
         else:
             return GroupBy(groups)
 
+    def create_agents(self, agent_class, num_agents, agent_set, *args, **kwargs):
+        """
+        Create multiple agents of the same class and add them to an AgentSet.
+
+        Args:
+            agent_class (class): The class of the agents to create.
+            num_agents (int): The number of agents to create.
+            agent_set (AgentSet): The AgentSet to add the agents to.
+            *args: Positional arguments to pass to the agent constructor.
+            **kwargs: Keyword arguments to pass to the agent constructor.
+        """
+        for _ in range(num_agents):
+            agent = agent_class(self.next_id(), self, *args, **kwargs)
+            agent_set.add(agent)
+            
     # consider adding for performance reasons
     # for Sequence: __reversed__, index, and count
     # for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__
-    def create_agent(self,agent_class,num_agents,agent_set,*args,**kwargs):
-        for i in range(num_agents):
-            agent = agent_class(self,next_id(),self,*args,**kwargs)
-            agent_set.add(agent)
+
 
 
 class GroupBy:
