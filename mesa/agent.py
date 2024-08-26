@@ -449,11 +449,10 @@ class AgentSet(MutableSet, Sequence):
         for _ in range(num_agents):
             agent = agent_class(self.next_id(), self, *args, **kwargs)
             agent_set.add(agent)
-            
+
     # consider adding for performance reasons
     # for Sequence: __reversed__, index, and count
     # for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__
-
 
 
 class GroupBy:
