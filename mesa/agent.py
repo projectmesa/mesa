@@ -438,6 +438,10 @@ class AgentSet(MutableSet, Sequence):
     # consider adding for performance reasons
     # for Sequence: __reversed__, index, and count
     # for MutableSet clear, pop, remove, __ior__, __iand__, __ixor__, and __isub__
+    def create_agent(self,agent_class,num_agents,agent_set,*args,**kwargs):
+        for i in range(num_agents):
+            agent = agent_class(self,next_id(),self,*args,**kwargs)
+            agent_set.add(agent)
 
 
 class GroupBy:
