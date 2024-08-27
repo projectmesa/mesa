@@ -1,7 +1,6 @@
-import mesa
-import numpy as np
 import perfplot
-import itertools
+
+import mesa
 
 
 # Mesa implementation
@@ -55,7 +54,6 @@ class MoneyModel(mesa.Model):
             self.step()
 
 
-
 def mesa_test_implementation(n_agents: int) -> None:
     model = MoneyTestModel(n_agents)
     model.run_model(100)
@@ -74,8 +72,10 @@ class MoneyTestAgent(mesa.Agent):
     def step(self):
         # Verify agent has some wealth
         if self.wealth > 0:
-            other_agent = self.random.choice(list(self.model.all_agents._agents.keyrefs()))
-            if (agent:=other_agent()) is not None:
+            other_agent = self.random.choice(
+                list(self.model.all_agents._agents.keyrefs())
+            )
+            if (agent := other_agent()) is not None:
                 agent.wealth += 1
                 self.wealth -= 1
 
@@ -111,6 +111,7 @@ def mesa_list_implementation(n_agents: int) -> None:
     model = MoneyListModel(n_agents)
     model.run_model(100)
 
+
 class MoneyListModel(mesa.Model):
     """A model with some number of agents."""
 
@@ -136,6 +137,7 @@ class MoneyListModel(mesa.Model):
         for _ in range(n_steps):
             self.step()
 
+
 class MoneyListAgent(mesa.Agent):
     """An agent with fixed initial wealth."""
 
@@ -154,10 +156,15 @@ class MoneyListAgent(mesa.Agent):
                 other_agent.wealth += 1
                 self.wealth -= 1
 
+
 def main():
     out = perfplot.bench(
         setup=lambda n: n,
-        kernels=[mesa_original_implementation, mesa_test_implementation, mesa_list_implementation],
+        kernels=[
+            mesa_original_implementation,
+            mesa_test_implementation,
+            mesa_list_implementation,
+        ],
         labels=["original", "updated", "list"],
         n_range=[k for k in range(10, 10000, 500)],
         xlabel="Number of agents",

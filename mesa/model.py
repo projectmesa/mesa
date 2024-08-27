@@ -145,7 +145,6 @@ class Model:
         self.agents_by_type[type(agent)].remove(agent)
         self.all_agents.remove(agent)
 
-
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as
         needed.
@@ -179,10 +178,10 @@ class Model:
         self._seed = seed
 
     def initialize_data_collector(
-            self,
-            model_reporters=None,
-            agent_reporters=None,
-            tables=None,
+        self,
+        model_reporters=None,
+        agent_reporters=None,
+        tables=None,
     ) -> None:
         if not hasattr(self, "schedule") or self.schedule is None:
             raise RuntimeError(
