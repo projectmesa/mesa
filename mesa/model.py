@@ -119,6 +119,17 @@ class Model:
 
 
     def register_agent(self, agent):
+        """Register the agent with the model
+
+        Args:
+            agent: The agent to register.
+
+        Notes:
+            This method is called automatically by ``Agent.__init__``, so there is no need to use this
+            if you are subclassing Agent and calling its super in the ``__init__`` method.
+
+
+        """
         if not hasattr(self, "_all_agents"):
             self._setup_agent_registration()
 

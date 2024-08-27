@@ -74,9 +74,9 @@ class MoneyTestAgent(mesa.Agent):
     def step(self):
         # Verify agent has some wealth
         if self.wealth > 0:
-            other_agent = self.random.choice(self.model.agents)
-            if other_agent is not None:
-                other_agent.wealth += 1
+            other_agent = self.random.choice(list(self.model.all_agents._agents.keyrefs()))
+            if (agent:=other_agent()) is not None:
+                agent.wealth += 1
                 self.wealth -= 1
 
 
@@ -88,14 +88,14 @@ class MoneyTestModel(mesa.Model):
         self.num_agents = N
         # Create scheduler and assign it to the model
         self.schedule = mesa.time.RandomActivation(self)
-        self.my_agents = []
 
         # Create agents
         for i in range(self.num_agents):
             a = MoneyTestAgent(i, self)
             # Add the agent to the scheduler
             self.schedule.add(a)
-            self.my_agents.append(a)
+
+        self.my_agents = list(self.all_agents._agents.keyrefs())
 
     def step(self):
         """Advance the model by one step."""
@@ -159,13 +159,13 @@ def main():
         setup=lambda n: n,
         kernels=[mesa_original_implementation, mesa_test_implementation, mesa_list_implementation],
         labels=["original", "updated", "list"],
-        n_range=[k for k in range(10, 1000, 100)],
+        n_range=[k for k in range(10, 10000, 500)],
         xlabel="Number of agents",
         equality_check=None,
         title="100 steps of the Boltzmann Wealth model",
     )
     out.show()
-    out.save("readme_plot4.png")
+    out.save("readme_plot6.png")
 
 
 if __name__ == "__main__":
