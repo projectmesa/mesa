@@ -8,9 +8,8 @@ Core Objects: Model
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
-import itertools
-import functools
 import random
+import warnings
 from collections import defaultdict
 
 # mypy
@@ -58,6 +57,7 @@ class Model:
             # advance.
             obj._seed = random.random()
         obj.random = random.Random(obj._seed)
+
         # TODO: Remove these 2 lines just before Mesa 3.0
         obj._steps = 0
         obj._time = 0
@@ -79,24 +79,17 @@ class Model:
         self._time: TimeT = 0  # the model's clock
 
     def _setup_agent_registration(self):
-        self._agents_by_type: defaultdict[type, dict] = defaultdict(dict)
-
         def hack():
             return AgentSet([], self)
 
         self.agents_by_type: defaultdict[type, AgentSet] = defaultdict(hack)
-        self._all_agents = set()
+        self._agents = {}
         self.all_agents = AgentSet([], self)
-
 
     @property
     def agents(self) -> AgentSet:
         """Provides an AgentSet of all agents in the model, combining agents from all types."""
-
-        if hasattr(self, "_agents"):
-            return self._agents
-        else:
-            return self.all_agents
+        return self.all_agents
 
     @agents.setter
     def agents(self, agents: Any) -> None:
@@ -106,8 +99,6 @@ class Model:
             "Please adjust your code to use a different attribute name for custom agent storage."
         )
 
-        self._agents = agents
-
     @property
     def agent_types(self) -> list[type]:
         """Return a list of different agent types."""
@@ -116,7 +107,6 @@ class Model:
     def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
         """Retrieves an AgentSet containing all agents of the specified type."""
         return self.agents_by_type[agenttype]
-
 
     def register_agent(self, agent):
         """Register the agent with the model
@@ -134,16 +124,26 @@ class Model:
             self._setup_agent_registration()
 
             warnings.warn(
-                "The Mesa Model class was not initialized. In the future, you need to explicitly initialize the Model by calling super().__init__() on initialization.",
+                "The Mesa Model class was not initialized. In the future, you need to explicitly initialize "
+                "the Model by calling super().__init__() on initialization.",
                 FutureWarning,
                 stacklevel=2,
             )
 
-        self._agents_by_type[type(agent)][agent] = None
-        self.agentset_experimental_warning_given = False
-
+        self._agents[agent] = None
         self.agents_by_type[type(agent)].add(agent)
         self.all_agents.add(agent)
+
+    def deregister_agent(self, agent):
+        """Deregister the agent with the model
+
+        Notes::
+        This method is called automatically by ``Agent.remove``
+
+        """
+        del self._agents[agent]
+        self.agents_by_type[type(agent)].remove(agent)
+        self.all_agents.remove(agent)
 
 
     def run_model(self) -> None:
@@ -179,10 +179,10 @@ class Model:
         self._seed = seed
 
     def initialize_data_collector(
-        self,
-        model_reporters=None,
-        agent_reporters=None,
-        tables=None,
+            self,
+            model_reporters=None,
+            agent_reporters=None,
+            tables=None,
     ) -> None:
         if not hasattr(self, "schedule") or self.schedule is None:
             raise RuntimeError(
