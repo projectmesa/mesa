@@ -78,14 +78,6 @@ class Model:
         self._steps: int = 0
         self._time: TimeT = 0  # the model's clock
 
-    def _setup_agent_registration(self):
-        def hack():
-            return AgentSet([], self)
-
-        self.agents_by_type: defaultdict[type, AgentSet] = defaultdict(hack)
-        self._agents = {}
-        self.all_agents = AgentSet([], self)
-
     @property
     def agents(self) -> AgentSet:
         """Provides an AgentSet of all agents in the model, combining agents from all types."""
@@ -108,6 +100,14 @@ class Model:
         """Retrieves an AgentSet containing all agents of the specified type."""
         return self.agents_by_type[agenttype]
 
+    def _setup_agent_registration(self):
+        def hack():
+            return AgentSet([], self)
+
+        self.agents_by_type: defaultdict[type, AgentSet] = defaultdict(hack)
+        self._agents = {}
+        self.all_agents = AgentSet([], self)
+
     def register_agent(self, agent):
         """Register the agent with the model
 
@@ -120,7 +120,7 @@ class Model:
 
 
         """
-        if not hasattr(self, "_all_agents"):
+        if not hasattr(self, "all_agents"):
             self._setup_agent_registration()
 
             warnings.warn(
