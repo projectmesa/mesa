@@ -147,7 +147,7 @@ class AgentSet(MutableSet, Sequence):
             n and fraction just return the first n or fraction of agents. To take a random sample, shuffle() beforehand.
         """
 
-        if filter_func is None and agent_type is None and n == 0 and p == 1.0:
+        if filter_func is None and agent_type is None and n == 0 and fraction == 1.0:
             return self if inplace else copy.copy(self)
 
         if n != 0 and fraction != 1.0:
