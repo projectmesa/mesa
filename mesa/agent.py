@@ -128,7 +128,7 @@ class AgentSet(MutableSet, Sequence):
     ) -> AgentSet:
         """
         Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
-    
+
         Args:
             filter_func (Callable[[Agent], bool], optional): A function that takes an Agent and returns True if the
                 agent should be included in the result. Defaults to None, meaning no filtering is applied.
@@ -136,10 +136,10 @@ class AgentSet(MutableSet, Sequence):
             fraction (float, optional): The fraction of agents to select. If 0.2, it selects 20% of Agents in the AgentSet. Defaults to 1.0.
             inplace (bool, optional): If True, modifies the current AgentSet; otherwise, returns a new AgentSet. Defaults to False.
             agent_type (type[Agent], optional): The class type of the agents to select. Defaults to None, meaning no type filtering is applied.
-    
+
         Returns:
             AgentSet: A new AgentSet containing the selected agents, unless inplace is True, in which case the current AgentSet is updated.
-    
+
         Raises:
             ValueError: If both n and fraction are set.
 
