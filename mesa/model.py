@@ -101,10 +101,9 @@ class Model:
         return self.agents_by_type[agenttype]
 
     def _setup_agent_registration(self):
-        def hack():
-            return AgentSet([], self)
 
-        self.agents_by_type: defaultdict[type, AgentSet] = defaultdict(hack)
+
+        self.agents_by_type: dict[type, AgentSet] = {}
         self._agents = {}
         self.all_agents = AgentSet([], self)
 
@@ -131,7 +130,14 @@ class Model:
             )
 
         self._agents[agent] = None
-        self.agents_by_type[type(agent)].add(agent)
+
+        # because AgentSet requires model, we cannot use defaultdict
+        # tricks with a function won't work because model then cannot be pickled
+        try:
+            self.agents_by_type[type(agent)].add(agent)
+        except KeyError:
+            self.agents_by_type[type(agent)] = AgentSet([agent,], self)
+
         self.all_agents.add(agent)
 
     def deregister_agent(self, agent):
@@ -198,3 +204,10 @@ class Model:
         )
         # Collect data for the first time during initialization.
         self.datacollector.collect(self)
+
+
+def _hack(model):
+    def __hack():
+        return AgentSet([], model)
+
+    return __hack
