@@ -91,7 +91,7 @@ class Model:
     @agents.setter
     def agents(self, agents: Any) -> None:
         raise AttributeError(
-            "You are trying to set model.agents. In Mesa 3.0 and higher, this attribute will be "
+            "You are trying to set model.agents. In Mesa 3.0 and higher, this attribute is "
             "used by Mesa itself, so you cannot use it directly anymore."
             "Please adjust your code to use a different attribute name for custom agent storage."
         )
