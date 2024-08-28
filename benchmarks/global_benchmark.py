@@ -16,18 +16,22 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # Generic function to initialize and run a model
 def run_model(model_class, seed, parameters):
+    no_simulator = ["BoltzmannWealth"]
     start_init = timeit.default_timer()
-    simulator = ABMSimulator()
-    model = model_class(simulator=simulator, seed=seed, **parameters)
-    simulator.setup(model)
+    if model_class.__name__ in no_simulator:
+        model = model_class(seed=seed, **parameters)
+    else:
+        simulator = ABMSimulator()
+        model = model_class(simulator=simulator, seed=seed, **parameters)
+        simulator.setup(model)
 
     end_init_start_run = timeit.default_timer()
 
-    simulator.run_for(config["steps"])
+    if model_class.__name__ in no_simulator:
+        model.run_model(config["steps"])
+    else:
+        simulator.run_for(config["steps"])
 
-    # for _ in range(config["steps"]):
-    #     model.step()
-    #       time.sleep(0.0001)
     end_run = timeit.default_timer()
 
     return (end_init_start_run - start_init), (end_run - end_init_start_run)
