@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import random
 import warnings
-from collections import defaultdict
 
 # mypy
 from typing import Any
@@ -101,8 +100,6 @@ class Model:
         return self.agents_by_type[agenttype]
 
     def _setup_agent_registration(self):
-
-
         self.agents_by_type: dict[type, AgentSet] = {}
         self._agents = {}
         self.all_agents = AgentSet([], self)
@@ -136,7 +133,12 @@ class Model:
         try:
             self.agents_by_type[type(agent)].add(agent)
         except KeyError:
-            self.agents_by_type[type(agent)] = AgentSet([agent,], self)
+            self.agents_by_type[type(agent)] = AgentSet(
+                [
+                    agent,
+                ],
+                self,
+            )
 
         self.all_agents.add(agent)
 
