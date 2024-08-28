@@ -11,7 +11,7 @@ configurations = {
             "replications": 5,
             "steps": 125,
             "parameters": {
-                "N": 100,
+                "n": 100,
                 "width": 10,
                 "height": 10,
             },
@@ -21,7 +21,7 @@ configurations = {
             "replications": 3,
             "steps": 10,
             "parameters": {
-                "N": 10000,
+                "n": 10000,
                 "width": 100,
                 "height": 100,
             },
@@ -59,7 +59,7 @@ configurations = {
         "small": {
             "seeds": 50,
             "replications": 5,
-            "steps": 40,
+            "steps": 80,
             "parameters": {
                 "height": 25,
                 "width": 25,

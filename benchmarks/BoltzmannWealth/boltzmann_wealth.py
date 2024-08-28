@@ -5,9 +5,9 @@ import mesa
 def compute_gini(model):
     agent_wealths = [agent.wealth for agent in model.agents]
     x = sorted(agent_wealths)
-    N = model.num_agents
-    B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * sum(x))
-    return 1 + (1 / N) - 2 * B
+    n = model.num_agents
+    b = sum(xi * (n - i) for i, xi in enumerate(x)) / (n * sum(x))
+    return 1 + (1 / n) - 2 * b
 
 
 class BoltzmannWealth(mesa.Model):
@@ -18,9 +18,9 @@ class BoltzmannWealth(mesa.Model):
     highly skewed distribution of wealth.
     """
 
-    def __init__(self, seed=None, N=100, width=10, height=10):
+    def __init__(self, seed=None, n=100, width=10, height=10):
         super().__init__()
-        self.num_agents = N
+        self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.schedule = mesa.time.RandomActivation(self)
         self.datacollector = mesa.DataCollector(
@@ -44,7 +44,7 @@ class BoltzmannWealth(mesa.Model):
         self.datacollector.collect(self)
 
     def run_model(self, n):
-        for i in range(n):
+        for _i in range(n):
             self.step()
 
 
