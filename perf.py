@@ -31,9 +31,9 @@ class MoneyAgent(mesa.Agent):
 class MoneyModel(mesa.Model):
     """A model with some number of agents."""
 
-    def __init__(self, N):
+    def __init__(self, n):
         super().__init__()
-        self.num_agents = N
+        self.num_agents = n
         # Create scheduler and assign it to the model
         self.schedule = mesa.time.RandomActivation(self)
 

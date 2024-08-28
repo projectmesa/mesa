@@ -206,10 +206,3 @@ class Model:
         )
         # Collect data for the first time during initialization.
         self.datacollector.collect(self)
-
-
-def _hack(model):
-    def __hack():
-        return AgentSet([], model)
-
-    return __hack
