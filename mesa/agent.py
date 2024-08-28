@@ -316,6 +316,17 @@ class AgentSet(MutableSet, Sequence):
                 for agent in self._agents
             ]
 
+    def set(self, attr_name: str, value: Any) -> None:
+        """
+        Set a specified attribute to a given value for all agents in the AgentSet.
+
+        Args:
+            attr_name (str): The name of the attribute to set.
+            value (Any): The value to set the attribute to.
+        """
+        for agent in self:
+            setattr(agent, attr_name, value)
+
     def __getitem__(self, item: int | slice) -> Agent:
         """
         Retrieve an agent or a slice of agents from the AgentSet.
