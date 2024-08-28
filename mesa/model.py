@@ -31,11 +31,9 @@ class Model:
         running: A boolean indicating if the model should continue running.
         schedule: An object to manage the order and execution of agent steps.
         current_id: A counter for assigning unique IDs to agents.
-        agents_by_type: A defaultdict mapping each agent type to a dict of its instances.
-                 This private attribute is used internally to manage agents.
 
     Properties:
-        agents: An AgentSet containing all agents in the model, generated from the _agents attribute.
+        agents: An AgentSet containing all agents in the model
         agent_types: A list of different agent types present in the model.
 
     Methods:
@@ -45,6 +43,12 @@ class Model:
         next_id: Generates and returns the next unique identifier for an agent.
         reset_randomizer: Resets the model's random number generator with a new or existing seed.
         initialize_data_collector: Sets up the data collector for the model, requiring an initialized scheduler and agents.
+
+    Notes:
+        Model.agents returns the AgentSet containing all agents registered with the model. Changing
+        the content of the AgentSet directly can result in strange behavior. If you want change the
+        composition of this AgentSet, ensure you operate on a copy.
+
     """
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
@@ -80,7 +84,7 @@ class Model:
     @property
     def agents(self) -> AgentSet:
         """Provides an AgentSet of all agents in the model, combining agents from all types."""
-        return self.all_agents
+        return self._all_agents
 
     @agents.setter
     def agents(self, agents: Any) -> None:
@@ -93,16 +97,16 @@ class Model:
     @property
     def agent_types(self) -> list[type]:
         """Return a list of different agent types."""
-        return list(self.agents_by_type.keys())
+        return list(self._agents_by_type.keys())
 
     def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
         """Retrieves an AgentSet containing all agents of the specified type."""
-        return self.agents_by_type[agenttype]
+        return self._agents_by_type[agenttype]
 
     def _setup_agent_registration(self):
-        self.agents_by_type: dict[type, AgentSet] = {}
         self._agents = {}
-        self.all_agents = AgentSet([], self)
+        self._agents_by_type: dict[type, AgentSet] = {}
+        self._all_agents = AgentSet([], self)
 
     def register_agent(self, agent):
         """Register the agent with the model
@@ -114,9 +118,8 @@ class Model:
             This method is called automatically by ``Agent.__init__``, so there is no need to use this
             if you are subclassing Agent and calling its super in the ``__init__`` method.
 
-
         """
-        if not hasattr(self, "all_agents"):
+        if not hasattr(self, "_agents"):
             self._setup_agent_registration()
 
             warnings.warn(
@@ -131,16 +134,16 @@ class Model:
         # because AgentSet requires model, we cannot use defaultdict
         # tricks with a function won't work because model then cannot be pickled
         try:
-            self.agents_by_type[type(agent)].add(agent)
+            self._agents_by_type[type(agent)].add(agent)
         except KeyError:
-            self.agents_by_type[type(agent)] = AgentSet(
+            self._agents_by_type[type(agent)] = AgentSet(
                 [
                     agent,
                 ],
                 self,
             )
 
-        self.all_agents.add(agent)
+        self._all_agents.add(agent)
 
     def deregister_agent(self, agent):
         """Deregister the agent with the model
@@ -150,8 +153,8 @@ class Model:
 
         """
         del self._agents[agent]
-        self.agents_by_type[type(agent)].remove(agent)
-        self.all_agents.remove(agent)
+        self._agents_by_type[type(agent)].remove(agent)
+        self._all_agents.remove(agent)
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached. Overload as
