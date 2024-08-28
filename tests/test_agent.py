@@ -59,6 +59,11 @@ def test_agentset():
     def test_function(agent):
         return agent.unique_id > 5
 
+    assert len(agentset.select(fraction=0.2)) == 2  # Select 20% of agents
+    assert len(agentset.select(fraction=0.549)) == 5  # Select 50% of agents
+    assert len(agentset.select(fraction=0)) == 0  # Select 0% of agents
+    assert len(agentset.select(fraction=1)) == 10  # Select 100% of agents
+
     assert len(agentset.select(test_function)) == 5
     assert len(agentset.select(test_function, n=2)) == 2
     assert len(agentset.select(test_function, inplace=True)) == 5
@@ -67,11 +72,6 @@ def test_agentset():
     assert all(a1 == a2 for a1, a2 in zip(agentset.select(n=5), agentset[:5]))
 
     assert len(agentset.shuffle(inplace=False).select(n=5)) == 5
-
-    assert len(agentset.select(fraction=0.2)) == 2  # Select 20% of agents
-    assert len(agentset.select(fraction=0.549)) == 5  # Select 50% of agents
-    assert len(agentset.select(fraction=0)) == 0  # Select 0% of agents
-    assert len(agentset.select(fraction=1)) == 10  # Select 100% of agents
 
     def test_function(agent):
         return agent.unique_id
