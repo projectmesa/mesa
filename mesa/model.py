@@ -43,6 +43,8 @@ class Model:
         next_id: Generates and returns the next unique identifier for an agent.
         reset_randomizer: Resets the model's random number generator with a new or existing seed.
         initialize_data_collector: Sets up the data collector for the model, requiring an initialized scheduler and agents.
+        register_agent : register an agent with the model
+        deregister_agent : remove an agent from the model
 
     Notes:
         Model.agents returns the AgentSet containing all agents registered with the model. Changing
