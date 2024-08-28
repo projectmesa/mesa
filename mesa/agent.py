@@ -139,10 +139,16 @@ class AgentSet(MutableSet, Sequence):
 
         Returns:
             AgentSet: A new AgentSet containing the selected agents, unless inplace is True, in which case the current AgentSet is updated.
+
+        Note:
+            n and p can't both be set at the same time, set one at most.
         """
 
         if filter_func is None and agent_type is None and n == 0 and p == 1.0:
             return self if inplace else copy.copy(self)
+
+        if p != 1.0 and n != 0:
+            raise ValueError("Cannot set both n and p. Please set only one of these parameters.")
 
         if p < 1.0:
             n = round(len(self) * p)
