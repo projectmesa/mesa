@@ -143,8 +143,10 @@ class AgentSet(MutableSet, Sequence):
         Raises:
             ValueError: If both n and fraction are set.
 
-        Note:
-            n and fraction just return the first n or fraction of agents. To take a random sample, shuffle() beforehand.
+        Notes:
+            - n and fraction just return the first n or fraction of agents. To take a random sample, shuffle() beforehand.
+            - n and fraction are upper limits. When specificing other criterea it can be smaller.
+            - A fraction is taken of the original AgentSet length, not the finally selected one.
         """
 
         if filter_func is None and agent_type is None and n == 0 and fraction == 1.0:
