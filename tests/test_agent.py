@@ -270,6 +270,30 @@ def test_agentset_do_callable():
     assert len(agentset) == 0
 
 
+def test_agentset_set_method():
+    # Initialize the model and agents with and without existing attributes
+    class TestAgentWithAttribute(Agent):
+        def __init__(self, unique_id, model, age=None):
+            super().__init__(unique_id, model)
+            self.age = age
+
+    model = Model()
+    agents = [TestAgentWithAttribute(model.next_id(), model, age=i) for i in range(5)]
+    agentset = AgentSet(agents, model)
+
+    # Set a new attribute "health" and an existing attribute "age" for all agents
+    agentset.set("health", 100).set("age", 50).set("status", "active")
+
+    # Check if all agents have the "health", "age", and "status" attributes correctly set
+    for agent in agentset:
+        assert hasattr(agent, "health")
+        assert agent.health == 100
+        assert hasattr(agent, "age")
+        assert agent.age == 50
+        assert hasattr(agent, "status")
+        assert agent.status == "active"
+
+
 def test_agentset_map_str():
     model = Model()
     agents = [TestAgent(model.next_id(), model) for _ in range(10)]
