@@ -323,7 +323,7 @@ class AgentSet(MutableSet, Sequence):
         Args:
             attr_name (str): The name of the attribute to set.
             value (Any): The value to set the attribute to.
-    
+
         Returns:
             AgentSet: The AgentSet instance itself, after setting the attribute.
         """
