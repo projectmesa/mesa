@@ -148,7 +148,9 @@ class AgentSet(MutableSet, Sequence):
             return self if inplace else copy.copy(self)
 
         if p != 1.0 and n != 0:
-            raise ValueError("Cannot set both n and p. Please set only one of these parameters.")
+            raise ValueError(
+                "Cannot set both n and p. Please set only one of these parameters."
+            )
 
         if p < 1.0:
             n = round(len(self) * p)
