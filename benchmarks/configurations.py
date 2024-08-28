@@ -1,8 +1,32 @@
+from BoltzmannWealth.boltzmann_wealth import BoltzmannWealth
 from Flocking.flocking import BoidFlockers
 from Schelling.schelling import Schelling
 from WolfSheep.wolf_sheep import WolfSheep
 
 configurations = {
+    # Schelling Model Configurations
+    BoltzmannWealth: {
+        "small": {
+            "seeds": 50,
+            "replications": 5,
+            "steps": 125,
+            "parameters": {
+                "N": 100,
+                "width": 10,
+                "height": 10,
+            },
+        },
+        "large": {
+            "seeds": 10,
+            "replications": 3,
+            "steps": 10,
+            "parameters": {
+                "N": 10000,
+                "width": 100,
+                "height": 100,
+            },
+        },
+    },
     # Schelling Model Configurations
     Schelling: {
         "small": {
