@@ -102,7 +102,16 @@ class Model:
         return list(self._agents_by_type.keys())
 
     def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
-        """Retrieves an AgentSet containing all agents of the specified type."""
+        """Retrieves an AgentSet containing all agents of the specified type.
+
+        Args:
+            agenttype: The type of agent to retrieve.
+
+        Raises:
+            KeyError: If agenttype does not exist
+
+
+        """
         return self._agents_by_type[agenttype]
 
     def _setup_agent_registration(self):
