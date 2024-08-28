@@ -122,6 +122,7 @@ class AgentSet(MutableSet, Sequence):
         self,
         filter_func: Callable[[Agent], bool] | None = None,
         n: int = 0,
+        p: float = 1.0,
         inplace: bool = False,
         agent_type: type[Agent] | None = None,
     ) -> AgentSet:
@@ -132,6 +133,7 @@ class AgentSet(MutableSet, Sequence):
             filter_func (Callable[[Agent], bool], optional): A function that takes an Agent and returns True if the
                 agent should be included in the result. Defaults to None, meaning no filtering is applied.
             n (int, optional): The number of agents to select. If 0, all matching agents are selected. Defaults to 0.
+            p (float, optional): The fraction of agents to select. If 0.2, it selects 20% of Agents in the AgentSet. Defaults to 1.0.
             inplace (bool, optional): If True, modifies the current AgentSet; otherwise, returns a new AgentSet. Defaults to False.
             agent_type (type[Agent], optional): The class type of the agents to select. Defaults to None, meaning no type filtering is applied.
 
@@ -139,8 +141,11 @@ class AgentSet(MutableSet, Sequence):
             AgentSet: A new AgentSet containing the selected agents, unless inplace is True, in which case the current AgentSet is updated.
         """
 
-        if filter_func is None and agent_type is None and n == 0:
+        if filter_func is None and agent_type is None and n == 0 and p == 1.0:
             return self if inplace else copy.copy(self)
+
+        if p < 1.0:
+            n = round(len(self) * p)
 
         def agent_generator(filter_func=None, agent_type=None, n=0):
             count = 0
