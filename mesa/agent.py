@@ -122,38 +122,41 @@ class AgentSet(MutableSet, Sequence):
         self,
         filter_func: Callable[[Agent], bool] | None = None,
         n: int = 0,
-        p: float = 1.0,
+        fraction: float = 1.0,
         inplace: bool = False,
         agent_type: type[Agent] | None = None,
     ) -> AgentSet:
         """
         Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
-
+    
         Args:
             filter_func (Callable[[Agent], bool], optional): A function that takes an Agent and returns True if the
                 agent should be included in the result. Defaults to None, meaning no filtering is applied.
             n (int, optional): The number of agents to select. If 0, all matching agents are selected. Defaults to 0.
-            p (float, optional): The fraction of agents to select. If 0.2, it selects 20% of Agents in the AgentSet. Defaults to 1.0.
+            fraction (float, optional): The fraction of agents to select. If 0.2, it selects 20% of Agents in the AgentSet. Defaults to 1.0.
             inplace (bool, optional): If True, modifies the current AgentSet; otherwise, returns a new AgentSet. Defaults to False.
             agent_type (type[Agent], optional): The class type of the agents to select. Defaults to None, meaning no type filtering is applied.
-
+    
         Returns:
             AgentSet: A new AgentSet containing the selected agents, unless inplace is True, in which case the current AgentSet is updated.
+    
+        Raises:
+            ValueError: If both n and fraction are set.
 
         Note:
-            n and p can't both be set at the same time, set one at most.
+            n and fraction just return the first n or fraction of agents. To take a random sample, shuffle() beforehand.
         """
 
         if filter_func is None and agent_type is None and n == 0 and p == 1.0:
             return self if inplace else copy.copy(self)
 
-        if p != 1.0 and n != 0:
+        if n != 0 and fraction != 1.0:
             raise ValueError(
-                "Cannot set both n and p. Please set only one of these parameters."
+                "Cannot set both n and fraction. Please set only one of these parameters."
             )
 
-        if p < 1.0:
-            n = round(len(self) * p)
+        if fraction < 1.0:
+            n = round(len(self) * fraction)
 
         def agent_generator(filter_func=None, agent_type=None, n=0):
             count = 0
