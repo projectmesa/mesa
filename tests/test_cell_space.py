@@ -385,7 +385,7 @@ def test_empties_space():
 
     model = Model()
     for i in range(8):
-        grid._cells[i].add_agent(CellAgent(i, model))
+        grid._cells[i].add_agent(CellAgent(model))
 
     cell = grid.select_random_empty_cell()
     assert cell.coordinate in {8, 9}
@@ -409,7 +409,7 @@ def test_cell():
 
     # add_agent
     model = Model()
-    agent = CellAgent(1, model)
+    agent = CellAgent(model)
 
     cell1.add_agent(agent)
     assert agent in cell1.agents
@@ -422,11 +422,11 @@ def test_cell():
         cell1.remove_agent(agent)
 
     cell1 = Cell((1,), capacity=1, random=random.Random())
-    cell1.add_agent(CellAgent(1, model))
+    cell1.add_agent(CellAgent(model))
     assert cell1.is_full
 
     with pytest.raises(Exception):
-        cell1.add_agent(CellAgent(2, model))
+        cell1.add_agent(CellAgent(model))
 
 
 def test_cell_collection():
@@ -452,9 +452,9 @@ def test_cell_collection():
 
     cells = collection.cells
     model = Model()
-    cells[0].add_agent(CellAgent(1, model))
-    cells[3].add_agent(CellAgent(2, model))
-    cells[7].add_agent(CellAgent(3, model))
+    cells[0].add_agent(CellAgent(model))
+    cells[3].add_agent(CellAgent(model))
+    cells[7].add_agent(CellAgent(model))
     agents = collection.agents
     assert len(list(agents)) == 3
 

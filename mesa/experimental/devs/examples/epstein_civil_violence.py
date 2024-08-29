@@ -7,8 +7,8 @@ from mesa.space import SingleGrid
 
 
 class EpsteinAgent(Agent):
-    def __init__(self, unique_id, model, vision, movement):
-        super().__init__(unique_id, model)
+    def __init__(self, model, vision, movement):
+        super().__init__(model)
         self.vision = vision
         self.movement = movement
 
