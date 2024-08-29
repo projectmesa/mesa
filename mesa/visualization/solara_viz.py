@@ -104,7 +104,8 @@ def SolaraViz(
         measures: List of callables or data attributes to plot
         name: Name for display
         agent_portrayal: Options for rendering agents (dictionary);
-            Default drawer supports custom `"size"`, `"color"`, and `"shape"`.
+            Default drawer supports custom matplotlib's [scatter](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html)
+            params, with the exception of (currently) vmin, vmax, & plotnonfinite.
         space_drawer: Method to render the agent space for
             the model; default implementation is the `SpaceMatplotlib` component;
             simulations with no space to visualize should
