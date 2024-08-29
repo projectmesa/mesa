@@ -116,9 +116,11 @@ class Model:
 
     def _setup_agent_registration(self):
         """helper method to initialize the agent registration datastructures"""
-        self._agents = {} # the hard references to all agents in the model
-        self._agents_by_type: dict[type, AgentSet] = {} # a dict with an agentset for each class of agents
-        self._all_agents = AgentSet([], self) # an agenset with all agents
+        self._agents = {}  # the hard references to all agents in the model
+        self._agents_by_type: dict[
+            type, AgentSet
+        ] = {}  # a dict with an agentset for each class of agents
+        self._all_agents = AgentSet([], self)  # an agenset with all agents
 
     def register_agent(self, agent):
         """Register the agent with the model
