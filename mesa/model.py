@@ -98,7 +98,7 @@ class Model:
 
     @property
     def agent_types(self) -> list[type]:
-        """Return a list of different agent types."""
+        """Return a list of all unique agent types registered with the model."""
         return list(self._agents_by_type.keys())
 
     def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
@@ -115,9 +115,10 @@ class Model:
         return self._agents_by_type[agenttype]
 
     def _setup_agent_registration(self):
-        self._agents = {}
-        self._agents_by_type: dict[type, AgentSet] = {}
-        self._all_agents = AgentSet([], self)
+        """helper method to initialize the agent registration datastructures"""
+        self._agents = {} # the hard references to all agents in the model
+        self._agents_by_type: dict[type, AgentSet] = {} # a dict with an agentset for each class of agents
+        self._all_agents = AgentSet([], self) # an agenset with all agents
 
     def register_agent(self, agent):
         """Register the agent with the model
