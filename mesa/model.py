@@ -17,8 +17,6 @@ from typing import Any
 from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
 
-TimeT = float | int
-
 
 class Model:
     """Base class for models in the Mesa ABM library.
@@ -35,6 +33,8 @@ class Model:
     Properties:
         agents: An AgentSet containing all agents in the model
         agent_types: A list of different agent types present in the model.
+        steps: An integer representing the number of steps the model has taken.
+               It increases automatically at the start of each step() call.
 
     Methods:
         get_agents_of_type: Returns an AgentSet of agents of the specified type.
@@ -62,10 +62,6 @@ class Model:
             # advance.
             obj._seed = random.random()
         obj.random = random.Random(obj._seed)
-
-        # TODO: Remove these 2 lines just before Mesa 3.0
-        obj._steps = 0
-        obj._time = 0
         return obj
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -77,25 +73,20 @@ class Model:
         self.running = True
         self.schedule = None
         self.current_id = 0
+        self.steps: int = 0
 
         self._setup_agent_registration()
 
-        self._steps: int = 0
-        self._time: TimeT = 0  # the model's clock
-
         # Wrap the user-defined step method
-        if hasattr(self, "step"):
-            self._user_step = self.step
-            self.step = self._wrapped_step
+        self._user_step = self.step
+        self.step = self._wrapped_step
 
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
         """Automatically increments time and steps after calling the user's step method."""
         # Automatically increment time and step counters
-        self._time += kwargs.get("time", 1)
-        self._steps += kwargs.get("step", 1)
+        self.steps += 1
         # Call the original user-defined step method
-        if self._user_step:
-            self._user_step(*args, **kwargs)
+        self._user_step(*args, **kwargs)
 
     @property
     def agents(self) -> AgentSet:
