@@ -103,7 +103,8 @@ def SolaraViz(
         model_params: Parameters for initializing the model
         measures: List of callables or data attributes to plot
         name: Name for display
-        agent_portrayal: Options for rendering agents (dictionary)
+        agent_portrayal: Options for rendering agents (dictionary);
+            Default drawer supports custom `"size"`, `"color"`, and `"shape"`.
         space_drawer: Method to render the agent space for
             the model; default implementation is the `SpaceMatplotlib` component;
             simulations with no space to visualize should
@@ -157,7 +158,11 @@ def SolaraViz(
         """Update the random seed for the model."""
         reactive_seed.value = model.random.random()
 
-    dependencies = [current_step.value, reactive_seed.value]
+    dependencies = [
+        *list(model_parameters.values()),
+        current_step.value,
+        reactive_seed.value,
+    ]
 
     # if space drawer is disabled, do not include it
     layout_types = [{"Space": "default"}] if space_drawer else []
@@ -239,7 +244,7 @@ def ModelController(model, play_interval, current_step, reset_counter):
         """Advance the model by one step."""
         model.step()
         previous_step.value = current_step.value
-        current_step.value = model._steps
+        current_step.value = model.steps
 
     def do_play():
         """Run the model continuously."""

@@ -7,7 +7,9 @@ def test_model_set_up():
     assert model.running is True
     assert model.schedule is None
     assert model.current_id == 0
+    assert model.steps == 0
     model.step()
+    assert model.steps == 1
 
 
 def test_running():
@@ -16,12 +18,12 @@ def test_running():
 
         def step(self):
             """Increase steps until 10."""
-            self.steps += 1
             if self.steps == 10:
                 self.running = False
 
     model = TestModel()
     model.run_model()
+    assert model.steps == 10
 
 
 def test_seed(seed=23):

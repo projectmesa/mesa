@@ -123,12 +123,6 @@ def test_agentset():
     assert all(
         a1 == a2.unique_id for a1, a2 in zip(agentset.get("unique_id"), agentset)
     )
-    assert all(
-        a1 == a2.unique_id
-        for a1, a2 in zip(
-            agentset.do("get_unique_identifier", return_results=True), agentset
-        )
-    )
     assert agentset == agentset.do("get_unique_identifier")
 
     agentset.discard(agents[0])
@@ -316,6 +310,59 @@ def test_agentset_do_callable():
     assert len(agentset) == 0
 
 
+def test_agentset_set_method():
+    # Initialize the model and agents with and without existing attributes
+    class TestAgentWithAttribute(Agent):
+        def __init__(self, unique_id, model, age=None):
+            super().__init__(unique_id, model)
+            self.age = age
+
+    model = Model()
+    agents = [TestAgentWithAttribute(model.next_id(), model, age=i) for i in range(5)]
+    agentset = AgentSet(agents, model)
+
+    # Set a new attribute "health" and an existing attribute "age" for all agents
+    agentset.set("health", 100).set("age", 50).set("status", "active")
+
+    # Check if all agents have the "health", "age", and "status" attributes correctly set
+    for agent in agentset:
+        assert hasattr(agent, "health")
+        assert agent.health == 100
+        assert hasattr(agent, "age")
+        assert agent.age == 50
+        assert hasattr(agent, "status")
+        assert agent.status == "active"
+
+
+def test_agentset_map_str():
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+
+    with pytest.raises(AttributeError):
+        agentset.do("non_existing_method")
+
+    results = agentset.map("get_unique_identifier")
+    assert all(i == entry for i, entry in zip(results, range(1, 11)))
+
+
+def test_agentset_map_callable():
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+
+    # Test callable with non-existent function
+    with pytest.raises(AttributeError):
+        agentset.map(lambda agent: agent.non_existing_method())
+
+    # tests for addition and removal in do using callables
+    # do iterates, so no error should be raised to change size while iterating
+    # related to issue #1595
+
+    results = agentset.map(lambda agent: agent.unique_id)
+    assert all(i == entry for i, entry in zip(results, range(1, 11)))
+
+
 def test_agentset_get_attribute():
     model = Model()
     agents = [TestAgent(model.next_id(), model) for _ in range(10)]
@@ -388,3 +435,45 @@ def test_agentset_shuffle():
     agentset = AgentSet(test_agents, model=model)
     agentset.shuffle(inplace=True)
     assert not all(a1 == a2 for a1, a2 in zip(test_agents, agentset))
+
+
+def test_agentset_groupby():
+    class TestAgent(Agent):
+        def __init__(self, unique_id, model):
+            super().__init__(unique_id, model)
+            self.even = self.unique_id % 2 == 0
+
+        def get_unique_identifier(self):
+            return self.unique_id
+
+    model = Model()
+    agents = [TestAgent(model.next_id(), model) for _ in range(10)]
+    agentset = AgentSet(agents, model)
+
+    groups = agentset.groupby("even")
+    assert len(groups.groups[True]) == 5
+    assert len(groups.groups[False]) == 5
+
+    groups = agentset.groupby(lambda a: a.unique_id % 2 == 0)
+    assert len(groups.groups[True]) == 5
+    assert len(groups.groups[False]) == 5
+    assert len(groups) == 2
+
+    for group_name, group in groups:
+        assert len(group) == 5
+        assert group_name in {True, False}
+
+    sizes = agentset.groupby("even", result_type="list").map(len)
+    assert sizes == {True: 5, False: 5}
+
+    attributes = agentset.groupby("even", result_type="agentset").map("get", "even")
+    for group_name, group in attributes.items():
+        assert all(group_name == entry for entry in group)
+
+    groups = agentset.groupby("even", result_type="agentset")
+    another_ref_to_groups = groups.do("do", "step")
+    assert groups == another_ref_to_groups
+
+    groups = agentset.groupby("even", result_type="agentset")
+    another_ref_to_groups = groups.do(lambda x: x.do("step"))
+    assert groups == another_ref_to_groups
