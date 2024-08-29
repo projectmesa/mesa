@@ -38,7 +38,6 @@ class BoltzmannWealth(mesa.Model):
         self.datacollector.collect(self)
 
     def step(self):
-        self._advance_time()
         self.agents.shuffle().do("step")
         # collect data
         self.datacollector.collect(self)
