@@ -49,19 +49,12 @@ class Agent:
         self.model = model
         self.pos: Position | None = None
 
-        # register agent
-        try:
-            self.model.agents_[type(self)][self] = None
-        except AttributeError as err:
-            # model super has not been called
-            raise RuntimeError(
-                "The Mesa Model class was not initialized. You must explicitly initialize the Model by calling super().__init__() on initialization."
-            ) from err
+        self.model.register_agent(self)
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
         with contextlib.suppress(KeyError):
-            self.model.agents_[type(self)].pop(self)
+            self.model.deregister_agent(self)
 
     def step(self) -> None:
         """A single step of the agent."""
