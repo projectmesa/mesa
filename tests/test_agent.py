@@ -343,7 +343,7 @@ def test_agentset_map_str():
         agentset.do("non_existing_method")
 
     results = agentset.map("get_unique_identifier")
-    assert all(i == entry for i, entry in zip(results, range(1, 11)))
+    assert all(i == entry for i, entry in zip(results, range(10)))
 
 
 def test_agentset_map_callable():
@@ -360,7 +360,7 @@ def test_agentset_map_callable():
     # related to issue #1595
 
     results = agentset.map(lambda agent: agent.unique_id)
-    assert all(i == entry for i, entry in zip(results, range(1, 11)))
+    assert all(i == entry for i, entry in zip(results, range(10)))
 
 
 def test_agentset_get_attribute():
