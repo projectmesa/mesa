@@ -23,7 +23,7 @@ TODO: Migration guide, contribution guide.
 ### ⚠️ Breaking changes
 * model: Automatically increase `steps` counter by @EwoutH in https://github.com/projectmesa/mesa/pull/2223
 ### 🧪 Experimental features
-* Voronoi Tesselation based Discrete Space by @vitorfrois in https://github.com/projectmesa/mesa/pull/2084
+* Voronoi Tessellation based Discrete Space by @vitorfrois in https://github.com/projectmesa/mesa/pull/2084
 ### 🎉 New features added
 * Add AgentSet.groupby by @quaquel in https://github.com/projectmesa/mesa/pull/2220
 * AgentSet: Add `set` method by @EwoutH in https://github.com/projectmesa/mesa/pull/2254
