@@ -49,19 +49,12 @@ class Agent:
         self.model = model
         self.pos: Position | None = None
 
-        # register agent
-        try:
-            self.model.agents_[type(self)][self] = None
-        except AttributeError as err:
-            # model super has not been called
-            raise RuntimeError(
-                "The Mesa Model class was not initialized. You must explicitly initialize the Model by calling super().__init__() on initialization."
-            ) from err
+        self.model.register_agent(self)
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
         with contextlib.suppress(KeyError):
-            self.model.agents_[type(self)].pop(self)
+            self.model.deregister_agent(self)
 
     def step(self) -> None:
         """A single step of the agent."""
@@ -315,6 +308,21 @@ class AgentSet(MutableSet, Sequence):
                 [getattr(agent, attr_name) for attr_name in attr_names]
                 for agent in self._agents
             ]
+
+    def set(self, attr_name: str, value: Any) -> AgentSet:
+        """
+        Set a specified attribute to a given value for all agents in the AgentSet.
+
+        Args:
+            attr_name (str): The name of the attribute to set.
+            value (Any): The value to set the attribute to.
+
+        Returns:
+            AgentSet: The AgentSet instance itself, after setting the attribute.
+        """
+        for agent in self:
+            setattr(agent, attr_name, value)
+        return self
 
     def __getitem__(self, item: int | slice) -> Agent:
         """

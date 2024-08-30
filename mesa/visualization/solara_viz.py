@@ -244,7 +244,7 @@ def ModelController(model, play_interval, current_step, reset_counter):
         """Advance the model by one step."""
         model.step()
         previous_step.value = current_step.value
-        current_step.value = model._steps
+        current_step.value = model.steps
 
     def do_play():
         """Run the model continuously."""

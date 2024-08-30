@@ -83,8 +83,8 @@ class MockModel(Model):
         return 42
 
     def step(self):
-        self.datacollector.collect(self)
         self.schedule.step()
+        self.datacollector.collect(self)
 
 
 def test_batch_run():
