@@ -146,7 +146,7 @@ def test_call_space_drawer(mocker):
         centroids_coordinates=[(0, 1), (0, 0), (1, 0)],
     )
     solara.render(
-        JupyterViz(
+        SolaraViz(
             model_class=voronoi_model, model_params={}, agent_portrayal=agent_portrayal
         )
     )
