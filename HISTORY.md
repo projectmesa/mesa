@@ -17,7 +17,9 @@ Our example models also got more love: We removed the `RandomActivation` schedul
 
 Finally, we have two brand new examples: An Ant Colony Optimization model using an Ant System approach to the Traveling Salesman problem, a Mesa NetworkGrid, and a custom visualisation with SolaraViz ([examples#157](https://github.com/projectmesa/mesa-examples/pull/157) by @zjost). The first example using the `PropertyLayer` was added, a very fast implementation of Conway's Game of Life ([examples#182](https://github.com/projectmesa/mesa-examples/pull/182)).
 
-TODO: Migration guide, contribution guide.
+To help the transition to Mesa 3.0, we started writing a [migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html). Progress is tracked in #2233, feedback and help is appreciated! Finally, we also added a new section to our [contributor guide](https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md#i-have-no-idea-where-to-start) to get new contributors up to speed.
+
+This pre-release can be installed as always with `pip install --pre mesa`
 
 ## What's Changed
 ### ⚠️ Breaking changes
@@ -28,17 +30,19 @@ TODO: Migration guide, contribution guide.
 * Add AgentSet.groupby by @quaquel in https://github.com/projectmesa/mesa/pull/2220
 * AgentSet: Add `set` method by @EwoutH in https://github.com/projectmesa/mesa/pull/2254
 ### 🛠 Enhancements made
-* Split AgentSet into map and do to separate return types by @quaquel in https://github.com/projectmesa/mesa/pull/2237
+* Split AgentSet into map and do to seperate return types by @quaquel in https://github.com/projectmesa/mesa/pull/2237
 * Performance enhancements for Model.agents by @quaquel in https://github.com/projectmesa/mesa/pull/2251
 * AgentSet: Allow selecting a fraction of agents in the AgentSet by @EwoutH in https://github.com/projectmesa/mesa/pull/2253
 ### 🐛 Bugs fixed
 * SolaraViz: Reset components when params are changed by @rht in https://github.com/projectmesa/mesa/pull/2240
+### 📜 Documentation improvements
+* Contribution: Add "I have no idea where to start" section by @EwoutH in https://github.com/projectmesa/mesa/pull/2258
+* Write initial Mesa Migration guide by @EwoutH in https://github.com/projectmesa/mesa/pull/2257
 ### 🔧 Maintenance
 * CI: Add test job for Python 3.13 by @EwoutH in https://github.com/projectmesa/mesa/pull/2173
 * Add pull request templates by @EwoutH in https://github.com/projectmesa/mesa/pull/2217
 * benchmarks: Add BoltzmannWealth model by @EwoutH in https://github.com/projectmesa/mesa/pull/2252
-### Other changes
-
+* CI: Add optional dependency for examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2261
 
 ## New Contributors
 * @vitorfrois made their first contribution in https://github.com/projectmesa/mesa/pull/2084
