@@ -1,6 +1,50 @@
 ---
 title: Release History
 ---
+# 3.0.0a3 (2024-08-30)
+## Highlights
+Developments toward Mesa 3.0 are steaming ahead, and our fourth alpha release is packed with features and updates - only 8 days after our third.
+
+Mesa 3.0.0a3 contains one breaking change: We now automatically increase the `steps` counter by one at the beginning of each `Model.steps()` call. That means increasing `steps` by hand isn't necessary anymore.
+
+The big new features is the experimental Voronoi grid that @vitorfrois implemented in #2084. It allows creating cells in a [Voronoi](https://en.wikipedia.org/wiki/Voronoi_diagram) layout as part of the experimental cell space. An example using it to model Cholera spread can be [found here](https://github.com/projectmesa/mesa-examples/pull/118).
+
+The AgentSet got a lot of love with two brand new methods: `.groupby()` to split in groups (#2220) and `.set()` to easily assign variables to all agents in that set (#2254). The `select()` method is improved by allowing to select at most a fraction of the agents (#2253), and we split the `do()` method in `do()` and `map()` to make a distinction between the return types (#2237). 
+
+Furthermore, we improved the performance of accessing `Model.agents`, squashed a bug in SolaraViz, started testing on Python 3.13 and added a new benchmark model.
+
+Our example models also got more love: We removed the `RandomActivation` scheduler in 14 models and removed SimultaneousActivation in 3 models ([examples#183](https://github.com/projectmesa/mesa-examples/pull/183)). They now use the automatic step increase and AgentSet functionality. We started testing our GIS model in CI ([examples#171](https://github.com/projectmesa/mesa-examples/pull/171)) and resolved a lot of bugs in them ([examples#172](https://github.com/projectmesa/mesa-examples/issues/172), help appreciated!).
+
+Finally, we have two brand new examples: An Ant Colony Optimization model using an Ant System approach to the Traveling Salesman problem, a Mesa NetworkGrid, and a custom visualisation with SolaraViz ([examples#157](https://github.com/projectmesa/mesa-examples/pull/157) by @zjost). The first example using the `PropertyLayer` was added, a very fast implementation of Conway's Game of Life ([examples#182](https://github.com/projectmesa/mesa-examples/pull/182)).
+
+TODO: Migration guide, contribution guide.
+
+## What's Changed
+### ⚠️ Breaking changes
+* model: Automatically increase `steps` counter by @EwoutH in https://github.com/projectmesa/mesa/pull/2223
+### 🧪 Experimental features
+* Voronoi Tesselation based Discrete Space by @vitorfrois in https://github.com/projectmesa/mesa/pull/2084
+### 🎉 New features added
+* Add AgentSet.groupby by @quaquel in https://github.com/projectmesa/mesa/pull/2220
+* AgentSet: Add `set` method by @EwoutH in https://github.com/projectmesa/mesa/pull/2254
+### 🛠 Enhancements made
+* Split AgentSet into map and do to separate return types by @quaquel in https://github.com/projectmesa/mesa/pull/2237
+* Performance enhancements for Model.agents by @quaquel in https://github.com/projectmesa/mesa/pull/2251
+* AgentSet: Allow selecting a fraction of agents in the AgentSet by @EwoutH in https://github.com/projectmesa/mesa/pull/2253
+### 🐛 Bugs fixed
+* SolaraViz: Reset components when params are changed by @rht in https://github.com/projectmesa/mesa/pull/2240
+### 🔧 Maintenance
+* CI: Add test job for Python 3.13 by @EwoutH in https://github.com/projectmesa/mesa/pull/2173
+* Add pull request templates by @EwoutH in https://github.com/projectmesa/mesa/pull/2217
+* benchmarks: Add BoltzmannWealth model by @EwoutH in https://github.com/projectmesa/mesa/pull/2252
+### Other changes
+
+
+## New Contributors
+* @vitorfrois made their first contribution in https://github.com/projectmesa/mesa/pull/2084
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a2...v3.0.0a3
+
 # 3.0.0a2 (2024-08-21)
 ## Highlights
 In Mesa 3.0 alpha 2 (`v3.0.0a2`) we've done more clean-up in preparation for Mesa 3.0. We now [require](https://github.com/projectmesa/mesa/pull/2218) `super().__init__()`  to run on initializing a Mesa model subclass, `Model.agents` is now fully reserved for the Model's internal AgentSet and we fixed a bug in our Solara space_drawer.
