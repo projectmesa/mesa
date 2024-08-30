@@ -30,7 +30,7 @@ This pre-release can be installed as always with `pip install --pre mesa`
 * Add AgentSet.groupby by @quaquel in https://github.com/projectmesa/mesa/pull/2220
 * AgentSet: Add `set` method by @EwoutH in https://github.com/projectmesa/mesa/pull/2254
 ### 🛠 Enhancements made
-* Split AgentSet into map and do to seperate return types by @quaquel in https://github.com/projectmesa/mesa/pull/2237
+* Split AgentSet into map and do to separate return types by @quaquel in https://github.com/projectmesa/mesa/pull/2237
 * Performance enhancements for Model.agents by @quaquel in https://github.com/projectmesa/mesa/pull/2251
 * AgentSet: Allow selecting a fraction of agents in the AgentSet by @EwoutH in https://github.com/projectmesa/mesa/pull/2253
 ### 🐛 Bugs fixed
