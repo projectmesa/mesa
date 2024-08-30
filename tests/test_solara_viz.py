@@ -5,7 +5,7 @@ import ipyvuetify as vw
 import solara
 
 import mesa
-from mesa.visualization.jupyter_viz import JupyterViz, Slider, UserInputs
+from mesa.visualization.solara_viz import Slider, SolaraViz, UserInputs
 
 
 class TestMakeUserInput(unittest.TestCase):
@@ -101,7 +101,7 @@ def test_call_space_drawer(mocker):
     # initialize with space drawer unspecified (use default)
     # component must be rendered for code to run
     solara.render(
-        JupyterViz(
+        SolaraViz(
             model_class=mesa.Model,
             model_params={},
             agent_portrayal=agent_portrayal,
@@ -116,7 +116,7 @@ def test_call_space_drawer(mocker):
     for falsy_value in [None, False, 0]:
         mock_space_matplotlib.reset_mock()
         solara.render(
-            JupyterViz(
+            SolaraViz(
                 model_class=mesa.Model,
                 model_params={},
                 agent_portrayal=agent_portrayal,
@@ -129,14 +129,16 @@ def test_call_space_drawer(mocker):
     # specify a custom space method
     altspace_drawer = Mock()
     solara.render(
-        JupyterViz(
+        SolaraViz(
             model_class=mesa.Model,
             model_params={},
             agent_portrayal=agent_portrayal,
             space_drawer=altspace_drawer,
         )
     )
-    altspace_drawer.assert_called_with(model, agent_portrayal)
+    altspace_drawer.assert_called_with(
+        model, agent_portrayal, dependencies=dependencies
+    )
 
     # check voronoi space drawer
     voronoi_model = mesa.Model()

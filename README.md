@@ -28,13 +28,19 @@ can be displayed in browser windows or Jupyter.*
 
 ## Using Mesa
 
-Getting started quickly:
+To install our latest stable release (2.3.x), run:
 
 ``` bash
-pip install mesa
+pip install -U mesa
 ```
 
-You can also use `pip` to install the github version:
+To install our latest pre-release (3.0.0 alpha), run:
+
+``` bash
+pip install -U --pre mesa
+```
+
+You can also use `pip` to install the latest GitHub version:
 
 ``` bash
 pip install -U -e git+https://github.com/projectmesa/mesa@main#egg=mesa

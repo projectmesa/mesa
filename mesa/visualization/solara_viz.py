@@ -5,7 +5,7 @@ This module provides components to create browser- and Jupyter notebook-based vi
 Mesa models, allowing users to watch models run step-by-step and interact with model parameters.
 
 Key features:
-    - JupyterViz: Main component for creating visualizations, supporting grid displays and plots
+    - SolaraViz: Main component for creating visualizations, supporting grid displays and plots
     - ModelController: Handles model execution controls (step, play, pause, reset)
     - UserInputs: Generates UI elements for adjusting model parameters
     - Card: Renders individual visualization elements (space, measures)
@@ -17,13 +17,12 @@ custom visualization components.
 Usage:
     1. Define an agent_portrayal function to specify how agents should be displayed
     2. Set up model_params to define adjustable parameters
-    3. Create a JupyterViz instance with your model, parameters, and desired measures
+    3. Create a SolaraViz instance with your model, parameters, and desired measures
     4. Display the visualization in a Jupyter notebook or run as a Solara app
 
 See the Visualization Tutorial and example models for more details.
 """
 
-import sys
 import threading
 
 import reacton.ipywidgets as widgets
@@ -71,7 +70,7 @@ def Card(
                 )
             elif space_drawer:
                 # if specified, draw agent space with an alternate renderer
-                space_drawer(model, agent_portrayal)
+                space_drawer(model, agent_portrayal, dependencies=dependencies)
         elif "Measure" in layout_type:
             rv.CardTitle(children=["Measure"])
             measure = measures[layout_type["Measure"]]
@@ -86,7 +85,7 @@ def Card(
 
 
 @solara.component
-def JupyterViz(
+def SolaraViz(
     model_class,
     model_params,
     measures=None,
@@ -104,7 +103,8 @@ def JupyterViz(
         model_params: Parameters for initializing the model
         measures: List of callables or data attributes to plot
         name: Name for display
-        agent_portrayal: Options for rendering agents (dictionary)
+        agent_portrayal: Options for rendering agents (dictionary);
+            Default drawer supports custom `"size"`, `"color"`, and `"shape"`.
         space_drawer: Method to render the agent space for
             the model; default implementation is the `SpaceMatplotlib` component;
             simulations with no space to visualize should
@@ -158,92 +158,56 @@ def JupyterViz(
         """Update the random seed for the model."""
         reactive_seed.value = model.random.random()
 
-    # jupyter
-    dependencies = [current_step.value, reactive_seed.value]
+    dependencies = [
+        *list(model_parameters.values()),
+        current_step.value,
+        reactive_seed.value,
+    ]
 
-    def render_in_jupyter():
-        """Render the visualization components in Jupyter notebook."""
-        with solara.GridFixed(columns=2):
+    # if space drawer is disabled, do not include it
+    layout_types = [{"Space": "default"}] if space_drawer else []
+
+    if measures:
+        layout_types += [{"Measure": elem} for elem in range(len(measures))]
+
+    grid_layout_initial = make_initial_grid_layout(layout_types=layout_types)
+    grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
+
+    with solara.Sidebar():
+        with solara.Card("Controls", margin=1, elevation=2):
+            solara.InputText(
+                label="Seed",
+                value=reactive_seed,
+                continuous_update=True,
+            )
             UserInputs(user_params, on_change=handle_change_model_params)
             ModelController(model, play_interval, current_step, reset_counter)
-            solara.Markdown(md_text=f"###Step - {current_step}")
+            solara.Button(label="Reseed", color="primary", on_click=do_reseed)
+        with solara.Card("Information", margin=1, elevation=2):
+            solara.Markdown(md_text=f"Step - {current_step}")
 
-        with solara.GridFixed(columns=2):
-            # 4. Space
-            if space_drawer == "default":
-                # draw with the default implementation
-                components_matplotlib.SpaceMatplotlib(
-                    model, agent_portrayal, dependencies=dependencies
-                )
-            elif space_drawer == "altair":
-                components_altair.SpaceAltair(
-                    model, agent_portrayal, dependencies=dependencies
-                )
-            elif space_drawer:
-                # if specified, draw agent space with an alternate renderer
-                space_drawer(model, agent_portrayal)
-            # otherwise, do nothing (do not draw space)
-
-            # 5. Plots
-            if measures:
-                for measure in measures:
-                    if callable(measure):
-                        # Is a custom object
-                        measure(model)
-                    else:
-                        components_matplotlib.PlotMatplotlib(
-                            model, measure, dependencies=dependencies
-                        )
-
-    def render_in_browser():
-        """Render the visualization components in a web browser."""
-        # if space drawer is disabled, do not include it
-        layout_types = [{"Space": "default"}] if space_drawer else []
-
-        if measures:
-            layout_types += [{"Measure": elem} for elem in range(len(measures))]
-
-        grid_layout_initial = make_initial_grid_layout(layout_types=layout_types)
-        grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
-
-        with solara.Sidebar():
-            with solara.Card("Controls", margin=1, elevation=2):
-                solara.InputText(
-                    label="Seed",
-                    value=reactive_seed,
-                    continuous_update=True,
-                )
-                UserInputs(user_params, on_change=handle_change_model_params)
-                ModelController(model, play_interval, current_step, reset_counter)
-                solara.Button(label="Reseed", color="primary", on_click=do_reseed)
-            with solara.Card("Information", margin=1, elevation=2):
-                solara.Markdown(md_text=f"Step - {current_step}")
-
-        items = [
-            Card(
-                model,
-                measures,
-                agent_portrayal,
-                space_drawer,
-                dependencies,
-                color="white",
-                layout_type=layout_types[i],
-            )
-            for i in range(len(layout_types))
-        ]
-        solara.GridDraggable(
-            items=items,
-            grid_layout=grid_layout,
-            resizable=True,
-            draggable=True,
-            on_grid_layout=set_grid_layout,
+    items = [
+        Card(
+            model,
+            measures,
+            agent_portrayal,
+            space_drawer,
+            dependencies,
+            color="white",
+            layout_type=layout_types[i],
         )
+        for i in range(len(layout_types))
+    ]
+    solara.GridDraggable(
+        items=items,
+        grid_layout=grid_layout,
+        resizable=True,
+        draggable=True,
+        on_grid_layout=set_grid_layout,
+    )
 
-    if ("ipykernel" in sys.argv[0]) or ("colab_kernel_launcher.py" in sys.argv[0]):
-        # When in Jupyter or Google Colab
-        render_in_jupyter()
-    else:
-        render_in_browser()
+
+JupyterViz = SolaraViz
 
 
 @solara.component
@@ -280,7 +244,7 @@ def ModelController(model, play_interval, current_step, reset_counter):
         """Advance the model by one step."""
         model.step()
         previous_step.value = current_step.value
-        current_step.value = model._steps
+        current_step.value = model.steps
 
     def do_play():
         """Run the model continuously."""

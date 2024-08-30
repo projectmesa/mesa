@@ -66,3 +66,4 @@ class TestExamples(unittest.TestCase):
                 model = model_class()
                 for _ in range(10):
                     model.step()
+                self.assertEqual(model.steps, 10)

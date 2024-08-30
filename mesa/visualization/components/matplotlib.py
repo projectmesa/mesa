@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import networkx as nx
 import solara
 from matplotlib.figure import Figure
@@ -26,12 +28,44 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = Non
     solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
 
 
+# matplotlib scatter does not allow for multiple shapes in one call
+def _split_and_scatter(portray_data, space_ax):
+    grouped_data = defaultdict(lambda: {"x": [], "y": [], "s": [], "c": []})
+
+    # Extract data from the dictionary
+    x = portray_data["x"]
+    y = portray_data["y"]
+    s = portray_data["s"]
+    c = portray_data["c"]
+    m = portray_data["m"]
+
+    if not (len(x) == len(y) == len(s) == len(c) == len(m)):
+        raise ValueError(
+            "Length mismatch in portrayal data lists: "
+            f"x: {len(x)}, y: {len(y)}, size: {len(s)}, "
+            f"color: {len(c)}, marker: {len(m)}"
+        )
+
+    # Group the data by marker
+    for i in range(len(x)):
+        marker = m[i]
+        grouped_data[marker]["x"].append(x[i])
+        grouped_data[marker]["y"].append(y[i])
+        grouped_data[marker]["s"].append(s[i])
+        grouped_data[marker]["c"].append(c[i])
+
+    # Plot each group with the same marker
+    for marker, data in grouped_data.items():
+        space_ax.scatter(data["x"], data["y"], s=data["s"], c=data["c"], marker=marker)
+
+
 def _draw_grid(space, space_ax, agent_portrayal):
     def portray(g):
         x = []
         y = []
         s = []  # size
         c = []  # color
+        m = []  # shape
         for i in range(g.width):
             for j in range(g.height):
                 content = g._grid[i][j]
@@ -44,23 +78,23 @@ def _draw_grid(space, space_ax, agent_portrayal):
                     data = agent_portrayal(agent)
                     x.append(i)
                     y.append(j)
-                    if "size" in data:
-                        s.append(data["size"])
-                    if "color" in data:
-                        c.append(data["color"])
-        out = {"x": x, "y": y}
-        # This is the default value for the marker size, which auto-scales
-        # according to the grid area.
-        out["s"] = (180 / min(g.width, g.height)) ** 2
-        if len(s) > 0:
-            out["s"] = s
-        if len(c) > 0:
-            out["c"] = c
+
+                    # This is the default value for the marker size, which auto-scales
+                    # according to the grid area.
+                    default_size = (180 / max(g.width, g.height)) ** 2
+                    # establishing a default prevents misalignment if some agents are not given size, color, etc.
+                    size = data.get("size", default_size)
+                    s.append(size)
+                    color = data.get("color", "tab:blue")
+                    c.append(color)
+                    mark = data.get("shape", "o")
+                    m.append(mark)
+        out = {"x": x, "y": y, "s": s, "c": c, "m": m}
         return out
 
     space_ax.set_xlim(-1, space.width)
     space_ax.set_ylim(-1, space.height)
-    space_ax.scatter(**portray(space))
+    _split_and_scatter(portray(space), space_ax)
 
 
 def _draw_network_grid(space, space_ax, agent_portrayal):
@@ -80,20 +114,23 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
         y = []
         s = []  # size
         c = []  # color
+        m = []  # shape
         for agent in space._agent_to_index:
             data = agent_portrayal(agent)
             _x, _y = agent.pos
             x.append(_x)
             y.append(_y)
-            if "size" in data:
-                s.append(data["size"])
-            if "color" in data:
-                c.append(data["color"])
-        out = {"x": x, "y": y}
-        if len(s) > 0:
-            out["s"] = s
-        if len(c) > 0:
-            out["c"] = c
+
+            # This is matplotlib's default marker size
+            default_size = 20
+            # establishing a default prevents misalignment if some agents are not given size, color, etc.
+            size = data.get("size", default_size)
+            s.append(size)
+            color = data.get("color", "tab:blue")
+            c.append(color)
+            mark = data.get("shape", "o")
+            m.append(mark)
+        out = {"x": x, "y": y, "s": s, "c": c, "m": m}
         return out
 
     # Determine border style based on space.torus
@@ -113,7 +150,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
     space_ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
     # Portray and scatter the agents in the space
-    space_ax.scatter(**portray(space))
+    _split_and_scatter(portray(space), space_ax)
 
 
 def _draw_voronoi(space, space_ax, agent_portrayal):

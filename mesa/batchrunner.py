@@ -132,14 +132,14 @@ def _model_run_func(
     """
     run_id, iteration, kwargs = run
     model = model_cls(**kwargs)
-    while model.running and model.schedule.steps <= max_steps:
+    while model.running and model.steps <= max_steps:
         model.step()
 
     data = []
 
-    steps = list(range(0, model.schedule.steps, data_collection_period))
-    if not steps or steps[-1] != model.schedule.steps - 1:
-        steps.append(model.schedule.steps - 1)
+    steps = list(range(0, model.steps, data_collection_period))
+    if not steps or steps[-1] != model.steps - 1:
+        steps.append(model.steps - 1)
 
     for step in steps:
         model_data, all_agents_data = _collect_data(model, step)
