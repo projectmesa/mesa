@@ -133,9 +133,8 @@ class AgentSet(MutableSet, Sequence):
             filter_func (Callable[[Agent], bool], optional): A function that takes an Agent and returns True if the
                 agent should be included in the result. Defaults to None, meaning no filtering is applied.
             at_most (int | float, optional): The maximum amount of agents to select. Defaults to infinity.
-              - If an integer of 1 or larger, the first n matching agents are selected.
+              - If an integer, at most the first number of matching agents are selected.
               - If a float between 0 and 1, at most that fraction of original the agents are selected.
-            fraction (float, optional): The fraction of agents to select. If 0.2, it selects 20% of Agents in the AgentSet. Defaults to 1.0.
             inplace (bool, optional): If True, modifies the current AgentSet; otherwise, returns a new AgentSet. Defaults to False.
             agent_type (type[Agent], optional): The class type of the agents to select. Defaults to None, meaning no type filtering is applied.
 
