@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import contextlib
 import copy
+import itertools
 import operator
 import warnings
 import weakref
@@ -36,8 +37,9 @@ class Agent:
         model (Model): A reference to the model instance.
         self.pos: Position | None = None
     """
+    _ids = itertools.count()
 
-    def __init__(self, unique_id: int, model: Model) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """
         Create a new agent.
 
@@ -45,6 +47,16 @@ class Agent:
             unique_id (int): A unique identifier for this agent.
             model (Model): The model instance in which the agent exists.
         """
+        if len(args) == 1:
+            model = args[0]
+            unique_id = next(self._ids)
+        else:
+            warnings.warn("unique ids are assigned automatically in MESA 3",
+                          DeprecationWarning, stacklevel=2)
+            unique_id, model, *args = args
+            # if *args is not empty, what should we do?
+
+
         self.unique_id = unique_id
         self.model = model
         self.pos: Position | None = None
