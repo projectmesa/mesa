@@ -63,6 +63,7 @@ For resources or help on using Mesa, check out the following:
 -   [Mesa Examples](https://github.com/projectmesa/mesa-examples/tree/main/examples) (A repository of seminal ABMs using Mesa and
     examples of employing specific Mesa Features)
 -   [Docs](http://mesa.readthedocs.org/) (Mesa's documentation, API and useful snippets)
+    -   [Development version docs](https://mesa.readthedocs.io/en/latest/) (the latest version docs if you're using a pre-release Mesa version)
 -   [Discussions](https://github.com/projectmesa/mesa/discussions) (GitHub threaded discussions about Mesa)
 -   [Matrix Chat](https://matrix.to/#/#project-mesa:matrix.org) (Chat Forum via Matrix to talk about Mesa)
 
