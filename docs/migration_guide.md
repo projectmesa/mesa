@@ -6,7 +6,7 @@ Non-breaking changes aren't included, for those see our [Release history](https:
 ## Mesa 3.0
 <!-- TODO small introduction-->
 
-The development of this deprecation guide is tracked in [Issue #2233](https://github.com/projectmesa/mesa/issues/2233).
+_This guide is a work in progress. The development of it is tracked in [Issue #2233](https://github.com/projectmesa/mesa/issues/2233)._
 
 ### Reserved and private variables
 <!-- TODO: Update this section based on https://github.com/projectmesa/mesa/discussions/2230 -->
