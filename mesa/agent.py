@@ -143,7 +143,7 @@ class AgentSet(MutableSet, Sequence):
 
         Notes:
             - at_most just return the first n or fraction of agents. To take a random sample, shuffle() beforehand.
-            - at_most is an upper limit. When specifying other criteria it can be smaller.
+            - at_most is an upper limit. When specifying other criteria, the number of agents returned can be smaller.
         """
         if n is not None:
             warnings.warn(
