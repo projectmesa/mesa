@@ -9,7 +9,7 @@ Mesa 3.0.0a3 contains one breaking change: We now automatically increase the `st
 
 The big new features is the experimental Voronoi grid that @vitorfrois implemented in #2084. It allows creating cells in a [Voronoi](https://en.wikipedia.org/wiki/Voronoi_diagram) layout as part of the experimental cell space. An example using it to model Cholera spread can be [found here](https://github.com/projectmesa/mesa-examples/pull/118).
 
-The AgentSet got a lot of love with two brand new methods: `.groupby()` to split in groups (#2220) and `.set()` to easily assign variables to all agents in that set (#2254). The `select()` method is improved by allowing to select at most a fraction of the agents (#2253), and we split the `do()` method in `do()` and `map()` to make a distinction between the return types (#2237). 
+The AgentSet got a lot of love with two brand new methods: `.groupby()` to split in groups (#2220) and `.set()` to easily assign variables to all agents in that set (#2254). The `select()` method is improved by allowing to select at most a fraction of the agents (#2253), and we split the `do()` method in `do()` and `map()` to make a distinction between the return types (#2237).
 
 Furthermore, we improved the performance of accessing `Model.agents`, squashed a bug in SolaraViz, started testing on Python 3.13 and added a new benchmark model.
 
