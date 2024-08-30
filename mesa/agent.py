@@ -37,6 +37,7 @@ class Agent:
         model (Model): A reference to the model instance.
         self.pos: Position | None = None
     """
+
     _ids = itertools.count()
 
     def __init__(self, *args, **kwargs) -> None:
@@ -51,11 +52,13 @@ class Agent:
             model = args[0]
             unique_id = next(self._ids)
         else:
-            warnings.warn("unique ids are assigned automatically in MESA 3",
-                          DeprecationWarning, stacklevel=2)
+            warnings.warn(
+                "unique ids are assigned automatically in MESA 3",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             unique_id, model, *args = args
             # if *args is not empty, what should we do?
-
 
         self.unique_id = unique_id
         self.model = model
