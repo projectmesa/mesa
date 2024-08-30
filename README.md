@@ -52,10 +52,12 @@ Or any other (development) branch on this repo or your own fork:
 pip install -U -e git+https://github.com/YOUR_FORK/mesa@YOUR_BRANCH#egg=mesa
 ```
 
+## Resources
 For resources or help on using Mesa, check out the following:
 
 -   [Intro to Mesa Tutorial](http://mesa.readthedocs.org/en/stable/tutorials/intro_tutorial.html) (An introductory model, the Boltzmann
     Wealth Model, for beginners or those new to Mesa.)
+-   [Visualization Tutorial](https://mesa.readthedocs.io/en/stable/tutorials/visualization_tutorial.html) (An introduction into our Solara visualization)
 -   [Complexity Explorer Tutorial](https://www.complexityexplorer.org/courses/172-agent-based-models-with-python-an-introduction-to-mesa) (An advanced-beginner model,
     SugarScape with Traders, with instructional videos)
 -   [Mesa Examples](https://github.com/projectmesa/mesa-examples/tree/main/examples) (A repository of seminal ABMs using Mesa and
