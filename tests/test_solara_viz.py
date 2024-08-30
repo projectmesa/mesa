@@ -140,6 +140,17 @@ def test_call_space_drawer(mocker):
         model, agent_portrayal, dependencies=dependencies
     )
 
+    # check voronoi space drawer
+    voronoi_model = mesa.Model()
+    voronoi_model.grid = mesa.experimental.cell_space.VoronoiGrid(
+        centroids_coordinates=[(0, 1), (0, 0), (1, 0)],
+    )
+    solara.render(
+        SolaraViz(
+            model_class=voronoi_model, model_params={}, agent_portrayal=agent_portrayal
+        )
+    )
+
 
 def test_slider():
     slider_float = Slider("Agent density", 0.8, 0.1, 1.0, 0.1)

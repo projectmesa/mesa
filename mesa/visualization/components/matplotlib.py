@@ -6,6 +6,7 @@ from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 
 import mesa
+from mesa.experimental.cell_space import VoronoiGrid
 
 
 @solara.component
@@ -20,6 +21,8 @@ def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = Non
         _draw_network_grid(space, space_ax, agent_portrayal)
     elif isinstance(space, mesa.space.ContinuousSpace):
         _draw_continuous_space(space, space_ax, agent_portrayal)
+    elif isinstance(space, VoronoiGrid):
+        _draw_voronoi(space, space_ax, agent_portrayal)
     else:
         _draw_grid(space, space_ax, agent_portrayal)
     solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
@@ -148,6 +151,56 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
 
     # Portray and scatter the agents in the space
     _split_and_scatter(portray(space), space_ax)
+
+
+def _draw_voronoi(space, space_ax, agent_portrayal):
+    def portray(g):
+        x = []
+        y = []
+        s = []  # size
+        c = []  # color
+
+        for cell in g.all_cells:
+            for agent in cell.agents:
+                data = agent_portrayal(agent)
+                x.append(cell.coordinate[0])
+                y.append(cell.coordinate[1])
+                if "size" in data:
+                    s.append(data["size"])
+                if "color" in data:
+                    c.append(data["color"])
+        out = {"x": x, "y": y}
+        # This is the default value for the marker size, which auto-scales
+        # according to the grid area.
+        out["s"] = s
+        if len(c) > 0:
+            out["c"] = c
+
+        return out
+
+    x_list = [i[0] for i in space.centroids_coordinates]
+    y_list = [i[1] for i in space.centroids_coordinates]
+    x_max = max(x_list)
+    x_min = min(x_list)
+    y_max = max(y_list)
+    y_min = min(y_list)
+
+    width = x_max - x_min
+    x_padding = width / 20
+    height = y_max - y_min
+    y_padding = height / 20
+    space_ax.set_xlim(x_min - x_padding, x_max + x_padding)
+    space_ax.set_ylim(y_min - y_padding, y_max + y_padding)
+    space_ax.scatter(**portray(space))
+
+    for cell in space.all_cells:
+        polygon = cell.properties["polygon"]
+        space_ax.fill(
+            *zip(*polygon),
+            alpha=min(1, cell.properties[space.cell_coloring_property]),
+            c="red",
+        )  # Plot filled polygon
+        space_ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in red
 
 
 @solara.component
