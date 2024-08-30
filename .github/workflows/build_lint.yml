@@ -77,7 +77,7 @@ jobs:
     - name: Install uv
       run: pip install uv
     - name: Install Mesa
-      run: uv pip install --system .[dev]
+      run: uv pip install --system .[examples]
     - name: Checkout mesa-examples
       uses: actions/checkout@v4
       with:
