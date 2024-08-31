@@ -50,7 +50,7 @@ def test_agent_types():
         pass
 
     model = Model()
-    test_agent = TestAgent(model.next_id(), model)
+    test_agent = TestAgent( model)
     assert test_agent in model.agents
     assert type(test_agent) in model.agent_types
 

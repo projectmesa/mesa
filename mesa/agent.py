@@ -28,29 +28,31 @@ if TYPE_CHECKING:
     from mesa.space import Position
 
 
+class TestClassDict(dict):
+    def __missing__(self, key):
+        res = self[key] = itertools.count(1)
+        return res
+
 class Agent:
     """
     Base class for a model agent in Mesa.
 
     Attributes:
-        unique_id (int): A unique identifier for this agent.
         model (Model): A reference to the model instance.
         self.pos: Position | None = None
     """
-
-    _ids = itertools.count()
+    _ids = TestClassDict()
 
     def __init__(self, *args, **kwargs) -> None:
         """
         Create a new agent.
 
         Args:
-            unique_id (int): A unique identifier for this agent.
             model (Model): The model instance in which the agent exists.
         """
         if len(args) == 1:
             model = args[0]
-            unique_id = next(self._ids)
+            unique_id = next(self._ids[model])
         else:
             warnings.warn(
                 "unique ids are assigned automatically in MESA 3",
@@ -59,6 +61,7 @@ class Agent:
             )
             unique_id, model, *args = args
             # if *args is not empty, what should we do?
+            # raise ValueError
 
         self.unique_id = unique_id
         self.model = model

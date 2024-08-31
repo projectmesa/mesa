@@ -30,7 +30,6 @@ class Animal(mesa.Agent):
     def spawn_offspring(self):
         self.energy /= 2
         offspring = self.__class__(
-            self.model.next_id(),
             self.model,
             self.moore,
             self.energy,

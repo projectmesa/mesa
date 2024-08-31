@@ -29,7 +29,7 @@ class Animal(CellAgent):
     def spawn_offspring(self):
         self.energy /= 2
         offspring = self.__class__(
-            self.model.next_id(),
+            self.
             self.model,
             self.energy,
             self.p_reproduce,
