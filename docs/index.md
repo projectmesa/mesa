@@ -52,6 +52,7 @@ mesa runserver examples/wolf_sheep
 
 For more help on using Mesa, check out the following resources:
 
+- [Mesa Overview]
 - [Mesa Introductory Tutorial]
 - [Mesa Visualization Tutorial]
 - [GitHub Issue Tracker]
@@ -99,7 +100,8 @@ Mesa Packages <packages>
 [github issue tracker]: https://github.com/projectmesa/mesa/issues
 [matrix chat room]: https://matrix.to/#/#project-mesa:matrix.org
 [mesa]: https://github.com/projectmesa/mesa/
-[mesa introductory tutorial]: tutorials/intro_tutorial.html
-[mesa visualization tutorial]: tutorials/visualization_tutorial.html
+[mesa overview]: https://mesa.readthedocs.io/en/stable/overview.html
+[mesa introductory tutorial]: https://mesa.readthedocs.io/en/stable/tutorials/intro_tutorial.html
+[mesa visualization tutorial]: https://mesa.readthedocs.io/en/stable/tutorials/visualization_tutorial.html
 [pypi]: https://pypi.python.org/pypi/Mesa/
 [ticket]: https://github.com/projectmesa/mesa/issues
