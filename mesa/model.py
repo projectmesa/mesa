@@ -189,11 +189,6 @@ class Model:
     def step(self) -> None:
         """A single step. Fill in here."""
 
-    def next_id(self) -> int:
-        """Return the next unique ID for agents, increment current_id"""
-        self.current_id += 1
-        return self.current_id
-
     def reset_randomizer(self, seed: int | None = None) -> None:
         """Reset the model random number generator.
 

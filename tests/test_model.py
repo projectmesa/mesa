@@ -6,9 +6,6 @@ def test_model_set_up():
     model = Model()
     assert model.running is True
     assert model.schedule is None
-    assert model.current_id == 0
-    assert model.current_id + 1 == model.next_id()
-    assert model.current_id == 1
     assert model.steps == 0
     model.step()
     assert model.steps == 1

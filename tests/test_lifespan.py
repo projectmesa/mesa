@@ -30,7 +30,7 @@ class LifeTimeModel(Model):
 
         for _ in range(n_agents):
             self.schedule.add(
-                FiniteLifeAgent(self.next_id(), self.agent_lifetime, self)
+                FiniteLifeAgent(self.agent_lifetime, self)
             )
 
     def step(self):
@@ -41,7 +41,7 @@ class LifeTimeModel(Model):
         if len(self.schedule.agents) < self.n_agents:
             for _ in range(self.n_agents - len(self.schedule.agents)):
                 self.schedule.add(
-                    FiniteLifeAgent(self.next_id(), self.agent_lifetime, self)
+                    FiniteLifeAgent(self.agent_lifetime, self)
                 )
 
     def run_model(self, step_count=100):
@@ -54,8 +54,8 @@ class FiniteLifeAgent(Agent):
     Also has a 10% chance of dying in each tick.
     """
 
-    def __init__(self, unique_id, lifetime, model):
-        super().__init__(unique_id, model)
+    def __init__(self, lifetime, model):
+        super().__init__(model)
         self.remaining_life = lifetime
         self.steps = 0
         self.model = model
