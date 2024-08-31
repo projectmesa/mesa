@@ -33,6 +33,7 @@ class TestClassDict(dict):
         res = self[key] = itertools.count(1)
         return res
 
+
 class Agent:
     """
     Base class for a model agent in Mesa.
@@ -41,6 +42,7 @@ class Agent:
         model (Model): A reference to the model instance.
         self.pos: Position | None = None
     """
+
     _ids = TestClassDict()
 
     def __init__(self, *args, **kwargs) -> None:

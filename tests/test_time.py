@@ -168,7 +168,7 @@ class TestRandomActivation(TestCase):
 
     def test_init(self):
         model = Model()
-        agents = [MockAgent( model) for _ in range(10)]
+        agents = [MockAgent(model) for _ in range(10)]
 
         scheduler = RandomActivation(model, agents)
         assert all(agent in scheduler.agents for agent in agents)
@@ -227,7 +227,7 @@ class TestRandomActivation(TestCase):
         model = MockModel(activation=RANDOM)
         # Create 10 agents
         for _ in range(10):
-            model.schedule.add(MockAgent( model))
+            model.schedule.add(MockAgent(model))
         # Run 3 steps
         for _ in range(3):
             model.step()
@@ -273,8 +273,8 @@ class TestRandomActivationByType(TestCase):
 
     def test_init(self):
         model = Model()
-        agents = [MockAgent( model) for _ in range(10)]
-        agents += [Agent( model) for _ in range(10)]
+        agents = [MockAgent(model) for _ in range(10)]
+        agents += [Agent(model) for _ in range(10)]
 
         scheduler = RandomActivationByType(model, agents)
         assert all(agent in scheduler.agents for agent in agents)
