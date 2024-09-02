@@ -33,11 +33,13 @@ class Model:
     Properties:
         agents: An AgentSet containing all agents in the model
         agent_types: A list of different agent types present in the model.
+        agents_by_type: A dictionary where the keys are agent types and the values are the corresponding AgentSets.
         steps: An integer representing the number of steps the model has taken.
                It increases automatically at the start of each step() call.
 
     Methods:
         get_agents_of_type: Returns an AgentSet of agents of the specified type.
+            Deprecated: Use agents_by_type[agenttype] instead.
         run_model: Runs the model's simulation until a defined end condition is reached.
         step: Executes a single step of the model's simulation process.
         next_id: Generates and returns the next unique identifier for an agent.
