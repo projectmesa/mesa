@@ -106,7 +106,7 @@ class Model:
         """Return a list of all unique agent types registered with the model."""
         return list(self._agents_by_type.keys())
 
-    def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
+    def agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
         """Retrieves an AgentSet containing all agents of the specified type.
 
         Args:
@@ -118,6 +118,15 @@ class Model:
 
         """
         return self._agents_by_type[agenttype]
+
+    def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
+        """Deprecated: Retrieves an AgentSet containing all agents of the specified type."""
+        warnings.warn(
+            "get_agents_of_type is deprecated, please use agents_of_type instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.agents_of_type(agenttype)
 
     def _setup_agent_registration(self):
         """helper method to initialize the agent registration datastructures"""
