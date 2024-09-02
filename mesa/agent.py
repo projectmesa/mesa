@@ -313,14 +313,9 @@ class AgentSet(MutableSet, Sequence):
             func (Callable): The function to apply to the attribute values (e.g., min, max, sum, np.mean).
 
         Returns:
-            Any: The result of applying the function to the attribute values.
+            Any: The result of applying the function to the attribute values. Often a single value.
         """
-        # Retrieve the attribute values from all agents
-        values = [
-            getattr(agent, attribute) for agent in self if hasattr(agent, attribute)
-        ]
-
-        # Apply the function to the values and return the result
+        values = self.get(attribute)
         return func(values)
 
     def get(self, attr_names: str | list[str]) -> list[Any]:
