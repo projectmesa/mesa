@@ -54,6 +54,10 @@ dev = [
   "sphinx",
   "pytest-mock",
 ]
+examples = [
+  "pytest >= 4.6",
+  "scipy"
+]
 docs = [
   "sphinx",
   "ipython",

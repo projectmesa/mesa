@@ -59,6 +59,12 @@ def test_agentset():
     def test_function(agent):
         return agent.unique_id > 5
 
+    assert len(agentset.select(at_most=0.2)) == 2  # Select 20% of agents
+    assert len(agentset.select(at_most=0.549)) == 5  # Select 50% of agents
+    assert len(agentset.select(at_most=0.09)) == 0  # Select 0% of agents
+    assert len(agentset.select(at_most=1.0)) == 10  # Select 100% agents
+    assert len(agentset.select(at_most=1)) == 1  # Select 1 agent
+
     assert len(agentset.select(test_function)) == 5
     assert len(agentset.select(test_function, n=2)) == 2
     assert len(agentset.select(test_function, inplace=True)) == 5
