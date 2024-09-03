@@ -319,6 +319,20 @@ class AgentSet(MutableSet, Sequence):
 
         return res
 
+    def agg(self, attribute: str, func: Callable) -> Any:
+        """
+        Aggregate an attribute of all agents in the AgentSet using a specified function.
+
+        Args:
+            attribute (str): The name of the attribute to aggregate.
+            func (Callable): The function to apply to the attribute values (e.g., min, max, sum, np.mean).
+
+        Returns:
+            Any: The result of applying the function to the attribute values. Often a single value.
+        """
+        values = self.get(attribute)
+        return func(values)
+
     def get(self, attr_names: str | list[str]) -> list[Any]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.

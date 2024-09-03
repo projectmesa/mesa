@@ -1,5 +1,6 @@
 import pickle
 
+import numpy as np
 import pytest
 
 from mesa.agent import Agent, AgentSet
@@ -274,6 +275,41 @@ def test_agentset_do_callable():
     # Actual function for removal
     agentset.do(remove_function)
     assert len(agentset) == 0
+
+
+def test_agentset_agg():
+    model = Model()
+    agents = [TestAgent(i, model) for i in range(10)]
+
+    # Assign some values to attributes
+    for i, agent in enumerate(agents):
+        agent.energy = i + 1
+        agent.wealth = 10 * (i + 1)
+
+    agentset = AgentSet(agents, model)
+
+    # Test min aggregation
+    min_energy = agentset.agg("energy", min)
+    assert min_energy == 1
+
+    # Test max aggregation
+    max_energy = agentset.agg("energy", max)
+    assert max_energy == 10
+
+    # Test sum aggregation
+    total_energy = agentset.agg("energy", sum)
+    assert total_energy == sum(range(1, 11))
+
+    # Test mean aggregation using numpy
+    avg_wealth = agentset.agg("wealth", np.mean)
+    assert avg_wealth == 55.0
+
+    # Test aggregation with a custom function
+    def custom_func(values):
+        return sum(values) / len(values)
+
+    custom_avg_energy = agentset.agg("energy", custom_func)
+    assert custom_avg_energy == 5.5
 
 
 def test_agentset_map_str():
