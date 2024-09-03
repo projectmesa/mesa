@@ -81,12 +81,12 @@ class WolfSheep(mesa.Model):
         self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
 
         collectors = {
-            "Wolves": lambda m: len(m.get_agents_of_type(Wolf)),
-            "Sheep": lambda m: len(m.get_agents_of_type(Sheep)),
+            "Wolves": lambda m: len(m.agents_by_type[Wolf]),
+            "Sheep": lambda m: len(m.agents_by_type[Sheep]),
         }
 
         if grass:
-            collectors["Grass"] = lambda m: len(m.get_agents_of_type(GrassPatch))
+            collectors["Grass"] = lambda m: len(m.agents_by_type[GrassPatch])
 
         self.datacollector = mesa.DataCollector(collectors)
 
@@ -128,7 +128,7 @@ class WolfSheep(mesa.Model):
         # Conceptually, it can be argued that this should be modelled differently.
         self.random.shuffle(self.agent_types)
         for agent_type in self.agent_types:
-            self.get_agents_of_type(agent_type).do("step")
+            self.agents_by_type[agent_type].do("step")
 
         # collect data
         self.datacollector.collect(self)
