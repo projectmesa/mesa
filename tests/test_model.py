@@ -54,6 +54,7 @@ def test_agent_types():
     assert test_agent in model.agents
     assert type(test_agent) in model.agent_types
 
+
 def test_agents_by_type():
     class Wolf(Agent):
         pass
