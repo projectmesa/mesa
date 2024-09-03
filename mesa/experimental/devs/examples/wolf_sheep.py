@@ -231,8 +231,8 @@ class WolfSheep(mesa.Model):
             self.grid.place_agent(patch, pos)
 
     def step(self):
-        self.get_agents_of_type(Sheep).shuffle(inplace=True).do("step")
-        self.get_agents_of_type(Wolf).shuffle(inplace=True).do("step")
+        self.agents_by_type[Sheep].shuffle(inplace=True).do("step")
+        self.agents_by_type[Wolf].shuffle(inplace=True).do("step")
 
 
 if __name__ == "__main__":

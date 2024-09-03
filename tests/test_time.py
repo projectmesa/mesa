@@ -320,7 +320,7 @@ class TestRandomActivationByType(TestCase):
         agent_types = model.agent_types
         for agent_type in agent_types:
             assert model.schedule.get_type_count(agent_type) == len(
-                model.get_agents_of_type(agent_type)
+                model.agents_by_type[agent_type]
             )
 
     # def test_add_non_unique_ids(self):

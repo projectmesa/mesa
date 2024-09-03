@@ -1,4 +1,4 @@
-from mesa.agent import Agent
+from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
 
@@ -51,3 +51,19 @@ def test_agent_types():
     test_agent = TestAgent(model.next_id(), model)
     assert test_agent in model.agents
     assert type(test_agent) in model.agent_types
+
+
+def test_agents_by_type():
+    class Wolf(Agent):
+        pass
+
+    class Sheep(Agent):
+        pass
+
+    model = Model()
+    wolf = Wolf(1, model)
+    sheep = Sheep(2, model)
+
+    assert model.agents_by_type[Wolf] == AgentSet([wolf], model)
+    assert model.agents_by_type[Sheep] == AgentSet([sheep], model)
+    assert len(model.agents_by_type) == 2
