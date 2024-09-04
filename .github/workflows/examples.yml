@@ -50,8 +50,10 @@ jobs:
         cache: 'pip'
     - name: Install uv
       run: pip install uv
-    - name: Install dependencies
-      run: uv pip install --system . pytest nbval jupyter nbconvert
+    - name: Install Mesa dependencies
+      run: uv pip install --system .
+    - name: Install tutorial dependencies
+      run: uv pip install --system pytest jupyter nbconvert seaborn pandas
     # Run Pytest on Jupyter Notebooks
     - name: Test Jupyter Notebooks with Pytest
       run: pytest -rA -Werror -Wdefault::FutureWarning tests/test_tutorials.py
