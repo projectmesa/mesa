@@ -17,8 +17,8 @@ Mesa is modular, meaning that its modeling, analysis and visualization component
 Most models consist of one class to represent the model itself; one class (or more) for agents; a scheduler to handle time (what order the agents act in), and possibly a space for the agents to inhabit and move through. These are implemented in Mesa's modeling modules:
 
 - `mesa.Model`, `mesa.Agent`
-- [mesa.time](apis/time.html)
-- [mesa.space](apis/space.html)
+- [mesa.time](apis/time)
+- [mesa.space](apis/space)
 
 The skeleton of a model might look like this:
 
