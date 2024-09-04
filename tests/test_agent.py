@@ -288,6 +288,7 @@ def test_agentset_get():
     results = agentset.get("unknown_attribute", True)
     assert all(results) is True
 
+
 def test_agentset_agg():
     model = Model()
     agents = [TestAgent(model) for i in range(10)]

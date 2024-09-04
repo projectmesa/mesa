@@ -142,12 +142,12 @@ class AgentSet(MutableSet, Sequence):
         return agent in self._agents
 
     def select(
-            self,
-            filter_func: Callable[[Agent], bool] | None = None,
-            at_most: int | float = float("inf"),
-            inplace: bool = False,
-            agent_type: type[Agent] | None = None,
-            n: int | None = None,
+        self,
+        filter_func: Callable[[Agent], bool] | None = None,
+        at_most: int | float = float("inf"),
+        inplace: bool = False,
+        agent_type: type[Agent] | None = None,
+        n: int | None = None,
     ) -> AgentSet:
         """
         Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
@@ -190,7 +190,7 @@ class AgentSet(MutableSet, Sequence):
                 if count >= at_most:
                     break
                 if (not filter_func or filter_func(agent)) and (
-                        not agent_type or isinstance(agent, agent_type)
+                    not agent_type or isinstance(agent, agent_type)
                 ):
                     yield agent
                     count += 1
@@ -225,10 +225,10 @@ class AgentSet(MutableSet, Sequence):
             )
 
     def sort(
-            self,
-            key: Callable[[Agent], Any] | str,
-            ascending: bool = False,
-            inplace: bool = False,
+        self,
+        key: Callable[[Agent], Any] | str,
+        ascending: bool = False,
+        inplace: bool = False,
     ) -> AgentSet:
         """
         Sort the agents in the AgentSet based on a specified attribute or custom function.
