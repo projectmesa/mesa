@@ -50,9 +50,10 @@ class Agent:
         Args:
             model (Model): The model instance in which the agent exists.
         """
+        # FIXME, at some future point, turn *args back into model and remove this if else
         if len(args) == 1:
             model = args[0]
-            unique_id = next(self._ids[model])
+            # unique_id = next(self._ids[model])
         else:
             warnings.warn(
                 "unique ids are assigned automatically in MESA 3",

@@ -60,8 +60,8 @@ def test_agents_by_type():
         pass
 
     model = Model()
-    wolf = Wolf(1, model)
-    sheep = Sheep(2, model)
+    wolf = Wolf(model)
+    sheep = Sheep(model)
 
     assert model.agents_by_type[Wolf] == AgentSet([wolf], model)
     assert model.agents_by_type[Sheep] == AgentSet([sheep], model)

@@ -278,7 +278,7 @@ def test_agentset_do_callable():
 
 def test_agentset_agg():
     model = Model()
-    agents = [TestAgent(i, model) for i in range(10)]
+    agents = [TestAgent(model) for i in range(10)]
 
     # Assign some values to attributes
     for i, agent in enumerate(agents):
