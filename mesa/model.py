@@ -89,8 +89,11 @@ class Model:
         self._user_step(*args, **kwargs)
 
     def next_id(self) -> int:
-        warnings.warn("using model.next_id() is deprecated. Agents track their unique ID automatically",
-                      DeprecationWarning, stacklevel=2)
+        warnings.warn(
+            "using model.next_id() is deprecated. Agents track their unique ID automatically",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return 0
 
     @property

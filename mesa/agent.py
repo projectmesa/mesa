@@ -65,9 +65,9 @@ class Agent:
             case [_, model]:
                 warnings.warn(
                     "unique ids are assigned automatically to Agents in Mesa 3. The use of custom unique_id is "
-                             "deprecated. Only input a model when calling `super()__init__(model)`. The unique_id inputted is not used.",
+                    "deprecated. Only input a model when calling `super()__init__(model)`. The unique_id inputted is not used.",
                     DeprecationWarning,
-                    stacklevel=2
+                    stacklevel=2,
                 )
                 self.model = model
                 self.unique_id = next(self._ids[model])
