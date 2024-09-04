@@ -56,7 +56,7 @@ model = MyModel(5)
 model.step()
 ```
 
-You should see agents 0-4, activated in random order. See the [tutorial](tutorials/intro_tutorial.html) or API documentation for more detail on how to add model functionality.
+You should see agents 0-4, activated in random order. See the [tutorial](tutorials/intro_tutorial) or API documentation for more detail on how to add model functionality.
 
 To bootstrap a new model install mesa and run `mesa startproject`
 
@@ -64,8 +64,8 @@ To bootstrap a new model install mesa and run `mesa startproject`
 
 If you're using modeling for research, you'll want a way to collect the data each model run generates. You'll probably also want to run the model multiple times, to see how some output changes with different parameters. Data collection and batch running are implemented in the appropriately-named analysis modules:
 
-- [mesa.datacollection](apis/datacollection.html)
-- [mesa.batchrunner](apis/batchrunner.html)
+- [mesa.datacollection](apis/datacollection)
+- [mesa.batchrunner](apis/batchrunner)
 
 You'd add a data collector to the model like this:
 
