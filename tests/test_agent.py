@@ -478,3 +478,14 @@ def test_agentset_groupby():
     groups = agentset.groupby("even", result_type="agentset")
     another_ref_to_groups = groups.do(lambda x: x.do("step"))
     assert groups == another_ref_to_groups
+
+
+def test_oldstyle_agent_instantiation():
+    """Old behavior of Agent creation with unique_id and model as positional arguments.
+    Can be removed/updated in the future."""
+    model = Model()
+    agent = Agent("some weird unique id", model)
+    assert isinstance(agent.unique_id, int)
+    assert agent.model == model
+    assert isinstance(agent.model, Model)
+    assert agent.unique_id == 1 # test that we ignore unique ID that is passed

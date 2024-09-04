@@ -35,7 +35,8 @@ class Agent:
 
     Attributes:
         model (Model): A reference to the model instance.
-        self.pos: Position | None = None
+        unique_id (int): A unique identifier for this agent.
+        pos (Position): A reference to the position where this agent is located.
     """
 
     # this is a class level attribute
