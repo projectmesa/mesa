@@ -29,9 +29,9 @@ import reacton.ipywidgets as widgets
 import solara
 from solara.alias import rv
 
-import mesa.visualization.components.altair as components_altair
-import mesa.visualization.components.matplotlib as components_matplotlib
-from mesa.visualization.UserParam import Slider
+import mesa.experimental.components.altair as components_altair
+import mesa.experimental.components.matplotlib as components_matplotlib
+from mesa.experimental.UserParam import Slider
 
 
 # TODO: Turn this function into a Solara component once the current_step.value
