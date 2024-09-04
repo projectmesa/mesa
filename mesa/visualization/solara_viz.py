@@ -25,6 +25,7 @@ See the Visualization Tutorial and example models for more details.
 
 import copy
 import threading
+from typing import TYPE_CHECKING
 
 import reacton.ipywidgets as widgets
 import solara
@@ -32,9 +33,11 @@ from solara.alias import rv
 
 import mesa.visualization.components.altair as components_altair
 import mesa.visualization.components.matplotlib as components_matplotlib
-from mesa.model import Model
 from mesa.visualization.UserParam import Slider
 from mesa.visualization.utils import force_update, update_counter
+
+if TYPE_CHECKING:
+    from mesa.model import Model
 
 
 # TODO: Turn this function into a Solara component once the current_step.value
@@ -89,12 +92,13 @@ def Card(
 
 @solara.component
 def SolaraViz(
-    model: Model | solara.Reactive[Model],
+    model: "Model" | solara.Reactive["Model"],
     components: list[solara.component] | None = None,
     *args,
     play_interval=150,
     model_params=None,
-    seed=None,
+    seed=0,
+    name: str | None = None,
 ):
     if components is None:
         components = []
@@ -119,7 +123,7 @@ def SolaraViz(
     solara.use_effect(connect_to_model, [model.value])
 
     with solara.AppBar():
-        solara.AppBarTitle(model.value.__class__.__name__)
+        solara.AppBarTitle(name if name else model.value.__class__.__name__)
 
     with solara.Sidebar():
         with solara.Card("Controls", margin=1, elevation=2):
@@ -144,7 +148,7 @@ JupyterViz = SolaraViz
 
 
 @solara.component
-def ModelController(model: solara.Reactive[Model], play_interval):
+def ModelController(model: solara.Reactive["Model"], play_interval):
     """
     Create controls for model execution (step, play, pause, reset).
 
