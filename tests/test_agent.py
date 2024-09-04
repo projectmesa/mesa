@@ -488,4 +488,4 @@ def test_oldstyle_agent_instantiation():
     assert isinstance(agent.unique_id, int)
     assert agent.model == model
     assert isinstance(agent.model, Model)
-    assert agent.unique_id == 1 # test that we ignore unique ID that is passed
+    assert agent.unique_id == 1  # test that we ignore unique ID that is passed
