@@ -218,9 +218,7 @@ class WolfSheep(Model):
                 countdown = grass_regrowth_time
             else:
                 countdown = self.random.randrange(grass_regrowth_time)
-            patch = GrassPatch(
-                self, fully_grown, countdown, grass_regrowth_time
-            )
+            patch = GrassPatch(self, fully_grown, countdown, grass_regrowth_time)
             patch.move_to(cell)
 
     def step(self):
