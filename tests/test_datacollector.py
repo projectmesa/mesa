@@ -39,6 +39,7 @@ class MockAgent(Agent):
 def agent_function_with_params(agent, multiplier, offset):
     return (agent.val * multiplier) + offset
 
+
 class MockModel(Model):
     """
     Minimalistic model for testing purposes.
@@ -52,7 +53,7 @@ class MockModel(Model):
         self.model_val = 100
 
         self.n = 10
-        for i in range(1, self.n+1):
+        for i in range(1, self.n + 1):
             self.schedule.add(MockAgent(self, val=i))
         self.initialize_data_collector(
             model_reporters={

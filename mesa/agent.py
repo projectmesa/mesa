@@ -37,6 +37,7 @@ class Agent:
         model (Model): A reference to the model instance.
         self.pos: Position | None = None
     """
+
     # this is a class level attribute
     # it is a dictionary, indexed by model instance
     # so, unique_id is unique relative to a model, and counting starts from 1
