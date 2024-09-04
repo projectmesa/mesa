@@ -89,7 +89,7 @@ class MockModel(Model):
             self.schedule = BaseScheduler(self)
 
         # Make agents
-        for name in ["A", "B"]:
+        for _ in range(2):
             agent = MockAgent(self)
             self.schedule.add(agent)
 

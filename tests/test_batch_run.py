@@ -75,7 +75,7 @@ class MockModel(Model):
             agent_val = 1
         else:
             agent_val = self.variable_agent_param
-        for i in range(self.n_agents):
+        for _ in range(self.n_agents):
             self.schedule.add(MockAgent(self, agent_val))
 
     def get_local_model_param(self):
