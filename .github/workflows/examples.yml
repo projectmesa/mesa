@@ -38,3 +38,20 @@ jobs:
       run: |
         cd mesa-examples
         pytest -rA -Werror -Wdefault::FutureWarning test_examples.py
+
+  tutorials:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: 'pip'
+    - name: Install uv
+      run: pip install uv
+    - name: Install dependencies
+      run: uv pip install --system . pytest nbval jupyter nbconvert
+    # Run Pytest on Jupyter Notebooks
+    - name: Test Jupyter Notebooks with Pytest
+      run: pytest -rA -Werror -Wdefault::FutureWarning tests/test_tutorials.py
