@@ -5,7 +5,7 @@ import ipyvuetify as vw
 import solara
 
 import mesa
-from mesa/experimental/solara_viz import Slider, SolaraViz, UserInputs
+from mesa.experimental.solara_viz import Slider, SolaraViz, UserInputs
 
 
 class TestMakeUserInput(unittest.TestCase):
