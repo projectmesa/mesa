@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import contextlib
 import copy
+import functools
 import itertools
 import operator
 import warnings
@@ -28,12 +29,6 @@ if TYPE_CHECKING:
     from mesa.space import Position
 
 
-class TestClassDict(dict):
-    def __missing__(self, key):
-        res = self[key] = itertools.count(1)
-        return res
-
-
 class Agent:
     """
     Base class for a model agent in Mesa.
@@ -42,8 +37,10 @@ class Agent:
         model (Model): A reference to the model instance.
         self.pos: Position | None = None
     """
-
-    _ids = TestClassDict()
+    # this is a class level attribute
+    # it is a dictionary, indexed by model instance
+    # so, unique_id is unique relative to a model, and counting starts from 1
+    _ids = defaultdict(functools.partial(itertools.count, 1))
 
     def __init__(self, *args, **kwargs) -> None:
         """
@@ -64,6 +61,7 @@ class Agent:
             unique_id, model, *args = args
             # if *args is not empty, what should we do?
             # raise ValueError
+            unique_id = next(self._ids[model])
 
         self.unique_id = unique_id
         self.model = model
