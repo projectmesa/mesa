@@ -1,6 +1,37 @@
 ---
 title: Release History
 ---
+# 2.3.4 (2024-09-04)
+## Highlights
+Two fixes in our docs: The visualization tutorial started using an example model that wasn't compatible with Mesa 2.x anymore, and some relative links were broken. This release fixes both.
+
+## What's Changed
+### 📜 Documentation improvements
+* docs: Fix Visualization Tutorial (2.x branch) by @EwoutH in https://github.com/projectmesa/mesa/pull/2272
+* Docs: Fix broken relative links by removing `.html` suffix by @EwoutH in https://github.com/projectmesa/mesa/pull/2274
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.3...v2.3.4
+
+# 2.3.3 (2024-09-01)
+## Highlights
+Mesa v2.3.3 is a small patch release with documentation and maintenance updates backported from our main branch.
+
+We do have included one feature as preview for Mesa 3.0: The AgentSet got a convenient `set` method to quickly set a variable value to (a subset of) agents. See #2254 for some examples.
+
+## What's Changed
+### 🎉 New features added
+* AgentSet: Add `set` method by @EwoutH in https://github.com/projectmesa/mesa/pull/2254
+### 📜 Documentation improvements
+* Fix image on landing page of docs. by @jackiekazil in https://github.com/projectmesa/mesa/pull/2146
+* Replace links in docs - google group to matrix. by @jackiekazil in https://github.com/projectmesa/mesa/pull/2148
+* Add experimental features to documentation as per #2122 by @stephenfmann in https://github.com/projectmesa/mesa/pull/2154
+* Update visualisation docs by @EwoutH in https://github.com/projectmesa/mesa/pull/2162
+* Add original conference paper link to docs by @ENUMERA8OR in https://github.com/projectmesa/mesa/pull/2160
+* docs/conf.py: Use modern `intersphinx_mapping` format by @EwoutH in https://github.com/projectmesa/mesa/pull/2206
+* Contribution: Add "I have no idea where to start" section by @EwoutH in https://github.com/projectmesa/mesa/pull/2258
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.2...v2.3.3
+
 # 2.3.2 (2024-07-22)
 ## Highlights
 Mesa 2.3.2 is a small patch release which fixes two bugs, one to the batch_run function still depending on `schedule.steps`, and one in the agent marker visualisation.
