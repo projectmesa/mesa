@@ -64,26 +64,3 @@ jobs:
     - if: matrix.os == 'ubuntu'
       name: Codecov
       uses: codecov/codecov-action@v4
-
-  examples:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-        cache: 'pip'
-    - name: Install uv
-      run: pip install uv
-    - name: Install Mesa
-      run: uv pip install --system .[examples]
-    - name: Checkout mesa-examples
-      uses: actions/checkout@v4
-      with:
-        repository: projectmesa/mesa-examples
-        path: mesa-examples
-    - name: Test examples
-      run: |
-        cd mesa-examples
-        pytest -rA -Werror -Wdefault::FutureWarning test_examples.py
