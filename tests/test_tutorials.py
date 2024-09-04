@@ -13,8 +13,8 @@ def test_notebook_execution(notebook):
     pytest.main(
         [
             "--nbval",
-            "--current-env",  # Use the current environment
-            "--sanitize-with",
+            "--nbval-current-env",  # Use the current environment
+            "--nbval-sanitize-with",
             ".sanitize_config.yaml",  # Optional: If you want to handle variable output, use this
             notebook,
         ]
