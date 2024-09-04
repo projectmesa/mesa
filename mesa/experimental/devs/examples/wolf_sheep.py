@@ -222,9 +222,7 @@ class WolfSheep(mesa.Model):
                 countdown = grass_regrowth_time
             else:
                 countdown = self.random.randrange(grass_regrowth_time)
-            patch = GrassPatch(
-                self, fully_grown, countdown, grass_regrowth_time
-            )
+            patch = GrassPatch(self, fully_grown, countdown, grass_regrowth_time)
             self.grid.place_agent(patch, pos)
 
     def step(self):
