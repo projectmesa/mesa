@@ -56,4 +56,6 @@ jobs:
       run: uv pip install --system pytest jupyter nbconvert seaborn pandas
     # Run Pytest on Jupyter Notebooks
     - name: Test Jupyter Notebooks with Pytest
+      env:
+        JUPYTER_PLATFORM_DIRS: 1
       run: pytest -rA -Werror -Wdefault::FutureWarning tests/test_tutorials.py
