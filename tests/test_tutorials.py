@@ -14,8 +14,6 @@ def test_notebook_execution(notebook):
         [
             "--nbval",
             "--nbval-current-env",  # Use the current environment
-            "--nbval-sanitize-with",
-            ".sanitize_config.yaml",  # Optional: If you want to handle variable output, use this
             notebook,
         ]
     )
