@@ -276,6 +276,18 @@ def test_agentset_do_callable():
     assert len(agentset) == 0
 
 
+def test_agentset_get():
+    model = Model()
+    agents = [TestAgent(i, model) for i in range(10)]
+
+    agentset = model.agents
+
+    with pytest.raises(AttributeError):
+        agentset.get("unknown_attribute")
+
+    results = agentset.get("unknown_attribute", True)
+    assert all(results) is True
+
 def test_agentset_agg():
     model = Model()
     agents = [TestAgent(model) for i in range(10)]

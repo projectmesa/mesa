@@ -142,12 +142,12 @@ class AgentSet(MutableSet, Sequence):
         return agent in self._agents
 
     def select(
-        self,
-        filter_func: Callable[[Agent], bool] | None = None,
-        at_most: int | float = float("inf"),
-        inplace: bool = False,
-        agent_type: type[Agent] | None = None,
-        n: int | None = None,
+            self,
+            filter_func: Callable[[Agent], bool] | None = None,
+            at_most: int | float = float("inf"),
+            inplace: bool = False,
+            agent_type: type[Agent] | None = None,
+            n: int | None = None,
     ) -> AgentSet:
         """
         Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
@@ -190,7 +190,7 @@ class AgentSet(MutableSet, Sequence):
                 if count >= at_most:
                     break
                 if (not filter_func or filter_func(agent)) and (
-                    not agent_type or isinstance(agent, agent_type)
+                        not agent_type or isinstance(agent, agent_type)
                 ):
                     yield agent
                     count += 1
@@ -225,10 +225,10 @@ class AgentSet(MutableSet, Sequence):
             )
 
     def sort(
-        self,
-        key: Callable[[Agent], Any] | str,
-        ascending: bool = False,
-        inplace: bool = False,
+            self,
+            key: Callable[[Agent], Any] | str,
+            ascending: bool = False,
+            inplace: bool = False,
     ) -> AgentSet:
         """
         Sort the agents in the AgentSet based on a specified attribute or custom function.
@@ -348,12 +348,16 @@ class AgentSet(MutableSet, Sequence):
         values = self.get(attribute)
         return func(values)
 
-    def get(self, attr_names: str | list[str]) -> list[Any]:
+    def get(self, *args) -> list[Any]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
 
         Args:
             attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
+            default (Any): The default value of the attribute(s) to retrieve from each agent if
+                                 the agent does not have the attribute.
+                                 If no default value is passed, an AttributeError is raised if
+                                 an agent does not have the attribute.
 
         Returns:
             list[Any]: A list with the attribute value for each agent in the set if attr_names is a str
@@ -363,12 +367,23 @@ class AgentSet(MutableSet, Sequence):
             AttributeError if an agent does not have the specified attribute(s)
 
         """
+        attr_names, *args = args
+
+        def get_attr(*args):
+            obj, attr_name, *args = args
+            try:
+                return getattr(obj, attr_name)
+            except AttributeError as e:
+                if len(args) > 0:
+                    return args[0]
+                else:
+                    raise e
 
         if isinstance(attr_names, str):
-            return [getattr(agent, attr_names) for agent in self._agents]
+            return [get_attr(agent, attr_names, *args) for agent in self._agents]
         else:
             return [
-                [getattr(agent, attr_name) for attr_name in attr_names]
+                [get_attr(agent, attr_name, *args) for attr_name in attr_names]
                 for agent in self._agents
             ]
 
