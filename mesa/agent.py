@@ -348,7 +348,12 @@ class AgentSet(MutableSet, Sequence):
         values = self.get(attribute)
         return func(values)
 
-    def get(self, attr_names: str | list[str], handle_missing: str = "error", default_value: Any = None) -> list[Any] | list[list[Any]]:
+    def get(
+        self,
+        attr_names: str | list[str],
+        handle_missing: str = "error",
+        default_value: Any = None,
+    ) -> list[Any] | list[list[Any]]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
 
@@ -379,28 +384,52 @@ class AgentSet(MutableSet, Sequence):
         match handle_missing:
             case "error":
                 if is_single_attr:
-                    return [self._get_or_raise(agent, attr_names) for agent in self._agents]
+                    return [
+                        self._get_or_raise(agent, attr_names) for agent in self._agents
+                    ]
                 else:
-                    return [[self._get_or_raise(agent, attr) for attr in attr_names] for agent in self._agents]
+                    return [
+                        [self._get_or_raise(agent, attr) for attr in attr_names]
+                        for agent in self._agents
+                    ]
 
             case "default":
                 if is_single_attr:
-                    return [self._get_with_default(agent, attr_names, default_value) for agent in self._agents]
+                    return [
+                        self._get_with_default(agent, attr_names, default_value)
+                        for agent in self._agents
+                    ]
                 else:
-                    return [[self._get_with_default(agent, attr, default_value) for attr in attr_names] for agent in self._agents]
+                    return [
+                        [
+                            self._get_with_default(agent, attr, default_value)
+                            for attr in attr_names
+                        ]
+                        for agent in self._agents
+                    ]
 
             case "skip":
                 if is_single_attr:
-                    return [val for agent in self._agents if (val := self._get_skip(agent, attr_names)) is not None]
+                    return [
+                        val
+                        for agent in self._agents
+                        if (val := self._get_skip(agent, attr_names)) is not None
+                    ]
                 else:
                     return [
-                        [val for attr in attr_names if (val := self._get_skip(agent, attr)) is not None]
+                        [
+                            val
+                            for attr in attr_names
+                            if (val := self._get_skip(agent, attr)) is not None
+                        ]
                         for agent in self._agents
                     ]
 
             case _:
-                raise ValueError(f"Unknown handle_missing option: {handle_missing}, "
-                                 "should be one of 'error', 'skip', or 'default'")
+                raise ValueError(
+                    f"Unknown handle_missing option: {handle_missing}, "
+                    "should be one of 'error', 'skip', or 'default'"
+                )
 
     # Helper method to get an attribute or raise an error if it's missing
     def _get_or_raise(self, agent: Any, attr_name: str) -> Any:
