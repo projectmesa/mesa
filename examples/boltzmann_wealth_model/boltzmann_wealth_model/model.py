@@ -26,8 +26,8 @@ class BoltzmannWealthModel(mesa.Model):
             model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
         )
         # Create agents
-        for i in range(self.num_agents):
-            a = MoneyAgent(i, self)
+        for _ in range(self.num_agents):
+            a = MoneyAgent(self)
 
             # Add the agent to a random grid cell
             x = self.random.randrange(self.grid.width)
@@ -50,8 +50,8 @@ class BoltzmannWealthModel(mesa.Model):
 class MoneyAgent(mesa.Agent):
     """An agent with fixed initial wealth."""
 
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
+    def __init__(self, model):
+        super().__init__(model)
         self.wealth = 1
 
     def move(self):
