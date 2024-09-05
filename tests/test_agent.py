@@ -278,15 +278,33 @@ def test_agentset_do_callable():
 
 def test_agentset_get():
     model = Model()
-    agents = [TestAgent(i, model) for i in range(10)]
+    _ = [TestAgent(i, model) for i in range(10)]
 
     agentset = model.agents
+
+    agentset.set("a", 5)
+    agentset.set("b", 6)
+
+    values = agentset.get(["a", "b"])
+    assert all([(a == 5) & (b == 6) for a,b in values])
 
     with pytest.raises(AttributeError):
         agentset.get("unknown_attribute")
 
-    results = agentset.get("unknown_attribute", True)
+    results = agentset.get("unknown_attribute", handle_missing="default", default_value=True)
     assert all(results) is True
+
+    values = agentset.get(["a", "unknown_attribute"], handle_missing="default", default_value=True)
+    assert all([(a == 5) & (b == True) for a,b in values])
+
+    results = agentset.get("unknown_attribute", handle_missing="skip")
+    assert len(results) == 0
+
+    values = agentset.get(["a", "unknown_attribute"], handle_missing="skip")
+    assert all([(a == 5) for a, in values])
+
+    with pytest.raises(ValueError):
+        agentset.get("unknown_attribute", handle_missing="some nonsense value")
 
 
 def test_agentset_agg():

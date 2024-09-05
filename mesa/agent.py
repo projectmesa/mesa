@@ -348,44 +348,74 @@ class AgentSet(MutableSet, Sequence):
         values = self.get(attribute)
         return func(values)
 
-    def get(self, *args) -> list[Any]:
+    def get(self, attr_names: str | list[str], handle_missing: str = "error", default_value: Any = None) -> list[Any] | list[list[Any]]:
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
 
         Args:
             attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
-            default (Any): The default value of the attribute(s) to retrieve from each agent if
-                                 the agent does not have the attribute.
-                                 If no default value is passed, an AttributeError is raised if
-                                 an agent does not have the attribute.
+            handle_missing (str, optional): How to handle missing attributes. Can be
+
+                                            -'error' (default), raises an AttributeError if attribute is missing.
+                                            -'skip' which skips the agents missing the attribute.
+                                            'default' to return the specified `default_value`.
+
+            default_value (Any, optional): Used in conjunction with ``handle_missing='default``
+                                     The default value to return if 'handle_missing' is set to 'default'
+                                     and the agent does not have the attribute.
 
         Returns:
-            list[Any]: A list with the attribute value for each agent in the set if attr_names is a str
-            list[list[Any]]: A list with a list of attribute values for each agent in the set if attr_names is a list of str
+            list[Any]: A list of attribute values for each agent if attr_names is a str.
+            list[list[Any]]: A list of lists of attribute values for each agent if attr_names is a list of str.
 
         Raises:
-            AttributeError if an agent does not have the specified attribute(s)
-
+            AttributeError: If 'handle_missing' is 'error' and the agent does not have the specified attribute(s).
         """
-        attr_names, *args = args
 
-        def get_attr(*args):
-            obj, attr_name, *args = args
-            try:
-                return getattr(obj, attr_name)
-            except AttributeError as e:
-                if len(args) > 0:
-                    return args[0]
+        # Check if the attr_names is a single string or a list of attributes.
+        is_single_attr = isinstance(attr_names, str)
+
+        # Branch earlier based on the `handle_missing` option to avoid repeated checks
+        match handle_missing:
+            case "error":
+                if is_single_attr:
+                    return [self._get_or_raise(agent, attr_names) for agent in self._agents]
                 else:
-                    raise e
+                    return [[self._get_or_raise(agent, attr) for attr in attr_names] for agent in self._agents]
 
-        if isinstance(attr_names, str):
-            return [get_attr(agent, attr_names, *args) for agent in self._agents]
-        else:
-            return [
-                [get_attr(agent, attr_name, *args) for attr_name in attr_names]
-                for agent in self._agents
-            ]
+            case "default":
+                if is_single_attr:
+                    return [self._get_with_default(agent, attr_names, default_value) for agent in self._agents]
+                else:
+                    return [[self._get_with_default(agent, attr, default_value) for attr in attr_names] for agent in self._agents]
+
+            case "skip":
+                if is_single_attr:
+                    return [val for agent in self._agents if (val := self._get_skip(agent, attr_names)) is not None]
+                else:
+                    return [
+                        [val for attr in attr_names if (val := self._get_skip(agent, attr)) is not None]
+                        for agent in self._agents
+                    ]
+
+            case _:
+                raise ValueError(f"Unknown handle_missing option: {handle_missing}, "
+                                 "should be one of 'error', 'skip', or 'default'")
+
+    # Helper method to get an attribute or raise an error if it's missing
+    def _get_or_raise(self, agent: Any, attr_name: str) -> Any:
+        return getattr(agent, attr_name)
+
+    # Helper method to get an attribute with a default value if missing
+    def _get_with_default(self, agent: Any, attr_name: str, default: Any) -> Any:
+        return getattr(agent, attr_name, default)
+
+    # Helper method to skip missing attributes by returning None
+    def _get_skip(self, agent: Any, attr_name: str) -> Any:
+        try:
+            return getattr(agent, attr_name)
+        except AttributeError:
+            return None
 
     def set(self, attr_name: str, value: Any) -> AgentSet:
         """
