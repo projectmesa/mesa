@@ -15,8 +15,8 @@ def compute_gini(model):
 class MoneyAgent(mesa.Agent):
     """An agent with fixed initial wealth."""
 
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
+    def __init__(self, model):
+        super().__init__(model)
         self.wealth = 1
 
     def move(self):

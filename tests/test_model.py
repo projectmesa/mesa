@@ -6,9 +6,6 @@ def test_model_set_up():
     model = Model()
     assert model.running is True
     assert model.schedule is None
-    assert model.current_id == 0
-    assert model.current_id + 1 == model.next_id()
-    assert model.current_id == 1
     assert model.steps == 0
     model.step()
     assert model.steps == 1
@@ -50,7 +47,7 @@ def test_agent_types():
         pass
 
     model = Model()
-    test_agent = TestAgent(model.next_id(), model)
+    test_agent = TestAgent(model)
     assert test_agent in model.agents
     assert type(test_agent) in model.agent_types
 
@@ -63,8 +60,8 @@ def test_agents_by_type():
         pass
 
     model = Model()
-    wolf = Wolf(1, model)
-    sheep = Sheep(2, model)
+    wolf = Wolf(model)
+    sheep = Sheep(model)
 
     assert model.agents_by_type[Wolf] == AgentSet([wolf], model)
     assert model.agents_by_type[Sheep] == AgentSet([sheep], model)

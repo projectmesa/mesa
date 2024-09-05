@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import contextlib
 import copy
+import functools
+import itertools
 import operator
 import warnings
 import weakref
@@ -32,21 +34,49 @@ class Agent:
     Base class for a model agent in Mesa.
 
     Attributes:
-        unique_id (int): A unique identifier for this agent.
         model (Model): A reference to the model instance.
-        self.pos: Position | None = None
+        unique_id (int): A unique identifier for this agent.
+        pos (Position): A reference to the position where this agent is located.
+
+    Notes:
+          unique_id is unique relative to a model instance and starts from 1
+
     """
 
-    def __init__(self, unique_id: int, model: Model) -> None:
+    # this is a class level attribute
+    # it is a dictionary, indexed by model instance
+    # so, unique_id is unique relative to a model, and counting starts from 1
+    _ids = defaultdict(functools.partial(itertools.count, 1))
+
+    def __init__(self, *args, **kwargs) -> None:
         """
         Create a new agent.
 
         Args:
-            unique_id (int): A unique identifier for this agent.
             model (Model): The model instance in which the agent exists.
         """
-        self.unique_id = unique_id
-        self.model = model
+        # TODO: Cleanup in future Mesa version (3.1+)
+        match args:
+            # Case 1: Only the model is provided. The new correct behavior.
+            case [model]:
+                self.model = model
+                self.unique_id = next(self._ids[model])
+            # Case 2: Both unique_id and model are provided, deprecated
+            case [_, model]:
+                warnings.warn(
+                    "unique ids are assigned automatically to Agents in Mesa 3. The use of custom unique_id is "
+                    "deprecated. Only input a model when calling `super()__init__(model)`. The unique_id inputted is not used.",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                self.model = model
+                self.unique_id = next(self._ids[model])
+            # Case 3: Anything else, raise an error
+            case _:
+                raise ValueError(
+                    "Invalid arguments provided to initialize the Agent. Only input a model: `super()__init__(model)`."
+                )
+
         self.pos: Position | None = None
 
         self.model.register_agent(self)

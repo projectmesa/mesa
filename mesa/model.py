@@ -28,7 +28,6 @@ class Model:
     Attributes:
         running: A boolean indicating if the model should continue running.
         schedule: An object to manage the order and execution of agent steps.
-        current_id: A counter for assigning unique IDs to agents.
 
     Properties:
         agents: An AgentSet containing all agents in the model
@@ -74,7 +73,6 @@ class Model:
 
         self.running = True
         self.schedule = None
-        self.current_id = 0
         self.steps: int = 0
 
         self._setup_agent_registration()
@@ -89,6 +87,14 @@ class Model:
         self.steps += 1
         # Call the original user-defined step method
         self._user_step(*args, **kwargs)
+
+    def next_id(self) -> int:
+        warnings.warn(
+            "using model.next_id() is deprecated. Agents track their unique ID automatically",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return 0
 
     @property
     def agents(self) -> AgentSet:
@@ -188,11 +194,6 @@ class Model:
 
     def step(self) -> None:
         """A single step. Fill in here."""
-
-    def next_id(self) -> int:
-        """Return the next unique ID for agents, increment current_id"""
-        self.current_id += 1
-        return self.current_id
 
     def reset_randomizer(self, seed: int | None = None) -> None:
         """Reset the model random number generator.
