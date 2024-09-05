@@ -78,18 +78,16 @@ class EpsteinCivilViolence(mesa.Model):
         self.datacollector = mesa.DataCollector(
             model_reporters=model_reporters, agent_reporters=agent_reporters
         )
-        unique_id = 0
         if self.cop_density + self.citizen_density > 1:
             raise ValueError("Cop density + citizen density must be less than 1")
+
         for contents, (x, y) in self.grid.coord_iter():
             if self.random.random() < self.cop_density:
-                cop = Cop(unique_id, self, (x, y), vision=self.cop_vision)
-                unique_id += 1
+                cop = Cop(self, (x, y), vision=self.cop_vision)
                 self.grid[x][y] = cop
 
             elif self.random.random() < (self.cop_density + self.citizen_density):
                 citizen = Citizen(
-                    unique_id,
                     self,
                     (x, y),
                     hardship=self.random.random(),
@@ -98,7 +96,6 @@ class EpsteinCivilViolence(mesa.Model):
                     threshold=self.active_threshold,
                     vision=self.citizen_vision,
                 )
-                unique_id += 1
                 self.grid[x][y] = citizen
 
         self.running = True

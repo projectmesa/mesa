@@ -4,17 +4,16 @@ import mesa
 class PDAgent(mesa.Agent):
     """Agent member of the iterated, spatial prisoner's dilemma model."""
 
-    def __init__(self, unique_id, model, starting_move=None):
+    def __init__(self, model, starting_move=None):
         """
         Create a new Prisoner's Dilemma agent.
 
         Args:
-            unique_id: Unique identifier for the agent.
             model: model instance
             starting_move: If provided, determines the agent's initial state:
                            C(ooperating) or D(efecting). Otherwise, random.
         """
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self.score = 0
         if starting_move:
             self.move = starting_move

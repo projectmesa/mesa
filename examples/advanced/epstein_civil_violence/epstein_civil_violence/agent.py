@@ -9,7 +9,6 @@ class Citizen(mesa.Agent):
     Summary of rule: If grievance - risk > threshold, rebel.
 
     Attributes:
-        unique_id: unique int
         x, y: Grid coordinates
         hardship: Agent's 'perceived hardship (i.e., physical or economic
             privation).' Exogenous, drawn from U(0,1).
@@ -30,7 +29,6 @@ class Citizen(mesa.Agent):
 
     def __init__(
         self,
-        unique_id,
         model,
         pos,
         hardship,
@@ -42,7 +40,6 @@ class Citizen(mesa.Agent):
         """
         Create a new Citizen.
         Args:
-            unique_id: unique int
             x, y: Grid coordinates
             hardship: Agent's 'perceived hardship (i.e., physical or economic
                 privation).' Exogenous, drawn from U(0,1).
@@ -55,7 +52,7 @@ class Citizen(mesa.Agent):
                 agent can inspect. Exogenous.
             model: model instance
         """
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self.breed = "citizen"
         self.pos = pos
         self.hardship = hardship
@@ -129,17 +126,16 @@ class Cop(mesa.Agent):
             able to inspect
     """
 
-    def __init__(self, unique_id, model, pos, vision):
+    def __init__(self, model, pos, vision):
         """
         Create a new Cop.
         Args:
-            unique_id: unique int
             x, y: Grid coordinates
             vision: number of cells in each direction (N, S, E and W) that
                 agent can inspect. Exogenous.
             model: model instance
         """
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self.breed = "cop"
         self.pos = pos
         self.vision = vision

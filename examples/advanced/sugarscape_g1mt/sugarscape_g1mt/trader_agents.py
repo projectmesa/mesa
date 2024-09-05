@@ -29,7 +29,6 @@ class Trader(mesa.Agent):
 
     def __init__(
         self,
-        unique_id,
         model,
         moore=False,
         sugar=0,
@@ -38,7 +37,7 @@ class Trader(mesa.Agent):
         metabolism_spice=0,
         vision=0,
     ):
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self.moore = moore
         self.sugar = sugar
         self.spice = spice

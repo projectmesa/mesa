@@ -88,15 +88,13 @@ class SugarscapeG1mt(mesa.Model):
         sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map.txt")
         spice_distribution = np.flip(sugar_distribution, 1)
 
-        agent_id = 0
         for _, (x, y) in self.grid.coord_iter():
             max_sugar = sugar_distribution[x, y]
             max_spice = spice_distribution[x, y]
-            resource = Resource(agent_id, self, max_sugar, max_spice)
+            resource = Resource(self, max_sugar, max_spice)
             self.grid.place_agent(resource, (x, y))
-            agent_id += 1
 
-        for i in range(self.initial_population):
+        for _ in range(self.initial_population):
             # get agent position
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
@@ -115,7 +113,6 @@ class SugarscapeG1mt(mesa.Model):
             vision = int(self.random.uniform(self.vision_min, self.vision_max + 1))
             # create Trader object
             trader = Trader(
-                agent_id,
                 self,
                 moore=False,
                 sugar=sugar,
@@ -126,7 +123,6 @@ class SugarscapeG1mt(mesa.Model):
             )
             # place agent
             self.grid.place_agent(trader, (x, y))
-            agent_id += 1
 
     def step(self):
         """

@@ -12,8 +12,8 @@ class Sheep(RandomWalker):
 
     energy = None
 
-    def __init__(self, unique_id, model, moore, energy=None):
-        super().__init__(unique_id, model, moore=moore)
+    def __init__(self, model, moore, energy=None):
+        super().__init__(model, moore=moore)
         self.energy = energy
 
     def step(self):
@@ -44,7 +44,7 @@ class Sheep(RandomWalker):
             # Create a new sheep:
             if self.model.grass:
                 self.energy /= 2
-            lamb = Sheep(self.model.next_id(), self.model, self.moore, self.energy)
+            lamb = Sheep(self.model, self.moore, self.energy)
             self.model.grid.place_agent(lamb, self.pos)
 
 
@@ -55,8 +55,8 @@ class Wolf(RandomWalker):
 
     energy = None
 
-    def __init__(self, unique_id, model, moore, energy=None):
-        super().__init__(unique_id, model, moore=moore)
+    def __init__(self, model, moore, energy=None):
+        super().__init__(model, moore=moore)
         self.energy = energy
 
     def step(self):
@@ -83,7 +83,7 @@ class Wolf(RandomWalker):
             if self.random.random() < self.model.wolf_reproduce:
                 # Create a new wolf cub
                 self.energy /= 2
-                cub = Wolf(self.model.next_id(), self.model, self.moore, self.energy)
+                cub = Wolf(self.model, self.moore, self.energy)
                 self.model.grid.place_agent(cub, self.pos)
 
 
@@ -92,7 +92,7 @@ class GrassPatch(mesa.Agent):
     A patch of grass that grows at a fixed rate and it is eaten by sheep
     """
 
-    def __init__(self, unique_id, model, fully_grown, countdown):
+    def __init__(self, model, fully_grown, countdown):
         """
         Creates a new patch of grass
 
@@ -100,7 +100,7 @@ class GrassPatch(mesa.Agent):
             grown: (boolean) Whether the patch of grass is fully grown or not
             countdown: Time for the patch of grass to be fully grown again
         """
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self.fully_grown = fully_grown
         self.countdown = countdown
 

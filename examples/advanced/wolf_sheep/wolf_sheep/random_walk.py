@@ -18,7 +18,7 @@ class RandomWalker(mesa.Agent):
     y = None
     moore = True
 
-    def __init__(self, unique_id, model, moore=True):
+    def __init__(self, model, moore=True):
         """
         grid: The MultiGrid object in which the agent lives.
         x: The agent's current x coordinate
@@ -26,7 +26,7 @@ class RandomWalker(mesa.Agent):
         moore: If True, may move in all 8 directions.
                 Otherwise, only up, down, left, right.
         """
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self.moore = moore
 
     def random_move(self):
