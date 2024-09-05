@@ -351,7 +351,7 @@ class AgentSet(MutableSet, Sequence):
     def get(
         self,
         attr_names: str | list[str],
-        handle_missing: str = "error",
+        handle_missing: Literal["error", "skip", "default"] = "error",
         default_value: Any = None,
     ) -> list[Any] | list[list[Any]]:
         """
