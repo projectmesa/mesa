@@ -24,10 +24,9 @@ See the Visualization Tutorial and example models for more details.
 """
 
 import copy
-import threading
+import time
 from typing import TYPE_CHECKING, Literal
 
-import reacton.ipywidgets as widgets
 import solara
 from solara.alias import rv
 
@@ -95,7 +94,7 @@ def SolaraViz(
     model: "Model" | solara.Reactive["Model"],
     components: list[solara.component] | Literal["default"] = "default",
     *args,
-    play_interval=150,
+    play_interval=100,
     model_params=None,
     seed=0,
     name: str | None = None,
@@ -149,115 +148,57 @@ JupyterViz = SolaraViz
 
 
 @solara.component
-def ModelController(model: solara.Reactive["Model"], play_interval):
+def ModelController(model: solara.Reactive["Model"], play_interval=100):
     """
     Create controls for model execution (step, play, pause, reset).
 
     Args:
-        model: The model being visualized
+        model: The reactive model being visualized
         play_interval: Interval between steps during play
-        current_step: Reactive value for the current step
-        reset_counter: Counter to trigger model reset
     """
+    if not isinstance(model, solara.Reactive):
+        model = solara.use_reactive(model)
+
     playing = solara.use_reactive(False)
-    thread = solara.use_reactive(None)
-    # We track the previous step to detect if user resets the model via
-    # clicking the reset button or changing the parameters. If previous_step >
-    # current_step, it means a model reset happens while the simulation is
-    # still playing.
-    previous_step = solara.use_reactive(0)
     original_model = solara.use_reactive(None)
 
     def save_initial_model():
         """Save the initial model for comparison."""
         original_model.set(copy.deepcopy(model.value))
+        playing.value = False
+        force_update()
 
     solara.use_effect(save_initial_model, [model.value])
 
-    def on_value_play(change):
-        """Handle play/pause state changes."""
-        if previous_step.value > model.value.steps and model.value.steps == 0:
-            # We add extra checks for model.value.steps == 0, just to be sure.
-            # We automatically stop the playing if a model is reset.
-            playing.value = False
-        elif model.value.running:
+    def step():
+        while playing.value:
+            time.sleep(play_interval / 1000)
             do_step()
-        else:
-            playing.value = False
+
+    solara.use_thread(step, [playing.value])
 
     def do_step():
         """Advance the model by one step."""
-        previous_step.value = model.value.steps
         model.value.step()
 
     def do_play():
         """Run the model continuously."""
-        model.value.running = True
-        while model.value.running:
-            do_step()
-
-    def threaded_do_play():
-        """Start a new thread for continuous model execution."""
-        if thread is not None and thread.is_alive():
-            return
-        thread.value = threading.Thread(target=do_play)
-        thread.start()
+        playing.value = True
 
     def do_pause():
         """Pause the model execution."""
-        if (thread is None) or (not thread.is_alive()):
-            return
-        model.value.running = False
-        thread.join()
+        playing.value = False
 
     def do_reset():
-        """Reset the model"""
+        """Reset the model to its initial state."""
+        playing.value = False
         model.value = copy.deepcopy(original_model.value)
-        previous_step.value = 0
-        force_update()
 
-    def do_set_playing(value):
-        """Set the playing state."""
-        if model.value.steps == 0:
-            # This means the model has been recreated, and the step resets to
-            # 0. We want to avoid triggering the playing.value = False in the
-            # on_value_play function.
-            previous_step.value = model.value.steps
-        playing.set(value)
-
-    with solara.Row():
-        solara.Button(label="Step", color="primary", on_click=do_step)
-        # This style is necessary so that the play widget has almost the same
-        # height as typical Solara buttons.
-        solara.Style(
-            """
-        .widget-play {
-            height: 35px;
-        }
-        .widget-play button {
-            color: white;
-            background-color: #1976D2;  // Solara blue color
-        }
-        """
-        )
-        widgets.Play(
-            value=0,
-            interval=play_interval,
-            repeat=True,
-            show_repeat=False,
-            on_value=on_value_play,
-            playing=playing.value,
-            on_playing=do_set_playing,
-        )
+    with solara.Row(justify="space-between"):
         solara.Button(label="Reset", color="primary", on_click=do_reset)
-        # threaded_do_play is not used for now because it
-        # doesn't work in Google colab. We use
-        # ipywidgets.Play until it is fixed. The threading
-        # version is definite a much better implementation,
-        # if it works.
-        # solara.Button(label="▶", color="primary", on_click=viz.threaded_do_play)
-        # solara.Button(label="⏸︎", color="primary", on_click=viz.do_pause)
-        # solara.Button(label="Reset", color="primary", on_click=do_reset)
+        solara.Button(label="Step", color="primary", on_click=do_step)
+        solara.Button(label="▶", color="primary", on_click=do_play)
+        solara.Button(label="⏸︎", color="primary", on_click=do_pause)
 
 
 def split_model_params(model_params):
