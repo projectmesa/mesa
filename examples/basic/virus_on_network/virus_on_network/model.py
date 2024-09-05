@@ -65,9 +65,8 @@ class VirusOnNetwork(mesa.Model):
         )
 
         # Create agents
-        for i, node in enumerate(self.G.nodes()):
+        for node in self.G.nodes():
             a = VirusAgent(
-                i,
                 self,
                 State.SUSCEPTIBLE,
                 self.virus_spread_chance,
@@ -112,7 +111,6 @@ class VirusAgent(mesa.Agent):
 
     def __init__(
         self,
-        unique_id,
         model,
         initial_state,
         virus_spread_chance,
@@ -120,7 +118,7 @@ class VirusAgent(mesa.Agent):
         recovery_chance,
         gain_resistance_chance,
     ):
-        super().__init__(unique_id, model)
+        super().__init__(model)
 
         self.state = initial_state
 

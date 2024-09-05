@@ -11,7 +11,7 @@ class Cell(mesa.Agent):
         """
         Create a cell, in the given state, at the given x, y position.
         """
-        super().__init__(pos, model)
+        super().__init__(model)
         self.x, self.y = pos
         self.state = init_state
         self._nextState = None

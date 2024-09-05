@@ -26,7 +26,6 @@ class Boid(mesa.Agent):
 
     def __init__(
         self,
-        unique_id,
         model,
         speed,
         direction,
@@ -40,7 +39,6 @@ class Boid(mesa.Agent):
         Create a new Boid flocker agent.
 
         Args:
-            unique_id: Unique agent identifier.
             speed: Distance to move per step.
             direction: numpy vector for the Boid's direction of movement.
             vision: Radius to look around for nearby Boids.
@@ -49,7 +47,7 @@ class Boid(mesa.Agent):
             separate: the relative importance of avoiding close neighbors
             match: the relative importance of matching neighbors' headings
         """
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self.speed = speed
         self.direction = direction
         self.vision = vision
@@ -129,13 +127,12 @@ class BoidFlockers(mesa.Model):
         """
         Create self.population agents, with random positions and starting headings.
         """
-        for i in range(self.population):
+        for _ in range(self.population):
             x = self.random.random() * self.space.x_max
             y = self.random.random() * self.space.y_max
             pos = np.array((x, y))
             direction = np.random.random(2) * 2 - 1
             boid = Boid(
-                unique_id=i,
                 model=self,
                 speed=self.speed,
                 direction=direction,
