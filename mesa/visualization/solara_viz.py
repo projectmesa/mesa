@@ -25,7 +25,7 @@ See the Visualization Tutorial and example models for more details.
 
 import copy
 import threading
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import reacton.ipywidgets as widgets
 import solara
@@ -93,15 +93,16 @@ def Card(
 @solara.component
 def SolaraViz(
     model: "Model" | solara.Reactive["Model"],
-    components: list[solara.component] | None = None,
+    components: list[solara.component] | Literal["default"] = "default",
     *args,
     play_interval=150,
     model_params=None,
     seed=0,
     name: str | None = None,
 ):
-    if components is None:
-        components = []
+    update_counter.get()
+    if components == "default":
+        components = [components_altair.make_space_altair()]
 
     # Convert model to reactive
     if not isinstance(model, solara.Reactive):
