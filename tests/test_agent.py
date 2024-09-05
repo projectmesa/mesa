@@ -329,9 +329,7 @@ def test_agentset_get():
 
     # Case 10: 'default' handling when one attribute is completely missing from some agents
     agentset.set("c", 8)  # Only some agents have attribute 'c'
-    values = agentset.get(
-        ["a", "c"], handle_missing="default", default_value=-1
-    )
+    values = agentset.get(["a", "c"], handle_missing="default", default_value=-1)
     assert all((a == 5) & (c in [8, -1]) for a, c in values)
 
     # Case 11: Skip handling when one attribute is completely missing from some agents
