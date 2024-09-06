@@ -305,36 +305,21 @@ def test_agentset_get():
     )
     assert all((a == 5) & (unknown is True) for a, unknown in values)
 
-    # Case 5: Skip agents missing the attribute
-    results = agentset.get("unknown_attribute", handle_missing="skip")
-    assert len(results) == 0
-
-    # Case 6: Skip missing attributes in mixed attribute retrieval
-    values = agentset.get(["a", "unknown_attribute"], handle_missing="skip")
-    assert all((a == 5) for (a,) in values)
-
-    # Case 7: Invalid handle_missing value raises ValueError
+    # Case 5: Invalid handle_missing value raises ValueError
     with pytest.raises(ValueError):
         agentset.get("unknown_attribute", handle_missing="some nonsense value")
 
-    # Case 8: Retrieve multiple attributes with mixed existence and 'default' handling
+    # Case 6: Retrieve multiple attributes with mixed existence and 'default' handling
     values = agentset.get(
         ["a", "b", "unknown_attribute"], handle_missing="default", default_value=0
     )
     assert all((a == 5) & (b == 6) & (unknown == 0) for a, b, unknown in values)
 
-    # Case 9: Retrieve multiple attributes with 'skip' handling for missing attributes
-    values = agentset.get(["a", "b", "unknown_attribute"], handle_missing="skip")
-    assert all((a == 5) & (b == 6) for a, b in values)  # No unknown_attribute included
-
-    # Case 10: 'default' handling when one attribute is completely missing from some agents
+    # Case 7: 'default' handling when one attribute is completely missing from some agents
     agentset.select(at_most=0.5).set("c", 8)  # Only some agents have attribute 'c'
     values = agentset.get(["a", "c"], handle_missing="default", default_value=-1)
     assert all((a == 5) & (c in [8, -1]) for a, c in values)
 
-    # Case 11: Skip handling when one attribute is completely missing from some agents
-    values = agentset.get(["a", "c"], handle_missing="skip")
-    assert all(5 in a for a in values)  # Only agents with 'a' are returned
 
 
 def test_agentset_agg():

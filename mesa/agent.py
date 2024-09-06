@@ -351,7 +351,7 @@ class AgentSet(MutableSet, Sequence):
     def get(
         self,
         attr_names: str | list[str],
-        handle_missing: Literal["error", "skip", "default"] = "error",
+        handle_missing: Literal["error", "default"] = "error",
         default_value: Any = None,
     ) -> list[Any] | list[list[Any]]:
         """
@@ -361,14 +361,13 @@ class AgentSet(MutableSet, Sequence):
             attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
             handle_missing (str, optional): How to handle missing attributes. Can be:
                                             - 'error' (default): raises an AttributeError if attribute is missing.
-                                            - 'skip': skips the agents missing the attribute.
                                             - 'default': returns the specified default_value.
             default_value (Any, optional): The default value to return if 'handle_missing' is set to 'default'
                                            and the agent does not have the attribute.
 
         Returns:
-            list[Any]: A list of attribute values for each agent if attr_names is a str.
-            list[list[Any]]: A list of lists of attribute values for each agent if attr_names is a list of str.
+            list[Any]: A list with the attribute value for each agent if attr_names is a str.
+            list[list[Any]]: A list with a lists of attribute values for each agent if attr_names is a list of str.
 
         Raises:
             AttributeError: If 'handle_missing' is 'error' and the agent does not have the specified attribute(s).
@@ -396,28 +395,10 @@ class AgentSet(MutableSet, Sequence):
                     for agent in self._agents
                 ]
 
-        elif handle_missing == "skip":
-            if is_single_attr:
-                return [
-                    getattr(agent, attr_names)
-                    for agent in self._agents
-                    if hasattr(agent, attr_names)
-                ]
-            else:
-                return [
-                    [
-                        getattr(agent, attr)
-                        for attr in attr_names
-                        if hasattr(agent, attr)
-                    ]
-                    for agent in self._agents
-                    if any(hasattr(agent, attr) for attr in attr_names)
-                ]
-
         else:
             raise ValueError(
                 f"Unknown handle_missing option: {handle_missing}, "
-                "should be one of 'error', 'skip', or 'default'"
+                "should be one of 'error' or 'default'"
             )
 
     def set(self, attr_name: str, value: Any) -> AgentSet:
