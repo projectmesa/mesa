@@ -276,6 +276,51 @@ def test_agentset_do_callable():
     assert len(agentset) == 0
 
 
+def test_agentset_get():
+    model = Model()
+    _ = [TestAgent(i, model) for i in range(10)]
+
+    agentset = model.agents
+
+    agentset.set("a", 5)
+    agentset.set("b", 6)
+
+    # Case 1: Normal retrieval of existing attributes
+    values = agentset.get(["a", "b"])
+    assert all((a == 5) & (b == 6) for a, b in values)
+
+    # Case 2: Raise AttributeError when attribute doesn't exist
+    with pytest.raises(AttributeError):
+        agentset.get("unknown_attribute")
+
+    # Case 3: Use default value when attribute is missing
+    results = agentset.get(
+        "unknown_attribute", handle_missing="default", default_value=True
+    )
+    assert all(results) is True
+
+    # Case 4: Retrieve mixed attributes with default value for missing ones
+    values = agentset.get(
+        ["a", "unknown_attribute"], handle_missing="default", default_value=True
+    )
+    assert all((a == 5) & (unknown is True) for a, unknown in values)
+
+    # Case 5: Invalid handle_missing value raises ValueError
+    with pytest.raises(ValueError):
+        agentset.get("unknown_attribute", handle_missing="some nonsense value")
+
+    # Case 6: Retrieve multiple attributes with mixed existence and 'default' handling
+    values = agentset.get(
+        ["a", "b", "unknown_attribute"], handle_missing="default", default_value=0
+    )
+    assert all((a == 5) & (b == 6) & (unknown == 0) for a, b, unknown in values)
+
+    # Case 7: 'default' handling when one attribute is completely missing from some agents
+    agentset.select(at_most=0.5).set("c", 8)  # Only some agents have attribute 'c'
+    values = agentset.get(["a", "c"], handle_missing="default", default_value=-1)
+    assert all((a == 5) & (c in [8, -1]) for a, c in values)
+
+
 def test_agentset_agg():
     model = Model()
     agents = [TestAgent(model) for i in range(10)]
