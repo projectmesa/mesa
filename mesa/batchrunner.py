@@ -1,4 +1,5 @@
 import itertools
+import multiprocessing
 from collections.abc import Iterable, Mapping
 from functools import partial
 from multiprocessing import Pool
@@ -7,6 +8,8 @@ from typing import Any, Optional, Union
 from tqdm.auto import tqdm
 
 from mesa.model import Model
+
+multiprocessing.set_start_method("spawn", force=True)
 
 
 def batch_run(
