@@ -60,7 +60,7 @@ class Grid(DiscreteSpace, Generic[T]):
             raise ValueError("Dimensions must be a list of positive integers.")
         if not isinstance(self.torus, bool):
             raise ValueError("Torus must be a boolean.")
-        if self.capacity is not None and not isinstance(self.capacity, (float, int)):
+        if self.capacity is not None and not isinstance(self.capacity, float | int):
             raise ValueError("Capacity must be a number or None.")
 
     def select_random_empty_cell(self) -> T:

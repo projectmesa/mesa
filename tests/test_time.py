@@ -25,8 +25,8 @@ class MockAgent(Agent):
     Minimalistic agent for testing purposes.
     """
 
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
+    def __init__(self, model):
+        super().__init__(model)
         self.steps = 0
         self.advances = 0
 
@@ -38,10 +38,10 @@ class MockAgent(Agent):
     def stage_one(self):
         if self.model.enable_kill_other_agent:
             self.kill_other_agent()
-        self.model.log.append(self.unique_id + "_1")
+        self.model.log.append(f"{self.unique_id}_1")
 
     def stage_two(self):
-        self.model.log.append(self.unique_id + "_2")
+        self.model.log.append(f"{self.unique_id}_2")
 
     def advance(self):
         self.advances += 1
@@ -89,8 +89,8 @@ class MockModel(Model):
             self.schedule = BaseScheduler(self)
 
         # Make agents
-        for name in ["A", "B"]:
-            agent = MockAgent(name, self)
+        for _ in range(2):
+            agent = MockAgent(self)
             self.schedule.add(agent)
 
     def step(self):
@@ -105,7 +105,7 @@ class TestStagedActivation(TestCase):
     Test the staged activation.
     """
 
-    expected_output = ["A_1", "B_1", "model_stage", "A_2", "B_2"]
+    expected_output = ["1_1", "1_1", "model_stage", "1_2", "1_2"]
 
     def test_no_shuffle(self):
         """
@@ -168,7 +168,7 @@ class TestRandomActivation(TestCase):
 
     def test_init(self):
         model = Model()
-        agents = [MockAgent(model.next_id(), model) for _ in range(10)]
+        agents = [MockAgent(model) for _ in range(10)]
 
         scheduler = RandomActivation(model, agents)
         assert all(agent in scheduler.agents for agent in agents)
@@ -227,7 +227,7 @@ class TestRandomActivation(TestCase):
         model = MockModel(activation=RANDOM)
         # Create 10 agents
         for _ in range(10):
-            model.schedule.add(MockAgent(model.next_id(), model))
+            model.schedule.add(MockAgent(model))
         # Run 3 steps
         for _ in range(3):
             model.step()
@@ -273,8 +273,8 @@ class TestRandomActivationByType(TestCase):
 
     def test_init(self):
         model = Model()
-        agents = [MockAgent(model.next_id(), model) for _ in range(10)]
-        agents += [Agent(model.next_id(), model) for _ in range(10)]
+        agents = [MockAgent(model) for _ in range(10)]
+        agents += [Agent(model) for _ in range(10)]
 
         scheduler = RandomActivationByType(model, agents)
         assert all(agent in scheduler.agents for agent in agents)
@@ -320,7 +320,7 @@ class TestRandomActivationByType(TestCase):
         agent_types = model.agent_types
         for agent_type in agent_types:
             assert model.schedule.get_type_count(agent_type) == len(
-                model.get_agents_of_type(agent_type)
+                model.agents_by_type[agent_type]
             )
 
     # def test_add_non_unique_ids(self):

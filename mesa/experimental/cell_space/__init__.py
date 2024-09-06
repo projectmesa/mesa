@@ -9,6 +9,7 @@ from mesa.experimental.cell_space.grid import (
     OrthogonalVonNeumannGrid,
 )
 from mesa.experimental.cell_space.network import Network
+from mesa.experimental.cell_space.voronoi import VoronoiGrid
 
 __all__ = [
     "CellCollection",
@@ -20,4 +21,5 @@ __all__ = [
     "OrthogonalMooreGrid",
     "OrthogonalVonNeumannGrid",
     "Network",
+    "VoronoiGrid",
 ]

@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "Mesa"
 description = "Agent-based modeling (ABM) in Python"
 license = { text = "Apache 2.0" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
   { name = "Project Mesa Team", email = "projectmesa@googlegroups.com" },
 ]
@@ -25,7 +25,6 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Intended Audience :: Science/Research",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -39,7 +38,6 @@ dependencies = [
   "click",
   "cookiecutter",
   "matplotlib",
-  "mesa_viz_tornado~=0.1.0,>=0.1.3",
   "networkx",
   "numpy",
   "pandas",
@@ -51,11 +49,14 @@ dynamic = ["version"]
 [project.optional-dependencies]
 dev = [
   "ruff~=0.1.1",   # Update periodically
-  "coverage",
   "pytest >= 4.6",
   "pytest-cov",
   "sphinx",
   "pytest-mock",
+]
+examples = [
+  "pytest >= 4.6",
+  "scipy"
 ]
 docs = [
   "sphinx",
@@ -81,9 +82,9 @@ path = "mesa/__init__.py"
 
 [tool.ruff]
 # See https://github.com/charliermarsh/ruff#rules for error code definitions.
-# Hardcode to Python 3.9.
+# Hardcode to Python 3.10.
 # Reminder to update mesa-examples if the value below is changed.
-target-version = "py39"
+target-version = "py310"
 extend-exclude = ["docs", "build"]
 
 [tool.ruff.lint]

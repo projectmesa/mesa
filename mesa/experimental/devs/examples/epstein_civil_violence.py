@@ -7,8 +7,8 @@ from mesa.space import SingleGrid
 
 
 class EpsteinAgent(Agent):
-    def __init__(self, unique_id, model, vision, movement):
-        super().__init__(unique_id, model)
+    def __init__(self, model, vision, movement):
+        super().__init__(model)
         self.vision = vision
         self.movement = movement
 
@@ -46,7 +46,6 @@ class Citizen(EpsteinAgent):
 
     def __init__(
         self,
-        unique_id,
         model,
         vision,
         movement,
@@ -59,7 +58,6 @@ class Citizen(EpsteinAgent):
         """
         Create a new Citizen.
         Args:
-            unique_id: unique int
             model : model instance
             hardship: Agent's 'perceived hardship (i.e., physical or economic
                 privation).' Exogenous, drawn from U(0,1).
@@ -71,7 +69,7 @@ class Citizen(EpsteinAgent):
             vision: number of cells in each direction (N, S, E and W) that
                 agent can inspect. Exogenous.
         """
-        super().__init__(unique_id, model, vision, movement)
+        super().__init__(model, vision, movement)
         self.hardship = hardship
         self.regime_legitimacy = regime_legitimacy
         self.risk_aversion = risk_aversion
@@ -144,8 +142,8 @@ class Cop(EpsteinAgent):
             able to inspect
     """
 
-    def __init__(self, unique_id, model, vision, movement, max_jail_term):
-        super().__init__(unique_id, model, vision, movement)
+    def __init__(self, model, vision, movement, max_jail_term):
+        super().__init__(model, vision, movement)
         self.max_jail_term = max_jail_term
 
     def step(self):
@@ -236,7 +234,6 @@ class EpsteinCivilViolence(Model):
         for _, pos in self.grid.coord_iter():
             if self.random.random() < self.cop_density:
                 agent = Cop(
-                    self.next_id(),
                     self,
                     cop_vision,
                     movement,
@@ -244,7 +241,6 @@ class EpsteinCivilViolence(Model):
                 )
             elif self.random.random() < (self.cop_density + self.citizen_density):
                 agent = Citizen(
-                    self.next_id(),
                     self,
                     citizen_vision,
                     movement,
@@ -270,4 +266,4 @@ if __name__ == "__main__":
 
     simulator.setup(model)
 
-    simulator.run(time_delta=100)
+    simulator.run_for(time_delta=100)

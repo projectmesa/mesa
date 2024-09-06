@@ -113,6 +113,8 @@ pygments_style = "gruvbox-dark"
 
 nb_execution_timeout = 60
 nb_execution_mode = "cache"
+nb_execution_allow_errors = False
+nb_execution_raise_on_error = True
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -279,4 +281,4 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {"http://docs.python.org/": None}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}

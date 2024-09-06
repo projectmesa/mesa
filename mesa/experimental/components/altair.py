@@ -1,5 +1,4 @@
 import contextlib
-from typing import Optional
 
 import solara
 
@@ -8,7 +7,7 @@ with contextlib.suppress(ImportError):
 
 
 @solara.component
-def SpaceAltair(model, agent_portrayal, dependencies: Optional[list[any]] = None):
+def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):
     space = getattr(model, "grid", None)
     if space is None:
         # Sometimes the space is defined as model.space instead of model.grid

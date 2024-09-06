@@ -17,8 +17,8 @@ from mesa.experimental.devs import ABMSimulator
 
 
 class Animal(CellAgent):
-    def __init__(self, unique_id, model, energy, p_reproduce, energy_from_food):
-        super().__init__(unique_id, model)
+    def __init__(self, model, energy, p_reproduce, energy_from_food):
+        super().__init__(model)
         self.energy = energy
         self.p_reproduce = p_reproduce
         self.energy_from_food = energy_from_food
@@ -29,7 +29,6 @@ class Animal(CellAgent):
     def spawn_offspring(self):
         self.energy /= 2
         offspring = self.__class__(
-            self.model.next_id(),
             self.model,
             self.energy,
             self.p_reproduce,
@@ -107,7 +106,7 @@ class GrassPatch(CellAgent):
                 function_args=[self, "fully_grown", True],
             )
 
-    def __init__(self, unique_id, model, fully_grown, countdown, grass_regrowth_time):
+    def __init__(self, model, fully_grown, countdown, grass_regrowth_time):
         """
         TODO:: fully grown can just be an int --> so one less param (i.e. countdown)
 
@@ -119,7 +118,7 @@ class GrassPatch(CellAgent):
             grass_regrowth_time : time to fully regrow grass
             countdown : Time for the patch of grass to be fully regrown if fully grown is False
         """
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self._fully_grown = fully_grown
         self.grass_regrowth_time = grass_regrowth_time
 
@@ -189,7 +188,6 @@ class WolfSheep(Model):
             )
             energy = self.random.randrange(2 * sheep_gain_from_food)
             sheep = Sheep(
-                self.next_id(),
                 self,
                 energy,
                 sheep_reproduce,
@@ -205,7 +203,6 @@ class WolfSheep(Model):
             )
             energy = self.random.randrange(2 * wolf_gain_from_food)
             wolf = Wolf(
-                self.next_id(),
                 self,
                 energy,
                 wolf_reproduce,
@@ -221,14 +218,12 @@ class WolfSheep(Model):
                 countdown = grass_regrowth_time
             else:
                 countdown = self.random.randrange(grass_regrowth_time)
-            patch = GrassPatch(
-                self.next_id(), self, fully_grown, countdown, grass_regrowth_time
-            )
+            patch = GrassPatch(self, fully_grown, countdown, grass_regrowth_time)
             patch.move_to(cell)
 
     def step(self):
-        self.get_agents_of_type(Sheep).shuffle(inplace=True).do("step")
-        self.get_agents_of_type(Wolf).shuffle(inplace=True).do("step")
+        self.agents_by_type[Sheep].shuffle(inplace=True).do("step")
+        self.agents_by_type[Wolf].shuffle(inplace=True).do("step")
 
 
 if __name__ == "__main__":

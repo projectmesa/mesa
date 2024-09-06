@@ -15,6 +15,8 @@ __pycache__/
 .Python
 env/
 venv/
+pythonenv*/
+.venv/
 build/
 develop-eggs/
 dist/
@@ -83,10 +85,6 @@ target/
 .dmypy.json
 dmypy.json
 
-# pythonenv
-pythonenv*/
-
 # JS dependencies
 mesa/visualization/templates/external/
 mesa/visualization/templates/js/external/
-

@@ -13,8 +13,8 @@ class MockAgent(Agent):
     Minimalistic agent for testing purposes.
     """
 
-    def __init__(self, unique_id, model, val=0):
-        super().__init__(unique_id, model)
+    def __init__(self, model, val=0):
+        super().__init__(model)
         self.val = val
         self.val2 = val
 
@@ -40,14 +40,6 @@ def agent_function_with_params(agent, multiplier, offset):
     return (agent.val * multiplier) + offset
 
 
-class DifferentMockAgent(MockAgent):
-    # We define a different MockAgent to test for attributes that are present
-    # only in 1 type of agent, but not the other.
-    def __init__(self, unique_id, model, val=0):
-        super().__init__(unique_id, model, val=val)
-        self.val3 = val + 42
-
-
 class MockModel(Model):
     """
     Minimalistic model for testing purposes.
@@ -61,8 +53,8 @@ class MockModel(Model):
         self.model_val = 100
 
         self.n = 10
-        for i in range(self.n):
-            self.schedule.add(MockAgent(i, self, val=i))
+        for i in range(1, self.n + 1):
+            self.schedule.add(MockAgent(self, val=i))
         self.initialize_data_collector(
             model_reporters={
                 "total_agents": lambda m: m.schedule.get_agent_count(),

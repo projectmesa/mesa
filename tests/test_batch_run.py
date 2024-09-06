@@ -28,9 +28,8 @@ class MockAgent(Agent):
     Minimalistic agent implementation for testing purposes
     """
 
-    def __init__(self, unique_id, model, val):
-        super().__init__(unique_id, model)
-        self.unique_id = unique_id
+    def __init__(self, model, val):
+        super().__init__(model)
         self.val = val
         self.local = 0
 
@@ -76,29 +75,20 @@ class MockModel(Model):
             agent_val = 1
         else:
             agent_val = self.variable_agent_param
-        for i in range(self.n_agents):
-            self.schedule.add(MockAgent(i, self, agent_val))
+        for _ in range(self.n_agents):
+            self.schedule.add(MockAgent(self, agent_val))
 
     def get_local_model_param(self):
         return 42
 
     def step(self):
-        self.datacollector.collect(self)
         self.schedule.step()
+        self.datacollector.collect(self)
 
 
 def test_batch_run():
     result = mesa.batch_run(MockModel, {}, number_processes=2)
     assert result == [
-        {
-            "RunId": 0,
-            "iteration": 0,
-            "Step": 1000,
-            "reported_model_param": 42,
-            "AgentID": 0,
-            "agent_id": 0,
-            "agent_local": 250.0,
-        },
         {
             "RunId": 0,
             "iteration": 0,
@@ -115,6 +105,15 @@ def test_batch_run():
             "reported_model_param": 42,
             "AgentID": 2,
             "agent_id": 2,
+            "agent_local": 250.0,
+        },
+        {
+            "RunId": 0,
+            "iteration": 0,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 3,
+            "agent_id": 3,
             "agent_local": 250.0,
         },
     ]
@@ -172,22 +171,15 @@ def test_batch_run_unhashable_param():
         {
             "RunId": 0,
             "iteration": 0,
-            "AgentID": 0,
-            "agent_id": 0,
+            "AgentID": 1,
+            "agent_id": 1,
             **template,
         },
         {
             "RunId": 0,
             "iteration": 0,
-            "AgentID": 1,
-            "agent_id": 1,
-            **template,
-        },
-        {
-            "RunId": 1,
-            "iteration": 1,
-            "AgentID": 0,
-            "agent_id": 0,
+            "AgentID": 2,
+            "agent_id": 2,
             **template,
         },
         {
@@ -195,6 +187,13 @@ def test_batch_run_unhashable_param():
             "iteration": 1,
             "AgentID": 1,
             "agent_id": 1,
+            **template,
+        },
+        {
+            "RunId": 1,
+            "iteration": 1,
+            "AgentID": 2,
+            "agent_id": 2,
             **template,
         },
     ]

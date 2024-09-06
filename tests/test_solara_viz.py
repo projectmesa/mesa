@@ -5,7 +5,8 @@ import ipyvuetify as vw
 import solara
 
 import mesa
-from mesa.experimental.jupyter_viz import JupyterViz, Slider, UserInputs
+from mesa.visualization.components.matplotlib import make_space_matplotlib
+from mesa.visualization.solara_viz import Slider, SolaraViz, UserInputs
 
 
 class TestMakeUserInput(unittest.TestCase):
@@ -84,7 +85,7 @@ class TestMakeUserInput(unittest.TestCase):
 
 def test_call_space_drawer(mocker):
     mock_space_matplotlib = mocker.patch(
-        "mesa.experimental.components.matplotlib.SpaceMatplotlib"
+        "mesa.visualization.components.matplotlib.SpaceMatplotlib"
     )
 
     model = mesa.Model()
@@ -95,48 +96,31 @@ def test_call_space_drawer(mocker):
         "Shape": "circle",
         "color": "gray",
     }
-    current_step = 0
-    seed = 0
-    dependencies = [current_step, seed]
     # initialize with space drawer unspecified (use default)
     # component must be rendered for code to run
-    solara.render(
-        JupyterViz(
-            model_class=mesa.Model,
-            model_params={},
-            agent_portrayal=agent_portrayal,
-        )
-    )
+    solara.render(SolaraViz(model, components=[make_space_matplotlib(agent_portrayal)]))
     # should call default method with class instance and agent portrayal
-    mock_space_matplotlib.assert_called_with(
-        model, agent_portrayal, dependencies=dependencies
-    )
+    mock_space_matplotlib.assert_called_with(model, agent_portrayal)
 
-    # specify no space should be drawn; any false value should work
-    for falsy_value in [None, False, 0]:
-        mock_space_matplotlib.reset_mock()
-        solara.render(
-            JupyterViz(
-                model_class=mesa.Model,
-                model_params={},
-                agent_portrayal=agent_portrayal,
-                space_drawer=falsy_value,
-            )
-        )
-        # should call default method with class instance and agent portrayal
-        assert mock_space_matplotlib.call_count == 0
+    # specify no space should be drawn
+    mock_space_matplotlib.reset_mock()
+    solara.render(SolaraViz(model, components=[]))
+    # should call default method with class instance and agent portrayal
+    assert mock_space_matplotlib.call_count == 0
 
     # specify a custom space method
     altspace_drawer = Mock()
-    solara.render(
-        JupyterViz(
-            model_class=mesa.Model,
-            model_params={},
-            agent_portrayal=agent_portrayal,
-            space_drawer=altspace_drawer,
-        )
+    solara.render(SolaraViz(model, components=[altspace_drawer]))
+    altspace_drawer.assert_called_with(model)
+
+    # check voronoi space drawer
+    voronoi_model = mesa.Model()
+    voronoi_model.grid = mesa.experimental.cell_space.VoronoiGrid(
+        centroids_coordinates=[(0, 1), (0, 0), (1, 0)],
     )
-    altspace_drawer.assert_called_with(model, agent_portrayal)
+    solara.render(
+        SolaraViz(voronoi_model, components=[make_space_matplotlib(agent_portrayal)])
+    )
 
 
 def test_slider():

@@ -17,8 +17,8 @@ Mesa is modular, meaning that its modeling, analysis and visualization component
 Most models consist of one class to represent the model itself; one class (or more) for agents; a scheduler to handle time (what order the agents act in), and possibly a space for the agents to inhabit and move through. These are implemented in Mesa's modeling modules:
 
 - `mesa.Model`, `mesa.Agent`
-- [mesa.time](apis/time.html)
-- [mesa.space](apis/space.html)
+- [mesa.time](apis/time)
+- [mesa.space](apis/space)
 
 The skeleton of a model might look like this:
 
@@ -56,7 +56,7 @@ model = MyModel(5)
 model.step()
 ```
 
-You should see agents 0-4, activated in random order. See the [tutorial](tutorials/intro_tutorial.html) or API documentation for more detail on how to add model functionality.
+You should see agents 0-4, activated in random order. See the [tutorial](tutorials/intro_tutorial) or API documentation for more detail on how to add model functionality.
 
 To bootstrap a new model install mesa and run `mesa startproject`
 
@@ -64,8 +64,8 @@ To bootstrap a new model install mesa and run `mesa startproject`
 
 If you're using modeling for research, you'll want a way to collect the data each model run generates. You'll probably also want to run the model multiple times, to see how some output changes with different parameters. Data collection and batch running are implemented in the appropriately-named analysis modules:
 
-- [mesa.datacollection](apis/datacollection.html)
-- [mesa.batchrunner](apis/batchrunner.html)
+- [mesa.datacollection](apis/datacollection)
+- [mesa.batchrunner](apis/batchrunner)
 
 You'd add a data collector to the model like this:
 
@@ -114,33 +114,3 @@ As with the data collector, once the runs are all over, you can extract the data
 ```python
 batch_df = batch_run.get_model_vars_dataframe()
 ```
-
-### Visualization modules
-
-Finally, you may want to directly observe your model as it runs. Mesa's main visualization tool uses a small local web server to render the model in a browser, using JavaScript. There are different components for drawing different types of data: for example, grids for drawing agents moving around on a grid, or charts for showing how some data changes as the model runs. A few core modules are:
-
-- mesa.visualization.ModularVisualization
-- mesa.visualization.modules
-
-To quickly spin up a model visualization, you might do something like:
-
-```python
-import mesa
-
-def agent_portrayal(agent):
-    portrayal = {"Shape": "circle",
-                 "Filled": "true",
-                 "Layer": 0,
-                 "Color": "red",
-                 "r": 0.5}
-    return portrayal
-
-grid = mesa.visualization.CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-server = mesa.visualization.ModularServer(MyModel,
-                       [grid],
-                       "My Model",
-                       {'n_agents': 10})
-server.launch()
-```
-
-This will launch the browser-based visualization, on the default port 8521.

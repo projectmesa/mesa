@@ -23,9 +23,9 @@ import inspect
 import itertools
 import math
 import warnings
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from numbers import Real
-from typing import Any, Callable, TypeVar, Union, cast, overload
+from typing import Any, TypeVar, cast, overload
 from warnings import warn
 
 with contextlib.suppress(ImportError):
@@ -42,12 +42,12 @@ _types_integer = (int, np.integer)
 
 Coordinate = tuple[int, int]
 # used in ContinuousSpace
-FloatCoordinate = Union[tuple[float, float], npt.NDArray[float]]
+FloatCoordinate = tuple[float, float] | npt.NDArray[float]
 NetworkCoordinate = int
 
-Position = Union[Coordinate, FloatCoordinate, NetworkCoordinate]
+Position = Coordinate | FloatCoordinate | NetworkCoordinate
 
-GridContent = Union[Agent, None]
+GridContent = Agent | None
 MultiGridContent = list[Agent]
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -591,7 +591,7 @@ class PropertyLayer:
         aggregate_property(operation): Performs an aggregate operation over all cells.
     """
 
-    agentset_experimental_warning_given = False
+    propertylayer_experimental_warning_given = False
 
     def __init__(
         self, name: str, width: int, height: int, default_value, dtype=np.float64
@@ -638,14 +638,14 @@ class PropertyLayer:
 
         self.data = np.full((width, height), default_value, dtype=dtype)
 
-        if not self.__class__.agentset_experimental_warning_given:
+        if not self.__class__.propertylayer_experimental_warning_given:
             warnings.warn(
                 "The new PropertyLayer and _PropertyGrid classes experimental. It may be changed or removed in any and all future releases, including patch releases.\n"
                 "We would love to hear what you think about this new feature. If you have any thoughts, share them with us here: https://github.com/projectmesa/mesa/discussions/1932",
                 FutureWarning,
                 stacklevel=2,
             )
-            self.__class__.agentset_experimental_warning_given = True
+            self.__class__.propertylayer_experimental_warning_given = True
 
     def set_cell(self, position: Coordinate, value):
         """

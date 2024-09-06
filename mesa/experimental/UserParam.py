@@ -47,7 +47,7 @@ class Slider(UserParam):
         if dtype is None:
             self.is_float_slider = self._check_values_are_float(value, min, max, step)
         else:
-            self.is_float_slider = dtype == float
+            self.is_float_slider = dtype is float
 
     def _check_values_are_float(self, value, min, max, step):
         return any(isinstance(n, float) for n in (value, min, max, step))

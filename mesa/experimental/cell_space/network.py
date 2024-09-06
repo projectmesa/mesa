@@ -1,5 +1,5 @@
 from random import Random
-from typing import Any, Optional
+from typing import Any
 
 from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.discrete_space import DiscreteSpace
@@ -11,8 +11,8 @@ class Network(DiscreteSpace):
     def __init__(
         self,
         G: Any,  # noqa: N803
-        capacity: Optional[int] = None,
-        random: Optional[Random] = None,
+        capacity: int | None = None,
+        random: Random | None = None,
         cell_klass: type[Cell] = Cell,
     ) -> None:
         """A Networked grid

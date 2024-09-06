@@ -1,7 +1,14 @@
-import contextlib
+from .components.altair import make_space_altair
+from .components.matplotlib import make_plot_measure, make_space_matplotlib
+from .solara_viz import JupyterViz, SolaraViz, make_text
+from .UserParam import Slider
 
-with contextlib.suppress(ImportError):
-    from mesa_viz_tornado.ModularVisualization import *  # noqa
-    from mesa_viz_tornado.modules import *  # noqa
-    from mesa_viz_tornado.UserParam import *  # noqa
-    from mesa_viz_tornado.TextVisualization import *  # noqa
+__all__ = [
+    "JupyterViz",
+    "SolaraViz",
+    "make_text",
+    "Slider",
+    "make_space_altair",
+    "make_space_matplotlib",
+    "make_plot_measure",
+]

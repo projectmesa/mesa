@@ -1,38 +1,21 @@
 # Visualization
 
+For a detailed tutorial, please refer to our [Visualization Tutorial](../tutorials/visualization_tutorial.ipynb).
+
+## Jupyter Visualization
+
 ```{eval-rst}
-.. automodule:: visualization.__init__
+.. automodule:: mesa.visualization.solara_viz
    :members:
+   :undoc-members:
+   :show-inheritance:
 ```
 
-```{eval-rst}
-.. automodule:: visualization.ModularVisualization
-   :members:
-```
+## User Parameters
 
 ```{eval-rst}
-.. automodule:: visualization.TextVisualization
+.. automodule:: mesa.visualization.UserParam
    :members:
-```
-
-## Modules
-
-```{eval-rst}
-.. automodule:: visualization.modules.__init__
-   :members:
-```
-
-```{eval-rst}
-.. automodule:: visualization.modules.CanvasGridVisualization
-   :members:
-```
-
-```{eval-rst}
-.. automodule:: visualization.modules.ChartVisualization
-   :members:
-```
-
-```{eval-rst}
-.. automodule:: visualization.modules.TextVisualization
-   :members:
+   :undoc-members:
+   :show-inheritance:
 ```

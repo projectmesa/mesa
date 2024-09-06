@@ -1,6 +1,166 @@
 ---
 title: Release History
 ---
+# 3.0.0a3 (2024-08-30)
+## Highlights
+Developments toward Mesa 3.0 are steaming ahead, and our fourth alpha release is packed with features and updates - only 8 days after our third.
+
+Mesa 3.0.0a3 contains one breaking change: We now automatically increase the `steps` counter by one at the beginning of each `Model.steps()` call. That means increasing `steps` by hand isn't necessary anymore.
+
+The big new features is the experimental Voronoi grid that @vitorfrois implemented in #2084. It allows creating cells in a [Voronoi](https://en.wikipedia.org/wiki/Voronoi_diagram) layout as part of the experimental cell space. An example using it to model Cholera spread can be [found here](https://github.com/projectmesa/mesa-examples/pull/118).
+
+The AgentSet got a lot of love with two brand new methods: `.groupby()` to split in groups (#2220) and `.set()` to easily assign variables to all agents in that set (#2254). The `select()` method is improved by allowing to select at most a fraction of the agents (#2253), and we split the `do()` method in `do()` and `map()` to make a distinction between the return types (#2237).
+
+Furthermore, we improved the performance of accessing `Model.agents`, squashed a bug in SolaraViz, started testing on Python 3.13 and added a new benchmark model.
+
+Our example models also got more love: We removed the `RandomActivation` scheduler in 14 models and removed SimultaneousActivation in 3 models ([examples#183](https://github.com/projectmesa/mesa-examples/pull/183)). They now use the automatic step increase and AgentSet functionality. We started testing our GIS model in CI ([examples#171](https://github.com/projectmesa/mesa-examples/pull/171)) and resolved a lot of bugs in them ([examples#172](https://github.com/projectmesa/mesa-examples/issues/172), help appreciated!).
+
+Finally, we have two brand new examples: An Ant Colony Optimization model using an Ant System approach to the Traveling Salesman problem, a Mesa NetworkGrid, and a custom visualisation with SolaraViz ([examples#157](https://github.com/projectmesa/mesa-examples/pull/157) by @zjost). The first example using the `PropertyLayer` was added, a very fast implementation of Conway's Game of Life ([examples#182](https://github.com/projectmesa/mesa-examples/pull/182)).
+
+To help the transition to Mesa 3.0, we started writing a [migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html). Progress is tracked in #2233, feedback and help is appreciated! Finally, we also added a new section to our [contributor guide](https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md#i-have-no-idea-where-to-start) to get new contributors up to speed.
+
+This pre-release can be installed as always with `pip install --pre mesa`
+
+## What's Changed
+### ⚠️ Breaking changes
+* model: Automatically increase `steps` counter by @EwoutH in https://github.com/projectmesa/mesa/pull/2223
+### 🧪 Experimental features
+* Voronoi Tessellation based Discrete Space by @vitorfrois in https://github.com/projectmesa/mesa/pull/2084
+### 🎉 New features added
+* Add AgentSet.groupby by @quaquel in https://github.com/projectmesa/mesa/pull/2220
+* AgentSet: Add `set` method by @EwoutH in https://github.com/projectmesa/mesa/pull/2254
+### 🛠 Enhancements made
+* Split AgentSet into map and do to separate return types by @quaquel in https://github.com/projectmesa/mesa/pull/2237
+* Performance enhancements for Model.agents by @quaquel in https://github.com/projectmesa/mesa/pull/2251
+* AgentSet: Allow selecting a fraction of agents in the AgentSet by @EwoutH in https://github.com/projectmesa/mesa/pull/2253
+### 🐛 Bugs fixed
+* SolaraViz: Reset components when params are changed by @rht in https://github.com/projectmesa/mesa/pull/2240
+### 📜 Documentation improvements
+* Contribution: Add "I have no idea where to start" section by @EwoutH in https://github.com/projectmesa/mesa/pull/2258
+* Write initial Mesa Migration guide by @EwoutH in https://github.com/projectmesa/mesa/pull/2257
+### 🔧 Maintenance
+* CI: Add test job for Python 3.13 by @EwoutH in https://github.com/projectmesa/mesa/pull/2173
+* Add pull request templates by @EwoutH in https://github.com/projectmesa/mesa/pull/2217
+* benchmarks: Add BoltzmannWealth model by @EwoutH in https://github.com/projectmesa/mesa/pull/2252
+* CI: Add optional dependency for examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2261
+
+## New Contributors
+* @vitorfrois made their first contribution in https://github.com/projectmesa/mesa/pull/2084
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a2...v3.0.0a3
+
+# 3.0.0a2 (2024-08-21)
+## Highlights
+In Mesa 3.0 alpha 2 (`v3.0.0a2`) we've done more clean-up in preparation for Mesa 3.0. We now [require](https://github.com/projectmesa/mesa/pull/2218) `super().__init__()`  to run on initializing a Mesa model subclass, `Model.agents` is now fully reserved for the Model's internal AgentSet and we fixed a bug in our Solara space_drawer.
+
+A new feature was added in [#2219](https://github.com/projectmesa/mesa/pull/2219), which now also allows `AgentSet.do()` to take any callable function, instead of only a string referencing to an Agent method. The argument name was changed from `method_name` to `method`.
+
+The new Solara visualisation now allows portraying agents in different shapes, checkout some examples in [#2214](https://github.com/projectmesa/mesa/pull/2214).
+
+We're also working hard on our [example models](https://github.com/projectmesa/mesa-examples). All model warnings were [resolved](https://github.com/projectmesa/mesa-examples/pull/153) and we've [replaced](https://github.com/projectmesa/mesa-examples/pull/161) a lot of schedulers with simpler and more flexible AgentSet functionality. Checkout our [open issues](https://github.com/projectmesa/mesa-examples/issues) if you want to help improve our example models further!
+
+## What's Changed
+### ⚠️ Breaking changes
+* breaking: Add dependencies argument to custom space_drawer by @rht in https://github.com/projectmesa/mesa/pull/2209
+* Require Mesa models to be initialized with `super().__init__()` by @EwoutH in https://github.com/projectmesa/mesa/pull/2218
+* Allow AgentSet.do() to take Callable function by @quaquel in https://github.com/projectmesa/mesa/pull/2219
+* Change warning when setting model.agents to error by @EwoutH in https://github.com/projectmesa/mesa/pull/2225
+### 🧪 Experimental features
+* devs/eventlist: Add repr method to print EventList pretty by @EwoutH in https://github.com/projectmesa/mesa/pull/2195
+### 🛠 Enhancements made
+* Visualisation: Allow specifying Agent shapes in agent_portrayal by @rmhopkins4 in https://github.com/projectmesa/mesa/pull/2214
+### 📜 Documentation improvements
+* docs/conf.py: Use modern `intersphinx_mapping` format by @EwoutH in https://github.com/projectmesa/mesa/pull/2206
+* docs: Update Readme and tutorials to mention Mesa 3.0 pre-releases by @EwoutH in https://github.com/projectmesa/mesa/pull/2203
+### 🔧 Maintenance
+* CI: Let pytest treat warnings as errors for examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2204
+
+## New Contributors
+* @rmhopkins4 made their first contribution in https://github.com/projectmesa/mesa/pull/2214
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a1...v3.0.0a2
+
+# 3.0.0a1 (2024-08-01)
+## Highlights
+Mesa 3.0 alpha 1 (`v3.0.0a1`) is another step towards our next major version. This release introduces a name change from JupyterViz (jupyter_viz) to SolaraViz (solara_viz), to better represent the tech stack being used. It also includes two bugfixes also present in 2.3.2.
+
+## What's Changed
+### ⚠️ Breaking changes
+* viz: Combine code for rendering in browser and Jupyter by @rht in https://github.com/projectmesa/mesa/pull/2180
+### 🛠 Enhancements made
+* Rename JupyterViz to SolaraViz by @rht in https://github.com/projectmesa/mesa/pull/2187
+* refactor: Rename jupyter_viz namespace to solara_viz by @rht in https://github.com/projectmesa/mesa/pull/2188
+### 🐛 Bugs fixed
+* fix: Render agent marker radius correctly by @rht in https://github.com/projectmesa/mesa/pull/2181
+* fix: Use model.schedule.steps -> mode._steps for batch_run by @rht in https://github.com/projectmesa/mesa/pull/2183
+### 📜 Documentation improvements
+* Add original conference paper link to docs by @ENUMERA8OR in https://github.com/projectmesa/mesa/pull/2160
+
+## New Contributors
+* @ENUMERA8OR made their first contribution in https://github.com/projectmesa/mesa/pull/2160
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a0...v3.0.0a1
+
+# 3.0.0a0 (2024-07-04)
+## Highlights
+This is the first pre-release in the Mesa 3.0 series, which is still in active development. The `v3.0.0a0` pre-release can help active Mesa developers help starting to test the latest features in their models.
+
+Since it's in active development, more breaking changes may follow and it's not recommended for general usage.
+
+There are two major breaking changes at this point:
+- The old visualisation is removed, in favor of the new, Solara based, Jupyter Viz. This was already available in the 2.3.x release series, but is now stabilized. Checkout out our new [Visualization Tutorial](https://mesa.readthedocs.io/en/latest/tutorials/visualization_tutorial.html). More examples and a migration guide will follow later in the Mesa 3.0 development.
+- The `mesa.flat` namespace is removed, since was not used very often.
+
+Mesa 3.0 will require Python 3.10+.
+
+This pre-release can be installed with `pip install mesa --upgrade --pre`.
+
+## What's Changed
+### ⚠️ Breaking changes
+* Remove mesa.flat namespace by @rht in https://github.com/projectmesa/mesa/pull/2091
+* breaking: Remove visualization_old (mesa-viz-tornado) by @rht in https://github.com/projectmesa/mesa/pull/2133
+### 🎉 New features added
+* Set JupyterViz as stable by @rht in https://github.com/projectmesa/mesa/pull/2090
+### 🐛 Bugs fixed
+* Jupyter_viz: Allow measures to be None by @EwoutH in https://github.com/projectmesa/mesa/pull/2163
+* Jupyter Viz: Don't avoid interactive backend by @EwoutH in https://github.com/projectmesa/mesa/pull/2165
+### 📜 Documentation improvements
+* Fix image on landing page of docs. by @jackiekazil in https://github.com/projectmesa/mesa/pull/2146
+* Replace links in docs - google group to matrix. by @jackiekazil in https://github.com/projectmesa/mesa/pull/2148
+* Update visualisation docs by @EwoutH in https://github.com/projectmesa/mesa/pull/2162
+### 🔧 Maintenance
+* CI: Add weekly scheduled run to all CI workflows by @EwoutH in https://github.com/projectmesa/mesa/pull/2130
+* Drop support for Python 3.9, require Python >= 3.10  by @EwoutH in https://github.com/projectmesa/mesa/pull/2132
+* Add script to list unlabeled PR's since latest release by @rht in https://github.com/projectmesa/mesa/pull/2047
+
+## New Contributors
+* @stephenfmann made their first contribution in https://github.com/projectmesa/mesa/pull/2154
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.1...v3.0.0a0
+
+# 2.3.2 (2024-07-22)
+## Highlights
+Mesa 2.3.2 is a small patch release which fixes two bugs, one to the batch_run function still depending on `schedule.steps`, and one in the agent marker visualisation.
+
+## What's Changed
+### 🐛 Bugs fixed
+* fix: Render agent marker radius correctly by @rht in https://github.com/projectmesa/mesa/pull/2181
+* fix: Use model.schedule.steps -> mode._steps for batch_run by @rht in https://github.com/projectmesa/mesa/pull/2183
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.1...v2.3.2
+
+# 2.3.1 (2024-07-03)
+## Highlights
+Mesa 2.3.1 is a small patch release with a datacollector bug fixed and improved documentation.
+
+## What's Changed
+### 🐛 Bugs fixed
+* datacollector: store separate snapshots of model data per step by @EwoutH in https://github.com/projectmesa/mesa/pull/2129
+### 📜 Documentation improvements
+* Add experimental features to documentation as per #2122 by @stephenfmann in https://github.com/projectmesa/mesa/pull/2154
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v2.3.0...v2.3.1
+
 # 2.3.0 (2024-04-23)
 ## Highlights
 Mesa 2.3.0 is a big feature release and the last feature release before 3.0.

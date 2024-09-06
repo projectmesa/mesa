@@ -18,13 +18,13 @@
 
 [Mesa] is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
 
+The original conference paper is [available here](http://conference.scipy.org.s3-website-us-east-1.amazonaws.com/proceedings/scipy2015/jacqueline_kazil.html).
+
 Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python-based counterpart to NetLogo, Repast, or MASON.
 
-```{image} https://raw.githubusercontent.com/projectmesa/mesa/main/docs/images/Mesa_Screenshot.png
-:alt: A screenshot of the Schelling Model in Mesa
-:scale: 100%
-:width: 100%
-```
+
+![A screenshot of the Schelling Model in Mesa|100%](https://raw.githubusercontent.com/projectmesa/mesa/main/docs/images/Mesa_Screenshot.png)
+
 
 *Above: A Mesa implementation of the Schelling segregation model,
 being visualized in a browser window and analyzed in a Jupyter
@@ -55,7 +55,7 @@ For more help on using Mesa, check out the following resources:
 - [Mesa Introductory Tutorial]
 - [Mesa Visualization Tutorial]
 - [GitHub Issue Tracker]
-- [Email list]
+- [Matrix chat room]
 - [PyPI]
 
 ## Contributing back to Mesa
@@ -81,11 +81,11 @@ ABM features users have shared that you may want to use in your model
 Mesa Overview <overview>
 tutorials/intro_tutorial
 tutorials/visualization_tutorial
+Migration guide <migration_guide>
 Best Practices <best-practices>
 How-to Guide <howto>
 API Documentation <apis/api_main>
 Mesa Packages <packages>
-tutorials/adv_tutorial_legacy.ipynb
 ```
 
 # Indices and tables
@@ -95,11 +95,11 @@ tutorials/adv_tutorial_legacy.ipynb
 - {ref}`search`
 
 [contributors guide]: https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md
-[email list]: https://groups.google.com/d/forum/projectmesa
 [github]: https://github.com/projectmesa/mesa/
 [github issue tracker]: https://github.com/projectmesa/mesa/issues
+[matrix chat room]: https://matrix.to/#/#project-mesa:matrix.org
 [mesa]: https://github.com/projectmesa/mesa/
-[mesa introductory tutorial]: tutorials/intro_tutorial.html
-[mesa visualization tutorial]: tutorials/visualization_tutorial.html
+[mesa introductory tutorial]: tutorials/intro_tutorial
+[mesa visualization tutorial]: tutorials/visualization_tutorial
 [pypi]: https://pypi.python.org/pypi/Mesa/
 [ticket]: https://github.com/projectmesa/mesa/issues

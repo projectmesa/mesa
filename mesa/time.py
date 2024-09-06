@@ -30,14 +30,12 @@ from collections import defaultdict
 from collections.abc import Iterable
 
 # mypy
-from typing import Union
-
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
 # BaseScheduler has a self.time of int, while
 # StagedActivation has a self.time of float
-TimeT = Union[float, int]
+TimeT = float | int
 
 
 class BaseScheduler:
@@ -71,8 +69,6 @@ class BaseScheduler:
         self.model = model
         self.steps = 0
         self.time: TimeT = 0
-        self._original_step = self.step
-        self.step = self._wrapped_step
 
         if agents is None:
             agents = []
@@ -114,11 +110,6 @@ class BaseScheduler:
         self.do_each("step")
         self.steps += 1
         self.time += 1
-
-    def _wrapped_step(self):
-        """Wrapper for the step method to include time and step updating."""
-        self._original_step()
-        self.model._advance_time()
 
     def get_agent_count(self) -> int:
         """Returns the current number of agents in the queue."""

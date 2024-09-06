@@ -2,7 +2,7 @@ import itertools
 from collections.abc import Iterable, Mapping
 from functools import partial
 from multiprocessing import Pool
-from typing import Any, Optional, Union
+from typing import Any
 
 from tqdm.auto import tqdm
 
@@ -11,9 +11,9 @@ from mesa.model import Model
 
 def batch_run(
     model_cls: type[Model],
-    parameters: Mapping[str, Union[Any, Iterable[Any]]],
+    parameters: Mapping[str, Any | Iterable[Any]],
     # We still retain the Optional[int] because users may set it to None (i.e. use all CPUs)
-    number_processes: Optional[int] = 1,
+    number_processes: int | None = 1,
     iterations: int = 1,
     data_collection_period: int = -1,
     max_steps: int = 1000,
@@ -76,7 +76,7 @@ def batch_run(
 
 
 def _make_model_kwargs(
-    parameters: Mapping[str, Union[Any, Iterable[Any]]],
+    parameters: Mapping[str, Any | Iterable[Any]],
 ) -> list[dict[str, Any]]:
     """Create model kwargs from parameters dictionary.
 
@@ -132,14 +132,14 @@ def _model_run_func(
     """
     run_id, iteration, kwargs = run
     model = model_cls(**kwargs)
-    while model.running and model.schedule.steps <= max_steps:
+    while model.running and model.steps <= max_steps:
         model.step()
 
     data = []
 
-    steps = list(range(0, model.schedule.steps, data_collection_period))
-    if not steps or steps[-1] != model.schedule.steps - 1:
-        steps.append(model.schedule.steps - 1)
+    steps = list(range(0, model.steps, data_collection_period))
+    if not steps or steps[-1] != model.steps - 1:
+        steps.append(model.steps - 1)
 
     for step in steps:
         model_data, all_agents_data = _collect_data(model, step)

@@ -8,7 +8,6 @@ import datetime
 
 import mesa.space as space
 import mesa.time as time
-import mesa.visualization as visualization
 from mesa.agent import Agent
 from mesa.batchrunner import batch_run
 from mesa.datacollection import DataCollector
@@ -19,14 +18,13 @@ __all__ = [
     "Agent",
     "time",
     "space",
-    "visualization",
     "DataCollector",
     "batch_run",
     "experimental",
 ]
 
 __title__ = "mesa"
-__version__ = "2.3.0"
+__version__ = "3.0.0a3"
 __license__ = "Apache 2.0"
 _this_year = datetime.datetime.now(tz=datetime.timezone.utc).date().year
 __copyright__ = f"Copyright {_this_year} Project Mesa Team"

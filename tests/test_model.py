@@ -1,4 +1,4 @@
-from mesa.agent import Agent
+from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
 
@@ -6,10 +6,9 @@ def test_model_set_up():
     model = Model()
     assert model.running is True
     assert model.schedule is None
-    assert model.current_id == 0
-    assert model.current_id + 1 == model.next_id()
-    assert model.current_id == 1
+    assert model.steps == 0
     model.step()
+    assert model.steps == 1
 
 
 def test_running():
@@ -18,12 +17,12 @@ def test_running():
 
         def step(self):
             """Increase steps until 10."""
-            self.steps += 1
             if self.steps == 10:
                 self.running = False
 
     model = TestModel()
     model.run_model()
+    assert model.steps == 10
 
 
 def test_seed(seed=23):
@@ -48,6 +47,22 @@ def test_agent_types():
         pass
 
     model = Model()
-    test_agent = TestAgent(model.next_id(), model)
+    test_agent = TestAgent(model)
     assert test_agent in model.agents
     assert type(test_agent) in model.agent_types
+
+
+def test_agents_by_type():
+    class Wolf(Agent):
+        pass
+
+    class Sheep(Agent):
+        pass
+
+    model = Model()
+    wolf = Wolf(model)
+    sheep = Sheep(model)
+
+    assert model.agents_by_type[Wolf] == AgentSet([wolf], model)
+    assert model.agents_by_type[Sheep] == AgentSet([sheep], model)
+    assert len(model.agents_by_type) == 2
