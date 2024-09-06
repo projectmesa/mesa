@@ -321,7 +321,6 @@ def test_agentset_get():
     assert all((a == 5) & (c in [8, -1]) for a, c in values)
 
 
-
 def test_agentset_agg():
     model = Model()
     agents = [TestAgent(model) for i in range(10)]
