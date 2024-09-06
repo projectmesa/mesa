@@ -127,7 +127,8 @@ class AgentSet(MutableSet, Sequence):
         """
 
         self.model = model
-        self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
+        self._agents_list: list[weakref.ref] = [weakref.ref(agent) for agent in agents]
+        self._agents_set: set[int] = set(id(agent) for agent in agents)
 
     def __len__(self) -> int:
         """Return the number of agents in the AgentSet."""
@@ -213,16 +214,14 @@ class AgentSet(MutableSet, Sequence):
             Using inplace = True is more performant
 
         """
-        weakrefs = list(self._agents.keyrefs())
-        self.random.shuffle(weakrefs)
-
         if inplace:
-            self._agents.data = {entry: None for entry in weakrefs}
+            self.random.shuffle(self._agents_list)
             return self
         else:
-            return AgentSet(
-                (agent for ref in weakrefs if (agent := ref()) is not None), self.model
-            )
+            new_agentset = AgentSet([], self.model)
+            new_agentset._agents_list = self.random.sample(self._agents_list, len(self._agents_list))
+            new_agentset._agents_set = self._agents_set.copy()
+            return new_agentset
 
     def sort(
         self,
@@ -276,43 +275,14 @@ class AgentSet(MutableSet, Sequence):
         Returns:
             AgentSet | list[Any]: The results of the callable calls if return_results is True, otherwise the AgentSet itself.
         """
-        try:
-            return_results = kwargs.pop("return_results")
-        except KeyError:
-            return_results = False
-        else:
-            warnings.warn(
-                "Using return_results is deprecated. Use AgenSet.do in case of return_results=False, and "
-                "AgentSet.map in case of return_results=True",
-                stacklevel=2,
-            )
-
-        if return_results:
-            return self.map(method, *args, **kwargs)
-
-        # we iterate over the actual weakref keys and check if weakref is alive before calling the method
         if isinstance(method, str):
-            for agentref in self._agents.keyrefs():
-                if (agent := agentref()) is not None:
+            for ref in self._agents_list:
+                if (agent := ref()) is not None:
                     getattr(agent, method)(*args, **kwargs)
         else:
-            for agentref in self._agents.keyrefs():
-                if (agent := agentref()) is not None:
+            for ref in self._agents_list:
+                if (agent := ref()) is not None:
                     method(agent, *args, **kwargs)
-
-        return self
-
-    def shuffle_do(self, method: str | Callable, *args, **kwargs) -> AgentSet:
-        agents = list(self._agents.keys())
-        self.random.shuffle(agents)
-
-        if isinstance(method, str):
-            for agent in agents:
-                getattr(agent, method)(*args, **kwargs)
-        else:
-            for agent in agents:
-                method(agent, *args, **kwargs)
-
         return self
 
     def map(self, method: str | Callable, *args, **kwargs) -> list[Any]:
@@ -470,7 +440,9 @@ class AgentSet(MutableSet, Sequence):
         Note:
             This method is an implementation of the abstract method from MutableSet.
         """
-        self._agents[agent] = None
+        if id(agent) not in self._agents_set:
+            self._agents_list.append(weakref.ref(agent))
+            self._agents_set.add(id(agent))
 
     def discard(self, agent: Agent):
         """
