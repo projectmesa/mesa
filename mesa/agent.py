@@ -128,7 +128,7 @@ class AgentSet(MutableSet, Sequence):
 
         self.model = model
         self._agents_list: list[weakref.ref] = [weakref.ref(agent) for agent in agents]
-        self._agents_set: set[int] = set(id(agent) for agent in agents)
+        self._agents_set: set[int] = {id(agent) for agent in agents}
 
     def __len__(self) -> int:
         """Return the number of agents in the AgentSet."""
@@ -219,7 +219,9 @@ class AgentSet(MutableSet, Sequence):
             return self
         else:
             new_agentset = AgentSet([], self.model)
-            new_agentset._agents_list = self.random.sample(self._agents_list, len(self._agents_list))
+            new_agentset._agents_list = self.random.sample(
+                self._agents_list, len(self._agents_list)
+            )
             new_agentset._agents_set = self._agents_set.copy()
             return new_agentset
 
