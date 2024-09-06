@@ -459,6 +459,7 @@ class _Grid:
             elif selection == "closest":
                 current_pos = agent.pos
                 # Find the closest position without sorting all positions
+                # TODO: See if this method can be optimized further
                 closest_pos = []
                 min_distance = float("inf")
                 agent.random.shuffle(pos)
