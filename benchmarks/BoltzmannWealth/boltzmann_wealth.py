@@ -4,7 +4,7 @@ https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth
 """
 
 import mesa
-
+import mesa.spaces as spaces
 
 def compute_gini(model):
     """Calculate gini for wealth in model.
@@ -42,18 +42,18 @@ class BoltzmannWealth(mesa.Model):
         """
         super().__init__(seed)
         self.num_agents = n
-        self.grid = mesa.space.MultiGrid(width, height, True)
+        self.grid = spaces.OrthogonalMooreGrid((width, height))
         self.schedule = mesa.time.RandomActivation(self)
         self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
         )
         # Create agents
         for _ in range(self.num_agents):
-            a = MoneyAgent(self)
+            agent = MoneyAgent(self)
             # Add the agent to a random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(a, (x, y))
+            x = self.random.randrange(width)
+            y = self.random.randrange(height)
+            agent.move_to(self.grid[(x, y)])
 
         self.running = True
         self.datacollector.collect(self)
@@ -75,7 +75,7 @@ class BoltzmannWealth(mesa.Model):
             self.step()
 
 
-class MoneyAgent(mesa.Agent):
+class MoneyAgent(mesa.spaces.CellAgent):
     """An agent with fixed initial wealth."""
 
     def __init__(self, model):
@@ -87,20 +87,8 @@ class MoneyAgent(mesa.Agent):
         super().__init__(model)
         self.wealth = 1
 
-    def move(self):
-        """Move the agent to a random neighboring cell."""
-        possible_steps = self.model.grid.get_neighborhood(
-            self.pos, moore=True, include_center=False
-        )
-        new_position = self.random.choice(possible_steps)
-        self.model.grid.move_agent(self, new_position)
-
     def give_money(self):
-        """Give money to a random cell mate."""
-        cellmates = self.model.grid.get_cell_list_contents([self.pos])
-        cellmates.pop(
-            cellmates.index(self)
-        )  # Ensure agent is not giving money to itself
+        cellmates = [agent for agent in self.cell.agents if not agent is self]
         if len(cellmates) > 0:
             other = self.random.choice(cellmates)
             other.wealth += 1
@@ -108,6 +96,12 @@ class MoneyAgent(mesa.Agent):
 
     def step(self):
         """Run the agent for 1 step."""
-        self.move()
+        self.move_to(self.cell.neighborhood().select_random_cell())
         if self.wealth > 0:
             self.give_money()
+
+
+if __name__ == '__main__':
+    model = BoltzmannWealth()
+    for _ in range(10):
+        model.step()

@@ -37,6 +37,9 @@ class CellAgent(Agent):
 
         """
         if self.cell is not None:
-            self.cell.remove_agent(self)
+            try:
+                self.cell.remove_agent(self)
+            except ValueError:
+                raise ValueError("Cannot remove agent from cell")
         self.cell = cell
         cell.add_agent(self)
