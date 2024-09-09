@@ -6,6 +6,7 @@ https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth
 import mesa
 import mesa.spaces as spaces
 
+
 def compute_gini(model):
     """Calculate gini for wealth in model.
 
@@ -88,7 +89,7 @@ class MoneyAgent(mesa.spaces.CellAgent):
         self.wealth = 1
 
     def give_money(self):
-        cellmates = [agent for agent in self.cell.agents if not agent is self]
+        cellmates = [agent for agent in self.cell.agents if agent is not self]
         if len(cellmates) > 0:
             other = self.random.choice(cellmates)
             other.wealth += 1
@@ -101,7 +102,7 @@ class MoneyAgent(mesa.spaces.CellAgent):
             self.give_money()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     model = BoltzmannWealth()
     for _ in range(10):
         model.step()

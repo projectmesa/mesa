@@ -10,7 +10,6 @@ from matplotlib.ticker import MaxNLocator
 import mesa
 
 
-
 @solara.component
 def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = None):
     """A component for rendering a space using Matplotlib.
@@ -164,7 +163,6 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
 
 
 def _draw_voronoi(space, space_ax, agent_portrayal):
-    from mesa.spaces.voronoi import VoronoiGrid
     def portray(g):
         x = []
         y = []

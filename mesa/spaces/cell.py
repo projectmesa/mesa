@@ -123,7 +123,7 @@ class Cell:
 
     # FIXME: Revisit caching strategy on methods
     @cache  # noqa: B019
-    def neighborhood(self, radius=1, include_center=False):
+    def neighborhood(self, radius=1, include_center=False): -> CellCollection:
         """Returns a list of all neighboring cells."""
         return CellCollection(
             self._neighborhood(radius=radius, include_center=include_center),
