@@ -116,7 +116,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
 
     # check voronoi space drawer
     voronoi_model = mesa.Model()
-    voronoi_model.grid = mesa.experimental.cell_space.VoronoiGrid(
+    voronoi_model.grid = mesa.spaces.VoronoiGrid(
         centroids_coordinates=[(0, 1), (0, 0), (1, 0)],
     )
     solara.render(
