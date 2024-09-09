@@ -1,7 +1,7 @@
 """Schelling separation for performance benchmarking."""
 
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
+from mesa.spaces import CellAgent, OrthogonalMooreGrid
 from mesa.time import RandomActivation
 
 

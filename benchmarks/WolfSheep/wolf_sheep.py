@@ -10,7 +10,7 @@ Replication of the model found in NetLogo:
 import math
 
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, OrthogonalVonNeumannGrid
+from mesa.spaces import CellAgent, OrthogonalVonNeumannGrid
 from mesa.experimental.devs import ABMSimulator
 
 
