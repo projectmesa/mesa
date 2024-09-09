@@ -12,7 +12,7 @@ Mesa 3.0.0a4 contains two major breaking changes:
             # When initializing the super class (Agent), passing unique_id isn't needed anymore
     -        super().__init__(unique_id, model)
     +        super().__init__(model)
-    
+
     - wolf = Wolf(unique_id, model)
     + wolf = Wolf(model)
     ```
@@ -22,7 +22,7 @@ Mesa 3.0.0a4 contains two major breaking changes:
 
 Furthermore, the AgentSet has a new `agg` method to quickly get an aggerate value (for example `min_energy = model.agents.agg("energy", min)`) ([#2266](https://github.com/projectmesa/mesa/pull/2266)), The Model `get_agents_of_type` function is replaced by directly exposing the `agents_by_type` property (which can be accessed as a dict) ([#2267](https://github.com/projectmesa/mesa/pull/2267), [mesa-examples#190](https://github.com/projectmesa/mesa-examples/pull/190)) and the AgentSet get() methods can now handle missing values by replacing it with a default value ([#2279](https://github.com/projectmesa/mesa/pull/2279)).
 
-Finally, it fixes a bug in which the Grid's `move_agent_to_one_of` method with `selection="closest"` selected a location deterministically, instead of randomly ([#2118](https://github.com/projectmesa/mesa/pull/2118)). 
+Finally, it fixes a bug in which the Grid's `move_agent_to_one_of` method with `selection="closest"` selected a location deterministically, instead of randomly ([#2118](https://github.com/projectmesa/mesa/pull/2118)).
 
 ## What's Changed
 ### ⚠️ Breaking changes
