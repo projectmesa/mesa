@@ -5,7 +5,7 @@ import random
 import pytest
 
 from mesa import Model
-from mesa.experimental.cell_space import (
+from mesa.spaces import (
     Cell,
     CellAgent,
     CellCollection,

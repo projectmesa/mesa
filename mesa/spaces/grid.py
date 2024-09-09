@@ -7,7 +7,7 @@ from itertools import product
 from random import Random
 from typing import Generic, TypeVar
 
-from mesa.experimental.cell_space import Cell, DiscreteSpace
+from mesa.spaces import Cell, DiscreteSpace
 
 T = TypeVar("T", bound=Cell)
 

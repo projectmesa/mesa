@@ -8,7 +8,7 @@ from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 
 import mesa
-from mesa.experimental.cell_space import VoronoiGrid
+
 
 
 @solara.component
@@ -164,6 +164,7 @@ def _draw_continuous_space(space, space_ax, agent_portrayal):
 
 
 def _draw_voronoi(space, space_ax, agent_portrayal):
+    from mesa.spaces.voronoi import VoronoiGrid
     def portray(g):
         x = []
         y = []

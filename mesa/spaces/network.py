@@ -3,8 +3,8 @@
 from random import Random
 from typing import Any
 
-from mesa.experimental.cell_space.cell import Cell
-from mesa.experimental.cell_space.discrete_space import DiscreteSpace
+from mesa.spaces.cell import Cell
+from mesa.spaces.discrete_space import DiscreteSpace
 
 
 class Network(DiscreteSpace):

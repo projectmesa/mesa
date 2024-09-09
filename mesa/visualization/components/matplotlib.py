@@ -8,7 +8,7 @@ from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 
 import mesa
-from mesa.experimental.cell_space import VoronoiGrid
+from mesa.spaces import VoronoiGrid
 from mesa.visualization.utils import update_counter
 
 

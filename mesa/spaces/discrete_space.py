@@ -6,8 +6,8 @@ from functools import cached_property
 from random import Random
 from typing import Generic, TypeVar
 
-from mesa.experimental.cell_space.cell import Cell
-from mesa.experimental.cell_space.cell_collection import CellCollection
+from mesa.spaces.cell import Cell
+from mesa.spaces.cell_collection import CellCollection
 
 T = TypeVar("T", bound=Cell)
 

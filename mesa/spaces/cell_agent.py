@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from mesa import Agent, Model
 
 if TYPE_CHECKING:
-    from mesa.experimental.cell_space.cell import Cell
+    from mesa.spaces.cell import Cell
 
 
 class CellAgent(Agent):

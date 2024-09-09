@@ -6,10 +6,10 @@ from functools import cache
 from random import Random
 from typing import TYPE_CHECKING
 
-from mesa.experimental.cell_space.cell_collection import CellCollection
+from mesa.spaces.cell_collection import CellCollection
 
 if TYPE_CHECKING:
-    from mesa.experimental.cell_space.cell_agent import CellAgent
+    from mesa.spaces.cell_agent import CellAgent
 
 
 class Cell:
