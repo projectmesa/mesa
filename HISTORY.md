@@ -54,11 +54,6 @@ Finally, it fixes a bug in which the Grid's `move_agent_to_one_of` method with `
 
 **Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a3...v3.0.0a4
 
-## New Contributors
-* @OrenBochman made their first contribution in https://github.com/projectmesa/mesa/pull/2118
-
-**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a3...v3.0.0a4
-
 # 3.0.0a3 (2024-08-30)
 ## Highlights
 Developments toward Mesa 3.0 are steaming ahead, and our fourth alpha release is packed with features and updates - only 8 days after our third.
