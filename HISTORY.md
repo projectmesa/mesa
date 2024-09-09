@@ -1,6 +1,55 @@
 ---
 title: Release History
 ---
+# 3.0.0a4 (2024-09-09)
+## Highlights
+Mesa 3.0.0a4 contains two major breaking changes:
+1. The Agent's `unique_id` is now automatically assigned, so doesn't need to be passed to the Agent class anymore. In a subclassed custom Agent, like normally used, this now looks like this:
+    ```diff
+    class Wolf(Agent):
+    -    def __init__(self, unique_id, model, energy=None):
+    +    def __init__(self, model, energy=None):
+            # When initializing the super class (Agent), passing unique_id isn't needed anymore
+    -        super().__init__(unique_id, model)
+    +        super().__init__(model)
+    
+    - wolf = Wolf(unique_id, model)
+    + wolf = Wolf(model)
+    ```
+    Example models were updated in [mesa-examples#194](https://github.com/projectmesa/mesa-examples/pull/194), which shows more examples on how to replace this.
+
+2. The our visualisation API is being overhauled, to be more flexible and powerful. For more details, see #2278. An initial example model was updated in [mesa-examples#195](https://github.com/projectmesa/mesa-examples/pull/195) and more examples will be updated in [mesa-examples#195](https://github.com/projectmesa/mesa-examples/pull/193). The old SolaraViz API is still available at `mesa.experimental`, but might be removed in future releases.
+
+Furthermore, the AgentSet has a new `agg` method to quickly get an aggerate value (for example `min_energy = model.agents.agg("energy", min)`) ([#2266](https://github.com/projectmesa/mesa/pull/2266)), The Model `get_agents_of_type` function is replaced by directly exposing the `agents_by_type` property (which can be accessed as a dict) ([#2267](https://github.com/projectmesa/mesa/pull/2267), [mesa-examples#190](https://github.com/projectmesa/mesa-examples/pull/190)) and the AgentSet get() methods can now handle missing values by replacing it with a default value ([#2279](https://github.com/projectmesa/mesa/pull/2279)).
+
+Finally, it fixes a bug in which the Grid's `move_agent_to_one_of` method with `selection="closest"` selected a location deterministically, instead of randomly ([#2118](https://github.com/projectmesa/mesa/pull/2118)). 
+
+## What's Changed
+### ⚠️ Breaking changes
+* track unique_id automatically by @quaquel in https://github.com/projectmesa/mesa/pull/2260
+* move solara_viz back to experimental by @Corvince in https://github.com/projectmesa/mesa/pull/2278
+### 🎉 New features added
+* AgentSet: Add `agg` method by @EwoutH in https://github.com/projectmesa/mesa/pull/2266
+* Implement new SolaraViz API by @Corvince in https://github.com/projectmesa/mesa/pull/2263
+### 🛠 Enhancements made
+* Model: Replace `get_agents_of_type` method with `agents_by_type` property by @EwoutH in https://github.com/projectmesa/mesa/pull/2267
+* add default SolaraViz by @Corvince in https://github.com/projectmesa/mesa/pull/2280
+* Simplify ModelController by @Corvince in https://github.com/projectmesa/mesa/pull/2282
+* Add default values and missing value handling to `agentset.get` by @quaquel in https://github.com/projectmesa/mesa/pull/2279
+### 🐛 Bugs fixed
+* Fix deterministic behavior in `move_agent_to_one_of` with `selection="closest"` by @OrenBochman in https://github.com/projectmesa/mesa/pull/2118
+### 📜 Documentation improvements
+* docs: Fix Visualization Tutorial (main branch) by @EwoutH in https://github.com/projectmesa/mesa/pull/2271
+* Docs: Fix broken relative links by removing `.html` suffix by @EwoutH in https://github.com/projectmesa/mesa/pull/2274
+* Readthedocs: Don't let notebook failures pass silently by @EwoutH in https://github.com/projectmesa/mesa/pull/2276
+### 🔧 Maintenance
+* Resolve multiprocessing warning, state Python 3.13 support by @rht in https://github.com/projectmesa/mesa/pull/2246
+
+## New Contributors
+* @OrenBochman made their first contribution in https://github.com/projectmesa/mesa/pull/2118
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a3...v3.0.0a4
+
 # 3.0.0a3 (2024-08-30)
 ## Highlights
 Developments toward Mesa 3.0 are steaming ahead, and our fourth alpha release is packed with features and updates - only 8 days after our third.
