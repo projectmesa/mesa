@@ -18,7 +18,10 @@ Mesa 3.0.0a4 contains two major breaking changes:
     ```
     Example models were updated in [mesa-examples#194](https://github.com/projectmesa/mesa-examples/pull/194), which shows more examples on how to update existing models.
 
-2. Our visualisation API is being overhauled, to be more flexible and powerful. For more details, see [#2278](https://github.com/projectmesa/mesa/pull/2278). An initial example model was updated in [mesa-examples#195](https://github.com/projectmesa/mesa-examples/pull/195) and more examples will be updated in [mesa-examples#195](https://github.com/projectmesa/mesa-examples/pull/193). The old SolaraViz API is still available at `mesa.experimental`, but might be removed in future releases.
+2. Our visualisation API is being overhauled, to be more flexible and powerful. For more details, see [#2278](https://github.com/projectmesa/mesa/pull/2278).
+    - An initial update to the tutorial was made in [#2289](https://github.com/projectmesa/mesa/pull/2289) and is [available here](https://mesa.readthedocs.io/en/latest/tutorials/visualization_tutorial.html).
+    - An initial example model was updated in [mesa-examples#195](https://github.com/projectmesa/mesa-examples/pull/195), and more examples will be updated in [mesa-examples#195](https://github.com/projectmesa/mesa-examples/pull/193).
+    - The old SolaraViz API is still available at `mesa.experimental`, but might be removed in future releases.
 
 Furthermore, the AgentSet has a new `agg` method to quickly get an aggerate value (for example `min_energy = model.agents.agg("energy", min)`) ([#2266](https://github.com/projectmesa/mesa/pull/2266)), The Model `get_agents_of_type` function is replaced by directly exposing the `agents_by_type` property (which can be accessed as a dict) ([#2267](https://github.com/projectmesa/mesa/pull/2267), [mesa-examples#190](https://github.com/projectmesa/mesa-examples/pull/190)) and the AgentSet get() methods can now handle missing values by replacing it with a default value ([#2279](https://github.com/projectmesa/mesa/pull/2279)).
 
@@ -26,8 +29,8 @@ Finally, it fixes a bug in which the Grid's `move_agent_to_one_of` method with `
 
 ## What's Changed
 ### ⚠️ Breaking changes
-* track unique_id automatically by @quaquel in https://github.com/projectmesa/mesa/pull/2260
 * move solara_viz back to experimental by @Corvince in https://github.com/projectmesa/mesa/pull/2278
+* track unique_id automatically by @quaquel in https://github.com/projectmesa/mesa/pull/2260
 ### 🎉 New features added
 * AgentSet: Add `agg` method by @EwoutH in https://github.com/projectmesa/mesa/pull/2266
 * Implement new SolaraViz API by @Corvince in https://github.com/projectmesa/mesa/pull/2263
@@ -42,8 +45,14 @@ Finally, it fixes a bug in which the Grid's `move_agent_to_one_of` method with `
 * docs: Fix Visualization Tutorial (main branch) by @EwoutH in https://github.com/projectmesa/mesa/pull/2271
 * Docs: Fix broken relative links by removing `.html` suffix by @EwoutH in https://github.com/projectmesa/mesa/pull/2274
 * Readthedocs: Don't let notebook failures pass silently by @EwoutH in https://github.com/projectmesa/mesa/pull/2276
+* Update viz tutorial to the new API by @Corvince in https://github.com/projectmesa/mesa/pull/2289
 ### 🔧 Maintenance
 * Resolve multiprocessing warning, state Python 3.13 support by @rht in https://github.com/projectmesa/mesa/pull/2246
+
+## New Contributors
+* @OrenBochman made their first contribution in https://github.com/projectmesa/mesa/pull/2118
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a3...v3.0.0a4
 
 ## New Contributors
 * @OrenBochman made their first contribution in https://github.com/projectmesa/mesa/pull/2118
