@@ -611,6 +611,31 @@ class GroupBy:
 
         return self
 
+    def count(self) -> dict[Any, int]:
+        """
+        Return the count of agents in each group.
+
+        Returns:
+            dict: A dictionary mapping group names to the number of agents in each group.
+        """
+        return {k: len(v) for k, v in self.groups.items()}
+
+    def agg(self, attr_name: str, func: Callable) -> dict[Any, Any]:
+        """
+        Aggregate the values of a specific attribute across each group using the provided function.
+
+        Args:
+            attr_name (str): The name of the attribute to aggregate.
+            func (Callable): The function to apply (e.g., sum, min, max, mean).
+
+        Returns:
+            dict: A dictionary mapping group names to the result of applying the aggregation function.
+        """
+        return {
+            group_name: func([getattr(agent, attr_name) for agent in group])
+            for group_name, group in self.groups.items()
+        }
+
     def __iter__(self):  # noqa: D105
         return iter(self.groups.items())
 
