@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from mesa.experimental.cell_space.cell_collection import CellCollection
 
 if TYPE_CHECKING:
-    from mesa.experimental.cell_space.cell_agent import CellAgent
+    from mesa.experimental.cell_space.cell_agent import CellHolder
 
 
 class Cell:
@@ -80,7 +80,7 @@ class Cell:
         """
         self._connections.remove(other)
 
-    def add_agent(self, agent: CellAgent) -> None:
+    def add_agent(self, agent: CellHolder) -> None:
         """Adds an agent to the cell.
 
         Args:
@@ -96,7 +96,7 @@ class Cell:
 
         self.agents.append(agent)
 
-    def remove_agent(self, agent: CellAgent) -> None:
+    def remove_agent(self, agent: CellHolder) -> None:
         """Removes an agent from the cell.
 
         Args:
