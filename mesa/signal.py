@@ -1,9 +1,7 @@
 import psygnal
-from psygnal.containers import EventedList
 
 
 class Observable:
-
     def __init__(self, dtype, check_types=False):
         self.dtype = dtype
         self.check_types: bool = check_types
@@ -80,7 +78,7 @@ class Test:
 
         # collect defined Signals to create a signal group
         signals = {k: v for k, v in _defined_signals_generator(obj)}
-        setattr(obj, "observables", MesaSignalGroup(signals, obj))
+        obj.observables = MesaSignalGroup(signals, obj)
 
         return obj
 
@@ -97,27 +95,25 @@ def _defined_signals_generator(obj):
             continue
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+
     class A(Test):
         a = Observable(int)
-
 
     class B(A):
         b = Observable(int)
 
-
     a = A()
     b = B()
-
 
     def specific_handler(arg: int):
         print(f"specific handler {arg}")
 
-
     def generic_handler(info: psygnal.EmissionInfo):
         signalinstance, arguments = info
-        print(f"received signal from {signalinstance.instance} about {signalinstance.name}: {arguments}")
-
+        print(
+            f"received signal from {signalinstance.instance} about {signalinstance.name}: {arguments}"
+        )
 
     a.a_changed.connect(specific_handler)
     b.observables["a_changed"].connect(specific_handler)

@@ -15,7 +15,6 @@ import itertools
 import operator
 import warnings
 import weakref
-
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
 from random import Random
@@ -43,6 +42,7 @@ class Agent:
           unique_id is unique relative to a model instance and starts from 1
 
     """
+
     # this is a class level attribute
     # it is a dictionary, indexed by model instance
     # so, unique_id is unique relative to a model, and counting starts from 1
@@ -53,7 +53,7 @@ class Agent:
         obj = super().__new__(cls)
         # collect defined Signals to create a signal group
         signals = {k: v for k, v in _defined_signals_generator(obj)}
-        setattr(obj, "observables", MesaSignalGroup(signals, obj))
+        obj.observables = MesaSignalGroup(signals, obj)
         return obj
 
     def __init__(self, *args, **kwargs) -> None:

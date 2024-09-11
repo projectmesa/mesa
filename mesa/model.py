@@ -54,6 +54,7 @@ class Model:
         composition of this AgentSet, ensure you operate on a copy.
 
     """
+
     observables: MesaSignalGroup
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
@@ -67,7 +68,7 @@ class Model:
         obj.random = random.Random(obj._seed)
 
         signals = {k: v for k, v in _defined_signals_generator(obj)}
-        setattr(obj, "observables", MesaSignalGroup(signals, obj))
+        obj.observables = MesaSignalGroup(signals, obj)
 
         return obj
 
@@ -214,10 +215,10 @@ class Model:
         self._seed = seed
 
     def initialize_data_collector(
-            self,
-            model_reporters=None,
-            agent_reporters=None,
-            tables=None,
+        self,
+        model_reporters=None,
+        agent_reporters=None,
+        tables=None,
     ) -> None:
         if not hasattr(self, "schedule") or self.schedule is None:
             raise RuntimeError(
