@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from mesa import Agent, Model
+from mesa import Agent
 
 if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell import Cell
+    from mesa import Model
 
 
 class CellAgent(Agent):

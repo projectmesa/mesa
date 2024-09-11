@@ -16,6 +16,7 @@ from typing import Any
 
 from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
+from mesa.signal import MesaSignalGroup, _defined_signals_generator
 
 
 class Model:
@@ -53,6 +54,7 @@ class Model:
         composition of this AgentSet, ensure you operate on a copy.
 
     """
+    observables: MesaSignalGroup
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """Create a new model object and instantiate its RNG automatically."""
@@ -63,6 +65,10 @@ class Model:
             # advance.
             obj._seed = random.random()
         obj.random = random.Random(obj._seed)
+
+        signals = {k: v for k, v in _defined_signals_generator(obj)}
+        setattr(obj, "observables", MesaSignalGroup(signals, obj))
+
         return obj
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -208,10 +214,10 @@ class Model:
         self._seed = seed
 
     def initialize_data_collector(
-        self,
-        model_reporters=None,
-        agent_reporters=None,
-        tables=None,
+            self,
+            model_reporters=None,
+            agent_reporters=None,
+            tables=None,
     ) -> None:
         if not hasattr(self, "schedule") or self.schedule is None:
             raise RuntimeError(
