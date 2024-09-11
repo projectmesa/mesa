@@ -44,6 +44,7 @@ dependencies = [
   "pandas",
   "solara",
   "tqdm",
+  "psygnal"
 ]
 dynamic = ["version"]
 
