@@ -54,6 +54,7 @@ class Model:
         composition of this AgentSet, ensure you operate on a copy.
 
     """
+
     signals: MesaSignalGroup
     observables: list = []
 

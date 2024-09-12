@@ -83,8 +83,9 @@ def _defined_signals_generator(obj):
             continue
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from mesa import Agent, Model
+
     class A(Agent):
         a = Observable(int)
 

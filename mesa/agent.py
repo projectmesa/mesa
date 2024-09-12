@@ -48,7 +48,7 @@ class Agent:
     # so, unique_id is unique relative to a model, and counting starts from 1
     _ids = defaultdict(functools.partial(itertools.count, 1))
     signals: MesaSignalGroup
-    observables : list = []
+    observables: list = []
 
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls)
@@ -61,7 +61,7 @@ class Agent:
 
         signals = {k: v for k, v in _defined_signals_generator(obj)}
         observables = [signal.instance for signal in signals.values()]
-        setattr(obj, "signals", MesaSignalGroup(signals, obj))
+        obj.signals = MesaSignalGroup(signals, obj)
         return obj
 
     def __init__(self, *args, **kwargs) -> None:
