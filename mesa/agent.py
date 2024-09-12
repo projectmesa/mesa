@@ -47,13 +47,21 @@ class Agent:
     # it is a dictionary, indexed by model instance
     # so, unique_id is unique relative to a model, and counting starts from 1
     _ids = defaultdict(functools.partial(itertools.count, 1))
-    observables: MesaSignalGroup
+    signals: MesaSignalGroup
+    observables : list = []
 
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls)
         # collect defined Signals to create a signal group
+
+        # fixme create observables and signals
+        # possibly use a mixin class to contain everythigg for cleaner code
+        # observables is just a collection of observables on an object
+        # signals is everything you can subscribe to.
+
         signals = {k: v for k, v in _defined_signals_generator(obj)}
-        obj.observables = MesaSignalGroup(signals, obj)
+        observables = [signal.instance for signal in signals.values()]
+        setattr(obj, "signals", MesaSignalGroup(signals, obj))
         return obj
 
     def __init__(self, *args, **kwargs) -> None:

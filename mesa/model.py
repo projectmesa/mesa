@@ -54,8 +54,8 @@ class Model:
         composition of this AgentSet, ensure you operate on a copy.
 
     """
-
-    observables: MesaSignalGroup
+    signals: MesaSignalGroup
+    observables: list = []
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """Create a new model object and instantiate its RNG automatically."""

@@ -18,10 +18,11 @@ class Observable:
         self.signal_name = f"{name}_changed"
 
         # dynamically add relevant Signal
-        mt = psygnal.Signal(self.dtype)
-        mt.__set_name__(type(owner), self.signal_name)
-        setattr(owner, self.signal_name, mt)
+        signal = psygnal.Signal(self.dtype)
+        signal.__set_name__(type(owner), self.signal_name)
+        setattr(owner, self.signal_name, signal)
         setattr(owner, self.private_name, None)
+        owner.observables.append(self)
 
     def __set__(self, instance, value):
         setattr(instance, self.private_name, value)
@@ -70,19 +71,6 @@ class MesaSignalGroup(psygnal.SignalGroup):
         self._psygnal_relay = psygnal._group.SignalRelay(self._psygnal_instances, owner)
 
 
-class Test:
-    observables: MesaSignalGroup
-
-    def __new__(cls, *args, **kwargs):
-        obj = super().__new__(cls)
-
-        # collect defined Signals to create a signal group
-        signals = {k: v for k, v in _defined_signals_generator(obj)}
-        obj.observables = MesaSignalGroup(signals, obj)
-
-        return obj
-
-
 def _defined_signals_generator(obj):
     fields = [entry for entry in dir(obj) if not entry.startswith("__")]
     for field in fields:
@@ -95,16 +83,18 @@ def _defined_signals_generator(obj):
             continue
 
 
-if __name__ == "__main__":
-
-    class A(Test):
+if __name__ == '__main__':
+    from mesa import Agent, Model
+    class A(Agent):
         a = Observable(int)
 
     class B(A):
         b = Observable(int)
 
-    a = A()
-    b = B()
+    model = Model()
+
+    a = A(model)
+    b = B(model)
 
     def specific_handler(arg: int):
         print(f"specific handler {arg}")
@@ -116,10 +106,10 @@ if __name__ == "__main__":
         )
 
     a.a_changed.connect(specific_handler)
-    b.observables["a_changed"].connect(specific_handler)
-    b.observables.connect(generic_handler)
+    b.signals["a_changed"].connect(specific_handler)
+    b.signals.connect(generic_handler)
 
-    print(b.observables["a_changed"] == b.a_changed)
+    print(b.signals["a_changed"] == b.a_changed)
 
     a.a = 5
     b.a = 6
