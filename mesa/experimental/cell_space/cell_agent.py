@@ -14,11 +14,9 @@ class DiscreteSpaceAgent(Protocol[T]):
     cell: T | None
     space: DiscreteSpace[T]
 
-    def move_to(self, cell: T) -> None:
-        ...
+    def move_to(self, cell: T) -> None: ...
 
-    def move_relative(self, directions: tuple[int, ...], distance: int = 1):
-        ...
+    def move_relative(self, directions: tuple[int, ...], distance: int = 1): ...
 
 
 class CellAgent:

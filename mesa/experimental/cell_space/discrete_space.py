@@ -43,8 +43,7 @@ class DiscreteSpace(Generic[T]):
     def cutoff_empties(self):
         return 7.953 * len(self._cells) ** 0.384
 
-    def _connect_single_cell(self, cell: T):
-        ...
+    def _connect_single_cell(self, cell: T): ...
 
     @cached_property
     def all_cells(self):

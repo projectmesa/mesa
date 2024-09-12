@@ -51,11 +51,9 @@ class Grid(DiscreteSpace[T], Generic[T]):
         else:
             self._connect_cells_nd()
 
-    def _connect_cells_2d(self) -> None:
-        ...
+    def _connect_cells_2d(self) -> None: ...
 
-    def _connect_cells_nd(self) -> None:
-        ...
+    def _connect_cells_nd(self) -> None: ...
 
     def _validate_parameters(self):
         if not all(isinstance(dim, int) and dim > 0 for dim in self.dimensions):
