@@ -71,7 +71,7 @@ class MockModel(Model):
                               'staged' creates a StagedActivation scheduler.
                               The default scheduler is a BaseScheduler.
         """
-        super().__init__()
+        super().__init__(seed=None)
         self.log = []
         self.enable_kill_other_agent = enable_kill_other_agent
 
@@ -114,12 +114,7 @@ class TestStagedActivation(TestCase):
         Testing the staged activation without shuffling.
         """
 
-        try:
-            model = MockModel(shuffle=False)
-        except TypeError as e:
-            print(f"what the f... {mesa.__version__}")
-            raise e
-
+        model = MockModel(shuffle=False)
         model.step()
         model.step()
         assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
