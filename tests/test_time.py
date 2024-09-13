@@ -54,7 +54,7 @@ class MockAgent(Agent):
 
 
 class MockModel(Model):
-    def __init__(self, shuffle=False, activation=STAGED, enable_kill_other_agent=False):
+    def __init__(self, seed=None, shuffle=False, activation=STAGED, enable_kill_other_agent=False):
         """
         Creates a Model instance with a schedule
 
@@ -69,7 +69,7 @@ class MockModel(Model):
                               'staged' creates a StagedActivation scheduler.
                               The default scheduler is a BaseScheduler.
         """
-        super().__init__()
+        super().__init__(seed=seed)
         self.log = []
         self.enable_kill_other_agent = enable_kill_other_agent
 
