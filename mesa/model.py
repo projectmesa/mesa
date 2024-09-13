@@ -53,8 +53,9 @@ class Model:
             seed: the seed for the random number generator
             **kwargs: keyword arguments to pass onto super
         """
-
-        super().__init__(*args, **kwargs)  # ensures proper behavior when using super in multiple inheritance
+        super().__init__(
+            *args, **kwargs
+        )  # ensures proper behavior when using super in multiple inheritance
         self.running = True
         self.schedule = None
         self.steps: int = 0
