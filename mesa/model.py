@@ -16,7 +16,6 @@ from typing import Any
 
 from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
-from mesa.signal import MesaSignalGroup, _defined_signals_generator
 
 
 class Model:
@@ -55,9 +54,6 @@ class Model:
 
     """
 
-    signals: MesaSignalGroup
-    observables: list = []
-
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         """Create a new model object and instantiate its RNG automatically."""
         obj = object.__new__(cls)
@@ -67,9 +63,6 @@ class Model:
             # advance.
             obj._seed = random.random()
         obj.random = random.Random(obj._seed)
-
-        signals = {k: v for k, v in _defined_signals_generator(obj)}
-        obj.observables = MesaSignalGroup(signals, obj)
 
         return obj
 

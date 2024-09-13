@@ -1,6 +1,9 @@
 import psygnal
 
 
+__all__ = ["Observable", "HasObservables"]
+
+
 class Observable:
     def __init__(self, dtype, check_types=False):
         self.dtype = dtype
@@ -83,28 +86,53 @@ def _defined_signals_generator(obj):
             continue
 
 
+class HasObservables:
+    signals: MesaSignalGroup
+    observables: list = []
+
+    def __new__(cls, *args, **kwargs):
+        obj = super().__new__(cls)
+        # collect defined Signals to create a signal group
+
+        # fixme create observables and signals
+        # possibly use a mixin class to contain everything for cleaner code
+        # observables is just a collection of observables on an object
+        # signals is everything you can subscribe to.
+
+        signals = {k: v for k, v in _defined_signals_generator(obj)}
+        obj.signals = MesaSignalGroup(signals, obj)
+
+        return obj
+
+
 if __name__ == "__main__":
     from mesa import Agent, Model
 
-    class A(Agent):
+
+    class A(Agent, HasObservables):
         a = Observable(int)
 
-    class B(A):
+
+    class B(A, HasObservables):
         b = Observable(int)
+
 
     model = Model()
 
     a = A(model)
     b = B(model)
 
+
     def specific_handler(arg: int):
         print(f"specific handler {arg}")
+
 
     def generic_handler(info: psygnal.EmissionInfo):
         signalinstance, arguments = info
         print(
             f"received signal from {signalinstance.instance} about {signalinstance.name}: {arguments}"
         )
+
 
     a.a_changed.connect(specific_handler)
     b.signals["a_changed"].connect(specific_handler)
