@@ -54,7 +54,6 @@ class Model:
 
     """
 
-
     def __init__(self, *args: Any, seed=None, **kwargs: Any) -> None:
         """Create a new model. Overload this method with the actual code to
         start the model. Always start with super().__init__() to initialize the
@@ -73,7 +72,6 @@ class Model:
             # advance.
             self._seed = random.random()
             self.random = random.Random(self._seed)
-
 
         # Wrap the user-defined step method
         self._user_step = self.step
