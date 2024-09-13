@@ -54,9 +54,9 @@ class Model:
 
     """
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> Any:
-        obj = object.__new__(cls)
-        return obj
+    # def __new__(cls, *args: Any, **kwargs: Any) -> Any:
+    #     obj = object.__new__(cls)
+    #     return obj
 
     def __init__(self, *args: Any, seed=None, **kwargs: Any) -> None:
         """Create a new model. Overload this method with the actual code to
