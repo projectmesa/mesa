@@ -141,7 +141,7 @@ class TestStagedActivation(TestCase):
         """
         Testing the staged activation without shuffling.
         """
-        a = SomeModel()
+        a = SomeModel(shuffle=False)
         print(a)
         model = MockModel(shuffle=False)
         model.step()
