@@ -24,7 +24,11 @@ class Observable:
         signal.__set_name__(type(owner), self.signal_name)
         setattr(owner, self.signal_name, signal)
         setattr(owner, self.private_name, None)
-        owner.observables.append(self)
+
+        try:
+            owner.observables.append(self)
+        except AttributeError:
+            raise ValueError(f'owner {owner} is not an instance of `HasObservables`)
 
     def __set__(self, instance, value):
         setattr(instance, self.private_name, value)
