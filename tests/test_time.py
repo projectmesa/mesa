@@ -116,8 +116,9 @@ class TestStagedActivation(TestCase):
 
         try:
             model = MockModel(shuffle=False)
-        except TypeError:
+        except TypeError as e:
             print(f"what the f... {mesa.__version__}")
+            raise e
 
         model.step()
         model.step()
