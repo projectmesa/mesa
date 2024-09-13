@@ -53,11 +53,10 @@ class MockAgent(Agent):
         self.model.log.append(self.unique_id)
 
 
-
 class SomeModel(Model):
-
     def __init__(self, seed=None):
         super().__init__(seed=seed)
+
 
 class MockModel(Model):
     def __init__(
