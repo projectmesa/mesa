@@ -5,7 +5,6 @@ Test the advanced schedulers.
 import unittest
 from unittest import TestCase, mock
 
-import mesa
 from mesa.agent import Agent
 from mesa.model import Model
 from mesa.time import (
