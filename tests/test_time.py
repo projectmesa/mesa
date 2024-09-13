@@ -130,6 +130,9 @@ class MockModel(Model):
         self.log.append("model_stage")
 
 
+a = SomeModel(activation=RANDOM, enable_kill_other_agent=False)
+print(a)
+
 class TestStagedActivation(TestCase):
     """
     Test the staged activation.
@@ -141,8 +144,6 @@ class TestStagedActivation(TestCase):
         """
         Testing the staged activation without shuffling.
         """
-        a = SomeModel(activation=RANDOM, enable_kill_other_agent=False)
-        print(a)
         model = MockModel(shuffle=False)
         model.step()
         model.step()
