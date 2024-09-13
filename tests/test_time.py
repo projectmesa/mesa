@@ -133,6 +133,7 @@ class MockModel(Model):
 a = SomeModel(activation=RANDOM, enable_kill_other_agent=False)
 print(a)
 
+
 class TestStagedActivation(TestCase):
     """
     Test the staged activation.
