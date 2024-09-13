@@ -53,10 +53,9 @@ class MockAgent(Agent):
         self.model.log.append(self.unique_id)
 
 
-class MockModel(Model):
-    def __init__(
-        self, seed=None, shuffle=False, activation=STAGED, enable_kill_other_agent=False
-    ):
+
+class WeirdModel(Model):
+    def __init__(self, seed=None, shuffle=False, activation=STAGED, enable_kill_other_agent=False):
         """
         Creates a Model instance with a schedule
 
@@ -113,7 +112,7 @@ class TestStagedActivation(TestCase):
         """
         Testing the staged activation without shuffling.
         """
-        model = MockModel(shuffle=False)
+        model = WeirdModel(shuffle=False)
         model.step()
         model.step()
         assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
@@ -122,7 +121,7 @@ class TestStagedActivation(TestCase):
         """
         Test the staged activation with shuffling
         """
-        model = MockModel(shuffle=True)
+        model = WeirdModel(shuffle=True)
         model.step()
         for output in self.expected_output[:2]:
             assert output in model.log[:2]
@@ -131,7 +130,7 @@ class TestStagedActivation(TestCase):
         assert self.expected_output[2] == model.log[2]
 
     def test_shuffle_shuffles_agents(self):
-        model = MockModel(shuffle=True)
+        model = WeirdModel(shuffle=True)
         model.random = mock.Mock()
         assert model.random.shuffle.call_count == 0
         model.step()
@@ -141,7 +140,7 @@ class TestStagedActivation(TestCase):
         """
         Test the staged activation can remove an agent
         """
-        model = MockModel(shuffle=True)
+        model = WeirdModel(shuffle=True)
         agents = list(model.schedule._agents)
         agent = agents[0]
         model.schedule.remove(agents[0])
@@ -152,12 +151,12 @@ class TestStagedActivation(TestCase):
         Test the staged activation can remove an agent in a
         step of another agent so that the one removed doesn't step.
         """
-        model = MockModel(shuffle=True, enable_kill_other_agent=True)
+        model = WeirdModel(shuffle=True, enable_kill_other_agent=True)
         model.step()
         assert len(model.log) == 3
 
     def test_add_existing_agent(self):
-        model = MockModel()
+        model = WeirdModel()
         agent = model.schedule.agents[0]
         with self.assertRaises(Exception):
             model.schedule.add(agent)
@@ -179,7 +178,7 @@ class TestRandomActivation(TestCase):
         """
         Test the random activation step
         """
-        model = MockModel(activation=RANDOM)
+        model = WeirdModel(activation=RANDOM)
         model.random = mock.Mock()
         model.schedule.step()
         assert model.random.shuffle.call_count == 1
@@ -188,7 +187,7 @@ class TestRandomActivation(TestCase):
         """
         Test the random activation step increments step and time counts
         """
-        model = MockModel(activation=RANDOM)
+        model = WeirdModel(activation=RANDOM)
         assert model.schedule.steps == 0
         assert model.schedule.time == 0
         model.schedule.step()
@@ -199,7 +198,7 @@ class TestRandomActivation(TestCase):
         """
         Test the random activation step causes each agent to step
         """
-        model = MockModel(activation=RANDOM)
+        model = WeirdModel(activation=RANDOM)
         model.step()
         agent_steps = [i.steps for i in model.schedule.agents]
         # one step for each of 2 agents
@@ -210,12 +209,12 @@ class TestRandomActivation(TestCase):
         Test the random activation can remove an agent in a
         step of another agent so that the one removed doesn't step.
         """
-        model = MockModel(activation=RANDOM, enable_kill_other_agent=True)
+        model = WeirdModel(activation=RANDOM, enable_kill_other_agent=True)
         model.step()
         assert len(model.log) == 1
 
     def test_get_agent_keys(self):
-        model = MockModel(activation=RANDOM)
+        model = WeirdModel(activation=RANDOM)
 
         keys = model.schedule.get_agent_keys()
         agent_ids = [agent.unique_id for agent in model.agents]
@@ -226,7 +225,7 @@ class TestRandomActivation(TestCase):
         assert all(entry in agent_ids for entry in keys)
 
     def test_not_sequential(self):
-        model = MockModel(activation=RANDOM)
+        model = WeirdModel(activation=RANDOM)
         # Create 10 agents
         for _ in range(10):
             model.schedule.add(MockAgent(model))
@@ -257,7 +256,7 @@ class TestSimultaneousActivation(TestCase):
         """
         Test the simultaneous activation step causes each agent to step
         """
-        model = MockModel(activation=SIMULTANEOUS)
+        model = WeirdModel(activation=SIMULTANEOUS)
         model.step()
         # one step for each of 2 agents
         agent_steps = [i.steps for i in model.schedule.agents]
@@ -285,7 +284,7 @@ class TestRandomActivationByType(TestCase):
         """
         Test the random activation by type step
         """
-        model = MockModel(activation=RANDOM_BY_TYPE)
+        model = WeirdModel(activation=RANDOM_BY_TYPE)
         model.random = mock.Mock()
         model.schedule.step()
         assert model.random.shuffle.call_count == 2
@@ -294,7 +293,7 @@ class TestRandomActivationByType(TestCase):
         """
         Test the random activation by type step increments step and time counts
         """
-        model = MockModel(activation=RANDOM_BY_TYPE)
+        model = WeirdModel(activation=RANDOM_BY_TYPE)
         assert model.schedule.steps == 0
         assert model.schedule.time == 0
         model.schedule.step()
@@ -306,7 +305,7 @@ class TestRandomActivationByType(TestCase):
         Test the random activation by type step causes each agent to step
         """
 
-        model = MockModel(activation=RANDOM_BY_TYPE)
+        model = WeirdModel(activation=RANDOM_BY_TYPE)
         model.step()
         agent_steps = [i.steps for i in model.schedule.agents]
         # one step for each of 2 agents
@@ -317,7 +316,7 @@ class TestRandomActivationByType(TestCase):
         Test the random activation by type step causes each agent to step
         """
 
-        model = MockModel(activation=RANDOM_BY_TYPE)
+        model = WeirdModel(activation=RANDOM_BY_TYPE)
 
         agent_types = model.agent_types
         for agent_type in agent_types:
