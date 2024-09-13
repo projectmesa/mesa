@@ -53,9 +53,10 @@ class MockAgent(Agent):
         self.model.log.append(self.unique_id)
 
 
-
 class WeirdModel(Model):
-    def __init__(self, seed=None, shuffle=False, activation=STAGED, enable_kill_other_agent=False):
+    def __init__(
+        self, seed=None, shuffle=False, activation=STAGED, enable_kill_other_agent=False
+    ):
         """
         Creates a Model instance with a schedule
 
