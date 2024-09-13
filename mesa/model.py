@@ -54,12 +54,16 @@ class Model:
 
     """
 
+    def __new__(cls, *args: Any, **kwargs: Any) -> Any:
+        obj = object.__new__(cls)
+        return obj
+
     def __init__(self, *args: Any, seed=None, **kwargs: Any) -> None:
         """Create a new model. Overload this method with the actual code to
         start the model. Always start with super().__init__() to initialize the
         model object properly.
         """
-
+        super().__init__(*args, **kwargs)
         self.running = True
         self.schedule = None
         self.steps: int = 0
@@ -204,10 +208,10 @@ class Model:
         self._seed = seed
 
     def initialize_data_collector(
-        self,
-        model_reporters=None,
-        agent_reporters=None,
-        tables=None,
+            self,
+            model_reporters=None,
+            agent_reporters=None,
+            tables=None,
     ) -> None:
         if not hasattr(self, "schedule") or self.schedule is None:
             raise RuntimeError(
