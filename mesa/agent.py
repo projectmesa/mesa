@@ -20,7 +20,7 @@ from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
 from random import Random
 
 # mypy
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
@@ -142,12 +142,12 @@ class AgentSet(MutableSet, Sequence):
         return agent in self._agents
 
     def select(
-        self,
-        filter_func: Callable[[Agent], bool] | None = None,
-        at_most: int | float = float("inf"),
-        inplace: bool = False,
-        agent_type: type[Agent] | None = None,
-        n: int | None = None,
+            self,
+            filter_func: Callable[[Agent], bool] | None = None,
+            at_most: int | float = float("inf"),
+            inplace: bool = False,
+            agent_type: type[Agent] | None = None,
+            n: int | None = None,
     ) -> AgentSet:
         """
         Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
@@ -190,7 +190,7 @@ class AgentSet(MutableSet, Sequence):
                 if count >= at_most:
                     break
                 if (not filter_func or filter_func(agent)) and (
-                    not agent_type or isinstance(agent, agent_type)
+                        not agent_type or isinstance(agent, agent_type)
                 ):
                     yield agent
                     count += 1
@@ -225,10 +225,10 @@ class AgentSet(MutableSet, Sequence):
             )
 
     def sort(
-        self,
-        key: Callable[[Agent], Any] | str,
-        ascending: bool = False,
-        inplace: bool = False,
+            self,
+            key: Callable[[Agent], Any] | str,
+            ascending: bool = False,
+            inplace: bool = False,
     ) -> AgentSet:
         """
         Sort the agents in the AgentSet based on a specified attribute or custom function.
@@ -348,12 +348,30 @@ class AgentSet(MutableSet, Sequence):
         values = self.get(attribute)
         return func(values)
 
+    @overload
     def get(
-        self,
-        attr_names: str | list[str],
-        handle_missing: Literal["error", "default"] = "error",
-        default_value: Any = None,
-    ) -> list[Any] | list[list[Any]]:
+            self,
+            attr_names: str,
+            handle_missing: Literal["error", "default"] = "error",
+            default_value: Any = None,
+    ) -> list[Any]:
+        ...
+
+    @overload
+    def get(
+            self,
+            attr_names: list[str],
+            handle_missing: Literal["error", "default"] = "error",
+            default_value: Any = None,
+    ) -> list[list[Any]]:
+        ...
+
+    def get(
+            self,
+            attr_names,
+            handle_missing="error",
+            default_value=None,
+    ):
         """
         Retrieve the specified attribute(s) from each agent in the AgentSet.
 
