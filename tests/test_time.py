@@ -54,8 +54,23 @@ class MockAgent(Agent):
 
 
 class SomeModel(Model):
-    def __init__(self, seed=None):
+    def __init__(self, seed=None, shuffle=False, activation=STAGED, enable_kill_other_agent=False):
         super().__init__(seed=seed)
+        self.log = []
+        self.enable_kill_other_agent = enable_kill_other_agent
+        self.shuffle = shuffle
+
+        match activation:
+            case "random":
+                pass
+            case "staged":
+                pass
+            case "simultaneous":
+                pass
+            case "random_by_type":
+                pass
+            case _:
+                raise ValueError(f"Unknown activation type: {activation}")
 
 
 class MockModel(Model):
@@ -119,6 +134,7 @@ class TestStagedActivation(TestCase):
         Testing the staged activation without shuffling.
         """
         a = SomeModel()
+        print(a)
         model = MockModel(shuffle=False)
         model.step()
         model.step()
