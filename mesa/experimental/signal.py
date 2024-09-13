@@ -1,6 +1,5 @@
 import psygnal
 
-
 __all__ = ["Observable", "HasObservables"]
 
 
@@ -108,31 +107,25 @@ class HasObservables:
 if __name__ == "__main__":
     from mesa import Agent, Model
 
-
     class A(Agent, HasObservables):
         a = Observable(int)
 
-
     class B(A, HasObservables):
         b = Observable(int)
-
 
     model = Model()
 
     a = A(model)
     b = B(model)
 
-
     def specific_handler(arg: int):
         print(f"specific handler {arg}")
-
 
     def generic_handler(info: psygnal.EmissionInfo):
         signalinstance, arguments = info
         print(
             f"received signal from {signalinstance.instance} about {signalinstance.name}: {arguments}"
         )
-
 
     a.a_changed.connect(specific_handler)
     b.signals["a_changed"].connect(specific_handler)
