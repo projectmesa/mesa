@@ -59,7 +59,7 @@ class Model:
         start the model. Always start with super().__init__() to initialize the
         model object properly.
         """
-
+        super().__init__(*args, **kwargs)
         self.running = True
         self.schedule = None
         self.steps: int = 0
