@@ -5,7 +5,9 @@ Test the advanced schedulers.
 import unittest
 from unittest import TestCase, mock
 
-from mesa import Agent, Model
+import mesa
+from mesa.agent import Agent
+from mesa.model import Model
 from mesa.time import (
     BaseScheduler,
     RandomActivation,
@@ -111,7 +113,12 @@ class TestStagedActivation(TestCase):
         """
         Testing the staged activation without shuffling.
         """
-        model = MockModel(shuffle=False)
+
+        try:
+            model = MockModel(shuffle=False)
+        except TypeError:
+            print(f"what the f... {mesa.__version__}")
+
         model.step()
         model.step()
         assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
