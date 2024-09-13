@@ -81,6 +81,7 @@ ABM features users have shared that you may want to use in your model
 Mesa Overview <overview>
 tutorials/intro_tutorial
 tutorials/visualization_tutorial
+Migration guide <migration_guide>
 Best Practices <best-practices>
 How-to Guide <howto>
 API Documentation <apis/api_main>
@@ -98,7 +99,7 @@ Mesa Packages <packages>
 [github issue tracker]: https://github.com/projectmesa/mesa/issues
 [matrix chat room]: https://matrix.to/#/#project-mesa:matrix.org
 [mesa]: https://github.com/projectmesa/mesa/
-[mesa introductory tutorial]: tutorials/intro_tutorial.html
-[mesa visualization tutorial]: tutorials/visualization_tutorial.html
+[mesa introductory tutorial]: tutorials/intro_tutorial
+[mesa visualization tutorial]: tutorials/visualization_tutorial
 [pypi]: https://pypi.python.org/pypi/Mesa/
 [ticket]: https://github.com/projectmesa/mesa/issues

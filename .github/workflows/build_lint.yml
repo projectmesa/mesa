@@ -77,7 +77,7 @@ jobs:
     - name: Install uv
       run: pip install uv
     - name: Install Mesa
-      run: uv pip install --system .[dev]
+      run: uv pip install --system .[examples]
     - name: Checkout mesa-examples
       uses: actions/checkout@v4
       with:
@@ -86,4 +86,4 @@ jobs:
     - name: Test examples
       run: |
         cd mesa-examples
-        pytest -rA -Werror test_examples.py
+        pytest -rA -Werror -Wdefault::FutureWarning test_examples.py

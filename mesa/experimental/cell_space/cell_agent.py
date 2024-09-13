@@ -19,7 +19,7 @@ class CellAgent(Agent):
         cell: (Cell | None): the cell which the agent occupies
     """
 
-    def __init__(self, unique_id: int, model: Model) -> None:
+    def __init__(self, model: Model) -> None:
         """
         Create a new agent.
 
@@ -27,7 +27,7 @@ class CellAgent(Agent):
             unique_id (int): A unique identifier for this agent.
             model (Model): The model instance in which the agent exists.
         """
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self.cell: Cell | None = None
 
     def move_to(self, cell) -> None:

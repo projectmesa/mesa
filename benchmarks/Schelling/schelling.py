@@ -8,15 +8,14 @@ class SchellingAgent(CellAgent):
     Schelling segregation agent
     """
 
-    def __init__(self, unique_id, model, agent_type, radius, homophily):
+    def __init__(self, model, agent_type, radius, homophily):
         """
         Create a new Schelling agent.
         Args:
-           unique_id: Unique identifier for the agent.
            x, y: Agent initial location.
            agent_type: Indicator for the agent's type (minority=1, majority=0)
         """
-        super().__init__(unique_id, model)
+        super().__init__(model)
         self.type = agent_type
         self.radius = radius
         self.homophily = homophily
@@ -81,9 +80,7 @@ class Schelling(Model):
         for cell in self.grid:
             if self.random.random() < density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
-                agent = SchellingAgent(
-                    self.next_id(), self, agent_type, radius, homophily
-                )
+                agent = SchellingAgent(self, agent_type, radius, homophily)
                 agent.move_to(cell)
                 self.schedule.add(agent)
 

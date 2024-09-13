@@ -28,6 +28,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
   "Development Status :: 3 - Alpha",
@@ -53,6 +54,10 @@ dev = [
   "pytest-cov",
   "sphinx",
   "pytest-mock",
+]
+examples = [
+  "pytest >= 4.6",
+  "scipy"
 ]
 docs = [
   "sphinx",

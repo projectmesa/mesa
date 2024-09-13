@@ -36,6 +36,40 @@ discuss via [Matrix] OR via [an issue].
 - Describe the change w/ ticket number(s) that the code fixes.
 - Format your commit message as per [Tim Pope's guideline].
 
+## I have no idea where to start
+That's fine! Here's a rough outline where you could start, depending on your experience:
+
+### I'm a modeller (but not an experienced developer)
+You already know how to build Mesa models (if not skip below), and probably have found things Mesa can't do (elegantly). You want to improve that. Awesome!
+
+First step is to install some proper tools, if you haven't already.
+- A good IDE helps for code development, testing and formatting. [PyCharm](https://www.jetbrains.com/pycharm/) or [VSCode](https://code.visualstudio.com/) for example.
+- Dive into Git and GitHub. Watch some videos, this takes some time to click. [GitHub Desktop](https://desktop.github.com/) is great.
+- [`https://github.dev/projectmesa/mesa`](https://github.dev/projectmesa/mesa) is great for small changes (to docs).
+
+Learn the tools, talk to us about what you want to change, and open a small PR. Or update an [example model](https://github.com/projectmesa/mesa-examples) (check open [issues](https://github.com/projectmesa/mesa-examples/issues))!
+
+### I'm a developer (but not a modeller)
+Awesome! You have the basics of open-source software development (if not check above), but not much modelling experience.
+
+First step is to start thinking like a modeller. To understand the fine details about our library and contribute meaningfully, get some modelling experience:
+- Go though our [Introductory Tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html) and [Visualization Tutorial](https://mesa.readthedocs.io/en/latest/tutorials/visualization_tutorial.html). While going through them, dive into the source code to really see what everything does.
+- Follow an ABM course (if possible). They might be a bit outdated programming language wise, but conceptual they're sound.
+  - This MOOC on ABM concepts: [Agent Based Modeling](https://ocw.tudelft.nl/course-lectures/agent-based-modeling/)
+  - This MOOC on practical ABM modelling: [Agent-Based Models with Python: An Introduction to Mesa](https://www.complexityexplorer.org/courses/172-agent-based-models-with-python-an-introduction-to-mesa)
+- Go though multiple of our [examples](https://github.com/projectmesa/mesa-examples). Play with them, modify things and get a feel for Mesa and ABMs.
+  - Check our open [issues](https://github.com/projectmesa/mesa-examples/issues) for the examples.
+  - If you see anything you want to improve, feel free to open a (small) PR!
+- If you have a feel for Mesa, check our [discussions](https://github.com/projectmesa/mesa/discussions) and [issues](https://github.com/projectmesa/mesa/issues).
+  - Also go thought our [release notes](https://github.com/projectmesa/mesa/releases) to see what we recently have been working on, and see some examples of successful PRs.
+- Once you found or thought of a nice idea, comment on the issue/discussion (or open a new one) and get to work!
+
+### I'm both
+That's great! You can just start working on things, reach out to us. Skim to the list above if you feel you're missing anything. Start small but don't be afraid to dream big!
+
+### I'm neither
+Start with creating your own models, for fun. Once you have some experience, move to the topics above.
+
 ## Testing and Code Standards
 
 ```{image} https://codecov.io/gh/projectmesa/mesa/branch/main/graph/badge.svg

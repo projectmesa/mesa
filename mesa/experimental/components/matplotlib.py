@@ -7,24 +7,10 @@ from matplotlib.ticker import MaxNLocator
 
 import mesa
 from mesa.experimental.cell_space import VoronoiGrid
-from mesa.visualization.utils import update_counter
-
-
-def make_space_matplotlib(agent_portrayal=None):
-    if agent_portrayal is None:
-
-        def agent_portrayal(a):
-            return {"id": a.unique_id}
-
-    def MakeSpaceMatplotlib(model):
-        return SpaceMatplotlib(model, agent_portrayal)
-
-    return MakeSpaceMatplotlib
 
 
 @solara.component
 def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = None):
-    update_counter.get()
     space_fig = Figure()
     space_ax = space_fig.subplots()
     space = getattr(model, "grid", None)
@@ -217,16 +203,8 @@ def _draw_voronoi(space, space_ax, agent_portrayal):
         space_ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in red
 
 
-def make_plot_measure(measure: str | dict[str, str] | list[str] | tuple[str]):
-    def MakePlotMeasure(model):
-        return PlotMatplotlib(model, measure)
-
-    return MakePlotMeasure
-
-
 @solara.component
 def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
-    update_counter.get()
     fig = Figure()
     ax = fig.subplots()
     df = model.datacollector.get_model_vars_dataframe()

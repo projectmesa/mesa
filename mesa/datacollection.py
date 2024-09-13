@@ -180,7 +180,7 @@ class DataCollector:
         rep_funcs = self.agent_reporters.values()
 
         def get_reports(agent):
-            _prefix = (agent.model._steps, agent.unique_id)
+            _prefix = (agent.model.steps, agent.unique_id)
             reports = tuple(rep(agent) for rep in rep_funcs)
             return _prefix + reports
 
@@ -216,7 +216,7 @@ class DataCollector:
 
         if self.agent_reporters:
             agent_records = self._record_agents(model)
-            self._agent_records[model._steps] = list(agent_records)
+            self._agent_records[model.steps] = list(agent_records)
 
     def add_table_row(self, table_name, row, ignore_missing=False):
         """Add a row dictionary to a specific table.

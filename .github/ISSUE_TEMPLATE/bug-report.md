@@ -11,7 +11,8 @@ about: Let us know if something is broken on Mesa
 <!-- A clear and concise description of what you expected to happen -->
 
 **To Reproduce**
-<!-- Steps to reproduce the bug, or a link to a project where the bug is visible -->
+<!-- Steps to reproduce the bug, or a link to a project where the bug is visible
+Include a Minimal reproducible example: https://stackoverflow.com/help/minimal-reproducible-example -->
 
 **Additional context**
 <!--
