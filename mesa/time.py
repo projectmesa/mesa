@@ -50,20 +50,14 @@ class BaseScheduler:
         - steps (int): The number of steps the scheduler has taken.
         - time (TimeT): The current time in the simulation. Can be an integer or a float.
 
-    Methods:
-        - add: Adds an agent to the scheduler.
-        - remove: Removes an agent from the scheduler.
-        - step: Executes a step, which involves activating each agent once.
-        - get_agent_count: Returns the number of agents in the scheduler.
-        - agents (property): Returns a list of all agent instances.
     """
 
     def __init__(self, model: Model, agents: Iterable[Agent] | None = None) -> None:
         """Create a new BaseScheduler.
 
         Args:
-            model (Model): The model to which the schedule belongs
-            agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
+            - model (Model): The model to which the schedule belongs
+            - agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
 
         """
         self.model = model
@@ -94,12 +88,13 @@ class BaseScheduler:
     def remove(self, agent: Agent) -> None:
         """Remove all instances of a given agent from the schedule.
 
+        Args:
+            agent: An `Agent` instance.
+
         Note:
             It is only necessary to explicitly remove agents from the schedule if
             the agent is not removed from the model.
 
-        Args:
-            agent: An agent object.
         """
         self._agents.remove(agent)
 
@@ -155,8 +150,6 @@ class RandomActivation(BaseScheduler):
 
     Inherits all attributes and methods from BaseScheduler.
 
-    Methods:
-        - step: Executes a step, activating each agent in a random order.
     """
 
     def step(self) -> None:
@@ -182,8 +175,6 @@ class SimultaneousActivation(BaseScheduler):
 
     Inherits all attributes and methods from BaseScheduler.
 
-    Methods:
-        - step: Executes a step for all agents, first calling `step` then `advance` on each.
     """
 
     def step(self) -> None:
@@ -215,8 +206,6 @@ class StagedActivation(BaseScheduler):
         - shuffle (bool): Determines whether to shuffle the order of agents each step.
         - shuffle_between_stages (bool): Determines whether to shuffle agents between each stage.
 
-    Methods:
-        - step: Executes all the stages for all agents in the defined order.
     """
 
     def __init__(
@@ -230,12 +219,12 @@ class StagedActivation(BaseScheduler):
         """Create an empty Staged Activation schedule.
 
         Args:
-            model (Model): The model to which the schedule belongs
-            agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
-            stage_list (:obj:`list` of :obj:`str`): List of strings of names of stages to run, in the
+            - model (Model): The model to which the schedule belongs
+            - agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
+            - stage_list (:obj:`list` of :obj:`str`): List of strings of names of stages to run, in the
                          order to run them in.
-            shuffle (bool, optional): If True, shuffle the order of agents each step.
-            shuffle_between_stages (bool, optional): If True, shuffle the agents after each
+            - shuffle (bool, optional): If True, shuffle the order of agents each step.
+            - shuffle_between_stages (bool, optional): If True, shuffle the agents after each
                                     stage; otherwise, only shuffle at the start
                                     of each step.
         """
@@ -278,10 +267,6 @@ class RandomActivationByType(BaseScheduler):
     Attributes:
         - agents_by_type (defaultdict): A dictionary mapping agent types to dictionaries of agents.
 
-    Methods:
-        - step: Executes the step of each agent type in a random order.
-        - step_type: Activates all agents of a given type.
-        - get_type_count: Returns the count of agents of a specific type.
     """
 
     @property
@@ -304,8 +289,8 @@ class RandomActivationByType(BaseScheduler):
         """
 
         Args:
-            model (Model): The model to which the schedule belongs
-            agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
+            - model (Model): The model to which the schedule belongs
+            - agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
         """
 
         # can't be a defaultdict because we need to pass model to AgentSet
@@ -335,6 +320,10 @@ class RandomActivationByType(BaseScheduler):
     def remove(self, agent: Agent) -> None:
         """
         Remove all instances of a given agent from the schedule.
+
+        args:
+            - agent: An Agent to be removed from the schedule.
+
         """
         super().remove(agent)
         self._agents_by_type[type(agent)].remove(agent)
@@ -344,10 +333,8 @@ class RandomActivationByType(BaseScheduler):
         Executes the step of each agent type, one at a time, in random order.
 
         Args:
-            shuffle_types: If True, the order of execution of each types is
-                           shuffled.
-            shuffle_agents: If True, the order of execution of each agents in a
-                            type group is shuffled.
+            - shuffle_types: If True, the order of execution of each types is shuffled.
+            - shuffle_agents: If True, the order of execution of each agents in a type group is shuffled.
         """
         # To be able to remove and/or add agents during stepping
         # it's necessary to cast the keys view to a list.
@@ -365,7 +352,7 @@ class RandomActivationByType(BaseScheduler):
         This method is equivalent to the NetLogo 'ask [breed]...'.
 
         Args:
-            agenttype: Class object of the type to run.
+            - agenttype: Class object of the type to run.
         """
         agents = self._agents_by_type[agenttype]
 
