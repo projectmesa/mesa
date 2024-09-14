@@ -5,11 +5,6 @@ Test the advanced schedulers.
 # import unittest
 # from unittest import TestCase, mock
 
-from traceback import print_tb
-from unittest import mock
-
-import pytest
-
 from mesa import Agent, Model
 from mesa.time import (
     BaseScheduler,
@@ -59,14 +54,10 @@ class MockAgent(Agent):
 
 
 class SomeModel(Model):
-    def __init__(
-        self, some_number, seed=None, some_other_argument=5
-    ):
+    def __init__(self, some_number, seed=None, some_other_argument=5):
         super().__init__(seed=seed)
         self.some_number = some_number
         self.some_other_argument = some_other_argument
-
-
 
 
 class MockModel(Model):
@@ -133,12 +124,12 @@ def test_some_model():
 #     except TypeError as e:
 #         print_tb(e.__traceback__)
 #         raise e
-# 
+#
 #     model.step()
 #     model.step()
 #     assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
-# 
-# 
+#
+#
 # def test_StagedActivation_shuffle():
 #     """
 #     Test the staged activation with shuffling
