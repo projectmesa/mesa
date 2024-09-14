@@ -55,7 +55,6 @@ class MockAgent(Agent):
         self.model.log.append(self.unique_id)
 
 
-
 class SomeModel(Model):
     def __init__(self, some_number, seed=None, some_other_argument=5):
         super().__init__(seed=seed)
