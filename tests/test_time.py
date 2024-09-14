@@ -84,6 +84,12 @@ class SomeModel(Model):
             agent = MockAgent(self)
             self.schedule.add(agent)
 
+    def step(self):
+        self.schedule.step()
+
+    def model_stage(self):
+        self.log.append("model_stage")
+
 
 class MockModel(Model):
     def __init__(
@@ -134,11 +140,13 @@ class MockModel(Model):
         self.log.append("model_stage")
 
 
+somemodel = SomeModel(seed=1, shuffle=True)
+
 def test_StagedActivation_no_shuffle():
     """
     Testing the staged activation without shuffling.
     """
-    model = MockModel(shuffle=False)
+    model = SomeModel(shuffle=False)
     model.step()
     model.step()
     assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
@@ -150,7 +158,7 @@ def test_StagedActivation_shuffle():
     """
     expected_output = ["1_1", "1_1", "model_stage", "1_2", "1_2"]
 
-    model = MockModel(shuffle=True)
+    model = SomeModel(shuffle=True)
     model.step()
     for output in expected_output[:2]:
         assert output in model.log[:2]
