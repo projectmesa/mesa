@@ -59,7 +59,6 @@ class MockAgent(Agent):
 
 
 class Model:
-
     def __init__(self, *args, seed=None, **kwargs):
         """Create a new model. Overload this method with the actual code to
         start the model. Always start with super().__init__() to initialize the
