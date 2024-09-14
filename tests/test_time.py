@@ -58,6 +58,7 @@ class BaseClass:
         super().__init__(*args, **kwargs)
         self.seed = seed
 
+
 class SomeModel(BaseClass):
     def __init__(self, some_number, seed=None, some_other_argument=5):
         super().__init__(seed=seed)
