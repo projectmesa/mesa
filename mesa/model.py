@@ -73,9 +73,6 @@ class Model:
             self._seed = random.random()
         self.random = random.Random(self._seed)
 
-        self._steps: int = 0
-        self._time: TimeT = 0  # the model's clock
-
         # Wrap the user-defined step method
         self._user_step = self.step
         self.step = self._wrapped_step
