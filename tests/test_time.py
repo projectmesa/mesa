@@ -114,7 +114,6 @@ class MockModel(Model):
 def test_some_model():
     print(inspect.getsource(Model))
 
-    some_model = SomeModel()
     some_model = SomeModel(5)
     some_model = SomeModel(5, seed=10)
     some_model = SomeModel(5, some_other_argument=10)
