@@ -112,9 +112,6 @@ class SomeModel(BaseClass):
         self.some_other_argument = some_other_argument
 
 
-
-
-
 def test_StagedActivation_no_shuffle():
     """
     Testing the staged activation without shuffling.
