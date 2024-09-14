@@ -228,7 +228,6 @@ class Model:
         self.datacollector.collect(self)
 
 
-
 class SomeModel(Model):
     def __init__(self, some_number, seed=None, some_other_argument=5):
         super().__init__(seed=seed)
