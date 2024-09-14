@@ -58,11 +58,14 @@ class Model:
     #     obj = object.__new__(cls)
     #     return obj
 
-    def __init__(self, *args: Any, seed=None, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a new model. Overload this method with the actual code to
         start the model. Always start with super().__init__() to initialize the
         model object properly.
         """
+        seed = kwargs.pop("seed", None)
+        print(kwargs)
+
         super().__init__(*args, **kwargs)
         self.running = True
         self.schedule = None
