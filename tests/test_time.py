@@ -53,7 +53,12 @@ class MockAgent(Agent):
         self.model.log.append(self.unique_id)
 
 
-class SomeModel(Model):
+class BaseClass:
+    def __init__(self, *args, seed=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.seed = seed
+
+class SomeModel(BaseClass):
     def __init__(self, some_number, seed=None, some_other_argument=5):
         super().__init__(seed=seed)
         self.some_number = some_number
@@ -113,6 +118,7 @@ def test_some_model():
     some_model = SomeModel(5)
     some_model = SomeModel(5, seed=10)
     some_model = SomeModel(5, some_other_argument=10)
+    some_model.some_number = 6
 
 
 # def test_StagedActivation_no_shuffle():
