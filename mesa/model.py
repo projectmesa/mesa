@@ -64,28 +64,34 @@ class Model:
     #     obj = object.__new__(cls)
     #     return obj
 
+
+
     def __init__(self, seed=None):
-        """Create a new model. Overload this method with the actual code to
-        start the model. Always start with super().__init__() to initialize the
-        model object properly.
-        """
         super().__init__()
-        self.running = True
-        self.schedule = None
-        self.steps: int = 0
+        self.seed = seed
 
-        self._setup_agent_registration()
-
-        self._seed = seed
-        if self._seed is None:
-            # We explicitly specify the seed here so that we know its value in
-            # advance.
-            self._seed = random.random()
-            self.random = random.Random(self._seed)
-
-        # Wrap the user-defined step method
-        self._user_step = self.step
-        self.step = self._wrapped_step
+    # def __init__(self, seed=None):
+    #     """Create a new model. Overload this method with the actual code to
+    #     start the model. Always start with super().__init__() to initialize the
+    #     model object properly.
+    #     """
+    #     super().__init__()
+    #     self.running = True
+    #     self.schedule = None
+    #     self.steps: int = 0
+    #
+    #     self._setup_agent_registration()
+    #
+    #     self._seed = seed
+    #     if self._seed is None:
+    #         # We explicitly specify the seed here so that we know its value in
+    #         # advance.
+    #         self._seed = random.random()
+    #         self.random = random.Random(self._seed)
+    #
+    #     # Wrap the user-defined step method
+    #     self._user_step = self.step
+    #     self.step = self._wrapped_step
 
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
         """Automatically increments time and steps after calling the user's step method."""
