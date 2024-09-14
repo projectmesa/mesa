@@ -103,7 +103,7 @@ class MockModel(Model):
         self.log.append("model_stage")
 
 
-class SomeModel(BaseClass):
+class SomeModel(Model):
     def __init__(self, some_number, seed=None, some_other_argument=5):
         super().__init__(seed=seed)
         self.some_number = some_number

@@ -64,14 +64,12 @@ class Model:
     #     obj = object.__new__(cls)
     #     return obj
 
-    def __init__(self, *args, seed=None, **kwargs):
+    def __init__(self, seed=None):
         """Create a new model. Overload this method with the actual code to
         start the model. Always start with super().__init__() to initialize the
         model object properly.
         """
-        print(args)
-        print(kwargs)
-        super().__init__(*args, **kwargs)
+        super().__init__()
         self.running = True
         self.schedule = None
         self.steps: int = 0
