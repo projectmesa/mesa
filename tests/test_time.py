@@ -6,7 +6,6 @@ Test the advanced schedulers.
 # from unittest import TestCase, mock
 
 from mesa import Agent, Model
-from mesa.model import BaseClass
 from mesa.time import (
     BaseScheduler,
     RandomActivation,
