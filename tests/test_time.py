@@ -5,12 +5,11 @@ Test the advanced schedulers.
 # import unittest
 # from unittest import TestCase, mock
 
-from unittest import mock
 from traceback import print_tb
+from unittest import mock
 
 import pytest
 
-import mesa
 from mesa import Agent, Model
 from mesa.time import (
     BaseScheduler,
@@ -142,14 +141,13 @@ class MockModel(Model):
         self.log.append("model_stage")
 
 
-
 def test_StagedActivation_no_shuffle():
     """
     Testing the staged activation without shuffling.
     """
     try:
         model = SomeModel(shuffle=False)
-    except TypeError  as e:
+    except TypeError as e:
         print_tb(e.__traceback__)
         raise e
 
