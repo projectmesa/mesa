@@ -142,6 +142,7 @@ class MockModel(Model):
 
 somemodel = SomeModel(seed=1, shuffle=True)
 
+
 def test_StagedActivation_no_shuffle():
     """
     Testing the staged activation without shuffling.
