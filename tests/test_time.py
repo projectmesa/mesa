@@ -5,7 +5,12 @@ Test the advanced schedulers.
 # import unittest
 # from unittest import TestCase, mock
 
-from mesa import Agent, Model
+import random
+from typing import Any
+
+from mesa import Agent
+from mesa.agent import AgentSet
+from mesa.datacollection import DataCollector
 from mesa.time import (
     BaseScheduler,
     RandomActivation,
@@ -54,7 +59,6 @@ class MockAgent(Agent):
 
 
 class Model:
-    import random
 
     def __init__(self, *args, seed=None, **kwargs):
         """Create a new model. Overload this method with the actual code to
@@ -86,14 +90,6 @@ class Model:
         # Call the original user-defined step method
         self._user_step(*args, **kwargs)
 
-    def next_id(self) -> int:
-        warnings.warn(
-            "using model.next_id() is deprecated. Agents track their unique ID automatically",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return 0
-
     @property
     def agents(self) -> AgentSet:
         """Provides an AgentSet of all agents in the model, combining agents from all types."""
@@ -117,16 +113,6 @@ class Model:
         """A dictionary where the keys are agent types and the values are the corresponding AgentSets."""
         return self._agents_by_type
 
-    def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
-        """Deprecated: Retrieves an AgentSet containing all agents of the specified type."""
-        warnings.warn(
-            f"Model.get_agents_of_type() is deprecated, please replace get_agents_of_type({agenttype})"
-            f"with the property agents_by_type[{agenttype}].",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.agents_by_type[agenttype]
-
     def _setup_agent_registration(self):
         """helper method to initialize the agent registration datastructures"""
         self._agents = {}  # the hard references to all agents in the model
@@ -146,16 +132,6 @@ class Model:
             if you are subclassing Agent and calling its super in the ``__init__`` method.
 
         """
-        if not hasattr(self, "_agents"):
-            self._setup_agent_registration()
-
-            warnings.warn(
-                "The Mesa Model class was not initialized. In the future, you need to explicitly initialize "
-                "the Model by calling super().__init__() on initialization.",
-                FutureWarning,
-                stacklevel=2,
-            )
-
         self._agents[agent] = None
 
         # because AgentSet requires model, we cannot use defaultdict
