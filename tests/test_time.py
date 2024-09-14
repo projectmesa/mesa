@@ -5,7 +5,6 @@ Test the advanced schedulers.
 # import unittest
 # from unittest import TestCase, mock
 
-import inspect
 
 from mesa import Agent, Model
 from mesa.time import (
@@ -55,11 +54,6 @@ class MockAgent(Agent):
         self.model.log.append(self.unique_id)
 
 
-class SomeModel(Model):
-    def __init__(self, some_number, seed=None, some_other_argument=5):
-        super().__init__(seed=seed)
-        self.some_number = some_number
-        self.some_other_argument = some_other_argument
 
 
 class MockModel(Model):
@@ -111,8 +105,19 @@ class MockModel(Model):
         self.log.append("model_stage")
 
 
+class BaseClass:
+    def __init__(self, seed=None):
+        super().__init__()
+        self.seed = seed
+
+
+class SomeModel(BaseClass):
+    def __init__(self, some_number, seed=None, some_other_argument=5):
+        super().__init__(seed=seed)
+        self.some_number = some_number
+        self.some_other_argument = some_other_argument
+
 def test_some_model():
-    print(inspect.getsource(Model))
 
     some_model = SomeModel(5)
     some_model = SomeModel(5, seed=10)
