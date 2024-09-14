@@ -141,6 +141,7 @@ def test_StagedActivation_no_shuffle():
     model.step()
     assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
 
+
 def test_StagedActivation_shuffle():
     """
     Test the staged activation with shuffling
@@ -155,12 +156,14 @@ def test_StagedActivation_shuffle():
         assert output in model.log[3:]
     assert expected_output[2] == model.log[2]
 
+
 def test_StagedActivation_shuffle_shuffles_agents():
     model = MockModel(shuffle=True)
     model.random = mock.Mock()
     assert model.random.shuffle.call_count == 0
     model.step()
     assert model.random.shuffle.call_count == 1
+
 
 def test_StagedActivation_remove():
     """
@@ -172,6 +175,7 @@ def test_StagedActivation_remove():
     model.schedule.remove(agents[0])
     assert agent not in model.schedule.agents
 
+
 def test_StagedActivation_intrastep_remove():
     """
     Test the staged activation can remove an agent in a
@@ -180,6 +184,7 @@ def test_StagedActivation_intrastep_remove():
     model = MockModel(shuffle=True, enable_kill_other_agent=True)
     model.step()
     assert len(model.log) == 3
+
 
 def test_StagedActivation_add_existing_agent():
     model = MockModel()
