@@ -260,10 +260,8 @@ def ModelCreator(model, model_params, seed=1):
         set_model_parameters({**model_parameters, name: value})
 
     def create_model():
-        model.value = model.value.__class__.__new__(
-            model.value.__class__, **model_parameters, seed=reactive_seed.value
-        )
-        model.value.__init__(**model_parameters)
+        model.value = model.value.__class__(**model_parameters)
+        model.value._seed = reactive_seed.value
 
     solara.use_effect(create_model, [model_parameters, reactive_seed.value])
 

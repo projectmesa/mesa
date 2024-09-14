@@ -89,7 +89,6 @@ def test_call_space_drawer(mocker):
     )
 
     model = mesa.Model()
-    mocker.patch.object(mesa.Model, "__new__", return_value=model)
     mocker.patch.object(mesa.Model, "__init__", return_value=None)
 
     agent_portrayal = {
