@@ -18,7 +18,6 @@ from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
 
 
-
 class BaseClass:
     def __init__(self, seed=None):
         super().__init__()
