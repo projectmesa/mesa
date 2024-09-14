@@ -18,6 +18,11 @@ from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
 
 
+class BaseClass:
+    def __init__(self, seed=None):
+        super().__init__()
+        self.seed = seed
+
 class Model:
     """Base class for models in the Mesa ABM library.
 
