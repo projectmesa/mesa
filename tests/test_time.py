@@ -9,6 +9,7 @@ from unittest import mock
 
 import pytest
 
+import mesa
 from mesa import Agent, Model
 from mesa.time import (
     BaseScheduler,
@@ -147,7 +148,11 @@ def test_StagedActivation_no_shuffle():
     """
     Testing the staged activation without shuffling.
     """
-    model = SomeModel(shuffle=False)
+    try:
+        model = SomeModel(shuffle=False)
+    except TypeError:
+        print(mesa.__version__)
+
     model.step()
     model.step()
     assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
