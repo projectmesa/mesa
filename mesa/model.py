@@ -19,7 +19,6 @@ from mesa.datacollection import DataCollector
 
 
 class BaseClass:
-
     def __init__(self, seed=None):
         """Create a new model. Overload this method with the actual code to
         start the model. Always start with super().__init__() to initialize the
@@ -170,10 +169,10 @@ class BaseClass:
         self._seed = seed
 
     def initialize_data_collector(
-            self,
-            model_reporters=None,
-            agent_reporters=None,
-            tables=None,
+        self,
+        model_reporters=None,
+        agent_reporters=None,
+        tables=None,
     ) -> None:
         if not hasattr(self, "schedule") or self.schedule is None:
             raise RuntimeError(
