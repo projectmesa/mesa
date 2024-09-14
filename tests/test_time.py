@@ -2,9 +2,10 @@
 Test the advanced schedulers.
 """
 
-import pytest
 import unittest
 from unittest import TestCase, mock
+
+import pytest
 
 from mesa import Agent, Model
 from mesa.time import (
