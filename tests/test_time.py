@@ -2,6 +2,7 @@
 Test the advanced schedulers.
 """
 
+import pytest
 import unittest
 from unittest import TestCase, mock
 
@@ -130,69 +131,61 @@ class MockModel(Model):
         self.log.append("model_stage")
 
 
-a = SomeModel(activation=RANDOM, enable_kill_other_agent=False)
-print(a)
-
-
-class TestStagedActivation(TestCase):
+def test_StagedActivation_no_shuffle():
     """
-    Test the staged activation.
+    Testing the staged activation without shuffling.
     """
+    model = MockModel(shuffle=False)
+    model.step()
+    model.step()
+    assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
 
+def test_StagedActivation_shuffle():
+    """
+    Test the staged activation with shuffling
+    """
     expected_output = ["1_1", "1_1", "model_stage", "1_2", "1_2"]
 
-    def test_no_shuffle(self):
-        """
-        Testing the staged activation without shuffling.
-        """
-        model = MockModel(shuffle=False)
-        model.step()
-        model.step()
-        assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
+    model = MockModel(shuffle=True)
+    model.step()
+    for output in expected_output[:2]:
+        assert output in model.log[:2]
+    for output in expected_output[3:]:
+        assert output in model.log[3:]
+    assert expected_output[2] == model.log[2]
 
-    def test_shuffle(self):
-        """
-        Test the staged activation with shuffling
-        """
-        model = MockModel(shuffle=True)
-        model.step()
-        for output in self.expected_output[:2]:
-            assert output in model.log[:2]
-        for output in self.expected_output[3:]:
-            assert output in model.log[3:]
-        assert self.expected_output[2] == model.log[2]
+def test_StagedActivation_shuffle_shuffles_agents():
+    model = MockModel(shuffle=True)
+    model.random = mock.Mock()
+    assert model.random.shuffle.call_count == 0
+    model.step()
+    assert model.random.shuffle.call_count == 1
 
-    def test_shuffle_shuffles_agents(self):
-        model = MockModel(shuffle=True)
-        model.random = mock.Mock()
-        assert model.random.shuffle.call_count == 0
-        model.step()
-        assert model.random.shuffle.call_count == 1
+def test_StagedActivation_remove():
+    """
+    Test the staged activation can remove an agent
+    """
+    model = MockModel(shuffle=True)
+    agents = list(model.schedule._agents)
+    agent = agents[0]
+    model.schedule.remove(agents[0])
+    assert agent not in model.schedule.agents
 
-    def test_remove(self):
-        """
-        Test the staged activation can remove an agent
-        """
-        model = MockModel(shuffle=True)
-        agents = list(model.schedule._agents)
-        agent = agents[0]
-        model.schedule.remove(agents[0])
-        assert agent not in model.schedule.agents
+def test_StagedActivation_intrastep_remove():
+    """
+    Test the staged activation can remove an agent in a
+    step of another agent so that the one removed doesn't step.
+    """
+    model = MockModel(shuffle=True, enable_kill_other_agent=True)
+    model.step()
+    assert len(model.log) == 3
 
-    def test_intrastep_remove(self):
-        """
-        Test the staged activation can remove an agent in a
-        step of another agent so that the one removed doesn't step.
-        """
-        model = MockModel(shuffle=True, enable_kill_other_agent=True)
-        model.step()
-        assert len(model.log) == 3
+def test_StagedActivation_add_existing_agent():
+    model = MockModel()
+    agent = model.schedule.agents[0]
 
-    def test_add_existing_agent(self):
-        model = MockModel()
-        agent = model.schedule.agents[0]
-        with self.assertRaises(Exception):
-            model.schedule.add(agent)
+    with pytest.raises(ValueError):
+        model.schedule.add(agent)
 
 
 class TestRandomActivation(TestCase):
