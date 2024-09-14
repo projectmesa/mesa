@@ -6,6 +6,7 @@ Test the advanced schedulers.
 # from unittest import TestCase, mock
 
 from unittest import mock
+from traceback import print_tb
 
 import pytest
 
@@ -141,8 +142,6 @@ class MockModel(Model):
         self.log.append("model_stage")
 
 
-somemodel = SomeModel(seed=1, shuffle=True)
-
 
 def test_StagedActivation_no_shuffle():
     """
@@ -150,8 +149,9 @@ def test_StagedActivation_no_shuffle():
     """
     try:
         model = SomeModel(shuffle=False)
-    except TypeError:
-        print(mesa.__version__)
+    except TypeError  as e:
+        print_tb(e.__traceback__)
+        raise e
 
     model.step()
     model.step()
