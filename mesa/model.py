@@ -21,7 +21,16 @@ from mesa.datacollection import DataCollector
 class BaseClass:
     def __init__(self, seed=None):
         super().__init__()
-        self.seed = seed
+        self.running = True
+        self.schedule = None
+        self.steps: int = 0
+
+        self._seed = seed
+        if self._seed is None:
+            # We explicitly specify the seed here so that we know its value in
+            # advance.
+            self._seed = random.random()
+            self.random = random.Random(self._seed)
 
 
 class Model:
