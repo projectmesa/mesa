@@ -8,6 +8,7 @@ Core Objects: Model
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
+import random
 import warnings
 
 # mypy
@@ -15,6 +16,7 @@ from typing import Any
 
 from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
+
 
 
 class BaseClass:
