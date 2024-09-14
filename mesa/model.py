@@ -23,6 +23,7 @@ class BaseClass:
         super().__init__()
         self.seed = seed
 
+
 class Model:
     """Base class for models in the Mesa ABM library.
 
