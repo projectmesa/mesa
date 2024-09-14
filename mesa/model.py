@@ -8,7 +8,6 @@ Core Objects: Model
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
-import random
 import warnings
 
 # mypy
@@ -63,8 +62,6 @@ class Model:
     # def __new__(cls, *args: Any, **kwargs: Any) -> Any:
     #     obj = object.__new__(cls)
     #     return obj
-
-
 
     def __init__(self, seed=None):
         super().__init__()
