@@ -13,6 +13,7 @@ from mesa.time import (
     SimultaneousActivation,
     StagedActivation,
 )
+from mesa.model import BaseClass
 
 RANDOM = "random"
 STAGED = "staged"
@@ -102,7 +103,7 @@ class MockModel(Model):
         self.log.append("model_stage")
 
 
-class SomeModel(Model):
+class SomeModel(BaseClass):
     def __init__(self, some_number, seed=None, some_other_argument=5):
         super().__init__(seed=seed)
         self.some_number = some_number
