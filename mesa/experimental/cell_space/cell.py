@@ -76,7 +76,7 @@ class Cell:
         """
         if name is None:
             name = str(other.coordinate)
-        self.connections.update({name: other})
+        self.connections[name] = other
 
     def disconnect(self, other: Cell) -> None:
         """Disconnects this cell from another cell.
@@ -85,7 +85,9 @@ class Cell:
             other (Cell): other cell to remove from connections
 
         """
-        self.connections = {k: v for k, v in self.connections.items() if v != other}
+        keys_to_remove = [k for k, v in self.connections.items() if v == other]
+        for key in keys_to_remove:
+            del self.connections[key]
 
     def add_agent(self, agent: CellAgent) -> None:
         """Adds an agent to the cell.
