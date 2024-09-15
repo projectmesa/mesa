@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 from mesa.experimental.cell_space.cell_collection import CellCollection
 
 if TYPE_CHECKING:
+    from mesa.agent import Agent
     from mesa.experimental.cell_space.cell_agent import CellAgent
 
 
@@ -26,7 +27,7 @@ class Cell:
 
     __slots__ = [
         "coordinate",
-        "_connections",
+        "connections",
         "agents",
         "capacity",
         "properties",
@@ -58,20 +59,24 @@ class Cell:
         """
         super().__init__()
         self.coordinate = coordinate
-        self._connections: list[Cell] = []  # TODO: change to CellCollection?
-        self.agents = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
+        self.connections: dict[str, Cell] = {}
+        self.agents: list[
+            Agent
+        ] = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
         self.properties: dict[str, object] = {}
         self.random = random
 
-    def connect(self, other: Cell) -> None:
+    def connect(self, other: Cell, name: str | None = None) -> None:
         """Connects this cell to another cell.
 
         Args:
             other (Cell): other cell to connect to
 
         """
-        self._connections.append(other)
+        if name is None:
+            name = str(other.coordinate)
+        self.connections.update({name: other})
 
     def disconnect(self, other: Cell) -> None:
         """Disconnects this cell from another cell.
@@ -80,7 +85,7 @@ class Cell:
             other (Cell): other cell to remove from connections
 
         """
-        self._connections.remove(other)
+        self.connections = {k: v for k, v in self.connections.items() if v != other}
 
     def add_agent(self, agent: CellAgent) -> None:
         """Adds an agent to the cell.
@@ -123,30 +128,34 @@ class Cell:
 
     # FIXME: Revisit caching strategy on methods
     @cache  # noqa: B019
-    def neighborhood(self, radius=1, include_center=False):
+    def neighborhood(self, radius: int = 1, include_center: bool = False):
         """Returns a list of all neighboring cells."""
-        return CellCollection(
+        return CellCollection[Cell](
             self._neighborhood(radius=radius, include_center=include_center),
             random=self.random,
         )
 
     # FIXME: Revisit caching strategy on methods
     @cache  # noqa: B019
-    def _neighborhood(self, radius=1, include_center=False):
+    def _neighborhood(
+        self, radius: int = 1, include_center: bool = False
+    ) -> dict[Cell, list[Agent]]:
         # if radius == 0:
         #     return {self: self.agents}
         if radius < 1:
             raise ValueError("radius must be larger than one")
         if radius == 1:
-            neighborhood = {neighbor: neighbor.agents for neighbor in self._connections}
+            neighborhood = {
+                neighbor: neighbor.agents for neighbor in self.connections.values()
+            }
             if not include_center:
                 return neighborhood
             else:
                 neighborhood[self] = self.agents
                 return neighborhood
         else:
-            neighborhood = {}
-            for neighbor in self._connections:
+            neighborhood: dict[Cell, list[Agent]] = {}
+            for neighbor in self.connections.values():
                 neighborhood.update(
                     neighbor._neighborhood(radius - 1, include_center=True)
                 )
