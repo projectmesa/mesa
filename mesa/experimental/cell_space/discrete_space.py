@@ -52,7 +52,8 @@ class DiscreteSpace(Generic[T]):
     def cutoff_empties(self):  # noqa
         return 7.953 * len(self._cells) ** 0.384
 
-    def _connect_single_cell(self, cell: T): ...
+    def _connect_single_cell(self, cell: T):
+        ...
 
     @cached_property
     def all_cells(self):
@@ -62,11 +63,11 @@ class DiscreteSpace(Generic[T]):
     def __iter__(self):  # noqa
         return iter(self._cells.values())
 
-    def __getitem__(self, key):  # noqa
+    def __getitem__(self, key: tuple[int, ...]) -> T:  # noqa: D105
         return self._cells[key]
 
     @property
-    def empties(self) -> CellCollection:
+    def empties(self) -> CellCollection[T]:
         """Return all empty in spaces."""
         return self.all_cells.select(lambda cell: cell.is_empty)
 
