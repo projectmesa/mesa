@@ -1,4 +1,5 @@
 """A Network grid."""
+
 from random import Random
 from typing import Any
 

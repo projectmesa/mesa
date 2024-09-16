@@ -1,4 +1,5 @@
 """Support for Voronoi meshed grids."""
+
 from collections.abc import Sequence
 from itertools import combinations
 from random import Random
@@ -161,6 +162,7 @@ def round_float(x: float) -> int:  # noqa
 
 class VoronoiGrid(DiscreteSpace):
     """Voronoi meshed GridSpace."""
+
     triangulation: Delaunay
     voronoi_coordinates: list
     regions: list

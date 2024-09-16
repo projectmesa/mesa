@@ -1,4 +1,5 @@
 """An agent with movement methods for cell spaces."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

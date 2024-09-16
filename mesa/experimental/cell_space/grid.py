@@ -188,6 +188,7 @@ class OrthogonalVonNeumannGrid(Grid[T]):
 
 class HexGrid(Grid[T]):
     """A Grid with hexagonal tilling of the space."""
+
     def _connect_cells_2d(self) -> None:
         # fmt: off
         even_offsets = [
