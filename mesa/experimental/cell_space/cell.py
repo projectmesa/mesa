@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from mesa.agent import Agent
     from mesa.experimental.cell_space.cell_agent import CellAgent
 
+Coordinate = tuple[int, ...]
+
 
 class Cell:
     """The cell represents a position in a discrete space.
@@ -45,7 +47,7 @@ class Cell:
 
     def __init__(
         self,
-        coordinate: tuple[int, ...],
+        coordinate: Coordinate,
         capacity: float | None = None,
         random: Random | None = None,
     ) -> None:
@@ -59,15 +61,15 @@ class Cell:
         """
         super().__init__()
         self.coordinate = coordinate
-        self.connections: dict[str, Cell] = {}
+        self.connections: dict[Coordinate, Cell] = {}
         self.agents: list[
             Agent
         ] = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity = capacity
-        self.properties: dict[str, object] = {}
+        self.properties: dict[Coordinate, object] = {}
         self.random = random
 
-    def connect(self, other: Cell, name: str | None = None) -> None:
+    def connect(self, other: Cell, name: Coordinate | None = None) -> None:
         """Connects this cell to another cell.
 
         Args:
@@ -75,7 +77,7 @@ class Cell:
 
         """
         if name is None:
-            name = str(other.coordinate)
+            name = other.coordinate
         self.connections[name] = other
 
     def disconnect(self, other: Cell) -> None:

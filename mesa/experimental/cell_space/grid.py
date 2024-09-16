@@ -102,7 +102,7 @@ class Grid(DiscreteSpace[T], Generic[T]):
             if self.torus:
                 n_coord = tuple(nc % d for nc, d in zip(n_coord, self.dimensions))
             if all(0 <= nc < d for nc, d in zip(n_coord, self.dimensions)):
-                cell.connect(self._cells[n_coord], f"{d_coord}")
+                cell.connect(self._cells[n_coord], d_coord)
 
     def _connect_single_cell_2d(self, cell: T, offsets: list[tuple[int, int]]) -> None:
         i, j = cell.coordinate
@@ -113,7 +113,7 @@ class Grid(DiscreteSpace[T], Generic[T]):
             if self.torus:
                 ni, nj = ni % height, nj % width
             if 0 <= ni < height and 0 <= nj < width:
-                cell.connect(self._cells[ni, nj], f"{(di, dj)}")
+                cell.connect(self._cells[ni, nj], (di, dj))
 
 
 class OrthogonalMooreGrid(Grid[T]):
