@@ -1,5 +1,4 @@
-"""
-Mesa Time Module
+"""Mesa Time Module
 ================
 
 Objects for handling the time component of a model. In particular, this module
@@ -39,8 +38,7 @@ TimeT = float | int
 
 
 class BaseScheduler:
-    """
-    A simple scheduler that activates agents one at a time, in the order they were added.
+    """A simple scheduler that activates agents one at a time, in the order they were added.
 
     This scheduler is designed to replicate the behavior of the scheduler in MASON, a multi-agent simulation toolkit.
     It assumes that each agent added has a `step` method which takes no arguments and executes the agent's actions.
@@ -79,7 +77,6 @@ class BaseScheduler:
             agent: An Agent to be added to the schedule. NOTE: The agent must
             have a step() method.
         """
-
         if agent not in self._agents:
             self._agents.add(agent)
         else:
@@ -139,8 +136,7 @@ class BaseScheduler:
 
 
 class RandomActivation(BaseScheduler):
-    """
-    A scheduler that activates each agent once per step, in a random order, with the order reshuffled each step.
+    """A scheduler that activates each agent once per step, in a random order, with the order reshuffled each step.
 
     This scheduler is equivalent to the NetLogo 'ask agents...' behavior and is a common default for ABMs.
     It assumes that all agents have a `step` method.
@@ -163,8 +159,7 @@ class RandomActivation(BaseScheduler):
 
 
 class SimultaneousActivation(BaseScheduler):
-    """
-    A scheduler that simulates the simultaneous activation of all agents.
+    """A scheduler that simulates the simultaneous activation of all agents.
 
     This scheduler is unique in that it requires agents to have both `step` and `advance` methods.
     - The `step` method is for activating the agent and staging any changes without applying them immediately.
@@ -189,8 +184,7 @@ class SimultaneousActivation(BaseScheduler):
 
 
 class StagedActivation(BaseScheduler):
-    """
-    A scheduler allowing agent activation to be divided into several stages, with all agents executing one stage
+    """A scheduler allowing agent activation to be divided into several stages, with all agents executing one stage
     before moving on to the next. This class is a generalization of SimultaneousActivation.
 
     This scheduler is useful for complex models where actions need to be broken down into distinct phases
@@ -250,8 +244,7 @@ class StagedActivation(BaseScheduler):
 
 
 class RandomActivationByType(BaseScheduler):
-    """
-    A scheduler that activates each type of agent once per step, in random order, with the order reshuffled every step.
+    """A scheduler that activates each type of agent once per step, in random order, with the order reshuffled every step.
 
     This scheduler is useful for models with multiple types of agents, ensuring that each type is treated
     equitably in terms of activation order. The randomness in activation order helps in reducing biases
@@ -304,8 +297,7 @@ class RandomActivationByType(BaseScheduler):
                     self._agents_by_type[type(agent)] = AgentSet([agent], self.model)
 
     def add(self, agent: Agent) -> None:
-        """
-        Add an Agent object to the schedule
+        """Add an Agent object to the schedule
 
         Args:
             agent: An Agent to be added to the schedule.
@@ -318,10 +310,9 @@ class RandomActivationByType(BaseScheduler):
             self._agents_by_type[type(agent)] = AgentSet([agent], self.model)
 
     def remove(self, agent: Agent) -> None:
-        """
-        Remove all instances of a given agent from the schedule.
+        """Remove all instances of a given agent from the schedule.
 
-        args:
+        Args:
             - agent: An Agent to be removed from the schedule.
 
         """
@@ -329,8 +320,7 @@ class RandomActivationByType(BaseScheduler):
         self._agents_by_type[type(agent)].remove(agent)
 
     def step(self, shuffle_types: bool = True, shuffle_agents: bool = True) -> None:
-        """
-        Executes the step of each agent type, one at a time, in random order.
+        """Executes the step of each agent type, one at a time, in random order.
 
         Args:
             - shuffle_types: If True, the order of execution of each types is shuffled.
@@ -347,8 +337,7 @@ class RandomActivationByType(BaseScheduler):
         self.time += 1
 
     def step_type(self, agenttype: type[Agent], shuffle_agents: bool = True) -> None:
-        """
-        Shuffle order and run all agents of a given type.
+        """Shuffle order and run all agents of a given type.
         This method is equivalent to the NetLogo 'ask [breed]...'.
 
         Args:
@@ -361,23 +350,19 @@ class RandomActivationByType(BaseScheduler):
         agents.do("step")
 
     def get_type_count(self, agenttype: type[Agent]) -> int:
-        """
-        Returns the current number of agents of certain type in the queue.
+        """Returns the current number of agents of certain type in the queue.
         """
         return len(self._agents_by_type[agenttype])
 
 
 class DiscreteEventScheduler(BaseScheduler):
-    """
-    This class has been deprecated and replaced by the functionality provided by experimental.devs
+    """This class has been deprecated and replaced by the functionality provided by experimental.devs
     """
 
     def __init__(self, model: Model, time_step: TimeT = 1) -> None:
-        """
-
-        Args:
-            model (Model): The model to which the schedule belongs
-            time_step (TimeT): The fixed time step between steps
+        """Args:
+        model (Model): The model to which the schedule belongs
+        time_step (TimeT): The fixed time step between steps
 
         """
         super().__init__(model)

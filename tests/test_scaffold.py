@@ -7,8 +7,7 @@ from mesa.main import cli
 
 
 class ScaffoldTest(unittest.TestCase):
-    """
-    Test mesa project scaffolding command
+    """Test mesa project scaffolding command
     """
 
     @classmethod

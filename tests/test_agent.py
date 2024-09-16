@@ -527,7 +527,8 @@ def test_agentset_groupby():
 
 def test_oldstyle_agent_instantiation():
     """Old behavior of Agent creation with unique_id and model as positional arguments.
-    Can be removed/updated in the future."""
+    Can be removed/updated in the future.
+    """
     model = Model()
     agent = Agent("some weird unique id", model)
     assert isinstance(agent.unique_id, int)

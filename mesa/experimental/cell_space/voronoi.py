@@ -9,14 +9,12 @@ from mesa.experimental.cell_space.discrete_space import DiscreteSpace
 
 
 class Delaunay:
-    """
-    Class to compute a Delaunay triangulation in 2D
+    """Class to compute a Delaunay triangulation in 2D
     ref: http://github.com/jmespadero/pyDelaunay2D
     """
 
     def __init__(self, center: tuple = (0, 0), radius: int = 9999) -> None:
-        """
-        Init and create a new frame to contain the triangulation
+        """Init and create a new frame to contain the triangulation
         center: Optional position for the center of the frame. Default (0,0)
         radius: Optional distance from corners to the center.
         """
@@ -44,8 +42,7 @@ class Delaunay:
             self.circles[t] = self._circumcenter(t)
 
     def _circumcenter(self, triangle: list) -> tuple:
-        """
-        Compute circumcenter and circumradius of a triangle in 2D.
+        """Compute circumcenter and circumradius of a triangle in 2D.
         """
         points = np.asarray([self.coords[v] for v in triangle])
         points2 = np.dot(points, points.T)
@@ -60,15 +57,13 @@ class Delaunay:
         return (center, radius)
 
     def _in_circle(self, triangle: list, point: list) -> bool:
-        """
-        Check if point p is inside of precomputed circumcircle of triangle.
+        """Check if point p is inside of precomputed circumcircle of triangle.
         """
         center, radius = self.circles[triangle]
         return np.sum(np.square(center - point)) <= radius
 
     def add_point(self, point: Sequence) -> None:
-        """
-        Add a point to the current DT, and refine it using Bowyer-Watson.
+        """Add a point to the current DT, and refine it using Bowyer-Watson.
         """
         point_index = len(self.coords)
         self.coords.append(np.asarray(point))
@@ -121,8 +116,7 @@ class Delaunay:
             self.triangles[triangle][2] = new_triangles[(i - 1) % n]  # previous
 
     def export_triangles(self) -> list:
-        """
-        Export the current list of Delaunay triangles
+        """Export the current list of Delaunay triangles
         """
         triangles_list = [
             (a - 4, b - 4, c - 4)
@@ -132,8 +126,7 @@ class Delaunay:
         return triangles_list
 
     def export_voronoi_regions(self):
-        """
-        Export coordinates and regions of Voronoi diagram as indexed data.
+        """Export coordinates and regions of Voronoi diagram as indexed data.
         """
         use_vertex = {i: [] for i in range(len(self.coords))}
         vor_coors = []
@@ -181,8 +174,7 @@ class VoronoiGrid(DiscreteSpace):
         capacity_function: callable = round_float,
         cell_coloring_property: str | None = None,
     ) -> None:
-        """
-        A Voronoi Tessellation Grid.
+        """A Voronoi Tessellation Grid.
 
         Given a set of points, this class creates a grid where a cell is centered in each point,
         its neighbors are given by Voronoi Tessellation cells neighbors
@@ -215,8 +207,7 @@ class VoronoiGrid(DiscreteSpace):
         self._build_cell_polygons()
 
     def _connect_cells(self) -> None:
-        """
-        Connect cells to neighbors based on given centroids and using Delaunay Triangulation
+        """Connect cells to neighbors based on given centroids and using Delaunay Triangulation
         """
         self.triangulation = Delaunay()
         for centroid in self.centroids_coordinates:

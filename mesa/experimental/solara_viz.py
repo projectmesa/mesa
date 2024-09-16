@@ -1,5 +1,4 @@
-"""
-Mesa visualization module for creating interactive model visualizations.
+"""Mesa visualization module for creating interactive model visualizations.
 
 This module provides components to create browser- and Jupyter notebook-based visualizations of
 Mesa models, allowing users to watch models run step-by-step and interact with model parameters.
@@ -39,8 +38,7 @@ from mesa.experimental.UserParam import Slider
 def Card(
     model, measures, agent_portrayal, space_drawer, dependencies, color, layout_type
 ):
-    """
-    Create a card component for visualizing model space or measures.
+    """Create a card component for visualizing model space or measures.
 
     Args:
         model: The Mesa model instance
@@ -95,8 +93,7 @@ def SolaraViz(
     play_interval=150,
     seed=None,
 ):
-    """
-    Initialize a component to visualize a model.
+    """Initialize a component to visualize a model.
 
     Args:
         model_class: Class of the model to instantiate
@@ -212,8 +209,7 @@ JupyterViz = SolaraViz
 
 @solara.component
 def ModelController(model, play_interval, current_step, reset_counter):
-    """
-    Create controls for model execution (step, play, pause, reset).
+    """Create controls for model execution (step, play, pause, reset).
 
     Args:
         model: The model being visualized
@@ -315,8 +311,7 @@ def ModelController(model, play_interval, current_step, reset_counter):
 
 
 def split_model_params(model_params):
-    """
-    Split model parameters into user-adjustable and fixed parameters.
+    """Split model parameters into user-adjustable and fixed parameters.
 
     Args:
         model_params: Dictionary of all model parameters
@@ -335,8 +330,7 @@ def split_model_params(model_params):
 
 
 def check_param_is_fixed(param):
-    """
-    Check if a parameter is fixed (not user-adjustable).
+    """Check if a parameter is fixed (not user-adjustable).
 
     Args:
         param: Parameter to check
@@ -354,8 +348,7 @@ def check_param_is_fixed(param):
 
 @solara.component
 def UserInputs(user_params, on_change=None):
-    """
-    Initialize user inputs for configurable model parameters.
+    """Initialize user inputs for configurable model parameters.
     Currently supports :class:`solara.SliderInt`, :class:`solara.SliderFloat`,
     :class:`solara.Select`, and :class:`solara.Checkbox`.
 
@@ -364,7 +357,6 @@ def UserInputs(user_params, on_change=None):
         min and max values, and other fields specific to the input type.
         on_change: Function to be called with (name, value) when the value of an input changes.
     """
-
     for name, options in user_params.items():
 
         def change_handler(value, name=name):
@@ -423,8 +415,7 @@ def UserInputs(user_params, on_change=None):
 
 
 def make_text(renderer):
-    """
-    Create a function that renders text using Markdown.
+    """Create a function that renders text using Markdown.
 
     Args:
         renderer: Function that takes a model and returns a string
@@ -440,8 +431,7 @@ def make_text(renderer):
 
 
 def make_initial_grid_layout(layout_types):
-    """
-    Create an initial grid layout for visualization components.
+    """Create an initial grid layout for visualization components.
 
     Args:
         layout_types: List of layout types (Space or Measure)

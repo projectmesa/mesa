@@ -1,8 +1,21 @@
-# https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
+"""boltmann wealth model for peformance benchmarking.
+
+https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
+"""
+
 import mesa
 
 
 def compute_gini(model):
+    """Calculate gini for wealth in model.
+
+    Args:
+        model: a Model instance
+
+    Returns:
+        float: gini score
+
+    """
     agent_wealths = [agent.wealth for agent in model.agents]
     x = sorted(agent_wealths)
     n = model.num_agents
@@ -19,7 +32,15 @@ class BoltzmannWealth(mesa.Model):
     """
 
     def __init__(self, seed=None, n=100, width=10, height=10):
-        super().__init__()
+        """Initializes the model.
+
+        Args:
+            seed: the seed for random number generator
+            n: the number of agents
+            width: the width of the grid
+            height: the height of the grid
+        """
+        super().__init__(seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.schedule = mesa.time.RandomActivation(self)
@@ -38,11 +59,18 @@ class BoltzmannWealth(mesa.Model):
         self.datacollector.collect(self)
 
     def step(self):
+        """Run the model for a single step."""
         self.agents.shuffle().do("step")
         # collect data
         self.datacollector.collect(self)
 
     def run_model(self, n):
+        """Run the model for n steps.
+
+        Args:
+            n: the number of steps for which to run the model
+
+        """
         for _i in range(n):
             self.step()
 
@@ -51,10 +79,16 @@ class MoneyAgent(mesa.Agent):
     """An agent with fixed initial wealth."""
 
     def __init__(self, model):
+        """Instantiate an agent.
+
+        Args:
+            model: a Model instance
+        """
         super().__init__(model)
         self.wealth = 1
 
     def move(self):
+        """Move the agent to a random neighboring cell."""
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=False
         )
@@ -62,6 +96,7 @@ class MoneyAgent(mesa.Agent):
         self.model.grid.move_agent(self, new_position)
 
     def give_money(self):
+        """"give money to a random cell mate."""
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         cellmates.pop(
             cellmates.index(self)
@@ -72,6 +107,7 @@ class MoneyAgent(mesa.Agent):
             self.wealth -= 1
 
     def step(self):
+        """Run the agent for 1 step."""
         self.move()
         if self.wealth > 0:
             self.give_money()

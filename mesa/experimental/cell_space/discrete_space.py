@@ -60,5 +60,5 @@ class DiscreteSpace(Generic[T]):
         return self.all_cells.select(lambda cell: cell.is_empty)
 
     def select_random_empty_cell(self) -> T:
-        """select random empty cell"""
+        """Select random empty cell"""
         return self.random.choice(list(self.empties))

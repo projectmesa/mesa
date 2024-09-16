@@ -20,8 +20,7 @@ class AgentState(enum.IntEnum):
 
 
 class Citizen(EpsteinAgent):
-    """
-    A member of the general population, may or may not be in active rebellion.
+    """A member of the general population, may or may not be in active rebellion.
     Summary of rule: If grievance - risk > threshold, rebel.
 
     Attributes:
@@ -55,8 +54,8 @@ class Citizen(EpsteinAgent):
         threshold,
         arrest_prob_constant,
     ):
-        """
-        Create a new Citizen.
+        """Create a new Citizen.
+
         Args:
             model : model instance
             hardship: Agent's 'perceived hardship (i.e., physical or economic
@@ -80,8 +79,7 @@ class Citizen(EpsteinAgent):
         self.arrest_prob_constant = arrest_prob_constant
 
     def step(self):
-        """
-        Decide whether to activate, then move if applicable.
+        """Decide whether to activate, then move if applicable.
         """
         self.update_neighbors()
         self.update_estimated_arrest_probability()
@@ -95,8 +93,7 @@ class Citizen(EpsteinAgent):
             self.model.grid.move_agent(self, new_pos)
 
     def update_neighbors(self):
-        """
-        Look around and see who my neighbors are
+        """Look around and see who my neighbors are
         """
         self.neighborhood = self.model.grid.get_neighborhood(
             self.pos, moore=True, radius=self.vision
@@ -107,8 +104,7 @@ class Citizen(EpsteinAgent):
         ]
 
     def update_estimated_arrest_probability(self):
-        """
-        Based on the ratio of cops to actives in my neighborhood, estimate the
+        """Based on the ratio of cops to actives in my neighborhood, estimate the
         p(Arrest | I go active).
         """
         cops_in_vision = len([c for c in self.neighbors if isinstance(c, Cop)])
@@ -131,8 +127,7 @@ class Citizen(EpsteinAgent):
 
 
 class Cop(EpsteinAgent):
-    """
-    A cop for life.  No defection.
+    """A cop for life.  No defection.
     Summary of rule: Inspect local vision and arrest a random active agent.
 
     Attributes:
@@ -147,8 +142,7 @@ class Cop(EpsteinAgent):
         self.max_jail_term = max_jail_term
 
     def step(self):
-        """
-        Inspect local vision and arrest a random active agent. Move if
+        """Inspect local vision and arrest a random active agent. Move if
         applicable.
         """
         self.update_neighbors()
@@ -164,8 +158,7 @@ class Cop(EpsteinAgent):
             self.model.grid.move_agent(self, new_pos)
 
     def update_neighbors(self):
-        """
-        Look around and see who my neighbors are.
+        """Look around and see who my neighbors are.
         """
         self.neighborhood = self.model.grid.get_neighborhood(
             self.pos, moore=True, radius=self.vision
@@ -177,8 +170,7 @@ class Cop(EpsteinAgent):
 
 
 class EpsteinCivilViolence(Model):
-    """
-    Model 1 from "Modeling civil violence: An agent-based computational
+    """Model 1 from "Modeling civil violence: An agent-based computational
     approach," by Joshua Epstein.
     http://www.pnas.org/content/99/suppl_3/7243.full
     Attributes:

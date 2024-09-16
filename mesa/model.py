@@ -1,5 +1,4 @@
-"""
-The model class for Mesa framework.
+"""The model class for Mesa framework.
 
 Core Objects: Model
 """
@@ -119,7 +118,7 @@ class Model:
         return self.agents_by_type[agenttype]
 
     def _setup_agent_registration(self):
-        """helper method to initialize the agent registration datastructures"""
+        """Helper method to initialize the agent registration datastructures"""
         self._agents = {}  # the hard references to all agents in the model
         self._agents_by_type: dict[
             type[Agent], AgentSet
@@ -193,7 +192,6 @@ class Model:
         Args:
             seed: A new seed for the RNG; if None, reset using the current seed
         """
-
         if seed is None:
             seed = self._seed
         self.random.seed(seed)

@@ -64,14 +64,14 @@ class SimulationEvent:
         self.function_kwargs = function_kwargs if function_kwargs else {}
 
     def execute(self):
-        """execute this event"""
+        """Execute this event"""
         if not self._canceled:
             fn = self.fn()
             if fn is not None:
                 fn(*self.function_args, **self.function_kwargs)
 
     def cancel(self) -> None:
-        """cancel this event"""
+        """Cancel this event"""
         self._canceled = True
         self.fn = None
         self.function_args = []
@@ -106,7 +106,6 @@ class EventList:
             event (SimulationEvent): The event to be added
 
         """
-
         heappush(self._events, event)
 
     def peak_ahead(self, n: int = 1) -> list[SimulationEvent]:
@@ -139,7 +138,7 @@ class EventList:
         return peek
 
     def pop_event(self) -> SimulationEvent:
-        """pop the first element from the event list"""
+        """Pop the first element from the event list"""
         while self._events:
             event = heappop(self._events)
             if not event.CANCELED:
@@ -167,7 +166,7 @@ class EventList:
         return f"EventList([{events_str}])"
 
     def remove(self, event: SimulationEvent) -> None:
-        """remove an event from the event list"""
+        """Remove an event from the event list"""
         # we cannot simply remove items from _eventlist because this breaks
         # heap structure invariant. So, we use a form of lazy deletion.
         # SimEvents have a CANCELED flag that we set to True, while popping and peak_ahead

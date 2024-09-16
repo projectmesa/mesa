@@ -1,5 +1,4 @@
-"""
-Mesa Data Collection Module
+"""Mesa Data Collection Module
 ===========================
 
 DataCollector is meant to provide a simple, standard way to collect data
@@ -59,8 +58,7 @@ class DataCollector:
         agent_reporters=None,
         tables=None,
     ):
-        """
-        Instantiate a DataCollector with lists of model and agent reporters.
+        """Instantiate a DataCollector with lists of model and agent reporters.
         Both model_reporters and agent_reporters accept a dictionary mapping a
         variable name to either an attribute name, a function, a method of a class/instance,
         or a function with parameters placed in a list.

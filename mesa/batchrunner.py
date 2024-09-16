@@ -41,12 +41,11 @@ def batch_run(
     display_progress : bool, optional
         Display batch run process, by default True
 
-    Returns
+    Returns:
     -------
     List[Dict[str, Any]]
         [description]
     """
-
     runs_list = []
     run_id = 0
     for iteration in range(iterations):
@@ -88,7 +87,7 @@ def _make_model_kwargs(
     parameters : Mapping[str, Union[Any, Iterable[Any]]]
         Single or multiple values for each model parameter name
 
-    Returns
+    Returns:
     -------
     List[Dict[str, Any]]
         A list of all kwargs combinations.
@@ -128,7 +127,7 @@ def _model_run_func(
     data_collection_period : int
         Number of steps after which data gets collected
 
-    Returns
+    Returns:
     -------
     List[Dict[str, Any]]
         Return model_data, agent_data from the reporters

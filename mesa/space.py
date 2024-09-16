@@ -1,5 +1,4 @@
-"""
-Mesa Space Module
+"""Mesa Space Module
 =================
 
 Objects used to add a spatial component to a model.
@@ -56,7 +55,8 @@ F = TypeVar("F", bound=Callable[..., Any])
 def accept_tuple_argument(wrapped_function: F) -> F:
     """Decorator to allow grid methods that take a list of (x, y) coord tuples
     to also handle a single position, by automatically wrapping tuple in
-    single-item list rather than forcing user to do it."""
+    single-item list rather than forcing user to do it.
+    """
 
     def wrapper(grid_instance, positions) -> Any:
         if len(positions) == 2 and not isinstance(positions[0], tuple):
@@ -159,7 +159,6 @@ class _Grid:
 
     def __getitem__(self, index):
         """Access contents from the grid."""
-
         if isinstance(index, int):
             # grid[x]
             return self._grid[index]
@@ -193,7 +192,8 @@ class _Grid:
 
     def __iter__(self) -> Iterator[GridContent]:
         """Create an iterator that chains the rows of the grid together
-        as if it is one list:"""
+        as if it is one list:
+        """
         return itertools.chain(*self._grid)
 
     def coord_iter(self) -> Iterator[tuple[GridContent, Coordinate]]:
@@ -382,7 +382,8 @@ class _Grid:
 
     def out_of_bounds(self, pos: Coordinate) -> bool:
         """Determines whether position is off the grid, returns the out of
-        bounds coordinate."""
+        bounds coordinate.
+        """
         x, y = pos
         return x < 0 or x >= self.width or y < 0 or y >= self.height
 
@@ -441,8 +442,7 @@ class _Grid:
         selection: str = "random",
         handle_empty: str | None = None,
     ) -> None:
-        """
-        Move an agent to one of the given positions.
+        """Move an agent to one of the given positions.
 
         Args:
             agent: Agent object to move. Assumed to have its current location stored in a 'pos' tuple.
@@ -494,8 +494,7 @@ class _Grid:
             )
 
     def _distance_squared(self, pos1: Coordinate, pos2: Coordinate) -> float:
-        """
-        Calculate the squared Euclidean distance between two points for performance.
+        """Calculate the squared Euclidean distance between two points for performance.
         """
         # Use squared Euclidean distance to avoid sqrt operation
         dx, dy = abs(pos1[0] - pos2[0]), abs(pos1[1] - pos2[1])
@@ -573,8 +572,7 @@ def ufunc_requires_additional_input(ufunc):
 
 
 class PropertyLayer:
-    """
-    A class representing a layer of properties in a two-dimensional grid. Each cell in the grid
+    """A class representing a layer of properties in a two-dimensional grid. Each cell in the grid
     can store a value of a specified data type.
 
     Attributes:
@@ -597,8 +595,7 @@ class PropertyLayer:
     def __init__(
         self, name: str, width: int, height: int, default_value, dtype=np.float64
     ):
-        """
-        Initializes a new PropertyLayer instance.
+        """Initializes a new PropertyLayer instance.
 
         Args:
             name (str): The name of the property layer.
@@ -649,14 +646,12 @@ class PropertyLayer:
             self.__class__.propertylayer_experimental_warning_given = True
 
     def set_cell(self, position: Coordinate, value):
-        """
-        Update a single cell's value in-place.
+        """Update a single cell's value in-place.
         """
         self.data[position] = value
 
     def set_cells(self, value, condition=None):
-        """
-        Perform a batch update either on the entire grid or conditionally, in-place.
+        """Perform a batch update either on the entire grid or conditionally, in-place.
 
         Args:
             value: The value to be used for the update.
@@ -685,8 +680,7 @@ class PropertyLayer:
             np.copyto(self.data, value, where=condition_result)
 
     def modify_cell(self, position: Coordinate, operation, value=None):
-        """
-        Modify a single cell using an operation, which can be a lambda function or a NumPy ufunc.
+        """Modify a single cell using an operation, which can be a lambda function or a NumPy ufunc.
         If a NumPy ufunc is used, an additional value should be provided.
 
         Args:
@@ -707,8 +701,7 @@ class PropertyLayer:
             raise ValueError("Invalid operation or missing value for NumPy ufunc.")
 
     def modify_cells(self, operation, value=None, condition_function=None):
-        """
-        Modify cells using an operation, which can be a lambda function or a NumPy ufunc.
+        """Modify cells using an operation, which can be a lambda function or a NumPy ufunc.
         If a NumPy ufunc is used, an additional value should be provided.
 
         Args:
@@ -742,8 +735,7 @@ class PropertyLayer:
         self.data = np.where(condition_array, modified_data, self.data)
 
     def select_cells(self, condition, return_list=True):
-        """
-        Find cells that meet a specified condition using NumPy's boolean indexing, in-place.
+        """Find cells that meet a specified condition using NumPy's boolean indexing, in-place.
 
         Args:
             condition: A callable that returns a boolean array when applied to the data.
@@ -768,8 +760,7 @@ class PropertyLayer:
 
 
 class _PropertyGrid(_Grid):
-    """
-    A private subclass of _Grid that supports the addition of property layers, enabling
+    """A private subclass of _Grid that supports the addition of property layers, enabling
     the representation and manipulation of additional data layers on the grid. This class is
     intended for internal use within the Mesa framework and is currently utilized by SingleGrid
     and MultiGrid classes to provide enhanced grid functionality.
@@ -809,8 +800,7 @@ class _PropertyGrid(_Grid):
         torus: bool,
         property_layers: None | PropertyLayer | list[PropertyLayer] = None,
     ):
-        """
-        Initializes a new _PropertyGrid instance with specified dimensions and optional property layers.
+        """Initializes a new _PropertyGrid instance with specified dimensions and optional property layers.
 
         Args:
             width (int): The width of the grid (number of columns).
@@ -839,15 +829,13 @@ class _PropertyGrid(_Grid):
 
     @property
     def empty_mask(self) -> np.ndarray:
-        """
-        Returns a boolean mask indicating empty cells on the grid.
+        """Returns a boolean mask indicating empty cells on the grid.
         """
         return self._empty_mask
 
     # Add and remove properties to the grid
     def add_property_layer(self, property_layer: PropertyLayer):
-        """
-        Adds a new property layer to the grid.
+        """Adds a new property layer to the grid.
 
         Args:
             property_layer (PropertyLayer): The PropertyLayer instance to be added to the grid.
@@ -865,8 +853,7 @@ class _PropertyGrid(_Grid):
         self.properties[property_layer.name] = property_layer
 
     def remove_property_layer(self, property_name: str):
-        """
-        Removes a property layer from the grid by its name.
+        """Removes a property layer from the grid by its name.
 
         Args:
             property_name (str): The name of the property layer to be removed.
@@ -881,8 +868,7 @@ class _PropertyGrid(_Grid):
     def get_neighborhood_mask(
         self, pos: Coordinate, moore: bool, include_center: bool, radius: int
     ) -> np.ndarray:
-        """
-        Generate a boolean mask representing the neighborhood.
+        """Generate a boolean mask representing the neighborhood.
         Helper method for select_cells_multi_properties() and move_agent_to_random_cell()
 
         Args:
@@ -910,8 +896,7 @@ class _PropertyGrid(_Grid):
         only_empty: bool = False,
         return_list: bool = True,
     ) -> list[Coordinate] | np.ndarray:
-        """
-        Select cells based on property conditions, extreme values, and/or masks, with an option to only select empty cells.
+        """Select cells based on property conditions, extreme values, and/or masks, with an option to only select empty cells.
 
         Args:
             conditions (dict): A dictionary where keys are property names and values are callables that return a boolean when applied.

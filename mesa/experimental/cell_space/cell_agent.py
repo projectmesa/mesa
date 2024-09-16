@@ -11,7 +11,6 @@ if TYPE_CHECKING:
 class CellAgent(Agent):
     """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces
 
-
     Attributes:
         unique_id (int): A unique identifier for this agent.
         model (Model): The model instance to which the agent belongs
@@ -20,8 +19,7 @@ class CellAgent(Agent):
     """
 
     def __init__(self, model: Model) -> None:
-        """
-        Create a new agent.
+        """Create a new agent.
 
         Args:
             unique_id (int): A unique identifier for this agent.

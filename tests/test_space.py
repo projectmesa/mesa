@@ -26,19 +26,16 @@ TEST_AGENTS_PERF = 200000
 
 @pytest.mark.skip(reason="a perf test will slow down the CI")
 class TestSpacePerformance(unittest.TestCase):
-    """
-    Testing adding many agents for a continuous space.
+    """Testing adding many agents for a continuous space.
     """
 
     def setUp(self):
-        """
-        Create a test space and populate with Mock Agents.
+        """Create a test space and populate with Mock Agents.
         """
         self.space = ContinuousSpace(10, 10, True, -10, -10)
 
     def test_agents_add_many(self):
-        """
-        Add many agents
+        """Add many agents
         """
         positions = np.random.rand(TEST_AGENTS_PERF, 2)
         for i in range(TEST_AGENTS_PERF):
@@ -48,13 +45,11 @@ class TestSpacePerformance(unittest.TestCase):
 
 
 class TestSpaceToroidal(unittest.TestCase):
-    """
-    Testing a toroidal continuous space.
+    """Testing a toroidal continuous space.
     """
 
     def setUp(self):
-        """
-        Create a test space and populate with Mock Agents.
+        """Create a test space and populate with Mock Agents.
         """
         self.space = ContinuousSpace(70, 20, True, -30, -30)
         self.agents = []
@@ -64,24 +59,21 @@ class TestSpaceToroidal(unittest.TestCase):
             self.space.place_agent(a, pos)
 
     def test_agent_positions(self):
-        """
-        Ensure that the agents are all placed properly.
+        """Ensure that the agents are all placed properly.
         """
         for i, pos in enumerate(TEST_AGENTS):
             a = self.agents[i]
             assert a.pos == pos
 
     def test_agent_matching(self):
-        """
-        Ensure that the agents are all placed and indexed properly.
+        """Ensure that the agents are all placed and indexed properly.
         """
         for i, agent in self.space._index_to_agent.items():
             assert agent.pos == tuple(self.space._agent_points[i, :])
             assert i == self.space._agent_to_index[agent]
 
     def test_distance_calculations(self):
-        """
-        Test toroidal distance calculations.
+        """Test toroidal distance calculations.
         """
         pos_1 = (-30, -30)
         pos_2 = (70, 20)
@@ -108,8 +100,7 @@ class TestSpaceToroidal(unittest.TestCase):
         self.assertEqual((10, 0), self.space.get_heading(pos_1, pos_2))
 
     def test_neighborhood_retrieval(self):
-        """
-        Test neighborhood retrieval
+        """Test neighborhood retrieval
         """
         neighbors_1 = self.space.get_neighbors((-20, -20), 1)
         assert len(neighbors_1) == 2
@@ -121,8 +112,7 @@ class TestSpaceToroidal(unittest.TestCase):
         assert len(neighbors_3) == 1
 
     def test_bounds(self):
-        """
-        Test positions outside of boundary
+        """Test positions outside of boundary
         """
         boundary_agents = []
         for i, pos in enumerate(OUTSIDE_POSITIONS):
@@ -141,13 +131,11 @@ class TestSpaceToroidal(unittest.TestCase):
 
 
 class TestSpaceNonToroidal(unittest.TestCase):
-    """
-    Testing a toroidal continuous space.
+    """Testing a toroidal continuous space.
     """
 
     def setUp(self):
-        """
-        Create a test space and populate with Mock Agents.
+        """Create a test space and populate with Mock Agents.
         """
         self.space = ContinuousSpace(70, 20, False, -30, -30)
         self.agents = []
@@ -157,26 +145,22 @@ class TestSpaceNonToroidal(unittest.TestCase):
             self.space.place_agent(a, pos)
 
     def test_agent_positions(self):
-        """
-        Ensure that the agents are all placed properly.
+        """Ensure that the agents are all placed properly.
         """
         for i, pos in enumerate(TEST_AGENTS):
             a = self.agents[i]
             assert a.pos == pos
 
     def test_agent_matching(self):
-        """
-        Ensure that the agents are all placed and indexed properly.
+        """Ensure that the agents are all placed and indexed properly.
         """
         for i, agent in self.space._index_to_agent.items():
             assert agent.pos == tuple(self.space._agent_points[i, :])
             assert i == self.space._agent_to_index[agent]
 
     def test_distance_calculations(self):
+        """Test toroidal distance calculations.
         """
-        Test toroidal distance calculations.
-        """
-
         pos_2 = (70, 20)
         pos_3 = (-30, -20)
         assert self.space.get_distance(pos_2, pos_3) == 107.70329614269008
@@ -191,8 +175,7 @@ class TestSpaceNonToroidal(unittest.TestCase):
         self.assertEqual((-90, 0), self.space.get_heading(pos_1, pos_2))
 
     def test_neighborhood_retrieval(self):
-        """
-        Test neighborhood retrieval
+        """Test neighborhood retrieval
         """
         neighbors_1 = self.space.get_neighbors((-20, -20), 1)
         assert len(neighbors_1) == 2
@@ -204,8 +187,7 @@ class TestSpaceNonToroidal(unittest.TestCase):
         assert len(neighbors_3) == 0
 
     def test_bounds(self):
-        """
-        Test positions outside of boundary
+        """Test positions outside of boundary
         """
         for i, pos in enumerate(OUTSIDE_POSITIONS):
             a = MockAgent(len(self.agents) + i)
@@ -220,13 +202,11 @@ class TestSpaceNonToroidal(unittest.TestCase):
 
 
 class TestSpaceAgentMapping(unittest.TestCase):
-    """
-    Testing a continuous space for agent mapping during removal.
+    """Testing a continuous space for agent mapping during removal.
     """
 
     def setUp(self):
-        """
-        Create a test space and populate with Mock Agents.
+        """Create a test space and populate with Mock Agents.
         """
         self.space = ContinuousSpace(70, 50, False, -30, -30)
         self.agents = []
@@ -236,8 +216,7 @@ class TestSpaceAgentMapping(unittest.TestCase):
             self.space.place_agent(a, pos)
 
     def test_remove_first(self):
-        """
-        Test removing the first entry
+        """Test removing the first entry
         """
         agent_to_remove = self.agents[0]
         self.space.remove_agent(agent_to_remove)
@@ -250,8 +229,7 @@ class TestSpaceAgentMapping(unittest.TestCase):
             self.space.remove_agent(agent_to_remove)
 
     def test_remove_last(self):
-        """
-        Test removing the last entry
+        """Test removing the last entry
         """
         agent_to_remove = self.agents[-1]
         self.space.remove_agent(agent_to_remove)
@@ -264,8 +242,7 @@ class TestSpaceAgentMapping(unittest.TestCase):
             self.space.remove_agent(agent_to_remove)
 
     def test_remove_middle(self):
-        """
-        Test removing a middle entry
+        """Test removing a middle entry
         """
         agent_to_remove = self.agents[3]
         self.space.remove_agent(agent_to_remove)
@@ -447,8 +424,7 @@ class TestSingleGrid(unittest.TestCase):
             self.space.place_agent(a, pos)
 
     def test_agent_positions(self):
-        """
-        Ensure that the agents are all placed properly.
+        """Ensure that the agents are all placed properly.
         """
         for i, pos in enumerate(TEST_AGENTS_GRID):
             a = self.agents[i]
@@ -541,8 +517,7 @@ class TestSingleGrid(unittest.TestCase):
         assert self.space._distance_squared(pos1, pos2) == expected_distance_squared
 
     def test_iter_cell_list_contents(self):
-        """
-        Test neighborhood retrieval
+        """Test neighborhood retrieval
         """
         cell_list_1 = list(self.space.iter_cell_list_contents(TEST_AGENTS_GRID[0]))
         assert len(cell_list_1) == 1
@@ -865,8 +840,7 @@ class TestSingleNetworkGrid(unittest.TestCase):
     GRAPH_SIZE = 10
 
     def setUp(self):
-        """
-        Create a test network grid and populate with Mock Agents.
+        """Create a test network grid and populate with Mock Agents.
         """
         G = nx.cycle_graph(TestSingleNetworkGrid.GRAPH_SIZE)  # noqa: N806
         self.space = NetworkGrid(G)
@@ -877,8 +851,7 @@ class TestSingleNetworkGrid(unittest.TestCase):
             self.space.place_agent(a, pos)
 
     def test_agent_positions(self):
-        """
-        Ensure that the agents are all placed properly.
+        """Ensure that the agents are all placed properly.
         """
         for i, pos in enumerate(TEST_AGENTS_NETWORK_SINGLE):
             a = self.agents[i]
@@ -891,8 +864,7 @@ class TestSingleNetworkGrid(unittest.TestCase):
         assert len(self.space.get_neighborhood(2, include_center=False, radius=3)) == 6
 
     def test_get_neighbors(self):
-        """
-        Test the get_neighbors method with varying radius and include_center values. Note there are agents on node 0, 1 and 5.
+        """Test the get_neighbors method with varying radius and include_center values. Note there are agents on node 0, 1 and 5.
         """
         # Test with default radius (1) and include_center = False
         neighbors_default = self.space.get_neighbors(0, include_center=False)
@@ -978,8 +950,7 @@ class TestMultipleNetworkGrid(unittest.TestCase):
     GRAPH_SIZE = 3
 
     def setUp(self):
-        """
-        Create a test network grid and populate with Mock Agents.
+        """Create a test network grid and populate with Mock Agents.
         """
         G = nx.complete_graph(TestMultipleNetworkGrid.GRAPH_SIZE)  # noqa: N806
         self.space = NetworkGrid(G)
@@ -990,8 +961,7 @@ class TestMultipleNetworkGrid(unittest.TestCase):
             self.space.place_agent(a, pos)
 
     def test_agent_positions(self):
-        """
-        Ensure that the agents are all placed properly.
+        """Ensure that the agents are all placed properly.
         """
         for i, pos in enumerate(TEST_AGENTS_NETWORK_MULTIPLE):
             a = self.agents[i]

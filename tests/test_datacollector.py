@@ -1,5 +1,4 @@
-"""
-Test the DataCollector
+"""Test the DataCollector
 """
 
 import unittest
@@ -9,8 +8,7 @@ from mesa.time import BaseScheduler
 
 
 class MockAgent(Agent):
-    """
-    Minimalistic agent for testing purposes.
+    """Minimalistic agent for testing purposes.
     """
 
     def __init__(self, model, val=0):
@@ -19,8 +17,7 @@ class MockAgent(Agent):
         self.val2 = val
 
     def step(self):
-        """
-        Increment vals by 1.
+        """Increment vals by 1.
         """
         self.val += 1
         self.val2 += 1
@@ -29,8 +26,7 @@ class MockAgent(Agent):
         return self.val * 2
 
     def write_final_values(self):
-        """
-        Write the final value to the appropriate table.
+        """Write the final value to the appropriate table.
         """
         row = {"agent_id": self.unique_id, "final_value": self.val}
         self.model.datacollector.add_table_row("Final_Values", row)
@@ -41,8 +37,7 @@ def agent_function_with_params(agent, multiplier, offset):
 
 
 class MockModel(Model):
-    """
-    Minimalistic model for testing purposes.
+    """Minimalistic model for testing purposes.
     """
 
     schedule = BaseScheduler(None)
@@ -86,8 +81,7 @@ class MockModel(Model):
 
 class TestDataCollector(unittest.TestCase):
     def setUp(self):
-        """
-        Create the model and run it a set number of steps.
+        """Create the model and run it a set number of steps.
         """
         self.model = MockModel()
         for i in range(7):
@@ -107,8 +101,7 @@ class TestDataCollector(unittest.TestCase):
                 assert element == 9
 
     def test_model_vars(self):
-        """
-        Test model-level variable collection.
+        """Test model-level variable collection.
         """
         data_collector = self.model.datacollector
         assert "total_agents" in data_collector.model_vars
@@ -131,8 +124,7 @@ class TestDataCollector(unittest.TestCase):
             assert element is None
 
     def test_agent_records(self):
-        """
-        Test agent-level variable collection.
+        """Test agent-level variable collection.
         """
         data_collector = self.model.datacollector
         agent_table = data_collector.get_agent_vars_dataframe()
@@ -168,8 +160,7 @@ class TestDataCollector(unittest.TestCase):
             data_collector._agent_records[8]
 
     def test_table_rows(self):
-        """
-        Test table collection
+        """Test table collection
         """
         data_collector = self.model.datacollector
         assert len(data_collector.tables["Final_Values"]) == 2
@@ -185,8 +176,7 @@ class TestDataCollector(unittest.TestCase):
             data_collector.add_table_row("Final_Values", {"final_value": 10})
 
     def test_exports(self):
-        """
-        Test DataFrame exports
+        """Test DataFrame exports
         """
         data_collector = self.model.datacollector
         model_vars = data_collector.get_model_vars_dataframe()

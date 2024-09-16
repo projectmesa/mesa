@@ -9,11 +9,9 @@ class UserParam:
 
 
 class Slider(UserParam):
-    """
-    A number-based slider input with settable increment.
+    """A number-based slider input with settable increment.
 
     Example:
-
     slider_option = Slider("My Slider", value=123, min=10, max=200, step=0.1)
 
     Args:

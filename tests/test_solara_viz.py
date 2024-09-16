@@ -61,7 +61,7 @@ class TestMakeUserInput(unittest.TestCase):
         assert checkbox.label == options["label"]
 
     def test_label_fallback(self):
-        """name should be used as fallback label"""
+        """Name should be used as fallback label"""
 
         @solara.component
         def Test(user_params):

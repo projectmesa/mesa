@@ -1,5 +1,4 @@
-"""
-Wolf-Sheep Predation Model
+"""Wolf-Sheep Predation Model
 ================================
 
 Replication of the model found in NetLogo:
@@ -57,8 +56,7 @@ class Animal(mesa.Agent):
 
 
 class Sheep(Animal):
-    """
-    A sheep that walks around, reproduces (asexually) and gets eaten.
+    """A sheep that walks around, reproduces (asexually) and gets eaten.
 
     The init is the same as the RandomWalker.
     """
@@ -73,8 +71,7 @@ class Sheep(Animal):
 
 
 class Wolf(Animal):
-    """
-    A wolf that walks around, reproduces (asexually) and eats sheep.
+    """A wolf that walks around, reproduces (asexually) and eats sheep.
     """
 
     def feed(self):
@@ -89,8 +86,7 @@ class Wolf(Animal):
 
 
 class GrassPatch(mesa.Agent):
-    """
-    A patch of grass that grows at a fixed rate and it is eaten by sheep
+    """A patch of grass that grows at a fixed rate and it is eaten by sheep
     """
 
     @property
@@ -109,8 +105,7 @@ class GrassPatch(mesa.Agent):
             )
 
     def __init__(self, model, fully_grown, countdown, grass_regrowth_time):
-        """
-        Creates a new patch of grass
+        """Creates a new patch of grass
 
         Args:
             grown: (boolean) Whether the patch of grass is fully grown or not
@@ -130,8 +125,7 @@ class GrassPatch(mesa.Agent):
 
 
 class WolfSheep(mesa.Model):
-    """
-    Wolf-Sheep Predation Model
+    """Wolf-Sheep Predation Model
 
     A model for simulating wolf and sheep (predator-prey) ecosystem modelling.
     """
@@ -151,8 +145,7 @@ class WolfSheep(mesa.Model):
         simulator=None,
         seed=None,
     ):
-        """
-        Create a new Wolf-Sheep model with the given parameters.
+        """Create a new Wolf-Sheep model with the given parameters.
 
         Args:
             initial_sheep: Number of sheep to start with

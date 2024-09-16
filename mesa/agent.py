@@ -1,5 +1,4 @@
-"""
-The agent class for Mesa framework.
+"""The agent class for Mesa framework.
 
 Core Objects: Agent
 """
@@ -30,8 +29,7 @@ if TYPE_CHECKING:
 
 
 class Agent:
-    """
-    Base class for a model agent in Mesa.
+    """Base class for a model agent in Mesa.
 
     Attributes:
         - model (Model): A reference to the model instance.
@@ -49,8 +47,7 @@ class Agent:
     _ids = defaultdict(functools.partial(itertools.count, 1))
 
     def __init__(self, *args, **kwargs) -> None:
-        """
-        Create a new agent.
+        """Create a new agent.
 
         Args:
             model (Model): The model instance in which the agent exists.
@@ -98,8 +95,7 @@ class Agent:
 
 
 class AgentSet(MutableSet, Sequence):
-    """
-    A collection class that represents an ordered set of agents within an agent-based model (ABM). This class
+    """A collection class that represents an ordered set of agents within an agent-based model (ABM). This class
     extends both MutableSet and Sequence, providing set-like functionality with order preservation and
     sequence operations.
 
@@ -114,14 +110,12 @@ class AgentSet(MutableSet, Sequence):
     """
 
     def __init__(self, agents: Iterable[Agent], model: Model):
-        """
-        Initializes the AgentSet with a collection of agents and a reference to the model.
+        """Initializes the AgentSet with a collection of agents and a reference to the model.
 
         Args:
             agents (Iterable[Agent]): An iterable of Agent objects to be included in the set.
             model (Model): The ABM model instance to which this AgentSet belongs.
         """
-
         self.model = model
         self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
 
@@ -145,8 +139,7 @@ class AgentSet(MutableSet, Sequence):
         agent_type: type[Agent] | None = None,
         n: int | None = None,
     ) -> AgentSet:
-        """
-        Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
+        """Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
 
         Args:
             filter_func (Callable[[Agent], bool], optional): A function that takes an Agent and returns True if the
@@ -196,8 +189,7 @@ class AgentSet(MutableSet, Sequence):
         return AgentSet(agents, self.model) if not inplace else self._update(agents)
 
     def shuffle(self, inplace: bool = False) -> AgentSet:
-        """
-        Randomly shuffle the order of agents in the AgentSet.
+        """Randomly shuffle the order of agents in the AgentSet.
 
         Args:
             inplace (bool, optional): If True, shuffles the agents in the current AgentSet; otherwise, returns a new shuffled AgentSet. Defaults to False.
@@ -226,8 +218,7 @@ class AgentSet(MutableSet, Sequence):
         ascending: bool = False,
         inplace: bool = False,
     ) -> AgentSet:
-        """
-        Sort the agents in the AgentSet based on a specified attribute or custom function.
+        """Sort the agents in the AgentSet based on a specified attribute or custom function.
 
         Args:
             key (Callable[[Agent], Any] | str): A function or attribute name based on which the agents are sorted.
@@ -252,13 +243,11 @@ class AgentSet(MutableSet, Sequence):
         """Update the AgentSet with a new set of agents.
         This is a private method primarily used internally by other methods like select, shuffle, and sort.
         """
-
         self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
         return self
 
     def do(self, method: str | Callable, *args, **kwargs) -> AgentSet:
-        """
-        Invoke a method or function on each agent in the AgentSet.
+        """Invoke a method or function on each agent in the AgentSet.
 
         Args:
             method (str, callable): the callable to do on each agent
@@ -299,8 +288,7 @@ class AgentSet(MutableSet, Sequence):
         return self
 
     def map(self, method: str | Callable, *args, **kwargs) -> list[Any]:
-        """
-        Invoke a method or function on each agent in the AgentSet and return the results.
+        """Invoke a method or function on each agent in the AgentSet and return the results.
 
         Args:
             method (str, callable): the callable to apply on each agent
@@ -331,8 +319,7 @@ class AgentSet(MutableSet, Sequence):
         return res
 
     def agg(self, attribute: str, func: Callable) -> Any:
-        """
-        Aggregate an attribute of all agents in the AgentSet using a specified function.
+        """Aggregate an attribute of all agents in the AgentSet using a specified function.
 
         Args:
             attribute (str): The name of the attribute to aggregate.
@@ -366,8 +353,7 @@ class AgentSet(MutableSet, Sequence):
         handle_missing="error",
         default_value=None,
     ):
-        """
-        Retrieve the specified attribute(s) from each agent in the AgentSet.
+        """Retrieve the specified attribute(s) from each agent in the AgentSet.
 
         Args:
             attr_names (str | list[str]): The name(s) of the attribute(s) to retrieve from each agent.
@@ -414,8 +400,7 @@ class AgentSet(MutableSet, Sequence):
             )
 
     def set(self, attr_name: str, value: Any) -> AgentSet:
-        """
-        Set a specified attribute to a given value for all agents in the AgentSet.
+        """Set a specified attribute to a given value for all agents in the AgentSet.
 
         Args:
             attr_name (str): The name of the attribute to set.
@@ -429,8 +414,7 @@ class AgentSet(MutableSet, Sequence):
         return self
 
     def __getitem__(self, item: int | slice) -> Agent:
-        """
-        Retrieve an agent or a slice of agents from the AgentSet.
+        """Retrieve an agent or a slice of agents from the AgentSet.
 
         Args:
             item (int | slice): The index or slice for selecting agents.
@@ -441,8 +425,7 @@ class AgentSet(MutableSet, Sequence):
         return list(self._agents.keys())[item]
 
     def add(self, agent: Agent):
-        """
-        Add an agent to the AgentSet.
+        """Add an agent to the AgentSet.
 
         Args:
             agent (Agent): The agent to add to the set.
@@ -453,8 +436,7 @@ class AgentSet(MutableSet, Sequence):
         self._agents[agent] = None
 
     def discard(self, agent: Agent):
-        """
-        Remove an agent from the AgentSet if it exists.
+        """Remove an agent from the AgentSet if it exists.
 
         This method does not raise an error if the agent is not present.
 
@@ -468,8 +450,7 @@ class AgentSet(MutableSet, Sequence):
             del self._agents[agent]
 
     def remove(self, agent: Agent):
-        """
-        Remove an agent from the AgentSet.
+        """Remove an agent from the AgentSet.
 
         This method raises an error if the agent is not present.
 
@@ -482,8 +463,7 @@ class AgentSet(MutableSet, Sequence):
         del self._agents[agent]
 
     def __getstate__(self):
-        """
-        Retrieve the state of the AgentSet for serialization.
+        """Retrieve the state of the AgentSet for serialization.
 
         Returns:
             dict: A dictionary representing the state of the AgentSet.
@@ -491,8 +471,7 @@ class AgentSet(MutableSet, Sequence):
         return {"agents": list(self._agents.keys()), "model": self.model}
 
     def __setstate__(self, state):
-        """
-        Set the state of the AgentSet during deserialization.
+        """Set the state of the AgentSet during deserialization.
 
         Args:
             state (dict): A dictionary representing the state to restore.
@@ -502,8 +481,7 @@ class AgentSet(MutableSet, Sequence):
 
     @property
     def random(self) -> Random:
-        """
-        Provide access to the model's random number generator.
+        """Provide access to the model's random number generator.
 
         Returns:
             Random: The random number generator associated with the model.
@@ -511,8 +489,7 @@ class AgentSet(MutableSet, Sequence):
         return self.model.random
 
     def groupby(self, by: Callable | str, result_type: str = "agentset") -> GroupBy:
-        """
-        Group agents by the specified attribute or return from the callable
+        """Group agents by the specified attribute or return from the callable
 
         Args:
             by (Callable, str): used to determine what to group agents by
@@ -522,6 +499,7 @@ class AgentSet(MutableSet, Sequence):
                                 * if ``by`` is a str, it should refer to an attribute on the agent and the value
                                   of this attribute will be used for grouping
             result_type (str, optional): The datatype for the resulting groups {"agentset", "list"}
+
         Returns:
             GroupBy
 
@@ -554,7 +532,6 @@ class AgentSet(MutableSet, Sequence):
 
 class GroupBy:
     """Helper class for AgentSet.groupby
-
 
     Attributes:
         groups (dict): A dictionary with the group_name as key and group as values

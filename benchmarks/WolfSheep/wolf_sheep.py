@@ -1,6 +1,4 @@
-"""
-Wolf-Sheep Predation Model
-================================
+"""Wolf-Sheep Predation Model for peformance benchmarking.
 
 Replication of the model found in NetLogo:
     Wilensky, U. (1997). NetLogo Wolf Sheep Predation model.
@@ -17,16 +15,27 @@ from mesa.experimental.devs import ABMSimulator
 
 
 class Animal(CellAgent):
+    """The base animal class."""
     def __init__(self, model, energy, p_reproduce, energy_from_food):
+        """Initializes an animal.
+
+        Args:
+            model: a model instance
+            energy: starting amount of energy
+            p_reproduce: probability of sexless reproduction
+            energy_from_food: energy obtained from 1 unit of food
+        """
         super().__init__(model)
         self.energy = energy
         self.p_reproduce = p_reproduce
         self.energy_from_food = energy_from_food
 
     def random_move(self):
+        """Move to a random neighboring cell."""
         self.move_to(self.cell.neighborhood().select_random_cell())
 
     def spawn_offspring(self):
+        """Create offspring."""
         self.energy /= 2
         offspring = self.__class__(
             self.model,
@@ -36,13 +45,16 @@ class Animal(CellAgent):
         )
         offspring.move_to(self.cell)
 
-    def feed(self): ...
+
+    def feed(self): ...  # noqa D102
 
     def die(self):
+        """Die."""
         self.cell.remove_agent(self)
         self.remove()
 
     def step(self):
+        """One step of the agent."""
         self.random_move()
         self.energy -= 1
 
@@ -55,13 +67,10 @@ class Animal(CellAgent):
 
 
 class Sheep(Animal):
-    """
-    A sheep that walks around, reproduces (asexually) and gets eaten.
-
-    The init is the same as the RandomWalker.
-    """
+    """A sheep that walks around, reproduces (asexually) and gets eaten."""
 
     def feed(self):
+        """If possibile eat the food in the current location."""
         # If there is grass available, eat it
         grass_patch = next(
             obj for obj in self.cell.agents if isinstance(obj, GrassPatch)
@@ -72,11 +81,10 @@ class Sheep(Animal):
 
 
 class Wolf(Animal):
-    """
-    A wolf that walks around, reproduces (asexually) and eats sheep.
-    """
+    """A wolf that walks around, reproduces (asexually) and eats sheep."""
 
     def feed(self):
+        """If possbile eat the food in the current location."""
         sheep = [obj for obj in self.cell.agents if isinstance(obj, Sheep)]
         if len(sheep) > 0:
             sheep_to_eat = self.random.choice(sheep)
@@ -87,12 +95,10 @@ class Wolf(Animal):
 
 
 class GrassPatch(CellAgent):
-    """
-    A patch of grass that grows at a fixed rate and it is eaten by sheep
-    """
+    """A patch of grass that grows at a fixed rate and it is eaten by sheep."""
 
     @property
-    def fully_grown(self):
+    def fully_grown(self):  # noqa D102
         return self._fully_grown
 
     @fully_grown.setter
@@ -107,17 +113,15 @@ class GrassPatch(CellAgent):
             )
 
     def __init__(self, model, fully_grown, countdown, grass_regrowth_time):
-        """
-        TODO:: fully grown can just be an int --> so one less param (i.e. countdown)
-
-        Creates a new patch of grass
+        """Creates a new patch of grass.
 
         Args:
+            model: a model instance
             fully_grown: (boolean) Whether the patch of grass is fully grown or not
             countdown: Time for the patch of grass to be fully grown again
             grass_regrowth_time : time to fully regrow grass
-            countdown : Time for the patch of grass to be fully regrown if fully grown is False
         """
+        # TODO:: fully grown can just be an int --> so one less param (i.e. countdown)
         super().__init__(model)
         self._fully_grown = fully_grown
         self.grass_regrowth_time = grass_regrowth_time
@@ -129,8 +133,7 @@ class GrassPatch(CellAgent):
 
 
 class WolfSheep(Model):
-    """
-    Wolf-Sheep Predation Model
+    """Wolf-Sheep Predation Model.
 
     A model for simulating wolf and sheep (predator-prey) ecosystem modelling.
     """
@@ -149,18 +152,19 @@ class WolfSheep(Model):
         sheep_gain_from_food=5,
         seed=None,
     ):
-        """
-        Create a new Wolf-Sheep model with the given parameters.
+        """Create a new Wolf-Sheep model with the given parameters.
 
         Args:
             simulator: ABMSimulator instance
+            width: width of the grid
+            height: height of the grid
             initial_sheep: Number of sheep to start with
             initial_wolves: Number of wolves to start with
             sheep_reproduce: Probability of each sheep reproducing each step
             wolf_reproduce: Probability of each wolf reproducing each step
-            wolf_gain_from_food: Energy a wolf gains from eating a sheep
             grass_regrowth_time: How long it takes for a grass patch to regrow
                                  once it is eaten
+            wolf_gain_from_food: Energy a wolf gains from eating a sheep
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
             seed : the random seed
         """
@@ -222,6 +226,7 @@ class WolfSheep(Model):
             patch.move_to(cell)
 
     def step(self):
+        """Run one step of the model."""
         self.agents_by_type[Sheep].shuffle(inplace=True).do("step")
         self.agents_by_type[Wolf].shuffle(inplace=True).do("step")
 
