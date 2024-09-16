@@ -1,4 +1,5 @@
 """runner for global performance benchmarks."""
+
 import gc
 import os
 import pickle

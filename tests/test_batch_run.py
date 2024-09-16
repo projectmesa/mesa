@@ -24,8 +24,7 @@ def test_make_model_kwargs():
 
 
 class MockAgent(Agent):
-    """Minimalistic agent implementation for testing purposes
-    """
+    """Minimalistic agent implementation for testing purposes"""
 
     def __init__(self, model, val):
         super().__init__(model)
@@ -38,8 +37,7 @@ class MockAgent(Agent):
 
 
 class MockModel(Model):
-    """Minimalistic model for testing purposes
-    """
+    """Minimalistic model for testing purposes"""
 
     def __init__(
         self,

@@ -1,4 +1,5 @@
 """compare timings across 2 benchmarks."""
+
 import pickle
 
 import numpy as np

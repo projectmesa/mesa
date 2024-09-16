@@ -1,4 +1,5 @@
 """batchrunner for running a factorial experiment design over a model."""
+
 import itertools
 import multiprocessing
 from collections.abc import Iterable, Mapping

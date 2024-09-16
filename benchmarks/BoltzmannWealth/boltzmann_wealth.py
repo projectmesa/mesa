@@ -96,7 +96,7 @@ class MoneyAgent(mesa.Agent):
         self.model.grid.move_agent(self, new_position)
 
     def give_money(self):
-        """"give money to a random cell mate."""
+        """ "give money to a random cell mate."""
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         cellmates.pop(
             cellmates.index(self)

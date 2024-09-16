@@ -16,6 +16,7 @@ from mesa.experimental.devs import ABMSimulator
 
 class Animal(CellAgent):
     """The base animal class."""
+
     def __init__(self, model, energy, p_reproduce, energy_from_food):
         """Initializes an animal.
 
@@ -44,7 +45,6 @@ class Animal(CellAgent):
             self.energy_from_food,
         )
         offspring.move_to(self.cell)
-
 
     def feed(self): ...  # noqa D102
 

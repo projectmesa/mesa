@@ -350,14 +350,12 @@ class RandomActivationByType(BaseScheduler):
         agents.do("step")
 
     def get_type_count(self, agenttype: type[Agent]) -> int:
-        """Returns the current number of agents of certain type in the queue.
-        """
+        """Returns the current number of agents of certain type in the queue."""
         return len(self._agents_by_type[agenttype])
 
 
 class DiscreteEventScheduler(BaseScheduler):
-    """This class has been deprecated and replaced by the functionality provided by experimental.devs
-    """
+    """This class has been deprecated and replaced by the functionality provided by experimental.devs"""
 
     def __init__(self, model: Model, time_step: TimeT = 1) -> None:
         """Args:

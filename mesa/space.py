@@ -72,6 +72,7 @@ def is_integer(x: Real) -> bool:
 
 def warn_if_agent_has_position_already(placement_func):
     """Decorater to give warning if agent has position already set."""
+
     def wrapper(self, agent, *args, **kwargs):
         if agent.pos is not None:
             warnings.warn(
@@ -557,7 +558,7 @@ def is_single_argument_function(function):
     )
 
 
-def ufunc_requires_additional_input(ufunc):  #noqa
+def ufunc_requires_additional_input(ufunc):  # noqa
     # NumPy ufuncs have a 'nargs' attribute indicating the number of input arguments
     # For binary ufuncs (like np.add), nargs is 2
     return ufunc.nargs > 1
@@ -1030,7 +1031,7 @@ class MultiGrid(_PropertyGrid):
             self._empty_mask[agent.pos] = False
         agent.pos = None
 
-    def iter_neighbors(  #noqa
+    def iter_neighbors(  # noqa
         self,
         pos: Coordinate,
         moore: bool,

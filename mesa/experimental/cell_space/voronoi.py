@@ -42,8 +42,7 @@ class Delaunay:
             self.circles[t] = self._circumcenter(t)
 
     def _circumcenter(self, triangle: list) -> tuple:
-        """Compute circumcenter and circumradius of a triangle in 2D.
-        """
+        """Compute circumcenter and circumradius of a triangle in 2D."""
         points = np.asarray([self.coords[v] for v in triangle])
         points2 = np.dot(points, points.T)
         a = np.bmat([[2 * points2, [[1], [1], [1]]], [[[1, 1, 1, 0]]]])
@@ -57,14 +56,12 @@ class Delaunay:
         return (center, radius)
 
     def _in_circle(self, triangle: list, point: list) -> bool:
-        """Check if point p is inside of precomputed circumcircle of triangle.
-        """
+        """Check if point p is inside of precomputed circumcircle of triangle."""
         center, radius = self.circles[triangle]
         return np.sum(np.square(center - point)) <= radius
 
     def add_point(self, point: Sequence) -> None:
-        """Add a point to the current DT, and refine it using Bowyer-Watson.
-        """
+        """Add a point to the current DT, and refine it using Bowyer-Watson."""
         point_index = len(self.coords)
         self.coords.append(np.asarray(point))
 
@@ -116,8 +113,7 @@ class Delaunay:
             self.triangles[triangle][2] = new_triangles[(i - 1) % n]  # previous
 
     def export_triangles(self) -> list:
-        """Export the current list of Delaunay triangles
-        """
+        """Export the current list of Delaunay triangles"""
         triangles_list = [
             (a - 4, b - 4, c - 4)
             for (a, b, c) in self.triangles
@@ -126,8 +122,7 @@ class Delaunay:
         return triangles_list
 
     def export_voronoi_regions(self):
-        """Export coordinates and regions of Voronoi diagram as indexed data.
-        """
+        """Export coordinates and regions of Voronoi diagram as indexed data."""
         use_vertex = {i: [] for i in range(len(self.coords))}
         vor_coors = []
         index = {}
@@ -207,8 +202,7 @@ class VoronoiGrid(DiscreteSpace):
         self._build_cell_polygons()
 
     def _connect_cells(self) -> None:
-        """Connect cells to neighbors based on given centroids and using Delaunay Triangulation
-        """
+        """Connect cells to neighbors based on given centroids and using Delaunay Triangulation"""
         self.triangulation = Delaunay()
         for centroid in self.centroids_coordinates:
             self.triangulation.add_point(centroid)

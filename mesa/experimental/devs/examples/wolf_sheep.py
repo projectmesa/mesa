@@ -71,8 +71,7 @@ class Sheep(Animal):
 
 
 class Wolf(Animal):
-    """A wolf that walks around, reproduces (asexually) and eats sheep.
-    """
+    """A wolf that walks around, reproduces (asexually) and eats sheep."""
 
     def feed(self):
         agents = self.model.grid.get_cell_list_contents(self.pos)
@@ -86,8 +85,7 @@ class Wolf(Animal):
 
 
 class GrassPatch(mesa.Agent):
-    """A patch of grass that grows at a fixed rate and it is eaten by sheep
-    """
+    """A patch of grass that grows at a fixed rate and it is eaten by sheep"""
 
     @property
     def fully_grown(self) -> bool:

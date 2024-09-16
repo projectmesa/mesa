@@ -79,8 +79,7 @@ class Citizen(EpsteinAgent):
         self.arrest_prob_constant = arrest_prob_constant
 
     def step(self):
-        """Decide whether to activate, then move if applicable.
-        """
+        """Decide whether to activate, then move if applicable."""
         self.update_neighbors()
         self.update_estimated_arrest_probability()
         net_risk = self.risk_aversion * self.arrest_probability
@@ -93,8 +92,7 @@ class Citizen(EpsteinAgent):
             self.model.grid.move_agent(self, new_pos)
 
     def update_neighbors(self):
-        """Look around and see who my neighbors are
-        """
+        """Look around and see who my neighbors are"""
         self.neighborhood = self.model.grid.get_neighborhood(
             self.pos, moore=True, radius=self.vision
         )
@@ -158,8 +156,7 @@ class Cop(EpsteinAgent):
             self.model.grid.move_agent(self, new_pos)
 
     def update_neighbors(self):
-        """Look around and see who my neighbors are.
-        """
+        """Look around and see who my neighbors are."""
         self.neighborhood = self.model.grid.get_neighborhood(
             self.pos, moore=True, radius=self.vision
         )

@@ -611,7 +611,7 @@ class GroupBy:
 
         return self
 
-    def __iter__(self): # noqa
+    def __iter__(self):  # noqa
         return iter(self.groups.items())
 
     def __len__(self):  # noqa
