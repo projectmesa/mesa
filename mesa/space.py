@@ -1,5 +1,4 @@
-"""Mesa Space Module
-=================
+"""Mesa Space Module.
 
 Objects used to add a spatial component to a model.
 
@@ -53,9 +52,9 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 
 def accept_tuple_argument(wrapped_function: F) -> F:
-    """Decorator to allow grid methods that take a list of (x, y) coord tuples
-    to also handle a single position, by automatically wrapping tuple in
-    single-item list rather than forcing user to do it.
+    """Decorator to allow grid methods that take a list of (x, y) coord tuples to also handle a single position.
+
+    Tuples are wrapped in a single-item list rather than forcing user to do it.
     """
 
     def wrapper(grid_instance, positions) -> Any:
@@ -67,11 +66,12 @@ def accept_tuple_argument(wrapped_function: F) -> F:
 
 
 def is_integer(x: Real) -> bool:
-    # Check if x is either a CPython integer or Numpy integer.
+    """Check if x is either a CPython integer or Numpy integer."""
     return isinstance(x, _types_integer)
 
 
 def warn_if_agent_has_position_already(placement_func):
+    """Decorater to give warning if agent has position already set."""
     def wrapper(self, agent, *args, **kwargs):
         if agent.pos is not None:
             warnings.warn(
@@ -102,7 +102,8 @@ class _Grid:
         """Create a new grid.
 
         Args:
-            width, height: The width and height of the grid
+            width: The grid's width.
+            height: The grid's height.
             torus: Boolean whether the grid wraps or not.
         """
         self.height = height
@@ -191,9 +192,7 @@ class _Grid:
             return [cell for rows in self._grid[x] for cell in rows[y]]
 
     def __iter__(self) -> Iterator[GridContent]:
-        """Create an iterator that chains the rows of the grid together
-        as if it is one list:
-        """
+        """Create an iterator that chains the rows of the grid together as if it is one list."""
         return itertools.chain(*self._grid)
 
     def coord_iter(self) -> Iterator[tuple[GridContent, Coordinate]]:
@@ -209,8 +208,7 @@ class _Grid:
         include_center: bool = False,
         radius: int = 1,
     ) -> Iterator[Coordinate]:
-        """Return an iterator over cell coordinates that are in the
-        neighborhood of a certain point.
+        """Return an iterator over cell coordinates that are in the neighborhood of a certain point.
 
         Args:
             pos: Coordinate tuple for the neighborhood to get.
@@ -237,8 +235,7 @@ class _Grid:
         include_center: bool = False,
         radius: int = 1,
     ) -> Sequence[Coordinate]:
-        """Return a list of cells that are in the neighborhood of a
-        certain point.
+        """Return a list of cells that are in the neighborhood of a certain point.
 
         Args:
             pos: Coordinate tuple for the neighborhood to get.
@@ -381,9 +378,7 @@ class _Grid:
             return pos[0] % self.width, pos[1] % self.height
 
     def out_of_bounds(self, pos: Coordinate) -> bool:
-        """Determines whether position is off the grid, returns the out of
-        bounds coordinate.
-        """
+        """Determines whether position is off the grid, returns the out of bounds coordinate."""
         x, y = pos
         return x < 0 or x >= self.width or y < 0 or y >= self.height
 
@@ -391,8 +386,7 @@ class _Grid:
     def iter_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
     ) -> Iterator[Agent]:
-        """Returns an iterator of the agents contained in the cells identified
-        in `cell_list`; cells with empty content are excluded.
+        """Returns an iterator of the agents contained in the cells identified in `cell_list`; cells with empty content are excluded.
 
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -408,8 +402,7 @@ class _Grid:
 
     @accept_tuple_argument
     def get_cell_list_contents(self, cell_list: Iterable[Coordinate]) -> list[Agent]:
-        """Returns an iterator of the agents contained in the cells identified
-        in `cell_list`; cells with empty content are excluded.
+        """Returns an iterator of the agents contained in the cells identified in `cell_list`; cells with empty content are excluded.
 
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -494,8 +487,7 @@ class _Grid:
             )
 
     def _distance_squared(self, pos1: Coordinate, pos2: Coordinate) -> float:
-        """Calculate the squared Euclidean distance between two points for performance.
-        """
+        """Calculate the squared Euclidean distance between two points for performance."""
         # Use squared Euclidean distance to avoid sqrt operation
         dx, dy = abs(pos1[0] - pos2[0]), abs(pos1[1] - pos2[1])
         if self.torus:
@@ -504,7 +496,7 @@ class _Grid:
         return dx**2 + dy**2
 
     def swap_pos(self, agent_a: Agent, agent_b: Agent) -> None:
-        """Swap agents positions"""
+        """Swap agents positions."""
         agents_no_pos = []
         if (pos_a := agent_a.pos) is None:
             agents_no_pos.append(agent_a)
@@ -565,15 +557,16 @@ def is_single_argument_function(function):
     )
 
 
-def ufunc_requires_additional_input(ufunc):
+def ufunc_requires_additional_input(ufunc):  #noqa
     # NumPy ufuncs have a 'nargs' attribute indicating the number of input arguments
     # For binary ufuncs (like np.add), nargs is 2
     return ufunc.nargs > 1
 
 
 class PropertyLayer:
-    """A class representing a layer of properties in a two-dimensional grid. Each cell in the grid
-    can store a value of a specified data type.
+    """A class representing a layer of properties in a two-dimensional grid.
+
+    Each cell in the grid can store a value of a specified data type.
 
     Attributes:
         name (str): The name of the property layer.
@@ -581,13 +574,6 @@ class PropertyLayer:
         height (int): The height of the grid (number of rows).
         data (numpy.ndarray): A NumPy array representing the grid data.
 
-    Methods:
-        set_cell(position, value): Sets the value of a single cell.
-        set_cells(value, condition=None): Sets the values of multiple cells, optionally based on a condition.
-        modify_cell(position, operation, value): Modifies the value of a single cell using an operation.
-        modify_cells(operation, value, condition_function): Modifies the values of multiple cells using an operation.
-        select_cells(condition, return_list): Selects cells that meet a specified condition.
-        aggregate_property(operation): Performs an aggregate operation over all cells.
     """
 
     propertylayer_experimental_warning_given = False
@@ -646,8 +632,7 @@ class PropertyLayer:
             self.__class__.propertylayer_experimental_warning_given = True
 
     def set_cell(self, position: Coordinate, value):
-        """Update a single cell's value in-place.
-        """
+        """Update a single cell's value in-place."""
         self.data[position] = value
 
     def set_cells(self, value, condition=None):
@@ -681,6 +666,7 @@ class PropertyLayer:
 
     def modify_cell(self, position: Coordinate, operation, value=None):
         """Modify a single cell using an operation, which can be a lambda function or a NumPy ufunc.
+
         If a NumPy ufunc is used, an additional value should be provided.
 
         Args:
@@ -702,6 +688,7 @@ class PropertyLayer:
 
     def modify_cells(self, operation, value=None, condition_function=None):
         """Modify cells using an operation, which can be a lambda function or a NumPy ufunc.
+
         If a NumPy ufunc is used, an additional value should be provided.
 
         Args:
@@ -760,8 +747,9 @@ class PropertyLayer:
 
 
 class _PropertyGrid(_Grid):
-    """A private subclass of _Grid that supports the addition of property layers, enabling
-    the representation and manipulation of additional data layers on the grid. This class is
+    """A private subclass of _Grid that supports the addition of property layers.
+
+    This enables the representation and manipulation of additional data layers on the grid. This class is
     intended for internal use within the Mesa framework and is currently utilized by SingleGrid
     and MultiGrid classes to provide enhanced grid functionality.
 
@@ -774,22 +762,15 @@ class _PropertyGrid(_Grid):
         properties (dict): A dictionary mapping property layer names to PropertyLayer instances.
         empty_mask (np.ndarray): A boolean array indicating empty cells on the grid.
 
-    Methods:
-        add_property_layer(property_layer): Adds a new property layer to the grid.
-        remove_property_layer(property_name): Removes a property layer from the grid by its name.
-        get_neighborhood_mask(pos, moore, include_center, radius): Generates a boolean mask of the neighborhood.
-        select_cells(conditions, extreme_values, masks, only_empty, return_list): Selects cells based on multiple conditions,
-            extreme values, masks, with an option to select only empty cells, returning either a list of coordinates or a mask.
 
-    Mask Usage:
-        Several methods in this class accept a mask as an input, which is a NumPy ndarray of boolean values. This mask
-        specifies the cells to be considered (True) or ignored (False) in operations. Users can create custom masks,
-        including neighborhood masks, to apply specific conditions or constraints. Additionally, methods that deal with
-        cell selection or agent movement can return either a list of cell coordinates or a mask, based on the 'return_list'
-        parameter. This flexibility allows for more nuanced control and customization of grid operations, catering to a wide
-        range of modeling requirements and scenarios.
+    Several methods in this class accept a mask as an input, which is a NumPy ndarray of boolean values. This mask
+    specifies the cells to be considered (True) or ignored (False) in operations. Users can create custom masks,
+    including neighborhood masks, to apply specific conditions or constraints. Additionally, methods that deal with
+    cell selection or agent movement can return either a list of cell coordinates or a mask, based on the 'return_list'
+    parameter. This flexibility allows for more nuanced control and customization of grid operations, catering to a wide
+    range of modeling requirements and scenarios.
 
-    Note:
+    Notes:
         This class is not intended for direct use in user models but is currently used by the SingleGrid and MultiGrid.
     """
 
@@ -829,8 +810,7 @@ class _PropertyGrid(_Grid):
 
     @property
     def empty_mask(self) -> np.ndarray:
-        """Returns a boolean mask indicating empty cells on the grid.
-        """
+        """Returns a boolean mask indicating empty cells on the grid."""
         return self._empty_mask
 
     # Add and remove properties to the grid
@@ -869,6 +849,7 @@ class _PropertyGrid(_Grid):
         self, pos: Coordinate, moore: bool, include_center: bool, radius: int
     ) -> np.ndarray:
         """Generate a boolean mask representing the neighborhood.
+
         Helper method for select_cells_multi_properties() and move_agent_to_random_cell()
 
         Args:
@@ -1049,7 +1030,7 @@ class MultiGrid(_PropertyGrid):
             self._empty_mask[agent.pos] = False
         agent.pos = None
 
-    def iter_neighbors(
+    def iter_neighbors(  #noqa
         self,
         pos: Coordinate,
         moore: bool,
@@ -1064,8 +1045,9 @@ class MultiGrid(_PropertyGrid):
     def iter_cell_list_contents(
         self, cell_list: Iterable[Coordinate]
     ) -> Iterator[Agent]:
-        """Returns an iterator of the agents contained in the cells identified
-        in `cell_list`; cells with empty content are excluded.
+        """Returns an iterator of the agents contained in the cells identified in `cell_list`.
+
+        Cells with empty content are excluded.
 
         Args:
             cell_list: Array-like of (x, y) tuples, or single tuple.
@@ -1103,9 +1085,9 @@ class _HexGrid:
     def get_neighborhood(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
     ) -> list[Coordinate]:
-        """Return a list of coordinates that are in the
-        neighborhood of a certain point. To calculate the neighborhood
-        for a HexGrid the parity of the x coordinate of the point is
+        """Return a list of coordinates that are in the neighborhood of a certain point.
+
+        To calculate the neighborhood for a HexGrid the parity of the x coordinate of the point is
         important, the neighborhood can be sketched as:
 
             Always: (0,-), (0,+)
@@ -1191,8 +1173,7 @@ class _HexGrid:
     def iter_neighborhood(
         self, pos: Coordinate, include_center: bool = False, radius: int = 1
     ) -> Iterator[Coordinate]:
-        """Return an iterator over cell coordinates that are in the
-        neighborhood of a certain point.
+        """Return an iterator over cell coordinates that are in the neighborhood of a certain point.
 
         Args:
             pos: Coordinate tuple for the neighborhood to get.
@@ -1242,8 +1223,7 @@ class _HexGrid:
 
 
 class HexSingleGrid(_HexGrid, SingleGrid):
-    """Hexagonal SingleGrid: a SingleGrid where neighbors are computed
-    according to a hexagonal tiling of the grid.
+    """Hexagonal SingleGrid: a SingleGrid where neighbors are computed according to a hexagonal tiling of the grid.
 
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
@@ -1259,8 +1239,7 @@ class HexSingleGrid(_HexGrid, SingleGrid):
 
 
 class HexMultiGrid(_HexGrid, MultiGrid):
-    """Hexagonal MultiGrid: a MultiGrid where neighbors are computed
-    according to a hexagonal tiling of the grid.
+    """Hexagonal MultiGrid: a MultiGrid where neighbors are computed according to a hexagonal tiling of the grid.
 
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
@@ -1278,8 +1257,7 @@ class HexMultiGrid(_HexGrid, MultiGrid):
 
 
 class HexGrid(HexSingleGrid):
-    """Hexagonal Grid: a Grid where neighbors are computed
-    according to a hexagonal tiling of the grid.
+    """Hexagonal Grid: a Grid where neighbors are computed according to a hexagonal tiling of the grid.
 
     Functions according to odd-q rules.
     See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
@@ -1290,6 +1268,13 @@ class HexGrid(HexSingleGrid):
     """
 
     def __init__(self, width: int, height: int, torus: bool) -> None:
+        """Initializes a HexGrid, deprecated.
+
+        Args:
+            width: the width of the grid
+            height: the height of the grid
+            torus: whether the grid wraps
+        """
         super().__init__(width, height, torus)
         warn(
             (
@@ -1326,11 +1311,13 @@ class ContinuousSpace:
         """Create a new continuous space.
 
         Args:
-            x_max, y_max: Maximum x and y coordinates for the space.
+            x_max: the maximum x-coordinate
+            y_max: the maximum y-coordinate.
             torus: Boolean for whether the edges loop around.
-            x_min, y_min: (default 0) If provided, set the minimum x and y
-                          coordinates for the space. Below them, values loop to
-                          the other edge (if torus=True) or raise an exception.
+            x_min: (default 0) If provided, set the minimum x -coordinate for the space. Below them, values loop to
+                  the other edge (if torus=True) or raise an exception.
+            y_min: (default 0) If provided, set the minimum y -coordinate for the space. Below them, values loop to
+                  the other edge (if torus=True) or raise an exception.
         """
         self.x_min = x_min
         self.x_max = x_max
@@ -1433,11 +1420,13 @@ class ContinuousSpace:
         self, pos_1: FloatCoordinate, pos_2: FloatCoordinate
     ) -> FloatCoordinate:
         """Get the heading vector between two points, accounting for toroidal space.
+
         It is possible to calculate the heading angle by applying the atan2 function to the
         result.
 
         Args:
-            pos_1, pos_2: Coordinate tuples for both points.
+            pos_1: Coordinate tuples for both points.
+            pos_2: Coordinate tuples for both points.
         """
         one = np.array(pos_1)
         two = np.array(pos_2)
@@ -1463,7 +1452,8 @@ class ContinuousSpace:
         """Get the distance between two point, accounting for toroidal space.
 
         Args:
-            pos_1, pos_2: Coordinate tuples for both points.
+            pos_1: Coordinate tuples for point1.
+            pos_2: Coordinate tuples for point2.
         """
         x1, y1 = pos_1
         x2, y2 = pos_2
@@ -1510,7 +1500,7 @@ class NetworkGrid:
         """Create a new network.
 
         Args:
-            G: a NetworkX graph instance.
+            g: a NetworkX graph instance.
         """
         self.G = g
         for node_id in self.G.nodes:
@@ -1530,7 +1520,16 @@ class NetworkGrid:
     def get_neighborhood(
         self, node_id: int, include_center: bool = False, radius: int = 1
     ) -> list[int]:
-        """Get all adjacent nodes within a certain radius"""
+        """Get all adjacent nodes within a certain radius.
+
+        Args:
+            node_id: node id for which to get neighborhood
+            include_center: boolean to include node itself or not
+            radius: size of neighborhood
+
+        Returns:
+            a list
+        """
         if radius == 1:
             neighborhood = list(self.G.neighbors(node_id))
             if include_center:
@@ -1547,28 +1546,61 @@ class NetworkGrid:
     def get_neighbors(
         self, node_id: int, include_center: bool = False, radius: int = 1
     ) -> list[Agent]:
-        """Get all agents in adjacent nodes (within a certain radius)."""
+        """Get all agents in adjacent nodes (within a certain radius).
+
+        Args:
+            node_id: node id for which to get neighbors
+            include_center: whether to include node itself or not
+            radius: size of neighborhood in which to find neighbors
+
+        Returns:
+            list of agents in neighborhood.
+        """
         neighborhood = self.get_neighborhood(node_id, include_center, radius)
         return self.get_cell_list_contents(neighborhood)
 
     def move_agent(self, agent: Agent, node_id: int) -> None:
-        """Move an agent from its current node to a new node."""
+        """Move an agent from its current node to a new node.
+
+        Args:
+            agent: agent instance
+            node_id: id of node
+
+        """
         self.remove_agent(agent)
         self.place_agent(agent, node_id)
 
     def remove_agent(self, agent: Agent) -> None:
-        """Remove the agent from the network and set its pos attribute to None."""
+        """Remove the agent from the network and set its pos attribute to None.
+
+        Args:
+            agent: agent instance
+
+        """
         node_id = agent.pos
         self.G.nodes[node_id]["agent"].remove(agent)
         agent.pos = None
 
     def is_cell_empty(self, node_id: int) -> bool:
-        """Returns a bool of the contents of a cell."""
+        """Returns a bool of the contents of a cell.
+
+        Args:
+            node_id: id of node
+
+        """
         return self.G.nodes[node_id]["agent"] == self.default_val()
 
     def get_cell_list_contents(self, cell_list: list[int]) -> list[Agent]:
-        """Returns a list of the agents contained in the nodes identified
-        in `cell_list`; nodes with empty content are excluded.
+        """Returns a list of the agents contained in the nodes identified in `cell_list`.
+
+        Nodes with empty content are excluded.
+
+        Args:
+            cell_list: list of cell ids.
+
+        Returns:
+            list of the agents contained in the nodes identified in `cell_list`.
+
         """
         return list(self.iter_cell_list_contents(cell_list))
 
@@ -1577,8 +1609,16 @@ class NetworkGrid:
         return self.get_cell_list_contents(self.G)
 
     def iter_cell_list_contents(self, cell_list: list[int]) -> Iterator[Agent]:
-        """Returns an iterator of the agents contained in the nodes identified
-        in `cell_list`; nodes with empty content are excluded.
+        """Returns an iterator of the agents contained in the nodes identified in `cell_list`.
+
+        Nodes with empty content are excluded.
+
+        Args:
+            cell_list: list of cell ids.
+
+        Returns:
+            iterator of the agents contained in the nodes identified in `cell_list`.
+
         """
         return itertools.chain.from_iterable(
             self.G.nodes[node_id]["agent"]
