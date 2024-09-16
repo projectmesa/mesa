@@ -6,6 +6,7 @@ from mesa.experimental.devs.simulator import ABMSimulator
 
 class Animal(mesa.Agent):
     """Base Animal class."""
+
     def __init__(self, model, moore, energy, p_reproduce, energy_from_food):
         """Initialize Animal instance.
 
@@ -41,7 +42,7 @@ class Animal(mesa.Agent):
         )
         self.model.grid.place_agent(offspring, self.pos)
 
-    def feed(self): ...   # noqa
+    def feed(self): ...  # noqa
 
     def die(self):
         """Die."""

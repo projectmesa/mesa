@@ -1,4 +1,5 @@
 """Altair components."""
+
 import contextlib
 
 import solara

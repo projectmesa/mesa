@@ -1,4 +1,5 @@
 """Eventlist which is at the core of event scheduling."""
+
 from __future__ import annotations
 
 import itertools
@@ -12,6 +13,7 @@ from weakref import WeakMethod, ref
 
 class Priority(IntEnum):
     """Enumeration of priority levels."""
+
     LOW = 10
     DEFAULT = 5
     HIGH = 1

@@ -1,4 +1,5 @@
 """Support for using matplotlib to draw spaces."""
+
 from collections import defaultdict
 
 import networkx as nx

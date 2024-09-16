@@ -1,4 +1,5 @@
 """Epstein civil violence example using ABMSimulator."""
+
 import enum
 import math
 
@@ -9,6 +10,7 @@ from mesa.space import SingleGrid
 
 class EpsteinAgent(Agent):
     """Epstein Agent."""
+
     def __init__(self, model, vision, movement):
         """Initialize the agent.
 
@@ -24,6 +26,7 @@ class EpsteinAgent(Agent):
 
 class AgentState(enum.IntEnum):
     """Agent states."""
+
     QUIESCENT = enum.auto()
     ARRESTED = enum.auto()
     ACTIVE = enum.auto()
