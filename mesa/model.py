@@ -76,7 +76,7 @@ class Model:
         # Call the original user-defined step method
         self._user_step(*args, **kwargs)
 
-    def next_id(self) -> int:
+    def next_id(self) -> int:  # noqa
         warnings.warn(
             "using model.next_id() is deprecated. Agents track their unique ID automatically",
             DeprecationWarning,
@@ -118,7 +118,7 @@ class Model:
         return self.agents_by_type[agenttype]
 
     def _setup_agent_registration(self):
-        """Helper method to initialize the agent registration datastructures"""
+        """Helper method to initialize the agent registration datastructures."""
         self._agents = {}  # the hard references to all agents in the model
         self._agents_by_type: dict[
             type[Agent], AgentSet
@@ -126,7 +126,7 @@ class Model:
         self._all_agents = AgentSet([], self)  # an agenset with all agents
 
     def register_agent(self, agent):
-        """Register the agent with the model
+        """Register the agent with the model.
 
         Args:
             agent: The agent to register.
@@ -163,7 +163,7 @@ class Model:
         self._all_agents.add(agent)
 
     def deregister_agent(self, agent):
-        """Deregister the agent with the model
+        """Deregister the agent with the model.
 
         Args:
             agent: The agent to deregister.
@@ -177,8 +177,9 @@ class Model:
         self._all_agents.remove(agent)
 
     def run_model(self) -> None:
-        """Run the model until the end condition is reached. Overload as
-        needed.
+        """Run the model until the end condition is reached.
+
+        Overload as needed.
         """
         while self.running:
             self.step()
@@ -203,6 +204,14 @@ class Model:
         agent_reporters=None,
         tables=None,
     ) -> None:
+        """Initialize the data collector for the model.
+
+        Args:
+            model_reporters: model reporters to collect
+            agent_reporters: agent reporters to collect
+            tables: tables to collect
+
+        """
         if not hasattr(self, "schedule") or self.schedule is None:
             raise RuntimeError(
                 "You must initialize the scheduler (self.schedule) before initializing the data collector."

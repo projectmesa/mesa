@@ -1,5 +1,4 @@
-"""Mesa Time Module
-================
+"""Mesa Time Module.
 
 Objects for handling the time component of a model. In particular, this module
 contains Schedulers, which handle agent activation. A Scheduler is an object
@@ -54,8 +53,8 @@ class BaseScheduler:
         """Create a new BaseScheduler.
 
         Args:
-            - model (Model): The model to which the schedule belongs
-            - agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
+            model (Model): The model to which the schedule belongs
+            agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
 
         """
         self.model = model
@@ -109,10 +108,12 @@ class BaseScheduler:
 
     @property
     def agents(self) -> AgentSet:
+        """Return agents in the scheduler."""
         # a bit dirty, but returns a copy of the internal agent set
         return self._agents.select()
 
     def get_agent_keys(self, shuffle: bool = False) -> list[int]:
+        """Deprecated."""
         # To be able to remove and/or add agents during stepping
         # it's necessary to cast the keys view to a list.
 
@@ -130,6 +131,14 @@ class BaseScheduler:
         return agent_keys
 
     def do_each(self, method, shuffle=False):
+        """Perform `method` on each agent.
+
+        Args:
+            method: method to call
+            shuffle: shuffle the agents or not prior to calling method
+
+
+        """
         if shuffle:
             self._agents.shuffle(inplace=True)
         self._agents.do(method)
@@ -149,10 +158,7 @@ class RandomActivation(BaseScheduler):
     """
 
     def step(self) -> None:
-        """Executes the step of all agents, one at a time, in
-        random order.
-
-        """
+        """Executes the step of all agents, one at a time, in random order."""
         self.do_each("step", shuffle=True)
         self.steps += 1
         self.time += 1
@@ -184,8 +190,9 @@ class SimultaneousActivation(BaseScheduler):
 
 
 class StagedActivation(BaseScheduler):
-    """A scheduler allowing agent activation to be divided into several stages, with all agents executing one stage
-    before moving on to the next. This class is a generalization of SimultaneousActivation.
+    """A scheduler allowing agent activation to be divided into several stages.
+
+    All agents executing one stage before moving on to the next. This class is a generalization of SimultaneousActivation.
 
     This scheduler is useful for complex models where actions need to be broken down into distinct phases
     for each agent in each time step. Agents must implement methods for each defined stage.
@@ -213,12 +220,12 @@ class StagedActivation(BaseScheduler):
         """Create an empty Staged Activation schedule.
 
         Args:
-            - model (Model): The model to which the schedule belongs
-            - agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
-            - stage_list (:obj:`list` of :obj:`str`): List of strings of names of stages to run, in the
+            model (Model): The model to which the schedule belongs
+            agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
+            stage_list (:obj:`list` of :obj:`str`): List of strings of names of stages to run, in the
                          order to run them in.
-            - shuffle (bool, optional): If True, shuffle the order of agents each step.
-            - shuffle_between_stages (bool, optional): If True, shuffle the agents after each
+            shuffle (bool, optional): If True, shuffle the order of agents each step.
+            shuffle_between_stages (bool, optional): If True, shuffle the agents after each
                                     stage; otherwise, only shuffle at the start
                                     of each step.
         """
@@ -263,7 +270,7 @@ class RandomActivationByType(BaseScheduler):
     """
 
     @property
-    def agents_by_type(self):
+    def agents_by_type(self):  # noqa
         warnings.warn(
             "Because of the shift to using AgentSet, in the future this attribute will return a dict with"
             "type as key as AgentSet as value. Future behavior is available via RandomActivationByType._agents_by_type",
@@ -278,14 +285,13 @@ class RandomActivationByType(BaseScheduler):
         return agentsbytype
 
     def __init__(self, model: Model, agents: Iterable[Agent] | None = None) -> None:
-        super().__init__(model, agents)
-        """
+        """Initialize RandomActivationByType instance.
 
         Args:
-            - model (Model): The model to which the schedule belongs
-            - agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
+            model (Model): The model to which the schedule belongs
+            agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
         """
-
+        super().__init__(model, agents)
         # can't be a defaultdict because we need to pass model to AgentSet
         self._agents_by_type: [type, AgentSet] = {}
 
@@ -297,7 +303,7 @@ class RandomActivationByType(BaseScheduler):
                     self._agents_by_type[type(agent)] = AgentSet([agent], self.model)
 
     def add(self, agent: Agent) -> None:
-        """Add an Agent object to the schedule
+        """Add an Agent object to the schedule.
 
         Args:
             agent: An Agent to be added to the schedule.
@@ -313,7 +319,7 @@ class RandomActivationByType(BaseScheduler):
         """Remove all instances of a given agent from the schedule.
 
         Args:
-            - agent: An Agent to be removed from the schedule.
+            agent: An Agent to be removed from the schedule.
 
         """
         super().remove(agent)
@@ -323,8 +329,8 @@ class RandomActivationByType(BaseScheduler):
         """Executes the step of each agent type, one at a time, in random order.
 
         Args:
-            - shuffle_types: If True, the order of execution of each types is shuffled.
-            - shuffle_agents: If True, the order of execution of each agents in a type group is shuffled.
+            shuffle_types: If True, the order of execution of each types is shuffled.
+            shuffle_agents: If True, the order of execution of each agents in a type group is shuffled.
         """
         # To be able to remove and/or add agents during stepping
         # it's necessary to cast the keys view to a list.
@@ -338,10 +344,10 @@ class RandomActivationByType(BaseScheduler):
 
     def step_type(self, agenttype: type[Agent], shuffle_agents: bool = True) -> None:
         """Shuffle order and run all agents of a given type.
-        This method is equivalent to the NetLogo 'ask [breed]...'.
 
         Args:
-            - agenttype: Class object of the type to run.
+            agenttype: Class object of the type to run.
+            shuffle_agents: If True, shuffle agents
         """
         agents = self._agents_by_type[agenttype]
 
@@ -355,12 +361,14 @@ class RandomActivationByType(BaseScheduler):
 
 
 class DiscreteEventScheduler(BaseScheduler):
-    """This class has been deprecated and replaced by the functionality provided by experimental.devs"""
+    """This class has been deprecated and replaced by the functionality provided by experimental.devs."""
 
     def __init__(self, model: Model, time_step: TimeT = 1) -> None:
-        """Args:
-        model (Model): The model to which the schedule belongs
-        time_step (TimeT): The fixed time step between steps
+        """Initialize DiscreteEventScheduler.
+
+        Args:
+            model (Model): The model to which the schedule belongs
+            time_step (TimeT): The fixed time step between steps
 
         """
         super().__init__(model)
