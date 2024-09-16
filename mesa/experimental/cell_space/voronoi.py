@@ -1,3 +1,4 @@
+"""Support for Voronoi meshed grids."""
 from collections.abc import Sequence
 from itertools import combinations
 from random import Random
@@ -9,14 +10,17 @@ from mesa.experimental.cell_space.discrete_space import DiscreteSpace
 
 
 class Delaunay:
-    """Class to compute a Delaunay triangulation in 2D
+    """Class to compute a Delaunay triangulation in 2D.
+
     ref: http://github.com/jmespadero/pyDelaunay2D
     """
 
     def __init__(self, center: tuple = (0, 0), radius: int = 9999) -> None:
-        """Init and create a new frame to contain the triangulation
-        center: Optional position for the center of the frame. Default (0,0)
-        radius: Optional distance from corners to the center.
+        """Init and create a new frame to contain the triangulation.
+
+        Args:
+            center: Optional position for the center of the frame. Default (0,0)
+            radius: Optional distance from corners to the center.
         """
         center = np.asarray(center)
         # Create coordinates for the corners of the frame
@@ -113,7 +117,7 @@ class Delaunay:
             self.triangles[triangle][2] = new_triangles[(i - 1) % n]  # previous
 
     def export_triangles(self) -> list:
-        """Export the current list of Delaunay triangles"""
+        """Export the current list of Delaunay triangles."""
         triangles_list = [
             (a - 4, b - 4, c - 4)
             for (a, b, c) in self.triangles
@@ -151,11 +155,12 @@ class Delaunay:
         return vor_coors, regions
 
 
-def round_float(x: float) -> int:
+def round_float(x: float) -> int:  # noqa
     return int(x * 500)
 
 
 class VoronoiGrid(DiscreteSpace):
+    """Voronoi meshed GridSpace."""
     triangulation: Delaunay
     voronoi_coordinates: list
     regions: list
@@ -179,7 +184,7 @@ class VoronoiGrid(DiscreteSpace):
             centroids_coordinates: coordinates of centroids to build the tessellation space
             capacity (int) : capacity of the cells in the discrete space
             random (Random): random number generator
-            CellKlass (type[Cell]): type of cell class
+            cell_klass (type[Cell]): type of cell class
             capacity_function (Callable): function to compute (int) capacity according to (float) area
             cell_coloring_property (str): voronoi visualization polygon fill property
         """
@@ -202,7 +207,7 @@ class VoronoiGrid(DiscreteSpace):
         self._build_cell_polygons()
 
     def _connect_cells(self) -> None:
-        """Connect cells to neighbors based on given centroids and using Delaunay Triangulation"""
+        """Connect cells to neighbors based on given centroids and using Delaunay Triangulation."""
         self.triangulation = Delaunay()
         for centroid in self.centroids_coordinates:
             self.triangulation.add_point(centroid)

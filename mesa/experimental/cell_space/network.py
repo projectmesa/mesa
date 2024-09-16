@@ -1,3 +1,4 @@
+"""A Network grid."""
 from random import Random
 from typing import Any
 
@@ -6,7 +7,7 @@ from mesa.experimental.cell_space.discrete_space import DiscreteSpace
 
 
 class Network(DiscreteSpace):
-    """A networked discrete space"""
+    """A networked discrete space."""
 
     def __init__(
         self,
@@ -15,13 +16,13 @@ class Network(DiscreteSpace):
         random: Random | None = None,
         cell_klass: type[Cell] = Cell,
     ) -> None:
-        """A Networked grid
+        """A Networked grid.
 
         Args:
             G: a NetworkX Graph instance.
             capacity (int) : the capacity of the cell
-            random (Random):
-            CellKlass (type[Cell]): The base Cell class to use in the Network
+            random (Random): a random number generator
+            cell_klass (type[Cell]): The base Cell class to use in the Network
 
         """
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)

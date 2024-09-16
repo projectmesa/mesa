@@ -1,3 +1,4 @@
+"""CellCollection class."""
 from __future__ import annotations
 
 import itertools
@@ -14,7 +15,7 @@ T = TypeVar("T", bound="Cell")
 
 
 class CellCollection(Generic[T]):
-    """An immutable collection of cells
+    """An immutable collection of cells.
 
     Attributes:
         cells (List[Cell]): The list of cells this collection represents
@@ -28,6 +29,12 @@ class CellCollection(Generic[T]):
         cells: Mapping[T, list[CellAgent]] | Iterable[T],
         random: Random | None = None,
     ) -> None:
+        """Initialize a CellCollection.
+
+        Args:
+            cells: cells to add to the collection
+            random: a seeded random number generator.
+        """
         if isinstance(cells, dict):
             self._cells = cells
         else:
@@ -40,34 +47,52 @@ class CellCollection(Generic[T]):
             random = Random()  # FIXME
         self.random = random
 
-    def __iter__(self):
+    def __iter__(self):  # noqa
         return iter(self._cells)
 
-    def __getitem__(self, key: T) -> Iterable[CellAgent]:
+    def __getitem__(self, key: T) -> Iterable[CellAgent]:  # noqa
         return self._cells[key]
 
     # @cached_property
-    def __len__(self) -> int:
+    def __len__(self) -> int:  # noqa
         return len(self._cells)
 
-    def __repr__(self):
+    def __repr__(self):  # noqa
         return f"CellCollection({self._cells})"
 
     @cached_property
-    def cells(self) -> list[T]:
+    def cells(self) -> list[T]:  # noqa
         return list(self._cells.keys())
 
     @property
-    def agents(self) -> Iterable[CellAgent]:
+    def agents(self) -> Iterable[CellAgent]:  # noqa
         return itertools.chain.from_iterable(self._cells.values())
 
     def select_random_cell(self) -> T:
+        """Select a random cell."""
         return self.random.choice(self.cells)
 
     def select_random_agent(self) -> CellAgent:
+        """Select a random agent.
+
+        Returns:
+            CellAgent instance
+
+
+        """
         return self.random.choice(list(self.agents))
 
     def select(self, filter_func: Callable[[T], bool] | None = None, n=0):
+        """Select cells based on filter function.
+
+        Args:
+            filter_func: filter function
+            n: number of cells to slect
+
+        Returns:
+            CellCollection
+
+        """
         # FIXME: n is not considered
         if filter_func is None and n == 0:
             return self

@@ -1,3 +1,5 @@
+"""Various Grid Spaces."""
+
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -11,7 +13,7 @@ T = TypeVar("T", bound=Cell)
 
 
 class Grid(DiscreteSpace, Generic[T]):
-    """Base class for all grid classes
+    """Base class for all grid classes.
 
     Attributes:
         dimensions (Sequence[int]): the dimensions of the grid
@@ -30,6 +32,15 @@ class Grid(DiscreteSpace, Generic[T]):
         random: Random | None = None,
         cell_klass: type[T] = Cell,
     ) -> None:
+        """Initialise the grid class.
+
+        Args:
+            dimensions: the dimensions of the space
+            torus: whether the space wraps
+            capacity: capacity of the grid cell
+            random: a random number generator
+            cell_klass: the base class to use for the cells
+        """
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
         self.torus = torus
         self.dimensions = dimensions
@@ -63,7 +74,7 @@ class Grid(DiscreteSpace, Generic[T]):
         if self.capacity is not None and not isinstance(self.capacity, float | int):
             raise ValueError("Capacity must be a number or None.")
 
-    def select_random_empty_cell(self) -> T:
+    def select_random_empty_cell(self) -> T:  # noqa
         # FIXME:: currently just a simple boolean to control behavior
         # FIXME:: basically if grid is close to 99% full, creating empty list can be faster
         # FIXME:: note however that the old results don't apply because in this implementation
@@ -176,6 +187,7 @@ class OrthogonalVonNeumannGrid(Grid[T]):
 
 
 class HexGrid(Grid[T]):
+    """A Grid with hexagonal tilling of the space."""
     def _connect_cells_2d(self) -> None:
         # fmt: off
         even_offsets = [

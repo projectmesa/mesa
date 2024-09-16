@@ -1,3 +1,5 @@
+"""The Cell in a cell space."""
+
 from __future__ import annotations
 
 from functools import cache
@@ -46,10 +48,10 @@ class Cell:
         capacity: float | None = None,
         random: Random | None = None,
     ) -> None:
-        """ "
+        """Initialise the cell.
 
         Args:
-            coordinate:
+            coordinate: coordinates of the cell
             capacity (int) : the capacity of the cell. If None, the capacity is infinite
             random (Random) : the random number generator to use
 
@@ -116,12 +118,13 @@ class Cell:
         """Returns a bool of the contents of a cell."""
         return len(self.agents) == self.capacity
 
-    def __repr__(self):
+    def __repr__(self):  # noqa
         return f"Cell({self.coordinate}, {self.agents})"
 
     # FIXME: Revisit caching strategy on methods
     @cache  # noqa: B019
     def neighborhood(self, radius=1, include_center=False):
+        """Returns a list of all neighboring cells."""
         return CellCollection(
             self._neighborhood(radius=radius, include_center=include_center),
             random=self.random,

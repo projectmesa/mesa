@@ -1,3 +1,4 @@
+"""DiscreteSpace base class."""
 from __future__ import annotations
 
 from functools import cached_property
@@ -28,6 +29,13 @@ class DiscreteSpace(Generic[T]):
         cell_klass: type[T] = Cell,
         random: Random | None = None,
     ):
+        """Instantiate a DiscreteSpace.
+
+        Args:
+            capacity: capacity of cells
+            cell_klass: base class for all cells
+            random: random number generator
+        """
         super().__init__()
         self.capacity = capacity
         self._cells: dict[tuple[int, ...], T] = {}
@@ -40,25 +48,27 @@ class DiscreteSpace(Generic[T]):
         self._empties_initialized = False
 
     @property
-    def cutoff_empties(self):
+    def cutoff_empties(self):  # noqa
         return 7.953 * len(self._cells) ** 0.384
 
     def _connect_single_cell(self, cell: T): ...
 
     @cached_property
     def all_cells(self):
+        """Return all cells in space."""
         return CellCollection({cell: cell.agents for cell in self._cells.values()})
 
-    def __iter__(self):
+    def __iter__(self):  # noqa
         return iter(self._cells.values())
 
-    def __getitem__(self, key):
+    def __getitem__(self, key):  # noqa
         return self._cells[key]
 
     @property
     def empties(self) -> CellCollection:
+        """Return all empty in spaces."""
         return self.all_cells.select(lambda cell: cell.is_empty)
 
     def select_random_empty_cell(self) -> T:
-        """Select random empty cell"""
+        """Select random empty cell."""
         return self.random.choice(list(self.empties))

@@ -1,3 +1,4 @@
+"""Cell spaces."""
 from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.cell_agent import CellAgent
 from mesa.experimental.cell_space.cell_collection import CellCollection
