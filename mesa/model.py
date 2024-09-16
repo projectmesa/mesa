@@ -25,14 +25,10 @@ class Model:
     running a simulation model.
 
     Attributes:
-        - running: A boolean indicating if the model should continue running.
-        - schedule: An object to manage the order and execution of agent steps.
-
-    Properties:
-        - agents: An AgentSet containing all agents in the model
-        - agent_types: A list of different agent types present in the model.
-        - agents_by_type: A dictionary where the keys are agent types and the values are the corresponding AgentSets.
-        - steps: An integer representing the number of steps the model has taken. It increases automatically at the start of each step() call.
+        running: A boolean indicating if the model should continue running.
+        schedule: An object to manage the order and execution of agent steps.
+        steps: the number of times `model.step()` has been called.
+        random: a seeded random number generator.
 
     Notes:
         Model.agents returns the AgentSet containing all agents registered with the model. Changing
@@ -48,9 +44,9 @@ class Model:
         to initialize the model object properly.
 
         Args:
-            *args: arguments to pass onto super
+            args: arguments to pass onto super
             seed: the seed for the random number generator
-            **kwargs: keyword arguments to pass onto super
+            kwargs: keyword arguments to pass onto super
         """
         self.running = True
         self.schedule = None

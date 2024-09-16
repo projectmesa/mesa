@@ -43,9 +43,9 @@ class BaseScheduler:
     It assumes that each agent added has a `step` method which takes no arguments and executes the agent's actions.
 
     Attributes:
-        - model (Model): The model instance associated with the scheduler.
-        - steps (int): The number of steps the scheduler has taken.
-        - time (TimeT): The current time in the simulation. Can be an integer or a float.
+        model (Model): The model instance associated with the scheduler.
+        steps (int): The number of steps the scheduler has taken.
+        time (TimeT): The current time in the simulation. Can be an integer or a float.
 
     """
 

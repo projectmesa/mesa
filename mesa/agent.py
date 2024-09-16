@@ -32,9 +32,9 @@ class Agent:
     """Base class for a model agent in Mesa.
 
     Attributes:
-        - model (Model): A reference to the model instance.
-        - unique_id (int): A unique identifier for this agent.
-        - pos (Position): A reference to the position where this agent is located.
+        model (Model): A reference to the model instance.
+        unique_id (int): A unique identifier for this agent.
+        pos (Position): A reference to the position where this agent is located.
 
     Notes:
           unique_id is unique relative to a model instance and starts from 1
