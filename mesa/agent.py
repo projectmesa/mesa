@@ -51,6 +51,8 @@ class Agent:
 
         Args:
             model (Model): The model instance in which the agent exists.
+            args: currently ignored, to be fixed in 3.1
+            kwargs: currently ignored, to be fixed in 3.1
         """
         # TODO: Cleanup in future Mesa version (3.1+)
         match args:
@@ -86,23 +88,25 @@ class Agent:
     def step(self) -> None:
         """A single step of the agent."""
 
-    def advance(self) -> None:
+    def advance(self) -> None:  # noqa
         pass
 
     @property
     def random(self) -> Random:
+        """Return a seeded rng."""
         return self.model.random
 
 
 class AgentSet(MutableSet, Sequence):
-    """A collection class that represents an ordered set of agents within an agent-based model (ABM). This class
-    extends both MutableSet and Sequence, providing set-like functionality with order preservation and
+    """A collection class that represents an ordered set of agents within an agent-based model (ABM).
+
+    This class extends both MutableSet and Sequence, providing set-like functionality with order preservation and
     sequence operations.
 
     Attributes:
         model (Model): The ABM model instance to which this AgentSet belongs.
 
-    Note:
+    Notes:
         The AgentSet maintains weak references to agents, allowing for efficient management of agent lifecycles
         without preventing garbage collection. It is associated with a specific model instance, enabling
         interactions with the model's environment and other agents.The implementation uses a WeakKeyDictionary to store agents,
@@ -149,6 +153,7 @@ class AgentSet(MutableSet, Sequence):
               - If a float between 0 and 1, at most that fraction of original the agents are selected.
             inplace (bool, optional): If True, modifies the current AgentSet; otherwise, returns a new AgentSet. Defaults to False.
             agent_type (type[Agent], optional): The class type of the agents to select. Defaults to None, meaning no type filtering is applied.
+            n (int): deprecated, use at_most instead
 
         Returns:
             AgentSet: A new AgentSet containing the selected agents, unless inplace is True, in which case the current AgentSet is updated.
@@ -241,6 +246,7 @@ class AgentSet(MutableSet, Sequence):
 
     def _update(self, agents: Iterable[Agent]):
         """Update the AgentSet with a new set of agents.
+
         This is a private method primarily used internally by other methods like select, shuffle, and sort.
         """
         self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
@@ -489,7 +495,7 @@ class AgentSet(MutableSet, Sequence):
         return self.model.random
 
     def groupby(self, by: Callable | str, result_type: str = "agentset") -> GroupBy:
-        """Group agents by the specified attribute or return from the callable
+        """Group agents by the specified attribute or return from the callable.
 
         Args:
             by (Callable, str): used to determine what to group agents by
@@ -531,7 +537,7 @@ class AgentSet(MutableSet, Sequence):
 
 
 class GroupBy:
-    """Helper class for AgentSet.groupby
+    """Helper class for AgentSet.groupby.
 
     Attributes:
         groups (dict): A dictionary with the group_name as key and group as values
@@ -539,6 +545,12 @@ class GroupBy:
     """
 
     def __init__(self, groups: dict[Any, list | AgentSet]):
+        """Initialize a GroupBy instance.
+
+        Args:
+            groups (dict): A dictionary with the group_name as key and group as values
+
+        """
         self.groups: dict[Any, list | AgentSet] = groups
 
     def map(self, method: Callable | str, *args, **kwargs) -> dict[Any, Any]:
@@ -551,6 +563,8 @@ class GroupBy:
                                     * if ``method`` is a str, it should refer to a method on the group
 
                                     Additional arguments and keyword arguments will be passed on to the callable.
+            args: arguments to pass to the callable
+            kwargs: keyword arguments to pass to the callable
 
         Returns:
             dict with group_name as key and the return of the method as value
@@ -568,7 +582,7 @@ class GroupBy:
             return {k: method(v, *args, **kwargs) for k, v in self.groups.items()}
 
     def do(self, method: Callable | str, *args, **kwargs) -> GroupBy:
-        """Apply the specified callable to each group
+        """Apply the specified callable to each group.
 
         Args:
             method (Callable, str): The callable to apply to each group,
@@ -577,6 +591,8 @@ class GroupBy:
                                     * if ``method`` is a str, it should refer to a method on the group
 
                                     Additional arguments and keyword arguments will be passed on to the callable.
+            args: arguments to pass to the callable
+            kwargs: keyword arguments to pass to the callable
 
         Returns:
             the original GroupBy instance
@@ -595,8 +611,8 @@ class GroupBy:
 
         return self
 
-    def __iter__(self):
+    def __iter__(self): # noqa
         return iter(self.groups.items())
 
-    def __len__(self):
+    def __len__(self):  # noqa
         return len(self.groups)
