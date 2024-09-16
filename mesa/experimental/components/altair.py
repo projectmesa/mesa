@@ -1,3 +1,4 @@
+"""Altair components."""
 import contextlib
 
 import solara
@@ -8,6 +9,14 @@ with contextlib.suppress(ImportError):
 
 @solara.component
 def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):
+    """A component that renders a Space using Altair.
+
+    Args:
+        model: a model instance
+        agent_portrayal: agent portray specification
+        dependencies: optional list of dependencies (currently not used)
+
+    """
     space = getattr(model, "grid", None)
     if space is None:
         # Sometimes the space is defined as model.space instead of model.grid

@@ -1,3 +1,4 @@
+"""Support for using matplotlib to draw spaces."""
 from collections import defaultdict
 
 import networkx as nx
@@ -11,6 +12,14 @@ from mesa.experimental.cell_space import VoronoiGrid
 
 @solara.component
 def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = None):
+    """A component for rendering a space using Matplotlib.
+
+    Args:
+        model: a model instance
+        agent_portrayal: a specification of how to portray an agent.
+        dependencies: list of dependencies.
+
+    """
     space_fig = Figure()
     space_ax = space_fig.subplots()
     space = getattr(model, "grid", None)
@@ -205,6 +214,14 @@ def _draw_voronoi(space, space_ax, agent_portrayal):
 
 @solara.component
 def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
+    """A solara component for creating a matplotlib figure.
+
+    Args:
+        model: Model instance
+        measure: measure to plot
+        dependencies: list of addtional dependencies
+
+    """
     fig = Figure()
     ax = fig.subplots()
     df = model.datacollector.get_model_vars_dataframe()
