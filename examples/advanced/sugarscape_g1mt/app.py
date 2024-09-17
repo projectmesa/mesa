@@ -1,12 +1,12 @@
 import numpy as np
 import solara
 from matplotlib.figure import Figure
-from mesa.visualization import SolaraViz
+from mesa.visualization import SolaraViz, make_plot_measure
 from sugarscape_g1mt.model import SugarscapeG1mt
 from sugarscape_g1mt.trader_agents import Trader
 
 
-def space_drawer(model, agent_portrayal):
+def SpaceDrawer(model):
     def portray(g):
         layers = {
             "sugar": [[np.nan for j in range(g.height)] for i in range(g.width)],
@@ -42,7 +42,7 @@ def space_drawer(model, agent_portrayal):
     # Trader
     ax.scatter(**out["trader"])
     ax.set_axis_off()
-    solara.FigureMatplotlib(fig)
+    return solara.FigureMatplotlib(fig)
 
 
 model_params = {
@@ -50,12 +50,12 @@ model_params = {
     "height": 50,
 }
 
+model1 = SugarscapeG1mt(50, 50)
+
 page = SolaraViz(
-    SugarscapeG1mt,
-    model_params,
-    measures=["Trader", "Price"],
+    model1,
+    components=[SpaceDrawer, make_plot_measure(["Trader", "Price"])],
     name="Sugarscape {G1, M, T}",
-    space_drawer=space_drawer,
     play_interval=1500,
 )
 page  # noqa
