@@ -1,4 +1,4 @@
-# noqa: D102
+# noqa: D100
 #!/usr/bin/env python3
 #
 # Mesa documentation build configuration file, created by
@@ -13,10 +13,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
 import os
+import sys
 from datetime import date
-
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -43,7 +42,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.ifconfig",
     "sphinx.ext.viewcode",
-    'sphinx.ext.napoleon',  # for google style docstrings
+    "sphinx.ext.napoleon",  # for google style docstrings
     "myst_nb",  # For Markdown and Jupyter notebooks
 ]
 
@@ -283,4 +282,4 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'python': ("https://docs.python.org/3", None)}
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
