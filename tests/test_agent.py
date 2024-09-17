@@ -1,3 +1,4 @@
+"""Agent.py related tests."""
 import pickle
 
 import numpy as np
@@ -8,30 +9,40 @@ from mesa.model import Model
 
 
 class TestAgent(Agent):
+    """Agent class for testing."""
     def get_unique_identifier(self):
+        """Return unique identifier for this agent."""
         return self.unique_id
 
 
 class TestAgentDo(Agent):
+    """Agent class for testing."""
     def __init__(
         self,
         model,
     ):
+        """Initialize an Agent.
+
+        Args:
+            model (Model): the model to which the agent belongs
+
+        """
         super().__init__(model)
         self.agent_set = None
 
-    def get_unique_identifier(self):
+    def get_unique_identifier(self):  # noqa D103
         return self.unique_id
 
-    def do_add(self):
+    def do_add(self):  # noqa D103
         agent = TestAgentDo(self.model)
         self.agent_set.add(agent)
 
-    def do_remove(self):
+    def do_remove(self):  # noqa D103
         self.agent_set.remove(self)
 
 
 def test_agent_removal():
+    """Test agent removal."""
     model = Model()
     agent = TestAgent(model)
     # Check if the agent is added
@@ -43,6 +54,7 @@ def test_agent_removal():
 
 
 def test_agentset():
+    """Test agentset class."""
     # create agentset
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
@@ -112,6 +124,7 @@ def test_agentset():
 
 
 def test_agentset_initialization():
+    """Test agentset initialization."""
     model = Model()
     empty_agentset = AgentSet([], model)
     assert len(empty_agentset) == 0
@@ -122,6 +135,7 @@ def test_agentset_initialization():
 
 
 def test_agentset_serialization():
+    """Test pickleability of agentset."""
     model = Model()
     agents = [TestAgent(model) for _ in range(5)]
     agentset = AgentSet(agents, model)
@@ -136,6 +150,7 @@ def test_agentset_serialization():
 
 
 def test_agent_membership():
+    """Test agent membership in AgentSet."""
     model = Model()
     agents = [TestAgent(model) for _ in range(5)]
     agentset = AgentSet(agents, model)
@@ -145,6 +160,7 @@ def test_agent_membership():
 
 
 def test_agent_add_remove_discard():
+    """Test adding, removing and discarding agents from AgentSet."""
     model = Model()
     agent = TestAgent(model)
     agentset = AgentSet([], model)
@@ -164,6 +180,7 @@ def test_agent_add_remove_discard():
 
 
 def test_agentset_get_item():
+    """Test integer based access to AgentSet."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -177,6 +194,7 @@ def test_agentset_get_item():
 
 
 def test_agentset_do_str():
+    """Test AgentSet.do with str."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -211,6 +229,7 @@ def test_agentset_do_str():
 
 
 def test_agentset_do_callable():
+    """Test AgentSet.do with callable."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -277,6 +296,7 @@ def test_agentset_do_callable():
 
 
 def test_agentset_get():
+    """Test AgentSet.get."""
     model = Model()
     _ = [TestAgent(i, model) for i in range(10)]
 
@@ -322,6 +342,7 @@ def test_agentset_get():
 
 
 def test_agentset_agg():
+    """Test agentset.agg."""
     model = Model()
     agents = [TestAgent(model) for i in range(10)]
 
@@ -357,6 +378,7 @@ def test_agentset_agg():
 
 
 def test_agentset_set_method():
+    """Test AgentSet.set."""
     # Initialize the model and agents with and without existing attributes
     class TestAgentWithAttribute(Agent):
         def __init__(self, model, age=None):
@@ -381,6 +403,7 @@ def test_agentset_set_method():
 
 
 def test_agentset_map_str():
+    """Test AgentSet.map with strings."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -393,6 +416,7 @@ def test_agentset_map_str():
 
 
 def test_agentset_map_callable():
+    """Test AgentSet.map with callable."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -410,6 +434,7 @@ def test_agentset_map_callable():
 
 
 def test_agentset_get_attribute():
+    """Test AgentSet.get for attributes."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -440,11 +465,14 @@ def test_agentset_get_attribute():
 
 
 class OtherAgentType(Agent):
+    """Another Agent class for testing."""
     def get_unique_identifier(self):
+        """Return unique identifier."""
         return self.unique_id
 
 
 def test_agentset_select_by_type():
+    """Test AgentSet.select for agent type."""
     model = Model()
     # Create a mix of agents of two different types
     test_agents = [TestAgent(model) for _ in range(4)]
@@ -471,6 +499,7 @@ def test_agentset_select_by_type():
 
 
 def test_agentset_shuffle():
+    """Test AgentSet.shuffle."""
     model = Model()
     test_agents = [TestAgent(model) for _ in range(12)]
 
@@ -484,6 +513,7 @@ def test_agentset_shuffle():
 
 
 def test_agentset_groupby():
+    """Test AgentSet.groupby."""
     class TestAgent(Agent):
         def __init__(self, model):
             super().__init__(model)
@@ -527,6 +557,7 @@ def test_agentset_groupby():
 
 def test_oldstyle_agent_instantiation():
     """Old behavior of Agent creation with unique_id and model as positional arguments.
+
     Can be removed/updated in the future.
     """
     model = Model()
