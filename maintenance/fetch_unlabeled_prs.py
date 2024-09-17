@@ -1,4 +1,4 @@
-# noqa
+# noqa D103
 import os
 from datetime import datetime
 

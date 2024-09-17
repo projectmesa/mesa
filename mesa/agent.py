@@ -88,7 +88,7 @@ class Agent:
     def step(self) -> None:
         """A single step of the agent."""
 
-    def advance(self) -> None:  # noqa
+    def advance(self) -> None:  # noqa D103
         pass
 
     @property
@@ -611,8 +611,8 @@ class GroupBy:
 
         return self
 
-    def __iter__(self):  # noqa
+    def __iter__(self):  # noqa D103
         return iter(self.groups.items())
 
-    def __len__(self):  # noqa
+    def __len__(self):  # noqa D103
         return len(self.groups)

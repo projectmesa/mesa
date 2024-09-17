@@ -72,7 +72,7 @@ class Model:
         # Call the original user-defined step method
         self._user_step(*args, **kwargs)
 
-    def next_id(self) -> int:  # noqa
+    def next_id(self) -> int:  # noqa D103
         warnings.warn(
             "using model.next_id() is deprecated. Agents track their unique ID automatically",
             DeprecationWarning,
