@@ -1,4 +1,5 @@
 """Test removal of agents."""
+
 import unittest
 
 import numpy as np

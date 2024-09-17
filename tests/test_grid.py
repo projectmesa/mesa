@@ -427,7 +427,6 @@ class TestHexSingleGridTorus(TestSingleGrid):
 
 
 class TestIndexing:  # noqa D103
-
     # Create a grid where the content of each coordinate is a tuple of its coordinates
     grid = SingleGrid(3, 5, True)
     for _, pos in grid.coord_iter():

@@ -1,4 +1,6 @@
 """Test if namespsaces importing work better."""
+
+
 def test_import():
     """This tests the new, simpler Mesa namespace.
 

@@ -76,6 +76,7 @@ class MockModel(Model):
 
 class TestDataCollector(unittest.TestCase):
     """Tests for DataCollector."""
+
     def setUp(self):
         """Create the model and run it a set number of steps."""
         self.model = MockModel()
@@ -183,6 +184,7 @@ class TestDataCollector(unittest.TestCase):
 
 class TestDataCollectorInitialization(unittest.TestCase):
     """Tests for DataCollector initialization."""
+
     def setUp(self):  # noqa D103
         self.model = Model()
 

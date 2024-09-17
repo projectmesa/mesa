@@ -1,4 +1,5 @@
 """Tests for model.py."""
+
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
@@ -15,6 +16,7 @@ def test_model_set_up():
 
 def test_running():
     """Test Model is running."""
+
     class TestModel(Model):
         steps = 0
 
@@ -49,6 +51,7 @@ def test_reset_randomizer(newseed=42):
 
 def test_agent_types():
     """Test Mode.agent_types property."""
+
     class TestAgent(Agent):
         pass
 
@@ -60,6 +63,7 @@ def test_agent_types():
 
 def test_agents_by_type():
     """Test getting agents by type from Model."""
+
     class Wolf(Agent):
         pass
 

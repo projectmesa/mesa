@@ -1,4 +1,5 @@
 """Test spaces."""
+
 import unittest
 
 import networkx as nx

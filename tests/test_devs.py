@@ -1,4 +1,5 @@
 """Tests for experimental Simulator classes."""
+
 from unittest.mock import MagicMock
 
 import pytest
