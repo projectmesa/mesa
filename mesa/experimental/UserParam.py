@@ -1,5 +1,7 @@
 """helper classes."""
-class UserParam:   # noqa D103
+
+
+class UserParam:  # noqa D103
     _ERROR_MESSAGE = "Missing or malformed inputs for '{}' Option '{}'"
 
     def maybe_raise_error(self, param_type, valid):  # noqa D103

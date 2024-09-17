@@ -1,4 +1,5 @@
 """Altair based solara components for visualization mesa spaces."""
+
 import contextlib
 
 import solara
