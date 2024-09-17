@@ -1,5 +1,5 @@
 from boid_flockers.model import BoidFlockers
-from mesa.visualization import SolaraViz
+from mesa.visualization import SolaraViz, make_space_matplotlib
 
 
 def boid_draw(agent):
@@ -15,11 +15,12 @@ model_params = {
     "separation": 2,
 }
 
+model = BoidFlockers(100, 100, 100, 5, 10, 2)
+
 page = SolaraViz(
-    model_class=BoidFlockers,
+    model,
+    [make_space_matplotlib(agent_portrayal=boid_draw)],
     model_params=model_params,
-    measures=[],
     name="BoidFlockers",
-    agent_portrayal=boid_draw,
 )
 page  # noqa
