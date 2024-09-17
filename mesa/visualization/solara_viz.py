@@ -91,12 +91,22 @@ def Card(
 def SolaraViz(
     model: "Model" | solara.Reactive["Model"],
     components: list[solara.component] | Literal["default"] = "default",
-    *args,
     play_interval=100,
     model_params=None,
     seed=0,
     name: str | None = None,
 ):
+    """Solara visualization component.
+
+    Args:
+        model: a Model instance
+        components: list of solara components
+        play_interval: int
+        model_params: parameters for instantiating a model
+        seed: the seed for the rng
+        name: str
+
+    """
     update_counter.get()
     if components == "default":
         components = [components_altair.make_space_altair()]
@@ -236,6 +246,15 @@ def check_param_is_fixed(param):
 
 @solara.component
 def ModelCreator(model, model_params, seed=1):
+    """Helper class to create a new Model instance.
+
+    Args:
+        model: model instance
+        model_params: model parameters
+        seed: the seed to use for the random number generator
+
+
+    """
     user_params, fixed_params = split_model_params(model_params)
 
     reactive_seed = solara.use_reactive(seed)
@@ -274,12 +293,12 @@ def ModelCreator(model, model_params, seed=1):
 @solara.component
 def UserInputs(user_params, on_change=None):
     """Initialize user inputs for configurable model parameters.
+
     Currently supports :class:`solara.SliderInt`, :class:`solara.SliderFloat`,
     :class:`solara.Select`, and :class:`solara.Checkbox`.
 
     Args:
-        user_params: Dictionary with options for the input, including label,
-        min and max values, and other fields specific to the input type.
+        user_params: Dictionary with options for the input, including label, min and max values, and other fields specific to the input type.
         on_change: Function to be called with (name, value) when the value of an input changes.
     """
     for name, options in user_params.items():
@@ -378,6 +397,6 @@ def make_initial_grid_layout(layout_types):
 
 
 @solara.component
-def ShowSteps(model):
+def ShowSteps(model):  # noqa D103
     update_counter.get()
     return solara.Text(f"Step: {model.steps}")

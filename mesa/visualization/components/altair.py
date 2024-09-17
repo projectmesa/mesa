@@ -1,3 +1,4 @@
+"""Altair based solara components for visualization mesa spaces."""
 import contextlib
 
 import solara
@@ -8,7 +9,7 @@ with contextlib.suppress(ImportError):
 from mesa.visualization.utils import update_counter
 
 
-def make_space_altair(agent_portrayal=None):
+def make_space_altair(agent_portrayal=None):  # noqa D103
     if agent_portrayal is None:
 
         def agent_portrayal(a):
@@ -21,7 +22,7 @@ def make_space_altair(agent_portrayal=None):
 
 
 @solara.component
-def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):
+def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):  # noqa D103
     update_counter.get()
     space = getattr(model, "grid", None)
     if space is None:

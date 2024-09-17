@@ -1,7 +1,8 @@
-class UserParam:
+"""helper classes."""
+class UserParam:   # noqa D103
     _ERROR_MESSAGE = "Missing or malformed inputs for '{}' Option '{}'"
 
-    def maybe_raise_error(self, param_type, valid):
+    def maybe_raise_error(self, param_type, valid):  # noqa D103
         if valid:
             return
         msg = self._ERROR_MESSAGE.format(param_type, self.label)
@@ -32,6 +33,16 @@ class Slider(UserParam):
         step=1,
         dtype=None,
     ):
+        """Slider class.
+
+        Args:
+            label: The displayed label in the UI
+            value: The initial value of the slider
+            min: The minimum possible value of the slider
+            max: The maximum possible value of the slider
+            step: The step between min and max for a range of possible values
+            dtype: either int or float
+        """
         self.label = label
         self.value = value
         self.min = min
@@ -50,5 +61,5 @@ class Slider(UserParam):
     def _check_values_are_float(self, value, min, max, step):
         return any(isinstance(n, float) for n in (value, min, max, step))
 
-    def get(self, attr):
+    def get(self, attr):  # noqa D103
         return getattr(self, attr)

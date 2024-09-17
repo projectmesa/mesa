@@ -73,8 +73,7 @@ class BaseScheduler:
         """Add an Agent object to the schedule.
 
         Args:
-            agent: An Agent to be added to the schedule. NOTE: The agent must
-            have a step() method.
+            agent (Agent): An Agent to be added to the schedule.
         """
         if agent not in self._agents:
             self._agents.add(agent)
