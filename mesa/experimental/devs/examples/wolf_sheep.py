@@ -42,7 +42,7 @@ class Animal(mesa.Agent):
         )
         self.model.grid.place_agent(offspring, self.pos)
 
-    def feed(self): ...  # noqa
+    def feed(self): ...  # noqa D103
 
     def die(self):
         """Die."""
@@ -94,7 +94,7 @@ class GrassPatch(mesa.Agent):
     """A patch of grass that grows at a fixed rate and it is eaten by sheep."""
 
     @property
-    def fully_grown(self) -> bool:  # noqa
+    def fully_grown(self) -> bool:  # noqa D103
         return self._fully_grown
 
     @fully_grown.setter
