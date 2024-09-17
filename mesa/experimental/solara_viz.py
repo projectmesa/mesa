@@ -349,6 +349,7 @@ def check_param_is_fixed(param):
 @solara.component
 def UserInputs(user_params, on_change=None):
     """Initialize user inputs for configurable model parameters.
+
     Currently supports :class:`solara.SliderInt`, :class:`solara.SliderFloat`,
     :class:`solara.Select`, and :class:`solara.Checkbox`.
 

@@ -21,7 +21,7 @@ TEST_GRID = [[0, 1, 0, 1, 0, 0], [0, 0, 1, 1, 0, 1], [1, 1, 0, 0, 0, 1]]
 class MockAgent:
     """Minimalistic agent for testing purposes."""
 
-    def __init__(self, unique_id):
+    def __init__(self, unique_id):  # noqa D103
         self.random = random.Random(0)
         self.unique_id = unique_id
         self.pos = None
@@ -33,7 +33,7 @@ class TestSingleGrid(unittest.TestCase):
     torus = False
 
     def setUp(self):
-        """Create a test non-toroidal grid and populate it with Mock Agents"""
+        """Create a test non-toroidal grid and populate it with Mock Agents."""
         # The height needs to be even to test the edge case described in PR #1517
         height = 6  # height of grid
         width = 3  # width of grid
@@ -57,15 +57,15 @@ class TestSingleGrid(unittest.TestCase):
             assert self.grid[x][y] == agent
 
     def test_cell_agent_reporting(self):
-        """Ensure that if an agent is in a cell, get_cell_list_contents accurately
-        reports that fact.
-        """
+        """Ensure that if an agent is in a cell, get_cell_list_contents accurately reports that fact."""
         for agent in self.agents:
             x, y = agent.pos
             assert agent in self.grid.get_cell_list_contents([(x, y)])
 
     def test_listfree_cell_agent_reporting(self):
-        """Ensure that if an agent is in a cell, get_cell_list_contents accurately
+        """Test if agent is correctly tracked in cell.
+
+        Ensure that if an agent is in a cell, get_cell_list_contents accurately
         reports that fact, even when single position is not wrapped in a list.
         """
         for agent in self.agents:
@@ -73,15 +73,15 @@ class TestSingleGrid(unittest.TestCase):
             assert agent in self.grid.get_cell_list_contents((x, y))
 
     def test_iter_cell_agent_reporting(self):
-        """Ensure that if an agent is in a cell, iter_cell_list_contents
-        accurately reports that fact.
-        """
+        """Ensure that if an agent is in a cell, iter_cell_list_contents accurately reports that fact."""
         for agent in self.agents:
             x, y = agent.pos
             assert agent in self.grid.iter_cell_list_contents([(x, y)])
 
     def test_listfree_iter_cell_agent_reporting(self):
-        """Ensure that if an agent is in a cell, iter_cell_list_contents
+        """Test if agent is correctly tracked in cell in iterator.
+
+        Ensure that if an agent is in a cell, iter_cell_list_contents
         accurately reports that fact, even when single position is not
         wrapped in a list.
         """
@@ -112,7 +112,7 @@ class TestSingleGrid(unittest.TestCase):
         neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
         assert len(neighbors) == 3
 
-    def test_coord_iter(self):
+    def test_coord_iter(self):  # noqa D103
         ci = self.grid.coord_iter()
 
         # no agent in first space
@@ -126,7 +126,7 @@ class TestSingleGrid(unittest.TestCase):
         assert second[0].pos == (0, 1)
         assert second[1] == (0, 1)
 
-    def test_agent_move(self):
+    def test_agent_move(self):  # noqa D103
         # get the agent at [0, 1]
         agent = self.agents[0]
         self.grid.move_agent(agent, (1, 0))
@@ -143,14 +143,14 @@ class TestSingleGrid(unittest.TestCase):
             self.grid.move_agent(agent, [1, self.grid.height])
             assert agent.pos == (1, 0)
 
-    def test_agent_remove(self):
+    def test_agent_remove(self):  # noqa D103
         agent = self.agents[0]
         x, y = agent.pos
         self.grid.remove_agent(agent)
         assert agent.pos is None
         assert self.grid[x][y] is None
 
-    def test_swap_pos(self):
+    def test_swap_pos(self):  # noqa D103
         # Swap agents positions
         agent_a, agent_b = list(filter(None, self.grid))[:2]
         pos_a = agent_a.pos
@@ -221,7 +221,7 @@ class TestSingleGridEnforcement(unittest.TestCase):
     """Test the enforcement in SingleGrid."""
 
     def setUp(self):
-        """Create a test non-toroidal grid and populate it with Mock Agents"""
+        """Create a test non-toroidal grid and populate it with Mock Agents."""
         width = 3
         height = 5
         self.grid = SingleGrid(width, height, True)
@@ -286,12 +286,12 @@ TEST_MULTIGRID = [[0, 1, 0, 2, 0], [0, 1, 5, 0, 0], [0, 0, 0, 3, 0]]
 
 
 class TestMultiGrid(unittest.TestCase):
-    """Testing a toroidal MultiGrid"""
+    """Testing a toroidal MultiGrid."""
 
     torus = True
 
     def setUp(self):
-        """Create a test non-toroidal grid and populate it with Mock Agents"""
+        """Create a test non-toroidal grid and populate it with Mock Agents."""
         width = 3
         height = 5
         self.grid = MultiGrid(width, height, self.torus)
@@ -340,7 +340,7 @@ class TestHexSingleGrid(unittest.TestCase):
     """Testing a hexagonal singlegrid."""
 
     def setUp(self):
-        """Create a test non-toroidal grid and populate it with Mock Agents"""
+        """Create a test non-toroidal grid and populate it with Mock Agents."""
         width = 3
         height = 5
         self.grid = HexSingleGrid(width, height, torus=False)
@@ -388,7 +388,7 @@ class TestHexSingleGridTorus(TestSingleGrid):
     """Testing a hexagonal toroidal singlegrid."""
 
     def setUp(self):
-        """Create a test non-toroidal grid and populate it with Mock Agents"""
+        """Create a test non-toroidal grid and populate it with Mock Agents."""
         width = 3
         height = 5
         self.grid = HexSingleGrid(width, height, torus=True)
@@ -426,27 +426,28 @@ class TestHexSingleGridTorus(TestSingleGrid):
         assert sum(x + y for x, y in neighborhood) == 45
 
 
-class TestIndexing:
+class TestIndexing:  # noqa D103
+
     # Create a grid where the content of each coordinate is a tuple of its coordinates
     grid = SingleGrid(3, 5, True)
     for _, pos in grid.coord_iter():
         x, y = pos
         grid._grid[x][y] = pos
 
-    def test_int(self):
+    def test_int(self):  # noqa D103
         assert self.grid[0][0] == (0, 0)
 
-    def test_tuple(self):
+    def test_tuple(self):  # noqa D103
         assert self.grid[1, 1] == (1, 1)
 
-    def test_list(self):
+    def test_list(self):  # noqa D103
         assert self.grid[(0, 0), (1, 1)] == [(0, 0), (1, 1)]
         assert self.grid[(0, 0), (5, 3)] == [(0, 0), (2, 3)]
 
-    def test_torus(self):
+    def test_torus(self):  # noqa D103
         assert self.grid[3, 5] == (0, 0)
 
-    def test_slice(self):
+    def test_slice(self):  # noqa D103
         assert self.grid[:, 0] == [(0, 0), (1, 0), (2, 0)]
         assert self.grid[::-1, 0] == [(2, 0), (1, 0), (0, 0)]
         assert self.grid[1, :] == [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4)]

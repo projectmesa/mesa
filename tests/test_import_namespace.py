@@ -1,6 +1,9 @@
+"""Test if namespsaces importing work better."""
 def test_import():
-    # This tests the new, simpler Mesa namespace. See
-    # https://github.com/projectmesa/mesa/pull/1294.
+    """This tests the new, simpler Mesa namespace.
+
+    See https://github.com/projectmesa/mesa/pull/1294.
+    """
     import mesa
     from mesa.time import RandomActivation
 

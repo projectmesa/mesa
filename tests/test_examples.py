@@ -1,3 +1,4 @@
+# noqa D103
 import contextlib
 import importlib
 import os.path
@@ -5,7 +6,7 @@ import sys
 import unittest
 
 
-def classcase(name):
+def classcase(name):  # noqa D103
     return "".join(x.capitalize() for x in name.replace("-", "_").split("_"))
 
 
@@ -13,7 +14,9 @@ def classcase(name):
     "Skipping TextExamples, because examples folder was moved. More discussion needed."
 )
 class TestExamples(unittest.TestCase):
-    """Test examples' models.  This creates a model object and iterates it through
+    """Test examples' models.
+
+    This creates a model object and iterates it through
     some steps.  The idea is to get code coverage, rather than to test the
     details of each example's model.
     """
@@ -22,7 +25,7 @@ class TestExamples(unittest.TestCase):
 
     @contextlib.contextmanager
     def active_example_dir(self, example):
-        """Save and restore sys.path and sys.modules"""
+        """Save and restore sys.path and sys.modules."""
         old_sys_path = sys.path[:]
         old_sys_modules = sys.modules.copy()
         old_cwd = os.getcwd()
@@ -39,7 +42,7 @@ class TestExamples(unittest.TestCase):
             sys.modules.update(old_sys_modules)
             sys.path[:] = old_sys_path
 
-    def test_examples(self):
+    def test_examples(self):  # noqa D103
         for example in os.listdir(self.EXAMPLES):
             if not os.path.isdir(os.path.join(self.EXAMPLES, example)):
                 continue

@@ -1,3 +1,4 @@
+"""Test Solara visualizations."""
 import unittest
 from unittest.mock import Mock
 
@@ -9,8 +10,8 @@ from mesa.visualization.components.matplotlib import make_space_matplotlib
 from mesa.visualization.solara_viz import Slider, SolaraViz, UserInputs
 
 
-class TestMakeUserInput(unittest.TestCase):
-    def test_unsupported_type(self):
+class TestMakeUserInput(unittest.TestCase):  # noqa D103
+    def test_unsupported_type(self):  # noqa D103
         @solara.component
         def Test(user_params):
             UserInputs(user_params)
@@ -24,7 +25,7 @@ class TestMakeUserInput(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "not a supported input type"):
             solara.render(Test({"mock": {}}), handle_error=False)
 
-    def test_slider_int(self):
+    def test_slider_int(self):  # noqa D103
         @solara.component
         def Test(user_params):
             UserInputs(user_params)
@@ -47,7 +48,7 @@ class TestMakeUserInput(unittest.TestCase):
         assert slider_int.max == options["max"]
         assert slider_int.step == options["step"]
 
-    def test_checkbox(self):
+    def test_checkbox(self):  # noqa D103
         @solara.component
         def Test(user_params):
             UserInputs(user_params)
@@ -61,7 +62,7 @@ class TestMakeUserInput(unittest.TestCase):
         assert checkbox.label == options["label"]
 
     def test_label_fallback(self):
-        """Name should be used as fallback label"""
+        """Name should be used as fallback label."""
 
         @solara.component
         def Test(user_params):
@@ -83,7 +84,7 @@ class TestMakeUserInput(unittest.TestCase):
         assert slider_int.step is None
 
 
-def test_call_space_drawer(mocker):
+def test_call_space_drawer(mocker):  # noqa D103
     mock_space_matplotlib = mocker.patch(
         "mesa.visualization.components.matplotlib.SpaceMatplotlib"
     )
@@ -122,7 +123,7 @@ def test_call_space_drawer(mocker):
     )
 
 
-def test_slider():
+def test_slider():  # noqa D103
     slider_float = Slider("Agent density", 0.8, 0.1, 1.0, 0.1)
     assert slider_float.is_float_slider
     assert slider_float.value == 0.8
