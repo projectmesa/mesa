@@ -11,7 +11,7 @@ class Animal(mesa.Agent):
         """Initialize Animal instance.
 
         Args:
-            model: a model isntance
+            model: a model instance
             moore: using moore grid or not
             energy: initial energy
             p_reproduce: probability of reproduction
@@ -112,7 +112,7 @@ class GrassPatch(mesa.Agent):
         """Creates a new patch of grass.
 
         Args:
-            model: a model isntance
+            model: a model instance
             fully_grown: (boolean) Whether the patch of grass is fully grown or not
             countdown: Time for the patch of grass to be fully grown again
             grass_regrowth_time: regrowth time for the grass

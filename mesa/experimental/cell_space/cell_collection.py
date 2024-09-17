@@ -88,7 +88,7 @@ class CellCollection(Generic[T]):
 
         Args:
             filter_func: filter function
-            n: number of cells to slect
+            n: number of cells to select
 
         Returns:
             CellCollection

@@ -1,4 +1,4 @@
-"""Schelling seperation for performance benchmarking."""
+"""Schelling separation for performance benchmarking."""
 
 from mesa import Model
 from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid

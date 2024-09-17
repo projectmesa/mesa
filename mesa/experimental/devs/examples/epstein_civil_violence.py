@@ -164,7 +164,7 @@ class Cop(EpsteinAgent):
         Args:
             model: a model instance
             vision: size of neighborhood
-            movement: wether agent can move or not
+            movement: whether agent can move or not
             max_jail_term: maximum jail sentence
         """
         super().__init__(model, vision, movement)

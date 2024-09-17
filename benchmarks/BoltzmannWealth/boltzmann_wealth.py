@@ -1,4 +1,4 @@
-"""boltmann wealth model for peformance benchmarking.
+"""boltmann wealth model for performance benchmarking.
 
 https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 """

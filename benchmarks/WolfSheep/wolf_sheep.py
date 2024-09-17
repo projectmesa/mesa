@@ -1,4 +1,4 @@
-"""Wolf-Sheep Predation Model for peformance benchmarking.
+"""Wolf-Sheep Predation Model for performance benchmarking.
 
 Replication of the model found in NetLogo:
     Wilensky, U. (1997). NetLogo Wolf Sheep Predation model.
@@ -70,7 +70,7 @@ class Sheep(Animal):
     """A sheep that walks around, reproduces (asexually) and gets eaten."""
 
     def feed(self):
-        """If possibile eat the food in the current location."""
+        """If possible eat the food in the current location."""
         # If there is grass available, eat it
         grass_patch = next(
             obj for obj in self.cell.agents if isinstance(obj, GrassPatch)
@@ -84,7 +84,7 @@ class Wolf(Animal):
     """A wolf that walks around, reproduces (asexually) and eats sheep."""
 
     def feed(self):
-        """If possbile eat the food in the current location."""
+        """If possible eat the food in the current location."""
         sheep = [obj for obj in self.cell.agents if isinstance(obj, Sheep)]
         if len(sheep) > 0:
             sheep_to_eat = self.random.choice(sheep)

@@ -1,1 +1,1 @@
-"""Wolf-Sheep Predation Model for peformance benchmarking."""
+"""Wolf-Sheep Predation Model for performance benchmarking."""

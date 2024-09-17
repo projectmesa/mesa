@@ -220,7 +220,7 @@ def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
     Args:
         model: Model instance
         measure: measure to plot
-        dependencies: list of addtional dependencies
+        dependencies: list of additional dependencies
 
     """
     fig = Figure()

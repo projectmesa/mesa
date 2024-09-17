@@ -71,7 +71,7 @@ def is_integer(x: Real) -> bool:
 
 
 def warn_if_agent_has_position_already(placement_func):
-    """Decorater to give warning if agent has position already set."""
+    """Decorator to give warning if agent has position already set."""
 
     def wrapper(self, agent, *args, **kwargs):
         if agent.pos is not None:
