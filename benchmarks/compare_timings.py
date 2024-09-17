@@ -1,3 +1,5 @@
+"""compare timings across 2 benchmarks."""
+
 import pickle
 
 import numpy as np
@@ -13,8 +15,17 @@ with open(f"{filename2}.pickle", "rb") as handle:
     timings_2 = pickle.load(handle)  # noqa: S301
 
 
-# Function to calculate the percentage change and perform bootstrap to estimate the confidence interval
 def bootstrap_percentage_change_confidence_interval(data1, data2, n=1000):
+    """Calculate the percentage change and perform bootstrap to estimate the confidence interval.
+
+    Args:
+        data1: benchmark dataset 1
+        data2: benchmark dataset 2
+        n: bootstrap sample size
+
+    Returns:
+        float, mean, and lower and upper bound of confidence interval.
+    """
     change_samples = []
     for _ in range(n):
         sampled_indices = np.random.choice(
@@ -32,8 +43,8 @@ def bootstrap_percentage_change_confidence_interval(data1, data2, n=1000):
 results_df = pd.DataFrame()
 
 
-# Function to determine the emoji based on change and confidence interval
 def performance_emoji(lower, upper):
+    """Function to determine the emoji based on change and confidence interval."""
     if upper < -3:
         return "🟢"  # Emoji for faster performance
     elif lower > 3:

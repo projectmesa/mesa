@@ -1,6 +1,4 @@
-"""
-Test the DataCollector
-"""
+"""Test the DataCollector."""
 
 import unittest
 
@@ -9,45 +7,37 @@ from mesa.time import BaseScheduler
 
 
 class MockAgent(Agent):
-    """
-    Minimalistic agent for testing purposes.
-    """
+    """Minimalistic agent for testing purposes."""
 
-    def __init__(self, model, val=0):
+    def __init__(self, model, val=0):  # noqa: D107
         super().__init__(model)
         self.val = val
         self.val2 = val
 
-    def step(self):
-        """
-        Increment vals by 1.
-        """
+    def step(self):  # D103
+        """Increment vals by 1."""
         self.val += 1
         self.val2 += 1
 
-    def double_val(self):
+    def double_val(self):  # noqa: D102
         return self.val * 2
 
-    def write_final_values(self):
-        """
-        Write the final value to the appropriate table.
-        """
+    def write_final_values(self):  # D103
+        """Write the final value to the appropriate table."""
         row = {"agent_id": self.unique_id, "final_value": self.val}
         self.model.datacollector.add_table_row("Final_Values", row)
 
 
-def agent_function_with_params(agent, multiplier, offset):
+def agent_function_with_params(agent, multiplier, offset):  # noqa: D103
     return (agent.val * multiplier) + offset
 
 
 class MockModel(Model):
-    """
-    Minimalistic model for testing purposes.
-    """
+    """Minimalistic model for testing purposes."""
 
     schedule = BaseScheduler(None)
 
-    def __init__(self):
+    def __init__(self):  # noqa: D107
         super().__init__()
         self.schedule = BaseScheduler(self)
         self.model_val = 100
@@ -72,23 +62,23 @@ class MockModel(Model):
             tables={"Final_Values": ["agent_id", "final_value"]},
         )
 
-    def test_model_calc_comp(self, input1, input2):
+    def test_model_calc_comp(self, input1, input2):  # noqa: D102
         if input2 > 0:
             return (self.model_val * input1) / input2
         else:
             assert ValueError
             return None
 
-    def step(self):
+    def step(self):  # noqa: D102
         self.schedule.step()
         self.datacollector.collect(self)
 
 
 class TestDataCollector(unittest.TestCase):
+    """Tests for DataCollector."""
+
     def setUp(self):
-        """
-        Create the model and run it a set number of steps.
-        """
+        """Create the model and run it a set number of steps."""
         self.model = MockModel()
         for i in range(7):
             if i == 4:
@@ -99,7 +89,7 @@ class TestDataCollector(unittest.TestCase):
         for agent in self.model.schedule.agents:
             agent.write_final_values()
 
-    def step_assertion(self, model_var):
+    def step_assertion(self, model_var):  # noqa: D102
         for element in model_var:
             if model_var.index(element) < 4:
                 assert element == 10
@@ -107,9 +97,7 @@ class TestDataCollector(unittest.TestCase):
                 assert element == 9
 
     def test_model_vars(self):
-        """
-        Test model-level variable collection.
-        """
+        """Test model-level variable collection."""
         data_collector = self.model.datacollector
         assert "total_agents" in data_collector.model_vars
         assert "model_value" in data_collector.model_vars
@@ -131,9 +119,7 @@ class TestDataCollector(unittest.TestCase):
             assert element is None
 
     def test_agent_records(self):
-        """
-        Test agent-level variable collection.
-        """
+        """Test agent-level variable collection."""
         data_collector = self.model.datacollector
         agent_table = data_collector.get_agent_vars_dataframe()
 
@@ -168,9 +154,7 @@ class TestDataCollector(unittest.TestCase):
             data_collector._agent_records[8]
 
     def test_table_rows(self):
-        """
-        Test table collection
-        """
+        """Test table collection."""
         data_collector = self.model.datacollector
         assert len(data_collector.tables["Final_Values"]) == 2
         assert "agent_id" in data_collector.tables["Final_Values"]
@@ -185,9 +169,7 @@ class TestDataCollector(unittest.TestCase):
             data_collector.add_table_row("Final_Values", {"final_value": 10})
 
     def test_exports(self):
-        """
-        Test DataFrame exports
-        """
+        """Test DataFrame exports."""
         data_collector = self.model.datacollector
         model_vars = data_collector.get_model_vars_dataframe()
         agent_vars = data_collector.get_agent_vars_dataframe()
@@ -201,10 +183,12 @@ class TestDataCollector(unittest.TestCase):
 
 
 class TestDataCollectorInitialization(unittest.TestCase):
-    def setUp(self):
+    """Tests for DataCollector initialization."""
+
+    def setUp(self):  # noqa: D102
         self.model = Model()
 
-    def test_initialize_before_scheduler(self):
+    def test_initialize_before_scheduler(self):  # noqa: D102
         with self.assertRaises(RuntimeError) as cm:
             self.model.initialize_data_collector()
         self.assertEqual(
@@ -212,7 +196,7 @@ class TestDataCollectorInitialization(unittest.TestCase):
             "You must initialize the scheduler (self.schedule) before initializing the data collector.",
         )
 
-    def test_initialize_before_agents_added_to_scheduler(self):
+    def test_initialize_before_agents_added_to_scheduler(self):  # noqa: D102
         with self.assertRaises(RuntimeError) as cm:
             self.model.schedule = BaseScheduler(self)
             self.model.initialize_data_collector()

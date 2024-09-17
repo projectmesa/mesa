@@ -1,3 +1,5 @@
+"""Test cell spaces."""
+
 import random
 
 import pytest
@@ -16,6 +18,7 @@ from mesa.experimental.cell_space import (
 
 
 def test_orthogonal_grid_neumann():
+    """Test orthogonal grid with von Neumann neighborhood."""
     width = 10
     height = 10
     grid = OrthogonalVonNeumannGrid((width, height), torus=False, capacity=None)
@@ -67,6 +70,7 @@ def test_orthogonal_grid_neumann():
 
 
 def test_orthogonal_grid_neumann_3d():
+    """Test 3D orthogonal grid with von Neumann neighborhood."""
     width = 10
     height = 10
     depth = 10
@@ -130,6 +134,7 @@ def test_orthogonal_grid_neumann_3d():
 
 
 def test_orthogonal_grid_moore():
+    """Test orthogonal grid with Moore neighborhood."""
     width = 10
     height = 10
 
@@ -160,6 +165,7 @@ def test_orthogonal_grid_moore():
 
 
 def test_orthogonal_grid_moore_3d():
+    """Test 3D orthogonal grid with Moore neighborhood."""
     width = 10
     height = 10
     depth = 10
@@ -199,6 +205,7 @@ def test_orthogonal_grid_moore_3d():
 
 
 def test_orthogonal_grid_moore_4d():
+    """Test 4D orthogonal grid with Moore neighborhood."""
     width = 10
     height = 10
     depth = 10
@@ -243,6 +250,7 @@ def test_orthogonal_grid_moore_4d():
 
 
 def test_orthogonal_grid_moore_1d():
+    """Test 1D orthogonal grid with Moore neighborhood."""
     width = 10
 
     # Moore neighborhood, torus false, left edge
@@ -264,6 +272,7 @@ def test_orthogonal_grid_moore_1d():
 
 
 def test_cell_neighborhood():
+    """Test neighborhood method of cell in different GridSpaces."""
     # orthogonal grid
 
     ## von Neumann
@@ -304,6 +313,7 @@ def test_cell_neighborhood():
 
 
 def test_hexgrid():
+    """Test HexGrid."""
     width = 10
     height = 10
 
@@ -358,6 +368,7 @@ def test_hexgrid():
 
 
 def test_networkgrid():
+    """Test NetworkGrid."""
     import networkx as nx
 
     n = 10
@@ -374,6 +385,7 @@ def test_networkgrid():
 
 
 def test_voronoigrid():
+    """Test VoronoiGrid."""
     points = [[0, 1], [1, 3], [1.1, 1], [1, 1]]
 
     grid = VoronoiGrid(points)
@@ -396,6 +408,7 @@ def test_voronoigrid():
 
 
 def test_empties_space():
+    """Test empties method for Discrete Spaces."""
     import networkx as nx
 
     n = 10
@@ -415,6 +428,7 @@ def test_empties_space():
 
 
 def test_cell():
+    """Test Cell class."""
     cell1 = Cell((1,), capacity=None, random=random.Random())
     cell2 = Cell((2,), capacity=None, random=random.Random())
 
@@ -453,6 +467,7 @@ def test_cell():
 
 
 def test_cell_collection():
+    """Test CellCollection."""
     cell1 = Cell((1,), capacity=None, random=random.Random())
 
     collection = CellCollection({cell1: cell1.agents}, random=random.Random())

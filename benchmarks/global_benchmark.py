@@ -1,3 +1,5 @@
+"""runner for global performance benchmarks."""
+
 import gc
 import os
 import pickle
@@ -16,6 +18,16 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # Generic function to initialize and run a model
 def run_model(model_class, seed, parameters):
+    """Run model for given seed and parameter values.
+
+    Args:
+        model_class: a model class
+        seed: the seed
+        parameters: parameters for the run
+
+    Returns:
+        startup time and run time
+    """
     no_simulator = ["BoltzmannWealth"]
     start_init = timeit.default_timer()
     if model_class.__name__ in no_simulator:
@@ -39,6 +51,13 @@ def run_model(model_class, seed, parameters):
 
 # Function to run experiments and save the fastest replication for each seed
 def run_experiments(model_class, config):
+    """Run performance benchmarks.
+
+    Args:
+        model_class: the model class to use for the benchmark
+        config: the benchmark configuration
+
+    """
     gc.enable()
     sys.path.insert(0, os.path.abspath("."))
 

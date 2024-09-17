@@ -1,7 +1,12 @@
+"""Solara visualization related helper classes."""
+
+
 class UserParam:
+    """UserParam."""
+
     _ERROR_MESSAGE = "Missing or malformed inputs for '{}' Option '{}'"
 
-    def maybe_raise_error(self, param_type, valid):
+    def maybe_raise_error(self, param_type, valid):  # noqa: D102
         if valid:
             return
         msg = self._ERROR_MESSAGE.format(param_type, self.label)
@@ -9,11 +14,9 @@ class UserParam:
 
 
 class Slider(UserParam):
-    """
-    A number-based slider input with settable increment.
+    """A number-based slider input with settable increment.
 
     Example:
-
     slider_option = Slider("My Slider", value=123, min=10, max=200, step=0.1)
 
     Args:
@@ -34,6 +37,16 @@ class Slider(UserParam):
         step=1,
         dtype=None,
     ):
+        """Initializes a slider.
+
+        Args:
+            label: The displayed label in the UI
+            value: The initial value of the slider
+            min: The minimum possible value of the slider
+            max: The maximum possible value of the slider
+            step: The step between min and max for a range of possible values
+            dtype: either int or float
+        """
         self.label = label
         self.value = value
         self.min = min
@@ -49,8 +62,8 @@ class Slider(UserParam):
         else:
             self.is_float_slider = dtype is float
 
-    def _check_values_are_float(self, value, min, max, step):
+    def _check_values_are_float(self, value, min, max, step):  # D103
         return any(isinstance(n, float) for n in (value, min, max, step))
 
-    def get(self, attr):
+    def get(self, attr):  # noqa: D102
         return getattr(self, attr)
