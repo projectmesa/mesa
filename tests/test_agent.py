@@ -1,4 +1,5 @@
 """Agent.py related tests."""
+
 import pickle
 
 import numpy as np
@@ -10,6 +11,7 @@ from mesa.model import Model
 
 class TestAgent(Agent):
     """Agent class for testing."""
+
     def get_unique_identifier(self):
         """Return unique identifier for this agent."""
         return self.unique_id
@@ -17,6 +19,7 @@ class TestAgent(Agent):
 
 class TestAgentDo(Agent):
     """Agent class for testing."""
+
     def __init__(
         self,
         model,
@@ -379,6 +382,7 @@ def test_agentset_agg():
 
 def test_agentset_set_method():
     """Test AgentSet.set."""
+
     # Initialize the model and agents with and without existing attributes
     class TestAgentWithAttribute(Agent):
         def __init__(self, model, age=None):
@@ -466,6 +470,7 @@ def test_agentset_get_attribute():
 
 class OtherAgentType(Agent):
     """Another Agent class for testing."""
+
     def get_unique_identifier(self):
         """Return unique identifier."""
         return self.unique_id
@@ -514,6 +519,7 @@ def test_agentset_shuffle():
 
 def test_agentset_groupby():
     """Test AgentSet.groupby."""
+
     class TestAgent(Agent):
         def __init__(self, model):
             super().__init__(model)

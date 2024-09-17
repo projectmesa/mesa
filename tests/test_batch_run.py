@@ -1,4 +1,5 @@
 """Test Batchrunner."""
+
 import mesa
 from mesa.agent import Agent
 from mesa.batchrunner import _make_model_kwargs

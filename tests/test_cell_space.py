@@ -1,4 +1,5 @@
 """Test cell spaces."""
+
 import random
 
 import pytest
