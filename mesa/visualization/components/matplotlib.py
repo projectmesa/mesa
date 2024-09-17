@@ -12,7 +12,7 @@ from mesa.experimental.cell_space import VoronoiGrid
 from mesa.visualization.utils import update_counter
 
 
-def make_space_matplotlib(agent_portrayal=None):  # noqa D103
+def make_space_matplotlib(agent_portrayal=None):  # noqa: D103
     if agent_portrayal is None:
 
         def agent_portrayal(a):
@@ -25,7 +25,7 @@ def make_space_matplotlib(agent_portrayal=None):  # noqa D103
 
 
 @solara.component
-def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = None):  # noqa D103
+def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = None):  # noqa: D103
     update_counter.get()
     space_fig = Figure()
     space_ax = space_fig.subplots()
@@ -219,7 +219,7 @@ def _draw_voronoi(space, space_ax, agent_portrayal):
         space_ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in red
 
 
-def make_plot_measure(measure: str | dict[str, str] | list[str] | tuple[str]):  # noqa D103
+def make_plot_measure(measure: str | dict[str, str] | list[str] | tuple[str]):  # noqa: D103
     def MakePlotMeasure(model):
         return PlotMatplotlib(model, measure)
 
@@ -227,7 +227,7 @@ def make_plot_measure(measure: str | dict[str, str] | list[str] | tuple[str]):  
 
 
 @solara.component
-def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):  # noqa D103
+def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):  # noqa: D103
     update_counter.get()
     fig = Figure()
     ax = fig.subplots()

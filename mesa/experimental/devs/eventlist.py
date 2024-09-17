@@ -38,7 +38,7 @@ class SimulationEvent:
     _ids = itertools.count()
 
     @property
-    def CANCELED(self) -> bool:  # noqa D103
+    def CANCELED(self) -> bool:  # noqa: D102
         return self._canceled
 
     def __init__(

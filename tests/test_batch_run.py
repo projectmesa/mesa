@@ -8,7 +8,7 @@ from mesa.model import Model
 from mesa.time import BaseScheduler
 
 
-def test_make_model_kwargs():  # noqa D103
+def test_make_model_kwargs():  # noqa: D103
     assert _make_model_kwargs({"a": 3, "b": 5}) == [{"a": 3, "b": 5}]
     assert _make_model_kwargs({"a": 3, "b": range(3)}) == [
         {"a": 3, "b": 0},
@@ -39,7 +39,7 @@ class MockAgent(Agent):
         self.val = val
         self.local = 0
 
-    def step(self):  # noqa D103
+    def step(self):  # noqa: D102
         self.val += 1
         self.local += 0.25
 
@@ -94,15 +94,15 @@ class MockModel(Model):
         for _ in range(self.n_agents):
             self.schedule.add(MockAgent(self, agent_val))
 
-    def get_local_model_param(self):  # noqa D103
+    def get_local_model_param(self):  # noqa: D102
         return 42
 
-    def step(self):  # noqa D103
+    def step(self):  # noqa: D102
         self.schedule.step()
         self.datacollector.collect(self)
 
 
-def test_batch_run():  # noqa D103
+def test_batch_run():  # noqa: D103
     result = mesa.batch_run(MockModel, {}, number_processes=2)
     assert result == [
         {
@@ -135,7 +135,7 @@ def test_batch_run():  # noqa D103
     ]
 
 
-def test_batch_run_with_params():  # noqa D103
+def test_batch_run_with_params():  # noqa: D103
     mesa.batch_run(
         MockModel,
         {
@@ -146,7 +146,7 @@ def test_batch_run_with_params():  # noqa D103
     )
 
 
-def test_batch_run_no_agent_reporters():  # noqa D103
+def test_batch_run_no_agent_reporters():  # noqa: D103
     result = mesa.batch_run(
         MockModel, {"enable_agent_reporters": False}, number_processes=2
     )
@@ -162,11 +162,11 @@ def test_batch_run_no_agent_reporters():  # noqa D103
     ]
 
 
-def test_batch_run_single_core():  # noqa D103
+def test_batch_run_single_core():  # noqa: D103
     mesa.batch_run(MockModel, {}, number_processes=1, iterations=6)
 
 
-def test_batch_run_unhashable_param():  # noqa D103
+def test_batch_run_unhashable_param():  # noqa: D103
     result = mesa.batch_run(
         MockModel,
         {

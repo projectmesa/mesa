@@ -49,7 +49,7 @@ class Simulator:
         self.time = self.start_time
         self.model = None
 
-    def check_time_unit(self, time: int | float) -> bool: ...  # noqa D103
+    def check_time_unit(self, time: int | float) -> bool: ...  # noqa: D102
 
     def setup(self, model: Model) -> None:
         """Set up the simulator with the model to simulate.

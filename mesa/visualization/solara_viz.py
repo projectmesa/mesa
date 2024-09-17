@@ -397,6 +397,6 @@ def make_initial_grid_layout(layout_types):
 
 
 @solara.component
-def ShowSteps(model):  # noqa D103
+def ShowSteps(model):  # noqa: D103
     update_counter.get()
     return solara.Text(f"Step: {model.steps}")

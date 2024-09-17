@@ -1,4 +1,4 @@
-# noqa D103
+# noqa: D102
 #!/usr/bin/env python3
 #
 # Mesa documentation build configuration file, created by

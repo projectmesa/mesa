@@ -558,7 +558,7 @@ def is_single_argument_function(function):
     )
 
 
-def ufunc_requires_additional_input(ufunc):  # noqa D103
+def ufunc_requires_additional_input(ufunc):  # noqa: D103
     # NumPy ufuncs have a 'nargs' attribute indicating the number of input arguments
     # For binary ufuncs (like np.add), nargs is 2
     return ufunc.nargs > 1
@@ -1031,7 +1031,7 @@ class MultiGrid(_PropertyGrid):
             self._empty_mask[agent.pos] = False
         agent.pos = None
 
-    def iter_neighbors(  # noqa D103
+    def iter_neighbors(  # noqa: D102
         self,
         pos: Coordinate,
         moore: bool,

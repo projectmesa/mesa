@@ -46,7 +46,7 @@ class Animal(CellAgent):
         )
         offspring.move_to(self.cell)
 
-    def feed(self): ...  # noqa D102
+    def feed(self): ...  # noqa: D102
 
     def die(self):
         """Die."""
@@ -98,7 +98,7 @@ class GrassPatch(CellAgent):
     """A patch of grass that grows at a fixed rate and it is eaten by sheep."""
 
     @property
-    def fully_grown(self):  # noqa D102
+    def fully_grown(self):  # noqa: D102
         return self._fully_grown
 
     @fully_grown.setter

@@ -33,14 +33,14 @@ class TestAgentDo(Agent):
         super().__init__(model)
         self.agent_set = None
 
-    def get_unique_identifier(self):  # noqa D103
+    def get_unique_identifier(self):  # noqa: D102
         return self.unique_id
 
-    def do_add(self):  # noqa D103
+    def do_add(self):  # noqa: D102
         agent = TestAgentDo(self.model)
         self.agent_set.add(agent)
 
-    def do_remove(self):  # noqa D103
+    def do_remove(self):  # noqa: D102
         self.agent_set.remove(self)
 
 

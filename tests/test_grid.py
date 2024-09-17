@@ -21,7 +21,7 @@ TEST_GRID = [[0, 1, 0, 1, 0, 0], [0, 0, 1, 1, 0, 1], [1, 1, 0, 0, 0, 1]]
 class MockAgent:
     """Minimalistic agent for testing purposes."""
 
-    def __init__(self, unique_id):  # noqa D103
+    def __init__(self, unique_id):  # noqa: D107
         self.random = random.Random(0)
         self.unique_id = unique_id
         self.pos = None
@@ -112,7 +112,7 @@ class TestSingleGrid(unittest.TestCase):
         neighbors = self.grid.get_neighbors((1, 3), moore=False, radius=2)
         assert len(neighbors) == 3
 
-    def test_coord_iter(self):  # noqa D103
+    def test_coord_iter(self):  # noqa: D102
         ci = self.grid.coord_iter()
 
         # no agent in first space
@@ -126,7 +126,7 @@ class TestSingleGrid(unittest.TestCase):
         assert second[0].pos == (0, 1)
         assert second[1] == (0, 1)
 
-    def test_agent_move(self):  # noqa D103
+    def test_agent_move(self):  # noqa: D102
         # get the agent at [0, 1]
         agent = self.agents[0]
         self.grid.move_agent(agent, (1, 0))
@@ -143,14 +143,14 @@ class TestSingleGrid(unittest.TestCase):
             self.grid.move_agent(agent, [1, self.grid.height])
             assert agent.pos == (1, 0)
 
-    def test_agent_remove(self):  # noqa D103
+    def test_agent_remove(self):  # noqa: D102
         agent = self.agents[0]
         x, y = agent.pos
         self.grid.remove_agent(agent)
         assert agent.pos is None
         assert self.grid[x][y] is None
 
-    def test_swap_pos(self):  # noqa D103
+    def test_swap_pos(self):  # noqa: D102
         # Swap agents positions
         agent_a, agent_b = list(filter(None, self.grid))[:2]
         pos_a = agent_a.pos
@@ -426,27 +426,27 @@ class TestHexSingleGridTorus(TestSingleGrid):
         assert sum(x + y for x, y in neighborhood) == 45
 
 
-class TestIndexing:  # noqa D103
+class TestIndexing:  # noqa: D101
     # Create a grid where the content of each coordinate is a tuple of its coordinates
     grid = SingleGrid(3, 5, True)
     for _, pos in grid.coord_iter():
         x, y = pos
         grid._grid[x][y] = pos
 
-    def test_int(self):  # noqa D103
+    def test_int(self):  # noqa: D102
         assert self.grid[0][0] == (0, 0)
 
-    def test_tuple(self):  # noqa D103
+    def test_tuple(self):  # noqa: D102
         assert self.grid[1, 1] == (1, 1)
 
-    def test_list(self):  # noqa D103
+    def test_list(self):  # noqa: D102
         assert self.grid[(0, 0), (1, 1)] == [(0, 0), (1, 1)]
         assert self.grid[(0, 0), (5, 3)] == [(0, 0), (2, 3)]
 
-    def test_torus(self):  # noqa D103
+    def test_torus(self):  # noqa: D102
         assert self.grid[3, 5] == (0, 0)
 
-    def test_slice(self):  # noqa D103
+    def test_slice(self):  # noqa: D102
         assert self.grid[:, 0] == [(0, 0), (1, 0), (2, 0)]
         assert self.grid[::-1, 0] == [(2, 0), (1, 0), (0, 0)]
         assert self.grid[1, :] == [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4)]

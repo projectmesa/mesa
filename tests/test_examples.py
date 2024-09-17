@@ -1,4 +1,4 @@
-# noqa D103
+# noqa: D100
 import contextlib
 import importlib
 import os.path
@@ -6,7 +6,7 @@ import sys
 import unittest
 
 
-def classcase(name):  # noqa D103
+def classcase(name):  # noqa: D103
     return "".join(x.capitalize() for x in name.replace("-", "_").split("_"))
 
 
@@ -42,7 +42,7 @@ class TestExamples(unittest.TestCase):
             sys.modules.update(old_sys_modules)
             sys.path[:] = old_sys_path
 
-    def test_examples(self):  # noqa D103
+    def test_examples(self):  # noqa: D102
         for example in os.listdir(self.EXAMPLES):
             if not os.path.isdir(os.path.join(self.EXAMPLES, example)):
                 continue

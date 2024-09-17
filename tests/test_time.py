@@ -22,35 +22,35 @@ RANDOM_BY_TYPE = "random_by_type"
 class MockAgent(Agent):
     """Minimalistic agent for testing purposes."""
 
-    def __init__(self, model):  # noqa D103
+    def __init__(self, model):  # noqa: D107
         super().__init__(model)
         self.steps = 0
         self.advances = 0
 
-    def kill_other_agent(self):  # noqa D103
+    def kill_other_agent(self):  # noqa: D102
         for agent in self.model.schedule.agents:
             if agent is not self:
                 agent.remove()
 
-    def stage_one(self):  # noqa D103
+    def stage_one(self):  # noqa: D102
         if self.model.enable_kill_other_agent:
             self.kill_other_agent()
         self.model.log.append(f"{self.unique_id}_1")
 
-    def stage_two(self):  # noqa D103
+    def stage_two(self):  # noqa: D102
         self.model.log.append(f"{self.unique_id}_2")
 
-    def advance(self):  # noqa D103
+    def advance(self):  # noqa: D102
         self.advances += 1
 
-    def step(self):  # noqa D103
+    def step(self):  # noqa: D102
         if self.model.enable_kill_other_agent:
             self.kill_other_agent()
         self.steps += 1
         self.model.log.append(self.unique_id)
 
 
-class MockModel(Model):  # noqa D103
+class MockModel(Model):  # noqa: D101
     def __init__(self, shuffle=False, activation=STAGED, enable_kill_other_agent=False):
         """Creates a Model instance with a schedule.
 
@@ -88,10 +88,10 @@ class MockModel(Model):  # noqa D103
             agent = MockAgent(self)
             self.schedule.add(agent)
 
-    def step(self):  # noqa D103
+    def step(self):  # noqa: D102
         self.schedule.step()
 
-    def model_stage(self):  # noqa D103
+    def model_stage(self):  # noqa: D102
         self.log.append("model_stage")
 
 
@@ -117,7 +117,7 @@ class TestStagedActivation(TestCase):
             assert output in model.log[3:]
         assert self.expected_output[2] == model.log[2]
 
-    def test_shuffle_shuffles_agents(self):  # noqa D103
+    def test_shuffle_shuffles_agents(self):  # noqa: D102
         model = MockModel(shuffle=True)
         model.random = mock.Mock()
         assert model.random.shuffle.call_count == 0
@@ -138,7 +138,7 @@ class TestStagedActivation(TestCase):
         model.step()
         assert len(model.log) == 3
 
-    def test_add_existing_agent(self):  # noqa D103
+    def test_add_existing_agent(self):  # noqa: D102
         model = MockModel()
         agent = model.schedule.agents[0]
         with self.assertRaises(Exception):
@@ -148,7 +148,7 @@ class TestStagedActivation(TestCase):
 class TestRandomActivation(TestCase):
     """Test the random activation."""
 
-    def test_init(self):  # noqa D103
+    def test_init(self):  # noqa: D102
         model = Model()
         agents = [MockAgent(model) for _ in range(10)]
 
@@ -185,7 +185,7 @@ class TestRandomActivation(TestCase):
         model.step()
         assert len(model.log) == 1
 
-    def test_get_agent_keys(self):  # noqa D103
+    def test_get_agent_keys(self):  # noqa: D102
         model = MockModel(activation=RANDOM)
 
         keys = model.schedule.get_agent_keys()
@@ -196,7 +196,7 @@ class TestRandomActivation(TestCase):
         agent_ids = {agent.unique_id for agent in model.agents}
         assert all(entry in agent_ids for entry in keys)
 
-    def test_not_sequential(self):  # noqa D103
+    def test_not_sequential(self):  # noqa: D102
         model = MockModel(activation=RANDOM)
         # Create 10 agents
         for _ in range(10):
@@ -240,7 +240,7 @@ class TestRandomActivationByType(TestCase):
     does step for one type of agents, not the entire agents.
     """
 
-    def test_init(self):  # noqa D103
+    def test_init(self):  # noqa: D102
         model = Model()
         agents = [MockAgent(model) for _ in range(10)]
         agents += [Agent(model) for _ in range(10)]
