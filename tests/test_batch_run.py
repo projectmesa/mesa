@@ -55,7 +55,7 @@ class MockModel(Model):
         schedule=None,
         enable_agent_reporters=True,
         n_agents=3,
-        **kwargs
+        **kwargs,
     ):
         """Initialize a MockModel.
 
