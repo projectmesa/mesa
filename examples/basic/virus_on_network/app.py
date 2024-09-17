@@ -3,7 +3,7 @@ import math
 import solara
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
-from mesa.visualization import SolaraViz, make_text
+from mesa.visualization import SolaraViz, make_space_matplotlib
 from virus_on_network.model import State, VirusOnNetwork, number_infected
 
 
@@ -57,7 +57,7 @@ def make_plot(model):
     fig.legend()
     # Set integer x axis
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    solara.FigureMatplotlib(fig)
+    return solara.FigureMatplotlib(fig)
 
 
 model_params = {
@@ -119,14 +119,17 @@ model_params = {
     },
 }
 
+SpacePlot = make_space_matplotlib(agent_portrayal)
+
+model1 = VirusOnNetwork()
+
 page = SolaraViz(
-    VirusOnNetwork,
-    model_params,
-    measures=[
+    model1,
+    [
+        SpacePlot,
         make_plot,
-        make_text(get_resistant_susceptible_ratio),
+        get_resistant_susceptible_ratio,
     ],
     name="Virus Model",
-    agent_portrayal=agent_portrayal,
 )
 page  # noqa
