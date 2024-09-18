@@ -1,4 +1,9 @@
-"""Cell spaces."""
+"""Cell spaces.
+
+Cell spaces offer an alternative API for discrete spaces. It is experimental and under development. The API is more
+expressive that the default grids available in `mesa.space`. 
+
+"""
 
 from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.cell_agent import CellAgent
