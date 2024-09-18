@@ -69,16 +69,17 @@ class Cell:
         self.properties: dict[Coordinate, object] = {}
         self.random = random
 
-    def connect(self, other: Cell, name: Coordinate | None = None) -> None:
+    def connect(self, other: Cell, key: Coordinate | None = None) -> None:
         """Connects this cell to another cell.
 
         Args:
             other (Cell): other cell to connect to
+            key (Tuple[int, ...]): key for the connection. Should resemble a relative coordinate
 
         """
-        if name is None:
-            name = other.coordinate
-        self.connections[name] = other
+        if key is None:
+            key = other.coordinate
+        self.connections[key] = other
 
     def disconnect(self, other: Cell) -> None:
         """Disconnects this cell from another cell.
