@@ -1,9 +1,5 @@
 # Experimental
-
-```{eval-rst}
-.. automodule:: experimental.__init__
-   :members:
-```
+This namespace contains experimental features. These are under development, and their API is not necessarily stable.
 
 ## Cell Space
 
