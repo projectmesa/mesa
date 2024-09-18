@@ -12,7 +12,7 @@ from mesa.experimental.cell_space import Cell, DiscreteSpace
 T = TypeVar("T", bound=Cell)
 
 
-class Grid(DiscreteSpace, Generic[T]):
+class Grid(DiscreteSpace[T], Generic[T]):
     """Base class for all grid classes.
 
     Attributes:
@@ -100,7 +100,7 @@ class Grid(DiscreteSpace, Generic[T]):
             if self.torus:
                 n_coord = tuple(nc % d for nc, d in zip(n_coord, self.dimensions))
             if all(0 <= nc < d for nc, d in zip(n_coord, self.dimensions)):
-                cell.connect(self._cells[n_coord])
+                cell.connect(self._cells[n_coord], d_coord)
 
     def _connect_single_cell_2d(self, cell: T, offsets: list[tuple[int, int]]) -> None:
         i, j = cell.coordinate
@@ -111,7 +111,7 @@ class Grid(DiscreteSpace, Generic[T]):
             if self.torus:
                 ni, nj = ni % height, nj % width
             if 0 <= ni < height and 0 <= nj < width:
-                cell.connect(self._cells[ni, nj])
+                cell.connect(self._cells[ni, nj], (di, dj))
 
 
 class OrthogonalMooreGrid(Grid[T]):
@@ -133,7 +133,6 @@ class OrthogonalMooreGrid(Grid[T]):
             ( 1, -1), ( 1, 0), ( 1, 1),
         ]
         # fmt: on
-        height, width = self.dimensions
 
         for cell in self.all_cells:
             self._connect_single_cell_2d(cell, offsets)
@@ -165,13 +164,12 @@ class OrthogonalVonNeumannGrid(Grid[T]):
                     ( 1, 0),
         ]
         # fmt: on
-        height, width = self.dimensions
 
         for cell in self.all_cells:
             self._connect_single_cell_2d(cell, offsets)
 
     def _connect_cells_nd(self) -> None:
-        offsets = []
+        offsets: list[tuple[int, ...]] = []
         dimensions = len(self.dimensions)
         for dim in range(dimensions):
             for delta in [
