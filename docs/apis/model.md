@@ -1,3 +1,5 @@
+# Model
+
 ```{eval-rst}
 .. automodule:: mesa.model
    :members:

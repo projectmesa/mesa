@@ -1,3 +1,6 @@
+# Agent
+
+
 ```{eval-rst}
 .. automodule:: mesa.agent
    :members:

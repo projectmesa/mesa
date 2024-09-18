@@ -1,4 +1,4 @@
-"""The agent class for Mesa framework.
+"""Agentt related classes
 
 Core Objects: Agent
 """
