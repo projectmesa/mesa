@@ -1,7 +1,7 @@
-# Spaces
+# Model
 
 ```{eval-rst}
-.. automodule:: mesa.space
+.. automodule:: mesa.model
    :members:
    :inherited-members:
 ```
