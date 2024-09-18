@@ -1,3 +1,4 @@
+# noqa: D100
 import toml
 
 # This file reads the pyproject.toml and prints out the

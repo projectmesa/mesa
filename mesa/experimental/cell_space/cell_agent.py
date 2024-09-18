@@ -1,3 +1,5 @@
+"""An agent with movement methods for cell spaces."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -9,8 +11,7 @@ if TYPE_CHECKING:
 
 
 class CellAgent(Agent):
-    """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces
-
+    """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces.
 
     Attributes:
         unique_id (int): A unique identifier for this agent.
@@ -20,17 +21,21 @@ class CellAgent(Agent):
     """
 
     def __init__(self, model: Model) -> None:
-        """
-        Create a new agent.
+        """Create a new agent.
 
         Args:
-            unique_id (int): A unique identifier for this agent.
             model (Model): The model instance in which the agent exists.
         """
         super().__init__(model)
         self.cell: Cell | None = None
 
     def move_to(self, cell) -> None:
+        """Move agent to cell.
+
+        Args:
+            cell: cell to which agent is to move
+
+        """
         if self.cell is not None:
             self.cell.remove_agent(self)
         self.cell = cell

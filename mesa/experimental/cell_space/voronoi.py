@@ -1,3 +1,5 @@
+"""Support for Voronoi meshed grids."""
+
 from collections.abc import Sequence
 from itertools import combinations
 from random import Random
@@ -9,16 +11,17 @@ from mesa.experimental.cell_space.discrete_space import DiscreteSpace
 
 
 class Delaunay:
-    """
-    Class to compute a Delaunay triangulation in 2D
+    """Class to compute a Delaunay triangulation in 2D.
+
     ref: http://github.com/jmespadero/pyDelaunay2D
     """
 
     def __init__(self, center: tuple = (0, 0), radius: int = 9999) -> None:
-        """
-        Init and create a new frame to contain the triangulation
-        center: Optional position for the center of the frame. Default (0,0)
-        radius: Optional distance from corners to the center.
+        """Init and create a new frame to contain the triangulation.
+
+        Args:
+            center: Optional position for the center of the frame. Default (0,0)
+            radius: Optional distance from corners to the center.
         """
         center = np.asarray(center)
         # Create coordinates for the corners of the frame
@@ -44,9 +47,7 @@ class Delaunay:
             self.circles[t] = self._circumcenter(t)
 
     def _circumcenter(self, triangle: list) -> tuple:
-        """
-        Compute circumcenter and circumradius of a triangle in 2D.
-        """
+        """Compute circumcenter and circumradius of a triangle in 2D."""
         points = np.asarray([self.coords[v] for v in triangle])
         points2 = np.dot(points, points.T)
         a = np.bmat([[2 * points2, [[1], [1], [1]]], [[[1, 1, 1, 0]]]])
@@ -60,16 +61,12 @@ class Delaunay:
         return (center, radius)
 
     def _in_circle(self, triangle: list, point: list) -> bool:
-        """
-        Check if point p is inside of precomputed circumcircle of triangle.
-        """
+        """Check if point p is inside of precomputed circumcircle of triangle."""
         center, radius = self.circles[triangle]
         return np.sum(np.square(center - point)) <= radius
 
     def add_point(self, point: Sequence) -> None:
-        """
-        Add a point to the current DT, and refine it using Bowyer-Watson.
-        """
+        """Add a point to the current DT, and refine it using Bowyer-Watson."""
         point_index = len(self.coords)
         self.coords.append(np.asarray(point))
 
@@ -121,9 +118,7 @@ class Delaunay:
             self.triangles[triangle][2] = new_triangles[(i - 1) % n]  # previous
 
     def export_triangles(self) -> list:
-        """
-        Export the current list of Delaunay triangles
-        """
+        """Export the current list of Delaunay triangles."""
         triangles_list = [
             (a - 4, b - 4, c - 4)
             for (a, b, c) in self.triangles
@@ -132,9 +127,7 @@ class Delaunay:
         return triangles_list
 
     def export_voronoi_regions(self):
-        """
-        Export coordinates and regions of Voronoi diagram as indexed data.
-        """
+        """Export coordinates and regions of Voronoi diagram as indexed data."""
         use_vertex = {i: [] for i in range(len(self.coords))}
         vor_coors = []
         index = {}
@@ -163,11 +156,13 @@ class Delaunay:
         return vor_coors, regions
 
 
-def round_float(x: float) -> int:
+def round_float(x: float) -> int:  # noqa
     return int(x * 500)
 
 
 class VoronoiGrid(DiscreteSpace):
+    """Voronoi meshed GridSpace."""
+
     triangulation: Delaunay
     voronoi_coordinates: list
     regions: list
@@ -181,8 +176,7 @@ class VoronoiGrid(DiscreteSpace):
         capacity_function: callable = round_float,
         cell_coloring_property: str | None = None,
     ) -> None:
-        """
-        A Voronoi Tessellation Grid.
+        """A Voronoi Tessellation Grid.
 
         Given a set of points, this class creates a grid where a cell is centered in each point,
         its neighbors are given by Voronoi Tessellation cells neighbors
@@ -192,7 +186,7 @@ class VoronoiGrid(DiscreteSpace):
             centroids_coordinates: coordinates of centroids to build the tessellation space
             capacity (int) : capacity of the cells in the discrete space
             random (Random): random number generator
-            CellKlass (type[Cell]): type of cell class
+            cell_klass (type[Cell]): type of cell class
             capacity_function (Callable): function to compute (int) capacity according to (float) area
             cell_coloring_property (str): voronoi visualization polygon fill property
         """
@@ -215,9 +209,7 @@ class VoronoiGrid(DiscreteSpace):
         self._build_cell_polygons()
 
     def _connect_cells(self) -> None:
-        """
-        Connect cells to neighbors based on given centroids and using Delaunay Triangulation
-        """
+        """Connect cells to neighbors based on given centroids and using Delaunay Triangulation."""
         self.triangulation = Delaunay()
         for centroid in self.centroids_coordinates:
             self.triangulation.add_point(centroid)

@@ -1,3 +1,5 @@
+"""Test removal of agents."""
+
 import unittest
 
 import numpy as np
@@ -8,10 +10,10 @@ from mesa.time import RandomActivation
 
 
 class LifeTimeModel(Model):
-    """Simple model for running models with a finite life"""
+    """Simple model for running models with a finite life."""
 
-    def __init__(self, agent_lifetime=1, n_agents=10):
-        super().__init__()
+    def __init__(self, agent_lifetime=1, n_agents=10, seed=None):  # noqa: D107
+        super().__init__(seed=seed)
 
         self.agent_lifetime = agent_lifetime
         self.n_agents = n_agents
@@ -32,7 +34,7 @@ class LifeTimeModel(Model):
             self.schedule.add(FiniteLifeAgent(self.agent_lifetime, self))
 
     def step(self):
-        """Add agents back to n_agents in each step"""
+        """Add agents back to n_agents in each step."""
         self.datacollector.collect(self)
         self.schedule.step()
 
@@ -40,30 +42,31 @@ class LifeTimeModel(Model):
             for _ in range(self.n_agents - len(self.schedule.agents)):
                 self.schedule.add(FiniteLifeAgent(self.agent_lifetime, self))
 
-    def run_model(self, step_count=100):
+    def run_model(self, step_count=100):  # noqa: D102
         for _ in range(step_count):
             self.step()
 
 
 class FiniteLifeAgent(Agent):
     """An agent that is supposed to live for a finite number of ticks.
+
     Also has a 10% chance of dying in each tick.
     """
 
-    def __init__(self, lifetime, model):
+    def __init__(self, lifetime, model):  # noqa: D107
         super().__init__(model)
         self.remaining_life = lifetime
         self.steps = 0
         self.model = model
 
-    def step(self):
+    def step(self):  # noqa: D102
         inactivated = self.inactivate()
         if not inactivated:
             self.steps += 1  # keep track of how many ticks are seen
             if np.random.binomial(1, 0.1) != 0:  # 10% chance of dying
                 self.model.schedule.remove(self)
 
-    def inactivate(self):
+    def inactivate(self):  # noqa: D102
         self.remaining_life -= 1
         if self.remaining_life < 0:
             self.model.schedule.remove(self)
@@ -71,18 +74,18 @@ class FiniteLifeAgent(Agent):
         return False
 
 
-class TestAgentLifespan(unittest.TestCase):
-    def setUp(self):
+class TestAgentLifespan(unittest.TestCase):  # noqa: D101
+    def setUp(self):  # noqa: D102
         self.model = LifeTimeModel()
         self.model.run_model()
         self.df = self.model.datacollector.get_agent_vars_dataframe()
         self.df = self.df.reset_index()
 
     def test_ticks_seen(self):
-        """Each agent should be activated no more than one time"""
+        """Each agent should be activated no more than one time."""
         assert self.df.steps.max() == 1
 
-    def test_agent_lifetime(self):
+    def test_agent_lifetime(self):  # noqa: D102
         lifetimes = self.df.groupby(["AgentID"]).agg({"Step": len})
         assert lifetimes.Step.max() == 2
 
