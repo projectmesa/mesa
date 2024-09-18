@@ -1,7 +1,8 @@
-# Spaces
+# Agent
+
 
 ```{eval-rst}
-.. automodule:: mesa.space
+.. automodule:: mesa.agent
    :members:
    :inherited-members:
 ```

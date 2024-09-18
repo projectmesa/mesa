@@ -2,13 +2,12 @@
 
 Objects used to add a spatial component to a model.
 
-Grid: base grid, which creates a rectangular grid.
-SingleGrid: extension to Grid which strictly enforces one agent per cell.
-MultiGrid: extension to Grid where each cell can contain a set of agents.
-HexGrid: extension to Grid to handle hexagonal neighbors.
-ContinuousSpace: a two-dimensional space where each agent has an arbitrary
-                 position of `float`'s.
-NetworkGrid: a network where each node contains zero or more agents.
+* Grid: base grid, which creates a rectangular grid.
+* SingleGrid: extension to Grid which strictly enforces one agent per cell.
+* MultiGrid: extension to Grid where each cell can contain a set of agents.
+* HexGrid: extension to Grid to handle hexagonal neighbors.
+* ContinuousSpace: a two-dimensional space where each agent has an arbitrary position of `float`'s.
+* NetworkGrid: a network where each node contains zero or more agents.
 """
 
 # Mypy; for the `|` operator purpose

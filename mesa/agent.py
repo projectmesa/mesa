@@ -1,6 +1,6 @@
-"""The agent class for Mesa framework.
+"""Agent related classes
 
-Core Objects: Agent
+Core Objects: Agent and AgentSet.
 """
 
 # Mypy; for the `|` operator purpose
