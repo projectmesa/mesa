@@ -1,7 +1,7 @@
 """Cell spaces.
 
 Cell spaces offer an alternative API for discrete spaces. It is experimental and under development. The API is more
-expressive that the default grids available in `mesa.space`. 
+expressive that the default grids available in `mesa.space`.
 
 """
 
