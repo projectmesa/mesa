@@ -25,8 +25,10 @@ from __future__ import annotations
 
 import copy
 import time
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
+import reacton.core
 import solara
 from solara.alias import rv
 
@@ -91,10 +93,12 @@ def Card(
 @solara.component
 def SolaraViz(
     model: Model | solara.Reactive[Model],
-    components: list[solara.component] | Literal["default"] = "default",
-    play_interval=100,
+    components: list[reacton.core.Component]
+    | list[Callable[[Model], reacton.core.Component]]
+    | Literal["default"] = "default",
+    play_interval: int = 100,
     model_params=None,
-    seed=0,
+    seed: float = 0,
     name: str | None = None,
 ):
     """Solara visualization component.
@@ -138,7 +142,7 @@ def SolaraViz(
 
     # Convert model to reactive
     if not isinstance(model, solara.Reactive):
-        model = solara.use_reactive(model)
+        model = solara.use_reactive(model)  # noqa: SH102, RUF100
 
     def connect_to_model():
         # Patch the step function to force updates
@@ -175,18 +179,37 @@ def SolaraViz(
     ComponentsView(components, model.value)
 
 
+def _wrap_component(
+    component: reacton.core.Component | Callable[[Model], reacton.core.Component],
+) -> reacton.core.Component:
+    """Wrap a component in an auto-updated Solara component if needed."""
+    if isinstance(component, reacton.core.Component):
+        return component
+
+    @solara.component
+    def WrappedComponent(model):
+        update_counter.get()
+        return component(model)
+
+    return WrappedComponent
+
+
 @solara.component
-def ComponentsView(components: list[solara.component], model: Model):
+def ComponentsView(
+    components: list[reacton.core.Component]
+    | list[Callable[[Model], reacton.core.Component]],
+    model: Model,
+):
     """Display a list of components.
 
     Args:
         components: List of components to display
         model: Model instance to pass to each component
     """
-    update_counter.get()
+    wrapped_components = [_wrap_component(component) for component in components]
 
     with solara.Column():
-        for component in components:
+        for component in wrapped_components:
             component(model)
 
 
