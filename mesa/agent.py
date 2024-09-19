@@ -612,8 +612,7 @@ class GroupBy:
         return self
 
     def count(self) -> dict[Any, int]:
-        """
-        Return the count of agents in each group.
+        """Return the count of agents in each group.
 
         Returns:
             dict: A dictionary mapping group names to the number of agents in each group.
@@ -621,8 +620,7 @@ class GroupBy:
         return {k: len(v) for k, v in self.groups.items()}
 
     def agg(self, attr_name: str, func: Callable) -> dict[Hashable, Any]:
-        """
-        Aggregate the values of a specific attribute across each group using the provided function.
+        """Aggregate the values of a specific attribute across each group using the provided function.
 
         Args:
             attr_name (str): The name of the attribute to aggregate.
