@@ -30,7 +30,6 @@ The `mesa.flat` namespace is removed. Use the full namespace for your imports.
 
 
 ### Mandatory Model initialization with `super().__init__()`
-
 In Mesa 3.0, it is now mandatory to call `super().__init__()` when initializing your model class. This ensures that all necessary Mesa model variables are correctly set up and agents are properly added to the model.
 
 Make sure all your model classes explicitly call `super().__init__()` in their `__init__` method:
@@ -57,9 +56,29 @@ RuntimeError: The Mesa Model class was not initialized. You must explicitly init
 
 
 ### Automatic assignment of `unique_id` to Agents
-<!-- TODO -->
+In Mesa 3.0, the `unique_id` is now automatically assigned to agents upon creation. This change simplifies agent initialization and ensures uniqueness of agent identifiers.
 
-- Ref: [PR #2226](https://github.com/projectmesa/mesa/pull/2226)
+_Key changes_
+1. Agent initialization:
+   - Old: `Agent(unique_id, model, ...)`
+   - New: `Agent(model, ...)`
+2. The `Model.next_id()` method is deprecated and will be removed in a future version.
+3. The `Model.current_id` counter now starts at 0 instead of 1.
+
+_Migration steps_
+1. Update agent creation calls:
+   ```python
+   # Old
+   agent = MyAgent(self.next_id(), self, ...)
+
+   # New
+   agent = MyAgent(self, ...)
+   ```
+2. Remove any custom logic for managing `unique_id` assignments.
+3. If you were using `Model.next_id()` for purposes other than agent creation, replace it with alternative logic.
+4. Be aware that agent IDs now start at 0 instead of 1, which may affect some model logic or data analysis.
+
+- Ref: [PR #2226](https://github.com/projectmesa/mesa/pull/2226), [PR #2260](https://github.com/projectmesa/mesa/pull/2226), Mesa-examples [PR #194](https://github.com/projectmesa/mesa-examples/pull/194)
 
 
 ### AgentSet and `Model.agents`
