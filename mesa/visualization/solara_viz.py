@@ -24,6 +24,7 @@ See the Visualization Tutorial and example models for more details.
 from __future__ import annotations
 
 import copy
+import threading
 import time
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
@@ -235,13 +236,6 @@ def ModelController(model: solara.Reactive[Model], play_interval=100):
 
     solara.use_effect(save_initial_model, [model.value])
 
-    def step():
-        while playing.value:
-            time.sleep(play_interval / 1000)
-            do_step()
-
-    solara.use_thread(step, [playing.value])
-
     def do_step():
         """Advance the model by one step."""
         model.value.step()
@@ -254,6 +248,15 @@ def ModelController(model: solara.Reactive[Model], play_interval=100):
     def do_play_pause():
         """Toggle play/pause."""
         playing.value = not playing.value
+
+        def play_loop():
+            while playing.value:
+                do_step()
+                time.sleep(play_interval / 1000)
+
+        if playing.value:
+            t = threading.Thread(target=play_loop)
+            t.start()
 
     with solara.Row(justify="space-between"):
         solara.Button(label="Reset", color="primary", on_click=do_reset)
