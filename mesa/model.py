@@ -198,6 +198,7 @@ class Model:
         self,
         model_reporters=None,
         agent_reporters=None,
+        agenttype_reporters=None,
         tables=None,
     ) -> None:
         """Initialize the data collector for the model.
@@ -205,6 +206,7 @@ class Model:
         Args:
             model_reporters: model reporters to collect
             agent_reporters: agent reporters to collect
+            agenttype_reporters: agent type reporters to collect
             tables: tables to collect
 
         """
@@ -219,6 +221,7 @@ class Model:
         self.datacollector = DataCollector(
             model_reporters=model_reporters,
             agent_reporters=agent_reporters,
+            agenttype_reporters=agenttype_reporters,
             tables=tables,
         )
         # Collect data for the first time during initialization.
