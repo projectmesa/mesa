@@ -1,4 +1,4 @@
-"""Agent related classes
+"""Agent related classes.
 
 Core Objects: Agent and AgentSet.
 """
