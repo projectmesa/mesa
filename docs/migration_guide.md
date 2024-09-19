@@ -29,6 +29,33 @@ The `mesa.flat` namespace is removed. Use the full namespace for your imports.
 - Ref: [PR #2091](https://github.com/projectmesa/mesa/pull/2091)
 
 
+### Mandatory Model initialization with `super().__init__()`
+
+In Mesa 3.0, it is now mandatory to call `super().__init__()` when initializing your model class. This ensures that all necessary Mesa model variables are correctly set up and agents are properly added to the model.
+
+Make sure all your model classes explicitly call `super().__init__()` in their `__init__` method:
+
+```python
+class MyModel(mesa.Model):
+    def __init__(self, *args, **kwargs):
+        super().__init__()  # This is now required!
+        # Your model initialization code here
+```
+
+This change ensures that all Mesa models are properly initialized, which is crucial for:
+- Correctly adding agents to the model
+- Setting up other essential Mesa model variables
+- Maintaining consistency across all models
+
+If you forget to call `super().__init__()`, you'll now see this error:
+
+```
+RuntimeError: The Mesa Model class was not initialized. You must explicitly initialize the Model by calling super().__init__() on initialization.
+```
+
+- Ref: [PR #2218](https://github.com/projectmesa/mesa/pull/2218), [PR #1928](https://github.com/projectmesa/mesa/pull/1928), Mesa-examples [PR #83](https://github.com/projectmesa/mesa-examples/pull/83)
+
+
 ### Automatic assignment of `unique_id` to Agents
 <!-- TODO -->
 
