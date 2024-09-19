@@ -15,7 +15,7 @@ import operator
 import warnings
 import weakref
 from collections import defaultdict
-from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
+from collections.abc import Callable, Hashable, Iterable, Iterator, MutableSet, Sequence
 from random import Random
 
 # mypy
@@ -620,7 +620,7 @@ class GroupBy:
         """
         return {k: len(v) for k, v in self.groups.items()}
 
-    def agg(self, attr_name: str, func: Callable) -> dict[Any, Any]:
+    def agg(self, attr_name: str, func: Callable) -> dict[Hashable, Any]:
         """
         Aggregate the values of a specific attribute across each group using the provided function.
 
@@ -629,7 +629,7 @@ class GroupBy:
             func (Callable): The function to apply (e.g., sum, min, max, mean).
 
         Returns:
-            dict: A dictionary mapping group names to the result of applying the aggregation function.
+            dict[Hashable, Any]: A dictionary mapping group names to the result of applying the aggregation function.
         """
         return {
             group_name: func([getattr(agent, attr_name) for agent in group])
