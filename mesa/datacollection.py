@@ -250,10 +250,24 @@ class DataCollector:
             reports = tuple(rep(agent) for rep in rep_funcs)
             return _prefix + reports
 
-        agenttype_records = map(
-            get_reports,
-            model.agents_by_type[agent_type],
-        )
+        agent_types = model.agent_types
+        if agent_type in agent_types:
+            agents = model.agents_by_type[agent_type]
+        else:
+            from mesa import Agent
+
+            # Check if agent_type is an Agent subclass
+            if issubclass(agent_type, Agent):
+                raise NotImplementedError(
+                    f"Agent type {agent_type} is not in model.agent_types. We might implement using superclasses in the future. For now, use one of {agent_types}."
+                )
+            else:
+                # Raise error if agent_type is not in model.agent_types
+                raise ValueError(
+                    f"Agent type {agent_type} is not recognized as an Agent type in the model. Use one of {agent_types}."
+                )
+
+        agenttype_records = map(get_reports, agents)
         return agenttype_records
 
     def collect(self, model):

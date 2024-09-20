@@ -104,22 +104,17 @@ class MockModelWithAgentTypes(Model):
 
     def __init__(self):  # noqa: D107
         super().__init__()
-        self.schedule = BaseScheduler(self)
         self.model_val = 100
 
         for i in range(10):
             if i % 2 == 0:
-                self.schedule.add(MockAgentA(self, val=i))
+                MockAgentA(self, val=i)
             else:
-                self.schedule.add(MockAgentB(self, val=i))
+                MockAgentB(self, val=i)
 
         self.datacollector = DataCollector(
-            model_reporters={
-                "total_agents": lambda m: m.schedule.get_agent_count(),
-            },
-            agent_reporters={
-                "value": lambda a: a.val,
-            },
+            model_reporters={"total_agents": lambda m: len(m.agents)},
+            agent_reporters={"value": lambda a: a.val},
             agenttype_reporters={
                 MockAgentA: {"type_a_val": lambda a: a.type_a_val},
                 MockAgentB: {"type_b_val": lambda a: a.type_b_val},
@@ -127,7 +122,7 @@ class MockModelWithAgentTypes(Model):
         )
 
     def step(self):  # noqa: D102
-        self.schedule.step()
+        self.agents.do("step")
         self.datacollector.collect(self)
 
 
@@ -324,14 +319,14 @@ class TestDataCollectorWithAgentTypes(unittest.TestCase):
 
     def test_agenttype_reporter_string_attribute(self):
         """Test agent-type-specific reporter with string attribute."""
-        model = MockModel()
+        model = MockModelWithAgentTypes()
         model.datacollector._new_agenttype_reporter(MockAgentA, "string_attr", "val")
         model.step()
 
         agent_a_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentA)
         self.assertIn("string_attr", agent_a_data.columns)
-        for (step, agent_id), value in agent_a_data["string_attr"].items():
-            expected_value = agent_id + 1  # Initial value + 1 step
+        for (_step, agent_id), value in agent_a_data["string_attr"].items():
+            expected_value = agent_id
             self.assertEqual(value, expected_value)
 
     def test_agenttype_reporter_function_with_params(self):
@@ -340,7 +335,7 @@ class TestDataCollectorWithAgentTypes(unittest.TestCase):
         def test_func(agent, multiplier):
             return agent.val * multiplier
 
-        model = MockModel()
+        model = MockModelWithAgentTypes()
         model.datacollector._new_agenttype_reporter(
             MockAgentB, "func_param", [test_func, [2]]
         )
@@ -348,13 +343,13 @@ class TestDataCollectorWithAgentTypes(unittest.TestCase):
 
         agent_b_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentB)
         self.assertIn("func_param", agent_b_data.columns)
-        for (step, agent_id), value in agent_b_data["func_param"].items():
-            expected_value = (agent_id + 1) * 2  # (Initial value + 1 step) * 2
+        for (_step, agent_id), value in agent_b_data["func_param"].items():
+            expected_value = agent_id * 2
             self.assertEqual(value, expected_value)
 
     def test_agenttype_reporter_multiple_types(self):
         """Test adding reporters for multiple agent types."""
-        model = MockModel()
+        model = MockModelWithAgentTypes()
         model.datacollector._new_agenttype_reporter(
             MockAgentA, "type_a_val", lambda a: a.type_a_val
         )
@@ -370,6 +365,14 @@ class TestDataCollectorWithAgentTypes(unittest.TestCase):
         self.assertIn("type_b_val", agent_b_data.columns)
         self.assertNotIn("type_b_val", agent_a_data.columns)
         self.assertNotIn("type_a_val", agent_b_data.columns)
+
+    def test_agenttype_reporter_not_in_model(self):
+        """Test NotImplementedError is raised when agent type is not in model.agents_by_type."""
+        model = MockModelWithAgentTypes()
+        # MockAgent is a legit Agent subclass, but it is not in model.agents_by_type
+        model.datacollector._new_agenttype_reporter(MockAgent, "val", lambda a: a.val)
+        with self.assertRaises(NotImplementedError):
+            model.step()
 
 
 if __name__ == "__main__":
