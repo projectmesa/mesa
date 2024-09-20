@@ -64,4 +64,67 @@ You can access it by `Model.steps`, and it's internally in the datacollector, ba
 
 
 ### Visualisation
-<!-- TODO -->
+
+Mesa has adopted a new API for our frontend. If you already migrated to the experimental new SolaraViz you can still use
+the import from mesa.experimental. Otherwise here is a list of things you need to change.
+
+#### Model Initialization
+
+Previously SolaraViz was initialized by providing a `model_cls` and a `model_params`. This has changed to expect a model instance `model`. You can still provide (user-settable) `model_params`, but only if users should be able to change them. It is now also possible to pass in a "reactive model" by first calling `model = solara.reactive(model)`. This is useful for notebook environments. It allows you to pass the model to the SolaraViz Module, but continue to use the model. For example calling `model.value.step()` (notice the extra .value) will automatically update the plots. This currently only automatically works for the step method, you can force visualization updates by calling `model.value.force_update()`.
+
+#### Default space visualization
+
+Previously we included a default space drawer that you could configure with an `agent_portrayal` function. You now have to explicitly create a space drawer with the `agent_portrayal` function
+
+```python
+# old
+from mesa.experimental import SolaraViz
+
+SolaraViz(model_cls, model_params, agent_portrayal=agent_portrayal)
+
+# new
+from mesa.visualization import SolaraViz, make_space_matplotlib
+
+SolaraViz(model, components=[make_space_matplotlib(agent_portrayal)])
+```
+
+#### Plotting "measures"
+
+"Measure" plots also need to be made explicit here. Previously, measure could either be 1) A function that receives a model and returns a solara component or 2) A string or list of string of variables that are collected by the datacollector and are to be plotted as a line plot. 1) still works, but you can pass that function to "components" directly. 2) needs to explicitly call the `make_plot_measure()`function.
+
+```python
+# old
+from mesa.experimental import SolaraViz
+
+def make_plot(model):
+    ...
+
+SolaraViz(model_cls, model_params, measures=[make_plot, "foo", ["bar", "baz"]])
+
+# new
+from mesa.visualization import SolaraViz, make_plot_measure
+
+SolaraViz(model, components=[make_plot, make_plot_measure("foo"), make_plot_measure("bar", "baz")])
+```
+
+#### Plotting text
+
+To plot model-dependent text the experimental SolaraViz provided a `make_text` function that wraps another functions that receives the model and turns its string return value into a solara text component. Again, this other function can now be passed directly to the new SolaraViz components array. It is okay if your function just returns a string.
+
+```python
+# old
+from mesa.experimental import SolaraViz, make_text
+
+def show_steps(model):
+    return f"Steps: {model.steps}"
+
+SolaraViz(model_cls, model_params, measures=make_text(show_steps))
+
+# new
+from mesa.visualisation import SolaraViz
+
+def show_steps(model):
+    return f"Steps: {model.steps}"
+
+SolaraViz(model, components=[show_steps])
+```
