@@ -489,6 +489,7 @@ def test_agentset_groupby():
         def __init__(self, unique_id, model):
             super().__init__(unique_id, model)
             self.even = self.unique_id % 2 == 0
+            self.value = self.unique_id * 10
 
         def get_unique_identifier(self):
             return self.unique_id
@@ -524,3 +525,34 @@ def test_agentset_groupby():
     groups = agentset.groupby("even", result_type="agentset")
     another_ref_to_groups = groups.do(lambda x: x.do("step"))
     assert groups == another_ref_to_groups
+
+    # New tests for count() method
+    groups = agentset.groupby("even")
+    count_result = groups.count()
+    assert count_result == {True: 5, False: 5}
+
+    # New tests for agg() method
+    groups = agentset.groupby("even")
+    sum_result = groups.agg("value", sum)
+    assert sum_result[True] == sum(agent.value for agent in agents if agent.even)
+    assert sum_result[False] == sum(agent.value for agent in agents if not agent.even)
+
+    max_result = groups.agg("value", max)
+    assert max_result[True] == max(agent.value for agent in agents if agent.even)
+    assert max_result[False] == max(agent.value for agent in agents if not agent.even)
+
+    min_result = groups.agg("value", min)
+    assert min_result[True] == min(agent.value for agent in agents if agent.even)
+    assert min_result[False] == min(agent.value for agent in agents if not agent.even)
+
+    # Test with a custom aggregation function
+    def custom_agg(values):
+        return sum(values) / len(values) if values else 0
+
+    custom_result = groups.agg("value", custom_agg)
+    assert custom_result[True] == custom_agg(
+        [agent.value for agent in agents if agent.even]
+    )
+    assert custom_result[False] == custom_agg(
+        [agent.value for agent in agents if not agent.even]
+    )
