@@ -366,13 +366,21 @@ class TestDataCollectorWithAgentTypes(unittest.TestCase):
         self.assertNotIn("type_b_val", agent_a_data.columns)
         self.assertNotIn("type_a_val", agent_b_data.columns)
 
-    def test_agenttype_reporter_not_in_model(self):
-        """Test NotImplementedError is raised when agent type is not in model.agents_by_type."""
+    def test_agenttype_superclass_reporter(self):
+        """Test adding a reporter for a superclass of an agent type."""
         model = MockModelWithAgentTypes()
-        # MockAgent is a legit Agent subclass, but it is not in model.agents_by_type
         model.datacollector._new_agenttype_reporter(MockAgent, "val", lambda a: a.val)
-        with self.assertRaises(NotImplementedError):
+        model.datacollector._new_agenttype_reporter(Agent, "val", lambda a: a.val)
+        for _ in range(3):
             model.step()
+
+        super_data = model.datacollector.get_agenttype_vars_dataframe(MockAgent)
+        agent_data = model.datacollector.get_agenttype_vars_dataframe(Agent)
+        self.assertIn("val", super_data.columns)
+        self.assertIn("val", agent_data.columns)
+        self.assertEqual(len(super_data), 30)  # 10 agents * 3 steps
+        self.assertEqual(len(agent_data), 30)
+        self.assertTrue(super_data.equals(agent_data))
 
 
 if __name__ == "__main__":

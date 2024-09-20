@@ -256,15 +256,14 @@ class DataCollector:
         else:
             from mesa import Agent
 
-            # Check if agent_type is an Agent subclass
             if issubclass(agent_type, Agent):
-                raise NotImplementedError(
-                    f"Agent type {agent_type} is not in model.agent_types. We might implement using superclasses in the future. For now, use one of {agent_types}."
-                )
+                agents = [
+                    agent for agent in model.agents if isinstance(agent, agent_type)
+                ]
             else:
                 # Raise error if agent_type is not in model.agent_types
                 raise ValueError(
-                    f"Agent type {agent_type} is not recognized as an Agent type in the model. Use one of {agent_types}."
+                    f"Agent type {agent_type} is not recognized as an Agent type in the model or Agent subclass. Use an Agent (sub)class, like {agent_types}."
                 )
 
         agenttype_records = map(get_reports, agents)
