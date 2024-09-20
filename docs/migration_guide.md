@@ -116,7 +116,7 @@ To plot model-dependent text the experimental SolaraViz provided a `make_text` f
 from mesa.experimental import SolaraViz, make_text
 
 def show_steps(model):
-    return f"model.steps"
+    return f"Steps: {model.steps}"
 
 SolaraViz(model_cls, model_params, measures=make_text(show_steps))
 
@@ -124,7 +124,7 @@ SolaraViz(model_cls, model_params, measures=make_text(show_steps))
 from mesa.visualisation import SolaraViz
 
 def show_steps(model):
-    return f"model.steps"
+    return f"Steps: {model.steps}"
 
 SolaraViz(model, components=[show_steps])
 ```
