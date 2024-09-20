@@ -293,6 +293,19 @@ class AgentSet(MutableSet, Sequence):
 
         return self
 
+    def shuffle_do(self, method: str | Callable, *args, **kwargs) -> AgentSet:
+        agents = list(self._agents.keys())
+        self.random.shuffle(agents)
+
+        if isinstance(method, str):
+            for agent in agents:
+                getattr(agent, method)(*args, **kwargs)
+        else:
+            for agent in agents:
+                method(agent, *args, **kwargs)
+
+        return self
+
     def map(self, method: str | Callable, *args, **kwargs) -> list[Any]:
         """Invoke a method or function on each agent in the AgentSet and return the results.
 
