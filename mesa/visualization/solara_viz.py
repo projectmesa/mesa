@@ -23,8 +23,8 @@ See the Visualization Tutorial and example models for more details.
 
 from __future__ import annotations
 
+import asyncio
 import copy
-import time
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
@@ -235,12 +235,12 @@ def ModelController(model: solara.Reactive[Model], play_interval=100):
 
     solara.use_effect(save_initial_model, [model.value])
 
-    def step():
+    async def step():
         while playing.value:
-            time.sleep(play_interval / 1000)
+            await asyncio.sleep(play_interval / 1000)
             do_step()
 
-    solara.use_thread(step, [playing.value])
+    solara.lab.use_task(step, dependencies=[playing.value], prefer_threaded=False)
 
     def do_step():
         """Advance the model by one step."""
