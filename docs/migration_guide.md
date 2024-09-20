@@ -56,17 +56,9 @@ RuntimeError: The Mesa Model class was not initialized. You must explicitly init
 
 
 ### Automatic assignment of `unique_id` to Agents
-In Mesa 3.0, the `unique_id` is now automatically assigned to agents upon creation. This change simplifies agent initialization and ensures uniqueness of agent identifiers.
+In Mesa 3.0, `unique_id` for agents is now automatically assigned, simplifying agent creation and ensuring unique IDs across all agents in a model.
 
-_Key changes_
-1. Agent initialization:
-   - Old: `Agent(unique_id, model, ...)`
-   - New: `Agent(model, ...)`
-2. The `Model.next_id()` method is deprecated and will be removed in a future version.
-3. The `Model.current_id` counter now starts at 0 instead of 1.
-
-_Migration steps_
-1. Update agent creation calls:
+1. Remove `unique_id` from agent initialization:
    ```python
    # Old
    agent = MyAgent(self.next_id(), self, ...)
@@ -74,11 +66,12 @@ _Migration steps_
    # New
    agent = MyAgent(self, ...)
    ```
-2. Remove any custom logic for managing `unique_id` assignments.
-3. If you were using `Model.next_id()` for purposes other than agent creation, replace it with alternative logic.
-4. Be aware that agent IDs now start at 0 instead of 1, which may affect some model logic or data analysis.
+2. `Model.next_id()` is deprecated and will always return 0. Remove any calls to this method.
+3. `unique_id` is now unique relative to a Model instance and starts from 1.
+4. If you previously used custom `unique_id` values, you'll need to store that information in a separate attribute.
+5. Deprecation warning: Initializing an agent with two arguments (`unique_id` and `model`) will raise a warning. The `unique_id` argument will be ignored.
 
-- Ref: [PR #2226](https://github.com/projectmesa/mesa/pull/2226), [PR #2260](https://github.com/projectmesa/mesa/pull/2226), Mesa-examples [PR #194](https://github.com/projectmesa/mesa-examples/pull/194)
+- Ref: [PR #2226](https://github.com/projectmesa/mesa/pull/2226), [PR #2260](https://github.com/projectmesa/mesa/pull/2260), Mesa-examples [PR #194](https://github.com/projectmesa/mesa-examples/pull/194), [Issue #2213](https://github.com/projectmesa/mesa/issues/2213)
 
 
 ### AgentSet and `Model.agents`
