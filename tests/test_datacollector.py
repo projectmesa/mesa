@@ -322,6 +322,55 @@ class TestDataCollectorWithAgentTypes(unittest.TestCase):
             )
             self.assertTrue(non_existent_data.empty)
 
+    def test_agenttype_reporter_string_attribute(self):
+        """Test agent-type-specific reporter with string attribute."""
+        model = MockModel()
+        model.datacollector._new_agenttype_reporter(MockAgentA, "string_attr", "val")
+        model.step()
+
+        agent_a_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentA)
+        self.assertIn("string_attr", agent_a_data.columns)
+        for (step, agent_id), value in agent_a_data["string_attr"].items():
+            expected_value = agent_id + 1  # Initial value + 1 step
+            self.assertEqual(value, expected_value)
+
+    def test_agenttype_reporter_function_with_params(self):
+        """Test agent-type-specific reporter with function and parameters."""
+
+        def test_func(agent, multiplier):
+            return agent.val * multiplier
+
+        model = MockModel()
+        model.datacollector._new_agenttype_reporter(
+            MockAgentB, "func_param", [test_func, [2]]
+        )
+        model.step()
+
+        agent_b_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentB)
+        self.assertIn("func_param", agent_b_data.columns)
+        for (step, agent_id), value in agent_b_data["func_param"].items():
+            expected_value = (agent_id + 1) * 2  # (Initial value + 1 step) * 2
+            self.assertEqual(value, expected_value)
+
+    def test_agenttype_reporter_multiple_types(self):
+        """Test adding reporters for multiple agent types."""
+        model = MockModel()
+        model.datacollector._new_agenttype_reporter(
+            MockAgentA, "type_a_val", lambda a: a.type_a_val
+        )
+        model.datacollector._new_agenttype_reporter(
+            MockAgentB, "type_b_val", lambda a: a.type_b_val
+        )
+        model.step()
+
+        agent_a_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentA)
+        agent_b_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentB)
+
+        self.assertIn("type_a_val", agent_a_data.columns)
+        self.assertIn("type_b_val", agent_b_data.columns)
+        self.assertNotIn("type_b_val", agent_a_data.columns)
+        self.assertNotIn("type_a_val", agent_b_data.columns)
+
 
 if __name__ == "__main__":
     unittest.main()
