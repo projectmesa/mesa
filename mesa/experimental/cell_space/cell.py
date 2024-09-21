@@ -134,7 +134,7 @@ class Cell:
 
     @cached_property
     def neighborhood(self) -> CellCollection:
-        """Returns the direct neigborhood of the cell.
+        """Returns the direct neighborhood of the cell.
 
         This is equivalent to cell.get_neighborhood(radius=1)
 
