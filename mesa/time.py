@@ -62,7 +62,6 @@ class BaseScheduler:
             agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
 
         """
-
         warnings.warn(
             "The time module and all its Schedulers are deprecated and will be removed in a future version. "
             "They can be replaced with AgentSet functionality. See the migration guide for details. "
@@ -70,7 +69,7 @@ class BaseScheduler:
             DeprecationWarning,
             stacklevel=2,
         )
-       
+
         self.model = model
         self.steps = 0
         self.time: TimeT = 0
