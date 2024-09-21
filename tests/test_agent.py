@@ -437,6 +437,42 @@ def test_agentset_map_callable():
     assert all(i == entry for i, entry in zip(results, range(1, 11)))
 
 
+def test_agentset_shuffle_do():
+    """Test AgentSet.shuffle_do method."""
+    model = Model()
+
+    class TestAgentShuffleDo(Agent):
+        def __init__(self, model):
+            super().__init__(model)
+            self.called = False
+
+        def test_method(self):
+            self.called = True
+
+    agents = [TestAgentShuffleDo(model) for _ in range(100)]
+    agentset = AgentSet(agents, model)
+
+    # Test shuffle_do with a string method name
+    agentset.shuffle_do("test_method")
+    assert all(agent.called for agent in agents)
+
+    # Reset the called flag
+    for agent in agents:
+        agent.called = False
+
+    # Test shuffle_do with a callable
+    agentset.shuffle_do(lambda agent: setattr(agent, "called", True))
+    assert all(agent.called for agent in agents)
+
+    # Verify that the order is indeed shuffled
+    original_order = list(agentset)
+    shuffled_order = []
+    agentset.shuffle_do(lambda agent: shuffled_order.append(agent))
+    assert (
+        original_order != shuffled_order
+    ), "The order should be different after shuffle_do"
+
+
 def test_agentset_get_attribute():
     """Test AgentSet.get for attributes."""
     model = Model()

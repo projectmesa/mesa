@@ -293,7 +293,7 @@ class EpsteinCivilViolence(Model):
 
     def step(self):
         """Run one step of the model."""
-        self.active_agents.shuffle(inplace=True).do("step")
+        self.active_agents.shuffle_do("step")
 
 
 if __name__ == "__main__":
