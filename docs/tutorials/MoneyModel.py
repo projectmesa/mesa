@@ -63,8 +63,8 @@ class MoneyModel(mesa.Model):
         self.schedule = mesa.time.RandomActivation(self)
 
         # Create agents
-        for i in range(self.num_agents):
-            a = MoneyAgent(i, self)
+        for _ in range(self.num_agents):
+            a = MoneyAgent(self)
             self.schedule.add(a)
             # Add the agent to a random grid cell
             x = self.random.randrange(self.grid.width)
