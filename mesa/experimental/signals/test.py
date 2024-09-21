@@ -1,9 +1,10 @@
+# noqa D100
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 import mesa
 from mesa.experimental.signals import HasObservables, Observable, ObservableList
 
 
-def compute_gini(model):
+def compute_gini(model):  # noqa D103
     agent_wealths = [agent.wealth for agent in model.agents]
     x = sorted(agent_wealths)
     n = model.num_agents
@@ -21,7 +22,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
 
     agent_wealth = ObservableList()
 
-    def __init__(self, seed=None, n=100, width=10, height=10):
+    def __init__(self, seed=None, n=100, width=10, height=10):  # noqa D103
         super().__init__(seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
@@ -41,7 +42,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
 
         self.agent_wealth = self.agents.get("wealth")
 
-    def step(self):
+    def step(self):  # noqa D103
         self.agents.shuffle().do("step")
         # collect data
         self.datacollector.collect(self)
@@ -49,7 +50,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         for i, entry in enumerate(self.agents.get("wealth")):
             self.agent_wealth[i] = entry
 
-    def run_model(self, n):
+    def run_model(self, n):  # noqa D103
         for _i in range(n):
             self.step()
 
@@ -59,18 +60,18 @@ class MoneyAgent(mesa.Agent, HasObservables):
 
     wealth = Observable()
 
-    def __init__(self, model):
+    def __init__(self, model):  # noqa D103
         super().__init__(model)
         self.wealth = 1
 
-    def move(self):
+    def move(self):  # noqa D103
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=False
         )
         new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
 
-    def give_money(self):
+    def give_money(self):  # noqa D103
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         cellmates.pop(
             cellmates.index(self)
@@ -80,15 +81,15 @@ class MoneyAgent(mesa.Agent, HasObservables):
             other.wealth += 1
             self.wealth -= 1
 
-    def step(self):
+    def step(self):  # noqa D103
         self.move()
         if self.wealth > 0:
             self.give_money()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    def some_callback(signal):
+    def some_callback(signal):  # noqa D103
         print(signal)
 
 

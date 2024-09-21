@@ -77,7 +77,7 @@ class SignalingList(MutableSequence[Any]):
         """
         self.owner: HasObservables = owner
         self.name: str = name
-        self.data = [entry for entry in iterable]
+        self.data = list(iterable)
 
     def __setitem__(self, index: int, value: Any) -> None:
         """Set item to index.
@@ -129,8 +129,8 @@ class SignalingList(MutableSequence[Any]):
         self.data.insert(index, value)
         self.owner.notify(self.name, old_value, value, "added")
 
-    def __str__(self):  # noqa: D103
+    def __str__(self):
         return self.data.__str__()
 
-    def __repr__(self):  # noqa: D103
+    def __repr__(self):
         return self.data.__repr__()

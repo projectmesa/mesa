@@ -1,3 +1,5 @@
+"""Core classes for Observables."""
+
 import functools
 import weakref
 from collections import defaultdict, namedtuple
@@ -8,7 +10,7 @@ __all__ = ["Observable", "HasObservables"]
 
 
 class Computable:
-    """A Computable that is depended on one or more Observables
+    """A Computable that is depended on one or more Observables.
 
     # fixme how to make this work with Descriptors?
     # we would need to now the owner (can also be in init)
@@ -16,10 +18,12 @@ class Computable:
     """
 
     def __init__(self, callable: Callable, *args, **kwargs):
-        """Args:
-        callable: the callable that is computed
-        *args: arguments to pass to the callable
-        **kwargs: keyword arguments to pass to the callable
+        """Draft Computable.
+
+        Args:
+            callable: the callable that is computed
+            args: arguments to pass to the callable
+            **kwargs: keyword arguments to pass to the callable
 
         """
         # fixme: what if these are observable?
@@ -37,7 +41,7 @@ class Computable:
         self.kwargs = kwargs
         self._is_dirty = True
 
-    def __get__(self):
+    def __get__(self, instance, owner):
         # fixme: not sure this will work correctly
 
         if self._is_dirty:
@@ -47,7 +51,10 @@ class Computable:
 
 
 class Observable:
+    """Base Observable class."""
+
     def __init__(self):
+        """Initialize an Observable."""
         self.public_name: str
         self.private_name: str
         self.signal_types: set = set(
@@ -55,17 +62,17 @@ class Observable:
         )
         self.fallback_value = None  # fixme, should this be user specifiable
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance, owner):  # noqa D103
         # fixme how do we want to handle the fallback value
         # and when should it raise an attribute error?
         return getattr(instance, self.private_name, self.fallback_value)
 
-    def __set_name__(self, owner, name):
+    def __set_name__(self, owner, name):  # noqa D103
         self.public_name = name
         self.private_name = f"_{name}"
         owner.observables[name] = self
 
-    def __set__(self, instance: "HasObservables", value):
+    def __set__(self, instance: "HasObservables", value):  # noqa D103
         instance.notify(
             self.public_name, self.__get__(instance, None), value, "on_change"
         )
@@ -73,7 +80,7 @@ class Observable:
 
 
 class All:
-    """Helper constant to subscribe to all Observables"""
+    """Helper constant to subscribe to all Observables."""
 
     def __init__(self):
         self.name = "all_signals"
@@ -89,9 +96,11 @@ Signal = namedtuple("Signal", "owner observable old_value new_value signal_type"
 
 
 class HasObservables:
+    """HasObservables class."""
+
     observables: dict[str, Observable] = {}
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):  # noqa D102
         # fixme dirty hack because super does not work on agents
         obj = super().__new__(cls)
 
@@ -105,7 +114,7 @@ class HasObservables:
         return obj
 
     def register_observable(self, observable: Observable):
-        """Register an Observable
+        """Register an Observable.
 
         Args:
             observable: the Observable to register
@@ -119,7 +128,7 @@ class HasObservables:
         signal_type: str,
         handler: Callable,
     ):
-        """Subscribe to the Observable <name> for signal_type
+        """Subscribe to the Observable <name> for signal_type.
 
         Args:
             name: name of the Observable to subscribe to
@@ -147,13 +156,11 @@ class HasObservables:
             self.subscribers[name][signal_type].add(handler)
 
     def unobserve(self, name: str | All, signal_type: str):
-        """Unsubscribe to the Observable <name> for signal_type
+        """Unsubscribe to the Observable <name> for signal_type.
 
         Args:
             name: name of the Observable to unsubscribe to
             signal_type: the type of signal on the Observable to unsubscribe to
-
-        Returns:
 
         """
         names = (
@@ -168,7 +175,7 @@ class HasObservables:
             del self.subscribers[name][signal_type]
 
     def unobserve_all(self, name: str | All):
-        """Clears all subscriptions for the observable <name>
+        """Clears all subscriptions for the observable <name>.
 
         if name is All, all subscriptions are removed
 
@@ -184,10 +191,10 @@ class HasObservables:
             )
 
     def notify(self, observable: str, old_value: Any, new_value: Any, signal_type: str):
-        """Emit a signal
+        """Emit a signal.
 
         Args:
-            observable: the public name of the observable emiting the signal
+            observable: the public name of the observable emitting the signal
             old_value: the old value of the observable
             new_value: the new value of the observable
             signal_type: the type of signal to emit
@@ -203,39 +210,4 @@ class HasObservables:
             observer(signal)
 
 
-if __name__ == "__main__":
-    import traitlets
 
-    from mesa import Agent, Model
-
-    traitlets.Int
-
-    class A(Agent, HasObservables):
-        a = Observable(int)
-
-    class B(A, HasObservables):
-        b = Observable(int)
-
-    model = Model()
-
-    a = A(model)
-    b = B(model)
-
-    def specific_handler(arg: int):
-        print(f"specific handler {arg}")
-
-    def generic_handler(info: psygnal.EmissionInfo):
-        signalinstance, arguments = info
-        print(
-            f"received signal from {signalinstance.instance} about {signalinstance.name}: {arguments}"
-        )
-
-    a.a_changed.connect(specific_handler)
-    b.signals["a_changed"].connect(specific_handler)
-    b.signals.connect(generic_handler)
-
-    print(b.signals["a_changed"] == b.a_changed)
-
-    a.a = 5
-    b.a = 6
-    b.b = 7
