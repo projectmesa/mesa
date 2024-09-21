@@ -1,7 +1,7 @@
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 import mesa
 
-from mesa.experimental.signal import HasObservables, Observable
+from mesa.experimental.signals import HasObservables, Observable, ObservableList
 
 def compute_gini(model):
     agent_wealths = [agent.wealth for agent in model.agents]
@@ -11,16 +11,17 @@ def compute_gini(model):
     return 1 + (1 / n) - 2 * b
 
 
-class BoltzmannWealth(mesa.Model):
+class BoltzmannWealth(mesa.Model, HasObservables):
     """A simple model of an economy where agents exchange currency at random.
 
     All the agents begin with one unit of currency, and each time step can give
     a unit of currency to another agent. Note how, over time, this produces a
     highly skewed distribution of wealth.
     """
+    agent_wealth = ObservableList()
 
     def __init__(self, seed=None, n=100, width=10, height=10):
-        super().__init__()
+        super().__init__(seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.schedule = mesa.time.RandomActivation(self)
@@ -42,6 +43,9 @@ class BoltzmannWealth(mesa.Model):
         self.agents.shuffle().do("step")
         # collect data
         self.datacollector.collect(self)
+
+        self.agent_wealth = self.agents.get("wealth")
+
 
     def run_model(self, n):
         for _i in range(n):
@@ -79,4 +83,7 @@ class MoneyAgent(mesa.Agent, HasObservables):
             self.give_money()
 
 
+if __name__ == '__main__':
+    model = BoltzmannWealth()
+    model.run_model(10)
 
