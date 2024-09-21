@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from functools import cache
+from functools import cache, cached_property
 from random import Random
 from typing import TYPE_CHECKING
 
@@ -131,8 +131,7 @@ class Cell:
     def __repr__(self):  # noqa
         return f"Cell({self.coordinate}, {self.agents})"
 
-    @property
-    @cache
+    @cached_property
     def neighborhood(self) -> CellCollection:
         """Returns the direct neigborhood of the cell
 
