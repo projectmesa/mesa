@@ -142,6 +142,7 @@ class BoidFlockers(mesa.Model):
         """Run the model for one step."""
         self.agents.shuffle_do("step")
 
+
 if __name__ == "__main__":
     import time
 

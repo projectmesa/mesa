@@ -2,7 +2,6 @@
 
 from mesa import Model
 from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
-from mesa.time import RandomActivation
 
 
 class SchellingAgent(CellAgent):
