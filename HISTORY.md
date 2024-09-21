@@ -1,6 +1,53 @@
 ---
 title: Release History
 ---
+# 3.0.0a4 (2024-09-21)
+## Highlights
+Mesa v3.0 alpha 5 release contains many quality of life updates, a big new feature for the DataCollector and a major deprecation.
+
+The entire `mesa.time` module, including all schedulers, has been deprecated ([#2306](https://github.com/projectmesa/mesa/pull/2306)). Users are encouraged to transition to AgentSet functionality for more flexible and explicit agent activation patterns. Check the [migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers) on how to 
+
+The DataCollector now supports collecting data from specific Agent subclasses using the new `agenttype_reporters` parameter ([#2300](https://github.com/projectmesa/mesa/pull/2300)). This allows collecting different metrics for different agent types. For example:
+
+```python
+self.datacollector = DataCollector(
+    agenttype_reporters={
+        Wolf: {"sheep_eaten": "sheep_eaten"},
+        Sheep: {"wool": "wool_amount"}
+    }
+)
+```
+
+Furthermore, a new `shuffle_do()` method for AgentSets provides a faster way to perform `shuffle().do()` ([#2283](https://github.com/projectmesa/mesa/pull/2283)). The GroupBy class gained `count()` and `agg()` methods to count the number of agents in groups and aggregate variables of them ([#2290](https://github.com/projectmesa/mesa/pull/2290)).
+<!--- TODO: Add #2307, #2308, #2309  --->
+
+Finally, SolaraViz received updates improving its interface and performance ([#2299](https://github.com/projectmesa/mesa/pull/2299), [#2304](https://github.com/projectmesa/mesa/pull/2304)). Cell connections in grids and networks are now public and named for more intuitive agent movements ([#2296](https://github.com/projectmesa/mesa/pull/2296)). The Model class initialization process was simplified by moving random seed and random object creation to `__init__` ([#1940](https://github.com/projectmesa/mesa/pull/1940)). Documentation has been extensively updated, including enforcing Google docstrings ([#2294](https://github.com/projectmesa/mesa/pull/2294)) and reorganizing the API documentation ([#2298](https://github.com/projectmesa/mesa/pull/2298)) for better clarity and navigation.
+
+While the Mesa 3.0 timeline is still being discussed, we're aiming at the first Mesa 3.0 beta in October followed by a stable release in November. Testing new features and sharing feedback is appreciated!
+
+## What's Changed
+### 🎉 New features added
+* GroupBy: Add `count` and `agg` methods by @EwoutH in https://github.com/projectmesa/mesa/pull/2290
+* datacollector: Allow collecting data from Agent (sub)classes by @EwoutH in https://github.com/projectmesa/mesa/pull/2300
+* Add optimized shuffle_do() method to AgentSet by @EwoutH in https://github.com/projectmesa/mesa/pull/2283
+### 🛠 Enhancements made
+* Make cell connections public and named by @Corvince in https://github.com/projectmesa/mesa/pull/2296
+* SolaraViz Updates by @Corvince in https://github.com/projectmesa/mesa/pull/2299
+* Solara viz: use_task for non-threaded continous play by @Corvince in https://github.com/projectmesa/mesa/pull/2304
+* Update to CellCollection.select by @quaquel in https://github.com/projectmesa/mesa/pull/2307
+### 📜 Documentation improvements
+* Enforce google docstrings by @quaquel in https://github.com/projectmesa/mesa/pull/2294
+* Api docs by @quaquel in https://github.com/projectmesa/mesa/pull/2298
+* update migration guide to describe solaraviz updates by @Corvince in https://github.com/projectmesa/mesa/pull/2297
+* Migration Guide: Add Model initialization requirement and automatic Agent.unique_id assignment by @EwoutH in https://github.com/projectmesa/mesa/pull/2302
+* Deprecate Time module and all its Schedulers by @EwoutH in https://github.com/projectmesa/mesa/pull/2306
+### 🔧 Maintenance
+* make typing behavior of AgentSet.get explicit by @quaquel in https://github.com/projectmesa/mesa/pull/2293
+* model: Move random seed and random to __init__ by @rht in https://github.com/projectmesa/mesa/pull/1940
+* Remove schedulers from benchmark models. by @quaquel in https://github.com/projectmesa/mesa/pull/2308
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a4...v3.0.0a5
+
 # 3.0.0a4 (2024-09-09)
 ## Highlights
 Mesa 3.0.0a4 contains two major breaking changes:
