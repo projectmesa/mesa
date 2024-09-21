@@ -33,7 +33,7 @@ class PDAgent(mesa.Agent):
         best_neighbor = max(neighbors, key=lambda a: a.score)
         self.next_move = best_neighbor.move
 
-        if self.model.schedule_type != "Simultaneous":
+        if self.model.activation_order != "Simultaneous":
             self.advance()
 
     def advance(self):
@@ -42,7 +42,7 @@ class PDAgent(mesa.Agent):
 
     def increment_score(self):
         neighbors = self.model.grid.get_neighbors(self.pos, True)
-        if self.model.schedule_type == "Simultaneous":
+        if self.model.activation_order == "Simultaneous":
             moves = [neighbor.next_move for neighbor in neighbors]
         else:
             moves = [neighbor.move for neighbor in neighbors]

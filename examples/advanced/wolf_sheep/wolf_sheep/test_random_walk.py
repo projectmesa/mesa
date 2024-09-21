@@ -5,7 +5,6 @@ agents.
 
 from mesa import Model
 from mesa.space import MultiGrid
-from mesa.time import RandomActivation
 from mesa.visualization.TextVisualization import TextGrid, TextVisualization
 from wolf_sheep.random_walk import RandomWalker
 
@@ -40,17 +39,15 @@ class WalkerWorld(Model):
         self.grid = MultiGrid(self.width, self.height, torus=True)
         self.agent_count = agent_count
 
-        self.schedule = RandomActivation(self)
         # Create agents
         for i in range(self.agent_count):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             a = WalkerAgent(i, (x, y), self, True)
-            self.schedule.add(a)
             self.grid.place_agent(a, (x, y))
 
     def step(self):
-        self.schedule.step()
+        self.agents.shuffle_do("step")
 
 
 class WalkerWorldViz(TextVisualization):

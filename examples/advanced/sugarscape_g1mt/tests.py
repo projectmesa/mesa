@@ -23,7 +23,7 @@ def test_decreasing_price_variance():
     model.datacollector._new_model_reporter(
         "price_variance",
         lambda m: np.var(
-            flatten([a.prices for a in m.schedule.agents_by_type[Trader].values()])
+            flatten([a.prices for a in m.agents_by_type[Trader].values()])
         ),
     )
     model.run_model(step_count=50)
@@ -40,7 +40,7 @@ def test_carrying_capacity():
         for vision_max in visions:
             model = SugarscapeG1mt(vision_max=vision_max, enable_trade=enable_trade)
             model.run_model(step_count=50)
-            carrying_capacities.append(len(model.schedule.agents_by_type[Trader]))
+            carrying_capacities.append(len(model.agents_by_type[Trader]))
         return carrying_capacities
 
     # Carrying capacity should increase over mean vision (figure IV-6).
