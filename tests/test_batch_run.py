@@ -1,3 +1,5 @@
+"""Test Batchrunner."""
+
 import mesa
 from mesa.agent import Agent
 from mesa.batchrunner import _make_model_kwargs
@@ -6,7 +8,7 @@ from mesa.model import Model
 from mesa.time import BaseScheduler
 
 
-def test_make_model_kwargs():
+def test_make_model_kwargs():  # noqa: D103
     assert _make_model_kwargs({"a": 3, "b": 5}) == [{"a": 3, "b": 5}]
     assert _make_model_kwargs({"a": 3, "b": range(3)}) == [
         {"a": 3, "b": 0},
@@ -24,24 +26,26 @@ def test_make_model_kwargs():
 
 
 class MockAgent(Agent):
-    """
-    Minimalistic agent implementation for testing purposes
-    """
+    """Minimalistic agent implementation for testing purposes."""
 
     def __init__(self, model, val):
+        """Initialize a MockAgent.
+
+        Args:
+            model: a model instance
+            val: a value for attribute
+        """
         super().__init__(model)
         self.val = val
         self.local = 0
 
-    def step(self):
+    def step(self):  # noqa: D102
         self.val += 1
         self.local += 0.25
 
 
 class MockModel(Model):
-    """
-    Minimalistic model for testing purposes
-    """
+    """Minimalistic model for testing purposes."""
 
     def __init__(
         self,
@@ -53,6 +57,17 @@ class MockModel(Model):
         n_agents=3,
         **kwargs,
     ):
+        """Initialize a MockModel.
+
+        Args:
+            variable_model_param: variable model parameters
+            variable_agent_param: variable agent parameters
+            fixed_model_param: fixed model parameters
+            schedule: schedule instance
+            enable_agent_reporters: whether to enable agent reporters
+            n_agents: number of agents
+            kwargs: keyword arguments
+        """
         super().__init__()
         self.schedule = BaseScheduler(self) if schedule is None else schedule
         self.variable_model_param = variable_model_param
@@ -71,6 +86,7 @@ class MockModel(Model):
         self.init_agents()
 
     def init_agents(self):
+        """Initialize agents."""
         if self.variable_agent_param is None:
             agent_val = 1
         else:
@@ -78,15 +94,15 @@ class MockModel(Model):
         for _ in range(self.n_agents):
             self.schedule.add(MockAgent(self, agent_val))
 
-    def get_local_model_param(self):
+    def get_local_model_param(self):  # noqa: D102
         return 42
 
-    def step(self):
+    def step(self):  # noqa: D102
         self.schedule.step()
         self.datacollector.collect(self)
 
 
-def test_batch_run():
+def test_batch_run():  # noqa: D103
     result = mesa.batch_run(MockModel, {}, number_processes=2)
     assert result == [
         {
@@ -119,7 +135,7 @@ def test_batch_run():
     ]
 
 
-def test_batch_run_with_params():
+def test_batch_run_with_params():  # noqa: D103
     mesa.batch_run(
         MockModel,
         {
@@ -130,7 +146,7 @@ def test_batch_run_with_params():
     )
 
 
-def test_batch_run_no_agent_reporters():
+def test_batch_run_no_agent_reporters():  # noqa: D103
     result = mesa.batch_run(
         MockModel, {"enable_agent_reporters": False}, number_processes=2
     )
@@ -146,11 +162,11 @@ def test_batch_run_no_agent_reporters():
     ]
 
 
-def test_batch_run_single_core():
+def test_batch_run_single_core():  # noqa: D103
     mesa.batch_run(MockModel, {}, number_processes=1, iterations=6)
 
 
-def test_batch_run_unhashable_param():
+def test_batch_run_unhashable_param():  # noqa: D103
     result = mesa.batch_run(
         MockModel,
         {

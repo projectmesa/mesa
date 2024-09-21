@@ -1,3 +1,4 @@
+# noqa: D100
 import os
 from datetime import datetime
 
@@ -66,7 +67,7 @@ def get_closed_pull_requests_since_latest_release(
     return pull_requests
 
 
-def main() -> None:
+def main() -> None:  # noqa: D103
     # Based on https://github.com/projectmesa/mesa/pull/1917#issuecomment-1871352058
     latest_release_date = get_latest_release_date()
     pull_requests = get_closed_pull_requests_since_latest_release(latest_release_date)

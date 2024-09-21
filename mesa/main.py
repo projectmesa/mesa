@@ -1,3 +1,5 @@
+"""main module for running mesa models with a server."""
+
 import os
 import sys
 from pathlib import Path
@@ -19,13 +21,13 @@ CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 
 @click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
-    "Manage Mesa projects"
+    """Manage Mesa projects."""
 
 
 @cli.command()
 @click.argument("project", type=PROJECT_PATH, default=".")
 def runserver(project):
-    """Run mesa project PROJECT
+    """Run mesa project PROJECT.
 
     PROJECT is the path to the directory containing `run.py`, or the current
     directory if not specified.
@@ -45,7 +47,7 @@ def runserver(project):
     "--no-input", is_flag=True, help="Do not prompt user for custom mesa model input."
 )
 def startproject(no_input):
-    """Create a new mesa project"""
+    """Create a new mesa project."""
     args = ["cookiecutter", COOKIECUTTER_PATH]
     if no_input:
         args.append("--no-input")
@@ -54,7 +56,7 @@ def startproject(no_input):
 
 @click.command()
 def version():
-    """Show the version of mesa"""
+    """Show the version of mesa."""
     print(f"mesa {__version__}")
 
 

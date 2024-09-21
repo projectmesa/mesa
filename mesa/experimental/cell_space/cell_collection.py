@@ -1,3 +1,5 @@
+"""CellCollection class."""
+
 from __future__ import annotations
 
 import itertools
@@ -14,7 +16,7 @@ T = TypeVar("T", bound="Cell")
 
 
 class CellCollection(Generic[T]):
-    """An immutable collection of cells
+    """An immutable collection of cells.
 
     Attributes:
         cells (List[Cell]): The list of cells this collection represents
@@ -28,6 +30,12 @@ class CellCollection(Generic[T]):
         cells: Mapping[T, list[CellAgent]] | Iterable[T],
         random: Random | None = None,
     ) -> None:
+        """Initialize a CellCollection.
+
+        Args:
+            cells: cells to add to the collection
+            random: a seeded random number generator.
+        """
         if isinstance(cells, dict):
             self._cells = cells
         else:
@@ -40,42 +48,71 @@ class CellCollection(Generic[T]):
             random = Random()  # FIXME
         self.random = random
 
-    def __iter__(self):
+    def __iter__(self):  # noqa
         return iter(self._cells)
 
-    def __getitem__(self, key: T) -> Iterable[CellAgent]:
+    def __getitem__(self, key: T) -> Iterable[CellAgent]:  # noqa
         return self._cells[key]
 
     # @cached_property
-    def __len__(self) -> int:
+    def __len__(self) -> int:  # noqa
         return len(self._cells)
 
-    def __repr__(self):
+    def __repr__(self):  # noqa
         return f"CellCollection({self._cells})"
 
     @cached_property
-    def cells(self) -> list[T]:
+    def cells(self) -> list[T]:  # noqa
         return list(self._cells.keys())
 
     @property
-    def agents(self) -> Iterable[CellAgent]:
+    def agents(self) -> Iterable[CellAgent]:  # noqa
         return itertools.chain.from_iterable(self._cells.values())
 
     def select_random_cell(self) -> T:
+        """Select a random cell."""
         return self.random.choice(self.cells)
 
     def select_random_agent(self) -> CellAgent:
+        """Select a random agent.
+
+        Returns:
+            CellAgent instance
+
+
+        """
         return self.random.choice(list(self.agents))
 
-    def select(self, filter_func: Callable[[T], bool] | None = None, n=0):
-        # FIXME: n is not considered
-        if filter_func is None and n == 0:
+    def select(
+        self,
+        filter_func: Callable[[T], bool] | None = None,
+        at_most: int | float = float("inf"),
+    ):
+        """Select cells based on filter function.
+
+        Args:
+            filter_func: filter function
+            at_most: The maximum amount of cells to select. Defaults to infinity.
+              - If an integer, at most the first number of matching cells is selected.
+              - If a float between 0 and 1, at most that fraction of original number of cells
+
+        Returns:
+            CellCollection
+
+        """
+        if filter_func is None and at_most == float("inf"):
             return self
 
-        return CellCollection(
-            {
-                cell: agents
-                for cell, agents in self._cells.items()
-                if filter_func is None or filter_func(cell)
-            }
-        )
+        if at_most <= 1.0 and isinstance(at_most, float):
+            at_most = int(len(self) * at_most)  # Note that it rounds down (floor)
+
+        def cell_generator(filter_func, at_most):
+            count = 0
+            for cell in self:
+                if count >= at_most:
+                    break
+                if not filter_func or filter_func(cell):
+                    yield cell
+                    count += 1
+
+        return CellCollection(cell_generator(filter_func, at_most))

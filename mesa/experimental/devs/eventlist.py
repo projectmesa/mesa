@@ -1,3 +1,5 @@
+"""Eventlist which is at the core of event scheduling."""
+
 from __future__ import annotations
 
 import itertools
@@ -10,15 +12,17 @@ from weakref import WeakMethod, ref
 
 
 class Priority(IntEnum):
+    """Enumeration of priority levels."""
+
     LOW = 10
     DEFAULT = 5
     HIGH = 1
 
 
 class SimulationEvent:
-    """A simulation event
+    """A simulation event.
 
-    the callable is wrapped using weakref, so there is no need to explicitly cancel event if e.g., an agent
+    The callable is wrapped using weakref, so there is no need to explicitly cancel event if e.g., an agent
     is removed from the simulation.
 
     Attributes:
@@ -34,7 +38,7 @@ class SimulationEvent:
     _ids = itertools.count()
 
     @property
-    def CANCELED(self) -> bool:
+    def CANCELED(self) -> bool:  # noqa: D102
         return self._canceled
 
     def __init__(
@@ -45,6 +49,15 @@ class SimulationEvent:
         function_args: list[Any] | None = None,
         function_kwargs: dict[str, Any] | None = None,
     ) -> None:
+        """Initialize a simulation event.
+
+        Args:
+            time: the instant of time of the simulation event
+            function: the callable to invoke
+            priority: the priority of the event
+            function_args: arguments for callable
+            function_kwargs: keyword arguments for the callable
+        """
         super().__init__()
         if not callable(function):
             raise Exception()
@@ -64,20 +77,20 @@ class SimulationEvent:
         self.function_kwargs = function_kwargs if function_kwargs else {}
 
     def execute(self):
-        """execute this event"""
+        """Execute this event."""
         if not self._canceled:
             fn = self.fn()
             if fn is not None:
                 fn(*self.function_args, **self.function_kwargs)
 
     def cancel(self) -> None:
-        """cancel this event"""
+        """Cancel this event."""
         self._canceled = True
         self.fn = None
         self.function_args = []
         self.function_kwargs = {}
 
-    def __lt__(self, other):
+    def __lt__(self, other):  # noqa
         # Define a total ordering for events to be used by the heapq
         return (self.time, self.priority, self.unique_id) < (
             other.time,
@@ -87,30 +100,31 @@ class SimulationEvent:
 
 
 class EventList:
-    """An event list
+    """An event list.
 
     This is a heap queue sorted list of events. Events are always removed from the left, so heapq is a performant and
     appropriate data structure. Events are sorted based on their time stamp, their priority, and their unique_id
     as a tie-breaker, guaranteeing a complete ordering.
 
+
     """
 
     def __init__(self):
+        """Initialize an event list."""
         self._events: list[SimulationEvent] = []
         heapify(self._events)
 
     def add_event(self, event: SimulationEvent):
-        """Add the event to the event list
+        """Add the event to the event list.
 
         Args:
             event (SimulationEvent): The event to be added
 
         """
-
         heappush(self._events, event)
 
     def peak_ahead(self, n: int = 1) -> list[SimulationEvent]:
-        """Look at the first n non-canceled event in the event list
+        """Look at the first n non-canceled event in the event list.
 
         Args:
             n (int): The number of events to look ahead
@@ -139,7 +153,7 @@ class EventList:
         return peek
 
     def pop_event(self) -> SimulationEvent:
-        """pop the first element from the event list"""
+        """Pop the first element from the event list."""
         while self._events:
             event = heappop(self._events)
             if not event.CANCELED:
@@ -147,16 +161,17 @@ class EventList:
         raise IndexError("Event list is empty")
 
     def is_empty(self) -> bool:
+        """Return whether the event list is empty."""
         return len(self) == 0
 
-    def __contains__(self, event: SimulationEvent) -> bool:
+    def __contains__(self, event: SimulationEvent) -> bool:  # noqa
         return event in self._events
 
-    def __len__(self) -> int:
+    def __len__(self) -> int:  # noqa
         return len(self._events)
 
     def __repr__(self) -> str:
-        """Return a string representation of the event list"""
+        """Return a string representation of the event list."""
         events_str = ", ".join(
             [
                 f"Event(time={e.time}, priority={e.priority}, id={e.unique_id})"
@@ -167,7 +182,12 @@ class EventList:
         return f"EventList([{events_str}])"
 
     def remove(self, event: SimulationEvent) -> None:
-        """remove an event from the event list"""
+        """Remove an event from the event list.
+
+        Args:
+            event (SimulationEvent): The event to be removed
+
+        """
         # we cannot simply remove items from _eventlist because this breaks
         # heap structure invariant. So, we use a form of lazy deletion.
         # SimEvents have a CANCELED flag that we set to True, while popping and peak_ahead
@@ -175,4 +195,5 @@ class EventList:
         event.cancel()
 
     def clear(self):
+        """Clear the event list."""
         self._events.clear()

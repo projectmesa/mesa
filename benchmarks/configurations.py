@@ -1,3 +1,5 @@
+"""configurations for benchmarks."""
+
 from BoltzmannWealth.boltzmann_wealth import BoltzmannWealth
 from Flocking.flocking import BoidFlockers
 from Schelling.schelling import Schelling

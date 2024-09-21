@@ -1,3 +1,5 @@
+"""Agent.py related tests."""
+
 import pickle
 
 import numpy as np
@@ -8,30 +10,42 @@ from mesa.model import Model
 
 
 class TestAgent(Agent):
+    """Agent class for testing."""
+
     def get_unique_identifier(self):
+        """Return unique identifier for this agent."""
         return self.unique_id
 
 
 class TestAgentDo(Agent):
+    """Agent class for testing."""
+
     def __init__(
         self,
         model,
     ):
+        """Initialize an Agent.
+
+        Args:
+            model (Model): the model to which the agent belongs
+
+        """
         super().__init__(model)
         self.agent_set = None
 
-    def get_unique_identifier(self):
+    def get_unique_identifier(self):  # noqa: D102
         return self.unique_id
 
-    def do_add(self):
+    def do_add(self):  # noqa: D102
         agent = TestAgentDo(self.model)
         self.agent_set.add(agent)
 
-    def do_remove(self):
+    def do_remove(self):  # noqa: D102
         self.agent_set.remove(self)
 
 
 def test_agent_removal():
+    """Test agent removal."""
     model = Model()
     agent = TestAgent(model)
     # Check if the agent is added
@@ -43,6 +57,7 @@ def test_agent_removal():
 
 
 def test_agentset():
+    """Test agentset class."""
     # create agentset
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
@@ -112,6 +127,7 @@ def test_agentset():
 
 
 def test_agentset_initialization():
+    """Test agentset initialization."""
     model = Model()
     empty_agentset = AgentSet([], model)
     assert len(empty_agentset) == 0
@@ -122,6 +138,7 @@ def test_agentset_initialization():
 
 
 def test_agentset_serialization():
+    """Test pickleability of agentset."""
     model = Model()
     agents = [TestAgent(model) for _ in range(5)]
     agentset = AgentSet(agents, model)
@@ -136,6 +153,7 @@ def test_agentset_serialization():
 
 
 def test_agent_membership():
+    """Test agent membership in AgentSet."""
     model = Model()
     agents = [TestAgent(model) for _ in range(5)]
     agentset = AgentSet(agents, model)
@@ -145,6 +163,7 @@ def test_agent_membership():
 
 
 def test_agent_add_remove_discard():
+    """Test adding, removing and discarding agents from AgentSet."""
     model = Model()
     agent = TestAgent(model)
     agentset = AgentSet([], model)
@@ -164,6 +183,7 @@ def test_agent_add_remove_discard():
 
 
 def test_agentset_get_item():
+    """Test integer based access to AgentSet."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -177,6 +197,7 @@ def test_agentset_get_item():
 
 
 def test_agentset_do_str():
+    """Test AgentSet.do with str."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -211,6 +232,7 @@ def test_agentset_do_str():
 
 
 def test_agentset_do_callable():
+    """Test AgentSet.do with callable."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -277,6 +299,7 @@ def test_agentset_do_callable():
 
 
 def test_agentset_get():
+    """Test AgentSet.get."""
     model = Model()
     _ = [TestAgent(i, model) for i in range(10)]
 
@@ -322,6 +345,7 @@ def test_agentset_get():
 
 
 def test_agentset_agg():
+    """Test agentset.agg."""
     model = Model()
     agents = [TestAgent(model) for i in range(10)]
 
@@ -357,6 +381,8 @@ def test_agentset_agg():
 
 
 def test_agentset_set_method():
+    """Test AgentSet.set."""
+
     # Initialize the model and agents with and without existing attributes
     class TestAgentWithAttribute(Agent):
         def __init__(self, model, age=None):
@@ -381,6 +407,7 @@ def test_agentset_set_method():
 
 
 def test_agentset_map_str():
+    """Test AgentSet.map with strings."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -393,6 +420,7 @@ def test_agentset_map_str():
 
 
 def test_agentset_map_callable():
+    """Test AgentSet.map with callable."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -409,7 +437,44 @@ def test_agentset_map_callable():
     assert all(i == entry for i, entry in zip(results, range(1, 11)))
 
 
+def test_agentset_shuffle_do():
+    """Test AgentSet.shuffle_do method."""
+    model = Model()
+
+    class TestAgentShuffleDo(Agent):
+        def __init__(self, model):
+            super().__init__(model)
+            self.called = False
+
+        def test_method(self):
+            self.called = True
+
+    agents = [TestAgentShuffleDo(model) for _ in range(100)]
+    agentset = AgentSet(agents, model)
+
+    # Test shuffle_do with a string method name
+    agentset.shuffle_do("test_method")
+    assert all(agent.called for agent in agents)
+
+    # Reset the called flag
+    for agent in agents:
+        agent.called = False
+
+    # Test shuffle_do with a callable
+    agentset.shuffle_do(lambda agent: setattr(agent, "called", True))
+    assert all(agent.called for agent in agents)
+
+    # Verify that the order is indeed shuffled
+    original_order = list(agentset)
+    shuffled_order = []
+    agentset.shuffle_do(lambda agent: shuffled_order.append(agent))
+    assert (
+        original_order != shuffled_order
+    ), "The order should be different after shuffle_do"
+
+
 def test_agentset_get_attribute():
+    """Test AgentSet.get for attributes."""
     model = Model()
     agents = [TestAgent(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
@@ -440,11 +505,15 @@ def test_agentset_get_attribute():
 
 
 class OtherAgentType(Agent):
+    """Another Agent class for testing."""
+
     def get_unique_identifier(self):
+        """Return unique identifier."""
         return self.unique_id
 
 
 def test_agentset_select_by_type():
+    """Test AgentSet.select for agent type."""
     model = Model()
     # Create a mix of agents of two different types
     test_agents = [TestAgent(model) for _ in range(4)]
@@ -471,6 +540,7 @@ def test_agentset_select_by_type():
 
 
 def test_agentset_shuffle():
+    """Test AgentSet.shuffle."""
     model = Model()
     test_agents = [TestAgent(model) for _ in range(12)]
 
@@ -484,10 +554,13 @@ def test_agentset_shuffle():
 
 
 def test_agentset_groupby():
+    """Test AgentSet.groupby."""
+
     class TestAgent(Agent):
         def __init__(self, model):
             super().__init__(model)
             self.even = self.unique_id % 2 == 0
+            self.value = self.unique_id * 10
 
         def get_unique_identifier(self):
             return self.unique_id
@@ -524,10 +597,43 @@ def test_agentset_groupby():
     another_ref_to_groups = groups.do(lambda x: x.do("step"))
     assert groups == another_ref_to_groups
 
+    # New tests for count() method
+    groups = agentset.groupby("even")
+    count_result = groups.count()
+    assert count_result == {True: 5, False: 5}
+
+    # New tests for agg() method
+    groups = agentset.groupby("even")
+    sum_result = groups.agg("value", sum)
+    assert sum_result[True] == sum(agent.value for agent in agents if agent.even)
+    assert sum_result[False] == sum(agent.value for agent in agents if not agent.even)
+
+    max_result = groups.agg("value", max)
+    assert max_result[True] == max(agent.value for agent in agents if agent.even)
+    assert max_result[False] == max(agent.value for agent in agents if not agent.even)
+
+    min_result = groups.agg("value", min)
+    assert min_result[True] == min(agent.value for agent in agents if agent.even)
+    assert min_result[False] == min(agent.value for agent in agents if not agent.even)
+
+    # Test with a custom aggregation function
+    def custom_agg(values):
+        return sum(values) / len(values) if values else 0
+
+    custom_result = groups.agg("value", custom_agg)
+    assert custom_result[True] == custom_agg(
+        [agent.value for agent in agents if agent.even]
+    )
+    assert custom_result[False] == custom_agg(
+        [agent.value for agent in agents if not agent.even]
+    )
+
 
 def test_oldstyle_agent_instantiation():
     """Old behavior of Agent creation with unique_id and model as positional arguments.
-    Can be removed/updated in the future."""
+
+    Can be removed/updated in the future.
+    """
     model = Model()
     agent = Agent("some weird unique id", model)
     assert isinstance(agent.unique_id, int)

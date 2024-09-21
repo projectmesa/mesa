@@ -1,3 +1,10 @@
+"""Provides several simulator classes.
+
+A Simulator is responsible for executing a simulation model. It controls time advancement and enables event scheduling.
+
+
+"""
+
 from __future__ import annotations
 
 import numbers
@@ -27,6 +34,12 @@ class Simulator:
     # TODO: add experimentation support
 
     def __init__(self, time_unit: type, start_time: int | float):
+        """Initialize a Simulator instance.
+
+        Args:
+            time_unit: type of the smulaiton time
+            start_time: the starttime of the simulator
+        """
         # should model run in a separate thread,
         # and we can then interact with start, stop, run_until, and step?
         self.event_list = EventList()
@@ -36,10 +49,10 @@ class Simulator:
         self.time = self.start_time
         self.model = None
 
-    def check_time_unit(self, time: int | float) -> bool: ...
+    def check_time_unit(self, time: int | float) -> bool: ...  # noqa: D102
 
     def setup(self, model: Model) -> None:
-        """Set up the simulator with the model to simulate
+        """Set up the simulator with the model to simulate.
 
         Args:
             model (Model): The model to simulate
@@ -49,12 +62,13 @@ class Simulator:
         self.model = model
 
     def reset(self):
-        """Reset the simulator by clearing the event list and removing the model to simulate"""
+        """Reset the simulator by clearing the event list and removing the model to simulate."""
         self.event_list.clear()
         self.model = None
         self.time = self.start_time
 
     def run_until(self, end_time: int | float) -> None:
+        """Run the simulator until the end time."""
         while True:
             try:
                 event = self.event_list.pop_event()
@@ -71,7 +85,7 @@ class Simulator:
                 break
 
     def run_for(self, time_delta: int | float):
-        """run the simulator for the specified time delta
+        """Run the simulator for the specified time delta.
 
         Args:
             time_delta (float| int): The time delta. The simulator is run from the current time to the current time
@@ -88,7 +102,7 @@ class Simulator:
         function_args: list[Any] | None = None,
         function_kwargs: dict[str, Any] | None = None,
     ) -> SimulationEvent:
-        """Schedule event for the current time instant
+        """Schedule event for the current time instant.
 
         Args:
             function (Callable): The callable to execute for this event
@@ -116,7 +130,7 @@ class Simulator:
         function_args: list[Any] | None = None,
         function_kwargs: dict[str, Any] | None = None,
     ) -> SimulationEvent:
-        """Schedule event for the specified time instant
+        """Schedule event for the specified time instant.
 
         Args:
             function (Callable): The callable to execute for this event
@@ -150,7 +164,7 @@ class Simulator:
         function_args: list[Any] | None = None,
         function_kwargs: dict[str, Any] | None = None,
     ) -> SimulationEvent:
-        """Schedule event for the current time plus the time delta
+        """Schedule event for the current time plus the time delta.
 
         Args:
             function (Callable): The callable to execute for this event
@@ -174,13 +188,12 @@ class Simulator:
         return event
 
     def cancel_event(self, event: SimulationEvent) -> None:
-        """remove the event from the event list
+        """Remove the event from the event list.
 
         Args:
             event (SimulationEvent): The simulation event to remove
 
         """
-
         self.event_list.remove(event)
 
     def _schedule_event(self, event: SimulationEvent):
@@ -204,13 +217,29 @@ class ABMSimulator(Simulator):
     """
 
     def __init__(self):
+        """Initialize a ABM simulator."""
         super().__init__(int, 0)
 
     def setup(self, model):
+        """Set up the simulator with the model to simulate.
+
+        Args:
+            model (Model): The model to simulate
+
+        """
         super().setup(model)
         self.schedule_event_now(self.model.step, priority=Priority.HIGH)
 
     def check_time_unit(self, time) -> bool:
+        """Check whether the time is of the correct unit.
+
+        Args:
+            time (int | float): the time
+
+        Returns:
+            bool: whether the time is of the correct unit
+
+        """
         if isinstance(time, int):
             return True
         if isinstance(time, float):
@@ -225,9 +254,9 @@ class ABMSimulator(Simulator):
         function_args: list[Any] | None = None,
         function_kwargs: dict[str, Any] | None = None,
     ) -> SimulationEvent:
-        """Schedule a SimulationEvent for the next tick
+        """Schedule a SimulationEvent for the next tick.
 
-        Args
+        Args:
             function (Callable): the callable to execute
             priority (Priority): the priority of the event
             function_args (List[Any]): List of arguments to pass to the callable
@@ -243,7 +272,7 @@ class ABMSimulator(Simulator):
         )
 
     def run_until(self, end_time: int) -> None:
-        """run the simulator up to and included the specified end time
+        """Run the simulator up to and included the specified end time.
 
         Args:
             end_time (float| int): The end_time delta. The simulator is until the specified end time
@@ -270,7 +299,7 @@ class ABMSimulator(Simulator):
                 break
 
     def run_for(self, time_delta: int):
-        """run the simulator for the specified time delta
+        """Run the simulator for the specified time delta.
 
         Args:
             time_delta (float| int): The time delta. The simulator is run from the current time to the current time
@@ -282,13 +311,24 @@ class ABMSimulator(Simulator):
 
 
 class DEVSimulator(Simulator):
-    """A simulator where the unit of time is a float. Can be used for full-blown discrete event simulating using
-    event scheduling.
+    """A simulator where the unit of time is a float.
+
+    Can be used for full-blown discrete event simulating using event scheduling.
 
     """
 
     def __init__(self):
+        """Initialize a DEVS simulator."""
         super().__init__(float, 0.0)
 
     def check_time_unit(self, time) -> bool:
+        """Check whether the time is of the correct unit.
+
+        Args:
+            time (float): the time
+
+        Returns:
+        bool: whether the time is of the correct unit
+
+        """
         return isinstance(time, numbers.Number)

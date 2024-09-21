@@ -114,6 +114,7 @@ select = [
   "UP",  # upgrade
   "W",   # style warnings
   "YTT", # sys.version
+  "D",  # docstring
 ]
 # Ignore list taken from https://github.com/psf/black/blob/master/.flake8
 # E203	Whitespace before ':'
@@ -137,3 +138,5 @@ extend-ignore = [
   "ISC001", # ruff format asks to disable this feature
   "S311",   # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]
+[tool.ruff.lint.pydocstyle]
+convention = "google"

@@ -1,3 +1,5 @@
+"""Tests for experimental Simulator classes."""
+
 from unittest.mock import MagicMock
 
 import pytest
@@ -8,6 +10,7 @@ from mesa.experimental.devs.simulator import ABMSimulator, DEVSimulator
 
 
 def test_devs_simulator():
+    """Tests devs simulator."""
     simulator = DEVSimulator()
 
     # setup
@@ -69,6 +72,7 @@ def test_devs_simulator():
 
 
 def test_abm_simulator():
+    """Tests abm simulator."""
     simulator = ABMSimulator()
 
     # setup
@@ -86,6 +90,7 @@ def test_abm_simulator():
 
 
 def test_simulation_event():
+    """Tests for SimulationEvent class."""
     some_test_function = MagicMock()
 
     time = 10
@@ -199,6 +204,7 @@ def test_simulation_event():
 
 
 def test_eventlist():
+    """Tests for EventList."""
     event_list = EventList()
 
     assert len(event_list._events) == 0
