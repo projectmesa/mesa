@@ -48,7 +48,7 @@ class Cell:
     def __init__(
         self,
         coordinate: Coordinate,
-        capacity: float | None = None,
+        capacity: int | None = None,
         random: Random | None = None,
     ) -> None:
         """Initialise the cell.
@@ -65,7 +65,7 @@ class Cell:
         self.agents: list[
             Agent
         ] = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
-        self.capacity = capacity
+        self.capacity: int = capacity
         self.properties: dict[Coordinate, object] = {}
         self.random = random
 
