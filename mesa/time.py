@@ -1,5 +1,10 @@
 """Mesa Time Module.
 
+.. warning::
+    The time module and all its Schedulers are deprecated and will be removed in a future version.
+    They can be replaced with AgentSet functionality. See the migration guide for details:
+    https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers
+
 Objects for handling the time component of a model. In particular, this module
 contains Schedulers, which handle agent activation. A Scheduler is an object
 which controls when agents are called upon to act, and when.
@@ -49,15 +54,6 @@ class BaseScheduler:
 
     """
 
-    # Throw module-level deprecation warning
-    warnings.warn(
-        "The time module and all its Schedulers are deprecated and will be removed in a future version. "
-        "They can be replaced with AgentSet functionality. See the migration guide for details. "
-        "https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-
     def __init__(self, model: Model, agents: Iterable[Agent] | None = None) -> None:
         """Create a new BaseScheduler.
 
@@ -66,6 +62,15 @@ class BaseScheduler:
             agents (Iterable[Agent], None, optional): An iterable of agents who are controlled by the schedule
 
         """
+
+        warnings.warn(
+            "The time module and all its Schedulers are deprecated and will be removed in a future version. "
+            "They can be replaced with AgentSet functionality. See the migration guide for details. "
+            "https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+       
         self.model = model
         self.steps = 0
         self.time: TimeT = 0
