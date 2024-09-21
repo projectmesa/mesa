@@ -5,7 +5,7 @@ title: Release History
 ## Highlights
 Mesa v3.0 alpha 5 release contains many quality of life updates, a big new feature for the DataCollector and a major deprecation.
 
-The entire `mesa.time` module, including all schedulers, has been deprecated ([#2306](https://github.com/projectmesa/mesa/pull/2306)). Users are encouraged to transition to AgentSet functionality for more flexible and explicit agent activation patterns. Check the [migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers) on how to
+The entire `mesa.time` module, including all schedulers, has been deprecated ([#2306](https://github.com/projectmesa/mesa/pull/2306)). Users are encouraged to transition to AgentSet functionality for more flexible and explicit agent activation patterns. Check the [migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers) on how to upgrade.
 
 The DataCollector now supports collecting data from specific Agent subclasses using the new `agenttype_reporters` parameter ([#2300](https://github.com/projectmesa/mesa/pull/2300)). This allows collecting different metrics for different agent types. For example:
 
@@ -33,7 +33,7 @@ While the Mesa 3.0 timeline is still being discussed, we're aiming at the first 
 ### 🛠 Enhancements made
 * Make cell connections public and named by @Corvince in https://github.com/projectmesa/mesa/pull/2296
 * SolaraViz Updates by @Corvince in https://github.com/projectmesa/mesa/pull/2299
-* Solara viz: use_task for non-threaded continous play by @Corvince in https://github.com/projectmesa/mesa/pull/2304
+* Solara viz: use_task for non-threaded continuous play by @Corvince in https://github.com/projectmesa/mesa/pull/2304
 * Update to CellCollection.select by @quaquel in https://github.com/projectmesa/mesa/pull/2307
 ### 📜 Documentation improvements
 * Enforce google docstrings by @quaquel in https://github.com/projectmesa/mesa/pull/2294
