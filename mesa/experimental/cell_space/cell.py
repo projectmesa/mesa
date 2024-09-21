@@ -139,7 +139,7 @@ class Cell:
         This is equivalent to cell.get_neighborhood(radius=1)
 
         """
-        return self.get_neighborhood(radius=1)
+        return self.get_neighborhood()
 
     # FIXME: Revisit caching strategy on methods
     @cache  # noqa: B019
