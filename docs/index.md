@@ -85,7 +85,7 @@ Migration guide <migration_guide>
 API Documentation <apis/api_main>
 Best Practices <best-practices>
 How-to Guide <howto>
-Release notes <../HISTORY.md>
+Release notes <../HISTORY>
 Mesa Packages <packages>
 ```
 
