@@ -31,15 +31,6 @@ from collections.abc import Iterable
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
-# Throw module-level deprecation warning
-warnings.warn(
-    "The time module and all its Schedulers are deprecated and will be removed in a future version. "
-    "They can be replaced with AgentSet functionality. See the migration guide for details. "
-    "https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
 # BaseScheduler has a self.time of int, while
 # StagedActivation has a self.time of float
 TimeT = float | int
@@ -57,6 +48,15 @@ class BaseScheduler:
         time (TimeT): The current time in the simulation. Can be an integer or a float.
 
     """
+
+    # Throw module-level deprecation warning
+    warnings.warn(
+        "The time module and all its Schedulers are deprecated and will be removed in a future version. "
+        "They can be replaced with AgentSet functionality. See the migration guide for details. "
+        "https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     def __init__(self, model: Model, agents: Iterable[Agent] | None = None) -> None:
         """Create a new BaseScheduler.
