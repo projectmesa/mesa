@@ -134,7 +134,7 @@ class Cell:
 
     @cached_property
     def neighborhood(self) -> CellCollection:
-        """Returns the direct neigborhood of the cell
+        """Returns the direct neigborhood of the cell.
 
         This is equivalent to cell.get_neighborhood(radius=1)
 
@@ -146,7 +146,7 @@ class Cell:
     def get_neighborhood(
         self, radius: int = 1, include_center: bool = False
     ) -> CellCollection:
-        """Returns a list of all neighboring cells for the given radius
+        """Returns a list of all neighboring cells for the given radius.
 
         For getting the direct neighborhood (i.e., radius=1) you can also use
         the `neighborhood` property.
