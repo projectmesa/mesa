@@ -131,10 +131,33 @@ class Cell:
     def __repr__(self):  # noqa
         return f"Cell({self.coordinate}, {self.agents})"
 
+
+    @property
+    @cache
+    def neighborhood(self) -> CellCollection:
+        """Returns the direct neigborhood of the cell
+
+        This is equivalent to cell.get_neighborhood(radius=1)
+
+        """
+        return self.get_neighborhood(radius=1)
+
     # FIXME: Revisit caching strategy on methods
     @cache  # noqa: B019
-    def neighborhood(self, radius: int = 1, include_center: bool = False):
-        """Returns a list of all neighboring cells."""
+    def get_neighborhood(self, radius: int = 1, include_center: bool = False) -> CellCollection:
+        """Returns a list of all neighboring cells for the given radius
+
+        For getting the direct neighborhood (i.e., radius=1) you can also use
+        the `neighborhood` property.
+
+        Args:
+            radius (int): the radius of the neighborhood
+            include_center (bool): include the center of the neighborhood
+
+        Returns
+            a list of all neighboring cells
+
+        """
         return CellCollection[Cell](
             self._neighborhood(radius=radius, include_center=include_center),
             random=self.random,
