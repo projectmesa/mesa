@@ -28,11 +28,6 @@ The DataCollector then stores the data it collects in dictionaries:
       each containing a list of each agent's id and its values.
 
 Finally, DataCollector can create a pandas DataFrame from each collection.
-
-The default DataCollector here makes several assumptions:
-    * The model has an agent list called agents
-    * The model has a dictionary of AgentSets called agents_by_type
-    * For collecting agent-level variables, agents must have a unique_id
 """
 
 import contextlib
