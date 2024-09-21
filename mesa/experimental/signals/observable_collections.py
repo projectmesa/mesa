@@ -128,3 +128,9 @@ class SignalingList(MutableSequence[Any]):
         old_value = self.data[index]
         self.data.insert(index, value)
         self.owner.notify(self.name, old_value, value, "added")
+
+    def __str__(self):  # noqa: D103
+        return self.data.__str__()
+
+    def __repr__(self):  # noqa: D103
+        return self.data.__repr__()

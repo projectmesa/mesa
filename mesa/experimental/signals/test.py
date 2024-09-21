@@ -25,7 +25,6 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         super().__init__(seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
-        self.schedule = mesa.time.RandomActivation(self)
         self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
         )
@@ -40,12 +39,15 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         self.running = True
         self.datacollector.collect(self)
 
+        self.agent_wealth = self.agents.get("wealth")
+
     def step(self):
         self.agents.shuffle().do("step")
         # collect data
         self.datacollector.collect(self)
 
-        self.agent_wealth = self.agents.get("wealth")
+        for i, entry in enumerate(self.agents.get("wealth")):
+            self.agent_wealth[i] = entry
 
     def run_model(self, n):
         for _i in range(n):
@@ -84,6 +86,14 @@ class MoneyAgent(mesa.Agent, HasObservables):
             self.give_money()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+
+    def some_callback(signal):
+        print(signal)
+
+
     model = BoltzmannWealth()
+
+    model.observe("agent_wealth", "replaced", some_callback)
+
     model.run_model(10)

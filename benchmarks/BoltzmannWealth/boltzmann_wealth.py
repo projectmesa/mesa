@@ -4,7 +4,7 @@ https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth
 """
 
 import mesa
-from mesa.experimental.signal import HasObservables, Observable
+from mesa.experimental.signals import HasObservables, Observable
 
 
 def compute_gini(model):

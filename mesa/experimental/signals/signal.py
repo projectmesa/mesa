@@ -99,9 +99,8 @@ class HasObservables:
         # we have the name of observable as a key
         # we have signal_type as a key
         # we want weakrefs for the callable
-        obj.subscribers: dict[str, dict[str, weakref.WeakValueDictionary]] = (
-            defaultdict(functools.partial(defaultdict, weakref.WeakValueDictionary))
-        )
+        obj.subscribers: dict[str, dict[str, weakref.WeakValueDictionary]] = defaultdict(
+            functools.partial(defaultdict, weakref.WeakSet))
 
         return obj
 
@@ -127,6 +126,8 @@ class HasObservables:
             signal_type: the type of signal on the Observable to subscribe to
             handler: the handler to call
 
+        # fixme, all should also work for signal type
+
         """
         names = (
             [
@@ -143,7 +144,7 @@ class HasObservables:
                     "on Observable {name}, which does not emit this signal_type"
                 )
 
-            self.subscribers[name][signal_type] = handler
+            self.subscribers[name][signal_type].add(handler)
 
     def unobserve(self, name: str | All, signal_type: str):
         """Unsubscribe to the Observable <name> for signal_type
