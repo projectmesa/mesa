@@ -143,4 +143,4 @@ class BoidFlockers(mesa.Model):
             self.space.place_agent(boid, pos)
 
     def step(self):
-        self.agents.shuffle().do("step")
+        self.agents.shuffle_do("step")
