@@ -108,8 +108,9 @@ class HasObservables:
         # we have the name of observable as a key
         # we have signal_type as a key
         # we want weakrefs for the callable
-        obj.subscribers: dict[str, dict[str, weakref.WeakValueDictionary]] = defaultdict(
-            functools.partial(defaultdict, weakref.WeakSet))
+        obj.subscribers: dict[str, dict[str, weakref.WeakValueDictionary]] = (
+            defaultdict(functools.partial(defaultdict, weakref.WeakSet))
+        )
 
         return obj
 
@@ -208,6 +209,3 @@ class HasObservables:
         observers = self.subscribers[observable][signal_type]
         for observer in observers:
             observer(signal)
-
-
-

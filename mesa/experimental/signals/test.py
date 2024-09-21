@@ -92,7 +92,6 @@ if __name__ == "__main__":
     def some_callback(signal):  # noqa D103
         print(signal)
 
-
     model = BoltzmannWealth()
 
     model.observe("agent_wealth", "replaced", some_callback)
