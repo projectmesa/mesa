@@ -2,7 +2,6 @@
 
 from mesa import Model
 from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
-from mesa.time import RandomActivation
 
 
 class SchellingAgent(CellAgent):
@@ -67,7 +66,6 @@ class Schelling(Model):
         self.minority_pc = minority_pc
         self.simulator = simulator
 
-        self.schedule = RandomActivation(self)
         self.grid = OrthogonalMooreGrid(
             [height, width],
             torus=True,
@@ -84,12 +82,11 @@ class Schelling(Model):
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(self, agent_type, radius, homophily)
                 agent.move_to(cell)
-                self.schedule.add(agent)
 
     def step(self):
         """Run one step of the model."""
         self.happy = 0  # Reset counter of happy agents
-        self.schedule.step()
+        self.agents.shuffle_do("step")
 
 
 if __name__ == "__main__":
