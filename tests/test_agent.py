@@ -461,14 +461,16 @@ def test_agentset_shuffle_do():
         agent.called = False
 
     # Test shuffle_do with a callable
-    agentset.shuffle_do(lambda agent: setattr(agent, 'called', True))
+    agentset.shuffle_do(lambda agent: setattr(agent, "called", True))
     assert all(agent.called for agent in agents)
 
     # Verify that the order is indeed shuffled
     original_order = list(agentset)
     shuffled_order = []
     agentset.shuffle_do(lambda agent: shuffled_order.append(agent))
-    assert original_order != shuffled_order, "The order should be different after shuffle_do"
+    assert (
+        original_order != shuffled_order
+    ), "The order should be different after shuffle_do"
 
 
 def test_agentset_get_attribute():
