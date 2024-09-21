@@ -26,9 +26,9 @@ class CellCollection(Generic[T]):
     """
 
     def __init__(
-            self,
-            cells: Mapping[T, list[CellAgent]] | Iterable[T],
-            random: Random | None = None,
+        self,
+        cells: Mapping[T, list[CellAgent]] | Iterable[T],
+        random: Random | None = None,
     ) -> None:
         """Initialize a CellCollection.
 
@@ -83,8 +83,11 @@ class CellCollection(Generic[T]):
         """
         return self.random.choice(list(self.agents))
 
-
-    def select(self, filter_func: Callable[[T], bool] | None = None, at_most: int | float = float("inf"), ):
+    def select(
+        self,
+        filter_func: Callable[[T], bool] | None = None,
+        at_most: int | float = float("inf"),
+    ):
         """Select cells based on filter function.
 
         Args:
@@ -108,7 +111,7 @@ class CellCollection(Generic[T]):
             for cell in self:
                 if count >= at_most:
                     break
-                if (not filter_func or filter_func(cell)):
+                if not filter_func or filter_func(cell):
                     yield cell
                     count += 1
 
