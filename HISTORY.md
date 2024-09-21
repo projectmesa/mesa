@@ -5,7 +5,7 @@ title: Release History
 ## Highlights
 Mesa v3.0 alpha 5 release contains many quality of life updates, a big new feature for the DataCollector and a major deprecation.
 
-The entire `mesa.time` module, including all schedulers, has been deprecated ([#2306](https://github.com/projectmesa/mesa/pull/2306)). Users are encouraged to transition to AgentSet functionality for more flexible and explicit agent activation patterns. Check the [migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers) on how to 
+The entire `mesa.time` module, including all schedulers, has been deprecated ([#2306](https://github.com/projectmesa/mesa/pull/2306)). Users are encouraged to transition to AgentSet functionality for more flexible and explicit agent activation patterns. Check the [migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers) on how to
 
 The DataCollector now supports collecting data from specific Agent subclasses using the new `agenttype_reporters` parameter ([#2300](https://github.com/projectmesa/mesa/pull/2300)). This allows collecting different metrics for different agent types. For example:
 
