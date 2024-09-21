@@ -512,3 +512,15 @@ def test_cell_collection():
 
     agents = collection[cells[0]]
     assert agents == cells[0].agents
+
+    cell = collection.select(at_most=1)
+    assert len(cell) == 1
+
+    cells = collection.select(at_most=2)
+    assert len(cells) == 2
+
+    cells = collection.select(at_most=0.5)
+    assert len(cells) == 5
+
+    cells = collection.select()
+    assert len(cells) == len(collection)

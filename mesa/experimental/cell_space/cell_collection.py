@@ -83,25 +83,36 @@ class CellCollection(Generic[T]):
         """
         return self.random.choice(list(self.agents))
 
-    def select(self, filter_func: Callable[[T], bool] | None = None, n=0):
+    def select(
+        self,
+        filter_func: Callable[[T], bool] | None = None,
+        at_most: int | float = float("inf"),
+    ):
         """Select cells based on filter function.
 
         Args:
             filter_func: filter function
-            n: number of cells to select
+            at_most: The maximum amount of cells to select. Defaults to infinity.
+              - If an integer, at most the first number of matching cells is selected.
+              - If a float between 0 and 1, at most that fraction of original number of cells
 
         Returns:
             CellCollection
 
         """
-        # FIXME: n is not considered
-        if filter_func is None and n == 0:
+        if filter_func is None and at_most == float("inf"):
             return self
 
-        return CellCollection(
-            {
-                cell: agents
-                for cell, agents in self._cells.items()
-                if filter_func is None or filter_func(cell)
-            }
-        )
+        if at_most <= 1.0 and isinstance(at_most, float):
+            at_most = int(len(self) * at_most)  # Note that it rounds down (floor)
+
+        def cell_generator(filter_func, at_most):
+            count = 0
+            for cell in self:
+                if count >= at_most:
+                    break
+                if not filter_func or filter_func(cell):
+                    yield cell
+                    count += 1
+
+        return CellCollection(cell_generator(filter_func, at_most))
