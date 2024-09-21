@@ -5,7 +5,7 @@ Non-breaking changes aren't included, for those see our [Release history](https:
 
 
 ## Mesa 3.0
-Mesa 3.0 introduces significant changes to core functionalities, such as agent and model initialization, scheduling, and visualization. The guide below outlines these changes and provides instructions for migrating your existing Mesa projects to version 3.0.
+Mesa 3.0 introduces significant changes to core functionalities, including agent and model initialization, scheduling, and visualization. The guide below outlines these changes and provides instructions for migrating your existing Mesa projects to version 3.0.
 
 _This guide is a work in progress. The development of it is tracked in [Issue #2233](https://github.com/projectmesa/mesa/issues/2233)._
 
