@@ -2,14 +2,7 @@
 import mesa
 
 from mesa.experimental import signal
-import traitlets
-
-
-class Observable(traitlets.TraitType):
-    def __init__(self):
-        super().__init__(allow_none=False, read_only=False,)
-
-
+from param import Parameter, Parameterized
 
 def compute_gini(model):
     agent_wealths = [agent.wealth for agent in model.agents]
@@ -56,13 +49,9 @@ class BoltzmannWealth(mesa.Model):
             self.step()
 
 
-class MoneyAgent(mesa.Agent, traitlets.HasTraits):
+class MoneyAgent(mesa.Agent, Parameterized):
     """An agent with fixed initial wealth."""
-    wealth = Observable()
-
-    import random
-    random.binomialvariate
-
+    wealth = Parameter()
 
     def __init__(self, model):
         super().__init__(model)
