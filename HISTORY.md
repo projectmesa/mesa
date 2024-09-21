@@ -1,7 +1,7 @@
 ---
 title: Release History
 ---
-# 3.0.0a4 (2024-09-21)
+# 3.0.0a5 (2024-09-21)
 ## Highlights
 Mesa v3.0 alpha 5 release contains many quality of life updates, a big new feature for the DataCollector and a major deprecation.
 
