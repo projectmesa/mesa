@@ -294,6 +294,10 @@ class AgentSet(MutableSet, Sequence):
         return self
 
     def shuffle_do(self, method: str | Callable, *args, **kwargs) -> AgentSet:
+        """Shuffle the agents in the AgentSet and then invoke a method or function on each agent.
+
+        It's a fast, optimized version of calling shuffle() followed by do().
+        """
         agents = list(self._agents.keys())
         self.random.shuffle(agents)
 
