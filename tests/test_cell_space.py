@@ -501,7 +501,6 @@ def test_cell_collection():
     agents = collection[cells[0]]
     assert agents == cells[0].agents
 
-
     cell = collection.select(at_most=1)
     assert len(cell) == 1
 
@@ -513,5 +512,3 @@ def test_cell_collection():
 
     cells = collection.select()
     assert len(cells) == len(collection)
-
-
