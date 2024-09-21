@@ -33,7 +33,7 @@ class Animal(CellAgent):
 
     def random_move(self):
         """Move to a random neighboring cell."""
-        self.move_to(self.cell.neighborhood().select_random_cell())
+        self.move_to(self.cell.get_neighborhood().select_random_cell())
 
     def spawn_offspring(self):
         """Create offspring."""

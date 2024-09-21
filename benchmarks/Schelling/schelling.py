@@ -25,7 +25,7 @@ class SchellingAgent(CellAgent):
     def step(self):
         """Run one step of the agent."""
         similar = 0
-        neighborhood = self.cell.neighborhood(radius=self.radius)
+        neighborhood = self.cell.get_neighborhood(radius=self.radius)
         for neighbor in neighborhood.agents:
             if neighbor.type == self.type:
                 similar += 1
