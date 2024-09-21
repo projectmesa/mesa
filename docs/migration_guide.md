@@ -99,8 +99,105 @@ You can access it by `Model.steps`, and it's internally in the datacollector, ba
 #### Removal of `Model._advance_time()`
 - The `Model._advance_time()` method is removed. This now happens automatically.
 
-<!-- TODO deprecate all schedulers? -->
+### Replacing Schedulers with AgentSet functionality
+The whole Time module in Mesa is deprecated, and all schedulers are being replaced with AgentSet functionality and the internal `Model.steps` counter. This allows much more flexibility in how to activate Agents and makes it explicit what's done exactly.
 
+Here's how to replace each scheduler:
+
+#### BaseScheduler
+Replace:
+```python
+self.schedule = BaseScheduler(self)
+self.schedule.step()
+```
+With:
+```python
+self.agents.do("step")
+```
+
+#### RandomActivation
+Replace:
+```python
+self.schedule = RandomActivation(self)
+self.schedule.step()
+```
+With:
+```python
+self.agents.shuffle_do("step")
+```
+
+#### SimultaneousActivation
+Replace:
+```python
+self.schedule = SimultaneousActivation(self)
+self.schedule.step()
+```
+With:
+```python
+self.agents.do("step")
+self.agents.do("advance")
+```
+
+#### StagedActivation
+Replace:
+```python
+self.schedule = StagedActivation(self, ["stage1", "stage2", "stage3"])
+self.schedule.step()
+```
+With:
+```python
+for stage in ["stage1", "stage2", "stage3"]:
+    self.agents.do(stage)
+```
+
+If you were using the `shuffle` and/or `shuffle_between_stages` options:
+```python
+stages = ["stage1", "stage2", "stage3"]
+if shuffle:
+    self.random.shuffle(stages)
+for stage in stages:
+    if shuffle_between_stages:
+        self.agents.shuffle_do(stage)
+    else:
+        self.agents.do(stage)
+```
+
+#### RandomActivationByType
+Replace:
+```python
+self.schedule = RandomActivationByType(self)
+self.schedule.step()
+```
+With:
+```python
+for agent_class in self.agent_types:
+    self.agents_by_type[agent_class].shuffle_do("step")
+```
+
+##### Replacing `step_type`
+The `RandomActivationByType` scheduler had a `step_type` method that allowed stepping only agents of a specific type. To replicate this functionality using AgentSet:
+
+Replace:
+```python
+self.schedule.step_type(AgentType)
+```
+
+With:
+```python
+self.agents_by_type[AgentType].shuffle_do("step")
+```
+
+#### General Notes
+
+1. The `Model.steps` counter is now automatically incremented. You don't need to manage it manually.
+2. If you were using `self.schedule.agents`, replace it with `self.agents`.
+3. If you were using `self.schedule.get_agent_count()`, replace it with `len(self.agents)`.
+4. If you were using `self.schedule.agents_by_type`, replace it with `self.agents_by_type`.
+5. Instead of `self.schedule.add()` and `self.schedule.remove()`, agents are now automatically added to and removed from the model's AgentSet when they are created or removed.
+
+From now on you're now not bound by 5 distinct schedulers, but can mix and match any combination of AgentSet methods (`do`, `shuffle`, `select`, etc.) to get the desired Agent activation.
+
+Ref: Original discussion [#1912](https://github.com/projectmesa/mesa/discussions/1912), decision discussion [#2231](https://github.com/projectmesa/mesa/discussions/2231), example updates [#183](https://github.com/projectmesa/mesa-examples/pull/183) and [#201](https://github.com/projectmesa/mesa-examples/pull/201), PR [#2306](https://github.com/projectmesa/mesa/pull/2306)
 
 ### Visualisation
 
