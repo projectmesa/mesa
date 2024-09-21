@@ -1,6 +1,15 @@
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 import mesa
 
+from mesa.experimental import signal
+import traitlets
+
+
+class Observable(traitlets.TraitType):
+    def __init__(self):
+        super().__init__(allow_none=False, read_only=False,)
+
+
 
 def compute_gini(model):
     agent_wealths = [agent.wealth for agent in model.agents]
@@ -47,8 +56,13 @@ class BoltzmannWealth(mesa.Model):
             self.step()
 
 
-class MoneyAgent(mesa.Agent):
+class MoneyAgent(mesa.Agent, traitlets.HasTraits):
     """An agent with fixed initial wealth."""
+    wealth = Observable()
+
+    import random
+    random.binomialvariate
+
 
     def __init__(self, model):
         super().__init__(model)
@@ -75,3 +89,6 @@ class MoneyAgent(mesa.Agent):
         self.move()
         if self.wealth > 0:
             self.give_money()
+
+
+

@@ -1,6 +1,51 @@
 import psygnal
 
+from typing import Callable
+
 __all__ = ["Observable", "HasObservables"]
+
+
+class Computable:
+    """A Computable that is depended on one or more Observables
+
+    # fixme how to make this work with Descriptors?
+    # we would need to now the owner (can also be in init)
+
+    """
+
+    def __init__(self, callable: Callable, *args, **kwargs):
+        """
+
+        Args:
+            callable: the callable that is computed
+            *args: arguments to pass to the callable
+            **kwargs: keyword arguments to pass to the callable
+
+        """
+        # fixme: what if these are observable?
+        #   basically the logic for subscribing should go into the observable class
+        #   but we might have to split up a few things here
+        #   easy fix is to just declare an attribute Observable at the class level
+        #   and next assign a Computed to this attribute.
+        #   not sure how this would work, because observable would return the computable
+        #   not its internal value. So, you could either
+        #   have a separate observable or let the observable check if the value
+        #   is a computed and thus do an additional get operation on this
+
+
+
+        self.callable = callable
+        self.args = args
+        self.kwargs = kwargs
+        self._is_dirty = True
+
+    def __get__(self):
+        # fixme: not sure this will work correctly
+
+        if self._is_dirty:
+            self.value = self.callable(*self.args, **self.kwargs)
+            self._is_dirty = False
+        return self.value
 
 
 class Observable:
@@ -28,7 +73,7 @@ class Observable:
         try:
             owner.observables.append(self)
         except AttributeError:
-            raise ValueError(f'owner {owner} is not an instance of `HasObservables`)
+            raise ValueError(f'owner {owner} is not an instance of `HasObservables`')
 
     def __set__(self, instance, value):
         setattr(instance, self.private_name, value)
