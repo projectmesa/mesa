@@ -1,7 +1,7 @@
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 import mesa
-
 from mesa.experimental.signals import HasObservables, Observable, ObservableList
+
 
 def compute_gini(model):
     agent_wealths = [agent.wealth for agent in model.agents]
@@ -18,6 +18,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
     a unit of currency to another agent. Note how, over time, this produces a
     highly skewed distribution of wealth.
     """
+
     agent_wealth = ObservableList()
 
     def __init__(self, seed=None, n=100, width=10, height=10):
@@ -46,7 +47,6 @@ class BoltzmannWealth(mesa.Model, HasObservables):
 
         self.agent_wealth = self.agents.get("wealth")
 
-
     def run_model(self, n):
         for _i in range(n):
             self.step()
@@ -54,6 +54,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
 
 class MoneyAgent(mesa.Agent, HasObservables):
     """An agent with fixed initial wealth."""
+
     wealth = Observable()
 
     def __init__(self, model):
@@ -83,7 +84,6 @@ class MoneyAgent(mesa.Agent, HasObservables):
             self.give_money()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     model = BoltzmannWealth()
     model.run_model(10)
-

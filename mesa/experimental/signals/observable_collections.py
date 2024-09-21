@@ -5,21 +5,29 @@ Observable collections behave like Observable but then for collections.
 
 """
 
-from .signal import Observable, HasObservables
+from collections.abc import Iterable, MutableSequence
+from typing import Any
 
-from collections.abc import MutableSequence
+from .signal import HasObservables, Observable
 
-from typing import Any, Iterable
-
-__all__ = ["ObservableList", ]
+__all__ = [
+    "ObservableList",
+]
 
 
 class ObservableList(Observable):
     """An ObservableList that emits signals on changes to the underlying list."""
+
     def __init__(self):
         """Initialize the ObservableList."""
         super().__init__()
-        self.signal_types: set = {"added", "removed", "cleared", "replaced", "on_change"}
+        self.signal_types: set = {
+            "added",
+            "removed",
+            "cleared",
+            "replaced",
+            "on_change",
+        }
         self.fallback_value = []
 
     def __get__(self, instance: HasObservables, owner):
@@ -43,8 +51,14 @@ class ObservableList(Observable):
             value: The value to set the attribute to.
 
         """
-        instance.notify(self.public_name, self.__get__(instance, None), value, "on_change")
-        setattr(instance, self.private_name, SignalingList(value, instance, self.public_name))
+        instance.notify(
+            self.public_name, self.__get__(instance, None), value, "on_change"
+        )
+        setattr(
+            instance,
+            self.private_name,
+            SignalingList(value, instance, self.public_name),
+        )
 
 
 class SignalingList(MutableSequence[Any]):
@@ -53,7 +67,7 @@ class SignalingList(MutableSequence[Any]):
     __slots__ = ["owner", "name", "data"]
 
     def __init__(self, iterable: Iterable, owner: HasObservables, name: str):
-        """initialize a SignalingList.
+        """Initialize a SignalingList.
 
         Args:
             iterable: initial values in the list
@@ -66,7 +80,7 @@ class SignalingList(MutableSequence[Any]):
         self.data = [entry for entry in iterable]
 
     def __setitem__(self, index: int, value: Any) -> None:
-        """set item to index.
+        """Set item to index.
 
         Args:
             index: the index to set item to
@@ -78,7 +92,7 @@ class SignalingList(MutableSequence[Any]):
         self.owner.notify(self.name, old_value, value, "replaced")
 
     def __delitem__(self, index: int) -> None:
-        """delete item at index.
+        """Delete item at index.
 
         Args:
             index: The index of the item to remove
@@ -89,7 +103,7 @@ class SignalingList(MutableSequence[Any]):
         self.owner.notify(self.name, old_value, None, "removed")
 
     def __getitem__(self, index) -> Any:
-        """get item at index.
+        """Get item at index.
 
         Args:
             index: The index of the item to retrieve
@@ -97,7 +111,6 @@ class SignalingList(MutableSequence[Any]):
         Returns:
             the item at index
         """
-
         return self.data[index]
 
     def __len__(self) -> int:

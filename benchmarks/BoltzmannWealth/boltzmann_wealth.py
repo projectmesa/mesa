@@ -4,8 +4,8 @@ https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth
 """
 
 import mesa
-
 from mesa.experimental.signal import HasObservables, Observable
+
 
 def compute_gini(model):
     """Calculate gini for wealth in model.
@@ -77,6 +77,7 @@ class BoltzmannWealth(mesa.Model):
 
 class MoneyAgent(mesa.Agent, HasObservables):
     """An agent with fixed initial wealth."""
+
     wealth = Observable()
 
     def __init__(self, model):
@@ -112,6 +113,3 @@ class MoneyAgent(mesa.Agent, HasObservables):
         self.move()
         if self.wealth > 0:
             self.give_money()
-
-
-

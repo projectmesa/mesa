@@ -1,8 +1,8 @@
-import weakref
 import functools
-
-from typing import Callable, Any
+import weakref
 from collections import defaultdict, namedtuple
+from collections.abc import Callable
+from typing import Any
 
 __all__ = ["Observable", "HasObservables"]
 
@@ -16,12 +16,10 @@ class Computable:
     """
 
     def __init__(self, callable: Callable, *args, **kwargs):
-        """
-
-        Args:
-            callable: the callable that is computed
-            *args: arguments to pass to the callable
-            **kwargs: keyword arguments to pass to the callable
+        """Args:
+        callable: the callable that is computed
+        *args: arguments to pass to the callable
+        **kwargs: keyword arguments to pass to the callable
 
         """
         # fixme: what if these are observable?
@@ -52,7 +50,9 @@ class Observable:
     def __init__(self):
         self.public_name: str
         self.private_name: str
-        self.signal_types: set = set("on_change", )
+        self.signal_types: set = set(
+            "on_change",
+        )
         self.fallback_value = None  # fixme, should this be user specifiable
 
     def __get__(self, instance, owner):
@@ -66,7 +66,9 @@ class Observable:
         owner.observables[name] = self
 
     def __set__(self, instance: "HasObservables", value):
-        instance.notify(self.public_name, self.__get__(instance, None), value, "on_change")
+        instance.notify(
+            self.public_name, self.__get__(instance, None), value, "on_change"
+        )
         setattr(instance, self.private_name, value)
 
 
@@ -97,14 +99,14 @@ class HasObservables:
         # we have the name of observable as a key
         # we have signal_type as a key
         # we want weakrefs for the callable
-        obj.subscribers: dict[str, dict[str, weakref.WeakValueDictionary]] = defaultdict(
-            functools.partial(defaultdict, weakref.WeakValueDictionary))
+        obj.subscribers: dict[str, dict[str, weakref.WeakValueDictionary]] = (
+            defaultdict(functools.partial(defaultdict, weakref.WeakValueDictionary))
+        )
 
         return obj
 
-
     def register_observable(self, observable: Observable):
-        """register an Observable
+        """Register an Observable
 
         Args:
             observable: the Observable to register
@@ -112,7 +114,12 @@ class HasObservables:
         """
         self.observables[observable.public_name] = observable
 
-    def observe(self, name: str | All, signal_type: str, handler: Callable, ):
+    def observe(
+        self,
+        name: str | All,
+        signal_type: str,
+        handler: Callable,
+    ):
         """Subscribe to the Observable <name> for signal_type
 
         Args:
@@ -121,13 +128,20 @@ class HasObservables:
             handler: the handler to call
 
         """
-        names = [name, ] if not isinstance(name, All) else self.observables.keys()
+        names = (
+            [
+                name,
+            ]
+            if not isinstance(name, All)
+            else self.observables.keys()
+        )
 
         for name in names:
             if signal_type not in self.observables[name].signal_types:
-                raise ValueError((f"you are trying to subscribe to a signal of {signal_type}"
-                                  "on Observable {name}, which does not emit this signal_type")
-                                 )
+                raise ValueError(
+                    f"you are trying to subscribe to a signal of {signal_type}"
+                    "on Observable {name}, which does not emit this signal_type"
+                )
 
             self.subscribers[name][signal_type] = handler
 
@@ -141,7 +155,13 @@ class HasObservables:
         Returns:
 
         """
-        names = [name, ] if not isinstance(name, All) else self.observables.keys()
+        names = (
+            [
+                name,
+            ]
+            if not isinstance(name, All)
+            else self.observables.keys()
+        )
 
         for name in names:
             del self.subscribers[name][signal_type]
@@ -151,17 +171,19 @@ class HasObservables:
 
         if name is All, all subscriptions are removed
 
-        Args
+        Args:
             name: name of the Observable to unsubscribe for all signal types
 
         """
         if name is not isinstance(name, All):
             del self.subscribers[name]
         else:
-            self.subscribers = defaultdict(functools.partial(defaultdict, weakref.WeakValueDictionary))
+            self.subscribers = defaultdict(
+                functools.partial(defaultdict, weakref.WeakValueDictionary)
+            )
 
     def notify(self, observable: str, old_value: Any, new_value: Any, signal_type: str):
-        """emit a signal
+        """Emit a signal
 
         Args:
             observable: the public name of the observable emiting the signal
@@ -181,36 +203,31 @@ class HasObservables:
 
 
 if __name__ == "__main__":
+    import traitlets
+
     from mesa import Agent, Model
 
-    import traitlets
     traitlets.Int
-
 
     class A(Agent, HasObservables):
         a = Observable(int)
 
-
     class B(A, HasObservables):
         b = Observable(int)
-
 
     model = Model()
 
     a = A(model)
     b = B(model)
 
-
     def specific_handler(arg: int):
         print(f"specific handler {arg}")
-
 
     def generic_handler(info: psygnal.EmissionInfo):
         signalinstance, arguments = info
         print(
             f"received signal from {signalinstance.instance} about {signalinstance.name}: {arguments}"
         )
-
 
     a.a_changed.connect(specific_handler)
     b.signals["a_changed"].connect(specific_handler)
