@@ -116,7 +116,6 @@ class BoidFlockers(mesa.Model):
         self.height = height
         self.simulator = simulator
 
-        self.schedule = mesa.time.RandomActivation(self)
         self.space = mesa.space.ContinuousSpace(self.width, self.height, True)
         self.factors = {
             "cohere": cohere,
@@ -138,12 +137,10 @@ class BoidFlockers(mesa.Model):
                 **self.factors,
             )
             self.space.place_agent(boid, pos)
-            self.schedule.add(boid)
 
     def step(self):
         """Run the model for one step."""
-        self.schedule.step()
-
+        self.agents.shuffle_do("step")
 
 if __name__ == "__main__":
     import time
