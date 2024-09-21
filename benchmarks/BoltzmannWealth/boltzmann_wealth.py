@@ -60,7 +60,7 @@ class BoltzmannWealth(mesa.Model):
 
     def step(self):
         """Run the model for a single step."""
-        self.agents.shuffle().do("step")
+        self.agents.shuffle_do("step")
         # collect data
         self.datacollector.collect(self)
 
