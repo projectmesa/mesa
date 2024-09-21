@@ -82,9 +82,10 @@ Mesa Overview <overview>
 tutorials/intro_tutorial
 tutorials/visualization_tutorial
 Migration guide <migration_guide>
+API Documentation <apis/api_main>
 Best Practices <best-practices>
 How-to Guide <howto>
-API Documentation <apis/api_main>
+Release notes <../HISTORY.md>
 Mesa Packages <packages>
 ```
 
