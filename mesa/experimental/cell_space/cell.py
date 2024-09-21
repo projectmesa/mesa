@@ -34,6 +34,7 @@ class Cell:
         "capacity",
         "properties",
         "random",
+        "__dict__"
     ]
 
     # def __new__(cls,
