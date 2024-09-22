@@ -11,49 +11,7 @@ from typing import Any
 
 __all__ = ["Observable", "HasObservables"]
 
-
-class Computable:
-    """A Computable that is depended on one or more Observables.
-
-    fixme how to make this work with Descriptors?
-     just to it as with ObservableList and SingallingList
-     so have a Computable and Computed class
-     declare the Computable at the top
-     assign the Computed in the instance
-
-    """
-
-    def __init__(self, callable: Callable, *args, **kwargs):
-        """Draft Computable.
-
-        Args:
-            callable: the callable that is computed
-            args: arguments to pass to the callable
-            **kwargs: keyword arguments to pass to the callable
-
-        """
-        # fixme: what if these are observable?
-        #   basically the logic for subscribing should go into the observable class
-        #   but we might have to split up a few things here
-        #   easy fix is to just declare an attribute Observable at the class level
-        #   and next assign a Computed to this attribute.
-        #   not sure how this would work, because observable would return the computable
-        #   not its internal value. So, you could either
-        #   have a separate observable or let the observable check if the value
-        #   is a computed and thus do an additional get operation on this
-
-        self.callable = callable
-        self.args = args
-        self.kwargs = kwargs
-        self._is_dirty = True
-
-    def __get__(self, instance, owner):
-        # fixme: not sure this will work correctly
-
-        if self._is_dirty:
-            self.value = self.callable(*self.args, **self.kwargs)
-            self._is_dirty = False
-        return self.value
+CURRENT_COMPUTED: "Computed" | None = None  # the current Computed that is evaluating
 
 
 class BaseObservable(ABC):
@@ -74,7 +32,14 @@ class BaseObservable(ABC):
         self.fallback_value = None  # fixme, should this be user specifiable?
 
     def __get__(self, instance, owner):
-        return getattr(instance, self.private_name)
+        value = getattr(instance, self.private_name)
+
+        if CURRENT_COMPUTED is not None:
+            # there is a computed dependent on this Observable, so let's add
+            # this Observable as a parent
+            CURRENT_COMPUTED._add_parent(self, instance, self.public_name, value)
+
+        return value
 
     def __set_name__(self, owner: "HasObservables", name: str):
         self.public_name = name
@@ -116,6 +81,138 @@ class Observable(BaseObservable):
             "on_change",
         )
         setattr(instance, self.private_name, value)
+
+
+class Computable(BaseObservable):
+    """A Computable that is depended on one or more Observables.
+
+    fixme how to make this work with Descriptors?
+     just to it as with ObservableList and SingalingList
+     so have a Computable and Computed class
+     declare the Computable at the top
+     assign the Computed in the instance
+
+    """
+
+    def __init__(self):
+        """Initialize a Computable."""
+        super().__init__()
+        self.public_name: str
+        self.private_name: str
+
+        self.signal_types: set = {"on_change"}
+
+    def __get__(self, instance, owner):
+        computed = getattr(instance, self.private_name)
+
+        old_value = computed.value
+        new_value = computed()
+
+        if new_value != old_value:
+            instance.notify(
+                self.public_name,
+                old_value,
+                new_value,
+                "on_change",
+            )
+        else:
+            return new_value
+
+    def __set_name__(self, owner: "HasObservables", name: str):
+        self.public_name = name
+        self.private_name = f"_{name}"
+        owner.register_observable(self)
+
+    def __set__(self, instance: "HasObservables", value):
+        setattr(instance, self.private_name, Computed(*value))
+
+
+class Computed:
+    def __init__(self, callable: Callable, *args, **kwargs):
+        self.callable = callable
+        self.args = args
+        self.kwargs = kwargs
+        self._is_dirty = False
+        self.value = None
+
+        # fixme this is not correct, our HasObservable might have disappeared....
+        #  so we need to use weakrefs here.
+        self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = weakref.WeakKeyDictionary()
+
+    def _set_dirty(self, signal):
+        self._is_dirty = True
+        # propagate this to all dependents
+
+    def _add_parent(self, parent: "HasObservables", name: str, current_value: Any):
+        """Add a parent Observable.
+
+        Args:
+            parent: the HasObservable instance to which the Observable belongs
+            name: the public name of the Observable
+            current_value: the current value of the Observable
+
+        """
+        parent.observe(name, All(), self._set_dirty)
+
+        try:
+            self.parents[parent][name] = current_value
+        except KeyError:
+            self.parents[parent] = {name: current_value}
+
+    def _remove_parents(self):
+        """Remove all parent Observables."""
+        # we can ubsubscribe from everything on each parent
+        for parent in self.parents:
+            parent.unobserve(All(), All())
+
+    def __call__(self):
+        global CURRENT_COMPUTED  # noqa: PLW0603
+        CURRENT_COMPUTED = self
+
+        if self._is_dirty:
+            changed = False
+
+            # we might be dirty but values might have changed
+            # back and forth in our parents so let's check to make sure we
+            # really need to recalculate
+            for parent in self.parents.keyrefs():
+                # does parent still exist?
+                if parent := parent():
+                    # if yes, compare old and new values for all
+                    # tracked observables on this parent
+                    for name, old_value in self.parents[parent].items():
+                        new_value = getattr(parent, name)
+                        if new_value != old_value:
+                            changed = True
+                            break  # we need to recalculate
+                    else:
+                        # trick for breaking cleanly out of nested for loops
+                        # see https://stackoverflow.com/questions/653509/breaking-out-of-nested-loops
+                        continue
+                    break
+                else:
+                    # one of our parents no longer exists
+                    changed = True
+                    break
+
+            if changed:
+                # the dependencies of the computable function might have changed
+                # so we rebuilt
+                self._remove_parents()
+
+                old = CURRENT_COMPUTED
+                CURRENT_COMPUTED = self
+
+                try:
+                    # fixme we need to handle error propagation somehow correctly
+                    self._value = self.callable(*self.args, **self.kwargs)
+                except Exception as e:
+                    raise e
+                finally:
+                    CURRENT_COMPUTED = old
+
+            self._is_dirty = False
+        return self.value
 
 
 class All:
@@ -166,10 +263,10 @@ class HasObservables:
         cls.observables[observable.public_name] = observable
 
     def observe(
-        self,
-        name: str | All,
-        signal_type: str | All,
-        handler: Callable,
+            self,
+            name: str | All,
+            signal_type: str | All,
+            handler: Callable,
     ):
         """Subscribe to the Observable <name> for signal_type.
 
