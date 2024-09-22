@@ -24,7 +24,6 @@ class ObservableList(Observable):
         self.signal_types: set = {
             "added",
             "removed",
-            "cleared",
             "replaced",
             "on_change",
         }

@@ -1,6 +1,7 @@
 """Core classes for Observables."""
-
+import contextlib
 import functools
+import itertools
 import weakref
 from collections import defaultdict, namedtuple
 from collections.abc import Callable
@@ -57,6 +58,8 @@ class Observable:
         """Initialize an Observable."""
         self.public_name: str
         self.private_name: str
+
+        # fixme can we make this an innerclass enum?
         self.signal_types: set = set(
             "on_change",
         )
@@ -99,6 +102,7 @@ class HasObservables:
     """HasObservables class."""
 
     observables: dict[str, Observable] = {}
+    subscribers: dict[str, dict[str, weakref.WeakSet]]
 
     def __new__(cls, *args, **kwargs):  # noqa D102
         # fixme dirty hack because super does not work on agents
@@ -108,9 +112,9 @@ class HasObservables:
         # we have the name of observable as a key
         # we have signal_type as a key
         # we want weakrefs for the callable
-        obj.subscribers: dict[str, dict[str, weakref.WeakValueDictionary]] = (
-            defaultdict(functools.partial(defaultdict, weakref.WeakSet))
-        )
+
+        obj.subscribers: dict[str, dict[str, weakref.WeakSet]] = defaultdict(
+            functools.partial(defaultdict, weakref.WeakSet))
 
         return obj
 
@@ -123,10 +127,12 @@ class HasObservables:
         """
         self.observables[observable.public_name] = observable
 
+
+
     def observe(
         self,
         name: str | All,
-        signal_type: str,
+        signal_type: str | All,
         handler: Callable,
     ):
         """Subscribe to the Observable <name> for signal_type.
@@ -136,27 +142,40 @@ class HasObservables:
             signal_type: the type of signal on the Observable to subscribe to
             handler: the handler to call
 
-        # fixme, all should also work for signal type
+        Raises:
+            ValueError: if the Observable <name> is not registered or if the Observable
+            does not emit the given signal_type
+
+
+        fixme should name/signal_type also take a list?
 
         """
-        names = (
-            [
-                name,
-            ]
-            if not isinstance(name, All)
-            else self.observables.keys()
-        )
+        # fixme: we have the same code here twice, can we move this to a helper method?
+        if not isinstance(name, All):
+            if name not in self.observables:
+                raise ValueError(
+                    f"you are trying to subscribe to {name}, but this Observable is not known"
+                )
+            else:
+                names = [name,]
+        else:
+            names = self.observables.keys()
 
-        for name in names:
+        if not isinstance(signal_type, All):
             if signal_type not in self.observables[name].signal_types:
                 raise ValueError(
                     f"you are trying to subscribe to a signal of {signal_type}"
-                    "on Observable {name}, which does not emit this signal_type"
+                    f"on Observable {name}, which does not emit this signal_type"
                 )
+            else:
+                signal_types = [signal_type, ]
+        else:
+            signal_types = self.observables[name].signal_types
 
+        for name, signal_type in itertools.product(names, signal_types):
             self.subscribers[name][signal_type].add(handler)
 
-    def unobserve(self, name: str | All, signal_type: str):
+    def unobserve(self, name: str | All, signal_type: str | All):
         """Unsubscribe to the Observable <name> for signal_type.
 
         Args:
@@ -171,9 +190,16 @@ class HasObservables:
             if not isinstance(name, All)
             else self.observables.keys()
         )
+        if isinstance(signal_type, All):
+            signal_types = self.observables[name].signal_types
+        else:
+            signal_types = [signal_type, ]
 
-        for name in names:
-            del self.subscribers[name][signal_type]
+        for name, signal_type in itertools.product(names, signal_types):
+            with contextlib.suppress(KeyError):
+                del self.subscribers[name][signal_type]
+                # we silently ignore trying to remove unsubscribed
+                # observables and/or signal types
 
     def unobserve_all(self, name: str | All):
         """Clears all subscriptions for the observable <name>.
@@ -185,7 +211,9 @@ class HasObservables:
 
         """
         if name is not isinstance(name, All):
-            del self.subscribers[name]
+            with contextlib.suppress(KeyError):
+                del self.subscribers[name]
+                # ignore when unsubscribing to  Observables that have no subscription
         else:
             self.subscribers = defaultdict(
                 functools.partial(defaultdict, weakref.WeakValueDictionary)
