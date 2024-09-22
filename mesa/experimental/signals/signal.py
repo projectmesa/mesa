@@ -55,6 +55,7 @@ class Computable:
             self._is_dirty = False
         return self.value
 
+
 class BaseObservable(ABC):
     """Abstract base class for all Observables."""
 
@@ -72,16 +73,16 @@ class BaseObservable(ABC):
         self.signal_types: set
         self.fallback_value = None  # fixme, should this be user specifiable?
 
-    def __get__(self, instance, owner):  # noqa: D103
+    def __get__(self, instance, owner):
         return getattr(instance, self.private_name)
 
-    def __set_name__(self, owner: "HasObservables", name: str):  # noqa: D103
+    def __set_name__(self, owner: "HasObservables", name: str):
         self.public_name = name
         self.private_name = f"_{name}"
         owner.register_observable(self)
 
     @abstractmethod
-    def __set__(self, instance: "HasObservables", value):  # noqa: D103
+    def __set__(self, instance: "HasObservables", value):
         # this only emits an on change signal, subclasses need to specify
         # this in more detail
         instance.notify(
