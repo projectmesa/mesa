@@ -14,8 +14,11 @@ __all__ = ["Observable", "HasObservables"]
 class Computable:
     """A Computable that is depended on one or more Observables.
 
-    # fixme how to make this work with Descriptors?
-    # we would need to now the owner (can also be in init)
+    fixme how to make this work with Descriptors?
+     just to it as with ObservableList and SingallingList
+     so have a Computable and Computed class
+     declare the Computable at the top
+     assign the Computed in the instance
 
     """
 
@@ -51,8 +54,42 @@ class Computable:
             self._is_dirty = False
         return self.value
 
+class BaseObservable:
+    """Base class for all Observables."""
+    def __init__(self):
+        """Initialize a BaseObservable."""
+        self.public_name: str
+        self.private_name: str
 
-class Observable:
+        # fixme can we make this an innerclass enum?
+        #  or some SignalTypes helper class?
+        #  its even more complicated. Ideally you can define
+        #  signal_types throughout the class hierarchy and they are just
+        #  combined together.
+        self.signal_types: set
+        self.fallback_value = None  # fixme, should this be user specifiable?
+
+    def __get__(self, instance, owner):  # noqa D103
+        return getattr(instance, self.private_name)
+
+    def __set_name__(self, owner: "HasObservables", name: str):  # noqa D103
+        self.public_name = name
+        self.private_name = f"_{name}"
+        owner.register_observable(self)
+
+    def __set__(self, instance: "HasObservables", value):  # noqa D103
+        # this only emits an on change signal, subclasses need to specify
+        # this in more detail
+        instance.notify(
+            self.public_name,
+            getattr(instance, self.private_name, self.fallback_value),
+            value,
+            "on_change",
+        )
+
+
+
+class Observable(BaseObservable):
     """Base Observable class."""
 
     # fixme, we might want to have a base observable
@@ -61,24 +98,17 @@ class Observable:
 
     def __init__(self):
         """Initialize an Observable."""
-        self.public_name: str
-        self.private_name: str
+        super().__init__()
 
         # fixme can we make this an innerclass enum?
+        #  or some SignalTypes helper class?
         self.signal_types: set = set(
             "on_change",
         )
         self.fallback_value = None  # fixme, should this be user specifiable
 
-    def __get__(self, instance, owner):  # noqa D103
-        return getattr(instance, self.private_name)
-
-    def __set_name__(self, owner, name):  # noqa D103
-        self.public_name = name
-        self.private_name = f"_{name}"
-        owner.observables[name] = self
-
     def __set__(self, instance: "HasObservables", value):  # noqa D103
+        super().__set__(instance, value)
         instance.notify(
             self.public_name,
             getattr(instance, self.private_name, self.fallback_value),
@@ -92,7 +122,7 @@ class All:
     """Helper constant to subscribe to all Observables."""
 
     def __init__(self):
-        self.name = "all_signals"
+        self.name = "all"
 
     def __copy__(self):
         return self
@@ -125,14 +155,15 @@ class HasObservables:
 
         return obj
 
-    def register_observable(self, observable: Observable):
+    @classmethod
+    def register_observable(cls, observable: Observable):
         """Register an Observable.
 
         Args:
             observable: the Observable to register
 
         """
-        self.observables[observable.public_name] = observable
+        cls.observables[observable.public_name] = observable
 
     def observe(
         self,

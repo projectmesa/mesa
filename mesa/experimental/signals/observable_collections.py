@@ -8,14 +8,14 @@ Observable collections behave like Observable but then for collections.
 from collections.abc import Iterable, MutableSequence
 from typing import Any
 
-from .signal import HasObservables, Observable
+from .signal import HasObservables, BaseObservable
 
 __all__ = [
     "ObservableList",
 ]
 
 
-class ObservableList(Observable):
+class ObservableList(BaseObservable):
     """An ObservableList that emits signals on changes to the underlying list."""
 
     def __init__(self):
@@ -37,12 +37,7 @@ class ObservableList(Observable):
             value: The value to set the attribute to.
 
         """
-        instance.notify(
-            self.public_name,
-            getattr(instance, self.private_name, self.fallback_value),
-            value,
-            "on_change",
-        )
+        super().__set__(instance, value)
         setattr(
             instance,
             self.private_name,
