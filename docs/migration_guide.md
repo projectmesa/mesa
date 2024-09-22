@@ -3,10 +3,21 @@ This guide contains breaking changes between major Mesa versions and how to reso
 
 Non-breaking changes aren't included, for those see our [Release history](https://github.com/projectmesa/mesa/releases).
 
+
 ## Mesa 3.0
-<!-- TODO small introduction-->
+Mesa 3.0 introduces significant changes to core functionalities, including agent and model initialization, scheduling, and visualization. The guide below outlines these changes and provides instructions for migrating your existing Mesa projects to version 3.0.
 
 _This guide is a work in progress. The development of it is tracked in [Issue #2233](https://github.com/projectmesa/mesa/issues/2233)._
+
+
+### Upgrade strategy
+We recommend the following upgrade strategy:
+- Update the the latest Mesa 2.x release (`mesa<3`).
+- Update the the latest Mesa 3.0.x release (`mesa<3.1`).
+- Update to the latest Mesa 3.x release (`mesa<4`).
+
+With each update, resolve all errors and warnings, before updating to the next one.
+
 
 ### Reserved and private variables
 <!-- TODO: Update this section based on https://github.com/projectmesa/mesa/discussions/2230 -->
@@ -17,6 +28,7 @@ Currently, we have reserved the following variables:
   - Agent: `unique_id`, `model`.
 
 You can use (read) any reserved variable, but Mesa may update them automatically and rely on them, so modify/update at your own risk.
+
 #### Private variables
 Any variables starting with an underscore (`_`) are considered private and for Mesa's internal use. We might use any of those. Modifying or overwriting any private variable is at your own risk.
 
@@ -75,11 +87,27 @@ In Mesa 3.0, `unique_id` for agents is now automatically assigned, simplifying a
 
 
 ### AgentSet and `Model.agents`
-#### AgentSet
-<!-- TODO  -->
+In Mesa 3.0, the Model class internally manages agents using several data structures:
+
+- `self._agents`: A dictionary containing hard references to all agents, indexed by their `unique_id`.
+- `self._agents_by_type`: A dictionary of AgentSets, organizing agents by their type.
+- `self._all_agents`: An AgentSet containing all agents in the model.
+
+These internal structures are used to efficiently manage and access agents. Users should interact with agents through the public `model.agents` property, which returns the `self._all_agents` AgentSet.
 
 #### `Model.agents`
-<!-- TODO  -->
+- Attempting to set `model.agents` now raises an `AttributeError` instead of a warning. This attribute is reserved for internal use by Mesa.
+- If you were previously setting `model.agents` in your code, you must update it to use a different attribute name for custom agent storage.
+
+For example, replace:
+```python
+model.agents = my_custom_agents
+```
+
+With:
+```python
+model.custom_agents = my_custom_agents
+```
 
 
 ### Time and schedulers
@@ -99,12 +127,12 @@ You can access it by `Model.steps`, and it's internally in the datacollector, ba
 #### Removal of `Model._advance_time()`
 - The `Model._advance_time()` method is removed. This now happens automatically.
 
-### Replacing Schedulers with AgentSet functionality
+#### Replacing Schedulers with AgentSet functionality
 The whole Time module in Mesa is deprecated, and all schedulers are being replaced with AgentSet functionality and the internal `Model.steps` counter. This allows much more flexibility in how to activate Agents and makes it explicit what's done exactly.
 
 Here's how to replace each scheduler:
 
-#### BaseScheduler
+##### BaseScheduler
 Replace:
 ```python
 self.schedule = BaseScheduler(self)
@@ -115,7 +143,7 @@ With:
 self.agents.do("step")
 ```
 
-#### RandomActivation
+##### RandomActivation
 Replace:
 ```python
 self.schedule = RandomActivation(self)
@@ -126,7 +154,7 @@ With:
 self.agents.shuffle_do("step")
 ```
 
-#### SimultaneousActivation
+##### SimultaneousActivation
 Replace:
 ```python
 self.schedule = SimultaneousActivation(self)
@@ -138,7 +166,7 @@ self.agents.do("step")
 self.agents.do("advance")
 ```
 
-#### StagedActivation
+##### StagedActivation
 Replace:
 ```python
 self.schedule = StagedActivation(self, ["stage1", "stage2", "stage3"])
@@ -162,7 +190,7 @@ for stage in stages:
         self.agents.do(stage)
 ```
 
-#### RandomActivationByType
+##### RandomActivationByType
 Replace:
 ```python
 self.schedule = RandomActivationByType(self)
@@ -174,7 +202,7 @@ for agent_class in self.agent_types:
     self.agents_by_type[agent_class].shuffle_do("step")
 ```
 
-##### Replacing `step_type`
+###### Replacing `step_type`
 The `RandomActivationByType` scheduler had a `step_type` method that allowed stepping only agents of a specific type. To replicate this functionality using AgentSet:
 
 Replace:
@@ -187,7 +215,7 @@ With:
 self.agents_by_type[AgentType].shuffle_do("step")
 ```
 
-#### General Notes
+##### General Notes
 
 1. The `Model.steps` counter is now automatically incremented. You don't need to manage it manually.
 2. If you were using `self.schedule.agents`, replace it with `self.agents`.
