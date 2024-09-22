@@ -4,6 +4,7 @@ import contextlib
 import functools
 import itertools
 import weakref
+from abc import ABC, abstractmethod
 from collections import defaultdict, namedtuple
 from collections.abc import Callable
 from typing import Any
@@ -54,10 +55,10 @@ class Computable:
             self._is_dirty = False
         return self.value
 
+class BaseObservable(ABC):
+    """Abstract base class for all Observables."""
 
-class BaseObservable:
-    """Base class for all Observables."""
-
+    @abstractmethod
     def __init__(self):
         """Initialize a BaseObservable."""
         self.public_name: str
@@ -71,15 +72,16 @@ class BaseObservable:
         self.signal_types: set
         self.fallback_value = None  # fixme, should this be user specifiable?
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance, owner):  # noqa: D103
         return getattr(instance, self.private_name)
 
-    def __set_name__(self, owner: "HasObservables", name: str):
+    def __set_name__(self, owner: "HasObservables", name: str):  # noqa: D103
         self.public_name = name
         self.private_name = f"_{name}"
         owner.register_observable(self)
 
-    def __set__(self, instance: "HasObservables", value):
+    @abstractmethod
+    def __set__(self, instance: "HasObservables", value):  # noqa: D103
         # this only emits an on change signal, subclasses need to specify
         # this in more detail
         instance.notify(
@@ -91,11 +93,7 @@ class BaseObservable:
 
 
 class Observable(BaseObservable):
-    """Base Observable class."""
-
-    # fixme, we might want to have a base observable
-    #  and move some of this into this class and use super to allways use it
-    #  for example the on_change notify can go there
+    """Observable class."""
 
     def __init__(self):
         """Initialize an Observable."""
@@ -157,7 +155,7 @@ class HasObservables:
         return obj
 
     @classmethod
-    def register_observable(cls, observable: Observable):
+    def register_observable(cls, observable: BaseObservable):
         """Register an Observable.
 
         Args:
