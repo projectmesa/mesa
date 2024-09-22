@@ -8,7 +8,7 @@ Observable collections behave like Observable but then for collections.
 from collections.abc import Iterable, MutableSequence
 from typing import Any
 
-from .signal import HasObservables, BaseObservable
+from .signal import BaseObservable, HasObservables
 
 __all__ = [
     "ObservableList",
