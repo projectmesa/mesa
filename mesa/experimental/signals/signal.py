@@ -1,5 +1,7 @@
 """Core classes for Observables."""
 
+from __future__ import annotations
+
 import contextlib
 import functools
 import itertools
@@ -9,9 +11,9 @@ from collections import defaultdict, namedtuple
 from collections.abc import Callable
 from typing import Any
 
-__all__ = ["Observable", "HasObservables"]
+__all__ = ["Observable", "HasObservables", "All", "Computable"]
 
-CURRENT_COMPUTED: "Computed" | None = None  # the current Computed that is evaluating
+CURRENT_COMPUTED: Computed | None = None  # the current Computed that is evaluating
 
 
 class BaseObservable(ABC):
@@ -245,7 +247,7 @@ Signal = namedtuple("Signal", "owner observable old_value new_value signal_type"
 class HasObservables:
     """HasObservables class."""
 
-    observables: dict[str, Observable] = {}
+    observables: dict[str, BaseObservable] = {}
     subscribers: dict[str, dict[str, weakref.WeakSet]]
 
     def __new__(cls, *args, **kwargs):  # noqa D102
