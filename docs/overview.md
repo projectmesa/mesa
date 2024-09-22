@@ -58,6 +58,50 @@ You should see agents 1-5, activated in random order. See the [tutorial](tutoria
 
 To bootstrap a new model install mesa and run `mesa startproject`
 
+### AgentSet and model.agents
+Mesa 3.0 introduces the AgentSet class and the `model.agents` attribute, providing powerful tools for managing agents.
+
+#### model.agents
+`model.agents` is an AgentSet containing all agents in the model. It's automatically updated when agents are added or removed:
+
+```python
+# Get total number of agents
+num_agents = len(model.agents)
+
+# Iterate over all agents
+for agent in model.agents:
+    print(agent.unique_id)
+```
+
+#### AgentSet Functionality
+AgentSet offers several methods for efficient agent management:
+
+1. **Selecting**: Filter agents based on criteria.
+   ```python
+   high_energy_agents = model.agents.select(lambda a: a.energy > 50)
+   ```
+2. **Shuffling and Sorting**: Randomize or order agents.
+   ```python
+   shuffled_agents = model.agents.shuffle()
+   sorted_agents = model.agents.sort(key="energy", ascending=False)
+   ```
+3. **Applying methods**: Execute methods on all agents.
+   ```python
+   model.agents.do("step")
+   model.agents.shuffle_do("move")  # Shuffle then apply method
+   ```
+4. **Aggregating**: Compute aggregate values across agents.
+   ```python
+   avg_energy = model.agents.agg("energy", func=np.mean)
+   ```
+5. **Grouping**: Group agents by attributes.
+   ```python
+   grouped_agents = model.agents.groupby("species")
+   ```
+`model.agents` can also be accessed within the model using `self.agents`.
+
+These are just some examples of using the AgentSet, there are many more possibilities, see the [AgentSet API docs](apis/agent).
+
 ### Analysis modules
 
 If you're using modeling for research, you'll want a way to collect the data each model run generates. You'll probably also want to run the model multiple times, to see how some output changes with different parameters. Data collection and batch running are implemented in the appropriately-named analysis modules:
