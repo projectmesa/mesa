@@ -36,7 +36,7 @@ def run_ast_nodes(
     user_ns : dict
         The user namespace.
 
-    Returns
+    Returns:
     -------
     dict
         A dictionary with the value of the last expression in the cell.
@@ -86,11 +86,11 @@ def prepare_cell_execution(shell: InteractiveShell, raw_code: str):
 
 def prepare_cell_execution_ipywidgets(shell: InteractiveShell, raw_code: str):
     try:
-        import ipywidgets  # noqa: PLC0415
+        import ipywidgets
     except ImportError:
         raise ImportError("ipywidgets is required for this feature.")  # noqa: B904
 
-    import ipywidgets  # noqa: PLC0415
+    import ipywidgets
 
     output_widget = ipywidgets.Output()
     display(output_widget)
@@ -148,7 +148,7 @@ class SignalsMagics(Magics):
         EFFECTS[name] = cleanup
 
     @cell_magic
-    def clear_effects(self, line, cell):  # noqa: PLR6301
+    def clear_effects(self, line, cell):
         """Clear all effects."""
         for cleanup in EFFECTS.values():
             cleanup()

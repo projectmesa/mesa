@@ -33,7 +33,7 @@ def batch(fn: typing.Callable[[], T]) -> T:
     fn : Callable[[], T]
         The callback function to execute within the batch.
 
-    Returns
+    Returns:
     -------
     T
         The value returned by the callback function.
@@ -139,7 +139,7 @@ class Signal(typing.Generic[T]):
         fn : Callable[[T], None]
             The callback function to run when the signal changes.
 
-        Returns
+        Returns:
         -------
         Callable[[], None]
             A function for unsubscribing from the signal.
@@ -253,7 +253,7 @@ class Computed(Signal[T]):
 
         return value
 
-    def set(self, value: T) -> None:  # noqa: PLR6301
+    def set(self, value: T) -> None:
         raise AttributeError("Computed singals are read-only")
 
     # def __repr__(self) -> str:
@@ -271,7 +271,7 @@ def computed(fn: typing.Callable[[], T]) -> Computed[T]:
     fn : Callable[[], T]
         The function to compute the value of the signal.
 
-    Returns
+    Returns:
     -------
     Computed[T]
         A new read-only signal.
@@ -338,7 +338,7 @@ def _effect(fn: typing.Callable[[], None]) -> Disposer:
     fn : Callable[[], None]
         The effect callback.
 
-    Returns
+    Returns:
     -------
     Callable[[], None]
         A function for disposing the effect.
@@ -365,7 +365,7 @@ def effect(  # noqa: D418
         Defer the effect until the next change, rather than running immediately.
         By default, False.
 
-    Returns
+    Returns:
     -------
     Callable[[Callable[..., None]], Disposer]
         A decorator function for creating effects.
@@ -388,7 +388,7 @@ def effect(fn: typing.Callable[[], None], /) -> Disposer:  # noqa: D418
     fn : Callable[[], None]
         The effect callback.
 
-    Returns
+    Returns:
     -------
     Callable[[], None]
         A function for disposing the effect.
@@ -421,7 +421,7 @@ def on(deps: typing.Sequence[Signal], *, defer: bool = False):
         Defer the effect until the next change, rather than running immediately.
         By default, False.
 
-    Returns
+    Returns:
     -------
     Callable[[Callable[..., None]], Callable[[], None]]
         A callback function that can be registered as an effect.
@@ -445,6 +445,6 @@ def on(deps: typing.Sequence[Signal], *, defer: bool = False):
 
             func = void
 
-        return lambda: func()  # noqa: PLW0108
+        return lambda: func()
 
     return decorator

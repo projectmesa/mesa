@@ -137,7 +137,9 @@ class Computed:
 
         # fixme this is not correct, our HasObservable might have disappeared....
         #  so we need to use weakrefs here.
-        self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = weakref.WeakKeyDictionary()
+        self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = (
+            weakref.WeakKeyDictionary()
+        )
 
     def _set_dirty(self, signal):
         self._is_dirty = True
@@ -263,10 +265,10 @@ class HasObservables:
         cls.observables[observable.public_name] = observable
 
     def observe(
-            self,
-            name: str | All,
-            signal_type: str | All,
-            handler: Callable,
+        self,
+        name: str | All,
+        signal_type: str | All,
+        handler: Callable,
     ):
         """Subscribe to the Observable <name> for signal_type.
 

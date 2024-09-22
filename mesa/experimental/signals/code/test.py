@@ -1,5 +1,4 @@
-
-from _core import Signal, Computed
+from _core import Computed, Signal
 
 a = Signal(2)
 b = Signal(3)
