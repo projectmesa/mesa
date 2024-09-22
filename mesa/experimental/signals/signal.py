@@ -1,4 +1,5 @@
 """Core classes for Observables."""
+
 import contextlib
 import functools
 import itertools
@@ -114,7 +115,8 @@ class HasObservables:
         # we want weakrefs for the callable
 
         obj.subscribers: dict[str, dict[str, weakref.WeakSet]] = defaultdict(
-            functools.partial(defaultdict, weakref.WeakSet))
+            functools.partial(defaultdict, weakref.WeakSet)
+        )
 
         return obj
 
@@ -126,8 +128,6 @@ class HasObservables:
 
         """
         self.observables[observable.public_name] = observable
-
-
 
     def observe(
         self,
@@ -157,7 +157,9 @@ class HasObservables:
                     f"you are trying to subscribe to {name}, but this Observable is not known"
                 )
             else:
-                names = [name,]
+                names = [
+                    name,
+                ]
         else:
             names = self.observables.keys()
 
@@ -168,7 +170,9 @@ class HasObservables:
                     f"on Observable {name}, which does not emit this signal_type"
                 )
             else:
-                signal_types = [signal_type, ]
+                signal_types = [
+                    signal_type,
+                ]
         else:
             signal_types = self.observables[name].signal_types
 
@@ -193,7 +197,9 @@ class HasObservables:
         if isinstance(signal_type, All):
             signal_types = self.observables[name].signal_types
         else:
-            signal_types = [signal_type, ]
+            signal_types = [
+                signal_type,
+            ]
 
         for name, signal_type in itertools.product(names, signal_types):
             with contextlib.suppress(KeyError):
