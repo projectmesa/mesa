@@ -18,7 +18,7 @@ self.datacollector = DataCollector(
 )
 ```
 
-Furthermore, a new `shuffle_do()` method for AgentSets provides a faster way to perform `shuffle().do()` ([#2283](https://github.com/projectmesa/mesa/pull/2283)). The GroupBy class gained `count()` and `agg()` methods to count the number of agents in groups and aggregate variables of them ([#2290](https://github.com/projectmesa/mesa/pull/2290)). 
+Furthermore, a new `shuffle_do()` method for AgentSets provides a faster way to perform `shuffle().do()` ([#2283](https://github.com/projectmesa/mesa/pull/2283)). The GroupBy class gained `count()` and `agg()` methods to count the number of agents in groups and aggregate variables of them ([#2290](https://github.com/projectmesa/mesa/pull/2290)).
 
 In the experimental Cell Space, the `CellCollection.select` method was updated to use `at_most` instead of `n`, aligning with the AgentSet API ([#2307](https://github.com/projectmesa/mesa/pull/2307)). Additionally, the Cell class now features a dedicated `neighborhood` property for direct neighbors (default radius=1) and a `get_neighborhood` method for larger radii ([#2309](https://github.com/projectmesa/mesa/pull/2309)).
 
