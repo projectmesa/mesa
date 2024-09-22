@@ -54,6 +54,7 @@ class Computable:
 
 class Observable:
     """Base Observable class."""
+
     # fixme, we might want to have a base observable
     #  and move some of this into this class and use super to allways use it
     #  for example the on_change notify can go there
@@ -79,7 +80,10 @@ class Observable:
 
     def __set__(self, instance: "HasObservables", value):  # noqa D103
         instance.notify(
-            self.public_name, getattr(instance, self.private_name, self.fallback_value), value, "on_change"
+            self.public_name,
+            getattr(instance, self.private_name, self.fallback_value),
+            value,
+            "on_change",
         )
         setattr(instance, self.private_name, value)
 

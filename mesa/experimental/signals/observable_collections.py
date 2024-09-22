@@ -51,7 +51,10 @@ class ObservableList(Observable):
 
         """
         instance.notify(
-            self.public_name, getattr(instance, self.private_name, self.fallback_value), value, "on_change"
+            self.public_name,
+            getattr(instance, self.private_name, self.fallback_value),
+            value,
+            "on_change",
         )
         setattr(
             instance,
