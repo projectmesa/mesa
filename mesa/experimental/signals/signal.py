@@ -43,13 +43,13 @@ class BaseObservable(ABC):
 
         return value
 
-    def __set_name__(self, owner: "HasObservables", name: str):
+    def __set_name__(self, owner: HasObservables, name: str):
         self.public_name = name
         self.private_name = f"_{name}"
         owner.register_observable(self)
 
     @abstractmethod
-    def __set__(self, instance: "HasObservables", value):
+    def __set__(self, instance: HasObservables, value):
         # this only emits an on change signal, subclasses need to specify
         # this in more detail
         instance.notify(
@@ -74,7 +74,7 @@ class Observable(BaseObservable):
         )
         self.fallback_value = None  # fixme, should this be user specifiable
 
-    def __set__(self, instance: "HasObservables", value):  # noqa D103
+    def __set__(self, instance: HasObservables, value):  # noqa D103
         super().__set__(instance, value)
         instance.notify(
             self.public_name,
@@ -129,12 +129,12 @@ class Computable(BaseObservable):
         else:
             return new_value
 
-    def __set_name__(self, owner: "HasObservables", name: str):
+    def __set_name__(self, owner: HasObservables, name: str):
         self.public_name = name
         self.private_name = f"_{name}"
         owner.register_observable(self)
 
-    def __set__(self, instance: "HasObservables", value):
+    def __set__(self, instance: HasObservables, value):
         setattr(instance, self.private_name, Computed(*value))
 
 
@@ -156,7 +156,7 @@ class Computed:
         self._is_dirty = True
         # propagate this to all dependents
 
-    def _add_parent(self, parent: "HasObservables", name: str, current_value: Any):
+    def _add_parent(self, parent: HasObservables, name: str, current_value: Any):
         """Add a parent Observable.
 
         Args:
