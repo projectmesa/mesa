@@ -29,19 +29,6 @@ class ObservableList(Observable):
         }
         self.fallback_value = []
 
-    def __get__(self, instance: HasObservables, owner):
-        """Get the value of the descriptor attribute.
-
-        Args:
-            instance: The instance from which to retrieve the attribute.
-            owner: the class
-
-        Returns:
-            The value of the descriptor attribute.
-
-        """
-        return getattr(instance, self.private_name, self.fallback_value)
-
     def __set__(self, instance: "HasObservables", value: Iterable):
         """Set the value of the descriptor attribute.
 
