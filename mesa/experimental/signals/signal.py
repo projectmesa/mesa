@@ -92,6 +92,15 @@ class Computable(BaseObservable):
      declare the Computable at the top
      assign the Computed in the instance
 
+    .. code-block:: python
+
+       class MyAgent(Agent):
+           wealth = Computable()
+
+           def __init__(self, model):
+                super().__init__(model)
+                wealth = some_callable, args, kwargs   # wip
+
     """
 
     def __init__(self):
