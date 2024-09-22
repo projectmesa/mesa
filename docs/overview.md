@@ -7,7 +7,7 @@ Mesa is a modular framework for building, analyzing and visualizing agent-based 
 
 Mesa is modular, meaning that its modeling, analysis and visualization components are kept separate but intended to work together. The modules are grouped into three categories:
 
-1. **Modeling:** Modules used to build the models themselves: a model and agent classes, space for them to move around on, and built-in functionality for managing agents.
+1. **Modeling:** Classes used to build the models themselves: a model and agent classes, space for them to move around in, and built-in functionality for managing agents.
 2. **Analysis:** Tools to collect data generated from your model, or to run it multiple times with different parameter values.
 3. **Visualization:** Classes to create and launch an interactive model visualization, using a browser-based interface.
 
@@ -38,8 +38,8 @@ class MyModel(mesa.Model):
         super().__init__()
         self.grid = mesa.space.MultiGrid(10, 10, torus=True)
         for _ in range(n_agents):
-            new_age = self.random.randint(0, 80)
-            a = MyAgent(self, new_age)
+            initial_age = self.random.randint(0, 80)
+            a = MyAgent(self, initial_age)
             coords = (self.random.randrange(0, 10), self.random.randrange(0, 10))
             self.grid.place_agent(a, coords)
 
@@ -59,7 +59,7 @@ You should see agents 1-5, activated in random order. See the [tutorial](tutoria
 To bootstrap a new model install mesa and run `mesa startproject`
 
 ### AgentSet and model.agents
-Mesa 3.0 introduces the AgentSet class and the `model.agents` attribute, providing powerful tools for managing agents.
+Mesa 3.0 makes `model.agents` and the AgentSet class central in managing and activating agents.
 
 #### model.agents
 `model.agents` is an AgentSet containing all agents in the model. It's automatically updated when agents are added or removed:
@@ -97,8 +97,13 @@ AgentSet offers several methods for efficient agent management:
 5. **Grouping**: Group agents by attributes.
    ```python
    grouped_agents = model.agents.groupby("species")
+
+   for _, agent_group in grouped_agents:
+      agent_group.shuffle_do()
+   species_counts = grouped_agents.count()
+   mean_age_by_group = grouped_agents.agg("age", np.mean)
    ```
-`model.agents` can also be accessed within the model using `self.agents`.
+`model.agents` can also be accessed within a model instance using `self.agents`.
 
 These are just some examples of using the AgentSet, there are many more possibilities, see the [AgentSet API docs](apis/agent).
 
