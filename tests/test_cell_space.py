@@ -2,6 +2,7 @@
 
 import random
 
+import numpy as np
 import pytest
 
 from mesa import Model
@@ -15,6 +16,7 @@ from mesa.experimental.cell_space import (
     OrthogonalVonNeumannGrid,
     VoronoiGrid,
 )
+from mesa.space import PropertyLayer
 
 
 def test_orthogonal_grid_neumann():
@@ -524,3 +526,58 @@ def test_cell_collection():
 
     cells = collection.select()
     assert len(cells) == len(collection)
+
+
+def test_property_layer_integration():
+    """Test integration of PropertyLayer with DiscreteSpace and Cell."""
+    width, height = 10, 10
+    grid = OrthogonalMooreGrid((width, height), torus=False)
+
+    # Test adding a PropertyLayer to the grid
+    elevation = PropertyLayer("elevation", width, height, default_value=0)
+    grid.add_property_layer(elevation)
+    assert "elevation" in grid.property_layers
+    assert len(grid.property_layers) == 1
+
+    # Test accessing PropertyLayer from a cell
+    cell = grid._cells[(0, 0)]
+    assert "elevation" in cell.property_layers
+    assert cell.get_property("elevation") == 0
+
+    # Test modifying PropertyLayer values
+    grid.set_property("elevation", 100, condition=lambda value: value == 0)
+    assert cell.get_property("elevation") == 100
+
+    # Test modifying PropertyLayer using numpy operations
+    grid.modify_properties("elevation", np.add, 50)
+    assert cell.get_property("elevation") == 150
+
+    # Test removing a PropertyLayer
+    grid.remove_property_layer("elevation")
+    assert "elevation" not in grid.property_layers
+    assert "elevation" not in cell.property_layers
+    assert len(grid.property_layers) == 0
+
+
+def test_discrete_space_with_property_layer():
+    """Test DiscreteSpace with PropertyLayer."""
+    width, height = 3, 3
+    grid = OrthogonalMooreGrid((width, height), torus=False, capacity=None)
+
+    # Add a property layer
+    prop_layer = PropertyLayer("temperature", width, height, default_value=20)
+    grid.add_property_layer(prop_layer)
+
+    assert "temperature" in grid.property_layers
+
+    # Set property values
+    grid.set_property("temperature", 25)
+
+    for cell in grid.all_cells:
+        assert cell.get_property("temperature") == 25
+
+    # Modify properties
+    grid.modify_properties("temperature", lambda x: x + 5)
+
+    for cell in grid.all_cells:
+        assert cell.get_property("temperature") == 30
