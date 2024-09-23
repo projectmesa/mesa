@@ -48,6 +48,9 @@ class BoltzmannWealth(mesa.Model, HasObservables):
             self.grid.place_agent(a, (x, y))
 
         # testing a chain of observable --> computable --> computable
+        # we cannot pass model.agent_wealth as an argument
+        # to self.gini, because the autodiscovery is tied to Observable.__get__
+        # which thus needs! to be accessed inside the callable
         self.agent_wealth = Computed(get_agent_wealth, self)
         self.gini = Computed(compute_gini, self)
 
@@ -55,8 +58,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         self.datacollector.collect(self)
 
     def step(self):  # noqa D103
-        self.agents.shuffle().do("step")
-        # collect data
+        self.agents.shuffle_do("step")        # collect data
         self.datacollector.collect(self)
 
     def run_model(self, n):  # noqa D103
