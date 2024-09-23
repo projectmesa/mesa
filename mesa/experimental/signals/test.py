@@ -1,7 +1,12 @@
 # noqa D100
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 import mesa
-from mesa.experimental.signals import HasObservables, Observable, ObservableList, Computable, Computed
+from mesa.experimental.signals import (
+    Computable,
+    Computed,
+    HasObservables,
+    Observable,
+)
 
 
 def compute_gini(model):  # noqa D103

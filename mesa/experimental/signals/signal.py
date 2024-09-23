@@ -72,7 +72,9 @@ class Observable(BaseObservable):
 
         # fixme can we make this an innerclass enum?
         #  or some SignalTypes helper class?
-        self.signal_types: set = {"on_change", }
+        self.signal_types: set = {
+            "on_change",
+        }
         self.fallback_value = None  # fixme, should this be user specifiable
 
     def __set__(self, instance: HasObservables, value):  # noqa D103
@@ -260,9 +262,7 @@ class HasObservables:
         # we have signal_type as a key
         # we want weakrefs for the callable
 
-        obj.subscribers = defaultdict(
-            functools.partial(defaultdict, list)
-        )
+        obj.subscribers = defaultdict(functools.partial(defaultdict, list))
 
         return obj
 
