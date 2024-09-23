@@ -88,7 +88,12 @@ class DiscreteSpace(Generic[T]):
     def add_property_layer(
         self, property_layer: PropertyLayer, add_to_cells: bool = True
     ):
-        """Add a property layer to the grid."""
+        """Add a property layer to the grid.
+
+        Args:
+            property_layer: the property layer to add
+            add_to_cells: whether to add the property layer to all cells (default: True)
+        """
         if property_layer.name in self.property_layers:
             raise ValueError(f"Property layer {property_layer.name} already exists.")
         self.property_layers[property_layer.name] = property_layer
@@ -97,7 +102,12 @@ class DiscreteSpace(Generic[T]):
                 cell.property_layers[property_layer.name] = property_layer
 
     def remove_property_layer(self, property_name: str, remove_from_cells: bool = True):
-        """Remove a property layer from the grid."""
+        """Remove a property layer from the grid.
+
+        Args:
+            property_name: the name of the property layer to remove
+            remove_from_cells: whether to remove the property layer from all cells (default: True)
+        """
         del self.property_layers[property_name]
         if remove_from_cells:
             for cell in self._cells.values():
@@ -106,7 +116,13 @@ class DiscreteSpace(Generic[T]):
     def set_property(
         self, property_name: str, value, condition: Callable[[T], bool] | None = None
     ):
-        """Set the value of a property for all cells in the grid."""
+        """Set the value of a property for all cells in the grid.
+
+        Args:
+            property_name: the name of the property to set
+            value: the value to set
+            condition: a function that takes a cell and returns a boolean
+        """
         self.property_layers[property_name].set_cells(value, condition)
 
     def modify_properties(
@@ -116,5 +132,12 @@ class DiscreteSpace(Generic[T]):
         value: Any = None,
         condition: Callable[[T], bool] | None = None,
     ):
-        """Modify the values of a specific property for all cells in the grid."""
+        """Modify the values of a specific property for all cells in the grid.
+
+        Args:
+            property_name: the name of the property to modify
+            operation: the operation to perform
+            value: the value to use in the operation
+            condition: a function that takes a cell and returns a boolean (used to filter cells)
+        """
         self.property_layers[property_name].modify_cells(operation, value, condition)
