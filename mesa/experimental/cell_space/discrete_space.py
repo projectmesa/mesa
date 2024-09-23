@@ -94,14 +94,14 @@ class DiscreteSpace(Generic[T]):
         self.property_layers[property_layer.name] = property_layer
         if add_to_cells:
             for cell in self._cells.values():
-                cell.add_property_layer(property_layer)
+                cell.property_layers[property_layer.name] = property_layer
 
     def remove_property_layer(self, property_name: str, remove_from_cells: bool = True):
         """Remove a property layer from the grid."""
         del self.property_layers[property_name]
         if remove_from_cells:
             for cell in self._cells.values():
-                cell.remove_property_layer(property_name)
+                del cell.property_layers[property_name]
 
     def set_property(
         self, property_name: str, value, condition: Callable[[T], bool] | None = None

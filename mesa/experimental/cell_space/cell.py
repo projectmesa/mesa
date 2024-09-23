@@ -196,16 +196,6 @@ class Cell:
             return neighborhood
 
     # PropertyLayer methods
-    def add_property_layer(self, property_layer: PropertyLayer):
-        """Add a PropertyLayer to the cell."""
-        if property_layer.name in self.property_layers:
-            raise ValueError(f"Property layer {property_layer.name} already exists.")
-        self.property_layers[property_layer.name] = property_layer
-
-    def remove_property_layer(self, property_name: str):
-        """Remove a PropertyLayer from the cell."""
-        del self.property_layers[property_name]
-
     def get_property(self, property_name: str) -> Any:
         """Get the value of a property."""
         return self.property_layers[property_name].data[self.coordinate]
