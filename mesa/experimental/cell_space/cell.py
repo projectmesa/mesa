@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import cache, cached_property
 from random import Random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from mesa.experimental.cell_space.cell_collection import CellCollection
+from mesa.space import PropertyLayer
 
 if TYPE_CHECKING:
     from mesa.agent import Agent
@@ -69,6 +71,7 @@ class Cell:
         self.capacity: int = capacity
         self.properties: dict[Coordinate, object] = {}
         self.random = random
+        self.property_layers: dict[str, PropertyLayer] = {}
 
     def connect(self, other: Cell, key: Coordinate | None = None) -> None:
         """Connects this cell to another cell.
@@ -191,3 +194,30 @@ class Cell:
             if not include_center:
                 neighborhood.pop(self, None)
             return neighborhood
+
+    # PropertyLayer methods
+    def add_property_layer(self, property_layer: PropertyLayer):
+        """Add a PropertyLayer to the cell."""
+        if property_layer.name in self.property_layers:
+            raise ValueError(f"Property layer {property_layer.name} already exists.")
+        self.property_layers[property_layer.name] = property_layer
+
+    def remove_property_layer(self, property_name: str):
+        """Remove a PropertyLayer from the cell."""
+        del self.property_layers[property_name]
+
+    def get_property(self, property_name: str) -> Any:
+        """Get the value of a property."""
+        return self.property_layers[property_name].data[self.coordinate]
+
+    def set_property(self, property_name: str, value: Any):
+        """Set the value of a property."""
+        self.property_layers[property_name].set_cell(self.coordinate, value)
+
+    def modify_property(
+        self, property_name: str, operation: Callable, value: Any = None
+    ):
+        """Modify the value of a property."""
+        self.property_layers[property_name].modify_cell(
+            self.coordinate, operation, value
+        )
