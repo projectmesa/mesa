@@ -58,7 +58,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         self.datacollector.collect(self)
 
     def step(self):  # noqa D103
-        self.agents.shuffle_do("step")        # collect data
+        self.agents.shuffle_do("step")  # collect data
         self.datacollector.collect(self)
 
     def run_model(self, n):  # noqa D103
