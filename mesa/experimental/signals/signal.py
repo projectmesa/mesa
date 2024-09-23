@@ -15,8 +15,6 @@ __all__ = ["Observable", "HasObservables", "All", "Computable"]
 
 CURRENT_COMPUTED: Computed | None = None  # the current Computed that is evaluating
 
-import psygnal
-
 
 class BaseObservable(ABC):
     """Abstract base class for all Observables."""
@@ -148,7 +146,9 @@ class Computed:
         self._is_dirty = False
         self.value = None
 
-        self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = weakref.WeakKeyDictionary()
+        self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = (
+            weakref.WeakKeyDictionary()
+        )
 
     def _set_dirty(self, signal):
         self._is_dirty = True
@@ -256,9 +256,7 @@ class HasObservables:
         # we have signal_type as a key
         # we want weakrefs for the callable
 
-        obj.subscribers = defaultdict(
-            functools.partial(defaultdict, weakref.WeakSet)
-        )
+        obj.subscribers = defaultdict(functools.partial(defaultdict, weakref.WeakSet))
 
         return obj
 
@@ -273,10 +271,10 @@ class HasObservables:
         cls.observables[observable.public_name] = observable
 
     def observe(
-            self,
-            name: str | All,
-            signal_type: str | All,
-            handler: Callable,
+        self,
+        name: str | All,
+        signal_type: str | All,
+        handler: Callable,
     ):
         """Subscribe to the Observable <name> for signal_type.
 

@@ -1,7 +1,11 @@
 # noqa D100
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 import mesa
-from mesa.experimental.signals import HasObservables, Observable, ObservableList, Computable
+from mesa.experimental.signals import (
+    Computable,
+    HasObservables,
+    Observable,
+)
 
 
 def compute_gini(agent_wealth):  # noqa D103
@@ -10,8 +14,10 @@ def compute_gini(agent_wealth):  # noqa D103
     b = sum(xi * (n - i) for i, xi in enumerate(x)) / (n * sum(x))
     return 1 + (1 / n) - 2 * b
 
+
 def get_agent_wealth(model):  # noqa D103
     return [agent.wealth for agent in model.agents]
+
 
 class BoltzmannWealth(mesa.Model, HasObservables):
     """A simple model of an economy where agents exchange currency at random.
@@ -29,8 +35,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.datacollector = mesa.DataCollector(
-            model_reporters={"Gini": "gini"},
-            agent_reporters={"Wealth": "wealth"}
+            model_reporters={"Gini": "gini"}, agent_reporters={"Wealth": "wealth"}
         )
         # Create agents
         for _ in range(self.num_agents):
@@ -90,6 +95,5 @@ class MoneyAgent(mesa.Agent, HasObservables):
 
 
 if __name__ == "__main__":
-
     model = BoltzmannWealth()
     model.run_model(10)
