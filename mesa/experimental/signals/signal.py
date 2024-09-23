@@ -66,6 +66,10 @@ class BaseObservable(ABC):
 class Observable(BaseObservable):
     """Observable class."""
 
+    # fixme, cycles
+    # fixme, how do we "traverse" the tree
+    #  do we go by layer, or by branch? it seems signals goes by layer with its batch construction
+
     def __init__(self):
         """Initialize an Observable."""
         super().__init__()
@@ -146,9 +150,8 @@ class Computed:
         self._first = True
         self._value = None
 
-        self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = (
-            weakref.WeakKeyDictionary()
-        )
+        self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = weakref.WeakKeyDictionary()
+
 
     def _set_dirty(self, signal):
         self._is_dirty = True
@@ -297,7 +300,6 @@ class HasObservables:
         fixme should name/signal_type also take a list?
 
         """
-        # fixme: we have the same code here twice, can we move this to a helper method?
         if not isinstance(name, All):
             if name not in self.observables:
                 raise ValueError(
@@ -310,6 +312,8 @@ class HasObservables:
         else:
             names = self.observables.keys()
 
+
+        # fixme, see unsubscribe, but event types differ accross names
         if not isinstance(signal_type, All):
             if signal_type not in self.observables[name].signal_types:
                 raise ValueError(
