@@ -1,16 +1,17 @@
 # noqa D100
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 import mesa
-from mesa.experimental.signals import HasObservables, Observable, ObservableList
+from mesa.experimental.signals import HasObservables, Observable, ObservableList, Computable
 
 
-def compute_gini(model):  # noqa D103
-    agent_wealths = [agent.wealth for agent in model.agents]
-    x = sorted(agent_wealths)
-    n = model.num_agents
+def compute_gini(agent_wealth):  # noqa D103
+    x = sorted(agent_wealth)
+    n = len(agent_wealth)
     b = sum(xi * (n - i) for i, xi in enumerate(x)) / (n * sum(x))
     return 1 + (1 / n) - 2 * b
 
+def get_agent_wealth(model):  # noqa D103
+    return [agent.wealth for agent in model.agents]
 
 class BoltzmannWealth(mesa.Model, HasObservables):
     """A simple model of an economy where agents exchange currency at random.
@@ -20,14 +21,16 @@ class BoltzmannWealth(mesa.Model, HasObservables):
     highly skewed distribution of wealth.
     """
 
-    agent_wealth = ObservableList()
+    agent_wealth = Computable()
+    gini = Computable()
 
     def __init__(self, seed=None, n=100, width=10, height=10):  # noqa D103
         super().__init__(seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.datacollector = mesa.DataCollector(
-            model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
+            model_reporters={"Gini": "gini"},
+            agent_reporters={"Wealth": "wealth"}
         )
         # Create agents
         for _ in range(self.num_agents):
@@ -37,18 +40,17 @@ class BoltzmannWealth(mesa.Model, HasObservables):
             y = self.random.randrange(self.grid.height)
             self.grid.place_agent(a, (x, y))
 
+        # testing a chain of observable --> computable --> computable
+        self.agent_wealth = get_agent_wealth(self), self, None  # fixme
+        self.gini = compute_gini, self.agent_wealth, None  # fixme
+
         self.running = True
         self.datacollector.collect(self)
-
-        self.agent_wealth = self.agents.get("wealth")
 
     def step(self):  # noqa D103
         self.agents.shuffle().do("step")
         # collect data
         self.datacollector.collect(self)
-
-        for i, entry in enumerate(self.agents.get("wealth")):
-            self.agent_wealth[i] = entry
 
     def run_model(self, n):  # noqa D103
         for _i in range(n):
@@ -89,11 +91,5 @@ class MoneyAgent(mesa.Agent, HasObservables):
 
 if __name__ == "__main__":
 
-    def some_callback(signal):  # noqa D103
-        print(signal)
-
     model = BoltzmannWealth()
-
-    model.observe("agent_wealth", "replaced", some_callback)
-
     model.run_model(10)
