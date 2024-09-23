@@ -39,7 +39,7 @@ class BaseObservable(ABC):
         if CURRENT_COMPUTED is not None:
             # there is a computed dependent on this Observable, so let's add
             # this Observable as a parent
-            CURRENT_COMPUTED._add_parent(self, instance, self.public_name, value)
+            CURRENT_COMPUTED._add_parent(instance, self.public_name, value)
 
         return value
 
@@ -59,6 +59,9 @@ class BaseObservable(ABC):
             "on_change",
         )
 
+    def __str__(self):
+        return f"{self.__class__.__name__}: {self.public_name}"
+
 
 class Observable(BaseObservable):
     """Observable class."""
@@ -69,19 +72,11 @@ class Observable(BaseObservable):
 
         # fixme can we make this an innerclass enum?
         #  or some SignalTypes helper class?
-        self.signal_types: set = set(
-            "on_change",
-        )
+        self.signal_types: set = {"on_change", }
         self.fallback_value = None  # fixme, should this be user specifiable
 
     def __set__(self, instance: HasObservables, value):  # noqa D103
         super().__set__(instance, value)
-        instance.notify(
-            self.public_name,
-            getattr(instance, self.private_name, self.fallback_value),
-            value,
-            "on_change",
-        )
         setattr(instance, self.private_name, value)
 
 
@@ -116,7 +111,7 @@ class Computable(BaseObservable):
     def __get__(self, instance, owner):
         computed = getattr(instance, self.private_name)
 
-        old_value = computed.value
+        old_value = computed._value
         new_value = computed()
 
         if new_value != old_value:
@@ -126,25 +121,28 @@ class Computable(BaseObservable):
                 new_value,
                 "on_change",
             )
-        else:
             return new_value
+        else:
+            return old_value
 
     def __set_name__(self, owner: HasObservables, name: str):
         self.public_name = name
         self.private_name = f"_{name}"
         owner.register_observable(self)
 
-    def __set__(self, instance: HasObservables, value):
-        setattr(instance, self.private_name, Computed(*value))
+    def __set__(self, instance: HasObservables, value):  # noqa D103
+        # no on change event?
+        setattr(instance, self.private_name, value)
 
 
 class Computed:
-    def __init__(self, callable: Callable, *args, **kwargs):
-        self.callable = callable
+    def __init__(self, func: Callable, *args, **kwargs):
+        self.func = func
         self.args = args
         self.kwargs = kwargs
-        self._is_dirty = False
-        self.value = None
+        self._is_dirty = True
+        self._first = True
+        self._value = None
 
         self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = (
             weakref.WeakKeyDictionary()
@@ -172,7 +170,7 @@ class Computed:
 
     def _remove_parents(self):
         """Remove all parent Observables."""
-        # we can ubsubscribe from everything on each parent
+        # we can unsubscribe from everything on each parent
         for parent in self.parents:
             parent.unobserve(All(), All())
 
@@ -182,6 +180,12 @@ class Computed:
 
         if self._is_dirty:
             changed = False
+
+            if self._first:
+                # fixme might be a cleaner solution for this
+                #  basicaly, we have no parents.
+                changed = True
+                self._first = False
 
             # we might be dirty but values might have changed
             # back and forth in our parents so let's check to make sure we
@@ -208,21 +212,21 @@ class Computed:
 
             if changed:
                 # the dependencies of the computable function might have changed
-                # so we rebuilt
+                # so, we rebuilt
                 self._remove_parents()
 
                 old = CURRENT_COMPUTED
                 CURRENT_COMPUTED = self
 
                 try:
-                    self._value = self.callable(*self.args, **self.kwargs)
+                    self._value = self.func(*self.args, **self.kwargs)
                 except Exception as e:
                     raise e
                 finally:
                     CURRENT_COMPUTED = old
 
             self._is_dirty = False
-        return self.value
+        return self._value
 
 
 class All:
@@ -256,7 +260,9 @@ class HasObservables:
         # we have signal_type as a key
         # we want weakrefs for the callable
 
-        obj.subscribers = defaultdict(functools.partial(defaultdict, weakref.WeakSet))
+        obj.subscribers = defaultdict(
+            functools.partial(defaultdict, list)
+        )
 
         return obj
 
@@ -318,7 +324,12 @@ class HasObservables:
             signal_types = self.observables[name].signal_types
 
         for name, signal_type in itertools.product(names, signal_types):
-            self.subscribers[name][signal_type].add(handler)
+            # fixme, we might built our own weakSet that handles this internally....
+            if hasattr(handler, "__self__"):
+                ref = weakref.WeakMethod(handler)
+            else:
+                ref = weakref.ref(handler)
+            self.subscribers[name][signal_type].append(ref)
 
     def unobserve(self, name: str | All, signal_type: str | All):
         """Unsubscribe to the Observable <name> for signal_type.
@@ -336,18 +347,20 @@ class HasObservables:
             else self.observables.keys()
         )
 
-        if isinstance(signal_type, All):
-            signal_types = self.observables[name].signal_types
-        else:
-            signal_types = [
-                signal_type,
-            ]
-
-        for name, signal_type in itertools.product(names, signal_types):
-            with contextlib.suppress(KeyError):
-                del self.subscribers[name][signal_type]
-                # we silently ignore trying to remove unsubscribed
-                # observables and/or signal types
+        for name in names:
+            # we need to do this here because signal types might
+            # differ for name so for each name we need to check
+            if isinstance(signal_type, All):
+                signal_types = self.observables[name].signal_types
+            else:
+                signal_types = [
+                    signal_type,
+                ]
+            for signal_type in signal_types:
+                with contextlib.suppress(KeyError):
+                    del self.subscribers[name][signal_type]
+                    # we silently ignore trying to remove unsubscribed
+                    # observables and/or signal types
 
     def unobserve_all(self, name: str | All):
         """Clears all subscriptions for the observable <name>.
@@ -385,5 +398,10 @@ class HasObservables:
         signal = Signal(self, observable, old_value, new_value, signal_type)
 
         observers = self.subscribers[observable][signal_type]
+        active_observers = []
         for observer in observers:
-            observer(signal)
+            if active_observer := observer():
+                active_observer(signal)
+                active_observers.append(observer)
+        # use iteration to also remove inactive observers
+        self.subscribers[observable][signal_type] = active_observers

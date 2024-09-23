@@ -1,14 +1,11 @@
 # noqa D100
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 import mesa
-from mesa.experimental.signals import (
-    Computable,
-    HasObservables,
-    Observable,
-)
+from mesa.experimental.signals import HasObservables, Observable, ObservableList, Computable, Computed
 
 
-def compute_gini(agent_wealth):  # noqa D103
+def compute_gini(model):  # noqa D103
+    agent_wealth = model.agent_wealth
     x = sorted(agent_wealth)
     n = len(agent_wealth)
     b = sum(xi * (n - i) for i, xi in enumerate(x)) / (n * sum(x))
@@ -46,8 +43,8 @@ class BoltzmannWealth(mesa.Model, HasObservables):
             self.grid.place_agent(a, (x, y))
 
         # testing a chain of observable --> computable --> computable
-        self.agent_wealth = get_agent_wealth(self), self, None  # fixme
-        self.gini = compute_gini, self.agent_wealth, None  # fixme
+        self.agent_wealth = Computed(get_agent_wealth, self)
+        self.gini = Computed(compute_gini, self)
 
         self.running = True
         self.datacollector.collect(self)
