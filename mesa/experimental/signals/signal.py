@@ -16,8 +16,9 @@ __all__ = ["Observable", "HasObservables", "All", "Computable"]
 _hashable_signal = namedtuple("_HashableSignal", "instance name")
 
 CURRENT_COMPUTED: Computed | None = None  # the current Computed that is evaluating
-PROCESSING_SIGNALS: set[tuple[
-    str,]] = set()  # fixme what to put here, we can't put the observable, but it is the name and has_observable combination
+PROCESSING_SIGNALS: set[tuple[str,]] = (
+    set()
+)  # fixme what to put here, we can't put the observable, but it is the name and has_observable combination
 
 
 class BaseObservable(ABC):
@@ -87,7 +88,8 @@ class Observable(BaseObservable):
         self.fallback_value = None  # fixme, should this be user specifiable
 
     def __set__(self, instance: HasObservables, value):  # noqa D103
-        if (CURRENT_COMPUTED is not None
+        if (
+            CURRENT_COMPUTED is not None
             and _hashable_signal(instance, self.public_name) in PROCESSING_SIGNALS
         ):
             raise ValueError("cyclical dependency detected")
@@ -163,7 +165,9 @@ class Computed:
         self._first = True
         self._value = None
 
-        self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = weakref.WeakKeyDictionary()
+        self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = (
+            weakref.WeakKeyDictionary()
+        )
 
     def _set_dirty(self, signal):
         self._is_dirty = True
@@ -292,10 +296,10 @@ class HasObservables:
         cls.observables[observable.public_name] = observable
 
     def observe(
-            self,
-            name: str | All,
-            signal_type: str | All,
-            handler: Callable,
+        self,
+        name: str | All,
+        signal_type: str | All,
+        handler: Callable,
     ):
         """Subscribe to the Observable <name> for signal_type.
 
