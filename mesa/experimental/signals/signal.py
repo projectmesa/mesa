@@ -13,7 +13,11 @@ from typing import Any
 
 __all__ = ["Observable", "HasObservables", "All", "Computable"]
 
+_hashable_signal = namedtuple("_HashableSignal", "instance name")
+
 CURRENT_COMPUTED: Computed | None = None  # the current Computed that is evaluating
+PROCESSING_SIGNALS: set[tuple[
+    str,]] = set()  # fixme what to put here, we can't put the observable, but it is the name and has_observable combination
 
 
 class BaseObservable(ABC):
@@ -33,13 +37,14 @@ class BaseObservable(ABC):
         self.signal_types: set
         self.fallback_value = None  # fixme, should this be user specifiable?
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance: HasObservables, owner):
         value = getattr(instance, self.private_name)
 
         if CURRENT_COMPUTED is not None:
             # there is a computed dependent on this Observable, so let's add
             # this Observable as a parent
             CURRENT_COMPUTED._add_parent(instance, self.public_name, value)
+            PROCESSING_SIGNALS.add(_hashable_signal(instance, self.public_name))
 
         return value
 
@@ -82,8 +87,16 @@ class Observable(BaseObservable):
         self.fallback_value = None  # fixme, should this be user specifiable
 
     def __set__(self, instance: HasObservables, value):  # noqa D103
-        super().__set__(instance, value)
+        if (CURRENT_COMPUTED is not None
+            and _hashable_signal(instance, self.public_name) in PROCESSING_SIGNALS
+        ):
+            raise ValueError("cyclical dependency detected")
+
         setattr(instance, self.private_name, value)
+
+        super().__set__(instance, value)  # send the notify
+
+        PROCESSING_SIGNALS.clear()  # we have notified our children, so we can clear this out
 
 
 class Computable(BaseObservable):
@@ -151,7 +164,6 @@ class Computed:
         self._value = None
 
         self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = weakref.WeakKeyDictionary()
-
 
     def _set_dirty(self, signal):
         self._is_dirty = True
@@ -237,13 +249,13 @@ class Computed:
 class All:
     """Helper constant to subscribe to all Observables."""
 
-    def __init__(self):
+    def __init__(self):  # noqa: D107
         self.name = "all"
 
-    def __copy__(self):
+    def __copy__(self):  # noqa: D105
         return self
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo):  # noqa: D105
         return self
 
 
@@ -280,10 +292,10 @@ class HasObservables:
         cls.observables[observable.public_name] = observable
 
     def observe(
-        self,
-        name: str | All,
-        signal_type: str | All,
-        handler: Callable,
+            self,
+            name: str | All,
+            signal_type: str | All,
+            handler: Callable,
     ):
         """Subscribe to the Observable <name> for signal_type.
 
@@ -311,7 +323,6 @@ class HasObservables:
                 ]
         else:
             names = self.observables.keys()
-
 
         # fixme, see unsubscribe, but event types differ accross names
         if not isinstance(signal_type, All):
