@@ -212,6 +212,7 @@ class Model:
         self,
         model_reporters=None,
         agent_reporters=None,
+        agenttype_reporters=None,
         tables=None,
     ) -> None:
         if not hasattr(self, "schedule") or self.schedule is None:
@@ -225,6 +226,7 @@ class Model:
         self.datacollector = DataCollector(
             model_reporters=model_reporters,
             agent_reporters=agent_reporters,
+            agenttype_reporters=agenttype_reporters,
             tables=tables,
         )
         # Collect data for the first time during initialization.

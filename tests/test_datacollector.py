@@ -5,6 +5,7 @@ Test the DataCollector
 import unittest
 
 from mesa import Agent, Model
+from mesa.datacollection import DataCollector
 from mesa.time import BaseScheduler
 
 
@@ -40,12 +41,28 @@ def agent_function_with_params(agent, multiplier, offset):
     return (agent.val * multiplier) + offset
 
 
-class DifferentMockAgent(MockAgent):
-    # We define a different MockAgent to test for attributes that are present
-    # only in 1 type of agent, but not the other.
+class MockAgentA(MockAgent):
+    """Agent subclass A for testing agent-type-specific reporters."""
+
     def __init__(self, unique_id, model, val=0):
-        super().__init__(unique_id, model, val=val)
-        self.val3 = val + 42
+        super().__init__(unique_id, model, val)
+        self.type_a_val = val * 2
+
+    def step(self):
+        super().step()
+        self.type_a_val = self.val * 2
+
+
+class MockAgentB(MockAgent):
+    """Agent subclass B for testing agent-type-specific reporters."""
+
+    def __init__(self, unique_id, model, val=0):
+        super().__init__(unique_id, model, val)
+        self.type_b_val = val * 3
+
+    def step(self):
+        super().step()
+        self.type_b_val = self.val * 3
 
 
 class MockModel(Model):
@@ -89,6 +106,34 @@ class MockModel(Model):
 
     def step(self):
         self.schedule.step()
+        self.datacollector.collect(self)
+
+
+class MockModelWithAgentTypes(Model):
+    """Model for testing agent-type-specific reporters."""
+
+    def __init__(self):
+        super().__init__()
+        self.model_val = 100
+
+        for i in range(10):
+            if i % 2 == 0:
+                MockAgentA(i, self, val=i)
+            else:
+                MockAgentB(i, self, val=i)
+
+        self.datacollector = DataCollector(
+            model_reporters={"total_agents": lambda m: len(m.agents)},
+            agent_reporters={"value": lambda a: a.val},
+            agenttype_reporters={
+                MockAgentA: {"type_a_val": lambda a: a.type_a_val},
+                MockAgentB: {"type_b_val": lambda a: a.type_b_val},
+            },
+        )
+
+    def step(self):
+        self._steps += 1
+        self.agents.do("step")
         self.datacollector.collect(self)
 
 
@@ -228,6 +273,132 @@ class TestDataCollectorInitialization(unittest.TestCase):
             str(cm.exception),
             "You must add agents to the scheduler before initializing the data collector.",
         )
+
+
+class TestDataCollectorWithAgentTypes(unittest.TestCase):
+    """Tests for DataCollector with agent-type-specific reporters."""
+
+    def setUp(self):
+        """Create the model and run it a set number of steps."""
+        self.model = MockModelWithAgentTypes()
+        for _ in range(5):
+            self.model.step()
+
+    def test_agenttype_vars(self):
+        """Test agent-type-specific variable collection."""
+        data_collector = self.model.datacollector
+
+        # Test MockAgentA data
+        agent_a_data = data_collector.get_agenttype_vars_dataframe(MockAgentA)
+        self.assertIn("type_a_val", agent_a_data.columns)
+        self.assertEqual(len(agent_a_data), 25)  # 5 agents * 5 steps
+        for (step, agent_id), value in agent_a_data["type_a_val"].items():
+            expected_value = agent_id * 2 + step * 2
+            self.assertEqual(value, expected_value)
+
+        # Test MockAgentB data
+        agent_b_data = data_collector.get_agenttype_vars_dataframe(MockAgentB)
+        self.assertIn("type_b_val", agent_b_data.columns)
+        self.assertEqual(len(agent_b_data), 25)  # 5 agents * 5 steps
+        for (step, agent_id), value in agent_b_data["type_b_val"].items():
+            expected_value = agent_id * 3 + step * 3
+            self.assertEqual(value, expected_value)
+
+    def test_agenttype_and_agent_vars(self):
+        """Test that agent-type-specific and general agent variables are collected correctly."""
+        data_collector = self.model.datacollector
+
+        agent_vars = data_collector.get_agent_vars_dataframe()
+        agent_a_vars = data_collector.get_agenttype_vars_dataframe(MockAgentA)
+        agent_b_vars = data_collector.get_agenttype_vars_dataframe(MockAgentB)
+
+        # Check that general agent variables are present for all agents
+        self.assertIn("value", agent_vars.columns)
+
+        # Check that agent-type-specific variables are only present in their respective dataframes
+        self.assertIn("type_a_val", agent_a_vars.columns)
+        self.assertNotIn("type_a_val", agent_b_vars.columns)
+        self.assertIn("type_b_val", agent_b_vars.columns)
+        self.assertNotIn("type_b_val", agent_a_vars.columns)
+
+    def test_nonexistent_agenttype(self):
+        """Test that requesting data for a non-existent agent type raises a warning."""
+        data_collector = self.model.datacollector
+
+        class NonExistentAgent(Agent):
+            pass
+
+        with self.assertWarns(UserWarning):
+            non_existent_data = data_collector.get_agenttype_vars_dataframe(
+                NonExistentAgent
+            )
+            self.assertTrue(non_existent_data.empty)
+
+    def test_agenttype_reporter_string_attribute(self):
+        """Test agent-type-specific reporter with string attribute."""
+        model = MockModelWithAgentTypes()
+        model.datacollector._new_agenttype_reporter(MockAgentA, "string_attr", "val")
+        model.step()
+
+        agent_a_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentA)
+        self.assertIn("string_attr", agent_a_data.columns)
+        for (_step, agent_id), value in agent_a_data["string_attr"].items():
+            expected_value = agent_id + 1
+            self.assertEqual(value, expected_value)
+
+    def test_agenttype_reporter_function_with_params(self):
+        """Test agent-type-specific reporter with function and parameters."""
+
+        def test_func(agent, multiplier):
+            return agent.val * multiplier
+
+        model = MockModelWithAgentTypes()
+        model.datacollector._new_agenttype_reporter(
+            MockAgentB, "func_param", [test_func, [2]]
+        )
+        model.step()
+
+        agent_b_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentB)
+        self.assertIn("func_param", agent_b_data.columns)
+        for (_step, agent_id), value in agent_b_data["func_param"].items():
+            expected_value = (agent_id + 1) * 2
+            self.assertEqual(value, expected_value)
+
+    def test_agenttype_reporter_multiple_types(self):
+        """Test adding reporters for multiple agent types."""
+        model = MockModelWithAgentTypes()
+        model.datacollector._new_agenttype_reporter(
+            MockAgentA, "type_a_val", lambda a: a.type_a_val
+        )
+        model.datacollector._new_agenttype_reporter(
+            MockAgentB, "type_b_val", lambda a: a.type_b_val
+        )
+        model.step()
+
+        agent_a_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentA)
+        agent_b_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentB)
+
+        self.assertIn("type_a_val", agent_a_data.columns)
+        self.assertIn("type_b_val", agent_b_data.columns)
+        self.assertNotIn("type_b_val", agent_a_data.columns)
+        self.assertNotIn("type_a_val", agent_b_data.columns)
+
+    def test_agenttype_superclass_reporter(self):
+        """Test adding a reporter for a superclass of an agent type."""
+        model = MockModelWithAgentTypes()
+        model.datacollector._new_agenttype_reporter(MockAgent, "val", lambda a: a.val)
+        model.datacollector._new_agenttype_reporter(Agent, "val", lambda a: a.val)
+        for _ in range(3):
+            model._steps += 1
+            model.step()
+
+        super_data = model.datacollector.get_agenttype_vars_dataframe(MockAgent)
+        agent_data = model.datacollector.get_agenttype_vars_dataframe(Agent)
+        self.assertIn("val", super_data.columns)
+        self.assertIn("val", agent_data.columns)
+        self.assertEqual(len(super_data), 30)  # 10 agents * 3 steps
+        self.assertEqual(len(agent_data), 30)
+        self.assertTrue(super_data.equals(agent_data))
 
 
 if __name__ == "__main__":
