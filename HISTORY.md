@@ -1,6 +1,70 @@
 ---
 title: Release History
 ---
+# 2.4.0 (2024-09-24)
+## Highlights
+Mesa 2.4.0 brings several key improvements from the upcoming 3.0 series, while maintaining compatibility with existing Mesa 2.x models.
+
+The DataCollector now supports collecting data from specific Agent subclasses using the new `agenttype_reporters` parameter ([#2300](https://github.com/projectmesa/mesa/pull/2300)). This allows collecting different metrics for different agent types. For example:
+
+```python
+self.datacollector = DataCollector(
+    agenttype_reporters={
+        Wolf: {"sheep_eaten": "sheep_eaten"},
+        Sheep: {"wool": "wool_amount"}
+    }
+)
+```
+
+The AgentSet class, which underpins `model.agents`, has received major enhancements:
+- A new `groupby()` method to split agents into groups ([#2220](https://github.com/projectmesa/mesa/pull/2220))
+- An `agg()` method to quickly compute aggregate values ([#2266](https://github.com/projectmesa/mesa/pull/2266))
+- A faster `shuffle_do()` method for more efficient random agent activation ([#2283](https://github.com/projectmesa/mesa/pull/2283))
+- The `select()` method now allows choosing a fraction of agents ([#2253](https://github.com/projectmesa/mesa/pull/2253))
+- The `do()` method can now take any callable function, not just string method names ([#2219](https://github.com/projectmesa/mesa/pull/2219))
+
+Other notable improvements include:
+- The Model class now exposes an `agents_by_type` property for easier access to agents of specific types ([#2267](https://github.com/projectmesa/mesa/pull/2267))
+- Performance enhancements for `Model.agents` ([#2251](https://github.com/projectmesa/mesa/pull/2251))
+- The `AgentSet.get()` method now handles missing values with optional default value ([#2279](https://github.com/projectmesa/mesa/pull/2279))
+
+This release also fixes a bug in the Grid's `move_agent_to_one_of` method with `selection="closest"`, which previously selected locations deterministically instead of randomly ([#2118](https://github.com/projectmesa/mesa/pull/2118)).
+
+Finally, we've made significant documentation improvements, including the addition of a new [Migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html) to help users transition to future Mesa versions ([#2257](https://github.com/projectmesa/mesa/pull/2257)).
+
+## What's Changed
+### 🎉 New features added
+* Add AgentSet.groupby by @quaquel in [#2220](https://github.com/projectmesa/mesa/pull/2220)
+* AgentSet: Add `agg` method by @EwoutH in [#2266](https://github.com/projectmesa/mesa/pull/2266)
+* GroupBy: Add `count` and `agg` methods by @EwoutH in [#2290](https://github.com/projectmesa/mesa/pull/2290)
+* datacollector: Allow collecting data from Agent (sub)classes by @EwoutH in [#2300](https://github.com/projectmesa/mesa/pull/2300)
+* Add optimized shuffle_do() method to AgentSet by @EwoutH in [#2283](https://github.com/projectmesa/mesa/pull/2283)
+
+### 🛠 Enhancements made
+* Allow AgentSet.do() to take Callable function by @quaquel in [#2219](https://github.com/projectmesa/mesa/pull/2219)
+* Split AgentSet into map and do to separate return types by @quaquel in [#2237](https://github.com/projectmesa/mesa/pull/2237)
+* Performance enhancements for Model.agents by @quaquel in [#2251](https://github.com/projectmesa/mesa/pull/2251)
+* AgentSet: Allow selecting a fraction of agents in the AgentSet by @EwoutH in [#2253](https://github.com/projectmesa/mesa/pull/2253)
+* Model: Replace `get_agents_of_type` method with `agents_by_type` property by @EwoutH in [#2267](https://github.com/projectmesa/mesa/pull/2267)
+* Add default values and missing value handling to `agentset.get` by @quaquel in [#2279](https://github.com/projectmesa/mesa/pull/2279)
+
+### 🐛 Bugs fixed
+* Jupyter_viz: Allow measures to be None by @EwoutH in [#2163](https://github.com/projectmesa/mesa/pull/2163)
+* Fix deterministic behavior in `move_agent_to_one_of` with `selection="closest"` by @OrenBochman in [#2118](https://github.com/projectmesa/mesa/pull/2118)
+
+### 📜 Documentation improvements
+* Contribution: Add "I have no idea where to start" section by @EwoutH in [#2258](https://github.com/projectmesa/mesa/pull/2258)
+* Write initial Mesa Migration guide by @EwoutH in [#2257](https://github.com/projectmesa/mesa/pull/2257)
+* Docs: Fix broken relative links by removing `.html` suffix by @EwoutH in [#2274](https://github.com/projectmesa/mesa/pull/2274)
+* Readthedocs: Don't let notebook failures pass silently by @EwoutH in [#2276](https://github.com/projectmesa/mesa/pull/2276)
+* update migration guide to describe solaraviz updates by @Corvince in [#2297](https://github.com/projectmesa/mesa/pull/2297)
+* Migration Guide: Add Model initialization requirement and automatic Agent.unique_id assignment by @EwoutH in [#2302](https://github.com/projectmesa/mesa/pull/2302)
+
+### 🔧 Maintenance
+* make typing behavior of AgentSet.get explicit by @quaquel in [#2293](https://github.com/projectmesa/mesa/pull/2293)
+
+**Full Changelog**: [https://github.com/projectmesa/mesa/compare/v2.3.4...v2.4.0](https://github.com/projectmesa/mesa/compare/v2.3.4...v2.4.0)
+
 # 2.3.4 (2024-09-04)
 ## Highlights
 Two fixes in our docs: The visualization tutorial started using an example model that wasn't compatible with Mesa 2.x anymore, and some relative links were broken. This release fixes both.
