@@ -5,7 +5,7 @@ title: Release History
 ## Highlights
 Mesa v3.0 alpha 5 release contains many quality of life updates, a big new feature for the DataCollector and a major deprecation.
 
-The entire `mesa.time` module, including all schedulers, has been deprecated ([#2306](https://github.com/projectmesa/mesa/pull/2306)). Users are encouraged to transition to AgentSet functionality for more flexible and explicit agent activation patterns. Check the [migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers) on how to upgrade.
+The entire `mesa.time` module, including all schedulers, has been deprecated ([#2306](https://github.com/projectmesa/mesa/pull/2306)). Users are encouraged to transition to AgentSet functionality for more flexible and explicit agent activation patterns. Check the [migration guide](https://mesa.readthedocs.io/latest/migration_guide.html#time-and-schedulers) on how to upgrade.
 
 The DataCollector now supports collecting data from specific Agent subclasses using the new `agenttype_reporters` parameter ([#2300](https://github.com/projectmesa/mesa/pull/2300)). This allows collecting different metrics for different agent types. For example:
 
@@ -71,7 +71,7 @@ Mesa 3.0.0a4 contains two major breaking changes:
     Example models were updated in [mesa-examples#194](https://github.com/projectmesa/mesa-examples/pull/194), which shows more examples on how to update existing models.
 
 2. Our visualisation API is being overhauled, to be more flexible and powerful. For more details, see [#2278](https://github.com/projectmesa/mesa/pull/2278).
-    - An initial update to the tutorial was made in [#2289](https://github.com/projectmesa/mesa/pull/2289) and is [available here](https://mesa.readthedocs.io/en/latest/tutorials/visualization_tutorial.html).
+    - An initial update to the tutorial was made in [#2289](https://github.com/projectmesa/mesa/pull/2289) and is [available here](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html).
     - An initial example model was updated in [mesa-examples#195](https://github.com/projectmesa/mesa-examples/pull/195), and more examples will be updated in [mesa-examples#195](https://github.com/projectmesa/mesa-examples/pull/193).
     - The old SolaraViz API is still available at `mesa.experimental`, but might be removed in future releases.
 
@@ -122,7 +122,7 @@ Our example models also got more love: We removed the `RandomActivation` schedul
 
 Finally, we have two brand new examples: An Ant Colony Optimization model using an Ant System approach to the Traveling Salesman problem, a Mesa NetworkGrid, and a custom visualisation with SolaraViz ([examples#157](https://github.com/projectmesa/mesa-examples/pull/157) by @zjost). The first example using the `PropertyLayer` was added, a very fast implementation of Conway's Game of Life ([examples#182](https://github.com/projectmesa/mesa-examples/pull/182)).
 
-To help the transition to Mesa 3.0, we started writing a [migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html). Progress is tracked in #2233, feedback and help is appreciated! Finally, we also added a new section to our [contributor guide](https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md#i-have-no-idea-where-to-start) to get new contributors up to speed.
+To help the transition to Mesa 3.0, we started writing a [migration guide](https://mesa.readthedocs.io/latest/migration_guide.html). Progress is tracked in #2233, feedback and help is appreciated! Finally, we also added a new section to our [contributor guide](https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md#i-have-no-idea-where-to-start) to get new contributors up to speed.
 
 This pre-release can be installed as always with `pip install --pre mesa`
 
@@ -213,7 +213,7 @@ This is the first pre-release in the Mesa 3.0 series, which is still in active d
 Since it's in active development, more breaking changes may follow and it's not recommended for general usage.
 
 There are two major breaking changes at this point:
-- The old visualisation is removed, in favor of the new, Solara based, Jupyter Viz. This was already available in the 2.3.x release series, but is now stabilized. Checkout out our new [Visualization Tutorial](https://mesa.readthedocs.io/en/latest/tutorials/visualization_tutorial.html). More examples and a migration guide will follow later in the Mesa 3.0 development.
+- The old visualisation is removed, in favor of the new, Solara based, Jupyter Viz. This was already available in the 2.3.x release series, but is now stabilized. Checkout out our new [Visualization Tutorial](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html). More examples and a migration guide will follow later in the Mesa 3.0 development.
 - The `mesa.flat` namespace is removed, since was not used very often.
 
 Mesa 3.0 will require Python 3.10+.
