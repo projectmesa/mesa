@@ -30,7 +30,7 @@ Other notable improvements include:
 
 This release also fixes a bug in the Grid's `move_agent_to_one_of` method with `selection="closest"`, which previously selected locations deterministically instead of randomly ([#2118](https://github.com/projectmesa/mesa/pull/2118)).
 
-Finally, we've made significant documentation improvements, including the addition of a new [Migration guide](https://mesa.readthedocs.io/en/latest/migration_guide.html) to help users transition to future Mesa versions ([#2257](https://github.com/projectmesa/mesa/pull/2257)).
+Finally, we've made significant documentation improvements, including the addition of a new [Migration guide](https://mesa.readthedocs.io/latest/migration_guide.html) to help users transition to future Mesa versions ([#2257](https://github.com/projectmesa/mesa/pull/2257)).
 
 ## What's Changed
 ### 🎉 New features added
