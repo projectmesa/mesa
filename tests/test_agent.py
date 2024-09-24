@@ -415,14 +415,14 @@ def test_agentset_shuffle_do():
     model = Model()
 
     class TestAgentShuffleDo(Agent):
-        def __init__(self, model):
-            super().__init__(model)
+        def __init__(self, unique_id, model):
+            super().__init__(unique_id, model)
             self.called = False
 
         def test_method(self):
             self.called = True
 
-    agents = [TestAgentShuffleDo(model) for _ in range(100)]
+    agents = [TestAgentShuffleDo(i, model) for i in range(100)]
     agentset = AgentSet(agents, model)
 
     # Test shuffle_do with a string method name
