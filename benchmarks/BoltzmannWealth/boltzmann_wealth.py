@@ -1,30 +1,27 @@
-"""boltmann wealth model for performance benchmarking.
-
-https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
-"""
-
+# noqa D100
+# https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 import mesa
-from mesa.experimental.signals import HasObservables, Observable
+from mesa.experimental.signals import (
+    Computable,
+    Computed,
+    HasObservables,
+    Observable,
+)
 
 
-def compute_gini(model):
-    """Calculate gini for wealth in model.
-
-    Args:
-        model: a Model instance
-
-    Returns:
-        float: gini score
-
-    """
-    agent_wealths = [agent.wealth for agent in model.agents]
-    x = sorted(agent_wealths)
-    n = model.num_agents
+def compute_gini(model):  # noqa D103
+    agent_wealth = model.agent_wealth
+    x = sorted(agent_wealth)
+    n = len(agent_wealth)
     b = sum(xi * (n - i) for i, xi in enumerate(x)) / (n * sum(x))
     return 1 + (1 / n) - 2 * b
 
 
-class BoltzmannWealth(mesa.Model):
+def get_agent_wealth(model):  # noqa D103
+    return [agent.wealth for agent in model.agents]
+
+
+class BoltzmannWealth(mesa.Model, HasObservables):
     """A simple model of an economy where agents exchange currency at random.
 
     All the agents begin with one unit of currency, and each time step can give
@@ -32,20 +29,15 @@ class BoltzmannWealth(mesa.Model):
     highly skewed distribution of wealth.
     """
 
-    def __init__(self, seed=None, n=100, width=10, height=10):
-        """Initializes the model.
+    agent_wealth = Computable()
+    gini = Computable()
 
-        Args:
-            seed: the seed for random number generator
-            n: the number of agents
-            width: the width of the grid
-            height: the height of the grid
-        """
+    def __init__(self, seed=None, n=100, width=10, height=10):  # noqa D103
         super().__init__(seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.datacollector = mesa.DataCollector(
-            model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
+            model_reporters={"Gini": "gini"}, agent_reporters={"Wealth": "wealth"}
         )
         # Create agents
         for _ in range(self.num_agents):
@@ -55,22 +47,21 @@ class BoltzmannWealth(mesa.Model):
             y = self.random.randrange(self.grid.height)
             self.grid.place_agent(a, (x, y))
 
+        # testing a chain of observable --> computable --> computable
+        # we cannot pass model.agent_wealth as an argument
+        # to self.gini, because the autodiscovery is tied to Observable.__get__
+        # which thus needs! to be accessed inside the callable
+        self.agent_wealth = Computed(get_agent_wealth, self)
+        self.gini = Computed(compute_gini, self)
+
         self.running = True
         self.datacollector.collect(self)
 
-    def step(self):
-        """Run the model for a single step."""
-        self.agents.shuffle_do("step")
-        # collect data
+    def step(self):  # noqa D103
+        self.agents.shuffle_do("step")  # collect data
         self.datacollector.collect(self)
 
-    def run_model(self, n):
-        """Run the model for n steps.
-
-        Args:
-            n: the number of steps for which to run the model
-
-        """
+    def run_model(self, n):  # noqa D103
         for _i in range(n):
             self.step()
 
@@ -80,25 +71,18 @@ class MoneyAgent(mesa.Agent, HasObservables):
 
     wealth = Observable()
 
-    def __init__(self, model):
-        """Instantiate an agent.
-
-        Args:
-            model: a Model instance
-        """
+    def __init__(self, model):  # noqa D103
         super().__init__(model)
         self.wealth = 1
 
-    def move(self):
-        """Move the agent to a random neighboring cell."""
+    def move(self):  # noqa D103
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=False
         )
         new_position = self.random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
 
-    def give_money(self):
-        """Give money to a random cell mate."""
+    def give_money(self):  # noqa D103
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
         cellmates.pop(
             cellmates.index(self)
@@ -108,8 +92,12 @@ class MoneyAgent(mesa.Agent, HasObservables):
             other.wealth += 1
             self.wealth -= 1
 
-    def step(self):
-        """Run the agent for 1 step."""
+    def step(self):  # noqa D103
         self.move()
         if self.wealth > 0:
             self.give_money()
+
+
+if __name__ == "__main__":
+    model = BoltzmannWealth()
+    model.run_model(10)
