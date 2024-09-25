@@ -23,6 +23,16 @@ def get_agent_wealth(model):  # noqa D103
     return [agent.wealth for agent in model.agents]
 
 
+
+class Collector:
+    def __init__(self, model, obj, attr):
+        self.data = []
+        self.obj = obj
+        self.attr = attr
+        self.model = model
+    def collect(self):
+        self.data.append(getattr(self.obj, self.attr))
+
 class Table:
     def __init__(self, model: BoltzmannWealth):
         self.data = {}
@@ -68,11 +78,13 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         self.gini = Computed(compute_gini, self)
 
         self.running = True
-        self.datacollector.collect(self)
+        self.datacollector = [Collector(self, self, "gini"),
+                              Collector(self, self, "agent_wealth")]
 
     def step(self):  # noqa D103
         self.agents.shuffle_do("step")  # collect data
-        # self.datacollector.collect(self)
+        for c in self.datacollector:
+            c.collect()
 
     def run_model(self, n):  # noqa D103
         for _i in range(n):
