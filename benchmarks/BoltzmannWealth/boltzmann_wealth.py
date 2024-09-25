@@ -62,7 +62,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         super().__init__(seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
-        self.datacollector = mesa.DataCollector(model_reporters={"Gini": compute_gini})
+
         # Create agents
         for _ in range(self.num_agents):
             a = MoneyAgent(self)
