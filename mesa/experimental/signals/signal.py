@@ -92,7 +92,11 @@ class Observable(BaseObservable):
             CURRENT_COMPUTED is not None
             and _hashable_signal(instance, self.public_name) in PROCESSING_SIGNALS
         ):
-            raise ValueError("cyclical dependency detected")
+            # fixme make cyclical dependency explict
+            #  so CURRENT_COMPUTED tries to modified self while being dependent on self
+            raise ValueError((f"cyclical dependency detected: Computed({CURRENT_COMPUTED.name}) tries to change "
+                              f"{instance.__class__.__name__}.{self.public_name} while being dependent """
+                              f"on {instance.__class__.__name__}.{self.public_name}"))
 
         setattr(instance, self.private_name, value)
 
@@ -154,6 +158,7 @@ class Computable(BaseObservable):
     def __set__(self, instance: HasObservables, value):  # noqa D103
         # no on change event?
         setattr(instance, self.private_name, value)
+        value.name = self.public_name
 
 
 class Computed:
@@ -164,10 +169,14 @@ class Computed:
         self._is_dirty = True
         self._first = True
         self._value = None
+        self.name: str = "" # set by Computable
 
         self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = (
             weakref.WeakKeyDictionary()
         )
+
+    def __str__(self):
+        return f"COMPUTED: {self.name}"
 
     def _set_dirty(self, signal):
         self._is_dirty = True
@@ -197,7 +206,6 @@ class Computed:
 
     def __call__(self):
         global CURRENT_COMPUTED  # noqa: PLW0603
-        CURRENT_COMPUTED = self
 
         if self._is_dirty:
             changed = False
@@ -247,6 +255,7 @@ class Computed:
                     CURRENT_COMPUTED = old
 
             self._is_dirty = False
+
         return self._value
 
 
