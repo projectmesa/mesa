@@ -46,39 +46,26 @@ class Agent:
     # so, unique_id is unique relative to a model, and counting starts from 1
     _ids = defaultdict(functools.partial(itertools.count, 1))
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, model: Model, *args, **kwargs) -> None:
         """Create a new agent.
 
         Args:
             model (Model): The model instance in which the agent exists.
-            args: currently ignored, to be fixed in 3.1
-            kwargs: currently ignored, to be fixed in 3.1
-        """
-        # TODO: Cleanup in future Mesa version (3.1+)
-        match args:
-            # Case 1: Only the model is provided. The new correct behavior.
-            case [model]:
-                self.model = model
-                self.unique_id = next(self._ids[model])
-            # Case 2: Both unique_id and model are provided, deprecated
-            case [_, model]:
-                warnings.warn(
-                    "unique ids are assigned automatically to Agents in Mesa 3. The use of custom unique_id is "
-                    "deprecated. Only input a model when calling `super()__init__(model)`. The unique_id inputted is not used.",
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-                self.model = model
-                self.unique_id = next(self._ids[model])
-            # Case 3: Anything else, raise an error
-            case _:
-                raise ValueError(
-                    "Invalid arguments provided to initialize the Agent. Only input a model: `super()__init__(model)`."
-                )
+            args: passed on to super
+            kwargs: passed on to super
 
+        Notes:
+            to make proper use of python's super, in each class remove the arguments and
+            keyword arguments you need and pass on the rest to super
+
+        """
+        super().__init__(*args, **kwargs)
+
+        self.model: Model = model
+        self.model.register_agent(self)
+        self.unique_id: int = next(self._ids[model])
         self.pos: Position | None = None
 
-        self.model.register_agent(self)
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
