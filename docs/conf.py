@@ -126,7 +126,13 @@ html_theme = "pydata_sphinx_theme"
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
+html_theme_options = {
+    "navbar_start": ["navbar-logo", "version-switcher"],  # Show switcher in navbar
+    "switcher": {
+        "json_url": "https://mesa.readthedocs.io/latest/_static/switcher.json",  # URL of your switcher.json file
+        "version_match": version  # Automatically matches the current version
+    }
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []

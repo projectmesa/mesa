@@ -73,9 +73,9 @@ Most likely you created an ABM that has the code that you want to share in it, w
 
 **Sharing your package**
 
-> 1. Layout a new file structure to move the code into and then make sure it is callable from Mesa, in a simple, easy to understand way. For example, `from example_package import foo`.  See [Creating the Scaffolding](https://python-packaging.readthedocs.io/en/latest/minimal.html#creating-the-scaffolding).
+> 1. Layout a new file structure to move the code into and then make sure it is callable from Mesa, in a simple, easy to understand way. For example, `from example_package import foo`.  See [Creating the Scaffolding](https://python-packaging.readthedocs.io/latest/minimal.html#creating-the-scaffolding).
 >
-> 2. [Pick a name](https://python-packaging.readthedocs.io/en/latest/minimal.html#picking-a-name).
+> 2. [Pick a name](https://python-packaging.readthedocs.io/latest/minimal.html#picking-a-name).
 >
 > 3. [Create a repo on GitHub](https://help.github.com/articles/create-a-repo/).
 >
