@@ -1,5 +1,7 @@
 # noqa D100
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
+from __future__ import annotations
+
 import mesa
 from mesa.experimental.signals import (
     Computable,
@@ -10,7 +12,7 @@ from mesa.experimental.signals import (
 
 
 def compute_gini(model):  # noqa D103
-    agent_wealth = model.agent_wealth
+    agent_wealth = model.agent_wealth.get()
     x = sorted(agent_wealth)
     n = len(agent_wealth)
     b = sum(xi * (n - i) for i, xi in enumerate(x)) / (n * sum(x))
@@ -21,6 +23,19 @@ def get_agent_wealth(model):  # noqa D103
     return [agent.wealth for agent in model.agents]
 
 
+class Table:
+    def __init__(self, model: BoltzmannWealth):
+        self.data = {}
+        for agent in model.agents:
+            agent.observe("wealth", "on_change", self.update)
+            self.data[agent.unique_id] = agent.wealth
+
+    def update(self, signal):
+        self.data[signal.owner.unique_id] = signal.new_value
+
+    def get(self):
+        return self.data.values()
+
 class BoltzmannWealth(mesa.Model, HasObservables):
     """A simple model of an economy where agents exchange currency at random.
 
@@ -29,7 +44,6 @@ class BoltzmannWealth(mesa.Model, HasObservables):
     highly skewed distribution of wealth.
     """
 
-    agent_wealth = Computable()
     gini = Computable()
 
     def __init__(self, seed=None, n=100, width=10, height=10):  # noqa D103
@@ -37,7 +51,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.datacollector = mesa.DataCollector(
-            model_reporters={"Gini": "gini"}, agent_reporters={"Wealth": "wealth"}
+            model_reporters={"Gini": compute_gini}
         )
         # Create agents
         for _ in range(self.num_agents):
@@ -51,7 +65,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         # we cannot pass model.agent_wealth as an argument
         # to self.gini, because the autodiscovery is tied to Observable.__get__
         # which thus needs! to be accessed inside the callable
-        self.agent_wealth = Computed(get_agent_wealth, self)
+        self.agent_wealth = Table(self)
         self.gini = Computed(compute_gini, self)
 
         self.running = True
@@ -59,7 +73,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
 
     def step(self):  # noqa D103
         self.agents.shuffle_do("step")  # collect data
-        self.datacollector.collect(self)
+        # self.datacollector.collect(self)
 
     def run_model(self, n):  # noqa D103
         for _i in range(n):
