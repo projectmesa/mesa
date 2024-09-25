@@ -301,7 +301,7 @@ def test_agentset_do_callable():
 def test_agentset_get():
     """Test AgentSet.get."""
     model = Model()
-    _ = [TestAgent(i, model) for i in range(10)]
+    _ = [TestAgent(model) for i in range(10)]
 
     agentset = model.agents
 
@@ -627,16 +627,3 @@ def test_agentset_groupby():
     assert custom_result[False] == custom_agg(
         [agent.value for agent in agents if not agent.even]
     )
-
-
-def test_oldstyle_agent_instantiation():
-    """Old behavior of Agent creation with unique_id and model as positional arguments.
-
-    Can be removed/updated in the future.
-    """
-    model = Model()
-    agent = Agent("some weird unique id", model)
-    assert isinstance(agent.unique_id, int)
-    assert agent.model == model
-    assert isinstance(agent.model, Model)
-    assert agent.unique_id == 1  # test that we ignore unique ID that is passed

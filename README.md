@@ -28,7 +28,7 @@ can be displayed in browser windows or Jupyter.*
 
 ## Using Mesa
 
-To install our latest stable release (2.3.x), run:
+To install our latest stable release (2.4.x), run:
 
 ``` bash
 pip install -U mesa
@@ -60,7 +60,7 @@ For resources or help on using Mesa, check out the following:
 -   [Visualization Tutorial](https://mesa.readthedocs.io/stable/tutorials/visualization_tutorial.html) (An introduction into our Solara visualization)
 -   [Complexity Explorer Tutorial](https://www.complexityexplorer.org/courses/172-agent-based-models-with-python-an-introduction-to-mesa) (An advanced-beginner model,
     SugarScape with Traders, with instructional videos)
--   [Mesa Examples](https://github.com/projectmesa/mesa-examples/tree/main/examples) (A repository of seminal ABMs using Mesa and
+-   [Mesa Examples](https://github.com/projectmesa/mesa-examples) (A repository of seminal ABMs using Mesa and
     examples of employing specific Mesa Features)
 -   [Docs](http://mesa.readthedocs.org/) (Mesa's documentation, API and useful snippets)
     -   [Development version docs](https://mesa.readthedocs.io/latest/) (the latest version docs if you're using a pre-release Mesa version)
