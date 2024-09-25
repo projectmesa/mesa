@@ -627,5 +627,3 @@ def test_agentset_groupby():
     assert custom_result[False] == custom_agg(
         [agent.value for agent in agents if not agent.even]
     )
-
-
