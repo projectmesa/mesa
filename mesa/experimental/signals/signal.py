@@ -94,9 +94,12 @@ class Observable(BaseObservable):
         ):
             # fixme make cyclical dependency explict
             #  so CURRENT_COMPUTED tries to modified self while being dependent on self
-            raise ValueError((f"cyclical dependency detected: Computed({CURRENT_COMPUTED.name}) tries to change "
-                              f"{instance.__class__.__name__}.{self.public_name} while being dependent """
-                              f"on {instance.__class__.__name__}.{self.public_name}"))
+            raise ValueError(
+                f"cyclical dependency detected: Computed({CURRENT_COMPUTED.name}) tries to change "
+                f"{instance.__class__.__name__}.{self.public_name} while being dependent "
+                ""
+                f"on {instance.__class__.__name__}.{self.public_name}"
+            )
 
         setattr(instance, self.private_name, value)
 
@@ -169,7 +172,7 @@ class Computed:
         self._is_dirty = True
         self._first = True
         self._value = None
-        self.name: str = "" # set by Computable
+        self.name: str = ""  # set by Computable
 
         self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str], Any] = (
             weakref.WeakKeyDictionary()
