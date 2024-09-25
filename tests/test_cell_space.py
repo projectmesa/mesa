@@ -280,7 +280,10 @@ def test_cell_neighborhood():
     height = 10
     grid = OrthogonalVonNeumannGrid((width, height), torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [2, 5, 9]):
-        neighborhood = grid._cells[(0, 0)].neighborhood(radius=radius)
+        if radius == 1:
+            neighborhood = grid._cells[(0, 0)].neighborhood
+        else:
+            neighborhood = grid._cells[(0, 0)].get_neighborhood(radius=radius)
         assert len(neighborhood) == n
 
     ## Moore
@@ -288,25 +291,34 @@ def test_cell_neighborhood():
     height = 10
     grid = OrthogonalMooreGrid((width, height), torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [3, 8, 15]):
-        neighborhood = grid._cells[(0, 0)].neighborhood(radius=radius)
+        if radius == 1:
+            neighborhood = grid._cells[(0, 0)].neighborhood
+        else:
+            neighborhood = grid._cells[(0, 0)].get_neighborhood(radius=radius)
         assert len(neighborhood) == n
 
     with pytest.raises(ValueError):
-        grid._cells[(0, 0)].neighborhood(radius=0)
+        grid._cells[(0, 0)].get_neighborhood(radius=0)
 
     # hexgrid
     width = 10
     height = 10
     grid = HexGrid((width, height), torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [2, 6, 11]):
-        neighborhood = grid._cells[(0, 0)].neighborhood(radius=radius)
+        if radius == 1:
+            neighborhood = grid._cells[(0, 0)].neighborhood
+        else:
+            neighborhood = grid._cells[(0, 0)].get_neighborhood(radius=radius)
         assert len(neighborhood) == n
 
     width = 10
     height = 10
     grid = HexGrid((width, height), torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [5, 10, 17]):
-        neighborhood = grid._cells[(1, 0)].neighborhood(radius=radius)
+        if radius == 1:
+            neighborhood = grid._cells[(1, 0)].neighborhood
+        else:
+            neighborhood = grid._cells[(1, 0)].get_neighborhood(radius=radius)
         assert len(neighborhood) == n
 
     # networkgrid
@@ -500,3 +512,15 @@ def test_cell_collection():
 
     agents = collection[cells[0]]
     assert agents == cells[0].agents
+
+    cell = collection.select(at_most=1)
+    assert len(cell) == 1
+
+    cells = collection.select(at_most=2)
+    assert len(cells) == 2
+
+    cells = collection.select(at_most=0.5)
+    assert len(cells) == 5
+
+    cells = collection.select()
+    assert len(cells) == len(collection)
