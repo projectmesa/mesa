@@ -309,3 +309,5 @@ With:
 ```python
 self.datacollector = DataCollector(...)
 ```
+
+- Ref: [PR #2327](https://github.com/projectmesa/mesa/pull/2327), Mesa-examples [PR #208](https://github.com/projectmesa/mesa-examples/pull/208))
