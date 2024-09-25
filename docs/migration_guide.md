@@ -221,7 +221,7 @@ self.agents_by_type[AgentType].shuffle_do("step")
 2. If you were using `self.schedule.agents`, replace it with `self.agents`.
 3. If you were using `self.schedule.get_agent_count()`, replace it with `len(self.agents)`.
 4. If you were using `self.schedule.agents_by_type`, replace it with `self.agents_by_type`.
-5. Agents are now automatically added to or removed from the model's `AgentSet` (`model.agents`) when they are created or deleted, eliminating the need to manually call `self.schedule.add()` or `self.schedule.remove()`. 
+5. Agents are now automatically added to or removed from the model's `AgentSet` (`model.agents`) when they are created or deleted, eliminating the need to manually call `self.schedule.add()` or `self.schedule.remove()`.
    - However, you still need to explicitly remove the Agent itself by using `Agent.remove()`. Typically, this means:
      - Replace `self.schedule.remove(agent)` with `agent.remove()` in the Model.
      - Replace `self.model.schedule.remove(self)` with `self.remove()` within the Agent.
