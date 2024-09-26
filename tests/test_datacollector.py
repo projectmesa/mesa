@@ -132,6 +132,7 @@ class TestDataCollector(unittest.TestCase):
     def setUp(self):
         """Create the model and run it a set number of steps."""
         self.model = MockModel()
+        self.model.datacollector.collect(self.model)
         for i in range(7):
             if i == 4:
                 self.model.schedule.remove(self.model.schedule._agents[3])
