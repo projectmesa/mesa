@@ -81,13 +81,13 @@ def test_agentset():
     assert len(agentset.select(at_most=1)) == 1  # Select 1 agent
 
     assert len(agentset.select(test_function)) == 5
-    assert len(agentset.select(test_function, n=2)) == 2
+    assert len(agentset.select(test_function, at_most=2)) == 2
     assert len(agentset.select(test_function, inplace=True)) == 5
     assert agentset.select(inplace=True) == agentset
     assert all(a1 == a2 for a1, a2 in zip(agentset.select(), agentset))
-    assert all(a1 == a2 for a1, a2 in zip(agentset.select(n=5), agentset[:5]))
+    assert all(a1 == a2 for a1, a2 in zip(agentset.select(at_most=5), agentset[:5]))
 
-    assert len(agentset.shuffle(inplace=False).select(n=5)) == 5
+    assert len(agentset.shuffle(inplace=False).select(at_most=5)) == 5
 
     def test_function(agent):
         return agent.unique_id
@@ -301,7 +301,7 @@ def test_agentset_do_callable():
 def test_agentset_get():
     """Test AgentSet.get."""
     model = Model()
-    _ = [TestAgent(model) for i in range(10)]
+    [TestAgent(model) for _ in range(10)]
 
     agentset = model.agents
 
