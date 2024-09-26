@@ -4,7 +4,6 @@ import unittest
 
 from mesa import Agent, Model
 from mesa.datacollection import DataCollector
-from mesa.time import BaseScheduler
 
 
 class MockAgent(Agent):
@@ -60,21 +59,17 @@ def agent_function_with_params(agent, multiplier, offset):  # noqa: D103
 class MockModel(Model):
     """Minimalistic model for testing purposes."""
 
-    schedule = BaseScheduler(None)
-
     def __init__(self):  # noqa: D107
         super().__init__()
-        self.schedule = BaseScheduler(self)
         self.model_val = 100
 
         self.n = 10
         for i in range(1, self.n + 1):
-            self.schedule.add(MockAgent(self, val=i))
+            MockAgent(self, val=i)
         self.datacollector = DataCollector(
             model_reporters={
-                "total_agents": lambda m: m.schedule.get_agent_count(),
+                "total_agents": lambda m: len(m.agents),
                 "model_value": "model_val",
-                "model_calc": self.schedule.get_agent_count,
                 "model_calc_comp": [self.test_model_calc_comp, [3, 4]],
                 "model_calc_fail": [self.test_model_calc_comp, [12, 0]],
             },
@@ -95,7 +90,7 @@ class MockModel(Model):
             return None
 
     def step(self):  # noqa: D102
-        self.schedule.step()
+        self.agents.do("step")
         self.datacollector.collect(self)
 
 
@@ -135,11 +130,11 @@ class TestDataCollector(unittest.TestCase):
         self.model.datacollector.collect(self.model)
         for i in range(7):
             if i == 4:
-                self.model.schedule.remove(self.model.schedule._agents[3])
+                self.model.agents[3].remove()
             self.model.step()
 
         # Write to table:
-        for agent in self.model.schedule.agents:
+        for agent in self.model.agents:
             agent.write_final_values()
 
     def step_assertion(self, model_var):  # noqa: D102
@@ -154,18 +149,15 @@ class TestDataCollector(unittest.TestCase):
         data_collector = self.model.datacollector
         assert "total_agents" in data_collector.model_vars
         assert "model_value" in data_collector.model_vars
-        assert "model_calc" in data_collector.model_vars
         assert "model_calc_comp" in data_collector.model_vars
         assert "model_calc_fail" in data_collector.model_vars
         length = 8
         assert len(data_collector.model_vars["total_agents"]) == length
         assert len(data_collector.model_vars["model_value"]) == length
-        assert len(data_collector.model_vars["model_calc"]) == length
         assert len(data_collector.model_vars["model_calc_comp"]) == length
         self.step_assertion(data_collector.model_vars["total_agents"])
         for element in data_collector.model_vars["model_value"]:
             assert element == 100
-        self.step_assertion(data_collector.model_vars["model_calc"])
         for element in data_collector.model_vars["model_calc_comp"]:
             assert element == 75
         for element in data_collector.model_vars["model_calc_fail"]:
@@ -227,7 +219,7 @@ class TestDataCollector(unittest.TestCase):
         model_vars = data_collector.get_model_vars_dataframe()
         agent_vars = data_collector.get_agent_vars_dataframe()
         table_df = data_collector.get_table_dataframe("Final_Values")
-        assert model_vars.shape == (8, 5)
+        assert model_vars.shape == (8, 4)
         assert agent_vars.shape == (77, 4)
         assert table_df.shape == (9, 2)
 
