@@ -9,6 +9,7 @@ from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
 
+@pytest.mark.skip(reason="Helper class, not a test class")
 class TestAgent(Agent):
     """Agent class for testing."""
 
@@ -17,6 +18,7 @@ class TestAgent(Agent):
         return self.unique_id
 
 
+@pytest.mark.skip(reason="Helper class, not a test class")
 class TestAgentDo(Agent):
     """Agent class for testing."""
 
