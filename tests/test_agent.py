@@ -9,8 +9,7 @@ from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
 
-@pytest.mark.skip(reason="Helper class, not a test class")
-class TestAgent(Agent):
+class AgentTest(Agent):
     """Agent class for testing."""
 
     def get_unique_identifier(self):
@@ -18,8 +17,7 @@ class TestAgent(Agent):
         return self.unique_id
 
 
-@pytest.mark.skip(reason="Helper class, not a test class")
-class TestAgentDo(Agent):
+class AgentDoTest(Agent):
     """Agent class for testing."""
 
     def __init__(
@@ -39,7 +37,7 @@ class TestAgentDo(Agent):
         return self.unique_id
 
     def do_add(self):  # noqa: D102
-        agent = TestAgentDo(self.model)
+        agent = AgentDoTest(self.model)
         self.agent_set.add(agent)
 
     def do_remove(self):  # noqa: D102
@@ -49,7 +47,7 @@ class TestAgentDo(Agent):
 def test_agent_removal():
     """Test agent removal."""
     model = Model()
-    agent = TestAgent(model)
+    agent = AgentTest(model)
     # Check if the agent is added
     assert agent in model.agents
 
@@ -62,7 +60,7 @@ def test_agentset():
     """Test agentset class."""
     # create agentset
     model = Model()
-    agents = [TestAgent(model) for _ in range(10)]
+    agents = [AgentTest(model) for _ in range(10)]
 
     agentset = AgentSet(agents, model)
 
@@ -134,7 +132,7 @@ def test_agentset_initialization():
     empty_agentset = AgentSet([], model)
     assert len(empty_agentset) == 0
 
-    agents = [TestAgent(model) for _ in range(10)]
+    agents = [AgentTest(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
     assert len(agentset) == 10
 
@@ -142,7 +140,7 @@ def test_agentset_initialization():
 def test_agentset_serialization():
     """Test pickleability of agentset."""
     model = Model()
-    agents = [TestAgent(model) for _ in range(5)]
+    agents = [AgentTest(model) for _ in range(5)]
     agentset = AgentSet(agents, model)
 
     serialized = pickle.dumps(agentset)
@@ -157,17 +155,17 @@ def test_agentset_serialization():
 def test_agent_membership():
     """Test agent membership in AgentSet."""
     model = Model()
-    agents = [TestAgent(model) for _ in range(5)]
+    agents = [AgentTest(model) for _ in range(5)]
     agentset = AgentSet(agents, model)
 
     assert agents[0] in agentset
-    assert TestAgent(model) not in agentset
+    assert AgentTest(model) not in agentset
 
 
 def test_agent_add_remove_discard():
     """Test adding, removing and discarding agents from AgentSet."""
     model = Model()
-    agent = TestAgent(model)
+    agent = AgentTest(model)
     agentset = AgentSet([], model)
 
     agentset.add(agent)
@@ -187,7 +185,7 @@ def test_agent_add_remove_discard():
 def test_agentset_get_item():
     """Test integer based access to AgentSet."""
     model = Model()
-    agents = [TestAgent(model) for _ in range(10)]
+    agents = [AgentTest(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
 
     assert agentset[0] == agents[0]
@@ -201,7 +199,7 @@ def test_agentset_get_item():
 def test_agentset_do_str():
     """Test AgentSet.do with str."""
     model = Model()
-    agents = [TestAgent(model) for _ in range(10)]
+    agents = [AgentTest(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
 
     with pytest.raises(AttributeError):
@@ -214,7 +212,7 @@ def test_agentset_do_str():
     # setup
     n = 10
     model = Model()
-    agents = [TestAgentDo(model) for _ in range(n)]
+    agents = [AgentDoTest(model) for _ in range(n)]
     agentset = AgentSet(agents, model)
     for agent in agents:
         agent.agent_set = agentset
@@ -224,7 +222,7 @@ def test_agentset_do_str():
 
     # setup
     model = Model()
-    agents = [TestAgentDo(model) for _ in range(10)]
+    agents = [AgentDoTest(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
     for agent in agents:
         agent.agent_set = agentset
@@ -236,7 +234,7 @@ def test_agentset_do_str():
 def test_agentset_do_callable():
     """Test AgentSet.do with callable."""
     model = Model()
-    agents = [TestAgent(model) for _ in range(10)]
+    agents = [AgentTest(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
 
     # Test callable with non-existent function
@@ -250,7 +248,7 @@ def test_agentset_do_callable():
     # setup for lambda function tests
     n = 10
     model = Model()
-    agents = [TestAgentDo(model) for _ in range(n)]
+    agents = [AgentDoTest(model) for _ in range(n)]
     agentset = AgentSet(agents, model)
     for agent in agents:
         agent.agent_set = agentset
@@ -261,7 +259,7 @@ def test_agentset_do_callable():
 
     # setup again for lambda function tests
     model = Model()
-    agents = [TestAgentDo(model) for _ in range(10)]
+    agents = [AgentDoTest(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
     for agent in agents:
         agent.agent_set = agentset
@@ -279,7 +277,7 @@ def test_agentset_do_callable():
 
     # setup again for actual function tests
     model = Model()
-    agents = [TestAgentDo(model) for _ in range(n)]
+    agents = [AgentDoTest(model) for _ in range(n)]
     agentset = AgentSet(agents, model)
     for agent in agents:
         agent.agent_set = agentset
@@ -290,7 +288,7 @@ def test_agentset_do_callable():
 
     # setup again for actual function tests
     model = Model()
-    agents = [TestAgentDo(model) for _ in range(10)]
+    agents = [AgentDoTest(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
     for agent in agents:
         agent.agent_set = agentset
@@ -303,7 +301,7 @@ def test_agentset_do_callable():
 def test_agentset_get():
     """Test AgentSet.get."""
     model = Model()
-    [TestAgent(model) for _ in range(10)]
+    [AgentTest(model) for _ in range(10)]
 
     agentset = model.agents
 
@@ -349,7 +347,7 @@ def test_agentset_get():
 def test_agentset_agg():
     """Test agentset.agg."""
     model = Model()
-    agents = [TestAgent(model) for i in range(10)]
+    agents = [AgentTest(model) for i in range(10)]
 
     # Assign some values to attributes
     for i, agent in enumerate(agents):
@@ -411,7 +409,7 @@ def test_agentset_set_method():
 def test_agentset_map_str():
     """Test AgentSet.map with strings."""
     model = Model()
-    agents = [TestAgent(model) for _ in range(10)]
+    agents = [AgentTest(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
 
     with pytest.raises(AttributeError):
@@ -424,7 +422,7 @@ def test_agentset_map_str():
 def test_agentset_map_callable():
     """Test AgentSet.map with callable."""
     model = Model()
-    agents = [TestAgent(model) for _ in range(10)]
+    agents = [AgentTest(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
 
     # Test callable with non-existent function
@@ -478,7 +476,7 @@ def test_agentset_shuffle_do():
 def test_agentset_get_attribute():
     """Test AgentSet.get for attributes."""
     model = Model()
-    agents = [TestAgent(model) for _ in range(10)]
+    agents = [AgentTest(model) for _ in range(10)]
     agentset = AgentSet(agents, model)
 
     unique_ids = agentset.get("unique_id")
@@ -490,7 +488,7 @@ def test_agentset_get_attribute():
     model = Model()
     agents = []
     for i in range(10):
-        agent = TestAgent(model)
+        agent = AgentTest(model)
         agent.i = i**2
         agents.append(agent)
     agentset = AgentSet(agents, model)
@@ -518,7 +516,7 @@ def test_agentset_select_by_type():
     """Test AgentSet.select for agent type."""
     model = Model()
     # Create a mix of agents of two different types
-    test_agents = [TestAgent(model) for _ in range(4)]
+    test_agents = [AgentTest(model) for _ in range(4)]
     other_agents = [OtherAgentType(model) for _ in range(6)]
 
     # Combine the two types of agents
@@ -526,9 +524,9 @@ def test_agentset_select_by_type():
     agentset = AgentSet(mixed_agents, model)
 
     # Test selection by type
-    selected_test_agents = agentset.select(agent_type=TestAgent)
+    selected_test_agents = agentset.select(agent_type=AgentTest)
     assert len(selected_test_agents) == len(test_agents)
-    assert all(isinstance(agent, TestAgent) for agent in selected_test_agents)
+    assert all(isinstance(agent, AgentTest) for agent in selected_test_agents)
     assert len(selected_test_agents) == 4
 
     selected_other_agents = agentset.select(agent_type=OtherAgentType)
@@ -544,7 +542,7 @@ def test_agentset_select_by_type():
 def test_agentset_shuffle():
     """Test AgentSet.shuffle."""
     model = Model()
-    test_agents = [TestAgent(model) for _ in range(12)]
+    test_agents = [AgentTest(model) for _ in range(12)]
 
     agentset = AgentSet(test_agents, model=model)
     agentset = agentset.shuffle()
