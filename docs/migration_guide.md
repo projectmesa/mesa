@@ -292,3 +292,19 @@ def show_steps(model):
 
 SolaraViz(model, components=[show_steps])
 ```
+
+### Other changes
+#### Removal of Model.initialize_data_collector
+The `initialize_data_collector` in the Model class is removed. In the Model class, replace:
+
+Replace:
+```python
+self.initialize_data_collector(...)
+```
+
+With:
+```python
+self.datacollector = DataCollector(...)
+```
+
+- Ref: [PR #2327](https://github.com/projectmesa/mesa/pull/2327), Mesa-examples [PR #208](https://github.com/projectmesa/mesa-examples/pull/208))

@@ -80,7 +80,7 @@ class MockModel(Model):
         self.n = 10
         for i in range(self.n):
             self.schedule.add(MockAgent(i, self, val=i))
-        self.initialize_data_collector(
+        self.datacollector = DataCollector(
             model_reporters={
                 "total_agents": lambda m: m.schedule.get_agent_count(),
                 "model_value": "model_val",
@@ -143,6 +143,7 @@ class TestDataCollector(unittest.TestCase):
         Create the model and run it a set number of steps.
         """
         self.model = MockModel()
+        self.model.datacollector.collect(self.model)
         for i in range(7):
             if i == 4:
                 self.model.schedule.remove(self.model.schedule._agents[3])
@@ -251,28 +252,6 @@ class TestDataCollector(unittest.TestCase):
 
         with self.assertRaises(Exception):
             table_df = data_collector.get_table_dataframe("not a real table")
-
-
-class TestDataCollectorInitialization(unittest.TestCase):
-    def setUp(self):
-        self.model = Model()
-
-    def test_initialize_before_scheduler(self):
-        with self.assertRaises(RuntimeError) as cm:
-            self.model.initialize_data_collector()
-        self.assertEqual(
-            str(cm.exception),
-            "You must initialize the scheduler (self.schedule) before initializing the data collector.",
-        )
-
-    def test_initialize_before_agents_added_to_scheduler(self):
-        with self.assertRaises(RuntimeError) as cm:
-            self.model.schedule = BaseScheduler(self)
-            self.model.initialize_data_collector()
-        self.assertEqual(
-            str(cm.exception),
-            "You must add agents to the scheduler before initializing the data collector.",
-        )
 
 
 class TestDataCollectorWithAgentTypes(unittest.TestCase):
