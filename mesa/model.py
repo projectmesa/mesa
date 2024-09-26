@@ -210,14 +210,13 @@ class Model:
             tables: tables to collect
 
         """
-        if not hasattr(self, "schedule") or self.schedule is None:
-            raise RuntimeError(
-                "You must initialize the scheduler (self.schedule) before initializing the data collector."
-            )
-        if self.schedule.get_agent_count() == 0:
-            raise RuntimeError(
-                "You must add agents to the scheduler before initializing the data collector."
-            )
+        warnings.warn(
+            "initialize_data_collector() is deprecated. Please use the DataCollector class directly. "
+            "by using `self.datacollector = DataCollector(...)`.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         self.datacollector = DataCollector(
             model_reporters=model_reporters,
             agent_reporters=agent_reporters,

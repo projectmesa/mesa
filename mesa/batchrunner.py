@@ -38,6 +38,9 @@ def batch_run(
     Returns:
         List[Dict[str, Any]]
 
+    Notes:
+        batch_run assumes the model has a `datacollector` attribute that has a DataCollector object initialized.
+
     """
     runs_list = []
     run_id = 0
@@ -173,6 +176,10 @@ def _collect_data(
     step: int,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Collect model and agent data from a model using mesas datacollector."""
+    if not hasattr(model, "datacollector"):
+        raise AttributeError(
+            "The model does not have a datacollector attribute. Please add a DataCollector to your model."
+        )
     dc = model.datacollector
 
     model_data = {param: values[step] for param, values in dc.model_vars.items()}
