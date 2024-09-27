@@ -17,9 +17,7 @@ __all__ = ["Observable", "HasObservables", "All", "Computable"]
 _hashable_signal = namedtuple("_HashableSignal", "instance name")
 
 CURRENT_COMPUTED: Computed | None = None  # the current Computed that is evaluating
-PROCESSING_SIGNALS: set[tuple[str,]] = (
-    set()
-)
+PROCESSING_SIGNALS: set[tuple[str,]] = set()
 
 
 class BaseObservable(ABC):
@@ -107,7 +105,6 @@ class Observable(BaseObservable):
 
 class Computable(BaseObservable):
     """A Computable that is depended on one or more Observables.
-
 
     .. code-block:: python
 
