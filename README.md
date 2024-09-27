@@ -39,6 +39,17 @@ To install our latest pre-release (3.0.0 alpha), run:
 ``` bash
 pip install -U --pre mesa
 ```
+With Mesa 3.0, we don't install all our dependencies anymore by default.
+```bash
+# You can customize the additional dependencies you need, if you want. Available are:
+pip install -U --pre mesa[network,viz]
+
+# This is equivalent to our recommended dependencies:
+pip install -U --pre mesa[rec]
+
+# To install all, including developer, dependencies:
+pip install -U --pre mesa[all]
+```
 
 You can also use `pip` to install the latest GitHub version:
 
