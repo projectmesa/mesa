@@ -91,8 +91,8 @@ class Observable(BaseObservable):
 
     def __set__(self, instance: HasObservables, value):  # noqa D103
         if (
-                CURRENT_COMPUTED is not None
-                and _hashable_signal(instance, self.public_name) in PROCESSING_SIGNALS
+            CURRENT_COMPUTED is not None
+            and _hashable_signal(instance, self.public_name) in PROCESSING_SIGNALS
         ):
             raise ValueError(
                 f"cyclical dependency detected: Computed({CURRENT_COMPUTED.name}) tries to change "
@@ -178,7 +178,9 @@ class Computed:
         self._is_dirty = True
         # fixme propagate this to all dependents
 
-    def _add_parent(self, parent: HasObservables, name: str, current_value: Any) -> None:
+    def _add_parent(
+        self, parent: HasObservables, name: str, current_value: Any
+    ) -> None:
         """Add a parent Observable.
 
         Args:
@@ -271,9 +273,6 @@ class All:
 Signal = namedtuple("Signal", "owner observable old_value new_value signal_type")
 
 
-
-
-
 class HasObservables:
     """HasObservables class."""
 
@@ -289,10 +288,10 @@ class HasObservables:
         self.observables = dict(descriptor_generator(self))
 
     def observe(
-            self,
-            name: str | All,
-            signal_type: str | All,
-            handler: Callable,
+        self,
+        name: str | All,
+        signal_type: str | All,
+        handler: Callable,
     ):
         """Subscribe to the Observable <name> for signal_type.
 

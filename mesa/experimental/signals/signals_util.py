@@ -1,7 +1,10 @@
 """helper functions and classes for mesa signals."""
+
 import weakref
 
-__all__ = ["create_weakref",]
+__all__ = [
+    "create_weakref",
+]
 
 
 def create_weakref(item, callback=None):
@@ -11,4 +14,3 @@ def create_weakref(item, callback=None):
     else:
         ref = weakref.ref(item, callback)
     return ref
-
