@@ -528,8 +528,9 @@ def test_cell_collection():
     assert len(cells) == len(collection)
 
 
+### PropertyLayer tests
 def test_property_layer_integration():
-    """Test integration of PropertyLayer with DiscreteSpace and Cell."""
+    """Test integration of PropertyLayer with DiscrateSpace and Cell."""
     width, height = 10, 10
     grid = OrthogonalMooreGrid((width, height), torus=False)
 
@@ -544,8 +545,19 @@ def test_property_layer_integration():
     assert "elevation" in cell.property_layers
     assert cell.get_property("elevation") == 0
 
+    # Test setting property value for a cell
+    cell.set_property("elevation", 100)
+    assert cell.get_property("elevation") == 100
+
+    # Test modifying property value for a cell
+    cell.modify_property("elevation", lambda x: x + 50)
+    assert cell.get_property("elevation") == 150
+
+    cell.modify_property("elevation", np.add, 50)
+    assert cell.get_property("elevation") == 200
+
     # Test modifying PropertyLayer values
-    grid.set_property("elevation", 100, condition=lambda value: value == 0)
+    grid.set_property("elevation", 100, condition=lambda value: value == 200)
     assert cell.get_property("elevation") == 100
 
     # Test modifying PropertyLayer using numpy operations
@@ -556,28 +568,47 @@ def test_property_layer_integration():
     grid.remove_property_layer("elevation")
     assert "elevation" not in grid.property_layers
     assert "elevation" not in cell.property_layers
-    assert len(grid.property_layers) == 0
 
 
-def test_discrete_space_with_property_layer():
-    """Test DiscreteSpace with PropertyLayer."""
-    width, height = 3, 3
-    grid = OrthogonalMooreGrid((width, height), torus=False, capacity=None)
+def test_multiple_property_layers():
+    """Test initialization of DiscrateSpace with PropertyLayers."""
+    width, height = 5, 5
+    elevation = PropertyLayer("elevation", width, height, default_value=0)
+    temperature = PropertyLayer("temperature", width, height, default_value=20)
 
-    # Add a property layer
-    prop_layer = PropertyLayer("temperature", width, height, default_value=20)
-    grid.add_property_layer(prop_layer)
+    # Test initialization with a single PropertyLayer
+    grid1 = OrthogonalMooreGrid((width, height), torus=False)
+    grid1.add_property_layer(elevation)
+    assert "elevation" in grid1.property_layers
+    assert len(grid1.property_layers) == 1
 
-    assert "temperature" in grid.property_layers
+    # Test initialization with multiple PropertyLayers
+    grid2 = OrthogonalMooreGrid((width, height), torus=False)
+    grid2.add_property_layer(temperature, add_to_cells=False)
+    grid2.add_property_layer(elevation, add_to_cells=True)
 
-    # Set property values
-    grid.set_property("temperature", 25)
-
-    for cell in grid.all_cells:
-        assert cell.get_property("temperature") == 25
+    assert "temperature" in grid2.property_layers
+    assert "elevation" in grid2.property_layers
+    assert len(grid2.property_layers) == 2
 
     # Modify properties
-    grid.modify_properties("temperature", lambda x: x + 5)
+    grid2.modify_properties("elevation", lambda x: x + 10)
+    grid2.modify_properties("temperature", lambda x: x + 5)
 
-    for cell in grid.all_cells:
-        assert cell.get_property("temperature") == 30
+    for cell in grid2.all_cells:
+        assert cell.get_property("elevation") == 10
+        # Assert error temperature, since it was not added to cells
+        with pytest.raises(KeyError):
+            cell.get_property("temperature")
+
+
+def test_property_layer_errors():
+    """Test error handling for PropertyLayers."""
+    width, height = 5, 5
+    grid = OrthogonalMooreGrid((width, height), torus=False)
+    elevation = PropertyLayer("elevation", width, height, default_value=0)
+
+    # Test adding a PropertyLayer with an existing name
+    grid.add_property_layer(elevation)
+    with pytest.raises(ValueError, match="Property layer elevation already exists."):
+        grid.add_property_layer(elevation)
