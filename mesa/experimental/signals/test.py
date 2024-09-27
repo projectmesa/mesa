@@ -108,6 +108,6 @@ if __name__ == "__main__":
         model = BoltzmannWealth()
         model.run_model(1000)
         end = time.perf_counter()
-        data.append((end - start))
+        data.append(end - start)
 
     print(f"mean runtime: {mean(data)}")

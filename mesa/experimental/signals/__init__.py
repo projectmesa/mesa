@@ -10,5 +10,5 @@ __all__ = [
     "All",
     "Computable",
     "Computed",
-    "Signal"
+    "Signal",
 ]
