@@ -24,8 +24,9 @@ class BaseObservable(ABC):
     """Abstract base class for all Observables."""
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self, fallback_value=None):
         """Initialize a BaseObservable."""
+        super().__init__()
         self.public_name: str
         self.private_name: str
 
@@ -34,8 +35,8 @@ class BaseObservable(ABC):
         #  its even more complicated. Ideally you can define
         #  signal_types throughout the class hierarchy and they are just
         #  combined together.
-        self.signal_types: set
-        self.fallback_value = None  # fixme, should this be user specifiable?
+        self.signal_types: set = set()
+        self.fallback_value = fallback_value
 
     def __get__(self, instance: HasObservables, owner):
         value = getattr(instance, self.private_name)
@@ -44,6 +45,9 @@ class BaseObservable(ABC):
             # there is a computed dependent on this Observable, so let's add
             # this Observable as a parent
             CURRENT_COMPUTED._add_parent(instance, self.public_name, value)
+
+            # fixme, this can be done more cleanly
+            #  problem here is that we cannot use self (i.e., the observable), we need to add the instance as well
             PROCESSING_SIGNALS.add(_hashable_signal(instance, self.public_name))
 
         return value
@@ -51,7 +55,7 @@ class BaseObservable(ABC):
     def __set_name__(self, owner: HasObservables, name: str):
         self.public_name = name
         self.private_name = f"_{name}"
-        owner.register_observable(self)
+        # owner.register_observable(self)
 
     @abstractmethod
     def __set__(self, instance: HasObservables, value):
@@ -77,19 +81,18 @@ class Observable(BaseObservable):
 
     def __init__(self, fallback_value=None):
         """Initialize an Observable."""
-        super().__init__()
+        super().__init__(fallback_value=fallback_value)
 
         # fixme can we make this an innerclass enum?
         #  or some SignalTypes helper class?
         self.signal_types: set = {
             "on_change",
         }
-        self.fallback_value = fallback_value
 
     def __set__(self, instance: HasObservables, value):  # noqa D103
         if (
-            CURRENT_COMPUTED is not None
-            and _hashable_signal(instance, self.public_name) in PROCESSING_SIGNALS
+                CURRENT_COMPUTED is not None
+                and _hashable_signal(instance, self.public_name) in PROCESSING_SIGNALS
         ):
             raise ValueError(
                 f"cyclical dependency detected: Computed({CURRENT_COMPUTED.name}) tries to change "
@@ -125,7 +128,7 @@ class Computable(BaseObservable):
 
         self.signal_types: set = {"on_change"}
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance, owner):  # noqa: D105
         computed = getattr(instance, self.private_name)
         old_value = computed._value
 
@@ -145,11 +148,6 @@ class Computable(BaseObservable):
             return new_value
         else:
             return old_value
-
-    def __set_name__(self, owner: HasObservables, name: str):
-        self.public_name = name
-        self.private_name = f"_{name}"
-        owner.register_observable(self)
 
     def __set__(self, instance: HasObservables, value):  # noqa D103
         # no on change event?
@@ -180,7 +178,7 @@ class Computed:
         self._is_dirty = True
         # fixme propagate this to all dependents
 
-    def _add_parent(self, parent: HasObservables, name: str, current_value: Any):
+    def _add_parent(self, parent: HasObservables, name: str, current_value: Any) -> None:
         """Add a parent Observable.
 
         Args:
@@ -273,40 +271,28 @@ class All:
 Signal = namedtuple("Signal", "owner observable old_value new_value signal_type")
 
 
+
+
+
 class HasObservables:
     """HasObservables class."""
-
-    observables: dict[str, BaseObservable] = {}
 
     # we can't use a weakset here because it does not handle bound methods correctly
     # also, a list is faster for our use case
     subscribers: dict[str, dict[str, list]]
+    observables: dict[str, BaseObservable]
 
-    def __new__(cls, *args, **kwargs):  # noqa D102
-        # fixme dirty hack because super does not work on agents
-        obj = super().__new__(cls)
-
-        # subscribers is a nested defaultdict
-        # obj.subscribers[observable_name][signal_type] = list of weakref handlers
-        obj.subscribers = defaultdict(functools.partial(defaultdict, list))
-
-        return obj
-
-    @classmethod
-    def register_observable(cls, observable: BaseObservable):
-        """Register an Observable.
-
-        Args:
-            observable: the Observable to register
-
-        """
-        cls.observables[observable.public_name] = observable
+    def __init__(self, *args, **kwargs) -> None:
+        """Initialize a HasObservables."""
+        super().__init__(*args, **kwargs)
+        self.subscribers = defaultdict(functools.partial(defaultdict, list))
+        self.observables = dict(descriptor_generator(self))
 
     def observe(
-        self,
-        name: str | All,
-        signal_type: str | All,
-        handler: Callable,
+            self,
+            name: str | All,
+            signal_type: str | All,
+            handler: Callable,
     ):
         """Subscribe to the Observable <name> for signal_type.
 
@@ -443,3 +429,15 @@ class HasObservables:
                 active_observers.append(observer)
         # use iteration to also remove inactive observers
         self.subscribers[observable][signal_type] = active_observers
+
+
+def descriptor_generator(obj) -> [str, BaseObservable]:
+    """Yield defined Observables on obj."""
+    # we need to traverse the entire class hierarchy to properly get
+    # also observables defined in super classes
+    for base in type(obj).__mro__:
+        base_dict = vars(base)
+
+        for entry in base_dict.values():
+            if isinstance(entry, BaseObservable):
+                yield entry.public_name, entry

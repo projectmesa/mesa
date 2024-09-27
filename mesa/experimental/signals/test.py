@@ -33,7 +33,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
     gini = Computable()
 
     def __init__(self, seed=None, n=100, width=10, height=10):  # noqa D103
-        super().__init__(seed)
+        super().__init__(seed=seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.datacollector = mesa.DataCollector(
@@ -41,11 +41,10 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         )
         # Create agents
         for _ in range(self.num_agents):
-            a = MoneyAgent(self)
             # Add the agent to a random grid cell
             x = self.random.randrange(self.grid.width)
             y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(a, (x, y))
+            self.grid.place_agent(MoneyAgent(self), (x, y))
 
         # testing a chain of observable --> computable --> computable
         # we cannot pass model.agent_wealth as an argument
@@ -103,7 +102,7 @@ if __name__ == "__main__":
     from statistics import mean
 
     data = []
-    for i in range(10):
+    for _ in range(10):
         start = time.perf_counter()
         model = BoltzmannWealth()
         model.run_model(1000)
