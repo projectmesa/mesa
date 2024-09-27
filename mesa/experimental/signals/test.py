@@ -100,10 +100,14 @@ class MoneyAgent(mesa.Agent, HasObservables):
 
 if __name__ == "__main__":
     import time
+    from statistics import mean
 
-    start = time.perf_counter()
-    model = BoltzmannWealth()
-    model.run_model(1000)
-    end = time.perf_counter()
+    data = []
+    for i in range(10):
+        start = time.perf_counter()
+        model = BoltzmannWealth()
+        model.run_model(1000)
+        end = time.perf_counter()
+        data.append((end - start))
 
-    print(f"runtimne {end - start}")
+    print(f"mean runtime: {mean(data)}")
