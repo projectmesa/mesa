@@ -23,7 +23,7 @@ class DiscreteSpace(Generic[T]):
         random (Random): The random number generator
         cell_klass (Type) : the type of cell class
         empties (CellCollection) : collecction of all cells that are empty
-        property_layers (dict[str, PropertyLayer]): the property layers of the grid
+        property_layers (dict[str, PropertyLayer]): the property layers of the discrete space
     """
 
     def __init__(
@@ -31,7 +31,6 @@ class DiscreteSpace(Generic[T]):
         capacity: int | None = None,
         cell_klass: type[T] = Cell,
         random: Random | None = None,
-        property_layers: None | PropertyLayer | list[PropertyLayer] = None,
     ):
         """Instantiate a DiscreteSpace.
 
@@ -39,7 +38,6 @@ class DiscreteSpace(Generic[T]):
             capacity: capacity of cells
             cell_klass: base class for all cells
             random: random number generator
-            property_layers: property layers to add to the grid
         """
         super().__init__()
         self.capacity = capacity
@@ -52,11 +50,6 @@ class DiscreteSpace(Generic[T]):
         self._empties: dict[tuple[int, ...], None] = {}
         self._empties_initialized = False
         self.property_layers: dict[str, PropertyLayer] = {}
-        if property_layers:
-            if isinstance(property_layers, PropertyLayer):
-                property_layers = [property_layers]
-            for layer in property_layers:
-                self.add_property_layer(layer)
 
     @property
     def cutoff_empties(self):  # noqa
