@@ -10,7 +10,7 @@ from collections import defaultdict, namedtuple
 from collections.abc import Callable
 from typing import Any
 
-from .signals_util import create_weakref
+from mesa.experimental.signals.signals_util import create_weakref
 
 __all__ = ["Observable", "HasObservables", "All", "Computable"]
 
@@ -127,8 +127,12 @@ class Computable(BaseObservable):
 
     def __get__(self, instance, owner):
         computed = getattr(instance, self.private_name)
-
         old_value = computed._value
+
+        # fixme, we are not detecting if one computable is dependent on another
+        if CURRENT_COMPUTED is not None:
+            CURRENT_COMPUTED._add_parent(instance, self.public_name, old_value)
+
         new_value = computed()
 
         if new_value != old_value:
@@ -151,6 +155,7 @@ class Computable(BaseObservable):
         # no on change event?
         setattr(instance, self.private_name, value)
         value.name = self.public_name
+        value.owner = instance
 
 
 class Computed:
@@ -162,6 +167,7 @@ class Computed:
         self._first = True
         self._value = None
         self.name: str = ""  # set by Computable
+        self.owner: HasObservables # set by Computable
 
         self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str, Any]] = (
             weakref.WeakKeyDictionary()
