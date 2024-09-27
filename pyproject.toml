@@ -36,28 +36,38 @@ classifiers = [
 ]
 readme = "README.md"
 dependencies = [
-  "click",
-  "cookiecutter",
-  "matplotlib",
-  "networkx",
   "numpy",
   "pandas",
-  "solara",
   "tqdm",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
+# User collections
+rec = ["mesa[network,viz]"]
+all = ["mesa[network,viz,dev,examples,docs]"]
+# Core dependencies
+network = [
+  "networkx",
+]
+viz = [
+  "matplotlib",
+  "solara",
+]
+# Dev and CI stuff
 dev = [
-  "ruff~=0.1.1",   # Update periodically
-  "pytest >= 4.6",
+  "mesa[rec]",
+  "ruff",
+  "pytest",
   "pytest-cov",
   "sphinx",
   "pytest-mock",
+  "cookiecutter",
 ]
 examples = [
-  "pytest >= 4.6",
-  "scipy"
+  "mesa[rec]",
+  "pytest",
+  "scipy",
 ]
 docs = [
   "sphinx",
@@ -65,7 +75,7 @@ docs = [
   "pydata_sphinx_theme",
   "seaborn",
   "myst-nb",
-  "myst-parser",         # Markdown in Sphinx
+  "myst-parser",  # Markdown in Sphinx
 ]
 
 [project.urls]
