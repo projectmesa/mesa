@@ -167,7 +167,7 @@ class Computed:
         self._first = True
         self._value = None
         self.name: str = ""  # set by Computable
-        self.owner: HasObservables # set by Computable
+        self.owner: HasObservables  # set by Computable
 
         self.parents: weakref.WeakKeyDictionary[HasObservables, dict[str, Any]] = (
             weakref.WeakKeyDictionary()
