@@ -99,5 +99,11 @@ class MoneyAgent(mesa.Agent, HasObservables):
 
 
 if __name__ == "__main__":
+    import time
+
+    start = time.perf_counter()
     model = BoltzmannWealth()
-    model.run_model(10)
+    model.run_model(1000)
+    end = time.perf_counter()
+
+    print(f"runtimne {end - start}")
