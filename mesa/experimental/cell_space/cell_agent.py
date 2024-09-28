@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 class CellDescriptor:
     """Descriptor for cell movement behavior."""
+
     def __get__(self, instance, owner):  # noqa D105
         return getattr(instance, self.private_name, None)
 
@@ -22,6 +23,7 @@ class CellDescriptor:
 
         if value is not None:
             value.add_agent(self)
+
     def __set_name__(self, owner, name):  # noqa D105
         self.public_name = name
         self.private_name = "_" + name
@@ -36,4 +38,5 @@ class CellAgent(Agent):
         pos: (Position | None): The position of the agent in the space
         cell: (Cell | None): the cell which the agent occupies
     """
+
     cell: Cell = CellDescriptor()
