@@ -4,27 +4,27 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from mesa import Agent, Model
+from mesa import Agent
 
 if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell import Cell
 
 
 class CellDescriptor:
-
-    def __get__(self, instance, owner):
+    """Descriptor for cell movement behavior."""
+    def __get__(self, instance, owner):  # noqa D105
         return getattr(instance, self.private_name, None)
 
-    def __set__(self, instance, value):
+    def __set__(self, instance, value):  # noqa D105
         if instance.cell is not None:
             instance.cell.remove_agent(self)
         setattr(instance, self.private_name, value)
 
         if value is not None:
             value.add_agent(self)
-    def __set_name__(self, owner, name):
+    def __set_name__(self, owner, name):  # noqa D105
         self.public_name = name
-        self.private_name = '_' + name
+        self.private_name = "_" + name
 
 
 class CellAgent(Agent):
