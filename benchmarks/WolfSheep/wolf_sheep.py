@@ -17,6 +17,7 @@ from mesa.experimental.devs import ABMSimulator
 class Animal(CellAgent):
     """The base animal class."""
 
+
     def __init__(self, model, energy, p_reproduce, energy_from_food):
         """Initializes an animal.
 
@@ -33,7 +34,7 @@ class Animal(CellAgent):
 
     def random_move(self):
         """Move to a random neighboring cell."""
-        self.move_to(self.cell.neighborhood.select_random_cell())
+        self.cell = self.cell.neighborhood.select_random_cell()
 
     def spawn_offspring(self):
         """Create offspring."""
@@ -44,7 +45,7 @@ class Animal(CellAgent):
             self.p_reproduce,
             self.energy_from_food,
         )
-        offspring.move_to(self.cell)
+        offspring.cell = self.cell
 
     def feed(self): ...  # noqa: D102
 
@@ -197,7 +198,7 @@ class WolfSheep(Model):
                 sheep_reproduce,
                 sheep_gain_from_food,
             )
-            sheep.move_to(self.grid[pos])
+            sheep.cell = self.grid[pos]
 
         # Create wolves
         for _ in range(self.initial_wolves):
@@ -212,7 +213,7 @@ class WolfSheep(Model):
                 wolf_reproduce,
                 wolf_gain_from_food,
             )
-            wolf.move_to(self.grid[pos])
+            wolf.cell = self.grid[pos]
 
         # Create grass patches
         possibly_fully_grown = [True, False]
@@ -223,7 +224,7 @@ class WolfSheep(Model):
             else:
                 countdown = self.random.randrange(grass_regrowth_time)
             patch = GrassPatch(self, fully_grown, countdown, grass_regrowth_time)
-            patch.move_to(cell)
+            patch.cell = cell
 
     def step(self):
         """Run one step of the model."""

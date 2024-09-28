@@ -31,7 +31,7 @@ class SchellingAgent(CellAgent):
 
         # If unhappy, move:
         if similar < self.homophily:
-            self.move_to(self.model.grid.select_random_empty_cell())
+            self.cell = self.model.grid.select_random_empty_cell()
         else:
             self.model.happy += 1
 
@@ -81,7 +81,7 @@ class Schelling(Model):
             if self.random.random() < density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
                 agent = SchellingAgent(self, agent_type, radius, homophily)
-                agent.move_to(cell)
+                agent.cell = cell
 
     def step(self):
         """Run one step of the model."""
