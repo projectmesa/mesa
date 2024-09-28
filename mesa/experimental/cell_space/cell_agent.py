@@ -10,6 +10,23 @@ if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell import Cell
 
 
+class CellDescriptor:
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.private_name, None)
+
+    def __set__(self, instance, value):
+        if instance.cell is not None:
+            instance.cell.remove_agent(self)
+        setattr(instance, self.private_name, value)
+
+        if value is not None:
+            value.add_agent(self)
+    def __set_name__(self, owner, name):
+        self.public_name = name
+        self.private_name = '_' + name
+
+
 class CellAgent(Agent):
     """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces.
 
@@ -19,24 +36,4 @@ class CellAgent(Agent):
         pos: (Position | None): The position of the agent in the space
         cell: (Cell | None): the cell which the agent occupies
     """
-
-    def __init__(self, model: Model) -> None:
-        """Create a new agent.
-
-        Args:
-            model (Model): The model instance in which the agent exists.
-        """
-        super().__init__(model)
-        self.cell: Cell | None = None
-
-    def move_to(self, cell) -> None:
-        """Move agent to cell.
-
-        Args:
-            cell: cell to which agent is to move
-
-        """
-        if self.cell is not None:
-            self.cell.remove_agent(self)
-        self.cell = cell
-        cell.add_agent(self)
+    cell: Cell = CellDescriptor()
