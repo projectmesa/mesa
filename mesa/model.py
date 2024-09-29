@@ -48,8 +48,8 @@ class Model:
             seed: the seed for the random number generator
             kwargs: keyword arguments to pass onto super
         """
+        super().__init__(*args, **kwargs)
         self.running = True
-        self.schedule = None
         self.steps: int = 0
 
         self._setup_agent_registration()
