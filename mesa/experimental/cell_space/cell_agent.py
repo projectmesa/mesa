@@ -18,10 +18,7 @@ class CellDescriptor:
 
     def __set__(self, instance, value):  # noqa D105
         if instance.cell is not None:
-            try:
-                instance.cell.remove_agent(instance)
-            except ValueError:
-                pass
+            instance.cell.remove_agent(instance)
         setattr(instance, self.private_name, value)
 
         if value is not None:
