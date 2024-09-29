@@ -40,7 +40,7 @@ class BoltzmannWealth(mesa.Model):
             width: the width of the grid
             height: the height of the grid
         """
-        super().__init__(seed)
+        super().__init__(seed=seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.datacollector = mesa.DataCollector(
