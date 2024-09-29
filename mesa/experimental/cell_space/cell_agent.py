@@ -39,4 +39,10 @@ class CellAgent(Agent):
         cell: (Cell | None): the cell which the agent occupies
     """
 
-    cell: Cell = CellDescriptor()
+    cell: Cell | None = CellDescriptor()
+
+
+    def remove(self):
+        """Remove the agent from the model."""
+        super().remove()
+        self.cell = None  # ensures that we are also removed from cell
