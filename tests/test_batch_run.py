@@ -5,7 +5,6 @@ from mesa.agent import Agent
 from mesa.batchrunner import _make_model_kwargs
 from mesa.datacollection import DataCollector
 from mesa.model import Model
-from mesa.time import BaseScheduler
 
 
 def test_make_model_kwargs():  # noqa: D103
@@ -52,7 +51,6 @@ class MockModel(Model):
         variable_model_param=None,
         variable_agent_param=None,
         fixed_model_param=None,
-        schedule=None,
         enable_agent_reporters=True,
         n_agents=3,
         **kwargs,
@@ -63,13 +61,11 @@ class MockModel(Model):
             variable_model_param: variable model parameters
             variable_agent_param: variable agent parameters
             fixed_model_param: fixed model parameters
-            schedule: schedule instance
             enable_agent_reporters: whether to enable agent reporters
             n_agents: number of agents
             kwargs: keyword arguments
         """
         super().__init__()
-        self.schedule = BaseScheduler(self) if schedule is None else schedule
         self.variable_model_param = variable_model_param
         self.variable_agent_param = variable_agent_param
         self.fixed_model_param = fixed_model_param
@@ -92,13 +88,13 @@ class MockModel(Model):
         else:
             agent_val = self.variable_agent_param
         for _ in range(self.n_agents):
-            self.schedule.add(MockAgent(self, agent_val))
+            MockAgent(self, agent_val)
 
     def get_local_model_param(self):  # noqa: D102
         return 42
 
     def step(self):  # noqa: D102
-        self.schedule.step()
+        self.agents.do("step")
         self.datacollector.collect(self)
 
 
