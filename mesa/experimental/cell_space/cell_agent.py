@@ -41,7 +41,6 @@ class CellAgent(Agent):
 
     cell: Cell | None = CellDescriptor()
 
-
     def remove(self):
         """Remove the agent from the model."""
         super().remove()

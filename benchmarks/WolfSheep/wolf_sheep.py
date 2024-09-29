@@ -187,13 +187,7 @@ class WolfSheep(Model):
                 self.random.randrange(self.height),
             )
             energy = self.random.randrange(2 * sheep_gain_from_food)
-            Sheep(
-                self,
-                energy,
-                sheep_reproduce,
-                sheep_gain_from_food,
-                self.grid[pos]
-            )
+            Sheep(self, energy, sheep_reproduce, sheep_gain_from_food, self.grid[pos])
 
         # Create wolves
         for _ in range(self.initial_wolves):
@@ -202,13 +196,7 @@ class WolfSheep(Model):
                 self.random.randrange(self.height),
             )
             energy = self.random.randrange(2 * wolf_gain_from_food)
-            Wolf(
-                self,
-                energy,
-                wolf_reproduce,
-                wolf_gain_from_food,
-                self.grid[pos]
-            )
+            Wolf(self, energy, wolf_reproduce, wolf_gain_from_food, self.grid[pos])
 
         # Create grass patches
         possibly_fully_grown = [True, False]

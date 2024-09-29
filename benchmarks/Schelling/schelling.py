@@ -1,14 +1,22 @@
 """Schelling separation for performance benchmarking."""
+
 from __future__ import annotations
 
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid, Cell
+from mesa.experimental.cell_space import Cell, CellAgent, OrthogonalMooreGrid
 
 
 class SchellingAgent(CellAgent):
     """Schelling segregation agent."""
 
-    def __init__(self, model: Schelling, agent_type: int, radius: int, homophily: float, cell: Cell):
+    def __init__(
+        self,
+        model: Schelling,
+        agent_type: int,
+        radius: int,
+        homophily: float,
+        cell: Cell,
+    ):
         """Create a new Schelling agent.
 
         Args:
