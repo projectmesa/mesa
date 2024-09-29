@@ -52,7 +52,7 @@ class Schelling(Model):
 
     def __init__(
         self,
-        simulator,
+        simulator=None,
         height=40,
         width=40,
         homophily=3,
