@@ -10,6 +10,10 @@ from mesa.experimental.signals import (
     Observable,
 )
 
+import solara.lab as lab
+
+lab.computed()
+
 
 def compute_gini(model):  # noqa D103
     agent_wealth = model.agent_wealth.get()
@@ -59,6 +63,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
     gini = Computable()
 
     def __init__(self, seed=None, n=100, width=10, height=10):  # noqa D103
+        """
         Args:
             seed: the seed for random number generator
             n: the number of agents
