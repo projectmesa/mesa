@@ -1,7 +1,5 @@
-"""
-Flockers
-=============================================================
-A Mesa implementation of Craig Reynolds's Boids flocker model.
+"""A Mesa implementation of Craig Reynolds's Boids flocker model.
+
 Uses numpy arrays to represent vectors.
 """
 
@@ -11,8 +9,7 @@ import mesa
 
 
 class Boid(mesa.Agent):
-    """
-    A Boid-style flocker agent.
+    """A Boid-style flocker agent.
 
     The agent follows three behaviors to flock:
         - Cohesion: steering towards neighboring agents.
@@ -36,10 +33,10 @@ class Boid(mesa.Agent):
         separate=0.015,
         match=0.05,
     ):
-        """
-        Create a new Boid flocker agent.
+        """Create a new Boid flocker agent.
 
         Args:
+            model: a Model instance
             speed: Distance to move per step.
             direction: numpy vector for the Boid's direction of movement.
             vision: Radius to look around for nearby Boids.
@@ -59,10 +56,7 @@ class Boid(mesa.Agent):
         self.match_factor = match
 
     def step(self):
-        """
-        Get the Boid's neighbors, compute the new vector, and move accordingly.
-        """
-
+        """Get the Boid's neighbors, compute the new vector, and move accordingly."""
         neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
         n = 0
         match_vector, separation_vector, cohere = np.zeros((3, 2))
@@ -84,9 +78,7 @@ class Boid(mesa.Agent):
 
 
 class BoidFlockers(mesa.Model):
-    """
-    Flocker model class. Handles agent creation, placement and scheduling.
-    """
+    """Flocker model class. Handles agent creation, placement and scheduling."""
 
     def __init__(
         self,
@@ -102,18 +94,21 @@ class BoidFlockers(mesa.Model):
         match=0.05,
         simulator=None,
     ):
-        """
-        Create a new Flockers model.
+        """Create a new Flockers model.
 
         Args:
+            seed: seed for random number generator
             population: Number of Boids
-            width, height: Size of the space.
+            width: the width of the space
+            height: the height of the space
             speed: How fast should the Boids move.
             vision: How far around should each Boid look for its neighbors
-            separation: What's the minimum distance each Boid will attempt to
-                    keep from any other
-            cohere, separate, match: factors for the relative importance of
+            separation: What's the minimum distance each Boid will attempt to keep from any other
+            cohere: the relative importance of matching neighbors' positions'
+            separate: the relative importance of avoiding close neighbors
+            match: factors for the relative importance of
                     the three drives.
+            simulator: a Simulator Instance
         """
         super().__init__(seed=seed)
         self.population = population
@@ -121,7 +116,6 @@ class BoidFlockers(mesa.Model):
         self.height = height
         self.simulator = simulator
 
-        self.schedule = mesa.time.RandomActivation(self)
         self.space = mesa.space.ContinuousSpace(self.width, self.height, True)
         self.factors = {
             "cohere": cohere,
@@ -143,10 +137,10 @@ class BoidFlockers(mesa.Model):
                 **self.factors,
             )
             self.space.place_agent(boid, pos)
-            self.schedule.add(boid)
 
     def step(self):
-        self.schedule.step()
+        """Run the model for one step."""
+        self.agents.shuffle_do("step")
 
 
 if __name__ == "__main__":

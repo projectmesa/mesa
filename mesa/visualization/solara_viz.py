@@ -1,5 +1,4 @@
-"""
-Mesa visualization module for creating interactive model visualizations.
+"""Mesa visualization module for creating interactive model visualizations.
 
 This module provides components to create browser- and Jupyter notebook-based visualizations of
 Mesa models, allowing users to watch models run step-by-step and interact with model parameters.
@@ -8,7 +7,6 @@ Key features:
     - SolaraViz: Main component for creating visualizations, supporting grid displays and plots
     - ModelController: Handles model execution controls (step, play, pause, reset)
     - UserInputs: Generates UI elements for adjusting model parameters
-    - Card: Renders individual visualization elements (space, measures)
 
 The module uses Solara for rendering in Jupyter notebooks or as standalone web applications.
 It supports various types of visualizations including matplotlib plots, agent grids, and
@@ -23,10 +21,14 @@ Usage:
 See the Visualization Tutorial and example models for more details.
 """
 
+from __future__ import annotations
+
+import asyncio
 import copy
-import time
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
+import reacton.core
 import solara
 from solara.alias import rv
 
@@ -44,8 +46,7 @@ if TYPE_CHECKING:
 def Card(
     model, measures, agent_portrayal, space_drawer, dependencies, color, layout_type
 ):
-    """
-    Create a card component for visualizing model space or measures.
+    """Create a card component for visualizing model space or measures.
 
     Args:
         model: The Mesa model instance
@@ -91,21 +92,57 @@ def Card(
 
 @solara.component
 def SolaraViz(
-    model: "Model" | solara.Reactive["Model"],
-    components: list[solara.component] | Literal["default"] = "default",
-    *args,
-    play_interval=100,
+    model: Model | solara.Reactive[Model],
+    components: list[reacton.core.Component]
+    | list[Callable[[Model], reacton.core.Component]]
+    | Literal["default"] = "default",
+    play_interval: int = 100,
     model_params=None,
-    seed=0,
+    seed: float = 0,
     name: str | None = None,
 ):
-    update_counter.get()
+    """Solara visualization component.
+
+    This component provides a visualization interface for a given model using Solara.
+    It supports various visualization components and allows for interactive model
+    stepping and parameter adjustments.
+
+    Args:
+        model (Model | solara.Reactive[Model]): A Model instance or a reactive Model.
+            This is the main model to be visualized. If a non-reactive model is provided,
+            it will be converted to a reactive model.
+        components (list[solara.component] | Literal["default"], optional): List of solara
+            components or functions that return a solara component.
+            These components are used to render different parts of the model visualization.
+            Defaults to "default", which uses the default Altair space visualization.
+        play_interval (int, optional): Interval for playing the model steps in milliseconds.
+            This controls the speed of the model's automatic stepping. Defaults to 100 ms.
+        model_params (dict, optional): Parameters for (re-)instantiating a model.
+            Can include user-adjustable parameters and fixed parameters. Defaults to None.
+        seed (int, optional): Seed for the random number generator. This ensures reproducibility
+            of the model's behavior. Defaults to 0.
+        name (str | None, optional): Name of the visualization. Defaults to the models class name.
+
+    Returns:
+        solara.component: A Solara component that renders the visualization interface for the model.
+
+    Example:
+        >>> model = MyModel()
+        >>> page = SolaraViz(model)
+        >>> page
+
+    Notes:
+        - The `model` argument can be either a direct model instance or a reactive model. If a direct
+          model instance is provided, it will be converted to a reactive model using `solara.use_reactive`.
+        - The `play_interval` argument controls the speed of the model's automatic stepping. A lower
+          value results in faster stepping, while a higher value results in slower stepping.
+    """
     if components == "default":
         components = [components_altair.make_space_altair()]
 
     # Convert model to reactive
     if not isinstance(model, solara.Reactive):
-        model = solara.use_reactive(model)
+        model = solara.use_reactive(model)  # noqa: SH102, RUF100
 
     def connect_to_model():
         # Patch the step function to force updates
@@ -125,40 +162,68 @@ def SolaraViz(
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
 
-    with solara.Sidebar():
-        with solara.Card("Controls", margin=1, elevation=2):
-            if model_params is not None:
+    with solara.Sidebar(), solara.Column():
+        with solara.Card("Controls"):
+            ModelController(model, play_interval)
+
+        if model_params is not None:
+            with solara.Card("Model Parameters"):
                 ModelCreator(
                     model,
                     model_params,
                     seed=seed,
                 )
-            ModelController(model, play_interval)
-        with solara.Card("Information", margin=1, elevation=2):
+        with solara.Card("Information"):
             ShowSteps(model.value)
 
-    solara.Column(
-        [
-            *(component(model.value) for component in components),
-        ]
-    )
+    ComponentsView(components, model.value)
+
+
+def _wrap_component(
+    component: reacton.core.Component | Callable[[Model], reacton.core.Component],
+) -> reacton.core.Component:
+    """Wrap a component in an auto-updated Solara component if needed."""
+    if isinstance(component, reacton.core.Component):
+        return component
+
+    @solara.component
+    def WrappedComponent(model):
+        update_counter.get()
+        return component(model)
+
+    return WrappedComponent
+
+
+@solara.component
+def ComponentsView(
+    components: list[reacton.core.Component]
+    | list[Callable[[Model], reacton.core.Component]],
+    model: Model,
+):
+    """Display a list of components.
+
+    Args:
+        components: List of components to display
+        model: Model instance to pass to each component
+    """
+    wrapped_components = [_wrap_component(component) for component in components]
+
+    with solara.Column():
+        for component in wrapped_components:
+            component(model)
 
 
 JupyterViz = SolaraViz
 
 
 @solara.component
-def ModelController(model: solara.Reactive["Model"], play_interval=100):
-    """
-    Create controls for model execution (step, play, pause, reset).
+def ModelController(model: solara.Reactive[Model], play_interval=100):
+    """Create controls for model execution (step, play, pause, reset).
 
     Args:
-        model: The reactive model being visualized
-        play_interval: Interval between steps during play
+        model (solara.Reactive[Model]): Reactive model instance
+        play_interval (int, optional): Interval for playing the model steps in milliseconds.
     """
-    if not isinstance(model, solara.Reactive):
-        model = solara.use_reactive(model)
-
     playing = solara.use_reactive(False)
     original_model = solara.use_reactive(None)
 
@@ -170,40 +235,40 @@ def ModelController(model: solara.Reactive["Model"], play_interval=100):
 
     solara.use_effect(save_initial_model, [model.value])
 
-    def step():
+    async def step():
         while playing.value:
-            time.sleep(play_interval / 1000)
+            await asyncio.sleep(play_interval / 1000)
             do_step()
 
-    solara.use_thread(step, [playing.value])
+    solara.lab.use_task(step, dependencies=[playing.value], prefer_threaded=False)
 
     def do_step():
         """Advance the model by one step."""
         model.value.step()
-
-    def do_play():
-        """Run the model continuously."""
-        playing.value = True
-
-    def do_pause():
-        """Pause the model execution."""
-        playing.value = False
 
     def do_reset():
         """Reset the model to its initial state."""
         playing.value = False
         model.value = copy.deepcopy(original_model.value)
 
+    def do_play_pause():
+        """Toggle play/pause."""
+        playing.value = not playing.value
+
     with solara.Row(justify="space-between"):
         solara.Button(label="Reset", color="primary", on_click=do_reset)
-        solara.Button(label="Step", color="primary", on_click=do_step)
-        solara.Button(label="▶", color="primary", on_click=do_play)
-        solara.Button(label="⏸︎", color="primary", on_click=do_pause)
+        solara.Button(
+            label="▶" if not playing.value else "❚❚",
+            color="primary",
+            on_click=do_play_pause,
+        )
+        solara.Button(
+            label="Step", color="primary", on_click=do_step, disabled=playing.value
+        )
 
 
 def split_model_params(model_params):
-    """
-    Split model parameters into user-adjustable and fixed parameters.
+    """Split model parameters into user-adjustable and fixed parameters.
 
     Args:
         model_params: Dictionary of all model parameters
@@ -222,8 +287,7 @@ def split_model_params(model_params):
 
 
 def check_param_is_fixed(param):
-    """
-    Check if a parameter is fixed (not user-adjustable).
+    """Check if a parameter is fixed (not user-adjustable).
 
     Args:
         param: Parameter to check
@@ -241,6 +305,36 @@ def check_param_is_fixed(param):
 
 @solara.component
 def ModelCreator(model, model_params, seed=1):
+    """Solara component for creating and managing a model instance with user-defined parameters.
+
+    This component allows users to create a model instance with specified parameters and seed.
+    It provides an interface for adjusting model parameters and reseeding the model's random
+    number generator.
+
+    Args:
+        model (solara.Reactive[Model]): A reactive model instance. This is the main model to be created and managed.
+        model_params (dict): Dictionary of model parameters. This includes both user-adjustable parameters and fixed parameters.
+        seed (int, optional): Initial seed for the random number generator. Defaults to 1.
+
+    Returns:
+        solara.component: A Solara component that renders the model creation and management interface.
+
+    Example:
+        >>> model = solara.reactive(MyModel())
+        >>> model_params = {
+        >>>     "param1": {"type": "slider", "value": 10, "min": 0, "max": 100},
+        >>>     "param2": {"type": "slider", "value": 5, "min": 1, "max": 10},
+        >>> }
+        >>> creator = ModelCreator(model, model_params)
+        >>> creator
+
+    Notes:
+        - The `model_params` argument should be a dictionary where keys are parameter names and values either fixed values
+          or are dictionaries containing parameter details such as type, value, min, and max.
+        - The `seed` argument ensures reproducibility by setting the initial seed for the model's random number generator.
+        - The component provides an interface for adjusting user-defined parameters and reseeding the model.
+
+    """
     user_params, fixed_params = split_model_params(model_params)
 
     reactive_seed = solara.use_reactive(seed)
@@ -260,37 +354,34 @@ def ModelCreator(model, model_params, seed=1):
         set_model_parameters({**model_parameters, name: value})
 
     def create_model():
-        model.value = model.value.__class__.__new__(
-            model.value.__class__, **model_parameters, seed=reactive_seed.value
-        )
-        model.value.__init__(**model_parameters)
+        model.value = model.value.__class__(**model_parameters)
+        model.value._seed = reactive_seed.value
 
     solara.use_effect(create_model, [model_parameters, reactive_seed.value])
 
-    solara.InputText(
-        label="Seed",
-        value=reactive_seed,
-        continuous_update=True,
-    )
+    with solara.Row(justify="space-between"):
+        solara.InputText(
+            label="Seed",
+            value=reactive_seed,
+            continuous_update=True,
+        )
 
-    solara.Button(label="Reseed", color="primary", on_click=do_reseed)
+        solara.Button(label="Reseed", color="primary", on_click=do_reseed)
 
     UserInputs(user_params, on_change=on_change)
 
 
 @solara.component
 def UserInputs(user_params, on_change=None):
-    """
-    Initialize user inputs for configurable model parameters.
+    """Initialize user inputs for configurable model parameters.
+
     Currently supports :class:`solara.SliderInt`, :class:`solara.SliderFloat`,
     :class:`solara.Select`, and :class:`solara.Checkbox`.
 
     Args:
-        user_params: Dictionary with options for the input, including label,
-        min and max values, and other fields specific to the input type.
+        user_params: Dictionary with options for the input, including label, min and max values, and other fields specific to the input type.
         on_change: Function to be called with (name, value) when the value of an input changes.
     """
-
     for name, options in user_params.items():
 
         def change_handler(value, name=name):
@@ -348,26 +439,8 @@ def UserInputs(user_params, on_change=None):
             raise ValueError(f"{input_type} is not a supported input type")
 
 
-def make_text(renderer):
-    """
-    Create a function that renders text using Markdown.
-
-    Args:
-        renderer: Function that takes a model and returns a string
-
-    Returns:
-        function: A function that renders the text as Markdown
-    """
-
-    def function(model):
-        solara.Markdown(renderer(model))
-
-    return function
-
-
 def make_initial_grid_layout(layout_types):
-    """
-    Create an initial grid layout for visualization components.
+    """Create an initial grid layout for visualization components.
 
     Args:
         layout_types: List of layout types (Space or Measure)
@@ -390,5 +463,6 @@ def make_initial_grid_layout(layout_types):
 
 @solara.component
 def ShowSteps(model):
+    """Display the current step of the model."""
     update_counter.get()
     return solara.Text(f"Step: {model.steps}")

@@ -1,20 +1,22 @@
-"""
-Wolf-Sheep Predation Model
-================================
-
-Replication of the model found in NetLogo:
-    Wilensky, U. (1997). NetLogo Wolf Sheep Predation model.
-    http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation.
-    Center for Connected Learning and Computer-Based Modeling,
-    Northwestern University, Evanston, IL.
-"""
+"""Example of using ABM simulator for Wolf-Sheep Predation Model."""
 
 import mesa
 from mesa.experimental.devs.simulator import ABMSimulator
 
 
 class Animal(mesa.Agent):
+    """Base Animal class."""
+
     def __init__(self, model, moore, energy, p_reproduce, energy_from_food):
+        """Initialize Animal instance.
+
+        Args:
+            model: a model instance
+            moore: using moore grid or not
+            energy: initial energy
+            p_reproduce: probability of reproduction
+            energy_from_food: energy gained from 1 unit of food
+        """
         super().__init__(model)
         self.energy = energy
         self.p_reproduce = p_reproduce
@@ -22,12 +24,14 @@ class Animal(mesa.Agent):
         self.moore = moore
 
     def random_move(self):
+        """Move to random neighboring cell."""
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
         next_move = self.random.choice(next_moves)
         # Now move:
         self.model.grid.move_agent(self, next_move)
 
     def spawn_offspring(self):
+        """Create offspring."""
         self.energy /= 2
         offspring = self.__class__(
             self.model,
@@ -38,13 +42,15 @@ class Animal(mesa.Agent):
         )
         self.model.grid.place_agent(offspring, self.pos)
 
-    def feed(self): ...
+    def feed(self): ...  # noqa: D102
 
     def die(self):
+        """Die."""
         self.model.grid.remove_agent(self)
         self.remove()
 
     def step(self):
+        """Execute one step of the agent."""
         self.random_move()
         self.energy -= 1
 
@@ -57,13 +63,10 @@ class Animal(mesa.Agent):
 
 
 class Sheep(Animal):
-    """
-    A sheep that walks around, reproduces (asexually) and gets eaten.
-
-    The init is the same as the RandomWalker.
-    """
+    """A sheep that walks around, reproduces (asexually) and gets eaten."""
 
     def feed(self):
+        """Eat grass and gain energy."""
         # If there is grass available, eat it
         agents = self.model.grid.get_cell_list_contents(self.pos)
         grass_patch = next(obj for obj in agents if isinstance(obj, GrassPatch))
@@ -73,11 +76,10 @@ class Sheep(Animal):
 
 
 class Wolf(Animal):
-    """
-    A wolf that walks around, reproduces (asexually) and eats sheep.
-    """
+    """A wolf that walks around, reproduces (asexually) and eats sheep."""
 
     def feed(self):
+        """Eat wolf and gain energy."""
         agents = self.model.grid.get_cell_list_contents(self.pos)
         sheep = [obj for obj in agents if isinstance(obj, Sheep)]
         if len(sheep) > 0:
@@ -89,12 +91,10 @@ class Wolf(Animal):
 
 
 class GrassPatch(mesa.Agent):
-    """
-    A patch of grass that grows at a fixed rate and it is eaten by sheep
-    """
+    """A patch of grass that grows at a fixed rate and it is eaten by sheep."""
 
     @property
-    def fully_grown(self) -> bool:
+    def fully_grown(self) -> bool:  # noqa: D102
         return self._fully_grown
 
     @fully_grown.setter
@@ -109,12 +109,13 @@ class GrassPatch(mesa.Agent):
             )
 
     def __init__(self, model, fully_grown, countdown, grass_regrowth_time):
-        """
-        Creates a new patch of grass
+        """Creates a new patch of grass.
 
         Args:
-            grown: (boolean) Whether the patch of grass is fully grown or not
+            model: a model instance
+            fully_grown: (boolean) Whether the patch of grass is fully grown or not
             countdown: Time for the patch of grass to be fully grown again
+            grass_regrowth_time: regrowth time for the grass
         """
         super().__init__(model)
         self._fully_grown = fully_grown
@@ -125,13 +126,12 @@ class GrassPatch(mesa.Agent):
                 setattr, countdown, function_args=[self, "fully_grown", True]
             )
 
-    def set_fully_grown(self):
+    def set_fully_grown(self):  # noqa
         self.fully_grown = True
 
 
 class WolfSheep(mesa.Model):
-    """
-    Wolf-Sheep Predation Model
+    """Wolf-Sheep Predation Model.
 
     A model for simulating wolf and sheep (predator-prey) ecosystem modelling.
     """
@@ -151,10 +151,11 @@ class WolfSheep(mesa.Model):
         simulator=None,
         seed=None,
     ):
-        """
-        Create a new Wolf-Sheep model with the given parameters.
+        """Create a new Wolf-Sheep model with the given parameters.
 
         Args:
+            height: height of the grid
+            width: width of the grid
             initial_sheep: Number of sheep to start with
             initial_wolves: Number of wolves to start with
             sheep_reproduce: Probability of each sheep reproducing each step
@@ -164,7 +165,9 @@ class WolfSheep(mesa.Model):
             grass_regrowth_time: How long it takes for a grass patch to regrow
                                  once it is eaten
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
-            moore:
+            moore: whether to use moore or von Neumann grid
+            simulator: Simulator to use for simulating wolf and sheep
+            seed: Random seed
         """
         super().__init__(seed=seed)
         # Set parameters
@@ -226,8 +229,9 @@ class WolfSheep(mesa.Model):
             self.grid.place_agent(patch, pos)
 
     def step(self):
-        self.agents_by_type[Sheep].shuffle(inplace=True).do("step")
-        self.agents_by_type[Wolf].shuffle(inplace=True).do("step")
+        """Perform one step of the model."""
+        self.agents_by_type[Sheep].shuffle_do("step")
+        self.agents_by_type[Wolf].shuffle_do("step")
 
 
 if __name__ == "__main__":

@@ -1,3 +1,5 @@
+"""An agent with movement methods for cell spaces."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Protocol, TypeVar
@@ -14,11 +16,9 @@ class DiscreteSpaceAgent(Protocol[T]):
     cell: T | None
     space: DiscreteSpace[T]
 
-    def move_to(self, cell: T) -> None:
-        ...
+    def move_to(self, cell: T) -> None: ...
 
-    def move_relative(self, directions: tuple[int, ...], distance: int = 1):
-        ...
+    def move_relative(self, directions: tuple[int, ...], distance: int = 1): ...
 
 
 class CellAgent:

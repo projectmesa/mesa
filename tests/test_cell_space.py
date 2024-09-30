@@ -1,3 +1,5 @@
+"""Test cell spaces."""
+
 import random
 
 import pytest
@@ -21,6 +23,7 @@ class TestAgent(Agent, CellAgent):
 
 
 def test_orthogonal_grid_neumann():
+    """Test orthogonal grid with von Neumann neighborhood."""
     width = 10
     height = 10
     grid = OrthogonalVonNeumannGrid((width, height), torus=False, capacity=None)
@@ -28,50 +31,51 @@ def test_orthogonal_grid_neumann():
     assert len(grid._cells) == width * height
 
     # von neumann neighborhood, torus false, top left corner
-    assert len(grid._cells[(0, 0)]._connections) == 2
-    for connection in grid._cells[(0, 0)]._connections:
+    assert len(grid._cells[(0, 0)].connections.values()) == 2
+    for connection in grid._cells[(0, 0)].connections.values():
         assert connection.coordinate in {(0, 1), (1, 0)}
 
     # von neumann neighborhood, torus false, top right corner
-    for connection in grid._cells[(0, width - 1)]._connections:
+    for connection in grid._cells[(0, width - 1)].connections.values():
         assert connection.coordinate in {(0, width - 2), (1, width - 1)}
 
     # von neumann neighborhood, torus false, bottom left corner
-    for connection in grid._cells[(height - 1, 0)]._connections:
+    for connection in grid._cells[(height - 1, 0)].connections.values():
         assert connection.coordinate in {(height - 1, 1), (height - 2, 0)}
 
     # von neumann neighborhood, torus false, bottom right corner
-    for connection in grid._cells[(height - 1, width - 1)]._connections:
+    for connection in grid._cells[(height - 1, width - 1)].connections.values():
         assert connection.coordinate in {
             (height - 1, width - 2),
             (height - 2, width - 1),
         }
 
     # von neumann neighborhood middle of grid
-    assert len(grid._cells[(5, 5)]._connections) == 4
-    for connection in grid._cells[(5, 5)]._connections:
+    assert len(grid._cells[(5, 5)].connections.values()) == 4
+    for connection in grid._cells[(5, 5)].connections.values():
         assert connection.coordinate in {(4, 5), (5, 4), (5, 6), (6, 5)}
 
     # von neumann neighborhood, torus True, top corner
     grid = OrthogonalVonNeumannGrid((width, height), torus=True, capacity=None)
-    assert len(grid._cells[(0, 0)]._connections) == 4
-    for connection in grid._cells[(0, 0)]._connections:
+    assert len(grid._cells[(0, 0)].connections.values()) == 4
+    for connection in grid._cells[(0, 0)].connections.values():
         assert connection.coordinate in {(0, 1), (1, 0), (0, 9), (9, 0)}
 
     # von neumann neighborhood, torus True, top right corner
-    for connection in grid._cells[(0, width - 1)]._connections:
+    for connection in grid._cells[(0, width - 1)].connections.values():
         assert connection.coordinate in {(0, 8), (0, 0), (1, 9), (9, 9)}
 
     # von neumann neighborhood, torus True, bottom left corner
-    for connection in grid._cells[(9, 0)]._connections:
+    for connection in grid._cells[(9, 0)].connections.values():
         assert connection.coordinate in {(9, 1), (9, 9), (0, 0), (8, 0)}
 
     # von neumann neighborhood, torus True, bottom right corner
-    for connection in grid._cells[(9, 9)]._connections:
+    for connection in grid._cells[(9, 9)].connections.values():
         assert connection.coordinate in {(9, 0), (9, 8), (8, 9), (0, 9)}
 
 
 def test_orthogonal_grid_neumann_3d():
+    """Test 3D orthogonal grid with von Neumann neighborhood."""
     width = 10
     height = 10
     depth = 10
@@ -80,12 +84,12 @@ def test_orthogonal_grid_neumann_3d():
     assert len(grid._cells) == width * height * depth
 
     # von neumann neighborhood, torus false, top left corner
-    assert len(grid._cells[(0, 0, 0)]._connections) == 3
-    for connection in grid._cells[(0, 0, 0)]._connections:
+    assert len(grid._cells[(0, 0, 0)].connections.values()) == 3
+    for connection in grid._cells[(0, 0, 0)].connections.values():
         assert connection.coordinate in {(0, 0, 1), (0, 1, 0), (1, 0, 0)}
 
     # von neumann neighborhood, torus false, top right corner
-    for connection in grid._cells[(0, width - 1, 0)]._connections:
+    for connection in grid._cells[(0, width - 1, 0)].connections.values():
         assert connection.coordinate in {
             (0, width - 1, 1),
             (0, width - 2, 0),
@@ -93,7 +97,7 @@ def test_orthogonal_grid_neumann_3d():
         }
 
     # von neumann neighborhood, torus false, bottom left corner
-    for connection in grid._cells[(height - 1, 0, 0)]._connections:
+    for connection in grid._cells[(height - 1, 0, 0)].connections.values():
         assert connection.coordinate in {
             (height - 1, 0, 1),
             (height - 1, 1, 0),
@@ -101,7 +105,7 @@ def test_orthogonal_grid_neumann_3d():
         }
 
     # von neumann neighborhood, torus false, bottom right corner
-    for connection in grid._cells[(height - 1, width - 1, 0)]._connections:
+    for connection in grid._cells[(height - 1, width - 1, 0)].connections.values():
         assert connection.coordinate in {
             (height - 1, width - 1, 1),
             (height - 1, width - 2, 0),
@@ -109,8 +113,8 @@ def test_orthogonal_grid_neumann_3d():
         }
 
     # von neumann neighborhood middle of grid
-    assert len(grid._cells[(5, 5, 5)]._connections) == 6
-    for connection in grid._cells[(5, 5, 5)]._connections:
+    assert len(grid._cells[(5, 5, 5)].connections.values()) == 6
+    for connection in grid._cells[(5, 5, 5)].connections.values():
         assert connection.coordinate in {
             (4, 5, 5),
             (5, 4, 5),
@@ -122,8 +126,8 @@ def test_orthogonal_grid_neumann_3d():
 
     # von neumann neighborhood, torus True, top corner
     grid = OrthogonalVonNeumannGrid((width, height, depth), torus=True, capacity=None)
-    assert len(grid._cells[(0, 0, 0)]._connections) == 6
-    for connection in grid._cells[(0, 0, 0)]._connections:
+    assert len(grid._cells[(0, 0, 0)].connections.values()) == 6
+    for connection in grid._cells[(0, 0, 0)].connections.values():
         assert connection.coordinate in {
             (0, 0, 1),
             (0, 1, 0),
@@ -135,18 +139,19 @@ def test_orthogonal_grid_neumann_3d():
 
 
 def test_orthogonal_grid_moore():
+    """Test orthogonal grid with Moore neighborhood."""
     width = 10
     height = 10
 
     # Moore neighborhood, torus false, top corner
     grid = OrthogonalMooreGrid((width, height), torus=False, capacity=None)
-    assert len(grid._cells[(0, 0)]._connections) == 3
-    for connection in grid._cells[(0, 0)]._connections:
+    assert len(grid._cells[(0, 0)].connections.values()) == 3
+    for connection in grid._cells[(0, 0)].connections.values():
         assert connection.coordinate in {(0, 1), (1, 0), (1, 1)}
 
     # Moore neighborhood middle of grid
-    assert len(grid._cells[(5, 5)]._connections) == 8
-    for connection in grid._cells[(5, 5)]._connections:
+    assert len(grid._cells[(5, 5)].connections.values()) == 8
+    for connection in grid._cells[(5, 5)].connections.values():
         # fmt: off
         assert connection.coordinate in {(4, 4), (4, 5), (4, 6),
                                          (5, 4),         (5, 6),
@@ -155,8 +160,8 @@ def test_orthogonal_grid_moore():
 
     # Moore neighborhood, torus True, top corner
     grid = OrthogonalMooreGrid([10, 10], torus=True, capacity=None)
-    assert len(grid._cells[(0, 0)]._connections) == 8
-    for connection in grid._cells[(0, 0)]._connections:
+    assert len(grid._cells[(0, 0)].connections.values()) == 8
+    for connection in grid._cells[(0, 0)].connections.values():
         # fmt: off
         assert connection.coordinate in {(9, 9), (9, 0), (9, 1),
                                          (0, 9),         (0, 1),
@@ -165,14 +170,15 @@ def test_orthogonal_grid_moore():
 
 
 def test_orthogonal_grid_moore_3d():
+    """Test 3D orthogonal grid with Moore neighborhood."""
     width = 10
     height = 10
     depth = 10
 
     # Moore neighborhood, torus false, top corner
     grid = OrthogonalMooreGrid((width, height, depth), torus=False, capacity=None)
-    assert len(grid._cells[(0, 0, 0)]._connections) == 7
-    for connection in grid._cells[(0, 0, 0)]._connections:
+    assert len(grid._cells[(0, 0, 0)].connections.values()) == 7
+    for connection in grid._cells[(0, 0, 0)].connections.values():
         assert connection.coordinate in {
             (0, 0, 1),
             (0, 1, 0),
@@ -184,8 +190,8 @@ def test_orthogonal_grid_moore_3d():
         }
 
     # Moore neighborhood middle of grid
-    assert len(grid._cells[(5, 5, 5)]._connections) == 26
-    for connection in grid._cells[(5, 5, 5)]._connections:
+    assert len(grid._cells[(5, 5, 5)].connections.values()) == 26
+    for connection in grid._cells[(5, 5, 5)].connections.values():
         # fmt: off
         assert connection.coordinate in {(4, 4, 4), (4, 4, 5), (4, 4, 6), (4, 5, 4), (4, 5, 5), (4, 5, 6), (4, 6, 4), (4, 6, 5), (4, 6, 6),
                                          (5, 4, 4), (5, 4, 5), (5, 4, 6), (5, 5, 4),             (5, 5, 6), (5, 6, 4), (5, 6, 5), (5, 6, 6),
@@ -194,8 +200,8 @@ def test_orthogonal_grid_moore_3d():
 
     # Moore neighborhood, torus True, top corner
     grid = OrthogonalMooreGrid((width, height, depth), torus=True, capacity=None)
-    assert len(grid._cells[(0, 0, 0)]._connections) == 26
-    for connection in grid._cells[(0, 0, 0)]._connections:
+    assert len(grid._cells[(0, 0, 0)].connections.values()) == 26
+    for connection in grid._cells[(0, 0, 0)].connections.values():
         # fmt: off
         assert connection.coordinate in {(9, 9, 9), (9, 9, 0), (9, 9, 1), (9, 0, 9), (9, 0, 0), (9, 0, 1), (9, 1, 9), (9, 1, 0), (9, 1, 1),
                                          (0, 9, 9), (0, 9, 0), (0, 9, 1), (0, 0, 9),             (0, 0, 1), (0, 1, 9), (0, 1, 0), (0, 1, 1),
@@ -204,6 +210,7 @@ def test_orthogonal_grid_moore_3d():
 
 
 def test_orthogonal_grid_moore_4d():
+    """Test 4D orthogonal grid with Moore neighborhood."""
     width = 10
     height = 10
     depth = 10
@@ -211,8 +218,8 @@ def test_orthogonal_grid_moore_4d():
 
     # Moore neighborhood, torus false, top corner
     grid = OrthogonalMooreGrid((width, height, depth, time), torus=False, capacity=None)
-    assert len(grid._cells[(0, 0, 0, 0)]._connections) == 15
-    for connection in grid._cells[(0, 0, 0, 0)]._connections:
+    assert len(grid._cells[(0, 0, 0, 0)].connections.values()) == 15
+    for connection in grid._cells[(0, 0, 0, 0)].connections.values():
         assert connection.coordinate in {
             (0, 0, 0, 1),
             (0, 0, 1, 0),
@@ -232,8 +239,8 @@ def test_orthogonal_grid_moore_4d():
         }
 
     # Moore neighborhood middle of grid
-    assert len(grid._cells[(5, 5, 5, 5)]._connections) == 80
-    for connection in grid._cells[(5, 5, 5, 5)]._connections:
+    assert len(grid._cells[(5, 5, 5, 5)].connections.values()) == 80
+    for connection in grid._cells[(5, 5, 5, 5)].connections.values():
         # fmt: off
         assert connection.coordinate in {(4, 4, 4, 4), (4, 4, 4, 5), (4, 4, 4, 6), (4, 4, 5, 4), (4, 4, 5, 5), (4, 4, 5, 6), (4, 4, 6, 4), (4, 4, 6, 5), (4, 4, 6, 6),
                                          (4, 5, 4, 4), (4, 5, 4, 5), (4, 5, 4, 6), (4, 5, 5, 4), (4, 5, 5, 5), (4, 5, 5, 6), (4, 5, 6, 4), (4, 5, 6, 5), (4, 5, 6, 6),
@@ -248,27 +255,29 @@ def test_orthogonal_grid_moore_4d():
 
 
 def test_orthogonal_grid_moore_1d():
+    """Test 1D orthogonal grid with Moore neighborhood."""
     width = 10
 
     # Moore neighborhood, torus false, left edge
     grid = OrthogonalMooreGrid((width,), torus=False, capacity=None)
-    assert len(grid._cells[(0,)]._connections) == 1
-    for connection in grid._cells[(0,)]._connections:
+    assert len(grid._cells[(0,)].connections.values()) == 1
+    for connection in grid._cells[(0,)].connections.values():
         assert connection.coordinate in {(1,)}
 
     # Moore neighborhood middle of grid
-    assert len(grid._cells[(5,)]._connections) == 2
-    for connection in grid._cells[(5,)]._connections:
+    assert len(grid._cells[(5,)].connections.values()) == 2
+    for connection in grid._cells[(5,)].connections.values():
         assert connection.coordinate in {(4,), (6,)}
 
     # Moore neighborhood, torus True, left edge
     grid = OrthogonalMooreGrid((width,), torus=True, capacity=None)
-    assert len(grid._cells[(0,)]._connections) == 2
-    for connection in grid._cells[(0,)]._connections:
+    assert len(grid._cells[(0,)].connections.values()) == 2
+    for connection in grid._cells[(0,)].connections.values():
         assert connection.coordinate in {(1,), (9,)}
 
 
 def test_cell_neighborhood():
+    """Test neighborhood method of cell in different GridSpaces."""
     # orthogonal grid
 
     ## von Neumann
@@ -276,7 +285,10 @@ def test_cell_neighborhood():
     height = 10
     grid = OrthogonalVonNeumannGrid((width, height), torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [2, 5, 9]):
-        neighborhood = grid._cells[(0, 0)].neighborhood(radius=radius)
+        if radius == 1:
+            neighborhood = grid._cells[(0, 0)].neighborhood
+        else:
+            neighborhood = grid._cells[(0, 0)].get_neighborhood(radius=radius)
         assert len(neighborhood) == n
 
     ## Moore
@@ -284,31 +296,41 @@ def test_cell_neighborhood():
     height = 10
     grid = OrthogonalMooreGrid((width, height), torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [3, 8, 15]):
-        neighborhood = grid._cells[(0, 0)].neighborhood(radius=radius)
+        if radius == 1:
+            neighborhood = grid._cells[(0, 0)].neighborhood
+        else:
+            neighborhood = grid._cells[(0, 0)].get_neighborhood(radius=radius)
         assert len(neighborhood) == n
 
     with pytest.raises(ValueError):
-        grid._cells[(0, 0)].neighborhood(radius=0)
+        grid._cells[(0, 0)].get_neighborhood(radius=0)
 
     # hexgrid
     width = 10
     height = 10
     grid = HexGrid((width, height), torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [2, 6, 11]):
-        neighborhood = grid._cells[(0, 0)].neighborhood(radius=radius)
+        if radius == 1:
+            neighborhood = grid._cells[(0, 0)].neighborhood
+        else:
+            neighborhood = grid._cells[(0, 0)].get_neighborhood(radius=radius)
         assert len(neighborhood) == n
 
     width = 10
     height = 10
     grid = HexGrid((width, height), torus=False, capacity=None)
     for radius, n in zip(range(1, 4), [5, 10, 17]):
-        neighborhood = grid._cells[(1, 0)].neighborhood(radius=radius)
+        if radius == 1:
+            neighborhood = grid._cells[(1, 0)].neighborhood
+        else:
+            neighborhood = grid._cells[(1, 0)].get_neighborhood(radius=radius)
         assert len(neighborhood) == n
 
     # networkgrid
 
 
 def test_hexgrid():
+    """Test HexGrid."""
     width = 10
     height = 10
 
@@ -316,21 +338,21 @@ def test_hexgrid():
     assert len(grid._cells) == width * height
 
     # first row
-    assert len(grid._cells[(0, 0)]._connections) == 2
-    for connection in grid._cells[(0, 0)]._connections:
+    assert len(grid._cells[(0, 0)].connections.values()) == 2
+    for connection in grid._cells[(0, 0)].connections.values():
         assert connection.coordinate in {(0, 1), (1, 0)}
 
     # second row
-    assert len(grid._cells[(1, 0)]._connections) == 5
-    for connection in grid._cells[(1, 0)]._connections:
+    assert len(grid._cells[(1, 0)].connections.values()) == 5
+    for connection in grid._cells[(1, 0)].connections.values():
         # fmt: off
         assert connection.coordinate in {(0, 0), (0, 1),
                                                     (1, 1),
                                          (2, 0), (2, 1)}
 
     # middle odd row
-    assert len(grid._cells[(5, 5)]._connections) == 6
-    for connection in grid._cells[(5, 5)]._connections:
+    assert len(grid._cells[(5, 5)].connections.values()) == 6
+    for connection in grid._cells[(5, 5)].connections.values():
         # fmt: off
         assert connection.coordinate in {(4, 5), (4, 6),
                                       (5, 4),       (5, 6),
@@ -339,8 +361,8 @@ def test_hexgrid():
         # fmt: on
 
     # middle even row
-    assert len(grid._cells[(4, 4)]._connections) == 6
-    for connection in grid._cells[(4, 4)]._connections:
+    assert len(grid._cells[(4, 4)].connections.values()) == 6
+    for connection in grid._cells[(4, 4)].connections.values():
         # fmt: off
         assert connection.coordinate in {(3, 3), (3, 4),
                                       (4, 3),       (4, 5),
@@ -352,8 +374,8 @@ def test_hexgrid():
     assert len(grid._cells) == width * height
 
     # first row
-    assert len(grid._cells[(0, 0)]._connections) == 6
-    for connection in grid._cells[(0, 0)]._connections:
+    assert len(grid._cells[(0, 0)].connections.values()) == 6
+    for connection in grid._cells[(0, 0)].connections.values():
         # fmt: off
         assert connection.coordinate in {(9, 9), (9, 0),
                                       (0, 9),       (0, 1),
@@ -363,6 +385,7 @@ def test_hexgrid():
 
 
 def test_networkgrid():
+    """Test NetworkGrid."""
     import networkx as nx
 
     n = 10
@@ -374,11 +397,12 @@ def test_networkgrid():
     assert len(grid._cells) == n
 
     for i, cell in grid._cells.items():
-        for connection in cell._connections:
+        for connection in cell.connections.values():
             assert connection.coordinate in G.neighbors(i)
 
 
 def test_voronoigrid():
+    """Test VoronoiGrid."""
     points = [[0, 1], [1, 3], [1.1, 1], [1, 1]]
 
     grid = VoronoiGrid(points)
@@ -386,8 +410,8 @@ def test_voronoigrid():
     assert len(grid._cells) == len(points)
 
     # Check cell neighborhood
-    assert len(grid._cells[0]._connections) == 2
-    for connection in grid._cells[0]._connections:
+    assert len(grid._cells[0].connections.values()) == 2
+    for connection in grid._cells[0].connections.values():
         assert connection.coordinate in [[1, 1], [1, 3]]
 
     with pytest.raises(ValueError):
@@ -401,6 +425,7 @@ def test_voronoigrid():
 
 
 def test_empties_space():
+    """Test empties method for Discrete Spaces."""
     import networkx as nx
 
     n = 10
@@ -420,20 +445,20 @@ def test_empties_space():
 
 
 def test_cell():
+    """Test Cell class."""
     cell1 = Cell((1,), capacity=None, random=random.Random())
     cell2 = Cell((2,), capacity=None, random=random.Random())
 
     # connect
     cell1.connect(cell2)
-    assert cell2 in cell1._connections
+    assert cell2 in cell1.connections.values()
 
     # disconnect
     cell1.disconnect(cell2)
-    assert cell2 not in cell1._connections
+    assert cell2 not in cell1.connections.values()
 
     # remove cell not in connections
-    with pytest.raises(ValueError):
-        cell1.disconnect(cell2)
+    cell1.disconnect(cell2)
 
     # add_agent
     model = Model()
@@ -458,6 +483,7 @@ def test_cell():
 
 
 def test_cell_collection():
+    """Test CellCollection."""
     cell1 = Cell((1,), capacity=None, random=random.Random())
 
     collection = CellCollection({cell1: cell1.agents}, random=random.Random())
@@ -491,3 +517,15 @@ def test_cell_collection():
 
     agents = collection[cells[0]]
     assert agents == cells[0].agents
+
+    cell = collection.select(at_most=1)
+    assert len(cell) == 1
+
+    cells = collection.select(at_most=2)
+    assert len(cells) == 2
+
+    cells = collection.select(at_most=0.5)
+    assert len(cells) == 5
+
+    cells = collection.select()
+    assert len(cells) == len(collection)

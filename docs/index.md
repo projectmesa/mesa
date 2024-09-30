@@ -38,10 +38,16 @@ notebook.*
 
 ## Using Mesa
 
-Getting started quickly:
+To install our latest stable release (2.4.x), run:
 
-```bash
-pip install mesa
+``` bash
+pip install -U mesa
+```
+
+To install our latest pre-release (3.0 alpha), run:
+
+``` bash
+pip install -U --pre mesa
 ```
 
 To launch an example model, clone the [repository](https://github.com/projectmesa/mesa) folder and invoke `mesa runserver` for one of the `examples/` subdirectories:
@@ -52,8 +58,10 @@ mesa runserver examples/wolf_sheep
 
 For more help on using Mesa, check out the following resources:
 
+- [Mesa Overview]
 - [Mesa Introductory Tutorial]
 - [Mesa Visualization Tutorial]
+- [Mesa Examples]
 - [GitHub Issue Tracker]
 - [Matrix chat room]
 - [PyPI]
@@ -99,6 +107,8 @@ Mesa Packages <packages>
 [github issue tracker]: https://github.com/projectmesa/mesa/issues
 [matrix chat room]: https://matrix.to/#/#project-mesa:matrix.org
 [mesa]: https://github.com/projectmesa/mesa/
+[mesa overview]: overview
+[mesa examples]: https://github.com/projectmesa/mesa-examples
 [mesa introductory tutorial]: tutorials/intro_tutorial
 [mesa visualization tutorial]: tutorials/visualization_tutorial
 [pypi]: https://pypi.python.org/pypi/Mesa/
