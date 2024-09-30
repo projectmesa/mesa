@@ -2,6 +2,8 @@
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 from __future__ import annotations
 
+import solara.lab as lab
+
 import mesa
 from mesa.experimental.signals import (
     Computable,
@@ -9,8 +11,6 @@ from mesa.experimental.signals import (
     HasObservables,
     Observable,
 )
-
-import solara.lab as lab
 
 lab.computed()
 
@@ -62,13 +62,12 @@ class BoltzmannWealth(mesa.Model, HasObservables):
 
     gini = Computable()
 
-    def __init__(self, seed=None, n=100, width=10, height=10):  # noqa D103
-        """
-        Args:
-            seed: the seed for random number generator
-            n: the number of agents
-            width: the width of the grid
-            height: the height of the grid
+    def __init__(self, seed=None, n=100, width=10, height=10):
+        """Args:
+        seed: the seed for random number generator
+        n: the number of agents
+        width: the width of the grid
+        height: the height of the grid
         """
         super().__init__(seed=seed)
         self.num_agents = n
