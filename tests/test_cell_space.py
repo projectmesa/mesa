@@ -524,3 +524,33 @@ def test_cell_collection():
 
     cells = collection.select()
     assert len(cells) == len(collection)
+
+
+def test_cell_agent():
+    cell1 = Cell((1,), capacity=None, random=random.Random())
+    cell2 = Cell((2,), capacity=None, random=random.Random())
+
+    # connect
+    # add_agent
+    model = Model()
+    agent = CellAgent(model)
+
+    agent.cell = cell1
+    assert agent in cell1.agents
+
+    agent.cell = None
+    assert agent not in cell1.agents
+
+    agent.cell = cell2
+    assert agent not in cell1.agents
+    assert agent in cell2.agents
+
+    agent.cell = cell1
+    assert agent in cell1.agents
+    assert agent not in cell2.agents
+
+    agent.remove()
+    assert agent not in model._all_agents
+    assert agent not in cell1.agents
+    assert agent not in cell2.agents
+
