@@ -33,10 +33,6 @@ class Animal(CellAgent):
         self.energy_from_food = energy_from_food
         self.cell = cell
 
-    def random_move(self):
-        """Move to a random neighboring cell."""
-        self.cell = self.cell.neighborhood.select_random_cell()
-
     def spawn_offspring(self):
         """Create offspring."""
         self.energy /= 2
@@ -52,7 +48,7 @@ class Animal(CellAgent):
 
     def step(self):
         """One step of the agent."""
-        self.random_move()
+        self.cell = self.cell.neighborhood.select_random_cell()
         self.energy -= 1
 
         self.feed()

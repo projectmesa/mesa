@@ -10,26 +10,29 @@ if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell import Cell
 
 
-class CellDescriptor:
+class HasCell:
     """Descriptor for cell movement behavior."""
+    _mesa_cell: Cell = None
 
-    def __get__(self, instance, owner):  # noqa D105
-        return getattr(instance, self.private_name, None)
+    @property
+    def cell(self) -> Cell | None:
+        return getattr(self, "_mesa_cell", None)
 
-    def __set__(self, instance, value):  # noqa D105
-        if instance.cell is not None:
-            instance.cell.remove_agent(instance)
-        setattr(instance, self.private_name, value)
+    @cell.setter
+    def cell(self, cell: Cell | None) -> None:  # noqa D105
+        # remove from current cell
+        if self.cell is not None:
+            self.cell.remove_agent(self)
 
-        if value is not None:
-            value.add_agent(instance)
+        # update private attribute
+        setattr(self, "_mesa_cell", cell)
 
-    def __set_name__(self, owner, name):  # noqa D105
-        self.public_name = name
-        self.private_name = "_" + name
+        # add to new cell
+        if cell is not None:
+            cell.add_agent(self)
 
 
-class CellAgent(Agent):
+class CellAgent(Agent, HasCell):
     """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces.
 
     Attributes:
@@ -38,8 +41,6 @@ class CellAgent(Agent):
         pos: (Position | None): The position of the agent in the space
         cell: (Cell | None): the cell which the agent occupies
     """
-
-    cell: Cell | None = CellDescriptor()
 
     def remove(self):
         """Remove the agent from the model."""

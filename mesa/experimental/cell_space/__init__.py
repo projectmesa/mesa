@@ -6,7 +6,7 @@ expressive that the default grids available in `mesa.space`.
 """
 
 from mesa.experimental.cell_space.cell import Cell
-from mesa.experimental.cell_space.cell_agent import CellAgent, CellDescriptor
+from mesa.experimental.cell_space.cell_agent import CellAgent
 from mesa.experimental.cell_space.cell_collection import CellCollection
 from mesa.experimental.cell_space.discrete_space import DiscreteSpace
 from mesa.experimental.cell_space.grid import (
@@ -21,7 +21,8 @@ from mesa.experimental.cell_space.voronoi import VoronoiGrid
 __all__ = [
     "CellCollection",
     "Cell",
-    "CellAgent" "CellDescriptor" "DiscreteSpace",
+    "CellAgent",
+    "DiscreteSpace",
     "Grid",
     "HexGrid",
     "OrthogonalMooreGrid",
