@@ -72,7 +72,7 @@ class CellAgent(Agent, HasCell, BasicMovement):
         self.cell = None  # ensures that we are also removed from cell
 
 
-class Grid2DMovingAgent(BasicMovement):
+class Grid2DMovement(BasicMovement):
     """Mixin for moving agents in 2D grids."""
 
     def move(self, direction: str, distance: int = 1):
@@ -82,25 +82,27 @@ class Grid2DMovingAgent(BasicMovement):
             direction: The cardinal direction to move in.
             distance: The distance to move.
         """
+        direction = direction.lower()  # Convert direction to lowercase
+
         match direction:
-            case "N" | "North" | "Up":
-                self.move_relative((-1, 0))
-            case "S" | "South" | "Down":
-                self.move_relative((1, 0))
-            case "E" | "East" | "Right":
-                self.move_relative((0, 1))
-            case "W" | "West" | "Left":
-                self.move_relative((0, -1))
-            case "NE" | "NorthEast" | "UpRight":
-                self.move_relative((-1, 1))
-            case "NW" | "NorthWest" | "UpLeft":
-                self.move_relative((-1, -1))
-            case "SE" | "SouthEast" | "DownRight":
-                self.move_relative((1, 1))
-            case "SW" | "SouthWest" | "DownLeft":
-                self.move_relative((1, -1))
+            case "n" | "north" | "up":
+                move_vector = (-1, 0)
+            case "s" | "south" | "down":
+                move_vector = (1, 0)
+            case "e" | "east" | "right":
+                move_vector = (0, 1)
+            case "w" | "west" | "left":
+                move_vector = (0, -1)
+            case "ne" | "northeast" | "upright":
+                move_vector = (-1, 1)
+            case "nw" | "northwest" | "upleft":
+                move_vector = (-1, -1)
+            case "se" | "southeast" | "downright":
+                move_vector = (1, 1)
+            case "sw" | "southwest" | "downleft":
+                move_vector = (1, -1)
             case _:
                 raise ValueError(f"Invalid direction: {direction}")
 
         for _ in range(distance):
-            self.move(direction)
+            self.move_relative(move_vector)
