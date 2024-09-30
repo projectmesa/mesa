@@ -59,7 +59,13 @@ class BoltzmannWealth(mesa.Model, HasObservables):
     gini = Computable()
 
     def __init__(self, seed=None, n=100, width=10, height=10):  # noqa D103
-        super().__init__(seed)
+        Args:
+            seed: the seed for random number generator
+            n: the number of agents
+            width: the width of the grid
+            height: the height of the grid
+        """
+        super().__init__(seed=seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
 
