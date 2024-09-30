@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 class HasCell:
     """Descriptor for cell movement behavior."""
+
     _mesa_cell: Cell = None
 
     @property
@@ -19,13 +20,13 @@ class HasCell:
         return getattr(self, "_mesa_cell", None)
 
     @cell.setter
-    def cell(self, cell: Cell | None) -> None:  # noqa D105
+    def cell(self, cell: Cell | None) -> None:
         # remove from current cell
         if self.cell is not None:
             self.cell.remove_agent(self)
 
         # update private attribute
-        setattr(self, "_mesa_cell", cell)
+        self._mesa_cell = cell
 
         # add to new cell
         if cell is not None:
