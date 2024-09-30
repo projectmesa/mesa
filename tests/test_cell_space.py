@@ -526,7 +526,7 @@ def test_cell_collection():
     assert len(cells) == len(collection)
 
 
-def test_cell_agent():
+def test_cell_agent():  # noqa: D103
     cell1 = Cell((1,), capacity=None, random=random.Random())
     cell2 = Cell((2,), capacity=None, random=random.Random())
 

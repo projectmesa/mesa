@@ -16,7 +16,7 @@ class HasCell:
     _mesa_cell: Cell = None
 
     @property
-    def cell(self) -> Cell | None:
+    def cell(self) -> Cell | None:  # noqa: D102
         return self._mesa_cell
 
     @cell.setter

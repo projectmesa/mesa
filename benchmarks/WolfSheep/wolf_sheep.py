@@ -36,7 +36,7 @@ class Animal(CellAgent):
     def spawn_offspring(self):
         """Create offspring."""
         self.energy /= 2
-        offspring = self.__class__(
+        self.__class__(
             self.model,
             self.energy,
             self.p_reproduce,
@@ -112,9 +112,10 @@ class GrassPatch(CellAgent):
             model: a model instance
             countdown: Time for the patch of grass to be fully grown again
             grass_regrowth_time : time to fully regrow grass
+            cell: the cell to which the patch of grass belongs
         """
         super().__init__(model)
-        self._fully_grown = True if countdown == 0 else False
+        self._fully_grown = True if countdown == 0 else False  # Noqa: SIM210
         self.grass_regrowth_time = grass_regrowth_time
         self.cell = cell
 
@@ -198,10 +199,7 @@ class WolfSheep(Model):
         possibly_fully_grown = [True, False]
         for cell in self.grid:
             fully_grown = self.random.choice(possibly_fully_grown)
-            if fully_grown:
-                countdown = 0
-            else:
-                countdown = self.random.randrange(grass_regrowth_time)
+            countdown = 0 if fully_grown else self.random.randrange(grass_regrowth_time)
             GrassPatch(self, countdown, grass_regrowth_time, cell)
 
     def step(self):
