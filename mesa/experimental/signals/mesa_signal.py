@@ -175,7 +175,10 @@ class Computed:
         return f"COMPUTED: {self.name}"
 
     def _set_dirty(self, signal):
-        self._is_dirty = True
+        if not self._is_dirty:
+            self._is_dirty = True
+            self.owner.notify(self.name, self._value, None, "on_change")
+
         # fixme propagate this to all dependents
 
     def _add_parent(
