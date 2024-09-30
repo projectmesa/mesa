@@ -17,7 +17,7 @@ class HasCell:
 
     @property
     def cell(self) -> Cell | None:
-        return getattr(self, "_mesa_cell", None)
+        return self._mesa_cell
 
     @cell.setter
     def cell(self, cell: Cell | None) -> None:
