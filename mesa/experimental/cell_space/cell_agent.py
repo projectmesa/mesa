@@ -73,7 +73,7 @@ class CellAgent(Agent, HasCell, BasicMovement):
 
 
 class Grid2DMovement(BasicMovement):
-    """Mixin for moving agents in 2D grids."""
+    """Mixin for moving agents in a 2D grid."""
 
     def move(self, direction: str, distance: int = 1):
         """Move the agent in a cardinal direction.
