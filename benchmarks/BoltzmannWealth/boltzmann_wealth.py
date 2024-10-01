@@ -2,12 +2,8 @@
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 from __future__ import annotations
 
-import solara.lab as lab
-
 import mesa
 from mesa.experimental.signals import (
-    Computable,
-    Computed,
     HasObservables,
     Observable,
 )
@@ -46,11 +42,11 @@ class Table:
             self.data[agent.unique_id] = agent.wealth
 
     def update(self, signal):
-        """handler for signal that updates the wealth for the agent in the table"""
+        """Handler for signal that updates the wealth for the agent in the table"""
         self.data[signal.owner.unique_id] = signal.new_value
 
     def get(self):
-        """return the wealth of agents"""
+        """Return the wealth of agents"""
         return self.data.values()
 
 
@@ -63,7 +59,6 @@ class BoltzmannWealth(mesa.Model, HasObservables):
     """
 
     # gini = Computable()
-
 
     def __init__(self, seed=None, n=100, width=10, height=10):
         """Args:
@@ -89,7 +84,6 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         # to self.gini, because the autodiscovery is tied to Observable.__get__
         # which thus needs! to be accessed inside the callable
         self.agent_wealth = Table(self)
-
 
         self.gini = compute_gini(self)
 
