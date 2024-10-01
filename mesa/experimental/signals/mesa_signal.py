@@ -323,20 +323,6 @@ class HasObservables:
         else:
             names = self.observables.keys()
 
-        # fixme, see unsubscribe, but event types differ across names
-        if not isinstance(signal_type, All):
-            if signal_type not in self.observables[name].signal_types:
-                raise ValueError(
-                    f"you are trying to subscribe to a signal of {signal_type}"
-                    f"on Observable {name}, which does not emit this signal_type"
-                )
-            else:
-                signal_types = [
-                    signal_type,
-                ]
-        else:
-            signal_types = self.observables[name].signal_types
-
         for name in names:
             if not isinstance(signal_type, All):
                 if signal_type not in self.observables[name].signal_types:
