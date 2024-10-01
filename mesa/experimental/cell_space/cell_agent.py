@@ -59,6 +59,22 @@ class BasicMovement:
             raise ValueError(f"No cell in direction {direction}")
 
 
+class FixedCell(HasCell):
+    """Mixin for agents that are fixed to a cell."""
+
+    @property
+    def cell(self) -> Cell | None:  # noqa: D102
+        return self._mesa_cell
+
+    @cell.setter
+    def cell(self, cell: Cell) -> None:
+        if self.cell is not None:
+            raise ValueError("Cannot move agent in FixedCell")
+        self._mesa_cell = cell
+
+        cell.add_agent(self)
+
+
 class CellAgent(Agent, HasCell, BasicMovement):
     """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces.
 
@@ -70,6 +86,10 @@ class CellAgent(Agent, HasCell, BasicMovement):
         """Remove the agent from the model."""
         super().remove()
         self.cell = None  # ensures that we are also removed from cell
+
+
+class Patch(Agent, FixedCell):
+    """A patch in a 2D grid."""
 
 
 class Grid2DMovingAgent(BasicMovement):
