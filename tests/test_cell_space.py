@@ -542,7 +542,7 @@ def test_property_layer_integration():
 
     # Test accessing PropertyLayer from a cell
     cell = grid._cells[(0, 0)]
-    assert "elevation" in cell.property_layers
+    assert "elevation" in cell._mesa_property_layers
     assert cell.get_property("elevation") == 0
 
     # Test setting property value for a cell
@@ -567,7 +567,7 @@ def test_property_layer_integration():
     # Test removing a PropertyLayer
     grid.remove_property_layer("elevation")
     assert "elevation" not in grid.property_layers
-    assert "elevation" not in cell.property_layers
+    assert "elevation" not in cell._mesa_property_layers
 
 
 def test_multiple_property_layers():

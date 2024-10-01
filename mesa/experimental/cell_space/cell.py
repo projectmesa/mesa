@@ -36,6 +36,7 @@ class Cell:
         "capacity",
         "properties",
         "random",
+        "_mesa_property_layers",
         "__dict__",
     ]
 
@@ -71,7 +72,7 @@ class Cell:
         self.capacity: int = capacity
         self.properties: dict[Coordinate, object] = {}
         self.random = random
-        self.property_layers: dict[str, PropertyLayer] = {}
+        self._mesa_property_layers: dict[str, PropertyLayer] = {}
 
     def connect(self, other: Cell, key: Coordinate | None = None) -> None:
         """Connects this cell to another cell.
@@ -198,16 +199,16 @@ class Cell:
     # PropertyLayer methods
     def get_property(self, property_name: str) -> Any:
         """Get the value of a property."""
-        return self.property_layers[property_name].data[self.coordinate]
+        return self._mesa_property_layers[property_name].data[self.coordinate]
 
     def set_property(self, property_name: str, value: Any):
         """Set the value of a property."""
-        self.property_layers[property_name].set_cell(self.coordinate, value)
+        self._mesa_property_layers[property_name].set_cell(self.coordinate, value)
 
     def modify_property(
         self, property_name: str, operation: Callable, value: Any = None
     ):
         """Modify the value of a property."""
-        self.property_layers[property_name].modify_cell(
+        self._mesa_property_layers[property_name].modify_cell(
             self.coordinate, operation, value
         )
