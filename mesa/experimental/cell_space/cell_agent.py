@@ -72,8 +72,21 @@ class CellAgent(Agent, HasCell, BasicMovement):
         self.cell = None  # ensures that we are also removed from cell
 
 
-class Grid2DMovement(BasicMovement):
-    """Mixin for moving agents in a 2D grid."""
+class Grid2DMovingAgent(BasicMovement):
+    """Mixin for moving agents in 2D grids."""
+
+    # fmt: off
+    DIRECTION_MAP = {
+        "n": (-1, 0), "north": (-1, 0), "up": (-1, 0),
+        "s": (1, 0), "south": (1, 0), "down": (1, 0),
+        "e": (0, 1), "east": (0, 1), "right": (0, 1),
+        "w": (0, -1), "west": (0, -1), "left": (0, -1),
+        "ne": (-1, 1), "northeast": (-1, 1), "upright": (-1, 1),
+        "nw": (-1, -1), "northwest": (-1, -1), "upleft": (-1, -1),
+        "se": (1, 1), "southeast": (1, 1), "downright": (1, 1),
+        "sw": (1, -1), "southwest": (1, -1), "downleft": (1, -1)
+    }
+    # fmt: on
 
     def move(self, direction: str, distance: int = 1):
         """Move the agent in a cardinal direction.
@@ -84,25 +97,9 @@ class Grid2DMovement(BasicMovement):
         """
         direction = direction.lower()  # Convert direction to lowercase
 
-        match direction:
-            case "n" | "north" | "up":
-                move_vector = (-1, 0)
-            case "s" | "south" | "down":
-                move_vector = (1, 0)
-            case "e" | "east" | "right":
-                move_vector = (0, 1)
-            case "w" | "west" | "left":
-                move_vector = (0, -1)
-            case "ne" | "northeast" | "upright":
-                move_vector = (-1, 1)
-            case "nw" | "northwest" | "upleft":
-                move_vector = (-1, -1)
-            case "se" | "southeast" | "downright":
-                move_vector = (1, 1)
-            case "sw" | "southwest" | "downleft":
-                move_vector = (1, -1)
-            case _:
-                raise ValueError(f"Invalid direction: {direction}")
+        if direction not in self.DIRECTION_MAP:
+            raise ValueError(f"Invalid direction: {direction}")
 
+        move_vector = self.DIRECTION_MAP[direction]
         for _ in range(distance):
             self.move_relative(move_vector)
