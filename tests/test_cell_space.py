@@ -641,4 +641,3 @@ def test_cell_agent():  # noqa: D103
     assert agent not in model._all_agents
     assert agent not in cell1.agents
     assert agent not in cell2.agents
-
