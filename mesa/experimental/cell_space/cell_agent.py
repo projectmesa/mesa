@@ -11,7 +11,30 @@ if TYPE_CHECKING:
     from mesa.experimental.cell_space.cell import Cell
 
 
-class CellAgent(Agent):
+class HasCell:
+    """Descriptor for cell movement behavior."""
+
+    _mesa_cell: Cell = None
+
+    @property
+    def cell(self) -> Cell | None:  # noqa: D102
+        return self._mesa_cell
+
+    @cell.setter
+    def cell(self, cell: Cell | None) -> None:
+        # remove from current cell
+        if self.cell is not None:
+            self.cell.remove_agent(self)
+
+        # update private attribute
+        self._mesa_cell = cell
+
+        # add to new cell
+        if cell is not None:
+            cell.add_agent(self)
+
+
+class CellAgent(Agent, HasCell):
     """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces.
 
     Attributes:
@@ -21,23 +44,7 @@ class CellAgent(Agent):
         cell: (Cell | None): the cell which the agent occupies
     """
 
-    def __init__(self, model: Model) -> None:
-        """Create a new agent.
-
-        Args:
-            model (Model): The model instance in which the agent exists.
-        """
-        super().__init__(model)
-        self.cell: Cell | None = None
-
-    def move_to(self, cell) -> None:
-        """Move agent to cell.
-
-        Args:
-            cell: cell to which agent is to move
-
-        """
-        if self.cell is not None:
-            self.cell.remove_agent(self)
-        self.cell = cell
-        cell.add_agent(self)
+    def remove(self):
+        """Remove the agent from the model."""
+        super().remove()
+        self.cell = None  # ensures that we are also removed from cell

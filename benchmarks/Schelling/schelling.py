@@ -1,13 +1,22 @@
 """Schelling separation for performance benchmarking."""
 
+from __future__ import annotations
+
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
+from mesa.experimental.cell_space import Cell, CellAgent, OrthogonalMooreGrid
 
 
 class SchellingAgent(CellAgent):
     """Schelling segregation agent."""
 
-    def __init__(self, model, agent_type, radius, homophily):
+    def __init__(
+        self,
+        model: Schelling,
+        agent_type: int,
+        radius: int,
+        homophily: float,
+        cell: Cell,
+    ):
         """Create a new Schelling agent.
 
         Args:
@@ -15,11 +24,13 @@ class SchellingAgent(CellAgent):
             agent_type: type of agent (minority=1, majority=0)
             radius: size of neighborhood of agent
             homophily: fraction of neighbors of the same type that triggers movement
+            cell: the cell in which the agent is located
         """
         super().__init__(model)
         self.type = agent_type
         self.radius = radius
         self.homophily = homophily
+        self.cell = cell
 
     def step(self):
         """Run one step of the agent."""
@@ -31,7 +42,7 @@ class SchellingAgent(CellAgent):
 
         # If unhappy, move:
         if similar < self.homophily:
-            self.move_to(self.model.grid.select_random_empty_cell())
+            self.cell = self.model.grid.select_random_empty_cell()
         else:
             self.model.happy += 1
 
@@ -41,6 +52,7 @@ class Schelling(Model):
 
     def __init__(
         self,
+        simulator=None,
         height=40,
         width=40,
         homophily=3,
@@ -48,11 +60,11 @@ class Schelling(Model):
         density=0.8,
         minority_pc=0.5,
         seed=None,
-        simulator=None,
     ):
         """Create a new Schelling model.
 
         Args:
+            simulator: simulator instance
             height: height of the grid
             width: width of the grid
             homophily: Minimum number of agents of same class needed to be happy
@@ -63,8 +75,9 @@ class Schelling(Model):
             simulator: a simulator instance
         """
         super().__init__(seed=seed)
-        self.minority_pc = minority_pc
         self.simulator = simulator
+        self.minority_pc = minority_pc
+        self.happy = 0
 
         self.grid = OrthogonalMooreGrid(
             [height, width],
@@ -80,8 +93,7 @@ class Schelling(Model):
         for cell in self.grid:
             if self.random.random() < density:
                 agent_type = 1 if self.random.random() < self.minority_pc else 0
-                agent = SchellingAgent(self, agent_type, radius, homophily)
-                agent.move_to(cell)
+                SchellingAgent(self, agent_type, radius, homophily, cell)
 
     def step(self):
         """Run one step of the model."""
