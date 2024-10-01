@@ -3,7 +3,7 @@
 .. warning::
     The time module and all its Schedulers are deprecated and will be removed in a future version.
     They can be replaced with AgentSet functionality. See the migration guide for details:
-    https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers
+    https://mesa.readthedocs.io/latest/migration_guide.html#time-and-schedulers
 
 Objects for handling the time component of a model. In particular, this module
 contains Schedulers, which handle agent activation. A Scheduler is an object
@@ -65,7 +65,7 @@ class BaseScheduler:
         warnings.warn(
             "The time module and all its Schedulers are deprecated and will be removed in a future version. "
             "They can be replaced with AgentSet functionality. See the migration guide for details. "
-            "https://mesa.readthedocs.io/en/latest/migration_guide.html#time-and-schedulers",
+            "https://mesa.readthedocs.io/latest/migration_guide.html#time-and-schedulers",
             DeprecationWarning,
             stacklevel=2,
         )

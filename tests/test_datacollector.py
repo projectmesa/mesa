@@ -4,7 +4,6 @@ import unittest
 
 from mesa import Agent, Model
 from mesa.datacollection import DataCollector
-from mesa.time import BaseScheduler
 
 
 class MockAgent(Agent):
@@ -60,21 +59,17 @@ def agent_function_with_params(agent, multiplier, offset):  # noqa: D103
 class MockModel(Model):
     """Minimalistic model for testing purposes."""
 
-    schedule = BaseScheduler(None)
-
     def __init__(self):  # noqa: D107
         super().__init__()
-        self.schedule = BaseScheduler(self)
         self.model_val = 100
 
         self.n = 10
         for i in range(1, self.n + 1):
-            self.schedule.add(MockAgent(self, val=i))
-        self.initialize_data_collector(
+            MockAgent(self, val=i)
+        self.datacollector = DataCollector(
             model_reporters={
-                "total_agents": lambda m: m.schedule.get_agent_count(),
+                "total_agents": lambda m: len(m.agents),
                 "model_value": "model_val",
-                "model_calc": self.schedule.get_agent_count,
                 "model_calc_comp": [self.test_model_calc_comp, [3, 4]],
                 "model_calc_fail": [self.test_model_calc_comp, [12, 0]],
             },
@@ -95,7 +90,7 @@ class MockModel(Model):
             return None
 
     def step(self):  # noqa: D102
-        self.schedule.step()
+        self.agents.do("step")
         self.datacollector.collect(self)
 
 
@@ -132,13 +127,14 @@ class TestDataCollector(unittest.TestCase):
     def setUp(self):
         """Create the model and run it a set number of steps."""
         self.model = MockModel()
+        self.model.datacollector.collect(self.model)
         for i in range(7):
             if i == 4:
-                self.model.schedule.remove(self.model.schedule._agents[3])
+                self.model.agents[3].remove()
             self.model.step()
 
         # Write to table:
-        for agent in self.model.schedule.agents:
+        for agent in self.model.agents:
             agent.write_final_values()
 
     def step_assertion(self, model_var):  # noqa: D102
@@ -153,18 +149,15 @@ class TestDataCollector(unittest.TestCase):
         data_collector = self.model.datacollector
         assert "total_agents" in data_collector.model_vars
         assert "model_value" in data_collector.model_vars
-        assert "model_calc" in data_collector.model_vars
         assert "model_calc_comp" in data_collector.model_vars
         assert "model_calc_fail" in data_collector.model_vars
         length = 8
         assert len(data_collector.model_vars["total_agents"]) == length
         assert len(data_collector.model_vars["model_value"]) == length
-        assert len(data_collector.model_vars["model_calc"]) == length
         assert len(data_collector.model_vars["model_calc_comp"]) == length
         self.step_assertion(data_collector.model_vars["total_agents"])
         for element in data_collector.model_vars["model_value"]:
             assert element == 100
-        self.step_assertion(data_collector.model_vars["model_calc"])
         for element in data_collector.model_vars["model_calc_comp"]:
             assert element == 75
         for element in data_collector.model_vars["model_calc_fail"]:
@@ -226,36 +219,12 @@ class TestDataCollector(unittest.TestCase):
         model_vars = data_collector.get_model_vars_dataframe()
         agent_vars = data_collector.get_agent_vars_dataframe()
         table_df = data_collector.get_table_dataframe("Final_Values")
-        assert model_vars.shape == (8, 5)
+        assert model_vars.shape == (8, 4)
         assert agent_vars.shape == (77, 4)
         assert table_df.shape == (9, 2)
 
         with self.assertRaises(Exception):
             table_df = data_collector.get_table_dataframe("not a real table")
-
-
-class TestDataCollectorInitialization(unittest.TestCase):
-    """Tests for DataCollector initialization."""
-
-    def setUp(self):  # noqa: D102
-        self.model = Model()
-
-    def test_initialize_before_scheduler(self):  # noqa: D102
-        with self.assertRaises(RuntimeError) as cm:
-            self.model.initialize_data_collector()
-        self.assertEqual(
-            str(cm.exception),
-            "You must initialize the scheduler (self.schedule) before initializing the data collector.",
-        )
-
-    def test_initialize_before_agents_added_to_scheduler(self):  # noqa: D102
-        with self.assertRaises(RuntimeError) as cm:
-            self.model.schedule = BaseScheduler(self)
-            self.model.initialize_data_collector()
-        self.assertEqual(
-            str(cm.exception),
-            "You must add agents to the scheduler before initializing the data collector.",
-        )
 
 
 class TestDataCollectorWithAgentTypes(unittest.TestCase):

@@ -221,7 +221,10 @@ self.agents_by_type[AgentType].shuffle_do("step")
 2. If you were using `self.schedule.agents`, replace it with `self.agents`.
 3. If you were using `self.schedule.get_agent_count()`, replace it with `len(self.agents)`.
 4. If you were using `self.schedule.agents_by_type`, replace it with `self.agents_by_type`.
-5. Instead of `self.schedule.add()` and `self.schedule.remove()`, agents are now automatically added to and removed from the model's AgentSet when they are created or removed.
+5. Agents are now automatically added to or removed from the model's `AgentSet` (`model.agents`) when they are created or deleted, eliminating the need to manually call `self.schedule.add()` or `self.schedule.remove()`.
+   - However, you still need to explicitly remove the Agent itself by using `Agent.remove()`. Typically, this means:
+     - Replace `self.schedule.remove(agent)` with `agent.remove()` in the Model.
+     - Replace `self.model.schedule.remove(self)` with `self.remove()` within the Agent.
 
 From now on you're now not bound by 5 distinct schedulers, but can mix and match any combination of AgentSet methods (`do`, `shuffle`, `select`, etc.) to get the desired Agent activation.
 
@@ -292,3 +295,19 @@ def show_steps(model):
 
 SolaraViz(model, components=[show_steps])
 ```
+
+### Other changes
+#### Removal of Model.initialize_data_collector
+The `initialize_data_collector` in the Model class is removed. In the Model class, replace:
+
+Replace:
+```python
+self.initialize_data_collector(...)
+```
+
+With:
+```python
+self.datacollector = DataCollector(...)
+```
+
+- Ref: [PR #2327](https://github.com/projectmesa/mesa/pull/2327), Mesa-examples [PR #208](https://github.com/projectmesa/mesa-examples/pull/208))

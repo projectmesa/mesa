@@ -612,3 +612,33 @@ def test_property_layer_errors():
     grid.add_property_layer(elevation)
     with pytest.raises(ValueError, match="Property layer elevation already exists."):
         grid.add_property_layer(elevation)
+
+
+def test_cell_agent():  # noqa: D103
+    cell1 = Cell((1,), capacity=None, random=random.Random())
+    cell2 = Cell((2,), capacity=None, random=random.Random())
+
+    # connect
+    # add_agent
+    model = Model()
+    agent = CellAgent(model)
+
+    agent.cell = cell1
+    assert agent in cell1.agents
+
+    agent.cell = None
+    assert agent not in cell1.agents
+
+    agent.cell = cell2
+    assert agent not in cell1.agents
+    assert agent in cell2.agents
+
+    agent.cell = cell1
+    assert agent in cell1.agents
+    assert agent not in cell2.agents
+
+    agent.remove()
+    assert agent not in model._all_agents
+    assert agent not in cell1.agents
+    assert agent not in cell2.agents
+

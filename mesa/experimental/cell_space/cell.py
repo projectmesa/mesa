@@ -121,7 +121,6 @@ class Cell:
 
         """
         self.agents.remove(agent)
-        agent.cell = None
 
     @property
     def is_empty(self) -> bool:
