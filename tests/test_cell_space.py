@@ -652,7 +652,7 @@ def test_cell_agent():  # noqa: D103
     assert agent in cell2.agents
 
 
-def test_grid2DMovingAgent():
+def test_grid2DMovingAgent():  # noqa: D103
     # we first test on a moore grid because all directions are defined
     grid = OrthogonalMooreGrid((10, 10), torus=False)
 
@@ -676,7 +676,7 @@ def test_grid2DMovingAgent():
         agent.move("back")
 
 
-def test_patch():
+def test_patch():  # noqa: D103
     cell1 = Cell((1,), capacity=None, random=random.Random())
     cell2 = Cell((2,), capacity=None, random=random.Random())
 
