@@ -100,7 +100,6 @@ class Patch(Agent, FixedCell):
         self.cell.remove_agent(self)
 
 
-
 class Grid2DMovingAgent(Agent, HasCell, BasicMovement):
     """Mixin for moving agents in 2D grids."""
 

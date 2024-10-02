@@ -10,13 +10,13 @@ from mesa.experimental.cell_space import (
     Cell,
     CellAgent,
     CellCollection,
+    Grid2DMovingAgent,
     HexGrid,
     Network,
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
+    Patch,
     VoronoiGrid,
-    Grid2DMovingAgent,
-    Patch
 )
 from mesa.space import PropertyLayer
 
@@ -659,21 +659,21 @@ def test_grid2DMovingAgent():
     model = Model()
     agent = Grid2DMovingAgent(model)
 
-    agent.cell = grid[4,4]
-    agent.move('up')
+    agent.cell = grid[4, 4]
+    agent.move("up")
     assert agent.cell == grid[3, 4]
 
     grid = OrthogonalVonNeumannGrid((10, 10), torus=False)
 
     model = Model()
     agent = Grid2DMovingAgent(model)
-    agent.cell = grid[4,4]
+    agent.cell = grid[4, 4]
 
     with pytest.raises(ValueError):  # test for invalid direction
-        agent.move('upright')
+        agent.move("upright")
 
     with pytest.raises(ValueError):  # test for unknown direction
-        agent.move('back')
+        agent.move("back")
 
 
 def test_patch():
