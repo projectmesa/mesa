@@ -91,8 +91,17 @@ class CellAgent(Agent, HasCell, BasicMovement):
 class Patch(Agent, FixedCell):
     """A patch in a 2D grid."""
 
+    def remove(self):
+        """Remove the agent from the model."""
+        super().remove()
 
-class Grid2DMovingAgent(BasicMovement):
+        # fixme we leave self._mesa_cell on the original value
+        #  so you cannot hijack remove() to move patches
+        self.cell.remove_agent(self)
+
+
+
+class Grid2DMovingAgent(Agent, HasCell, BasicMovement):
     """Mixin for moving agents in 2D grids."""
 
     # fmt: off

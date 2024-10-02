@@ -15,6 +15,8 @@ from mesa.experimental.cell_space import (
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
     VoronoiGrid,
+    Grid2DMovingAgent,
+    Patch
 )
 from mesa.space import PropertyLayer
 
@@ -641,3 +643,51 @@ def test_cell_agent():  # noqa: D103
     assert agent not in model._all_agents
     assert agent not in cell1.agents
     assert agent not in cell2.agents
+
+    model = Model()
+    agent = CellAgent(model)
+    agent.cell = cell1
+    agent.move_to(cell2)
+    assert agent not in cell1.agents
+    assert agent in cell2.agents
+
+
+def test_grid2DMovingAgent():
+    # we first test on a moore grid because all directions are defined
+    grid = OrthogonalMooreGrid((10, 10), torus=False)
+
+    model = Model()
+    agent = Grid2DMovingAgent(model)
+
+    agent.cell = grid[4,4]
+    agent.move('up')
+    assert agent.cell == grid[3, 4]
+
+    grid = OrthogonalVonNeumannGrid((10, 10), torus=False)
+
+    model = Model()
+    agent = Grid2DMovingAgent(model)
+    agent.cell = grid[4,4]
+
+    with pytest.raises(ValueError):  # test for invalid direction
+        agent.move('upright')
+
+    with pytest.raises(ValueError):  # test for unknown direction
+        agent.move('back')
+
+
+def test_patch():
+    cell1 = Cell((1,), capacity=None, random=random.Random())
+    cell2 = Cell((2,), capacity=None, random=random.Random())
+
+    # connect
+    # add_agent
+    model = Model()
+    agent = Patch(model)
+    agent.cell = cell1
+
+    with pytest.raises(ValueError):
+        agent.cell = cell2
+
+    agent.remove()
+    assert agent not in model._agents
