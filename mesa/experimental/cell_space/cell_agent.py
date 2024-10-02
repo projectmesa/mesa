@@ -101,7 +101,7 @@ class Patch(Agent, FixedCell):
 
 
 
-class Grid2DMovingAgent(Agent, HasCell, BasicMovement):
+class Grid2DMovingAgent(CellAgent):
     """Mixin for moving agents in 2D grids."""
 
     # fmt: off
