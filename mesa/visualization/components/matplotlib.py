@@ -3,114 +3,212 @@
 from collections import defaultdict
 
 import networkx as nx
-import solara
+from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.figure import Figure
-from matplotlib.ticker import MaxNLocator
+import solara
+from mesa.visualization.utils import update_counter
+from mesa.space import PropertyLayer
 
 import mesa
 from mesa.experimental.cell_space import VoronoiGrid
 from mesa.visualization.utils import update_counter
 
 
-def make_space_matplotlib(agent_portrayal=None):  # noqa: D103
-    if agent_portrayal is None:
+def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
+    """
+    Create a Matplotlib-based space visualization component.
 
+    Args:
+        agent_portrayal (function): Function to portray agents
+        propertylayer_portrayal (dict): Dictionary of PropertyLayer portrayal specifications
+
+    Returns:
+        function: A function that creates a SpaceMatplotlib component
+    """
+    if agent_portrayal is None:
         def agent_portrayal(a):
             return {"id": a.unique_id}
 
     def MakeSpaceMatplotlib(model):
-        return SpaceMatplotlib(model, agent_portrayal)
+        return SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal)
 
     return MakeSpaceMatplotlib
 
 
 @solara.component
-def SpaceMatplotlib(model, agent_portrayal, dependencies: list[any] | None = None):  # noqa: D103
+def SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal, dependencies: list[any] | None = None):
     update_counter.get()
     space_fig = Figure()
     space_ax = space_fig.subplots()
     space = getattr(model, "grid", None)
     if space is None:
-        # Sometimes the space is defined as model.space instead of model.grid
         space = model.space
-    if isinstance(space, mesa.space.NetworkGrid):
-        _draw_network_grid(space, space_ax, agent_portrayal)
+
+    if isinstance(space, mesa.space._Grid):
+        _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
     elif isinstance(space, mesa.space.ContinuousSpace):
-        _draw_continuous_space(space, space_ax, agent_portrayal)
+        _draw_continuous_space(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
+    elif isinstance(space, mesa.space.NetworkGrid):
+        _draw_network_grid(space, space_ax, agent_portrayal)
     elif isinstance(space, VoronoiGrid):
-        _draw_voronoi(space, space_ax, agent_portrayal)
-    else:
-        _draw_grid(space, space_ax, agent_portrayal)
+        _draw_voronoi(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
+
     solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
 
 
-# matplotlib scatter does not allow for multiple shapes in one call
+def draw_property_layers(ax, space, propertylayer_portrayal, model):
+    """
+    Draw PropertyLayers on the given axes.
+
+    Args:
+        ax (matplotlib.axes.Axes): The axes to draw on.
+        space (mesa.space._Grid): The space containing the PropertyLayers.
+        propertylayer_portrayal (dict): Dictionary of PropertyLayer portrayal specifications.
+        model (mesa.Model): The model instance.
+    """
+    for layer_name, portrayal in propertylayer_portrayal.items():
+        layer = getattr(model, layer_name, None)
+        if layer is None or not isinstance(layer, PropertyLayer):
+            continue
+
+        cmap = portrayal.get('colormap', 'viridis')
+        alpha = portrayal.get('alpha', 0.5)
+        vmin = portrayal.get('vmin', np.min(layer.data))
+        vmax = portrayal.get('vmax', np.max(layer.data))
+
+        if isinstance(cmap, list):
+            cmap = LinearSegmentedColormap.from_list(layer_name, cmap)
+
+        im = ax.imshow(layer.data.T, cmap=cmap, alpha=alpha, vmin=vmin, vmax=vmax,
+                       extent=(0, space.width, 0, space.height), origin='lower')
+        plt.colorbar(im, ax=ax, label=layer_name)
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.figure import Figure
+import solara
+from mesa.visualization.utils import update_counter
+
+
+def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
+    """
+    Create a Matplotlib-based space visualization component.
+
+    Args:
+        agent_portrayal (function): Function to portray agents
+        propertylayer_portrayal (dict): Dictionary of PropertyLayer portrayal specifications
+
+    Returns:
+        function: A function that creates a SpaceMatplotlib component
+    """
+    if agent_portrayal is None:
+        def agent_portrayal(a):
+            return {"id": a.unique_id}
+
+    def MakeSpaceMatplotlib(model):
+        return SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal)
+
+    return MakeSpaceMatplotlib
+
+
+@solara.component
+def SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal, dependencies: list[any] | None = None):
+    update_counter.get()
+    space_fig = Figure()
+    space_ax = space_fig.subplots()
+    space = getattr(model, "grid", None)
+    if space is None:
+        space = model.space
+
+    if isinstance(space, mesa.space._Grid):
+        _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
+    elif isinstance(space, mesa.space.ContinuousSpace):
+        _draw_continuous_space(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
+    elif isinstance(space, mesa.space.NetworkGrid):
+        _draw_network_grid(space, space_ax, agent_portrayal)
+    elif isinstance(space, VoronoiGrid):
+        _draw_voronoi(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
+
+    solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
+
+
+def draw_property_layers(ax, space, propertylayer_portrayal, model):
+    """
+    Draw PropertyLayers on the given axes.
+
+    Args:
+        ax (matplotlib.axes.Axes): The axes to draw on.
+        space (mesa.space._Grid): The space containing the PropertyLayers.
+        propertylayer_portrayal (dict): Dictionary of PropertyLayer portrayal specifications.
+        model (mesa.Model): The model instance.
+    """
+    for layer_name, portrayal in propertylayer_portrayal.items():
+        layer = getattr(model, layer_name, None)
+        if layer is None or not isinstance(layer, PropertyLayer):
+            continue
+
+        cmap = portrayal.get('colormap', 'viridis')
+        alpha = portrayal.get('alpha', 0.5)
+        vmin = portrayal.get('vmin', np.min(layer.data))
+        vmax = portrayal.get('vmax', np.max(layer.data))
+
+        if isinstance(cmap, list):
+            cmap = LinearSegmentedColormap.from_list(layer_name, cmap)
+
+        im = ax.imshow(layer.data.T, cmap=cmap, alpha=alpha, vmin=vmin, vmax=vmax,
+                       extent=(0, space.width, 0, space.height), origin='lower')
+        plt.colorbar(im, ax=ax, label=layer_name)
+
+
+def _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model):
+    if propertylayer_portrayal:
+        draw_property_layers(space_ax, space, propertylayer_portrayal, model)
+
+    agent_data = _get_agent_data(space, agent_portrayal)
+
+    space_ax.set_xlim(0, space.width)
+    space_ax.set_ylim(0, space.height)
+    _split_and_scatter(agent_data, space_ax)
+
+    # Draw grid lines
+    for x in range(space.width + 1):
+        space_ax.axvline(x, color='gray', linestyle=':')
+    for y in range(space.height + 1):
+        space_ax.axhline(y, color='gray', linestyle=':')
+
+
+def _get_agent_data(space, agent_portrayal):
+    """Helper function to get agent data for visualization."""
+    x, y, s, c, m = [], [], [], [], []
+    for agents, pos in space.coord_iter():
+        if not agents:
+            continue
+        if not isinstance(agents, list):
+            agents = [agents]
+        for agent in agents:
+            data = agent_portrayal(agent)
+            x.append(pos[0] + 0.5)  # Center the agent in the cell
+            y.append(pos[1] + 0.5)  # Center the agent in the cell
+            default_size = (180 / max(space.width, space.height)) ** 2
+            s.append(data.get("size", default_size))
+            c.append(data.get("color", "tab:blue"))
+            m.append(data.get("shape", "o"))
+    return {"x": x, "y": y, "s": s, "c": c, "m": m}
+
+
 def _split_and_scatter(portray_data, space_ax):
-    grouped_data = defaultdict(lambda: {"x": [], "y": [], "s": [], "c": []})
-
-    # Extract data from the dictionary
-    x = portray_data["x"]
-    y = portray_data["y"]
-    s = portray_data["s"]
-    c = portray_data["c"]
-    m = portray_data["m"]
-
-    if not (len(x) == len(y) == len(s) == len(c) == len(m)):
-        raise ValueError(
-            "Length mismatch in portrayal data lists: "
-            f"x: {len(x)}, y: {len(y)}, size: {len(s)}, "
-            f"color: {len(c)}, marker: {len(m)}"
+    """Helper function to split and scatter agent data."""
+    for marker in set(portray_data["m"]):
+        mask = [m == marker for m in portray_data["m"]]
+        space_ax.scatter(
+            [x for x, show in zip(portray_data["x"], mask) if show],
+            [y for y, show in zip(portray_data["y"], mask) if show],
+            s=[s for s, show in zip(portray_data["s"], mask) if show],
+            c=[c for c, show in zip(portray_data["c"], mask) if show],
+            marker=marker
         )
-
-    # Group the data by marker
-    for i in range(len(x)):
-        marker = m[i]
-        grouped_data[marker]["x"].append(x[i])
-        grouped_data[marker]["y"].append(y[i])
-        grouped_data[marker]["s"].append(s[i])
-        grouped_data[marker]["c"].append(c[i])
-
-    # Plot each group with the same marker
-    for marker, data in grouped_data.items():
-        space_ax.scatter(data["x"], data["y"], s=data["s"], c=data["c"], marker=marker)
-
-
-def _draw_grid(space, space_ax, agent_portrayal):
-    def portray(g):
-        x = []
-        y = []
-        s = []  # size
-        c = []  # color
-        m = []  # shape
-        for i in range(g.width):
-            for j in range(g.height):
-                content = g._grid[i][j]
-                if not content:
-                    continue
-                if not hasattr(content, "__iter__"):
-                    # Is a single grid
-                    content = [content]
-                for agent in content:
-                    data = agent_portrayal(agent)
-                    x.append(i)
-                    y.append(j)
-
-                    # This is the default value for the marker size, which auto-scales
-                    # according to the grid area.
-                    default_size = (180 / max(g.width, g.height)) ** 2
-                    # establishing a default prevents misalignment if some agents are not given size, color, etc.
-                    size = data.get("size", default_size)
-                    s.append(size)
-                    color = data.get("color", "tab:blue")
-                    c.append(color)
-                    mark = data.get("shape", "o")
-                    m.append(mark)
-        out = {"x": x, "y": y, "s": s, "c": c, "m": m}
-        return out
-
-    space_ax.set_xlim(-1, space.width)
-    space_ax.set_ylim(-1, space.height)
-    _split_and_scatter(portray(space), space_ax)
 
 
 def _draw_network_grid(space, space_ax, agent_portrayal):
