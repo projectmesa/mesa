@@ -1,22 +1,18 @@
 """Matplotlib based solara components for visualization MESA spaces and plots."""
 
-from collections import defaultdict
-
 import networkx as nx
+import solara
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.figure import Figure
-import solara
-from mesa.visualization.utils import update_counter
-from mesa.space import PropertyLayer
 
 import mesa
 from mesa.experimental.cell_space import VoronoiGrid
+from mesa.space import PropertyLayer
 from mesa.visualization.utils import update_counter
 
 
 def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
-    """
-    Create a Matplotlib-based space visualization component.
+    """Create a Matplotlib-based space visualization component.
 
     Args:
         agent_portrayal (function): Function to portray agents
@@ -26,6 +22,7 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
         function: A function that creates a SpaceMatplotlib component
     """
     if agent_portrayal is None:
+
         def agent_portrayal(a):
             return {"id": a.unique_id}
 
@@ -36,7 +33,12 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
 
 
 @solara.component
-def SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal, dependencies: list[any] | None = None):
+def SpaceMatplotlib(
+    model,
+    agent_portrayal,
+    propertylayer_portrayal,
+    dependencies: list[any] | None = None,
+):
     update_counter.get()
     space_fig = Figure()
     space_ax = space_fig.subplots()
@@ -47,7 +49,9 @@ def SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal, dependencie
     if isinstance(space, mesa.space._Grid):
         _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
     elif isinstance(space, mesa.space.ContinuousSpace):
-        _draw_continuous_space(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
+        _draw_continuous_space(
+            space, space_ax, agent_portrayal, propertylayer_portrayal, model
+        )
     elif isinstance(space, mesa.space.NetworkGrid):
         _draw_network_grid(space, space_ax, agent_portrayal)
     elif isinstance(space, VoronoiGrid):
@@ -57,8 +61,7 @@ def SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal, dependencie
 
 
 def draw_property_layers(ax, space, propertylayer_portrayal, model):
-    """
-    Draw PropertyLayers on the given axes.
+    """Draw PropertyLayers on the given axes.
 
     Args:
         ax (matplotlib.axes.Axes): The axes to draw on.
@@ -71,30 +74,33 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
         if layer is None or not isinstance(layer, PropertyLayer):
             continue
 
-        cmap = portrayal.get('colormap', 'viridis')
-        alpha = portrayal.get('alpha', 0.5)
-        vmin = portrayal.get('vmin', np.min(layer.data))
-        vmax = portrayal.get('vmax', np.max(layer.data))
+        cmap = portrayal.get("colormap", "viridis")
+        alpha = portrayal.get("alpha", 0.5)
+        vmin = portrayal.get("vmin", np.min(layer.data))
+        vmax = portrayal.get("vmax", np.max(layer.data))
 
         if isinstance(cmap, list):
             cmap = LinearSegmentedColormap.from_list(layer_name, cmap)
 
-        im = ax.imshow(layer.data.T, cmap=cmap, alpha=alpha, vmin=vmin, vmax=vmax,
-                       extent=(0, space.width, 0, space.height), origin='lower')
+        im = ax.imshow(
+            layer.data.T,
+            cmap=cmap,
+            alpha=alpha,
+            vmin=vmin,
+            vmax=vmax,
+            extent=(0, space.width, 0, space.height),
+            origin="lower",
+        )
         plt.colorbar(im, ax=ax, label=layer_name)
 
 
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.figure import Figure
+import numpy as np
 import solara
-from mesa.visualization.utils import update_counter
 
 
 def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
-    """
-    Create a Matplotlib-based space visualization component.
+    """Create a Matplotlib-based space visualization component.
 
     Args:
         agent_portrayal (function): Function to portray agents
@@ -104,6 +110,7 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
         function: A function that creates a SpaceMatplotlib component
     """
     if agent_portrayal is None:
+
         def agent_portrayal(a):
             return {"id": a.unique_id}
 
@@ -114,7 +121,12 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
 
 
 @solara.component
-def SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal, dependencies: list[any] | None = None):
+def SpaceMatplotlib(
+    model,
+    agent_portrayal,
+    propertylayer_portrayal,
+    dependencies: list[any] | None = None,
+):
     update_counter.get()
     space_fig = Figure()
     space_ax = space_fig.subplots()
@@ -125,7 +137,9 @@ def SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal, dependencie
     if isinstance(space, mesa.space._Grid):
         _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
     elif isinstance(space, mesa.space.ContinuousSpace):
-        _draw_continuous_space(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
+        _draw_continuous_space(
+            space, space_ax, agent_portrayal, propertylayer_portrayal, model
+        )
     elif isinstance(space, mesa.space.NetworkGrid):
         _draw_network_grid(space, space_ax, agent_portrayal)
     elif isinstance(space, VoronoiGrid):
@@ -135,8 +149,7 @@ def SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal, dependencie
 
 
 def draw_property_layers(ax, space, propertylayer_portrayal, model):
-    """
-    Draw PropertyLayers on the given axes.
+    """Draw PropertyLayers on the given axes.
 
     Args:
         ax (matplotlib.axes.Axes): The axes to draw on.
@@ -149,16 +162,23 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
         if layer is None or not isinstance(layer, PropertyLayer):
             continue
 
-        cmap = portrayal.get('colormap', 'viridis')
-        alpha = portrayal.get('alpha', 0.5)
-        vmin = portrayal.get('vmin', np.min(layer.data))
-        vmax = portrayal.get('vmax', np.max(layer.data))
+        cmap = portrayal.get("colormap", "viridis")
+        alpha = portrayal.get("alpha", 0.5)
+        vmin = portrayal.get("vmin", np.min(layer.data))
+        vmax = portrayal.get("vmax", np.max(layer.data))
 
         if isinstance(cmap, list):
             cmap = LinearSegmentedColormap.from_list(layer_name, cmap)
 
-        im = ax.imshow(layer.data.T, cmap=cmap, alpha=alpha, vmin=vmin, vmax=vmax,
-                       extent=(0, space.width, 0, space.height), origin='lower')
+        im = ax.imshow(
+            layer.data.T,
+            cmap=cmap,
+            alpha=alpha,
+            vmin=vmin,
+            vmax=vmax,
+            extent=(0, space.width, 0, space.height),
+            origin="lower",
+        )
         plt.colorbar(im, ax=ax, label=layer_name)
 
 
@@ -174,9 +194,9 @@ def _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
 
     # Draw grid lines
     for x in range(space.width + 1):
-        space_ax.axvline(x, color='gray', linestyle=':')
+        space_ax.axvline(x, color="gray", linestyle=":")
     for y in range(space.height + 1):
-        space_ax.axhline(y, color='gray', linestyle=':')
+        space_ax.axhline(y, color="gray", linestyle=":")
 
 
 def _get_agent_data(space, agent_portrayal):
@@ -207,7 +227,7 @@ def _split_and_scatter(portray_data, space_ax):
             [y for y, show in zip(portray_data["y"], mask) if show],
             s=[s for s, show in zip(portray_data["s"], mask) if show],
             c=[c for c, show in zip(portray_data["c"], mask) if show],
-            marker=marker
+            marker=marker,
         )
 
 
