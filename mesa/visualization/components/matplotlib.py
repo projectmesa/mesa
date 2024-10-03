@@ -59,7 +59,7 @@ def SpaceMatplotlib(
     elif isinstance(space, mesa.space.NetworkGrid):
         _draw_network_grid(space, space_ax, agent_portrayal)
     elif isinstance(space, VoronoiGrid):
-        _draw_voronoi(space, space_ax, agent_portrayal)
+        _draw_voronoi(space, space_ax, agent_portrayal, model)
     elif space is None and propertylayer_portrayal:
         draw_property_layers(space_ax, space, propertylayer_portrayal, model)
 
@@ -157,7 +157,15 @@ def _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
 
 def _get_agent_data(space, agent_portrayal):
     """Helper function to get agent data for visualization."""
-    x, y, s, c, m = [], [], [], [], []
+    x, y, s, c, m, edgecolors, linewidths, alpha = [], [], [], [], [], [], [], []
+    translation_dict = {
+        "c": "color",
+        "s": "size",
+        "marker": "shape",
+        "edgecolors": "edgecolor",
+        "linewidths": "linewidth",
+    }
+
     for agents, pos in space.coord_iter():
         if not agents:
             continue
@@ -165,13 +173,31 @@ def _get_agent_data(space, agent_portrayal):
             agents = [agents]  # noqa PLW2901
         for agent in agents:
             data = agent_portrayal(agent)
+            # Translate old keywords to new keywords if they exist
+            for key, value in translation_dict.items():
+                if value in data:
+                    data[key] = data.pop(value)
+
             x.append(pos[0] + 0.5)  # Center the agent in the cell
             y.append(pos[1] + 0.5)  # Center the agent in the cell
             default_size = (180 / max(space.width, space.height)) ** 2
-            s.append(data.get("size", default_size))
-            c.append(data.get("color", "tab:blue"))
-            m.append(data.get("shape", "o"))
-    return {"x": x, "y": y, "s": s, "c": c, "m": m}
+            s.append(data.get("s", default_size))
+            c.append(data.get("c", "tab:blue"))
+            m.append(data.get("marker", "o"))
+            edgecolors.append(data.get("edgecolors", "none"))
+            linewidths.append(data.get("linewidths", 0))
+            alpha.append(data.get("alpha", 1.0))
+
+    return {
+        "x": x,
+        "y": y,
+        "s": s,
+        "c": c,
+        "m": m,
+        "edgecolors": edgecolors,
+        "linewidths": linewidths,
+        "alpha": alpha,
+    }
 
 
 def _split_and_scatter(portray_data, space_ax):
@@ -184,6 +210,11 @@ def _split_and_scatter(portray_data, space_ax):
             s=[s for s, show in zip(portray_data["s"], mask) if show],
             c=[c for c, show in zip(portray_data["c"], mask) if show],
             marker=marker,
+            edgecolors=[e for e, show in zip(portray_data["edgecolors"], mask) if show],
+            linewidths=[
+                lw for lw, show in zip(portray_data["linewidths"], mask) if show
+            ],
+            alpha=[a for a, show in zip(portray_data["alpha"], mask) if show],
         )
 
 
@@ -198,28 +229,9 @@ def _draw_network_grid(space, space_ax, agent_portrayal):
     )
 
 
-def _draw_continuous_space(space, space_ax, agent_portrayal, model):
-    def portray(space):
-        x = []
-        y = []
-        s = []  # size
-        c = []  # color
-        m = []  # shape
-        for agent in space._agent_to_index:
-            data = agent_portrayal(agent)
-            _x, _y = agent.pos
-            x.append(_x)
-            y.append(_y)
-
-            # This is matplotlib's default marker size
-            default_size = 20
-            size = data.get("size", default_size)
-            s.append(size)
-            color = data.get("color", "tab:blue")
-            c.append(color)
-            mark = data.get("shape", "o")
-            m.append(mark)
-        return {"x": x, "y": y, "s": s, "c": c, "m": m}
+def _draw_continuous_space(space, space_ax, agent_portrayal):
+    """Draw agents in a continuous space."""
+    agent_data = _get_agent_data(space, agent_portrayal)
 
     # Determine border style based on space.torus
     border_style = "solid" if not space.torus else (0, (5, 10))
@@ -238,32 +250,14 @@ def _draw_continuous_space(space, space_ax, agent_portrayal, model):
     space_ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
     # Portray and scatter the agents in the space
-    _split_and_scatter(portray(space), space_ax)
+    _split_and_scatter(agent_data, space_ax)
 
 
 def _draw_voronoi(space, space_ax, agent_portrayal):
-    def portray(g):
-        x = []
-        y = []
-        s = []  # size
-        c = []  # color
+    """Draw agents in a Voronoi space."""
+    agent_data = _get_agent_data(space, agent_portrayal)
 
-        for cell in g.all_cells:
-            for agent in cell.agents:
-                data = agent_portrayal(agent)
-                x.append(cell.coordinate[0])
-                y.append(cell.coordinate[1])
-                if "size" in data:
-                    s.append(data["size"])
-                if "color" in data:
-                    c.append(data["color"])
-        out = {"x": x, "y": y}
-        out["s"] = s
-        if len(c) > 0:
-            out["c"] = c
-
-        return out
-
+    # Set plot limits based on Voronoi centroids
     x_list = [i[0] for i in space.centroids_coordinates]
     y_list = [i[1] for i in space.centroids_coordinates]
     x_max = max(x_list)
@@ -277,8 +271,11 @@ def _draw_voronoi(space, space_ax, agent_portrayal):
     y_padding = height / 20
     space_ax.set_xlim(x_min - x_padding, x_max + x_padding)
     space_ax.set_ylim(y_min - y_padding, y_max + y_padding)
-    space_ax.scatter(**portray(space))
 
+    # Scatter the agent data
+    _split_and_scatter(agent_data, space_ax)
+
+    # Draw Voronoi cells as polygons
     for cell in space.all_cells:
         polygon = cell.properties["polygon"]
         space_ax.fill(
