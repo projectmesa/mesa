@@ -1,8 +1,7 @@
-name: PR install note
-
+name: PR Install Note
 on:
   pull_request:
-    types: [opened]
+    types: [opened, reopened, ready_for_review]
 
 jobs:
   add-install-note:
@@ -19,12 +18,14 @@ jobs:
           FORK_NAME=$(gh pr view $PR_NUMBER --json headRepositoryOwner -q .headRepositoryOwner.login)
           PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName -q .headRefName)
           REPO_OWNER=${FORK_NAME:-projectmesa}
-          INSTALL_NOTE="
+          INSTALL_NOTE=$(cat << EOF
 
-You can install this PR branch with:
-\`\`\`
-pip install -U -e git+https://github.com/${REPO_OWNER}/mesa@${PR_BRANCH}#egg=mesa
-\`\`\`"
+          You can install this PR branch with:
+          \`\`\`
+          pip install -U -e git+https://github.com/${REPO_OWNER}/mesa@${PR_BRANCH}#egg=mesa
+          \`\`\`
+          EOF
+          )
 
           NEW_PR_BODY="${PR_BODY}${INSTALL_NOTE}"
           gh pr edit $PR_NUMBER --body "$NEW_PR_BODY"
