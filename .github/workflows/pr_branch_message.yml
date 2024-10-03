@@ -1,0 +1,30 @@
+name: PR install note
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  add-install-note:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Add PR install note
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          PR_BODY=$(gh pr view $PR_NUMBER --json body -q .body)
+          FORK_NAME=$(gh pr view $PR_NUMBER --json headRepositoryOwner -q .headRepositoryOwner.login)
+          PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName -q .headRefName)
+          REPO_OWNER=${FORK_NAME:-projectmesa}
+          INSTALL_NOTE="
+
+You can install this PR branch with:
+\`\`\`
+pip install -U -e git+https://github.com/${REPO_OWNER}/mesa@${PR_BRANCH}#egg=mesa
+\`\`\`"
+
+          NEW_PR_BODY="${PR_BODY}${INSTALL_NOTE}"
+          gh pr edit $PR_NUMBER --body "$NEW_PR_BODY"
