@@ -10,12 +10,12 @@ from mesa.experimental.cell_space import (
     Cell,
     CellAgent,
     CellCollection,
+    FixedAgent,
     Grid2DMovingAgent,
     HexGrid,
     Network,
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
-    FixedAgent,
     VoronoiGrid,
 )
 from mesa.space import PropertyLayer
