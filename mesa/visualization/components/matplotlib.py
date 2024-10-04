@@ -44,6 +44,7 @@ def SpaceMatplotlib(
     propertylayer_portrayal,
     dependencies: list[any] | None = None,
 ):
+    """Create a Matplotlib-based space visualization component."""
     update_counter.get()
     space_fig = Figure()
     space_ax = space_fig.subplots()
@@ -86,6 +87,7 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
             warnings.warn(
                 f"Layer {layer_name} dimensions ({data.shape}) do not match space dimensions ({width}, {height}).",
                 UserWarning,
+                stacklevel=2,
             )
 
         # Get portrayal properties, or use defaults
@@ -160,7 +162,7 @@ def _get_agent_data(space, agent_portrayal):
         if not agents:
             continue
         if not isinstance(agents, list):
-            agents = [agents]
+            agents = [agents]  # noqa PLW2901
         for agent in agents:
             data = agent_portrayal(agent)
             x.append(pos[0] + 0.5)  # Center the agent in the cell
