@@ -225,6 +225,7 @@ def ModelController(model: solara.Reactive[Model], play_interval=100):
         play_interval (int, optional): Interval for playing the model steps in milliseconds.
     """
     playing = solara.use_reactive(False)
+    running = solara.use_reactive(True)
     original_model = solara.use_reactive(None)
 
     def save_initial_model():
@@ -236,19 +237,23 @@ def ModelController(model: solara.Reactive[Model], play_interval=100):
     solara.use_effect(save_initial_model, [model.value])
 
     async def step():
-        while playing.value:
+        while playing.value and running.value:
             await asyncio.sleep(play_interval / 1000)
             do_step()
 
-    solara.lab.use_task(step, dependencies=[playing.value], prefer_threaded=False)
+    solara.lab.use_task(
+        step, dependencies=[playing.value, running.value], prefer_threaded=False
+    )
 
     def do_step():
         """Advance the model by one step."""
         model.value.step()
+        running.value = model.value.running
 
     def do_reset():
         """Reset the model to its initial state."""
         playing.value = False
+        running.value = True
         model.value = copy.deepcopy(original_model.value)
 
     def do_play_pause():
@@ -261,9 +266,13 @@ def ModelController(model: solara.Reactive[Model], play_interval=100):
             label="▶" if not playing.value else "❚❚",
             color="primary",
             on_click=do_play_pause,
+            disabled=not running.value,
         )
         solara.Button(
-            label="Step", color="primary", on_click=do_step, disabled=playing.value
+            label="Step",
+            color="primary",
+            on_click=do_step,
+            disabled=playing.value or not running.value,
         )
 
 

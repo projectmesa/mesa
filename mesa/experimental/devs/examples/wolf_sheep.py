@@ -1,6 +1,7 @@
 """Example of using ABM simulator for Wolf-Sheep Predation Model."""
 
 import mesa
+from mesa.experimental.cell_space import FixedAgent
 from mesa.experimental.devs.simulator import ABMSimulator
 
 
@@ -90,7 +91,7 @@ class Wolf(Animal):
             sheep_to_eat.die()
 
 
-class GrassPatch(mesa.Agent):
+class GrassPatch(FixedAgent):
     """A patch of grass that grows at a fixed rate and it is eaten by sheep."""
 
     @property
