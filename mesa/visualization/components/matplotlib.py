@@ -93,6 +93,7 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
         alpha = portrayal.get("alpha", 1)
         vmin = portrayal.get("vmin", np.min(data))
         vmax = portrayal.get("vmax", np.max(data))
+        colorbar = portrayal.get("colorbar", True)
 
         # Draw the layer
         if "color" in portrayal:
@@ -118,7 +119,8 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
                 extent=(0, width, 0, height),
                 origin="lower",
             )
-            plt.colorbar(im, ax=ax, label=layer_name)
+            if colorbar:
+                plt.colorbar(im, ax=ax, label=layer_name)
         else:
             raise ValueError(
                 f"PropertyLayer {layer_name} portrayal must include 'color' or 'colormap'."
