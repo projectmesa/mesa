@@ -10,7 +10,7 @@ Replication of the model found in NetLogo:
 import math
 
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, OrthogonalVonNeumannGrid
+from mesa.experimental.cell_space import CellAgent, FixedAgent, OrthogonalVonNeumannGrid
 from mesa.experimental.devs import ABMSimulator
 
 
@@ -87,7 +87,7 @@ class Wolf(Animal):
             sheep_to_eat.remove()
 
 
-class GrassPatch(CellAgent):
+class GrassPatch(FixedAgent):
     """A patch of grass that grows at a fixed rate and it is eaten by sheep."""
 
     @property
