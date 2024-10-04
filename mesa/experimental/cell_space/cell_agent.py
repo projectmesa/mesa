@@ -88,7 +88,7 @@ class CellAgent(Agent, HasCell, BasicMovement):
         self.cell = None  # ensures that we are also removed from cell
 
 
-class Patch(Agent, FixedCell):
+class FixedAgent(Agent, FixedCell):
     """A patch in a 2D grid."""
 
     def remove(self):
