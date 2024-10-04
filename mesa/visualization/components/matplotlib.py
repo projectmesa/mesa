@@ -8,6 +8,8 @@ import numpy as np
 import solara
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 from matplotlib.figure import Figure
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
 
 import mesa
 from mesa.experimental.cell_space import VoronoiGrid
@@ -101,11 +103,18 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
             normalized_data = (data - vmin) / (vmax - vmin)
             rgba_data = np.full((*data.shape, 4), rgba_color)
             rgba_data[..., 3] *= normalized_data * alpha
+            cmap = LinearSegmentedColormap.from_list(layer_name, [(0, 0, 0, 0), rgba_color])
             im = ax.imshow(
                 rgba_data.transpose(1, 0, 2),
                 extent=(0, width, 0, height),
                 origin="lower",
             )
+            if colorbar:
+                norm = Normalize(vmin=vmin, vmax=vmax)
+                sm = ScalarMappable(norm=norm, cmap=cmap)
+                sm.set_array([])
+                ax.figure.colorbar(sm, ax=ax, orientation="vertical")
+
         elif "colormap" in portrayal:
             cmap = portrayal.get("colormap", "viridis")
             if isinstance(cmap, list):
