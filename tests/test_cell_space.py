@@ -15,7 +15,7 @@ from mesa.experimental.cell_space import (
     Network,
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
-    Patch,
+    FixedAgent,
     VoronoiGrid,
 )
 from mesa.space import PropertyLayer
@@ -683,7 +683,7 @@ def test_patch():  # noqa: D103
     # connect
     # add_agent
     model = Model()
-    agent = Patch(model)
+    agent = FixedAgent(model)
     agent.cell = cell1
 
     with pytest.raises(ValueError):

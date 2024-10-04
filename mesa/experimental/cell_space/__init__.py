@@ -6,7 +6,7 @@ expressive that the default grids available in `mesa.space`.
 """
 
 from mesa.experimental.cell_space.cell import Cell
-from mesa.experimental.cell_space.cell_agent import CellAgent, Grid2DMovingAgent, Patch
+from mesa.experimental.cell_space.cell_agent import CellAgent, Grid2DMovingAgent, FixedAgent
 from mesa.experimental.cell_space.cell_collection import CellCollection
 from mesa.experimental.cell_space.discrete_space import DiscreteSpace
 from mesa.experimental.cell_space.grid import (
@@ -23,7 +23,7 @@ __all__ = [
     "Cell",
     "CellAgent",
     "Grid2DMovingAgent",
-    "Patch",
+    "FixedAgent",
     "DiscreteSpace",
     "Grid",
     "HexGrid",
