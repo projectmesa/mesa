@@ -103,7 +103,7 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
             normalized_data = (data - vmin) / (vmax - vmin)
             rgba_data = np.full((*data.shape, 4), rgba_color)
             rgba_data[..., 3] *= normalized_data * alpha
-            cmap = LinearSegmentedColormap.from_list(layer_name, [(0, 0, 0, 0), rgba_color])
+            cmap = LinearSegmentedColormap.from_list(layer_name, [(0, 0, 0, 0), (*rgba_color[:3], alpha)])
             im = ax.imshow(
                 rgba_data.transpose(1, 0, 2),
                 extent=(0, width, 0, height),
