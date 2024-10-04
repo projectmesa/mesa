@@ -54,13 +54,11 @@ def SpaceMatplotlib(
     if isinstance(space, mesa.space._Grid):
         _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
     elif isinstance(space, mesa.space.ContinuousSpace):
-        _draw_continuous_space(
-            space, space_ax, agent_portrayal, propertylayer_portrayal, model
-        )
+        _draw_continuous_space(space, space_ax, agent_portrayal, model)
     elif isinstance(space, mesa.space.NetworkGrid):
         _draw_network_grid(space, space_ax, agent_portrayal)
     elif isinstance(space, VoronoiGrid):
-        _draw_voronoi(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
+        _draw_voronoi(space, space_ax, agent_portrayal, model)
     elif space is None and propertylayer_portrayal:
         draw_property_layers(space_ax, space, propertylayer_portrayal, model)
 
