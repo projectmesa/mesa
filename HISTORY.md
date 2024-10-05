@@ -7,9 +7,10 @@ We're proud to release the first Mesa 3.0 beta! This pre-release announces that 
 
 In this beta, not so much has changed as in the alphas (we're stabilizing, that's a good sign), but there are still a few notable things:
 - Agents now have to be initialized without their `unique_id`. See [#2328](https://github.com/projectmesa/mesa/pull/2328) and the [Migration guide](https://mesa.readthedocs.io/latest/migration_guide.html#automatic-assignment-of-unique-id-to-agents).
+- PropertyLayers can now be visualized! See [#2336](https://github.com/projectmesa/mesa/pull/2336) for details and some examples, and [mesa-examples#214](https://github.com/projectmesa/mesa-examples/pull/214) as a simple example model.
 - We reduced the core dependencies of Mesa, so that's a lighter and simpler install. You can now use extras to install the dependencies, for example add `[viz]` to install all visualisation dependencies: `pip install -U --pre mesa[viz]`. See [#2265](https://github.com/projectmesa/mesa/pull/2265) for details.
 - The [Mesa Overview](https://mesa.readthedocs.io/latest/overview.html) as fully updated for 3.0. We highly recommend reading though it!
-- We made some more progress on the experimental Cell Space, adding movement and integrating the PropertyLayer. Development continues during the betas and
+- We made some more progress on the experimental Cell Space, adding movement and integrating the PropertyLayer. Among others, Agents have nu initial movement capabilities for grids. Development continues during the betas and
 
 We plan to release one or two more beta's in the coming weeks, and tag a release candidate and Mesa 3.0 late October. In the [v3.0 milestone](https://github.com/projectmesa/mesa/milestone/43) are the critical items on our todo-list.
 
@@ -23,9 +24,12 @@ We're very curious what you think, try it out and ask any questions or share any
 ## What's Changed
 ### ⚠️ Breaking changes
 * update `Agent.__init__` to remove deprecation warning by @quaquel in https://github.com/projectmesa/mesa/pull/2328
+### 🎉 New features added
+* Visualize PropertyLayers by @EwoutH in https://github.com/projectmesa/mesa/pull/2336
 ### 🧪 Experimental features
 * Encapsulate cell movement in properties by @quaquel in https://github.com/projectmesa/mesa/pull/2333
 * experimental: Integrate PropertyLayers into cell space by @EwoutH in https://github.com/projectmesa/mesa/pull/2319
+* Generalize CellAgent by @Corvince in https://github.com/projectmesa/mesa/pull/2292
 ### 🛠 Enhancements made
 * Reduce core dependencies, split in optional dependencies by @EwoutH in https://github.com/projectmesa/mesa/pull/2265
 ### 🐛 Bugs fixed
@@ -36,6 +40,7 @@ We're very curious what you think, try it out and ask any questions or share any
 ### 🔧 Maintenance
 * tests: Resolve warnings by removing scheduler and updating arguments by @EwoutH in https://github.com/projectmesa/mesa/pull/2329
 * add super call to Model and remove self.schedule by @quaquel in https://github.com/projectmesa/mesa/pull/2334
+### Other changes
 * Deprecate `initialize_data_collector` by @EwoutH in https://github.com/projectmesa/mesa/pull/2327
 
 **Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0a5...v3.0.0b0
