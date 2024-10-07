@@ -6,8 +6,8 @@ from random import Random
 
 import numpy as np
 
-from mesa.experimental.cell_space.cell import Cell
-from mesa.experimental.cell_space.discrete_space import DiscreteSpace
+from mesa.spaces.cell import Cell
+from mesa.spaces.discrete_space import DiscreteSpace
 
 
 class Delaunay:

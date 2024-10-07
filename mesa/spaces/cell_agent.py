@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Protocol
 from mesa.agent import Agent
 
 if TYPE_CHECKING:
-    from mesa.experimental.cell_space import Cell
+    from mesa.spaces.cell import Cell
 
 
 class HasCellProtocol(Protocol):
@@ -127,7 +127,3 @@ class Grid2DMovingAgent(CellAgent):
 
         if direction not in self.DIRECTION_MAP:
             raise ValueError(f"Invalid direction: {direction}")
-
-        move_vector = self.DIRECTION_MAP[direction]
-        for _ in range(distance):
-            self.move_relative(move_vector)

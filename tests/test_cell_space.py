@@ -6,7 +6,8 @@ import numpy as np
 import pytest
 
 from mesa import Model
-from mesa.experimental.cell_space import (
+from mesa.space import PropertyLayer
+from mesa.spaces import (
     Cell,
     CellAgent,
     CellCollection,
@@ -18,7 +19,6 @@ from mesa.experimental.cell_space import (
     OrthogonalVonNeumannGrid,
     VoronoiGrid,
 )
-from mesa.space import PropertyLayer
 
 
 def test_orthogonal_grid_neumann():

@@ -10,8 +10,8 @@ Replication of the model found in NetLogo:
 import math
 
 from mesa import Model
-from mesa.experimental.cell_space import CellAgent, FixedAgent, OrthogonalVonNeumannGrid
 from mesa.experimental.devs import ABMSimulator
+from mesa.spaces import CellAgent, OrthogonalVonNeumannGrid
 
 
 class Animal(CellAgent):

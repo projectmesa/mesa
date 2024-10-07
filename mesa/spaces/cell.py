@@ -7,8 +7,11 @@ from functools import cache, cached_property
 from random import Random
 from typing import TYPE_CHECKING, Any
 
-from mesa.experimental.cell_space.cell_agent import CellAgent
-from mesa.experimental.cell_space.cell_collection import CellCollection
+from mesa.spaces.cell_collection import CellCollection
+
+if TYPE_CHECKING:
+    from mesa.spaces.cell_agent import CellAgent
+
 from mesa.space import PropertyLayer
 
 if TYPE_CHECKING:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from mesa import Model
-from mesa.experimental.cell_space import Cell, CellAgent, OrthogonalMooreGrid
+from mesa.spaces import CellAgent, OrthogonalMooreGrid
 
 
 class SchellingAgent(CellAgent):

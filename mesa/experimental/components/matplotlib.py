@@ -8,7 +8,6 @@ from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 
 import mesa
-from mesa.experimental.cell_space import VoronoiGrid
 
 
 @solara.component
