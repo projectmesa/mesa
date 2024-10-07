@@ -25,7 +25,7 @@ class ObservableList(BaseObservable):
             "added",
             "removed",
             "replaced",
-            "on_change",
+            "change",
         }
         self.fallback_value = []
 

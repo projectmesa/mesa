@@ -10,7 +10,7 @@ from collections import defaultdict, namedtuple
 from collections.abc import Callable
 from typing import Any
 
-from mesa.experimental.signals.signals_util import create_weakref
+from mesa.experimental.signals.signals_util import AttributeDict, create_weakref
 
 __all__ = ["Observable", "HasObservables", "All", "Computable"]
 
@@ -30,11 +30,12 @@ class BaseObservable(ABC):
         self.public_name: str
         self.private_name: str
 
-        # fixme can we make this an innerclass enum?
+        # fixme can we make this an inner class enum?
         #  or some SignalTypes helper class?
         #  its even more complicated. Ideally you can define
         #  signal_types throughout the class hierarchy and they are just
         #  combined together.
+        #  while we also want to  make sure that any signal being emitted is valid for that class
         self.signal_types: set = set()
         self.fallback_value = fallback_value
 
@@ -65,7 +66,7 @@ class BaseObservable(ABC):
             self.public_name,
             getattr(instance, self.private_name, self.fallback_value),
             value,
-            "on_change",
+            "change",
         )
 
     def __str__(self):
@@ -75,18 +76,12 @@ class BaseObservable(ABC):
 class Observable(BaseObservable):
     """Observable class."""
 
-    # fixme, cycles
-    # fixme, how do we "traverse" the tree
-    #  do we go by layer, or by branch? it seems signals goes by layer with its batch construction
-
     def __init__(self, fallback_value=None):
         """Initialize an Observable."""
         super().__init__(fallback_value=fallback_value)
 
-        # fixme can we make this an innerclass enum?
-        #  or some SignalTypes helper class?
         self.signal_types: set = {
-            "on_change",
+            "change",
         }
 
     def __set__(self, instance: HasObservables, value):  # noqa D103
@@ -123,10 +118,6 @@ class Computable(BaseObservable):
     def __init__(self):
         """Initialize a Computable."""
         super().__init__()
-        self.public_name: str
-        self.private_name: str
-
-        self.signal_types: set = {"on_change"}
 
     def __get__(self, instance, owner):  # noqa: D105
         computed = getattr(instance, self.private_name)
@@ -143,7 +134,7 @@ class Computable(BaseObservable):
                 self.public_name,
                 old_value,
                 new_value,
-                "on_change",
+                "change",
             )
             return new_value
         else:
@@ -177,9 +168,7 @@ class Computed:
     def _set_dirty(self, signal):
         if not self._is_dirty:
             self._is_dirty = True
-            self.owner.notify(self.name, self._value, None, "on_change")
-
-        # fixme propagate this to all dependents
+            self.owner.notify(self.name, self._value, None, "change")
 
     def _add_parent(
         self, parent: HasObservables, name: str, current_value: Any
@@ -213,7 +202,7 @@ class Computed:
 
             if self._first:
                 # fixme might be a cleaner solution for this
-                #  basicaly, we have no parents.
+                #  basically, we have no parents.
                 changed = True
                 self._first = False
 
@@ -273,9 +262,6 @@ class All:
         return self
 
 
-Signal = namedtuple("Signal", "owner observable old_value new_value signal_type")
-
-
 class HasObservables:
     """HasObservables class."""
 
@@ -307,10 +293,8 @@ class HasObservables:
             ValueError: if the Observable <name> is not registered or if the Observable
             does not emit the given signal_type
 
-
-        fixme should name/signal_type also take a list?
-
         """
+        # fixme should name/signal_type also take a list of str?
         if not isinstance(name, All):
             if name not in self.observables:
                 raise ValueError(
@@ -384,7 +368,7 @@ class HasObservables:
         if name is not isinstance(name, All):
             with contextlib.suppress(KeyError):
                 del self.subscribers[name]
-                # ignore when unsubscribing to  Observables that have no subscription
+                # ignore when unsubscribing to Observables that have no subscription
         else:
             self.subscribers = defaultdict(
                 functools.partial(defaultdict, weakref.WeakSet)
@@ -400,12 +384,28 @@ class HasObservables:
             signal_type: the type of signal to emit
 
         """
-        # fixme: currently strongly tied to just on_change signals
-        #  this needs to be refined for e.g. list and dicts in due course
-        #  idea is to just mimic how traitlets handles this.
-        #  Traitlets uses a Bunch helper class which turns a dict into something with
-        #  attribute access. This will be richer than the current Signal named tuple
-        signal = Signal(self, observable, old_value, new_value, signal_type)
+        signal = AttributeDict(name=observable,
+                               old=old_value,
+                               new=new_value,
+                               owner=self,
+                               type=signal_type)
+
+        self._mesa_notify(signal)
+
+    def _mesa_notify(self, signal: AttributeDict):
+        """Send out the signal.
+
+        Args:
+        signal: the signal
+
+        Notes:
+        signal must contain name and type attributes because this is how observers are stored.
+
+        """
+        # we put this into a helper method, so we can emit signals with other fields
+        # then the default ones in notify.
+        observable = signal.name
+        signal_type = signal.type
 
         # because we are using a list of subscribers
         # we should update this list to subscribers that are still alive
