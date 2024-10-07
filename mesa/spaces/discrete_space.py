@@ -7,9 +7,9 @@ from functools import cached_property
 from random import Random
 from typing import Any, Generic, TypeVar
 
+from mesa.space import PropertyLayer
 from mesa.spaces.cell import Cell
 from mesa.spaces.cell_collection import CellCollection
-from mesa.space import PropertyLayer
 
 T = TypeVar("T", bound=Cell)
 

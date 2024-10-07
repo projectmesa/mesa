@@ -11,8 +11,8 @@ from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.figure import Figure
 
 import mesa
-from mesa.spaces import VoronoiGrid
 from mesa.space import PropertyLayer
+from mesa.spaces import VoronoiGrid
 from mesa.visualization.utils import update_counter
 
 

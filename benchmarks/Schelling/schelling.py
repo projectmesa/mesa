@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from mesa import Model
 from mesa.spaces import CellAgent, OrthogonalMooreGrid
-from mesa.time import RandomActivation
 
 
 class SchellingAgent(CellAgent):
