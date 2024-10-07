@@ -12,12 +12,14 @@ import traitlets
 traitlets.HasTraits
 traitlets.List
 
+
 class AttributeDict(dict):
     """A dict with attribute like access.
 
     Each value can be accessed as if it were an attribute with its key as attribute name
 
     """
+
     # I want our signals to act like traitlet signals, so this is inspired by trailets Bunch
     # and some stack overflow posts.
     __setattr__ = dict.__setitem__

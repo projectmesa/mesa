@@ -384,11 +384,9 @@ class HasObservables:
             signal_type: the type of signal to emit
 
         """
-        signal = AttributeDict(name=observable,
-                               old=old_value,
-                               new=new_value,
-                               owner=self,
-                               type=signal_type)
+        signal = AttributeDict(
+            name=observable, old=old_value, new=new_value, owner=self, type=signal_type
+        )
 
         self._mesa_notify(signal)
 
