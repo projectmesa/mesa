@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import cache, cached_property
 from random import Random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
+from mesa.experimental.cell_space.cell_agent import CellAgent
 from mesa.experimental.cell_space.cell_collection import CellCollection
+from mesa.space import PropertyLayer
 
 if TYPE_CHECKING:
     from mesa.agent import Agent
-    from mesa.experimental.cell_space.cell_agent import CellAgent
 
 Coordinate = tuple[int, ...]
 
@@ -34,6 +36,7 @@ class Cell:
         "capacity",
         "properties",
         "random",
+        "_mesa_property_layers",
         "__dict__",
     ]
 
@@ -66,9 +69,10 @@ class Cell:
         self.agents: list[
             Agent
         ] = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
-        self.capacity: int = capacity
+        self.capacity: int | None = capacity
         self.properties: dict[Coordinate, object] = {}
         self.random = random
+        self._mesa_property_layers: dict[str, PropertyLayer] = {}
 
     def connect(self, other: Cell, key: Coordinate | None = None) -> None:
         """Connects this cell to another cell.
@@ -117,7 +121,6 @@ class Cell:
 
         """
         self.agents.remove(agent)
-        agent.cell = None
 
     @property
     def is_empty(self) -> bool:
@@ -133,7 +136,7 @@ class Cell:
         return f"Cell({self.coordinate}, {self.agents})"
 
     @cached_property
-    def neighborhood(self) -> CellCollection:
+    def neighborhood(self) -> CellCollection[Cell]:
         """Returns the direct neighborhood of the cell.
 
         This is equivalent to cell.get_neighborhood(radius=1)
@@ -145,7 +148,7 @@ class Cell:
     @cache  # noqa: B019
     def get_neighborhood(
         self, radius: int = 1, include_center: bool = False
-    ) -> CellCollection:
+    ) -> CellCollection[Cell]:
         """Returns a list of all neighboring cells for the given radius.
 
         For getting the direct neighborhood (i.e., radius=1) you can also use
@@ -191,3 +194,20 @@ class Cell:
             if not include_center:
                 neighborhood.pop(self, None)
             return neighborhood
+
+    # PropertyLayer methods
+    def get_property(self, property_name: str) -> Any:
+        """Get the value of a property."""
+        return self._mesa_property_layers[property_name].data[self.coordinate]
+
+    def set_property(self, property_name: str, value: Any):
+        """Set the value of a property."""
+        self._mesa_property_layers[property_name].set_cell(self.coordinate, value)
+
+    def modify_property(
+        self, property_name: str, operation: Callable, value: Any = None
+    ):
+        """Modify the value of a property."""
+        self._mesa_property_layers[property_name].modify_cell(
+            self.coordinate, operation, value
+        )

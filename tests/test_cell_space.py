@@ -2,6 +2,7 @@
 
 import random
 
+import numpy as np
 import pytest
 
 from mesa import Model
@@ -9,12 +10,15 @@ from mesa.experimental.cell_space import (
     Cell,
     CellAgent,
     CellCollection,
+    FixedAgent,
+    Grid2DMovingAgent,
     HexGrid,
     Network,
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
     VoronoiGrid,
 )
+from mesa.space import PropertyLayer
 
 
 def test_orthogonal_grid_neumann():
@@ -524,3 +528,166 @@ def test_cell_collection():
 
     cells = collection.select()
     assert len(cells) == len(collection)
+
+
+### PropertyLayer tests
+def test_property_layer_integration():
+    """Test integration of PropertyLayer with DiscrateSpace and Cell."""
+    width, height = 10, 10
+    grid = OrthogonalMooreGrid((width, height), torus=False)
+
+    # Test adding a PropertyLayer to the grid
+    elevation = PropertyLayer("elevation", width, height, default_value=0)
+    grid.add_property_layer(elevation)
+    assert "elevation" in grid.property_layers
+    assert len(grid.property_layers) == 1
+
+    # Test accessing PropertyLayer from a cell
+    cell = grid._cells[(0, 0)]
+    assert "elevation" in cell._mesa_property_layers
+    assert cell.get_property("elevation") == 0
+
+    # Test setting property value for a cell
+    cell.set_property("elevation", 100)
+    assert cell.get_property("elevation") == 100
+
+    # Test modifying property value for a cell
+    cell.modify_property("elevation", lambda x: x + 50)
+    assert cell.get_property("elevation") == 150
+
+    cell.modify_property("elevation", np.add, 50)
+    assert cell.get_property("elevation") == 200
+
+    # Test modifying PropertyLayer values
+    grid.set_property("elevation", 100, condition=lambda value: value == 200)
+    assert cell.get_property("elevation") == 100
+
+    # Test modifying PropertyLayer using numpy operations
+    grid.modify_properties("elevation", np.add, 50)
+    assert cell.get_property("elevation") == 150
+
+    # Test removing a PropertyLayer
+    grid.remove_property_layer("elevation")
+    assert "elevation" not in grid.property_layers
+    assert "elevation" not in cell._mesa_property_layers
+
+
+def test_multiple_property_layers():
+    """Test initialization of DiscrateSpace with PropertyLayers."""
+    width, height = 5, 5
+    elevation = PropertyLayer("elevation", width, height, default_value=0)
+    temperature = PropertyLayer("temperature", width, height, default_value=20)
+
+    # Test initialization with a single PropertyLayer
+    grid1 = OrthogonalMooreGrid((width, height), torus=False)
+    grid1.add_property_layer(elevation)
+    assert "elevation" in grid1.property_layers
+    assert len(grid1.property_layers) == 1
+
+    # Test initialization with multiple PropertyLayers
+    grid2 = OrthogonalMooreGrid((width, height), torus=False)
+    grid2.add_property_layer(temperature, add_to_cells=False)
+    grid2.add_property_layer(elevation, add_to_cells=True)
+
+    assert "temperature" in grid2.property_layers
+    assert "elevation" in grid2.property_layers
+    assert len(grid2.property_layers) == 2
+
+    # Modify properties
+    grid2.modify_properties("elevation", lambda x: x + 10)
+    grid2.modify_properties("temperature", lambda x: x + 5)
+
+    for cell in grid2.all_cells:
+        assert cell.get_property("elevation") == 10
+        # Assert error temperature, since it was not added to cells
+        with pytest.raises(KeyError):
+            cell.get_property("temperature")
+
+
+def test_property_layer_errors():
+    """Test error handling for PropertyLayers."""
+    width, height = 5, 5
+    grid = OrthogonalMooreGrid((width, height), torus=False)
+    elevation = PropertyLayer("elevation", width, height, default_value=0)
+
+    # Test adding a PropertyLayer with an existing name
+    grid.add_property_layer(elevation)
+    with pytest.raises(ValueError, match="Property layer elevation already exists."):
+        grid.add_property_layer(elevation)
+
+
+def test_cell_agent():  # noqa: D103
+    cell1 = Cell((1,), capacity=None, random=random.Random())
+    cell2 = Cell((2,), capacity=None, random=random.Random())
+
+    # connect
+    # add_agent
+    model = Model()
+    agent = CellAgent(model)
+
+    agent.cell = cell1
+    assert agent in cell1.agents
+
+    agent.cell = None
+    assert agent not in cell1.agents
+
+    agent.cell = cell2
+    assert agent not in cell1.agents
+    assert agent in cell2.agents
+
+    agent.cell = cell1
+    assert agent in cell1.agents
+    assert agent not in cell2.agents
+
+    agent.remove()
+    assert agent not in model._all_agents
+    assert agent not in cell1.agents
+    assert agent not in cell2.agents
+
+    model = Model()
+    agent = CellAgent(model)
+    agent.cell = cell1
+    agent.move_to(cell2)
+    assert agent not in cell1.agents
+    assert agent in cell2.agents
+
+
+def test_grid2DMovingAgent():  # noqa: D103
+    # we first test on a moore grid because all directions are defined
+    grid = OrthogonalMooreGrid((10, 10), torus=False)
+
+    model = Model()
+    agent = Grid2DMovingAgent(model)
+
+    agent.cell = grid[4, 4]
+    agent.move("up")
+    assert agent.cell == grid[3, 4]
+
+    grid = OrthogonalVonNeumannGrid((10, 10), torus=False)
+
+    model = Model()
+    agent = Grid2DMovingAgent(model)
+    agent.cell = grid[4, 4]
+
+    with pytest.raises(ValueError):  # test for invalid direction
+        agent.move("upright")
+
+    with pytest.raises(ValueError):  # test for unknown direction
+        agent.move("back")
+
+
+def test_patch():  # noqa: D103
+    cell1 = Cell((1,), capacity=None, random=random.Random())
+    cell2 = Cell((2,), capacity=None, random=random.Random())
+
+    # connect
+    # add_agent
+    model = Model()
+    agent = FixedAgent(model)
+    agent.cell = cell1
+
+    with pytest.raises(ValueError):
+        agent.cell = cell2
+
+    agent.remove()
+    assert agent not in model._agents
