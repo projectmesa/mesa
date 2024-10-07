@@ -41,7 +41,7 @@ class BoltzmannWealth(mesa.Model):
             width: the width of the grid
             height: the height of the grid
         """
-        super().__init__(seed)
+        super().__init__(seed=seed)
         self.num_agents = n
         self.grid = spaces.OrthogonalMooreGrid((width, height))
         self.schedule = mesa.time.RandomActivation(self)
@@ -61,7 +61,7 @@ class BoltzmannWealth(mesa.Model):
 
     def step(self):
         """Run the model for a single step."""
-        self.agents.shuffle().do("step")
+        self.agents.shuffle_do("step")
         # collect data
         self.datacollector.collect(self)
 

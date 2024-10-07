@@ -3,7 +3,7 @@
 import unittest
 
 from mesa import Agent, Model
-from mesa.time import BaseScheduler
+from mesa.datacollection import DataCollector
 
 
 class MockAgent(Agent):
@@ -28,6 +28,30 @@ class MockAgent(Agent):
         self.model.datacollector.add_table_row("Final_Values", row)
 
 
+class MockAgentA(MockAgent):
+    """Agent subclass A for testing agent-type-specific reporters."""
+
+    def __init__(self, model, val=0):  # noqa: D107
+        super().__init__(model, val)
+        self.type_a_val = val * 2
+
+    def step(self):  # noqa: D102
+        super().step()
+        self.type_a_val = self.val * 2
+
+
+class MockAgentB(MockAgent):
+    """Agent subclass B for testing agent-type-specific reporters."""
+
+    def __init__(self, model, val=0):  # noqa: D107
+        super().__init__(model, val)
+        self.type_b_val = val * 3
+
+    def step(self):  # noqa: D102
+        super().step()
+        self.type_b_val = self.val * 3
+
+
 def agent_function_with_params(agent, multiplier, offset):  # noqa: D103
     return (agent.val * multiplier) + offset
 
@@ -35,21 +59,17 @@ def agent_function_with_params(agent, multiplier, offset):  # noqa: D103
 class MockModel(Model):
     """Minimalistic model for testing purposes."""
 
-    schedule = BaseScheduler(None)
-
     def __init__(self):  # noqa: D107
         super().__init__()
-        self.schedule = BaseScheduler(self)
         self.model_val = 100
 
         self.n = 10
         for i in range(1, self.n + 1):
-            self.schedule.add(MockAgent(self, val=i))
-        self.initialize_data_collector(
+            MockAgent(self, val=i)
+        self.datacollector = DataCollector(
             model_reporters={
-                "total_agents": lambda m: m.schedule.get_agent_count(),
+                "total_agents": lambda m: len(m.agents),
                 "model_value": "model_val",
-                "model_calc": self.schedule.get_agent_count,
                 "model_calc_comp": [self.test_model_calc_comp, [3, 4]],
                 "model_calc_fail": [self.test_model_calc_comp, [12, 0]],
             },
@@ -70,7 +90,34 @@ class MockModel(Model):
             return None
 
     def step(self):  # noqa: D102
-        self.schedule.step()
+        self.agents.do("step")
+        self.datacollector.collect(self)
+
+
+class MockModelWithAgentTypes(Model):
+    """Model for testing agent-type-specific reporters."""
+
+    def __init__(self):  # noqa: D107
+        super().__init__()
+        self.model_val = 100
+
+        for i in range(10):
+            if i % 2 == 0:
+                MockAgentA(self, val=i)
+            else:
+                MockAgentB(self, val=i)
+
+        self.datacollector = DataCollector(
+            model_reporters={"total_agents": lambda m: len(m.agents)},
+            agent_reporters={"value": lambda a: a.val},
+            agenttype_reporters={
+                MockAgentA: {"type_a_val": lambda a: a.type_a_val},
+                MockAgentB: {"type_b_val": lambda a: a.type_b_val},
+            },
+        )
+
+    def step(self):  # noqa: D102
+        self.agents.do("step")
         self.datacollector.collect(self)
 
 
@@ -80,13 +127,14 @@ class TestDataCollector(unittest.TestCase):
     def setUp(self):
         """Create the model and run it a set number of steps."""
         self.model = MockModel()
+        self.model.datacollector.collect(self.model)
         for i in range(7):
             if i == 4:
-                self.model.schedule.remove(self.model.schedule._agents[3])
+                self.model.agents[3].remove()
             self.model.step()
 
         # Write to table:
-        for agent in self.model.schedule.agents:
+        for agent in self.model.agents:
             agent.write_final_values()
 
     def step_assertion(self, model_var):  # noqa: D102
@@ -101,18 +149,15 @@ class TestDataCollector(unittest.TestCase):
         data_collector = self.model.datacollector
         assert "total_agents" in data_collector.model_vars
         assert "model_value" in data_collector.model_vars
-        assert "model_calc" in data_collector.model_vars
         assert "model_calc_comp" in data_collector.model_vars
         assert "model_calc_fail" in data_collector.model_vars
         length = 8
         assert len(data_collector.model_vars["total_agents"]) == length
         assert len(data_collector.model_vars["model_value"]) == length
-        assert len(data_collector.model_vars["model_calc"]) == length
         assert len(data_collector.model_vars["model_calc_comp"]) == length
         self.step_assertion(data_collector.model_vars["total_agents"])
         for element in data_collector.model_vars["model_value"]:
             assert element == 100
-        self.step_assertion(data_collector.model_vars["model_calc"])
         for element in data_collector.model_vars["model_calc_comp"]:
             assert element == 75
         for element in data_collector.model_vars["model_calc_fail"]:
@@ -174,7 +219,7 @@ class TestDataCollector(unittest.TestCase):
         model_vars = data_collector.get_model_vars_dataframe()
         agent_vars = data_collector.get_agent_vars_dataframe()
         table_df = data_collector.get_table_dataframe("Final_Values")
-        assert model_vars.shape == (8, 5)
+        assert model_vars.shape == (8, 4)
         assert agent_vars.shape == (77, 4)
         assert table_df.shape == (9, 2)
 
@@ -182,28 +227,129 @@ class TestDataCollector(unittest.TestCase):
             table_df = data_collector.get_table_dataframe("not a real table")
 
 
-class TestDataCollectorInitialization(unittest.TestCase):
-    """Tests for DataCollector initialization."""
+class TestDataCollectorWithAgentTypes(unittest.TestCase):
+    """Tests for DataCollector with agent-type-specific reporters."""
 
-    def setUp(self):  # noqa: D102
-        self.model = Model()
+    def setUp(self):
+        """Create the model and run it a set number of steps."""
+        self.model = MockModelWithAgentTypes()
+        for _ in range(5):
+            self.model.step()
 
-    def test_initialize_before_scheduler(self):  # noqa: D102
-        with self.assertRaises(RuntimeError) as cm:
-            self.model.initialize_data_collector()
-        self.assertEqual(
-            str(cm.exception),
-            "You must initialize the scheduler (self.schedule) before initializing the data collector.",
+    def test_agenttype_vars(self):
+        """Test agent-type-specific variable collection."""
+        data_collector = self.model.datacollector
+
+        # Test MockAgentA data
+        agent_a_data = data_collector.get_agenttype_vars_dataframe(MockAgentA)
+        self.assertIn("type_a_val", agent_a_data.columns)
+        self.assertEqual(len(agent_a_data), 25)  # 5 agents * 5 steps
+        for (step, agent_id), value in agent_a_data["type_a_val"].items():
+            expected_value = (agent_id - 1) * 2 + step * 2
+            self.assertEqual(value, expected_value)
+
+        # Test MockAgentB data
+        agent_b_data = data_collector.get_agenttype_vars_dataframe(MockAgentB)
+        self.assertIn("type_b_val", agent_b_data.columns)
+        self.assertEqual(len(agent_b_data), 25)  # 5 agents * 5 steps
+        for (step, agent_id), value in agent_b_data["type_b_val"].items():
+            expected_value = (agent_id - 1) * 3 + step * 3
+            self.assertEqual(value, expected_value)
+
+    def test_agenttype_and_agent_vars(self):
+        """Test that agent-type-specific and general agent variables are collected correctly."""
+        data_collector = self.model.datacollector
+
+        agent_vars = data_collector.get_agent_vars_dataframe()
+        agent_a_vars = data_collector.get_agenttype_vars_dataframe(MockAgentA)
+        agent_b_vars = data_collector.get_agenttype_vars_dataframe(MockAgentB)
+
+        # Check that general agent variables are present for all agents
+        self.assertIn("value", agent_vars.columns)
+
+        # Check that agent-type-specific variables are only present in their respective dataframes
+        self.assertIn("type_a_val", agent_a_vars.columns)
+        self.assertNotIn("type_a_val", agent_b_vars.columns)
+        self.assertIn("type_b_val", agent_b_vars.columns)
+        self.assertNotIn("type_b_val", agent_a_vars.columns)
+
+    def test_nonexistent_agenttype(self):
+        """Test that requesting data for a non-existent agent type raises a warning."""
+        data_collector = self.model.datacollector
+
+        class NonExistentAgent(Agent):
+            pass
+
+        with self.assertWarns(UserWarning):
+            non_existent_data = data_collector.get_agenttype_vars_dataframe(
+                NonExistentAgent
+            )
+            self.assertTrue(non_existent_data.empty)
+
+    def test_agenttype_reporter_string_attribute(self):
+        """Test agent-type-specific reporter with string attribute."""
+        model = MockModelWithAgentTypes()
+        model.datacollector._new_agenttype_reporter(MockAgentA, "string_attr", "val")
+        model.step()
+
+        agent_a_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentA)
+        self.assertIn("string_attr", agent_a_data.columns)
+        for (_step, agent_id), value in agent_a_data["string_attr"].items():
+            expected_value = agent_id
+            self.assertEqual(value, expected_value)
+
+    def test_agenttype_reporter_function_with_params(self):
+        """Test agent-type-specific reporter with function and parameters."""
+
+        def test_func(agent, multiplier):
+            return agent.val * multiplier
+
+        model = MockModelWithAgentTypes()
+        model.datacollector._new_agenttype_reporter(
+            MockAgentB, "func_param", [test_func, [2]]
         )
+        model.step()
 
-    def test_initialize_before_agents_added_to_scheduler(self):  # noqa: D102
-        with self.assertRaises(RuntimeError) as cm:
-            self.model.schedule = BaseScheduler(self)
-            self.model.initialize_data_collector()
-        self.assertEqual(
-            str(cm.exception),
-            "You must add agents to the scheduler before initializing the data collector.",
+        agent_b_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentB)
+        self.assertIn("func_param", agent_b_data.columns)
+        for (_step, agent_id), value in agent_b_data["func_param"].items():
+            expected_value = agent_id * 2
+            self.assertEqual(value, expected_value)
+
+    def test_agenttype_reporter_multiple_types(self):
+        """Test adding reporters for multiple agent types."""
+        model = MockModelWithAgentTypes()
+        model.datacollector._new_agenttype_reporter(
+            MockAgentA, "type_a_val", lambda a: a.type_a_val
         )
+        model.datacollector._new_agenttype_reporter(
+            MockAgentB, "type_b_val", lambda a: a.type_b_val
+        )
+        model.step()
+
+        agent_a_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentA)
+        agent_b_data = model.datacollector.get_agenttype_vars_dataframe(MockAgentB)
+
+        self.assertIn("type_a_val", agent_a_data.columns)
+        self.assertIn("type_b_val", agent_b_data.columns)
+        self.assertNotIn("type_b_val", agent_a_data.columns)
+        self.assertNotIn("type_a_val", agent_b_data.columns)
+
+    def test_agenttype_superclass_reporter(self):
+        """Test adding a reporter for a superclass of an agent type."""
+        model = MockModelWithAgentTypes()
+        model.datacollector._new_agenttype_reporter(MockAgent, "val", lambda a: a.val)
+        model.datacollector._new_agenttype_reporter(Agent, "val", lambda a: a.val)
+        for _ in range(3):
+            model.step()
+
+        super_data = model.datacollector.get_agenttype_vars_dataframe(MockAgent)
+        agent_data = model.datacollector.get_agenttype_vars_dataframe(Agent)
+        self.assertIn("val", super_data.columns)
+        self.assertIn("val", agent_data.columns)
+        self.assertEqual(len(super_data), 30)  # 10 agents * 3 steps
+        self.assertEqual(len(agent_data), 30)
+        self.assertTrue(super_data.equals(agent_data))
 
 
 if __name__ == "__main__":

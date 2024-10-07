@@ -1,4 +1,4 @@
-"""Agent related classes
+"""Agent related classes.
 
 Core Objects: Agent and AgentSet.
 """
@@ -15,7 +15,7 @@ import operator
 import warnings
 import weakref
 from collections import defaultdict
-from collections.abc import Callable, Iterable, Iterator, MutableSet, Sequence
+from collections.abc import Callable, Hashable, Iterable, Iterator, MutableSet, Sequence
 from random import Random
 
 # mypy
@@ -46,39 +46,25 @@ class Agent:
     # so, unique_id is unique relative to a model, and counting starts from 1
     _ids = defaultdict(functools.partial(itertools.count, 1))
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, model: Model, *args, **kwargs) -> None:
         """Create a new agent.
 
         Args:
             model (Model): The model instance in which the agent exists.
-            args: currently ignored, to be fixed in 3.1
-            kwargs: currently ignored, to be fixed in 3.1
+            args: passed on to super
+            kwargs: passed on to super
+
+        Notes:
+            to make proper use of python's super, in each class remove the arguments and
+            keyword arguments you need and pass on the rest to super
+
         """
-        # TODO: Cleanup in future Mesa version (3.1+)
-        match args:
-            # Case 1: Only the model is provided. The new correct behavior.
-            case [model]:
-                self.model = model
-                self.unique_id = next(self._ids[model])
-            # Case 2: Both unique_id and model are provided, deprecated
-            case [_, model]:
-                warnings.warn(
-                    "unique ids are assigned automatically to Agents in Mesa 3. The use of custom unique_id is "
-                    "deprecated. Only input a model when calling `super()__init__(model)`. The unique_id inputted is not used.",
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-                self.model = model
-                self.unique_id = next(self._ids[model])
-            # Case 3: Anything else, raise an error
-            case _:
-                raise ValueError(
-                    "Invalid arguments provided to initialize the Agent. Only input a model: `super()__init__(model)`."
-                )
+        super().__init__(*args, **kwargs)
 
-        self.pos: Position | None = None
-
+        self.model: Model = model
         self.model.register_agent(self)
+        self.unique_id: int = next(self._ids[model])
+        self.pos: Position | None = None
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
@@ -290,6 +276,23 @@ class AgentSet(MutableSet, Sequence):
             for agentref in self._agents.keyrefs():
                 if (agent := agentref()) is not None:
                     method(agent, *args, **kwargs)
+
+        return self
+
+    def shuffle_do(self, method: str | Callable, *args, **kwargs) -> AgentSet:
+        """Shuffle the agents in the AgentSet and then invoke a method or function on each agent.
+
+        It's a fast, optimized version of calling shuffle() followed by do().
+        """
+        agents = list(self._agents.keys())
+        self.random.shuffle(agents)
+
+        if isinstance(method, str):
+            for agent in agents:
+                getattr(agent, method)(*args, **kwargs)
+        else:
+            for agent in agents:
+                method(agent, *args, **kwargs)
 
         return self
 
@@ -610,6 +613,29 @@ class GroupBy:
                 method(v, *args, **kwargs)
 
         return self
+
+    def count(self) -> dict[Any, int]:
+        """Return the count of agents in each group.
+
+        Returns:
+            dict: A dictionary mapping group names to the number of agents in each group.
+        """
+        return {k: len(v) for k, v in self.groups.items()}
+
+    def agg(self, attr_name: str, func: Callable) -> dict[Hashable, Any]:
+        """Aggregate the values of a specific attribute across each group using the provided function.
+
+        Args:
+            attr_name (str): The name of the attribute to aggregate.
+            func (Callable): The function to apply (e.g., sum, min, max, mean).
+
+        Returns:
+            dict[Hashable, Any]: A dictionary mapping group names to the result of applying the aggregation function.
+        """
+        return {
+            group_name: func([getattr(agent, attr_name) for agent in group])
+            for group_name, group in self.groups.items()
+        }
 
     def __iter__(self):  # noqa: D105
         return iter(self.groups.items())

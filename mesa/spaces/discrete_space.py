@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from functools import cached_property
 from random import Random
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from mesa.spaces.cell import Cell
 from mesa.spaces.cell_collection import CellCollection
+from mesa.space import PropertyLayer
 
 T = TypeVar("T", bound=Cell)
 
@@ -21,7 +23,7 @@ class DiscreteSpace(Generic[T]):
         random (Random): The random number generator
         cell_klass (Type) : the type of cell class
         empties (CellCollection) : collecction of all cells that are empty
-
+        property_layers (dict[str, PropertyLayer]): the property layers of the discrete space
     """
 
     def __init__(
@@ -47,6 +49,7 @@ class DiscreteSpace(Generic[T]):
 
         self._empties: dict[tuple[int, ...], None] = {}
         self._empties_initialized = False
+        self.property_layers: dict[str, PropertyLayer] = {}
 
     @property
     def cutoff_empties(self):  # noqa
@@ -62,14 +65,72 @@ class DiscreteSpace(Generic[T]):
     def __iter__(self):  # noqa
         return iter(self._cells.values())
 
-    def __getitem__(self, key):  # noqa
+    def __getitem__(self, key: tuple[int, ...]) -> T:  # noqa: D105
         return self._cells[key]
 
     @property
-    def empties(self) -> CellCollection:
+    def empties(self) -> CellCollection[T]:
         """Return all empty in spaces."""
         return self.all_cells.select(lambda cell: cell.is_empty)
 
     def select_random_empty_cell(self) -> T:
         """Select random empty cell."""
         return self.random.choice(list(self.empties))
+
+    # PropertyLayer methods
+    def add_property_layer(
+        self, property_layer: PropertyLayer, add_to_cells: bool = True
+    ):
+        """Add a property layer to the grid.
+
+        Args:
+            property_layer: the property layer to add
+            add_to_cells: whether to add the property layer to all cells (default: True)
+        """
+        if property_layer.name in self.property_layers:
+            raise ValueError(f"Property layer {property_layer.name} already exists.")
+        self.property_layers[property_layer.name] = property_layer
+        if add_to_cells:
+            for cell in self._cells.values():
+                cell._mesa_property_layers[property_layer.name] = property_layer
+
+    def remove_property_layer(self, property_name: str, remove_from_cells: bool = True):
+        """Remove a property layer from the grid.
+
+        Args:
+            property_name: the name of the property layer to remove
+            remove_from_cells: whether to remove the property layer from all cells (default: True)
+        """
+        del self.property_layers[property_name]
+        if remove_from_cells:
+            for cell in self._cells.values():
+                del cell._mesa_property_layers[property_name]
+
+    def set_property(
+        self, property_name: str, value, condition: Callable[[T], bool] | None = None
+    ):
+        """Set the value of a property for all cells in the grid.
+
+        Args:
+            property_name: the name of the property to set
+            value: the value to set
+            condition: a function that takes a cell and returns a boolean
+        """
+        self.property_layers[property_name].set_cells(value, condition)
+
+    def modify_properties(
+        self,
+        property_name: str,
+        operation: Callable,
+        value: Any = None,
+        condition: Callable[[T], bool] | None = None,
+    ):
+        """Modify the values of a specific property for all cells in the grid.
+
+        Args:
+            property_name: the name of the property to modify
+            operation: the operation to perform
+            value: the value to use in the operation
+            condition: a function that takes a cell and returns a boolean (used to filter cells)
+        """
+        self.property_layers[property_name].modify_cells(operation, value, condition)

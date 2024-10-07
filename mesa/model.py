@@ -48,8 +48,8 @@ class Model:
             seed: the seed for the random number generator
             kwargs: keyword arguments to pass onto super
         """
+        super().__init__(*args, **kwargs)
         self.running = True
-        self.schedule = None
         self.steps: int = 0
 
         self._setup_agent_registration()
@@ -198,6 +198,7 @@ class Model:
         self,
         model_reporters=None,
         agent_reporters=None,
+        agenttype_reporters=None,
         tables=None,
     ) -> None:
         """Initialize the data collector for the model.
@@ -205,20 +206,21 @@ class Model:
         Args:
             model_reporters: model reporters to collect
             agent_reporters: agent reporters to collect
+            agenttype_reporters: agent type reporters to collect
             tables: tables to collect
 
         """
-        if not hasattr(self, "schedule") or self.schedule is None:
-            raise RuntimeError(
-                "You must initialize the scheduler (self.schedule) before initializing the data collector."
-            )
-        if self.schedule.get_agent_count() == 0:
-            raise RuntimeError(
-                "You must add agents to the scheduler before initializing the data collector."
-            )
+        warnings.warn(
+            "initialize_data_collector() is deprecated. Please use the DataCollector class directly. "
+            "by using `self.datacollector = DataCollector(...)`.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         self.datacollector = DataCollector(
             model_reporters=model_reporters,
             agent_reporters=agent_reporters,
+            agenttype_reporters=agenttype_reporters,
             tables=tables,
         )
         # Collect data for the first time during initialization.

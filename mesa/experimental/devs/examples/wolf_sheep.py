@@ -1,6 +1,7 @@
 """Example of using ABM simulator for Wolf-Sheep Predation Model."""
 
 import mesa
+from mesa.experimental.cell_space import FixedAgent
 from mesa.experimental.devs.simulator import ABMSimulator
 
 
@@ -90,7 +91,7 @@ class Wolf(Animal):
             sheep_to_eat.die()
 
 
-class GrassPatch(mesa.Agent):
+class GrassPatch(FixedAgent):
     """A patch of grass that grows at a fixed rate and it is eaten by sheep."""
 
     @property
@@ -230,8 +231,8 @@ class WolfSheep(mesa.Model):
 
     def step(self):
         """Perform one step of the model."""
-        self.agents_by_type[Sheep].shuffle(inplace=True).do("step")
-        self.agents_by_type[Wolf].shuffle(inplace=True).do("step")
+        self.agents_by_type[Sheep].shuffle_do("step")
+        self.agents_by_type[Wolf].shuffle_do("step")
 
 
 if __name__ == "__main__":

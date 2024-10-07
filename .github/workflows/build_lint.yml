@@ -53,12 +53,8 @@ jobs:
         cache: 'pip'
     - name: Install uv
       run: pip install uv
-    - name: Install Mesa with uv pip
+    - name: Install Mesa and dependencies
       run: uv pip install --system .[dev]
-      if: matrix.python-version != '3.13'
-    - name: Install Mesa with pip
-      run: pip install .[dev]
-      if: matrix.python-version == '3.13'
     - name: Test with pytest
       run: pytest --durations=10 --cov=mesa tests/ --cov-report=xml
     - if: matrix.os == 'ubuntu'

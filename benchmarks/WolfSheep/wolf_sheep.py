@@ -17,7 +17,7 @@ from mesa.spaces import CellAgent, OrthogonalVonNeumannGrid
 class Animal(CellAgent):
     """The base animal class."""
 
-    def __init__(self, model, energy, p_reproduce, energy_from_food):
+    def __init__(self, model, energy, p_reproduce, energy_from_food, cell):
         """Initializes an animal.
 
         Args:
@@ -25,43 +25,36 @@ class Animal(CellAgent):
             energy: starting amount of energy
             p_reproduce: probability of sexless reproduction
             energy_from_food: energy obtained from 1 unit of food
+            cell: the cell in which the animal starts
         """
         super().__init__(model)
         self.energy = energy
         self.p_reproduce = p_reproduce
         self.energy_from_food = energy_from_food
-
-    def random_move(self):
-        """Move to a random neighboring cell."""
-        self.move_to(self.cell.neighborhood().select_random_cell())
+        self.cell = cell
 
     def spawn_offspring(self):
         """Create offspring."""
         self.energy /= 2
-        offspring = self.__class__(
+        self.__class__(
             self.model,
             self.energy,
             self.p_reproduce,
             self.energy_from_food,
+            self.cell,
         )
-        offspring.move_to(self.cell)
 
     def feed(self): ...  # noqa: D102
 
-    def die(self):
-        """Die."""
-        self.cell.remove_agent(self)
-        self.remove()
-
     def step(self):
         """One step of the agent."""
-        self.random_move()
+        self.cell = self.cell.neighborhood.select_random_cell()
         self.energy -= 1
 
         self.feed()
 
         if self.energy < 0:
-            self.die()
+            self.remove()
         elif self.random.random() < self.p_reproduce:
             self.spawn_offspring()
 
@@ -91,10 +84,10 @@ class Wolf(Animal):
             self.energy += self.energy_from_food
 
             # Kill the sheep
-            sheep_to_eat.die()
+            sheep_to_eat.remove()
 
 
-class GrassPatch(CellAgent):
+class GrassPatch(FixedAgent):
     """A patch of grass that grows at a fixed rate and it is eaten by sheep."""
 
     @property
@@ -112,19 +105,19 @@ class GrassPatch(CellAgent):
                 function_args=[self, "fully_grown", True],
             )
 
-    def __init__(self, model, fully_grown, countdown, grass_regrowth_time):
+    def __init__(self, model, countdown, grass_regrowth_time, cell):
         """Creates a new patch of grass.
 
         Args:
             model: a model instance
-            fully_grown: (boolean) Whether the patch of grass is fully grown or not
             countdown: Time for the patch of grass to be fully grown again
             grass_regrowth_time : time to fully regrow grass
+            cell: the cell to which the patch of grass belongs
         """
-        # TODO:: fully grown can just be an int --> so one less param (i.e. countdown)
         super().__init__(model)
-        self._fully_grown = fully_grown
+        self._fully_grown = True if countdown == 0 else False  # Noqa: SIM210
         self.grass_regrowth_time = grass_regrowth_time
+        self.cell = cell
 
         if not self.fully_grown:
             self.model.simulator.schedule_event_relative(
@@ -191,13 +184,7 @@ class WolfSheep(Model):
                 self.random.randrange(self.height),
             )
             energy = self.random.randrange(2 * sheep_gain_from_food)
-            sheep = Sheep(
-                self,
-                energy,
-                sheep_reproduce,
-                sheep_gain_from_food,
-            )
-            sheep.move_to(self.grid[pos])
+            Sheep(self, energy, sheep_reproduce, sheep_gain_from_food, self.grid[pos])
 
         # Create wolves
         for _ in range(self.initial_wolves):
@@ -206,29 +193,19 @@ class WolfSheep(Model):
                 self.random.randrange(self.height),
             )
             energy = self.random.randrange(2 * wolf_gain_from_food)
-            wolf = Wolf(
-                self,
-                energy,
-                wolf_reproduce,
-                wolf_gain_from_food,
-            )
-            wolf.move_to(self.grid[pos])
+            Wolf(self, energy, wolf_reproduce, wolf_gain_from_food, self.grid[pos])
 
         # Create grass patches
         possibly_fully_grown = [True, False]
         for cell in self.grid:
             fully_grown = self.random.choice(possibly_fully_grown)
-            if fully_grown:
-                countdown = grass_regrowth_time
-            else:
-                countdown = self.random.randrange(grass_regrowth_time)
-            patch = GrassPatch(self, fully_grown, countdown, grass_regrowth_time)
-            patch.move_to(cell)
+            countdown = 0 if fully_grown else self.random.randrange(grass_regrowth_time)
+            GrassPatch(self, countdown, grass_regrowth_time, cell)
 
     def step(self):
         """Run one step of the model."""
-        self.agents_by_type[Sheep].shuffle(inplace=True).do("step")
-        self.agents_by_type[Wolf].shuffle(inplace=True).do("step")
+        self.agents_by_type[Sheep].shuffle_do("step")
+        self.agents_by_type[Wolf].shuffle_do("step")
 
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ can be displayed in browser windows or Jupyter.*
 
 ## Using Mesa
 
-To install our latest stable release (2.3.x), run:
+To install our latest stable release (2.4.x), run:
 
 ``` bash
 pip install -U mesa
@@ -38,6 +38,17 @@ To install our latest pre-release (3.0.0 alpha), run:
 
 ``` bash
 pip install -U --pre mesa
+```
+With Mesa 3.0, we don't install all our dependencies anymore by default.
+```bash
+# You can customize the additional dependencies you need, if you want. Available are:
+pip install -U --pre mesa[network,viz]
+
+# This is equivalent to our recommended dependencies:
+pip install -U --pre mesa[rec]
+
+# To install all, including developer, dependencies:
+pip install -U --pre mesa[all]
 ```
 
 You can also use `pip` to install the latest GitHub version:
@@ -57,13 +68,13 @@ For resources or help on using Mesa, check out the following:
 
 -   [Intro to Mesa Tutorial](http://mesa.readthedocs.org/en/stable/tutorials/intro_tutorial.html) (An introductory model, the Boltzmann
     Wealth Model, for beginners or those new to Mesa.)
--   [Visualization Tutorial](https://mesa.readthedocs.io/en/stable/tutorials/visualization_tutorial.html) (An introduction into our Solara visualization)
+-   [Visualization Tutorial](https://mesa.readthedocs.io/stable/tutorials/visualization_tutorial.html) (An introduction into our Solara visualization)
 -   [Complexity Explorer Tutorial](https://www.complexityexplorer.org/courses/172-agent-based-models-with-python-an-introduction-to-mesa) (An advanced-beginner model,
     SugarScape with Traders, with instructional videos)
--   [Mesa Examples](https://github.com/projectmesa/mesa-examples/tree/main/examples) (A repository of seminal ABMs using Mesa and
+-   [Mesa Examples](https://github.com/projectmesa/mesa-examples) (A repository of seminal ABMs using Mesa and
     examples of employing specific Mesa Features)
 -   [Docs](http://mesa.readthedocs.org/) (Mesa's documentation, API and useful snippets)
-    -   [Development version docs](https://mesa.readthedocs.io/en/latest/) (the latest version docs if you're using a pre-release Mesa version)
+    -   [Development version docs](https://mesa.readthedocs.io/latest/) (the latest version docs if you're using a pre-release Mesa version)
 -   [Discussions](https://github.com/projectmesa/mesa/discussions) (GitHub threaded discussions about Mesa)
 -   [Matrix Chat](https://matrix.to/#/#project-mesa:matrix.org) (Chat Forum via Matrix to talk about Mesa)
 

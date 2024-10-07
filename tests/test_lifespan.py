@@ -6,7 +6,6 @@ import numpy as np
 
 from mesa import Agent, Model
 from mesa.datacollection import DataCollector
-from mesa.time import RandomActivation
 
 
 class LifeTimeModel(Model):
@@ -28,19 +27,20 @@ class LifeTimeModel(Model):
         )
 
         self.current_ID = 0
-        self.schedule = RandomActivation(self)
 
         for _ in range(n_agents):
-            self.schedule.add(FiniteLifeAgent(self.agent_lifetime, self))
+            FiniteLifeAgent(self.agent_lifetime, self)
+
+        self.datacollector.collect(self)
 
     def step(self):
         """Add agents back to n_agents in each step."""
+        self.agents.shuffle_do("step")
         self.datacollector.collect(self)
-        self.schedule.step()
 
-        if len(self.schedule.agents) < self.n_agents:
-            for _ in range(self.n_agents - len(self.schedule.agents)):
-                self.schedule.add(FiniteLifeAgent(self.agent_lifetime, self))
+        if len(self.agents) < self.n_agents:
+            for _ in range(self.n_agents - len(self.agents)):
+                FiniteLifeAgent(self.agent_lifetime, self)
 
     def run_model(self, step_count=100):  # noqa: D102
         for _ in range(step_count):
@@ -64,12 +64,12 @@ class FiniteLifeAgent(Agent):
         if not inactivated:
             self.steps += 1  # keep track of how many ticks are seen
             if np.random.binomial(1, 0.1) != 0:  # 10% chance of dying
-                self.model.schedule.remove(self)
+                self.remove()
 
     def inactivate(self):  # noqa: D102
         self.remaining_life -= 1
         if self.remaining_life < 0:
-            self.model.schedule.remove(self)
+            self.remove()
             return True
         return False
 

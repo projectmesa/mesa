@@ -2,14 +2,22 @@
 
 from __future__ import annotations
 
-from functools import cache
+from collections.abc import Callable
+from functools import cache, cached_property
 from random import Random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from mesa.spaces.cell_collection import CellCollection
 
 if TYPE_CHECKING:
     from mesa.spaces.cell_agent import CellAgent
+
+from mesa.space import PropertyLayer
+
+if TYPE_CHECKING:
+    from mesa.agent import Agent
+
+Coordinate = tuple[int, ...]
 
 
 class Cell:
@@ -26,11 +34,13 @@ class Cell:
 
     __slots__ = [
         "coordinate",
-        "_connections",
+        "connections",
         "agents",
         "capacity",
         "properties",
         "random",
+        "_mesa_property_layers",
+        "__dict__",
     ]
 
     # def __new__(cls,
@@ -44,8 +54,8 @@ class Cell:
 
     def __init__(
         self,
-        coordinate: tuple[int, ...],
-        capacity: float | None = None,
+        coordinate: Coordinate,
+        capacity: int | None = None,
         random: Random | None = None,
     ) -> None:
         """Initialise the cell.
@@ -58,20 +68,26 @@ class Cell:
         """
         super().__init__()
         self.coordinate = coordinate
-        self._connections: list[Cell] = []  # TODO: change to CellCollection?
-        self.agents = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
-        self.capacity = capacity
-        self.properties: dict[str, object] = {}
+        self.connections: dict[Coordinate, Cell] = {}
+        self.agents: list[
+            Agent
+        ] = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
+        self.capacity: int | None = capacity
+        self.properties: dict[Coordinate, object] = {}
         self.random = random
+        self._mesa_property_layers: dict[str, PropertyLayer] = {}
 
-    def connect(self, other: Cell) -> None:
+    def connect(self, other: Cell, key: Coordinate | None = None) -> None:
         """Connects this cell to another cell.
 
         Args:
             other (Cell): other cell to connect to
+            key (Tuple[int, ...]): key for the connection. Should resemble a relative coordinate
 
         """
-        self._connections.append(other)
+        if key is None:
+            key = other.coordinate
+        self.connections[key] = other
 
     def disconnect(self, other: Cell) -> None:
         """Disconnects this cell from another cell.
@@ -80,7 +96,9 @@ class Cell:
             other (Cell): other cell to remove from connections
 
         """
-        self._connections.remove(other)
+        keys_to_remove = [k for k, v in self.connections.items() if v == other]
+        for key in keys_to_remove:
+            del self.connections[key]
 
     def add_agent(self, agent: CellAgent) -> None:
         """Adds an agent to the cell.
@@ -106,7 +124,6 @@ class Cell:
 
         """
         self.agents.remove(agent)
-        agent.cell = None
 
     @property
     def is_empty(self) -> bool:
@@ -121,35 +138,79 @@ class Cell:
     def __repr__(self):  # noqa
         return f"Cell({self.coordinate}, {self.agents})"
 
+    @cached_property
+    def neighborhood(self) -> CellCollection[Cell]:
+        """Returns the direct neighborhood of the cell.
+
+        This is equivalent to cell.get_neighborhood(radius=1)
+
+        """
+        return self.get_neighborhood()
+
     # FIXME: Revisit caching strategy on methods
     @cache  # noqa: B019
-    def neighborhood(self, radius=1, include_center=False) -> CellCollection:
-        """Returns a list of all neighboring cells."""
-        return CellCollection(
+    def get_neighborhood(
+        self, radius: int = 1, include_center: bool = False
+    ) -> CellCollection[Cell]:
+        """Returns a list of all neighboring cells for the given radius.
+
+        For getting the direct neighborhood (i.e., radius=1) you can also use
+        the `neighborhood` property.
+
+        Args:
+            radius (int): the radius of the neighborhood
+            include_center (bool): include the center of the neighborhood
+
+        Returns:
+            a list of all neighboring cells
+
+        """
+        return CellCollection[Cell](
             self._neighborhood(radius=radius, include_center=include_center),
             random=self.random,
         )
 
     # FIXME: Revisit caching strategy on methods
     @cache  # noqa: B019
-    def _neighborhood(self, radius=1, include_center=False):
+    def _neighborhood(
+        self, radius: int = 1, include_center: bool = False
+    ) -> dict[Cell, list[Agent]]:
         # if radius == 0:
         #     return {self: self.agents}
         if radius < 1:
             raise ValueError("radius must be larger than one")
         if radius == 1:
-            neighborhood = {neighbor: neighbor.agents for neighbor in self._connections}
+            neighborhood = {
+                neighbor: neighbor.agents for neighbor in self.connections.values()
+            }
             if not include_center:
                 return neighborhood
             else:
                 neighborhood[self] = self.agents
                 return neighborhood
         else:
-            neighborhood = {}
-            for neighbor in self._connections:
+            neighborhood: dict[Cell, list[Agent]] = {}
+            for neighbor in self.connections.values():
                 neighborhood.update(
                     neighbor._neighborhood(radius - 1, include_center=True)
                 )
             if not include_center:
                 neighborhood.pop(self, None)
             return neighborhood
+
+    # PropertyLayer methods
+    def get_property(self, property_name: str) -> Any:
+        """Get the value of a property."""
+        return self._mesa_property_layers[property_name].data[self.coordinate]
+
+    def set_property(self, property_name: str, value: Any):
+        """Set the value of a property."""
+        self._mesa_property_layers[property_name].set_cell(self.coordinate, value)
+
+    def modify_property(
+        self, property_name: str, operation: Callable, value: Any = None
+    ):
+        """Modify the value of a property."""
+        self._mesa_property_layers[property_name].modify_cell(
+            self.coordinate, operation, value
+        )

@@ -1,12 +1,13 @@
 """Test Solara visualizations."""
 
 import unittest
-from unittest.mock import Mock
 
 import ipyvuetify as vw
 import solara
 
 import mesa
+import mesa.visualization.components.altair
+import mesa.visualization.components.matplotlib
 from mesa.visualization.components.matplotlib import make_space_matplotlib
 from mesa.visualization.solara_viz import Slider, SolaraViz, UserInputs
 
@@ -86,9 +87,11 @@ class TestMakeUserInput(unittest.TestCase):  # noqa: D101
 
 
 def test_call_space_drawer(mocker):  # noqa: D103
-    mock_space_matplotlib = mocker.patch(
-        "mesa.visualization.components.matplotlib.SpaceMatplotlib"
+    mock_space_matplotlib = mocker.spy(
+        mesa.visualization.components.matplotlib, "SpaceMatplotlib"
     )
+
+    mock_space_altair = mocker.spy(mesa.visualization.components.altair, "SpaceAltair")
 
     model = mesa.Model()
     mocker.patch.object(mesa.Model, "__init__", return_value=None)
@@ -97,21 +100,30 @@ def test_call_space_drawer(mocker):  # noqa: D103
         "Shape": "circle",
         "color": "gray",
     }
+    propertylayer_portrayal = None
     # initialize with space drawer unspecified (use default)
     # component must be rendered for code to run
     solara.render(SolaraViz(model, components=[make_space_matplotlib(agent_portrayal)]))
     # should call default method with class instance and agent portrayal
-    mock_space_matplotlib.assert_called_with(model, agent_portrayal)
+    mock_space_matplotlib.assert_called_with(
+        model, agent_portrayal, propertylayer_portrayal
+    )
 
     # specify no space should be drawn
     mock_space_matplotlib.reset_mock()
-    solara.render(SolaraViz(model, components=[]))
+    solara.render(SolaraViz(model))
     # should call default method with class instance and agent portrayal
     assert mock_space_matplotlib.call_count == 0
+    assert mock_space_altair.call_count > 0
 
     # specify a custom space method
-    altspace_drawer = Mock()
-    solara.render(SolaraViz(model, components=[altspace_drawer]))
+    class AltSpace:
+        @staticmethod
+        def drawer(model):
+            return
+
+    altspace_drawer = mocker.spy(AltSpace, "drawer")
+    solara.render(SolaraViz(model, components=[AltSpace.drawer]))
     altspace_drawer.assert_called_with(model)
 
     # check voronoi space drawer
