@@ -119,6 +119,24 @@ ruff .
 
 The license of this project is located in [LICENSE].  By submitting a contribution to this project, you are agreeing that your contribution will be released under the terms of this license.
 
+## Maintainers
+Some notes useful for Mesa maintainers.
+
+### Releases
+To create a new release, follow these steps:
+
+1. Ensure all pull requests (PRs) have a clear title and are labeled with at least one label. Check [this link](https://github.com/projectmesa/mesa/pulls?q=is%3Apr+is%3Amerged+no%3Alabel+merged%3A%3E%3D2024-03-01+) to see if all PRs are labeled. These labels will be used when drafting the changelog using the [`.github/release.yml`](https://github.com/projectmesa/mesa/blob/main/.github/release.yml) configuration.
+2. Navigate to the [Releases](https://github.com/projectmesa/mesa/releases) section in the GitHub UI and click the _Draft a new release_ button.
+3. Specify the upcoming tag in the _Choose a tag_ and _Release title_ fields (e.g., `v3.0.0`).
+   - For pre-releases, add a `a`, `b` or `rc` and a number behind the version tag (see [Versioning](https://packaging.python.org/en/latest/discussions/versioning/)), and check the box _Set as a pre-release_.
+4. Use the _Generate release notes_ button to automatically create release notes. Review them carefully for accuracy, and update labels and edit PR titles if necessary (step 1).
+5. Write a _Highlights_ section summarizing the most important features or changes in this release.
+6. Copy the release notes and save them by clicking the grey _Save draft_ button.
+7. Open a new PR to update the version number in [`mesa/__init__.py`](https://github.com/projectmesa/mesa/blob/main/mesa/__init__.py) and add the copied release notes to the [`HISTORY.md`](https://github.com/projectmesa/mesa/blob/main/HISTORY.md).
+8. Once this PR is merged, return to the _Releases_ section and publish the draft release.
+9. The [`release.yml`](https://github.com/projectmesa/mesa/blob/main/.github/workflows/release.yml) CI workflow should automatically create and upload the package to PyPI. Verify this on [PyPI.org](https://pypi.org/project/mesa/).
+10. Finally, after release, open a new PR to update the version number in [`mesa/__init__.py`](https://github.com/projectmesa/mesa/blob/main/mesa/__init__.py) for the next release (e.g., `"3.1.0.dev"`).
+
 ## Special Thanks
 
 A special thanks to the following projects who offered inspiration for this contributing file.
