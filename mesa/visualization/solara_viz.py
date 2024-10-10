@@ -30,64 +30,13 @@ from typing import TYPE_CHECKING, Literal
 
 import reacton.core
 import solara
-from solara.alias import rv
 
 import mesa.visualization.components.altair as components_altair
-import mesa.visualization.components.matplotlib as components_matplotlib
 from mesa.visualization.UserParam import Slider
 from mesa.visualization.utils import force_update, update_counter
 
 if TYPE_CHECKING:
     from mesa.model import Model
-
-
-# TODO: Turn this function into a Solara component once the current_step.value
-# dependency is passed to measure()
-def Card(
-    model, measures, agent_portrayal, space_drawer, dependencies, color, layout_type
-):
-    """Create a card component for visualizing model space or measures.
-
-    Args:
-        model: The Mesa model instance
-        measures: List of measures to be plotted
-        agent_portrayal: Function to define agent appearance
-        space_drawer: Method to render agent space
-        dependencies: List of dependencies for updating the visualization
-        color: Background color of the card
-        layout_type: Type of layout (Space or Measure)
-
-    Returns:
-        rv.Card: A card component containing the visualization
-    """
-    with rv.Card(
-        style_=f"background-color: {color}; width: 100%; height: 100%"
-    ) as main:
-        if "Space" in layout_type:
-            rv.CardTitle(children=["Space"])
-            if space_drawer == "default":
-                # draw with the default implementation
-                components_matplotlib.SpaceMatplotlib(
-                    model, agent_portrayal, dependencies=dependencies
-                )
-            elif space_drawer == "altair":
-                components_altair.SpaceAltair(
-                    model, agent_portrayal, dependencies=dependencies
-                )
-            elif space_drawer:
-                # if specified, draw agent space with an alternate renderer
-                space_drawer(model, agent_portrayal, dependencies=dependencies)
-        elif "Measure" in layout_type:
-            rv.CardTitle(children=["Measure"])
-            measure = measures[layout_type["Measure"]]
-            if callable(measure):
-                # Is a custom object
-                measure(model)
-            else:
-                components_matplotlib.PlotMatplotlib(
-                    model, measure, dependencies=dependencies
-                )
-    return main
 
 
 @solara.component
@@ -207,10 +156,16 @@ def ComponentsView(
         model: Model instance to pass to each component
     """
     wrapped_components = [_wrap_component(component) for component in components]
-
-    with solara.Column():
-        for component in wrapped_components:
-            component(model)
+    items = [component(model) for component in wrapped_components]
+    grid_layout_initial = make_initial_grid_layout(num_components=len(items))
+    grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
+    solara.GridDraggable(
+        items=items,
+        grid_layout=grid_layout,
+        resizable=True,
+        draggable=True,
+        on_grid_layout=set_grid_layout,
+    )
 
 
 JupyterViz = SolaraViz
@@ -448,11 +403,11 @@ def UserInputs(user_params, on_change=None):
             raise ValueError(f"{input_type} is not a supported input type")
 
 
-def make_initial_grid_layout(layout_types):
+def make_initial_grid_layout(num_components):
     """Create an initial grid layout for visualization components.
 
     Args:
-        layout_types: List of layout types (Space or Measure)
+        num_components: Number of components to display
 
     Returns:
         list: Initial grid layout configuration
@@ -466,7 +421,7 @@ def make_initial_grid_layout(layout_types):
             "x": 6 * (i % 2),
             "y": 16 * (i - i % 2),
         }
-        for i in range(len(layout_types))
+        for i in range(num_components)
     ]
 
 
