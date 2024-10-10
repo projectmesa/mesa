@@ -63,7 +63,9 @@ def SpaceMatplotlib(
     elif space is None and propertylayer_portrayal:
         draw_property_layers(space_ax, space, propertylayer_portrayal, model)
 
-    solara.FigureMatplotlib(space_fig, format="png", dependencies=dependencies)
+    solara.FigureMatplotlib(
+        space_fig, format="png", bbox_inches="tight", dependencies=dependencies
+    )
 
 
 def draw_property_layers(ax, space, propertylayer_portrayal, model):
@@ -327,11 +329,14 @@ def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
     elif isinstance(measure, dict):
         for m, color in measure.items():
             ax.plot(df.loc[:, m], label=m, color=color)
-        fig.legend()
+        ax.legend(loc="best")
     elif isinstance(measure, list | tuple):
         for m in measure:
             ax.plot(df.loc[:, m], label=m)
-        fig.legend()
+        ax.legend(loc="best")
+    ax.set_xlabel("Step")
     # Set integer x axis
     ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
-    solara.FigureMatplotlib(fig, dependencies=dependencies)
+    solara.FigureMatplotlib(
+        fig, format="png", bbox_inches="tight", dependencies=dependencies
+    )
