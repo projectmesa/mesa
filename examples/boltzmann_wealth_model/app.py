@@ -1,113 +1,65 @@
-import time
-
-import altair as alt
-import pandas as pd
-import streamlit as st
-from boltzmann_wealth_model.model import BoltzmannWealthModel
-
-model = st.title("Boltzman Wealth Model")
-num_agents = st.slider(
-    "Choose how many agents to include in the model",
-    min_value=1,
-    max_value=100,
-    value=50,
+from mesa.visualization import (
+    SolaraViz,
+    make_plot_measure,
+    make_space_matplotlib,
 )
-num_ticks = st.slider(
-    "Select number of Simulation Runs", min_value=1, max_value=100, value=50
+from model import BoltzmannWealthModel
+
+
+def agent_portrayal(agent):
+    size = 10
+    color = "tab:red"
+    if agent.wealth > 0:
+        size = 50
+        color = "tab:blue"
+    return {"size": size, "color": color}
+
+
+model_params = {
+    "N": {
+        "type": "SliderInt",
+        "value": 50,
+        "label": "Number of agents:",
+        "min": 10,
+        "max": 100,
+        "step": 1,
+    },
+    "width": 10,
+    "height": 10,
+}
+
+# Create initial model instance
+model1 = BoltzmannWealthModel(50, 10, 10)
+
+# Create visualization elements. The visualization elements are solara components
+# that receive the model instance as a "prop" and display it in a certain way.
+# Under the hood these are just classes that receive the model instance.
+# You can also author your own visualization elements, which can also be functions
+# that receive the model instance and return a valid solara component.
+SpaceGraph = make_space_matplotlib(agent_portrayal)
+GiniPlot = make_plot_measure("Gini")
+
+# Create the SolaraViz page. This will automatically create a server and display the
+# visualization elements in a web browser.
+# Display it using the following command in the example directory:
+# solara run app.py
+# It will automatically update and display any changes made to this file
+page = SolaraViz(
+    model1,
+    components=[SpaceGraph, GiniPlot],
+    model_params=model_params,
+    name="Boltzmann Wealth Model",
 )
-height = st.slider("Select Grid Height", min_value=10, max_value=100, step=10, value=15)
-width = st.slider("Select Grid Width", min_value=10, max_value=100, step=10, value=20)
-model = BoltzmannWealthModel(num_agents, height, width)
+page  # noqa
 
 
-status_text = st.empty()
-run = st.button("Run Simulation")
+# In a notebook environment, we can also display the visualization elements directly
+# SpaceGraph(model1)
+# GiniPlot(model1)
 
-
-if run:
-    tick = time.time()
-    step = 0
-    # init grid
-    df_grid = pd.DataFrame()
-    df_gini = pd.DataFrame({"step": [0], "gini": [-1]})
-    for x in range(width):
-        for y in range(height):
-            df_grid = pd.concat(
-                [df_grid, pd.DataFrame({"x": [x], "y": [y], "agent_count": 0})],
-                ignore_index=True,
-            )
-
-    heatmap = (
-        alt.Chart(df_grid)
-        .mark_point(size=100)
-        .encode(x="x", y="y", color=alt.Color("agent_count"))
-        .interactive()
-        .properties(width=800, height=600)
-    )
-
-    line = (
-        alt.Chart(df_gini)
-        .mark_line(point=True)
-        .encode(x="step", y="gini")
-        .properties(width=800, height=600)
-    )
-
-    # init progress bar
-    my_bar = st.progress(0, text="Simulation Progress")  # progress
-    placeholder = st.empty()
-    st.subheader("Agent Grid")
-    chart = st.altair_chart(heatmap)
-    st.subheader("Gini Values")
-    line_chart = st.altair_chart(line)
-
-    color_scale = alt.Scale(
-        domain=[0, 1, 2, 3, 4], range=["red", "cyan", "white", "white", "blue"]
-    )
-    for i in range(num_ticks):
-        model.step()
-        my_bar.progress((i / num_ticks), text="Simulation progress")
-        placeholder.text("Step = %d" % i)
-        for cell in model.grid.coord_iter():
-            cell_content, (x, y) = cell
-            agent_count = len(cell_content)
-            selected_row = df_grid[(df_grid["x"] == x) & (df_grid["y"] == y)]
-            df_grid.loc[selected_row.index, "agent_count"] = (
-                agent_count  # random.choice([1,2])
-            )
-
-        df_gini = pd.concat(
-            [
-                df_gini,
-                pd.DataFrame(
-                    {"step": [i], "gini": [model.datacollector.model_vars["Gini"][i]]}
-                ),
-            ]
-        )
-        # st.table(df_grid)
-        heatmap = (
-            alt.Chart(df_grid)
-            .mark_circle(size=100)
-            .encode(x="x", y="y", color=alt.Color("agent_count", scale=color_scale))
-            .interactive()
-            .properties(width=800, height=600)
-        )
-        chart.altair_chart(heatmap)
-
-        line = (
-            alt.Chart(df_gini)
-            .mark_line(point=True)
-            .encode(x="step", y="gini")
-            .properties(width=800, height=600)
-        )
-        line_chart.altair_chart(line)
-
-        time.sleep(0.01)
-
-    tock = time.time()
-    st.success(f"Simulation completed in {tock - tick:.2f} secs")
-
-    # st.subheader('Agent Grid')
-    # fig = px.imshow(agent_counts,labels={'color':'Agent Count'})
-    # st.plotly_chart(fig)
-    # st.subheader('Gini value over sim ticks (Plotly)')
-    # chart = st.line_chart(model.datacollector.model_vars['Gini'])
+# The plots will be static. If you want to pick up model steps,
+# you have to make the model reactive first
+# reactive_model = solara.reactive(model1)
+# SpaceGraph(reactive_model)
+# In a different notebook block:
+# reactive_model.value.step()

@@ -12,32 +12,41 @@ As the model runs, the distribution of wealth among agents goes from being perfe
 
 To follow the tutorial example, launch the Jupyter Notebook and run the code in ``Introduction to Mesa Tutorial Code.ipynb`` which you can find in the main mesa repo [here](https://github.com/projectmesa/mesa/blob/main/docs/tutorials/intro_tutorial.ipynb)
 
-To launch the interactive server, as described in the [last section of the tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html#adding-visualization), run:
-
-```
-    $ python server.py
-```
-
 Make sure to install the requirements first:
 
 ```
-    pip install -r requirements.txt
+    $ pip install -r requirements.txt
 ```
 
-If your browser doesn't open automatically, point it to [http://127.0.0.1:8521/](http://127.0.0.1:8521/). When the visualization loads, press Reset, then Run.
+To launch the interactive server, as described in the [last section of the tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html#adding-visualization), run:
+
+```
+    $ solara run app.py
+```
+
+If your browser doesn't open automatically, point it to [http://127.0.0.1:8765/](http://127.0.0.1:8765/). When the visualization loads, click on the Play button.
 
 
 ## Files
 
-* ``boltzmann_wealth_model/model.py``: Final version of the model.
-* ``boltzmann_wealth_model/server.py``: Code for the interactive visualization.
-* ``run.py``: Launches the server.
+* ``model.py``: Final version of the model.
+* ``app.py``: Code for the interactive visualization.
 
 ## Optional
 
-*  ``boltzmann_wealth_model/app.py``: can be used to run the simulation via the streamlit interface.
-* For this some additional packages like ``streamlit`` and ``altair`` needs to be installed.
-* Once installed, the app can be opened in the browser using : ``streamlit run app.py``
+An optional visualization is also provided using Streamlit, which is another popular Python library for creating interactive web applications.
+
+To run the Streamlit app, you will need to install the `streamlit` and `altair` libraries:
+
+```
+    $ pip install streamlit altair
+```
+
+Then, you can run the Streamlit app using the following command:
+
+```
+    $ streamlit run st_app.py
+```
 
 ## Further Reading
 
