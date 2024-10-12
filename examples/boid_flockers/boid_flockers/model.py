@@ -1,17 +1,16 @@
-"""
-Flockers
+"""Flockers
 =============================================================
 A Mesa implementation of Craig Reynolds's Boids flocker model.
 Uses numpy arrays to represent vectors.
 """
 
-import mesa
 import numpy as np
+
+import mesa
 
 
 class Boid(mesa.Agent):
-    """
-    A Boid-style flocker agent.
+    """A Boid-style flocker agent.
 
     The agent follows three behaviors to flock:
         - Cohesion: steering towards neighboring agents.
@@ -35,8 +34,7 @@ class Boid(mesa.Agent):
         separate=0.015,
         match=0.05,
     ):
-        """
-        Create a new Boid flocker agent.
+        """Create a new Boid flocker agent.
 
         Args:
             speed: Distance to move per step.
@@ -58,10 +56,7 @@ class Boid(mesa.Agent):
         self.neighbors = None
 
     def step(self):
-        """
-        Get the Boid's neighbors, compute the new vector, and move accordingly.
-        """
-
+        """Get the Boid's neighbors, compute the new vector, and move accordingly."""
         self.neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
         n = 0
         match_vector, separation_vector, cohere = np.zeros((3, 2))
@@ -83,9 +78,7 @@ class Boid(mesa.Agent):
 
 
 class BoidFlockers(mesa.Model):
-    """
-    Flocker model class. Handles agent creation, placement and scheduling.
-    """
+    """Flocker model class. Handles agent creation, placement and scheduling."""
 
     def __init__(
         self,
@@ -100,8 +93,7 @@ class BoidFlockers(mesa.Model):
         separate=0.015,
         match=0.05,
     ):
-        """
-        Create a new Flockers model.
+        """Create a new Flockers model.
 
         Args:
             population: Number of Boids
@@ -124,9 +116,7 @@ class BoidFlockers(mesa.Model):
         self.make_agents()
 
     def make_agents(self):
-        """
-        Create self.population agents, with random positions and starting headings.
-        """
+        """Create self.population agents, with random positions and starting headings."""
         for _ in range(self.population):
             x = self.random.random() * self.space.x_max
             y = self.random.random() * self.space.y_max

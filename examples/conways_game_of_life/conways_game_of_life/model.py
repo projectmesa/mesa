@@ -4,15 +4,12 @@ from .cell import Cell
 
 
 class ConwaysGameOfLife(mesa.Model):
-    """
-    Represents the 2-dimensional array of cells in Conway's
+    """Represents the 2-dimensional array of cells in Conway's
     Game of Life.
     """
 
     def __init__(self, width=50, height=50):
-        """
-        Create a new playing area of (width, height) cells.
-        """
+        """Create a new playing area of (width, height) cells."""
         super().__init__()
         # Use a simple grid, where edges wrap around.
         self.grid = mesa.space.SingleGrid(width, height, torus=True)
@@ -28,8 +25,7 @@ class ConwaysGameOfLife(mesa.Model):
         self.running = True
 
     def step(self):
-        """
-        Perform the model step in two stages:
+        """Perform the model step in two stages:
         - First, all cells assume their next state (whether they will be dead or alive)
         - Then, all cells change state to their next state
         """

@@ -1,4 +1,5 @@
 from boid_flockers.model import BoidFlockers
+
 from mesa.visualization import SolaraViz, make_space_matplotlib
 
 

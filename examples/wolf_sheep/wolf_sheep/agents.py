@@ -4,8 +4,7 @@ from .random_walk import RandomWalker
 
 
 class Sheep(RandomWalker):
-    """
-    A sheep that walks around, reproduces (asexually) and gets eaten.
+    """A sheep that walks around, reproduces (asexually) and gets eaten.
 
     The init is the same as the RandomWalker.
     """
@@ -17,9 +16,7 @@ class Sheep(RandomWalker):
         self.energy = energy
 
     def step(self):
-        """
-        A model step. Move, then eat grass and reproduce.
-        """
+        """A model step. Move, then eat grass and reproduce."""
         self.random_move()
         living = True
 
@@ -49,9 +46,7 @@ class Sheep(RandomWalker):
 
 
 class Wolf(RandomWalker):
-    """
-    A wolf that walks around, reproduces (asexually) and eats sheep.
-    """
+    """A wolf that walks around, reproduces (asexually) and eats sheep."""
 
     energy = None
 
@@ -88,13 +83,10 @@ class Wolf(RandomWalker):
 
 
 class GrassPatch(mesa.Agent):
-    """
-    A patch of grass that grows at a fixed rate and it is eaten by sheep
-    """
+    """A patch of grass that grows at a fixed rate and it is eaten by sheep"""
 
     def __init__(self, model, fully_grown, countdown):
-        """
-        Creates a new patch of grass
+        """Creates a new patch of grass
 
         Args:
             grown: (boolean) Whether the patch of grass is fully grown or not

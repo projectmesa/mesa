@@ -1,5 +1,4 @@
-"""
-Testing the RandomWalker by having an ABM composed only of random walker
+"""Testing the RandomWalker by having an ABM composed only of random walker
 agents.
 """
 
@@ -10,25 +9,20 @@ from wolf_sheep.random_walk import RandomWalker
 
 
 class WalkerAgent(RandomWalker):
-    """
-    Agent which only walks around.
-    """
+    """Agent which only walks around."""
 
     def step(self):
         self.random_move()
 
 
 class WalkerWorld(Model):
-    """
-    Random walker world.
-    """
+    """Random walker world."""
 
     height = 10
     width = 10
 
     def __init__(self, width, height, agent_count):
-        """
-        Create a new WalkerWorld.
+        """Create a new WalkerWorld.
 
         Args:
             width, height: World size.
@@ -51,16 +45,14 @@ class WalkerWorld(Model):
 
 
 class WalkerWorldViz(TextVisualization):
-    """
-    ASCII Visualization for a WalkerWorld agent.
+    """ASCII Visualization for a WalkerWorld agent.
     Each cell is displayed as the number of agents currently in that cell.
     """
 
     def __init__(self, model):
-        """
-        Create a new visualization for a WalkerWorld instance.
+        """Create a new visualization for a WalkerWorld instance.
 
-        args:
+        Args:
             model: An instance of a WalkerWorld model.
         """
         self.model = model

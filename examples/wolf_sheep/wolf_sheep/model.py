@@ -1,5 +1,4 @@
-"""
-Wolf-Sheep Predation Model
+"""Wolf-Sheep Predation Model
 ================================
 
 Replication of the model found in NetLogo:
@@ -15,9 +14,7 @@ from .agents import GrassPatch, Sheep, Wolf
 
 
 class WolfSheep(mesa.Model):
-    """
-    Wolf-Sheep Predation Model
-    """
+    """Wolf-Sheep Predation Model"""
 
     height = 20
     width = 20
@@ -51,8 +48,7 @@ class WolfSheep(mesa.Model):
         grass_regrowth_time=30,
         sheep_gain_from_food=4,
     ):
-        """
-        Create a new Wolf-Sheep model with the given parameters.
+        """Create a new Wolf-Sheep model with the given parameters.
 
         Args:
             initial_sheep: Number of sheep to start with
