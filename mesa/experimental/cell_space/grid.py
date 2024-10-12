@@ -29,14 +29,13 @@ class Grid(DiscreteSpace[T], Generic[T]):
 
     @property
     def width(self) -> int:
-        """convenience access to the width of the grid."""
+        """Convenience access to the width of the grid."""
         return self.dimensions[0]
 
     @property
     def height(self) -> int:
-        """convenience access to the height of the grid."""
+        """Convenience access to the height of the grid."""
         return self.dimensions[1]
-
 
     def __init__(
         self,
