@@ -82,6 +82,38 @@ class Agent:
         """Return a seeded rng."""
         return self.model.random
 
+    @classmethod
+    def create_agents(cls, model: Model, n: int, *args, **kwargs):
+        """Create N agents.
+
+        Args:
+            model: the model to which the agents belong
+            args: arguments to pass onto agent instances
+                  each arg is either a single object or a sequence of length n
+            n: the number of agents to create
+            kwargs: keyword arguments to pass onto agent instances
+                   each keyword arg is either a single object or a sequence of length n
+
+        """
+        for i in range(n):
+            instance_args = []
+            for arg in args:
+                try:
+                    instance_args.append(arg[i])
+                except TypeError:
+                    instance_args.append(arg)
+
+            instance_kwargs = {}
+            for k,v in kwargs.items():
+                try:
+                    instance_kwargs[k] = v[i]
+                except IndexError:
+                    instance_kwargs[k] = v
+
+            cls(model, *instance_args, **instance_kwargs)
+
+
+
 
 class AgentSet(MutableSet, Sequence):
     """A collection class that represents an ordered set of agents within an agent-based model (ABM).
