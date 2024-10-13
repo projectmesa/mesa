@@ -104,15 +104,13 @@ class Agent:
                     instance_args.append(arg)
 
             instance_kwargs = {}
-            for k,v in kwargs.items():
+            for k, v in kwargs.items():
                 try:
                     instance_kwargs[k] = v[i]
                 except IndexError:
                     instance_kwargs[k] = v
 
             cls(model, *instance_args, **instance_kwargs)
-
-
 
 
 class AgentSet(MutableSet, Sequence):

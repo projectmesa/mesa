@@ -178,20 +178,36 @@ class WolfSheep(Model):
         )
 
         # Create sheep:
-        Sheep.create_agents(self,
-                            self.initial_sheep,
-                            [self.random.randrange(2 * sheep_gain_from_food) for _ in range(self.initial_sheep)],
-                            sheep_reproduce,
-                            sheep_gain_from_food,
-                            [self.grid.all_cells.select_random_cell() for _ in range(self.initial_sheep)])
+        Sheep.create_agents(
+            self,
+            self.initial_sheep,
+            [
+                self.random.randrange(2 * sheep_gain_from_food)
+                for _ in range(self.initial_sheep)
+            ],
+            sheep_reproduce,
+            sheep_gain_from_food,
+            [
+                self.grid.all_cells.select_random_cell()
+                for _ in range(self.initial_sheep)
+            ],
+        )
 
         # create wolves:
-        Wolf.create_agents(self,
-                           self.initial_wolves,
-                           [self.random.randrange(2 * wolf_gain_from_food) for _ in range(self.initial_wolves)],
-                           wolf_reproduce,
-                           wolf_gain_from_food,
-                           [self.grid.all_cells.select_random_cell() for _ in range(self.initial_wolves)],)
+        Wolf.create_agents(
+            self,
+            self.initial_wolves,
+            [
+                self.random.randrange(2 * wolf_gain_from_food)
+                for _ in range(self.initial_wolves)
+            ],
+            wolf_reproduce,
+            wolf_gain_from_food,
+            [
+                self.grid.all_cells.select_random_cell()
+                for _ in range(self.initial_wolves)
+            ],
+        )
 
         # Create grass patches
         possibly_fully_grown = [True, False]
