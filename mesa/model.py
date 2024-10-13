@@ -52,8 +52,6 @@ class Model:
         self.running = True
         self.steps: int = 0
 
-        self._setup_agent_registration()
-
         self._seed = seed
         if self._seed is None:
             # We explicitly specify the seed here so that we know its value in
@@ -64,6 +62,9 @@ class Model:
         # Wrap the user-defined step method
         self._user_step = self.step
         self.step = self._wrapped_step
+
+        # setup agent registration data structures
+        self._setup_agent_registration()
 
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
         """Automatically increments time and steps after calling the user's step method."""
@@ -119,7 +120,9 @@ class Model:
         self._agents_by_type: dict[
             type[Agent], AgentSet
         ] = {}  # a dict with an agentset for each class of agents
-        self._all_agents = AgentSet([], self)  # an agenset with all agents
+        self._all_agents = AgentSet(
+            [], random=self.random
+        )  # an agenset with all agents
 
     def register_agent(self, agent):
         """Register the agent with the model.
@@ -153,7 +156,7 @@ class Model:
                 [
                     agent,
                 ],
-                self,
+                random=self.random,
             )
 
         self._all_agents.add(agent)
