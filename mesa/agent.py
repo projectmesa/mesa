@@ -99,14 +99,16 @@ class AgentSet(MutableSet, Sequence):
         which means that agents not referenced elsewhere in the program may be automatically removed from the AgentSet.
     """
 
-    def __init__(self, agents: Iterable[Agent], model: Model):
+    def __init__(self, agents: Iterable[Agent], random: Random | None = None):
         """Initializes the AgentSet with a collection of agents and a reference to the model.
 
         Args:
             agents (Iterable[Agent]): An iterable of Agent objects to be included in the set.
-            model (Model): The ABM model instance to which this AgentSet belongs.
+            random (Random): the random number generator
         """
-        self.model = model
+        if random is None:
+            random = Random()  # FIXME see issue 1981, how to get the central rng from model
+        self.random = random
         self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
 
     def __len__(self) -> int:
@@ -177,7 +179,7 @@ class AgentSet(MutableSet, Sequence):
 
         agents = agent_generator(filter_func, agent_type, at_most)
 
-        return AgentSet(agents, self.model) if not inplace else self._update(agents)
+        return AgentSet(agents, self.random) if not inplace else self._update(agents)
 
     def shuffle(self, inplace: bool = False) -> AgentSet:
         """Randomly shuffle the order of agents in the AgentSet.
@@ -200,7 +202,7 @@ class AgentSet(MutableSet, Sequence):
             return self
         else:
             return AgentSet(
-                (agent for ref in weakrefs if (agent := ref()) is not None), self.model
+                (agent for ref in weakrefs if (agent := ref()) is not None), self.random
             )
 
     def sort(
@@ -225,7 +227,7 @@ class AgentSet(MutableSet, Sequence):
         sorted_agents = sorted(self._agents.keys(), key=key, reverse=not ascending)
 
         return (
-            AgentSet(sorted_agents, self.model)
+            AgentSet(sorted_agents, self.random)
             if not inplace
             else self._update(sorted_agents)
         )
@@ -477,7 +479,7 @@ class AgentSet(MutableSet, Sequence):
         Returns:
             dict: A dictionary representing the state of the AgentSet.
         """
-        return {"agents": list(self._agents.keys()), "model": self.model}
+        return {"agents": list(self._agents.keys()), "random": self.random}
 
     def __setstate__(self, state):
         """Set the state of the AgentSet during deserialization.
@@ -485,17 +487,8 @@ class AgentSet(MutableSet, Sequence):
         Args:
             state (dict): A dictionary representing the state to restore.
         """
-        self.model = state["model"]
+        self.random = state["random"]
         self._update(state["agents"])
-
-    @property
-    def random(self) -> Random:
-        """Provide access to the model's random number generator.
-
-        Returns:
-            Random: The random number generator associated with the model.
-        """
-        return self.model.random
 
     def groupby(self, by: Callable | str, result_type: str = "agentset") -> GroupBy:
         """Group agents by the specified attribute or return from the callable.
@@ -529,7 +522,7 @@ class AgentSet(MutableSet, Sequence):
 
         if result_type == "agentset":
             return GroupBy(
-                {k: AgentSet(v, model=self.model) for k, v in groups.items()}
+                {k: AgentSet(v, random=self.random) for k, v in groups.items()}
             )
         else:
             return GroupBy(groups)
