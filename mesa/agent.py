@@ -107,7 +107,9 @@ class AgentSet(MutableSet, Sequence):
             random (Random): the random number generator
         """
         if random is None:
-            random = Random()  # FIXME see issue 1981, how to get the central rng from model
+            random = (
+                Random()
+            )  # FIXME see issue 1981, how to get the central rng from model
         self.random = random
         self._agents = weakref.WeakKeyDictionary({agent: None for agent in agents})
 

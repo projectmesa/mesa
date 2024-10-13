@@ -120,7 +120,9 @@ class Model:
         self._agents_by_type: dict[
             type[Agent], AgentSet
         ] = {}  # a dict with an agentset for each class of agents
-        self._all_agents = AgentSet([], random=self.random)  # an agenset with all agents
+        self._all_agents = AgentSet(
+            [], random=self.random
+        )  # an agenset with all agents
 
     def register_agent(self, agent):
         """Register the agent with the model.
