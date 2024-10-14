@@ -79,7 +79,7 @@ class Model:
         elif seed is None or rng is None:
             seed = rng
         elif rng is None:
-            rng = seed
+            seed = rng
 
         self.rng: np.random.Generator = np.random.default_rng(rng)
         self._rng: dict = (
