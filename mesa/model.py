@@ -76,8 +76,10 @@ class Model:
             raise ValueError("you have to pass either rng or seed, not both")
         elif seed is None and rng is None:
             pass
-        elif seed is None or rng is None or rng is None:
+        elif seed is None:
             seed = rng
+        elif rng is None:
+            rng = seed
 
         self.rng: np.random.Generator = np.random.default_rng(rng)
         self._rng: dict = (
