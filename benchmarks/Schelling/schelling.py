@@ -34,11 +34,8 @@ class SchellingAgent(CellAgent):
 
     def step(self):
         """Run one step of the agent."""
-        similar = 0
-        neighborhood = self.cell.get_neighborhood(radius=self.radius)
-        for neighbor in neighborhood.agents:
-            if neighbor.type == self.type:
-                similar += 1
+        neighbors = self.cell.get_neighborhood(radius=self.radius).agents
+        similar = sum(1 for neighbor in neighbors if neighbor.type == self.type)
 
         # If unhappy, move:
         if similar < self.homophily:
@@ -76,7 +73,6 @@ class Schelling(Model):
         """
         super().__init__(seed=seed)
         self.simulator = simulator
-        self.minority_pc = minority_pc
         self.happy = 0
 
         self.grid = OrthogonalMooreGrid(
@@ -92,7 +88,7 @@ class Schelling(Model):
         # its contents. (coord_iter)
         for cell in self.grid:
             if self.random.random() < density:
-                agent_type = 1 if self.random.random() < self.minority_pc else 0
+                agent_type = 1 if self.random.random() < minority_pc else 0
                 SchellingAgent(self, agent_type, radius, homophily, cell)
 
     def step(self):
