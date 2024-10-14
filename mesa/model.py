@@ -45,11 +45,11 @@ class Model:
     """
 
     def __init__(
-        self,
-        *args: Any,
-        seed: float | None = None,
-        rng: RNGLike | SeedLike | None = None,
-        **kwargs: Any,
+            self,
+            *args: Any,
+            seed: float | None = None,
+            rng: RNGLike | SeedLike | None = None,
+            **kwargs: Any,
     ) -> None:
         """Create a new model.
 
@@ -64,19 +64,29 @@ class Model:
                   `numpy.random.default_rng` to instantiate a `Generator`.
             kwargs: keyword arguments to pass onto super
 
+        Notes:
+            you have to pass either seed or rng, but not both. 
+
         """
         super().__init__(*args, **kwargs)
         self.running = True
         self.steps: int = 0
 
-        self._seed = seed
-        if self._seed is None:
-            # We explicitly specify the seed here so that we know its value in advance.
-            self._seed = random.random()
-        self.rng: np.random.Generator = np.random.default_rng(rng)
-        self._rng: dict = self.rng.__getstate__()  # this allows for reproducing the rng
+        if (seed is not None) and (rng is not None):
+            raise ValueError("you have to pass either rng or seed, not both")
+        elif seed is None and rng is None:
+            pass
+        elif seed is None:
+            seed = rng
+        elif rng is None:
+            seed = rng
 
-        self.random = random.Random(self._seed)
+
+        self.rng: np.random.Generator = np.random.default_rng(rng)
+        self._rng: dict = self.rng.bit_generator.state  # this allows for reproducing the rng
+
+        self.random = random.Random(seed)
+        self._random = self.random.getstate()[1] # this allows for reproducing stdlib.random
 
         # Wrap the user-defined step method
         self._user_step = self.step
@@ -225,11 +235,11 @@ class Model:
         self.rng = np.random.default_rng(rng)
 
     def initialize_data_collector(
-        self,
-        model_reporters=None,
-        agent_reporters=None,
-        agenttype_reporters=None,
-        tables=None,
+            self,
+            model_reporters=None,
+            agent_reporters=None,
+            agenttype_reporters=None,
+            tables=None,
     ) -> None:
         """Initialize the data collector for the model.
 
