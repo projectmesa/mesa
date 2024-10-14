@@ -78,16 +78,19 @@ class Model:
             pass
         elif seed is None or rng is None:
             seed = rng
+        elif rng is None:
+            rng = seed
 
         self.rng: np.random.Generator = np.random.default_rng(rng)
         self._rng: dict = (
             self.rng.bit_generator.state
         )  # this allows for reproducing the rng
 
+        if seed is None:
+            seed = int(self.rng.integers(np.iinfo(np.int32).max))
+
         self.random = random.Random(seed)
-        self._random = self.random.getstate()[
-            1
-        ]  # this allows for reproducing stdlib.random
+        self._seed = seed  # this allows for reproducing stdlib.random
 
         # Wrap the user-defined step method
         self._user_step = self.step
