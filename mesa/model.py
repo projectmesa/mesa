@@ -82,7 +82,9 @@ class Model:
             rng = seed
 
         self.rng: np.random.Generator = np.random.default_rng(rng)
-        self._rng: dict = self.rng.bit_generator.state # this allows for reproducing the rng
+        self._rng: dict = (
+            self.rng.bit_generator.state
+        )  # this allows for reproducing the rng
 
         if seed is None:
             seed = int(self.rng.integers(np.iinfo(np.int32).max))
