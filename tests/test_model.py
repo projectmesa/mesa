@@ -65,7 +65,6 @@ def test_reset_rng(newseed=42):
     assert old_rng != new_rng
 
 
-
 def test_agent_types():
     """Test Mode.agent_types property."""
 

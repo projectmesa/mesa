@@ -9,15 +9,15 @@ from __future__ import annotations
 
 import random
 import warnings
+from collections.abc import Sequence
 
 # mypy
 from typing import Any
 
+import numpy as np
+
 from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
-
-from collections.abc import Sequence
-import numpy as np
 
 SeedLike = int | np.integer | Sequence[int] | np.random.SeedSequence
 RNGLike = np.random.Generator | np.random.BitGenerator
@@ -44,8 +44,13 @@ class Model:
 
     """
 
-    def __init__(self, *args: Any, seed: float | None = None, rng: RNGLike | SeedLike | None = None,
-                 **kwargs: Any) -> None:
+    def __init__(
+        self,
+        *args: Any,
+        seed: float | None = None,
+        rng: RNGLike | SeedLike | None = None,
+        **kwargs: Any,
+    ) -> None:
         """Create a new model.
 
         Overload this method with the actual code to initialize the model. Always start with super().__init__()
@@ -220,11 +225,11 @@ class Model:
         self.rng = np.random.default_rng(rng)
 
     def initialize_data_collector(
-            self,
-            model_reporters=None,
-            agent_reporters=None,
-            agenttype_reporters=None,
-            tables=None,
+        self,
+        model_reporters=None,
+        agent_reporters=None,
+        agenttype_reporters=None,
+        tables=None,
     ) -> None:
         """Initialize the data collector for the model.
 
