@@ -95,21 +95,32 @@ class Agent:
                    each keyword arg is either a single object or a sequence of length n
 
         """
+
+        class ListLike:
+            """Helper class to make default arguments act as if they are in a list of length N."""
+            def __init__(self, value):
+                self.value = value
+
+            def __getitem__(self, i):
+                return self.value
+
+        listlike_args = []
+        for arg in args:
+            if isinstance(arg, list) and len(arg) == n:
+                listlike_args.append(arg)
+            else:
+                listlike_args.append(ListLike(arg))
+
+        listlike_kwargs = {}
+        for k, v in kwargs.items():
+            if isinstance(v, list) and len(v) == n:
+                listlike_kwargs[k] = v
+            else:
+                listlike_kwargs[k] = ListLike(v)
+
         for i in range(n):
-            instance_args = []
-            for arg in args:
-                try:
-                    instance_args.append(arg[i])
-                except TypeError:
-                    instance_args.append(arg)
-
-            instance_kwargs = {}
-            for k, v in kwargs.items():
-                try:
-                    instance_kwargs[k] = v[i]
-                except IndexError:
-                    instance_kwargs[k] = v
-
+            instance_args = [arg[i] for arg in listlike_args]
+            instance_kwargs = {k: v[i] for k,v in listlike_kwargs.items()}
             cls(model, *instance_args, **instance_kwargs)
 
 
