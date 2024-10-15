@@ -8,6 +8,7 @@ Core Objects: Model
 from __future__ import annotations
 
 import random
+import sys
 import warnings
 from collections.abc import Sequence
 
@@ -74,23 +75,21 @@ class Model:
 
         if (seed is not None) and (rng is not None):
             raise ValueError("you have to pass either rng or seed, not both")
-        elif seed is None and rng is None:
-            pass
         elif seed is None:
-            seed = rng
-        elif rng is None:
-            rng = seed
+            self.rng: np.random.Generator = np.random.default_rng(rng)
+            self._rng = self.rng.bit_generator.state  # this allows for reproducing the rng
 
-        self.rng: np.random.Generator = np.random.default_rng(rng)
-        self._rng: dict = (
-            self.rng.bit_generator.state
-        )  # this allows for reproducing the rng
-
-        if seed is None:
             seed = int(self.rng.integers(np.iinfo(np.int32).max))
+            self.random = random.Random(seed)
+            self._seed = seed  # this allows for reproducing stdlib.random
+        elif rng is None:
+            self.random = random.Random(seed)
+            self._seed = seed  # this allows for reproducing stdlib.random
 
-        self.random = random.Random(seed)
-        self._seed = seed  # this allows for reproducing stdlib.random
+            rng = self.random.randint(0, sys.maxsize)
+            self.rng: np.random.Generator = np.random.default_rng(rng)
+            self._rng = self.rng.bit_generator.state
+
 
         # Wrap the user-defined step method
         self._user_step = self.step
