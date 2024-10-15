@@ -312,7 +312,9 @@ class RandomActivationByType(BaseScheduler):
                 try:
                     self._agents_by_type[type(agent)].add(agent)
                 except KeyError:
-                    self._agents_by_type[type(agent)] = AgentSet([agent], self.model.random)
+                    self._agents_by_type[type(agent)] = AgentSet(
+                        [agent], self.model.random
+                    )
 
     def add(self, agent: Agent) -> None:
         """Add an Agent object to the schedule.
