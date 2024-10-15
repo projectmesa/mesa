@@ -1,9 +1,10 @@
-import mesa
+from mesa import Model
+from mesa.space import SingleGrid
 
-from .cell import Cell
+from agents import Cell
 
 
-class ConwaysGameOfLife(mesa.Model):
+class ConwaysGameOfLife(Model):
     """
     Represents the 2-dimensional array of cells in Conway's
     Game of Life.
@@ -15,7 +16,7 @@ class ConwaysGameOfLife(mesa.Model):
         """
         super().__init__()
         # Use a simple grid, where edges wrap around.
-        self.grid = mesa.space.SingleGrid(width, height, torus=True)
+        self.grid = SingleGrid(width, height, torus=True)
 
         # Place a cell at each location, with some initialized to
         # ALIVE and some to DEAD.
