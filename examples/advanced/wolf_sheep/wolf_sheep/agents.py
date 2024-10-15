@@ -1,93 +1,81 @@
-import mesa
-
-from .random_walk import RandomWalker
+from mesa.experimental.cell_space import CellAgent, FixedAgent
 
 
-class Sheep(RandomWalker):
-    """
-    A sheep that walks around, reproduces (asexually) and gets eaten.
+class Animal(CellAgent):
+    """The base animal class."""
 
-    The init is the same as the RandomWalker.
-    """
+    def __init__(self, model, energy, p_reproduce, energy_from_food, cell):
+        """Initializes an animal.
 
-    energy = None
-
-    def __init__(self, model, moore, energy=None):
-        super().__init__(model, moore=moore)
+        Args:
+            model: a model instance
+            energy: starting amount of energy
+            p_reproduce: probability of sexless reproduction
+            energy_from_food: energy obtained from 1 unit of food
+            cell: the cell in which the animal starts
+        """
+        super().__init__(model)
         self.energy = energy
+        self.p_reproduce = p_reproduce
+        self.energy_from_food = energy_from_food
+        self.cell = cell
+
+    def spawn_offspring(self):
+        """Create offspring."""
+        self.energy /= 2
+        self.__class__(
+            self.model,
+            self.energy,
+            self.p_reproduce,
+            self.energy_from_food,
+            self.cell,
+        )
+
+    def feed(self): ...
 
     def step(self):
-        """
-        A model step. Move, then eat grass and reproduce.
-        """
-        self.random_move()
-        living = True
-
-        if self.model.grass:
-            # Reduce energy
-            self.energy -= 1
-
-            # If there is grass available, eat it
-            this_cell = self.model.grid.get_cell_list_contents([self.pos])
-            grass_patch = next(obj for obj in this_cell if isinstance(obj, GrassPatch))
-            if grass_patch.fully_grown:
-                self.energy += self.model.sheep_gain_from_food
-                grass_patch.fully_grown = False
-
-            # Death
-            if self.energy < 0:
-                self.model.grid.remove_agent(self)
-                self.remove()
-                living = False
-
-        if living and self.random.random() < self.model.sheep_reproduce:
-            # Create a new sheep:
-            if self.model.grass:
-                self.energy /= 2
-            lamb = Sheep(self.model, self.moore, self.energy)
-            self.model.grid.place_agent(lamb, self.pos)
-
-
-class Wolf(RandomWalker):
-    """
-    A wolf that walks around, reproduces (asexually) and eats sheep.
-    """
-
-    energy = None
-
-    def __init__(self, model, moore, energy=None):
-        super().__init__(model, moore=moore)
-        self.energy = energy
-
-    def step(self):
-        self.random_move()
+        """One step of the agent."""
+        self.cell = self.cell.neighborhood.select_random_cell()
         self.energy -= 1
 
-        # If there are sheep present, eat one
-        x, y = self.pos
-        this_cell = self.model.grid.get_cell_list_contents([self.pos])
-        sheep = [obj for obj in this_cell if isinstance(obj, Sheep)]
+        self.feed()
+
+        if self.energy < 0:
+            self.remove()
+        elif self.random.random() < self.p_reproduce:
+            self.spawn_offspring()
+
+
+class Sheep(Animal):
+    """A sheep that walks around, reproduces (asexually) and gets eaten."""
+
+    def feed(self):
+        """If possible eat the food in the current location."""
+        # If there is grass available, eat it
+        if self.model.grass:
+            grass_patch = next(
+                obj for obj in self.cell.agents if isinstance(obj, GrassPatch)
+            )
+            if grass_patch.fully_grown:
+                self.energy += self.energy_from_food
+                grass_patch.fully_grown = False
+
+
+class Wolf(Animal):
+    """A wolf that walks around, reproduces (asexually) and eats sheep."""
+
+    def feed(self):
+        """If possible eat the food in the current location."""
+        sheep = [obj for obj in self.cell.agents if isinstance(obj, Sheep)]
         if len(sheep) > 0:
             sheep_to_eat = self.random.choice(sheep)
-            self.energy += self.model.wolf_gain_from_food
+            self.energy += self.energy_from_food
 
             # Kill the sheep
-            self.model.grid.remove_agent(sheep_to_eat)
             sheep_to_eat.remove()
 
-        # Death or reproduction
-        if self.energy < 0:
-            self.model.grid.remove_agent(self)
-            self.remove()
-        else:
-            if self.random.random() < self.model.wolf_reproduce:
-                # Create a new wolf cub
-                self.energy /= 2
-                cub = Wolf(self.model, self.moore, self.energy)
-                self.model.grid.place_agent(cub, self.pos)
 
-
-class GrassPatch(mesa.Agent):
+class GrassPatch(FixedAgent):
     """
     A patch of grass that grows at a fixed rate and it is eaten by sheep
     """

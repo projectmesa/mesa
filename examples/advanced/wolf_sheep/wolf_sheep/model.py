@@ -10,6 +10,7 @@ Replication of the model found in NetLogo:
 """
 
 import mesa
+from mesa.experimental.cell_space import OrthogonalMooreGrid
 
 from .agents import GrassPatch, Sheep, Wolf
 
@@ -50,6 +51,7 @@ class WolfSheep(mesa.Model):
         grass=False,
         grass_regrowth_time=30,
         sheep_gain_from_food=4,
+        seed=None,
     ):
         """
         Create a new Wolf-Sheep model with the given parameters.
@@ -65,20 +67,16 @@ class WolfSheep(mesa.Model):
                                  once it is eaten
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
         """
-        super().__init__()
+        super().__init__(seed=None)
         # Set parameters
         self.width = width
         self.height = height
         self.initial_sheep = initial_sheep
         self.initial_wolves = initial_wolves
-        self.sheep_reproduce = sheep_reproduce
-        self.wolf_reproduce = wolf_reproduce
-        self.wolf_gain_from_food = wolf_gain_from_food
         self.grass = grass
         self.grass_regrowth_time = grass_regrowth_time
-        self.sheep_gain_from_food = sheep_gain_from_food
 
-        self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
+        self.grid = OrthogonalMooreGrid((self.width, self.height), torus=True)
 
         collectors = {
             "Wolves": lambda m: len(m.agents_by_type[Wolf]),
@@ -95,20 +93,20 @@ class WolfSheep(mesa.Model):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             energy = self.random.randrange(2 * self.sheep_gain_from_food)
-            sheep = Sheep(self, True, energy)
-            self.grid.place_agent(sheep, (x, y))
+            Sheep(
+                self, energy, sheep_reproduce, sheep_gain_from_food, self.grid[(x, y)]
+            )
 
         # Create wolves
         for _ in range(self.initial_wolves):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             energy = self.random.randrange(2 * self.wolf_gain_from_food)
-            wolf = Wolf(self, True, energy)
-            self.grid.place_agent(wolf, (x, y))
+            Wolf(self, energy, wolf_reproduce, wolf_gain_from_food, self.grid[(x, y)])
 
         # Create grass patches
         if self.grass:
-            for agent, (x, y) in self.grid.coord_iter():
+            for cell in self.grid.all_cells:
                 fully_grown = self.random.choice([True, False])
 
                 if fully_grown:
@@ -117,7 +115,7 @@ class WolfSheep(mesa.Model):
                     countdown = self.random.randrange(self.grass_regrowth_time)
 
                 patch = GrassPatch(self, fully_grown, countdown)
-                self.grid.place_agent(patch, (x, y))
+                patch.cell = cell
 
         self.running = True
         self.datacollector.collect(self)
@@ -128,7 +126,7 @@ class WolfSheep(mesa.Model):
         # Conceptually, it can be argued that this should be modelled differently.
         self.random.shuffle(self.agent_types)
         for agent_type in self.agent_types:
-            self.agents_by_type[agent_type].do("step")
+            self.agents_by_type[agent_type].shuffle_do("step")
 
         # collect data
         self.datacollector.collect(self)

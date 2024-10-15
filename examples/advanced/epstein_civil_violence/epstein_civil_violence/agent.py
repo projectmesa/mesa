@@ -3,13 +3,23 @@ import math
 import mesa
 
 
-class Citizen(mesa.Agent):
+class EpsteinAgent(mesa.experimental.cell_space.CellAgent):
+    def update_neighbors(self):
+        """
+        Look around and see who my neighbors are
+        """
+        self.neighborhood = self.cell.get_neighborhood(radius=self.vision)
+
+        self.neighbors = self.neighborhood.agents
+        self.empty_neighbors = [c for c in self.neighborhood if c.is_empty]
+
+
+class Citizen(EpsteinAgent):
     """
     A member of the general population, may or may not be in active rebellion.
     Summary of rule: If grievance - risk > threshold, rebel.
 
     Attributes:
-        x, y: Grid coordinates
         hardship: Agent's 'perceived hardship (i.e., physical or economic
             privation).' Exogenous, drawn from U(0,1).
         regime_legitimacy: Agent's perception of regime legitimacy, equal
@@ -30,7 +40,6 @@ class Citizen(mesa.Agent):
     def __init__(
         self,
         model,
-        pos,
         hardship,
         regime_legitimacy,
         risk_aversion,
@@ -40,7 +49,7 @@ class Citizen(mesa.Agent):
         """
         Create a new Citizen.
         Args:
-            x, y: Grid coordinates
+            model: the model to which the agent belongs
             hardship: Agent's 'perceived hardship (i.e., physical or economic
                 privation).' Exogenous, drawn from U(0,1).
             regime_legitimacy: Agent's perception of regime legitimacy, equal
@@ -53,8 +62,6 @@ class Citizen(mesa.Agent):
             model: model instance
         """
         super().__init__(model)
-        self.breed = "citizen"
-        self.pos = pos
         self.hardship = hardship
         self.regime_legitimacy = regime_legitimacy
         self.risk_aversion = risk_aversion
@@ -79,32 +86,21 @@ class Citizen(mesa.Agent):
             self.condition = "Active"
         else:
             self.condition = "Quiescent"
-        if self.model.movement and self.empty_neighbors:
-            new_pos = self.random.choice(self.empty_neighbors)
-            self.model.grid.move_agent(self, new_pos)
 
-    def update_neighbors(self):
-        """
-        Look around and see who my neighbors are
-        """
-        self.neighborhood = self.model.grid.get_neighborhood(
-            self.pos, moore=True, radius=self.vision
-        )
-        self.neighbors = self.model.grid.get_cell_list_contents(self.neighborhood)
-        self.empty_neighbors = [
-            c for c in self.neighborhood if self.model.grid.is_cell_empty(c)
-        ]
+        if self.model.movement and self.empty_neighbors:
+            new_cell = self.random.choice(self.empty_neighbors)
+            self.move_to(new_cell)
 
     def update_estimated_arrest_probability(self):
         """
         Based on the ratio of cops to actives in my neighborhood, estimate the
         p(Arrest | I go active).
         """
-        cops_in_vision = len([c for c in self.neighbors if c.breed == "cop"])
+        cops_in_vision = len([c for c in self.neighbors if isinstance(c, Cop)])
         actives_in_vision = 1.0  # citizen counts herself
         for c in self.neighbors:
             if (
-                c.breed == "citizen"
+                isinstance(c, Citizen)
                 and c.condition == "Active"
                 and c.jail_sentence == 0
             ):
@@ -114,7 +110,7 @@ class Citizen(mesa.Agent):
         )
 
 
-class Cop(mesa.Agent):
+class Cop(EpsteinAgent):
     """
     A cop for life.  No defection.
     Summary of rule: Inspect local vision and arrest a random active agent.
@@ -126,7 +122,7 @@ class Cop(mesa.Agent):
             able to inspect
     """
 
-    def __init__(self, model, pos, vision):
+    def __init__(self, model, vision):
         """
         Create a new Cop.
         Args:
@@ -136,8 +132,6 @@ class Cop(mesa.Agent):
             model: model instance
         """
         super().__init__(model)
-        self.breed = "cop"
-        self.pos = pos
         self.vision = vision
 
     def step(self):
@@ -149,7 +143,7 @@ class Cop(mesa.Agent):
         active_neighbors = []
         for agent in self.neighbors:
             if (
-                agent.breed == "citizen"
+                isinstance(agent, Citizen)
                 and agent.condition == "Active"
                 and agent.jail_sentence == 0
             ):
@@ -161,16 +155,4 @@ class Cop(mesa.Agent):
             arrestee.condition = "Quiescent"
         if self.model.movement and self.empty_neighbors:
             new_pos = self.random.choice(self.empty_neighbors)
-            self.model.grid.move_agent(self, new_pos)
-
-    def update_neighbors(self):
-        """
-        Look around and see who my neighbors are.
-        """
-        self.neighborhood = self.model.grid.get_neighborhood(
-            self.pos, moore=True, radius=self.vision
-        )
-        self.neighbors = self.model.grid.get_cell_list_contents(self.neighborhood)
-        self.empty_neighbors = [
-            c for c in self.neighborhood if self.model.grid.is_cell_empty(c)
-        ]
+            self.move_to(new_pos)

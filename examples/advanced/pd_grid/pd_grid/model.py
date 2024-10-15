@@ -1,4 +1,5 @@
 import mesa
+from mesa.experimental.cell_space import OrthogonalMooreGrid
 
 from .agent import PDAgent
 
@@ -25,15 +26,18 @@ class PdGrid(mesa.Model):
                            Determines the agent activation regime.
             payoffs: (optional) Dictionary of (move, neighbor_move) payoffs.
         """
-        super().__init__()
+        super().__init__(seed=seed)
         self.activation_order = activation_order
-        self.grid = mesa.space.SingleGrid(width, height, torus=True)
+        self.grid = OrthogonalMooreGrid((width, height), torus=True)
+
+        if payoffs is not None:
+            self.payoff = payoffs
 
         # Create agents
         for x in range(width):
             for y in range(height):
                 agent = PDAgent(self)
-                self.grid.place_agent(agent, (x, y))
+                agent.cell = self.grid[(x, y)]
 
         self.datacollector = mesa.DataCollector(
             {

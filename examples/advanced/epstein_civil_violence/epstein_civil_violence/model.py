@@ -59,7 +59,9 @@ class EpsteinCivilViolence(mesa.Model):
         self.max_iters = max_iters
         self.iteration = 0
 
-        self.grid = mesa.space.SingleGrid(width, height, torus=True)
+        self.grid = mesa.experimental.cell_space.OrthogonalMooreGrid(
+            (width, height), capacity=1, torus=True
+        )
 
         model_reporters = {
             "Quiescent": lambda m: self.count_type_citizens(m, "Quiescent"),
@@ -68,9 +70,9 @@ class EpsteinCivilViolence(mesa.Model):
             "Cops": self.count_cops,
         }
         agent_reporters = {
-            "x": lambda a: a.pos[0],
-            "y": lambda a: a.pos[1],
-            "breed": lambda a: a.breed,
+            "x": lambda a: a.cell.coordinate[0],
+            "y": lambda a: a.cell.coordinate[1],
+            "breed": lambda a: type(a).__name__,
             "jail_sentence": lambda a: getattr(a, "jail_sentence", None),
             "condition": lambda a: getattr(a, "condition", None),
             "arrest_probability": lambda a: getattr(a, "arrest_probability", None),
@@ -81,22 +83,21 @@ class EpsteinCivilViolence(mesa.Model):
         if self.cop_density + self.citizen_density > 1:
             raise ValueError("Cop density + citizen density must be less than 1")
 
-        for contents, (x, y) in self.grid.coord_iter():
+        for cell in self.grid.all_cells:
             if self.random.random() < self.cop_density:
-                cop = Cop(self, (x, y), vision=self.cop_vision)
-                self.grid[x][y] = cop
+                cop = Cop(self, vision=self.cop_vision)
+                cop.move_to(cell)
 
             elif self.random.random() < (self.cop_density + self.citizen_density):
                 citizen = Citizen(
                     self,
-                    (x, y),
                     hardship=self.random.random(),
                     regime_legitimacy=self.legitimacy,
                     risk_aversion=self.random.random(),
                     threshold=self.active_threshold,
                     vision=self.citizen_vision,
                 )
-                self.grid[x][y] = citizen
+                citizen.move_to(cell)
 
         self.running = True
         self.datacollector.collect(self)
@@ -117,34 +118,29 @@ class EpsteinCivilViolence(mesa.Model):
         """
         Helper method to count agents by Quiescent/Active.
         """
-        count = 0
-        for agent in model.agents:
-            if agent.breed == "cop":
-                continue
-            if exclude_jailed and agent.jail_sentence > 0:
-                continue
-            if agent.condition == condition:
-                count += 1
-        return count
+        citizens = model.agents_by_type[Citizen]
+
+        if exclude_jailed:
+            return len(
+                [
+                    c
+                    for c in citizens
+                    if (c.condition == condition) and (c.jail_sentence == 0)
+                ]
+            )
+        else:
+            return len([c for c in citizens if c.condition == condition])
 
     @staticmethod
     def count_jailed(model):
         """
         Helper method to count jailed agents.
         """
-        count = 0
-        for agent in model.agents:
-            if agent.breed == "citizen" and agent.jail_sentence > 0:
-                count += 1
-        return count
+        return len([a for a in model.agents_by_type[Citizen] if a.jail_sentence > 0])
 
     @staticmethod
     def count_cops(model):
         """
         Helper method to count jailed agents.
         """
-        count = 0
-        for agent in model.agents:
-            if agent.breed == "cop":
-                count += 1
-        return count
+        return len(model.agents_by_type[Cop])

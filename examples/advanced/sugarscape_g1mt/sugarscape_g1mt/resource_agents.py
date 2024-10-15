@@ -1,7 +1,7 @@
-import mesa
+from mesa.experimental.cell_space import FixedAgent
 
 
-class Resource(mesa.Agent):
+class Resource(FixedAgent):
     """
     Resource:
     - contains an amount of sugar and spice
@@ -9,12 +9,13 @@ class Resource(mesa.Agent):
     - grows 1 amount of spice at each turn
     """
 
-    def __init__(self, model, max_sugar, max_spice):
+    def __init__(self, model, max_sugar, max_spice, cell):
         super().__init__(model)
         self.sugar_amount = max_sugar
         self.max_sugar = max_sugar
         self.spice_amount = max_spice
         self.max_spice = max_spice
+        self.cell = cell
 
     def step(self):
         """

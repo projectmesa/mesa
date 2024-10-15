@@ -1,26 +1,26 @@
 import math
 
-import mesa
+from mesa.experimental.cell_space import CellAgent
 
 from .resource_agents import Resource
 
 
 # Helper function
-def get_distance(pos_1, pos_2):
+def get_distance(cell_1, cell_2):
     """
     Calculate the Euclidean distance between two positions
 
     used in trade.move()
     """
 
-    x1, y1 = pos_1
-    x2, y2 = pos_2
+    x1, y1 = cell_1.coordinate
+    x2, y2 = cell_2.coordinate
     dx = x1 - x2
     dy = y1 - y2
     return math.sqrt(dx**2 + dy**2)
 
 
-class Trader(mesa.Agent):
+class Trader(CellAgent):
     """
     Trader:
     - has a metabolism of sugar and spice
@@ -30,7 +30,7 @@ class Trader(mesa.Agent):
     def __init__(
         self,
         model,
-        moore=False,
+        cell,
         sugar=0,
         spice=0,
         metabolism_sugar=0,
@@ -38,7 +38,7 @@ class Trader(mesa.Agent):
         vision=0,
     ):
         super().__init__(model)
-        self.moore = moore
+        self.cell = cell
         self.sugar = sugar
         self.spice = spice
         self.metabolism_sugar = metabolism_sugar
@@ -47,35 +47,31 @@ class Trader(mesa.Agent):
         self.prices = []
         self.trade_partners = []
 
-    def get_resource(self, pos):
-        this_cell = self.model.grid.get_cell_list_contents(pos)
-        for agent in this_cell:
-            if type(agent) is Resource:
+    def get_resource(self, cell):
+        for agent in cell.agents:
+            if isinstance(agent, Resource):
                 return agent
-        raise Exception(f"Resource agent not found in the position {pos}")
+        raise Exception(f"Resource agent not found in the position {cell.coordinate}")
 
-    def get_trader(self, pos):
+    def get_trader(self, cell):
         """
         helper function used in self.trade_with_neighbors()
         """
 
-        this_cell = self.model.grid.get_cell_list_contents(pos)
-
-        for agent in this_cell:
+        for agent in cell.agents:
             if isinstance(agent, Trader):
                 return agent
 
-    def is_occupied_by_other(self, pos):
+    def is_occupied_by_other(self, cell):
         """
         helper function part 1 of self.move()
         """
 
-        if pos == self.pos:
+        if cell is self.cell:
             # agent's position is considered unoccupied as agent can stay there
             return False
         # get contents of each cell in neighborhood
-        this_cell = self.model.grid.get_cell_list_contents(pos)
-        return any(isinstance(a, Trader) for a in this_cell)
+        return any(isinstance(a, Trader) for a in cell.agents)
 
     def calculate_welfare(self, sugar, spice):
         """
@@ -202,7 +198,7 @@ class Trader(mesa.Agent):
         if math.isclose(mrs_self, mrs_other):
             return
 
-        # calcualte price
+        # calculate price
         price = math.sqrt(mrs_self * mrs_other)
 
         if mrs_self > mrs_other:
@@ -242,22 +238,20 @@ class Trader(mesa.Agent):
 
         # 1. identify all possible moves
 
-        neighbors = [
-            i
-            for i in self.model.grid.get_neighborhood(
-                self.pos, self.moore, True, self.vision
-            )
-            if not self.is_occupied_by_other(i)
+        neighboring_cells = [
+            cell
+            for cell in self.cell.get_neighborhood(self.vision, include_center=True)
+            if not self.is_occupied_by_other(cell)
         ]
 
         # 2. determine which move maximizes welfare
 
         welfares = [
             self.calculate_welfare(
-                self.sugar + self.get_resource(pos).sugar_amount,
-                self.spice + self.get_resource(pos).spice_amount,
+                self.sugar + self.get_resource(cell).sugar_amount,
+                self.spice + self.get_resource(cell).spice_amount,
             )
-            for pos in neighbors
+            for cell in neighboring_cells
         ]
 
         # 3. Find closest best option
@@ -270,22 +264,20 @@ class Trader(mesa.Agent):
         ]
 
         # convert index to positions of those cells
-        candidates = [neighbors[i] for i in candidate_indices]
+        candidates = [neighboring_cells[i] for i in candidate_indices]
 
-        min_dist = min(get_distance(self.pos, pos) for pos in candidates)
+        min_dist = min(get_distance(self.cell, cell) for cell in candidates)
 
         final_candidates = [
-            pos
-            for pos in candidates
-            if math.isclose(get_distance(self.pos, pos), min_dist, rel_tol=1e-02)
+            cell
+            for cell in candidates
+            if math.isclose(get_distance(self.cell, cell), min_dist, rel_tol=1e-02)
         ]
-        final_candidate = self.random.choice(final_candidates)
-
         # 4. Move Agent
-        self.model.grid.move_agent(self, final_candidate)
+        self.cell = self.random.choice(final_candidates)
 
     def eat(self):
-        patch = self.get_resource(self.pos)
+        patch = self.get_resource(self.cell)
         if patch.sugar_amount > 0:
             self.sugar += patch.sugar_amount
             patch.sugar_amount = 0
@@ -302,7 +294,6 @@ class Trader(mesa.Agent):
         """
 
         if self.is_starved():
-            self.model.grid.remove_agent(self)
             self.remove()
 
     def trade_with_neighbors(self):
@@ -315,11 +306,9 @@ class Trader(mesa.Agent):
         """
 
         neighbor_agents = [
-            self.get_trader(pos)
-            for pos in self.model.grid.get_neighborhood(
-                self.pos, self.moore, False, self.vision
-            )
-            if self.is_occupied_by_other(pos)
+            self.get_trader(cell)
+            for cell in self.cell.get_neighborhood(radius=self.vision)
+            if self.is_occupied_by_other(cell)
         ]
 
         if len(neighbor_agents) == 0:
@@ -327,7 +316,6 @@ class Trader(mesa.Agent):
 
             # iterate through traders in neighboring cells and trade
         for a in neighbor_agents:
-            if a:
-                self.trade(a)
+            self.trade(a)
 
         return

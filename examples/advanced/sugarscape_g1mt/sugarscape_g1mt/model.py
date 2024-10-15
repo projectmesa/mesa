@@ -2,6 +2,7 @@ from pathlib import Path
 
 import mesa
 import numpy as np
+from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
 
 from .resource_agents import Resource
 from .trader_agents import Trader
@@ -69,7 +70,7 @@ class SugarscapeG1mt(mesa.Model):
         self.running = True
 
         # initiate mesa grid class
-        self.grid = mesa.space.MultiGrid(self.width, self.height, torus=False)
+        self.grid = OrthogonalVonNeumannGrid((self.width, self.height), torus=False)
         # initiate datacollector
         self.datacollector = mesa.DataCollector(
             model_reporters={
@@ -88,11 +89,10 @@ class SugarscapeG1mt(mesa.Model):
         sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map.txt")
         spice_distribution = np.flip(sugar_distribution, 1)
 
-        for _, (x, y) in self.grid.coord_iter():
-            max_sugar = sugar_distribution[x, y]
-            max_spice = spice_distribution[x, y]
-            resource = Resource(self, max_sugar, max_spice)
-            self.grid.place_agent(resource, (x, y))
+        for cell in self.grid.all_cells:
+            max_sugar = sugar_distribution[cell.coordinate]
+            max_spice = spice_distribution[cell.coordinate]
+            Resource(self, max_sugar, max_spice, cell)
 
         for _ in range(self.initial_population):
             # get agent position
@@ -111,18 +111,18 @@ class SugarscapeG1mt(mesa.Model):
             )
             # give agents vision
             vision = int(self.random.uniform(self.vision_min, self.vision_max + 1))
+
+            cell = self.grid[(x, y)]
             # create Trader object
-            trader = Trader(
+            Trader(
                 self,
-                moore=False,
+                cell,
                 sugar=sugar,
                 spice=spice,
                 metabolism_sugar=metabolism_sugar,
                 metabolism_spice=metabolism_spice,
                 vision=vision,
             )
-            # place agent
-            self.grid.place_agent(trader, (x, y))
 
     def step(self):
         """

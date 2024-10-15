@@ -1,7 +1,7 @@
-import mesa
+from mesa.experimental.cell_space import CellAgent
 
 
-class PDAgent(mesa.Agent):
+class PDAgent(CellAgent):
     """Agent member of the iterated, spatial prisoner's dilemma model."""
 
     def __init__(self, model, starting_move=None):
@@ -22,14 +22,15 @@ class PDAgent(mesa.Agent):
         self.next_move = None
 
     @property
-    def isCooroperating(self):
+    def is_cooroperating(self):
         return self.move == "C"
 
     def step(self):
         """Get the best neighbor's move, and change own move accordingly
         if better than own score."""
 
-        neighbors = self.model.grid.get_neighbors(self.pos, True, include_center=True)
+        # neighbors = self.model.grid.get_neighbors(self.pos, True, include_center=True)
+        neighbors = [*list(self.cell.neighborhood.agents), self]
         best_neighbor = max(neighbors, key=lambda a: a.score)
         self.next_move = best_neighbor.move
 
@@ -41,7 +42,7 @@ class PDAgent(mesa.Agent):
         self.score += self.increment_score()
 
     def increment_score(self):
-        neighbors = self.model.grid.get_neighbors(self.pos, True)
+        neighbors = self.cell.neighborhood.agents
         if self.model.activation_order == "Simultaneous":
             moves = [neighbor.next_move for neighbor in neighbors]
         else:
