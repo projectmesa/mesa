@@ -6,8 +6,8 @@ coverage:
         threshold: 1%
 
 ignore:
-  - "experimental/**"
   - "benchmarks/**"
-  - "visualization/**"
+  - "mesa/experimental/**"
+  - "mesa/visualization/**"
 
 comment: off
