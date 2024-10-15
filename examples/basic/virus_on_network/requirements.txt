@@ -1,0 +1,2 @@
+networkx>=2.0
+mesa~=2.0
