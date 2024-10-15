@@ -77,7 +77,7 @@ class BaseScheduler:
         if agents is None:
             agents = []
 
-        self._agents: AgentSet = AgentSet(agents, model)
+        self._agents: AgentSet = AgentSet(agents, model.random)
 
         self._remove_warning_given = False
         self._agents_key_warning_given = False
@@ -312,7 +312,9 @@ class RandomActivationByType(BaseScheduler):
                 try:
                     self._agents_by_type[type(agent)].add(agent)
                 except KeyError:
-                    self._agents_by_type[type(agent)] = AgentSet([agent], self.model)
+                    self._agents_by_type[type(agent)] = AgentSet(
+                        [agent], self.model.random
+                    )
 
     def add(self, agent: Agent) -> None:
         """Add an Agent object to the schedule.
@@ -325,7 +327,7 @@ class RandomActivationByType(BaseScheduler):
         try:
             self._agents_by_type[type(agent)].add(agent)
         except KeyError:
-            self._agents_by_type[type(agent)] = AgentSet([agent], self.model)
+            self._agents_by_type[type(agent)] = AgentSet([agent], self.model.random)
 
     def remove(self, agent: Agent) -> None:
         """Remove all instances of a given agent from the schedule.
