@@ -34,7 +34,7 @@ Directly run the file ``run.py`` in the terminal. e.g.
 
 ## Files
 
-* [boid_flockers/model.py](boid_flockers/model.py): Core model file; contains the Boid Model and Boid Agent class.
+* [model.py](model.py): Core model file; contains the Boid Model and Boid Agent class.
 * [app.py](app.py): Visualization code.
 
 ## Further Reading
