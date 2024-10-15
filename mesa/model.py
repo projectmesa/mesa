@@ -77,7 +77,9 @@ class Model:
             raise ValueError("you have to pass either rng or seed, not both")
         elif seed is None:
             self.rng: np.random.Generator = np.random.default_rng(rng)
-            self._rng = self.rng.bit_generator.state  # this allows for reproducing the rng
+            self._rng = (
+                self.rng.bit_generator.state
+            )  # this allows for reproducing the rng
 
             seed = int(self.rng.integers(np.iinfo(np.int32).max))
             self.random = random.Random(seed)
@@ -89,7 +91,6 @@ class Model:
             rng = self.random.randint(0, sys.maxsize)
             self.rng: np.random.Generator = np.random.default_rng(rng)
             self._rng = self.rng.bit_generator.state
-
 
         # Wrap the user-defined step method
         self._user_step = self.step
