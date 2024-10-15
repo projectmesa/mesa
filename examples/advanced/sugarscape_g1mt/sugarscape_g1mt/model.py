@@ -55,7 +55,7 @@ class SugarscapeG1mt(mesa.Model):
         enable_trade=True,
     ):
         super().__init__()
-        # Initiate width and heigh of sugarscape
+        # Initiate width and height of sugarscape
         self.width = width
         self.height = height
         # Initiate population attributes
@@ -133,7 +133,7 @@ class SugarscapeG1mt(mesa.Model):
         self.agents_by_type[Resource].do("step")
 
         # step trader agents
-        # to account for agent death and removal we need a seperate data strcuture to
+        # to account for agent death and removal we need a separate data structure to
         # iterate
         trader_shuffle = self.agents_by_type[Trader].shuffle()
 
