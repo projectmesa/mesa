@@ -3,7 +3,7 @@ import math
 import solara
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
-from mesa.visualization import SolaraViz, make_space_matplotlib
+from mesa.visualization import SolaraViz, Slider, make_space_matplotlib
 from virus_on_network.model import State, VirusOnNetwork, number_infected
 
 
@@ -57,66 +57,61 @@ def make_plot(model):
     fig.legend()
     # Set integer x axis
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.set_xlabel("Step")
+    ax.set_ylabel("Number of Agents")
     return solara.FigureMatplotlib(fig)
 
 
 model_params = {
-    "num_nodes": {
-        "type": "SliderInt",
-        "value": 10,
-        "label": "Number of agents",
-        "min": 10,
-        "max": 100,
-        "step": 1,
-    },
-    "avg_node_degree": {
-        "type": "SliderInt",
-        "value": 3,
-        "label": "Avg Node Degree",
-        "min": 3,
-        "max": 8,
-        "step": 1,
-    },
-    "initial_outbreak_size": {
-        "type": "SliderInt",
-        "value": 1,
-        "label": "Initial Outbreak Size",
-        "min": 1,
-        "max": 10,
-        "step": 1,
-    },
-    "virus_spread_chance": {
-        "type": "SliderFloat",
-        "value": 0.4,
-        "label": "Virus Spread Chance",
-        "min": 0.0,
-        "max": 1.0,
-        "step": 0.1,
-    },
-    "virus_check_frequency": {
-        "type": "SliderFloat",
-        "value": 0.4,
-        "label": "Virus Check Frequency",
-        "min": 0.0,
-        "max": 1.0,
-        "step": 0.1,
-    },
-    "recovery_chance": {
-        "type": "SliderFloat",
-        "value": 0.3,
-        "label": "Recovery Chance",
-        "min": 0.0,
-        "max": 1.0,
-        "step": 0.1,
-    },
-    "gain_resistance_chance": {
-        "type": "SliderFloat",
-        "value": 0.5,
-        "label": "Gain Resistance Chance",
-        "min": 0.0,
-        "max": 1.0,
-        "step": 0.1,
-    },
+    "num_nodes": Slider(
+        label="Number of agents",
+        value=10,
+        min=10,
+        max=100,
+        step=1,
+    ),
+    "avg_node_degree": Slider(
+        label="Avg Node Degree",
+        value=3,
+        min=3,
+        max=8,
+        step=1,
+    ),
+    "initial_outbreak_size": Slider(
+        label="Initial Outbreak Size",
+        value=1,
+        min=1,
+        max=10,
+        step=1,
+    ),
+    "virus_spread_chance": Slider(
+        label="Virus Spread Chance",
+        value=0.4,
+        min=0.0,
+        max=1.0,
+        step=0.1,
+    ),
+    "virus_check_frequency": Slider(
+        label="Virus Check Frequency",
+        value=0.4,
+        min=0.0,
+        max=1.0,
+        step=0.1,
+    ),
+    "recovery_chance": Slider(
+        label="Recovery Chance",
+        value=0.3,
+        min=0.0,
+        max=1.0,
+        step=0.1,
+    ),
+    "gain_resistance_chance": Slider(
+        label="Gain Resistance Chance",
+        value=0.5,
+        min=0.0,
+        max=1.0,
+        step=0.1,
+    ),
 }
 
 SpacePlot = make_space_matplotlib(agent_portrayal)
@@ -128,8 +123,9 @@ page = SolaraViz(
     [
         SpacePlot,
         make_plot,
-        get_resistant_susceptible_ratio,
+        # get_resistant_susceptible_ratio,  # TODO: Fix and uncomment
     ],
+    model_params=model_params,
     name="Virus Model",
 )
 page  # noqa
