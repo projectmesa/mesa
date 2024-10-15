@@ -98,6 +98,7 @@ class Agent:
 
         class ListLike:
             """Helper class to make default arguments act as if they are in a list of length N."""
+
             def __init__(self, value):
                 self.value = value
 
@@ -120,7 +121,7 @@ class Agent:
 
         for i in range(n):
             instance_args = [arg[i] for arg in listlike_args]
-            instance_kwargs = {k: v[i] for k,v in listlike_kwargs.items()}
+            instance_kwargs = {k: v[i] for k, v in listlike_kwargs.items()}
             cls(model, *instance_args, **instance_kwargs)
 
 
