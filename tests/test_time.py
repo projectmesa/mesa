@@ -51,8 +51,9 @@ class MockAgent(Agent):
 
 
 class MockModel(Model):
-    def __init__(self, shuffle=False, activation=STAGED, enable_kill_other_agent=False):
-        """Creates a Model instance with a schedule
+    def __init__(self, shuffle=False, activation=STAGED, enable_kill_other_agent=False, seed=None):
+        """
+        Creates a Model instance with a schedule
 
         Args:
             shuffle (Bool): whether or not to instantiate a scheduler
@@ -65,7 +66,7 @@ class MockModel(Model):
                               'staged' creates a StagedActivation scheduler.
                               The default scheduler is a BaseScheduler.
         """
-        super().__init__()
+        super().__init__(seed=seed)
         self.log = []
         self.enable_kill_other_agent = enable_kill_other_agent
 
@@ -120,10 +121,11 @@ class TestStagedActivation(TestCase):
 
     def test_shuffle_shuffles_agents(self):
         model = MockModel(shuffle=True)
-        model.random = mock.Mock()
-        assert model.random.shuffle.call_count == 0
+        a = mock.Mock()
+        model.schedule._agents.random = a
+        assert a.shuffle.call_count == 0
         model.step()
-        assert model.random.shuffle.call_count == 1
+        assert a.shuffle.call_count == 1
 
     def test_remove(self):
         """Test the staged activation can remove an agent"""
@@ -161,9 +163,10 @@ class TestRandomActivation(TestCase):
     def test_random_activation_step_shuffles(self):
         """Test the random activation step"""
         model = MockModel(activation=RANDOM)
-        model.random = mock.Mock()
+        a = mock.Mock()
+        model.schedule._agents.random = a
         model.schedule.step()
-        assert model.random.shuffle.call_count == 1
+        assert a.shuffle.call_count == 1
 
     def test_random_activation_step_increments_step_and_time_counts(self):
         """Test the random activation step increments step and time counts"""
@@ -255,9 +258,11 @@ class TestRandomActivationByType(TestCase):
     def test_random_activation_step_shuffles(self):
         """Test the random activation by type step"""
         model = MockModel(activation=RANDOM_BY_TYPE)
-        model.random = mock.Mock()
+        a = mock.Mock()
+        model.random = a
+        model.schedule._agents.random = a
         model.schedule.step()
-        assert model.random.shuffle.call_count == 2
+        assert a.shuffle.call_count == 2
 
     def test_random_activation_step_increments_step_and_time_counts(self):
         """Test the random activation by type step increments step and time counts"""
