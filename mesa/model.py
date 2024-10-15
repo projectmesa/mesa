@@ -81,15 +81,21 @@ class Model:
                 self.rng.bit_generator.state
             )  # this allows for reproducing the rng
 
-            seed = int(self.rng.integers(np.iinfo(np.int32).max))
-            self.random = random.Random(seed)
+            try:
+                self.random = random.Random(rng)
+            except TypeError:
+                seed = int(self.rng.integers(np.iinfo(np.int32).max))
+                self.random = random.Random(seed)
             self._seed = seed  # this allows for reproducing stdlib.random
         elif rng is None:
             self.random = random.Random(seed)
             self._seed = seed  # this allows for reproducing stdlib.random
 
-            rng = self.random.randint(0, sys.maxsize)
-            self.rng: np.random.Generator = np.random.default_rng(rng)
+            try:
+                self.rng: np.random.Generator = np.random.default_rng(rng)
+            except TypeError:
+                rng = self.random.randint(0, sys.maxsize)
+                self.rng: np.random.Generator = np.random.default_rng(rng)
             self._rng = self.rng.bit_generator.state
 
         # Wrap the user-defined step method
