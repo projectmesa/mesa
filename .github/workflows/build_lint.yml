@@ -60,6 +60,8 @@ jobs:
     - if: matrix.os == 'ubuntu'
       name: Codecov
       uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} 
 
   examples:
     runs-on: ubuntu-latest
