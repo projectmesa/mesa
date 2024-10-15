@@ -1,6 +1,48 @@
 ---
 title: Release History
 ---
+
+# 3.0.0b1 (2024-10-17)
+
+## Highlights 
+Basic exmaples are now importable in Mesa, includes boid_flockers, boltzmann_wealth_model, conways_game_of_life, schelling, and virus_on_network models. With this change they are also integrated into the Mesa tutorial in the docs. 
+
+Also, in this release, visualizations are improved by making visualization elements scalable and more clearly labeling the plots. 
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### ⚠️ Breaking changes
+* replace model with random in AgentSet init by @quaquel in https://github.com/projectmesa/mesa/pull/2350
+### 🧪 Experimental features
+* cell space: Add convenience properties for grid width and height by @quaquel in https://github.com/projectmesa/mesa/pull/2348
+* Bugfix for deepcopy / pickling discrete spaces by @quaquel in https://github.com/projectmesa/mesa/pull/2378
+### 🎉 New features added
+* Move core example models back (v2) by @EwoutH in https://github.com/projectmesa/mesa/pull/2358
+* Add Model.rng for SPEC-7 compliant numpy random number generation by @quaquel in https://github.com/projectmesa/mesa/pull/2352
+### 🛠 Enhancements made
+* use GridDraggable instead of Column in SolaraViz by @wang-boyu in https://github.com/projectmesa/mesa/pull/2344
+* update legend, xlabel & format of matplotlib plots by @wang-boyu in https://github.com/projectmesa/mesa/pull/2346
+* __init__.py: Import mesa.experimental by @EwoutH in https://github.com/projectmesa/mesa/pull/2374
+* Importable examples by @Corvince in https://github.com/projectmesa/mesa/pull/2381
+### 🐛 Bugs fixed
+* experimental init: Fix Solara import by making it lazy by @EwoutH in https://github.com/projectmesa/mesa/pull/2357
+* fix: pass `model.random` to schedulers by @quaquel in https://github.com/projectmesa/mesa/pull/2359
+* fix: register agent after creating unique_id and pos attributes by @wang-boyu in https://github.com/projectmesa/mesa/pull/2368
+* solara: viz tutorial: fix histogram code by @Corvince in https://github.com/projectmesa/mesa/pull/2379
+### 🔍 Examples updated
+* Cleanup and restructure basic example models by @EwoutH in https://github.com/projectmesa/mesa/pull/2365
+* Ruff basic examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2370
+### 📜 Documentation improvements
+* Update migration_guide.md by @quaquel in https://github.com/projectmesa/mesa/pull/2347
+### 🔧 Maintenance
+* Code coverage: ignore experimental and visualization by @Corvince in https://github.com/projectmesa/mesa/pull/2361
+* add codecov token, fixes #2363 by @Corvince in https://github.com/projectmesa/mesa/pull/2366
+* add test_time back by @quaquel in https://github.com/projectmesa/mesa/pull/2367
+* Release notes: Add example category by @EwoutH in https://github.com/projectmesa/mesa/pull/2369
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0b0...v3.0.0b1
+
 # 3.0.0b0 (2024-10-04)
 ## Highlights
 We're proud to release the first Mesa 3.0 beta! This pre-release announces that we're ready for Mesa 3.0 to be tested by all our regular users. We try to not making breaking changes anymore, but focus on resolving bugs and imperfections.
