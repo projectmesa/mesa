@@ -22,39 +22,39 @@ RANDOM_BY_TYPE = "random_by_type"
 class MockAgent(Agent):
     """Minimalistic agent for testing purposes."""
 
-    def __init__(self, model):
+    def __init__(self, model):  # noqa: D107
         super().__init__(model)
         self.steps = 0
         self.advances = 0
 
-    def kill_other_agent(self):
+    def kill_other_agent(self):  # noqa: D102
         for agent in self.model.schedule.agents:
             if agent is not self:
                 agent.remove()
 
-    def stage_one(self):
+    def stage_one(self):  # noqa: D102
         if self.model.enable_kill_other_agent:
             self.kill_other_agent()
         self.model.log.append(f"{self.unique_id}_1")
 
-    def stage_two(self):
+    def stage_two(self):  # noqa: D102
         self.model.log.append(f"{self.unique_id}_2")
 
-    def advance(self):
+    def advance(self):  # noqa: D102
         self.advances += 1
 
-    def step(self):
+    def step(self):  # noqa: D102
         if self.model.enable_kill_other_agent:
             self.kill_other_agent()
         self.steps += 1
         self.model.log.append(self.unique_id)
 
 
-class MockModel(Model):
+class MockModel(Model):  # Noqa: D101
     def __init__(
         self, shuffle=False, activation=STAGED, enable_kill_other_agent=False, seed=None
     ):
-        """Creates a Model instance with a schedule
+        """Creates a Model instance with a schedule.
 
         Args:
             shuffle (Bool): whether or not to instantiate a scheduler
@@ -66,6 +66,8 @@ class MockModel(Model):
                               'random' creates a RandomActivation scheduler.
                               'staged' creates a StagedActivation scheduler.
                               The default scheduler is a BaseScheduler.
+            enable_kill_other_agent: whether or not to enable kill_other_agent
+            seed : rng
         """
         super().__init__(seed=seed)
         self.log = []
@@ -91,10 +93,10 @@ class MockModel(Model):
             agent = MockAgent(self)
             self.schedule.add(agent)
 
-    def step(self):
+    def step(self):  # noqa: D102
         self.schedule.step()
 
-    def model_stage(self):
+    def model_stage(self):  # noqa: D102
         self.log.append("model_stage")
 
 
@@ -111,7 +113,7 @@ class TestStagedActivation(TestCase):
         assert all(i == j for i, j in zip(model.log[:5], model.log[5:]))
 
     def test_shuffle(self):
-        """Test the staged activation with shuffling"""
+        """Test the staged activation with shuffling."""
         model = MockModel(shuffle=True)
         model.step()
         for output in self.expected_output[:2]:
@@ -120,7 +122,7 @@ class TestStagedActivation(TestCase):
             assert output in model.log[3:]
         assert self.expected_output[2] == model.log[2]
 
-    def test_shuffle_shuffles_agents(self):
+    def test_shuffle_shuffles_agents(self):  # noqa: D102
         model = MockModel(shuffle=True)
         a = mock.Mock()
         model.schedule._agents.random = a
@@ -129,7 +131,7 @@ class TestStagedActivation(TestCase):
         assert a.shuffle.call_count == 1
 
     def test_remove(self):
-        """Test the staged activation can remove an agent"""
+        """Test the staged activation can remove an agent."""
         model = MockModel(shuffle=True)
         agents = list(model.schedule._agents)
         agent = agents[0]
@@ -137,14 +139,15 @@ class TestStagedActivation(TestCase):
         assert agent not in model.schedule.agents
 
     def test_intrastep_remove(self):
-        """Test the staged activation can remove an agent in a
-        step of another agent so that the one removed doesn't step.
+        """Test the staged activation can remove an agent in a step of another agent.
+
+        so that the one removed doesn't step.
         """
         model = MockModel(shuffle=True, enable_kill_other_agent=True)
         model.step()
         assert len(model.log) == 3
 
-    def test_add_existing_agent(self):
+    def test_add_existing_agent(self):  # noqa: D102
         model = MockModel()
         agent = model.schedule.agents[0]
         with self.assertRaises(Exception):
@@ -154,7 +157,7 @@ class TestStagedActivation(TestCase):
 class TestRandomActivation(TestCase):
     """Test the random activation."""
 
-    def test_init(self):
+    def test_init(self):  # noqa: D102
         model = Model()
         agents = [MockAgent(model) for _ in range(10)]
 
@@ -162,7 +165,7 @@ class TestRandomActivation(TestCase):
         assert all(agent in scheduler.agents for agent in agents)
 
     def test_random_activation_step_shuffles(self):
-        """Test the random activation step"""
+        """Test the random activation step."""
         model = MockModel(activation=RANDOM)
         a = mock.Mock()
         model.schedule._agents.random = a
@@ -170,7 +173,7 @@ class TestRandomActivation(TestCase):
         assert a.shuffle.call_count == 1
 
     def test_random_activation_step_increments_step_and_time_counts(self):
-        """Test the random activation step increments step and time counts"""
+        """Test the random activation step increments step and time counts."""
         model = MockModel(activation=RANDOM)
         assert model.schedule.steps == 0
         assert model.schedule.time == 0
@@ -179,7 +182,7 @@ class TestRandomActivation(TestCase):
         assert model.schedule.time == 1
 
     def test_random_activation_step_steps_each_agent(self):
-        """Test the random activation step causes each agent to step"""
+        """Test the random activation step causes each agent to step."""
         model = MockModel(activation=RANDOM)
         model.step()
         agent_steps = [i.steps for i in model.schedule.agents]
@@ -187,14 +190,15 @@ class TestRandomActivation(TestCase):
         assert all(x == 1 for x in agent_steps)
 
     def test_intrastep_remove(self):
-        """Test the random activation can remove an agent in a
-        step of another agent so that the one removed doesn't step.
+        """Test the random activation can remove an agent in a step of another agent.
+
+        so that the one removed doesn't step.
         """
         model = MockModel(activation=RANDOM, enable_kill_other_agent=True)
         model.step()
         assert len(model.log) == 1
 
-    def test_get_agent_keys(self):
+    def test_get_agent_keys(self):  # noqa: D102
         model = MockModel(activation=RANDOM)
 
         keys = model.schedule.get_agent_keys()
@@ -205,7 +209,7 @@ class TestRandomActivation(TestCase):
         agent_ids = {agent.unique_id for agent in model.agents}
         assert all(entry in agent_ids for entry in keys)
 
-    def test_not_sequential(self):
+    def test_not_sequential(self):  # noqa: D102
         model = MockModel(activation=RANDOM)
         # Create 10 agents
         for _ in range(10):
@@ -232,7 +236,7 @@ class TestSimultaneousActivation(TestCase):
     """Test the simultaneous activation."""
 
     def test_simultaneous_activation_step_steps_and_advances_each_agent(self):
-        """Test the simultaneous activation step causes each agent to step"""
+        """Test the simultaneous activation step causes each agent to step."""
         model = MockModel(activation=SIMULTANEOUS)
         model.step()
         # one step for each of 2 agents
@@ -244,11 +248,12 @@ class TestSimultaneousActivation(TestCase):
 
 class TestRandomActivationByType(TestCase):
     """Test the random activation by type.
+
     TODO implement at least 2 types of agents, and test that step_type only
     does step for one type of agents, not the entire agents.
     """
 
-    def test_init(self):
+    def test_init(self):  # noqa: D102
         model = Model()
         agents = [MockAgent(model) for _ in range(10)]
         agents += [Agent(model) for _ in range(10)]
@@ -257,7 +262,7 @@ class TestRandomActivationByType(TestCase):
         assert all(agent in scheduler.agents for agent in agents)
 
     def test_random_activation_step_shuffles(self):
-        """Test the random activation by type step"""
+        """Test the random activation by type step."""
         model = MockModel(activation=RANDOM_BY_TYPE)
         a = mock.Mock()
         model.random = a
@@ -267,7 +272,7 @@ class TestRandomActivationByType(TestCase):
         assert a.shuffle.call_count == 2
 
     def test_random_activation_step_increments_step_and_time_counts(self):
-        """Test the random activation by type step increments step and time counts"""
+        """Test the random activation by type step increments step and time counts."""
         model = MockModel(activation=RANDOM_BY_TYPE)
         assert model.schedule.steps == 0
         assert model.schedule.time == 0
@@ -276,7 +281,7 @@ class TestRandomActivationByType(TestCase):
         assert model.schedule.time == 1
 
     def test_random_activation_step_steps_each_agent(self):
-        """Test the random activation by type step causes each agent to step"""
+        """Test the random activation by type step causes each agent to step."""
         model = MockModel(activation=RANDOM_BY_TYPE)
         model.step()
         agent_steps = [i.steps for i in model.schedule.agents]
@@ -284,7 +289,7 @@ class TestRandomActivationByType(TestCase):
         assert all(x == 1 for x in agent_steps)
 
     def test_random_activation_counts(self):
-        """Test the random activation by type step causes each agent to step"""
+        """Test the random activation by type step causes each agent to step."""
         model = MockModel(activation=RANDOM_BY_TYPE)
 
         agent_types = model.agent_types
