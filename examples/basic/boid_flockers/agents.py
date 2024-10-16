@@ -1,10 +1,10 @@
-from mesa import Agent
 import numpy as np
+
+from mesa import Agent
 
 
 class Boid(Agent):
-    """
-    A Boid-style flocker agent.
+    """A Boid-style flocker agent.
 
     The agent follows three behaviors to flock:
         - Cohesion: steering towards neighboring agents.
@@ -28,8 +28,7 @@ class Boid(Agent):
         separate=0.015,
         match=0.05,
     ):
-        """
-        Create a new Boid flocker agent.
+        """Create a new Boid flocker agent.
 
         Args:
             speed: Distance to move per step.
@@ -51,10 +50,7 @@ class Boid(Agent):
         self.neighbors = None
 
     def step(self):
-        """
-        Get the Boid's neighbors, compute the new vector, and move accordingly.
-        """
-
+        """Get the Boid's neighbors, compute the new vector, and move accordingly."""
         self.neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
         n = 0
         match_vector, separation_vector, cohere = np.zeros((3, 2))
