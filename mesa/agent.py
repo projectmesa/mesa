@@ -62,9 +62,9 @@ class Agent:
         super().__init__(*args, **kwargs)
 
         self.model: Model = model
-        self.model.register_agent(self)
         self.unique_id: int = next(self._ids[model])
         self.pos: Position | None = None
+        self.model.register_agent(self)
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""

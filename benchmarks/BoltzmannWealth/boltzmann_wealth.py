@@ -72,7 +72,7 @@ class BoltzmannWealth(mesa.Model):
             n: the number of steps for which to run the model
 
         """
-        for _i in range(n):
+        for _ in range(n):
             self.step()
 
 
