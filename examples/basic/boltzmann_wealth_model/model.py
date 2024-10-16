@@ -1,13 +1,5 @@
 import mesa
-
-
-def compute_gini(model):
-    agent_wealths = [agent.wealth for agent in model.agents]
-    x = sorted(agent_wealths)
-    N = model.num_agents
-    B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * sum(x))
-    return 1 + (1 / N) - 2 * B
-
+from agents import MoneyAgent
 
 class BoltzmannWealthModel(mesa.Model):
     """A simple model of an economy where agents exchange currency at random.
@@ -23,7 +15,8 @@ class BoltzmannWealthModel(mesa.Model):
         self.grid = mesa.space.MultiGrid(width, height, True)
 
         self.datacollector = mesa.DataCollector(
-            model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
+            model_reporters={"Gini": self.compute_gini},
+            agent_reporters={"Wealth": "wealth"}
         )
         # Create agents
         for _ in range(self.num_agents):
@@ -39,39 +32,11 @@ class BoltzmannWealthModel(mesa.Model):
 
     def step(self):
         self.agents.shuffle_do("step")
-        # collect data
         self.datacollector.collect(self)
 
-    def run_model(self, n):
-        for i in range(n):
-            self.step()
-
-
-class MoneyAgent(mesa.Agent):
-    """An agent with fixed initial wealth."""
-
-    def __init__(self, model):
-        super().__init__(model)
-        self.wealth = 1
-
-    def move(self):
-        possible_steps = self.model.grid.get_neighborhood(
-            self.pos, moore=True, include_center=False
-        )
-        new_position = self.random.choice(possible_steps)
-        self.model.grid.move_agent(self, new_position)
-
-    def give_money(self):
-        cellmates = self.model.grid.get_cell_list_contents([self.pos])
-        cellmates.pop(
-            cellmates.index(self)
-        )  # Ensure agent is not giving money to itself
-        if len(cellmates) > 0:
-            other = self.random.choice(cellmates)
-            other.wealth += 1
-            self.wealth -= 1
-
-    def step(self):
-        self.move()
-        if self.wealth > 0:
-            self.give_money()
+    def compute_gini(self):
+        agent_wealths = [agent.wealth for agent in self.agents]
+        x = sorted(agent_wealths)
+        N = self.num_agents
+        B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * sum(x))
+        return 1 + (1 / N) - 2 * B
