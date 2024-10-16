@@ -1,5 +1,7 @@
-import mesa
 from agents import MoneyAgent
+
+import mesa
+
 
 class BoltzmannWealthModel(mesa.Model):
     """A simple model of an economy where agents exchange currency at random.
@@ -16,7 +18,7 @@ class BoltzmannWealthModel(mesa.Model):
 
         self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": self.compute_gini},
-            agent_reporters={"Wealth": "wealth"}
+            agent_reporters={"Wealth": "wealth"},
         )
         # Create agents
         for _ in range(self.num_agents):

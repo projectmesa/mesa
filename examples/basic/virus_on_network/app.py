@@ -3,8 +3,9 @@ import math
 import solara
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
-from mesa.visualization import SolaraViz, Slider, make_space_matplotlib
 from model import State, VirusOnNetwork, number_infected
+
+from mesa.visualization import Slider, SolaraViz, make_space_matplotlib
 
 
 def agent_portrayal(graph):

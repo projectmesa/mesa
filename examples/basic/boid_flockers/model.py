@@ -1,19 +1,17 @@
-"""
-Flockers
+"""Flockers.
 =============================================================
 A Mesa implementation of Craig Reynolds's Boids flocker model.
 Uses numpy arrays to represent vectors.
 """
 
-import mesa
 import numpy as np
 from agents import Boid
 
+import mesa
+
 
 class BoidFlockers(mesa.Model):
-    """
-    Flocker model class. Handles agent creation, placement and scheduling.
-    """
+    """Flocker model class. Handles agent creation, placement and scheduling."""
 
     def __init__(
         self,
@@ -28,8 +26,7 @@ class BoidFlockers(mesa.Model):
         separate=0.015,
         match=0.05,
     ):
-        """
-        Create a new Flockers model.
+        """Create a new Flockers model.
 
         Args:
             population: Number of Boids
@@ -52,9 +49,7 @@ class BoidFlockers(mesa.Model):
         self.make_agents()
 
     def make_agents(self):
-        """
-        Create self.population agents, with random positions and starting headings.
-        """
+        """Create self.population agents, with random positions and starting headings."""
         for _ in range(self.population):
             x = self.random.random() * self.space.x_max
             y = self.random.random() * self.space.y_max

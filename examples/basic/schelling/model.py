@@ -1,13 +1,11 @@
+from agents import SchellingAgent
+
 import mesa
 from mesa import Model
 
-from agents import SchellingAgent
-
 
 class Schelling(Model):
-    """
-    Model class for the Schelling segregation model.
-    """
+    """Model class for the Schelling segregation model."""
 
     def __init__(
         self,
@@ -19,8 +17,7 @@ class Schelling(Model):
         minority_pc=0.2,
         seed=None,
     ):
-        """
-        Create a new Schelling model.
+        """Create a new Schelling model.
 
         Args:
             width, height: Size of the space.
@@ -30,7 +27,6 @@ class Schelling(Model):
             radius: Search radius for checking similarity
             seed: Seed for Reproducibility
         """
-
         super().__init__(seed=seed)
         self.homophily = homophily
         self.radius = radius
@@ -55,9 +51,7 @@ class Schelling(Model):
         self.datacollector.collect(self)
 
     def step(self):
-        """
-        Run one step of the model.
-        """
+        """Run one step of the model."""
         self.happy = 0  # Reset counter of happy agents
         self.agents.shuffle_do("step")
 

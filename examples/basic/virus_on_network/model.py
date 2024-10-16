@@ -1,10 +1,10 @@
 import math
 
+import networkx as nx
+from agents import State, VirusAgent
+
 import mesa
 from mesa import Model
-import networkx as nx
-
-from agents import VirusAgent, State
 
 
 def number_state(model, state):
@@ -24,9 +24,7 @@ def number_resistant(model):
 
 
 class VirusOnNetwork(Model):
-    """
-    A virus model with some number of agents
-    """
+    """A virus model with some number of agents."""
 
     def __init__(
         self,
@@ -96,5 +94,5 @@ class VirusOnNetwork(Model):
         self.datacollector.collect(self)
 
     def run_model(self, n):
-        for i in range(n):
+        for _ in range(n):
             self.step()
