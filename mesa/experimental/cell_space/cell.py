@@ -211,3 +211,12 @@ class Cell:
         self._mesa_property_layers[property_name].modify_cell(
             self.coordinate, operation, value
         )
+
+
+    def __getstate__(self):
+        """Return state of the Cell with connections set to empty."""
+        state = super().__getstate__()
+        state[1][
+            "connections"
+        ] = {}  # replace this with empty connections to avoid infinite recursion error in pickle/deepcopy
+        return state
