@@ -194,7 +194,7 @@ class WolfSheep(Model):
         Wolf.create_agents(
             self,
             self.initial_wolves,
-            list(self.rng.random(self.initial_wolves)*2* wolf_gain_from_food),
+            list(self.rng.random(self.initial_wolves) * 2 * wolf_gain_from_food),
             wolf_reproduce,
             wolf_gain_from_food,
             [
