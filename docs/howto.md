@@ -2,6 +2,45 @@
 
 This guide provides concise instructions and examples to help you start with common tasks in Mesa.
 
+## Implementing Different Activation Regimes
+
+
+### Random Activation
+
+self.agents.shuffle_do("<agent function>")
+
+### Random Activation By Type
+
+```python
+for agent_class in self.agent_types:
+    self.agents_by_type[agent_class].shuffle_do("<agent function>")
+```
+### Only Activating Certain Agent Types
+
+```python
+self.agents_by_type[AgentType].shuffle_do("<agent function>")
+```
+
+### Staged Activation
+
+```python
+for stage in ["stage1", "stage2", "stage3"]:
+    self.agents.do(stage)
+```
+
+If you want to  `shuffle` and/or `shuffle_between_stages` options:
+```python
+
+stages = ["stage1", "stage2", "stage3"]
+if shuffle:
+    self.random.shuffle(stages)
+for stage in stages:
+    if shuffle_between_stages:
+        self.agents.shuffle_do(stage)
+    else:
+        self.agents.do(stage)
+```
+
 ## Models with Discrete Time
 
 For models involving agents of multiple types, including those with a time attribute, you can construct a discrete-time model. This setup allows each agent to perform actions in steps that correspond to the model's discrete time.
