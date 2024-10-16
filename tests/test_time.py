@@ -51,9 +51,10 @@ class MockAgent(Agent):
 
 
 class MockModel(Model):
-    def __init__(self, shuffle=False, activation=STAGED, enable_kill_other_agent=False, seed=None):
-        """
-        Creates a Model instance with a schedule
+    def __init__(
+        self, shuffle=False, activation=STAGED, enable_kill_other_agent=False, seed=None
+    ):
+        """Creates a Model instance with a schedule
 
         Args:
             shuffle (Bool): whether or not to instantiate a scheduler
