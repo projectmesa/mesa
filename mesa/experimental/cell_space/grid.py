@@ -22,7 +22,20 @@ class Grid(DiscreteSpace[T], Generic[T]):
         random (Random): the random number generator
         _try_random (bool): whether to get empty cell be repeatedly trying random cell
 
+    Notes:
+        width and height are accessible via properties, higher dimensions can be retrieved via dimensions
+
     """
+
+    @property
+    def width(self) -> int:
+        """Convenience access to the width of the grid."""
+        return self.dimensions[0]
+
+    @property
+    def height(self) -> int:
+        """Convenience access to the height of the grid."""
+        return self.dimensions[1]
 
     def __init__(
         self,
