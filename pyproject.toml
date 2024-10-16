@@ -87,7 +87,7 @@ repository = "https://github.com/projectmesa/mesa"
 mesa = "mesa.main:cli"
 
 [tool.hatch.build.targets.wheel]
-packages = ["mesa"]
+packages = ["mesa", "examples"]
 
 [tool.hatch.version]
 path = "mesa/__init__.py"
