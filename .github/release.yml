@@ -19,6 +19,9 @@ changelog:
     - title: 🐛 Bugs fixed
       labels:
         - bug
+    - title: 🔍 Examples updated
+      labels:
+        - example
     - title: 📜 Documentation improvements
       labels:
         - docs
