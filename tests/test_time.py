@@ -261,7 +261,8 @@ class TestRandomActivationByType(TestCase):
         model = MockModel(activation=RANDOM_BY_TYPE)
         a = mock.Mock()
         model.random = a
-        model.schedule._agents.random = a
+        for agentset in model.schedule._agents_by_type.values():
+            agentset.random = a
         model.schedule.step()
         assert a.shuffle.call_count == 2
 
