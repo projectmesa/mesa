@@ -1,17 +1,16 @@
 import solara
+from model import Schelling
+
 from mesa.visualization import (
     Slider,
     SolaraViz,
     make_plot_measure,
     make_space_matplotlib,
 )
-from model import Schelling
 
 
 def get_happy_agents(model):
-    """
-    Display a text count of how many happy agents there are.
-    """
+    """Display a text count of how many happy agents there are."""
     return solara.Markdown(f"**Happy agents: {model.happy}**")
 
 
