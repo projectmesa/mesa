@@ -5,6 +5,7 @@ Core Objects: Model, and Agent.
 
 import datetime
 
+import mesa.experimental as experimental
 import mesa.space as space
 import mesa.time as time
 from mesa.agent import Agent

@@ -1,17 +1,10 @@
-"""
-Flockers
-=============================================================
-A Mesa implementation of Craig Reynolds's Boids flocker model.
-Uses numpy arrays to represent vectors.
-"""
-
-import mesa
 import numpy as np
 
+from mesa import Agent
 
-class Boid(mesa.Agent):
-    """
-    A Boid-style flocker agent.
+
+class Boid(Agent):
+    """A Boid-style flocker agent.
 
     The agent follows three behaviors to flock:
         - Cohesion: steering towards neighboring agents.
@@ -35,8 +28,7 @@ class Boid(mesa.Agent):
         separate=0.015,
         match=0.05,
     ):
-        """
-        Create a new Boid flocker agent.
+        """Create a new Boid flocker agent.
 
         Args:
             speed: Distance to move per step.
@@ -58,10 +50,7 @@ class Boid(mesa.Agent):
         self.neighbors = None
 
     def step(self):
-        """
-        Get the Boid's neighbors, compute the new vector, and move accordingly.
-        """
-
+        """Get the Boid's neighbors, compute the new vector, and move accordingly."""
         self.neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
         n = 0
         match_vector, separation_vector, cohere = np.zeros((3, 2))
@@ -80,67 +69,3 @@ class Boid(mesa.Agent):
         self.direction /= np.linalg.norm(self.direction)
         new_pos = self.pos + self.direction * self.speed
         self.model.space.move_agent(self, new_pos)
-
-
-class BoidFlockers(mesa.Model):
-    """
-    Flocker model class. Handles agent creation, placement and scheduling.
-    """
-
-    def __init__(
-        self,
-        seed=None,
-        population=100,
-        width=100,
-        height=100,
-        vision=10,
-        speed=1,
-        separation=1,
-        cohere=0.03,
-        separate=0.015,
-        match=0.05,
-    ):
-        """
-        Create a new Flockers model.
-
-        Args:
-            population: Number of Boids
-            width, height: Size of the space.
-            speed: How fast should the Boids move.
-            vision: How far around should each Boid look for its neighbors
-            separation: What's the minimum distance each Boid will attempt to
-                    keep from any other
-            cohere, separate, match: factors for the relative importance of
-                    the three drives.
-        """
-        super().__init__(seed=seed)
-        self.population = population
-        self.vision = vision
-        self.speed = speed
-        self.separation = separation
-
-        self.space = mesa.space.ContinuousSpace(width, height, True)
-        self.factors = {"cohere": cohere, "separate": separate, "match": match}
-        self.make_agents()
-
-    def make_agents(self):
-        """
-        Create self.population agents, with random positions and starting headings.
-        """
-        for _ in range(self.population):
-            x = self.random.random() * self.space.x_max
-            y = self.random.random() * self.space.y_max
-            pos = np.array((x, y))
-            direction = np.random.random(2) * 2 - 1
-            boid = Boid(
-                model=self,
-                speed=self.speed,
-                direction=direction,
-                vision=self.vision,
-                separation=self.separation,
-                **self.factors,
-            )
-            self.space.place_agent(boid, pos)
-
-    def step(self):
-        self.agents.shuffle_do("step")
