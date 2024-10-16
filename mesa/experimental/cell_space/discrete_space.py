@@ -137,5 +137,6 @@ class DiscreteSpace(Generic[T]):
         self.property_layers[property_name].modify_cells(operation, value, condition)
 
     def __setstate__(self, state):
+        """Set the state of the discrete space."""
         self.__dict__ = state
         self._connect_cells()

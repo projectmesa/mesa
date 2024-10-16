@@ -204,6 +204,7 @@ class Cell:
         )
 
     def __getstate__(self):
+        """Return the state of the cell."""
         state = super().__getstate__()
         state[1][
             "connections"
