@@ -205,5 +205,7 @@ class Cell:
 
     def __getstate__(self):
         state = super().__getstate__()
-        state[1]["connections"] = {}  # replace this with empty connections to avoid infinite recursion error in pickle/deepcopy
+        state[1][
+            "connections"
+        ] = {}  # replace this with empty connections to avoid infinite recursion error in pickle/deepcopy
         return state

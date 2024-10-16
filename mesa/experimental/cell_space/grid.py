@@ -126,7 +126,6 @@ class Grid(DiscreteSpace[T], Generic[T]):
             if 0 <= ni < height and 0 <= nj < width:
                 cell.connect(self._cells[ni, nj], (di, dj))
 
-
     def __setstate__(self, state):
         self.__dict__ = state
         self._connect_cells()

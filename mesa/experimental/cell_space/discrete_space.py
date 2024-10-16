@@ -134,4 +134,3 @@ class DiscreteSpace(Generic[T]):
             condition: a function that takes a cell and returns a boolean (used to filter cells)
         """
         self.property_layers[property_name].modify_cells(operation, value, condition)
-
