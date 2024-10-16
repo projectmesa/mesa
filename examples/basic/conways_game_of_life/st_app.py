@@ -4,9 +4,9 @@ import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
-from conways_game_of_life.model import ConwaysGameOfLife
+from model import ConwaysGameOfLife
 
-model = st.title("Boltzman Wealth Model")
+model = st.title("Conway's Game of Life")
 num_ticks = st.slider("Select number of Steps", min_value=1, max_value=100, value=50)
 height = st.slider("Select Grid Height", min_value=10, max_value=100, step=10, value=15)
 width = st.slider("Select Grid Width", min_value=10, max_value=100, step=10, value=20)

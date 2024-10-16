@@ -1,3 +1,5 @@
+# Run with streamlit run st_app.py
+
 import time
 
 import altair as alt

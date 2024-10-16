@@ -43,9 +43,9 @@ Directly run the file ``run.py`` in the terminal. e.g.
 
 ## Files
 
-* ``run.py``: Launches a model visualization server.
 * ``model.py``: Contains the agent class, and the overall model class.
-* ``server.py``: Defines classes for visualizing the model (network layout) in the browser via Mesa's modular server, and instantiates a visualization server.
+* ``agents.py``: Contains the agent class.
+* ``app.py``: Contains the code for the interactive Solara visualization.
 
 ## Further Reading
 
