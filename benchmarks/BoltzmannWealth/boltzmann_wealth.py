@@ -99,7 +99,7 @@ class BoltzmannWealth(mesa.Model, HasObservables):
         for c in self.datacollector:
             c.collect()
 
-    def run_model(self, n):  # noqa D103
+    def run_model(self, n):
         """Run the model for n steps.
 
         Args:
