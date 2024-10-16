@@ -31,10 +31,10 @@ jobs:
       fail-fast: False
       matrix:
         os: [windows, ubuntu, macos]
-        python-version: ["3.12"]
+        python-version: ["3.13"]
         include:
           - os: ubuntu
-            python-version: "3.13"
+            python-version: "3.12"
           - os: ubuntu
             python-version: "3.11"
           - os: ubuntu
@@ -60,6 +60,9 @@ jobs:
     - if: matrix.os == 'ubuntu'
       name: Codecov
       uses: codecov/codecov-action@v4
+      with:
+        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   examples:
     runs-on: ubuntu-latest
@@ -68,7 +71,8 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.13"
+        allow-prereleases: true
         cache: 'pip'
     - name: Install uv
       run: pip install uv

@@ -100,7 +100,13 @@ class BoltzmannWealth(mesa.Model, HasObservables):
             c.collect()
 
     def run_model(self, n):  # noqa D103
-        for _i in range(n):
+        """Run the model for n steps.
+
+        Args:
+            n: the number of steps for which to run the model
+
+        """
+        for _ in range(n):
             self.step()
 
 
