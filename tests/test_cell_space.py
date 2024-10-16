@@ -703,8 +703,8 @@ def test_copying_discrete_spaces():  # noqa: D103
     grid = OrthogonalMooreGrid((100, 100))
     grid_copy = copy.deepcopy(grid)
 
-    c1 = grid[(5,5)].connections
-    c2 = grid_copy[(5,5)].connections
+    c1 = grid[(5, 5)].connections
+    c2 = grid_copy[(5, 5)].connections
 
     for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
         for k, v in c1.connections.items():
@@ -721,12 +721,11 @@ def test_copying_discrete_spaces():  # noqa: D103
         for k, v in c1.connections.items():
             assert v.coordinate == c2.connections[k].coordinate
 
-
     grid = HexGrid((100, 100))
     grid_copy = copy.deepcopy(grid)
 
-    c1 = grid[(5,5)].connections
-    c2 = grid_copy[(5,5)].connections
+    c1 = grid[(5, 5)].connections
+    c2 = grid_copy[(5, 5)].connections
 
     for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
         for k, v in c1.connections.items():

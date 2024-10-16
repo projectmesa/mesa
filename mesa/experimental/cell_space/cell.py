@@ -212,7 +212,6 @@ class Cell:
             self.coordinate, operation, value
         )
 
-
     def __getstate__(self):
         """Return state of the Cell with connections set to empty."""
         state = super().__getstate__()
