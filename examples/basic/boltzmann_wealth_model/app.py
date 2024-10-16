@@ -1,9 +1,10 @@
+from model import BoltzmannWealthModel
+
 from mesa.visualization import (
     SolaraViz,
     make_plot_measure,
     make_space_matplotlib,
 )
-from model import BoltzmannWealthModel
 
 
 def agent_portrayal(agent):
@@ -16,7 +17,7 @@ def agent_portrayal(agent):
 
 
 model_params = {
-    "N": {
+    "n": {
         "type": "SliderInt",
         "value": 50,
         "label": "Number of agents:",
