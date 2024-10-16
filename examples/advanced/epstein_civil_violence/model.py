@@ -43,8 +43,9 @@ class EpsteinCivilViolence(mesa.Model):
         arrest_prob_constant=2.3,
         movement=True,
         max_iters=1000,
+        seed=None
     ):
-        super().__init__()
+        super().__init__(seed=seed)
         self.width = width
         self.height = height
         self.citizen_density = citizen_density
@@ -59,48 +60,50 @@ class EpsteinCivilViolence(mesa.Model):
         self.max_iters = max_iters
         self.iteration = 0
 
-        self.grid = mesa.experimental.cell_space.OrthogonalMooreGrid(
-            (width, height), capacity=1, torus=True
-        )
+        self.grid = mesa.experimental.cell_space.OrthogonalMooreGrid((width, height), capacity=1, torus=True, random=self.random)
 
-        model_reporters = {
-            "Quiescent": lambda m: self.count_type_citizens(m, "Quiescent"),
-            "Active": lambda m: self.count_type_citizens(m, "Active"),
-            "Jailed": self.count_jailed,
-            "Cops": self.count_cops,
-        }
-        agent_reporters = {
-            "x": lambda a: a.cell.coordinate[0],
-            "y": lambda a: a.cell.coordinate[1],
-            "breed": lambda a: type(a).__name__,
-            "jail_sentence": lambda a: getattr(a, "jail_sentence", None),
-            "condition": lambda a: getattr(a, "condition", None),
-            "arrest_probability": lambda a: getattr(a, "arrest_probability", None),
-        }
-        self.datacollector = mesa.DataCollector(
-            model_reporters=model_reporters, agent_reporters=agent_reporters
-        )
-        if self.cop_density + self.citizen_density > 1:
-            raise ValueError("Cop density + citizen density must be less than 1")
+        # self.grid = mesa.experimental.cell_space.OrthogonalMooreGrid(
+        #     (width, height), capacity=1, torus=True, random=self.random
+        # )
 
-        for cell in self.grid.all_cells:
-            if self.random.random() < self.cop_density:
-                cop = Cop(self, vision=self.cop_vision)
-                cop.move_to(cell)
-
-            elif self.random.random() < (self.cop_density + self.citizen_density):
-                citizen = Citizen(
-                    self,
-                    hardship=self.random.random(),
-                    regime_legitimacy=self.legitimacy,
-                    risk_aversion=self.random.random(),
-                    threshold=self.active_threshold,
-                    vision=self.citizen_vision,
-                )
-                citizen.move_to(cell)
-
-        self.running = True
-        self.datacollector.collect(self)
+        # model_reporters = {
+        #     "Quiescent": lambda m: self.count_type_citizens(m, "Quiescent"),
+        #     "Active": lambda m: self.count_type_citizens(m, "Active"),
+        #     "Jailed": self.count_jailed,
+        #     "Cops": self.count_cops,
+        # }
+        # agent_reporters = {
+        #     "x": lambda a: a.cell.coordinate[0],
+        #     "y": lambda a: a.cell.coordinate[1],
+        #     "breed": lambda a: type(a).__name__,
+        #     "jail_sentence": lambda a: getattr(a, "jail_sentence", None),
+        #     "condition": lambda a: getattr(a, "condition", None),
+        #     "arrest_probability": lambda a: getattr(a, "arrest_probability", None),
+        # }
+        # self.datacollector = mesa.DataCollector(
+        #     model_reporters=model_reporters, agent_reporters=agent_reporters
+        # )
+        # if self.cop_density + self.citizen_density > 1:
+        #     raise ValueError("Cop density + citizen density must be less than 1")
+        #
+        # for cell in self.grid.all_cells:
+        #     if self.random.random() < self.cop_density:
+        #         cop = Cop(self, vision=self.cop_vision)
+        #         cop.move_to(cell)
+        #
+        #     elif self.random.random() < (self.cop_density + self.citizen_density):
+        #         citizen = Citizen(
+        #             self,
+        #             hardship=self.random.random(),
+        #             regime_legitimacy=self.legitimacy,
+        #             risk_aversion=self.random.random(),
+        #             threshold=self.active_threshold,
+        #             vision=self.citizen_vision,
+        #         )
+        #         citizen.move_to(cell)
+        #
+        # self.running = True
+        # self.datacollector.collect(self)
 
     def step(self):
         """
@@ -144,3 +147,17 @@ class EpsteinCivilViolence(mesa.Model):
         Helper method to count jailed agents.
         """
         return len(model.agents_by_type[Cop])
+
+
+if __name__ == "__main__":
+
+    import mesa.experimental as experimental
+
+    import sys
+
+    print(sys.getrecursionlimit())
+
+    model = EpsteinCivilViolence()
+    import copy
+    # copy.deepcopy(model)
+    copy.deepcopy(experimental.cell_space.OrthogonalMooreGrid((100,100), torus=True, random=model.random))

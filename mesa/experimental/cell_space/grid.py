@@ -127,6 +127,11 @@ class Grid(DiscreteSpace[T], Generic[T]):
                 cell.connect(self._cells[ni, nj], (di, dj))
 
 
+    def __setstate__(self, state):
+        self.__dict__ = state
+        self._connect_cells()
+
+
 class OrthogonalMooreGrid(Grid[T]):
     """Grid where cells are connected to their 8 neighbors.
 
