@@ -55,6 +55,7 @@ class DiscreteSpace(Generic[T]):
     def cutoff_empties(self):  # noqa
         return 7.953 * len(self._cells) ** 0.384
 
+    def _connect_cells(self): ...
     def _connect_single_cell(self, cell: T): ...
 
     @cached_property
@@ -134,3 +135,7 @@ class DiscreteSpace(Generic[T]):
             condition: a function that takes a cell and returns a boolean (used to filter cells)
         """
         self.property_layers[property_name].modify_cells(operation, value, condition)
+
+    def __setstate__(self, state):
+        self.__dict__ = state
+        self._connect_cells()
