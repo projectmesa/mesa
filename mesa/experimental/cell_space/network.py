@@ -34,6 +34,9 @@ class Network(DiscreteSpace[Cell]):
                 node_id, capacity, random=self.random
             )
 
+        self._connect_cells()
+
+    def _connect_cells(self) -> None:
         for cell in self.all_cells:
             self._connect_single_cell(cell)
 

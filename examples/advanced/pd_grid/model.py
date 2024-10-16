@@ -1,7 +1,7 @@
 import mesa
 from mesa.experimental.cell_space import OrthogonalMooreGrid
 
-from .agent import PDAgent
+from agents import PDAgent
 
 
 class PdGrid(mesa.Model):
@@ -41,7 +41,7 @@ class PdGrid(mesa.Model):
 
         self.datacollector = mesa.DataCollector(
             {
-                "Cooperating_Agents": lambda m: len(
+                "cooperating_agents": lambda m: len(
                     [a for a in m.agents if a.move == "C"]
                 )
             }
