@@ -126,6 +126,7 @@ class Grid(DiscreteSpace[T], Generic[T]):
             if 0 <= ni < height and 0 <= nj < width:
                 cell.connect(self._cells[ni, nj], (di, dj))
 
+
 class OrthogonalMooreGrid(Grid[T]):
     """Grid where cells are connected to their 8 neighbors.
 
