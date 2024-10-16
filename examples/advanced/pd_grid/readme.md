@@ -27,9 +27,10 @@ Launch the ``Demographic Prisoner's Dilemma Activation Schedule.ipynb`` notebook
 
 ## Files
 
-* ``run.py`` is the entry point for the font-end simulations.
-* ``pd_grid/``: contains the model and agent classes; the model takes a ``activation_order`` string as an argument, which determines in which order agents are activated: Sequential, Random or Simultaneous.
-* ``Demographic Prisoner's Dilemma Activation Schedule.ipynb``: Jupyter Notebook for running the scheduling experiment. This runs the model three times, one for each activation type, and demonstrates how the activation regime drives the model to different outcomes.
+* ``model.py``: contains the model, which takes a ``activation_order`` string as an argument, which determines in which order agents are activated: Sequential, Random or Simultaneous.
+* ``agents.py``: contains the agent class, which has a strategy and a score.
+* ``app.py``: contains the interactive visualization of the model.
+* ``analysis.ipynb``: Jupyter Notebook for running the scheduling experiment. This runs the model three times, one for each activation type, and demonstrates how the activation regime drives the model to different outcomes.
 
 ## Further Reading
 
