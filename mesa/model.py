@@ -240,7 +240,7 @@ class Model:
         """Reset the model random number generator.
 
         Args:
-            seed: A new seed for the RNG; if None, reset using the current seed
+            rng: A new seed for the RNG; if None, reset using the current seed
         """
         self.rng = np.random.default_rng(rng)
         self._rng = self.rng.bit_generator.state
