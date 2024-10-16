@@ -47,13 +47,8 @@ class BoltzmannWealth(mesa.Model):
             model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
         )
 
-        positions = [
-            (
-                self.random.randrange(self.grid.width),
-                self.random.randrange(self.grid.height),
-            )
-            for _ in range(self.num_agents)
-        ]
+        positions = list(zip(self.rng.integers(0, self.grid.width, n),
+                             self.rng.integers(0, self.grid.height, n)))
         MoneyAgent.create_agents(self, self.num_agents, pos=positions)
 
         self.running = True
