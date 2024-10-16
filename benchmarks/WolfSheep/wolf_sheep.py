@@ -181,10 +181,7 @@ class WolfSheep(Model):
         Sheep.create_agents(
             self,
             self.initial_sheep,
-            [
-                self.random.randrange(2 * sheep_gain_from_food)
-                for _ in range(self.initial_sheep)
-            ],
+            list(self.rng.random(self.initial_sheep) * 2 * sheep_gain_from_food),
             sheep_reproduce,
             sheep_gain_from_food,
             [
@@ -197,10 +194,7 @@ class WolfSheep(Model):
         Wolf.create_agents(
             self,
             self.initial_wolves,
-            [
-                self.random.randrange(2 * wolf_gain_from_food)
-                for _ in range(self.initial_wolves)
-            ],
+            list(self.rng.random(self.initial_wolves)*2* wolf_gain_from_food),
             wolf_reproduce,
             wolf_gain_from_food,
             [
@@ -241,5 +235,5 @@ if __name__ == "__main__":
     simulator.setup(model)
 
     start_time = time.perf_counter()
-    simulator.run(100)
+    simulator.run_until(100)
     print("Time:", time.perf_counter() - start_time)
