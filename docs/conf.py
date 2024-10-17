@@ -341,7 +341,6 @@ def setup_examples_pages():
 
         if md_filename not in md_files:
             with open(os.path.join(HERE, "examples", md_filename), "w") as fh:
-                # fixme we need to read in the entire file here
                 content = template.substitute(
                     dict(agent_file=agent_file, model_file=model_file,
                          readme_file=readme_file)
@@ -373,6 +372,6 @@ def setup(app):
     # shutil.copy(osp.join(HERE, "..", "..", "CHANGELOG.md"), dest)
     setup_examples_pages()
 
-
+#
 # if __name__ == "__main__":
 #     setup_examples_pages()
