@@ -48,6 +48,23 @@ def test_reset_randomizer(newseed=42):
     assert model._seed == newseed
 
 
+def test_reset_rng(newseed=42):
+    """Test resetting the random seed on the model."""
+    model = Model(rng=5)
+    old_rng = model._rng
+
+    model.reset_rng(rng=6)
+    new_rng = model._rng
+
+    assert old_rng != new_rng
+
+    old_rng = new_rng
+    model.reset_rng()
+    new_rng = model.rng.__getstate__()
+
+    assert old_rng != new_rng
+
+
 def test_agent_types():
     """Test Mode.agent_types property."""
 

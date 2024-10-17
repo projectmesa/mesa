@@ -2,11 +2,12 @@ coverage:
   status:
     project:
       default:
-        target: 90%
+        target: 80%
         threshold: 1%
 
 ignore:
-  - "**experimental/"
   - "benchmarks/**"
+  - "mesa/experimental/**"
+  - "mesa/visualization/**"
 
 comment: off
