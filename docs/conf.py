@@ -355,7 +355,7 @@ def setup_examples_pages():
         fn = os.path.join(HERE, "examples", entry)
         os.remove(fn)
 
-    # creeate overview of examples.md
+    # create overview of examples.md
     with open(os.path.join(HERE, "examples_overview_template.txt")) as fh:
         template = string.Template(fh.read())
 
