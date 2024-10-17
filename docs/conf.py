@@ -332,11 +332,11 @@ def setup_examples_pages():
         md_filename = f"{base_name}.md"
         examples_md.append(f"./examples/{base_name}")
 
-        with open(agent_filename, 'r') as content_file:
+        with open(agent_filename) as content_file:
             agent_file = content_file.read()
-        with open(model_filename, 'r') as content_file:
+        with open(model_filename) as content_file:
             model_file = content_file.read()
-        with open(readme_filename, 'r') as content_file:
+        with open(readme_filename) as content_file:
             readme_file = content_file.read()
 
         if md_filename not in md_files:
