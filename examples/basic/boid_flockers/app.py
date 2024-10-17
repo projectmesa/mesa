@@ -1,6 +1,6 @@
-from model import BoidFlockers
-
 from mesa.visualization import Slider, SolaraViz, make_space_matplotlib
+
+from .model import BoidFlockers
 
 
 def boid_draw(agent):

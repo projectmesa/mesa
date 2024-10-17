@@ -1,5 +1,4 @@
 import solara
-from model import Schelling
 
 from mesa.visualization import (
     Slider,
@@ -7,6 +6,8 @@ from mesa.visualization import (
     make_plot_measure,
     make_space_matplotlib,
 )
+
+from .model import Schelling
 
 
 def get_happy_agents(model):

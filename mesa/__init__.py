@@ -5,6 +5,7 @@ Core Objects: Model, and Agent.
 
 import datetime
 
+import mesa.examples as examples
 import mesa.experimental as experimental
 import mesa.space as space
 import mesa.time as time
@@ -21,6 +22,7 @@ __all__ = [
     "DataCollector",
     "batch_run",
     "experimental",
+    "examples",
 ]
 
 __title__ = "mesa"
