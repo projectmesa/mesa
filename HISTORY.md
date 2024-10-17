@@ -4,8 +4,8 @@ title: Release History
 
 # 3.0.0b1 (2024-10-15)
 
-## Highlights 
-Improved visualization by making visualization elements scalable and more clearly labeling the plots. 
+## Highlights
+Improved visualization by making visualization elements scalable and more clearly labeling the plots.
 
 ## What's Changed
 ### ⚠️ Breaking changes
