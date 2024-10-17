@@ -327,7 +327,7 @@ def setup_examples_pages():
 
         agent_filename = os.path.join(example, "agents.py")
         model_filename = os.path.join(example, "model.py")
-        readme_filename = os.path.join(example, "README.md")
+        readme_filename = os.path.join(example, "Readme.md")
 
         md_filename = f"{base_name}.md"
         examples_md.append(f"./examples/{base_name}")
