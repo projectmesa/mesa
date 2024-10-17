@@ -14,12 +14,16 @@
 # serve to show the default.
 
 import os
+import os.path as osp
+import glob
 import sys
+import string
 from datetime import date
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
+HERE = osp.abspath(osp.dirname(__file__))
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, "../examples")
 sys.path.insert(0, "../mesa")
@@ -289,3 +293,86 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
+
+
+
+def setup_examples_pages():
+    # create rst files for all examples
+    # check what examples exist
+    examples_folder = osp.abspath(osp.join(HERE, "..", "examples"))
+
+    # fixme shift to walkdir
+    #  we should have a single rst page for each subdirectory
+
+    basic_examples = [f.path for f in os.scandir(osp.join(examples_folder, "basic")) if f.is_dir() ]
+    advanced_examples = []
+    # advanced_examples = [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir()]
+    examples = basic_examples + advanced_examples
+
+    # get all existing rst files
+    md_files = glob.glob(os.path.join(HERE, "examples", "*.md"))
+    md_files = {os.path.basename(os.path.normpath(entry)) for entry in md_files}
+
+    # check which rst files exist
+    with open(os.path.join(HERE, "example_template.txt")) as fh:
+        template = string.Template(fh.read())
+
+    # TODO:: at the moment no idea what happens if example is updated. Does this trigger a rebuild of the html page?
+    #  probably not... because file is not new. So we need some timestamp trick?
+    examples_md = []
+    for example in examples:
+        # fixme we have the directories
+        #  from the directory, get 3 file names
+        base_name = os.path.basename(os.path.normpath(example))
+
+        agent_filename = os.path.join(example, "agents.py")
+        model_filename = os.path.join(example, "model.py")
+        readme_filename = os.path.join(example, "README.md")
+
+        md_filename = f"{base_name}.md"
+        examples_md.append(f"./examples/{base_name}")
+
+        with open(agent_filename, 'r') as content_file:
+            agent_file = content_file.read()
+        with open(model_filename, 'r') as content_file:
+            model_file = content_file.read()
+        with open(readme_filename, 'r') as content_file:
+            readme_file = content_file.read()
+
+        if md_filename not in md_files:
+            with open(os.path.join(HERE, "examples", md_filename), "w") as fh:
+                # fixme we need to read in the entire file here
+                content = template.substitute(
+                    dict(agent_file=agent_file, model_file=model_file,
+                         readme_file=readme_file)
+                )
+                fh.write(content)
+        else:
+            md_files.remove(md_filename)
+
+    # these md files are outdated because the example has been removed
+    for entry in md_files:
+        fn = os.path.join(HERE, "examples", entry)
+        os.remove(fn)
+
+    # creeate overview of examples.md
+    with open(os.path.join(HERE, "examples_overview_template.txt")) as fh:
+        template = string.Template(fh.read())
+
+    with open(os.path.join(HERE, "examples.md"), "w") as fh:
+        content = template.substitute(
+            dict(
+                examples="\n".join([f"<{entry[2::]}>" for entry in examples_md]),
+            )
+        )
+        fh.write(content)
+
+def setup(app):
+    # copy changelog into source folder for documentation
+    # dest = osp.join(HERE, "./getting_started/changelog.md")
+    # shutil.copy(osp.join(HERE, "..", "..", "CHANGELOG.md"), dest)
+    setup_examples_pages()
+
+
+if __name__ == "__main__":
+    setup_examples_pages()
