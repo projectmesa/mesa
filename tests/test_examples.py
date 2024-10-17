@@ -6,6 +6,23 @@ import sys
 import unittest
 
 
+def test_examples_imports():
+    """Test examples imports."""
+    from mesa.examples.basic import (
+        BoidFlockers,
+        BoltzmannWealthModel,
+        ConwaysGameOfLife,
+        Schelling,
+        VirusOnNetwork,
+    )
+
+    BoltzmannWealthModel()
+    Schelling()
+    BoidFlockers()
+    ConwaysGameOfLife()
+    VirusOnNetwork()
+
+
 def classcase(name):  # noqa: D103
     return "".join(x.capitalize() for x in name.replace("-", "_").split("_"))
 
