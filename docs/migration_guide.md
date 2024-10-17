@@ -42,14 +42,14 @@ The `mesa.flat` namespace is removed. Use the full namespace for your imports.
 
 
 ### Mandatory Model initialization with `super().__init__()`
-In Mesa 3.0, it is now mandatory to call `super().__init__()` when initializing your model class. This ensures that all necessary Mesa model variables are correctly set up and agents are properly added to the model. The convention in Python is to extract the arguments and keyword arguments you need in your `__init__` and pass on the rest via `super`. To control the random number generation, `mesa.Model` relies on the `seed` keyword argument.
+In Mesa 3.0, it is now mandatory to call `super().__init__()` when initializing your model class. This ensures that all necessary Mesa model variables are correctly set up and agents are properly added to the model. If you want to control the seed of the random number generator, you have to pass this as a keyword argument to super as shown below.
 
 Make sure all your model classes explicitly call `super().__init__()` in their `__init__` method:
 
 ```python
 class MyModel(mesa.Model):
-    def __init__(self, some_arg_I_need, *args, seed=None, my_init_kwarg=True, **kwargs):
-        super().__init__(*args, seed=seed, **kwargs)  # This is now required!
+    def __init__(self, some_arg_I_need, seed=None, some_kwarg_I_need=True):
+        super().__init__(seed=seed)  # Calling super is now required, passing seed is highly recommended
         # Your model initialization code here
         # this code uses some_arg_I_need and my_init_kwarg
 ```
