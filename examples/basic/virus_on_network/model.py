@@ -1,10 +1,11 @@
 import math
 
 import networkx as nx
-from agents import State, VirusAgent
 
 import mesa
 from mesa import Model
+
+from .agents import State, VirusAgent
 
 
 def number_state(model, state):
