@@ -5,7 +5,7 @@ title: Release History
 # 3.0.0b1 (2024-10-17)
 
 ## Highlights
-Basic exmaples are now importable in Mesa, includes boid_flockers, boltzmann_wealth_model, conways_game_of_life, schelling, and virus_on_network models. With this change they are also integrated into the Mesa tutorial in the docs.
+Basic examples are now importable in Mesa, includes boid_flockers, boltzmann_wealth_model, conways_game_of_life, schelling, and virus_on_network models. With this change they are also integrated into the Mesa tutorial in the docs.
 
 Also, in this release, visualizations are improved by making visualization elements scalable and more clearly labeling the plots.
 
