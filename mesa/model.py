@@ -8,13 +8,20 @@ Core Objects: Model
 from __future__ import annotations
 
 import random
+import sys
 import warnings
+from collections.abc import Sequence
 
 # mypy
 from typing import Any
 
+import numpy as np
+
 from mesa.agent import Agent, AgentSet
 from mesa.datacollection import DataCollector
+
+SeedLike = int | np.integer | Sequence[int] | np.random.SeedSequence
+RNGLike = np.random.Generator | np.random.BitGenerator
 
 
 class Model:
@@ -28,7 +35,8 @@ class Model:
         running: A boolean indicating if the model should continue running.
         schedule: An object to manage the order and execution of agent steps.
         steps: the number of times `model.step()` has been called.
-        random: a seeded random number generator.
+        random: a seeded python.random number generator.
+        rng : a seeded numpy.random.Generator
 
     Notes:
         Model.agents returns the AgentSet containing all agents registered with the model. Changing
@@ -37,7 +45,13 @@ class Model:
 
     """
 
-    def __init__(self, *args: Any, seed: float | None = None, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        *args: Any,
+        seed: float | None = None,
+        rng: RNGLike | SeedLike | None = None,
+        **kwargs: Any,
+    ) -> None:
         """Create a new model.
 
         Overload this method with the actual code to initialize the model. Always start with super().__init__()
@@ -46,18 +60,43 @@ class Model:
         Args:
             args: arguments to pass onto super
             seed: the seed for the random number generator
+            rng : Pseudorandom number generator state. When `rng` is None, a new `numpy.random.Generator` is created
+                  using entropy from the operating system. Types other than `numpy.random.Generator` are passed to
+                  `numpy.random.default_rng` to instantiate a `Generator`.
             kwargs: keyword arguments to pass onto super
+
+        Notes:
+            you have to pass either seed or rng, but not both.
+
         """
         super().__init__(*args, **kwargs)
         self.running = True
         self.steps: int = 0
 
-        self._seed = seed
-        if self._seed is None:
-            # We explicitly specify the seed here so that we know its value in
-            # advance.
-            self._seed = random.random()
-        self.random = random.Random(self._seed)
+        if (seed is not None) and (rng is not None):
+            raise ValueError("you have to pass either rng or seed, not both")
+        elif seed is None:
+            self.rng: np.random.Generator = np.random.default_rng(rng)
+            self._rng = (
+                self.rng.bit_generator.state
+            )  # this allows for reproducing the rng
+
+            try:
+                self.random = random.Random(rng)
+            except TypeError:
+                seed = int(self.rng.integers(np.iinfo(np.int32).max))
+                self.random = random.Random(seed)
+            self._seed = seed  # this allows for reproducing stdlib.random
+        elif rng is None:
+            self.random = random.Random(seed)
+            self._seed = seed  # this allows for reproducing stdlib.random
+
+            try:
+                self.rng: np.random.Generator = np.random.default_rng(rng)
+            except TypeError:
+                rng = self.random.randint(0, sys.maxsize)
+                self.rng: np.random.Generator = np.random.default_rng(rng)
+            self._rng = self.rng.bit_generator.state
 
         # Wrap the user-defined step method
         self._user_step = self.step
@@ -196,6 +235,15 @@ class Model:
             seed = self._seed
         self.random.seed(seed)
         self._seed = seed
+
+    def reset_rng(self, rng: RNGLike | SeedLike | None = None) -> None:
+        """Reset the model random number generator.
+
+        Args:
+            rng: A new seed for the RNG; if None, reset using the current seed
+        """
+        self.rng = np.random.default_rng(rng)
+        self._rng = self.rng.bit_generator.state
 
     def initialize_data_collector(
         self,
