@@ -14,12 +14,16 @@
 # serve to show the default.
 
 import os
+import os.path as osp
+import glob
 import sys
+import string
 from datetime import date
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
+HERE = osp.abspath(osp.dirname(__file__))
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, "../examples")
 sys.path.insert(0, "../mesa")
@@ -289,3 +293,86 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
+
+
+
+def write_example_md_file(agent_filename, model_filename, readme_filename, app_filename, md_filepath, template):
+    with open(agent_filename) as content_file:
+        agent_file = content_file.read()
+    with open(model_filename) as content_file:
+        model_file = content_file.read()
+    with open(readme_filename) as content_file:
+        readme_file = content_file.read()
+    with open(app_filename) as content_file:
+        app_file = content_file.read()
+
+    with open(md_filepath, "w") as fh:
+        content = template.substitute(
+            dict(agent_file=agent_file, model_file=model_file,
+                 readme_file=readme_file, app_file=app_file)
+        )
+        fh.write(content)
+
+def setup_examples_pages():
+    # create md files for all examples
+    # check what examples exist
+    examples_folder = osp.abspath(osp.join(HERE, "..", "mesa", "examples"))
+    basic_examples = [f.path for f in os.scandir(osp.join(examples_folder, "basic")) if f.is_dir() ]
+    advanced_examples = []
+    # advanced_examples = [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir()]
+    examples = basic_examples + advanced_examples
+
+    # get all existing md files
+    md_files = glob.glob(os.path.join(HERE, "examples", "*.md"))
+    md_files = {os.path.basename(os.path.normpath(entry)) for entry in md_files}
+
+    # check which rst files exist
+    with open(os.path.join(HERE, "example_template.txt")) as fh:
+        template = string.Template(fh.read())
+
+    examples_md = []
+    for example in examples:
+        base_name = os.path.basename(os.path.normpath(example))
+
+        agent_filename = os.path.join(example, "agents.py")
+        model_filename = os.path.join(example, "model.py")
+        readme_filename = os.path.join(example, "Readme.md")
+        app_filename = os.path.join(example, "app.py")
+
+        md_filename = f"{base_name}.md"
+        examples_md.append(base_name)
+
+        # let's establish the latest update to the example files
+        timestamps = [osp.getmtime(fh) for fh in [agent_filename, model_filename, readme_filename, app_filename]]
+        latest_edit = max(timestamps)
+
+        md_filepath = os.path.join(HERE, "examples", md_filename)
+
+        # if the example is new or the existing example md file is older than the latest update, create a new file
+        if md_filename not in md_files or latest_edit > osp.getmtime(md_filepath):
+            write_example_md_file(agent_filename, model_filename, readme_filename, app_filename, md_filepath, template)
+
+
+    # check if any md files should be removed because the example is removed
+    outdated_md_files = md_files - {f"{entry}.md" for entry in examples_md}
+    for entry in outdated_md_files:
+        os.remove(os.path.join(HERE, "examples", entry)  )
+
+    # create overview of examples.md
+    with open(os.path.join(HERE, "examples_overview_template.txt")) as fh:
+        template = string.Template(fh.read())
+
+    with open(os.path.join(HERE, "examples.md"), "w") as fh:
+        content = template.substitute(
+            dict(
+                examples="\n".join([f"{' '.join(base_name.split('_'))} </examples/{base_name}>" for base_name in examples_md]),
+            )
+        )
+        fh.write(content)
+
+def setup(app):
+    setup_examples_pages()
+
+
+if __name__ == "__main__":
+    setup_examples_pages()

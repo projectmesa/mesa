@@ -12,10 +12,10 @@ class Cell(Agent):
         super().__init__(model)
         self.x, self.y = pos
         self.state = init_state
-        self._nextState = None
+        self._next_state = None
 
     @property
-    def isAlive(self):
+    def is_alive(self):
         return self.state == self.ALIVE
 
     @property
@@ -31,17 +31,17 @@ class Cell(Agent):
         """
         # Get the neighbors and apply the rules on whether to be alive or dead
         # at the next tick.
-        live_neighbors = sum(neighbor.isAlive for neighbor in self.neighbors)
+        live_neighbors = sum(neighbor.is_alive for neighbor in self.neighbors)
 
         # Assume nextState is unchanged, unless changed below.
-        self._nextState = self.state
-        if self.isAlive:
+        self._next_state = self.state
+        if self.is_alive:
             if live_neighbors < 2 or live_neighbors > 3:
-                self._nextState = self.DEAD
+                self._next_state = self.DEAD
         else:
             if live_neighbors == 3:
-                self._nextState = self.ALIVE
+                self._next_state = self.ALIVE
 
     def assume_state(self):
         """Set the state to the new computed state -- computed in step()."""
-        self.state = self._nextState
+        self.state = self._next_state
