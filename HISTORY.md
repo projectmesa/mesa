@@ -3,12 +3,11 @@ title: Release History
 ---
 
 # 3.0.0b1 (2024-10-17)
+## Highlights
 Mesa 3.0 beta 1 is our last beta release before the Mesa 3.0 stable release. We are restructuring our examples and have move 9 core examples from [mesa-examples](https://github.com/projectmesa/mesa-examples) to mesa itself ([#2358](https://github.com/projectmesa/mesa/pull/2358)). The 5 basic examples are now directly importable ([#2381](https://github.com/projectmesa/mesa/pull/2381)):
-
 ```Python
-from mesa.examples.basic import BoidFlockers, BoltzmannWealthModel, ConwaysGameOfLife, Schelling, VirusOnNetwork
+from examples.basic import BoidFlockers, BoltzmannWealthModel, ConwaysGameOfLife, Schelling, VirusOnNetwork
 ```
-
 The 5 basic examples will always use stable Mesa features, we are also working on 4 more advanced example which can also include experimental features.
 
 All our core examples can now be viewed in the [`examples`](https://github.com/projectmesa/mesa/tree/main/examples) folder. [mesa-examples](https://github.com/projectmesa/mesa-examples) will continue to exists for user showcases. We're also working on making the examples visible in the ReadtheDocs ([#2382](https://github.com/projectmesa/mesa/pull/2382)) and on an website ([mesa-examples#139](https://github.com/projectmesa/mesa-examples/issues/139)). Follow all our work on the examples in this tracking issue [#2364](https://github.com/projectmesa/mesa/issues/2364).
