@@ -365,7 +365,7 @@ def setup_examples_pages():
     with open(os.path.join(HERE, "examples.md"), "w") as fh:
         content = template.substitute(
             dict(
-                examples="\n".join([f"{' '.join(base_name.split('_'))} </examples/<base_name>>" for base_name in examples_md]),
+                examples="\n".join([f"{' '.join(base_name.split('_'))} </examples/{base_name}>" for base_name in examples_md]),
             )
         )
         fh.write(content)
