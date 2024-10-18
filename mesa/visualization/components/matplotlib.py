@@ -11,7 +11,7 @@ from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.figure import Figure
 
 import mesa
-from mesa.experimental.cell_space import VoronoiGrid, OrthogonalMooreGrid
+from mesa.experimental.cell_space import OrthogonalMooreGrid, VoronoiGrid
 from mesa.space import PropertyLayer
 from mesa.visualization.utils import update_counter
 
