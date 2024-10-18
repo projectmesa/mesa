@@ -12,7 +12,7 @@ The 5 basic examples will always use stable Mesa features, we are also working o
 
 All our core examples can now be viewed in the [`examples`](https://github.com/projectmesa/mesa/tree/main/examples) folder. [mesa-examples](https://github.com/projectmesa/mesa-examples) will continue to exists for user showcases. We're also working on making the examples visible in the ReadtheDocs ([#2382](https://github.com/projectmesa/mesa/pull/2382)) and on an website ([mesa-examples#139](https://github.com/projectmesa/mesa-examples/issues/139)). Follow all our work on the examples in this tracking issue [#2364](https://github.com/projectmesa/mesa/issues/2364).
 
-Furthermore, the visualizations are improved by making visualization elements scalable and more clearly labeling the plots, and the Model now has an `rng` argument for an [SPEC 7](https://scientific-python.org/specs/spec-0007/) compliant NumPy random number generator ([#2352](https://github.com/projectmesa/mesa/pull/2352)).
+Furthermore, the visualizations are improved by making visualization elements scalable and more clearly labeling the plots, and the Model now has an `rng` argument for an [SPEC 7](https://scientific-python.org/specs/spec-0007/) compliant NumPy random number generator ([#2352](https://github.com/projectmesa/mesa/pull/2352)). Following SPEC 7, you have to pass either `seed` or `rng`. Whichever one you pass will be used to seed both `random.Random`, and `numpy.random.Generator.`
 
 ## What's Changed
 ### ⚠️ Breaking changes
