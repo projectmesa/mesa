@@ -327,7 +327,7 @@ def setup_examples_pages():
         app_filename = os.path.join(example, "app.py")
 
         md_filename = f"{base_name}.md"
-        examples_md.append(f"./examples/{base_name}")
+        examples_md.append((base_name, f"./examples/{base_name}"))
 
         # fixme should be replaced with something based on timestep
         #  so if any(mymodelfiles) is newer then existing_md_filename
@@ -362,7 +362,7 @@ def setup_examples_pages():
     with open(os.path.join(HERE, "examples.md"), "w") as fh:
         content = template.substitute(
             dict(
-                examples="\n".join([f"{entry} <{entry[2::]}>" for entry in examples_md]),
+                examples="\n".join([f"{' '.join(base_name.split('_'))} <{file_path[2::]}>" for base_name, file_path in examples_md]),
             )
         )
         fh.write(content)
@@ -373,6 +373,6 @@ def setup(app):
     # shutil.copy(osp.join(HERE, "..", "..", "CHANGELOG.md"), dest)
     setup_examples_pages()
 
-#
-# if __name__ == "__main__":
-#     setup_examples_pages()
+
+if __name__ == "__main__":
+    setup_examples_pages()
