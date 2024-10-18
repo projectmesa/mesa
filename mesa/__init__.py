@@ -5,6 +5,7 @@ Core Objects: Model, and Agent.
 
 import datetime
 
+import mesa.examples as examples
 import mesa.experimental as experimental
 import mesa.space as space
 import mesa.time as time
@@ -21,10 +22,11 @@ __all__ = [
     "DataCollector",
     "batch_run",
     "experimental",
+    "examples",
 ]
 
 __title__ = "mesa"
-__version__ = "3.0.0b0"
+__version__ = "3.0.0b1"
 __license__ = "Apache 2.0"
 _this_year = datetime.datetime.now(tz=datetime.timezone.utc).date().year
 __copyright__ = f"Copyright {_this_year} Project Mesa Team"
