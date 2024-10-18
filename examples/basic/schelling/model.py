@@ -1,7 +1,7 @@
-from agents import SchellingAgent
-
 import mesa
 from mesa import Model
+
+from .agents import SchellingAgent
 
 
 class Schelling(Model):

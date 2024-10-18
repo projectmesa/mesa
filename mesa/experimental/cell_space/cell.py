@@ -204,8 +204,9 @@ class Cell:
         )
 
     def __getstate__(self):
-        """Return the state of the cell."""
-        state = super().__getstate__()
+        """Return state of the Cell with connections set to empty."""
+        # fixme, once we shift to 3.11, replace this with super. __getstate__
+        state = (self.__dict__, {k: getattr(self, k) for k in self.__slots__})
         state[1][
             "connections"
         ] = {}  # replace this with empty connections to avoid infinite recursion error in pickle/deepcopy

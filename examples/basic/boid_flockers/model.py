@@ -5,9 +5,10 @@ Uses numpy arrays to represent vectors.
 """
 
 import numpy as np
-from agents import Boid
 
 import mesa
+
+from .agents import Boid
 
 
 class BoidFlockers(mesa.Model):

@@ -22,7 +22,7 @@ class DiscreteSpace(Generic[T]):
         all_cells (CellCollection): The cells composing the discrete space
         random (Random): The random number generator
         cell_klass (Type) : the type of cell class
-        empties (CellCollection) : collecction of all cells that are empty
+        empties (CellCollection) : collection of all cells that are empty
         property_layers (dict[str, PropertyLayer]): the property layers of the discrete space
     """
 
@@ -137,6 +137,6 @@ class DiscreteSpace(Generic[T]):
         self.property_layers[property_name].modify_cells(operation, value, condition)
 
     def __setstate__(self, state):
-        """Set the state of the discrete space."""
+        """Set the state of the discrete space and rebuild the connections."""
         self.__dict__ = state
         self._connect_cells()
