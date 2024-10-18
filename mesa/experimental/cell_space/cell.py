@@ -40,15 +40,6 @@ class Cell:
         "__dict__",
     ]
 
-    # def __new__(cls,
-    #     coordinate: tuple[int, ...],
-    #     capacity: float | None = None,
-    #     random: Random | None = None,):
-    #     if capacity != 1:
-    #         return object.__new__(cls)
-    #     else:
-    #         return object.__new__(SingleAgentCell)
-
     def __init__(
         self,
         coordinate: Coordinate,

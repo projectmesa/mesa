@@ -18,8 +18,9 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 
 ## Files
 
-* ``EpsteinCivilViolence.py``: Core model and agent code.
-* ``EpsteinCivilViolenceServer.py``: Sets up the interactive visualization.
+* ``model.py``: Core model code.
+* ``agent.py``: Agent classes.
+* ``app.py``: Sets up the interactive visualization.
 * ``Epstein Civil Violence.ipynb``: Jupyter notebook conducting some preliminary analysis of the model.
 
 ## Further Reading
