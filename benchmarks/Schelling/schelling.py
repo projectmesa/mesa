@@ -35,7 +35,9 @@ class SchellingAgent(CellAgent):
     def step(self):
         """Run one step of the agent."""
         neighbors = self.cell.get_neighborhood(radius=self.radius).agents
-        similar = len([neighbor for neighbor in neighbors if neighbor.type == self.type])
+        similar = len(
+            [neighbor for neighbor in neighbors if neighbor.type == self.type]
+        )
 
         # If unhappy, move:
         if similar < self.homophily:
