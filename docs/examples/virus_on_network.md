@@ -1,5 +1,4 @@
 
-## Description
 # Virus on a Network
 
 ## Summary

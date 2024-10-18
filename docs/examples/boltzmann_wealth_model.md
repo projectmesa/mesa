@@ -1,5 +1,4 @@
 
-## Description
 # Boltzmann Wealth Model (Tutorial)
 
 ## Summary

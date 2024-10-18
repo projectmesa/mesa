@@ -1,5 +1,4 @@
 
-## Description
 # Boids Flockers
 
 ## Summary

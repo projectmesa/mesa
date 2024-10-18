@@ -1,5 +1,4 @@
 
-## Description
 # Conway's Game Of "Life"
 
 ## Summary

@@ -1,5 +1,4 @@
 
-## Description
 # Schelling Segregation Model
 
 ## Summary
