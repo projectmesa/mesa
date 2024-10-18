@@ -1,16 +1,16 @@
 # noqa D100
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
-from __future__ import annotations
-
 import mesa
 from mesa.experimental.signals import (
+    Computable,
+    Computed,
     HasObservables,
     Observable,
 )
 
 
 def compute_gini(model):  # noqa D103
-    agent_wealth = model.agent_wealth.get()
+    agent_wealth = model.agent_wealth
     x = sorted(agent_wealth)
     n = len(agent_wealth)
     b = sum(xi * (n - i) for i, xi in enumerate(x)) / (n * sum(x))
@@ -21,35 +21,6 @@ def get_agent_wealth(model):  # noqa D103
     return [agent.wealth for agent in model.agents]
 
 
-class Collector:
-    def __init__(self, model, obj, attr):
-        self.data = []
-        self.obj = obj
-        self.attr = attr
-        self.model = model
-
-    def collect(self):
-        self.data.append(getattr(self.obj, self.attr))
-
-
-class Table:
-    """This table tracks the wealth of agents."""
-
-    def __init__(self, model: BoltzmannWealth):
-        self.data = {}
-        for agent in model.agents:
-            agent.observe("wealth", "on_change", self.update)
-            self.data[agent.unique_id] = agent.wealth
-
-    def update(self, signal):
-        """Handler for signal that updates the wealth for the agent in the table"""
-        self.data[signal.owner.unique_id] = signal.new_value
-
-    def get(self):
-        """Return the wealth of agents"""
-        return self.data.values()
-
-
 class BoltzmannWealth(mesa.Model, HasObservables):
     """A simple model of an economy where agents exchange currency at random.
 
@@ -58,55 +29,39 @@ class BoltzmannWealth(mesa.Model, HasObservables):
     highly skewed distribution of wealth.
     """
 
-    # gini = Computable()
+    agent_wealth = Computable()
+    gini = Computable()
 
-    def __init__(self, seed=None, n=100, width=10, height=10):
-        """Args:
-        seed: the seed for random number generator
-        n: the number of agents
-        width: the width of the grid
-        height: the height of the grid
-        """
+    def __init__(self, seed=None, n=100, width=10, height=10):  # noqa D103
         super().__init__(seed=seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
-
+        self.datacollector = mesa.DataCollector(
+            model_reporters={"Gini": "gini"}, agent_reporters={"Wealth": "wealth"}
+        )
         # Create agents
         for _ in range(self.num_agents):
-            a = MoneyAgent(self)
             # Add the agent to a random grid cell
             x = self.random.randrange(self.grid.width)
             y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(a, (x, y))
+            self.grid.place_agent(MoneyAgent(self), (x, y))
 
         # testing a chain of observable --> computable --> computable
         # we cannot pass model.agent_wealth as an argument
         # to self.gini, because the autodiscovery is tied to Observable.__get__
         # which thus needs! to be accessed inside the callable
-        self.agent_wealth = Table(self)
-
-        self.gini = compute_gini(self)
+        self.agent_wealth = Computed(get_agent_wealth, self)
+        self.gini = Computed(compute_gini, self)
 
         self.running = True
-        self.datacollector = [
-            Collector(self, self, "gini"),
-            Collector(self, self, "agent_wealth"),
-        ]
+        self.datacollector.collect(self)
 
     def step(self):  # noqa D103
         self.agents.shuffle_do("step")  # collect data
-        self.gini = compute_gini(self)
-        for c in self.datacollector:
-            c.collect()
+        self.datacollector.collect(self)
 
-    def run_model(self, n):
-        """Run the model for n steps.
-
-        Args:
-            n: the number of steps for which to run the model
-
-        """
-        for _ in range(n):
+    def run_model(self, n):  # noqa D103
+        for _i in range(n):
             self.step()
 
 
@@ -143,5 +98,15 @@ class MoneyAgent(mesa.Agent, HasObservables):
 
 
 if __name__ == "__main__":
-    model = BoltzmannWealth()
-    model.run_model(10)
+    import time
+    from statistics import mean
+
+    data = []
+    for _ in range(10):
+        start = time.perf_counter()
+        model = BoltzmannWealth()
+        model.run_model(1000)
+        end = time.perf_counter()
+        data.append(end - start)
+
+    print(f"mean runtime: {mean(data)}")
