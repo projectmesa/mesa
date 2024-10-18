@@ -317,33 +317,34 @@ def setup_examples_pages():
     with open(os.path.join(HERE, "example_template.txt")) as fh:
         template = string.Template(fh.read())
 
-    # TODO:: at the moment no idea what happens if example is updated. Does this trigger a rebuild of the html page?
-    #  probably not... because file is not new. So we need some timestamp trick?
     examples_md = []
     for example in examples:
-        # fixme we have the directories
-        #  from the directory, get 3 file names
         base_name = os.path.basename(os.path.normpath(example))
 
         agent_filename = os.path.join(example, "agents.py")
         model_filename = os.path.join(example, "model.py")
         readme_filename = os.path.join(example, "Readme.md")
+        app_filename = os.path.join(example, "app.py")
 
         md_filename = f"{base_name}.md"
         examples_md.append(f"./examples/{base_name}")
 
-        with open(agent_filename) as content_file:
-            agent_file = content_file.read()
-        with open(model_filename) as content_file:
-            model_file = content_file.read()
-        with open(readme_filename) as content_file:
-            readme_file = content_file.read()
-
+        # fixme should be replaced with something based on timestep
+        #  so if any(mymodelfiles) is newer then existing_md_filename
         if md_filename not in md_files:
+            with open(agent_filename) as content_file:
+                agent_file = content_file.read()
+            with open(model_filename) as content_file:
+                model_file = content_file.read()
+            with open(readme_filename) as content_file:
+                readme_file = content_file.read()
+            with open(app_filename) as content_file:
+                app_file = content_file.read()
+
             with open(os.path.join(HERE, "examples", md_filename), "w") as fh:
                 content = template.substitute(
                     dict(agent_file=agent_file, model_file=model_file,
-                         readme_file=readme_file)
+                         readme_file=readme_file, app_file=app_file)
                 )
                 fh.write(content)
         else:
