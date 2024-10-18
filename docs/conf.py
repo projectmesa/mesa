@@ -316,7 +316,7 @@ def write_example_md_file(agent_filename, model_filename, readme_filename, app_f
 def setup_examples_pages():
     # create md files for all examples
     # check what examples exist
-    examples_folder = osp.abspath(osp.join(HERE, "..", "examples"))
+    examples_folder = osp.abspath(osp.join(HERE, "..", "mesa", "examples"))
     basic_examples = [f.path for f in os.scandir(osp.join(examples_folder, "basic")) if f.is_dir() ]
     advanced_examples = []
     # advanced_examples = [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir()]
@@ -371,9 +371,6 @@ def setup_examples_pages():
         fh.write(content)
 
 def setup(app):
-    # copy changelog into source folder for documentation
-    # dest = osp.join(HERE, "./getting_started/changelog.md")
-    # shutil.copy(osp.join(HERE, "..", "..", "CHANGELOG.md"), dest)
     setup_examples_pages()
 
 
