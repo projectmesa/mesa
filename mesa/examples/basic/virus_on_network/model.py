@@ -57,6 +57,7 @@ class VirusOnNetwork(Model):
                 "Infected": number_infected,
                 "Susceptible": number_susceptible,
                 "Resistant": number_resistant,
+                "R over S": self.resistant_susceptible_ratio
             }
         )
 
