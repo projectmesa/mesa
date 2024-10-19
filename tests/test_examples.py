@@ -8,7 +8,7 @@ import unittest
 
 def test_examples_imports():
     """Test examples imports."""
-    from mesa.examples.basic import (
+    from mesa.examples import (
         BoidFlockers,
         BoltzmannWealthModel,
         ConwaysGameOfLife,
@@ -38,7 +38,9 @@ class TestExamples(unittest.TestCase):
     details of each example's model.
     """
 
-    EXAMPLES = os.path.abspath(os.path.join(os.path.dirname(__file__), "../examples"))
+    EXAMPLES = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../mesa/examples")
+    )
 
     @contextlib.contextmanager
     def active_example_dir(self, example):
