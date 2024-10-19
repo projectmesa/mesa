@@ -57,7 +57,7 @@ class VirusOnNetwork(Model):
                 "Infected": number_infected,
                 "Susceptible": number_susceptible,
                 "Resistant": number_resistant,
-                "R over S": self.resistant_susceptible_ratio
+                "R over S": self.resistant_susceptible_ratio,
             }
         )
 
@@ -95,4 +95,3 @@ class VirusOnNetwork(Model):
         self.agents.shuffle_do("step")
         # collect data
         self.datacollector.collect(self)
-
