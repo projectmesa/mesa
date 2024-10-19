@@ -95,6 +95,3 @@ class VirusOnNetwork(Model):
         # collect data
         self.datacollector.collect(self)
 
-    def run_model(self, n):
-        for _ in range(n):
-            self.step()
