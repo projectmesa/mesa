@@ -15,7 +15,7 @@
 
 import os
 import os.path as osp
-import glob
+import pathlib
 import sys
 import string
 from datetime import date
@@ -324,6 +324,8 @@ def setup_examples_pages():
     with open(os.path.join(HERE, "example_template.txt")) as fh:
         template = string.Template(fh.read())
 
+    pathlib.Path(os.path.join(HERE, "examples")).mkdir(parents=True, exist_ok=True)
+
     examples_md = []
     for example in examples:
         base_name = os.path.basename(os.path.normpath(example))
@@ -355,5 +357,5 @@ def setup(app):
     setup_examples_pages()
 
 #
-# if __name__ == "__main__":
-#     setup_examples_pages()
+if __name__ == "__main__":
+    setup_examples_pages()
