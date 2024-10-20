@@ -22,7 +22,7 @@ class DiscreteSpace(Generic[T]):
         all_cells (CellCollection): The cells composing the discrete space
         random (Random): The random number generator
         cell_klass (Type) : the type of cell class
-        empties (CellCollection) : collecction of all cells that are empty
+        empties (CellCollection) : collection of all cells that are empty
         property_layers (dict[str, PropertyLayer]): the property layers of the discrete space
     """
 
@@ -55,6 +55,7 @@ class DiscreteSpace(Generic[T]):
     def cutoff_empties(self):  # noqa
         return 7.953 * len(self._cells) ** 0.384
 
+    def _connect_cells(self): ...
     def _connect_single_cell(self, cell: T): ...
 
     @cached_property
@@ -134,3 +135,8 @@ class DiscreteSpace(Generic[T]):
             condition: a function that takes a cell and returns a boolean (used to filter cells)
         """
         self.property_layers[property_name].modify_cells(operation, value, condition)
+
+    def __setstate__(self, state):
+        """Set the state of the discrete space and rebuild the connections."""
+        self.__dict__ = state
+        self._connect_cells()

@@ -1,5 +1,7 @@
 import mesa
-from agents import MoneyAgent
+
+from .agents import MoneyAgent
+
 
 class BoltzmannWealthModel(mesa.Model):
     """A simple model of an economy where agents exchange currency at random.
@@ -9,14 +11,14 @@ class BoltzmannWealthModel(mesa.Model):
     highly skewed distribution of wealth.
     """
 
-    def __init__(self, N=100, width=10, height=10):
+    def __init__(self, n=100, width=10, height=10):
         super().__init__()
-        self.num_agents = N
+        self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
 
         self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": self.compute_gini},
-            agent_reporters={"Wealth": "wealth"}
+            agent_reporters={"Wealth": "wealth"},
         )
         # Create agents
         for _ in range(self.num_agents):
@@ -37,6 +39,6 @@ class BoltzmannWealthModel(mesa.Model):
     def compute_gini(self):
         agent_wealths = [agent.wealth for agent in self.agents]
         x = sorted(agent_wealths)
-        N = self.num_agents
-        B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * sum(x))
-        return 1 + (1 / N) - 2 * B
+        n = self.num_agents
+        b = sum(xi * (n - i) for i, xi in enumerate(x)) / (n * sum(x))
+        return 1 + (1 / n) - 2 * b

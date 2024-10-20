@@ -2,13 +2,10 @@ from mesa import Agent, Model
 
 
 class SchellingAgent(Agent):
-    """
-    Schelling segregation agent
-    """
+    """Schelling segregation agent."""
 
     def __init__(self, model: Model, agent_type: int) -> None:
-        """
-        Create a new Schelling agent.
+        """Create a new Schelling agent.
 
         Args:
            agent_type: Indicator for the agent's type (minority=1, majority=0)

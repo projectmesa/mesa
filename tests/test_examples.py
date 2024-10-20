@@ -6,6 +6,23 @@ import sys
 import unittest
 
 
+def test_examples_imports():
+    """Test examples imports."""
+    from mesa.examples import (
+        BoidFlockers,
+        BoltzmannWealthModel,
+        ConwaysGameOfLife,
+        Schelling,
+        VirusOnNetwork,
+    )
+
+    BoltzmannWealthModel()
+    Schelling()
+    BoidFlockers()
+    ConwaysGameOfLife()
+    VirusOnNetwork()
+
+
 def classcase(name):  # noqa: D103
     return "".join(x.capitalize() for x in name.replace("-", "_").split("_"))
 
@@ -21,7 +38,9 @@ class TestExamples(unittest.TestCase):
     details of each example's model.
     """
 
-    EXAMPLES = os.path.abspath(os.path.join(os.path.dirname(__file__), "../examples"))
+    EXAMPLES = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../mesa/examples")
+    )
 
     @contextlib.contextmanager
     def active_example_dir(self, example):

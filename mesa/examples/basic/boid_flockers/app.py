@@ -1,6 +1,7 @@
-from model import BoidFlockers
-from mesa.visualization import SolaraViz, make_space_matplotlib
-from mesa.visualization import Slider
+from mesa.visualization import Slider, SolaraViz, make_space_matplotlib
+
+from .model import BoidFlockers
+
 
 def boid_draw(agent):
     if not agent.neighbors:  # Only for the first Frame
@@ -12,6 +13,7 @@ def boid_draw(agent):
         return {"color": "red", "size": 20}
     elif neighbors >= 2:
         return {"color": "green", "size": 20}
+
 
 model_params = {
     "population": Slider(

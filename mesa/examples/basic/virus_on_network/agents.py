@@ -1,5 +1,6 @@
-from mesa import Agent
 from enum import Enum
+
+from mesa import Agent
 
 
 class State(Enum):
@@ -9,9 +10,7 @@ class State(Enum):
 
 
 class VirusAgent(Agent):
-    """
-    Individual Agent definition and its properties/interaction methods
-    """
+    """Individual Agent definition and its properties/interaction methods."""
 
     def __init__(
         self,

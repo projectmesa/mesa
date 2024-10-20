@@ -1,6 +1,51 @@
 ---
 title: Release History
 ---
+
+# 3.0.0b1 (2024-10-17)
+## Highlights
+Mesa 3.0 beta 1 is our last beta release before the Mesa 3.0 stable release. We are restructuring our examples and have move 9 core examples from [mesa-examples](https://github.com/projectmesa/mesa-examples) to mesa itself ([#2358](https://github.com/projectmesa/mesa/pull/2358)). The 5 basic examples are now directly importable ([#2381](https://github.com/projectmesa/mesa/pull/2381)):
+```Python
+from examples.basic import BoidFlockers, BoltzmannWealthModel, ConwaysGameOfLife, Schelling, VirusOnNetwork
+```
+The 5 basic examples will always use stable Mesa features, we are also working on 4 more advanced example which can also include experimental features.
+
+All our core examples can now be viewed in the [`examples`](https://github.com/projectmesa/mesa/tree/main/examples) folder. [mesa-examples](https://github.com/projectmesa/mesa-examples) will continue to exists for user showcases. We're also working on making the examples visible in the ReadtheDocs ([#2382](https://github.com/projectmesa/mesa/pull/2382)) and on an website ([mesa-examples#139](https://github.com/projectmesa/mesa-examples/issues/139)). Follow all our work on the examples in this tracking issue [#2364](https://github.com/projectmesa/mesa/issues/2364).
+
+Furthermore, the visualizations are improved by making visualization elements scalable and more clearly labeling the plots, and the Model now has an `rng` argument for an [SPEC 7](https://scientific-python.org/specs/spec-0007/) compliant NumPy random number generator ([#2352](https://github.com/projectmesa/mesa/pull/2352)). Following SPEC 7, you have to pass either `seed` or `rng`. Whichever one you pass will be used to seed both `random.Random`, and `numpy.random.Generator.`
+
+## What's Changed
+### ⚠️ Breaking changes
+* replace model with random in AgentSet init by @quaquel in https://github.com/projectmesa/mesa/pull/2350
+### 🧪 Experimental features
+* cell space: Add convenience properties for grid width and height by @quaquel in https://github.com/projectmesa/mesa/pull/2348
+* Bugfix for deepcopy / pickling discrete spaces by @quaquel in https://github.com/projectmesa/mesa/pull/2378
+### 🎉 New features added
+* Move core example models back (v2) by @EwoutH in https://github.com/projectmesa/mesa/pull/2358
+* Add Model.rng for SPEC-7 compliant numpy random number generation by @quaquel in https://github.com/projectmesa/mesa/pull/2352
+### 🛠 Enhancements made
+* use GridDraggable instead of Column in SolaraViz by @wang-boyu in https://github.com/projectmesa/mesa/pull/2344
+* update legend, xlabel & format of matplotlib plots by @wang-boyu in https://github.com/projectmesa/mesa/pull/2346
+* __init__.py: Import mesa.experimental by @EwoutH in https://github.com/projectmesa/mesa/pull/2374
+* Importable examples by @Corvince in https://github.com/projectmesa/mesa/pull/2381
+### 🐛 Bugs fixed
+* experimental init: Fix Solara import by making it lazy by @EwoutH in https://github.com/projectmesa/mesa/pull/2357
+* fix: pass `model.random` to schedulers by @quaquel in https://github.com/projectmesa/mesa/pull/2359
+* fix: register agent after creating unique_id and pos attributes by @wang-boyu in https://github.com/projectmesa/mesa/pull/2368
+* solara: viz tutorial: fix histogram code by @Corvince in https://github.com/projectmesa/mesa/pull/2379
+### 🔍 Examples updated
+* Cleanup and restructure basic example models by @EwoutH in https://github.com/projectmesa/mesa/pull/2365
+* Ruff basic examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2370
+### 📜 Documentation improvements
+* Update migration_guide.md by @quaquel in https://github.com/projectmesa/mesa/pull/2347
+### 🔧 Maintenance
+* Code coverage: ignore experimental and visualization by @Corvince in https://github.com/projectmesa/mesa/pull/2361
+* add codecov token, fixes #2363 by @Corvince in https://github.com/projectmesa/mesa/pull/2366
+* add test_time back by @quaquel in https://github.com/projectmesa/mesa/pull/2367
+* Release notes: Add example category by @EwoutH in https://github.com/projectmesa/mesa/pull/2369
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0b0...v3.0.0b1
+
 # 3.0.0b0 (2024-10-04)
 ## Highlights
 We're proud to release the first Mesa 3.0 beta! This pre-release announces that we're ready for Mesa 3.0 to be tested by all our regular users. We try to not making breaking changes anymore, but focus on resolving bugs and imperfections.
