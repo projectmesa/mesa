@@ -354,6 +354,6 @@ def setup_examples_pages():
 def setup(app):
     setup_examples_pages()
 
-
-if __name__ == "__main__":
-    setup_examples_pages()
+#
+# if __name__ == "__main__":
+#     setup_examples_pages()
