@@ -317,7 +317,7 @@ def setup_examples_pages():
     # create md files for all examples
     # check what examples exist
     examples_folder = osp.abspath(osp.join(HERE, "..", "mesa", "examples"))
-    basic_examples = [f.path for f in os.scandir(osp.join(examples_folder, "basic")) if f.is_dir() ]
+    basic_examples = [f.path for f in os.scandir(osp.join(examples_folder, "basic")) if f.is_dir() and not f.name.startswith("__") ]
     advanced_examples = []  # fixme [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir()]
     examples = basic_examples + advanced_examples
 
