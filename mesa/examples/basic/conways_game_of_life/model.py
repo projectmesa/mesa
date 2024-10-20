@@ -7,9 +7,9 @@ from .agents import Cell
 class ConwaysGameOfLife(Model):
     """Represents the 2-dimensional array of cells in Conway's Game of Life."""
 
-    def __init__(self, width=50, height=50):
+    def __init__(self, width=50, height=50, seed=None):
         """Create a new playing area of (width, height) cells."""
-        super().__init__()
+        super().__init__(seed=seed)
         # Use a simple grid, where edges wrap around.
         self.grid = SingleGrid(width, height, torus=True)
 
