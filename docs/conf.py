@@ -318,15 +318,9 @@ def setup_examples_pages():
     # check what examples exist
     examples_folder = osp.abspath(osp.join(HERE, "..", "mesa", "examples"))
     basic_examples = [f.path for f in os.scandir(osp.join(examples_folder, "basic")) if f.is_dir() ]
-    advanced_examples = []
-    # advanced_examples = [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir()]
+    advanced_examples = []  # fixme [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir()]
     examples = basic_examples + advanced_examples
 
-    # get all existing md files
-    md_files = glob.glob(os.path.join(HERE, "examples", "*.md"))
-    md_files = {os.path.basename(os.path.normpath(entry)) for entry in md_files}
-
-    # check which rst files exist
     with open(os.path.join(HERE, "example_template.txt")) as fh:
         template = string.Template(fh.read())
 
@@ -342,21 +336,8 @@ def setup_examples_pages():
         md_filename = f"{base_name}.md"
         examples_md.append(base_name)
 
-        # let's establish the latest update to the example files
-        timestamps = [osp.getmtime(fh) for fh in [agent_filename, model_filename, readme_filename, app_filename]]
-        latest_edit = max(timestamps)
-
         md_filepath = os.path.join(HERE, "examples", md_filename)
-
-        # if the example is new or the existing example md file is older than the latest update, create a new file
-        if md_filename not in md_files or latest_edit > osp.getmtime(md_filepath):
-            write_example_md_file(agent_filename, model_filename, readme_filename, app_filename, md_filepath, template)
-
-
-    # check if any md files should be removed because the example is removed
-    outdated_md_files = md_files - {f"{entry}.md" for entry in examples_md}
-    for entry in outdated_md_files:
-        os.remove(os.path.join(HERE, "examples", entry)  )
+        write_example_md_file(agent_filename, model_filename, readme_filename, app_filename, md_filepath, template)
 
     # create overview of examples.md
     with open(os.path.join(HERE, "examples_overview_template.txt")) as fh:
