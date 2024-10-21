@@ -121,7 +121,6 @@ def _draw_grid(space, agent_portrayal):
 
     invalid_tooltips = ["color", "size", "x", "y"]
 
-
     x_y_type = "ordinal" if not isinstance(space, ContinuousSpace) else "nominal"
 
     encoding_dict = {
