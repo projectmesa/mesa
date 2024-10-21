@@ -95,14 +95,12 @@ def _get_agent_data_continous_space(space: ContinuousSpace, agent_portrayal):
     Returns:
         list of dicts
     """
-    data = space.__agent_points
-
     all_agent_data = []
-    for i, agent in space._index_to_agent.items():
+    for agent in space._agent_to_index.keys():
         agent_data = agent_portrayal(agent)
-        agent_data["x"] = data[i, 0]
-        agent_data["y"] = data[i, 1]
-        all_agent_data.append(agent)
+        agent_data["x"] = agent.pos[0]
+        agent_data["y"] = agent.pos[1]
+        all_agent_data.append(agent_data)
     return all_agent_data
 
 
