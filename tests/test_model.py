@@ -93,3 +93,18 @@ def test_agents_by_type():
     assert model.agents_by_type[Wolf] == AgentSet([wolf], model)
     assert model.agents_by_type[Sheep] == AgentSet([sheep], model)
     assert len(model.agents_by_type) == 2
+
+
+def test_agent_remove():
+    """Test removing all agents from the model."""
+
+    class TestAgent(Agent):
+        pass
+
+    model = Model()
+    for _ in range(100):
+        TestAgent(model)
+    assert len(model.agents) == 100
+
+    model.remove_all_agents()
+    assert len(model.agents) == 0

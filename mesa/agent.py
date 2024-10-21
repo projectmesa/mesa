@@ -67,7 +67,13 @@ class Agent:
         self.model.register_agent(self)
 
     def remove(self) -> None:
-        """Remove and delete the agent from the model."""
+        """Remove and delete the agent from the model.
+
+        Notes:
+            If you need to do additional cleanup when removing an agent by for example removing
+            it from a space, consider extending this method in your own agent class.
+
+        """
         with contextlib.suppress(KeyError):
             self.model.deregister_agent(self)
 
