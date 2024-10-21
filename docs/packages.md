@@ -60,7 +60,7 @@ The commands above should also work with Anaconda, just replace the `pip` with `
 
 ## Package Development: A "How-to Guide"
 
-The purpose of this section is help you understand, setup, and distribute your Mesa package as quickly as possible. A Mesa package is just a Python package or repo. We just call it a Mesa package, because we are talking about a Python package in the context of Mesa. These instructions assume that you are a little familiar with development, but that you have little knowledge of the packaging process.
+The purpose of this section is to help you understand, setup, and distribute your Mesa package as quickly as possible. A Mesa package is just a Python package or repo. We just call it a Mesa package, because we are talking about a Python package in the context of Mesa. These instructions assume that you are a little familiar with development, but that you have little knowledge of the packaging process.
 
 There are two ways to share a package:
 
@@ -85,7 +85,7 @@ Most likely you created an ABM that has the code that you want to share in it, w
 >
 > 4. [Clone the repo to your computer](https://help.github.com/articles/cloning-a-repository/#platform-linux).
 >
-> 5. Copy your code directory into the repo that you cloned one your computer.
+> 5. Copy your code directory into the repo that you cloned on your computer.
 >
 > 6. Add a requirements.txt file, which lets people know which external Python packages are needed to run the code in your repo. To create a file, run: `pip freeze > requirements.txt`. Note, if you are running Anaconda, you will need to install pip first: `conda install pip`.
 >
