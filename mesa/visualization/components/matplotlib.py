@@ -11,7 +11,7 @@ from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.figure import Figure
 
 import mesa
-from mesa.experimental.cell_space import OrthogonalMooreGrid, VoronoiGrid
+from mesa.experimental.cell_space import VoronoiGrid, Grid
 from mesa.space import PropertyLayer
 from mesa.visualization.utils import update_counter
 
@@ -60,7 +60,8 @@ def SpaceMatplotlib(
             _draw_network_grid(space, space_ax, agent_portrayal)
         case VoronoiGrid():
             _draw_voronoi(space, space_ax, agent_portrayal)
-        case OrthogonalMooreGrid():
+        case Grid():  # matches OrthogonalMooreGrid, OrthogonalVonNeumannGrid, and Hexgrid
+            # fixme add a separate draw method for hexgrids in the future
             _draw_discrete_space_grid(space, space_ax, agent_portrayal)
         case None:
             if propertylayer_portrayal:
