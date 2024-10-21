@@ -86,7 +86,7 @@ def _get_agent_data_new_discrete_space(space: DiscreteSpace, agent_portrayal):
 
 
 def _get_agent_data_continous_space(space: ContinuousSpace, agent_portrayal):
-    """Format agent portrayal data for contiuous space.
+    """Format agent portrayal data for continuous space.
 
     Args:
         space: the ContinuousSpace instance
