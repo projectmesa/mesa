@@ -295,7 +295,7 @@ def _draw_voronoi(space, space_ax, agent_portrayal):
         space_ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in black
 
 
-def _draw_discrete_space_grid(space: OrthogonalMooreGrid, space_ax, agent_portrayal):
+def _draw_discrete_space_grid(space: Grid, space_ax, agent_portrayal):
     if space._ndims != 2:
         raise ValueError("Space must be 2D")
 
