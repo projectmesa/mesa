@@ -121,11 +121,14 @@ def _draw_grid(space, agent_portrayal):
 
     invalid_tooltips = ["color", "size", "x", "y"]
 
+
+    x_y_type = "ordinal" if not isinstance(space, ContinuousSpace) else "nominal"
+
     encoding_dict = {
         # no x-axis label
-        "x": alt.X("x", axis=None, type="ordinal"),
+        "x": alt.X("x", axis=None, type=x_y_type),
         # no y-axis label
-        "y": alt.Y("y", axis=None, type="ordinal"),
+        "y": alt.Y("y", axis=None, type=x_y_type),
         "tooltip": [
             alt.Tooltip(key, type=alt.utils.infer_vegalite_type([value]))
             for key, value in all_agent_data[0].items()
