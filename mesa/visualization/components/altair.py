@@ -96,7 +96,7 @@ def _get_agent_data_continuous_space(space: ContinuousSpace, agent_portrayal):
         list of dicts
     """
     all_agent_data = []
-    for agent in space._agent_to_index.keys():
+    for agent in space._agent_to_index:
         agent_data = agent_portrayal(agent)
         agent_data["x"] = agent.pos[0]
         agent_data["y"] = agent.pos[1]
