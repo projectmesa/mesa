@@ -111,7 +111,7 @@ def _draw_grid(space, agent_portrayal):
         case _Grid():
             all_agent_data = _get_agent_data_old__discrete_space(space, agent_portrayal)
         case ContinuousSpace():
-            all_agent_data = _get_agent_data_continous_space(space, agent_portrayal)
+            all_agent_data = _get_agent_data_continuous_space(space, agent_portrayal)
         case _:
             raise NotImplementedError(
                 f"visualizing {type(space)} is currently not supported through altair"
