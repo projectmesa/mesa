@@ -277,7 +277,7 @@ class Model:
         # Collect data for the first time during initialization.
         self.datacollector.collect(self)
 
-    def remove_agents(self):
+    def remove_all_agents(self):
         """Remove all agents from the model."""
         # we need to wrap keys in a list to avoid a RunTimeError: dictionary changed size during iteration
         for agent in list(self._agents.keys()):

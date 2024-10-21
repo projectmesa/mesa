@@ -106,5 +106,5 @@ def test_agent_remove():
         TestAgent(model)
     assert len(model.agents) == 100
 
-    model.remove_agents()
+    model.remove_all_agents()
     assert len(model.agents) == 0
