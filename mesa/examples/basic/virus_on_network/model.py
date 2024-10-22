@@ -36,8 +36,9 @@ class VirusOnNetwork(Model):
         virus_check_frequency=0.4,
         recovery_chance=0.3,
         gain_resistance_chance=0.5,
+        seed=None,
     ):
-        super().__init__()
+        super().__init__(seed=seed)
         self.num_nodes = num_nodes
         prob = avg_node_degree / self.num_nodes
         self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=prob)
@@ -56,6 +57,7 @@ class VirusOnNetwork(Model):
                 "Infected": number_infected,
                 "Susceptible": number_susceptible,
                 "Resistant": number_resistant,
+                "R over S": self.resistant_susceptible_ratio,
             }
         )
 
@@ -93,7 +95,3 @@ class VirusOnNetwork(Model):
         self.agents.shuffle_do("step")
         # collect data
         self.datacollector.collect(self)
-
-    def run_model(self, n):
-        for _ in range(n):
-            self.step()

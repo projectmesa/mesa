@@ -89,6 +89,7 @@ ABM features users have shared that you may want to use in your model
 Mesa Overview <overview>
 tutorials/intro_tutorial
 tutorials/visualization_tutorial
+Examples <examples>
 Migration guide <migration_guide>
 Best Practices <best-practices>
 How-to Guide <howto>
