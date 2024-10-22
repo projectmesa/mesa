@@ -55,6 +55,8 @@ def SpaceMatplotlib(
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
         case mesa.space._Grid():
+            _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
+        case mesa.space.ContinuousSpace():
             _draw_continuous_space(space, space_ax, agent_portrayal, model)
         case mesa.space.NetworkGrid():
             _draw_network_grid(space, space_ax, agent_portrayal)
