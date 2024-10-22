@@ -472,7 +472,6 @@ def test_agentset_shuffle_do():
         original_order != shuffled_order
     ), "The order should be different after shuffle_do"
 
-
     class AgentWithRemove(Agent):
         def __init__(self, model):
             super().__init__(model)
@@ -495,6 +494,7 @@ def test_agentset_shuffle_do():
     for _ in range(100):
         AgentWithRemove(model)
     model.agents.shuffle_do("step")
+
 
 def test_agentset_get_attribute():
     """Test AgentSet.get for attributes."""
