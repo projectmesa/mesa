@@ -46,13 +46,14 @@ class BoltzmannWealth(mesa.Model):
         self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
         )
-        # Create agents
-        for _ in range(self.num_agents):
-            a = MoneyAgent(self)
-            # Add the agent to a random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(a, (x, y))
+
+        positions = list(
+            zip(
+                self.rng.integers(0, self.grid.width, n),
+                self.rng.integers(0, self.grid.height, n),
+            )
+        )
+        MoneyAgent.create_agents(self, self.num_agents, pos=positions)
 
         self.running = True
         self.datacollector.collect(self)
@@ -77,7 +78,7 @@ class BoltzmannWealth(mesa.Model):
 class MoneyAgent(mesa.Agent):
     """An agent with fixed initial wealth."""
 
-    def __init__(self, model):
+    def __init__(self, model, pos=None):
         """Instantiate an agent.
 
         Args:
@@ -85,6 +86,7 @@ class MoneyAgent(mesa.Agent):
         """
         super().__init__(model)
         self.wealth = 1
+        self.model.grid.place_agent(self, pos=pos)
 
     def move(self):
         """Move the agent to a random neighboring cell."""
