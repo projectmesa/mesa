@@ -473,6 +473,29 @@ def test_agentset_shuffle_do():
     ), "The order should be different after shuffle_do"
 
 
+    class AgentWithRemove(Agent):
+        def __init__(self, model):
+            super().__init__(model)
+            self.is_alive = True
+
+        def remove(self):
+            super().remove()
+            self.is_alive = False
+
+        def step(self):
+            if not self.is_alive:
+                raise Exception
+
+            agent_to_remove = self.random.choice(self.model.agents)
+
+            if agent_to_remove is not self:
+                agent_to_remove.remove()
+
+    model = Model(seed=32)
+    for _ in range(100):
+        AgentWithRemove(model)
+    model.agents.shuffle_do("step")
+
 def test_agentset_get_attribute():
     """Test AgentSet.get for attributes."""
     model = Model()

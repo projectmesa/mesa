@@ -294,15 +294,17 @@ class AgentSet(MutableSet, Sequence):
 
         It's a fast, optimized version of calling shuffle() followed by do().
         """
-        agents = list(self._agents.keys())
-        self.random.shuffle(agents)
+        weakrefs = list(self._agents.keyrefs())
+        self.random.shuffle(weakrefs)
 
         if isinstance(method, str):
-            for agent in agents:
-                getattr(agent, method)(*args, **kwargs)
+            for ref in weakrefs:
+                if (agent := ref()) is not None:
+                    getattr(agent, method)(*args, **kwargs)
         else:
-            for agent in agents:
-                method(agent, *args, **kwargs)
+            for ref in weakrefs:
+                if (agent := ref()) is not None:
+                    method(agent, *args, **kwargs)
 
         return self
 
