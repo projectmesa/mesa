@@ -1,6 +1,5 @@
 import mesa
 from mesa import Model
-
 from mesa.examples.basic.schelling.agents import SchellingAgent
 
 

@@ -1,5 +1,4 @@
 import mesa
-
 from mesa.examples.basic.boltzmann_wealth_model.agents import MoneyAgent
 
 

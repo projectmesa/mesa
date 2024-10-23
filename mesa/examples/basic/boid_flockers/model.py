@@ -7,7 +7,6 @@ Uses numpy arrays to represent vectors.
 import numpy as np
 
 import mesa
-
 from mesa.examples.basic.boid_flockers.agents import Boid
 
 

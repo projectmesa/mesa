@@ -1,13 +1,12 @@
 import solara
 
+from mesa.examples.basic.schelling.model import Schelling
 from mesa.visualization import (
     Slider,
     SolaraViz,
     make_plot_measure,
     make_space_matplotlib,
 )
-
-from mesa.examples.basic.schelling.model import Schelling
 
 
 def get_happy_agents(model):
