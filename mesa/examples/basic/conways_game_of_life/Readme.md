@@ -9,26 +9,30 @@ The "game" is a zero-player game, meaning that its evolution is determined by it
 
 ## How to Run
 
-To run the model interactively, run ``mesa runserver`` in this directory. e.g.
+To run the model interactively you can use either the streamlit or solara version. For solara, you use
 
 ```
-    $ mesa runserver
+    $ solara run app.py
 ```
 
-Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press ``run``.
+For streamlit, you need
+
+```
+    $ streamlit run st_app.py
+```
+
+This will open your browser and show you the controls. You can start the model by hitting the run button.
 
 ## Files
 
 * ``agents.py``: Defines the behavior of an individual cell, which can be in two states: DEAD or ALIVE.
 * ``model.py``: Defines the model itself, initialized with a random configuration of alive and dead cells.
-* ``portrayal.py``: Describes for the front end how to render a cell.
-* ``st_app.py``: Defines an interactive visualization using Streamlit.
+* ``app.py``: Defines an interactive visualization using solara.
+* ``st_app.py``: Defines an interactive visualization using Streamlit. 
 
 ## Optional
 
-*  ``conways_game_of_life/st_app.py``: can be used to run the simulation via the streamlit interface.
-* For this some additional packages like ``streamlit`` and ``altair`` needs to be installed.
-* Once installed, the app can be opened in the browser using : ``streamlit run st_app.py``
+* For the streamlit version, you need to have streamlit installed (can be done via pip install streamlit)
 
 
 ## Further Reading
