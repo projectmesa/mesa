@@ -1,7 +1,7 @@
 import mesa
 from mesa.experimental.cell_space import OrthogonalMooreGrid
 
-from .agent import PDAgent
+from agents import PDAgent
 
 
 class PdGrid(mesa.Model):
