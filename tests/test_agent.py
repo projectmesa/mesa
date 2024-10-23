@@ -161,6 +161,7 @@ def test_agent_membership():
     assert agents[0] in agentset
     assert AgentTest(model) not in agentset
 
+
 def test_agent_rng():
     model = Model(seed=42)
     agent = Agent(model)
