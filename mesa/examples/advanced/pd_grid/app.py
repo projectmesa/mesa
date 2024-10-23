@@ -2,10 +2,9 @@
 Solara-based visualization for the Spatial Prisoner's Dilemma Model.
 """
 
-import solara
-from mesa.visualization import SolaraViz, make_space_matplotlib, make_plot_measure
-from mesa.visualization.UserParam import Slider
 from mesa.examples.advanced.pd_grid.model import PdGrid
+from mesa.visualization import SolaraViz, make_plot_measure, make_space_matplotlib
+from mesa.visualization.UserParam import Slider
 
 
 def pd_agent_portrayal(agent):
@@ -21,26 +20,14 @@ def pd_agent_portrayal(agent):
 
 # Model parameters
 model_params = {
-    "width": Slider(
-        "Grid Width",
-        value=50,
-        min=10,
-        max=100,
-        step=1
-    ),
-    "height": Slider(
-        "Grid Height",
-        value=50,
-        min=10,
-        max=100,
-        step=1
-    ),
+    "width": Slider("Grid Width", value=50, min=10, max=100, step=1),
+    "height": Slider("Grid Height", value=50, min=10, max=100, step=1),
     "activation_order": {
         "type": "Select",
         "value": "Random",
         "values": PdGrid.activation_regimes,
-        "label": "Activation Regime"
-    }
+        "label": "Activation Regime",
+    },
 }
 
 
