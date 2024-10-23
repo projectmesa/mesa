@@ -161,6 +161,12 @@ def test_agent_membership():
     assert agents[0] in agentset
     assert AgentTest(model) not in agentset
 
+def test_agent_rng():
+    model = Model(seed=42)
+    agent = Agent(model)
+    assert agent.random is model.random
+    assert agent.rng is model.rng
+
 
 def test_agent_add_remove_discard():
     """Test adding, removing and discarding agents from AgentSet."""
