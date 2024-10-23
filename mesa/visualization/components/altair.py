@@ -32,6 +32,7 @@ def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None): 
         # Sometimes the space is defined as model.space instead of model.grid
         space = model.space
 
+
     chart = _draw_grid(space, agent_portrayal)
     solara.FigureAltair(chart)
 
@@ -63,7 +64,7 @@ def _get_agent_data_old__discrete_space(space, agent_portrayal):
     return all_agent_data
 
 
-def _get_agent_data_new_discrete_space(space: DiscreteSpace, agent_portrayal):
+def _get_agent_data_new_discrete_space(space:DiscreteSpace, agent_portrayal):
     """Format agent portrayal data for new-style discrete spaces.
 
     Args:
@@ -85,7 +86,7 @@ def _get_agent_data_new_discrete_space(space: DiscreteSpace, agent_portrayal):
     return all_agent_data
 
 
-def _get_agent_data_continous_space(space: ContinuousSpace, agent_portrayal):
+def _get_agent_data_continous_space(space:ContinuousSpace, agent_portrayal):
     """Format agent portrayal data for contiuous space.
 
     Args:
@@ -105,8 +106,8 @@ def _get_agent_data_continous_space(space: ContinuousSpace, agent_portrayal):
         all_agent_data.append(agent)
     return all_agent_data
 
-
 def _draw_grid(space, agent_portrayal):
+
     match space:
         case Grid():
             all_agent_data = _get_agent_data_new_discrete_space(space, agent_portrayal)
@@ -115,9 +116,7 @@ def _draw_grid(space, agent_portrayal):
         case ContinuousSpace():
             all_agent_data = _get_agent_data_continous_space(space, agent_portrayal)
         case _:
-            raise NotImplementedError(
-                f"visualizing {type(space)} is currently not supported through altair"
-            )
+            raise NotImplementedError(f"visualizing {type(space)} is currently not supported through altair")
 
     invalid_tooltips = ["color", "size", "x", "y"]
 
