@@ -37,6 +37,8 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
     return MakeSpaceMatplotlib
 
 
+
+
 @solara.component
 def SpaceMatplotlib(
     model,
