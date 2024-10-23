@@ -1,7 +1,7 @@
 from mesa.visualization import SolaraViz, Slider, make_space_matplotlib, make_plot_measure
 
-from agents import Citizen, Cop
-from model import EpsteinCivilViolence
+from mesa.examples.advanced.epstein_civil_violence.agents import Citizen, Cop
+from mesa.examples.advanced.epstein_civil_violence.model import EpsteinCivilViolence
 
 COP_COLOR = "#000000"
 AGENT_QUIET_COLOR = "#648FFF"

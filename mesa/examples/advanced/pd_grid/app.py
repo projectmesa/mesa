@@ -5,7 +5,7 @@ Solara-based visualization for the Spatial Prisoner's Dilemma Model.
 import solara
 from mesa.visualization import SolaraViz, make_space_matplotlib, make_plot_measure
 from mesa.visualization.UserParam import Slider
-from model import PdGrid
+from mesa.examples.advanced.pd_grid.model import PdGrid
 
 
 def pd_agent_portrayal(agent):
