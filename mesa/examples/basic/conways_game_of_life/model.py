@@ -1,7 +1,7 @@
 from mesa import Model
 from mesa.space import SingleGrid
 
-from .agents import Cell
+from mesa.examples.basic.conways_game_of_life.agents import Cell
 
 
 class ConwaysGameOfLife(Model):

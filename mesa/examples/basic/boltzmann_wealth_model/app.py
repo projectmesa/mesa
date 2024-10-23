@@ -4,7 +4,7 @@ from mesa.visualization import (
     make_space_matplotlib,
 )
 
-from .model import BoltzmannWealthModel
+from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealthModel
 
 
 def agent_portrayal(agent):

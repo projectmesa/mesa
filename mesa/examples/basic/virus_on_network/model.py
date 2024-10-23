@@ -5,7 +5,7 @@ import networkx as nx
 import mesa
 from mesa import Model
 
-from .agents import State, VirusAgent
+from mesa.examples.basic.virus_on_network.agents import (State, VirusAgent)
 
 
 def number_state(model, state):

@@ -7,7 +7,7 @@ from mesa.visualization import (
     make_space_matplotlib,
 )
 
-from .model import Schelling
+from mesa.examples.basic.schelling.model import Schelling
 
 
 def get_happy_agents(model):
