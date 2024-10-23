@@ -28,7 +28,7 @@ This will open your browser and show you the controls. You can start the model b
 * ``agents.py``: Defines the behavior of an individual cell, which can be in two states: DEAD or ALIVE.
 * ``model.py``: Defines the model itself, initialized with a random configuration of alive and dead cells.
 * ``app.py``: Defines an interactive visualization using solara.
-* ``st_app.py``: Defines an interactive visualization using Streamlit. 
+* ``st_app.py``: Defines an interactive visualization using Streamlit.
 
 ## Optional
 

@@ -37,4 +37,3 @@ page = SolaraViz(
     name="Game of Life",
 )
 page  # noqa
-

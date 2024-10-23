@@ -19,8 +19,6 @@ status_text = st.empty()
 run = st.button("Run Simulation")
 
 
-
-
 if run:
     tick = time.time()
     step = 0
