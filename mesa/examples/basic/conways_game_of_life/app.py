@@ -4,7 +4,8 @@ import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
-from model import ConwaysGameOfLife
+
+from mesa.examples.basic.conways_game_of_life.model import ConwaysGameOfLife
 
 model = st.title("Conway's Game of Life")
 num_ticks = st.slider("Select number of Steps", min_value=1, max_value=100, value=50)
