@@ -163,6 +163,7 @@ def test_agent_membership():
 
 
 def test_agent_rng():
+    """Test whether agent.random and agent.rng are equal to model.random and model.rng."""
     model = Model(seed=42)
     agent = Agent(model)
     assert agent.random is model.random
