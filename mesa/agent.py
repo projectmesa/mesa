@@ -21,6 +21,8 @@ from random import Random
 # mypy
 from typing import TYPE_CHECKING, Any, Literal, overload
 
+import numpy as np
+
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
     # dependency.
@@ -85,8 +87,13 @@ class Agent:
 
     @property
     def random(self) -> Random:
-        """Return a seeded rng."""
+        """Return a seeded stdlib rng."""
         return self.model.random
+
+    @property
+    def rng(self) -> np.random.Generator:
+        """Return a seeded np.random rng."""
+        return self.model.rng
 
 
 class AgentSet(MutableSet, Sequence):
