@@ -128,7 +128,7 @@ class _Grid:
         # Cutoff used inside self.move_to_empty. The parameters are fitted on Python
         # 3.11 and it was verified that they are roughly the same for 3.10. Refer to
         # the code in PR#1565 to check for their stability when a new release gets out.
-        self.cutoff_empties = 7.953 * self.num_cells**0.384
+        self.cutoff_empties = 7.953 * self.num_cells ** 0.384
 
     @staticmethod
     def default_val() -> None:
@@ -151,12 +151,14 @@ class _Grid:
         self._empties_built = True
 
     @overload
-    def __getitem__(self, index: int | Sequence[Coordinate]) -> list[GridContent]: ...
+    def __getitem__(self, index: int | Sequence[Coordinate]) -> list[GridContent]:
+        ...
 
     @overload
     def __getitem__(
-        self, index: tuple[int | slice, int | slice]
-    ) -> GridContent | list[GridContent]: ...
+            self, index: tuple[int | slice, int | slice]
+    ) -> GridContent | list[GridContent]:
+        ...
 
     def __getitem__(self, index):
         """Access contents from the grid."""
@@ -202,11 +204,11 @@ class _Grid:
                 yield self._grid[row][col], (row, col)  # agent, position
 
     def iter_neighborhood(
-        self,
-        pos: Coordinate,
-        moore: bool,
-        include_center: bool = False,
-        radius: int = 1,
+            self,
+            pos: Coordinate,
+            moore: bool,
+            include_center: bool = False,
+            radius: int = 1,
     ) -> Iterator[Coordinate]:
         """Return an iterator over cell coordinates that are in the neighborhood of a certain point.
 
@@ -229,11 +231,11 @@ class _Grid:
         yield from self.get_neighborhood(pos, moore, include_center, radius)
 
     def get_neighborhood(
-        self,
-        pos: Coordinate,
-        moore: bool,
-        include_center: bool = False,
-        radius: int = 1,
+            self,
+            pos: Coordinate,
+            moore: bool,
+            include_center: bool = False,
+            radius: int = 1,
     ) -> Sequence[Coordinate]:
         """Return a list of cells that are in the neighborhood of a certain point.
 
@@ -268,10 +270,10 @@ class _Grid:
 
         # First we check if the neighborhood is inside the grid
         if (
-            x >= radius
-            and self.width - x > radius
-            and y >= radius
-            and self.height - y > radius
+                x >= radius
+                and self.width - x > radius
+                and y >= radius
+                and self.height - y > radius
         ):
             # If the radius is smaller than the distance from the borders, we
             # can skip boundary checks.
@@ -312,11 +314,11 @@ class _Grid:
         return tuple(neighborhood.keys())
 
     def iter_neighbors(
-        self,
-        pos: Coordinate,
-        moore: bool,
-        include_center: bool = False,
-        radius: int = 1,
+            self,
+            pos: Coordinate,
+            moore: bool,
+            include_center: bool = False,
+            radius: int = 1,
     ) -> Iterator[Agent]:
         """Return an iterator over neighbors to a certain point.
 
@@ -342,11 +344,11 @@ class _Grid:
                 yield cell
 
     def get_neighbors(
-        self,
-        pos: Coordinate,
-        moore: bool,
-        include_center: bool = False,
-        radius: int = 1,
+            self,
+            pos: Coordinate,
+            moore: bool,
+            include_center: bool = False,
+            radius: int = 1,
     ) -> list[Agent]:
         """Return a list of neighbors to a certain point.
 
@@ -384,7 +386,7 @@ class _Grid:
 
     @accept_tuple_argument
     def iter_cell_list_contents(
-        self, cell_list: Iterable[Coordinate]
+            self, cell_list: Iterable[Coordinate]
     ) -> Iterator[Agent]:
         """Returns an iterator of the agents contained in the cells identified in `cell_list`; cells with empty content are excluded.
 
@@ -412,9 +414,11 @@ class _Grid:
         """
         return list(self.iter_cell_list_contents(cell_list))
 
-    def place_agent(self, agent: Agent, pos: Coordinate) -> None: ...
+    def place_agent(self, agent: Agent, pos: Coordinate) -> None:
+        ...
 
-    def remove_agent(self, agent: Agent) -> None: ...
+    def remove_agent(self, agent: Agent) -> None:
+        ...
 
     def move_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Move an agent from its current position to a new position.
@@ -429,11 +433,11 @@ class _Grid:
         self.place_agent(agent, pos)
 
     def move_agent_to_one_of(
-        self,
-        agent: Agent,
-        pos: list[Coordinate],
-        selection: str = "random",
-        handle_empty: str | None = None,
+            self,
+            agent: Agent,
+            pos: list[Coordinate],
+            selection: str = "random",
+            handle_empty: str | None = None,
     ) -> None:
         """Move an agent to one of the given positions.
 
@@ -493,7 +497,7 @@ class _Grid:
         if self.torus:
             dx = min(dx, self.width - dx)
             dy = min(dy, self.height - dy)
-        return dx**2 + dy**2
+        return dx ** 2 + dy ** 2
 
     def swap_pos(self, agent_a: Agent, agent_b: Agent) -> None:
         """Swap agents positions."""
@@ -552,8 +556,8 @@ class _Grid:
 def is_single_argument_function(function):
     """Check if a function is a single argument function."""
     return (
-        inspect.isfunction(function)
-        and len(inspect.signature(function).parameters) == 1
+            inspect.isfunction(function)
+            and len(inspect.signature(function).parameters) == 1
     )
 
 
@@ -579,7 +583,7 @@ class PropertyLayer:
     propertylayer_experimental_warning_given = False
 
     def __init__(
-        self, name: str, width: int, height: int, default_value, dtype=np.float64
+            self, name: str, width: int, height: int, default_value, dtype=np.float64
     ):
         """Initializes a new PropertyLayer instance.
 
@@ -607,7 +611,7 @@ class PropertyLayer:
 
         # Check that width and height are positive integers
         if (not isinstance(width, int) or width < 1) or (
-            not isinstance(height, int) or height < 1
+                not isinstance(height, int) or height < 1
         ):
             raise ValueError(
                 f"Width and height must be positive integers, got {width} and {height}."
@@ -655,8 +659,8 @@ class PropertyLayer:
                 condition_result = vectorized_condition(self.data)
 
             if (
-                not isinstance(condition_result, np.ndarray)
-                or condition_result.shape != self.data.shape
+                    not isinstance(condition_result, np.ndarray)
+                    or condition_result.shape != self.data.shape
             ):
                 raise ValueError(
                     "Result of condition must be a NumPy array with the same shape as the grid."
@@ -775,11 +779,11 @@ class _PropertyGrid(_Grid):
     """
 
     def __init__(
-        self,
-        width: int,
-        height: int,
-        torus: bool,
-        property_layers: None | PropertyLayer | list[PropertyLayer] = None,
+            self,
+            width: int,
+            height: int,
+            torus: bool,
+            property_layers: None | PropertyLayer | list[PropertyLayer] = None,
     ):
         """Initializes a new _PropertyGrid instance with specified dimensions and optional property layers.
 
@@ -846,7 +850,7 @@ class _PropertyGrid(_Grid):
         del self.properties[property_name]
 
     def get_neighborhood_mask(
-        self, pos: Coordinate, moore: bool, include_center: bool, radius: int
+            self, pos: Coordinate, moore: bool, include_center: bool, radius: int
     ) -> np.ndarray:
         """Generate a boolean mask representing the neighborhood.
 
@@ -870,12 +874,12 @@ class _PropertyGrid(_Grid):
         return mask
 
     def select_cells(
-        self,
-        conditions: dict | None = None,
-        extreme_values: dict | None = None,
-        masks: np.ndarray | list[np.ndarray] = None,
-        only_empty: bool = False,
-        return_list: bool = True,
+            self,
+            conditions: dict | None = None,
+            extreme_values: dict | None = None,
+            masks: np.ndarray | list[np.ndarray] = None,
+            only_empty: bool = False,
+            return_list: bool = True,
     ) -> list[Coordinate] | np.ndarray:
         """Select cells based on property conditions, extreme values, and/or masks, with an option to only select empty cells.
 
@@ -1031,11 +1035,11 @@ class MultiGrid(_PropertyGrid):
         agent.pos = None
 
     def iter_neighbors(  # noqa: D102
-        self,
-        pos: Coordinate,
-        moore: bool,
-        include_center: bool = False,
-        radius: int = 1,
+            self,
+            pos: Coordinate,
+            moore: bool,
+            include_center: bool = False,
+            radius: int = 1,
     ) -> Iterator[Agent]:
         return itertools.chain.from_iterable(
             super().iter_neighbors(pos, moore, include_center, radius)
@@ -1043,7 +1047,7 @@ class MultiGrid(_PropertyGrid):
 
     @accept_tuple_argument
     def iter_cell_list_contents(
-        self, cell_list: Iterable[Coordinate]
+            self, cell_list: Iterable[Coordinate]
     ) -> Iterator[Agent]:
         """Returns an iterator of the agents contained in the cells identified in `cell_list`.
 
@@ -1083,7 +1087,7 @@ class _HexGrid:
         return pos[0] % self.width, pos[1] % self.height
 
     def get_neighborhood(
-        self, pos: Coordinate, include_center: bool = False, radius: int = 1
+            self, pos: Coordinate, include_center: bool = False, radius: int = 1
     ) -> list[Coordinate]:
         """Return a list of coordinates that are in the neighborhood of a certain point.
 
@@ -1171,7 +1175,7 @@ class _HexGrid:
         return neighborhood
 
     def iter_neighborhood(
-        self, pos: Coordinate, include_center: bool = False, radius: int = 1
+            self, pos: Coordinate, include_center: bool = False, radius: int = 1
     ) -> Iterator[Coordinate]:
         """Return an iterator over cell coordinates that are in the neighborhood of a certain point.
 
@@ -1187,7 +1191,7 @@ class _HexGrid:
         yield from self.get_neighborhood(pos, include_center, radius)
 
     def iter_neighbors(
-        self, pos: Coordinate, include_center: bool = False, radius: int = 1
+            self, pos: Coordinate, include_center: bool = False, radius: int = 1
     ) -> Iterator[Agent]:
         """Return an iterator over neighbors to a certain point.
 
@@ -1205,7 +1209,7 @@ class _HexGrid:
         return self.iter_cell_list_contents(neighborhood)
 
     def get_neighbors(
-        self, pos: Coordinate, include_center: bool = False, radius: int = 1
+            self, pos: Coordinate, include_center: bool = False, radius: int = 1
     ) -> list[Agent]:
         """Return a list of neighbors to a certain point.
 
@@ -1221,6 +1225,10 @@ class _HexGrid:
         """
         return list(self.iter_neighbors(pos, include_center, radius))
 
+    def __iter__(self) -> Iterator[GridContent]:
+        """Create an iterator returns the agents in the space"""
+        for entry in self._agent_to_index:
+            yield entry
 
 class HexSingleGrid(_HexGrid, SingleGrid):
     """Hexagonal SingleGrid: a SingleGrid where neighbors are computed according to a hexagonal tiling of the grid.
@@ -1301,12 +1309,12 @@ class ContinuousSpace:
     """
 
     def __init__(
-        self,
-        x_max: float,
-        y_max: float,
-        torus: bool,
-        x_min: float = 0,
-        y_min: float = 0,
+            self,
+            x_max: float,
+            y_max: float,
+            torus: bool,
+            x_min: float = 0,
+            y_min: float = 0,
     ) -> None:
         """Create a new continuous space.
 
@@ -1390,7 +1398,7 @@ class ContinuousSpace:
         agent.pos = None
 
     def get_neighbors(
-        self, pos: FloatCoordinate, radius: float, include_center: bool = True
+            self, pos: FloatCoordinate, radius: float, include_center: bool = True
     ) -> list[Agent]:
         """Get all agents within a certain radius.
 
@@ -1410,14 +1418,14 @@ class ContinuousSpace:
             deltas = np.minimum(deltas, self.size - deltas)
         dists = deltas[:, 0] ** 2 + deltas[:, 1] ** 2
 
-        (idxs,) = np.where(dists <= radius**2)
+        (idxs,) = np.where(dists <= radius ** 2)
         neighbors = [
             self._index_to_agent[x] for x in idxs if include_center or dists[x] > 0
         ]
         return neighbors
 
     def get_heading(
-        self, pos_1: FloatCoordinate, pos_2: FloatCoordinate
+            self, pos_1: FloatCoordinate, pos_2: FloatCoordinate
     ) -> FloatCoordinate:
         """Get the heading vector between two points, accounting for toroidal space.
 
@@ -1492,6 +1500,11 @@ class ContinuousSpace:
         x, y = pos
         return x < self.x_min or x >= self.x_max or y < self.y_min or y >= self.y_max
 
+    def __iter__(self) -> Iterator[GridContent]:
+        """Create an iterator returns the agents in the space"""
+        for entry in self._agent_to_index:
+            yield entry
+
 
 class NetworkGrid:
     """Network Grid where each node contains zero or more agents."""
@@ -1518,7 +1531,7 @@ class NetworkGrid:
         agent.pos = node_id
 
     def get_neighborhood(
-        self, node_id: int, include_center: bool = False, radius: int = 1
+            self, node_id: int, include_center: bool = False, radius: int = 1
     ) -> list[int]:
         """Get all adjacent nodes within a certain radius.
 
@@ -1544,7 +1557,7 @@ class NetworkGrid:
         return neighborhood
 
     def get_neighbors(
-        self, node_id: int, include_center: bool = False, radius: int = 1
+            self, node_id: int, include_center: bool = False, radius: int = 1
     ) -> list[Agent]:
         """Get all agents in adjacent nodes (within a certain radius).
 
@@ -1624,3 +1637,8 @@ class NetworkGrid:
             self.G.nodes[node_id]["agent"]
             for node_id in itertools.filterfalse(self.is_cell_empty, cell_list)
         )
+
+    def __iter__(self) -> Iterator[GridContent]:
+        """Create an iterator returns the agents in the space"""
+        for node_id in self.G.nodes:
+            yield self.g.nodes[node_id]["agent"]
