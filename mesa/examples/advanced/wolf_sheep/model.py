@@ -12,7 +12,7 @@ Replication of the model found in NetLogo:
 import mesa
 from mesa.experimental.cell_space import OrthogonalMooreGrid
 
-from .agents import GrassPatch, Sheep, Wolf
+from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 
 
 class WolfSheep(mesa.Model):
@@ -67,7 +67,7 @@ class WolfSheep(mesa.Model):
                                  once it is eaten
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
         """
-        super().__init__(seed=None)
+        super().__init__(seed=seed)
         # Set parameters
         self.width = width
         self.height = height
@@ -81,10 +81,8 @@ class WolfSheep(mesa.Model):
         collectors = {
             "Wolves": lambda m: len(m.agents_by_type[Wolf]),
             "Sheep": lambda m: len(m.agents_by_type[Sheep]),
+            "Grass": lambda m: len(m.agents_by_type[GrassPatch].select(lambda a:a.fully_grown)) if m.grass else -1,
         }
-
-        if grass:
-            collectors["Grass"] = lambda m: len(m.agents_by_type[GrassPatch])
 
         self.datacollector = mesa.DataCollector(collectors)
 
