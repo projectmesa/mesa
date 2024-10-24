@@ -12,4 +12,3 @@ dependencies:
     - seaborn
     - solara
     - mesa[rec]==3.0.0b1
-
