@@ -1,7 +1,8 @@
 import numpy as np
 from scipy import stats
-from .model import SugarscapeG1mt, flatten
+
 from .agents import Trader
+from .model import SugarscapeG1mt, flatten
 
 
 def check_slope(y, increasing):

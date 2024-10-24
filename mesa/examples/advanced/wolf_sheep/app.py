@@ -1,4 +1,4 @@
-from mesa.examples.advanced.wolf_sheep.agents import Wolf, Sheep, GrassPatch
+from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.examples.advanced.wolf_sheep.model import WolfSheep
 from mesa.visualization import (
     Slider,

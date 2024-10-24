@@ -10,9 +10,8 @@ Replication of the model found in NetLogo:
 """
 
 import mesa
-from mesa.experimental.cell_space import OrthogonalMooreGrid
-
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
+from mesa.experimental.cell_space import OrthogonalMooreGrid
 
 
 class WolfSheep(mesa.Model):
@@ -87,7 +86,7 @@ class WolfSheep(mesa.Model):
         self.datacollector = mesa.DataCollector(collectors)
 
         # Create sheep:
-        for i in range(self.initial_sheep):
+        for _ in range(self.initial_sheep):
             x = self.random.randrange(self.width)
             y = self.random.randrange(self.height)
             energy = self.random.randrange(2 * self.sheep_gain_from_food)
@@ -130,5 +129,5 @@ class WolfSheep(mesa.Model):
         self.datacollector.collect(self)
 
     def run_model(self, step_count=200):
-        for i in range(step_count):
+        for _ in range(step_count):
             self.step()
