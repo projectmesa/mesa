@@ -50,17 +50,20 @@ def test_epstein():  # noqa: D103
     for _i in range(10):
         model.step()
 
+
 def test_pd_grid():  # noqa: D103
     model = PdGrid(seed=42)
 
     for _i in range(10):
         model.step()
 
+
 def test_sugarscape_g1mt():  # noqa: D103
     model = SugarscapeG1mt(seed=42)
 
     for _i in range(10):
         model.step()
+
 
 def test_wolf_sheep():  # noqa: D103
     model = WolfSheep(seed=42)

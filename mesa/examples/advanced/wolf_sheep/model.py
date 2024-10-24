@@ -80,7 +80,11 @@ class WolfSheep(mesa.Model):
         collectors = {
             "Wolves": lambda m: len(m.agents_by_type[Wolf]),
             "Sheep": lambda m: len(m.agents_by_type[Sheep]),
-            "Grass": lambda m: len(m.agents_by_type[GrassPatch].select(lambda a:a.fully_grown)) if m.grass else -1,
+            "Grass": lambda m: len(
+                m.agents_by_type[GrassPatch].select(lambda a: a.fully_grown)
+            )
+            if m.grass
+            else -1,
         }
 
         self.datacollector = mesa.DataCollector(collectors)

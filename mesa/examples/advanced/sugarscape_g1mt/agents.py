@@ -43,9 +43,6 @@ class Resource(FixedAgent):
         self.spice_amount = min([self.max_spice, self.spice_amount + 1])
 
 
-
-
-
 class Trader(CellAgent):
     """
     Trader:

@@ -8,7 +8,6 @@ from mesa.examples.basic.conways_game_of_life.model import ConwaysGameOfLife
 from mesa.examples.basic.schelling.model import Schelling
 from mesa.examples.basic.virus_on_network.model import VirusOnNetwork
 
-
 __all__ = [
     "BoidFlockers",
     "BoltzmannWealthModel",
@@ -18,5 +17,5 @@ __all__ = [
     "EpsteinCivilViolence",
     "PdGrid",
     "SugarscapeG1mt",
-    "PdGrid"
+    "PdGrid",
 ]

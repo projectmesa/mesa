@@ -47,4 +47,4 @@ page = SolaraViz(
     model_params=model_params,
     name="Spatial Prisoner's Dilemma",
 )
-page #noqa B018
+page  # noqa B018

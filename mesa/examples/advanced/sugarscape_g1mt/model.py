@@ -52,7 +52,7 @@ class SugarscapeG1mt(mesa.Model):
         vision_min=1,
         vision_max=5,
         enable_trade=True,
-        seed=None
+        seed=None,
     ):
         super().__init__(seed=seed)
         # Initiate width and height of sugarscape
