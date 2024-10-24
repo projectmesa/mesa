@@ -318,7 +318,7 @@ def setup_examples_pages():
     # check what examples exist
     examples_folder = osp.abspath(osp.join(HERE, "..", "mesa", "examples"))
     basic_examples = [f.path for f in os.scandir(osp.join(examples_folder, "basic")) if f.is_dir() and not f.name.startswith("__") ]
-    advanced_examples = []  # fixme [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir()]
+    advanced_examples = [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir() and not f.name.startswith("__")]
     examples = basic_examples + advanced_examples
 
     with open(os.path.join(HERE, "example_template.txt")) as fh:
