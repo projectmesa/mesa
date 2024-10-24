@@ -12,11 +12,6 @@ As the model runs, the distribution of wealth among agents goes from being perfe
 
 To follow the tutorial example, launch the Jupyter Notebook and run the code in ``Introduction to Mesa Tutorial Code.ipynb`` which you can find in the main mesa repo [here](https://github.com/projectmesa/mesa/blob/main/docs/tutorials/intro_tutorial.ipynb)
 
-Make sure to install the requirements first:
-
-```
-    $ pip install -r requirements.txt
-```
 
 To launch the interactive server, as described in the [last section of the tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html#adding-visualization), run:
 
@@ -30,6 +25,7 @@ If your browser doesn't open automatically, point it to [http://127.0.0.1:8765/]
 ## Files
 
 * ``model.py``: Final version of the model.
+* ``agents.py``: Final version of the agent.
 * ``app.py``: Code for the interactive visualization.
 
 ## Optional
