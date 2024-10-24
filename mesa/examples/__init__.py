@@ -17,5 +17,5 @@ __all__ = [
     "EpsteinCivilViolence",
     "PdGrid",
     "SugarscapeG1mt",
-    "PdGrid",
+    "WolfSheep"
 ]
