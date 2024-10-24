@@ -25,7 +25,7 @@ To run the model with the grid displayed as an ASCII text, run `python run_ascii
 ## Files
 
 * ``model.py``: Contains the Schelling model class
-*  ``agent.py``: Contains the Schelling agent class
+*  ``agents.py``: Contains the Schelling agent class
 * ``app.py``: Code for the interactive visualization.
 * ``analysis.ipynb``: Notebook demonstrating how to run experiments and parameter sweeps on the model.
 
