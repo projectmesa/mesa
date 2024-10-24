@@ -53,7 +53,7 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 ## Files
 
 * `model.py`: The Sugarscape Constant Growback with Traders model.
-* `agent.py`: Defines the Trader agent class and the Resource agent class which contains an amount of sugar and spice.
+* `agents.py`: Defines the Trader agent class and the Resource agent class which contains an amount of sugar and spice.
 * `app.py`: Runs a visualization server via Solara (`solara run app.py`).
 * `sugar_map.txt`: Provides sugar and spice landscape in raster type format.
 * `tests.py`: Has tests to ensure that the model reproduces the results in shown in Growing Artificial Societies.
