@@ -25,7 +25,7 @@ If your browser doesn't open automatically, point it to [http://127.0.0.1:8765/]
 ## Files
 
 * ``model.py``: Final version of the model.
-* ``agent.py``: Final version of the agent.
+* ``agents.py``: Final version of the agent.
 * ``app.py``: Code for the interactive visualization.
 
 ## Optional
