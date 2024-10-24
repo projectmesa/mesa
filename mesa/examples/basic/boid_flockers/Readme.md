@@ -13,7 +13,7 @@ This model tests Mesa's continuous space feature, and uses numpy arrays to repre
 ## Files
 
 * [model.py](model.py): Ccntains the Boid Model
-* [agent.py](agent.py): Contains the Boid agent
+* [agents.py](agents.py): Contains the Boid agent
 * [app.py](app.py): Solara based Visualization code.
 
 ## Further Reading
