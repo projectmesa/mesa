@@ -1,8 +1,6 @@
 import math
 
-from mesa.experimental.cell_space import CellAgent
-from mesa.experimental.cell_space import FixedAgent
-
+from mesa.experimental.cell_space import CellAgent, FixedAgent
 
 
 # Helper function
@@ -18,6 +16,8 @@ def get_distance(cell_1, cell_2):
     dx = x1 - x2
     dy = y1 - y2
     return math.sqrt(dx**2 + dy**2)
+
+
 class Resource(FixedAgent):
     """
     Resource:
@@ -41,9 +41,6 @@ class Resource(FixedAgent):
         """
         self.sugar_amount = min([self.max_sugar, self.sugar_amount + 1])
         self.spice_amount = min([self.max_spice, self.spice_amount + 1])
-
-
-
 
 
 class Trader(CellAgent):

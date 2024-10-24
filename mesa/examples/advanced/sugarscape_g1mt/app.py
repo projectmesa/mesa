@@ -1,15 +1,18 @@
-import sys
 import os.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../')))
+import sys
+
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../"))
+)
 
 
 import numpy as np
 import solara
 from matplotlib.figure import Figure
-from mesa.visualization import SolaraViz, make_plot_measure
-
 from sugarscape_g1mt.model import SugarscapeG1mt
 from sugarscape_g1mt.trader_agents import Trader
+
+from mesa.visualization import SolaraViz, make_plot_measure
 
 
 def SpaceDrawer(model):

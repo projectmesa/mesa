@@ -1,4 +1,4 @@
-from mesa.examples.advanced.wolf_sheep.agents import Wolf, Sheep, GrassPatch
+from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.examples.advanced.wolf_sheep.model import WolfSheep
 from mesa.visualization import (
     Slider,
@@ -37,21 +37,18 @@ def wolf_sheep_portrayal(agent):
 
     return portrayal
 
+
 model_params = {
     # The following line is an example to showcase StaticText.
     "grass": {
         "type": "Select",
         "value": True,
         "values": [True, False],
-        "label": "grass regrowth enabled?"
+        "label": "grass regrowth enabled?",
     },
     "grass_regrowth_time": Slider("Grass Regrowth Time", 20, 1, 50),
-    "initial_sheep": Slider(
-        "Initial Sheep Population", 100, 10, 300
-    ),
-    "sheep_reproduce": Slider(
-        "Sheep Reproduction Rate", 0.04, 0.01, 1.0, 0.01
-    ),
+    "initial_sheep": Slider("Initial Sheep Population", 100, 10, 300),
+    "sheep_reproduce": Slider("Sheep Reproduction Rate", 0.04, 0.01, 1.0, 0.01),
     "initial_wolves": Slider("Initial Wolf Population", 10, 5, 100),
     "wolf_reproduce": Slider(
         "Wolf Reproduction Rate",
@@ -60,9 +57,7 @@ model_params = {
         1.0,
         0.01,
     ),
-    "wolf_gain_from_food": Slider(
-        "Wolf Gain From Food Rate", 20, 1, 50
-    ),
+    "wolf_gain_from_food": Slider("Wolf Gain From Food Rate", 20, 1, 50),
     "sheep_gain_from_food": Slider("Sheep Gain From Food", 4, 1, 10),
 }
 
