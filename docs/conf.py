@@ -25,7 +25,6 @@ from datetime import date
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 HERE = osp.abspath(osp.dirname(__file__))
 sys.path.insert(0, os.path.abspath("."))
-sys.path.insert(0, "../examples")
 sys.path.insert(0, "../mesa")
 
 
@@ -318,7 +317,7 @@ def setup_examples_pages():
     # check what examples exist
     examples_folder = osp.abspath(osp.join(HERE, "..", "mesa", "examples"))
     basic_examples = [f.path for f in os.scandir(osp.join(examples_folder, "basic")) if f.is_dir() and not f.name.startswith("__") ]
-    advanced_examples = []  # fixme [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir()]
+    advanced_examples = [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir() and not f.name.startswith("__")]
     examples = basic_examples + advanced_examples
 
     with open(os.path.join(HERE, "example_template.txt")) as fh:
