@@ -162,6 +162,14 @@ def test_agent_membership():
     assert AgentTest(model) not in agentset
 
 
+def test_agent_rng():
+    """Test whether agent.random and agent.rng are equal to model.random and model.rng."""
+    model = Model(seed=42)
+    agent = Agent(model)
+    assert agent.random is model.random
+    assert agent.rng is model.rng
+
+
 def test_agent_add_remove_discard():
     """Test adding, removing and discarding agents from AgentSet."""
     model = Model()
@@ -471,6 +479,29 @@ def test_agentset_shuffle_do():
     assert (
         original_order != shuffled_order
     ), "The order should be different after shuffle_do"
+
+    class AgentWithRemove(Agent):
+        def __init__(self, model):
+            super().__init__(model)
+            self.is_alive = True
+
+        def remove(self):
+            super().remove()
+            self.is_alive = False
+
+        def step(self):
+            if not self.is_alive:
+                raise Exception
+
+            agent_to_remove = self.random.choice(self.model.agents)
+
+            if agent_to_remove is not self:
+                agent_to_remove.remove()
+
+    model = Model(seed=32)
+    for _ in range(100):
+        AgentWithRemove(model)
+    model.agents.shuffle_do("step")
 
 
 def test_agentset_get_attribute():

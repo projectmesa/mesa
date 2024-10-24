@@ -1,6 +1,5 @@
 import mesa
-
-from .agents import MoneyAgent
+from mesa.examples.basic.boltzmann_wealth_model.agents import MoneyAgent
 
 
 class BoltzmannWealthModel(mesa.Model):

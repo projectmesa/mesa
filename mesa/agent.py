@@ -21,6 +21,8 @@ from random import Random
 # mypy
 from typing import TYPE_CHECKING, Any, Literal, overload
 
+import numpy as np
+
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
     # dependency.
@@ -85,8 +87,13 @@ class Agent:
 
     @property
     def random(self) -> Random:
-        """Return a seeded rng."""
+        """Return a seeded stdlib rng."""
         return self.model.random
+
+    @property
+    def rng(self) -> np.random.Generator:
+        """Return a seeded np.random rng."""
+        return self.model.rng
 
 
 class AgentSet(MutableSet, Sequence):
@@ -294,15 +301,17 @@ class AgentSet(MutableSet, Sequence):
 
         It's a fast, optimized version of calling shuffle() followed by do().
         """
-        agents = list(self._agents.keys())
-        self.random.shuffle(agents)
+        weakrefs = list(self._agents.keyrefs())
+        self.random.shuffle(weakrefs)
 
         if isinstance(method, str):
-            for agent in agents:
-                getattr(agent, method)(*args, **kwargs)
+            for ref in weakrefs:
+                if (agent := ref()) is not None:
+                    getattr(agent, method)(*args, **kwargs)
         else:
-            for agent in agents:
-                method(agent, *args, **kwargs)
+            for ref in weakrefs:
+                if (agent := ref()) is not None:
+                    method(agent, *args, **kwargs)
 
         return self
 
