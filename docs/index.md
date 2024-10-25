@@ -44,24 +44,24 @@ To install our latest stable release (2.4.x), run:
 pip install -U mesa
 ```
 
-Mesa >= 3.0 beta includes several installations options:  
+Mesa >= 3.0 beta includes several installations options:
 
 ``` bash
 pip install -U --pre mesa[rec]
 ```
-**mesa[rec]** (recommend install) installs - mesa, [networkx](https://networkx.org/), [matplotlib](https://matplotlib.org/stable/install/index.html) 
+**mesa[rec]** (recommend install) installs - mesa, [networkx](https://networkx.org/), [matplotlib](https://matplotlib.org/stable/install/index.html)
 and [solara](https://solara.dev/)
 
-### Other installation options include: 
+### Other installation options include:
 
-- **mesa[network]** installs mesa and [networkx](https://networkx.org/)  
+- **mesa[network]** installs mesa and [networkx](https://networkx.org/)
 - **mesa[viz]** installs, mesa, [matplotlib](https://matplotlib.org/stable/install/index.html) and [solara](https://solara.dev/)
 - **mesa[dev]** installs mesa[rec], [ruff](https://docs.astral.sh/ruff/), [pytest](https://docs.pytest.org/en/stable/), [pytest-cov](https://pytest-cov.readthedocs.io/en/latest/), [sphinx](https://www.sphinx-doc.org/en/master/man/sphinx-build.html#cmdoption-sphinx-build-e), [pytest-mock](https://pytest-mock.readthedocs.io/en/latest/), [cookiecutter](https://cookiecutter.readthedocs.io/en/stable/)
 - **mesa[examples]** installs mesa[rec], [pytest](https://docs.pytest.org/en/stable/), and [scipy](https://scipy.org/)
 - **mesa[docs]** installs mesa[rec], [sphinx](https://www.sphinx-doc.org/en/master/man/sphinx-build.html#cmdoption-sphinx-build-e), [ipython](https://ipython.readthedocs.io/en/stable/install/kernel_install.html), [pydata_sphinx_theme](https://pydata-sphinx-theme.readthedocs.io/en/stable/),
 [seaborn](https://seaborn.pydata.org/), [myst-nb](https://myst-nb.readthedocs.io/en/latest/), [myst-parser](https://myst-parser.readthedocs.io/en/latest/)
 
-Then mesa[all] installs all these sub installation options: 
+Then mesa[all] installs all these sub installation options:
 **mesa[all]** = mesa[network,viz,dev,examples,docs]
 
 For more help on using Mesa, check out the following resources:
