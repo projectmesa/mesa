@@ -7,8 +7,7 @@ Uses numpy arrays to represent vectors.
 import numpy as np
 
 import mesa
-
-from .agents import Boid
+from mesa.examples.basic.boid_flockers.agents import Boid
 
 
 class BoidFlockers(mesa.Model):

@@ -1,6 +1,5 @@
 import mesa
-
-from .agent import Citizen, Cop
+from mesa.examples.advanced.epstein_civil_violence.agents import Citizen, Cop
 
 
 class EpsteinCivilViolence(mesa.Model):
@@ -43,8 +42,9 @@ class EpsteinCivilViolence(mesa.Model):
         arrest_prob_constant=2.3,
         movement=True,
         max_iters=1000,
+        seed=None,
     ):
-        super().__init__()
+        super().__init__(seed=seed)
         self.width = width
         self.height = height
         self.citizen_density = citizen_density
@@ -60,7 +60,7 @@ class EpsteinCivilViolence(mesa.Model):
         self.iteration = 0
 
         self.grid = mesa.experimental.cell_space.OrthogonalMooreGrid(
-            (width, height), capacity=1, torus=True
+            (width, height), capacity=1, torus=True, random=self.random
         )
 
         model_reporters = {

@@ -74,15 +74,32 @@ In Mesa 3.0, `unique_id` for agents is now automatically assigned, simplifying a
 1. Remove `unique_id` from agent initialization:
    ```python
    # Old
+   agent = MyAgent(unique_id=unique_id, model=self, ...)
+   agent = MyAgent(unique_id, self, ...)
    agent = MyAgent(self.next_id(), self, ...)
 
    # New
+   agent = MyAgent(model=self, ...)
    agent = MyAgent(self, ...)
    ```
-2. `Model.next_id()` is deprecated and will always return 0. Remove any calls to this method.
-3. `unique_id` is now unique relative to a Model instance and starts from 1.
-4. If you previously used custom `unique_id` values, you'll need to store that information in a separate attribute.
-5. Deprecation warning: Initializing an agent with two arguments (`unique_id` and `model`) will raise a warning. The `unique_id` argument will be ignored.
+
+2. Remove `unique_id` from Agent super() call:
+   ```python
+   # Old
+   class MyAgent(Agent):
+       def __init__(self, unique_id, model, ...):
+           super().__init__(unique_id, model)
+
+   # New
+   class MyAgent(Agent):
+       def __init__(self, model, ...):
+           super().__init__(model)
+   ```
+
+3. Important notes:
+   - `unique_id` is now automatically assigned relative to a Model instance and starts from 1
+   - `Model.next_id()` is removed
+   - If you previously used custom `unique_id` values, store that information in a separate attribute
 
 - Ref: [PR #2226](https://github.com/projectmesa/mesa/pull/2226), [PR #2260](https://github.com/projectmesa/mesa/pull/2260), Mesa-examples [PR #194](https://github.com/projectmesa/mesa-examples/pull/194), [Issue #2213](https://github.com/projectmesa/mesa/issues/2213)
 

@@ -1,11 +1,8 @@
-import random
-
 import numpy as np
 from scipy import stats
-from sugarscape_g1mt.model import SugarscapeG1mt, flatten
-from sugarscape_g1mt.trader_agents import Trader
 
-random.seed(1)
+from .agents import Trader
+from .model import SugarscapeG1mt, flatten
 
 
 def check_slope(y, increasing):
@@ -19,7 +16,7 @@ def check_slope(y, increasing):
 def test_decreasing_price_variance():
     # The variance of the average trade price should decrease over time (figure IV-3)
     # See Growing Artificial Societies p. 109.
-    model = SugarscapeG1mt()
+    model = SugarscapeG1mt(42)
     model.datacollector._new_model_reporter(
         "price_variance",
         lambda m: np.var(
