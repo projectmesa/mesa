@@ -155,7 +155,7 @@ class _Grid:
 
     @property
     def agents(self) -> AgentSet:
-        """Return an AgentSet with the agents in the space"""
+        """Return an AgentSet with the agents in the space."""
         agents = []
         for entry in self:
             if not entry:
@@ -1355,8 +1355,8 @@ class ContinuousSpace:
 
     @property
     def agents(self) -> AgentSet:
-        """Return an AgentSet with the agents in the space"""
-        agents = [agent for agent in self._agent_to_index]
+        """Return an AgentSet with the agents in the space."""
+        agents = list(self._agent_to_index)
 
         # getting the rng is a bit hacky because old style spaces don't have the rng
         try:
@@ -1541,7 +1541,7 @@ class NetworkGrid:
 
     @property
     def agents(self) -> AgentSet:
-        """Return an AgentSet with the agents in the space"""
+        """Return an AgentSet with the agents in the space."""
         agents = []
         for node_id in self.G.nodes:
             entry = self.G.nodes[node_id]["agent"]

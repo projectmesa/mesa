@@ -58,7 +58,7 @@ class DiscreteSpace(Generic[T]):
 
     @property
     def agents(self) -> AgentSet:
-        """Return an AgentSet with the agents in the space"""
+        """Return an AgentSet with the agents in the space."""
         return AgentSet(self.all_cells.agents, random=self.random)
 
     def _connect_cells(self): ...

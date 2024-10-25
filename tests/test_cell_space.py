@@ -439,8 +439,27 @@ def test_empties_space():
     for i in range(8):
         grid._cells[i].add_agent(CellAgent(model))
 
+def test_agents_property():
+    """Test empties method for Discrete Spaces."""
+    import networkx as nx
+
+    n = 10
+    m = 20
+    seed = 42
+    G = nx.gnm_random_graph(n, m, seed=seed)  # noqa: N806
+    grid = Network(G)
+
+    model = Model()
+    for i in range(8):
+        grid._cells[i].add_agent(CellAgent(model))
+
     cell = grid.select_random_empty_cell()
     assert cell.coordinate in {8, 9}
+
+    assert len(grid.agents) == 8
+
+    for i, j in enumerate(sorted(grid.agents.get("unique_id"))):
+        assert (i+1)==j  # unique_id starts from 1
 
 
 def test_cell():
