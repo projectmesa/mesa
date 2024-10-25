@@ -2,10 +2,21 @@
 
 Objects used to add a spatial component to a model.
 
-* Grid: base grid, which creates a rectangular grid.
-* SingleGrid: extension to Grid which strictly enforces one agent per cell.
-* MultiGrid: extension to Grid where each cell can contain a set of agents.
-* HexGrid: extension to Grid to handle hexagonal neighbors.
+.. note::
+    All Grid classes (:class:`_Grid`, :class:`SingleGrid`, :class:`MultiGrid`,
+    :class:`HexGrid`, etc.) are now in maintenance-only mode. While these classes remain
+    fully supported, new development occurs in the experimental cell space module
+    (:mod:`mesa.experimental.cell_space`).
+
+    The :class:`PropertyLayer` and :class:`ContinuousSpace` classes remain fully supported
+    and actively developed.
+
+Classes
+-------
+* PropertyLayer: A data layer that can be added to Grids to store cell properties
+* SingleGrid: a Grid which strictly enforces one agent per cell.
+* MultiGrid: a Grid where each cell can contain a set of agents.
+* HexGrid: a Grid to handle hexagonal neighbors.
 * ContinuousSpace: a two-dimensional space where each agent has an arbitrary position of `float`'s.
 * NetworkGrid: a network where each node contains zero or more agents.
 """
