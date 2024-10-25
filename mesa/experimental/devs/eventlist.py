@@ -35,7 +35,7 @@ class SimulationEvent:
 
 
     Notes:
-        simulation events use a weak reference to the callable. Therefore, you cannot pass a lamda function in fn.
+        simulation events use a weak reference to the callable. Therefore, you cannot pass a lambda function in fn.
         A simulation event where the callable no longer exists (e.g., because the agent has been removed from the model)
         will fail silently.
 
