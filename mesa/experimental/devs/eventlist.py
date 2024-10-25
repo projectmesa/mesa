@@ -33,6 +33,12 @@ class SimulationEvent:
         function_args (list[Any]): Argument for the function
         function_kwargs (Dict[str, Any]): Keyword arguments for the function
 
+
+    Notes:
+        simulation events use a weak reference to the callable. Therefore, you cannot pass a lamda function in fn.
+        A simulation event where the callable no longer exists (e.g., because the agent has been removed from the model)
+        will fail silently.
+
     """
 
     _ids = itertools.count()
