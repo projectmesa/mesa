@@ -3,12 +3,12 @@
 Objects used to add a spatial component to a model.
 
 .. note::
-    All Grid classes (:class:`_Grid`, :class:`SingleGrid`, :class:`MultiGrid`, 
-    :class:`HexGrid`, etc.) are now in maintenance-only mode. While these classes remain 
-    fully supported, new development occurs in the experimental cell space module 
+    All Grid classes (:class:`_Grid`, :class:`SingleGrid`, :class:`MultiGrid`,
+    :class:`HexGrid`, etc.) are now in maintenance-only mode. While these classes remain
+    fully supported, new development occurs in the experimental cell space module
     (:mod:`mesa.experimental.cell_space`).
-    
-    The :class:`PropertyLayer` and :class:`ContinuousSpace` classes remain fully supported 
+
+    The :class:`PropertyLayer` and :class:`ContinuousSpace` classes remain fully supported
     and actively developed.
 
 Classes
