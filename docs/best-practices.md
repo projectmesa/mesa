@@ -24,8 +24,6 @@ an `images` directory.
 The [Schelling](https://github.com/projectmesa/mesa-examples/tree/main/examples/schelling) model is
 a good example of a small well-packaged model.
 
-It's easy to create a cookiecutter mesa model by running `mesa startproject`
-
 ## Randomization
 
 If your model involves some random choice, you can use the built-in `random`

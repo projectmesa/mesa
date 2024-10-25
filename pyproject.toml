@@ -62,7 +62,6 @@ dev = [
   "pytest-cov",
   "sphinx",
   "pytest-mock",
-  "cookiecutter",
 ]
 examples = [
   "mesa[rec]",

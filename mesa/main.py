@@ -12,9 +12,7 @@ from mesa import __version__
 PROJECT_PATH = click.Path(
     exists=True, file_okay=False, dir_okay=True, resolve_path=True
 )
-COOKIECUTTER_DIR = "mesa/cookiecutter-mesa"
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
-COOKIECUTTER_PATH = os.path.join(os.path.dirname(SCRIPTS_DIR), COOKIECUTTER_DIR)
 
 CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 
