@@ -7,6 +7,7 @@ from functools import cached_property
 from random import Random
 from typing import Any, Generic, TypeVar
 
+from mesa.agent import AgentSet
 from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.cell_collection import CellCollection
 from mesa.space import PropertyLayer
@@ -54,6 +55,11 @@ class DiscreteSpace(Generic[T]):
     @property
     def cutoff_empties(self):  # noqa
         return 7.953 * len(self._cells) ** 0.384
+
+    @property
+    def agents(self) -> AgentSet:
+        """Return an AgentSet with the agents in the space."""
+        return AgentSet(self.all_cells.agents, random=self.random)
 
     def _connect_cells(self): ...
     def _connect_single_cell(self, cell: T): ...
