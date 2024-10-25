@@ -153,7 +153,6 @@ class _Grid:
     @overload
     def __getitem__(self, index: int | Sequence[Coordinate]) -> list[GridContent]: ...
 
-
     @property
     def agents(self) -> AgentSet:
         """Return an AgentSet with the agents in the space"""
@@ -1354,7 +1353,6 @@ class ContinuousSpace:
         self._index_to_agent: dict[int, Agent] = {}
         self._agent_to_index: dict[Agent, int | None] = {}
 
-
     @property
     def agents(self) -> AgentSet:
         """Return an AgentSet with the agents in the space"""
@@ -1544,7 +1542,11 @@ class NetworkGrid:
     @property
     def agents(self) -> AgentSet:
         """Return an AgentSet with the agents in the space"""
-        agents = [entry for node_id in self.G.nodes if (entry := self.G.nodes[node_id]["agent"])]
+        agents = [
+            entry
+            for node_id in self.G.nodes
+            if (entry := self.G.nodes[node_id]["agent"])
+        ]
 
         # getting the rng is a bit hacky because old style spaces don't have the rng
         try:
