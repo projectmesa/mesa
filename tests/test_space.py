@@ -198,6 +198,13 @@ class TestSpaceAgentMapping(unittest.TestCase):
             self.agents.append(a)
             self.space.place_agent(a, pos)
 
+    def test_agents_property(self):
+        """test whether space.agents returns correct agents"""
+        for i, agent in enumerate(self.space.agents):
+            self.assertEqual(i, agent.unique_id)
+
+        self.assertEqual(len(REMOVAL_TEST_AGENTS), len(self.space.agents))
+
     def test_remove_first(self):
         """Test removing the first entry."""
         agent_to_remove = self.agents[0]
@@ -402,6 +409,14 @@ class TestSingleGrid(unittest.TestCase):  # noqa: D101
             a = MockAgent(i)
             self.agents.append(a)
             self.space.place_agent(a, pos)
+
+    def test_agents_property(self):
+        """test whether space.agents returns correct agents"""
+        for i, agent in enumerate(self.space.agents):
+            self.assertEqual(i, agent.unique_id)
+
+        self.assertEqual(len(TEST_AGENTS_GRID), len(self.space.agents))
+
 
     def test_agent_positions(self):
         """Ensure that the agents are all placed properly."""
@@ -826,6 +841,13 @@ class TestSingleNetworkGrid(unittest.TestCase):  # noqa D101
             a = MockAgent(i)
             self.agents.append(a)
             self.space.place_agent(a, pos)
+
+    def test_agents_property(self):
+        """test whether space.agents returns correct agents"""
+        for i, agent in enumerate(self.space.agents):
+            self.assertEqual(i, agent.unique_id)
+
+        self.assertEqual(len(TEST_AGENTS_NETWORK_SINGLE), len(self.space.agents))
 
     def test_agent_positions(self):
         """Ensure that the agents are all placed properly."""

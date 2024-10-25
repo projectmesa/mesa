@@ -1542,11 +1542,15 @@ class NetworkGrid:
     @property
     def agents(self) -> AgentSet:
         """Return an AgentSet with the agents in the space"""
-        agents = [
-            entry
-            for node_id in self.G.nodes
-            if (entry := self.G.nodes[node_id]["agent"])
-        ]
+        agents = []
+        for node_id in self.G.nodes:
+            entry = self.G.nodes[node_id]["agent"]
+            if not entry:
+                continue
+            if not isinstance(entry, list):
+                entry = [entry]  # noqa PLW2901
+            for agent in entry:
+                agents.append(agent)
 
         # getting the rng is a bit hacky because old style spaces don't have the rng
         try:
