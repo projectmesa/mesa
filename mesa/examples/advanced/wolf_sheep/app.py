@@ -1,3 +1,8 @@
+import sys
+import os.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../')))
+
+
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.examples.advanced.wolf_sheep.model import WolfSheep
 from mesa.visualization import (
@@ -16,24 +21,25 @@ def wolf_sheep_portrayal(agent):
         return
 
     portrayal = {
-        "size": 25,
-        "shape": "s",  # square marker
+        "s": 25,
     }
 
     if isinstance(agent, Wolf):
-        portrayal["color"] = WOLF_COLOR
-        portrayal["Layer"] = 3
+        portrayal["c"] = "tab:orange"
+        portrayal["marker"] = "o"
     elif isinstance(agent, Sheep):
-        portrayal["color"] = SHEEP_COLOR
-        portrayal["Layer"] = 2
+        portrayal["c"] = "tab:blue"
+        portrayal["zorder"] = 2
+        portrayal["marker"] = "o"
     elif isinstance(agent, GrassPatch):
         if agent.fully_grown:
-            portrayal["color"] = "#00FF00"
+            portrayal["c"] = "tab:green"
         else:
-            portrayal["color"] = "#84e184"
-        # portrayal["shape"] = "rect"
+            portrayal["c"] = "tab:brown"
+        portrayal["marker"] = "s"
         # portrayal["Filled"] = "true"
-        portrayal["Layer"] = 1
+        portrayal["zorder"] = 1
+        portrayal["s"] = 75
 
     return portrayal
 
@@ -65,7 +71,7 @@ model_params = {
 space_component = make_space_matplotlib(wolf_sheep_portrayal)
 lineplot_component = make_plot_measure(["Wolves", "Sheep", "Grass"])
 
-model = WolfSheep()
+model = WolfSheep(grass=True)
 
 
 page = SolaraViz(
