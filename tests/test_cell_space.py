@@ -439,6 +439,7 @@ def test_empties_space():
     for i in range(8):
         grid._cells[i].add_agent(CellAgent(model))
 
+
 def test_agents_property():
     """Test empties method for Discrete Spaces."""
     import networkx as nx
@@ -459,7 +460,7 @@ def test_agents_property():
     assert len(grid.agents) == 8
 
     for i, j in enumerate(sorted(grid.agents.get("unique_id"))):
-        assert (i+1)==j  # unique_id starts from 1
+        assert (i + 1) == j  # unique_id starts from 1
 
 
 def test_cell():
