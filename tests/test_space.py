@@ -199,7 +199,7 @@ class TestSpaceAgentMapping(unittest.TestCase):
             self.space.place_agent(a, pos)
 
     def test_agents_property(self):
-        """Test whether space.agents returns correct agents"""
+        """Test whether space.agents returns correct agents."""
         for i, agent in enumerate(self.space.agents):
             self.assertEqual(i, agent.unique_id)
 
@@ -411,7 +411,7 @@ class TestSingleGrid(unittest.TestCase):  # noqa: D101
             self.space.place_agent(a, pos)
 
     def test_agents_property(self):
-        """Test whether space.agents returns correct agents"""
+        """Test whether space.agents returns correct agents."""
         for i, agent in enumerate(self.space.agents):
             self.assertEqual(i, agent.unique_id)
 
@@ -842,7 +842,7 @@ class TestSingleNetworkGrid(unittest.TestCase):  # noqa D101
             self.space.place_agent(a, pos)
 
     def test_agents_property(self):
-        """Test whether space.agents returns correct agents"""
+        """Test whether space.agents returns correct agents."""
         for i, agent in enumerate(self.space.agents):
             self.assertEqual(i, agent.unique_id)
 
