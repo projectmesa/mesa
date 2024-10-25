@@ -1,11 +1,10 @@
 from pathlib import Path
 
-import mesa
 import numpy as np
-from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
 
-from .resource_agents import Resource
-from .trader_agents import Trader
+import mesa
+from mesa.examples.advanced.sugarscape_g1mt.agents import Resource, Trader
+from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
 
 
 # Helper Functions
@@ -53,8 +52,9 @@ class SugarscapeG1mt(mesa.Model):
         vision_min=1,
         vision_max=5,
         enable_trade=True,
+        seed=None,
     ):
-        super().__init__()
+        super().__init__(seed=seed)
         # Initiate width and height of sugarscape
         self.width = width
         self.height = height
@@ -176,5 +176,5 @@ class SugarscapeG1mt(mesa.Model):
         self.datacollector._agent_records[self.steps] = agent_trades
 
     def run_model(self, step_count=1000):
-        for i in range(step_count):
+        for _ in range(step_count):
             self.step()

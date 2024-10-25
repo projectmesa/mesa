@@ -34,51 +34,28 @@ cross over one another otherwise *end*.
 (Epstein and Axtell, 1996, p. 105)
 
 The model demonstrates several Mesa concepts and features:
- - MultiGrid
+ - OrthogonalMooreGrid
  - Multiple agent types (traders, sugar, spice)
  - Dynamically removing agents from the grid and schedule when they die
  - Data Collection at the model and agent level
- - Batchrunner (i.e. parameter sweeps)
+ - custom solara matplotlib space visualization
 
-## Installation
-
-To install the dependencies use pip and the requirements.txt in this directory. e.g.
-
-```
-  $ pip install -r requirements.txt
-```
 
 ## How to Run
-
-To run the model a single instance of the model:
-
-```
-  $ python run.py -s
-```
-
-To run the model with BatchRunner:
-
-```
-  $ python run.py -b
-```
-
 To run the model interactively:
 
 ```
-  $ mesa runserver
+  $ solara run app.py
 ```
 
 Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
 
 ## Files
 
-* `sugarscape_g1mt/trader_agents.py`: Defines the Trader agent class.
-* `sugarscape_g1mt/resource_agents.py`: Defines the Resource agent class which contains an amount of sugar and spice.
-* `sugarscape_g1mt/model.py`: Manages the Sugarscape Constant Growback with Traders model.
-* `sugarscape_g1mt/sugar_map.txt`: Provides sugar and spice landscape in raster type format.
-* `server.py`: Sets up an interactive visualization server.
-* `run.py`: Runs Server, Single Run or Batch Run  with data collection and basic analysis.
+* `model.py`: The Sugarscape Constant Growback with Traders model.
+* `agents.py`: Defines the Trader agent class and the Resource agent class which contains an amount of sugar and spice.
 * `app.py`: Runs a visualization server via Solara (`solara run app.py`).
+* `sugar_map.txt`: Provides sugar and spice landscape in raster type format.
 * `tests.py`: Has tests to ensure that the model reproduces the results in shown in Growing Artificial Societies.
 
 ## Additional Resources
