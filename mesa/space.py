@@ -1548,7 +1548,7 @@ class NetworkGrid:
             if not entry:
                 continue
             if not isinstance(entry, list):
-                entry = [entry]  # noqa PLW2901
+                entry = [entry]
             for agent in entry:
                 agents.append(agent)
 
