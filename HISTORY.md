@@ -1,6 +1,61 @@
 ---
 title: Release History
 ---
+# 3.0.0b2 (2024-10-26)
+## Highlights
+Mesa 3.0 beta 2 includes major work on the example models, docs, a new tutorial and visualisation.
+
+The included example models are now part of the Mesa package itself and directly importable, using:
+```Python
+from mesa.examples import BoidFlockers, BoltzmannWealthModel, ConwaysGameOfLife, ...
+```
+The advanced examples were also restructured and cleaned up.
+
+The tutorial was completely rewritten for Mesa 3.0, including it's latest features and practices. Many of our other docs also received some love, and almost everything is now ready for Mesa 3.0.
+
+A new feature to remove all agents from the model was added, and the visualisation now supports drawing the experimental discrete spaces in both matplotlib and altair. All agents which are in a space can now conveniently be accessed with `.agents`.
+
+The rarely used `mesa startproject` cookiecutter feature was removed. We updated our best-practice guide to include how to structure a modern Mesa project, which is now very straightforward.
+
+## What's Changed
+### ⚠️ Breaking changes
+* remove cookiecutter by @quaquel in https://github.com/projectmesa/mesa/pull/2421
+### 🧪 Experimental features
+* Add support for drawing discrete grids by @quaquel in https://github.com/projectmesa/mesa/pull/2386
+* Altair spaces by @quaquel in https://github.com/projectmesa/mesa/pull/2397
+### 🎉 New features added
+* remove_all_agents method added to model by @quaquel in https://github.com/projectmesa/mesa/pull/2394
+* Pass through model.rgn in agent analogous to model.random by @quaquel in https://github.com/projectmesa/mesa/pull/2400
+* add agents property to all spaces by @quaquel in https://github.com/projectmesa/mesa/pull/2418
+### 🛠 Enhancements made
+* update_tutorial environment by @tpike3 in https://github.com/projectmesa/mesa/pull/2411
+### 🐛 Bugs fixed
+* Fix for mistaken removal of _draw_grid by @quaquel in https://github.com/projectmesa/mesa/pull/2398
+* fixes weakref bug in shuffe_do by @quaquel in https://github.com/projectmesa/mesa/pull/2399
+### 🔍 Examples updated
+* refactor: Simplify Schelling code by @rht in https://github.com/projectmesa/mesa/pull/2353
+* Move examples into mesa by @Corvince in https://github.com/projectmesa/mesa/pull/2387
+* Explicitly test basic examples by @quaquel in https://github.com/projectmesa/mesa/pull/2390
+* Make example import absolute by @quaquel in https://github.com/projectmesa/mesa/pull/2402
+* Cleanup and restructure EpsteinCivilViolence and PdGrid examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2408
+* Reorganize advanced examples: wolf_sheep and sugarscape_g1mt by @quaquel in https://github.com/projectmesa/mesa/pull/2410
+* reactivate ruff for advanced examples and include them in tests by @quaquel in https://github.com/projectmesa/mesa/pull/2414
+### 📜 Documentation improvements
+* Include examples in readthedocs (port) by @EwoutH in https://github.com/projectmesa/mesa/pull/2392
+* Update into_tutorial by @tpike3 in https://github.com/projectmesa/mesa/pull/2372
+* Update Schelling Readme.md by @quaquel in https://github.com/projectmesa/mesa/pull/2406
+* Update Conway example by @quaquel in https://github.com/projectmesa/mesa/pull/2403
+* Boltzman readme by @quaquel in https://github.com/projectmesa/mesa/pull/2405
+* Update Readme.md of Boid flockers by @quaquel in https://github.com/projectmesa/mesa/pull/2404
+* add advanced examples to rtd by @quaquel in https://github.com/projectmesa/mesa/pull/2413
+* Tutorial Improvements by @tpike3 in https://github.com/projectmesa/mesa/pull/2415
+* space: Add note that Grids are maintenance only by @EwoutH in https://github.com/projectmesa/mesa/pull/2420
+* Migration guide: Update automatic unique_id assignment examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2419
+* Update docstring of SimEvent by @quaquel in https://github.com/projectmesa/mesa/pull/2417
+### 🔧 Maintenance
+* Add empty `pull_request_template.md` to enable PR template chooser by @EwoutH in https://github.com/projectmesa/mesa/pull/2409
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0b1...v3.0.0b2
 
 # 3.0.0b1 (2024-10-17)
 ## Highlights
