@@ -52,6 +52,8 @@ The rarely used `mesa startproject` cookiecutter feature was removed. We updated
 * space: Add note that Grids are maintenance only by @EwoutH in https://github.com/projectmesa/mesa/pull/2420
 * Migration guide: Update automatic unique_id assignment examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2419
 * Update docstring of SimEvent by @quaquel in https://github.com/projectmesa/mesa/pull/2417
+* best-practices: Update Model Layout section by @EwoutH in https://github.com/projectmesa/mesa/pull/2424
+* docs: Clean-up index.md by @EwoutH in https://github.com/projectmesa/mesa/pull/2422
 ### 🔧 Maintenance
 * Add empty `pull_request_template.md` to enable PR template chooser by @EwoutH in https://github.com/projectmesa/mesa/pull/2409
 
