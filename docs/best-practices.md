@@ -5,24 +5,21 @@ Here are some general principles that have proven helpful for developing models.
 ## Model Layout
 
 A model should be contained in a folder named with lower-case letters and
-underscores, such as `thunder_cats`. Within that directory:
+underscores, such as `wolf_sheep`. Within that directory:
 
-- `README.md` describes the model, how to use it, and any other details.
-  Github will automatically show this file to anyone visiting the directory.
-- `model.py` should contain the model class.  If the file gets large, it may
-  make sense to move the complex bits into other files, but this is the first
-  place readers will look to figure out how the model works.
-- `server.py` should contain the visualization support, including the server
-  class.
-- `run.py` is a Python script that will run the model when invoked via
-  `mesa runserver`.
+- `Readme.md` describes the model, how to use it, and any other details.
+- `model.py` should contain the model class.
+- `agents.py` should contain the agent class(es).
+- `app.py` should contain the Solara-based visualization code (optional).
 
-After the number of files grows beyond a half-dozen, try to use sub-folders to
-organize them. For example, if the visualization uses image files, put those in
-an `images` directory.
+You can add more files as needed, for example:
+- `run.py` could contain the code to run the model.
+- `batch_run.py` could contain the code to run the model multiple times.
+- `analysis.py` could contain any analysis code.
 
-The [Schelling](https://github.com/projectmesa/mesa-examples/tree/main/examples/schelling) model is
-a good example of a small well-packaged model.
+Input data can be stored in a `data` directory, output data in an `output`, processed results in a `results` directory, images in an `images` directory, etc.
+
+All our [examples](examples) follow this layout.
 
 ## Randomization
 
