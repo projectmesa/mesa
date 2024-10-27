@@ -16,8 +16,9 @@ COP_COLOR = "#000000"
 agent_colors = {
     CitizenState.ACTIVE: "#FE6100",
     CitizenState.QUIET: "#648FFF",
-    CitizenState.ARRESTED: "#808080"
+    CitizenState.ARRESTED: "#808080",
 }
+
 
 def citizen_cop_portrayal(agent):
     if agent is None:
