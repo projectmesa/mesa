@@ -1,16 +1,4 @@
-import os.path
-import sys
-
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../"))
-)
-
-
-from mesa.examples.advanced.epstein_civil_violence.agents import (
-    Citizen,
-    CitizenState,
-    Cop,
-)
+from mesa.examples.advanced.epstein_civil_violence.agents import Citizen, Cop, CitizenState
 from mesa.examples.advanced.epstein_civil_violence.model import EpsteinCivilViolence
 from mesa.visualization import (
     Slider,
