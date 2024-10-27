@@ -1,6 +1,7 @@
 """Matplotlib based solara components for visualization MESA spaces and plots."""
 
 import warnings
+import itertools
 from collections import defaultdict
 from collections.abc import Callable
 
@@ -8,6 +9,12 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import solara
+
+from matplotlib.collections import PatchCollection
+from matplotlib.patches import RegularPolygon
+import math
+
+
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.figure import Figure
@@ -282,13 +289,35 @@ def draw_hex_grid(
     arguments = collect_agent_data(space, agent_portrayal)
 
     # give all odd rows an offset in the x direction
+    offset = math.sqrt(0.75)
+
     logical = np.mod(arguments["y"], 2) == 1
-    arguments["x"][logical] += +1
+    arguments["y"] = arguments["y"].astype(float) * offset
+    arguments["x"] = arguments["x"].astype(float)
+    arguments["x"][logical] += 0.5
 
     fig = Figure()
     ax = fig.add_subplot(111)
+    ax.set_xlim(-1, space.width+0.5)
+    ax.set_ylim(-offset, space.height*offset)
 
     _scatter(ax, arguments)
+
+    def setup_hexmesh(width, height, ):
+        """Helper function for creating the hexmaesh."""
+        # fixme: this should be done once, rather than in each update
+
+        patches = []
+        for x, y in itertools.product(range(width), range(height)):
+            if y % 2 == 1:
+                x += 0.5
+            y *= offset
+            hex = RegularPolygon((x, y), numVertices=6, radius=math.sqrt(1 / 3),
+                                 orientation=np.radians(120))
+            patches.append(hex)
+        mesh = PatchCollection(patches, edgecolor='k', facecolor=(1, 1, 1, 0), linestyle='dotted', lw=1)
+        return mesh
+    ax.add_collection(setup_hexmesh(space.width, space.height, ))
 
     if propertylayer_portrayal:
         draw_property_layers(ax, space, propertylayer_portrayal, model)
