@@ -1,7 +1,8 @@
 """Matplotlib based solara components for visualization MESA spaces and plots."""
 
-import warnings
 import itertools
+import math
+import warnings
 from collections import defaultdict
 from collections.abc import Callable
 
@@ -9,15 +10,11 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import solara
-
-from matplotlib.collections import PatchCollection
-from matplotlib.patches import RegularPolygon
-import math
-
-
 from matplotlib.cm import ScalarMappable
+from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.figure import Figure
+from matplotlib.patches import RegularPolygon
 
 import mesa
 from mesa.experimental.cell_space import (
@@ -298,12 +295,15 @@ def draw_hex_grid(
 
     fig = Figure()
     ax = fig.add_subplot(111)
-    ax.set_xlim(-1, space.width+0.5)
-    ax.set_ylim(-offset, space.height*offset)
+    ax.set_xlim(-1, space.width + 0.5)
+    ax.set_ylim(-offset, space.height * offset)
 
     _scatter(ax, arguments)
 
-    def setup_hexmesh(width, height, ):
+    def setup_hexmesh(
+        width,
+        height,
+    ):
         """Helper function for creating the hexmaesh."""
         # fixme: this should be done once, rather than in each update
 
@@ -312,12 +312,24 @@ def draw_hex_grid(
             if y % 2 == 1:
                 x += 0.5
             y *= offset
-            hex = RegularPolygon((x, y), numVertices=6, radius=math.sqrt(1 / 3),
-                                 orientation=np.radians(120))
+            hex = RegularPolygon(
+                (x, y),
+                numVertices=6,
+                radius=math.sqrt(1 / 3),
+                orientation=np.radians(120),
+            )
             patches.append(hex)
-        mesh = PatchCollection(patches, edgecolor='k', facecolor=(1, 1, 1, 0), linestyle='dotted', lw=1)
+        mesh = PatchCollection(
+            patches, edgecolor="k", facecolor=(1, 1, 1, 0), linestyle="dotted", lw=1
+        )
         return mesh
-    ax.add_collection(setup_hexmesh(space.width, space.height, ))
+
+    ax.add_collection(
+        setup_hexmesh(
+            space.width,
+            space.height,
+        )
+    )
 
     if propertylayer_portrayal:
         draw_property_layers(ax, space, propertylayer_portrayal, model)
