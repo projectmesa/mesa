@@ -1,6 +1,8 @@
 """Matplotlib based solara components for visualization MESA spaces and plots."""
 
 import warnings
+from collections import defaultdict
+from collections.abc import Callable
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -10,16 +12,25 @@ from matplotlib.cm import ScalarMappable
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.figure import Figure
 
-from collections import defaultdict
-from typing import Callable
-
 import mesa
-from mesa.experimental.cell_space import Grid, VoronoiGrid, OrthogonalMooreGrid, OrthogonalVonNeumannGrid, HexGrid
-from mesa.space import PropertyLayer, SingleGrid, MultiGrid, HexSingleGrid, HexMultiGrid, ContinuousSpace, NetworkGrid
+from mesa.experimental.cell_space import (
+    OrthogonalMooreGrid,
+    OrthogonalVonNeumannGrid,
+    VoronoiGrid,
+)
+from mesa.space import (
+    ContinuousSpace,
+    HexMultiGrid,
+    HexSingleGrid,
+    MultiGrid,
+    NetworkGrid,
+    PropertyLayer,
+    SingleGrid,
+)
 from mesa.visualization.utils import update_counter
 
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
-HexGrid = HexSingleGrid | HexMultiGrid | HexGrid
+HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
 Network = NetworkGrid | mesa.experimental.cell_space.Network
 
 
@@ -60,22 +71,30 @@ def SpaceMatplotlib(
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
         case mesa.space._Grid():
-            fig, ax = draw_orthogonal_grid(space, agent_portrayal, propertylayer_portrayal)
-        # case mesa.space.ContinuousSpace():
-        #     _draw_continuous_space(space, space_ax, agent_portrayal, model)
+            fig, ax = draw_orthogonal_grid(space, agent_portrayal, propertylayer_portrayal, model)
+        case OrthogonalMooreGrid():
+            fig, ax = draw_orthogonal_grid(space, agent_portrayal, propertylayer_portrayal, model)
+        case OrthogonalVonNeumannGrid():
+            fig, ax = draw_orthogonal_grid(space, agent_portrayal, propertylayer_portrayal, model)
+        case HexSingleGrid():
+            fig, ax = draw_hex_grid(space, agent_portrayal, propertylayer_portrayal, model)
+        case HexSingleGrid():
+            fig, ax = draw_hex_grid(space, agent_portrayal, propertylayer_portrayal, model)
+        case mesa.experimental.cell_space.HexGrid():
+            fig, ax = draw_hex_grid(space, agent_portrayal, propertylayer_portrayal, model)
+        case mesa.space.ContinuousSpace():
+            fig, ax = draw_continuous_space(space, agent_portrayal)
         case mesa.space.NetworkGrid():
             fig, ax = draw_network(space, agent_portrayal)
-        # case VoronoiGrid():
-        #     _draw_voronoi(space, space_ax, agent_portrayal)
-        case OrthogonalMooreGrid():  # matches OrthogonalMooreGrid, OrthogonalVonNeumannGrid, and Hexgrid
-            fig, ax = draw_orthogonal_grid(space, agent_portrayal, propertylayer_portrayal)
-        case OrthogonalVonNeumannGrid():  # matches OrthogonalMooreGrid, OrthogonalVonNeumannGrid, and Hexgrid
-            fig, ax = draw_orthogonal_grid(space, agent_portrayal, propertylayer_portrayal)
+        case VoronoiGrid():
+            fig, ax = draw_voroinoi_grid(space, agent_portrayal)
         case mesa.experimental.cell_space.Network():
             fig, ax = draw_network(space, agent_portrayal)
         case None:
+            fig = Figure()
+            ax = fig.subplots(111)
             if propertylayer_portrayal:
-                draw_property_layers(space_ax, space, propertylayer_portrayal, model)
+                draw_property_layers(ax, space, propertylayer_portrayal, model)
 
     solara.FigureMatplotlib(
         fig, format="png", bbox_inches="tight", dependencies=dependencies
@@ -172,7 +191,7 @@ def collect_agent_data(space: OrthogonalGrid | HexGrid | Network | ContinuousSpa
     """
     default_size = (180 / max(space.width, space.height)) ** 2
 
-    arguments = dict(x=[], y=[], s=[], c=[], marker=[])
+    arguments = {"x":[], "y":[], "s":[], "c":[], "marker":[]}
     for agent in space.agents:
         portray = agent_portrayal(agent)
         loc = agent.pos
@@ -182,17 +201,31 @@ def collect_agent_data(space: OrthogonalGrid | HexGrid | Network | ContinuousSpa
         arguments["x"].append(x)
         arguments["y"].append(y)
 
-        arguments['s'].append(portray.get("s", default_size))
-        arguments['c'].append(portray.get("c", "tab:blue"))
-        arguments['marker'].append(portray.get("marker", "o"))
+        arguments["s"].append(portray.get("s", default_size))
+        arguments["c"].append(portray.get("c", "tab:blue"))
+        arguments["marker"].append(portray.get("marker", "o"))
 
     return {k: np.asarray(v) for k, v in arguments.items()}
 
 
-def draw_orthogonal_grid(space: OrthogonalGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable):
+def draw_orthogonal_grid(space: OrthogonalGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model):
+    """Visualize a orthogonal grid..
+
+    Args:
+        space: the space to visualize
+        agent_portrayal: a callable that is called with the agent and returns a dict
+        propertylayer_portrayal: a callable that is called with the agent and returns a dict
+        model: a model instance
+
+    Returns:
+        A Figure and Axes instance
+
+    """
     arguments = collect_agent_data(space, agent_portrayal)
 
-    fig, ax = plt.subplots()
+    fig = Figure()
+    ax = fig.add_subplot(111)
+
     ax.set_xlim(-0.5, space.width-0.5)
     ax.set_ylim(-0.5, space.height-0.5)
 
@@ -202,26 +235,54 @@ def draw_orthogonal_grid(space: OrthogonalGrid, agent_portrayal: Callable, prope
     for y in np.arange(-0.5, space.height-0.5, 1):
         ax.axhline(y, color="gray", linestyle=":")
 
-    x = arguments.pop('x')
-    y = arguments.pop('y')
-    marker = arguments.pop('marker')
+    _scatter(ax, arguments)
 
-    for mark in np.unique(marker):
-        mask = marker == mark
-        ax.scatter(x[mask], y[mask], marker=mark, **{k: v[mask] for k, v in arguments.items()})
+    if propertylayer_portrayal:
+        draw_property_layers(ax, space, propertylayer_portrayal, model)
 
     return fig, ax
 
 
-# def draw_hex_grid(space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable):
-#     ...
-#
+def draw_hex_grid(space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model):
+    """Visualize a hex grid.
+
+    Args:
+        space: the space to visualize
+        agent_portrayal: a callable that is called with the agent and returns a dict
+        propertylayer_portrayal: a callable that is called with the agent and returns a dict
+        model: a model instance
+
+    Returns:
+        A Figure and Axes instance
+
+    """
+    arguments = collect_agent_data(space, agent_portrayal)
+
+    # give all odd rows an offset in the x direction
+    logical = np.mod(arguments["y"], 2) == 1
+    arguments["x"] = arguments["x"][logical] + 1
+
+    fig = Figure()
+    ax = fig.add_subplot(111)
+
+    _scatter(ax, arguments)
+
+    if propertylayer_portrayal:
+        draw_property_layers(ax, space, propertylayer_portrayal, model)
+    return fig, ax
 
 def collect_agent_data_for_networks(space, agent_portrayal):
+    """Collect the plotting data for all agents in the network.
+
+    Args:
+        space: the space to visualize
+        agent_portrayal: a callable that is called with the agent and returns a dict
+
+    """
     arguments = defaultdict(list)
     for agent in space.agents:
         portray = agent_portrayal(agent)
-        for k, v in agent_portrayal.items():
+        for k, v in portray.items():
             arguments[k].append(v)
 
     return arguments
@@ -254,80 +315,57 @@ def draw_network(space: Network, agent_portrayal: Callable):
     return fig, ax
 
 
-# def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable):
-#     ...
-#
-# def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable):
-#     ...
+def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable):
+    """Visualize a continuous space.
+
+    Args:
+        space: the space to visualize
+        agent_portrayal: a callable that is called with the agent and returns a dict
+
+    Returns:
+        A Figure and Axes instance
+
+    """
+    arguments = collect_agent_data(space, agent_portrayal)
+
+    fig = Figure()
+    ax = fig.add_subplot(111)
+
+    border_style = "solid" if not space.torus else (0, (5, 10))
+
+    # Set the border of the plot
+    for spine in ax.spines.values():
+        spine.set_linewidth(1.5)
+        spine.set_color("black")
+        spine.set_linestyle(border_style)
+
+    width = space.x_max - space.x_min
+    x_padding = width / 20
+    height = space.y_max - space.y_min
+    y_padding = height / 20
+
+    ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
+    ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
+
+    _scatter(ax, arguments)
+    return fig, ax
 
 
+def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable):
+    """Visualize a voronoi grid.
 
+    Args:
+        space: the space to visualize
+        agent_portrayal: a callable that is called with the agent and returns a dict
 
-# def _draw_continuous_space(space, space_ax, agent_portrayal, model):
-#     def portray(space):
-#         x = []
-#         y = []
-#         s = []  # size
-#         c = []  # color
-#         m = []  # shape
-#         for agent in space._agent_to_index:
-#             data = agent_portrayal(agent)
-#             _x, _y = agent.pos
-#             x.append(_x)
-#             y.append(_y)
-#
-#             # This is matplotlib's default marker size
-#             default_size = 20
-#             size = data.get("size", default_size)
-#             s.append(size)
-#             color = data.get("color", "tab:blue")
-#             c.append(color)
-#             mark = data.get("shape", "o")
-#             m.append(mark)
-#         return {"x": x, "y": y, "s": s, "c": c, "m": m}
-#
-#     # Determine border style based on space.torus
-#     border_style = "solid" if not space.torus else (0, (5, 10))
-#
-#     # Set the border of the plot
-#     for spine in space_ax.spines.values():
-#         spine.set_linewidth(1.5)
-#         spine.set_color("black")
-#         spine.set_linestyle(border_style)
-#
-#     width = space.x_max - space.x_min
-#     x_padding = width / 20
-#     height = space.y_max - space.y_min
-#     y_padding = height / 20
-#     space_ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
-#     space_ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
-#
-#     # Portray and scatter the agents in the space
-#     _split_and_scatter(portray(space), space_ax)
+    Returns:
+        A Figure and Axes instance
 
+    """
+    arguments = collect_agent_data(space, agent_portrayal)
 
-def _draw_voronoi(space, space_ax, agent_portrayal):
-    def portray(g):
-        x = []
-        y = []
-        s = []  # size
-        c = []  # color
-
-        for cell in g.all_cells:
-            for agent in cell.agents:
-                data = agent_portrayal(agent)
-                x.append(cell.coordinate[0])
-                y.append(cell.coordinate[1])
-                if "size" in data:
-                    s.append(data["size"])
-                if "color" in data:
-                    c.append(data["color"])
-        out = {"x": x, "y": y}
-        out["s"] = s
-        if len(c) > 0:
-            out["c"] = c
-
-        return out
+    fig = Figure()
+    ax = fig.add_subplot(111)
 
     x_list = [i[0] for i in space.centroids_coordinates]
     y_list = [i[1] for i in space.centroids_coordinates]
@@ -340,20 +378,32 @@ def _draw_voronoi(space, space_ax, agent_portrayal):
     x_padding = width / 20
     height = y_max - y_min
     y_padding = height / 20
-    space_ax.set_xlim(x_min - x_padding, x_max + x_padding)
-    space_ax.set_ylim(y_min - y_padding, y_max + y_padding)
-    space_ax.scatter(**portray(space))
+    ax.set_xlim(x_min - x_padding, x_max + x_padding)
+    ax.set_ylim(y_min - y_padding, y_max + y_padding)
+
+    _scatter(ax, arguments)
+
 
     for cell in space.all_cells:
         polygon = cell.properties["polygon"]
-        space_ax.fill(
+        ax.fill(
             *zip(*polygon),
             alpha=min(1, cell.properties[space.cell_coloring_property]),
-            c="red",
+            c="red", zorder=0
         )  # Plot filled polygon
-        space_ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in black
+        ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in black
+    return fig, ax
 
 
+
+def _scatter(ax, arguments):
+    x = arguments.pop("x")
+    y = arguments.pop("y")
+    marker = arguments.pop("marker")
+
+    for mark in np.unique(marker):
+        mask = marker == mark
+        ax.scatter(x[mask], y[mask], marker=mark, **{k: v[mask] for k, v in arguments.items()})
 
 
 def make_plot_measure(measure: str | dict[str, str] | list[str] | tuple[str]):
