@@ -227,7 +227,7 @@ def collect_agent_data(
 def draw_orthogonal_grid(
     space: OrthogonalGrid,
     agent_portrayal: Callable,
-    propertylayer_portrayal: Callable,
+    propertylayer_portrayal: Callable | None,
     model,
 ):
     """Visualize a orthogonal grid..
@@ -283,7 +283,7 @@ def draw_hex_grid(
 
     # give all odd rows an offset in the x direction
     logical = np.mod(arguments["y"], 2) == 1
-    arguments["x"] = arguments["x"][logical] + 1
+    arguments["x"][logical] += + 1
 
     fig = Figure()
     ax = fig.add_subplot(111)
@@ -321,13 +321,16 @@ def draw_network(space: Network, agent_portrayal: Callable):
 
     Notes:
         this uses networkx.draw under the hood so agent portrayal fields should match those used there
-        i.e., node_side, node_color, node_shape, edge_color
+        i.e., node_size and node_color.
 
 
     """
-    arguments = collect_agent_data_for_networks(agent_portrayal)
+    # FIXME this plotting is not correct. The x,y coordinates reflect the nodes in the network
+    #  not the location of the agents on those nodes
+    arguments = collect_agent_data_for_networks(space, agent_portrayal)
 
-    fig, ax = plt.subplots()
+    fig = Figure()
+    ax = fig.add_subplot(111)
     graph = space.G
     pos = nx.spring_layout(graph, seed=0)
     nx.draw(
