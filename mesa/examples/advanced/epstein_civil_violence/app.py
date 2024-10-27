@@ -12,10 +12,12 @@ from mesa.visualization import (
 )
 
 COP_COLOR = "#000000"
-QUIET_COLOR = "#648FFF"
-ACTIVE_COLOR = "#FE6100"
-ARRESTED_COLOR = "#808080"
 
+agent_colors = {
+    CitizenState.ACTIVE: "#FE6100",
+    CitizenState.QUIET: "#648FFF",
+    CitizenState.ARRESTED: "#808080"
+}
 
 def citizen_cop_portrayal(agent):
     if agent is None:
@@ -26,14 +28,7 @@ def citizen_cop_portrayal(agent):
     }
 
     if isinstance(agent, Citizen):
-        match agent.state:
-            case CitizenState.ACTIVE:
-                color = ACTIVE_COLOR
-            case CitizenState.QUIET:
-                color = QUIET_COLOR
-            case CitizenState.ARRESTED:
-                color = ARRESTED_COLOR
-        portrayal["color"] = color
+        portrayal["color"] = agent_colors[agent.state]
     elif isinstance(agent, Cop):
         portrayal["color"] = COP_COLOR
 
