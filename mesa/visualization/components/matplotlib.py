@@ -283,7 +283,7 @@ def draw_hex_grid(
 
     # give all odd rows an offset in the x direction
     logical = np.mod(arguments["y"], 2) == 1
-    arguments["x"][logical] += + 1
+    arguments["x"][logical] += +1
 
     fig = Figure()
     ax = fig.add_subplot(111)
