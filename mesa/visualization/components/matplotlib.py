@@ -64,7 +64,7 @@ def SpaceMatplotlib(
         # case mesa.space.ContinuousSpace():
         #     _draw_continuous_space(space, space_ax, agent_portrayal, model)
         case mesa.space.NetworkGrid():
-            fig, ax = _draw_network_grid(space, agent_portrayal)
+            fig, ax = draw_network(space, agent_portrayal)
         # case VoronoiGrid():
         #     _draw_voronoi(space, space_ax, agent_portrayal)
         case OrthogonalMooreGrid():  # matches OrthogonalMooreGrid, OrthogonalVonNeumannGrid, and Hexgrid
@@ -72,10 +72,10 @@ def SpaceMatplotlib(
         case OrthogonalVonNeumannGrid():  # matches OrthogonalMooreGrid, OrthogonalVonNeumannGrid, and Hexgrid
             fig, ax = draw_orthogonal_grid(space, agent_portrayal, propertylayer_portrayal)
         case mesa.experimental.cell_space.Network():
-            fig, ax = _draw_network_grid(space, agent_portrayal)
-        # case None:
-        #     if propertylayer_portrayal:
-        #         draw_property_layers(space_ax, space, propertylayer_portrayal, model)
+            fig, ax = draw_network(space, agent_portrayal)
+        case None:
+            if propertylayer_portrayal:
+                draw_property_layers(space_ax, space, propertylayer_portrayal, model)
 
     solara.FigureMatplotlib(
         fig, format="png", bbox_inches="tight", dependencies=dependencies
@@ -193,17 +193,17 @@ def draw_orthogonal_grid(space: OrthogonalGrid, agent_portrayal: Callable, prope
     arguments = collect_agent_data(space, agent_portrayal)
 
     fig, ax = plt.subplots()
-    ax.set_xlim(0, space.width)
-    ax.set_ylim(0, space.height)
+    ax.set_xlim(-0.5, space.width-0.5)
+    ax.set_ylim(-0.5, space.height-0.5)
 
     # Draw grid lines
-    for x in range(space.width + 1):
+    for x in np.arange(-0.5, space.width-0.5, 1):
         ax.axvline(x, color="gray", linestyle=":")
-    for y in range(space.height + 1):
+    for y in np.arange(-0.5, space.height-0.5, 1):
         ax.axhline(y, color="gray", linestyle=":")
 
-    x = arguments.pop('x') + 0.5
-    y = arguments.pop('y') + 0.5
+    x = arguments.pop('x')
+    y = arguments.pop('y')
     marker = arguments.pop('marker')
 
     for mark in np.unique(marker):
@@ -216,6 +216,7 @@ def draw_orthogonal_grid(space: OrthogonalGrid, agent_portrayal: Callable, prope
 # def draw_hex_grid(space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable):
 #     ...
 #
+
 def collect_agent_data_for_networks(space, agent_portrayal):
     arguments = defaultdict(list)
     for agent in space.agents:
@@ -259,74 +260,7 @@ def draw_network(space: Network, agent_portrayal: Callable):
 # def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable):
 #     ...
 
-# def _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model):
-#     if propertylayer_portrayal:
-#         draw_property_layers(space_ax, space, propertylayer_portrayal, model)
-#
-#     agent_data = _get_agent_data(space, agent_portrayal)
-#
-#     space_ax.set_xlim(0, space.width)
-#     space_ax.set_ylim(0, space.height)
-#     _split_and_scatter(agent_data, space_ax)
-#
-#     # Draw grid lines
-#     for x in range(space.width + 1):
-#         space_ax.axvline(x, color="gray", linestyle=":")
-#     for y in range(space.height + 1):
-#         space_ax.axhline(y, color="gray", linestyle=":")
-#
-#
-# def _get_agent_data(space, agent_portrayal):
-#     """Helper function to get agent data for visualization."""
-#     x, y, s, c, m = [], [], [], [], []
-#     for agents, pos in space.coord_iter():
-#         if not agents:
-#             continue
-#         if not isinstance(agents, list):
-#             agents = [agents]  # noqa PLW2901
-#         for agent in agents:
-#             data = agent_portrayal(agent)
-#             x.append(pos[0] + 0.5)  # Center the agent in the cell
-#             y.append(pos[1] + 0.5)  # Center the agent in the cell
-#             default_size = (180 / max(space.width, space.height)) ** 2
-#             s.append(data.get("size", default_size))
-#             c.append(data.get("color", "tab:blue"))
-#             m.append(data.get("shape", "o"))
-#     return {"x": x, "y": y, "s": s, "c": c, "m": m}
-#
-#
-# def _split_and_scatter(portray_data, space_ax):
-#     """Helper function to split and scatter agent data."""
-#     for marker in set(portray_data["m"]):
-#         mask = [m == marker for m in portray_data["m"]]
-#         space_ax.scatter(
-#             [x for x, show in zip(portray_data["x"], mask) if show],
-#             [y for y, show in zip(portray_data["y"], mask) if show],
-#             s=[s for s, show in zip(portray_data["s"], mask) if show],
-#             c=[c for c, show in zip(portray_data["c"], mask) if show],
-#             marker=marker,
-#         )
 
-def collect_agent_data_for_networks(space, agent_portrayal):
-    arguments = defaultdict(list)
-    for agent in space.agents:
-        portray = agent_portrayal(agent)
-        for k, v in agent_portrayal.items():
-            arguments[k].append(v)
-
-    return arguments
-
-def _draw_network_grid(space, space_ax, agent_portrayal):
-    arguments = collect_agent_data_for_networks(agent_portrayal)
-
-    graph = space.G
-    pos = nx.spring_layout(graph, seed=0)
-    nx.draw(
-        graph,
-        ax=space_ax,
-        pos=pos,
-        **arguments,
-    )
 
 
 # def _draw_continuous_space(space, space_ax, agent_portrayal, model):
