@@ -57,11 +57,8 @@ class EpsteinCivilViolence(mesa.Model):
             'active': CitizenState.ACTIVE.name,
             'quiet': CitizenState.QUIET.name,
             'arrested': CitizenState.ARRESTED.name,
-            "Cops": self.count_cops
         }
         agent_reporters = {
-            "x": lambda a: a.cell.coordinate[0],
-            "y": lambda a: a.cell.coordinate[1],
             "jail_sentence": lambda a: getattr(a, "jail_sentence", None),
             "arrest_probability": lambda a: getattr(a, "arrest_probability", None),
         }
@@ -82,9 +79,7 @@ class EpsteinCivilViolence(mesa.Model):
             elif klass == Citizen:
                 citizen = Citizen(
                     self,
-                    hardship=self.random.random(),
                     regime_legitimacy=legitimacy,
-                    risk_aversion=self.random.random(),
                     threshold=active_threshold,
                     vision=citizen_vision,
                     arrest_prob_constant=arrest_prob_constant
@@ -107,15 +102,8 @@ class EpsteinCivilViolence(mesa.Model):
             self.running = False
 
     def _update_counts(self):
+        """Helper function for counting nr. of citizens in given state."""
         counts = self.agents_by_type[Citizen].groupby("state").count()
 
         for state in CitizenState:
             setattr(self, state.name, counts.get(state, 0))
-
-
-    @staticmethod
-    def count_cops(model):
-        """
-        Helper method to count jailed agents.
-        """
-        return len(model.agents_by_type[Cop])

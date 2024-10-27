@@ -19,6 +19,12 @@ class EpsteinAgent(mesa.experimental.cell_space.CellAgent):
         self.neighbors = self.neighborhood.agents
         self.empty_neighbors = [c for c in self.neighborhood if c.is_empty]
 
+    def move(self):
+        if self.model.movement and self.empty_neighbors:
+            new_pos = self.random.choice(self.empty_neighbors)
+            self.move_to(new_pos)
+
+
 
 class Citizen(EpsteinAgent):
     """
@@ -46,9 +52,7 @@ class Citizen(EpsteinAgent):
     def __init__(
             self,
             model,
-            hardship,
             regime_legitimacy,
-            risk_aversion,
             threshold,
             vision,
             arrest_prob_constant
@@ -69,9 +73,9 @@ class Citizen(EpsteinAgent):
             model: model instance
         """
         super().__init__(model)
-        self.hardship = hardship
+        self.hardship = self.random.random()
+        self.risk_aversion = self.random.random()
         self.regime_legitimacy = regime_legitimacy
-        self.risk_aversion = risk_aversion
         self.threshold = threshold
         self.state = CitizenState.QUIET
         self.vision = vision
@@ -95,14 +99,12 @@ class Citizen(EpsteinAgent):
         self.update_estimated_arrest_probability()
 
         net_risk = self.risk_aversion * self.arrest_probability
-        if self.grievance - net_risk > self.threshold:
+        if (self.grievance - net_risk) > self.threshold:
             self.state = CitizenState.ACTIVE
         else:
             self.state = CitizenState.QUIET
 
-        if self.model.movement and self.empty_neighbors:
-            new_cell = self.random.choice(self.empty_neighbors)
-            self.move_to(new_cell)
+        self.move()
 
     def update_estimated_arrest_probability(self):
         """
@@ -114,7 +116,7 @@ class Citizen(EpsteinAgent):
         for neighbor in self.neighbors:
             if isinstance(neighbor, Cop):
                 cops_in_vision += 1
-            elif neighbor.state == CitizenState:
+            elif neighbor.state == CitizenState.ACTIVE:
                 actives_in_vision += 1
 
         # there is a body of literature on this equation
@@ -168,6 +170,4 @@ class Cop(EpsteinAgent):
             arrestee.jail_sentence = self.random.randint(0, self.max_jail_term)
             arrestee.state = CitizenState.ARRESTED
 
-        if self.model.movement and self.empty_neighbors:
-            new_pos = self.random.choice(self.empty_neighbors)
-            self.move_to(new_pos)
+        self.move()
