@@ -25,7 +25,6 @@ class EpsteinAgent(mesa.experimental.cell_space.CellAgent):
             self.move_to(new_pos)
 
 
-
 class Citizen(EpsteinAgent):
     """
     A member of the general population, may or may not be in active rebellion.
@@ -50,12 +49,7 @@ class Citizen(EpsteinAgent):
     """
 
     def __init__(
-            self,
-            model,
-            regime_legitimacy,
-            threshold,
-            vision,
-            arrest_prob_constant
+        self, model, regime_legitimacy, threshold, vision, arrest_prob_constant
     ):
         """
         Create a new Citizen.
@@ -160,10 +154,7 @@ class Cop(EpsteinAgent):
         self.update_neighbors()
         active_neighbors = []
         for agent in self.neighbors:
-            if (
-                    isinstance(agent, Citizen)
-                    and agent.state == CitizenState.ACTIVE
-            ):
+            if isinstance(agent, Citizen) and agent.state == CitizenState.ACTIVE:
                 active_neighbors.append(agent)
         if active_neighbors:
             arrestee = self.random.choice(active_neighbors)

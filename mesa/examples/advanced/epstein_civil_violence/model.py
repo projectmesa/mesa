@@ -1,5 +1,9 @@
 import mesa
-from mesa.examples.advanced.epstein_civil_violence.agents import Citizen, Cop, CitizenState
+from mesa.examples.advanced.epstein_civil_violence.agents import (
+    Citizen,
+    CitizenState,
+    Cop,
+)
 
 
 class EpsteinCivilViolence(mesa.Model):
@@ -54,9 +58,9 @@ class EpsteinCivilViolence(mesa.Model):
         )
 
         model_reporters = {
-            'active': CitizenState.ACTIVE.name,
-            'quiet': CitizenState.QUIET.name,
-            'arrested': CitizenState.ARRESTED.name,
+            "active": CitizenState.ACTIVE.name,
+            "quiet": CitizenState.QUIET.name,
+            "arrested": CitizenState.ARRESTED.name,
         }
         agent_reporters = {
             "jail_sentence": lambda a: getattr(a, "jail_sentence", None),
@@ -69,9 +73,10 @@ class EpsteinCivilViolence(mesa.Model):
             raise ValueError("Cop density + citizen density must be less than 1")
 
         for cell in self.grid.all_cells:
-            klass = self.random.choices([Citizen, Cop, None],
-                                   cum_weights=[citizen_density,
-                                                citizen_density+cop_density, 1])[0]
+            klass = self.random.choices(
+                [Citizen, Cop, None],
+                cum_weights=[citizen_density, citizen_density + cop_density, 1],
+            )[0]
 
             if klass == Cop:
                 cop = Cop(self, vision=cop_vision, max_jail_term=max_jail_term)
@@ -82,7 +87,7 @@ class EpsteinCivilViolence(mesa.Model):
                     regime_legitimacy=legitimacy,
                     threshold=active_threshold,
                     vision=citizen_vision,
-                    arrest_prob_constant=arrest_prob_constant
+                    arrest_prob_constant=arrest_prob_constant,
                 )
                 citizen.move_to(cell)
 
