@@ -1,7 +1,5 @@
 """Matplotlib based solara components for visualization MESA spaces and plots."""
 
-
-
 import warnings
 from collections import defaultdict
 from collections.abc import Callable
