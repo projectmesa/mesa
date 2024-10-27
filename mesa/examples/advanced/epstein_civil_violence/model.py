@@ -1,5 +1,5 @@
 import mesa
-from mesa.examples.advanced.epstein_civil_violence.agents import Citizen, Cop
+from mesa.examples.advanced.epstein_civil_violence.agents import Citizen, Cop, CitizenState
 
 
 class EpsteinCivilViolence(mesa.Model):
@@ -7,7 +7,8 @@ class EpsteinCivilViolence(mesa.Model):
     Model 1 from "Modeling civil violence: An agent-based computational
     approach," by Joshua Epstein.
     http://www.pnas.org/content/99/suppl_3/7243.full
-    Attributes:
+
+    Args:
         height: grid height
         width: grid width
         citizen_density: approximate % of cells occupied by citizens.
@@ -45,61 +46,53 @@ class EpsteinCivilViolence(mesa.Model):
         seed=None,
     ):
         super().__init__(seed=seed)
-        self.width = width
-        self.height = height
-        self.citizen_density = citizen_density
-        self.cop_density = cop_density
-        self.citizen_vision = citizen_vision
-        self.cop_vision = cop_vision
-        self.legitimacy = legitimacy
-        self.max_jail_term = max_jail_term
-        self.active_threshold = active_threshold
-        self.arrest_prob_constant = arrest_prob_constant
         self.movement = movement
         self.max_iters = max_iters
-        self.iteration = 0
 
-        self.grid = mesa.experimental.cell_space.OrthogonalMooreGrid(
+        self.grid = mesa.experimental.cell_space.OrthogonalVonNeumannGrid(
             (width, height), capacity=1, torus=True, random=self.random
         )
 
         model_reporters = {
-            "Quiescent": lambda m: self.count_type_citizens(m, "Quiescent"),
-            "Active": lambda m: self.count_type_citizens(m, "Active"),
-            "Jailed": self.count_jailed,
-            "Cops": self.count_cops,
+            'active': CitizenState.ACTIVE.name,
+            'quiet': CitizenState.QUIET.name,
+            'arrested': CitizenState.ARRESTED.name,
+            "Cops": self.count_cops
         }
         agent_reporters = {
             "x": lambda a: a.cell.coordinate[0],
             "y": lambda a: a.cell.coordinate[1],
-            "breed": lambda a: type(a).__name__,
             "jail_sentence": lambda a: getattr(a, "jail_sentence", None),
-            "condition": lambda a: getattr(a, "condition", None),
             "arrest_probability": lambda a: getattr(a, "arrest_probability", None),
         }
         self.datacollector = mesa.DataCollector(
             model_reporters=model_reporters, agent_reporters=agent_reporters
         )
-        if self.cop_density + self.citizen_density > 1:
+        if cop_density + citizen_density > 1:
             raise ValueError("Cop density + citizen density must be less than 1")
 
         for cell in self.grid.all_cells:
-            if self.random.random() < self.cop_density:
-                cop = Cop(self, vision=self.cop_vision)
-                cop.move_to(cell)
+            klass = self.random.choices([Citizen, Cop, None],
+                                   cum_weights=[citizen_density,
+                                                citizen_density+cop_density, 1])[0]
 
-            elif self.random.random() < (self.cop_density + self.citizen_density):
+            if klass == Cop:
+                cop = Cop(self, vision=cop_vision, max_jail_term=max_jail_term)
+                cop.move_to(cell)
+            elif klass == Citizen:
                 citizen = Citizen(
                     self,
                     hardship=self.random.random(),
-                    regime_legitimacy=self.legitimacy,
+                    regime_legitimacy=legitimacy,
                     risk_aversion=self.random.random(),
-                    threshold=self.active_threshold,
-                    vision=self.citizen_vision,
+                    threshold=active_threshold,
+                    vision=citizen_vision,
+                    arrest_prob_constant=arrest_prob_constant
                 )
                 citizen.move_to(cell)
 
         self.running = True
+        self._update_counts()
         self.datacollector.collect(self)
 
     def step(self):
@@ -107,36 +100,18 @@ class EpsteinCivilViolence(mesa.Model):
         Advance the model by one step and collect data.
         """
         self.agents.shuffle_do("step")
-        # collect data
+        self._update_counts()
         self.datacollector.collect(self)
-        self.iteration += 1
-        if self.iteration > self.max_iters:
+
+        if self.steps > self.max_iters:
             self.running = False
 
-    @staticmethod
-    def count_type_citizens(model, condition, exclude_jailed=True):
-        """
-        Helper method to count agents by Quiescent/Active.
-        """
-        citizens = model.agents_by_type[Citizen]
+    def _update_counts(self):
+        counts = self.agents_by_type[Citizen].groupby("state").count()
 
-        if exclude_jailed:
-            return len(
-                [
-                    c
-                    for c in citizens
-                    if (c.condition == condition) and (c.jail_sentence == 0)
-                ]
-            )
-        else:
-            return len([c for c in citizens if c.condition == condition])
+        for state in CitizenState:
+            setattr(self, state.name, counts.get(state, 0))
 
-    @staticmethod
-    def count_jailed(model):
-        """
-        Helper method to count jailed agents.
-        """
-        return len([a for a in model.agents_by_type[Citizen] if a.jail_sentence > 0])
 
     @staticmethod
     def count_cops(model):

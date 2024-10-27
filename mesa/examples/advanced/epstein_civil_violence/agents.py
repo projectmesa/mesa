@@ -1,6 +1,13 @@
 import math
+from enum import Enum
 
 import mesa
+
+
+class CitizenState(Enum):
+    ACTIVE = 1
+    QUIET = 2
+    ARRESTED = 3
 
 
 class EpsteinAgent(mesa.experimental.cell_space.CellAgent):
@@ -9,7 +16,6 @@ class EpsteinAgent(mesa.experimental.cell_space.CellAgent):
         Look around and see who my neighbors are
         """
         self.neighborhood = self.cell.get_neighborhood(radius=self.vision)
-
         self.neighbors = self.neighborhood.agents
         self.empty_neighbors = [c for c in self.neighborhood if c.is_empty]
 
@@ -38,13 +44,14 @@ class Citizen(EpsteinAgent):
     """
 
     def __init__(
-        self,
-        model,
-        hardship,
-        regime_legitimacy,
-        risk_aversion,
-        threshold,
-        vision,
+            self,
+            model,
+            hardship,
+            regime_legitimacy,
+            risk_aversion,
+            threshold,
+            vision,
+            arrest_prob_constant
     ):
         """
         Create a new Citizen.
@@ -66,11 +73,16 @@ class Citizen(EpsteinAgent):
         self.regime_legitimacy = regime_legitimacy
         self.risk_aversion = risk_aversion
         self.threshold = threshold
-        self.condition = "Quiescent"
+        self.state = CitizenState.QUIET
         self.vision = vision
         self.jail_sentence = 0
         self.grievance = self.hardship * (1 - self.regime_legitimacy)
+        self.arrest_prob_constant = arrest_prob_constant
         self.arrest_probability = None
+
+        self.neighborhood = []
+        self.neighbors = []
+        self.empty_neighbors = []
 
     def step(self):
         """
@@ -81,11 +93,12 @@ class Citizen(EpsteinAgent):
             return  # no other changes or movements if agent is in jail.
         self.update_neighbors()
         self.update_estimated_arrest_probability()
+
         net_risk = self.risk_aversion * self.arrest_probability
         if self.grievance - net_risk > self.threshold:
-            self.condition = "Active"
+            self.state = CitizenState.ACTIVE
         else:
-            self.condition = "Quiescent"
+            self.state = CitizenState.QUIET
 
         if self.model.movement and self.empty_neighbors:
             new_cell = self.random.choice(self.empty_neighbors)
@@ -96,17 +109,19 @@ class Citizen(EpsteinAgent):
         Based on the ratio of cops to actives in my neighborhood, estimate the
         p(Arrest | I go active).
         """
-        cops_in_vision = len([c for c in self.neighbors if isinstance(c, Cop)])
-        actives_in_vision = 1.0  # citizen counts herself
-        for c in self.neighbors:
-            if (
-                isinstance(c, Citizen)
-                and c.condition == "Active"
-                and c.jail_sentence == 0
-            ):
+        cops_in_vision = 0
+        actives_in_vision = 1  # citizen counts herself
+        for neighbor in self.neighbors:
+            if isinstance(neighbor, Cop):
+                cops_in_vision += 1
+            elif neighbor.state == CitizenState:
                 actives_in_vision += 1
+
+        # there is a body of literature on this equation
+        # the round is not in the pnas paper but without it, its impossible to replicate
+        # the dynamics shown there.
         self.arrest_probability = 1 - math.exp(
-            -1 * self.model.arrest_prob_constant * (cops_in_vision / actives_in_vision)
+            -1 * self.arrest_prob_constant * round(cops_in_vision / actives_in_vision)
         )
 
 
@@ -122,7 +137,7 @@ class Cop(EpsteinAgent):
             able to inspect
     """
 
-    def __init__(self, model, vision):
+    def __init__(self, model, vision, max_jail_term):
         """
         Create a new Cop.
         Args:
@@ -133,6 +148,7 @@ class Cop(EpsteinAgent):
         """
         super().__init__(model)
         self.vision = vision
+        self.max_jail_term = max_jail_term
 
     def step(self):
         """
@@ -143,16 +159,15 @@ class Cop(EpsteinAgent):
         active_neighbors = []
         for agent in self.neighbors:
             if (
-                isinstance(agent, Citizen)
-                and agent.condition == "Active"
-                and agent.jail_sentence == 0
+                    isinstance(agent, Citizen)
+                    and agent.state == CitizenState.ACTIVE
             ):
                 active_neighbors.append(agent)
         if active_neighbors:
             arrestee = self.random.choice(active_neighbors)
-            sentence = self.random.randint(0, self.model.max_jail_term)
-            arrestee.jail_sentence = sentence
-            arrestee.condition = "Quiescent"
+            arrestee.jail_sentence = self.random.randint(0, self.max_jail_term)
+            arrestee.state = CitizenState.ARRESTED
+
         if self.model.movement and self.empty_neighbors:
             new_pos = self.random.choice(self.empty_neighbors)
             self.move_to(new_pos)
