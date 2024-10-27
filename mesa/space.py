@@ -1252,10 +1252,6 @@ class _HexGrid:
         """
         return list(self.iter_neighbors(pos, include_center, radius))
 
-    def __iter__(self) -> Iterator[GridContent]:
-        """Create an iterator returns the agents in the space"""
-        yield from self._agent_to_index
-
 
 class HexSingleGrid(_HexGrid, SingleGrid):
     """Hexagonal SingleGrid: a SingleGrid where neighbors are computed according to a hexagonal tiling of the grid.
@@ -1540,10 +1536,6 @@ class ContinuousSpace:
         x, y = pos
         return x < self.x_min or x >= self.x_max or y < self.y_min or y >= self.y_max
 
-    def __iter__(self) -> Iterator[GridContent]:
-        """Create an iterator returns the agents in the space"""
-        yield from self._agent_to_index
-
 
 class NetworkGrid:
     """Network Grid where each node contains zero or more agents."""
@@ -1697,8 +1689,3 @@ class NetworkGrid:
             self.G.nodes[node_id]["agent"]
             for node_id in itertools.filterfalse(self.is_cell_empty, cell_list)
         )
-
-    def __iter__(self) -> Iterator[GridContent]:
-        """Create an iterator returns the agents in the space"""
-        for node_id in self.G.nodes:
-            yield self.g.nodes[node_id]["agent"]
