@@ -1,24 +1,26 @@
-from typing import Callable
+from collections.abc import Callable
 
-from mesa.space import _Grid, ContinuousSpace, _HexGrid, NetworkGrid
 from mesa.experimental.cell_space import DiscreteSpace
+from mesa.space import ContinuousSpace, NetworkGrid, _Grid, _HexGrid
 
-
-__all__ = ["get_agent_continuous",
-           "get_agents_olstyle_grid",
-           "get_agents_newstyle_grid"]
+__all__ = [
+    "get_agent_continuous",
+    "get_agents_olstyle_grid",
+    "get_agents_newstyle_grid",
+]
 
 OldStyleSpace = _Grid | ContinuousSpace | _HexGrid | NetworkGrid
 Space = OldStyleSpace | DiscreteSpace
+
 
 def get_agents_olstyle_space(space: OldStyleSpace):
     for entry in space:
         if entry:
             yield entry
 
+
 def get_agents_newstyle_space(space: DiscreteSpace):
-    for agent in space.all_cells.agents:
-        yield agent
+    yield from space.all_cells.agents
 
 
 def _get_oldstyle_agent_data(agents, agent_portrayal):
@@ -74,18 +76,17 @@ def get_agent_data(space: Space, agent_portrayal: Callable):
 
         x.append(x_i)
         y.append(y_i)
-        s.append(data.get("size", None))  # we use None here as a flag to fall back on default
+        s.append(
+            data.get("size", None)
+        )  # we use None here as a flag to fall back on default
         c.append(data.get("color", "tab:blue"))
         m.append(data.get("shape", "o"))
 
 
-
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     from mesa import Agent, Model
+    from mesa.experimental.cell_space import CellAgent, OrthogonalMooreGrid
     from mesa.space import SingleGrid
-    from mesa.experimental.cell_space import OrthogonalMooreGrid, CellAgent
 
     model = Model()
     space = SingleGrid(10, 10, True)
@@ -96,7 +97,6 @@ if __name__ == '__main__':
 
     agents = list(get_agents_olstyle_space(space))
     assert len(agents) == 10
-
 
     model = Model()
     space = OrthogonalMooreGrid((10, 10), capacity=1, torus=True, random=model.random)
@@ -112,7 +112,10 @@ if __name__ == '__main__':
     space = ContinuousSpace(10, 10, True)
     for _ in range(10):
         agent = Agent(model)
-        pos = (agent.random.random()*space.width, agent.random.random()*space.height)
+        pos = (
+            agent.random.random() * space.width,
+            agent.random.random() * space.height,
+        )
         space.place_agent(agent, pos)
 
     agents = list(get_agents_olstyle_space(space))

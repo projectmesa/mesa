@@ -45,6 +45,7 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
         function: A function that creates a SpaceMatplotlib component
     """
     if agent_portrayal is None:
+
         def agent_portrayal(a):
             return {"id": a.unique_id}
 
@@ -56,10 +57,10 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
 
 @solara.component
 def SpaceMatplotlib(
-        model,
-        agent_portrayal,
-        propertylayer_portrayal,
-        dependencies: list[any] | None = None,
+    model,
+    agent_portrayal,
+    propertylayer_portrayal,
+    dependencies: list[any] | None = None,
 ):
     """Create a Matplotlib-based space visualization component."""
     update_counter.get()
@@ -71,17 +72,29 @@ def SpaceMatplotlib(
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
         case mesa.space._Grid():
-            fig, ax = draw_orthogonal_grid(space, agent_portrayal, propertylayer_portrayal, model)
+            fig, ax = draw_orthogonal_grid(
+                space, agent_portrayal, propertylayer_portrayal, model
+            )
         case OrthogonalMooreGrid():
-            fig, ax = draw_orthogonal_grid(space, agent_portrayal, propertylayer_portrayal, model)
+            fig, ax = draw_orthogonal_grid(
+                space, agent_portrayal, propertylayer_portrayal, model
+            )
         case OrthogonalVonNeumannGrid():
-            fig, ax = draw_orthogonal_grid(space, agent_portrayal, propertylayer_portrayal, model)
+            fig, ax = draw_orthogonal_grid(
+                space, agent_portrayal, propertylayer_portrayal, model
+            )
         case HexSingleGrid():
-            fig, ax = draw_hex_grid(space, agent_portrayal, propertylayer_portrayal, model)
+            fig, ax = draw_hex_grid(
+                space, agent_portrayal, propertylayer_portrayal, model
+            )
         case HexSingleGrid():
-            fig, ax = draw_hex_grid(space, agent_portrayal, propertylayer_portrayal, model)
+            fig, ax = draw_hex_grid(
+                space, agent_portrayal, propertylayer_portrayal, model
+            )
         case mesa.experimental.cell_space.HexGrid():
-            fig, ax = draw_hex_grid(space, agent_portrayal, propertylayer_portrayal, model)
+            fig, ax = draw_hex_grid(
+                space, agent_portrayal, propertylayer_portrayal, model
+            )
         case mesa.space.ContinuousSpace():
             fig, ax = draw_continuous_space(space, agent_portrayal)
         case mesa.space.NetworkGrid():
@@ -173,7 +186,10 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
             )
 
 
-def collect_agent_data(space: OrthogonalGrid | HexGrid | Network | ContinuousSpace, agent_portrayal: Callable):
+def collect_agent_data(
+    space: OrthogonalGrid | HexGrid | Network | ContinuousSpace,
+    agent_portrayal: Callable,
+):
     """Collect the plotting data for all agents in the space.
 
     Args:
@@ -191,7 +207,7 @@ def collect_agent_data(space: OrthogonalGrid | HexGrid | Network | ContinuousSpa
     """
     default_size = (180 / max(space.width, space.height)) ** 2
 
-    arguments = {"x":[], "y":[], "s":[], "c":[], "marker":[]}
+    arguments = {"x": [], "y": [], "s": [], "c": [], "marker": []}
     for agent in space.agents:
         portray = agent_portrayal(agent)
         loc = agent.pos
@@ -208,7 +224,12 @@ def collect_agent_data(space: OrthogonalGrid | HexGrid | Network | ContinuousSpa
     return {k: np.asarray(v) for k, v in arguments.items()}
 
 
-def draw_orthogonal_grid(space: OrthogonalGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model):
+def draw_orthogonal_grid(
+    space: OrthogonalGrid,
+    agent_portrayal: Callable,
+    propertylayer_portrayal: Callable,
+    model,
+):
     """Visualize a orthogonal grid..
 
     Args:
@@ -226,13 +247,13 @@ def draw_orthogonal_grid(space: OrthogonalGrid, agent_portrayal: Callable, prope
     fig = Figure()
     ax = fig.add_subplot(111)
 
-    ax.set_xlim(-0.5, space.width-0.5)
-    ax.set_ylim(-0.5, space.height-0.5)
+    ax.set_xlim(-0.5, space.width - 0.5)
+    ax.set_ylim(-0.5, space.height - 0.5)
 
     # Draw grid lines
-    for x in np.arange(-0.5, space.width-0.5, 1):
+    for x in np.arange(-0.5, space.width - 0.5, 1):
         ax.axvline(x, color="gray", linestyle=":")
-    for y in np.arange(-0.5, space.height-0.5, 1):
+    for y in np.arange(-0.5, space.height - 0.5, 1):
         ax.axhline(y, color="gray", linestyle=":")
 
     _scatter(ax, arguments)
@@ -243,7 +264,9 @@ def draw_orthogonal_grid(space: OrthogonalGrid, agent_portrayal: Callable, prope
     return fig, ax
 
 
-def draw_hex_grid(space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model):
+def draw_hex_grid(
+    space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model
+):
     """Visualize a hex grid.
 
     Args:
@@ -271,6 +294,7 @@ def draw_hex_grid(space: HexGrid, agent_portrayal: Callable, propertylayer_portr
         draw_property_layers(ax, space, propertylayer_portrayal, model)
     return fig, ax
 
+
 def collect_agent_data_for_networks(space, agent_portrayal):
     """Collect the plotting data for all agents in the network.
 
@@ -286,6 +310,7 @@ def collect_agent_data_for_networks(space, agent_portrayal):
             arguments[k].append(v)
 
     return arguments
+
 
 def draw_network(space: Network, agent_portrayal: Callable):
     """Visualize a network space.
@@ -383,17 +408,16 @@ def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable):
 
     _scatter(ax, arguments)
 
-
     for cell in space.all_cells:
         polygon = cell.properties["polygon"]
         ax.fill(
             *zip(*polygon),
             alpha=min(1, cell.properties[space.cell_coloring_property]),
-            c="red", zorder=0
+            c="red",
+            zorder=0,
         )  # Plot filled polygon
         ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in black
     return fig, ax
-
 
 
 def _scatter(ax, arguments):
@@ -403,7 +427,9 @@ def _scatter(ax, arguments):
 
     for mark in np.unique(marker):
         mask = marker == mark
-        ax.scatter(x[mask], y[mask], marker=mark, **{k: v[mask] for k, v in arguments.items()})
+        ax.scatter(
+            x[mask], y[mask], marker=mark, **{k: v[mask] for k, v in arguments.items()}
+        )
 
 
 def make_plot_measure(measure: str | dict[str, str] | list[str] | tuple[str]):
