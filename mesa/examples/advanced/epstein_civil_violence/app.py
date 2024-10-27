@@ -1,4 +1,8 @@
-from mesa.examples.advanced.epstein_civil_violence.agents import Citizen, Cop
+from mesa.examples.advanced.epstein_civil_violence.agents import (
+    Citizen,
+    CitizenState,
+    Cop,
+)
 from mesa.examples.advanced.epstein_civil_violence.model import EpsteinCivilViolence
 from mesa.visualization import (
     Slider,
@@ -8,10 +12,12 @@ from mesa.visualization import (
 )
 
 COP_COLOR = "#000000"
-AGENT_QUIET_COLOR = "#648FFF"
-AGENT_REBEL_COLOR = "#FE6100"
-JAIL_COLOR = "#808080"
-JAIL_SHAPE = "rect"
+
+agent_colors = {
+    CitizenState.ACTIVE: "#FE6100",
+    CitizenState.QUIET: "#648FFF",
+    CitizenState.ARRESTED: "#808080",
+}
 
 
 def citizen_cop_portrayal(agent):
@@ -20,29 +26,12 @@ def citizen_cop_portrayal(agent):
 
     portrayal = {
         "size": 25,
-        "shape": "s",  # square marker
     }
 
     if isinstance(agent, Citizen):
-        color = (
-            AGENT_QUIET_COLOR if agent.condition == "Quiescent" else AGENT_REBEL_COLOR
-        )
-        color = JAIL_COLOR if agent.jail_sentence else color
-        shape = JAIL_SHAPE if agent.jail_sentence else "circle"
-        portrayal["color"] = color
-        portrayal["shape"] = shape
-        if shape == "s":
-            portrayal["w"] = 0.9
-            portrayal["h"] = 0.9
-        else:
-            portrayal["r"] = 0.5
-            portrayal["filled"] = False
-        portrayal["layer"] = 0
-
+        portrayal["color"] = agent_colors[agent.state]
     elif isinstance(agent, Cop):
         portrayal["color"] = COP_COLOR
-        portrayal["r"] = 0.9
-        portrayal["layer"] = 1
 
     return portrayal
 
@@ -59,7 +48,7 @@ model_params = {
 }
 
 space_component = make_space_matplotlib(citizen_cop_portrayal)
-chart_component = make_plot_measure(["Quiescent", "Active", "Jailed"])
+chart_component = make_plot_measure([state.name.lower() for state in CitizenState])
 
 epstein_model = EpsteinCivilViolence()
 
