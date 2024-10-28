@@ -10,6 +10,12 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import solara
+
+from matplotlib.collections import PatchCollection
+from matplotlib.patches import RegularPolygon
+import math
+
+
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
@@ -49,7 +55,6 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
         function: A function that creates a SpaceMatplotlib component
     """
     if agent_portrayal is None:
-
         def agent_portrayal(a):
             return {"id": a.unique_id}
 
@@ -61,10 +66,10 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
 
 @solara.component
 def SpaceMatplotlib(
-    model,
-    agent_portrayal,
-    propertylayer_portrayal,
-    dependencies: list[any] | None = None,
+        model,
+        agent_portrayal,
+        propertylayer_portrayal,
+        dependencies: list[any] | None = None,
 ):
     """Create a Matplotlib-based space visualization component."""
     update_counter.get()
@@ -191,8 +196,11 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
 
 
 def collect_agent_data(
-    space: OrthogonalGrid | HexGrid | Network | ContinuousSpace,
-    agent_portrayal: Callable,
+        space: OrthogonalGrid | HexGrid | Network | ContinuousSpace,
+        agent_portrayal: Callable,
+        c_default="tab:blue",
+        marker_default="o",
+        s_default=25
 ):
     """Collect the plotting data for all agents in the space.
 
@@ -200,6 +208,9 @@ def collect_agent_data(
         space: The space containing the Agents.
         agent_portrayal: A callable that is called with the agent and returns a dict
         loc: a boolean indicating whether to gather agent x, y data or not
+        c_default: default color
+        marker_default: default marker
+        s_default: default size
 
     Notes:
         agent portray dict is limited to s (size of marker), c (color of marker, and marker (marker style)
@@ -209,30 +220,26 @@ def collect_agent_data(
     .. _Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html
 
     """
-    default_size = (180 / max(space.width, space.height)) ** 2
-
-    arguments = {"x": [], "y": [], "s": [], "c": [], "marker": []}
+    arguments = {"loc": [], "s": [], "c": [], "marker": []}
     for agent in space.agents:
         portray = agent_portrayal(agent)
         loc = agent.pos
         if loc is None:
             loc = agent.cell.coordinate
-        x, y = loc
-        arguments["x"].append(x)
-        arguments["y"].append(y)
 
-        arguments["s"].append(portray.get("s", default_size))
-        arguments["c"].append(portray.get("c", "tab:blue"))
-        arguments["marker"].append(portray.get("marker", "o"))
+        arguments['loc'] = loc
+        arguments["s"].append(portray.get("s", s_default))
+        arguments["c"].append(portray.get("c", c_default))
+        arguments["marker"].append(portray.get("marker", marker_default))
 
     return {k: np.asarray(v) for k, v in arguments.items()}
 
 
 def draw_orthogonal_grid(
-    space: OrthogonalGrid,
-    agent_portrayal: Callable,
-    propertylayer_portrayal: Callable | None,
-    model,
+        space: OrthogonalGrid,
+        agent_portrayal: Callable,
+        propertylayer_portrayal: Callable | None,
+        model,
 ):
     """Visualize a orthogonal grid..
 
@@ -246,7 +253,8 @@ def draw_orthogonal_grid(
         A Figure and Axes instance
 
     """
-    arguments = collect_agent_data(space, agent_portrayal)
+    s_default = (180 / max(space.width, space.height)) ** 2
+    arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
     fig = Figure()
     ax = fig.add_subplot(111)
@@ -269,7 +277,7 @@ def draw_orthogonal_grid(
 
 
 def draw_hex_grid(
-    space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model
+        space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model
 ):
     """Visualize a hex grid.
 
@@ -283,7 +291,8 @@ def draw_hex_grid(
         A Figure and Axes instance
 
     """
-    arguments = collect_agent_data(space, agent_portrayal)
+    s_default = (180 / max(space.width, space.height)) ** 2
+    arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
     # give all odd rows an offset in the x direction
     offset = math.sqrt(0.75)
@@ -306,6 +315,7 @@ def draw_hex_grid(
     ):
         """Helper function for creating the hexmaesh."""
         # fixme: this should be done once, rather than in each update
+        # fixme check coordinate system in hexgrid (see https://www.redblobgames.com/grids/hexagons/#coordinates-offset)
 
         patches = []
         for x, y in itertools.product(range(width), range(height)):
@@ -336,23 +346,6 @@ def draw_hex_grid(
     return fig, ax
 
 
-def collect_agent_data_for_networks(space, agent_portrayal):
-    """Collect the plotting data for all agents in the network.
-
-    Args:
-        space: the space to visualize
-        agent_portrayal: a callable that is called with the agent and returns a dict
-
-    """
-    arguments = defaultdict(list)
-    for agent in space.agents:
-        portray = agent_portrayal(agent)
-        for k, v in portray.items():
-            arguments[k].append(v)
-
-    return arguments
-
-
 def draw_network(space: Network, agent_portrayal: Callable):
     """Visualize a network space.
 
@@ -366,20 +359,32 @@ def draw_network(space: Network, agent_portrayal: Callable):
 
 
     """
-    # FIXME this plotting is not correct. The x,y coordinates reflect the nodes in the network
-    #  not the location of the agents on those nodes
-    arguments = collect_agent_data_for_networks(space, agent_portrayal)
+    graph = space.G
+    pos = nx.spring_layout(graph, seed=0)
+    x, y = list(zip(*pos.values()))
+    xmin, xmax = min(x), max(x)
+    ymin, ymax = min(y), max(y)
+
+    width = xmax - xmin
+    height = ymax - ymin
+
+    s_default = (180 / max(width, height)) ** 2
+    arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
+
+
+    # fixme check if this code works
+    #  it won't work in the current format because pos is a dict
+    arguments['loc'] = pos[arguments['loc']]
 
     fig = Figure()
     ax = fig.add_subplot(111)
-    graph = space.G
-    pos = nx.spring_layout(graph, seed=0)
-    nx.draw(
-        graph,
-        ax=ax,
-        pos=pos,
-        **arguments,
-    )
+    ax.set_axis_off()
+    ax.set_xlim(xmin=xmin, xmax=xmax)
+    ax.set_ylim(ymin=ymin, ymax=ymax)
+
+    _scatter(ax, arguments)
+
+    nx.draw_networkx_edges(graph, pos, ax=ax)
 
     return fig, ax
 
@@ -395,7 +400,13 @@ def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable):
         A Figure and Axes instance
 
     """
-    arguments = collect_agent_data(space, agent_portrayal)
+    width = space.x_max - space.x_min
+    x_padding = width / 20
+    height = space.y_max - space.y_min
+    y_padding = height / 20
+
+    s_default = (180 / max(width, height)) ** 2
+    arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
     fig = Figure()
     ax = fig.add_subplot(111)
@@ -407,11 +418,6 @@ def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable):
         spine.set_linewidth(1.5)
         spine.set_color("black")
         spine.set_linestyle(border_style)
-
-    width = space.x_max - space.x_min
-    x_padding = width / 20
-    height = space.y_max - space.y_min
-    y_padding = height / 20
 
     ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
@@ -431,11 +437,6 @@ def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable):
         A Figure and Axes instance
 
     """
-    arguments = collect_agent_data(space, agent_portrayal)
-
-    fig = Figure()
-    ax = fig.add_subplot(111)
-
     x_list = [i[0] for i in space.centroids_coordinates]
     y_list = [i[1] for i in space.centroids_coordinates]
     x_max = max(x_list)
@@ -447,6 +448,13 @@ def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable):
     x_padding = width / 20
     height = y_max - y_min
     y_padding = height / 20
+
+    s_default = (180 / max(width, height)) ** 2
+    arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
+
+    fig = Figure()
+    ax = fig.add_subplot(111)
+
     ax.set_xlim(x_min - x_padding, x_max + x_padding)
     ax.set_ylim(y_min - y_padding, y_max + y_padding)
 
@@ -465,8 +473,10 @@ def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable):
 
 
 def _scatter(ax, arguments):
-    x = arguments.pop("x")
-    y = arguments.pop("y")
+    loc = arguments.pop['loc']
+
+    x = loc[:, 0]
+    y = loc[:, 1]
     marker = arguments.pop("marker")
 
     for mark in np.unique(marker):
