@@ -33,6 +33,8 @@ from mesa.space import (
 )
 from mesa.visualization.utils import update_counter
 
+
+# For typing
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
 Network = NetworkGrid | mesa.experimental.cell_space.Network
@@ -90,7 +92,7 @@ def SpaceMatplotlib(
             draw_voroinoi_grid(space, agent_portrayal, ax)
 
     if propertylayer_portrayal:
-        draw_property_layers(space, propertylayer_portrayal, model, ax)
+        draw_property_layers(space, propertylayer_portrayal, ax)
 
     solara.FigureMatplotlib(
         fig, format="png", bbox_inches="tight", dependencies=dependencies
