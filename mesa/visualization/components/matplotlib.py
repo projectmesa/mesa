@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import solara
+
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
@@ -30,6 +31,7 @@ from mesa.space import (
     PropertyLayer,
     SingleGrid,
 )
+from mesa import Model
 from mesa.visualization.utils import update_counter
 
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
@@ -79,19 +81,19 @@ def SpaceMatplotlib(
     match space:
         case mesa.space._Grid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid():
             draw_orthogonal_grid(
-                space, agent_portrayal, propertylayer_portrayal, model, ax
+                space, agent_portrayal, ax
             )
-        case HexSingleGrid() | HexSingleGrid() | mesa.experimental.cell_space.HexGrid():
-            draw_hex_grid(space, agent_portrayal, propertylayer_portrayal, model, ax)
+        case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
+            draw_hex_grid(space, agent_portrayal, ax)
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
             draw_network(space, agent_portrayal, ax)
         case mesa.space.ContinuousSpace():
             draw_continuous_space(space, agent_portrayal, ax)
         case VoronoiGrid():
             draw_voroinoi_grid(space, agent_portrayal, ax)
-        case None:
-            if propertylayer_portrayal:
-                draw_property_layers(space, propertylayer_portrayal, model, ax)
+
+    if propertylayer_portrayal:
+        draw_property_layers(space, propertylayer_portrayal, model, ax)
 
     solara.FigureMatplotlib(
         fig, format="png", bbox_inches="tight", dependencies=dependencies
@@ -213,8 +215,6 @@ def collect_agent_data(
 def draw_orthogonal_grid(
     space: OrthogonalGrid,
     agent_portrayal: Callable,
-    propertylayer_portrayal: Callable | None,
-    model,
     ax,
 ):
     """Visualize a orthogonal grid.
@@ -222,8 +222,6 @@ def draw_orthogonal_grid(
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
-        propertylayer_portrayal: a callable that is called with the agent and returns a dict
-        model: a model instance
         ax: a Matplotlib Axes instance
 
     Returns:
@@ -244,15 +242,10 @@ def draw_orthogonal_grid(
 
     _scatter(ax, arguments)
 
-    if propertylayer_portrayal:
-        draw_property_layers(ax, space, propertylayer_portrayal, model)
-
 
 def draw_hex_grid(
     space: HexGrid,
     agent_portrayal: Callable,
-    propertylayer_portrayal: Callable,
-    model,
     ax,
 ):
     """Visualize a hex grid.
@@ -324,9 +317,6 @@ def draw_hex_grid(
             space.height,
         )
     )
-
-    if propertylayer_portrayal:
-        draw_property_layers(ax, space, propertylayer_portrayal, model)
 
 
 def draw_network(space: Network, agent_portrayal: Callable, ax):
