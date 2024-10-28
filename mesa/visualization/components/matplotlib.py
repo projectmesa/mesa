@@ -293,7 +293,7 @@ def draw_hex_grid(
     # numbers here are based on a distance of 1 between centers of hexes
     offset = math.sqrt(0.75)
 
-    loc = arguments['loc'].astype(float)
+    loc = arguments["loc"].astype(float)
 
     logical = np.mod(loc[:, 1], 2) == 1
     loc[:, 1] *= offset
