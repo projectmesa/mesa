@@ -4,8 +4,7 @@ import itertools
 import math
 import warnings
 from collections.abc import Callable
-
-from typing import Dict, Any
+from typing import Any
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -98,7 +97,7 @@ def SpaceMatplotlib(
     )
 
 
-def draw_property_layers(space, propertylayer_portrayal: Dict[str, Dict[str, Any]], ax):
+def draw_property_layers(space, propertylayer_portrayal: dict[str, dict[str, Any]], ax):
     """Draw PropertyLayers on the given axes.
 
     Args:
