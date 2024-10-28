@@ -333,13 +333,16 @@ def draw_hex_grid(
     )
 
 
-def draw_network(space: Network, agent_portrayal: Callable, ax):
+def draw_network(space: Network, agent_portrayal: Callable, ax,
+                 layout_alg=nx.spring_layout, layout_kwargs={"seed":0}):
     """Visualize a network space.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance
+        layout_alg: a networkx layout algorithm or other callable with the same behavior
+        layout_kwargs: a dictionary of keyword arguments for the layout algorithm
 
     Notes:
         this uses networkx.draw under the hood so agent portrayal fields should match those used there
@@ -349,7 +352,7 @@ def draw_network(space: Network, agent_portrayal: Callable, ax):
     """
     # gather locations for nodes in network
     graph = space.G
-    pos = nx.spring_layout(graph, seed=0)
+    pos = layout_alg(graph, **layout_kwargs)
     x, y = list(zip(*pos.values()))
     xmin, xmax = min(x), max(x)
     ymin, ymax = min(y), max(y)
