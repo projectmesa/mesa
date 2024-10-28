@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import solara
-
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
@@ -31,7 +30,6 @@ from mesa.space import (
     PropertyLayer,
     SingleGrid,
 )
-from mesa import Model
 from mesa.visualization.utils import update_counter
 
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
@@ -80,9 +78,7 @@ def SpaceMatplotlib(
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
         case mesa.space._Grid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid():
-            draw_orthogonal_grid(
-                space, agent_portrayal, ax
-            )
+            draw_orthogonal_grid(space, agent_portrayal, ax)
         case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
             draw_hex_grid(space, agent_portrayal, ax)
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
