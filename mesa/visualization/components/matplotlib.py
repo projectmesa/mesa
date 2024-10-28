@@ -75,7 +75,7 @@ def SpaceMatplotlib(
         space = getattr(model, "space", None)
 
     fig = Figure()
-    ax = fig.subplots(111)
+    ax = fig.subplots()
 
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:

@@ -1,3 +1,7 @@
+import sys
+import os.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../')))
+
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.examples.advanced.wolf_sheep.model import WolfSheep
 from mesa.visualization import (
@@ -64,7 +68,7 @@ model_params = {
 
 
 space_component = make_space_matplotlib(wolf_sheep_portrayal)
-lineplot_component = make_plot_measure(["Wolves", "Sheep", "Grass"])
+lineplot_component = make_plot_measure({"Wolves":"tab:orange", "Sheep":"tab:blue", "Grass":"tab:green"})
 
 model = WolfSheep(grass=True)
 
