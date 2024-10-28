@@ -300,7 +300,7 @@ def draw_hex_grid(
 
     loc = arguments["loc"].astype(float)
 
-    logical = np.mod(loc[:, 1], 2) == 1
+    logical = np.mod(loc[:, 1], 2) == 0
     loc[:, 0][logical] += 0.5
     loc[:, 1] *= offset
     arguments["loc"] = loc
@@ -322,7 +322,7 @@ def draw_hex_grid(
 
         patches = []
         for x, y in itertools.product(range(width), range(height)):
-            if y % 2 == 1:
+            if y % 2 == 0:
                 x += 0.5  # noqa: PLW2901
             y *= offset  # noqa: PLW2901
             hex = RegularPolygon(
