@@ -16,6 +16,7 @@ from mesa.visualization.components.matplotlib import (
     draw_orthogonal_grid,
     draw_voroinoi_grid,
 )
+import matplotlib.pyplot as plt
 
 
 def agent_portrayal(agent):
@@ -39,7 +40,9 @@ def test_draw_hex_grid():
     for _ in range(10):
         agent = Agent(model)
         grid.move_to_empty(agent)
-    draw_hex_grid(grid, agent_portrayal, None, model)
+
+    fig, ax = plt.subplots()
+    draw_hex_grid(grid, agent_portrayal, None, model, ax)
 
     model = Model(seed=42)
     grid = HexGrid((10, 10), torus=True, random=model.random, capacity=1)
@@ -47,7 +50,8 @@ def test_draw_hex_grid():
         agent = CellAgent(model)
         agent.cell = grid.select_random_empty_cell()
 
-    draw_hex_grid(grid, agent_portrayal, None, model)
+    fig, ax = plt.subplots()
+    draw_hex_grid(grid, agent_portrayal, None, model, ax)
 
 
 def test_draw_voroinoi_grid():
@@ -61,7 +65,8 @@ def test_draw_voroinoi_grid():
         agent = CellAgent(model)
         agent.cell = grid.select_random_empty_cell()
 
-    draw_voroinoi_grid(grid, agent_portrayal)
+    fig, ax = plt.subplots()
+    draw_voroinoi_grid(grid, agent_portrayal, ax)
 
 
 def test_draw_orthogonal_grid():
@@ -71,7 +76,9 @@ def test_draw_orthogonal_grid():
     for _ in range(10):
         agent = Agent(model)
         grid.move_to_empty(agent)
-    draw_orthogonal_grid(grid, agent_portrayal, None, model)
+
+    fig, ax = plt.subplots()
+    draw_orthogonal_grid(grid, agent_portrayal, None, model, ax)
 
     model = Model(seed=42)
     grid = OrthogonalMooreGrid((10, 10), torus=True, random=model.random, capacity=1)
@@ -79,7 +86,8 @@ def test_draw_orthogonal_grid():
         agent = CellAgent(model)
         agent.cell = grid.select_random_empty_cell()
 
-    draw_orthogonal_grid(grid, agent_portrayal, None, model)
+    fig, ax = plt.subplots()
+    draw_orthogonal_grid(grid, agent_portrayal, None, model, ax)
 
 
 def test_draw_continuous_space():
@@ -91,7 +99,9 @@ def test_draw_continuous_space():
         y = model.random.random() * 10
         agent = Agent(model)
         space.place_agent(agent, (x, y))
-    draw_continuous_space(space, agent_portrayal)
+
+    fig, ax = plt.subplots()
+    draw_continuous_space(space, agent_portrayal, ax)
 
 
 def test_draw_network():
@@ -119,7 +129,9 @@ def test_draw_network():
         agent = Agent(model)
         pos = agent.random.randint(0, len(graph.nodes) - 1)
         grid.place_agent(agent, pos)
-    draw_network(grid, agent_portrayal)
+
+    fig, ax = plt.subplots()
+    draw_network(grid, agent_portrayal, ax)
 
     model = Model(seed=42)
     grid = Network(graph, random=model.random, capacity=1)
@@ -127,7 +139,8 @@ def test_draw_network():
         agent = CellAgent(model)
         agent.cell = grid.select_random_empty_cell()
 
-    draw_network(grid, agent_portrayal)
+    fig, ax = plt.subplots()
+    draw_network(grid, agent_portrayal, ax)
 
 
 def test_draw_property_layers():
