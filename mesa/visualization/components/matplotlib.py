@@ -72,52 +72,35 @@ def SpaceMatplotlib(
     if space is None:
         space = getattr(model, "space", None)
 
+    fig = Figure()
+    ax = fig.subplots(111)
+
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
-        case mesa.space._Grid():
-            fig, ax = draw_orthogonal_grid(
-                space, agent_portrayal, propertylayer_portrayal, model
+        case mesa.space._Grid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid():
+            draw_orthogonal_grid(
+                space, agent_portrayal, propertylayer_portrayal, model, ax
             )
-        case OrthogonalMooreGrid():
-            fig, ax = draw_orthogonal_grid(
-                space, agent_portrayal, propertylayer_portrayal, model
+        case HexSingleGrid() | HexSingleGrid() | mesa.experimental.cell_space.HexGrid():
+            draw_hex_grid(
+                space, agent_portrayal, propertylayer_portrayal, model, ax
             )
-        case OrthogonalVonNeumannGrid():
-            fig, ax = draw_orthogonal_grid(
-                space, agent_portrayal, propertylayer_portrayal, model
-            )
-        case HexSingleGrid():
-            fig, ax = draw_hex_grid(
-                space, agent_portrayal, propertylayer_portrayal, model
-            )
-        case HexSingleGrid():
-            fig, ax = draw_hex_grid(
-                space, agent_portrayal, propertylayer_portrayal, model
-            )
-        case mesa.experimental.cell_space.HexGrid():
-            fig, ax = draw_hex_grid(
-                space, agent_portrayal, propertylayer_portrayal, model
-            )
+        case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
+            draw_network(space, agent_portrayal, ax)
         case mesa.space.ContinuousSpace():
-            fig, ax = draw_continuous_space(space, agent_portrayal)
-        case mesa.space.NetworkGrid():
-            fig, ax = draw_network(space, agent_portrayal)
+            draw_continuous_space(space, agent_portrayal, ax)
         case VoronoiGrid():
-            fig, ax = draw_voroinoi_grid(space, agent_portrayal)
-        case mesa.experimental.cell_space.Network():
-            fig, ax = draw_network(space, agent_portrayal)
+            draw_voroinoi_grid(space, agent_portrayal, ax)
         case None:
-            fig = Figure()
-            ax = fig.subplots(111)
             if propertylayer_portrayal:
-                draw_property_layers(ax, space, propertylayer_portrayal, model)
+                draw_property_layers(space, propertylayer_portrayal, model, ax)
 
     solara.FigureMatplotlib(
         fig, format="png", bbox_inches="tight", dependencies=dependencies
     )
 
 
-def draw_property_layers(ax, space, propertylayer_portrayal, model):
+def draw_property_layers(space, propertylayer_portrayal, model, ax):
     """Draw PropertyLayers on the given axes.
 
     Args:
@@ -234,14 +217,16 @@ def draw_orthogonal_grid(
     agent_portrayal: Callable,
     propertylayer_portrayal: Callable | None,
     model,
+    ax
 ):
-    """Visualize a orthogonal grid..
+    """Visualize a orthogonal grid.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         propertylayer_portrayal: a callable that is called with the agent and returns a dict
         model: a model instance
+        ax: a Matplotlib Axes instance
 
     Returns:
         A Figure and Axes instance
@@ -249,9 +234,6 @@ def draw_orthogonal_grid(
     """
     s_default = (180 / max(space.width, space.height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
-
-    fig = Figure()
-    ax = fig.add_subplot(111)
 
     ax.set_xlim(-0.5, space.width - 0.5)
     ax.set_ylim(-0.5, space.height - 0.5)
@@ -267,11 +249,9 @@ def draw_orthogonal_grid(
     if propertylayer_portrayal:
         draw_property_layers(ax, space, propertylayer_portrayal, model)
 
-    return fig, ax
-
 
 def draw_hex_grid(
-    space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model
+    space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model, ax
 ):
     """Visualize a hex grid.
 
@@ -280,6 +260,7 @@ def draw_hex_grid(
         agent_portrayal: a callable that is called with the agent and returns a dict
         propertylayer_portrayal: a callable that is called with the agent and returns a dict
         model: a model instance
+        ax: a Matplotlib Axes instance
 
     Returns:
         A Figure and Axes instance
@@ -305,8 +286,6 @@ def draw_hex_grid(
     loc[:, 1] *= offset
     arguments["loc"] = loc
 
-    fig = Figure()
-    ax = fig.add_subplot(111)
     ax.set_xlim(-1, space.width + 0.5)
     ax.set_ylim(-offset, space.height * offset)
 
@@ -346,15 +325,15 @@ def draw_hex_grid(
 
     if propertylayer_portrayal:
         draw_property_layers(ax, space, propertylayer_portrayal, model)
-    return fig, ax
 
 
-def draw_network(space: Network, agent_portrayal: Callable):
+def draw_network(space: Network, agent_portrayal: Callable, ax):
     """Visualize a network space.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
+        ax: a Matplotlib Axes instance
 
     Notes:
         this uses networkx.draw under the hood so agent portrayal fields should match those used there
@@ -379,25 +358,22 @@ def draw_network(space: Network, agent_portrayal: Callable):
     pos = np.asarray(list(pos.values()))
     arguments["loc"] = pos[arguments["loc"]]
 
-    fig = Figure()
     ax = fig.add_subplot(111)
     ax.set_axis_off()
     ax.set_xlim(xmin=xmin, xmax=xmax)
     ax.set_ylim(ymin=ymin, ymax=ymax)
 
     _scatter(ax, arguments)
-
     nx.draw_networkx_edges(graph, pos, ax=ax)
 
-    return fig, ax
 
-
-def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable):
+def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax):
     """Visualize a continuous space.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
+        ax: a Matplotlib Axes instance
 
     Returns:
         A Figure and Axes instance
@@ -411,8 +387,6 @@ def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable):
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
-    fig = Figure()
-    ax = fig.add_subplot(111)
 
     border_style = "solid" if not space.torus else (0, (5, 10))
 
@@ -426,15 +400,15 @@ def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable):
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
     _scatter(ax, arguments)
-    return fig, ax
 
 
-def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable):
+def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax):
     """Visualize a voronoi grid.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
+        ax: a Matplotlib Axes instance
 
     Returns:
         A Figure and Axes instance
@@ -455,9 +429,6 @@ def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable):
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
-    fig = Figure()
-    ax = fig.add_subplot(111)
-
     ax.set_xlim(x_min - x_padding, x_max + x_padding)
     ax.set_ylim(y_min - y_padding, y_max + y_padding)
 
@@ -472,7 +443,6 @@ def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable):
             zorder=0,
         )  # Plot filled polygon
         ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in black
-    return fig, ax
 
 
 def _scatter(ax, arguments):
