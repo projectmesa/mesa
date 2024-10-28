@@ -289,6 +289,8 @@ def draw_hex_grid(
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
     # give all odd rows an offset in the x direction
+    # give all rows an offset in the y direction
+    # numbers here are based on a distance of 1 between centers of hexes
     offset = math.sqrt(0.75)
 
     logical = np.mod(arguments["y"], 2) == 1
@@ -314,8 +316,8 @@ def draw_hex_grid(
         patches = []
         for x, y in itertools.product(range(width), range(height)):
             if y % 2 == 1:
-                x += 0.5
-            y *= offset
+                x += 0.5  # noqa: PLW2901
+            y *= offset    # noqa: PLW2901
             hex = RegularPolygon(
                 (x, y),
                 numVertices=6,
@@ -466,7 +468,7 @@ def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable):
 
 
 def _scatter(ax, arguments):
-    loc = arguments.pop["loc"]
+    loc = arguments.pop("loc")
 
     x = loc[:, 0]
     y = loc[:, 1]
