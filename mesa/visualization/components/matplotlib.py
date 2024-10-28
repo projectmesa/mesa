@@ -221,10 +221,7 @@ def collect_agent_data(
 
 
 def draw_orthogonal_grid(
-    space: OrthogonalGrid,
-    agent_portrayal: Callable,
-    ax,
-    draw_grid:bool =True
+    space: OrthogonalGrid, agent_portrayal: Callable, ax, draw_grid: bool = True
 ):
     """Visualize a orthogonal grid.
 
@@ -258,10 +255,7 @@ def draw_orthogonal_grid(
 
 
 def draw_hex_grid(
-    space: HexGrid,
-    agent_portrayal: Callable,
-    ax,
-    draw_grid: bool = True
+    space: HexGrid, agent_portrayal: Callable, ax, draw_grid: bool = True
 ):
     """Visualize a hex grid.
 
@@ -337,9 +331,14 @@ def draw_hex_grid(
         )
 
 
-def draw_network(space: Network, agent_portrayal: Callable, ax, draw_grid: bool=True,
-                 layout_alg=nx.spring_layout, layout_kwargs={"seed":0},
-                 ):
+def draw_network(
+    space: Network,
+    agent_portrayal: Callable,
+    ax,
+    draw_grid: bool = True,
+    layout_alg=nx.spring_layout,
+    layout_kwargs={"seed": 0},
+):
     """Visualize a network space.
 
     Args:
@@ -382,8 +381,8 @@ def draw_network(space: Network, agent_portrayal: Callable, ax, draw_grid: bool=
 
     # further styling
     ax.set_axis_off()
-    ax.set_xlim(xmin=xmin-x_padding, xmax=xmax+x_padding)
-    ax.set_ylim(ymin=ymin-y_padding, ymax=ymax+y_padding)
+    ax.set_xlim(xmin=xmin - x_padding, xmax=xmax + x_padding)
+    ax.set_ylim(ymin=ymin - y_padding, ymax=ymax + y_padding)
 
     if draw_grid:
         # fixme we need to draw the empty nodes as well
