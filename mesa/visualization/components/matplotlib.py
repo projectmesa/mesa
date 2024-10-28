@@ -82,9 +82,7 @@ def SpaceMatplotlib(
                 space, agent_portrayal, propertylayer_portrayal, model, ax
             )
         case HexSingleGrid() | HexSingleGrid() | mesa.experimental.cell_space.HexGrid():
-            draw_hex_grid(
-                space, agent_portrayal, propertylayer_portrayal, model, ax
-            )
+            draw_hex_grid(space, agent_portrayal, propertylayer_portrayal, model, ax)
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
             draw_network(space, agent_portrayal, ax)
         case mesa.space.ContinuousSpace():
@@ -217,7 +215,7 @@ def draw_orthogonal_grid(
     agent_portrayal: Callable,
     propertylayer_portrayal: Callable | None,
     model,
-    ax
+    ax,
 ):
     """Visualize a orthogonal grid.
 
@@ -251,7 +249,11 @@ def draw_orthogonal_grid(
 
 
 def draw_hex_grid(
-    space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model, ax
+    space: HexGrid,
+    agent_portrayal: Callable,
+    propertylayer_portrayal: Callable,
+    model,
+    ax,
 ):
     """Visualize a hex grid.
 
@@ -386,7 +388,6 @@ def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax)
 
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
-
 
     border_style = "solid" if not space.torus else (0, (5, 10))
 

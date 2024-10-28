@@ -1,5 +1,7 @@
 """tests for matplotlib components."""
 
+import matplotlib.pyplot as plt
+
 from mesa import Agent, Model
 from mesa.experimental.cell_space import (
     CellAgent,
@@ -16,7 +18,6 @@ from mesa.visualization.components.matplotlib import (
     draw_orthogonal_grid,
     draw_voroinoi_grid,
 )
-import matplotlib.pyplot as plt
 
 
 def agent_portrayal(agent):
