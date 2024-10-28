@@ -224,6 +224,7 @@ def draw_orthogonal_grid(
     space: OrthogonalGrid,
     agent_portrayal: Callable,
     ax,
+    draw_grid:bool =True
 ):
     """Visualize a orthogonal grid.
 
@@ -231,6 +232,7 @@ def draw_orthogonal_grid(
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance
+        draw_grid: whether to draw the grid
 
     Returns:
         A Figure and Axes instance
@@ -247,26 +249,27 @@ def draw_orthogonal_grid(
     ax.set_xlim(-0.5, space.width - 0.5)
     ax.set_ylim(-0.5, space.height - 0.5)
 
-    # Draw grid lines
-    for x in np.arange(-0.5, space.width - 0.5, 1):
-        ax.axvline(x, color="gray", linestyle=":")
-    for y in np.arange(-0.5, space.height - 0.5, 1):
-        ax.axhline(y, color="gray", linestyle=":")
+    if draw_grid:
+        # Draw grid lines
+        for x in np.arange(-0.5, space.width - 0.5, 1):
+            ax.axvline(x, color="gray", linestyle=":")
+        for y in np.arange(-0.5, space.height - 0.5, 1):
+            ax.axhline(y, color="gray", linestyle=":")
 
 
 def draw_hex_grid(
     space: HexGrid,
     agent_portrayal: Callable,
     ax,
+    draw_grid: bool = True
 ):
     """Visualize a hex grid.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
-        propertylayer_portrayal: a callable that is called with the agent and returns a dict
-        model: a model instance
         ax: a Matplotlib Axes instance
+        draw_grid: whether to draw the grid
 
     Returns:
         A Figure and Axes instance
@@ -324,23 +327,26 @@ def draw_hex_grid(
         )
         return mesh
 
-    # add grid
-    ax.add_collection(
-        setup_hexmesh(
-            space.width,
-            space.height,
+    if draw_grid:
+        # add grid
+        ax.add_collection(
+            setup_hexmesh(
+                space.width,
+                space.height,
+            )
         )
-    )
 
 
-def draw_network(space: Network, agent_portrayal: Callable, ax,
-                 layout_alg=nx.spring_layout, layout_kwargs={"seed":0}):
+def draw_network(space: Network, agent_portrayal: Callable, ax, draw_grid: bool=True,
+                 layout_alg=nx.spring_layout, layout_kwargs={"seed":0},
+                 ):
     """Visualize a network space.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance
+        draw_grid: whether to draw the grid
         layout_alg: a networkx layout algorithm or other callable with the same behavior
         layout_kwargs: a dictionary of keyword arguments for the layout algorithm
 
@@ -359,6 +365,8 @@ def draw_network(space: Network, agent_portrayal: Callable, ax,
 
     width = xmax - xmin
     height = ymax - ymin
+    x_padding = width / 20
+    y_padding = height / 20
 
     # gather agent data
     s_default = (180 / max(width, height)) ** 2
@@ -374,10 +382,12 @@ def draw_network(space: Network, agent_portrayal: Callable, ax,
 
     # further styling
     ax.set_axis_off()
-    ax.set_xlim(xmin=xmin, xmax=xmax)
-    ax.set_ylim(ymin=ymin, ymax=ymax)
+    ax.set_xlim(xmin=xmin-x_padding, xmax=xmax+x_padding)
+    ax.set_ylim(ymin=ymin-y_padding, ymax=ymax+y_padding)
 
-    nx.draw_networkx_edges(graph, pos, ax=ax)
+    if draw_grid:
+        # fixme we need to draw the empty nodes as well
+        nx.draw_networkx_edges(graph, pos, ax=ax)
 
 
 def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax):
