@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 
 from mesa import Agent, Model
-from mesa.space import PropertyLayer
 from mesa.experimental.cell_space import (
     CellAgent,
     HexGrid,
@@ -11,14 +10,20 @@ from mesa.experimental.cell_space import (
     OrthogonalMooreGrid,
     VoronoiGrid,
 )
-from mesa.space import ContinuousSpace, HexSingleGrid, NetworkGrid, SingleGrid
+from mesa.space import (
+    ContinuousSpace,
+    HexSingleGrid,
+    NetworkGrid,
+    PropertyLayer,
+    SingleGrid,
+)
 from mesa.visualization.components.matplotlib import (
     draw_continuous_space,
     draw_hex_grid,
     draw_network,
     draw_orthogonal_grid,
+    draw_property_layers,
     draw_voroinoi_grid,
-    draw_property_layers
 )
 
 
@@ -138,18 +143,16 @@ def test_draw_network():
 
 def test_draw_property_layers():
     """Test drawing property layers."""
-
     model = Model(seed=42)
     grid = SingleGrid(10, 10, torus=True)
     grid.add_property_layer(PropertyLayer("test", grid.width, grid.height, 0))
 
     fig, ax = plt.subplots()
-    draw_property_layers(grid, {"test":{"colormap":"viridis", "colorbar":True}}, ax)
+    draw_property_layers(grid, {"test": {"colormap": "viridis", "colorbar": True}}, ax)
 
     model = Model(seed=42)
     grid = OrthogonalMooreGrid((10, 10), torus=True, random=model.random, capacity=1)
     grid.add_property_layer(PropertyLayer("test", grid.width, grid.height, 0))
 
     fig, ax = plt.subplots()
-    draw_property_layers(grid, {"test":{"colormap":"viridis", "colorbar":True}}, ax)
-
+    draw_property_layers(grid, {"test": {"colormap": "viridis", "colorbar": True}}, ax)
