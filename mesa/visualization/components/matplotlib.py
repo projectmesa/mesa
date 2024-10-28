@@ -293,11 +293,19 @@ def draw_hex_grid(
     # numbers here are based on a distance of 1 between centers of hexes
     offset = math.sqrt(0.75)
 
+
+    # logical = np.mod(arguments["y"], 2) == 1
+    # arguments["y"] = arguments["y"].astype(float) * offset
+    # arguments["x"] = arguments["x"].astype(float)
+    # arguments["x"][logical] += 0.5
+
     loc = arguments["loc"].astype(float)
 
     logical = np.mod(loc[:, 1], 2) == 1
-    loc[:, 1] *= offset
     loc[:, 0][logical] += 0.5
+    loc[:, 1] *= offset
+    arguments["loc"] = loc
+
 
     fig = Figure()
     ax = fig.add_subplot(111)
