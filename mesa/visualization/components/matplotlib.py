@@ -360,7 +360,6 @@ def draw_network(space: Network, agent_portrayal: Callable, ax):
     pos = np.asarray(list(pos.values()))
     arguments["loc"] = pos[arguments["loc"]]
 
-    ax = fig.add_subplot(111)
     ax.set_axis_off()
     ax.set_xlim(xmin=xmin, xmax=xmax)
     ax.set_ylim(ymin=ymin, ymax=ymax)
