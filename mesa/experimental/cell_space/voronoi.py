@@ -208,7 +208,6 @@ class VoronoiGrid(DiscreteSpace):
         self._connect_cells()
         self._build_cell_polygons()
 
-
     def _connect_cells(self) -> None:
         """Connect cells to neighbors based on given centroids and using Delaunay Triangulation."""
         self.triangulation = Delaunay()

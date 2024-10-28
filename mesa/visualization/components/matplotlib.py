@@ -3,19 +3,12 @@
 import itertools
 import math
 import warnings
-from collections import defaultdict
 from collections.abc import Callable
 
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import solara
-
-from matplotlib.collections import PatchCollection
-from matplotlib.patches import RegularPolygon
-import math
-
-
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
@@ -55,6 +48,7 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
         function: A function that creates a SpaceMatplotlib component
     """
     if agent_portrayal is None:
+
         def agent_portrayal(a):
             return {"id": a.unique_id}
 
@@ -66,10 +60,10 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
 
 @solara.component
 def SpaceMatplotlib(
-        model,
-        agent_portrayal,
-        propertylayer_portrayal,
-        dependencies: list[any] | None = None,
+    model,
+    agent_portrayal,
+    propertylayer_portrayal,
+    dependencies: list[any] | None = None,
 ):
     """Create a Matplotlib-based space visualization component."""
     update_counter.get()
@@ -196,11 +190,11 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
 
 
 def collect_agent_data(
-        space: OrthogonalGrid | HexGrid | Network | ContinuousSpace,
-        agent_portrayal: Callable,
-        c_default="tab:blue",
-        marker_default="o",
-        s_default=25
+    space: OrthogonalGrid | HexGrid | Network | ContinuousSpace,
+    agent_portrayal: Callable,
+    c_default="tab:blue",
+    marker_default="o",
+    s_default=25,
 ):
     """Collect the plotting data for all agents in the space.
 
@@ -227,7 +221,7 @@ def collect_agent_data(
         if loc is None:
             loc = agent.cell.coordinate
 
-        arguments['loc'] = loc
+        arguments["loc"] = loc
         arguments["s"].append(portray.get("s", s_default))
         arguments["c"].append(portray.get("c", c_default))
         arguments["marker"].append(portray.get("marker", marker_default))
@@ -236,10 +230,10 @@ def collect_agent_data(
 
 
 def draw_orthogonal_grid(
-        space: OrthogonalGrid,
-        agent_portrayal: Callable,
-        propertylayer_portrayal: Callable | None,
-        model,
+    space: OrthogonalGrid,
+    agent_portrayal: Callable,
+    propertylayer_portrayal: Callable | None,
+    model,
 ):
     """Visualize a orthogonal grid..
 
@@ -277,7 +271,7 @@ def draw_orthogonal_grid(
 
 
 def draw_hex_grid(
-        space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model
+    space: HexGrid, agent_portrayal: Callable, propertylayer_portrayal: Callable, model
 ):
     """Visualize a hex grid.
 
@@ -371,10 +365,9 @@ def draw_network(space: Network, agent_portrayal: Callable):
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
-
     # fixme check if this code works
     #  it won't work in the current format because pos is a dict
-    arguments['loc'] = pos[arguments['loc']]
+    arguments["loc"] = pos[arguments["loc"]]
 
     fig = Figure()
     ax = fig.add_subplot(111)
@@ -473,7 +466,7 @@ def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable):
 
 
 def _scatter(ax, arguments):
-    loc = arguments.pop['loc']
+    loc = arguments.pop["loc"]
 
     x = loc[:, 0]
     y = loc[:, 1]
