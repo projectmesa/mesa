@@ -368,8 +368,9 @@ def draw_network(space: Network, agent_portrayal: Callable):
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
-    # fixme check if this code works
-    #  it won't work in the current format because pos is a dict
+    # this assumes that nodes are identified by an integer
+    # which is true for default nx graphs but might user changeable
+    pos = np.asarray(list(pos.values()))
     arguments["loc"] = pos[arguments["loc"]]
 
     fig = Figure()
