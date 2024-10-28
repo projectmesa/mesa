@@ -33,7 +33,6 @@ from mesa.space import (
 )
 from mesa.visualization.utils import update_counter
 
-
 # For typing
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
