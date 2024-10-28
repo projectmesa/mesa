@@ -386,7 +386,8 @@ def draw_network(
 
     if draw_grid:
         # fixme we need to draw the empty nodes as well
-        nx.draw_networkx_edges(graph, pos, ax=ax)
+        edge_collection = nx.draw_networkx_edges(graph, pos, ax=ax, alpha=0.5, style='--')
+        edge_collection.set_zorder(0)
 
 
 def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax):
