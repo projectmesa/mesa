@@ -254,8 +254,6 @@ def draw_orthogonal_grid(
         ax.axhline(y, color="gray", linestyle=":")
 
 
-
-
 def draw_hex_grid(
     space: HexGrid,
     agent_portrayal: Callable,
@@ -277,7 +275,6 @@ def draw_hex_grid(
     # gather data
     s_default = (180 / max(space.width, space.height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
-
 
     # for hexgrids we have to go from logical coordinates to visual coordinates
     # this is a bit messy.
@@ -372,7 +369,6 @@ def draw_network(space: Network, agent_portrayal: Callable, ax):
     # plot the agents
     _scatter(ax, arguments)
 
-
     # further styling
     ax.set_axis_off()
     ax.set_xlim(xmin=xmin, xmax=xmax)
@@ -415,8 +411,6 @@ def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax)
 
     ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
-
-
 
 
 def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax):
