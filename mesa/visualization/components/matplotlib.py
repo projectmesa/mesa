@@ -337,7 +337,7 @@ def draw_network(
     ax,
     draw_grid: bool = True,
     layout_alg=nx.spring_layout,
-    layout_kwargs={"seed": 0},
+    layout_kwargs=None,
 ):
     """Visualize a network space.
 
@@ -355,6 +355,9 @@ def draw_network(
 
 
     """
+    if layout_kwargs is None:
+        layout_kwargs = {"seed": 0}
+
     # gather locations for nodes in network
     graph = space.G
     pos = layout_alg(graph, **layout_kwargs)
