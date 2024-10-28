@@ -105,7 +105,6 @@ def draw_property_layers(space, propertylayer_portrayal: dict[str, dict[str, Any
         space (mesa.space._Grid): The space containing the PropertyLayers.
         propertylayer_portrayal (dict): the key is the name of the layer, the value is a dict with
                                         fields specifying how the layer is to be portrayed
-        model (mesa.Model): The model instance.
         ax (matplotlib.axes.Axes): The axes to draw on.
 
     Notes:
@@ -237,9 +236,14 @@ def draw_orthogonal_grid(
         A Figure and Axes instance
 
     """
+    # gather agent data
     s_default = (180 / max(space.width, space.height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
+    # plot the agents
+    _scatter(ax, arguments)
+
+    # further styling
     ax.set_xlim(-0.5, space.width - 0.5)
     ax.set_ylim(-0.5, space.height - 0.5)
 
@@ -249,7 +253,7 @@ def draw_orthogonal_grid(
     for y in np.arange(-0.5, space.height - 0.5, 1):
         ax.axhline(y, color="gray", linestyle=":")
 
-    _scatter(ax, arguments)
+
 
 
 def draw_hex_grid(
@@ -270,18 +274,19 @@ def draw_hex_grid(
         A Figure and Axes instance
 
     """
+    # gather data
     s_default = (180 / max(space.width, space.height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
-    # give all odd rows an offset in the x direction
+
+    # for hexgrids we have to go from logical coordinates to visual coordinates
+    # this is a bit messy.
+
+    # give all even rows an offset in the x direction
     # give all rows an offset in the y direction
+
     # numbers here are based on a distance of 1 between centers of hexes
     offset = math.sqrt(0.75)
-
-    # logical = np.mod(arguments["y"], 2) == 1
-    # arguments["y"] = arguments["y"].astype(float) * offset
-    # arguments["x"] = arguments["x"].astype(float)
-    # arguments["x"][logical] += 0.5
 
     loc = arguments["loc"].astype(float)
 
@@ -290,10 +295,12 @@ def draw_hex_grid(
     loc[:, 1] *= offset
     arguments["loc"] = loc
 
+    # plot the agents
+    _scatter(ax, arguments)
+
+    # further styling and adding of grid
     ax.set_xlim(-1, space.width + 0.5)
     ax.set_ylim(-offset, space.height * offset)
-
-    _scatter(ax, arguments)
 
     def setup_hexmesh(
         width,
@@ -320,6 +327,7 @@ def draw_hex_grid(
         )
         return mesh
 
+    # add grid
     ax.add_collection(
         setup_hexmesh(
             space.width,
@@ -342,6 +350,7 @@ def draw_network(space: Network, agent_portrayal: Callable, ax):
 
 
     """
+    # gather locations for nodes in network
     graph = space.G
     pos = nx.spring_layout(graph, seed=0)
     x, y = list(zip(*pos.values()))
@@ -351,6 +360,7 @@ def draw_network(space: Network, agent_portrayal: Callable, ax):
     width = xmax - xmin
     height = ymax - ymin
 
+    # gather agent data
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
@@ -359,11 +369,15 @@ def draw_network(space: Network, agent_portrayal: Callable, ax):
     pos = np.asarray(list(pos.values()))
     arguments["loc"] = pos[arguments["loc"]]
 
+    # plot the agents
+    _scatter(ax, arguments)
+
+
+    # further styling
     ax.set_axis_off()
     ax.set_xlim(xmin=xmin, xmax=xmax)
     ax.set_ylim(ymin=ymin, ymax=ymax)
 
-    _scatter(ax, arguments)
     nx.draw_networkx_edges(graph, pos, ax=ax)
 
 
@@ -379,17 +393,21 @@ def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax)
         A Figure and Axes instance
 
     """
+    # space related setup
     width = space.x_max - space.x_min
     x_padding = width / 20
     height = space.y_max - space.y_min
     y_padding = height / 20
 
+    # gather agent data
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
 
-    border_style = "solid" if not space.torus else (0, (5, 10))
+    # plot the agents
+    _scatter(ax, arguments)
 
-    # Set the border of the plot
+    # further visual styling
+    border_style = "solid" if not space.torus else (0, (5, 10))
     for spine in ax.spines.values():
         spine.set_linewidth(1.5)
         spine.set_color("black")
@@ -398,7 +416,7 @@ def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax)
     ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
-    _scatter(ax, arguments)
+
 
 
 def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax):
