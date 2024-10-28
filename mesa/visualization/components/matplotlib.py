@@ -317,7 +317,7 @@ def draw_hex_grid(
         for x, y in itertools.product(range(width), range(height)):
             if y % 2 == 1:
                 x += 0.5  # noqa: PLW2901
-            y *= offset    # noqa: PLW2901
+            y *= offset  # noqa: PLW2901
             hex = RegularPolygon(
                 (x, y),
                 numVertices=6,
