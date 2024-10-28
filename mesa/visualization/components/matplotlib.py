@@ -5,6 +5,8 @@ import math
 import warnings
 from collections.abc import Callable
 
+from typing import Dict
+
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -96,17 +98,30 @@ def SpaceMatplotlib(
     )
 
 
-def draw_property_layers(space, propertylayer_portrayal, model, ax):
+def draw_property_layers(space, propertylayer_portrayal: Dict[str:Dict], ax):
     """Draw PropertyLayers on the given axes.
 
     Args:
-        ax (matplotlib.axes.Axes): The axes to draw on.
         space (mesa.space._Grid): The space containing the PropertyLayers.
-        propertylayer_portrayal (dict): Dictionary of PropertyLayer portrayal specifications.
+        propertylayer_portrayal (dict): the key is the name of the layer, the value is a dict with
+                                        fields specifying how the layer is to be portrayed
         model (mesa.Model): The model instance.
+        ax (matplotlib.axes.Axes): The axes to draw on.
+
+    Notes:
+        valid fields in in the inner dict of propertylayer_portrayal are "alpha", "vmin", "vmax", "color" or "colormap", and "colorbar"
+        so you can do `{"some_layer":{"colormap":'viridis', 'alpha':.25, "colorbar":False}}`
+
     """
+    try:
+        # old style spaces
+        property_layers = space.properties
+    except AttributeError:
+        # new style spaces
+        property_layers = space.property_layers
+
     for layer_name, portrayal in propertylayer_portrayal.items():
-        layer = getattr(model, layer_name, None)
+        layer = property_layers.get(layer_name, None)
         if not isinstance(layer, PropertyLayer):
             continue
 
@@ -138,7 +153,6 @@ def draw_property_layers(space, propertylayer_portrayal, model, ax):
             )
             im = ax.imshow(
                 rgba_data.transpose(1, 0, 2),
-                extent=(0, width, 0, height),
                 origin="lower",
             )
             if colorbar:
@@ -157,7 +171,6 @@ def draw_property_layers(space, propertylayer_portrayal, model, ax):
                 alpha=alpha,
                 vmin=vmin,
                 vmax=vmax,
-                extent=(0, width, 0, height),
                 origin="lower",
             )
             if colorbar:
