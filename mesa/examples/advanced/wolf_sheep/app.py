@@ -63,13 +63,14 @@ def post_process(ax):
     ax.set_yticks([])
 
 
-space_component = make_space_matplotlib(wolf_sheep_portrayal, draw_grid=False, post_process=post_process)
+space_component = make_space_matplotlib(
+    wolf_sheep_portrayal, draw_grid=False, post_process=post_process
+)
 lineplot_component = make_plot_measure(
     {"Wolves": "tab:orange", "Sheep": "tab:blue", "Grass": "tab:green"}
 )
 
 model = WolfSheep(grass=True)
-
 
 
 page = SolaraViz(
