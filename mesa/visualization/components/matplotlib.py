@@ -41,10 +41,10 @@ Network = NetworkGrid | mesa.experimental.cell_space.Network
 
 
 def make_space_component(
-        agent_portrayal: Callable | None = None,
-        propertylayer_portrayal: dict | None = None,
-        post_process: Callable | None = None,
-        **space_drawing_kwargs,
+    agent_portrayal: Callable | None = None,
+    propertylayer_portrayal: dict | None = None,
+    post_process: Callable | None = None,
+    **space_drawing_kwargs,
 ):
     """Create a Matplotlib-based space visualization component.
 
@@ -63,6 +63,7 @@ def make_space_component(
         function: A function that creates a SpaceMatplotlib component
     """
     if agent_portrayal is None:
+
         def agent_portrayal(a):
             return {}
 
@@ -80,12 +81,12 @@ def make_space_component(
 
 @solara.component
 def SpaceMatplotlib(
-        model,
-        agent_portrayal,
-        propertylayer_portrayal,
-        dependencies: list[any] | None = None,
-        post_process: Callable | None = None,
-        **space_drawing_kwargs,
+    model,
+    agent_portrayal,
+    propertylayer_portrayal,
+    dependencies: list[any] | None = None,
+    post_process: Callable | None = None,
+    **space_drawing_kwargs,
 ):
     """Create a Matplotlib-based space visualization component."""
     update_counter.get()
@@ -112,12 +113,12 @@ def SpaceMatplotlib(
 
 
 def collect_agent_data(
-        space: OrthogonalGrid | HexGrid | Network | ContinuousSpace | VoronoiGrid,
-        agent_portrayal: Callable,
-        color="tab:blue",
-        size=25,
-        marker="o",
-        zorder: int = 1,
+    space: OrthogonalGrid | HexGrid | Network | ContinuousSpace | VoronoiGrid,
+    agent_portrayal: Callable,
+    color="tab:blue",
+    size=25,
+    marker="o",
+    zorder: int = 1,
 ):
     """Collect the plotting data for all agents in the space.
 
@@ -163,12 +164,12 @@ def collect_agent_data(
 
 
 def draw_space(
-        space,
-        agent_portrayal: Callable,
-        propertylayer_portrayal: dict | None = None,
-        ax: Axes | None = None,
-        post_process: Callable | None = None,
-        **space_drawing_kwargs,
+    space,
+    agent_portrayal: Callable,
+    propertylayer_portrayal: dict | None = None,
+    ax: Axes | None = None,
+    post_process: Callable | None = None,
+    **space_drawing_kwargs,
 ):
     """Draw a Matplotlib-based visualization of the space.
 
@@ -215,7 +216,7 @@ def draw_space(
 
 
 def draw_property_layers(
-        space, propertylayer_portrayal: dict[str, dict[str, Any]], ax: Axes
+    space, propertylayer_portrayal: dict[str, dict[str, Any]], ax: Axes
 ):
     """Draw PropertyLayers on the given axes.
 
@@ -299,10 +300,10 @@ def draw_property_layers(
 
 
 def draw_orthogonal_grid(
-        space: OrthogonalGrid,
-        agent_portrayal: Callable,
-        ax: Axes | None = None,
-        draw_grid: bool = True,
+    space: OrthogonalGrid,
+    agent_portrayal: Callable,
+    ax: Axes | None = None,
+    draw_grid: bool = True,
 ):
     """Visualize a orthogonal grid.
 
@@ -344,10 +345,10 @@ def draw_orthogonal_grid(
 
 
 def draw_hex_grid(
-        space: HexGrid,
-        agent_portrayal: Callable,
-        ax: Axes | None = None,
-        draw_grid: bool = True,
+    space: HexGrid,
+    agent_portrayal: Callable,
+    ax: Axes | None = None,
+    draw_grid: bool = True,
 ):
     """Visualize a hex grid.
 
@@ -395,8 +396,8 @@ def draw_hex_grid(
     ax.set_ylim(-offset, space.height * offset)
 
     def setup_hexmesh(
-            width,
-            height,
+        width,
+        height,
     ):
         """Helper function for creating the hexmaesh."""
         # fixme: this should be done once, rather than in each update
@@ -431,12 +432,12 @@ def draw_hex_grid(
 
 
 def draw_network(
-        space: Network,
-        agent_portrayal: Callable,
-        ax: Axes | None = None,
-        draw_grid: bool = True,
-        layout_alg=nx.spring_layout,
-        layout_kwargs=None,
+    space: Network,
+    agent_portrayal: Callable,
+    ax: Axes | None = None,
+    draw_grid: bool = True,
+    layout_alg=nx.spring_layout,
+    layout_kwargs=None,
 ):
     """Visualize a network space.
 
@@ -500,7 +501,7 @@ def draw_network(
 
 
 def draw_continuous_space(
-        space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None
+    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None
 ):
     """Visualize a continuous space.
 
@@ -546,7 +547,7 @@ def draw_continuous_space(
 
 
 def draw_voroinoi_grid(
-        space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None
+    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None
 ):
     """Visualize a voronoi grid.
 
