@@ -127,7 +127,9 @@ def collect_agent_data(
         if len(portray) > 0:
             ignored_fields = list(portray.keys())
             msg = ", ".join(ignored_fields)
-            warnings.warn(f"the following fields are not used in agent portrayal and thus ignored: {msg}.")
+            warnings.warn(
+                f"the following fields are not used in agent portrayal and thus ignored: {msg}."
+            )
 
     return {k: np.asarray(v) for k, v in arguments.items()}
 
