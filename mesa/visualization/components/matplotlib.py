@@ -118,7 +118,7 @@ def collect_agent_data(
     color="tab:blue",
     size=25,
     marker="o",
-    zorder:int = 1
+    zorder: int = 1,
 ):
     """Collect the plotting data for all agents in the space.
 
@@ -139,7 +139,7 @@ def collect_agent_data(
     .. _Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html
 
     """
-    arguments = {"s":[],"c":[], "marker":[], "zorder":[], 'loc':[]}
+    arguments = {"s": [], "c": [], "marker": [], "zorder": [], "loc": []}
 
     for agent in space.agents:
         portray = agent_portrayal(agent)
@@ -580,14 +580,17 @@ def _scatter(ax: Axes, arguments):
     marker = arguments.pop("marker")
     zorder = arguments.pop("zorder")
 
-
     for mark in np.unique(marker):
         mark_mask = marker == mark
         for z_order in np.unique(zorder):
             zorder_mask = z_order == zorder
             logical = mark_mask & zorder_mask
             ax.scatter(
-                x[logical], y[logical], marker=mark, zorder=z_order, **{k: v[logical] for k, v in arguments.items()}
+                x[logical],
+                y[logical],
+                marker=mark,
+                zorder=z_order,
+                **{k: v[logical] for k, v in arguments.items()},
             )
 
 
