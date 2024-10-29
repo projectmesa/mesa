@@ -56,7 +56,7 @@ def make_space_matplotlib(
                                the functions for drawing the various spaces for further details.
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
-    "size", and "marker". Other field are ignored and will result in a user warning.
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
 
 
     Returns:
@@ -180,10 +180,12 @@ def draw_space(
         propertylayer_portrayal: a dict specifying how to show propertylayer(s)
         ax: the axes upon which to draw the plot
         post_process: a callable called with the Axes instance
-        space_drawing_kwargs: any additional keyword arguments to be passed on to the underlying function for drawing the space.
-
         postprocess: a user-specified callable to do post-processing called with the Axes instance. This callable
         can be used for any further fine-tuning of the plot (e.g., changing ticks, etc.)
+        space_drawing_kwargs: any additional keyword arguments to be passed on to the underlying function for drawing the space.
+
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
 
     """
     if ax is None:
@@ -307,8 +309,8 @@ def draw_orthogonal_grid(
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
 
-    Returns:
-        A Figure and Axes instance
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
 
     """
     if ax is None:
@@ -347,8 +349,8 @@ def draw_hex_grid(
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
 
-    Returns:
-        A Figure and Axes instance
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
 
     """
     if ax is None:
@@ -434,10 +436,8 @@ def draw_network(
         layout_alg: a networkx layout algorithm or other callable with the same behavior
         layout_kwargs: a dictionary of keyword arguments for the layout algorithm
 
-    Notes:
-        this uses networkx.draw under the hood so agent portrayal fields should match those used there
-        i.e., node_size and node_color.
-
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
 
     """
     if ax is None:
@@ -492,8 +492,8 @@ def draw_continuous_space(
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
 
-    Returns:
-        A Figure and Axes instance
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
 
     """
     if ax is None:
@@ -533,8 +533,8 @@ def draw_voroinoi_grid(
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
 
-    Returns:
-        A Figure and Axes instance
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
 
     """
     if ax is None:
