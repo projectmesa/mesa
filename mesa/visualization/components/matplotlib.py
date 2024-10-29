@@ -40,11 +40,11 @@ HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
 Network = NetworkGrid | mesa.experimental.cell_space.Network
 
 
-def make_space_matplotlib(
-    agent_portrayal: Callable | None = None,
-    propertylayer_portrayal: dict | None = None,
-    post_process: Callable | None = None,
-    **space_drawing_kwargs,
+def make_space_component(
+        agent_portrayal: Callable | None = None,
+        propertylayer_portrayal: dict | None = None,
+        post_process: Callable | None = None,
+        **space_drawing_kwargs,
 ):
     """Create a Matplotlib-based space visualization component.
 
@@ -63,7 +63,6 @@ def make_space_matplotlib(
         function: A function that creates a SpaceMatplotlib component
     """
     if agent_portrayal is None:
-
         def agent_portrayal(a):
             return {}
 
@@ -81,12 +80,12 @@ def make_space_matplotlib(
 
 @solara.component
 def SpaceMatplotlib(
-    model,
-    agent_portrayal,
-    propertylayer_portrayal,
-    dependencies: list[any] | None = None,
-    post_process: Callable | None = None,
-    **space_drawing_kwargs,
+        model,
+        agent_portrayal,
+        propertylayer_portrayal,
+        dependencies: list[any] | None = None,
+        post_process: Callable | None = None,
+        **space_drawing_kwargs,
 ):
     """Create a Matplotlib-based space visualization component."""
     update_counter.get()
@@ -113,26 +112,25 @@ def SpaceMatplotlib(
 
 
 def collect_agent_data(
-    space: OrthogonalGrid | HexGrid | Network | ContinuousSpace | VoronoiGrid,
-    agent_portrayal: Callable,
-    color="tab:blue",
-    size=25,
-    marker="o",
-    zorder: int = 1,
+        space: OrthogonalGrid | HexGrid | Network | ContinuousSpace | VoronoiGrid,
+        agent_portrayal: Callable,
+        color="tab:blue",
+        size=25,
+        marker="o",
+        zorder: int = 1,
 ):
     """Collect the plotting data for all agents in the space.
 
     Args:
         space: The space containing the Agents.
         agent_portrayal: A callable that is called with the agent and returns a dict
-        loc: a boolean indicating whether to gather agent x, y data or not
         color: default color
-        marker: default marker
         size: default size
+        marker: default marker
         zorder: default zorder
 
     Notes:
-        agent portray dict is limited to size (size of marker), color (color of marker, and marker (marker style)
+        agent portray dict is limited to size (size of marker), color (color of marker, zorder, and marker (marker style)
         see `Matplotlib`_.
 
 
@@ -165,12 +163,12 @@ def collect_agent_data(
 
 
 def draw_space(
-    space,
-    agent_portrayal: Callable,
-    propertylayer_portrayal: dict | None = None,
-    ax: Axes | None = None,
-    post_process: Callable | None = None,
-    **space_drawing_kwargs,
+        space,
+        agent_portrayal: Callable,
+        propertylayer_portrayal: dict | None = None,
+        ax: Axes | None = None,
+        post_process: Callable | None = None,
+        **space_drawing_kwargs,
 ):
     """Draw a Matplotlib-based visualization of the space.
 
@@ -183,6 +181,9 @@ def draw_space(
         postprocess: a user-specified callable to do post-processing called with the Axes instance. This callable
         can be used for any further fine-tuning of the plot (e.g., changing ticks, etc.)
         space_drawing_kwargs: any additional keyword arguments to be passed on to the underlying function for drawing the space.
+
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
     "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
@@ -210,9 +211,11 @@ def draw_space(
     if post_process is not None:
         post_process(ax=ax)
 
+    return ax
+
 
 def draw_property_layers(
-    space, propertylayer_portrayal: dict[str, dict[str, Any]], ax: Axes
+        space, propertylayer_portrayal: dict[str, dict[str, Any]], ax: Axes
 ):
     """Draw PropertyLayers on the given axes.
 
@@ -296,10 +299,10 @@ def draw_property_layers(
 
 
 def draw_orthogonal_grid(
-    space: OrthogonalGrid,
-    agent_portrayal: Callable,
-    ax: Axes | None = None,
-    draw_grid: bool = True,
+        space: OrthogonalGrid,
+        agent_portrayal: Callable,
+        ax: Axes | None = None,
+        draw_grid: bool = True,
 ):
     """Visualize a orthogonal grid.
 
@@ -308,6 +311,9 @@ def draw_orthogonal_grid(
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
+
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
     "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
@@ -334,12 +340,14 @@ def draw_orthogonal_grid(
         for y in np.arange(-0.5, space.height - 0.5, 1):
             ax.axhline(y, color="gray", linestyle=":")
 
+    return ax
+
 
 def draw_hex_grid(
-    space: HexGrid,
-    agent_portrayal: Callable,
-    ax: Axes | None = None,
-    draw_grid: bool = True,
+        space: HexGrid,
+        agent_portrayal: Callable,
+        ax: Axes | None = None,
+        draw_grid: bool = True,
 ):
     """Visualize a hex grid.
 
@@ -348,6 +356,9 @@ def draw_hex_grid(
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
+
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
     "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
@@ -384,8 +395,8 @@ def draw_hex_grid(
     ax.set_ylim(-offset, space.height * offset)
 
     def setup_hexmesh(
-        width,
-        height,
+            width,
+            height,
     ):
         """Helper function for creating the hexmaesh."""
         # fixme: this should be done once, rather than in each update
@@ -416,15 +427,16 @@ def draw_hex_grid(
                 space.height,
             )
         )
+    return ax
 
 
 def draw_network(
-    space: Network,
-    agent_portrayal: Callable,
-    ax: Axes | None = None,
-    draw_grid: bool = True,
-    layout_alg=nx.spring_layout,
-    layout_kwargs=None,
+        space: Network,
+        agent_portrayal: Callable,
+        ax: Axes | None = None,
+        draw_grid: bool = True,
+        layout_alg=nx.spring_layout,
+        layout_kwargs=None,
 ):
     """Visualize a network space.
 
@@ -435,6 +447,9 @@ def draw_network(
         draw_grid: whether to draw the grid
         layout_alg: a networkx layout algorithm or other callable with the same behavior
         layout_kwargs: a dictionary of keyword arguments for the layout algorithm
+
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
     "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
@@ -481,9 +496,11 @@ def draw_network(
         )
         edge_collection.set_zorder(0)
 
+    return ax
+
 
 def draw_continuous_space(
-    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None
+        space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None
 ):
     """Visualize a continuous space.
 
@@ -491,6 +508,9 @@ def draw_continuous_space(
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
     "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
@@ -522,9 +542,11 @@ def draw_continuous_space(
     ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
+    return ax
+
 
 def draw_voroinoi_grid(
-    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None
+        space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None
 ):
     """Visualize a voronoi grid.
 
@@ -532,6 +554,9 @@ def draw_voroinoi_grid(
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
     "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
@@ -569,6 +594,8 @@ def draw_voroinoi_grid(
             zorder=0,
         )  # Plot filled polygon
         ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in black
+
+    return ax
 
 
 def _scatter(ax: Axes, arguments):

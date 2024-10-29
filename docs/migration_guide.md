@@ -268,9 +268,9 @@ from mesa.experimental import SolaraViz
 SolaraViz(model_cls, model_params, agent_portrayal=agent_portrayal)
 
 # new
-from mesa.visualization import SolaraViz, make_space_matplotlib
+from mesa.visualization import SolaraViz, make_space_component
 
-SolaraViz(model, components=[make_space_matplotlib(agent_portrayal)])
+SolaraViz(model, components=[make_space_component(agent_portrayal)])
 ```
 
 #### Plotting "measures"

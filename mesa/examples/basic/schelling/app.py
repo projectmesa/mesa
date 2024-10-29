@@ -5,7 +5,7 @@ from mesa.visualization import (
     Slider,
     SolaraViz,
     make_plot_measure,
-    make_space_matplotlib,
+    make_space_component,
 )
 
 
@@ -33,7 +33,7 @@ HappyPlot = make_plot_measure("happy")
 page = SolaraViz(
     model1,
     components=[
-        make_space_matplotlib(agent_portrayal),
+        make_space_component(agent_portrayal),
         make_plot_measure("happy"),
         get_happy_agents,
     ],

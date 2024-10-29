@@ -2,7 +2,7 @@ from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealthMode
 from mesa.visualization import (
     SolaraViz,
     make_plot_measure,
-    make_space_matplotlib,
+    make_space_component,
 )
 
 
@@ -36,7 +36,7 @@ model1 = BoltzmannWealthModel(50, 10, 10)
 # Under the hood these are just classes that receive the model instance.
 # You can also author your own visualization elements, which can also be functions
 # that receive the model instance and return a valid solara component.
-SpaceGraph = make_space_matplotlib(agent_portrayal)
+SpaceGraph = make_space_component(agent_portrayal)
 GiniPlot = make_plot_measure("Gini")
 
 # Create the SolaraViz page. This will automatically create a server and display the

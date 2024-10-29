@@ -9,7 +9,7 @@ from mesa.examples.basic.virus_on_network.model import (
     VirusOnNetwork,
     number_infected,
 )
-from mesa.visualization import Slider, SolaraViz, make_space_matplotlib
+from mesa.visualization import Slider, SolaraViz, make_space_component
 
 
 def agent_portrayal(graph):
@@ -119,7 +119,7 @@ model_params = {
     ),
 }
 
-SpacePlot = make_space_matplotlib(agent_portrayal)
+SpacePlot = make_space_component(agent_portrayal)
 
 model1 = VirusOnNetwork()
 

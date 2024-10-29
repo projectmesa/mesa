@@ -4,7 +4,7 @@ from mesa.visualization import (
     Slider,
     SolaraViz,
     make_plot_measure,
-    make_space_matplotlib,
+    make_space_component,
 )
 
 
@@ -65,7 +65,7 @@ def post_process(ax):
     ax.set_yticks([])
 
 
-space_component = make_space_matplotlib(
+space_component = make_space_component(
     wolf_sheep_portrayal, draw_grid=False, post_process=post_process
 )
 lineplot_component = make_plot_measure(
