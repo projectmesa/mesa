@@ -1,12 +1,17 @@
+import sys
+import os.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../')))
+
+
 from mesa.examples.basic.conways_game_of_life.model import ConwaysGameOfLife
 from mesa.visualization import (
     SolaraViz,
     make_space_matplotlib,
 )
 
-
 def agent_portrayal(agent):
-    return {"color": "white" if agent.state == 0 else "black"}
+    return {"c": "white" if agent.state == 0 else "black",
+            "marker":'s'}
 
 
 model_params = {
