@@ -1,3 +1,9 @@
+import sys
+import os.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../')))
+
+
+
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.examples.advanced.wolf_sheep.model import WolfSheep
 from mesa.visualization import (
@@ -17,11 +23,13 @@ def wolf_sheep_portrayal(agent):
     }
 
     if isinstance(agent, Wolf):
-        portrayal["color"] = "tab:orange"
+        portrayal["color"] = "tab:red"
         portrayal["marker"] = "o"
+        portrayal["zorder"] = 2
     elif isinstance(agent, Sheep):
-        portrayal["color"] = "tab:blue"
+        portrayal["color"] = "tab:cyan"
         portrayal["marker"] = "o"
+        portrayal["zorder"] = 2
     elif isinstance(agent, GrassPatch):
         if agent.fully_grown:
             portrayal["color"] = "tab:green"
@@ -67,7 +75,7 @@ space_component = make_space_matplotlib(
     wolf_sheep_portrayal, draw_grid=False, post_process=post_process
 )
 lineplot_component = make_plot_measure(
-    {"Wolves": "tab:orange", "Sheep": "tab:blue", "Grass": "tab:green"}
+    {"Wolves": "tab:orange", "Sheep": "tab:cyan", "Grass": "tab:green"}
 )
 
 model = WolfSheep(grass=True)

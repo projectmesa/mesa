@@ -118,6 +118,7 @@ def collect_agent_data(
     color="tab:blue",
     size=25,
     marker="o",
+    zorder:int = 1
 ):
     """Collect the plotting data for all agents in the space.
 
@@ -128,6 +129,7 @@ def collect_agent_data(
         color: default color
         marker: default marker
         size: default size
+        zorder: default zorder
 
     Notes:
         agent portray dict is limited to size (size of marker), color (color of marker, and marker (marker style)
@@ -137,7 +139,8 @@ def collect_agent_data(
     .. _Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html
 
     """
-    arguments = {"loc": [], "s": [], "c": [], "marker": []}
+    arguments = {"s":[],"c":[], "marker":[], "zorder":[], 'loc':[]}
+
     for agent in space.agents:
         portray = agent_portrayal(agent)
         loc = agent.pos
@@ -148,6 +151,7 @@ def collect_agent_data(
         arguments["s"].append(portray.pop("size", size))
         arguments["c"].append(portray.pop("color", color))
         arguments["marker"].append(portray.pop("marker", marker))
+        arguments["zorder"].append(portray.pop("zorder", zorder))
 
         if len(portray) > 0:
             ignored_fields = list(portray.keys())
@@ -574,12 +578,17 @@ def _scatter(ax: Axes, arguments):
     x = loc[:, 0]
     y = loc[:, 1]
     marker = arguments.pop("marker")
+    zorder = arguments.pop("zorder")
+
 
     for mark in np.unique(marker):
-        mask = marker == mark
-        ax.scatter(
-            x[mask], y[mask], marker=mark, **{k: v[mask] for k, v in arguments.items()}
-        )
+        mark_mask = marker == mark
+        for z_order in np.unique(zorder):
+            zorder_mask = z_order == zorder
+            logical = mark_mask & zorder_mask
+            ax.scatter(
+                x[logical], y[logical], marker=mark, zorder=z_order, **{k: v[logical] for k, v in arguments.items()}
+            )
 
 
 def make_plot_measure(measure: str | dict[str, str] | list[str] | tuple[str]):
