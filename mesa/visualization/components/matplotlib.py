@@ -40,10 +40,12 @@ HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
 Network = NetworkGrid | mesa.experimental.cell_space.Network
 
 
-def make_space_matplotlib(agent_portrayal: Callable | None = None,
-                          propertylayer_portrayal: dict | None = None,
-                          post_process: Callable | None = None,
-                          **space_drawing_kwargs):
+def make_space_matplotlib(
+    agent_portrayal: Callable | None = None,
+    propertylayer_portrayal: dict | None = None,
+    post_process: Callable | None = None,
+    **space_drawing_kwargs,
+):
     """Create a Matplotlib-based space visualization component.
 
     Args:
@@ -66,7 +68,13 @@ def make_space_matplotlib(agent_portrayal: Callable | None = None,
             return {}
 
     def MakeSpaceMatplotlib(model):
-        return SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal, post_process=post_process, **space_drawing_kwargs)
+        return SpaceMatplotlib(
+            model,
+            agent_portrayal,
+            propertylayer_portrayal,
+            post_process=post_process,
+            **space_drawing_kwargs,
+        )
 
     return MakeSpaceMatplotlib
 
@@ -77,8 +85,8 @@ def SpaceMatplotlib(
     agent_portrayal,
     propertylayer_portrayal,
     dependencies: list[any] | None = None,
-    post_process: Callable| None = None,
-    **space_drawing_kwargs
+    post_process: Callable | None = None,
+    **space_drawing_kwargs,
 ):
     """Create a Matplotlib-based space visualization component."""
     update_counter.get()
@@ -91,7 +99,12 @@ def SpaceMatplotlib(
     ax = fig.add_subplot()
 
     draw_space(
-        space, agent_portrayal, propertylayer_portrayal=propertylayer_portrayal, ax=ax, post_process=post_process, **space_drawing_kwargs
+        space,
+        agent_portrayal,
+        propertylayer_portrayal=propertylayer_portrayal,
+        ax=ax,
+        post_process=post_process,
+        **space_drawing_kwargs,
     )
 
     solara.FigureMatplotlib(
@@ -152,7 +165,7 @@ def draw_space(
     propertylayer_portrayal: dict | None = None,
     ax: Axes | None = None,
     space_drawing_kwargs: dict | None = None,
-    post_process: Callable| None = None,
+    post_process: Callable | None = None,
 ):
     """Draw a Matplotlib-based visualization of the space.
 
