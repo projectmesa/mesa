@@ -130,12 +130,8 @@ def collect_agent_data(
         marker: default marker
         zorder: default zorder
 
-    Notes:
-        agent portray dict is limited to size (size of marker), color (color of marker, zorder, and marker (marker style)
-        see `Matplotlib`_.
-
-
-    .. _Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html
+    agent_portrayal should return a dict, limited to size (size of marker), color (color of marker), zorder (z-order), 
+    and marker (marker style)
 
     """
     arguments = {"s": [], "c": [], "marker": [], "zorder": [], "loc": []}
