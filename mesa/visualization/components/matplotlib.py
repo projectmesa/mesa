@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import solara
+
+from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
@@ -221,20 +223,23 @@ def collect_agent_data(
 
 
 def draw_orthogonal_grid(
-    space: OrthogonalGrid, agent_portrayal: Callable, ax, draw_grid: bool = True
+    space: OrthogonalGrid, agent_portrayal: Callable, ax: Axes = None, draw_grid: bool = True
 ):
     """Visualize a orthogonal grid.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
-        ax: a Matplotlib Axes instance
+        ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
 
     Returns:
         A Figure and Axes instance
 
     """
+    if ax is None:
+        fig, ax = plt.subplots()
+
     # gather agent data
     s_default = (180 / max(space.width, space.height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
@@ -255,20 +260,23 @@ def draw_orthogonal_grid(
 
 
 def draw_hex_grid(
-    space: HexGrid, agent_portrayal: Callable, ax, draw_grid: bool = True
+    space: HexGrid, agent_portrayal: Callable, ax: Axes = None , draw_grid: bool = True
 ):
     """Visualize a hex grid.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
-        ax: a Matplotlib Axes instance
+        ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
 
     Returns:
         A Figure and Axes instance
 
     """
+    if ax is None:
+        fig, ax = plt.subplots()
+
     # gather data
     s_default = (180 / max(space.width, space.height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
@@ -334,7 +342,7 @@ def draw_hex_grid(
 def draw_network(
     space: Network,
     agent_portrayal: Callable,
-    ax,
+    ax: Axes = None ,
     draw_grid: bool = True,
     layout_alg=nx.spring_layout,
     layout_kwargs=None,
@@ -344,7 +352,7 @@ def draw_network(
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
-        ax: a Matplotlib Axes instance
+        ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
         layout_alg: a networkx layout algorithm or other callable with the same behavior
         layout_kwargs: a dictionary of keyword arguments for the layout algorithm
@@ -355,6 +363,8 @@ def draw_network(
 
 
     """
+    if ax is None:
+        fig, ax = plt.subplots()
     if layout_kwargs is None:
         layout_kwargs = {"seed": 0}
 
@@ -395,18 +405,21 @@ def draw_network(
         edge_collection.set_zorder(0)
 
 
-def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax):
+def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax: Axes = None ):
     """Visualize a continuous space.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
-        ax: a Matplotlib Axes instance
+        ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
 
     Returns:
         A Figure and Axes instance
 
     """
+    if ax is None:
+        fig, ax = plt.subplots()
+
     # space related setup
     width = space.x_max - space.x_min
     x_padding = width / 20
@@ -431,18 +444,21 @@ def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax)
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
 
-def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax):
+def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax: Axes = None ):
     """Visualize a voronoi grid.
 
     Args:
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
-        ax: a Matplotlib Axes instance
+        ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
 
     Returns:
         A Figure and Axes instance
 
     """
+    if ax is None:
+        fig, ax = plt.subplots()
+
     x_list = [i[0] for i in space.centroids_coordinates]
     y_list = [i[1] for i in space.centroids_coordinates]
     x_max = max(x_list)
@@ -474,7 +490,8 @@ def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax):
         ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in black
 
 
-def _scatter(ax, arguments):
+def _scatter(ax: Axes, arguments):
+    """Helper function for plotting the agents."""
     loc = arguments.pop("loc")
 
     x = loc[:, 0]
