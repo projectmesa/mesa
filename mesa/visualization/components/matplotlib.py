@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import solara
-
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PatchCollection
@@ -223,7 +222,10 @@ def collect_agent_data(
 
 
 def draw_orthogonal_grid(
-    space: OrthogonalGrid, agent_portrayal: Callable, ax: Axes = None, draw_grid: bool = True
+    space: OrthogonalGrid,
+    agent_portrayal: Callable,
+    ax: Axes = None,
+    draw_grid: bool = True,
 ):
     """Visualize a orthogonal grid.
 
@@ -260,7 +262,7 @@ def draw_orthogonal_grid(
 
 
 def draw_hex_grid(
-    space: HexGrid, agent_portrayal: Callable, ax: Axes = None , draw_grid: bool = True
+    space: HexGrid, agent_portrayal: Callable, ax: Axes = None, draw_grid: bool = True
 ):
     """Visualize a hex grid.
 
@@ -342,7 +344,7 @@ def draw_hex_grid(
 def draw_network(
     space: Network,
     agent_portrayal: Callable,
-    ax: Axes = None ,
+    ax: Axes = None,
     draw_grid: bool = True,
     layout_alg=nx.spring_layout,
     layout_kwargs=None,
@@ -405,7 +407,9 @@ def draw_network(
         edge_collection.set_zorder(0)
 
 
-def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax: Axes = None ):
+def draw_continuous_space(
+    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes = None
+):
     """Visualize a continuous space.
 
     Args:
@@ -444,7 +448,7 @@ def draw_continuous_space(space: ContinuousSpace, agent_portrayal: Callable, ax:
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
 
-def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax: Axes = None ):
+def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax: Axes = None):
     """Visualize a voronoi grid.
 
     Args:
