@@ -78,14 +78,21 @@ def SpaceMatplotlib(
     fig = Figure()
     ax = fig.add_subplot()
 
-    draw_space(space, agent_portrayal, propertylayer_portrayal=propertylayer_portrayal, ax=ax)
+    draw_space(
+        space, agent_portrayal, propertylayer_portrayal=propertylayer_portrayal, ax=ax
+    )
 
     solara.FigureMatplotlib(
         fig, format="png", bbox_inches="tight", dependencies=dependencies
     )
 
 
-def draw_space(space, agent_portrayal: Callable, propertylayer_portrayal: dict | None = None, ax: Axes | None = None):
+def draw_space(
+    space,
+    agent_portrayal: Callable,
+    propertylayer_portrayal: dict | None = None,
+    ax: Axes | None = None,
+):
     """Draw a Matplotlib-based visualization of the space.
 
     Args:
@@ -115,7 +122,9 @@ def draw_space(space, agent_portrayal: Callable, propertylayer_portrayal: dict |
         draw_property_layers(space, propertylayer_portrayal, ax=ax)
 
 
-def draw_property_layers(space, propertylayer_portrayal: dict[str, dict[str, Any]], ax: Axes):
+def draw_property_layers(
+    space, propertylayer_portrayal: dict[str, dict[str, Any]], ax: Axes
+):
     """Draw PropertyLayers on the given axes.
 
     Args:
@@ -278,7 +287,10 @@ def draw_orthogonal_grid(
 
 
 def draw_hex_grid(
-    space: HexGrid, agent_portrayal: Callable, ax: Axes | None = None, draw_grid: bool = True
+    space: HexGrid,
+    agent_portrayal: Callable,
+    ax: Axes | None = None,
+    draw_grid: bool = True,
 ):
     """Visualize a hex grid.
 
@@ -464,7 +476,9 @@ def draw_continuous_space(
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
 
-def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None):
+def draw_voroinoi_grid(
+    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None
+):
     """Visualize a voronoi grid.
 
     Args:
