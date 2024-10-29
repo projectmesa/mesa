@@ -154,7 +154,7 @@ def collect_agent_data(
             msg = ", ".join(ignored_fields)
             warnings.warn(
                 f"the following fields are not used in agent portrayal and thus ignored: {msg}.",
-                stacklevel=2
+                stacklevel=2,
             )
 
     return {k: np.asarray(v) for k, v in arguments.items()}
