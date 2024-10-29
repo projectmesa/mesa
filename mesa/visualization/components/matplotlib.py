@@ -87,6 +87,51 @@ def SpaceMatplotlib(
     )
 
 
+def collect_agent_data(
+    space: OrthogonalGrid | HexGrid | Network | ContinuousSpace | VoronoiGrid,
+    agent_portrayal: Callable,
+    color="tab:blue",
+    size=25,
+    marker="o",
+):
+    """Collect the plotting data for all agents in the space.
+
+    Args:
+        space: The space containing the Agents.
+        agent_portrayal: A callable that is called with the agent and returns a dict
+        loc: a boolean indicating whether to gather agent x, y data or not
+        color: default color
+        marker: default marker
+        size: default size
+
+    Notes:
+        agent portray dict is limited to size (size of marker), color (color of marker, and marker (marker style)
+        see `Matplotlib`_.
+
+
+    .. _Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html
+
+    """
+    arguments = {"loc": [], "s": [], "c": [], "marker": []}
+    for agent in space.agents:
+        portray = agent_portrayal(agent)
+        loc = agent.pos
+        if loc is None:
+            loc = agent.cell.coordinate
+
+        arguments["loc"].append(loc)
+        arguments["s"].append(portray.pop("size", size))
+        arguments["c"].append(portray.pop("color", color))
+        arguments["marker"].append(portray.pop("marker", marker))
+
+        if len(portray) > 0:
+            ignored_fields = list(portray.keys())
+            msg = ", ".join(ignored_fields)
+            warnings.warn(f"the following fields are not used in agent portrayal and thus ignored: {msg}.")
+
+    return {k: np.asarray(v) for k, v in arguments.items()}
+
+
 def draw_space(
     space,
     agent_portrayal: Callable,
@@ -206,46 +251,6 @@ def draw_property_layers(
             )
 
 
-def collect_agent_data(
-    space: OrthogonalGrid | HexGrid | Network | ContinuousSpace,
-    agent_portrayal: Callable,
-    c_default="tab:blue",
-    marker_default="o",
-    s_default=25,
-):
-    """Collect the plotting data for all agents in the space.
-
-    Args:
-        space: The space containing the Agents.
-        agent_portrayal: A callable that is called with the agent and returns a dict
-        loc: a boolean indicating whether to gather agent x, y data or not
-        c_default: default color
-        marker_default: default marker
-        s_default: default size
-
-    Notes:
-        agent portray dict is limited to size (size of marker), color (color of marker, and marker (marker style)
-        see `Matplotlib`_.
-
-
-    .. _Matplotlib: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.scatter.html
-
-    """
-    arguments = {"loc": [], "s": [], "c": [], "marker": []}
-    for agent in space.agents:
-        portray = agent_portrayal(agent)
-        loc = agent.pos
-        if loc is None:
-            loc = agent.cell.coordinate
-
-        arguments["loc"].append(loc)
-        arguments["s"].append(portray.get("size", s_default))
-        arguments["c"].append(portray.get("color", c_default))
-        arguments["marker"].append(portray.get("marker", marker_default))
-
-    return {k: np.asarray(v) for k, v in arguments.items()}
-
-
 def draw_orthogonal_grid(
     space: OrthogonalGrid,
     agent_portrayal: Callable,
@@ -269,7 +274,7 @@ def draw_orthogonal_grid(
 
     # gather agent data
     s_default = (180 / max(space.width, space.height)) ** 2
-    arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
+    arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
     # plot the agents
     _scatter(ax, arguments)
@@ -309,7 +314,7 @@ def draw_hex_grid(
 
     # gather data
     s_default = (180 / max(space.width, space.height)) ** 2
-    arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
+    arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
     # for hexgrids we have to go from logical coordinates to visual coordinates
     # this is a bit messy.
@@ -412,7 +417,7 @@ def draw_network(
 
     # gather agent data
     s_default = (180 / max(width, height)) ** 2
-    arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
+    arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
     # this assumes that nodes are identified by an integer
     # which is true for default nx graphs but might user changeable
@@ -460,7 +465,7 @@ def draw_continuous_space(
 
     # gather agent data
     s_default = (180 / max(width, height)) ** 2
-    arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
+    arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
     # plot the agents
     _scatter(ax, arguments)
@@ -506,7 +511,7 @@ def draw_voroinoi_grid(
     y_padding = height / 20
 
     s_default = (180 / max(width, height)) ** 2
-    arguments = collect_agent_data(space, agent_portrayal, s_default=s_default)
+    arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
     ax.set_xlim(x_min - x_padding, x_max + x_padding)
     ax.set_ylim(y_min - y_padding, y_max + y_padding)
