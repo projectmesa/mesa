@@ -130,7 +130,7 @@ def collect_agent_data(
         marker: default marker
         zorder: default zorder
 
-    agent_portrayal should return a dict, limited to size (size of marker), color (color of marker), zorder (z-order), 
+    agent_portrayal should return a dict, limited to size (size of marker), color (color of marker), zorder (z-order),
     and marker (marker style)
 
     """
