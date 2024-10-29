@@ -224,7 +224,7 @@ def collect_agent_data(
         s_default: default size
 
     Notes:
-        agent portray dict is limited to s (size of marker), c (color of marker, and marker (marker style)
+        agent portray dict is limited to size (size of marker), color (color of marker, and marker (marker style)
         see `Matplotlib`_.
 
 
@@ -239,8 +239,8 @@ def collect_agent_data(
             loc = agent.cell.coordinate
 
         arguments["loc"].append(loc)
-        arguments["s"].append(portray.get("s", s_default))
-        arguments["c"].append(portray.get("c", c_default))
+        arguments["s"].append(portray.get("size", s_default))
+        arguments["c"].append(portray.get("color", c_default))
         arguments["marker"].append(portray.get("marker", marker_default))
 
     return {k: np.asarray(v) for k, v in arguments.items()}
