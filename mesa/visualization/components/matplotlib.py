@@ -153,7 +153,8 @@ def collect_agent_data(
             ignored_fields = list(portray.keys())
             msg = ", ".join(ignored_fields)
             warnings.warn(
-                f"the following fields are not used in agent portrayal and thus ignored: {msg}."
+                f"the following fields are not used in agent portrayal and thus ignored: {msg}.",
+                stacklevel=2
             )
 
     return {k: np.asarray(v) for k, v in arguments.items()}
@@ -164,8 +165,8 @@ def draw_space(
     agent_portrayal: Callable,
     propertylayer_portrayal: dict | None = None,
     ax: Axes | None = None,
-    space_drawing_kwargs: dict | None = None,
     post_process: Callable | None = None,
+    **space_drawing_kwargs,
 ):
     """Draw a Matplotlib-based visualization of the space.
 
@@ -174,6 +175,9 @@ def draw_space(
         agent_portrayal: A callable that returns a dict specifying how to show the agent
         propertylayer_portrayal: a dict specifying how to show propertylayer(s)
         ax: the axes upon which to draw the plot
+        post_process: a callable called with the Axes instance
+        space_drawing_kwargs: any additional keyword arguments to be passed on to the underlying function for drawing the space.
+
         postprocess: a user-specified callable to do post-processing called with the Axes instance. This callable
         can be used for any further fine-tuning of the plot (e.g., changing ticks, etc.)
 
