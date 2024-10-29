@@ -76,30 +76,46 @@ def SpaceMatplotlib(
         space = getattr(model, "space", None)
 
     fig = Figure()
-    ax = fig.subplots()
+    ax = fig.add_subplot()
 
-    # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
-    match space:
-        case mesa.space._Grid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid():
-            draw_orthogonal_grid(space, agent_portrayal, ax)
-        case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
-            draw_hex_grid(space, agent_portrayal, ax)
-        case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
-            draw_network(space, agent_portrayal, ax)
-        case mesa.space.ContinuousSpace():
-            draw_continuous_space(space, agent_portrayal, ax)
-        case VoronoiGrid():
-            draw_voroinoi_grid(space, agent_portrayal, ax)
-
-    if propertylayer_portrayal:
-        draw_property_layers(space, propertylayer_portrayal, ax)
+    draw_space(space, agent_portrayal, propertylayer_portrayal=propertylayer_portrayal, ax=ax)
 
     solara.FigureMatplotlib(
         fig, format="png", bbox_inches="tight", dependencies=dependencies
     )
 
 
-def draw_property_layers(space, propertylayer_portrayal: dict[str, dict[str, Any]], ax):
+def draw_space(space, agent_portrayal: Callable, propertylayer_portrayal: dict | None = None, ax: Axes | None = None):
+    """Draw a Matplotlib-based visualization of the space.
+
+    Args:
+        space: the space of the mesa model
+        agent_portrayal: A callable that returns a dict specifying how to show the agent
+        propertylayer_portrayal: a dict specifying how to show propertylayer(s)
+        ax: the axes upon which to draw the plot
+
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
+    match space:
+        case mesa.space._Grid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid():
+            draw_orthogonal_grid(space, agent_portrayal, ax=ax)
+        case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
+            draw_hex_grid(space, agent_portrayal, ax=ax)
+        case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
+            draw_network(space, agent_portrayal, ax=ax)
+        case mesa.space.ContinuousSpace():
+            draw_continuous_space(space, agent_portrayal, ax=ax)
+        case VoronoiGrid():
+            draw_voroinoi_grid(space, agent_portrayal, ax=ax)
+
+    if propertylayer_portrayal:
+        draw_property_layers(space, propertylayer_portrayal, ax=ax)
+
+
+def draw_property_layers(space, propertylayer_portrayal: dict[str, dict[str, Any]], ax: Axes):
     """Draw PropertyLayers on the given axes.
 
     Args:
@@ -224,7 +240,7 @@ def collect_agent_data(
 def draw_orthogonal_grid(
     space: OrthogonalGrid,
     agent_portrayal: Callable,
-    ax: Axes = None,
+    ax: Axes | None = None,
     draw_grid: bool = True,
 ):
     """Visualize a orthogonal grid.
@@ -262,7 +278,7 @@ def draw_orthogonal_grid(
 
 
 def draw_hex_grid(
-    space: HexGrid, agent_portrayal: Callable, ax: Axes = None, draw_grid: bool = True
+    space: HexGrid, agent_portrayal: Callable, ax: Axes | None = None, draw_grid: bool = True
 ):
     """Visualize a hex grid.
 
@@ -344,7 +360,7 @@ def draw_hex_grid(
 def draw_network(
     space: Network,
     agent_portrayal: Callable,
-    ax: Axes = None,
+    ax: Axes | None = None,
     draw_grid: bool = True,
     layout_alg=nx.spring_layout,
     layout_kwargs=None,
@@ -408,7 +424,7 @@ def draw_network(
 
 
 def draw_continuous_space(
-    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes = None
+    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None
 ):
     """Visualize a continuous space.
 
@@ -448,7 +464,7 @@ def draw_continuous_space(
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
 
-def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax: Axes = None):
+def draw_voroinoi_grid(space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None):
     """Visualize a voronoi grid.
 
     Args:
