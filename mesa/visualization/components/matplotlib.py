@@ -40,12 +40,22 @@ HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
 Network = NetworkGrid | mesa.experimental.cell_space.Network
 
 
-def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
+def make_space_matplotlib(agent_portrayal: Callable | None = None,
+                          propertylayer_portrayal: dict | None = None,
+                          post_process: Callable | None = None,
+                          **space_drawing_kwargs):
     """Create a Matplotlib-based space visualization component.
 
     Args:
-        agent_portrayal (function): Function to portray agents
-        propertylayer_portrayal (dict): Dictionary of PropertyLayer portrayal specifications
+        agent_portrayal: Function to portray agents.
+        propertylayer_portrayal: Dictionary of PropertyLayer portrayal specifications
+        post_process : a callable that will be called with the Axes instance. Allows for fine tuning plots (e.g., control ticks)
+        space_drawing_kwargs : additional keyword arguments to be passed on to the underlying space drawer function. See
+                               the functions for drawing the various spaces for further details.
+
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", and "marker". Other field are ignored and will result in a user warning.
+
 
     Returns:
         function: A function that creates a SpaceMatplotlib component
@@ -53,10 +63,10 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
     if agent_portrayal is None:
 
         def agent_portrayal(a):
-            return {"id": a.unique_id}
+            return {}
 
     def MakeSpaceMatplotlib(model):
-        return SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal)
+        return SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal, post_process=post_process, **space_drawing_kwargs)
 
     return MakeSpaceMatplotlib
 
@@ -67,6 +77,8 @@ def SpaceMatplotlib(
     agent_portrayal,
     propertylayer_portrayal,
     dependencies: list[any] | None = None,
+    post_process: Callable| None = None,
+    **space_drawing_kwargs
 ):
     """Create a Matplotlib-based space visualization component."""
     update_counter.get()
@@ -79,7 +91,7 @@ def SpaceMatplotlib(
     ax = fig.add_subplot()
 
     draw_space(
-        space, agent_portrayal, propertylayer_portrayal=propertylayer_portrayal, ax=ax
+        space, agent_portrayal, propertylayer_portrayal=propertylayer_portrayal, ax=ax, post_process=post_process, **space_drawing_kwargs
     )
 
     solara.FigureMatplotlib(
@@ -139,6 +151,8 @@ def draw_space(
     agent_portrayal: Callable,
     propertylayer_portrayal: dict | None = None,
     ax: Axes | None = None,
+    space_drawing_kwargs: dict | None = None,
+    post_process: Callable| None = None,
 ):
     """Draw a Matplotlib-based visualization of the space.
 
@@ -147,6 +161,8 @@ def draw_space(
         agent_portrayal: A callable that returns a dict specifying how to show the agent
         propertylayer_portrayal: a dict specifying how to show propertylayer(s)
         ax: the axes upon which to draw the plot
+        postprocess: a user-specified callable to do post-processing called with the Axes instance. This callable
+        can be used for any further fine-tuning of the plot (e.g., changing ticks, etc.)
 
     """
     if ax is None:
@@ -155,11 +171,11 @@ def draw_space(
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
         case mesa.space._Grid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid():
-            draw_orthogonal_grid(space, agent_portrayal, ax=ax)
+            draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
-            draw_hex_grid(space, agent_portrayal, ax=ax)
+            draw_hex_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
-            draw_network(space, agent_portrayal, ax=ax)
+            draw_network(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case mesa.space.ContinuousSpace():
             draw_continuous_space(space, agent_portrayal, ax=ax)
         case VoronoiGrid():
@@ -167,6 +183,9 @@ def draw_space(
 
     if propertylayer_portrayal:
         draw_property_layers(space, propertylayer_portrayal, ax=ax)
+
+    if post_process is not None:
+        post_process(ax=ax)
 
 
 def draw_property_layers(
