@@ -97,7 +97,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
     mocker.patch.object(mesa.Model, "__init__", return_value=None)
 
     agent_portrayal = {
-        "Shape": "circle",
+        "marker": "circle",
         "color": "gray",
     }
     propertylayer_portrayal = None
@@ -106,7 +106,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
     solara.render(SolaraViz(model, components=[make_space_matplotlib(agent_portrayal)]))
     # should call default method with class instance and agent portrayal
     mock_space_matplotlib.assert_called_with(
-        model, agent_portrayal, propertylayer_portrayal
+        model, agent_portrayal, propertylayer_portrayal, post_process=None
     )
 
     # specify no space should be drawn
