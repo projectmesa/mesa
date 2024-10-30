@@ -37,7 +37,7 @@ def citizen_cop_portrayal(agent):
 
 
 def post_process(ax):
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
     ax.set_xticks([])
     ax.set_yticks([])
     ax.get_figure().set_size_inches(10, 10)

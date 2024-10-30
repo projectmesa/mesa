@@ -2,8 +2,8 @@ import numpy as np
 import solara
 from matplotlib.figure import Figure
 
-from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt
 from mesa.examples.advanced.sugarscape_g1mt.agents import Trader
+from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt
 from mesa.visualization import SolaraViz, make_plot_measure
 
 
