@@ -1286,37 +1286,6 @@ class HexMultiGrid(_HexGrid, MultiGrid):
         empties: Returns a set of hexagonal coordinates for all empty cells.
     """
 
-
-class HexGrid(HexSingleGrid):
-    """Hexagonal Grid: a Grid where neighbors are computed according to a hexagonal tiling of the grid.
-
-    Functions according to odd-q rules.
-    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
-
-    Properties:
-        width, height: The grid's width and height.
-        torus: Boolean which determines whether to treat the grid as a torus.
-    """
-
-    def __init__(self, width: int, height: int, torus: bool) -> None:
-        """Initializes a HexGrid, deprecated.
-
-        Args:
-            width: the width of the grid
-            height: the height of the grid
-            torus: whether the grid wraps
-        """
-        super().__init__(width, height, torus)
-        warn(
-            (
-                "HexGrid is being deprecated; use instead HexSingleGrid or HexMultiGrid "
-                "depending on your use case."
-            ),
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position.
 
