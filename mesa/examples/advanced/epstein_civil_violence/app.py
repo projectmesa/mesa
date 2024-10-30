@@ -7,7 +7,7 @@ from mesa.examples.advanced.epstein_civil_violence.model import EpsteinCivilViol
 from mesa.visualization import (
     Slider,
     SolaraViz,
-    make_plot_measure,
+    make_plot_component,
     make_space_component,
 )
 
@@ -58,7 +58,7 @@ space_component = make_space_component(
     citizen_cop_portrayal, post_process=post_process, draw_grid=False
 )
 
-chart_component = make_plot_measure(
+chart_component = make_plot_component(
     {state.name.lower(): agent_colors[state] for state in CitizenState}
 )
 

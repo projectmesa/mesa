@@ -618,30 +618,35 @@ def _scatter(ax: Axes, arguments):
             )
 
 
-def make_plot_measure(measure: str | dict[str, str] | list[str] | tuple[str]):
+def make_plot_component(measure: str | dict[str, str] | list[str] | tuple[str], post_process: Callable | None = None, save_format="png"):
     """Create a plotting function for a specified measure.
 
     Args:
         measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
+        post_process: a user-specified callable to do post-processing called with the Axes instance.
+        save_format: save format of figure in solara backend
 
     Returns:
         function: A function that creates a PlotMatplotlib component.
     """
 
-    def MakePlotMeasure(model):
-        return PlotMatplotlib(model, measure)
+    def MakePlotMatplotlib(model):
+        return PlotMatplotlib(model, measure, post_process=post_process, save_format=save_format)
 
-    return MakePlotMeasure
+    return MakePlotMatplotlib
 
 
 @solara.component
-def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
+def PlotMatplotlib(model, measure, dependencies: list[any] | None = None, post_process: Callable | None = None,
+                   save_format="png"):
     """Create a Matplotlib-based plot for a measure or measures.
 
     Args:
         model (mesa.Model): The model instance.
         measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
         dependencies (list[any] | None): Optional dependencies for the plot.
+        post_process: a user-specified callable to do post-processing called with the Axes instance.
+        save_format: format used for saving the figure.
 
     Returns:
         solara.FigureMatplotlib: A component for rendering the plot.
@@ -661,9 +666,13 @@ def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
         for m in measure:
             ax.plot(df.loc[:, m], label=m)
         ax.legend(loc="best")
+
+    if post_process is not None:
+        post_process(ax)
+
     ax.set_xlabel("Step")
     # Set integer x axis
     ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
     solara.FigureMatplotlib(
-        fig, format="png", bbox_inches="tight", dependencies=dependencies
+        fig, format=save_format, bbox_inches="tight", dependencies=dependencies
     )
