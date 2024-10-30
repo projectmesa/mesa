@@ -609,8 +609,7 @@ def _scatter(ax: Axes, arguments, **kwargs):
     Args:
         ax: a Matplotlib Axes instance
         arguments: the agents specific arguments for platting
-        additional keyword arguments for ax.scatter
-
+        kwargs: additional keyword arguments for ax.scatter
 
     """
     loc = arguments.pop("loc")
