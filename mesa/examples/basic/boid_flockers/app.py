@@ -1,5 +1,5 @@
 from mesa.examples.basic.boid_flockers.model import BoidFlockers
-from mesa.visualization import Slider, SolaraViz, make_space_matplotlib
+from mesa.visualization import Slider, SolaraViz, make_space_component
 
 
 def boid_draw(agent):
@@ -51,7 +51,7 @@ model = BoidFlockers()
 
 page = SolaraViz(
     model,
-    [make_space_matplotlib(agent_portrayal=boid_draw)],
+    [make_space_component(agent_portrayal=boid_draw)],
     model_params=model_params,
     name="Boid Flocking Model",
 )

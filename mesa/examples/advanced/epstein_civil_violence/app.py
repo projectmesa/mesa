@@ -8,7 +8,7 @@ from mesa.visualization import (
     Slider,
     SolaraViz,
     make_plot_measure,
-    make_space_matplotlib,
+    make_space_component,
 )
 
 COP_COLOR = "#000000"
@@ -47,7 +47,7 @@ model_params = {
     "max_jail_term": Slider("Max Jail Term", 30, 0, 50, 1),
 }
 
-space_component = make_space_matplotlib(citizen_cop_portrayal)
+space_component = make_space_component(citizen_cop_portrayal)
 chart_component = make_plot_measure([state.name.lower() for state in CitizenState])
 
 epstein_model = EpsteinCivilViolence()

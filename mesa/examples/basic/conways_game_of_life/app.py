@@ -1,12 +1,12 @@
 from mesa.examples.basic.conways_game_of_life.model import ConwaysGameOfLife
 from mesa.visualization import (
     SolaraViz,
-    make_space_matplotlib,
+    make_space_component,
 )
 
 
 def agent_portrayal(agent):
-    return {"color": "white" if agent.state == 0 else "black"}
+    return {"c": "white" if agent.state == 0 else "black", "marker": "s"}
 
 
 model_params = {
@@ -22,7 +22,7 @@ model1 = ConwaysGameOfLife(50, 50)
 # Under the hood these are just classes that receive the model instance.
 # You can also author your own visualization elements, which can also be functions
 # that receive the model instance and return a valid solara component.
-SpaceGraph = make_space_matplotlib(agent_portrayal)
+SpaceGraph = make_space_component(agent_portrayal)
 
 
 # Create the SolaraViz page. This will automatically create a server and display the

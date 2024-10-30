@@ -4,11 +4,8 @@ from mesa.visualization import (
     Slider,
     SolaraViz,
     make_plot_measure,
-    make_space_matplotlib,
+    make_space_component,
 )
-
-WOLF_COLOR = "#000000"
-SHEEP_COLOR = "#648FFF"
 
 
 def wolf_sheep_portrayal(agent):
@@ -17,23 +14,23 @@ def wolf_sheep_portrayal(agent):
 
     portrayal = {
         "size": 25,
-        "shape": "s",  # square marker
     }
 
     if isinstance(agent, Wolf):
-        portrayal["color"] = WOLF_COLOR
-        portrayal["Layer"] = 3
+        portrayal["color"] = "tab:red"
+        portrayal["marker"] = "o"
+        portrayal["zorder"] = 2
     elif isinstance(agent, Sheep):
-        portrayal["color"] = SHEEP_COLOR
-        portrayal["Layer"] = 2
+        portrayal["color"] = "tab:cyan"
+        portrayal["marker"] = "o"
+        portrayal["zorder"] = 2
     elif isinstance(agent, GrassPatch):
         if agent.fully_grown:
-            portrayal["color"] = "#00FF00"
+            portrayal["color"] = "tab:green"
         else:
-            portrayal["color"] = "#84e184"
-        # portrayal["shape"] = "rect"
-        # portrayal["Filled"] = "true"
-        portrayal["Layer"] = 1
+            portrayal["color"] = "tab:brown"
+        portrayal["marker"] = "s"
+        portrayal["size"] = 75
 
     return portrayal
 
@@ -62,10 +59,20 @@ model_params = {
 }
 
 
-space_component = make_space_matplotlib(wolf_sheep_portrayal)
-lineplot_component = make_plot_measure(["Wolves", "Sheep", "Grass"])
+def post_process(ax):
+    ax.set_aspect("equal")
+    ax.set_xticks([])
+    ax.set_yticks([])
 
-model = WolfSheep()
+
+space_component = make_space_component(
+    wolf_sheep_portrayal, draw_grid=False, post_process=post_process
+)
+lineplot_component = make_plot_measure(
+    {"Wolves": "tab:orange", "Sheep": "tab:cyan", "Grass": "tab:green"}
+)
+
+model = WolfSheep(grass=True)
 
 
 page = SolaraViz(
