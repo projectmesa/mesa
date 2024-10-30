@@ -86,15 +86,17 @@ model_params = {
     ),
 }
 
+
 def post_process_lineplot(ax):
     ax.set_ylim(ymin=0)
     ax.set_ylabel("# people")
     ax.legend(bbox_to_anchor=(1.05, 1.0), loc="upper left")
 
+
 SpacePlot = make_space_component(agent_portrayal)
 StatePlot = make_plot_component(
     {"Infected": "tab:red", "Susceptible": "tab:green", "Resistant": "tab:gray"},
-    post_process=post_process_lineplot
+    post_process=post_process_lineplot,
 )
 
 model1 = VirusOnNetwork()

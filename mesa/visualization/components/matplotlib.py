@@ -618,7 +618,11 @@ def _scatter(ax: Axes, arguments):
             )
 
 
-def make_plot_component(measure: str | dict[str, str] | list[str] | tuple[str], post_process: Callable | None = None, save_format="png"):
+def make_plot_component(
+    measure: str | dict[str, str] | list[str] | tuple[str],
+    post_process: Callable | None = None,
+    save_format="png",
+):
     """Create a plotting function for a specified measure.
 
     Args:
@@ -631,14 +635,21 @@ def make_plot_component(measure: str | dict[str, str] | list[str] | tuple[str], 
     """
 
     def MakePlotMatplotlib(model):
-        return PlotMatplotlib(model, measure, post_process=post_process, save_format=save_format)
+        return PlotMatplotlib(
+            model, measure, post_process=post_process, save_format=save_format
+        )
 
     return MakePlotMatplotlib
 
 
 @solara.component
-def PlotMatplotlib(model, measure, dependencies: list[any] | None = None, post_process: Callable | None = None,
-                   save_format="png"):
+def PlotMatplotlib(
+    model,
+    measure,
+    dependencies: list[any] | None = None,
+    post_process: Callable | None = None,
+    save_format="png",
+):
     """Create a Matplotlib-based plot for a measure or measures.
 
     Args:
