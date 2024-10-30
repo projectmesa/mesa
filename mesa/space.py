@@ -1286,6 +1286,7 @@ class HexMultiGrid(_HexGrid, MultiGrid):
         empties: Returns a set of hexagonal coordinates for all empty cells.
     """
 
+
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position.
 
