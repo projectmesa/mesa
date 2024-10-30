@@ -42,7 +42,7 @@ Network = NetworkGrid | mesa.experimental.cell_space.Network
 
 def make_space_matplotlib(*args, **kwargs):  # noqa: D103
     warnings.warn("make_space_matplotlib has been renamed to make_space_component", DeprecationWarning, stacklevel=2)
-    return make_plot_component(*args, **kwargs)
+    return make_space_component(*args, **kwargs)
 
 def make_space_component(
     agent_portrayal: Callable | None = None,
