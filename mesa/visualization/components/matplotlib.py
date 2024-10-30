@@ -41,8 +41,13 @@ Network = NetworkGrid | mesa.experimental.cell_space.Network
 
 
 def make_space_matplotlib(*args, **kwargs):  # noqa: D103
-    warnings.warn("make_space_matplotlib has been renamed to make_space_component", DeprecationWarning, stacklevel=2)
+    warnings.warn(
+        "make_space_matplotlib has been renamed to make_space_component",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return make_space_component(*args, **kwargs)
+
 
 def make_space_component(
     agent_portrayal: Callable | None = None,
@@ -623,8 +628,13 @@ def _scatter(ax: Axes, arguments):
 
 
 def make_plot_measure(*args, **kwargs):  # noqa: D103
-    warnings.warn("make_plot_measure has been renamed to make_plot_component", DeprecationWarning, stacklevel=2)
+    warnings.warn(
+        "make_plot_measure has been renamed to make_plot_component",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return make_plot_component(*args, **kwargs)
+
 
 def make_plot_component(
     measure: str | dict[str, str] | list[str] | tuple[str],
