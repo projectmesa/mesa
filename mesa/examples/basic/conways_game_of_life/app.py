@@ -6,11 +6,11 @@ from mesa.visualization import (
 
 
 def agent_portrayal(agent):
-    return {"color": "white" if agent.state == 0 else "black", "marker": "s", 'size':25}
+    return {"color": "white" if agent.state == 0 else "black", "marker": "s", "size":25}
 
 
 def post_process(ax):
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
     ax.set_xticks([])
     ax.set_yticks([])
 

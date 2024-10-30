@@ -1,4 +1,5 @@
 import solara
+
 from mesa.examples.basic.schelling.model import Schelling
 from mesa.visualization import (
     Slider,

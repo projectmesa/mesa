@@ -1,71 +1,34 @@
 import math
 
 import solara
-from matplotlib.figure import Figure
-from matplotlib.ticker import MaxNLocator
 
 from mesa.examples.basic.virus_on_network.model import (
     State,
     VirusOnNetwork,
     number_infected,
 )
-from mesa.visualization import Slider, SolaraViz, make_space_component
+from mesa.visualization import (
+    Slider,
+    SolaraViz,
+    make_plot_measure,
+    make_space_component,
+)
 
 
-def agent_portrayal(graph):
-    def get_agent(node):
-        return graph.nodes[node]["agent"][0]
-
-    edge_width = []
-    edge_color = []
-    for u, v in graph.edges():
-        agent1 = get_agent(u)
-        agent2 = get_agent(v)
-        w = 2
-        ec = "#e8e8e8"
-        if State.RESISTANT in (agent1.state, agent2.state):
-            w = 3
-            ec = "black"
-        edge_width.append(w)
-        edge_color.append(ec)
+def agent_portrayal(agent):
     node_color_dict = {
         State.INFECTED: "tab:red",
         State.SUSCEPTIBLE: "tab:green",
         State.RESISTANT: "tab:gray",
     }
-    node_color = [node_color_dict[get_agent(node).state] for node in graph.nodes()]
-    return {
-        "width": edge_width,
-        "edge_color": edge_color,
-        "node_color": node_color,
-    }
-
+    return {"color": node_color_dict[agent.state], "size":10}
 
 def get_resistant_susceptible_ratio(model):
     ratio = model.resistant_susceptible_ratio()
     ratio_text = r"$\infty$" if ratio is math.inf else f"{ratio:.2f}"
     infected_text = str(number_infected(model))
 
-    return f"Resistant/Susceptible Ratio: {ratio_text}<br>Infected Remaining: {infected_text}"
-
-
-def make_plot(model):
-    # This is for the case when we want to plot multiple measures in 1 figure.
-    fig = Figure()
-    ax = fig.subplots()
-    measures = ["Infected", "Susceptible", "Resistant"]
-    colors = ["tab:red", "tab:green", "tab:gray"]
-    for i, m in enumerate(measures):
-        color = colors[i]
-        df = model.datacollector.get_model_vars_dataframe()
-        ax.plot(df.loc[:, m], label=m, color=color)
-    fig.legend()
-    # Set integer x axis
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    ax.set_xlabel("Step")
-    ax.set_ylabel("Number of Agents")
-    return solara.FigureMatplotlib(fig)
-
+    return solara.Markdown(f"Resistant/Susceptible Ratio: {ratio_text}<br>Infected Remaining: {infected_text}")
 
 model_params = {
     "num_nodes": Slider(
@@ -120,6 +83,7 @@ model_params = {
 }
 
 SpacePlot = make_space_component(agent_portrayal)
+StatePlot = make_plot_measure({"Infected":"tab:red", "Susceptible":"tab:green", "Resistant":"tab:gray"})
 
 model1 = VirusOnNetwork()
 
@@ -127,8 +91,8 @@ page = SolaraViz(
     model1,
     [
         SpacePlot,
-        make_plot,
-        # get_resistant_susceptible_ratio,  # TODO: Fix and uncomment
+        StatePlot,
+        get_resistant_susceptible_ratio,
     ],
     model_params=model_params,
     name="Virus Model",
