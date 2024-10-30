@@ -1,9 +1,9 @@
 import numpy as np
 import solara
 from matplotlib.figure import Figure
-from sugarscape_g1mt.model import SugarscapeG1mt
-from sugarscape_g1mt.trader_agents import Trader
 
+from mesa.examples.advanced.sugarscape_g1mt.agents import Trader
+from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt
 from mesa.visualization import SolaraViz, make_plot_measure
 
 
@@ -57,6 +57,6 @@ page = SolaraViz(
     model1,
     components=[SpaceDrawer, make_plot_measure(["Trader", "Price"])],
     name="Sugarscape {G1, M, T}",
-    play_interval=1500,
+    play_interval=150,
 )
 page  # noqa

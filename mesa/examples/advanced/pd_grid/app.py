@@ -13,7 +13,7 @@ def pd_agent_portrayal(agent):
     """
     return {
         "color": "blue" if agent.move == "C" else "red",
-        "shape": "s",  # square marker
+        "marker": "s",  # square marker
         "size": 25,
     }
 
