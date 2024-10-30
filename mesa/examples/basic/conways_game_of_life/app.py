@@ -6,8 +6,13 @@ from mesa.visualization import (
 
 
 def agent_portrayal(agent):
-    return {"c": "white" if agent.state == 0 else "black", "marker": "s"}
+    return {"color": "white" if agent.state == 0 else "black", "marker": "s", 'size':25}
 
+
+def post_process(ax):
+    ax.set_aspect('equal')
+    ax.set_xticks([])
+    ax.set_yticks([])
 
 model_params = {
     "width": 50,
@@ -22,7 +27,7 @@ model1 = ConwaysGameOfLife(50, 50)
 # Under the hood these are just classes that receive the model instance.
 # You can also author your own visualization elements, which can also be functions
 # that receive the model instance and return a valid solara component.
-SpaceGraph = make_space_component(agent_portrayal)
+SpaceGraph = make_space_component(agent_portrayal, post_process=post_process, draw_grid=False)
 
 
 # Create the SolaraViz page. This will automatically create a server and display the
