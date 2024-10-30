@@ -42,6 +42,7 @@ def post_process(ax):
     ax.set_yticks([])
     ax.get_figure().set_size_inches(10, 10)
 
+
 model_params = {
     "height": 40,
     "width": 40,
@@ -53,9 +54,13 @@ model_params = {
     "max_jail_term": Slider("Max Jail Term", 30, 0, 50, 1),
 }
 
-space_component = make_space_component(citizen_cop_portrayal, post_process=post_process, draw_grid=False)
+space_component = make_space_component(
+    citizen_cop_portrayal, post_process=post_process, draw_grid=False
+)
 
-chart_component = make_plot_measure({state.name.lower():agent_colors[state] for state in CitizenState})
+chart_component = make_plot_measure(
+    {state.name.lower(): agent_colors[state] for state in CitizenState}
+)
 
 epstein_model = EpsteinCivilViolence()
 

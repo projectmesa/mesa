@@ -21,14 +21,18 @@ def agent_portrayal(agent):
         State.SUSCEPTIBLE: "tab:green",
         State.RESISTANT: "tab:gray",
     }
-    return {"color": node_color_dict[agent.state], "size":10}
+    return {"color": node_color_dict[agent.state], "size": 10}
+
 
 def get_resistant_susceptible_ratio(model):
     ratio = model.resistant_susceptible_ratio()
     ratio_text = r"$\infty$" if ratio is math.inf else f"{ratio:.2f}"
     infected_text = str(number_infected(model))
 
-    return solara.Markdown(f"Resistant/Susceptible Ratio: {ratio_text}<br>Infected Remaining: {infected_text}")
+    return solara.Markdown(
+        f"Resistant/Susceptible Ratio: {ratio_text}<br>Infected Remaining: {infected_text}"
+    )
+
 
 model_params = {
     "num_nodes": Slider(
@@ -83,7 +87,9 @@ model_params = {
 }
 
 SpacePlot = make_space_component(agent_portrayal)
-StatePlot = make_plot_measure({"Infected":"tab:red", "Susceptible":"tab:green", "Resistant":"tab:gray"})
+StatePlot = make_plot_measure(
+    {"Infected": "tab:red", "Susceptible": "tab:green", "Resistant": "tab:gray"}
+)
 
 model1 = VirusOnNetwork()
 
