@@ -7,12 +7,8 @@ from mesa.visualization import (
 
 
 def agent_portrayal(agent):
-    size = 10
-    color = "tab:red"
-    if agent.wealth > 0:
-        size = 50
-        color = "tab:blue"
-    return {"size": size, "color": color}
+    color = agent.wealth
+    return {"color": color}
 
 
 model_params = {
@@ -28,6 +24,9 @@ model_params = {
     "height": 10,
 }
 
+def post_process(ax):
+    ax.get_figure().colorbar(ax.collections[0], label="wealth", ax=ax)
+
 # Create initial model instance
 model1 = BoltzmannWealthModel(50, 10, 10)
 
@@ -36,7 +35,7 @@ model1 = BoltzmannWealthModel(50, 10, 10)
 # Under the hood these are just classes that receive the model instance.
 # You can also author your own visualization elements, which can also be functions
 # that receive the model instance and return a valid solara component.
-SpaceGraph = make_space_component(agent_portrayal)
+SpaceGraph = make_space_component(agent_portrayal, cmap='viridis', vmin=0, vmax=10, post_process=post_process)
 GiniPlot = make_plot_measure("Gini")
 
 # Create the SolaraViz page. This will automatically create a server and display the
