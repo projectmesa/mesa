@@ -172,27 +172,27 @@ from mesa.visualization import SolaraViz, make_space_component, make_plot_compon
 
 
 def agent_portrayal(agent):
-   return {"color": "blue", "size": 50}
+    return {"color": "blue", "size": 50}
 
 
 model_params = {
-   "N": {
-      "type": "SliderInt",
-      "value": 50,
-      "label": "Number of agents:",
-      "min": 10,
-      "max": 100,
-      "step": 1,
+    "N": {
+       "type": "SliderInt",
+       "value": 50,
+       "label": "Number of agents:",
+       "min": 10,
+       "max": 100,
+       "step": 1,
    }
 }
 
 page = SolaraViz(
-   MyModel,
-   [
-      make_space_component(agent_portrayal),
-      make_plot_component("mean_age")
-   ],
-   model_params=model_params
+    MyModel,
+    [
+       make_space_component(agent_portrayal),
+       make_plot_component("mean_age")
+    ],
+    model_params=model_params
 )
 page
 ```
