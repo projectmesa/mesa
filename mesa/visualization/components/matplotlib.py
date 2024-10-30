@@ -300,7 +300,7 @@ def draw_orthogonal_grid(
     agent_portrayal: Callable,
     ax: Axes | None = None,
     draw_grid: bool = True,
-    **kwargs
+    **kwargs,
 ):
     """Visualize a orthogonal grid.
 
@@ -347,7 +347,7 @@ def draw_hex_grid(
     agent_portrayal: Callable,
     ax: Axes | None = None,
     draw_grid: bool = True,
-    **kwargs
+    **kwargs,
 ):
     """Visualize a hex grid.
 
@@ -438,7 +438,7 @@ def draw_network(
     draw_grid: bool = True,
     layout_alg=nx.spring_layout,
     layout_kwargs=None,
-    **kwargs
+    **kwargs,
 ):
     """Visualize a network space.
 
@@ -503,8 +503,7 @@ def draw_network(
 
 
 def draw_continuous_space(
-    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None,
-    **kwargs
+    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
 ):
     """Visualize a continuous space.
 
@@ -551,8 +550,7 @@ def draw_continuous_space(
 
 
 def draw_voroinoi_grid(
-    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None,
-    **kwargs
+    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
 ):
     """Visualize a voronoi grid.
 
@@ -608,7 +606,7 @@ def draw_voroinoi_grid(
 def _scatter(ax: Axes, arguments, **kwargs):
     """Helper function for plotting the agents.
 
-    Args
+    Args:
         ax: a Matplotlib Axes instance
         arguments: the agents specific arguments for platting
         additional keyword arguments for ax.scatter
