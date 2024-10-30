@@ -7,7 +7,7 @@ from mesa.visualization import (
 
 
 def agent_portrayal(agent):
-    color = agent.wealth
+    color = agent.wealth  # we are using a colormap to translate wealth to color
     return {"color": color}
 
 
