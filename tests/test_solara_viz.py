@@ -6,9 +6,9 @@ import ipyvuetify as vw
 import solara
 
 import mesa
-import mesa.visualization.components.altair
-import mesa.visualization.components.matplotlib
-from mesa.visualization.components.matplotlib import make_space_component
+import mesa.visualization.components.altair_components
+import mesa.visualization.components.matplotlib_components
+from mesa.visualization.components.matplotlib_components import make_space_component
 from mesa.visualization.solara_viz import Slider, SolaraViz, UserInputs
 
 
