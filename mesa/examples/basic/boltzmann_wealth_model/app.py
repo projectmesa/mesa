@@ -2,6 +2,7 @@ from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealthMode
 from mesa.visualization import (
     SolaraViz,
     make_space_component,
+    make_plot_component
 )
 
 
@@ -40,7 +41,7 @@ model1 = BoltzmannWealthModel(50, 10, 10)
 SpaceGraph = make_space_component(
     agent_portrayal, cmap="viridis", vmin=0, vmax=10, post_process=post_process
 )
-GiniPlot = make_plot_measure("Gini")
+GiniPlot = make_plot_component("Gini")
 
 # Create the SolaraViz page. This will automatically create a server and display the
 # visualization elements in a web browser.
