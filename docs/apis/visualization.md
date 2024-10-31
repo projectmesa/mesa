@@ -24,7 +24,14 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
 ## Matplotlib-based components
 
 ```{eval-rst}
-.. automodule:: mesa.visualization.components.matplotlib
+.. automodule:: mesa.visualization.components.matplotlib_components
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
+```{eval-rst}
+.. automodule:: mesa.visualization.components.mpl_space_drawing
    :members:
    :undoc-members:
    :show-inheritance:
@@ -33,7 +40,7 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
 ## Altair-based components
 
 ```{eval-rst}
-.. automodule:: mesa.visualization.components.altair
+.. automodule:: mesa.visualization.components.altair_components
    :members:
    :undoc-members:
    :show-inheritance:
