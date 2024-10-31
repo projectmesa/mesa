@@ -26,4 +26,13 @@ __all__ = [
     "make_space_altair",
     "make_space_component",
     "make_plot_component",
+    "make_plot_measure",
+    "make_space_matplotlib",
+    "draw_continuous_space",
+    "draw_hex_grid",
+    "draw_network",
+    "draw_orthogonal_grid",
+    "draw_property_layers",
+    "draw_space",
+    "draw_voroinoi_grid",
 ]
