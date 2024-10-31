@@ -88,10 +88,10 @@ class TestMakeUserInput(unittest.TestCase):  # noqa: D101
 
 def test_call_space_drawer(mocker):  # noqa: D103
     mock_space_matplotlib = mocker.spy(
-        mesa.visualization.components.matplotlib, "SpaceMatplotlib"
+        mesa.visualization.components.matplotlib_components, "SpaceMatplotlib"
     )
 
-    mock_space_altair = mocker.spy(mesa.visualization.components.altair, "SpaceAltair")
+    mock_space_altair = mocker.spy(mesa.visualization.components.altair_components, "SpaceAltair")
 
     model = mesa.Model()
     mocker.patch.object(mesa.Model, "__init__", return_value=None)
