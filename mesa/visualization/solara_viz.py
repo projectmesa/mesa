@@ -31,7 +31,7 @@ from typing import TYPE_CHECKING, Literal
 import reacton.core
 import solara
 
-import mesa.visualization.components.altair as components_altair
+import mesa.visualization.components.altair_components as components_altair
 from mesa.visualization.UserParam import Slider
 from mesa.visualization.utils import force_update, update_counter
 
