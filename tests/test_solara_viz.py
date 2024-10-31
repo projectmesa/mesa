@@ -91,7 +91,9 @@ def test_call_space_drawer(mocker):  # noqa: D103
         mesa.visualization.components.matplotlib_components, "SpaceMatplotlib"
     )
 
-    mock_space_altair = mocker.spy(mesa.visualization.components.altair_components, "SpaceAltair")
+    mock_space_altair = mocker.spy(
+        mesa.visualization.components.altair_components, "SpaceAltair"
+    )
 
     model = mesa.Model()
     mocker.patch.object(mesa.Model, "__init__", return_value=None)
