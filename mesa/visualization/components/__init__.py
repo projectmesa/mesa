@@ -1,11 +1,16 @@
 """custom solara components."""
+
 from __future__ import annotations
-from typing import overload
 
 from collections.abc import Callable
+from typing import overload
 
-from .altair_components import make_altair_space, SpaceAltair
-from .matplotlib_components import make_mpl_plot_component, make_mpl_space_component, SpaceMatplotlib
+from .altair_components import SpaceAltair, make_altair_space
+from .matplotlib_components import (
+    SpaceMatplotlib,
+    make_mpl_plot_component,
+    make_mpl_space_component,
+)
 
 
 def make_space_component(
@@ -30,11 +35,24 @@ def make_space_component(
         function: A function that creates a space component
     """
     if backend == "matplotlib":
-        return make_mpl_space_component(agent_portrayal, propertylayer_portrayal, post_process, **space_drawing_kwargs)
+        return make_mpl_space_component(
+            agent_portrayal,
+            propertylayer_portrayal,
+            post_process,
+            **space_drawing_kwargs,
+        )
     elif backend == "altair":
-        return make_altair_space(agent_portrayal, propertylayer_portrayal, post_process, **space_drawing_kwargs)
+        return make_altair_space(
+            agent_portrayal,
+            propertylayer_portrayal,
+            post_process,
+            **space_drawing_kwargs,
+        )
     else:
-        raise ValueError(f"unknown backend {backend}, must be one of matplotlib, altair")
+        raise ValueError(
+            f"unknown backend {backend}, must be one of matplotlib, altair"
+        )
+
 
 def make_plot_component(
     measure: str | dict[str, str] | list[str] | tuple[str],
@@ -61,4 +79,6 @@ def make_plot_component(
     elif backend == "altair":
         raise NotImplementedError("altair line plots are not yet implemented")
     else:
-        raise ValueError(f"unknown backend {backend}, must be one of matplotlib, altair")
+        raise ValueError(
+            f"unknown backend {backend}, must be one of matplotlib, altair"
+        )

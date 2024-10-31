@@ -37,5 +37,5 @@ __all__ = [
     "draw_space",
     "draw_voroinoi_grid",
     "make_plot_component",
-    "make_space_component"
+    "make_space_component",
 ]

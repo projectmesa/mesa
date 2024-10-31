@@ -12,7 +12,9 @@ from mesa.space import ContinuousSpace, _Grid
 from mesa.visualization.utils import update_counter
 
 
-def make_altair_space(agent_portrayal, propertylayer_portrayal, post_process, **space_drawing_kwargs):  # noqa: D103
+def make_altair_space(
+    agent_portrayal, propertylayer_portrayal, post_process, **space_drawing_kwargs
+):  # noqa: D103
     if agent_portrayal is None:
 
         def agent_portrayal(a):

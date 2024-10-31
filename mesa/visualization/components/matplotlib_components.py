@@ -1,4 +1,5 @@
 """Matplotlib based solara components for visualization MESA spaces and plots."""
+
 from __future__ import annotations
 
 import warnings
