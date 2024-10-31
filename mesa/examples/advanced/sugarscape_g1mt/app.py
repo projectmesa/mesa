@@ -4,7 +4,7 @@ from matplotlib.figure import Figure
 
 from mesa.examples.advanced.sugarscape_g1mt.agents import Trader
 from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt
-from mesa.visualization import SolaraViz, make_plot_component
+from mesa.visualization import SolaraViz, make_mpl_plot_component
 
 
 def SpaceDrawer(model):
@@ -55,7 +55,7 @@ model1 = SugarscapeG1mt(50, 50)
 
 page = SolaraViz(
     model1,
-    components=[SpaceDrawer, make_plot_component(["Trader", "Price"])],
+    components=[SpaceDrawer, make_mpl_plot_component(["Trader", "Price"])],
     name="Sugarscape {G1, M, T}",
     play_interval=150,
 )

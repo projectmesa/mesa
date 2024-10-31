@@ -1,10 +1,11 @@
 """Solara based visualization for Mesa models."""
 
-from .components.altair_components import make_space_altair
+from .components import make_plot_component, make_space_component
+from .components.altair_components import make_altair_space
 from .components.matplotlib_components import (
-    make_plot_component,
+    make_mpl_plot_component,
+    make_mpl_space_component,
     make_plot_measure,
-    make_space_component,
     make_space_matplotlib,
 )
 from .components.mpl_space_drawing import (
@@ -23,9 +24,9 @@ __all__ = [
     "JupyterViz",
     "SolaraViz",
     "Slider",
-    "make_space_altair",
-    "make_space_component",
-    "make_plot_component",
+    "make_altair_space",
+    "make_mpl_space_component",
+    "make_mpl_plot_component",
     "make_plot_measure",
     "make_space_matplotlib",
     "draw_continuous_space",
@@ -35,4 +36,6 @@ __all__ = [
     "draw_property_layers",
     "draw_space",
     "draw_voroinoi_grid",
+    "make_plot_component",
+    "make_space_component"
 ]

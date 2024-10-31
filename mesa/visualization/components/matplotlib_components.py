@@ -17,10 +17,10 @@ def make_space_matplotlib(*args, **kwargs):  # noqa: D103
         DeprecationWarning,
         stacklevel=2,
     )
-    return make_space_component(*args, **kwargs)
+    return make_mpl_space_component(*args, **kwargs)
 
 
-def make_space_component(
+def make_mpl_space_component(
     agent_portrayal: Callable | None = None,
     propertylayer_portrayal: dict | None = None,
     post_process: Callable | None = None,
@@ -98,10 +98,10 @@ def make_plot_measure(*args, **kwargs):  # noqa: D103
         DeprecationWarning,
         stacklevel=2,
     )
-    return make_plot_component(*args, **kwargs)
+    return make_mpl_plot_component(*args, **kwargs)
 
 
-def make_plot_component(
+def make_mpl_plot_component(
     measure: str | dict[str, str] | list[str] | tuple[str],
     post_process: Callable | None = None,
     save_format="png",

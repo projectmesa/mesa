@@ -8,7 +8,7 @@ import solara
 import mesa
 import mesa.visualization.components.altair_components
 import mesa.visualization.components.matplotlib_components
-from mesa.visualization.components.matplotlib_components import make_space_component
+from mesa.visualization.components.matplotlib_components import make_mpl_space_component
 from mesa.visualization.solara_viz import Slider, SolaraViz, UserInputs
 
 
@@ -105,7 +105,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
     propertylayer_portrayal = None
     # initialize with space drawer unspecified (use default)
     # component must be rendered for code to run
-    solara.render(SolaraViz(model, components=[make_space_component(agent_portrayal)]))
+    solara.render(SolaraViz(model, components=[make_mpl_space_component(agent_portrayal)]))
     # should call default method with class instance and agent portrayal
     mock_space_matplotlib.assert_called_with(
         model, agent_portrayal, propertylayer_portrayal, post_process=None
@@ -116,7 +116,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
     solara.render(SolaraViz(model))
     # should call default method with class instance and agent portrayal
     assert mock_space_matplotlib.call_count == 0
-    assert mock_space_altair.call_count > 0
+    assert mock_space_altair.call_count == 0
 
     # specify a custom space method
     class AltSpace:
@@ -134,7 +134,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
         centroids_coordinates=[(0, 1), (0, 0), (1, 0)],
     )
     solara.render(
-        SolaraViz(voronoi_model, components=[make_space_component(agent_portrayal)])
+        SolaraViz(voronoi_model, components=[make_mpl_space_component(agent_portrayal)])
     )
 
 

@@ -7,8 +7,8 @@ from mesa.examples.advanced.epstein_civil_violence.model import EpsteinCivilViol
 from mesa.visualization import (
     Slider,
     SolaraViz,
-    make_plot_component,
-    make_space_component,
+    make_mpl_plot_component,
+    make_mpl_space_component,
 )
 
 COP_COLOR = "#000000"
@@ -54,11 +54,11 @@ model_params = {
     "max_jail_term": Slider("Max Jail Term", 30, 0, 50, 1),
 }
 
-space_component = make_space_component(
+space_component = make_mpl_space_component(
     citizen_cop_portrayal, post_process=post_process, draw_grid=False
 )
 
-chart_component = make_plot_component(
+chart_component = make_mpl_plot_component(
     {state.name.lower(): agent_colors[state] for state in CitizenState}
 )
 
