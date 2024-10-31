@@ -230,6 +230,7 @@ def draw_orthogonal_grid(
     agent_portrayal: Callable,
     ax: Axes | None = None,
     draw_grid: bool = True,
+    **kwargs,
 ):
     """Visualize a orthogonal grid.
 
@@ -238,6 +239,7 @@ def draw_orthogonal_grid(
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
+        kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
@@ -254,7 +256,7 @@ def draw_orthogonal_grid(
     arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
     # plot the agents
-    _scatter(ax, arguments)
+    _scatter(ax, arguments, **kwargs)
 
     # further styling
     ax.set_xlim(-0.5, space.width - 0.5)
@@ -275,6 +277,7 @@ def draw_hex_grid(
     agent_portrayal: Callable,
     ax: Axes | None = None,
     draw_grid: bool = True,
+    **kwargs,
 ):
     """Visualize a hex grid.
 
@@ -283,6 +286,7 @@ def draw_hex_grid(
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
+        kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
@@ -315,7 +319,7 @@ def draw_hex_grid(
     arguments["loc"] = loc
 
     # plot the agents
-    _scatter(ax, arguments)
+    _scatter(ax, arguments, **kwargs)
 
     # further styling and adding of grid
     ax.set_xlim(-1, space.width + 0.5)
@@ -364,6 +368,7 @@ def draw_network(
     draw_grid: bool = True,
     layout_alg=nx.spring_layout,
     layout_kwargs=None,
+    **kwargs,
 ):
     """Visualize a network space.
 
@@ -374,6 +379,7 @@ def draw_network(
         draw_grid: whether to draw the grid
         layout_alg: a networkx layout algorithm or other callable with the same behavior
         layout_kwargs: a dictionary of keyword arguments for the layout algorithm
+        kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
@@ -409,7 +415,7 @@ def draw_network(
     arguments["loc"] = pos[arguments["loc"]]
 
     # plot the agents
-    _scatter(ax, arguments)
+    _scatter(ax, arguments, **kwargs)
 
     # further styling
     ax.set_axis_off()
@@ -427,7 +433,7 @@ def draw_network(
 
 
 def draw_continuous_space(
-    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None
+    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
 ):
     """Visualize a continuous space.
 
@@ -435,6 +441,7 @@ def draw_continuous_space(
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
@@ -457,7 +464,7 @@ def draw_continuous_space(
     arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
     # plot the agents
-    _scatter(ax, arguments)
+    _scatter(ax, arguments, **kwargs)
 
     # further visual styling
     border_style = "solid" if not space.torus else (0, (5, 10))
@@ -473,7 +480,7 @@ def draw_continuous_space(
 
 
 def draw_voroinoi_grid(
-    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None
+    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
 ):
     """Visualize a voronoi grid.
 
@@ -481,6 +488,7 @@ def draw_voroinoi_grid(
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
@@ -510,7 +518,7 @@ def draw_voroinoi_grid(
     ax.set_xlim(x_min - x_padding, x_max + x_padding)
     ax.set_ylim(y_min - y_padding, y_max + y_padding)
 
-    _scatter(ax, arguments)
+    _scatter(ax, arguments, **kwargs)
 
     for cell in space.all_cells:
         polygon = cell.properties["polygon"]
@@ -525,8 +533,15 @@ def draw_voroinoi_grid(
     return ax
 
 
-def _scatter(ax: Axes, arguments):
-    """Helper function for plotting the agents."""
+def _scatter(ax: Axes, arguments, **kwargs):
+    """Helper function for plotting the agents.
+
+    Args:
+        ax: a Matplotlib Axes instance
+        arguments: the agents specific arguments for platting
+        kwargs: additional keyword arguments for ax.scatter
+
+    """
     loc = arguments.pop("loc")
 
     x = loc[:, 0]
@@ -545,4 +560,5 @@ def _scatter(ax: Axes, arguments):
                 marker=mark,
                 zorder=z_order,
                 **{k: v[logical] for k, v in arguments.items()},
+                **kwargs,
             )
