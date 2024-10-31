@@ -1,9 +1,5 @@
 from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealthModel
-from mesa.visualization import (
-    SolaraViz,
-    make_space_component,
-    make_plot_component
-)
+from mesa.visualization import SolaraViz, make_plot_component, make_space_component
 
 
 def agent_portrayal(agent):
