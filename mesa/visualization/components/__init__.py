@@ -1,10 +1,11 @@
 """custom solara components."""
-
+from __future__ import annotations
+from typing import overload
 
 from collections.abc import Callable
 
-from .altair_components import make_altair_space
-from .matplotlib_components import make_mpl_plot_component, make_mpl_space_component
+from .altair_components import make_altair_space, SpaceAltair
+from .matplotlib_components import make_mpl_plot_component, make_mpl_space_component, SpaceMatplotlib
 
 
 def make_space_component(
@@ -13,7 +14,7 @@ def make_space_component(
     post_process: Callable | None = None,
     backend: str = "matplotlib",
     **space_drawing_kwargs,
-):
+) -> SpaceMatplotlib | SpaceAltair:
     """Create a Matplotlib-based space visualization component.
 
     Args:

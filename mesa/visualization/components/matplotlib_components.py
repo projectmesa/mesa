@@ -1,4 +1,5 @@
 """Matplotlib based solara components for visualization MESA spaces and plots."""
+from __future__ import annotations
 
 import warnings
 from collections.abc import Callable
@@ -25,7 +26,7 @@ def make_mpl_space_component(
     propertylayer_portrayal: dict | None = None,
     post_process: Callable | None = None,
     **space_drawing_kwargs,
-):
+) -> SpaceMatplotlib:
     """Create a Matplotlib-based space visualization component.
 
     Args:
