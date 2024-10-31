@@ -177,20 +177,20 @@ def agent_portrayal(agent):
 
 model_params = {
     "N": {
-       "type": "SliderInt",
-       "value": 50,
-       "label": "Number of agents:",
-       "min": 10,
-       "max": 100,
-       "step": 1,
+        "type": "SliderInt",
+        "value": 50,
+        "label": "Number of agents:",
+        "min": 10,
+        "max": 100,
+        "step": 1,
    }
 }
 
 page = SolaraViz(
     MyModel,
     [
-       make_space_component(agent_portrayal),
-       make_plot_component("mean_age")
+        make_space_component(agent_portrayal),
+        make_plot_component("mean_age")
     ],
     model_params=model_params
 )
