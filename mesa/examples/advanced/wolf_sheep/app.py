@@ -3,7 +3,7 @@ from mesa.examples.advanced.wolf_sheep.model import WolfSheep
 from mesa.visualization import (
     Slider,
     SolaraViz,
-    make_plot_measure,
+    make_plot_component,
     make_space_component,
 )
 
@@ -68,7 +68,7 @@ def post_process(ax):
 space_component = make_space_component(
     wolf_sheep_portrayal, draw_grid=False, post_process=post_process
 )
-lineplot_component = make_plot_measure(
+lineplot_component = make_plot_component(
     {"Wolves": "tab:orange", "Sheep": "tab:cyan", "Grass": "tab:green"}
 )
 
