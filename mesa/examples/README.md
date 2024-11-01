@@ -1,5 +1,5 @@
 # Mesa core examples
-This folder contains a collection of example models built using Mesa. These core models are maintained by the Mesa team and are intended to demonstrate the capabilities of Mesa.
+These examples are a collection of classic agent based models built using Mesa. These core examples are maintained by the Mesa team and are intended to demonstrate the capabilities of Mesa.
 
 More user examples and showcases can be found in the [mesa-examples](https://github.com/projectmesa/mesa-examples) repository.
 
@@ -25,7 +25,7 @@ This model is based on the NetLogo [Virus on a Network](https://ccl.northwestern
 The advanced examples are more complex and may use experimental Mesa features. They are good starting points for learning how to build more complex models.
 
 ### [Epstein Civil Violence Model](examples/advanced/epstein_civil_violence)
-Joshua Epstein's [model](http://www.uvm.edu/~pdodds/files/papers/others/2002/epstein2002a.pdf) of how a decentralized uprising can be suppressed or reach a critical mass of support.
+Joshua Epstein's [model](https://www.pnas.org/doi/10.1073/pnas.092080199) of how a decentralized uprising can be suppressed or reach a critical mass of support.
 
 ### [Demographic Prisoner's Dilemma on a Grid](examples/advanced/pd_grid)
 Grid-based demographic prisoner's dilemma model, demonstrating how simple rules can lead to the emergence of widespread cooperation -- and how a model activation regime can change its outcome.
