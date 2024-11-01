@@ -1,6 +1,8 @@
 
 # Examples
 
+$readme
+
 
 ```{toctree}
 :maxdepth: 1
