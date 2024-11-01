@@ -42,7 +42,7 @@ def make_altair_space(
 
 
 @solara.component
-def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):  # noqa: D103
+def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):
     """Create an Altair-based space visualization component.
 
     Returns:
