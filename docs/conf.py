@@ -355,7 +355,7 @@ def setup_examples_pages():
             dict(
                 readme=readme_md,
             #     examples="\n".join([f"{' '.join(base_name.split('_'))} </examples/{base_name}>" for base_name in examples_md]),
-            # )
+            )
         )
         fh.write(content)
 
