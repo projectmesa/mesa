@@ -9,7 +9,7 @@ The basic examples are relatively simple and only use stable Mesa features. They
 ### [Boltzmann Wealth Model](basic/boltzmann_wealth_model)
 Completed code to go along with the [tutorial](https://mesa.readthedocs.io/latest/tutorials/intro_tutorial.html) on making a simple model of how a highly-skewed wealth distribution can emerge from simple rules.
 
-### [Boids Flockers Model](basic/boid_flockers)
+### [Boids Flockers Model](examples/boid_flockers)
 [Boids](https://en.wikipedia.org/wiki/Boids)-style flocking model, demonstrating the use of agents moving through a continuous space following direction vectors.
 
 ### [Conway's Game of Life](basic/conways_game_of_life)
