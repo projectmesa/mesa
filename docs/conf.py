@@ -344,7 +344,7 @@ def setup_examples_pages():
     with open(os.path.join(HERE, "examples_overview_template.txt")) as fh:
         template = string.Template(fh.read())
 
-    with open(os.path.join(examples_folder, "README.MD")) as fh:
+    with open(os.path.join(examples_folder, "README.md")) as fh:
         readme_md = fh.read()
 
     with open(os.path.join(HERE, "examples.md"), "w") as fh:
