@@ -78,7 +78,6 @@ tutorials/visualization_tutorial
 Examples <examples>
 Migration guide <migration_guide>
 Best Practices <best-practices>
-How-to Guide <howto>
 API Documentation <apis/api_main>
 Mesa Packages <packages>
 ```
