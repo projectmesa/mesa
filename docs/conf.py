@@ -316,17 +316,20 @@ def setup_examples_pages():
     # create md files for all examples
     # check what examples exist
     examples_folder = osp.abspath(osp.join(HERE, "..", "mesa", "examples"))
-    basic_examples = [f.path for f in os.scandir(osp.join(examples_folder, "basic")) if f.is_dir() and not f.name.startswith("__") ]
-    advanced_examples = [f.path for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir() and not f.name.startswith("__")]
+    basic_examples = [("basic", f.path) for f in os.scandir(osp.join(examples_folder, "basic")) if f.is_dir() and not f.name.startswith("__") ]
+    advanced_examples = [("advanced", f.path) for f in os.scandir(osp.join(examples_folder, "advanced")) if f.is_dir() and not f.name.startswith("__")]
     examples = basic_examples + advanced_examples
 
     with open(os.path.join(HERE, "example_template.txt")) as fh:
         template = string.Template(fh.read())
 
-    pathlib.Path(os.path.join(HERE, "examples")).mkdir(parents=True, exist_ok=True)
+    root_folder = pathlib.Path(os.path.join(HERE, "examples"))
+    root_folder.mkdir(parents=True, exist_ok=True)
+    pathlib.Path(os.path.join(root_folder, "basic")).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(os.path.join(root_folder, "advanced")).mkdir(parents=True, exist_ok=True)
 
     examples_md = []
-    for example in examples:
+    for kind, example in examples:
         base_name = os.path.basename(os.path.normpath(example))
 
         agent_filename = os.path.join(example, "agents.py")
@@ -337,7 +340,7 @@ def setup_examples_pages():
         md_filename = f"{base_name}.md"
         examples_md.append(base_name)
 
-        md_filepath = os.path.join(HERE, "examples", md_filename)
+        md_filepath = os.path.join(HERE, "examples", kind, md_filename)
         write_example_md_file(agent_filename, model_filename, readme_filename, app_filename, md_filepath, template)
 
     # create overview of examples.md
