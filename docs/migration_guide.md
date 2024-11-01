@@ -281,15 +281,17 @@ SolaraViz(model, components=[make_space_component(agent_portrayal)])
 # old
 from mesa.experimental import SolaraViz
 
+
 def make_plot(model):
     ...
+
 
 SolaraViz(model_cls, model_params, measures=[make_plot, "foo", ["bar", "baz"]])
 
 # new
-from mesa.visualization import SolaraViz, make_plot_measure
+from mesa.visualization import SolaraViz, make_plot_component
 
-SolaraViz(model, components=[make_plot, make_plot_measure("foo"), make_plot_measure("bar", "baz")])
+SolaraViz(model, components=[make_plot, make_plot_component("foo"), make_plot_component("bar", "baz")])
 ```
 
 #### Plotting text

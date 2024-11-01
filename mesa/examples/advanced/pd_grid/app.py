@@ -3,7 +3,7 @@ Solara-based visualization for the Spatial Prisoner's Dilemma Model.
 """
 
 from mesa.examples.advanced.pd_grid.model import PdGrid
-from mesa.visualization import SolaraViz, make_plot_measure, make_space_component
+from mesa.visualization import SolaraViz, make_plot_component, make_space_component
 from mesa.visualization.UserParam import Slider
 
 
@@ -13,7 +13,7 @@ def pd_agent_portrayal(agent):
     """
     return {
         "color": "blue" if agent.move == "C" else "red",
-        "shape": "s",  # square marker
+        "marker": "s",  # square marker
         "size": 25,
     }
 
@@ -35,7 +35,7 @@ model_params = {
 grid_viz = make_space_component(agent_portrayal=pd_agent_portrayal)
 
 # Create plot for tracking cooperating agents over time
-plot_component = make_plot_measure("Cooperating_Agents")
+plot_component = make_plot_component("Cooperating_Agents")
 
 # Initialize model
 initial_model = PdGrid()

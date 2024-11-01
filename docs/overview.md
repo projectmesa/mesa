@@ -168,7 +168,7 @@ The results are returned as a list of dictionaries, which can be easily converte
 Mesa now uses a new browser-based visualization system called SolaraViz. This allows for interactive, customizable visualizations of your models. Here's a basic example of how to set up a visualization:
 
 ```python
-from mesa.visualization import SolaraViz, make_space_component, make_plot_measure
+from mesa.visualization import SolaraViz, make_space_component, make_plot_component
 
 
 def agent_portrayal(agent):
@@ -183,14 +183,14 @@ model_params = {
         "min": 10,
         "max": 100,
         "step": 1,
-    }
+   }
 }
 
 page = SolaraViz(
     MyModel,
     [
         make_space_component(agent_portrayal),
-        make_plot_measure("mean_age")
+        make_plot_component("mean_age")
     ],
     model_params=model_params
 )

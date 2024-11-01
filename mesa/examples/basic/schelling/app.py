@@ -4,7 +4,7 @@ from mesa.examples.basic.schelling.model import Schelling
 from mesa.visualization import (
     Slider,
     SolaraViz,
-    make_plot_measure,
+    make_plot_component,
     make_space_component,
 )
 
@@ -28,13 +28,13 @@ model_params = {
 
 model1 = Schelling(20, 20, 0.8, 0.2, 3)
 
-HappyPlot = make_plot_measure("happy")
+HappyPlot = make_plot_component({"happy": "tab:green"})
 
 page = SolaraViz(
     model1,
     components=[
         make_space_component(agent_portrayal),
-        make_plot_measure("happy"),
+        HappyPlot,
         get_happy_agents,
     ],
     model_params=model_params,

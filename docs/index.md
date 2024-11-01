@@ -20,7 +20,7 @@
 
 Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python-based counterpart to NetLogo, Repast, or MASON.
 
-![A screenshot of the Wolf Sheep model in Mesa|100%](images/wolf_scheep.png)
+![A screenshot of the Wolf Sheep model in Mesa|100%](images/wolf_sheep.png)
 *A visualisation of the Wolf Sheep model build with Mesa.*
 
 ## Features

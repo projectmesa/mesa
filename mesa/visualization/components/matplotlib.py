@@ -40,6 +40,15 @@ HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
 Network = NetworkGrid | mesa.experimental.cell_space.Network
 
 
+def make_space_matplotlib(*args, **kwargs):  # noqa: D103
+    warnings.warn(
+        "make_space_matplotlib has been renamed to make_space_component",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return make_space_component(*args, **kwargs)
+
+
 def make_space_component(
     agent_portrayal: Callable | None = None,
     propertylayer_portrayal: dict | None = None,
@@ -300,6 +309,7 @@ def draw_orthogonal_grid(
     agent_portrayal: Callable,
     ax: Axes | None = None,
     draw_grid: bool = True,
+    **kwargs,
 ):
     """Visualize a orthogonal grid.
 
@@ -308,6 +318,7 @@ def draw_orthogonal_grid(
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
+        kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
@@ -324,7 +335,7 @@ def draw_orthogonal_grid(
     arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
     # plot the agents
-    _scatter(ax, arguments)
+    _scatter(ax, arguments, **kwargs)
 
     # further styling
     ax.set_xlim(-0.5, space.width - 0.5)
@@ -345,6 +356,7 @@ def draw_hex_grid(
     agent_portrayal: Callable,
     ax: Axes | None = None,
     draw_grid: bool = True,
+    **kwargs,
 ):
     """Visualize a hex grid.
 
@@ -353,6 +365,7 @@ def draw_hex_grid(
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
+        kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
@@ -385,7 +398,7 @@ def draw_hex_grid(
     arguments["loc"] = loc
 
     # plot the agents
-    _scatter(ax, arguments)
+    _scatter(ax, arguments, **kwargs)
 
     # further styling and adding of grid
     ax.set_xlim(-1, space.width + 0.5)
@@ -434,6 +447,7 @@ def draw_network(
     draw_grid: bool = True,
     layout_alg=nx.spring_layout,
     layout_kwargs=None,
+    **kwargs,
 ):
     """Visualize a network space.
 
@@ -444,6 +458,7 @@ def draw_network(
         draw_grid: whether to draw the grid
         layout_alg: a networkx layout algorithm or other callable with the same behavior
         layout_kwargs: a dictionary of keyword arguments for the layout algorithm
+        kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
@@ -479,7 +494,7 @@ def draw_network(
     arguments["loc"] = pos[arguments["loc"]]
 
     # plot the agents
-    _scatter(ax, arguments)
+    _scatter(ax, arguments, **kwargs)
 
     # further styling
     ax.set_axis_off()
@@ -497,7 +512,7 @@ def draw_network(
 
 
 def draw_continuous_space(
-    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None
+    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
 ):
     """Visualize a continuous space.
 
@@ -505,6 +520,7 @@ def draw_continuous_space(
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
@@ -527,7 +543,7 @@ def draw_continuous_space(
     arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
     # plot the agents
-    _scatter(ax, arguments)
+    _scatter(ax, arguments, **kwargs)
 
     # further visual styling
     border_style = "solid" if not space.torus else (0, (5, 10))
@@ -543,7 +559,7 @@ def draw_continuous_space(
 
 
 def draw_voroinoi_grid(
-    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None
+    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
 ):
     """Visualize a voronoi grid.
 
@@ -551,6 +567,7 @@ def draw_voroinoi_grid(
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
@@ -580,7 +597,7 @@ def draw_voroinoi_grid(
     ax.set_xlim(x_min - x_padding, x_max + x_padding)
     ax.set_ylim(y_min - y_padding, y_max + y_padding)
 
-    _scatter(ax, arguments)
+    _scatter(ax, arguments, **kwargs)
 
     for cell in space.all_cells:
         polygon = cell.properties["polygon"]
@@ -595,8 +612,15 @@ def draw_voroinoi_grid(
     return ax
 
 
-def _scatter(ax: Axes, arguments):
-    """Helper function for plotting the agents."""
+def _scatter(ax: Axes, arguments, **kwargs):
+    """Helper function for plotting the agents.
+
+    Args:
+        ax: a Matplotlib Axes instance
+        arguments: the agents specific arguments for platting
+        kwargs: additional keyword arguments for ax.scatter
+
+    """
     loc = arguments.pop("loc")
 
     x = loc[:, 0]
@@ -615,33 +639,59 @@ def _scatter(ax: Axes, arguments):
                 marker=mark,
                 zorder=z_order,
                 **{k: v[logical] for k, v in arguments.items()},
+                **kwargs,
             )
 
 
-def make_plot_measure(measure: str | dict[str, str] | list[str] | tuple[str]):
+def make_plot_measure(*args, **kwargs):  # noqa: D103
+    warnings.warn(
+        "make_plot_measure has been renamed to make_plot_component",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return make_plot_component(*args, **kwargs)
+
+
+def make_plot_component(
+    measure: str | dict[str, str] | list[str] | tuple[str],
+    post_process: Callable | None = None,
+    save_format="png",
+):
     """Create a plotting function for a specified measure.
 
     Args:
         measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
+        post_process: a user-specified callable to do post-processing called with the Axes instance.
+        save_format: save format of figure in solara backend
 
     Returns:
         function: A function that creates a PlotMatplotlib component.
     """
 
-    def MakePlotMeasure(model):
-        return PlotMatplotlib(model, measure)
+    def MakePlotMatplotlib(model):
+        return PlotMatplotlib(
+            model, measure, post_process=post_process, save_format=save_format
+        )
 
-    return MakePlotMeasure
+    return MakePlotMatplotlib
 
 
 @solara.component
-def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
+def PlotMatplotlib(
+    model,
+    measure,
+    dependencies: list[any] | None = None,
+    post_process: Callable | None = None,
+    save_format="png",
+):
     """Create a Matplotlib-based plot for a measure or measures.
 
     Args:
         model (mesa.Model): The model instance.
         measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
         dependencies (list[any] | None): Optional dependencies for the plot.
+        post_process: a user-specified callable to do post-processing called with the Axes instance.
+        save_format: format used for saving the figure.
 
     Returns:
         solara.FigureMatplotlib: A component for rendering the plot.
@@ -661,9 +711,13 @@ def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
         for m in measure:
             ax.plot(df.loc[:, m], label=m)
         ax.legend(loc="best")
+
+    if post_process is not None:
+        post_process(ax)
+
     ax.set_xlabel("Step")
     # Set integer x axis
     ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
     solara.FigureMatplotlib(
-        fig, format="png", bbox_inches="tight", dependencies=dependencies
+        fig, format=save_format, bbox_inches="tight", dependencies=dependencies
     )
