@@ -24,14 +24,14 @@ This model is based on the NetLogo [Virus on a Network](https://ccl.northwestern
 ## Advanced Examples
 The advanced examples are more complex and may use experimental Mesa features. They are good starting points for learning how to build more complex models.
 
-### [Epstein Civil Violence Model](advanced/epstein_civil_violence)
+### [Epstein Civil Violence Model](/advanced/epstein_civil_violence)
 Joshua Epstein's [model](http://www.uvm.edu/~pdodds/files/papers/others/2002/epstein2002a.pdf) of how a decentralized uprising can be suppressed or reach a critical mass of support.
 
-### [Demographic Prisoner's Dilemma on a Grid](advanced/pd_grid)
+### [Demographic Prisoner's Dilemma on a Grid](/advanced/pd_grid)
 Grid-based demographic prisoner's dilemma model, demonstrating how simple rules can lead to the emergence of widespread cooperation -- and how a model activation regime can change its outcome.
 
-### [Sugarscape Model with Traders](advanced/sugarscape_g1mt)
+### [Sugarscape Model with Traders](./advanced/sugarscape_g1mt)
 This is Epstein & Axtell's Sugarscape model with Traders, a detailed description is in Chapter four of *Growing Artificial Societies: Social Science from the Bottom Up (1996)*. The model shows how emergent price equilibrium can happen via decentralized dynamics.
 
-### [Wolf-Sheep Predation Model](advanced/wolf_sheep)
+### [Wolf-Sheep Predation Model](./advanced/wolf_sheep)
 Implementation of an ecological model of predation and reproduction, based on the NetLogo [Wolf Sheep Predation](http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation) model.
