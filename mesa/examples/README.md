@@ -6,19 +6,19 @@ More user examples and showcases can be found in the [mesa-examples](https://git
 ## Basic Examples
 The basic examples are relatively simple and only use stable Mesa features. They are good starting points for learning how to use Mesa.
 
-### [Boltzmann Wealth Model](basic/boltzmann_wealth_model)
+### [Boltzmann Wealth Model](examples/basic/boltzmann_wealth_model)
 Completed code to go along with the [tutorial](https://mesa.readthedocs.io/latest/tutorials/intro_tutorial.html) on making a simple model of how a highly-skewed wealth distribution can emerge from simple rules.
 
-### [Boids Flockers Model](basic/boid_flockers)
+### [Boids Flockers Model](examples/basic/boid_flockers)
 [Boids](https://en.wikipedia.org/wiki/Boids)-style flocking model, demonstrating the use of agents moving through a continuous space following direction vectors.
 
-### [Conway's Game of Life](basic/conways_game_of_life)
+### [Conway's Game of Life](examples/basic/conways_game_of_life)
 Implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life), a cellular automata where simple rules can give rise to complex patterns.
 
-### [Schelling Segregation Model](basic/schelling)
+### [Schelling Segregation Model](examples/basic/schelling)
 Mesa implementation of the classic [Schelling segregation](http://nifty.stanford.edu/2014/mccown-schelling-model-segregation/) model.
 
-### [Virus on a Network Model](basic/virus_on_network)
+### [Virus on a Network Model](examples/basic/virus_on_network)
 This model is based on the NetLogo [Virus on a Network](https://ccl.northwestern.edu/netlogo/models/VirusonaNetwork) model.
 
 ## Advanced Examples
