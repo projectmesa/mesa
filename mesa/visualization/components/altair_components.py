@@ -15,6 +15,21 @@ from mesa.visualization.utils import update_counter
 def make_altair_space(
     agent_portrayal, propertylayer_portrayal, post_process, **space_drawing_kwargs
 ):
+    """Create an Altair-based space visualization component.
+
+    Args:
+        agent_portrayal: Function to portray agents.
+        propertylayer_portrayal: not yet implemented
+        post_process :not yet implemented
+        space_drawing_kwargs : not yet implemented
+
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
+
+
+    Returns:
+        function: A function that creates a SpaceMatplotlib component
+    """
     if agent_portrayal is None:
 
         def agent_portrayal(a):
@@ -28,6 +43,11 @@ def make_altair_space(
 
 @solara.component
 def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):  # noqa: D103
+    """Create an Altair-based space visualization component.
+
+    Returns:
+        a solara FigureAltair instance
+    """
     update_counter.get()
     space = getattr(model, "grid", None)
     if space is None:
