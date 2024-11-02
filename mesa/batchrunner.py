@@ -4,25 +4,22 @@ To take advantage of parallel execution of experiments, `batch_run` uses
 multiprocessing if ``number_processes`` is larger than 1. It is strongly advised
 to only run in parallel using a normal python file (so don't try to do it in a
 jupyter notebook). Moreover, best practice when using multiprocessing is to
-put the code inside an ``if __name__ == '__main__':`` code black as shown below.
+put the code inside an ``if __name__ == '__main__':`` code black as shown below::
 
+    from mesa.batchrunner import batch_run
 
-```python
-from mesa.batchrunner import batch_run
+    params = {"width": 10, "height": 10, "N": range(10, 500, 10)}
 
-params = {"width": 10, "height": 10, "N": range(10, 500, 10)}
-
-if __name__ == '__main__':
-    results = batch_run(
-        MoneyModel,
-        parameters=params,
-        iterations=5,
-        max_steps=100,
-        number_processes=None,
-        data_collection_period=1,
-        display_progress=True,
-    )
-```
+    if __name__ == '__main__':
+        results = batch_run(
+            MoneyModel,
+            parameters=params,
+            iterations=5,
+            max_steps=100,
+            number_processes=None,
+            data_collection_period=1,
+            display_progress=True,
+        )
 
 
 
