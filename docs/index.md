@@ -73,13 +73,9 @@ The original Mesa conference paper is [available here](http://conference.scipy.o
 :maxdepth: 7
 
 Mesa Overview <overview>
-tutorials/intro_tutorial
-tutorials/visualization_tutorial
-Examples <examples>
-Migration guide <migration_guide>
-Best Practices <best-practices>
+Getting Started <getting_started>
 API Documentation <apis/api_main>
-Mesa Packages <packages>
+
 ```
 
 # Indices and tables
