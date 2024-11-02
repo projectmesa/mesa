@@ -1,6 +1,5 @@
 """batchrunner for running a factorial experiment design over a model.
 
-
 To take advantage of parallel execution of experiments, `batch_run` uses
 multiprocessing if ``number_processes`` is larger than 1. It is strongly adviced
 to only run in parallel using a normal python file (so don't try to do it in a
