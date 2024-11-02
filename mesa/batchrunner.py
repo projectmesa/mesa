@@ -7,7 +7,6 @@ jupyter notebook). Moreover, best practice when using multiprocessing is to
 put the code inside an ``if __name__ == '__main__':`` code black as shown below.
 
 
-Example:
 ```python
 from mesa.batchrunner import batch_run
 
