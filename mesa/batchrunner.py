@@ -1,7 +1,7 @@
 """batchrunner for running a factorial experiment design over a model.
 
 To take advantage of parallel execution of experiments, `batch_run` uses
-multiprocessing if ``number_processes`` is larger than 1. It is strongly adviced
+multiprocessing if ``number_processes`` is larger than 1. It is strongly advised
 to only run in parallel using a normal python file (so don't try to do it in a
 jupyter notebook). Moreover, best practice when using multiprocessing is to
 put the code inside an ``if __name__ == '__main__':`` code black as shown below.
