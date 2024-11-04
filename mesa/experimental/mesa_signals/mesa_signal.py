@@ -10,7 +10,7 @@ from collections import defaultdict, namedtuple
 from collections.abc import Callable
 from typing import Any
 
-from mesa.experimental.signals.signals_util import AttributeDict, create_weakref
+from mesa.experimental.mesa_signals.signals_util import AttributeDict, create_weakref
 
 __all__ = ["Observable", "HasObservables", "All", "Computable"]
 

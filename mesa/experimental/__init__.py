@@ -1,6 +1,6 @@
 """Experimental init."""
 
-import mesa.experimental.signals as signals
+import mesa.experimental.mesa_signals as signals
 from mesa.experimental import cell_space
 
 try:

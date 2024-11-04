@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import mesa
-from mesa.experimental.signals import (
+from mesa.experimental.mesa_signals import (
     HasObservables,
     Observable,
 )
