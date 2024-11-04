@@ -94,7 +94,6 @@ def draw_space(
     agent_portrayal: Callable,
     propertylayer_portrayal: dict | None = None,
     ax: Axes | None = None,
-    post_process: Callable | None = None,
     **space_drawing_kwargs,
 ):
     """Draw a Matplotlib-based visualization of the space.
@@ -105,8 +104,6 @@ def draw_space(
         propertylayer_portrayal: a dict specifying how to show propertylayer(s)
         ax: the axes upon which to draw the plot
         post_process: a callable called with the Axes instance
-        postprocess: a user-specified callable to do post-processing called with the Axes instance. This callable
-        can be used for any further fine-tuning of the plot (e.g., changing ticks, etc.)
         space_drawing_kwargs: any additional keyword arguments to be passed on to the underlying function for drawing the space.
 
     Returns:
@@ -134,9 +131,6 @@ def draw_space(
 
     if propertylayer_portrayal:
         draw_property_layers(space, propertylayer_portrayal, ax=ax)
-
-    if post_process is not None:
-        post_process(ax=ax)
 
     return ax
 

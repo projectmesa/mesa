@@ -89,6 +89,9 @@ def SpaceMatplotlib(
         **space_drawing_kwargs,
     )
 
+    if post_process is not None:
+        post_process(ax)
+
     solara.FigureMatplotlib(
         fig, format="png", bbox_inches="tight", dependencies=dependencies
     )
