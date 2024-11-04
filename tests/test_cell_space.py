@@ -439,8 +439,28 @@ def test_empties_space():
     for i in range(8):
         grid._cells[i].add_agent(CellAgent(model))
 
+
+def test_agents_property():
+    """Test empties method for Discrete Spaces."""
+    import networkx as nx
+
+    n = 10
+    m = 20
+    seed = 42
+    G = nx.gnm_random_graph(n, m, seed=seed)  # noqa: N806
+    grid = Network(G)
+
+    model = Model()
+    for i in range(8):
+        grid._cells[i].add_agent(CellAgent(model))
+
     cell = grid.select_random_empty_cell()
     assert cell.coordinate in {8, 9}
+
+    assert len(grid.agents) == 8
+
+    for i, j in enumerate(sorted(grid.agents.get("unique_id"))):
+        assert (i + 1) == j  # unique_id starts from 1
 
 
 def test_cell():
@@ -691,3 +711,42 @@ def test_patch():  # noqa: D103
 
     agent.remove()
     assert agent not in model._agents
+
+
+def test_copying_discrete_spaces():  # noqa: D103
+    # inspired by #2373
+    # we use deepcopy but this also applies to pickle
+    import copy
+
+    import networkx as nx
+
+    grid = OrthogonalMooreGrid((100, 100))
+    grid_copy = copy.deepcopy(grid)
+
+    c1 = grid[(5, 5)].connections
+    c2 = grid_copy[(5, 5)].connections
+
+    for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
+        for k, v in c1.connections.items():
+            assert v.coordinate == c2.connections[k].coordinate
+
+    n = 10
+    m = 20
+    seed = 42
+    G = nx.gnm_random_graph(n, m, seed=seed)  # noqa: N806
+    grid = Network(G)
+    grid_copy = copy.deepcopy(grid)
+
+    for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
+        for k, v in c1.connections.items():
+            assert v.coordinate == c2.connections[k].coordinate
+
+    grid = HexGrid((100, 100))
+    grid_copy = copy.deepcopy(grid)
+
+    c1 = grid[(5, 5)].connections
+    c2 = grid_copy[(5, 5)].connections
+
+    for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
+        for k, v in c1.connections.items():
+            assert v.coordinate == c2.connections[k].coordinate

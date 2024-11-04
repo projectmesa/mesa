@@ -19,3 +19,22 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
    :undoc-members:
    :show-inheritance:
 ```
+
+
+## Matplotlib-based components
+
+```{eval-rst}
+.. automodule:: mesa.visualization.components.matplotlib
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
+## Altair-based components
+
+```{eval-rst}
+.. automodule:: mesa.visualization.components.altair
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```

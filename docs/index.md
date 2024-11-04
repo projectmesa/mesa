@@ -13,74 +13,60 @@
 ```
 
 ```{image} https://img.shields.io/matrix/project-mesa:matrix.org?label=chat&logo=Matrix
-:target: https://matrix.to/#/#project-mesa:matrix.orgs
+:target: https://matrix.to/#/#project-mesa:matrix.org
 ```
 
 [Mesa] is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
 
-The original conference paper is [available here](http://conference.scipy.org.s3-website-us-east-1.amazonaws.com/proceedings/scipy2015/jacqueline_kazil.html).
-
 Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python-based counterpart to NetLogo, Repast, or MASON.
 
-
-![A screenshot of the Schelling Model in Mesa|100%](https://raw.githubusercontent.com/projectmesa/mesa/main/docs/images/Mesa_Screenshot.png)
-
-
-*Above: A Mesa implementation of the Schelling segregation model,
-being visualized in a browser window and analyzed in a Jupyter
-notebook.*
+![A screenshot of the Wolf Sheep model in Mesa|100%](images/wolf_sheep.png)
+*A visualisation of the Wolf Sheep model build with Mesa.*
 
 ## Features
 
-- Modular components
-- Browser-based visualization
-- Built-in tools for analysis
+- Built-in core modeling components
+- Flexible agent and model management through AgentSet
+- Browser-based Solara visualization
+- Built-in tools for data collection and analysis
+- Example model library
 
 ## Using Mesa
+### Installation Options
 
 To install our latest stable release (2.4.x), run:
 
-``` bash
+```bash
 pip install -U mesa
 ```
 
-To install our latest pre-release (3.0 alpha), run:
-
-``` bash
-pip install -U --pre mesa
-```
-
-To launch an example model, clone the [repository](https://github.com/projectmesa/mesa) folder and invoke `mesa runserver` for one of the `examples/` subdirectories:
+To install our latest Mesa 3.0 beta with recommended dependencies:
 
 ```bash
-mesa runserver examples/wolf_sheep
+pip install -U --pre mesa[rec]
 ```
 
-For more help on using Mesa, check out the following resources:
+### Resources
 
-- [Mesa Overview]
-- [Mesa Introductory Tutorial]
-- [Mesa Visualization Tutorial]
-- [Mesa Examples]
-- [GitHub Issue Tracker]
-- [Matrix chat room]
-- [PyPI]
+For help getting started with Mesa, check out these resources:
 
-## Contributing back to Mesa
+- [Mesa Overview] - Learn about Mesa's core concepts and components
+- [Mesa Introductory Tutorial] - Build your first agent-based model
+- [Mesa Visualization Tutorial] - Learn how to create interactive visualizations with Solara
+- [Migration Guide] - Upgrade to Mesa 3.0
+- [Mesa Examples] - Browse user-contributed models and implementations
+- [GitHub Discussions] - Ask questions and discuss Mesa
+- [Matrix Chat Room] - Real-time chat with the Mesa community
 
-If you run into an issue, please file a [ticket] for us to discuss. If possible, follow up with a pull request.
+### Development and Support
 
-If you would like to add a feature, please reach out via [ticket] or the [email list] for discussion. A feature is most likely to be added if you build it!
+Mesa is an open source project and welcomes contributions:
 
-- [Contributors guide]
-- [Github]
+- [GitHub Repository] - Access the source code
+- [Issue Tracker] - Report bugs or suggest features
+- [Contributors Guide] - Learn how to contribute
 
-## Mesa Packages
-
-ABM features users have shared that you may want to use in your model
-
-- [See the Packages](https://github.com/projectmesa/mesa/wiki)
-- {ref}`Mesa-Packages <packages>`
+The original Mesa conference paper is [available here](http://conference.scipy.org.s3-website-us-east-1.amazonaws.com/proceedings/scipy2015/jacqueline_kazil.html).
 
 ```{toctree}
 :hidden: true
@@ -89,9 +75,9 @@ ABM features users have shared that you may want to use in your model
 Mesa Overview <overview>
 tutorials/intro_tutorial
 tutorials/visualization_tutorial
+Examples <examples>
 Migration guide <migration_guide>
 Best Practices <best-practices>
-How-to Guide <howto>
 API Documentation <apis/api_main>
 Mesa Packages <packages>
 ```
@@ -103,13 +89,13 @@ Mesa Packages <packages>
 - {ref}`search`
 
 [contributors guide]: https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md
-[github]: https://github.com/projectmesa/mesa/
-[github issue tracker]: https://github.com/projectmesa/mesa/issues
+[github repository]: https://github.com/projectmesa/mesa/
+[github discussions]: https://github.com/projectmesa/mesa/discussions
+[issue tracker]: https://github.com/projectmesa/mesa/issues
 [matrix chat room]: https://matrix.to/#/#project-mesa:matrix.org
 [mesa]: https://github.com/projectmesa/mesa/
 [mesa overview]: overview
 [mesa examples]: https://github.com/projectmesa/mesa-examples
 [mesa introductory tutorial]: tutorials/intro_tutorial
 [mesa visualization tutorial]: tutorials/visualization_tutorial
-[pypi]: https://pypi.python.org/pypi/Mesa/
-[ticket]: https://github.com/projectmesa/mesa/issues
+[migration guide]: migration_guide

@@ -21,6 +21,8 @@ from random import Random
 # mypy
 from typing import TYPE_CHECKING, Any, Literal, overload
 
+import numpy as np
+
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
     # dependency.
@@ -67,7 +69,13 @@ class Agent:
         self.model.register_agent(self)
 
     def remove(self) -> None:
-        """Remove and delete the agent from the model."""
+        """Remove and delete the agent from the model.
+
+        Notes:
+            If you need to do additional cleanup when removing an agent by for example removing
+            it from a space, consider extending this method in your own agent class.
+
+        """
         with contextlib.suppress(KeyError):
             self.model.deregister_agent(self)
 
@@ -79,7 +87,7 @@ class Agent:
 
     @property
     def random(self) -> Random:
-        """Return a seeded rng."""
+        """Return a seeded stdlib rng."""
         return self.model.random
 
     @classmethod
@@ -123,6 +131,11 @@ class Agent:
             instance_args = [arg[i] for arg in listlike_args]
             instance_kwargs = {k: v[i] for k, v in listlike_kwargs.items()}
             cls(model, *instance_args, **instance_kwargs)
+
+    @property
+    def rng(self) -> np.random.Generator:
+        """Return a seeded np.random rng."""
+        return self.model.rng
 
 
 class AgentSet(MutableSet, Sequence):
@@ -330,15 +343,17 @@ class AgentSet(MutableSet, Sequence):
 
         It's a fast, optimized version of calling shuffle() followed by do().
         """
-        agents = list(self._agents.keys())
-        self.random.shuffle(agents)
+        weakrefs = list(self._agents.keyrefs())
+        self.random.shuffle(weakrefs)
 
         if isinstance(method, str):
-            for agent in agents:
-                getattr(agent, method)(*args, **kwargs)
+            for ref in weakrefs:
+                if (agent := ref()) is not None:
+                    getattr(agent, method)(*args, **kwargs)
         else:
-            for agent in agents:
-                method(agent, *args, **kwargs)
+            for ref in weakrefs:
+                if (agent := ref()) is not None:
+                    method(agent, *args, **kwargs)
 
         return self
 

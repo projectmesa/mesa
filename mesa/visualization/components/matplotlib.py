@@ -1,27 +1,72 @@
 """Matplotlib based solara components for visualization MESA spaces and plots."""
 
+import itertools
+import math
 import warnings
+from collections.abc import Callable
+from typing import Any
 
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import solara
+from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
+from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.figure import Figure
+from matplotlib.patches import RegularPolygon
 
 import mesa
-from mesa.experimental.cell_space import VoronoiGrid
-from mesa.space import PropertyLayer
+from mesa.experimental.cell_space import (
+    OrthogonalMooreGrid,
+    OrthogonalVonNeumannGrid,
+    VoronoiGrid,
+)
+from mesa.space import (
+    ContinuousSpace,
+    HexMultiGrid,
+    HexSingleGrid,
+    MultiGrid,
+    NetworkGrid,
+    PropertyLayer,
+    SingleGrid,
+)
 from mesa.visualization.utils import update_counter
 
+# For typing
+OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
+HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
+Network = NetworkGrid | mesa.experimental.cell_space.Network
 
-def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
+
+def make_space_matplotlib(*args, **kwargs):  # noqa: D103
+    warnings.warn(
+        "make_space_matplotlib has been renamed to make_space_component",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return make_space_component(*args, **kwargs)
+
+
+def make_space_component(
+    agent_portrayal: Callable | None = None,
+    propertylayer_portrayal: dict | None = None,
+    post_process: Callable | None = None,
+    **space_drawing_kwargs,
+):
     """Create a Matplotlib-based space visualization component.
 
     Args:
-        agent_portrayal (function): Function to portray agents
-        propertylayer_portrayal (dict): Dictionary of PropertyLayer portrayal specifications
+        agent_portrayal: Function to portray agents.
+        propertylayer_portrayal: Dictionary of PropertyLayer portrayal specifications
+        post_process : a callable that will be called with the Axes instance. Allows for fine tuning plots (e.g., control ticks)
+        space_drawing_kwargs : additional keyword arguments to be passed on to the underlying space drawer function. See
+                               the functions for drawing the various spaces for further details.
+
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
+
 
     Returns:
         function: A function that creates a SpaceMatplotlib component
@@ -29,10 +74,16 @@ def make_space_matplotlib(agent_portrayal=None, propertylayer_portrayal=None):
     if agent_portrayal is None:
 
         def agent_portrayal(a):
-            return {"id": a.unique_id}
+            return {}
 
     def MakeSpaceMatplotlib(model):
-        return SpaceMatplotlib(model, agent_portrayal, propertylayer_portrayal)
+        return SpaceMatplotlib(
+            model,
+            agent_portrayal,
+            propertylayer_portrayal,
+            post_process=post_process,
+            **space_drawing_kwargs,
+        )
 
     return MakeSpaceMatplotlib
 
@@ -43,42 +94,157 @@ def SpaceMatplotlib(
     agent_portrayal,
     propertylayer_portrayal,
     dependencies: list[any] | None = None,
+    post_process: Callable | None = None,
+    **space_drawing_kwargs,
 ):
     """Create a Matplotlib-based space visualization component."""
     update_counter.get()
-    space_fig = Figure()
-    space_ax = space_fig.subplots()
+
     space = getattr(model, "grid", None)
     if space is None:
         space = getattr(model, "space", None)
 
-    if isinstance(space, mesa.space._Grid):
-        _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model)
-    elif isinstance(space, mesa.space.ContinuousSpace):
-        _draw_continuous_space(space, space_ax, agent_portrayal, model)
-    elif isinstance(space, mesa.space.NetworkGrid):
-        _draw_network_grid(space, space_ax, agent_portrayal)
-    elif isinstance(space, VoronoiGrid):
-        _draw_voronoi(space, space_ax, agent_portrayal)
-    elif space is None and propertylayer_portrayal:
-        draw_property_layers(space_ax, space, propertylayer_portrayal, model)
+    fig = Figure()
+    ax = fig.add_subplot()
+
+    draw_space(
+        space,
+        agent_portrayal,
+        propertylayer_portrayal=propertylayer_portrayal,
+        ax=ax,
+        post_process=post_process,
+        **space_drawing_kwargs,
+    )
 
     solara.FigureMatplotlib(
-        space_fig, format="png", bbox_inches="tight", dependencies=dependencies
+        fig, format="png", bbox_inches="tight", dependencies=dependencies
     )
 
 
-def draw_property_layers(ax, space, propertylayer_portrayal, model):
+def collect_agent_data(
+    space: OrthogonalGrid | HexGrid | Network | ContinuousSpace | VoronoiGrid,
+    agent_portrayal: Callable,
+    color="tab:blue",
+    size=25,
+    marker="o",
+    zorder: int = 1,
+):
+    """Collect the plotting data for all agents in the space.
+
+    Args:
+        space: The space containing the Agents.
+        agent_portrayal: A callable that is called with the agent and returns a dict
+        color: default color
+        size: default size
+        marker: default marker
+        zorder: default zorder
+
+    agent_portrayal should return a dict, limited to size (size of marker), color (color of marker), zorder (z-order),
+    and marker (marker style)
+
+    """
+    arguments = {"s": [], "c": [], "marker": [], "zorder": [], "loc": []}
+
+    for agent in space.agents:
+        portray = agent_portrayal(agent)
+        loc = agent.pos
+        if loc is None:
+            loc = agent.cell.coordinate
+
+        arguments["loc"].append(loc)
+        arguments["s"].append(portray.pop("size", size))
+        arguments["c"].append(portray.pop("color", color))
+        arguments["marker"].append(portray.pop("marker", marker))
+        arguments["zorder"].append(portray.pop("zorder", zorder))
+
+        if len(portray) > 0:
+            ignored_fields = list(portray.keys())
+            msg = ", ".join(ignored_fields)
+            warnings.warn(
+                f"the following fields are not used in agent portrayal and thus ignored: {msg}.",
+                stacklevel=2,
+            )
+
+    return {k: np.asarray(v) for k, v in arguments.items()}
+
+
+def draw_space(
+    space,
+    agent_portrayal: Callable,
+    propertylayer_portrayal: dict | None = None,
+    ax: Axes | None = None,
+    post_process: Callable | None = None,
+    **space_drawing_kwargs,
+):
+    """Draw a Matplotlib-based visualization of the space.
+
+    Args:
+        space: the space of the mesa model
+        agent_portrayal: A callable that returns a dict specifying how to show the agent
+        propertylayer_portrayal: a dict specifying how to show propertylayer(s)
+        ax: the axes upon which to draw the plot
+        post_process: a callable called with the Axes instance
+        postprocess: a user-specified callable to do post-processing called with the Axes instance. This callable
+        can be used for any further fine-tuning of the plot (e.g., changing ticks, etc.)
+        space_drawing_kwargs: any additional keyword arguments to be passed on to the underlying function for drawing the space.
+
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
+
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
+
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
+    match space:
+        case mesa.space._Grid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid():
+            draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
+        case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
+            draw_hex_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
+        case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
+            draw_network(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
+        case mesa.space.ContinuousSpace():
+            draw_continuous_space(space, agent_portrayal, ax=ax)
+        case VoronoiGrid():
+            draw_voroinoi_grid(space, agent_portrayal, ax=ax)
+
+    if propertylayer_portrayal:
+        draw_property_layers(space, propertylayer_portrayal, ax=ax)
+
+    if post_process is not None:
+        post_process(ax=ax)
+
+    return ax
+
+
+def draw_property_layers(
+    space, propertylayer_portrayal: dict[str, dict[str, Any]], ax: Axes
+):
     """Draw PropertyLayers on the given axes.
 
     Args:
-        ax (matplotlib.axes.Axes): The axes to draw on.
         space (mesa.space._Grid): The space containing the PropertyLayers.
-        propertylayer_portrayal (dict): Dictionary of PropertyLayer portrayal specifications.
-        model (mesa.Model): The model instance.
+        propertylayer_portrayal (dict): the key is the name of the layer, the value is a dict with
+                                        fields specifying how the layer is to be portrayed
+        ax (matplotlib.axes.Axes): The axes to draw on.
+
+    Notes:
+        valid fields in in the inner dict of propertylayer_portrayal are "alpha", "vmin", "vmax", "color" or "colormap", and "colorbar"
+        so you can do `{"some_layer":{"colormap":'viridis', 'alpha':.25, "colorbar":False}}`
+
     """
+    try:
+        # old style spaces
+        property_layers = space.properties
+    except AttributeError:
+        # new style spaces
+        property_layers = space.property_layers
+
     for layer_name, portrayal in propertylayer_portrayal.items():
-        layer = getattr(model, layer_name, None)
+        layer = property_layers.get(layer_name, None)
         if not isinstance(layer, PropertyLayer):
             continue
 
@@ -110,7 +276,6 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
             )
             im = ax.imshow(
                 rgba_data.transpose(1, 0, 2),
-                extent=(0, width, 0, height),
                 origin="lower",
             )
             if colorbar:
@@ -129,7 +294,6 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
                 alpha=alpha,
                 vmin=vmin,
                 vmax=vmax,
-                extent=(0, width, 0, height),
                 origin="lower",
             )
             if colorbar:
@@ -140,131 +304,280 @@ def draw_property_layers(ax, space, propertylayer_portrayal, model):
             )
 
 
-def _draw_grid(space, space_ax, agent_portrayal, propertylayer_portrayal, model):
-    if propertylayer_portrayal:
-        draw_property_layers(space_ax, space, propertylayer_portrayal, model)
+def draw_orthogonal_grid(
+    space: OrthogonalGrid,
+    agent_portrayal: Callable,
+    ax: Axes | None = None,
+    draw_grid: bool = True,
+    **kwargs,
+):
+    """Visualize a orthogonal grid.
 
-    agent_data = _get_agent_data(space, agent_portrayal)
+    Args:
+        space: the space to visualize
+        agent_portrayal: a callable that is called with the agent and returns a dict
+        ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        draw_grid: whether to draw the grid
+        kwargs: additional keyword arguments passed to ax.scatter
 
-    space_ax.set_xlim(0, space.width)
-    space_ax.set_ylim(0, space.height)
-    _split_and_scatter(agent_data, space_ax)
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
 
-    # Draw grid lines
-    for x in range(space.width + 1):
-        space_ax.axvline(x, color="gray", linestyle=":")
-    for y in range(space.height + 1):
-        space_ax.axhline(y, color="gray", linestyle=":")
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
+
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    # gather agent data
+    s_default = (180 / max(space.width, space.height)) ** 2
+    arguments = collect_agent_data(space, agent_portrayal, size=s_default)
+
+    # plot the agents
+    _scatter(ax, arguments, **kwargs)
+
+    # further styling
+    ax.set_xlim(-0.5, space.width - 0.5)
+    ax.set_ylim(-0.5, space.height - 0.5)
+
+    if draw_grid:
+        # Draw grid lines
+        for x in np.arange(-0.5, space.width - 0.5, 1):
+            ax.axvline(x, color="gray", linestyle=":")
+        for y in np.arange(-0.5, space.height - 0.5, 1):
+            ax.axhline(y, color="gray", linestyle=":")
+
+    return ax
 
 
-def _get_agent_data(space, agent_portrayal):
-    """Helper function to get agent data for visualization."""
-    x, y, s, c, m = [], [], [], [], []
-    for agents, pos in space.coord_iter():
-        if not agents:
-            continue
-        if not isinstance(agents, list):
-            agents = [agents]  # noqa PLW2901
-        for agent in agents:
-            data = agent_portrayal(agent)
-            x.append(pos[0] + 0.5)  # Center the agent in the cell
-            y.append(pos[1] + 0.5)  # Center the agent in the cell
-            default_size = (180 / max(space.width, space.height)) ** 2
-            s.append(data.get("size", default_size))
-            c.append(data.get("color", "tab:blue"))
-            m.append(data.get("shape", "o"))
-    return {"x": x, "y": y, "s": s, "c": c, "m": m}
+def draw_hex_grid(
+    space: HexGrid,
+    agent_portrayal: Callable,
+    ax: Axes | None = None,
+    draw_grid: bool = True,
+    **kwargs,
+):
+    """Visualize a hex grid.
 
+    Args:
+        space: the space to visualize
+        agent_portrayal: a callable that is called with the agent and returns a dict
+        ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        draw_grid: whether to draw the grid
+        kwargs: additional keyword arguments passed to ax.scatter
 
-def _split_and_scatter(portray_data, space_ax):
-    """Helper function to split and scatter agent data."""
-    for marker in set(portray_data["m"]):
-        mask = [m == marker for m in portray_data["m"]]
-        space_ax.scatter(
-            [x for x, show in zip(portray_data["x"], mask) if show],
-            [y for y, show in zip(portray_data["y"], mask) if show],
-            s=[s for s, show in zip(portray_data["s"], mask) if show],
-            c=[c for c, show in zip(portray_data["c"], mask) if show],
-            marker=marker,
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
+
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
+
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    # gather data
+    s_default = (180 / max(space.width, space.height)) ** 2
+    arguments = collect_agent_data(space, agent_portrayal, size=s_default)
+
+    # for hexgrids we have to go from logical coordinates to visual coordinates
+    # this is a bit messy.
+
+    # give all even rows an offset in the x direction
+    # give all rows an offset in the y direction
+
+    # numbers here are based on a distance of 1 between centers of hexes
+    offset = math.sqrt(0.75)
+
+    loc = arguments["loc"].astype(float)
+
+    logical = np.mod(loc[:, 1], 2) == 0
+    loc[:, 0][logical] += 0.5
+    loc[:, 1] *= offset
+    arguments["loc"] = loc
+
+    # plot the agents
+    _scatter(ax, arguments, **kwargs)
+
+    # further styling and adding of grid
+    ax.set_xlim(-1, space.width + 0.5)
+    ax.set_ylim(-offset, space.height * offset)
+
+    def setup_hexmesh(
+        width,
+        height,
+    ):
+        """Helper function for creating the hexmaesh."""
+        # fixme: this should be done once, rather than in each update
+        # fixme check coordinate system in hexgrid (see https://www.redblobgames.com/grids/hexagons/#coordinates-offset)
+
+        patches = []
+        for x, y in itertools.product(range(width), range(height)):
+            if y % 2 == 0:
+                x += 0.5  # noqa: PLW2901
+            y *= offset  # noqa: PLW2901
+            hex = RegularPolygon(
+                (x, y),
+                numVertices=6,
+                radius=math.sqrt(1 / 3),
+                orientation=np.radians(120),
+            )
+            patches.append(hex)
+        mesh = PatchCollection(
+            patches, edgecolor="k", facecolor=(1, 1, 1, 0), linestyle="dotted", lw=1
         )
+        return mesh
+
+    if draw_grid:
+        # add grid
+        ax.add_collection(
+            setup_hexmesh(
+                space.width,
+                space.height,
+            )
+        )
+    return ax
 
 
-def _draw_network_grid(space, space_ax, agent_portrayal):
+def draw_network(
+    space: Network,
+    agent_portrayal: Callable,
+    ax: Axes | None = None,
+    draw_grid: bool = True,
+    layout_alg=nx.spring_layout,
+    layout_kwargs=None,
+    **kwargs,
+):
+    """Visualize a network space.
+
+    Args:
+        space: the space to visualize
+        agent_portrayal: a callable that is called with the agent and returns a dict
+        ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        draw_grid: whether to draw the grid
+        layout_alg: a networkx layout algorithm or other callable with the same behavior
+        layout_kwargs: a dictionary of keyword arguments for the layout algorithm
+        kwargs: additional keyword arguments passed to ax.scatter
+
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
+
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
+
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
+    if layout_kwargs is None:
+        layout_kwargs = {"seed": 0}
+
+    # gather locations for nodes in network
     graph = space.G
-    pos = nx.spring_layout(graph, seed=0)
-    nx.draw(
-        graph,
-        ax=space_ax,
-        pos=pos,
-        **agent_portrayal(graph),
-    )
+    pos = layout_alg(graph, **layout_kwargs)
+    x, y = list(zip(*pos.values()))
+    xmin, xmax = min(x), max(x)
+    ymin, ymax = min(y), max(y)
+
+    width = xmax - xmin
+    height = ymax - ymin
+    x_padding = width / 20
+    y_padding = height / 20
+
+    # gather agent data
+    s_default = (180 / max(width, height)) ** 2
+    arguments = collect_agent_data(space, agent_portrayal, size=s_default)
+
+    # this assumes that nodes are identified by an integer
+    # which is true for default nx graphs but might user changeable
+    pos = np.asarray(list(pos.values()))
+    arguments["loc"] = pos[arguments["loc"]]
+
+    # plot the agents
+    _scatter(ax, arguments, **kwargs)
+
+    # further styling
+    ax.set_axis_off()
+    ax.set_xlim(xmin=xmin - x_padding, xmax=xmax + x_padding)
+    ax.set_ylim(ymin=ymin - y_padding, ymax=ymax + y_padding)
+
+    if draw_grid:
+        # fixme we need to draw the empty nodes as well
+        edge_collection = nx.draw_networkx_edges(
+            graph, pos, ax=ax, alpha=0.5, style="--"
+        )
+        edge_collection.set_zorder(0)
+
+    return ax
 
 
-def _draw_continuous_space(space, space_ax, agent_portrayal, model):
-    def portray(space):
-        x = []
-        y = []
-        s = []  # size
-        c = []  # color
-        m = []  # shape
-        for agent in space._agent_to_index:
-            data = agent_portrayal(agent)
-            _x, _y = agent.pos
-            x.append(_x)
-            y.append(_y)
+def draw_continuous_space(
+    space: ContinuousSpace, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
+):
+    """Visualize a continuous space.
 
-            # This is matplotlib's default marker size
-            default_size = 20
-            size = data.get("size", default_size)
-            s.append(size)
-            color = data.get("color", "tab:blue")
-            c.append(color)
-            mark = data.get("shape", "o")
-            m.append(mark)
-        return {"x": x, "y": y, "s": s, "c": c, "m": m}
+    Args:
+        space: the space to visualize
+        agent_portrayal: a callable that is called with the agent and returns a dict
+        ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        kwargs: additional keyword arguments passed to ax.scatter
 
-    # Determine border style based on space.torus
-    border_style = "solid" if not space.torus else (0, (5, 10))
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
 
-    # Set the border of the plot
-    for spine in space_ax.spines.values():
-        spine.set_linewidth(1.5)
-        spine.set_color("black")
-        spine.set_linestyle(border_style)
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
 
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    # space related setup
     width = space.x_max - space.x_min
     x_padding = width / 20
     height = space.y_max - space.y_min
     y_padding = height / 20
-    space_ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
-    space_ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
-    # Portray and scatter the agents in the space
-    _split_and_scatter(portray(space), space_ax)
+    # gather agent data
+    s_default = (180 / max(width, height)) ** 2
+    arguments = collect_agent_data(space, agent_portrayal, size=s_default)
+
+    # plot the agents
+    _scatter(ax, arguments, **kwargs)
+
+    # further visual styling
+    border_style = "solid" if not space.torus else (0, (5, 10))
+    for spine in ax.spines.values():
+        spine.set_linewidth(1.5)
+        spine.set_color("black")
+        spine.set_linestyle(border_style)
+
+    ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
+    ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
+
+    return ax
 
 
-def _draw_voronoi(space, space_ax, agent_portrayal):
-    def portray(g):
-        x = []
-        y = []
-        s = []  # size
-        c = []  # color
+def draw_voroinoi_grid(
+    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
+):
+    """Visualize a voronoi grid.
 
-        for cell in g.all_cells:
-            for agent in cell.agents:
-                data = agent_portrayal(agent)
-                x.append(cell.coordinate[0])
-                y.append(cell.coordinate[1])
-                if "size" in data:
-                    s.append(data["size"])
-                if "color" in data:
-                    c.append(data["color"])
-        out = {"x": x, "y": y}
-        out["s"] = s
-        if len(c) > 0:
-            out["c"] = c
+    Args:
+        space: the space to visualize
+        agent_portrayal: a callable that is called with the agent and returns a dict
+        ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        kwargs: additional keyword arguments passed to ax.scatter
 
-        return out
+    Returns:
+        Returns the Axes object with the plot drawn onto it.
+
+    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
+    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
+
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
 
     x_list = [i[0] for i in space.centroids_coordinates]
     y_list = [i[1] for i in space.centroids_coordinates]
@@ -277,44 +590,108 @@ def _draw_voronoi(space, space_ax, agent_portrayal):
     x_padding = width / 20
     height = y_max - y_min
     y_padding = height / 20
-    space_ax.set_xlim(x_min - x_padding, x_max + x_padding)
-    space_ax.set_ylim(y_min - y_padding, y_max + y_padding)
-    space_ax.scatter(**portray(space))
+
+    s_default = (180 / max(width, height)) ** 2
+    arguments = collect_agent_data(space, agent_portrayal, size=s_default)
+
+    ax.set_xlim(x_min - x_padding, x_max + x_padding)
+    ax.set_ylim(y_min - y_padding, y_max + y_padding)
+
+    _scatter(ax, arguments, **kwargs)
 
     for cell in space.all_cells:
         polygon = cell.properties["polygon"]
-        space_ax.fill(
+        ax.fill(
             *zip(*polygon),
             alpha=min(1, cell.properties[space.cell_coloring_property]),
             c="red",
+            zorder=0,
         )  # Plot filled polygon
-        space_ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in black
+        ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in black
+
+    return ax
 
 
-def make_plot_measure(measure: str | dict[str, str] | list[str] | tuple[str]):
+def _scatter(ax: Axes, arguments, **kwargs):
+    """Helper function for plotting the agents.
+
+    Args:
+        ax: a Matplotlib Axes instance
+        arguments: the agents specific arguments for platting
+        kwargs: additional keyword arguments for ax.scatter
+
+    """
+    loc = arguments.pop("loc")
+
+    x = loc[:, 0]
+    y = loc[:, 1]
+    marker = arguments.pop("marker")
+    zorder = arguments.pop("zorder")
+
+    for mark in np.unique(marker):
+        mark_mask = marker == mark
+        for z_order in np.unique(zorder):
+            zorder_mask = z_order == zorder
+            logical = mark_mask & zorder_mask
+            ax.scatter(
+                x[logical],
+                y[logical],
+                marker=mark,
+                zorder=z_order,
+                **{k: v[logical] for k, v in arguments.items()},
+                **kwargs,
+            )
+
+
+def make_plot_measure(*args, **kwargs):  # noqa: D103
+    warnings.warn(
+        "make_plot_measure has been renamed to make_plot_component",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return make_plot_component(*args, **kwargs)
+
+
+def make_plot_component(
+    measure: str | dict[str, str] | list[str] | tuple[str],
+    post_process: Callable | None = None,
+    save_format="png",
+):
     """Create a plotting function for a specified measure.
 
     Args:
         measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
+        post_process: a user-specified callable to do post-processing called with the Axes instance.
+        save_format: save format of figure in solara backend
 
     Returns:
         function: A function that creates a PlotMatplotlib component.
     """
 
-    def MakePlotMeasure(model):
-        return PlotMatplotlib(model, measure)
+    def MakePlotMatplotlib(model):
+        return PlotMatplotlib(
+            model, measure, post_process=post_process, save_format=save_format
+        )
 
-    return MakePlotMeasure
+    return MakePlotMatplotlib
 
 
 @solara.component
-def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
+def PlotMatplotlib(
+    model,
+    measure,
+    dependencies: list[any] | None = None,
+    post_process: Callable | None = None,
+    save_format="png",
+):
     """Create a Matplotlib-based plot for a measure or measures.
 
     Args:
         model (mesa.Model): The model instance.
         measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
         dependencies (list[any] | None): Optional dependencies for the plot.
+        post_process: a user-specified callable to do post-processing called with the Axes instance.
+        save_format: format used for saving the figure.
 
     Returns:
         solara.FigureMatplotlib: A component for rendering the plot.
@@ -334,9 +711,13 @@ def PlotMatplotlib(model, measure, dependencies: list[any] | None = None):
         for m in measure:
             ax.plot(df.loc[:, m], label=m)
         ax.legend(loc="best")
+
+    if post_process is not None:
+        post_process(ax)
+
     ax.set_xlabel("Step")
     # Set integer x axis
     ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
     solara.FigureMatplotlib(
-        fig, format="png", bbox_inches="tight", dependencies=dependencies
+        fig, format=save_format, bbox_inches="tight", dependencies=dependencies
     )

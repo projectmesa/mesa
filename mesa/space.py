@@ -2,10 +2,21 @@
 
 Objects used to add a spatial component to a model.
 
-* Grid: base grid, which creates a rectangular grid.
-* SingleGrid: extension to Grid which strictly enforces one agent per cell.
-* MultiGrid: extension to Grid where each cell can contain a set of agents.
-* HexGrid: extension to Grid to handle hexagonal neighbors.
+.. note::
+    All Grid classes (:class:`_Grid`, :class:`SingleGrid`, :class:`MultiGrid`,
+    :class:`HexGrid`, etc.) are now in maintenance-only mode. While these classes remain
+    fully supported, new development occurs in the experimental cell space module
+    (:mod:`mesa.experimental.cell_space`).
+
+    The :class:`PropertyLayer` and :class:`ContinuousSpace` classes remain fully supported
+    and actively developed.
+
+Classes
+-------
+* PropertyLayer: A data layer that can be added to Grids to store cell properties
+* SingleGrid: a Grid which strictly enforces one agent per cell.
+* MultiGrid: a Grid where each cell can contain a set of agents.
+* HexGrid: a Grid to handle hexagonal neighbors.
 * ContinuousSpace: a two-dimensional space where each agent has an arbitrary position of `float`'s.
 * NetworkGrid: a network where each node contains zero or more agents.
 """
@@ -32,7 +43,7 @@ import numpy as np
 import numpy.typing as npt
 
 # For Mypy
-from .agent import Agent
+from .agent import Agent, AgentSet
 
 # for better performance, we calculate the tuple to use in the is_integer function
 _types_integer = (int, np.integer)
@@ -152,6 +163,26 @@ class _Grid:
 
     @overload
     def __getitem__(self, index: int | Sequence[Coordinate]) -> list[GridContent]: ...
+
+    @property
+    def agents(self) -> AgentSet:
+        """Return an AgentSet with the agents in the space."""
+        agents = []
+        for entry in self:
+            if not entry:
+                continue
+            if not isinstance(entry, list):
+                entry = [entry]  # noqa PLW2901
+            for agent in entry:
+                agents.append(agent)
+
+        # getting the rng is a bit hacky because old style spaces don't have the rng
+        try:
+            rng = agents[0].random
+        except IndexError:
+            # there are no agents in the space
+            rng = None
+        return AgentSet(agents, random=rng)
 
     @overload
     def __getitem__(
@@ -1256,36 +1287,6 @@ class HexMultiGrid(_HexGrid, MultiGrid):
     """
 
 
-class HexGrid(HexSingleGrid):
-    """Hexagonal Grid: a Grid where neighbors are computed according to a hexagonal tiling of the grid.
-
-    Functions according to odd-q rules.
-    See http://www.redblobgames.com/grids/hexagons/#coordinates for more.
-
-    Properties:
-        width, height: The grid's width and height.
-        torus: Boolean which determines whether to treat the grid as a torus.
-    """
-
-    def __init__(self, width: int, height: int, torus: bool) -> None:
-        """Initializes a HexGrid, deprecated.
-
-        Args:
-            width: the width of the grid
-            height: the height of the grid
-            torus: whether the grid wraps
-        """
-        super().__init__(width, height, torus)
-        warn(
-            (
-                "HexGrid is being deprecated; use instead HexSingleGrid or HexMultiGrid "
-                "depending on your use case."
-            ),
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position.
 
@@ -1332,6 +1333,19 @@ class ContinuousSpace:
         self._agent_points: npt.NDArray[FloatCoordinate] | None = None
         self._index_to_agent: dict[int, Agent] = {}
         self._agent_to_index: dict[Agent, int | None] = {}
+
+    @property
+    def agents(self) -> AgentSet:
+        """Return an AgentSet with the agents in the space."""
+        agents = list(self._agent_to_index)
+
+        # getting the rng is a bit hacky because old style spaces don't have the rng
+        try:
+            rng = agents[0].random
+        except IndexError:
+            # there are no agents in the space
+            rng = None
+        return AgentSet(agents, random=rng)
 
     def _build_agent_cache(self):
         """Cache agents positions to speed up neighbors calculations."""
@@ -1505,6 +1519,27 @@ class NetworkGrid:
         self.G = g
         for node_id in self.G.nodes:
             g.nodes[node_id]["agent"] = self.default_val()
+
+    @property
+    def agents(self) -> AgentSet:
+        """Return an AgentSet with the agents in the space."""
+        agents = []
+        for node_id in self.G.nodes:
+            entry = self.G.nodes[node_id]["agent"]
+            if not entry:
+                continue
+            if not isinstance(entry, list):
+                entry = [entry]
+            for agent in entry:
+                agents.append(agent)
+
+        # getting the rng is a bit hacky because old style spaces don't have the rng
+        try:
+            rng = agents[0].random
+        except IndexError:
+            # there are no agents in the space
+            rng = None
+        return AgentSet(agents, random=rng)
 
     @staticmethod
     def default_val() -> list:

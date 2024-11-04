@@ -62,7 +62,6 @@ dev = [
   "pytest-cov",
   "sphinx",
   "pytest-mock",
-  "cookiecutter",
 ]
 examples = [
   "mesa[rec]",
@@ -97,7 +96,7 @@ path = "mesa/__init__.py"
 # Hardcode to Python 3.10.
 # Reminder to update mesa-examples if the value below is changed.
 target-version = "py310"
-extend-exclude = ["docs", "build", "examples/advanced"]  # TODO: Remove examples/advanced
+extend-exclude = ["docs", "build"]
 
 [tool.ruff.lint]
 select = [
@@ -149,7 +148,7 @@ extend-ignore = [
   "S311",   # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]
 # Ignore all docstring errors in examples
-per-file-ignores = {"examples/*"= ["D"]}
+per-file-ignores = {"mesa/examples/*"= ["D"]}
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
