@@ -171,8 +171,7 @@ def test_agent_rng():
 
 
 def test_agent_create():
-    """Test create agent factory method"""
-
+    """Test create agent factory method."""
     class TestAgent(Agent):
         def __init__(self, model, attr, def_attr, a=0, b=0):
             super().__init__(model)
