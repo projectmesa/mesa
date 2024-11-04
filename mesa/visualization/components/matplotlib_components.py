@@ -85,7 +85,6 @@ def SpaceMatplotlib(
         agent_portrayal,
         propertylayer_portrayal=propertylayer_portrayal,
         ax=ax,
-        post_process=post_process,
         **space_drawing_kwargs,
     )
 
