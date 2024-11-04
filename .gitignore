@@ -2,7 +2,8 @@
 benchmarks/**/*.pickle
 
 # exampledocs
-docs/examples/*.md
+docs/examples/*
+docs/example.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
