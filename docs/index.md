@@ -74,6 +74,8 @@ The original Mesa conference paper is [available here](http://conference.scipy.o
 
 Mesa Overview <overview>
 Getting Started <getting_started>
+Examples <examples>
+Migration guide <migration_guide>
 API Documentation <apis/api_main>
 
 ```
