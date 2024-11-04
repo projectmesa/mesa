@@ -1,10 +1,11 @@
 """Solara based visualization for Mesa models."""
 
-from .components import make_plot_component, make_space_component
-from .components.altair_components import make_altair_space, make_space_altair
 from mesa.visualization.mpl_space_drawing import (
     draw_space,
 )
+
+from .components import make_plot_component, make_space_component
+from .components.altair_components import make_altair_space, make_space_altair
 from .solara_viz import JupyterViz, SolaraViz
 from .UserParam import Slider
 
