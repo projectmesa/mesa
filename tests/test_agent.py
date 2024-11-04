@@ -170,6 +170,28 @@ def test_agent_rng():
     assert agent.rng is model.rng
 
 
+def test_agent_create():
+    """Test create agent factory method"""
+    class TestAgent(Agent):
+        def __init__(self, model, attr, def_attr, a=0, b=0):
+            super().__init__(model)
+            self.some_attribute = attr
+            self.some_default_value = def_attr
+            self.a = a
+            self.b = b
+
+    model = Model(seed=42)
+    n = 10
+    some_attribute= model.rng.random(n)
+    a = tuple([model.random.random() for _ in range(n)])
+    TestAgent.create_agents(model, n, some_attribute, 5, a=a, b=7)
+
+    for agent, value, a in zip(model.agents, some_attribute, a):
+        assert agent.some_attribute == value
+        assert agent.some_default_value == 5
+        assert agent.a == a
+        assert agent.b == 7
+
 def test_agent_add_remove_discard():
     """Test adding, removing and discarding agents from AgentSet."""
     model = Model()

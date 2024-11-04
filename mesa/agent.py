@@ -117,7 +117,7 @@ class Agent:
 
         listlike_kwargs = {}
         for k, v in kwargs.items():
-            if isinstance(v, list) and len(v) == n:
+            if isinstance(v, (list | np.ndarray | tuple)) and len(v) == n:
                 listlike_kwargs[k] = v
             else:
                 listlike_kwargs[k] = ListLike(v)
