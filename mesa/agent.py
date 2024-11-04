@@ -110,7 +110,7 @@ class Agent:
 
         listlike_args = []
         for arg in args:
-            if isinstance(arg, (list| np.ndarray| tuple)) and len(arg) == n:
+            if isinstance(arg, (list | np.ndarray | tuple)) and len(arg) == n:
                 listlike_args.append(arg)
             else:
                 listlike_args.append(ListLike(arg))
