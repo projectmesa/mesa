@@ -138,7 +138,6 @@ class Agent:
         return self.model.rng
 
 
-
 class AgentSet(MutableSet, Sequence):
     """A collection class that represents an ordered set of agents within an agent-based model (ABM).
 
