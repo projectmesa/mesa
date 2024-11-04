@@ -1,6 +1,7 @@
 """Altair based solara components for visualization mesa spaces."""
 
 import contextlib
+import warnings
 
 import solara
 
@@ -10,6 +11,15 @@ with contextlib.suppress(ImportError):
 from mesa.experimental.cell_space import DiscreteSpace, Grid
 from mesa.space import ContinuousSpace, _Grid
 from mesa.visualization.utils import update_counter
+
+
+def make_space_altair(*args, **kwargs):  # noqa: D103
+        warnings.warn(
+            'make_space_altair has been renamed to make_altair_space',
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return make_altair_space(*args, **kwargs)
 
 
 def make_altair_space(

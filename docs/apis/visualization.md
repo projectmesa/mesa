@@ -21,7 +21,7 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
 ```
 
 
-## Matplotlib-based components
+## Matplotlib-based visualizations
 
 ```{eval-rst}
 .. automodule:: mesa.visualization.components.matplotlib_components
@@ -31,13 +31,13 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
 ```
 
 ```{eval-rst}
-.. automodule:: mesa.visualization.components.mpl_space_drawing
+.. automodule:: mesa.visualization.mpl_space_drawing
    :members:
    :undoc-members:
    :show-inheritance:
 ```
 
-## Altair-based components
+## Altair-based visualizations
 
 ```{eval-rst}
 .. automodule:: mesa.visualization.components.altair_components

@@ -9,13 +9,13 @@ import matplotlib.pyplot as plt
 import solara
 from matplotlib.figure import Figure
 
-from mesa.visualization.components.mpl_space_drawing import draw_space
+from mesa.visualization.mpl_space_drawing import draw_space
 from mesa.visualization.utils import update_counter
 
 
 def make_space_matplotlib(*args, **kwargs):  # noqa: D103
     warnings.warn(
-        "make_space_matplotlib has been renamed to make_space_component",
+        "make_space_matplotlib has been renamed to make_mpl_space_component",
         DeprecationWarning,
         stacklevel=2,
     )

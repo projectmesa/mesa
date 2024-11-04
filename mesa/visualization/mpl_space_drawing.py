@@ -1,7 +1,7 @@
 """Helper functions for drawing mesa spaces with matplotlib.
 
 These functions are used by the provided matplotlib components, but can also be used to quickly visualize
-a space with matplotlib for example when creating an mp4 of a movie run or when needing a figure
+a space with matplotlib for example when creating a mp4 of a movie run or when needing a figure
 for a paper.
 
 """

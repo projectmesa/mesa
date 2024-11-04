@@ -17,7 +17,7 @@ from mesa.space import (
     PropertyLayer,
     SingleGrid,
 )
-from mesa.visualization.components.mpl_space_drawing import (
+from mesa.visualization.mpl_space_drawing import (
     draw_continuous_space,
     draw_hex_grid,
     draw_network,
