@@ -30,7 +30,7 @@ def post_process(ax):
 
 
 # Create initial model instance
-model1 = BoltzmannWealthModel(50, 10, 10)
+model1 = BoltzmannWealthModel(50, 20, 20)
 
 # Create visualization elements. The visualization elements are solara components
 # that receive the model instance as a "prop" and display it in a certain way.

@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import asyncio
 import copy
+import inspect
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
@@ -92,6 +93,13 @@ def SolaraViz(
     # Convert model to reactive
     if not isinstance(model, solara.Reactive):
         model = solara.use_reactive(model)  # noqa: SH102, RUF100
+
+    model_class_arguments = inspect.signature(model.value.__class__).parameters
+    for k in model_class_arguments:
+        if k not in model_params:
+            if model_class_arguments[k].default == inspect.Parameter.empty:
+                print(f"Missing parameter: {k}")
+                return solara.Text(f"Missing parameter: {k}")
 
     def connect_to_model():
         # Patch the step function to force updates
@@ -301,8 +309,6 @@ def ModelCreator(model, model_params, seed=1):
     """
     user_params, fixed_params = split_model_params(model_params)
 
-    reactive_seed = solara.use_reactive(seed)
-
     model_parameters, set_model_parameters = solara.use_state(
         {
             **fixed_params,
@@ -310,27 +316,11 @@ def ModelCreator(model, model_params, seed=1):
         }
     )
 
-    def do_reseed():
-        """Update the random seed for the model."""
-        reactive_seed.value = model.value.random.random()
-
     def on_change(name, value):
-        set_model_parameters({**model_parameters, name: value})
-
-    def create_model():
-        model.value = model.value.__class__(**model_parameters)
-        model.value._seed = reactive_seed.value
-
-    solara.use_effect(create_model, [model_parameters, reactive_seed.value])
-
-    with solara.Row(justify="space-between"):
-        solara.InputText(
-            label="Seed",
-            value=reactive_seed,
-            continuous_update=True,
-        )
-
-        solara.Button(label="Reseed", color="primary", on_click=do_reseed)
+        print(f"Setting {name} to {value}")
+        new_model_parameters = {**model_parameters, name: value}
+        model.value = model.value.__class__(**new_model_parameters)
+        set_model_parameters(new_model_parameters)
 
     UserInputs(user_params, on_change=on_change)
 
