@@ -85,11 +85,6 @@ class Agent:
     def advance(self) -> None:  # noqa: D102
         pass
 
-    @property
-    def random(self) -> Random:
-        """Return a seeded stdlib rng."""
-        return self.model.random
-
     @classmethod
     def create_agents(cls, model: Model, n: int, *args, **kwargs):
         """Create N agents.
@@ -115,7 +110,7 @@ class Agent:
 
         listlike_args = []
         for arg in args:
-            if isinstance(arg, list) and len(arg) == n:
+            if isinstance(arg, (list, np.ndarray, tuple)) and len(arg) == n:
                 listlike_args.append(arg)
             else:
                 listlike_args.append(ListLike(arg))
@@ -133,9 +128,15 @@ class Agent:
             cls(model, *instance_args, **instance_kwargs)
 
     @property
+    def random(self) -> Random:
+        """Return a seeded stdlib rng."""
+        return self.model.random
+
+    @property
     def rng(self) -> np.random.Generator:
         """Return a seeded np.random rng."""
         return self.model.rng
+
 
 
 class AgentSet(MutableSet, Sequence):
