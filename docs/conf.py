@@ -338,7 +338,7 @@ def setup_examples_pages():
         app_filename = os.path.join(example, "app.py")
 
         md_filename = f"{base_name}.md"
-        examples_md.append(base_name)
+        examples_md.append((base_name, f"{kind}/{base_name}"))
 
         md_filepath = os.path.join(HERE, "examples", kind, md_filename)
         write_example_md_file(agent_filename, model_filename, readme_filename, app_filename, md_filepath, template)
@@ -354,7 +354,7 @@ def setup_examples_pages():
         content = template.substitute(
             dict(
                 readme=readme_md,
-            #     examples="\n".join([f"{' '.join(base_name.split('_'))} </examples/{base_name}>" for base_name in examples_md]),
+                example_paths="\n".join([f"{' '.join(a.split('_'))} </examples/{b}>" for a, b in examples_md]),
             )
         )
         fh.write(content)
