@@ -187,10 +187,10 @@ def test_agent_create():
     a = tuple([model.random.random() for _ in range(n)])
     TestAgent.create_agents(model, n, some_attribute, 5, a=a, b=7)
 
-    for agent, value, a in zip(model.agents, some_attribute, a):
+    for agent, value, a_i in zip(model.agents, some_attribute, a):
         assert agent.some_attribute == value
         assert agent.some_default_value == 5
-        assert agent.a == a
+        assert agent.a == a_i
         assert agent.b == 7
 
 
