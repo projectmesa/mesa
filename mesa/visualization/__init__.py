@@ -1,5 +1,7 @@
 """Solara based visualization for Mesa models."""
 
+from .components import make_plot_component, make_space_component
+from .components.altair_components import make_space_altair
 from mesa.visualization.mpl_space_drawing import (
     draw_space,
 )
@@ -14,7 +16,6 @@ __all__ = [
     "SolaraViz",
     "Slider",
     "make_space_altair",
-    "make_altair_space",
     "draw_space",
     "make_plot_component",
     "make_space_component",
