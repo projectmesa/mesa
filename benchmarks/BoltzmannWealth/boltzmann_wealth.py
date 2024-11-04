@@ -83,6 +83,8 @@ class MoneyAgent(mesa.Agent):
 
         Args:
             model: a Model instance
+            pos: the position of the agent
+
         """
         super().__init__(model)
         self.wealth = 1
