@@ -1,6 +1,10 @@
 # Benchmarking
 benchmarks/**/*.pickle
 
+# exampledocs
+docs/examples/*
+docs/example.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

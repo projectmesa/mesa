@@ -7,6 +7,8 @@ import solara
 with contextlib.suppress(ImportError):
     import altair as alt
 
+from mesa.experimental.cell_space import DiscreteSpace, Grid
+from mesa.space import ContinuousSpace, _Grid
 from mesa.visualization.utils import update_counter
 
 
@@ -29,35 +31,101 @@ def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None): 
     if space is None:
         # Sometimes the space is defined as model.space instead of model.grid
         space = model.space
+
     chart = _draw_grid(space, agent_portrayal)
     solara.FigureAltair(chart)
 
 
-def _draw_grid(space, agent_portrayal):
-    def portray(g):
-        all_agent_data = []
-        for content, (x, y) in g.coord_iter():
-            if not content:
-                continue
-            if not hasattr(content, "__iter__"):
-                # Is a single grid
-                content = [content]  # noqa: PLW2901
-            for agent in content:
-                # use all data from agent portrayal, and add x,y coordinates
-                agent_data = agent_portrayal(agent)
-                agent_data["x"] = x
-                agent_data["y"] = y
-                all_agent_data.append(agent_data)
-        return all_agent_data
+def _get_agent_data_old__discrete_space(space, agent_portrayal):
+    """Format agent portrayal data for old-style discrete spaces.
 
-    all_agent_data = portray(space)
+    Args:
+        space: the mesa.space._Grid instance
+        agent_portrayal: the agent portrayal callable
+
+    Returns:
+        list of dicts
+
+    """
+    all_agent_data = []
+    for content, (x, y) in space.coord_iter():
+        if not content:
+            continue
+        if not hasattr(content, "__iter__"):
+            # Is a single grid
+            content = [content]  # noqa: PLW2901
+        for agent in content:
+            # use all data from agent portrayal, and add x,y coordinates
+            agent_data = agent_portrayal(agent)
+            agent_data["x"] = x
+            agent_data["y"] = y
+            all_agent_data.append(agent_data)
+    return all_agent_data
+
+
+def _get_agent_data_new_discrete_space(space: DiscreteSpace, agent_portrayal):
+    """Format agent portrayal data for new-style discrete spaces.
+
+    Args:
+        space: the mesa.experiment.cell_space.Grid instance
+        agent_portrayal: the agent portrayal callable
+
+    Returns:
+        list of dicts
+
+    """
+    all_agent_data = []
+
+    for cell in space.all_cells:
+        for agent in cell.agents:
+            agent_data = agent_portrayal(agent)
+            agent_data["x"] = cell.coordinate[0]
+            agent_data["y"] = cell.coordinate[1]
+            all_agent_data.append(agent_data)
+    return all_agent_data
+
+
+def _get_agent_data_continuous_space(space: ContinuousSpace, agent_portrayal):
+    """Format agent portrayal data for continuous space.
+
+    Args:
+        space: the ContinuousSpace instance
+        agent_portrayal: the agent portrayal callable
+
+    Returns:
+        list of dicts
+    """
+    all_agent_data = []
+    for agent in space._agent_to_index:
+        agent_data = agent_portrayal(agent)
+        agent_data["x"] = agent.pos[0]
+        agent_data["y"] = agent.pos[1]
+        all_agent_data.append(agent_data)
+    return all_agent_data
+
+
+def _draw_grid(space, agent_portrayal):
+    match space:
+        case Grid():
+            all_agent_data = _get_agent_data_new_discrete_space(space, agent_portrayal)
+        case _Grid():
+            all_agent_data = _get_agent_data_old__discrete_space(space, agent_portrayal)
+        case ContinuousSpace():
+            all_agent_data = _get_agent_data_continuous_space(space, agent_portrayal)
+        case _:
+            raise NotImplementedError(
+                f"visualizing {type(space)} is currently not supported through altair"
+            )
+
     invalid_tooltips = ["color", "size", "x", "y"]
+
+    x_y_type = "ordinal" if not isinstance(space, ContinuousSpace) else "nominal"
 
     encoding_dict = {
         # no x-axis label
-        "x": alt.X("x", axis=None, type="ordinal"),
+        "x": alt.X("x", axis=None, type=x_y_type),
         # no y-axis label
-        "y": alt.Y("y", axis=None, type="ordinal"),
+        "y": alt.Y("y", axis=None, type=x_y_type),
         "tooltip": [
             alt.Tooltip(key, type=alt.utils.infer_vegalite_type([value]))
             for key, value in all_agent_data[0].items()

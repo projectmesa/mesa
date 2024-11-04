@@ -42,15 +42,16 @@ The `mesa.flat` namespace is removed. Use the full namespace for your imports.
 
 
 ### Mandatory Model initialization with `super().__init__()`
-In Mesa 3.0, it is now mandatory to call `super().__init__()` when initializing your model class. This ensures that all necessary Mesa model variables are correctly set up and agents are properly added to the model.
+In Mesa 3.0, it is now mandatory to call `super().__init__()` when initializing your model class. This ensures that all necessary Mesa model variables are correctly set up and agents are properly added to the model. If you want to control the seed of the random number generator, you have to pass this as a keyword argument to super as shown below.
 
 Make sure all your model classes explicitly call `super().__init__()` in their `__init__` method:
 
 ```python
 class MyModel(mesa.Model):
-    def __init__(self, *args, **kwargs):
-        super().__init__()  # This is now required!
+    def __init__(self, some_arg_I_need, seed=None, some_kwarg_I_need=True):
+        super().__init__(seed=seed)  # Calling super is now required, passing seed is highly recommended
         # Your model initialization code here
+        # this code uses some_arg_I_need and my_init_kwarg
 ```
 
 This change ensures that all Mesa models are properly initialized, which is crucial for:
@@ -73,15 +74,32 @@ In Mesa 3.0, `unique_id` for agents is now automatically assigned, simplifying a
 1. Remove `unique_id` from agent initialization:
    ```python
    # Old
+   agent = MyAgent(unique_id=unique_id, model=self, ...)
+   agent = MyAgent(unique_id, self, ...)
    agent = MyAgent(self.next_id(), self, ...)
 
    # New
+   agent = MyAgent(model=self, ...)
    agent = MyAgent(self, ...)
    ```
-2. `Model.next_id()` is deprecated and will always return 0. Remove any calls to this method.
-3. `unique_id` is now unique relative to a Model instance and starts from 1.
-4. If you previously used custom `unique_id` values, you'll need to store that information in a separate attribute.
-5. Deprecation warning: Initializing an agent with two arguments (`unique_id` and `model`) will raise a warning. The `unique_id` argument will be ignored.
+
+2. Remove `unique_id` from Agent super() call:
+   ```python
+   # Old
+   class MyAgent(Agent):
+       def __init__(self, unique_id, model, ...):
+           super().__init__(unique_id, model)
+
+   # New
+   class MyAgent(Agent):
+       def __init__(self, model, ...):
+           super().__init__(model)
+   ```
+
+3. Important notes:
+   - `unique_id` is now automatically assigned relative to a Model instance and starts from 1
+   - `Model.next_id()` is removed
+   - If you previously used custom `unique_id` values, store that information in a separate attribute
 
 - Ref: [PR #2226](https://github.com/projectmesa/mesa/pull/2226), [PR #2260](https://github.com/projectmesa/mesa/pull/2260), Mesa-examples [PR #194](https://github.com/projectmesa/mesa-examples/pull/194), [Issue #2213](https://github.com/projectmesa/mesa/issues/2213)
 
@@ -250,9 +268,9 @@ from mesa.experimental import SolaraViz
 SolaraViz(model_cls, model_params, agent_portrayal=agent_portrayal)
 
 # new
-from mesa.visualization import SolaraViz, make_space_matplotlib
+from mesa.visualization import SolaraViz, make_space_component
 
-SolaraViz(model, components=[make_space_matplotlib(agent_portrayal)])
+SolaraViz(model, components=[make_space_component(agent_portrayal)])
 ```
 
 #### Plotting "measures"
@@ -263,15 +281,17 @@ SolaraViz(model, components=[make_space_matplotlib(agent_portrayal)])
 # old
 from mesa.experimental import SolaraViz
 
+
 def make_plot(model):
     ...
+
 
 SolaraViz(model_cls, model_params, measures=[make_plot, "foo", ["bar", "baz"]])
 
 # new
-from mesa.visualization import SolaraViz, make_plot_measure
+from mesa.visualization import SolaraViz, make_plot_component
 
-SolaraViz(model, components=[make_plot, make_plot_measure("foo"), make_plot_measure("bar", "baz")])
+SolaraViz(model, components=[make_plot, make_plot_component("foo"), make_plot_component("bar", "baz")])
 ```
 
 #### Plotting text
