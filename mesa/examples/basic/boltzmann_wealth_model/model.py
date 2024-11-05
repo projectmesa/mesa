@@ -10,7 +10,7 @@ class BoltzmannWealthModel(mesa.Model):
     highly skewed distribution of wealth.
     """
 
-    def __init__(self, hans=213, n=100, width=10, height=10, seed=None):
+    def __init__(self, n=100, width=10, height=10, seed=None):
         super().__init__(seed=seed)
         self.num_agents = n
         self.grid = mesa.space.MultiGrid(width, height, True)
