@@ -195,6 +195,8 @@ def ModelController(model: solara.Reactive[Model], model_parameters, play_interv
     Args:
         model (solara.Reactive[Model]): Reactive model instance
         play_interval (int, optional): Interval for playing the model steps in milliseconds.
+        model_parameters: Parameters for (re-)instantiating a model.
+
     """
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
