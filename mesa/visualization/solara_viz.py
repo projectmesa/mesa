@@ -88,6 +88,8 @@ def SolaraViz(
     """
     if components == "default":
         components = [components_altair.make_space_altair()]
+    if model_params is None:
+        model_params = {}
 
     # Convert model to reactive
     if not isinstance(model, solara.Reactive):
