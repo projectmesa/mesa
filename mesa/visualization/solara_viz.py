@@ -300,7 +300,6 @@ def ModelCreator(model, model_params, seed=1):
         - The component provides an interface for adjusting user-defined parameters and reseeding the model.
 
     """
-
     solara.use_effect(
         lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
         [model.value],
