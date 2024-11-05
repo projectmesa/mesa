@@ -5,11 +5,10 @@ from __future__ import annotations
 import warnings
 from collections.abc import Callable
 
-import matplotlib.pyplot as plt
 import solara
 from matplotlib.figure import Figure
 
-from mesa.visualization.mpl_space_drawing import draw_space
+from mesa.visualization.mpl_drawing import draw_plot, draw_space
 from mesa.visualization.utils import update_counter
 
 
@@ -151,26 +150,10 @@ def PlotMatplotlib(
     """
     update_counter.get()
     fig = Figure()
-    ax = fig.subplots()
-    df = model.datacollector.get_model_vars_dataframe()
-    if isinstance(measure, str):
-        ax.plot(df.loc[:, measure])
-        ax.set_ylabel(measure)
-    elif isinstance(measure, dict):
-        for m, color in measure.items():
-            ax.plot(df.loc[:, m], label=m, color=color)
-        ax.legend(loc="best")
-    elif isinstance(measure, list | tuple):
-        for m in measure:
-            ax.plot(df.loc[:, m], label=m)
-        ax.legend(loc="best")
-
+    ax = fig.add_subplot()
+    draw_plot(model, measure, ax)
     if post_process is not None:
         post_process(ax)
-
-    ax.set_xlabel("Step")
-    # Set integer x axis
-    ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
     solara.FigureMatplotlib(
         fig, format=save_format, bbox_inches="tight", dependencies=dependencies
     )

@@ -556,3 +556,41 @@ def _scatter(ax: Axes, arguments, **kwargs):
                 **{k: v[logical] for k, v in arguments.items()},
                 **kwargs,
             )
+
+
+def draw_plot(
+    model,
+    measure,
+    ax: Axes | None = None,
+):
+    """Create a Matplotlib-based plot for a measure or measures.
+
+    Args:
+        model (mesa.Model): The model instance.
+        measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
+        ax: the axes upon which to draw the plot
+        post_process: a user-specified callable to do post-processing called with the Axes instance.
+
+    Returns:
+        plt.Axes: The Axes object with the plot drawn onto it.
+    """
+    if ax is None:
+        _, ax = plt.subplots()
+    df = model.datacollector.get_model_vars_dataframe()
+    if isinstance(measure, str):
+        ax.plot(df.loc[:, measure])
+        ax.set_ylabel(measure)
+    elif isinstance(measure, dict):
+        for m, color in measure.items():
+            ax.plot(df.loc[:, m], label=m, color=color)
+        ax.legend(loc="best")
+    elif isinstance(measure, list | tuple):
+        for m in measure:
+            ax.plot(df.loc[:, m], label=m)
+        ax.legend(loc="best")
+
+    ax.set_xlabel("Step")
+    # Set integer x axis
+    ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
+
+    return ax
