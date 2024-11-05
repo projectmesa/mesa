@@ -9,7 +9,6 @@ import solara
 import mesa
 import mesa.visualization.components.altair
 import mesa.visualization.components.matplotlib
-from mesa.visualization.components.matplotlib import make_space_component
 from mesa.visualization.solara_viz import (
     Slider,
     SolaraViz,
