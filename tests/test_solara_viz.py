@@ -3,13 +3,19 @@
 import unittest
 
 import ipyvuetify as vw
+import pytest
 import solara
 
 import mesa
-import mesa.visualization.components.altair_components
-import mesa.visualization.components.matplotlib_components
-from mesa.visualization.components.matplotlib_components import make_mpl_space_component
-from mesa.visualization.solara_viz import Slider, SolaraViz, UserInputs
+import mesa.visualization.components.altair
+import mesa.visualization.components.matplotlib
+from mesa.visualization.components.matplotlib import make_space_component
+from mesa.visualization.solara_viz import (
+    Slider,
+    SolaraViz,
+    UserInputs,
+    _check_model_params,
+)
 
 
 class TestMakeUserInput(unittest.TestCase):  # noqa: D101
@@ -152,3 +158,41 @@ def test_slider():  # noqa: D103
     assert not slider_int.is_float_slider
     slider_dtype_float = Slider("Homophily", 3, 0, 8, 1, dtype=float)
     assert slider_dtype_float.is_float_slider
+
+
+def test_model_param_checks():
+    class ModelWithOptionalParams:
+        def __init__(self, required_param, optional_param=10):
+            pass
+
+    class ModelWithOnlyRequired:
+        def __init__(self, param1, param2):
+            pass
+
+    # Test that optional params can be omitted
+    _check_model_params(ModelWithOptionalParams.__init__, {"required_param": 1})
+
+    # Test that optional params can be provided
+    _check_model_params(
+        ModelWithOptionalParams.__init__, {"required_param": 1, "optional_param": 5}
+    )
+
+    # Test invalid parameter name raises ValueError
+    with pytest.raises(ValueError, match="Invalid model parameter: invalid_param"):
+        _check_model_params(
+            ModelWithOptionalParams.__init__, {"required_param": 1, "invalid_param": 2}
+        )
+
+    # Test missing required parameter raises ValueError
+    with pytest.raises(ValueError, match="Missing required model parameter: param2"):
+        _check_model_params(ModelWithOnlyRequired.__init__, {"param1": 1})
+
+    # Test passing extra parameters raises ValueError
+    with pytest.raises(ValueError, match="Invalid model parameter: extra"):
+        _check_model_params(
+            ModelWithOnlyRequired.__init__, {"param1": 1, "param2": 2, "extra": 3}
+        )
+
+    # Test empty params dict raises ValueError if required params
+    with pytest.raises(ValueError, match="Missing required model parameter"):
+        _check_model_params(ModelWithOnlyRequired.__init__, {})

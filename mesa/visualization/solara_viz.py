@@ -94,13 +94,6 @@ def SolaraViz(
     if not isinstance(model, solara.Reactive):
         model = solara.use_reactive(model)  # noqa: SH102, RUF100
 
-    model_class_arguments = inspect.signature(model.value.__class__).parameters
-    for k in model_class_arguments:
-        if k not in model_params:
-            if model_class_arguments[k].default == inspect.Parameter.empty:
-                print(f"Missing parameter: {k}")
-                return solara.Text(f"Missing parameter: {k}")
-
     def connect_to_model():
         # Patch the step function to force updates
         original_step = model.value.step
@@ -307,6 +300,12 @@ def ModelCreator(model, model_params, seed=1):
         - The component provides an interface for adjusting user-defined parameters and reseeding the model.
 
     """
+
+    solara.use_effect(
+        lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
+        [model.value],
+    )
+
     user_params, fixed_params = split_model_params(model_params)
 
     model_parameters, set_model_parameters = solara.use_state(
@@ -317,12 +316,34 @@ def ModelCreator(model, model_params, seed=1):
     )
 
     def on_change(name, value):
-        print(f"Setting {name} to {value}")
         new_model_parameters = {**model_parameters, name: value}
         model.value = model.value.__class__(**new_model_parameters)
         set_model_parameters(new_model_parameters)
 
     UserInputs(user_params, on_change=on_change)
+
+
+def _check_model_params(init_func, model_params):
+    """Check if model parameters are valid for the model's initialization function.
+
+    Args:
+        init_func: Model initialization function
+        model_params: Dictionary of model parameters
+
+    Raises:
+        ValueError: If a parameter is not valid for the model's initialization function
+    """
+    model_parameters = inspect.signature(init_func).parameters
+    for name in model_parameters:
+        if (
+            model_parameters[name].default == inspect.Parameter.empty
+            and name not in model_params
+            and name != "self"
+        ):
+            raise ValueError(f"Missing required model parameter: {name}")
+    for name in model_params:
+        if name not in model_parameters:
+            raise ValueError(f"Invalid model parameter: {name}")
 
 
 @solara.component
