@@ -24,7 +24,6 @@ See the Visualization Tutorial and example models for more details.
 from __future__ import annotations
 
 import asyncio
-import copy
 import inspect
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
@@ -109,7 +108,6 @@ def SolaraViz(
 
     solara.use_effect(connect_to_model, [model.value])
 
-
     solara.use_effect(
         lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
         [model.value],
@@ -128,7 +126,6 @@ def SolaraViz(
         new_model_parameters = {**model_parameters, name: value}
         model.value = model.value.__class__(**new_model_parameters)
         set_model_parameters(new_model_parameters)
-
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
@@ -200,8 +197,6 @@ def ModelController(model: solara.Reactive[Model], model_parameters, play_interv
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
     # original_model = solara.use_reactive(None)
-
-
 
     # def save_initial_model():
     #     """Save the initial model for comparison."""
