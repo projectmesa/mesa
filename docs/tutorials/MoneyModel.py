@@ -49,7 +49,7 @@ class MoneyAgent(mesa.Agent):
 class MoneyModel(mesa.Model):
     """A model with some number of agents."""
 
-    def __init__(self, n, width, height, seed=None):
+    def __init__(self, n=10, width=10, height=10, seed=None):
         """Initialize a MoneyModel instance.
 
         Args:
