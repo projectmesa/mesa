@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import asyncio
 import copy
+import inspect
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
@@ -299,9 +300,12 @@ def ModelCreator(model, model_params, seed=1):
         - The component provides an interface for adjusting user-defined parameters and reseeding the model.
 
     """
-    user_params, fixed_params = split_model_params(model_params)
+    solara.use_effect(
+        lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
+        [model.value],
+    )
 
-    reactive_seed = solara.use_reactive(seed)
+    user_params, fixed_params = split_model_params(model_params)
 
     model_parameters, set_model_parameters = solara.use_state(
         {
@@ -310,29 +314,35 @@ def ModelCreator(model, model_params, seed=1):
         }
     )
 
-    def do_reseed():
-        """Update the random seed for the model."""
-        reactive_seed.value = model.value.random.random()
-
     def on_change(name, value):
-        set_model_parameters({**model_parameters, name: value})
-
-    def create_model():
-        model.value = model.value.__class__(**model_parameters)
-        model.value._seed = reactive_seed.value
-
-    solara.use_effect(create_model, [model_parameters, reactive_seed.value])
-
-    with solara.Row(justify="space-between"):
-        solara.InputText(
-            label="Seed",
-            value=reactive_seed,
-            continuous_update=True,
-        )
-
-        solara.Button(label="Reseed", color="primary", on_click=do_reseed)
+        new_model_parameters = {**model_parameters, name: value}
+        model.value = model.value.__class__(**new_model_parameters)
+        set_model_parameters(new_model_parameters)
 
     UserInputs(user_params, on_change=on_change)
+
+
+def _check_model_params(init_func, model_params):
+    """Check if model parameters are valid for the model's initialization function.
+
+    Args:
+        init_func: Model initialization function
+        model_params: Dictionary of model parameters
+
+    Raises:
+        ValueError: If a parameter is not valid for the model's initialization function
+    """
+    model_parameters = inspect.signature(init_func).parameters
+    for name in model_parameters:
+        if (
+            model_parameters[name].default == inspect.Parameter.empty
+            and name not in model_params
+            and name != "self"
+        ):
+            raise ValueError(f"Missing required model parameter: {name}")
+    for name in model_params:
+        if name not in model_parameters:
+            raise ValueError(f"Invalid model parameter: {name}")
 
 
 @solara.component
