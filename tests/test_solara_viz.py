@@ -7,8 +7,9 @@ import pytest
 import solara
 
 import mesa
-import mesa.visualization.components.altair
-import mesa.visualization.components.matplotlib
+import mesa.visualization.components.altair_components
+import mesa.visualization.components.matplotlib_components
+from mesa.visualization.components.matplotlib_components import make_mpl_space_component
 from mesa.visualization.solara_viz import (
     Slider,
     SolaraViz,
