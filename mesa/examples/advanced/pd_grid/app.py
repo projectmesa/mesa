@@ -3,7 +3,11 @@ Solara-based visualization for the Spatial Prisoner's Dilemma Model.
 """
 
 from mesa.examples.advanced.pd_grid.model import PdGrid
-from mesa.visualization import SolaraViz, make_plot_component, make_space_component
+from mesa.visualization import (
+    SolaraViz,
+    make_plot_component,
+    make_space_component,
+)
 from mesa.visualization.UserParam import Slider
 
 
