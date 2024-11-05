@@ -116,7 +116,10 @@ def test_call_space_drawer(mocker):  # noqa: D103
     # initialize with space drawer unspecified (use default)
     # component must be rendered for code to run
     solara.render(
-        SolaraViz(model, components=[make_mpl_space_component(agent_portrayal)], )
+        SolaraViz(
+            model,
+            components=[make_mpl_space_component(agent_portrayal)],
+        )
     )
     # should call default method with class instance and agent portrayal
     mock_space_matplotlib.assert_called_with(
