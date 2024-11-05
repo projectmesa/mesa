@@ -160,7 +160,7 @@ def test_slider():  # noqa: D103
     assert slider_dtype_float.is_float_slider
 
 
-def test_model_param_checks():
+def test_model_param_checks():  # noqa: D103
     class ModelWithOptionalParams:
         def __init__(self, required_param, optional_param=10):
             pass
