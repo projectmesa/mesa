@@ -1,3 +1,7 @@
+import sys
+import os.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../')))
+
 from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealthModel
 from mesa.visualization import (
     SolaraViz,
@@ -19,6 +23,11 @@ model_params = {
         "min": 10,
         "max": 100,
         "step": 1,
+    },
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
     },
     "width": 10,
     "height": 10,
