@@ -176,12 +176,25 @@ def test_model_param_checks():  # noqa: D103
         def __init__(self, param1, param2):
             pass
 
+    class ModelWithKwargs:
+        def __init__(self, **kwargs):
+            pass
+
+
     # Test that optional params can be omitted
     _check_model_params(ModelWithOptionalParams.__init__, {"required_param": 1})
 
     # Test that optional params can be provided
     _check_model_params(
         ModelWithOptionalParams.__init__, {"required_param": 1, "optional_param": 5}
+    )
+
+    # Test that kwargs are accepted
+    _check_model_params(
+        ModelWithKwargs.__init__, {"another_kwarg":6}
+    )
+    _check_model_params(
+        ModelWithKwargs.__init__, {}
     )
 
     # Test invalid parameter name raises ValueError
