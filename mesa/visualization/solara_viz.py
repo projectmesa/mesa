@@ -115,9 +115,15 @@ def SolaraViz(
 
     with solara.Sidebar(), solara.Column():
         with solara.Card("Controls"):
-            ModelController(model, model_parameters=reactive_model_parameters, play_interval=play_interval)
+            ModelController(
+                model,
+                model_parameters=reactive_model_parameters,
+                play_interval=play_interval,
+            )
         with solara.Card("Model Parameters"):
-            ModelCreator(model, model_params, model_parameters=reactive_model_parameters)
+            ModelCreator(
+                model, model_params, model_parameters=reactive_model_parameters
+            )
         with solara.Card("Information"):
             ShowSteps(model.value)
 
@@ -263,7 +269,11 @@ def check_param_is_fixed(param):
 
 
 @solara.component
-def ModelCreator(model: solara.Reactive[Model], user_params: dict, model_parameters: dict | solara.Reactive[dict] = None):
+def ModelCreator(
+    model: solara.Reactive[Model],
+    user_params: dict,
+    model_parameters: dict | solara.Reactive[dict] = None,
+):
     """Solara component for creating and managing a model instance with user-defined parameters.
 
     This component allows users to create a model instance with specified parameters and seed.
@@ -304,8 +314,10 @@ def ModelCreator(model: solara.Reactive[Model], user_params: dict, model_paramet
     user_params, fixed_params = split_model_params(user_params)
 
     # set model_parameters to the default values for all parameters
-    model_parameters.value = {**fixed_params,
-                              **{k: v.get("value") for k, v in user_params.items()}}
+    model_parameters.value = {
+        **fixed_params,
+        **{k: v.get("value") for k, v in user_params.items()},
+    }
 
     def on_change(name, value):
         new_model_parameters = {**model_parameters.value, name: value}
