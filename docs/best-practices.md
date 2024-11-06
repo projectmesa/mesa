@@ -24,7 +24,7 @@ All our [examples](examples) follow this layout.
 ## Randomization
 
 If your model involves some random choice, you can use the built-in `random`
-property that Mesa `Model` and `Agent` objects have. This works exactly
+property that many Mesa objects have, including `Model`, `Agent`, and `AgentSet`. This works exactly
 like the built-in `random` library.
 
 ```python
@@ -45,20 +45,24 @@ class AwesomeAgent(Agent):
     random_number = self.random.randint(0, 100)
 ```
 
-(The agent's random property is just a reference to its parent model's
-`random` property).
+`Agent.random` is just a convenient shorthand in the Agent class to `self.model.random`. If you create your own `AgentSet`
+instances, you have to pass `random` explicitly. Typically, you can simply do, in a Model instance, 
+`my_agentset = AgentSet([], random=self.random)`. This ensures that `my_agentset` uses the same random
+number generator as the rest of the model.
+
 
 When a model object is created, its random property is automatically seeded
 with the current time. The seed determines the sequence of random numbers; if
 you instantiate a model with the same seed, you will get the same results.
 To allow you to set the seed, make sure your model has a `seed` argument in its
-constructor.
+`__init__`.
 
 ```python
 class AwesomeModel(Model):
 
   def __init__(self, seed=None):
-    pass
+    super().__init__(seed=seed)
+    ...
 
   def cool_method(self):
     interesting_number = self.random.random()
