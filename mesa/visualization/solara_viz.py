@@ -84,7 +84,7 @@ def SolaraViz(
           value results in faster stepping, while a higher value results in slower stepping.
     """
     if components == "default":
-        components = [components_altair.make_space_altair()]
+        components = [components_altair.make_altair_space()]
     if model_params is None:
         model_params = {}
 
@@ -108,26 +108,16 @@ def SolaraViz(
     solara.use_effect(connect_to_model, [model.value])
 
     # set up reactive model_parameters shared by ModelCreator and ModelController
-    solara.use_effect(
-        lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
-        [model.value],
-    )
-    user_params, fixed_params = split_model_params(model_params)
-    model_parameters = solara.use_reactive(
-        {
-            **fixed_params,
-            **{k: v.get("value") for k, v in user_params.items()},
-        }
-    )
+    reactive_model_parameters = solara.use_reactive({})
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
 
     with solara.Sidebar(), solara.Column():
         with solara.Card("Controls"):
-            ModelController(model, model_parameters, play_interval=play_interval)
+            ModelController(model, model_parameters=reactive_model_parameters, play_interval=play_interval)
         with solara.Card("Model Parameters"):
-            ModelCreator(model, user_params, model_parameters)
+            ModelCreator(model, model_params, model_parameters=reactive_model_parameters)
         with solara.Card("Information"):
             ShowSteps(model.value)
 
@@ -273,7 +263,7 @@ def check_param_is_fixed(param):
 
 
 @solara.component
-def ModelCreator(model, user_params, model_parameters):
+def ModelCreator(model: solara.Reactive[Model], user_params: dict, model_parameters: dict | solara.Reactive[dict] = None):
     """Solara component for creating and managing a model instance with user-defined parameters.
 
     This component allows users to create a model instance with specified parameters and seed.
@@ -281,8 +271,8 @@ def ModelCreator(model, user_params, model_parameters):
     number generator.
 
     Args:
-        model (solara.Reactive[Model]): A reactive model instance. This is the main model to be created and managed.
-        user_params (dict): user-adjustable parameters
+        model: A reactive model instance. This is the main model to be created and managed.
+        user_params: Parameters for (re-)instantiating a model. Can include user-adjustable parameters and fixed parameters. Defaults to None.
         model_parameters: reactive parameters for reinitializing the model
 
     Returns:
@@ -304,6 +294,18 @@ def ModelCreator(model, user_params, model_parameters):
         - The component provides an interface for adjusting user-defined parameters and reseeding the model.
 
     """
+    if model_parameters is None:
+        model_parameters = solara.use_reactive({})
+
+    solara.use_effect(
+        lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
+        [model.value],
+    )
+    user_params, fixed_params = split_model_params(user_params)
+
+    # set model_parameters to the default values for all parameters
+    model_parameters.value = {**fixed_params,
+                              **{k: v.get("value") for k, v in user_params.items()}}
 
     def on_change(name, value):
         new_model_parameters = {**model_parameters.value, name: value}
