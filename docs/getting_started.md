@@ -11,10 +11,8 @@ If you want to get a quick start on how to build agent based models with MESA, c
 - [Visualization Tutorial](tutorials/visualization_tutorial.html): Learn how to create interactive visualizations for your models.
 
 ## Examples
-Mesa ships with a collection of example models. These are classic ABMs, so if you are familiar with ABMs and want to get a quick sense of how MESA works, these examples are great place to start. You can find them [here](examples/examples)
+Mesa ships with a collection of example models. These are classic ABMs, so if you are familiar with ABMs and want to get a quick sense of how MESA works, these examples are great place to start. You can find them [here](examples)
 
-- [Introductory Tutorial](tutorials/intro_tutorial): Learn how to create your first Mesa model.
-- [Visualization Tutorial](tutorials/visualization_tutorial.html): Learn how to create interactive visualizations for your models.
 
 ## Overview of the MESA library
 
@@ -223,24 +221,26 @@ This will create an interactive visualization of your model, including:
 
 You can also create custom visualization components using Matplotlib. For more advanced usage and customization options, please refer to the [visualization tutorial](tutorials/visualization_tutorial).
 
-### Further resources
+## Further resources
 To further explore Mesa and its features, we have the following resources available:
 
+### Best practices
+- [Mesa best practices](best-practices): an overview of tips and guidelines for using MESA.
 
-#### API documentation
+### API documentation
 - [Mesa API reference](apis): Detailed documentation of Mesa's classes and functions.
 
-#### Example models
+### Repository of models built using MESA
 - [Mesa Examples repository](https://github.com/projectmesa/mesa-examples): A collection of example models demonstrating various Mesa features and modeling techniques.
 
-#### Migration guide
+### Migration guide
 - [Mesa 3.0 Migration guide](migration_guide): If you're upgrading from an earlier version of Mesa, this guide will help you navigate the changes in Mesa 3.0.
 
-#### Source Ccode and development
+### Source Ccode and development
 - [Mesa GitHub repository](https://github.com/projectmesa/mesa): Access the full source code of Mesa, contribute to its development, or report issues.
 - [Mesa release notes](https://github.com/projectmesa/mesa/releases): View the detailed changelog of Mesa, including all past releases and their features.
 
-#### Community and support
+### Community and support
 - [Mesa GitHub Discussions](https://github.com/projectmesa/mesa/discussions): Join discussions, ask questions, and connect with other Mesa users.
 - [Matrix Chat](https://matrix.to/#/#project-mesa:matrix.org): Real-time chat for quick questions and community interaction.
 
