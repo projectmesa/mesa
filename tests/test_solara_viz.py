@@ -101,7 +101,11 @@ def test_call_space_drawer(mocker):  # noqa: D103
         mesa.visualization.components.altair_components, "SpaceAltair"
     )
 
-    model = mesa.Model()
+    class MockModel(mesa.Model):
+        def __init__(self, seed=None):
+            super().__init__(seed=seed)
+
+    model = MockModel()
     mocker.patch.object(mesa.Model, "__init__", return_value=None)
 
     agent_portrayal = {
@@ -112,7 +116,10 @@ def test_call_space_drawer(mocker):  # noqa: D103
     # initialize with space drawer unspecified (use default)
     # component must be rendered for code to run
     solara.render(
-        SolaraViz(model, components=[make_mpl_space_component(agent_portrayal)])
+        SolaraViz(
+            model,
+            components=[make_mpl_space_component(agent_portrayal)],
+        )
     )
     # should call default method with class instance and agent portrayal
     mock_space_matplotlib.assert_called_with(
