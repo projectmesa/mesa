@@ -47,7 +47,6 @@ def SolaraViz(
     | Literal["default"] = "default",
     play_interval: int = 100,
     model_params=None,
-    seed: float = 0,
     name: str | None = None,
 ):
     """Solara visualization component.
@@ -68,8 +67,6 @@ def SolaraViz(
             This controls the speed of the model's automatic stepping. Defaults to 100 ms.
         model_params (dict, optional): Parameters for (re-)instantiating a model.
             Can include user-adjustable parameters and fixed parameters. Defaults to None.
-        seed (int, optional): Seed for the random number generator. This ensures reproducibility
-            of the model's behavior. Defaults to 0.
         name (str | None, optional): Name of the visualization. Defaults to the models class name.
 
     Returns:
@@ -110,24 +107,17 @@ def SolaraViz(
 
     solara.use_effect(connect_to_model, [model.value])
 
+    # set up reactive model_parameters shared by ModelCreator and ModelController
     solara.use_effect(
         lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
         [model.value],
     )
-
     user_params, fixed_params = split_model_params(model_params)
-
-    model_parameters, set_model_parameters = solara.use_state(
-        {
+    model_parameters = solara.use_reactive({
             **fixed_params,
             **{k: v.get("value") for k, v in user_params.items()},
-        }
-    )
+        })
 
-    def on_change(name, value):
-        new_model_parameters = {**model_parameters, name: value}
-        model.value = model.value.__class__(**new_model_parameters)
-        set_model_parameters(new_model_parameters)
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
@@ -135,10 +125,8 @@ def SolaraViz(
     with solara.Sidebar(), solara.Column():
         with solara.Card("Controls"):
             ModelController(model, model_parameters, play_interval=play_interval)
-
-        if model_params is not None:
-            with solara.Card("Model Parameters"):
-                UserInputs(user_params, on_change=on_change)
+        with solara.Card("Model Parameters"):
+            ModelCreator(model, user_params, model_parameters)
         with solara.Card("Information"):
             ShowSteps(model.value)
 
@@ -195,20 +183,11 @@ def ModelController(model: solara.Reactive[Model], model_parameters, play_interv
     Args:
         model (solara.Reactive[Model]): Reactive model instance
         play_interval (int, optional): Interval for playing the model steps in milliseconds.
-        model_parameters: Parameters for (re-)instantiating a model.
+        model_parameters: Reactive parameters for (re-)instantiating a model.
 
     """
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
-    # original_model = solara.use_reactive(None)
-
-    # def save_initial_model():
-    #     """Save the initial model for comparison."""
-    #     original_model.set(copy.deepcopy(model.value))
-    #     playing.value = False
-    #     force_update()
-    #
-    # solara.use_effect(save_initial_model, [model.value])
 
     async def step():
         while playing.value and running.value:
@@ -228,7 +207,7 @@ def ModelController(model: solara.Reactive[Model], model_parameters, play_interv
         """Reset the model to its initial state."""
         playing.value = False
         running.value = True
-        model.value = model.value = model.value.__class__(**model_parameters)
+        model.value = model.value = model.value.__class__(**model_parameters.value)
 
     def do_play_pause():
         """Toggle play/pause."""
@@ -286,58 +265,47 @@ def check_param_is_fixed(param):
         return True
 
 
-# @solara.component
-# def ModelCreator(model, model_params, seed=1):
-#     """Solara component for creating and managing a model instance with user-defined parameters.
-#
-#     This component allows users to create a model instance with specified parameters and seed.
-#     It provides an interface for adjusting model parameters and reseeding the model's random
-#     number generator.
-#
-#     Args:
-#         model (solara.Reactive[Model]): A reactive model instance. This is the main model to be created and managed.
-#         model_params (dict): Dictionary of model parameters. This includes both user-adjustable parameters and fixed parameters.
-#         seed (int, optional): Initial seed for the random number generator. Defaults to 1.
-#
-#     Returns:
-#         solara.component: A Solara component that renders the model creation and management interface.
-#
-#     Example:
-#         >>> model = solara.reactive(MyModel())
-#         >>> model_params = {
-#         >>>     "param1": {"type": "slider", "value": 10, "min": 0, "max": 100},
-#         >>>     "param2": {"type": "slider", "value": 5, "min": 1, "max": 10},
-#         >>> }
-#         >>> creator = ModelCreator(model, model_params)
-#         >>> creator
-#
-#     Notes:
-#         - The `model_params` argument should be a dictionary where keys are parameter names and values either fixed values
-#           or are dictionaries containing parameter details such as type, value, min, and max.
-#         - The `seed` argument ensures reproducibility by setting the initial seed for the model's random number generator.
-#         - The component provides an interface for adjusting user-defined parameters and reseeding the model.
-#
-#     """
-#     solara.use_effect(
-#         lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
-#         [model.value],
-#     )
-#
-#     user_params, fixed_params = split_model_params(model_params)
-#
-#     model_parameters, set_model_parameters = solara.use_state(
-#         {
-#             **fixed_params,
-#             **{k: v.get("value") for k, v in user_params.items()},
-#         }
-#     )
-#
-#     def on_change(name, value):
-#         new_model_parameters = {**model_parameters, name: value}
-#         model.value = model.value.__class__(**new_model_parameters)
-#         set_model_parameters(new_model_parameters)
-#
-#
+@solara.component
+def ModelCreator(model, user_params, model_parameters):
+    """Solara component for creating and managing a model instance with user-defined parameters.
+
+    This component allows users to create a model instance with specified parameters and seed.
+    It provides an interface for adjusting model parameters and reseeding the model's random
+    number generator.
+
+    Args:
+        model (solara.Reactive[Model]): A reactive model instance. This is the main model to be created and managed.
+        user_params (dict): user-adjustable parameters
+        model_parameters: reactive parameters for reinitializing the model
+
+    Returns:
+        solara.component: A Solara component that renders the model creation and management interface.
+
+    Example:
+        >>> model = solara.reactive(MyModel())
+        >>> model_params = {
+        >>>     "param1": {"type": "slider", "value": 10, "min": 0, "max": 100},
+        >>>     "param2": {"type": "slider", "value": 5, "min": 1, "max": 10},
+        >>> }
+        >>> creator = ModelCreator(model, model_params)
+        >>> creator
+
+    Notes:
+        - The `model_params` argument should be a dictionary where keys are parameter names and values either fixed values
+          or are dictionaries containing parameter details such as type, value, min, and max.
+        - The `seed` argument ensures reproducibility by setting the initial seed for the model's random number generator.
+        - The component provides an interface for adjusting user-defined parameters and reseeding the model.
+
+    """
+
+    def on_change(name, value):
+        new_model_parameters = {**model_parameters.value, name: value}
+        model.value = model.value.__class__(**new_model_parameters)
+        model_parameters.value = new_model_parameters
+
+    UserInputs(user_params, on_change=on_change)
+
+
 
 
 def _check_model_params(init_func, model_params):
