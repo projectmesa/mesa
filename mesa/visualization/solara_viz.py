@@ -113,11 +113,12 @@ def SolaraViz(
         [model.value],
     )
     user_params, fixed_params = split_model_params(model_params)
-    model_parameters = solara.use_reactive({
+    model_parameters = solara.use_reactive(
+        {
             **fixed_params,
             **{k: v.get("value") for k, v in user_params.items()},
-        })
-
+        }
+    )
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
@@ -304,8 +305,6 @@ def ModelCreator(model, user_params, model_parameters):
         model_parameters.value = new_model_parameters
 
     UserInputs(user_params, on_change=on_change)
-
-
 
 
 def _check_model_params(init_func, model_params):
