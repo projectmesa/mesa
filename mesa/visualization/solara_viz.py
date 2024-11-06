@@ -175,7 +175,7 @@ JupyterViz = SolaraViz
 
 @solara.component
 def ModelController(
-    model: solara.Reactive[Model],
+    model: solara.Reactive[Model], *,
     model_parameters: dict | solara.Reactive[dict] = None,
     play_interval: int = 100,
 ):
@@ -271,7 +271,7 @@ def check_param_is_fixed(param):
 @solara.component
 def ModelCreator(
     model: solara.Reactive[Model],
-    user_params: dict,
+    user_params: dict, *,
     model_parameters: dict | solara.Reactive[dict] = None,
 ):
     """Solara component for creating and managing a model instance with user-defined parameters.
