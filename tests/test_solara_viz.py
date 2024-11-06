@@ -189,14 +189,10 @@ def test_model_param_checks():  # noqa: D103
     )
 
     # Test that model_params are accepted if model uses **kwargs
-    _check_model_params(
-        ModelWithKwargs.__init__, {"another_kwarg":6}
-    )
+    _check_model_params(ModelWithKwargs.__init__, {"another_kwarg": 6})
 
     # test hat kwargs are accepted even if no model_params are specified
-    _check_model_params(
-        ModelWithKwargs.__init__, {}
-    )
+    _check_model_params(ModelWithKwargs.__init__, {})
 
     # Test invalid parameter name raises ValueError
     with pytest.raises(ValueError, match="Invalid model parameter: invalid_param"):
