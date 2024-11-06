@@ -253,6 +253,8 @@ Ref: Original discussion [#1912](https://github.com/projectmesa/mesa/discussions
 Mesa has adopted a new API for our frontend. If you already migrated to the experimental new SolaraViz you can still use
 the import from mesa.experimental. Otherwise here is a list of things you need to change.
 
+> **Note:** SolaraViz is experimental and still in active development for Mesa 3.0. While we attempt to minimize them, there might be API breaking changes between Mesa 3.0 and 3.1. There won't be breaking changes between Mesa 3.0.x patch releases.
+
 #### Model Initialization
 
 Previously SolaraViz was initialized by providing a `model_cls` and a `model_params`. This has changed to expect a model instance `model`. You can still provide (user-settable) `model_params`, but only if users should be able to change them. It is now also possible to pass in a "reactive model" by first calling `model = solara.reactive(model)`. This is useful for notebook environments. It allows you to pass the model to the SolaraViz Module, but continue to use the model. For example calling `model.value.step()` (notice the extra .value) will automatically update the plots. This currently only automatically works for the step method, you can force visualization updates by calling `model.value.force_update()`.
