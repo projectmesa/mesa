@@ -178,17 +178,19 @@ JupyterViz = SolaraViz
 
 
 @solara.component
-def ModelController(model: solara.Reactive[Model], model_parameters, play_interval=100):
+def ModelController(model: solara.Reactive[Model], model_parameters: dict | solara.Reactive[dict] = None, play_interval: int=100):
     """Create controls for model execution (step, play, pause, reset).
 
     Args:
-        model (solara.Reactive[Model]): Reactive model instance
-        play_interval (int, optional): Interval for playing the model steps in milliseconds.
+        model: Reactive model instance
         model_parameters: Reactive parameters for (re-)instantiating a model.
+        play_interval: Interval for playing the model steps in milliseconds.
 
     """
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
+    if model_parameters is None:
+        model_parameters = solara.use_reactive({})
 
     async def step():
         while playing.value and running.value:
