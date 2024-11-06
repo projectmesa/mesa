@@ -70,7 +70,7 @@ The original Mesa conference paper is [available here](http://conference.scipy.o
 :hidden: true
 :maxdepth: 7
 
-Getting Started <getting_started>
+Getting started <getting_started>
 Examples <examples>
 Migration guide <migration_guide>
 API Documentation <apis/api_main>
@@ -94,3 +94,6 @@ API Documentation <apis/api_main>
 [mesa introductory tutorial]: tutorials/intro_tutorial
 [mesa visualization tutorial]: tutorials/visualization_tutorial
 [migration guide]: migration_guide
+[Getting started]: getting_started
+
+ 
