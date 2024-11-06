@@ -178,7 +178,7 @@ results = mesa.batch_run(
 The results are returned as a list of dictionaries, which can be easily converted to a pandas DataFrame for further analysis.
 
 ### Visualization
-Mesa now uses a new browser-based visualization system called SolaraViz. This allows for interactive, customizable visualizations of your models. 
+Mesa now uses a new browser-based visualization system called SolaraViz. This allows for interactive, customizable visualizations of your models.
 
 The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace
 
