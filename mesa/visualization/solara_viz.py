@@ -298,7 +298,6 @@ def ModelCreator(model, user_params, model_parameters):
         - The component provides an interface for adjusting user-defined parameters and reseeding the model.
 
     """
-
     def on_change(name, value):
         new_model_parameters = {**model_parameters.value, name: value}
         model.value = model.value.__class__(**new_model_parameters)
