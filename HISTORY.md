@@ -1,6 +1,142 @@
 ---
 title: Release History
 ---
+# 3.0.0
+## Highlights
+Mesa 3.0 brings major improvements to agent-based modeling, making it more intuitive and powerful while reducing complexity. This release modernizes core functionalities and introduces new capabilities for both beginners and advanced users.
+
+### Streamlined agent management
+
+The centerpiece of Mesa 3.0 is its new agent management system. Agents are now automatically tracked and assigned unique IDs, eliminating common boilerplate code. The new AgentSet functionality provides an elegant and flexible way to work with agents:
+
+```python
+# Find agents meeting specific criteria
+wealthy_agents = model.agents.select(lambda a: a.wealth > 1000)
+
+# Group and analyze agents
+grouped = model.agents.groupby("species")
+species_stats = grouped.agg({
+    "count": len,
+    "avg_age": ("age", np.mean),
+    "total_wealth": ("wealth", sum)
+})
+
+# Activate agents in different patterns
+model.agents.shuffle_do("step")  # Random activation
+model.agents.select(lambda a: a.energy > 0).do("move")  # Conditional activation
+```
+
+The AgentSet provides powerful methods for filtering, grouping, and analyzing agents, making it easier to express complex model logic. Each model automatically maintains an AgentSet containing all agents (`model.agents`) and separate AgentSets for each agent type (`model.agents_by_type`).
+
+### Modern Visualization with SolaraViz
+
+Mesa 3.0's new visualization system, SolaraViz, provides a modern, interactive interface for model exploration:
+
+```python
+from mesa.visualization import SolaraViz, make_space_component, make_plot_component
+
+visualization = SolaraViz(
+    model,
+    [
+        make_space_component(agent_portrayal),
+        make_plot_component(["population", "average_wealth"]),
+        lambda m: f"Step {m.steps}: {len(m.agents)} agents"  # Custom text component
+    ],
+    model_params=parameter_controls
+)
+```
+
+Key visualization features:
+- Interactive browser-based interface with real-time updates
+- Support for both grid-based and network models
+- Visualization of PropertyLayers and hexagonal grids
+- Custom components using Matplotlib or text
+- Improved performance and responsiveness
+
+### Enhanced Data Collection
+
+The DataCollector now supports collecting different metrics for different agent types:
+
+```python
+self.datacollector = DataCollector(
+    model_reporters={"total_wealth": lambda m: m.agents.agg("wealth", sum)},
+    agent_reporters={"age": "age", "wealth": "wealth"},
+    agenttype_reporters={
+        Predator: {"kills": "kills_count"},
+        Prey: {"distance_fled": "total_flight_distance"}
+    }
+)
+```
+
+### Experimental Features
+
+Mesa 3.0 introduces several experimental features for advanced modeling:
+- Voronoi grid implementation for irregular spatial layouts
+- Enhanced Cell Space with integrated PropertyLayers
+- Improved agent movement capabilities
+- Event-driven simulation capabilities (experimental)
+
+## Breaking changes
+If you want to move existing models from Mesa 2.x to 3.0, there are a few things you have to change.
+
+1. Models must explicitly initialize the Mesa base class:
+```python
+class MyModel(mesa.Model):
+    def __init__(self, n_agents, seed=None):
+        super().__init__(seed=seed)  # Required in Mesa 3.0
+```
+
+2. Agents are created without manual ID assignment:
+```python
+# Old
+agent = MyAgent(unique_id=1, model=self)
+# New
+agent = MyAgent(model=self)
+```
+
+3. Scheduler replacement with AgentSet operations:
+```python
+# Old (RandomActivation)
+self.schedule = RandomActivation(self)
+self.schedule.step()
+
+# New
+self.agents.shuffle_do("step")
+
+# Old (SimultaneousActivation)
+self.schedule = SimultaneousActivation(self)
+self.schedule.step()
+
+# New
+self.agents.do("step")
+self.agents.do("advance")
+```
+
+Furthermore:
+- Steps counter automatically increments
+- `mesa.flat` namespace removed
+- Python 3.10+ required
+- Reserved model variables (`agents`, `steps`, etc.) protected
+- Simplified DataCollector initialization
+- Old visualization system replaced by SolaraViz
+
+## Getting Started
+
+Install Mesa 3.0:
+```bash
+pip install --upgrade mesa
+```
+
+We recommend upgrading in steps:
+1. Update to latest Mesa 2.x
+2. Address deprecation warnings
+3. Upgrade to Mesa 3.0
+4. Replace schedulers with AgentSet functionality
+
+A comprehensive [migration guide](https://mesa.readthedocs.io/latest/migration_guide.html) is available to help with the transition. For questions or support, join our [GitHub Discussions](https://github.com/projectmesa/mesa/discussions) or [Matrix Chat](https://matrix.to/#/#project-mesa:matrix.org).
+
+We would love to hear what you think about Mesa 3.0! [Say hello here](https://github.com/projectmesa/mesa/discussions/2465) and leave any [feedback on 3.0 here](https://github.com/projectmesa/mesa/discussions/2338).
+
 # 3.0.0b2 (2024-10-26)
 ## Highlights
 Mesa 3.0 beta 2 includes major work on the example models, docs, a new tutorial and visualisation.
