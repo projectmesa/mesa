@@ -92,3 +92,6 @@ dmypy.json
 # JS dependencies
 mesa/visualization/templates/external/
 mesa/visualization/templates/js/external/
+
+# Video
+**/*.mp4

@@ -6,7 +6,8 @@
     There won't be breaking changes between Mesa 3.0.x patch releases.
 """
 
-from mesa.visualization.mpl_space_drawing import (
+from mesa.visualization.mpl_drawing import (
+    draw_plot,
     draw_space,
 )
 
@@ -21,6 +22,7 @@ __all__ = [
     "Slider",
     "make_space_altair",
     "draw_space",
+    "draw_plot",
     "make_plot_component",
     "make_space_component",
 ]
