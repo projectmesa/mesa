@@ -1,7 +1,7 @@
 ---
 title: Release History
 ---
-# 3.0.0
+# 3.0.0 (2024-11-09)
 ## Highlights
 Mesa 3.0 brings major improvements to agent-based modeling, making it more intuitive and powerful while reducing complexity. This release modernizes core functionalities and introduces new capabilities for both beginners and advanced users.
 
@@ -124,7 +124,6 @@ Furthermore:
 - Old visualization system replaced by SolaraViz
 
 ## Getting Started
-
 Install Mesa 3.0:
 ```bash
 pip install --upgrade mesa
@@ -141,6 +140,40 @@ For updating existing models, we recommend upgrading in steps:
 A detailed [migration guide](https://mesa.readthedocs.io/latest/migration_guide.html#mesa-3-0) is available to help moving to Mesa 3.0. For questions or support, join our [GitHub Discussions](https://github.com/projectmesa/mesa/discussions) or [Matrix Chat](https://matrix.to/#/#project-mesa:matrix.org).
 
 We would love to hear what you think about Mesa 3.0! [Say hello here](https://github.com/projectmesa/mesa/discussions/2465) and leave any [feedback on 3.0 here](https://github.com/projectmesa/mesa/discussions/2338).
+
+# 3.0.0rc0 (2024-11-06)
+## Highlights
+We're releasing the Mesa 3.0 Release Candidate, ready for final testing before we release Mesa 3.0 later this week!
+
+In this last 3.0 pre-release, the visualisation has been thoroughly updated, with a brand new API. Visualizing the experimental Cell Space, including PropertyLayers and hexogonal grids, is now also supported.
+
+We're still working very active on the visualisation, so we have marked that experimental for Mesa 3.0. We will stabilize SolaraViz in Mesa 3.1.
+
+Any feedback and last-minute bug reports are welcome [here](https://github.com/projectmesa/mesa/discussions/2338).
+
+## What's Changed
+### ⚠️ Breaking changes
+* Viz: Refactor Matplotlib plotting by @quaquel in https://github.com/projectmesa/mesa/pull/2430
+* api reorganization by @quaquel in https://github.com/projectmesa/mesa/pull/2447
+### 🧪 Experimental features
+* Mark SolaraViz as experimental for Mesa 3.0 by @EwoutH in https://github.com/projectmesa/mesa/pull/2459
+### 🛠 Enhancements made
+* expand ax.scatter kwargs that can be used by @quaquel in https://github.com/projectmesa/mesa/pull/2445
+### 🐛 Bugs fixed
+* Fix #2452 - handle solara viz model params better by @Corvince in https://github.com/projectmesa/mesa/pull/2454
+* Update MoneyModel.py by @quaquel in https://github.com/projectmesa/mesa/pull/2458
+### 🔍 Examples updated
+* Updates to Epstein example by @quaquel in https://github.com/projectmesa/mesa/pull/2429
+* Update examples to use updated space drawing by @quaquel in https://github.com/projectmesa/mesa/pull/2442
+### 📜 Documentation improvements
+* Update wolf-sheep png and fix typo in file name by @quaquel in https://github.com/projectmesa/mesa/pull/2444
+* Include main examples readme in docs by @quaquel in https://github.com/projectmesa/mesa/pull/2448
+* remove how-to guide and update docs in places by @quaquel in https://github.com/projectmesa/mesa/pull/2449
+### 🔧 Maintenance
+* remove deprecated HexGrid class by @quaquel in https://github.com/projectmesa/mesa/pull/2441
+* rename make_plot_measure to make_plot_component and add some kwargs by @quaquel in https://github.com/projectmesa/mesa/pull/2446
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0b2...v3.0.0rc0
 
 # 3.0.0b2 (2024-10-26)
 ## Highlights
