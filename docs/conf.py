@@ -175,7 +175,9 @@ html_static_path = ["_static"]
 # html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-# html_sidebars = {}
+html_sidebars = {
+    'migration_guide': [],  # No sidebar migration
+}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
