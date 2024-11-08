@@ -11,7 +11,7 @@ If you want to get a quick start on how to build agent based models with MESA, c
 - [Visualization Tutorial](tutorials/visualization_tutorial.html): Learn how to create interactive visualizations for your models.
 
 ## Examples
-Mesa ships with a collection of example models. These are classic ABMs, so if you are familiar with ABMs and want to get a quick sense of how MESA works, these examples are great place to start. You can find them [here](examples)
+Mesa ships with a collection of example models. These are classic ABMs, so if you are familiar with ABMs and want to get a quick sense of how MESA works, these examples are great place to start. You can find them [here](examples).
 
 
 ## Overview of the MESA library
