@@ -61,7 +61,7 @@ def collect_agent_data(
         zorder: default zorder
 
     agent_portrayal should return a dict, limited to size (size of marker), color (color of marker), zorder (z-order),
-    and marker (marker style)
+    marker (marker style), alpha, linewidths, and edgecolors
 
     """
     # "edgecolor", "linewidth" can operate on individual agent level as list, or single command at ax.scatter level
