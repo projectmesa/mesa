@@ -4,6 +4,11 @@ This namespace contains experimental features. These are under development, and 
 ## Cell Space
 
 ```{eval-rst}
+.. automodule:: experimental.cell_space.__init__
+   :members:
+```
+
+```{eval-rst}
 .. automodule:: experimental.cell_space.cell
    :members:
 ```
