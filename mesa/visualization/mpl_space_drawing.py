@@ -65,10 +65,6 @@ def collect_agent_data(
     marker (marker style), alpha, linewidths, and edgecolors
 
     """
-    # "edgecolor", "linewidth" can operate on individual agent level as list, or single command at ax.scatter level
-    # so interdependency if not passed at agent level but passed as extra kwargs --> you can do something
-    # "alpha": 0.7 $ only works for single scatter commend
-
     arguments = {
         "s": [],
         "c": [],
@@ -569,7 +565,7 @@ def _scatter(ax: Axes, arguments, **kwargs):
     marker = arguments.pop("marker")
     zorder = arguments.pop("zorder")
 
-    # we check if edgecolor, linewidth, and alhpa are specified
+    # we check if edgecolor, linewidth, and alpha are specified
     # at the agent level, if not, we remove them from the arguments dict
     # and fallback to the default value in ax.scatter / use what is passed via **kwargs
     for entry in ["edgecolors", "linewidths", "alpha"]:
