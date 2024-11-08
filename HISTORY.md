@@ -14,7 +14,12 @@ The centerpiece of Mesa 3.0 is its new agent management system. Agents are now a
 wealthy_agents = model.agents.select(lambda a: a.wealth > 1000)
 
 # Group and analyze agents
-grouped = model.agents.groupby("species")
+grouped = model.agents.groupby("state")
+state_stats = grouped.agg({
+     "count": len,
+     "avg_age": ("age", np.mean),
+     "total_wealth": ("wealth", sum)
+ })
 species_stats = grouped.agg({
     "count": len,
     "avg_age": ("age", np.mean),
@@ -74,7 +79,7 @@ Mesa 3.0 introduces several experimental features for advanced modeling:
 - Voronoi grid implementation for irregular spatial layouts
 - Enhanced Cell Space with integrated PropertyLayers
 - Improved agent movement capabilities
-- Event-driven simulation capabilities (experimental)
+- Event-scheduling simulation capabilities (experimental)
 
 ## Breaking changes
 If you want to move existing models from Mesa 2.x to 3.0, there are a few things you have to change.
