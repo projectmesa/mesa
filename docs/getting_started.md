@@ -178,11 +178,11 @@ The results are returned as a list of dictionaries, which can be easily converte
 ### Visualization
 Mesa now uses a new browser-based visualization system called SolaraViz. This allows for interactive, customizable visualizations of your models.
 
+> **Note:** SolaraViz is experimental and still in active development for Mesa 3.0. While we attempt to minimize them, there might be API breaking changes between Mesa 3.0 and 3.1. There won't be breaking changes between Mesa 3.0.x patch releases.
+
 The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace
 
 Here's a basic example of how to set up a visualization:
-
-> **Note:** SolaraViz is experimental and still in active development for Mesa 3.0. While we attempt to minimize them, there might be API breaking changes between Mesa 3.0 and 3.1. There won't be breaking changes between Mesa 3.0.x patch releases.
 
 ```python
 from mesa.visualization import SolaraViz, make_space_component, make_plot_component
