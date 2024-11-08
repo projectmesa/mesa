@@ -40,7 +40,7 @@ class WolfSheep(mesa.Model):
 
     def __init__(
         self,
-        simulator,
+        simulator=None,
         width=20,
         height=20,
         initial_sheep=100,
@@ -70,6 +70,7 @@ class WolfSheep(mesa.Model):
         """
         super().__init__(seed=seed)
         self.simulator = simulator
+        self.simulator.setup(self)
 
         # Set parameters
         self.width = width
@@ -79,7 +80,7 @@ class WolfSheep(mesa.Model):
         self.grass = grass
         self.grass_regrowth_time = grass_regrowth_time
 
-        self.grid = OrthogonalMooreGrid((self.width, self.height), torus=True)
+        self.grid = OrthogonalMooreGrid((self.width, self.height), torus=True, random=self.random)
 
         collectors = {
             "Wolves": lambda m: len(m.agents_by_type[Wolf]),
@@ -114,7 +115,7 @@ class WolfSheep(mesa.Model):
             possibly_fully_grown = [True, False]
             for cell in self.grid:
                 fully_grown = self.random.choice(possibly_fully_grown)
-                countdown = 0 if fully_grown else self.random.randrange(grass_regrowth_time)
+                countdown = 0 if fully_grown else self.random.randrange(0, stop=grass_regrowth_time)
                 GrassPatch(self, countdown, grass_regrowth_time, cell)
 
         self.running = True
@@ -131,7 +132,3 @@ class WolfSheep(mesa.Model):
 
         # collect data
         self.datacollector.collect(self)
-
-    def run_model(self, step_count=200):
-        for _ in range(step_count):
-            self.step()
