@@ -5,6 +5,7 @@ a space with matplotlib for example when creating a mp4 of a movie run or when n
 for a paper.
 
 """
+
 import contextlib
 import itertools
 import math
