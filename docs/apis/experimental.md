@@ -38,6 +38,11 @@ This namespace contains experimental features. These are under development, and 
    :members:
 ```
 
+```{eval-rst}
+.. automodule:: experimental.cell_space.voronoi
+   :members:
+```
+
 ## Devs
 
 ```{eval-rst}
