@@ -14,7 +14,7 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
 ## User Parameters
 
 ```{eval-rst}
-.. automodule:: mesa.visualization.UserParam
+.. automodule:: mesa.visualization.user_param
    :members:
    :undoc-members:
    :show-inheritance:
