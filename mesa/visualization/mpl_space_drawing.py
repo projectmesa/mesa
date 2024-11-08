@@ -124,7 +124,7 @@ def draw_space(
         Returns the Axes object with the plot drawn onto it.
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
-    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
+    "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
 
     """
     if ax is None:

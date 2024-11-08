@@ -38,8 +38,7 @@ def make_mpl_space_component(
                                the functions for drawing the various spaces for further details.
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
-    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
-
+    "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
 
     Returns:
         function: A function that creates a SpaceMatplotlib component
