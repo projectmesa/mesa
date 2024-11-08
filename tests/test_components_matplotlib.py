@@ -141,8 +141,8 @@ def test_draw_hex_grid():
     draw_hex_grid(grid, agent_portrayal, ax)
 
 
-def test_draw_voroinoi_grid():
-    """Test drawing voroinoi grids."""
+def test_draw_voronoi_grid():
+    """Test drawing voronoi grids."""
     model = Model(seed=42)
 
     coordinates = model.rng.random((100, 2)) * 10
