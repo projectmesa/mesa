@@ -76,27 +76,38 @@ class Wolf(Animal):
 
 
 class GrassPatch(FixedAgent):
-    """
-    A patch of grass that grows at a fixed rate and it is eaten by sheep
-    """
+    """A patch of grass that grows at a fixed rate and it is eaten by sheep."""
 
-    def __init__(self, model, fully_grown, countdown):
-        """
-        Creates a new patch of grass
+    @property
+    def fully_grown(self):  # noqa: D102
+        return self._fully_grown
+
+    @fully_grown.setter
+    def fully_grown(self, value: bool) -> None:
+        self._fully_grown = value
+
+        if not value:
+            self.model.simulator.schedule_event_relative(
+                setattr,
+                self.grass_regrowth_time,
+                function_args=[self, "fully_grown", True],
+            )
+
+    def __init__(self, model, countdown, grass_regrowth_time, cell):
+        """Creates a new patch of grass.
 
         Args:
-            grown: (boolean) Whether the patch of grass is fully grown or not
+            model: a model instance
             countdown: Time for the patch of grass to be fully grown again
+            grass_regrowth_time : time to fully regrow grass
+            cell: the cell to which the patch of grass belongs
         """
         super().__init__(model)
-        self.fully_grown = fully_grown
-        self.countdown = countdown
+        self._fully_grown = True if countdown == 0 else False  # Noqa: SIM210
+        self.grass_regrowth_time = grass_regrowth_time
+        self.cell = cell
 
-    def step(self):
         if not self.fully_grown:
-            if self.countdown <= 0:
-                # Set as fully grown
-                self.fully_grown = True
-                self.countdown = self.model.grass_regrowth_time
-            else:
-                self.countdown -= 1
+            self.model.simulator.schedule_event_relative(
+                setattr, countdown, function_args=[self, "fully_grown", True]
+            )

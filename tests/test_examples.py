@@ -10,7 +10,7 @@ from mesa.examples import (
     VirusOnNetwork,
     WolfSheep,
 )
-
+from mesa.experimental.devs import ABMSimulator
 
 def test_boltzmann_model():  # noqa: D103
     model = BoltzmannWealthModel(seed=42)
@@ -66,7 +66,9 @@ def test_sugarscape_g1mt():  # noqa: D103
 
 
 def test_wolf_sheep():  # noqa: D103
-    model = WolfSheep(seed=42)
+    simulator = ABMSimulator()
+    model = WolfSheep(simulator, seed=42)
 
-    for _i in range(10):
-        model.step()
+    simulator.setup(model)
+
+    simulator.run_for(10)

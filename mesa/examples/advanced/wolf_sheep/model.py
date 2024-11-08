@@ -40,6 +40,7 @@ class WolfSheep(mesa.Model):
 
     def __init__(
         self,
+        simulator,
         width=20,
         height=20,
         initial_sheep=100,
@@ -56,6 +57,7 @@ class WolfSheep(mesa.Model):
         Create a new Wolf-Sheep model with the given parameters.
 
         Args:
+            simulator: a Simulator instance
             initial_sheep: Number of sheep to start with
             initial_wolves: Number of wolves to start with
             sheep_reproduce: Probability of each sheep reproducing each step
@@ -67,6 +69,8 @@ class WolfSheep(mesa.Model):
             sheep_gain_from_food: Energy sheep gain from grass, if enabled.
         """
         super().__init__(seed=seed)
+        self.simulator = simulator
+
         # Set parameters
         self.width = width
         self.height = height
@@ -107,16 +111,11 @@ class WolfSheep(mesa.Model):
 
         # Create grass patches
         if self.grass:
-            for cell in self.grid.all_cells:
-                fully_grown = self.random.choice([True, False])
-
-                if fully_grown:
-                    countdown = self.grass_regrowth_time
-                else:
-                    countdown = self.random.randrange(self.grass_regrowth_time)
-
-                patch = GrassPatch(self, fully_grown, countdown)
-                patch.cell = cell
+            possibly_fully_grown = [True, False]
+            for cell in self.grid:
+                fully_grown = self.random.choice(possibly_fully_grown)
+                countdown = 0 if fully_grown else self.random.randrange(grass_regrowth_time)
+                GrassPatch(self, countdown, grass_regrowth_time, cell)
 
         self.running = True
         self.datacollector.collect(self)
@@ -125,8 +124,9 @@ class WolfSheep(mesa.Model):
         # This replicated the behavior of the old RandomActivationByType scheduler
         # when using step(shuffle_types=True, shuffle_agents=True).
         # Conceptually, it can be argued that this should be modelled differently.
-        self.random.shuffle(self.agent_types)
-        for agent_type in self.agent_types:
+        agent_types = [Wolf, Sheep]
+        self.random.shuffle(agent_types)
+        for agent_type in agent_types:
             self.agents_by_type[agent_type].shuffle_do("step")
 
         # collect data
