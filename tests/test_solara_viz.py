@@ -3,13 +3,19 @@
 import unittest
 
 import ipyvuetify as vw
+import pytest
 import solara
 
 import mesa
-import mesa.visualization.components.altair
-import mesa.visualization.components.matplotlib
-from mesa.visualization.components.matplotlib import make_space_component
-from mesa.visualization.solara_viz import Slider, SolaraViz, UserInputs
+import mesa.visualization.components.altair_components
+import mesa.visualization.components.matplotlib_components
+from mesa.visualization.components.matplotlib_components import make_mpl_space_component
+from mesa.visualization.solara_viz import (
+    Slider,
+    SolaraViz,
+    UserInputs,
+    _check_model_params,
+)
 
 
 class TestMakeUserInput(unittest.TestCase):  # noqa: D101
@@ -88,12 +94,18 @@ class TestMakeUserInput(unittest.TestCase):  # noqa: D101
 
 def test_call_space_drawer(mocker):  # noqa: D103
     mock_space_matplotlib = mocker.spy(
-        mesa.visualization.components.matplotlib, "SpaceMatplotlib"
+        mesa.visualization.components.matplotlib_components, "SpaceMatplotlib"
     )
 
-    mock_space_altair = mocker.spy(mesa.visualization.components.altair, "SpaceAltair")
+    mock_space_altair = mocker.spy(
+        mesa.visualization.components.altair_components, "SpaceAltair"
+    )
 
-    model = mesa.Model()
+    class MockModel(mesa.Model):
+        def __init__(self, seed=None):
+            super().__init__(seed=seed)
+
+    model = MockModel()
     mocker.patch.object(mesa.Model, "__init__", return_value=None)
 
     agent_portrayal = {
@@ -103,7 +115,12 @@ def test_call_space_drawer(mocker):  # noqa: D103
     propertylayer_portrayal = None
     # initialize with space drawer unspecified (use default)
     # component must be rendered for code to run
-    solara.render(SolaraViz(model, components=[make_space_component(agent_portrayal)]))
+    solara.render(
+        SolaraViz(
+            model,
+            components=[make_mpl_space_component(agent_portrayal)],
+        )
+    )
     # should call default method with class instance and agent portrayal
     mock_space_matplotlib.assert_called_with(
         model, agent_portrayal, propertylayer_portrayal, post_process=None
@@ -114,7 +131,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
     solara.render(SolaraViz(model))
     # should call default method with class instance and agent portrayal
     assert mock_space_matplotlib.call_count == 0
-    assert mock_space_altair.call_count > 0
+    assert mock_space_altair.call_count == 0
 
     # specify a custom space method
     class AltSpace:
@@ -132,7 +149,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
         centroids_coordinates=[(0, 1), (0, 0), (1, 0)],
     )
     solara.render(
-        SolaraViz(voronoi_model, components=[make_space_component(agent_portrayal)])
+        SolaraViz(voronoi_model, components=[make_mpl_space_component(agent_portrayal)])
     )
 
 
@@ -148,3 +165,51 @@ def test_slider():  # noqa: D103
     assert not slider_int.is_float_slider
     slider_dtype_float = Slider("Homophily", 3, 0, 8, 1, dtype=float)
     assert slider_dtype_float.is_float_slider
+
+
+def test_model_param_checks():  # noqa: D103
+    class ModelWithOptionalParams:
+        def __init__(self, required_param, optional_param=10):
+            pass
+
+    class ModelWithOnlyRequired:
+        def __init__(self, param1, param2):
+            pass
+
+    class ModelWithKwargs:
+        def __init__(self, **kwargs):
+            pass
+
+    # Test that optional params can be omitted
+    _check_model_params(ModelWithOptionalParams.__init__, {"required_param": 1})
+
+    # Test that optional params can be provided
+    _check_model_params(
+        ModelWithOptionalParams.__init__, {"required_param": 1, "optional_param": 5}
+    )
+
+    # Test that model_params are accepted if model uses **kwargs
+    _check_model_params(ModelWithKwargs.__init__, {"another_kwarg": 6})
+
+    # test hat kwargs are accepted even if no model_params are specified
+    _check_model_params(ModelWithKwargs.__init__, {})
+
+    # Test invalid parameter name raises ValueError
+    with pytest.raises(ValueError, match="Invalid model parameter: invalid_param"):
+        _check_model_params(
+            ModelWithOptionalParams.__init__, {"required_param": 1, "invalid_param": 2}
+        )
+
+    # Test missing required parameter raises ValueError
+    with pytest.raises(ValueError, match="Missing required model parameter: param2"):
+        _check_model_params(ModelWithOnlyRequired.__init__, {"param1": 1})
+
+    # Test passing extra parameters raises ValueError
+    with pytest.raises(ValueError, match="Invalid model parameter: extra"):
+        _check_model_params(
+            ModelWithOnlyRequired.__init__, {"param1": 1, "param2": 2, "extra": 3}
+        )
+
+    # Test empty params dict raises ValueError if required params
+    with pytest.raises(ValueError, match="Missing required model parameter"):
+        _check_model_params(ModelWithOnlyRequired.__init__, {})

@@ -1,5 +1,9 @@
 from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealthModel
-from mesa.visualization import SolaraViz, make_plot_component, make_space_component
+from mesa.visualization import (
+    SolaraViz,
+    make_plot_component,
+    make_space_component,
+)
 
 
 def agent_portrayal(agent):
@@ -16,6 +20,11 @@ model_params = {
         "max": 100,
         "step": 1,
     },
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "width": 10,
     "height": 10,
 }
@@ -26,7 +35,7 @@ def post_process(ax):
 
 
 # Create initial model instance
-model1 = BoltzmannWealthModel(50, 10, 10)
+model = BoltzmannWealthModel(50, 10, 10)
 
 # Create visualization elements. The visualization elements are solara components
 # that receive the model instance as a "prop" and display it in a certain way.
@@ -45,7 +54,7 @@ GiniPlot = make_plot_component("Gini")
 # solara run app.py
 # It will automatically update and display any changes made to this file
 page = SolaraViz(
-    model1,
+    model,
     components=[SpaceGraph, GiniPlot],
     model_params=model_params,
     name="Boltzmann Wealth Model",

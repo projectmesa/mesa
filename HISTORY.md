@@ -1,6 +1,180 @@
 ---
 title: Release History
 ---
+# 3.0.0 (2024-11-09)
+## Highlights
+Mesa 3.0 brings major improvements to agent-based modeling, making it more intuitive and powerful while reducing complexity. This release modernizes core functionalities and introduces new capabilities for both beginners and advanced users.
+
+### Streamlined agent management
+The centerpiece of Mesa 3.0 is its new agent management system. Agents are now automatically tracked and assigned unique IDs, eliminating common boilerplate code. The new AgentSet functionality provides an elegant and flexible way to work with agents, for example:
+
+```python
+# Find agents meeting specific criteria
+wealthy_agents = model.agents.select(lambda a: a.wealth > 1000)
+
+# Group and analyze agents
+grouped = model.agents.groupby("state")
+state_stats = grouped.agg({
+     "count": len,
+     "avg_age": ("age", np.mean),
+     "total_wealth": ("wealth", sum)
+ })
+
+# Activate agents in different patterns
+model.agents.shuffle_do("step")  # Random activation
+model.agents.select(lambda a: a.energy > 0).do("move")  # Conditional activation
+```
+
+The AgentSet provides powerful methods for filtering, grouping, and analyzing agents, making it easier to express complex model logic. Each model automatically maintains an AgentSet containing all agents (`model.agents`) and separate AgentSets for each agent type (`model.agents_by_type`). See the full [AgentSet docs](https://mesa.readthedocs.io/latest/apis/agent.html#mesa.agent.AgentSet) here.
+
+### Modern Visualization with SolaraViz
+Mesa 3.0's new experimental visualization system, SolaraViz, provides a modern, interactive interface for model exploration:
+
+```python
+from mesa.visualization import SolaraViz, make_space_component, make_plot_component
+
+visualization = SolaraViz(
+    model,
+    [
+        make_space_component(agent_portrayal),
+        make_plot_component(["population", "average_wealth"]),
+        lambda m: f"Step {m.steps}: {len(m.agents)} agents"  # Custom text component
+    ],
+    model_params=parameter_controls
+)
+```
+
+Key visualization features:
+- Interactive browser-based interface with real-time updates
+- Support for both grid-based and network models
+- Visualization of PropertyLayers and hexagonal grids
+- Custom components using Matplotlib or text
+- Improved performance and responsiveness
+
+Check out the [Visualization Tutorial](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html) to get started.
+
+*Note: SolaraViz is in active development. We might make API breaking changes between Mesa 3.0 and 3.1.*
+
+### Enhanced data collection
+The DataCollector now supports collecting different metrics for different agent types, using  `agenttype_reporters`:
+
+```python
+self.datacollector = DataCollector(
+    model_reporters={"total_wealth": lambda m: m.agents.agg("wealth", sum)},
+    agent_reporters={"age": "age", "wealth": "wealth"},
+    agenttype_reporters={
+        Predator: {"kills": "kills_count"},
+        Prey: {"distance_fled": "total_flight_distance"}
+    }
+)
+```
+
+### Experimental features
+Mesa 3.0 introduces several experimental features for advanced modeling:
+- [Cell Space](https://mesa.readthedocs.io/latest/apis/experimental.html#module-experimental.cell_space.cell) with integrated PropertyLayers and improved agent movement capabilities
+- Voronoi grid implementation
+- [Event-scheduling simulation](https://mesa.readthedocs.io/latest/apis/experimental.html#module-experimental.devs.eventlist) capabilities
+
+These experimental features are in active development and might break API between releases.
+
+## Breaking changes
+_See our [Mesa 3.0 migration guide](https://mesa.readthedocs.io/latest/migration_guide.html#mesa-3-0) for a full overview._
+
+If you want to move existing models from Mesa 2.x to 3.0, there are a few things you have to change.
+
+1. Models must explicitly initialize the Mesa base class:
+```python
+class MyModel(mesa.Model):
+    def __init__(self, n_agents, seed=None):
+        super().__init__(seed=seed)  # Required in Mesa 3.0
+```
+
+2. Agents are created without manual ID assignment:
+```python
+# Old
+agent = MyAgent(unique_id=1, model=self)
+# New
+agent = MyAgent(model=self)
+```
+
+3. Scheduler replacement with AgentSet operations:
+```python
+# Old (RandomActivation)
+self.schedule = RandomActivation(self)
+self.schedule.step()
+
+# New
+self.agents.shuffle_do("step")
+
+# Old (SimultaneousActivation)
+self.schedule = SimultaneousActivation(self)
+self.schedule.step()
+
+# New
+self.agents.do("step")
+self.agents.do("advance")
+```
+
+Furthermore:
+- Steps counter automatically increments
+- `mesa.flat` namespace removed
+- Python 3.10+ required
+- Reserved model variables (`agents`, `steps`, etc.) protected
+- Simplified DataCollector initialization
+- Old visualization system replaced by SolaraViz
+
+## Getting Started
+Install Mesa 3.0:
+```bash
+pip install --upgrade mesa
+```
+
+If building a new model, we recommend checking out the updated [Mesa Overview](https://mesa.readthedocs.io/latest/overview.html) and [Introductory Tutorial](https://mesa.readthedocs.io/latest/tutorials/intro_tutorial.html).
+
+For updating existing models, we recommend upgrading in steps:
+1. Update to latest Mesa 2.x
+2. Address deprecation warnings
+3. Upgrade to Mesa 3.0
+4. Replace schedulers with AgentSet functionality
+
+A detailed [migration guide](https://mesa.readthedocs.io/latest/migration_guide.html#mesa-3-0) is available to help moving to Mesa 3.0. For questions or support, join our [GitHub Discussions](https://github.com/projectmesa/mesa/discussions) or [Matrix Chat](https://matrix.to/#/#project-mesa:matrix.org).
+
+We would love to hear what you think about Mesa 3.0! [Say hello here](https://github.com/projectmesa/mesa/discussions/2465) and leave any [feedback on 3.0 here](https://github.com/projectmesa/mesa/discussions/2338).
+
+# 3.0.0rc0 (2024-11-06)
+## Highlights
+We're releasing the Mesa 3.0 Release Candidate, ready for final testing before we release Mesa 3.0 later this week!
+
+In this last 3.0 pre-release, the visualisation has been thoroughly updated, with a brand new API. Visualizing the experimental Cell Space, including PropertyLayers and hexogonal grids, is now also supported.
+
+We're still working very active on the visualisation, so we have marked that experimental for Mesa 3.0. We will stabilize SolaraViz in Mesa 3.1.
+
+Any feedback and last-minute bug reports are welcome [here](https://github.com/projectmesa/mesa/discussions/2338).
+
+## What's Changed
+### ⚠️ Breaking changes
+* Viz: Refactor Matplotlib plotting by @quaquel in https://github.com/projectmesa/mesa/pull/2430
+* api reorganization by @quaquel in https://github.com/projectmesa/mesa/pull/2447
+### 🧪 Experimental features
+* Mark SolaraViz as experimental for Mesa 3.0 by @EwoutH in https://github.com/projectmesa/mesa/pull/2459
+### 🛠 Enhancements made
+* expand ax.scatter kwargs that can be used by @quaquel in https://github.com/projectmesa/mesa/pull/2445
+### 🐛 Bugs fixed
+* Fix #2452 - handle solara viz model params better by @Corvince in https://github.com/projectmesa/mesa/pull/2454
+* Update MoneyModel.py by @quaquel in https://github.com/projectmesa/mesa/pull/2458
+### 🔍 Examples updated
+* Updates to Epstein example by @quaquel in https://github.com/projectmesa/mesa/pull/2429
+* Update examples to use updated space drawing by @quaquel in https://github.com/projectmesa/mesa/pull/2442
+### 📜 Documentation improvements
+* Update wolf-sheep png and fix typo in file name by @quaquel in https://github.com/projectmesa/mesa/pull/2444
+* Include main examples readme in docs by @quaquel in https://github.com/projectmesa/mesa/pull/2448
+* remove how-to guide and update docs in places by @quaquel in https://github.com/projectmesa/mesa/pull/2449
+### 🔧 Maintenance
+* remove deprecated HexGrid class by @quaquel in https://github.com/projectmesa/mesa/pull/2441
+* rename make_plot_measure to make_plot_component and add some kwargs by @quaquel in https://github.com/projectmesa/mesa/pull/2446
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0b2...v3.0.0rc0
+
 # 3.0.0b2 (2024-10-26)
 ## Highlights
 Mesa 3.0 beta 2 includes major work on the example models, docs, a new tutorial and visualisation.

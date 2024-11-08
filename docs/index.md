@@ -50,9 +50,7 @@ pip install -U --pre mesa[rec]
 
 For help getting started with Mesa, check out these resources:
 
-- [Mesa Overview] - Learn about Mesa's core concepts and components
-- [Mesa Introductory Tutorial] - Build your first agent-based model
-- [Mesa Visualization Tutorial] - Learn how to create interactive visualizations with Solara
+- [Getting started] - Learn about Mesa's core concepts and components
 - [Migration Guide] - Upgrade to Mesa 3.0
 - [Mesa Examples] - Browse user-contributed models and implementations
 - [GitHub Discussions] - Ask questions and discuss Mesa
@@ -72,14 +70,11 @@ The original Mesa conference paper is [available here](http://conference.scipy.o
 :hidden: true
 :maxdepth: 7
 
-Mesa Overview <overview>
-tutorials/intro_tutorial
-tutorials/visualization_tutorial
+Getting started <getting_started>
 Examples <examples>
 Migration guide <migration_guide>
-Best Practices <best-practices>
 API Documentation <apis/api_main>
-Mesa Packages <packages>
+
 ```
 
 # Indices and tables
@@ -99,3 +94,5 @@ Mesa Packages <packages>
 [mesa introductory tutorial]: tutorials/intro_tutorial
 [mesa visualization tutorial]: tutorials/visualization_tutorial
 [migration guide]: migration_guide
+[Getting started]: getting_started
+
