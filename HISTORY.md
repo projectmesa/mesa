@@ -130,7 +130,9 @@ Install Mesa 3.0:
 pip install --upgrade mesa
 ```
 
-For older models, we recommend upgrading in steps:
+If building a new model, we recommend checking out the updated [Mesa Overview](https://mesa.readthedocs.io/latest/overview.html) and [Introductory Tutorial](https://mesa.readthedocs.io/latest/tutorials/intro_tutorial.html).
+
+For updating existing models, we recommend upgrading in steps:
 1. Update to latest Mesa 2.x
 2. Address deprecation warnings
 3. Upgrade to Mesa 3.0
