@@ -19,11 +19,6 @@ state_stats = grouped.agg({
      "avg_age": ("age", np.mean),
      "total_wealth": ("wealth", sum)
  })
-species_stats = grouped.agg({
-    "count": len,
-    "avg_age": ("age", np.mean),
-    "total_wealth": ("wealth", sum)
-})
 
 # Activate agents in different patterns
 model.agents.shuffle_do("step")  # Random activation
