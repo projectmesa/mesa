@@ -68,8 +68,16 @@ def collect_agent_data(
     # so interdependency if not passed at agent level but passed as extra kwargs --> you can do something
     # "alpha": 0.7 $ only works for single scatter commend
 
-    arguments = {"s": [], "c": [], "marker": [], "zorder": [], "loc": [], 'alpha': [],
-                 'edgecolors': [], 'linewidths': []}
+    arguments = {
+        "s": [],
+        "c": [],
+        "marker": [],
+        "zorder": [],
+        "loc": [],
+        "alpha": [],
+        "edgecolors": [],
+        "linewidths": [],
+    }
 
     for agent in space.agents:
         portray = agent_portrayal(agent)
@@ -132,7 +140,12 @@ def draw_space(
         # order matters here given the class structure of old-style grid spaces
         case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
             draw_hex_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
-        case mesa.space.SingleGrid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid() | mesa.space.MultiGrid():
+        case (
+            mesa.space.SingleGrid()
+            | OrthogonalMooreGrid()
+            | OrthogonalVonNeumannGrid()
+            | mesa.space.MultiGrid()
+        ):
             draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
             draw_network(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
@@ -142,7 +155,6 @@ def draw_space(
             draw_voroinoi_grid(space, agent_portrayal, ax=ax)
         case _:
             raise ValueError(f"Unknown space type: {type(space)}")
-
 
     if propertylayer_portrayal:
         draw_property_layers(space, propertylayer_portrayal, ax=ax)
@@ -566,8 +578,9 @@ def _scatter(ax: Axes, arguments, **kwargs):
             arguments.pop(entry)
         else:
             if entry in kwargs:
-                raise ValueError(f"{entry} is specified in agent portrayal and via plotting kwargs, you can only use one or the other")
-
+                raise ValueError(
+                    f"{entry} is specified in agent portrayal and via plotting kwargs, you can only use one or the other"
+                )
 
     for mark in np.unique(marker):
         mark_mask = marker == mark

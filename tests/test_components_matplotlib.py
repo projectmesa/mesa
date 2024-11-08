@@ -23,8 +23,8 @@ from mesa.visualization.mpl_space_drawing import (
     draw_network,
     draw_orthogonal_grid,
     draw_property_layers,
+    draw_space,
     draw_voroinoi_grid,
-    draw_space
 )
 
 
@@ -43,7 +43,7 @@ def agent_portrayal(agent):
 
 
 def test_draw_space():
-    """test draw_space helper method."""
+    """Test draw_space helper method."""
     import networkx as nx
 
     def my_portrayal(agent):
@@ -59,7 +59,7 @@ def test_draw_space():
             "marker": "s" if (agent.unique_id % 2) == 0 else "o",
             "alpha": 0.5,
             "linewidths": 1,
-            "linecolors": "tab:orange"
+            "linecolors": "tab:orange",
         }
 
     # draw space for hexgrid
