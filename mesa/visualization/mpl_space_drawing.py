@@ -64,7 +64,12 @@ def collect_agent_data(
     and marker (marker style)
 
     """
-    arguments = {"s": [], "c": [], "marker": [], "zorder": [], "loc": []}
+    # "edgecolor", "linewidth" can operate on individual agent level as list, or single command at ax.scatter level
+    # so interdependency if not passed at agent level but passed as extra kwargs --> you can do something
+    # "alpha": 0.7 $ only works for single scatter commend
+
+    arguments = {"s": [], "c": [], "marker": [], "zorder": [], "loc": [], 'alpha': [],
+                 'edgecolors': [], 'linewidths': []}
 
     for agent in space.agents:
         portray = agent_portrayal(agent)
@@ -77,6 +82,12 @@ def collect_agent_data(
         arguments["c"].append(portray.pop("color", color))
         arguments["marker"].append(portray.pop("marker", marker))
         arguments["zorder"].append(portray.pop("zorder", zorder))
+
+        for entry in ["alpha", "edgecolors", "linewidths"]:
+            try:
+                arguments[entry].append(portray.pop(entry))
+            except KeyError:
+                pass
 
         if len(portray) > 0:
             ignored_fields = list(portray.keys())
@@ -118,16 +129,20 @@ def draw_space(
 
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
-        case mesa.space._Grid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid():
-            draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
+        # order matters here given the class structure of old-style grid spaces
         case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
             draw_hex_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
+        case mesa.space.SingleGrid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid() | mesa.space.MultiGrid():
+            draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
             draw_network(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case mesa.space.ContinuousSpace():
             draw_continuous_space(space, agent_portrayal, ax=ax)
         case VoronoiGrid():
             draw_voroinoi_grid(space, agent_portrayal, ax=ax)
+        case _:
+            raise ValueError(f"Unknown space type: {type(space)}")
+
 
     if propertylayer_portrayal:
         draw_property_layers(space, propertylayer_portrayal, ax=ax)
@@ -543,11 +558,23 @@ def _scatter(ax: Axes, arguments, **kwargs):
     marker = arguments.pop("marker")
     zorder = arguments.pop("zorder")
 
+    # we check if edgecolor, linewidth, and alhpa are specified
+    # at the agent level, if not, we remove them from the arguments dict
+    # and fallback to the default value in ax.scatter / use what is passed via **kwargs
+    for entry in ["edgecolors", "linewidths", "alpha"]:
+        if len(arguments[entry]) == 0:
+            arguments.pop(entry)
+        else:
+            if entry in kwargs:
+                raise ValueError(f"{entry} is specified in agent portrayal and via plotting kwargs, you can only use one or the other")
+
+
     for mark in np.unique(marker):
         mark_mask = marker == mark
         for z_order in np.unique(zorder):
             zorder_mask = z_order == zorder
             logical = mark_mask & zorder_mask
+
             ax.scatter(
                 x[logical],
                 y[logical],
