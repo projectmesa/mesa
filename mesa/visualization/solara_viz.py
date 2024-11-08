@@ -32,7 +32,7 @@ import reacton.core
 import solara
 
 import mesa.visualization.components.altair_components as components_altair
-from mesa.visualization.UserParam import Slider
+from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
 
 if TYPE_CHECKING:

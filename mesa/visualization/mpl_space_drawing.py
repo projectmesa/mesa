@@ -147,7 +147,7 @@ def draw_space(
         case mesa.space.ContinuousSpace():
             draw_continuous_space(space, agent_portrayal, ax=ax)
         case VoronoiGrid():
-            draw_voroinoi_grid(space, agent_portrayal, ax=ax)
+            draw_voronoi_grid(space, agent_portrayal, ax=ax)
         case _:
             raise ValueError(f"Unknown space type: {type(space)}")
 
@@ -495,7 +495,7 @@ def draw_continuous_space(
     return ax
 
 
-def draw_voroinoi_grid(
+def draw_voronoi_grid(
     space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
 ):
     """Visualize a voronoi grid.

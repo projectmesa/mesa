@@ -24,7 +24,7 @@ from mesa.visualization.mpl_space_drawing import (
     draw_orthogonal_grid,
     draw_property_layers,
     draw_space,
-    draw_voroinoi_grid,
+    draw_voronoi_grid,
 )
 
 
@@ -153,7 +153,7 @@ def test_draw_voroinoi_grid():
         agent.cell = grid.select_random_empty_cell()
 
     fig, ax = plt.subplots()
-    draw_voroinoi_grid(grid, agent_portrayal, ax)
+    draw_voronoi_grid(grid, agent_portrayal, ax)
 
 
 def test_draw_orthogonal_grid():
