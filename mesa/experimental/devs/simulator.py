@@ -58,7 +58,9 @@ class Simulator:
             model (Model): The model to simulate
 
         """
-        self.event_list.clear()
+        if self.time != self.start_time:
+            raise ValueError(f"something has gone terribly wrong {self.time} {self.start_time}")
+
         self.model = model
 
     def reset(self):
@@ -83,6 +85,16 @@ class Simulator:
                 self.time = end_time
                 self._schedule_event(event)  # reschedule event
                 break
+
+    def step(self):
+        """Execute the next event."""
+        try:
+            event = self.event_list.pop_event()
+        except IndexError:  # event list is empty
+            return
+        else:
+            self.time = event.time
+            event.execute()
 
     def run_for(self, time_delta: int | float):
         """Run the simulator for the specified time delta.
@@ -228,7 +240,7 @@ class ABMSimulator(Simulator):
 
         """
         super().setup(model)
-        self.schedule_event_now(self.model.step, priority=Priority.HIGH)
+        self.schedule_event_next_tick(self.model.step, priority=Priority.HIGH)
 
     def check_time_unit(self, time) -> bool:
         """Check whether the time is of the correct unit.
@@ -285,6 +297,8 @@ class ABMSimulator(Simulator):
                 self.time = end_time
                 break
 
+            # fixme: the alternative would be to wrap model.step with an annotation which
+            #  handles this scheduling.
             if event.time <= end_time:
                 self.time = event.time
                 if event.fn() == self.model.step:
@@ -297,17 +311,6 @@ class ABMSimulator(Simulator):
                 self.time = end_time
                 self._schedule_event(event)
                 break
-
-    def run_for(self, time_delta: int):
-        """Run the simulator for the specified time delta.
-
-        Args:
-            time_delta (float| int): The time delta. The simulator is run from the current time to the current time
-                                     plus the time delta
-
-        """
-        end_time = self.time + time_delta - 1
-        self.run_until(end_time)
 
 
 class DEVSimulator(Simulator):
