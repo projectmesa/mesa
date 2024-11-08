@@ -5,7 +5,7 @@ a space with matplotlib for example when creating a mp4 of a movie run or when n
 for a paper.
 
 """
-
+import contextlib
 import itertools
 import math
 import warnings
@@ -92,10 +92,8 @@ def collect_agent_data(
         arguments["zorder"].append(portray.pop("zorder", zorder))
 
         for entry in ["alpha", "edgecolors", "linewidths"]:
-            try:
+            with contextlib.suppress(KeyError):
                 arguments[entry].append(portray.pop(entry))
-            except KeyError:
-                pass
 
         if len(portray) > 0:
             ignored_fields = list(portray.keys())
