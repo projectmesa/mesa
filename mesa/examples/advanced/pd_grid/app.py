@@ -8,7 +8,7 @@ from mesa.visualization import (
     make_plot_component,
     make_space_component,
 )
-from mesa.visualization.UserParam import Slider
+from mesa.visualization import Slider
 
 
 def pd_agent_portrayal(agent):
