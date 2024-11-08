@@ -1,5 +1,5 @@
-import sys
 import os.path as osp
+import sys
 
 sys.path.insert(0, osp.abspath("../../../.."))
 

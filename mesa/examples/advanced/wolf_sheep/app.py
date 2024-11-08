@@ -1,12 +1,12 @@
-import sys
 import os.path as osp
+import sys
 
 sys.path.insert(0, osp.abspath("../../../.."))
 
 
-
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.examples.advanced.wolf_sheep.model import WolfSheep
+from mesa.experimental.devs import ABMSimulator
 from mesa.visualization import (
     Slider,
     SolaraViz,
@@ -14,7 +14,6 @@ from mesa.visualization import (
     make_space_component,
 )
 
-from mesa.experimental.devs import ABMSimulator
 
 def wolf_sheep_portrayal(agent):
     if agent is None:
@@ -77,6 +76,7 @@ def post_process_space(ax):
     ax.set_xticks([])
     ax.set_yticks([])
 
+
 def post_process_lines(ax):
     ax.legend(loc="center left", bbox_to_anchor=(1, 0.9))
 
@@ -86,7 +86,7 @@ space_component = make_space_component(
 )
 lineplot_component = make_plot_component(
     {"Wolves": "tab:orange", "Sheep": "tab:cyan", "Grass": "tab:green"},
-    post_process=post_process_lines
+    post_process=post_process_lines,
 )
 
 simulator = ABMSimulator()
@@ -98,6 +98,6 @@ page = SolaraViz(
     components=[space_component, lineplot_component],
     model_params=model_params,
     name="Wolf Sheep",
-    simulator=simulator
+    simulator=simulator,
 )
 page  # noqa

@@ -36,8 +36,8 @@ from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
 
 if TYPE_CHECKING:
-    from mesa.model import Model
     from mesa.experimental.devs.simulator import Simulator
+    from mesa.model import Model
 
 
 @solara.component
@@ -286,7 +286,9 @@ def SimulatorController(
         playing.value = False
         running.value = True
         simulator.reset()
-        model.value = model.value = model.value.__class__(simulator, **model_parameters.value)
+        model.value = model.value = model.value.__class__(
+            simulator, **model_parameters.value
+        )
         simulator.setup(model.value)
 
     def do_play_pause():
@@ -307,6 +309,7 @@ def SimulatorController(
             on_click=do_step,
             disabled=playing.value or not running.value,
         )
+
 
 def split_model_params(model_params):
     """Split model parameters into user-adjustable and fixed parameters.

@@ -59,7 +59,9 @@ class Simulator:
 
         """
         if self.time != self.start_time:
-            raise ValueError(f"something has gone terribly wrong {self.time} {self.start_time}")
+            raise ValueError(
+                f"something has gone terribly wrong {self.time} {self.start_time}"
+            )
 
         self.model = model
 

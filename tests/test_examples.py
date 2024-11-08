@@ -12,6 +12,7 @@ from mesa.examples import (
 )
 from mesa.experimental.devs import ABMSimulator
 
+
 def test_boltzmann_model():  # noqa: D103
     model = BoltzmannWealthModel(seed=42)
 
