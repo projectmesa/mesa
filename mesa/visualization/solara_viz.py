@@ -67,6 +67,7 @@ def SolaraViz(
             Defaults to "default", which uses the default Altair space visualization.
         play_interval (int, optional): Interval for playing the model steps in milliseconds.
             This controls the speed of the model's automatic stepping. Defaults to 100 ms.
+        simulator: A simulator that controls the model (optional)
         model_params (dict, optional): Parameters for (re-)instantiating a model.
             Can include user-adjustable parameters and fixed parameters. Defaults to None.
         name (str | None, optional): Name of the visualization. Defaults to the models class name.
