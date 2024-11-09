@@ -23,7 +23,7 @@ def test_observables():
 
         def __init__(self, model, value):
             super().__init__(model)
-            some_attribute = value    # noqa: F841
+            some_attribute = value  # noqa: F841
 
     handler = Mock()
 
@@ -46,7 +46,6 @@ def test_HasObservables():
             super().__init__(model)
             some_attribute = value  # noqa: F841
             some_other_attribute = 5  # noqa: F841
-
 
     handler = Mock()
 
@@ -116,17 +115,20 @@ def test_HasObservables():
     with pytest.raises(ValueError):
         agent.observe("unknonw_attribute", "change", handler)
 
+
 def test_ObservableList():
     """Test ObservableList."""
     list = ObservableList()
     del list
 
+
 def test_Computable():
     """Test Computable and Computed."""
+
     class MyAgent(Agent, HasObservables):
         some_attribute = Computable()
         some_other_attribute = Observable()
 
         def __init__(self, model, value):
             super().__init__(model)
-            some_attribute = Computed(lambda x:x, self)  # noqa: F841
+            some_attribute = Computed(lambda x: x, self)  # noqa: F841
