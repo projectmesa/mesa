@@ -36,7 +36,6 @@ from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
 
 if TYPE_CHECKING:
-    from mesa.experimental.devs.simulator import Simulator
     from mesa.model import Model
 
 
@@ -47,7 +46,6 @@ def SolaraViz(
     | list[Callable[[Model], reacton.core.Component]]
     | Literal["default"] = "default",
     play_interval: int = 100,
-    simulator: Simulator | None = None,
     model_params=None,
     name: str | None = None,
 ):
@@ -67,7 +65,6 @@ def SolaraViz(
             Defaults to "default", which uses the default Altair space visualization.
         play_interval (int, optional): Interval for playing the model steps in milliseconds.
             This controls the speed of the model's automatic stepping. Defaults to 100 ms.
-        simulator: A simulator that controls the model (optional)
         model_params (dict, optional): Parameters for (re-)instantiating a model.
             Can include user-adjustable parameters and fixed parameters. Defaults to None.
         name (str | None, optional): Name of the visualization. Defaults to the models class name.
@@ -95,6 +92,21 @@ def SolaraViz(
     if not isinstance(model, solara.Reactive):
         model = solara.use_reactive(model)  # noqa: SH102, RUF100
 
+    def connect_to_model():
+        # Patch the step function to force updates
+        original_step = model.value.step
+
+        def step():
+            original_step()
+            force_update()
+
+        model.value.step = step
+        # Add a trigger to model itself
+        model.value.force_update = force_update
+        force_update()
+
+    solara.use_effect(connect_to_model, [model.value])
+
     # set up reactive model_parameters shared by ModelCreator and ModelController
     reactive_model_parameters = solara.use_reactive({})
 
@@ -103,19 +115,11 @@ def SolaraViz(
 
     with solara.Sidebar(), solara.Column():
         with solara.Card("Controls"):
-            if simulator is None:
-                ModelController(
-                    model,
-                    model_parameters=reactive_model_parameters,
-                    play_interval=play_interval,
-                )
-            else:
-                SimulatorController(
-                    model,
-                    simulator,
-                    model_parameters=reactive_model_parameters,
-                    play_interval=play_interval,
-                )
+            ModelController(
+                model,
+                model_parameters=reactive_model_parameters,
+                play_interval=play_interval,
+            )
         with solara.Card("Model Parameters"):
             ModelCreator(
                 model, model_params, model_parameters=reactive_model_parameters
@@ -203,80 +207,12 @@ def ModelController(
         """Advance the model by one step."""
         model.value.step()
         running.value = model.value.running
-        force_update()
 
     def do_reset():
         """Reset the model to its initial state."""
         playing.value = False
         running.value = True
         model.value = model.value = model.value.__class__(**model_parameters.value)
-
-    def do_play_pause():
-        """Toggle play/pause."""
-        playing.value = not playing.value
-
-    with solara.Row(justify="space-between"):
-        solara.Button(label="Reset", color="primary", on_click=do_reset)
-        solara.Button(
-            label="▶" if not playing.value else "❚❚",
-            color="primary",
-            on_click=do_play_pause,
-            disabled=not running.value,
-        )
-        solara.Button(
-            label="Step",
-            color="primary",
-            on_click=do_step,
-            disabled=playing.value or not running.value,
-        )
-
-
-@solara.component
-def SimulatorController(
-    model: solara.Reactive[Model],
-    simulator,
-    *,
-    model_parameters: dict | solara.Reactive[dict] = None,
-    play_interval: int = 100,
-):
-    """Create controls for model execution (step, play, pause, reset).
-
-    Args:
-        model: Reactive model instance
-        simulator: Simulator instance
-        model_parameters: Reactive parameters for (re-)instantiating a model.
-        play_interval: Interval for playing the model steps in milliseconds.
-
-    """
-    playing = solara.use_reactive(False)
-    running = solara.use_reactive(True)
-    if model_parameters is None:
-        model_parameters = {}
-    model_parameters = solara.use_reactive(model_parameters)
-
-    async def step():
-        while playing.value and running.value:
-            await asyncio.sleep(play_interval / 1000)
-            do_step()
-
-    solara.lab.use_task(
-        step, dependencies=[playing.value, running.value], prefer_threaded=False
-    )
-
-    def do_step():
-        """Advance the model by one step."""
-        simulator.run_for(1)  # fixme
-        running.value = model.value.running
-        force_update()
-
-    def do_reset():
-        """Reset the model to its initial state."""
-        playing.value = False
-        running.value = True
-        simulator.reset()
-        model.value = model.value = model.value.__class__(
-            simulator, **model_parameters.value
-        )
 
     def do_play_pause():
         """Toggle play/pause."""
