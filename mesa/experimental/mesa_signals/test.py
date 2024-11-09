@@ -1,4 +1,4 @@
-# noqa D100
+# noqa
 # https://github.com/projectmesa/mesa-examples/blob/main/examples/boltzmann_wealth_model_experimental/model.py
 import mesa
 from mesa.experimental.mesa_signals import (
