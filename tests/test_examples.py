@@ -69,6 +69,5 @@ def test_wolf_sheep():  # noqa: D103
     from mesa.experimental.devs import ABMSimulator
 
     simulator = ABMSimulator()
-    model = WolfSheep(seed=42, simulator=simulator)
-    simulator.setup(model)
+    WolfSheep(seed=42, simulator=simulator)
     simulator.run_for(10)

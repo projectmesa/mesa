@@ -33,7 +33,6 @@ def run_model(model_class, seed, parameters):
     if model_class.__name__ in uses_simulator:
         simulator = ABMSimulator()
         model = model_class(simulator=simulator, seed=seed, **parameters)
-        simulator.setup(model)
     else:
         model = model_class(seed=seed, **parameters)
 

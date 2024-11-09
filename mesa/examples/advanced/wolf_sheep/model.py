@@ -61,12 +61,13 @@ class WolfSheep(Model):
             simulator: ABMSimulator instance for event scheduling
         """
         super().__init__(seed=seed)
+        self.simulator = simulator
+        self.simulator.setup(self)
 
         # Initialize model parameters
         self.height = height
         self.width = width
         self.grass = grass
-        self.simulator = simulator
 
         # Create grid using experimental cell space
         self.grid = OrthogonalVonNeumannGrid(
