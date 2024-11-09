@@ -292,7 +292,6 @@ def SimulatorController(
         model.value = model.value = model.value.__class__(
             simulator, **model_parameters.value
         )
-        simulator.setup(model.value)
 
     def do_play_pause():
         """Toggle play/pause."""
