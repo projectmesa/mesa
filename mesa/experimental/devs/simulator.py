@@ -109,7 +109,7 @@ class Simulator:
                 self._schedule_event(event)  # reschedule event
                 break
 
-    def step(self):
+    def run_next_event(self):
         """Execute the next event.
 
         Raises:

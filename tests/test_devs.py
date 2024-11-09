@@ -62,15 +62,15 @@ def test_devs_simulator():
 
     fn = MagicMock()
     simulator.schedule_event_absolute(fn, 1.0)
-    simulator.step()
+    simulator.run_next_event()
     fn.assert_called_once()
     assert simulator.time == 1.0
-    simulator.step()
+    simulator.run_next_event()
     assert simulator.time == 1.0
 
     simulator = DEVSimulator()
     with pytest.raises(Exception):
-        simulator.step()
+        simulator.run_next_event()
 
     # cancel_event
     simulator = DEVSimulator()
