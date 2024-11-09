@@ -94,7 +94,7 @@ def test_devs_simulator():
 
     # setup with time advanced
     simulator = DEVSimulator()
-    simulator.time = simulator.start_time+1
+    simulator.time = simulator.start_time + 1
     model = MagicMock(spec=Model)
     with pytest.raises(Exception):
         simulator.setup(model)
@@ -104,7 +104,6 @@ def test_devs_simulator():
     simulator.schedule_event_now(Mock())
     with pytest.raises(Exception):
         simulator.setup(model)
-
 
 
 def test_abm_simulator():

@@ -63,9 +63,13 @@ class Simulator:
 
         """
         if self.time != self.start_time:
-            raise ValueError("trying to setup model, but current time is not equal to start_time, Has the simulator been reset or freshly initialized?")
+            raise ValueError(
+                "trying to setup model, but current time is not equal to start_time, Has the simulator been reset or freshly initialized?"
+            )
         if not self.event_list.is_empty():
-            raise ValueError("trying to setup model, but events have already been scheduled. Call simulator.setup before any scheduling")
+            raise ValueError(
+                "trying to setup model, but events have already been scheduled. Call simulator.setup before any scheduling"
+            )
 
         self.model = model
 
@@ -78,7 +82,7 @@ class Simulator:
     def run_until(self, end_time: int | float) -> None:
         """Run the simulator until the end time.
 
-        Args
+        Args:
             end_time (int | float): The end time for stopping the simulator
 
         Raises:
@@ -86,7 +90,9 @@ class Simulator:
 
         """
         if self.model is None:
-            raise Exception("simulator has not been setup, call simulator.setup(model) first")
+            raise Exception(
+                "simulator has not been setup, call simulator.setup(model) first"
+            )
 
         while True:
             try:
@@ -111,7 +117,9 @@ class Simulator:
 
         """
         if self.model is None:
-            raise Exception("simulator has not been setup, call simulator.setup(model) first")
+            raise Exception(
+                "simulator has not been setup, call simulator.setup(model) first"
+            )
 
         try:
             event = self.event_list.pop_event()
@@ -320,7 +328,9 @@ class ABMSimulator(Simulator):
 
         """
         if self.model is None:
-            raise Exception("simulator has not been setup, call simulator.setup(model) first")
+            raise Exception(
+                "simulator has not been setup, call simulator.setup(model) first"
+            )
 
         while True:
             try:
