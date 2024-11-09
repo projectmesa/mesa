@@ -66,7 +66,9 @@ def test_sugarscape_g1mt():  # noqa: D103
 
 
 def test_wolf_sheep():  # noqa: D103
-    model = WolfSheep(seed=42)
+    from mesa.experimental.devs import ABMSimulator
 
-    for _i in range(10):
-        model.step()
+    simulator = ABMSimulator()
+    model = WolfSheep(seed=42, simulator=simulator)
+    simulator.setup(model)
+    simulator.run_for(10)
