@@ -1,5 +1,5 @@
 import mesa
-from mesa.examples.basic.boltzmann_wealth_model.agents import MoneyAgent
+from agents import MoneyAgent
 
 
 class BoltzmannWealthModel(mesa.Model):
@@ -20,8 +20,8 @@ class BoltzmannWealthModel(mesa.Model):
             agent_reporters={"Wealth": "wealth"},
         )
         # Create agents
-        for _ in range(self.num_agents):
-            a = MoneyAgent(self)
+        for i in range(self.num_agents):
+            a = MoneyAgent(model=self, unique_id=i)
 
             # Add the agent to a random grid cell
             x = self.random.randrange(self.grid.width)

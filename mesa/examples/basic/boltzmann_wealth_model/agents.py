@@ -4,8 +4,8 @@ from mesa import Agent
 class MoneyAgent(Agent):
     """An agent with fixed initial wealth."""
 
-    def __init__(self, model):
-        super().__init__(model)
+    def __init__(self, model, unique_id):
+        super().__init__(model=model, unique_id=unique_id)
         self.wealth = 1
 
     def move(self):
