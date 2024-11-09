@@ -57,11 +57,15 @@ class Simulator:
         Args:
             model (Model): The model to simulate
 
+        Raises:
+            Exception if simulator.time is not equal to simulator.starttime
+            Exception if event list is not empty
+
         """
         if self.time != self.start_time:
-            raise ValueError(
-                f"something has gone terribly wrong {self.time} {self.start_time}"
-            )
+            raise ValueError("trying to setup model, but current time is not equal to start_time, Has the simulator been reset or freshly initialized?")
+        if not self.event_list.is_empty():
+            raise ValueError("trying to setup model, but events have already been scheduled. Call simulator.setup before any scheduling")
 
         self.model = model
 
@@ -72,7 +76,18 @@ class Simulator:
         self.time = self.start_time
 
     def run_until(self, end_time: int | float) -> None:
-        """Run the simulator until the end time."""
+        """Run the simulator until the end time.
+
+        Args
+            end_time (int | float): The end time for stopping the simulator
+
+        Raises:
+            Exception if simulator.setup() has not yet been called
+
+        """
+        if self.model is None:
+            raise Exception("simulator has not been setup, call simulator.setup(model) first")
+
         while True:
             try:
                 event = self.event_list.pop_event()
@@ -89,7 +104,15 @@ class Simulator:
                 break
 
     def step(self):
-        """Execute the next event."""
+        """Execute the next event.
+
+        Raises:
+            Exception if simulator.setup() has not yet been called
+
+        """
+        if self.model is None:
+            raise Exception("simulator has not been setup, call simulator.setup(model) first")
+
         try:
             event = self.event_list.pop_event()
         except IndexError:  # event list is empty
@@ -292,7 +315,13 @@ class ABMSimulator(Simulator):
         Args:
             end_time (float| int): The end_time delta. The simulator is until the specified end time
 
+        Raises:
+            Exception if simulator.setup() has not yet been called
+
         """
+        if self.model is None:
+            raise Exception("simulator has not been setup, call simulator.setup(model) first")
+
         while True:
             try:
                 event = self.event_list.pop_event()
