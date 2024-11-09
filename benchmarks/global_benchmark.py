@@ -28,20 +28,21 @@ def run_model(model_class, seed, parameters):
     Returns:
         startup time and run time
     """
-    no_simulator = ["BoltzmannWealth"]
+    uses_simulator = ["WolfSheep"]
     start_init = timeit.default_timer()
-    if model_class.__name__ in no_simulator:
-        model = model_class(seed=seed, **parameters)
-    else:
+    if model_class.__name__ in uses_simulator:
         simulator = ABMSimulator()
         model = model_class(simulator=simulator, seed=seed, **parameters)
+    else:
+        model = model_class(seed=seed, **parameters)
 
     end_init_start_run = timeit.default_timer()
 
-    if model_class.__name__ in no_simulator:
-        model.run_model(config["steps"])
-    else:
+    if model_class.__name__ in uses_simulator:
         simulator.run_for(config["steps"])
+    else:
+        for _ in range(config["steps"]):
+            model.step()
 
     end_run = timeit.default_timer()
 
