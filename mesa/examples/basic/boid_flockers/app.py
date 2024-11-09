@@ -51,7 +51,7 @@ model = BoidFlockers()
 
 page = SolaraViz(
     model,
-    [make_space_component(agent_portrayal=boid_draw)],
+    [make_space_component(agent_portrayal=boid_draw, backend="matplotlib")],
     model_params=model_params,
     name="Boid Flocking Model",
 )

@@ -1,20 +1,25 @@
-"""Matplotlib based solara components for visualization MESA spaces and plots."""
+"""Helper functions for drawing mesa spaces with matplotlib.
 
+These functions are used by the provided matplotlib components, but can also be used to quickly visualize
+a space with matplotlib for example when creating a mp4 of a movie run or when needing a figure
+for a paper.
+
+"""
+
+import contextlib
 import itertools
 import math
 import warnings
 from collections.abc import Callable
 from typing import Any
 
-import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-import solara
+from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
-from matplotlib.figure import Figure
 from matplotlib.patches import RegularPolygon
 
 import mesa
@@ -32,93 +37,10 @@ from mesa.space import (
     PropertyLayer,
     SingleGrid,
 )
-from mesa.visualization.utils import update_counter
 
-# For typing
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
 Network = NetworkGrid | mesa.experimental.cell_space.Network
-
-
-def make_space_matplotlib(*args, **kwargs):  # noqa: D103
-    warnings.warn(
-        "make_space_matplotlib has been renamed to make_space_component",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return make_space_component(*args, **kwargs)
-
-
-def make_space_component(
-    agent_portrayal: Callable | None = None,
-    propertylayer_portrayal: dict | None = None,
-    post_process: Callable | None = None,
-    **space_drawing_kwargs,
-):
-    """Create a Matplotlib-based space visualization component.
-
-    Args:
-        agent_portrayal: Function to portray agents.
-        propertylayer_portrayal: Dictionary of PropertyLayer portrayal specifications
-        post_process : a callable that will be called with the Axes instance. Allows for fine tuning plots (e.g., control ticks)
-        space_drawing_kwargs : additional keyword arguments to be passed on to the underlying space drawer function. See
-                               the functions for drawing the various spaces for further details.
-
-    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
-    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
-
-
-    Returns:
-        function: A function that creates a SpaceMatplotlib component
-    """
-    if agent_portrayal is None:
-
-        def agent_portrayal(a):
-            return {}
-
-    def MakeSpaceMatplotlib(model):
-        return SpaceMatplotlib(
-            model,
-            agent_portrayal,
-            propertylayer_portrayal,
-            post_process=post_process,
-            **space_drawing_kwargs,
-        )
-
-    return MakeSpaceMatplotlib
-
-
-@solara.component
-def SpaceMatplotlib(
-    model,
-    agent_portrayal,
-    propertylayer_portrayal,
-    dependencies: list[any] | None = None,
-    post_process: Callable | None = None,
-    **space_drawing_kwargs,
-):
-    """Create a Matplotlib-based space visualization component."""
-    update_counter.get()
-
-    space = getattr(model, "grid", None)
-    if space is None:
-        space = getattr(model, "space", None)
-
-    fig = Figure()
-    ax = fig.add_subplot()
-
-    draw_space(
-        space,
-        agent_portrayal,
-        propertylayer_portrayal=propertylayer_portrayal,
-        ax=ax,
-        post_process=post_process,
-        **space_drawing_kwargs,
-    )
-
-    solara.FigureMatplotlib(
-        fig, format="png", bbox_inches="tight", dependencies=dependencies
-    )
 
 
 def collect_agent_data(
@@ -140,10 +62,19 @@ def collect_agent_data(
         zorder: default zorder
 
     agent_portrayal should return a dict, limited to size (size of marker), color (color of marker), zorder (z-order),
-    and marker (marker style)
+    marker (marker style), alpha, linewidths, and edgecolors
 
     """
-    arguments = {"s": [], "c": [], "marker": [], "zorder": [], "loc": []}
+    arguments = {
+        "s": [],
+        "c": [],
+        "marker": [],
+        "zorder": [],
+        "loc": [],
+        "alpha": [],
+        "edgecolors": [],
+        "linewidths": [],
+    }
 
     for agent in space.agents:
         portray = agent_portrayal(agent)
@@ -156,6 +87,10 @@ def collect_agent_data(
         arguments["c"].append(portray.pop("color", color))
         arguments["marker"].append(portray.pop("marker", marker))
         arguments["zorder"].append(portray.pop("zorder", zorder))
+
+        for entry in ["alpha", "edgecolors", "linewidths"]:
+            with contextlib.suppress(KeyError):
+                arguments[entry].append(portray.pop(entry))
 
         if len(portray) > 0:
             ignored_fields = list(portray.keys())
@@ -173,7 +108,6 @@ def draw_space(
     agent_portrayal: Callable,
     propertylayer_portrayal: dict | None = None,
     ax: Axes | None = None,
-    post_process: Callable | None = None,
     **space_drawing_kwargs,
 ):
     """Draw a Matplotlib-based visualization of the space.
@@ -184,15 +118,13 @@ def draw_space(
         propertylayer_portrayal: a dict specifying how to show propertylayer(s)
         ax: the axes upon which to draw the plot
         post_process: a callable called with the Axes instance
-        postprocess: a user-specified callable to do post-processing called with the Axes instance. This callable
-        can be used for any further fine-tuning of the plot (e.g., changing ticks, etc.)
         space_drawing_kwargs: any additional keyword arguments to be passed on to the underlying function for drawing the space.
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
-    "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
+    "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
 
     """
     if ax is None:
@@ -200,22 +132,27 @@ def draw_space(
 
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
-        case mesa.space._Grid() | OrthogonalMooreGrid() | OrthogonalVonNeumannGrid():
-            draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
+        # order matters here given the class structure of old-style grid spaces
         case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
             draw_hex_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
+        case (
+            mesa.space.SingleGrid()
+            | OrthogonalMooreGrid()
+            | OrthogonalVonNeumannGrid()
+            | mesa.space.MultiGrid()
+        ):
+            draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
             draw_network(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case mesa.space.ContinuousSpace():
             draw_continuous_space(space, agent_portrayal, ax=ax)
         case VoronoiGrid():
-            draw_voroinoi_grid(space, agent_portrayal, ax=ax)
+            draw_voronoi_grid(space, agent_portrayal, ax=ax)
+        case _:
+            raise ValueError(f"Unknown space type: {type(space)}")
 
     if propertylayer_portrayal:
         draw_property_layers(space, propertylayer_portrayal, ax=ax)
-
-    if post_process is not None:
-        post_process(ax=ax)
 
     return ax
 
@@ -558,7 +495,7 @@ def draw_continuous_space(
     return ax
 
 
-def draw_voroinoi_grid(
+def draw_voronoi_grid(
     space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
 ):
     """Visualize a voronoi grid.
@@ -628,11 +565,24 @@ def _scatter(ax: Axes, arguments, **kwargs):
     marker = arguments.pop("marker")
     zorder = arguments.pop("zorder")
 
+    # we check if edgecolor, linewidth, and alpha are specified
+    # at the agent level, if not, we remove them from the arguments dict
+    # and fallback to the default value in ax.scatter / use what is passed via **kwargs
+    for entry in ["edgecolors", "linewidths", "alpha"]:
+        if len(arguments[entry]) == 0:
+            arguments.pop(entry)
+        else:
+            if entry in kwargs:
+                raise ValueError(
+                    f"{entry} is specified in agent portrayal and via plotting kwargs, you can only use one or the other"
+                )
+
     for mark in np.unique(marker):
         mark_mask = marker == mark
         for z_order in np.unique(zorder):
             zorder_mask = z_order == zorder
             logical = mark_mask & zorder_mask
+
             ax.scatter(
                 x[logical],
                 y[logical],
@@ -641,83 +591,3 @@ def _scatter(ax: Axes, arguments, **kwargs):
                 **{k: v[logical] for k, v in arguments.items()},
                 **kwargs,
             )
-
-
-def make_plot_measure(*args, **kwargs):  # noqa: D103
-    warnings.warn(
-        "make_plot_measure has been renamed to make_plot_component",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return make_plot_component(*args, **kwargs)
-
-
-def make_plot_component(
-    measure: str | dict[str, str] | list[str] | tuple[str],
-    post_process: Callable | None = None,
-    save_format="png",
-):
-    """Create a plotting function for a specified measure.
-
-    Args:
-        measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
-        post_process: a user-specified callable to do post-processing called with the Axes instance.
-        save_format: save format of figure in solara backend
-
-    Returns:
-        function: A function that creates a PlotMatplotlib component.
-    """
-
-    def MakePlotMatplotlib(model):
-        return PlotMatplotlib(
-            model, measure, post_process=post_process, save_format=save_format
-        )
-
-    return MakePlotMatplotlib
-
-
-@solara.component
-def PlotMatplotlib(
-    model,
-    measure,
-    dependencies: list[any] | None = None,
-    post_process: Callable | None = None,
-    save_format="png",
-):
-    """Create a Matplotlib-based plot for a measure or measures.
-
-    Args:
-        model (mesa.Model): The model instance.
-        measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
-        dependencies (list[any] | None): Optional dependencies for the plot.
-        post_process: a user-specified callable to do post-processing called with the Axes instance.
-        save_format: format used for saving the figure.
-
-    Returns:
-        solara.FigureMatplotlib: A component for rendering the plot.
-    """
-    update_counter.get()
-    fig = Figure()
-    ax = fig.subplots()
-    df = model.datacollector.get_model_vars_dataframe()
-    if isinstance(measure, str):
-        ax.plot(df.loc[:, measure])
-        ax.set_ylabel(measure)
-    elif isinstance(measure, dict):
-        for m, color in measure.items():
-            ax.plot(df.loc[:, m], label=m, color=color)
-        ax.legend(loc="best")
-    elif isinstance(measure, list | tuple):
-        for m in measure:
-            ax.plot(df.loc[:, m], label=m)
-        ax.legend(loc="best")
-
-    if post_process is not None:
-        post_process(ax)
-
-    ax.set_xlabel("Step")
-    # Set integer x axis
-    ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
-    solara.FigureMatplotlib(
-        fig, format=save_format, bbox_inches="tight", dependencies=dependencies
-    )

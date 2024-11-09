@@ -24,15 +24,15 @@ See the Visualization Tutorial and example models for more details.
 from __future__ import annotations
 
 import asyncio
-import copy
+import inspect
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
 import reacton.core
 import solara
 
-import mesa.visualization.components.altair as components_altair
-from mesa.visualization.UserParam import Slider
+import mesa.visualization.components.altair_components as components_altair
+from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
 
 if TYPE_CHECKING:
@@ -47,7 +47,6 @@ def SolaraViz(
     | Literal["default"] = "default",
     play_interval: int = 100,
     model_params=None,
-    seed: float = 0,
     name: str | None = None,
 ):
     """Solara visualization component.
@@ -68,8 +67,6 @@ def SolaraViz(
             This controls the speed of the model's automatic stepping. Defaults to 100 ms.
         model_params (dict, optional): Parameters for (re-)instantiating a model.
             Can include user-adjustable parameters and fixed parameters. Defaults to None.
-        seed (int, optional): Seed for the random number generator. This ensures reproducibility
-            of the model's behavior. Defaults to 0.
         name (str | None, optional): Name of the visualization. Defaults to the models class name.
 
     Returns:
@@ -87,7 +84,9 @@ def SolaraViz(
           value results in faster stepping, while a higher value results in slower stepping.
     """
     if components == "default":
-        components = [components_altair.make_space_altair()]
+        components = [components_altair.make_altair_space()]
+    if model_params is None:
+        model_params = {}
 
     # Convert model to reactive
     if not isinstance(model, solara.Reactive):
@@ -108,20 +107,23 @@ def SolaraViz(
 
     solara.use_effect(connect_to_model, [model.value])
 
+    # set up reactive model_parameters shared by ModelCreator and ModelController
+    reactive_model_parameters = solara.use_reactive({})
+
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
 
     with solara.Sidebar(), solara.Column():
         with solara.Card("Controls"):
-            ModelController(model, play_interval)
-
-        if model_params is not None:
-            with solara.Card("Model Parameters"):
-                ModelCreator(
-                    model,
-                    model_params,
-                    seed=seed,
-                )
+            ModelController(
+                model,
+                model_parameters=reactive_model_parameters,
+                play_interval=play_interval,
+            )
+        with solara.Card("Model Parameters"):
+            ModelCreator(
+                model, model_params, model_parameters=reactive_model_parameters
+            )
         with solara.Card("Information"):
             ShowSteps(model.value)
 
@@ -172,24 +174,25 @@ JupyterViz = SolaraViz
 
 
 @solara.component
-def ModelController(model: solara.Reactive[Model], play_interval=100):
+def ModelController(
+    model: solara.Reactive[Model],
+    *,
+    model_parameters: dict | solara.Reactive[dict] = None,
+    play_interval: int = 100,
+):
     """Create controls for model execution (step, play, pause, reset).
 
     Args:
-        model (solara.Reactive[Model]): Reactive model instance
-        play_interval (int, optional): Interval for playing the model steps in milliseconds.
+        model: Reactive model instance
+        model_parameters: Reactive parameters for (re-)instantiating a model.
+        play_interval: Interval for playing the model steps in milliseconds.
+
     """
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
-    original_model = solara.use_reactive(None)
-
-    def save_initial_model():
-        """Save the initial model for comparison."""
-        original_model.set(copy.deepcopy(model.value))
-        playing.value = False
-        force_update()
-
-    solara.use_effect(save_initial_model, [model.value])
+    if model_parameters is None:
+        model_parameters = {}
+    model_parameters = solara.use_reactive(model_parameters)
 
     async def step():
         while playing.value and running.value:
@@ -209,7 +212,7 @@ def ModelController(model: solara.Reactive[Model], play_interval=100):
         """Reset the model to its initial state."""
         playing.value = False
         running.value = True
-        model.value = copy.deepcopy(original_model.value)
+        model.value = model.value = model.value.__class__(**model_parameters.value)
 
     def do_play_pause():
         """Toggle play/pause."""
@@ -268,7 +271,12 @@ def check_param_is_fixed(param):
 
 
 @solara.component
-def ModelCreator(model, model_params, seed=1):
+def ModelCreator(
+    model: solara.Reactive[Model],
+    user_params: dict,
+    *,
+    model_parameters: dict | solara.Reactive[dict] = None,
+):
     """Solara component for creating and managing a model instance with user-defined parameters.
 
     This component allows users to create a model instance with specified parameters and seed.
@@ -276,9 +284,9 @@ def ModelCreator(model, model_params, seed=1):
     number generator.
 
     Args:
-        model (solara.Reactive[Model]): A reactive model instance. This is the main model to be created and managed.
-        model_params (dict): Dictionary of model parameters. This includes both user-adjustable parameters and fixed parameters.
-        seed (int, optional): Initial seed for the random number generator. Defaults to 1.
+        model: A reactive model instance. This is the main model to be created and managed.
+        user_params: Parameters for (re-)instantiating a model. Can include user-adjustable parameters and fixed parameters. Defaults to None.
+        model_parameters: reactive parameters for reinitializing the model
 
     Returns:
         solara.component: A Solara component that renders the model creation and management interface.
@@ -299,40 +307,52 @@ def ModelCreator(model, model_params, seed=1):
         - The component provides an interface for adjusting user-defined parameters and reseeding the model.
 
     """
-    user_params, fixed_params = split_model_params(model_params)
+    if model_parameters is None:
+        model_parameters = {}
+    model_parameters = solara.use_reactive(model_parameters)
 
-    reactive_seed = solara.use_reactive(seed)
-
-    model_parameters, set_model_parameters = solara.use_state(
-        {
-            **fixed_params,
-            **{k: v.get("value") for k, v in user_params.items()},
-        }
+    solara.use_effect(
+        lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
+        [model.value],
     )
+    user_params, fixed_params = split_model_params(user_params)
 
-    def do_reseed():
-        """Update the random seed for the model."""
-        reactive_seed.value = model.value.random.random()
+    # set model_parameters to the default values for all parameters
+    model_parameters.value = {
+        **fixed_params,
+        **{k: v.get("value") for k, v in user_params.items()},
+    }
 
     def on_change(name, value):
-        set_model_parameters({**model_parameters, name: value})
-
-    def create_model():
-        model.value = model.value.__class__(**model_parameters)
-        model.value._seed = reactive_seed.value
-
-    solara.use_effect(create_model, [model_parameters, reactive_seed.value])
-
-    with solara.Row(justify="space-between"):
-        solara.InputText(
-            label="Seed",
-            value=reactive_seed,
-            continuous_update=True,
-        )
-
-        solara.Button(label="Reseed", color="primary", on_click=do_reseed)
+        new_model_parameters = {**model_parameters.value, name: value}
+        model.value = model.value.__class__(**new_model_parameters)
+        model_parameters.value = new_model_parameters
 
     UserInputs(user_params, on_change=on_change)
+
+
+def _check_model_params(init_func, model_params):
+    """Check if model parameters are valid for the model's initialization function.
+
+    Args:
+        init_func: Model initialization function
+        model_params: Dictionary of model parameters
+
+    Raises:
+        ValueError: If a parameter is not valid for the model's initialization function
+    """
+    model_parameters = inspect.signature(init_func).parameters
+    for name in model_parameters:
+        if (
+            model_parameters[name].default == inspect.Parameter.empty
+            and name not in model_params
+            and name != "self"
+            and name != "kwargs"
+        ):
+            raise ValueError(f"Missing required model parameter: {name}")
+    for name in model_params:
+        if name not in model_parameters and "kwargs" not in model_parameters:
+            raise ValueError(f"Invalid model parameter: {name}")
 
 
 @solara.component
@@ -395,6 +415,12 @@ def UserInputs(user_params, on_change=None):
             )
         elif input_type == "Checkbox":
             solara.Checkbox(
+                label=label,
+                on_value=change_handler,
+                value=options.get("value"),
+            )
+        elif input_type == "InputText":
+            solara.InputText(
                 label=label,
                 on_value=change_handler,
                 value=options.get("value"),
