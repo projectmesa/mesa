@@ -41,4 +41,3 @@ def create_weakref(item, callback=None):
     else:
         ref = weakref.ref(item, callback)
     return ref
-
