@@ -7,10 +7,6 @@ __all__ = [
     "create_weakref",
 ]
 
-import traitlets
-
-traitlets.HasTraits
-traitlets.List
 
 
 class AttributeDict(dict):

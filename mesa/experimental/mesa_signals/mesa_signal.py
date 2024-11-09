@@ -311,7 +311,7 @@ class HasObservables:
             if not isinstance(signal_type, All):
                 if signal_type not in self.observables[name].signal_types:
                     raise ValueError(
-                        f"you are trying to subscribe to a signal of {signal_type}"
+                        f"you are trying to subscribe to a signal of {signal_type} "
                         f"on Observable {name}, which does not emit this signal_type"
                     )
                 else:
@@ -325,12 +325,13 @@ class HasObservables:
             for signal_type in signal_types:
                 self.subscribers[name][signal_type].append(ref)
 
-    def unobserve(self, name: str | All, signal_type: str | All):
+    def unobserve(self, name: str | All, signal_type: str | All, handler: Callable):
         """Unsubscribe to the Observable <name> for signal_type.
 
         Args:
-            name: name of the Observable to unsubscribe to
+            name: name of the Observable to unsubscribe from
             signal_type: the type of signal on the Observable to unsubscribe to
+            handler: the handler that is unsubscribing
 
         """
         names = (
@@ -352,11 +353,15 @@ class HasObservables:
                 ]
             for signal_type in signal_types:
                 with contextlib.suppress(KeyError):
-                    del self.subscribers[name][signal_type]
-                    # we silently ignore trying to remove unsubscribed
-                    # observables and/or signal types
+                    remaining = []
+                    for ref in self.subscribers[name][signal_type]:
+                        if subscriber := ref():
+                            if subscriber != handler:
+                                remaining.append(ref)
+                    self.subscribers[name][signal_type] = remaining
 
-    def unobserve_all(self, name: str | All):
+
+    def clear_all_subscriptions(self, name: str | All):
         """Clears all subscriptions for the observable <name>.
 
         if name is All, all subscriptions are removed
@@ -365,7 +370,7 @@ class HasObservables:
             name: name of the Observable to unsubscribe for all signal types
 
         """
-        if name is not isinstance(name, All):
+        if not isinstance(name, All):
             with contextlib.suppress(KeyError):
                 del self.subscribers[name]
                 # ignore when unsubscribing to Observables that have no subscription
