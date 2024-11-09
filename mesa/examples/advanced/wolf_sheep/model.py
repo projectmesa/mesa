@@ -30,8 +30,8 @@ class WolfSheep(Model):
 
     def __init__(
         self,
-        width=20,
         height=20,
+        width=20,
         initial_sheep=100,
         initial_wolves=50,
         sheep_reproduce=0.04,
@@ -68,6 +68,7 @@ class WolfSheep(Model):
         self.height = height
         self.width = width
         self.grass = grass
+
 
         # Create grid using experimental cell space
         self.grid = OrthogonalVonNeumannGrid(
