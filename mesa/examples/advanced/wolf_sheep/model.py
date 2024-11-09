@@ -9,30 +9,20 @@ Replication of the model found in NetLogo:
     Northwestern University, Evanston, IL.
 """
 
-import mesa
+import math
+
+from mesa import Model
+from mesa.datacollection import DataCollector
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
-from mesa.experimental.cell_space import OrthogonalMooreGrid
+from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
+from mesa.experimental.devs import ABMSimulator
 
 
-class WolfSheep(mesa.Model):
+class WolfSheep(Model):
+    """Wolf-Sheep Predation Model.
+
+    A model for simulating wolf and sheep (predator-prey) ecosystem modelling.
     """
-    Wolf-Sheep Predation Model
-    """
-
-    height = 20
-    width = 20
-
-    initial_sheep = 100
-    initial_wolves = 50
-
-    sheep_reproduce = 0.04
-    wolf_reproduce = 0.05
-
-    wolf_gain_from_food = 20
-
-    grass = False
-    grass_regrowth_time = 30
-    sheep_gain_from_food = 4
 
     description = (
         "A model for simulating wolf and sheep (predator-prey) ecosystem modelling."
@@ -40,22 +30,24 @@ class WolfSheep(mesa.Model):
 
     def __init__(
         self,
-        width=20,
         height=20,
+        width=20,
         initial_sheep=100,
         initial_wolves=50,
         sheep_reproduce=0.04,
         wolf_reproduce=0.05,
         wolf_gain_from_food=20,
-        grass=False,
+        grass=True,
         grass_regrowth_time=30,
         sheep_gain_from_food=4,
         seed=None,
+        simulator: ABMSimulator = None,
     ):
-        """
-        Create a new Wolf-Sheep model with the given parameters.
+        """Create a new Wolf-Sheep model with the given parameters.
 
         Args:
+            height: Height of the grid
+            width: Width of the grid
             initial_sheep: Number of sheep to start with
             initial_wolves: Number of wolves to start with
             sheep_reproduce: Probability of each sheep reproducing each step
@@ -63,75 +55,85 @@ class WolfSheep(mesa.Model):
             wolf_gain_from_food: Energy a wolf gains from eating a sheep
             grass: Whether to have the sheep eat grass for energy
             grass_regrowth_time: How long it takes for a grass patch to regrow
-                                 once it is eaten
-            sheep_gain_from_food: Energy sheep gain from grass, if enabled.
+                                once it is eaten
+            sheep_gain_from_food: Energy sheep gain from grass, if enabled
+            seed: Random seed
+            simulator: ABMSimulator instance for event scheduling
         """
         super().__init__(seed=seed)
-        # Set parameters
-        self.width = width
+
+        # Initialize model parameters
         self.height = height
-        self.initial_sheep = initial_sheep
-        self.initial_wolves = initial_wolves
+        self.width = width
         self.grass = grass
-        self.grass_regrowth_time = grass_regrowth_time
+        self.simulator = simulator
 
-        self.grid = OrthogonalMooreGrid((self.width, self.height), torus=True)
+        # Create grid using experimental cell space
+        self.grid = OrthogonalVonNeumannGrid(
+            [self.height, self.width],
+            torus=True,
+            capacity=math.inf,
+            random=self.random,
+        )
 
-        collectors = {
+        # Set up data collection
+        model_reporters = {
             "Wolves": lambda m: len(m.agents_by_type[Wolf]),
             "Sheep": lambda m: len(m.agents_by_type[Sheep]),
-            "Grass": lambda m: len(
+        }
+        if grass:
+            model_reporters["Grass"] = lambda m: len(
                 m.agents_by_type[GrassPatch].select(lambda a: a.fully_grown)
             )
-            if m.grass
-            else -1,
-        }
 
-        self.datacollector = mesa.DataCollector(collectors)
+        self.datacollector = DataCollector(model_reporters)
 
         # Create sheep:
-        for _ in range(self.initial_sheep):
-            x = self.random.randrange(self.width)
-            y = self.random.randrange(self.height)
-            energy = self.random.randrange(2 * self.sheep_gain_from_food)
-            Sheep(
-                self, energy, sheep_reproduce, sheep_gain_from_food, self.grid[(x, y)]
+        for _ in range(initial_sheep):
+            pos = (
+                self.random.randrange(width),
+                self.random.randrange(height),
             )
+            energy = self.random.randrange(2 * sheep_gain_from_food)
+            Sheep(self, energy, sheep_reproduce, sheep_gain_from_food, self.grid[pos])
 
         # Create wolves
-        for _ in range(self.initial_wolves):
-            x = self.random.randrange(self.width)
-            y = self.random.randrange(self.height)
-            energy = self.random.randrange(2 * self.wolf_gain_from_food)
-            Wolf(self, energy, wolf_reproduce, wolf_gain_from_food, self.grid[(x, y)])
+        for _ in range(initial_wolves):
+            pos = (
+                self.random.randrange(width),
+                self.random.randrange(height),
+            )
+            energy = self.random.randrange(2 * wolf_gain_from_food)
+            Wolf(self, energy, wolf_reproduce, wolf_gain_from_food, self.grid[pos])
 
-        # Create grass patches
-        if self.grass:
-            for cell in self.grid.all_cells:
-                fully_grown = self.random.choice([True, False])
+        # Create grass patches if enabled
+        if grass:
+            possibly_fully_grown = [True, False]
+            for cell in self.grid:
+                fully_grown = self.random.choice(possibly_fully_grown)
+                countdown = (
+                    0 if fully_grown else self.random.randrange(grass_regrowth_time)
+                )
+                GrassPatch(self, countdown, grass_regrowth_time, cell)
 
-                if fully_grown:
-                    countdown = self.grass_regrowth_time
-                else:
-                    countdown = self.random.randrange(self.grass_regrowth_time)
-
-                patch = GrassPatch(self, fully_grown, countdown)
-                patch.cell = cell
-
+        # Collect initial data
         self.running = True
         self.datacollector.collect(self)
 
     def step(self):
-        # This replicated the behavior of the old RandomActivationByType scheduler
-        # when using step(shuffle_types=True, shuffle_agents=True).
-        # Conceptually, it can be argued that this should be modelled differently.
-        self.random.shuffle(self.agent_types)
-        for agent_type in self.agent_types:
-            self.agents_by_type[agent_type].shuffle_do("step")
+        """Execute one step of the model."""
+        # First activate all sheep, then all wolves, both in random order
+        self.agents_by_type[Sheep].shuffle_do("step")
+        self.agents_by_type[Wolf].shuffle_do("step")
 
-        # collect data
+        # Collect data
         self.datacollector.collect(self)
 
     def run_model(self, step_count=200):
+        """Run the model for a specified number of steps.
+
+        Args:
+            step_count: Number of steps to run the model
+        """
         for _ in range(step_count):
             self.step()
