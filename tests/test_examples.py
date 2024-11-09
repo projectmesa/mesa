@@ -1,7 +1,7 @@
 # noqa: D100
 from mesa.examples import (
     BoidFlockers,
-    BoltzmannWealthModel,
+    BoltzmannWealth,
     ConwaysGameOfLife,
     EpsteinCivilViolence,
     PdGrid,
@@ -13,7 +13,7 @@ from mesa.examples import (
 
 
 def test_boltzmann_model():  # noqa: D103
-    model = BoltzmannWealthModel(seed=42)
+    model = BoltzmannWealth(seed=42)
 
     for _i in range(10):
         model.step()

@@ -1,10 +1,10 @@
 """configurations for benchmarks."""
 
-from mesa.examples import BoidFlockers, BoltzmannWealthModel, Schelling, WolfSheep
+from mesa.examples import BoidFlockers, BoltzmannWealth, Schelling, WolfSheep
 
 configurations = {
     # Schelling Model Configurations
-    BoltzmannWealthModel: {
+    BoltzmannWealth: {
         "small": {
             "seeds": 50,
             "replications": 5,

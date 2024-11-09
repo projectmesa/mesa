@@ -1,4 +1,4 @@
-from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealthModel
+from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealth
 from mesa.visualization import (
     SolaraViz,
     make_plot_component,
@@ -35,7 +35,7 @@ def post_process(ax):
 
 
 # Create initial model instance
-model = BoltzmannWealthModel(50, 10, 10)
+model = BoltzmannWealth(50, 10, 10)
 
 # Create visualization elements. The visualization elements are solara components
 # that receive the model instance as a "prop" and display it in a certain way.

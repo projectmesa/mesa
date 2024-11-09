@@ -5,7 +5,7 @@ import time
 import altair as alt
 import pandas as pd
 import streamlit as st
-from model import BoltzmannWealthModel
+from model import BoltzmannWealth
 
 model = st.title("Boltzman Wealth Model")
 num_agents = st.slider(
@@ -19,7 +19,7 @@ num_ticks = st.slider(
 )
 height = st.slider("Select Grid Height", min_value=10, max_value=100, step=10, value=15)
 width = st.slider("Select Grid Width", min_value=10, max_value=100, step=10, value=20)
-model = BoltzmannWealthModel(num_agents, height, width)
+model = BoltzmannWealth(num_agents, height, width)
 
 
 status_text = st.empty()

@@ -13,7 +13,7 @@ from mesa.examples.basic.boltzmann_wealth_model.agents import MoneyAgent
 from mesa.space import MultiGrid
 
 
-class BoltzmannWealthModel(Model):
+class BoltzmannWealth(Model):
     """A simple model of an economy where agents exchange currency at random.
 
     All agents begin with one unit of currency, and each time step agents can give
