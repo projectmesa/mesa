@@ -75,7 +75,7 @@ class Schelling(Model):
         """
         super().__init__(seed=seed)
         self.simulator = simulator
-        self.simulator.setup()
+        self.simulator.setup(self)
         self.happy = 0
 
         self.grid = OrthogonalMooreGrid(

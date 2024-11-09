@@ -166,7 +166,7 @@ class WolfSheep(Model):
         self.height = height
         self.width = width
         self.simulator = simulator
-        self.simulator.setup()
+        self.simulator.setup(self)
 
         self.initial_sheep = initial_sheep
         self.initial_wolves = initial_wolves
