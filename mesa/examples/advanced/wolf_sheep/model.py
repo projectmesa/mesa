@@ -69,7 +69,6 @@ class WolfSheep(Model):
         self.width = width
         self.grass = grass
 
-
         # Create grid using experimental cell space
         self.grid = OrthogonalVonNeumannGrid(
             [self.height, self.width],
