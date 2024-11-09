@@ -8,7 +8,6 @@ __all__ = [
 ]
 
 
-
 class AttributeDict(dict):
     """A dict with attribute like access.
 

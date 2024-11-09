@@ -1,16 +1,19 @@
 """Tests for mesa_signals."""
 
 from unittest.mock import Mock
+
 import pytest
 
-from mesa.experimental.mesa_signals import (Observable, ObservableList, HasObservables, All, Computable, Computed)
+from mesa import Agent, Model
+from mesa.experimental.mesa_signals import (
+    All,
+    HasObservables,
+    Observable,
+)
 
-
-
-from mesa import Model, Agent
 
 def test_observables():
-    """test Observable."""
+    """Test Observable."""
 
     class MyAgent(Agent, HasObservables):
         some_attribute = Observable()
@@ -30,7 +33,7 @@ def test_observables():
 
 
 def test_HasObservables():
-    """test Observable."""
+    """Test Observable."""
 
     class MyAgent(Agent, HasObservables):
         some_attribute = Observable()
@@ -54,7 +57,9 @@ def test_HasObservables():
     subscribers = {entry() for entry in agent.subscribers["some_attribute"]["change"]}
     assert handler not in subscribers
 
-    subscribers = {entry() for entry in agent.subscribers["some_other_attribute"]["change"]}
+    subscribers = {
+        entry() for entry in agent.subscribers["some_other_attribute"]["change"]
+    }
     assert len(subscribers) == 0
 
     # testing All()
@@ -84,14 +89,18 @@ def test_HasObservables():
     subscribers = {entry() for entry in agent.subscribers["some_attribute"]["change"]}
     assert len(subscribers) == 0
 
-    subscribers = {entry() for entry in agent.subscribers["some_other_attribute"]["change"]}
+    subscribers = {
+        entry() for entry in agent.subscribers["some_other_attribute"]["change"]
+    }
     assert len(subscribers) == 3
 
     agent.clear_all_subscriptions(All())
     subscribers = {entry() for entry in agent.subscribers["some_attribute"]["change"]}
     assert len(subscribers) == 0
 
-    subscribers = {entry() for entry in agent.subscribers["some_other_attribute"]["change"]}
+    subscribers = {
+        entry() for entry in agent.subscribers["some_other_attribute"]["change"]
+    }
     assert len(subscribers) == 0
 
     # fixme unobserve all observables
@@ -102,4 +111,3 @@ def test_HasObservables():
 
     with pytest.raises(ValueError):
         agent.observe("unknonw_attribute", "change", handler)
-

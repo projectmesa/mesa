@@ -360,7 +360,6 @@ class HasObservables:
                                 remaining.append(ref)
                     self.subscribers[name][signal_type] = remaining
 
-
     def clear_all_subscriptions(self, name: str | All):
         """Clears all subscriptions for the observable <name>.
 
