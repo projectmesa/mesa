@@ -128,4 +128,3 @@ class WolfSheep(Model):
 
         # Collect data
         self.datacollector.collect(self)
-
