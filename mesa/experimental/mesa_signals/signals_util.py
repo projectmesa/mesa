@@ -20,14 +20,14 @@ class AttributeDict(dict):
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
 
-    def __getattr__(self, key):
+    def __getattr__(self, key):  # noqa: D105
         try:
             return self.__getitem__(key)
         except KeyError as e:
             # we need to go from key error to attribute error
             raise AttributeError(key) from e
 
-    def __dir__(self):
+    def __dir__(self):  # noqa: D105
         # allows us to easily access all defined attributes
         names = dir({})
         names.extend(self.keys())
@@ -42,9 +42,3 @@ def create_weakref(item, callback=None):
         ref = weakref.ref(item, callback)
     return ref
 
-
-if __name__ == "__main__":
-    a = dict(a=1, b=2)
-    b = AttributeDict(a)
-    print(dir(a))
-    print(dir(b))
