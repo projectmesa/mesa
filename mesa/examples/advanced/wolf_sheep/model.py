@@ -112,7 +112,7 @@ class WolfSheep(Model):
             for cell in self.grid:
                 fully_grown = self.random.choice(possibly_fully_grown)
                 countdown = (
-                    0 if fully_grown else self.random.randrange(grass_regrowth_time)
+                    0 if fully_grown else self.random.randrange(0, grass_regrowth_time)
                 )
                 GrassPatch(self, countdown, grass_regrowth_time, cell)
 
@@ -129,11 +129,3 @@ class WolfSheep(Model):
         # Collect data
         self.datacollector.collect(self)
 
-    def run_model(self, step_count=200):
-        """Run the model for a specified number of steps.
-
-        Args:
-            step_count: Number of steps to run the model
-        """
-        for _ in range(step_count):
-            self.step()
