@@ -96,17 +96,17 @@ def SolaraViz(
         model = solara.use_reactive(model)  # noqa: SH102, RUF100
 
     # def connect_to_model():
-        # # Patch the step function to force updates
-        # original_step = model.value.step
-        #
-        # def step():
-        #     original_step()
-        #     force_update()
-        #
-        # model.value.step = step
-        # Add a trigger to model itself
-        # model.value.force_update = force_update
-        # force_update()
+    # # Patch the step function to force updates
+    # original_step = model.value.step
+    #
+    # def step():
+    #     original_step()
+    #     force_update()
+    #
+    # model.value.step = step
+    # Add a trigger to model itself
+    # model.value.force_update = force_update
+    # force_update()
 
     # solara.use_effect(connect_to_model, [model.value])
 
