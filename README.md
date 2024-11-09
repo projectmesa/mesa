@@ -28,18 +28,18 @@ can be displayed in browser windows or Jupyter.*
 
 ## Using Mesa
 
-To install our latest stable release (2.4.x), run:
+To install our latest stable release (3.0.x), run:
 
 ``` bash
 pip install -U mesa
 ```
 
-To install our latest pre-release (3.0.0 alpha), run:
+To install our latest pre-release, run:
 
 ``` bash
 pip install -U --pre mesa
 ```
-With Mesa 3.0, we don't install all our dependencies anymore by default.
+Starting with Mesa 3.0, we don't install all our dependencies anymore by default.
 ```bash
 # You can customize the additional dependencies you need, if you want. Available are:
 pip install -U --pre mesa[network,viz]
