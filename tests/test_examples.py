@@ -1,7 +1,7 @@
 # noqa: D100
 from mesa.examples import (
     BoidFlockers,
-    BoltzmannWealthModel,
+    BoltzmannWealth,
     ConwaysGameOfLife,
     EpsteinCivilViolence,
     PdGrid,
@@ -13,7 +13,7 @@ from mesa.examples import (
 
 
 def test_boltzmann_model():  # noqa: D103
-    model = BoltzmannWealthModel(seed=42)
+    model = BoltzmannWealth(seed=42)
 
     for _i in range(10):
         model.step()
@@ -66,7 +66,9 @@ def test_sugarscape_g1mt():  # noqa: D103
 
 
 def test_wolf_sheep():  # noqa: D103
-    model = WolfSheep(seed=42)
+    from mesa.experimental.devs import ABMSimulator
 
-    for _i in range(10):
-        model.step()
+    simulator = ABMSimulator()
+    model = WolfSheep(seed=42, simulator=simulator)
+    simulator.setup(model)
+    simulator.run_for(10)
