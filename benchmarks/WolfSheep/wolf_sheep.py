@@ -166,6 +166,7 @@ class WolfSheep(Model):
         self.height = height
         self.width = width
         self.simulator = simulator
+        self.simulator.setup()
 
         self.initial_sheep = initial_sheep
         self.initial_wolves = initial_wolves
@@ -225,9 +226,6 @@ if __name__ == "__main__":
         20,
         seed=15,
     )
-
-    simulator.setup(model)
-
     start_time = time.perf_counter()
     simulator.run(100)
     print("Time:", time.perf_counter() - start_time)

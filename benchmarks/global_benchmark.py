@@ -35,7 +35,6 @@ def run_model(model_class, seed, parameters):
     else:
         simulator = ABMSimulator()
         model = model_class(simulator=simulator, seed=seed, **parameters)
-        simulator.setup(model)
 
     end_init_start_run = timeit.default_timer()
 
