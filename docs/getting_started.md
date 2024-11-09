@@ -8,7 +8,7 @@ Mesa is a modular framework for building, analyzing and visualizing agent-based 
 If you want to get a quick start on how to build agent based models with MESA, check the tutorials:
 
 - [Introductory Tutorial](tutorials/intro_tutorial): Learn how to create your first Mesa model.
-- [Visualization Tutorial](tutorials/visualization_tutorial.html): Learn how to create interactive visualizations for your models.
+- [Visualization Tutorial](tutorials/visualization_tutorial): Learn how to create interactive visualizations for your models.
 
 ## Examples
 Mesa ships with a collection of example models. These are classic ABMs, so if you are familiar with ABMs and want to get a quick sense of how MESA works, these examples are great place to start. You can find them [here](examples).
