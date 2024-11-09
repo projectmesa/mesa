@@ -1,8 +1,3 @@
-import os.path as osp
-import sys
-
-sys.path.insert(0, osp.abspath("../../../.."))
-
 from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealthModel
 from mesa.visualization import (
     SolaraViz,

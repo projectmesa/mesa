@@ -1,9 +1,3 @@
-import os.path as osp
-import sys
-
-sys.path.insert(0, osp.abspath("../../../.."))
-
-
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.examples.advanced.wolf_sheep.model import WolfSheep
 from mesa.experimental.devs import ABMSimulator
@@ -43,7 +37,6 @@ def wolf_sheep_portrayal(agent):
 
 
 model_params = {
-    # The following line is an example to showcase StaticText.
     "seed": {
         "type": "InputText",
         "value": 42,
