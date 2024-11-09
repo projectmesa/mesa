@@ -70,7 +70,6 @@ class WolfSheep(mesa.Model):
         """
         super().__init__(seed=seed)
         self.simulator = simulator
-        self.simulator.setup(self)
 
         # Set parameters
         self.width = width

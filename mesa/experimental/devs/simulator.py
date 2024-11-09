@@ -106,6 +106,7 @@ class Simulator:
                                      plus the time delta
 
         """
+        # fixme, raise initialization error or something like it if model.setup has not been called
         end_time = self.time + time_delta
         self.run_until(end_time)
 
