@@ -355,7 +355,7 @@ class HasObservables:
                 with contextlib.suppress(KeyError):
                     remaining = []
                     for ref in self.subscribers[name][signal_type]:
-                        if subscriber := ref():
+                        if subscriber := ref():  # noqa: SIM102
                             if subscriber != handler:
                                 remaining.append(ref)
                     self.subscribers[name][signal_type] = remaining
