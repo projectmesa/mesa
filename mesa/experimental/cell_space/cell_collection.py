@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+import warnings
 from collections.abc import Callable, Iterable, Mapping
 from functools import cached_property
 from random import Random
@@ -45,7 +46,9 @@ class CellCollection(Generic[T]):
         self._capacity: int = next(iter(self._cells.keys())).capacity
 
         if random is None:
-            random = Random()  # FIXME
+            warnings.warn("Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
+                          UserWarning, stacklevel=2)
+            random = Random()
         self.random = random
 
     def __iter__(self):  # noqa

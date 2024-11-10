@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from collections.abc import Callable
 from functools import cached_property
 from random import Random
@@ -44,6 +45,8 @@ class DiscreteSpace(Generic[T]):
         self.capacity = capacity
         self._cells: dict[tuple[int, ...], T] = {}
         if random is None:
+            warnings.warn("Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
+                          UserWarning, stacklevel=2)
             random = Random()  # FIXME should default to default rng from model
         self.random = random
         self.cell_klass = cell_klass

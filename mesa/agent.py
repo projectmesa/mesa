@@ -120,6 +120,8 @@ class AgentSet(MutableSet, Sequence):
             random (Random): the random number generator
         """
         if random is None:
+            warnings.warn("Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
+                          UserWarning, stacklevel=2)
             random = (
                 Random()
             )  # FIXME see issue 1981, how to get the central rng from model
