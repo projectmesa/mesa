@@ -46,8 +46,11 @@ class CellCollection(Generic[T]):
         self._capacity: int = next(iter(self._cells.keys())).capacity
 
         if random is None:
-            warnings.warn("Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
-                          UserWarning, stacklevel=2)
+            warnings.warn(
+                "Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
+                UserWarning,
+                stacklevel=2,
+            )
             random = Random()
         self.random = random
 
