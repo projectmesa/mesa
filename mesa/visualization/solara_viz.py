@@ -266,7 +266,7 @@ def SimulatorController(
 
     def do_step():
         """Advance the model by one step."""
-        simulator.run_for(1)  # fixme
+        simulator.run_for(1)
         running.value = model.value.running
         force_update()
 
