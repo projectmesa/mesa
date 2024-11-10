@@ -50,7 +50,7 @@ class DiscreteSpace(Generic[T]):
                 UserWarning,
                 stacklevel=2,
             )
-            random = Random()  # FIXME should default to default rng from model
+            random = Random() 
         self.random = random
         self.cell_klass = cell_klass
 
