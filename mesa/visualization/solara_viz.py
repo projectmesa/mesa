@@ -388,9 +388,7 @@ def ModelCreator(
     }
 
     def on_change(name, value):
-        new_model_parameters = {**model_parameters.value, name: value}
-        model.value = model.value.__class__(**new_model_parameters)
-        model_parameters.value = new_model_parameters
+        model_parameters.value = {**model_parameters.value, name: value}
 
     UserInputs(user_params, on_change=on_change)
 
