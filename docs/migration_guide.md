@@ -12,8 +12,8 @@ _This guide is a work in progress. The development of it is tracked in [Issue #2
 
 ### Upgrade strategy
 We recommend the following upgrade strategy:
-- Update the the latest Mesa 2.x release (`mesa<3`).
-- Update the the latest Mesa 3.0.x release (`mesa<3.1`).
+- Update to the latest Mesa 2.x release (`mesa<3`).
+- Update to the latest Mesa 3.0.x release (`mesa<3.1`).
 - Update to the latest Mesa 3.x release (`mesa<4`).
 
 With each update, resolve all errors and warnings, before updating to the next one.
