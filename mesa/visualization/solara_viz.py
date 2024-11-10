@@ -43,10 +43,10 @@ if TYPE_CHECKING:
 @solara.component
 def SolaraViz(
     model: Model | solara.Reactive[Model],
+    *,
     components: list[reacton.core.Component]
     | list[Callable[[Model], reacton.core.Component]]
     | Literal["default"] = "default",
-    *,
     play_interval: int = 100,
     simulator: Simulator | None = None,
     model_params=None,
@@ -104,7 +104,7 @@ def SolaraViz(
 
     with solara.Sidebar(), solara.Column():
         with solara.Card("Controls"):
-            if not isinstance(simulator, Simulator):
+            if simulator is None or not isinstance(simulator, Simulator):
                 ModelController(
                     model,
                     model_parameters=reactive_model_parameters,
