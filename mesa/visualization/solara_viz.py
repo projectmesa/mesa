@@ -32,9 +32,9 @@ import reacton.core
 import solara
 
 import mesa.visualization.components.altair_components as components_altair
+from mesa.experimental.devs.simulator import Simulator
 from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
-from mesa.experimental.devs.simulator import Simulator
 
 if TYPE_CHECKING:
     from mesa.model import Model
@@ -101,7 +101,6 @@ def SolaraViz(
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
-
 
     with solara.Sidebar(), solara.Column():
         with solara.Card("Controls"):
