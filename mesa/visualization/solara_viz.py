@@ -276,7 +276,7 @@ def SimulatorController(
         running.value = True
         simulator.reset()
         model.value = model.value = model.value.__class__(
-            simulator, **model_parameters.value
+            simulator=simulator, **model_parameters.value
         )
 
     def do_play_pause():
