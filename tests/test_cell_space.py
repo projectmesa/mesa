@@ -25,7 +25,7 @@ def test_orthogonal_grid_neumann():
     """Test orthogonal grid with von Neumann neighborhood."""
     width = 10
     height = 10
-    grid = OrthogonalVonNeumannGrid((width, height), torus=False, capacity=None)
+    grid = OrthogonalVonNeumannGrid((width, height), torus=False, capacity=None, random=random.Random(42))
 
     assert len(grid._cells) == width * height
 
@@ -55,7 +55,7 @@ def test_orthogonal_grid_neumann():
         assert connection.coordinate in {(4, 5), (5, 4), (5, 6), (6, 5)}
 
     # von neumann neighborhood, torus True, top corner
-    grid = OrthogonalVonNeumannGrid((width, height), torus=True, capacity=None)
+    grid = OrthogonalVonNeumannGrid((width, height), torus=True, capacity=None, random=random.Random(42))
     assert len(grid._cells[(0, 0)].connections.values()) == 4
     for connection in grid._cells[(0, 0)].connections.values():
         assert connection.coordinate in {(0, 1), (1, 0), (0, 9), (9, 0)}
@@ -78,7 +78,7 @@ def test_orthogonal_grid_neumann_3d():
     width = 10
     height = 10
     depth = 10
-    grid = OrthogonalVonNeumannGrid((width, height, depth), torus=False, capacity=None)
+    grid = OrthogonalVonNeumannGrid((width, height, depth), torus=False, capacity=None, random=random.Random(42))
 
     assert len(grid._cells) == width * height * depth
 
@@ -124,7 +124,7 @@ def test_orthogonal_grid_neumann_3d():
         }
 
     # von neumann neighborhood, torus True, top corner
-    grid = OrthogonalVonNeumannGrid((width, height, depth), torus=True, capacity=None)
+    grid = OrthogonalVonNeumannGrid((width, height, depth), torus=True, capacity=None, random=random.Random(42))
     assert len(grid._cells[(0, 0, 0)].connections.values()) == 6
     for connection in grid._cells[(0, 0, 0)].connections.values():
         assert connection.coordinate in {
@@ -143,7 +143,7 @@ def test_orthogonal_grid_moore():
     height = 10
 
     # Moore neighborhood, torus false, top corner
-    grid = OrthogonalMooreGrid((width, height), torus=False, capacity=None)
+    grid = OrthogonalMooreGrid((width, height), torus=False, capacity=None, random=random.Random(42))
     assert len(grid._cells[(0, 0)].connections.values()) == 3
     for connection in grid._cells[(0, 0)].connections.values():
         assert connection.coordinate in {(0, 1), (1, 0), (1, 1)}
@@ -158,7 +158,7 @@ def test_orthogonal_grid_moore():
         # fmt: on
 
     # Moore neighborhood, torus True, top corner
-    grid = OrthogonalMooreGrid([10, 10], torus=True, capacity=None)
+    grid = OrthogonalMooreGrid([10, 10], torus=True, capacity=None, random=random.Random(42))
     assert len(grid._cells[(0, 0)].connections.values()) == 8
     for connection in grid._cells[(0, 0)].connections.values():
         # fmt: off
@@ -175,7 +175,7 @@ def test_orthogonal_grid_moore_3d():
     depth = 10
 
     # Moore neighborhood, torus false, top corner
-    grid = OrthogonalMooreGrid((width, height, depth), torus=False, capacity=None)
+    grid = OrthogonalMooreGrid((width, height, depth), torus=False, capacity=None, random=random.Random(42))
     assert len(grid._cells[(0, 0, 0)].connections.values()) == 7
     for connection in grid._cells[(0, 0, 0)].connections.values():
         assert connection.coordinate in {
@@ -198,7 +198,7 @@ def test_orthogonal_grid_moore_3d():
         # fmt: on
 
     # Moore neighborhood, torus True, top corner
-    grid = OrthogonalMooreGrid((width, height, depth), torus=True, capacity=None)
+    grid = OrthogonalMooreGrid((width, height, depth), torus=True, capacity=None, random=random.Random(42))
     assert len(grid._cells[(0, 0, 0)].connections.values()) == 26
     for connection in grid._cells[(0, 0, 0)].connections.values():
         # fmt: off
@@ -216,7 +216,7 @@ def test_orthogonal_grid_moore_4d():
     time = 10
 
     # Moore neighborhood, torus false, top corner
-    grid = OrthogonalMooreGrid((width, height, depth, time), torus=False, capacity=None)
+    grid = OrthogonalMooreGrid((width, height, depth, time), torus=False, capacity=None, random=random.Random(42))
     assert len(grid._cells[(0, 0, 0, 0)].connections.values()) == 15
     for connection in grid._cells[(0, 0, 0, 0)].connections.values():
         assert connection.coordinate in {
@@ -258,7 +258,7 @@ def test_orthogonal_grid_moore_1d():
     width = 10
 
     # Moore neighborhood, torus false, left edge
-    grid = OrthogonalMooreGrid((width,), torus=False, capacity=None)
+    grid = OrthogonalMooreGrid((width,), torus=False, capacity=None, random=random.Random(42))
     assert len(grid._cells[(0,)].connections.values()) == 1
     for connection in grid._cells[(0,)].connections.values():
         assert connection.coordinate in {(1,)}
@@ -269,7 +269,7 @@ def test_orthogonal_grid_moore_1d():
         assert connection.coordinate in {(4,), (6,)}
 
     # Moore neighborhood, torus True, left edge
-    grid = OrthogonalMooreGrid((width,), torus=True, capacity=None)
+    grid = OrthogonalMooreGrid((width,), torus=True, capacity=None, random=random.Random(42))
     assert len(grid._cells[(0,)].connections.values()) == 2
     for connection in grid._cells[(0,)].connections.values():
         assert connection.coordinate in {(1,), (9,)}
@@ -282,7 +282,7 @@ def test_cell_neighborhood():
     ## von Neumann
     width = 10
     height = 10
-    grid = OrthogonalVonNeumannGrid((width, height), torus=False, capacity=None)
+    grid = OrthogonalVonNeumannGrid((width, height), torus=False, capacity=None, random=random.Random(42))
     for radius, n in zip(range(1, 4), [2, 5, 9]):
         if radius == 1:
             neighborhood = grid._cells[(0, 0)].neighborhood
@@ -293,7 +293,7 @@ def test_cell_neighborhood():
     ## Moore
     width = 10
     height = 10
-    grid = OrthogonalMooreGrid((width, height), torus=False, capacity=None)
+    grid = OrthogonalMooreGrid((width, height), torus=False, capacity=None, random=random.Random(42))
     for radius, n in zip(range(1, 4), [3, 8, 15]):
         if radius == 1:
             neighborhood = grid._cells[(0, 0)].neighborhood
@@ -307,7 +307,7 @@ def test_cell_neighborhood():
     # hexgrid
     width = 10
     height = 10
-    grid = HexGrid((width, height), torus=False, capacity=None)
+    grid = HexGrid((width, height), torus=False, capacity=None, random=random.Random(42))
     for radius, n in zip(range(1, 4), [2, 6, 11]):
         if radius == 1:
             neighborhood = grid._cells[(0, 0)].neighborhood
@@ -317,7 +317,7 @@ def test_cell_neighborhood():
 
     width = 10
     height = 10
-    grid = HexGrid((width, height), torus=False, capacity=None)
+    grid = HexGrid((width, height), torus=False, capacity=None, random=random.Random(42))
     for radius, n in zip(range(1, 4), [5, 10, 17]):
         if radius == 1:
             neighborhood = grid._cells[(1, 0)].neighborhood
@@ -333,7 +333,7 @@ def test_hexgrid():
     width = 10
     height = 10
 
-    grid = HexGrid((width, height), torus=False)
+    grid = HexGrid((width, height), torus=False, random=random.Random(42))
     assert len(grid._cells) == width * height
 
     # first row
@@ -369,7 +369,7 @@ def test_hexgrid():
 
         # fmt: on
 
-    grid = HexGrid((width, height), torus=True)
+    grid = HexGrid((width, height), torus=True, random=random.Random(42))
     assert len(grid._cells) == width * height
 
     # first row
@@ -391,7 +391,7 @@ def test_networkgrid():
     m = 20
     seed = 42
     G = nx.gnm_random_graph(n, m, seed=seed)  # noqa: N806
-    grid = Network(G)
+    grid = Network(G, random=random.Random(42))
 
     assert len(grid._cells) == n
 
@@ -404,7 +404,7 @@ def test_voronoigrid():
     """Test VoronoiGrid."""
     points = [[0, 1], [1, 3], [1.1, 1], [1, 1]]
 
-    grid = VoronoiGrid(points)
+    grid = VoronoiGrid(points, random=random.Random(42))
 
     assert len(grid._cells) == len(points)
 
@@ -414,13 +414,13 @@ def test_voronoigrid():
         assert connection.coordinate in [[1, 1], [1, 3]]
 
     with pytest.raises(ValueError):
-        VoronoiGrid(points, capacity="str")
+        VoronoiGrid(points, capacity="str", random=random.Random(42))
 
     with pytest.raises(ValueError):
-        VoronoiGrid((1, 1))
+        VoronoiGrid((1, 1), random=random.Random(42))
 
     with pytest.raises(ValueError):
-        VoronoiGrid([[0, 1], [0, 1, 1]])
+        VoronoiGrid([[0, 1], [0, 1, 1]], random=random.Random(42))
 
 
 def test_empties_space():
@@ -431,7 +431,7 @@ def test_empties_space():
     m = 20
     seed = 42
     G = nx.gnm_random_graph(n, m, seed=seed)  # noqa: N806
-    grid = Network(G)
+    grid = Network(G, random=random.Random(42))
 
     assert len(grid.empties) == n
 
@@ -448,7 +448,7 @@ def test_agents_property():
     m = 20
     seed = 42
     G = nx.gnm_random_graph(n, m, seed=seed)  # noqa: N806
-    grid = Network(G)
+    grid = Network(G, random=random.Random(42))
 
     model = Model()
     for i in range(8):
@@ -554,7 +554,7 @@ def test_cell_collection():
 def test_property_layer_integration():
     """Test integration of PropertyLayer with DiscrateSpace and Cell."""
     width, height = 10, 10
-    grid = OrthogonalMooreGrid((width, height), torus=False)
+    grid = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
 
     # Test adding a PropertyLayer to the grid
     elevation = PropertyLayer("elevation", width, height, default_value=0)
@@ -599,13 +599,13 @@ def test_multiple_property_layers():
     temperature = PropertyLayer("temperature", width, height, default_value=20)
 
     # Test initialization with a single PropertyLayer
-    grid1 = OrthogonalMooreGrid((width, height), torus=False)
+    grid1 = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
     grid1.add_property_layer(elevation)
     assert "elevation" in grid1.property_layers
     assert len(grid1.property_layers) == 1
 
     # Test initialization with multiple PropertyLayers
-    grid2 = OrthogonalMooreGrid((width, height), torus=False)
+    grid2 = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
     grid2.add_property_layer(temperature, add_to_cells=False)
     grid2.add_property_layer(elevation, add_to_cells=True)
 
@@ -627,7 +627,7 @@ def test_multiple_property_layers():
 def test_property_layer_errors():
     """Test error handling for PropertyLayers."""
     width, height = 5, 5
-    grid = OrthogonalMooreGrid((width, height), torus=False)
+    grid = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
     elevation = PropertyLayer("elevation", width, height, default_value=0)
 
     # Test adding a PropertyLayer with an existing name
@@ -674,7 +674,7 @@ def test_cell_agent():  # noqa: D103
 
 def test_grid2DMovingAgent():  # noqa: D103
     # we first test on a moore grid because all directions are defined
-    grid = OrthogonalMooreGrid((10, 10), torus=False)
+    grid = OrthogonalMooreGrid((10, 10), torus=False, random=random.Random(42))
 
     model = Model()
     agent = Grid2DMovingAgent(model)
@@ -683,7 +683,7 @@ def test_grid2DMovingAgent():  # noqa: D103
     agent.move("up")
     assert agent.cell == grid[3, 4]
 
-    grid = OrthogonalVonNeumannGrid((10, 10), torus=False)
+    grid = OrthogonalVonNeumannGrid((10, 10), torus=False, random=random.Random(42))
 
     model = Model()
     agent = Grid2DMovingAgent(model)
@@ -720,7 +720,7 @@ def test_copying_discrete_spaces():  # noqa: D103
 
     import networkx as nx
 
-    grid = OrthogonalMooreGrid((100, 100))
+    grid = OrthogonalMooreGrid((100, 100), random=random.Random(42))
     grid_copy = copy.deepcopy(grid)
 
     c1 = grid[(5, 5)].connections
@@ -734,14 +734,14 @@ def test_copying_discrete_spaces():  # noqa: D103
     m = 20
     seed = 42
     G = nx.gnm_random_graph(n, m, seed=seed)  # noqa: N806
-    grid = Network(G)
+    grid = Network(G, random=random.Random(42))
     grid_copy = copy.deepcopy(grid)
 
     for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
         for k, v in c1.connections.items():
             assert v.coordinate == c2.connections[k].coordinate
 
-    grid = HexGrid((100, 100))
+    grid = HexGrid((100, 100), random=random.Random(42))
     grid_copy = copy.deepcopy(grid)
 
     c1 = grid[(5, 5)].connections
