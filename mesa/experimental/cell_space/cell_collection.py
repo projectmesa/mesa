@@ -24,6 +24,12 @@ class CellCollection(Generic[T]):
         agents (List[CellAgent]) : List of agents occupying the cells in this collection
         random (Random) : The random number generator
 
+    Notes:
+        A `UserWarning` is issued if `random=None`. You can resolve this warning by explicitly
+        passing a random number generator. In most cases, this will be the seeded random number
+        generator in the model. So, you would do `random=self.random` in a `Model` or `Agent` instance.
+
+
     """
 
     def __init__(

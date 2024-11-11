@@ -110,6 +110,12 @@ class AgentSet(MutableSet, Sequence):
         without preventing garbage collection. It is associated with a specific model instance, enabling
         interactions with the model's environment and other agents.The implementation uses a WeakKeyDictionary to store agents,
         which means that agents not referenced elsewhere in the program may be automatically removed from the AgentSet.
+
+    Notes:
+        A `UserWarning` is issued if `random=None`. You can resolve this warning by explicitly
+        passing a random number generator. In most cases, this will be the seeded random number
+        generator in the model. So, you would do `random=self.random` in a `Model` or `Agent` instance.
+
     """
 
     def __init__(self, agents: Iterable[Agent], random: Random | None = None):

@@ -26,6 +26,12 @@ class DiscreteSpace(Generic[T]):
         cell_klass (Type) : the type of cell class
         empties (CellCollection) : collection of all cells that are empty
         property_layers (dict[str, PropertyLayer]): the property layers of the discrete space
+
+    Notes:
+        A `UserWarning` is issued if `random=None`. You can resolve this warning by explicitly
+        passing a random number generator. In most cases, this will be the seeded random number
+        generator in the model. So, you would do `random=self.random` in a `Model` or `Agent` instance.
+
     """
 
     def __init__(
