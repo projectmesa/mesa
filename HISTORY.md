@@ -1,6 +1,25 @@
 ---
 title: Release History
 ---
+# 3.0.1 (2024-11-11)
+## Highlights
+After our huge [3.0.0 release](https://github.com/projectmesa/mesa/releases/tag/v3.0.0), Mesa 3.0.1 follows up with two improvements to experimental features, examples and docs.
+
+## What's Changed
+### 🧪 Experimental features
+* Bugfixes to DEVS by @quaquel in https://github.com/projectmesa/mesa/pull/2478
+* Support simulators in SolaraViz by @quaquel in https://github.com/projectmesa/mesa/pull/2470
+### 🔍 Examples updated
+* Integrate benchmarks and example models by @EwoutH in https://github.com/projectmesa/mesa/pull/2473
+### 📜 Documentation improvements
+* docs/tutorial: Replace scheduler in MoneyModel by @EwoutH in https://github.com/projectmesa/mesa/pull/2475
+* docs: update migration_guide.md by @eltociear in https://github.com/projectmesa/mesa/pull/2480
+
+## New Contributors
+* @eltociear made their first contribution in https://github.com/projectmesa/mesa/pull/2480
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.0...v3.0.1
+
 # 3.0.0 (2024-11-09)
 ## Highlights
 Mesa 3.0 brings major improvements to agent-based modeling, making it more intuitive and powerful while reducing complexity. This release modernizes core functionalities and introduces new capabilities for both beginners and advanced users.
