@@ -83,7 +83,7 @@ lineplot_component = make_plot_component(
 )
 
 simulator = ABMSimulator()
-model = WolfSheep(simulator, grass=True)
+model = WolfSheep(simulator=simulator, grass=True)
 
 page = SolaraViz(
     model,
