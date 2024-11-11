@@ -1,7 +1,7 @@
 """Mesa Time Module.
 
 .. warning::
-    The time module and all its Schedulers are deprecated and will be removed in a future version.
+    The time module and all its Schedulers are deprecated and will be removed in Mesa 3.1.
     They can be replaced with AgentSet functionality. See the migration guide for details:
     https://mesa.readthedocs.io/latest/migration_guide.html#time-and-schedulers
 
@@ -63,7 +63,7 @@ class BaseScheduler:
 
         """
         warnings.warn(
-            "The time module and all its Schedulers are deprecated and will be removed in a future version. "
+            "The time module and all its Schedulers are deprecated and will be removed in Mesa 3.1. "
             "They can be replaced with AgentSet functionality. See the migration guide for details. "
             "https://mesa.readthedocs.io/latest/migration_guide.html#time-and-schedulers",
             DeprecationWarning,
@@ -375,7 +375,7 @@ class RandomActivationByType(BaseScheduler):
 
 
 class DiscreteEventScheduler(BaseScheduler):
-    """This class has been deprecated and replaced by the functionality provided by experimental.devs."""
+    """This class has been removed and replaced by the functionality provided by experimental.devs."""
 
     def __init__(self, model: Model, time_step: TimeT = 1) -> None:
         """Initialize DiscreteEventScheduler.
@@ -387,5 +387,5 @@ class DiscreteEventScheduler(BaseScheduler):
         """
         super().__init__(model)
         raise Exception(
-            "DiscreteEventScheduler is deprecated in favor of the functionality provided by experimental.devs"
+            "DiscreteEventScheduler is removed in favor of the functionality provided by experimental.devs"
         )
