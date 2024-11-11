@@ -13,7 +13,7 @@ from mesa.examples import (
 
 
 def test_boltzmann_model():  # noqa: D103
-    from mesa.examples.basic.boltzmann_wealth_model import app, st_app
+    from mesa.examples.basic.boltzmann_wealth_model import app
 
     app.page  # noqa: B018
 
@@ -24,7 +24,7 @@ def test_boltzmann_model():  # noqa: D103
 
 
 def test_conways_game_model():  # noqa: D103
-    from mesa.examples.basic.conways_game_of_life import app, st_app
+    from mesa.examples.basic.conways_game_of_life import app
 
     app.page  # noqa: B018
 
