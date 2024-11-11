@@ -26,7 +26,7 @@ model_params = {
     "height": 20,
 }
 
-model1 = Schelling(20, 20, 0.8, 0.2, 3)
+model1 = Schelling()
 
 HappyPlot = make_plot_component({"happy": "tab:green"})
 
