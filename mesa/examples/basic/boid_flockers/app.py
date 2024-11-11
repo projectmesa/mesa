@@ -12,6 +12,11 @@ def boid_draw(agent):
 
 
 model_params = {
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "population": Slider(
         label="Number of boids",
         value=100,
