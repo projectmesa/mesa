@@ -3,10 +3,7 @@ from mesa.visualization import Slider, SolaraViz, make_space_component
 
 
 def boid_draw(agent):
-    if not agent.neighbors:  # Only for the first Frame
-        neighbors = len(agent.model.space.get_neighbors(agent.pos, agent.vision, False))
-    else:
-        neighbors = len(agent.neighbors)
+    neighbors = len(agent.neighbors)
 
     if neighbors <= 1:
         return {"color": "red", "size": 20}
