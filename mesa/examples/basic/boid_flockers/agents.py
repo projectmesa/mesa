@@ -54,13 +54,14 @@ class Boid(Agent):
         self.cohere_factor = cohere
         self.separate_factor = separate
         self.match_factor = match
+        self.neighbors = []
 
     def step(self):
         """Get the Boid's neighbors, compute the new vector, and move accordingly."""
-        neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
+        self.neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
 
         # If no neighbors, maintain current direction
-        if not neighbors:
+        if not self.neighbors:
             new_pos = self.pos + self.direction * self.speed
             self.model.space.move_agent(self, new_pos)
             return
@@ -71,7 +72,7 @@ class Boid(Agent):
         separation_vector = np.zeros(2)  # Separation vector
 
         # Calculate the contribution of each neighbor to the three behaviors
-        for neighbor in neighbors:
+        for neighbor in self.neighbors:
             heading = self.model.space.get_heading(self.pos, neighbor.pos)
             distance = self.model.space.get_distance(self.pos, neighbor.pos)
 
@@ -86,7 +87,7 @@ class Boid(Agent):
             match_vector += neighbor.direction
 
         # Weight each behavior by its factor and normalize by number of neighbors
-        n = len(neighbors)
+        n = len(self.neighbors)
         cohere = cohere * self.cohere_factor
         separation_vector = separation_vector * self.separate_factor
         match_vector = match_vector * self.match_factor
