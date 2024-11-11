@@ -178,7 +178,7 @@ class AgentSet(MutableSet, Sequence):
         """
         if n is not None:
             warnings.warn(
-                "The parameter 'n' is deprecated. Use 'at_most' instead.",
+                "The parameter 'n' is deprecated and will be removed in Mesa 3.1. Use 'at_most' instead.",
                 DeprecationWarning,
                 stacklevel=2,
             )
@@ -287,8 +287,9 @@ class AgentSet(MutableSet, Sequence):
             return_results = False
         else:
             warnings.warn(
-                "Using return_results is deprecated. Use AgenSet.do in case of return_results=False, and "
-                "AgentSet.map in case of return_results=True",
+                "Using return_results is deprecated and will be removed in Mesa 3.1."
+                "Use AgenSet.do in case of return_results=False, and AgentSet.map in case of return_results=True",
+                DeprecationWarning,
                 stacklevel=2,
             )
 

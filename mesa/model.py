@@ -114,7 +114,7 @@ class Model:
 
     def next_id(self) -> int:  # noqa: D102
         warnings.warn(
-            "using model.next_id() is deprecated. Agents track their unique ID automatically",
+            "using model.next_id() is deprecated and will be removed in Mesa 3.1. Agents track their unique ID automatically",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -146,8 +146,8 @@ class Model:
     def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
         """Deprecated: Retrieves an AgentSet containing all agents of the specified type."""
         warnings.warn(
-            f"Model.get_agents_of_type() is deprecated, please replace get_agents_of_type({agenttype})"
-            f"with the property agents_by_type[{agenttype}].",
+            f"Model.get_agents_of_type() is deprecated and will be removed in Mesa 3.1."
+            f"Please replace get_agents_of_type({agenttype}) with the property agents_by_type[{agenttype}].",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -262,7 +262,7 @@ class Model:
 
         """
         warnings.warn(
-            "initialize_data_collector() is deprecated. Please use the DataCollector class directly. "
+            "initialize_data_collector() is deprecated and will be removed in Mesa 3.1. Please use the DataCollector class directly. "
             "by using `self.datacollector = DataCollector(...)`.",
             DeprecationWarning,
             stacklevel=2,
