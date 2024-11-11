@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import numbers
 from collections.abc import Callable
-from typing import Any
-
-from mesa import Model
+from typing import TYPE_CHECKING, Any
 
 from .eventlist import EventList, Priority, SimulationEvent
+
+if TYPE_CHECKING:
+    from mesa import Model
 
 
 class Simulator:
