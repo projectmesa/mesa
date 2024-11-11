@@ -9,11 +9,14 @@ After our huge [3.0.0 release](https://github.com/projectmesa/mesa/releases/tag/
 ### 🧪 Experimental features
 * Bugfixes to DEVS by @quaquel in https://github.com/projectmesa/mesa/pull/2478
 * Support simulators in SolaraViz by @quaquel in https://github.com/projectmesa/mesa/pull/2470
+### 🛠 Enhancements made
+* issue a user warning if random is None by @quaquel in https://github.com/projectmesa/mesa/pull/2479
 ### 🔍 Examples updated
 * Integrate benchmarks and example models by @EwoutH in https://github.com/projectmesa/mesa/pull/2473
 ### 📜 Documentation improvements
 * docs/tutorial: Replace scheduler in MoneyModel by @EwoutH in https://github.com/projectmesa/mesa/pull/2475
 * docs: update migration_guide.md by @eltociear in https://github.com/projectmesa/mesa/pull/2480
+* Update some DeprecationWarnings to note they are removed in Mesa 3.1 by @EwoutH in https://github.com/projectmesa/mesa/pull/2481
 
 ## New Contributors
 * @eltociear made their first contribution in https://github.com/projectmesa/mesa/pull/2480
