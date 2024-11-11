@@ -7,7 +7,6 @@ import datetime
 
 import mesa.experimental as experimental
 import mesa.space as space
-import mesa.time as time
 from mesa.agent import Agent
 from mesa.batchrunner import batch_run
 from mesa.datacollection import DataCollector
@@ -16,7 +15,6 @@ from mesa.model import Model
 __all__ = [
     "Model",
     "Agent",
-    "time",
     "space",
     "DataCollector",
     "batch_run",
