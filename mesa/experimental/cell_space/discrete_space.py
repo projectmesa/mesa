@@ -73,7 +73,7 @@ class DiscreteSpace(Generic[T]):
     @cached_property
     def all_cells(self):
         """Return all cells in space."""
-        return CellCollection({cell: cell.agents for cell in self._cells.values()})
+        return CellCollection({cell: cell.agents for cell in self._cells.values()}, random=self.random)
 
     def __iter__(self):  # noqa
         return iter(self._cells.values())
