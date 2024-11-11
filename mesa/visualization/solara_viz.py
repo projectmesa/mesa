@@ -43,10 +43,10 @@ if TYPE_CHECKING:
 @solara.component
 def SolaraViz(
     model: Model | solara.Reactive[Model],
-    *,
     components: list[reacton.core.Component]
     | list[Callable[[Model], reacton.core.Component]]
     | Literal["default"] = "default",
+    *,
     play_interval: int = 100,
     simulator: Simulator | None = None,
     model_params=None,
