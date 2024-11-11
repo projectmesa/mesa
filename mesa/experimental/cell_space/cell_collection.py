@@ -121,4 +121,4 @@ class CellCollection(Generic[T]):
                     yield cell
                     count += 1
 
-        return CellCollection(cell_generator(filter_func, at_most))
+        return CellCollection(cell_generator(filter_func, at_most), random=self.random)
