@@ -103,7 +103,7 @@ model1 = VirusOnNetwork()
 
 page = SolaraViz(
     model1,
-    [
+    components=[
         SpacePlot,
         StatePlot,
         get_resistant_susceptible_ratio,
