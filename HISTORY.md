@@ -1,6 +1,24 @@
 ---
 title: Release History
 ---
+# 3.0.2 (2024-11-11)
+## Highlighst
+Mesa 3.0.2 is a small follow-up patch release, in which we fixed a lot of small bugs in the example models their visualisation, and improved their testing.
+
+## What's Changed
+### 🐛 Bugs fixed
+* allow components as a positional argument again by @Corvince in https://github.com/projectmesa/mesa/pull/2488
+### 🔍 Examples updated
+* examples: Add required components keyword by @EwoutH in https://github.com/projectmesa/mesa/pull/2485
+* examples: Fix boid_flockers viz by @EwoutH in https://github.com/projectmesa/mesa/pull/2492
+* examples: Fix schelling viz by @EwoutH in https://github.com/projectmesa/mesa/pull/2490
+* example: Add input sliders to Sugerscape viz by @EwoutH in https://github.com/projectmesa/mesa/pull/2487
+* examples/gol: Add initial fraction alive, add sliders to viz by @EwoutH in https://github.com/projectmesa/mesa/pull/2489
+### 🔧 Maintenance
+* test app init of examples by @Corvince in https://github.com/projectmesa/mesa/pull/2491
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.1...v3.0.2
+
 # 3.0.1 (2024-11-11)
 ## Highlights
 After our huge [3.0.0 release](https://github.com/projectmesa/mesa/releases/tag/v3.0.0), Mesa 3.0.1 follows up with two improvements to experimental features, examples and docs.
