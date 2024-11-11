@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from collections.abc import Callable
 from functools import cached_property
 from random import Random
@@ -25,6 +26,12 @@ class DiscreteSpace(Generic[T]):
         cell_klass (Type) : the type of cell class
         empties (CellCollection) : collection of all cells that are empty
         property_layers (dict[str, PropertyLayer]): the property layers of the discrete space
+
+    Notes:
+        A `UserWarning` is issued if `random=None`. You can resolve this warning by explicitly
+        passing a random number generator. In most cases, this will be the seeded random number
+        generator in the model. So, you would do `random=self.random` in a `Model` or `Agent` instance.
+
     """
 
     def __init__(
@@ -44,7 +51,12 @@ class DiscreteSpace(Generic[T]):
         self.capacity = capacity
         self._cells: dict[tuple[int, ...], T] = {}
         if random is None:
-            random = Random()  # FIXME should default to default rng from model
+            warnings.warn(
+                "Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
+                UserWarning,
+                stacklevel=2,
+            )
+            random = Random()
         self.random = random
         self.cell_klass = cell_klass
 
@@ -67,7 +79,9 @@ class DiscreteSpace(Generic[T]):
     @cached_property
     def all_cells(self):
         """Return all cells in space."""
-        return CellCollection({cell: cell.agents for cell in self._cells.values()})
+        return CellCollection(
+            {cell: cell.agents for cell in self._cells.values()}, random=self.random
+        )
 
     def __iter__(self):  # noqa
         return iter(self._cells.values())
