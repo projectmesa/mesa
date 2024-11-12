@@ -24,7 +24,7 @@ SeedLike = int | np.integer | Sequence[int] | np.random.SeedSequence
 RNGLike = np.random.Generator | np.random.BitGenerator
 
 
-logger = create_module_logger()
+_mesa_logger = create_module_logger()
 
 class Model:
     """Base class for models in the Mesa ABM library.

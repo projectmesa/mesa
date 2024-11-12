@@ -1,3 +1,8 @@
+import sys
+import os.path
+
+sys.path.insert(0, os.path.abspath('../../../..'))
+
 from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealth
 from mesa.visualization import (
     SolaraViz,
@@ -5,6 +10,9 @@ from mesa.visualization import (
     make_space_component,
 )
 
+
+from mesa.mesa_logging import log_to_stderr, DEBUG
+log_to_stderr(DEBUG)
 
 def agent_portrayal(agent):
     color = agent.wealth  # we are using a colormap to translate wealth to color
