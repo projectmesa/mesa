@@ -228,12 +228,7 @@ class DataCollector:
             reports = tuple(rep(agent) for rep in rep_funcs)
             return _prefix + reports
 
-        agent_records = map(
-            get_reports,
-            model.schedule.agents
-            if hasattr(model, "schedule") and model.schedule is not None
-            else model.agents,
-        )
+        agent_records = map(get_reports, model.agents)
         return agent_records
 
     def _record_agenttype(self, model, agent_type):
