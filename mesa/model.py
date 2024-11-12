@@ -18,10 +18,13 @@ from typing import Any
 import numpy as np
 
 from mesa.agent import Agent, AgentSet
+from mesa.mesa_logging import create_module_logger, method_logger
 
 SeedLike = int | np.integer | Sequence[int] | np.random.SeedSequence
 RNGLike = np.random.Generator | np.random.BitGenerator
 
+
+logger = create_module_logger()
 
 class Model:
     """Base class for models in the Mesa ABM library.
@@ -44,6 +47,7 @@ class Model:
 
     """
 
+    @method_logger(__name__)
     def __init__(
         self,
         *args: Any,
@@ -104,6 +108,7 @@ class Model:
         # setup agent registration data structures
         self._setup_agent_registration()
 
+    @method_logger(__name__)
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
         """Automatically increments time and steps after calling the user's step method."""
         # Automatically increment time and step counters
@@ -144,6 +149,7 @@ class Model:
             [], random=self.random
         )  # an agenset with all agents
 
+    @method_logger(__name__)
     def register_agent(self, agent):
         """Register the agent with the model.
 
