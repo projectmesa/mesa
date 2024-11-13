@@ -382,11 +382,17 @@ def ModelCreator(
     )
     user_params, fixed_params = split_model_params(user_params)
 
-    # set model_parameters to the default values for all parameters
-    model_parameters.value = {
-        **fixed_params,
-        **{k: v.get("value") for k, v in user_params.items()},
-    }
+    # Use solara.use_effect to run the initialization code only once
+    solara.use_effect(
+        # set model_parameters to the default values for all parameters
+        lambda: model_parameters.set(
+            {
+                **fixed_params,
+                **{k: v.get("value") for k, v in user_params.items()},
+            }
+        ),
+        [],
+    )
 
     def on_change(name, value):
         model_parameters.value = {**model_parameters.value, name: value}
