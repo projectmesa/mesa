@@ -35,7 +35,6 @@ class Model:
 
     Attributes:
         running: A boolean indicating if the model should continue running.
-        schedule: An object to manage the order and execution of agent steps.
         steps: the number of times `model.step()` has been called.
         random: a seeded python.random number generator.
         rng : a seeded numpy.random.Generator
