@@ -69,7 +69,6 @@ class Agent:
         self.pos: Position | None = None
         self.model.register_agent(self)
 
-
     def remove(self) -> None:
         """Remove and delete the agent from the model.
 
@@ -146,9 +145,10 @@ class AgentSet(MutableSet, Sequence):
 
     def __iter__(self) -> Iterator[Agent]:
         """Provide an iterator over the agents in the AgentSet."""
-
         # fixme should this not also be used to cleanout the weakrefs that resolve to None?
-        return (agent for entry in self._agents.keys() if (agent := entry()) is not None)
+        return (
+            agent for entry in self._agents.keys() if (agent := entry()) is not None
+        )
 
     def __contains__(self, agent: Agent) -> bool:
         """Check if an agent is in the AgentSet. Can be used like `agent in agentset`."""
@@ -395,22 +395,30 @@ class AgentSet(MutableSet, Sequence):
 
         if handle_missing == "error":
             if is_single_attr:
-                return [getattr(agent, attr_names) for agent_ref in self._agents if (agent := agent_ref()) is not None]
+                return [
+                    getattr(agent, attr_names)
+                    for agent_ref in self._agents
+                    if (agent := agent_ref()) is not None
+                ]
             else:
                 return [
                     [getattr(agent, attr) for attr in attr_names]
-                    for agent_ref in self._agents if (agent := agent_ref()) is not None
+                    for agent_ref in self._agents
+                    if (agent := agent_ref()) is not None
                 ]
 
         elif handle_missing == "default":
             if is_single_attr:
                 return [
-                    getattr(agent, attr_names, default_value) for agent_ref in self._agents if (agent := agent_ref()) is not None
+                    getattr(agent, attr_names, default_value)
+                    for agent_ref in self._agents
+                    if (agent := agent_ref()) is not None
                 ]
             else:
                 return [
                     [getattr(agent, attr, default_value) for attr in attr_names]
-                    for agent_ref in self._agents if (agent := agent_ref()) is not None
+                    for agent_ref in self._agents
+                    if (agent := agent_ref()) is not None
                 ]
 
         else:
@@ -442,7 +450,7 @@ class AgentSet(MutableSet, Sequence):
         Returns:
             Agent | list[Agent]: The selected agent or list of agents based on the index or slice provided.
         """
-        return list(self._agents.keys())[item]  #fixme
+        return list(self._agents.keys())[item]  # fixme
 
     def add(self, agent: Agent):
         """Add an agent to the AgentSet.
@@ -488,7 +496,10 @@ class AgentSet(MutableSet, Sequence):
         Returns:
             dict: A dictionary representing the state of the AgentSet.
         """
-        return {"agents": list(self._agents.keys()), "random": self.random} # fixme, we have to resolve all weakrefs here
+        return {
+            "agents": list(self._agents.keys()),
+            "random": self.random,
+        }  # fixme, we have to resolve all weakrefs here
 
     def __setstate__(self, state):
         """Set the state of the AgentSet during deserialization.
@@ -497,7 +508,9 @@ class AgentSet(MutableSet, Sequence):
             state (dict): A dictionary representing the state to restore.
         """
         self.random = state["random"]
-        self._update(state["agents"]) # fixme, we have to get the weakrefs out again here
+        self._update(
+            state["agents"]
+        )  # fixme, we have to get the weakrefs out again here
 
     def groupby(self, by: Callable | str, result_type: str = "agentset") -> GroupBy:
         """Group agents by the specified attribute or return from the callable.
