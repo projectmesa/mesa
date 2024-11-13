@@ -47,6 +47,11 @@ def SpaceDrawer(model):
 
 
 model_params = {
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "width": 50,
     "height": 50,
     # Population parameters
@@ -66,10 +71,10 @@ model_params = {
     "enable_trade": {"type": "Checkbox", "value": True, "label": "Enable Trading"},
 }
 
-model1 = SugarscapeG1mt()
+model = SugarscapeG1mt()
 
 page = SolaraViz(
-    model1,
+    model,
     components=[SpaceDrawer, make_plot_component(["Trader", "Price"])],
     model_params=model_params,
     name="Sugarscape {G1, M, T}",
