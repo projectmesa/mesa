@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import random
 import sys
-import warnings
 from collections.abc import Sequence
 
 # mypy
@@ -138,7 +137,6 @@ class Model:
     def agents_by_type(self) -> dict[type[Agent], AgentSet]:
         """A dictionary where the keys are agent types and the values are the corresponding AgentSets."""
         return self._agents_by_type
-
 
     def register_agent(self, agent):
         """Register the agent with the model.
