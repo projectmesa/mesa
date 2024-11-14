@@ -118,8 +118,61 @@ def test_HasObservables():
 
 def test_ObservableList():
     """Test ObservableList."""
-    list = ObservableList()
-    del list
+    # fixme, this does not test the emmited signals yet
+
+    class MyAgent(Agent, HasObservables):
+        my_list = ObservableList()
+
+        def __init__(self, model,):
+            super().__init__(model)
+            self.my_list = []
+
+    model = Model(seed=42)
+    agent = MyAgent(model)
+
+    assert len(agent.my_list) == 0
+
+    # add
+    agent.my_list.append(1)
+    assert len(agent.my_list) == 1
+
+    # remove
+    agent.my_list.remove(1)
+    assert len(agent.my_list) == 0
+
+    # overwrite the existing list
+    a_list = [1,2,3,4,5]
+    agent.my_list = a_list
+    assert len(agent.my_list) == len(a_list)
+    agent.my_list = a_list
+    assert len(agent.my_list) == len(a_list)
+
+    # pop
+    index = 4
+    entry = agent.my_list.pop(index)
+    assert entry == a_list.pop(index)
+    assert len(agent.my_list) == len(a_list)
+
+    # insert
+    agent.my_list.insert(0, 5)
+
+
+    # overwrite
+    agent.my_list[0] = 10
+    assert agent.my_list[0] == 10
+
+    # combine two lists
+    a_list = [1,2,3,4,5]
+    agent.my_list = a_list
+    assert len(agent.my_list) == len(a_list)
+    agent.my_list += a_list
+    assert len(agent.my_list) == 2*len(a_list)
+
+
+    assert 5 in agent.my_list
+
+    assert agent.my_list.index(5) == 4
+
 
 
 def test_Computable():

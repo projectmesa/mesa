@@ -378,7 +378,7 @@ class HasObservables:
                 functools.partial(defaultdict, weakref.WeakSet)
             )
 
-    def notify(self, observable: str, old_value: Any, new_value: Any, signal_type: str):
+    def notify(self, observable: str, old_value: Any, new_value: Any, signal_type: str, **kwargs):
         """Emit a signal.
 
         Args:
@@ -386,10 +386,11 @@ class HasObservables:
             old_value: the old value of the observable
             new_value: the new value of the observable
             signal_type: the type of signal to emit
+            kwargs: additional keyword arguments to include in the signal
 
         """
         signal = AttributeDict(
-            name=observable, old=old_value, new=new_value, owner=self, type=signal_type
+            name=observable, old=old_value, new=new_value, owner=self, type=signal_type, **kwargs
         )
 
         self._mesa_notify(signal)

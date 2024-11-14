@@ -22,10 +22,11 @@ class ObservableList(BaseObservable):
         """Initialize the ObservableList."""
         super().__init__()
         self.signal_types: set = {
-            "added",
             "removed",
             "replaced",
             "change",
+            "insert"
+            "append"
         }
         self.fallback_value = []
 
@@ -73,7 +74,7 @@ class SignalingList(MutableSequence[Any]):
         """
         old_value = self.data[index]
         self.data[index] = value
-        self.owner.notify(self.name, old_value, value, "replaced")
+        self.owner.notify(self.name, old_value, value, "replaced", index=index)
 
     def __delitem__(self, index: int) -> None:
         """Delete item at index.
@@ -84,7 +85,7 @@ class SignalingList(MutableSequence[Any]):
         """
         old_value = self.data
         del self.data[index]
-        self.owner.notify(self.name, old_value, None, "removed")
+        self.owner.notify(self.name, old_value, None, "removed", index=index)
 
     def __getitem__(self, index) -> Any:
         """Get item at index.
@@ -109,9 +110,20 @@ class SignalingList(MutableSequence[Any]):
             value: the value to insert
 
         """
-        old_value = self.data[index]
         self.data.insert(index, value)
-        self.owner.notify(self.name, old_value, value, "added")
+        self.owner.notify(self.name, None, value, "insert", index=index)
+
+    def append(self, value):
+        """Insert value at index.
+
+        Args:
+            index: the index to insert value into
+            value: the value to insert
+
+        """
+        index = len(self.data)
+        self.data.append(value)
+        self.owner.notify(self.name, None, value, "append", index=index)
 
     def __str__(self):
         return self.data.__str__()
