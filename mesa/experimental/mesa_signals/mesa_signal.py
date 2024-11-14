@@ -97,7 +97,6 @@ class Observable(BaseObservable):
         super().__set__(instance, value)  # send the notify
         setattr(instance, self.private_name, value)
 
-
         PROCESSING_SIGNALS.clear()  # we have notified our children, so we can clear this out
 
 

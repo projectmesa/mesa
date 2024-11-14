@@ -140,7 +140,11 @@ def test_ObservableList():
     agent.my_list.append(1)
     assert len(agent.my_list) == 1
     handler.assert_called_once()
-    handler.assert_called_once_with(AttributeDict(name="my_list", new=1, old=None, type="append", index=0, owner=agent))
+    handler.assert_called_once_with(
+        AttributeDict(
+            name="my_list", new=1, old=None, type="append", index=0, owner=agent
+        )
+    )
     agent.unobserve("my_list", "append", handler)
 
     # remove
@@ -207,9 +211,9 @@ def test_ObservableList():
     assert agent.my_list.index(5) == 4
 
 
-
 def test_AttributeDict():
     """Test AttributeDict."""
+
     class MyAgent(Agent, HasObservables):
         some_attribute = Observable()
 
