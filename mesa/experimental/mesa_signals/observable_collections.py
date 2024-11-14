@@ -21,13 +21,7 @@ class ObservableList(BaseObservable):
     def __init__(self):
         """Initialize the ObservableList."""
         super().__init__()
-        self.signal_types: set = {
-            "removed",
-            "replaced",
-            "change",
-            "insert"
-            "append"
-        }
+        self.signal_types: set = {"removed", "replaced", "change", "insert" "append"}
         self.fallback_value = []
 
     def __set__(self, instance: "HasObservables", value: Iterable):

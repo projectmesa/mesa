@@ -123,7 +123,10 @@ def test_ObservableList():
     class MyAgent(Agent, HasObservables):
         my_list = ObservableList()
 
-        def __init__(self, model,):
+        def __init__(
+            self,
+            model,
+        ):
             super().__init__(model)
             self.my_list = []
 
@@ -141,7 +144,7 @@ def test_ObservableList():
     assert len(agent.my_list) == 0
 
     # overwrite the existing list
-    a_list = [1,2,3,4,5]
+    a_list = [1, 2, 3, 4, 5]
     agent.my_list = a_list
     assert len(agent.my_list) == len(a_list)
     agent.my_list = a_list
@@ -156,23 +159,20 @@ def test_ObservableList():
     # insert
     agent.my_list.insert(0, 5)
 
-
     # overwrite
     agent.my_list[0] = 10
     assert agent.my_list[0] == 10
 
     # combine two lists
-    a_list = [1,2,3,4,5]
+    a_list = [1, 2, 3, 4, 5]
     agent.my_list = a_list
     assert len(agent.my_list) == len(a_list)
     agent.my_list += a_list
-    assert len(agent.my_list) == 2*len(a_list)
-
+    assert len(agent.my_list) == 2 * len(a_list)
 
     assert 5 in agent.my_list
 
     assert agent.my_list.index(5) == 4
-
 
 
 def test_Computable():
