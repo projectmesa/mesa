@@ -94,9 +94,9 @@ class Observable(BaseObservable):
                 f"{instance.__class__.__name__}.{self.public_name} while also being dependent it"
             )
 
+        super().__set__(instance, value)  # send the notify
         setattr(instance, self.private_name, value)
 
-        super().__set__(instance, value)  # send the notify
 
         PROCESSING_SIGNALS.clear()  # we have notified our children, so we can clear this out
 

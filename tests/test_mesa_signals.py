@@ -13,6 +13,7 @@ from mesa.experimental.mesa_signals import (
     Observable,
     ObservableList,
 )
+from mesa.experimental.mesa_signals.signals_util import AttributeDict
 
 
 def test_observables():
@@ -106,8 +107,6 @@ def test_HasObservables():
     }
     assert len(subscribers) == 0
 
-    # fixme unobserve all observables
-
     # test raises
     with pytest.raises(ValueError):
         agent.observe("some_attribute", "unknonw_signal", handler)
@@ -118,7 +117,6 @@ def test_HasObservables():
 
 def test_ObservableList():
     """Test ObservableList."""
-    # fixme, this does not test the emmited signals yet
 
     class MyAgent(Agent, HasObservables):
         my_list = ObservableList()
@@ -136,43 +134,104 @@ def test_ObservableList():
     assert len(agent.my_list) == 0
 
     # add
+    handler = Mock()
+    agent.observe("my_list", "append", handler)
+
     agent.my_list.append(1)
     assert len(agent.my_list) == 1
+    handler.assert_called_once()
+    handler.assert_called_once_with(AttributeDict(name="my_list", new=1, old=None, type="append", index=0, owner=agent))
+    agent.unobserve("my_list", "append", handler)
 
     # remove
+    handler = Mock()
+    agent.observe("my_list", "remove", handler)
+
     agent.my_list.remove(1)
     assert len(agent.my_list) == 0
+    handler.assert_called_once()
+
+    agent.unobserve("my_list", "remove", handler)
 
     # overwrite the existing list
     a_list = [1, 2, 3, 4, 5]
+    handler = Mock()
+    agent.observe("my_list", "change", handler)
     agent.my_list = a_list
     assert len(agent.my_list) == len(a_list)
+    handler.assert_called_once()
+
     agent.my_list = a_list
     assert len(agent.my_list) == len(a_list)
+    handler.assert_called()
+    agent.unobserve("my_list", "change", handler)
 
     # pop
+    handler = Mock()
+    agent.observe("my_list", "remove", handler)
+
     index = 4
     entry = agent.my_list.pop(index)
     assert entry == a_list.pop(index)
     assert len(agent.my_list) == len(a_list)
+    handler.assert_called_once()
+    agent.unobserve("my_list", "remove", handler)
 
     # insert
+    handler = Mock()
+    agent.observe("my_list", "insert", handler)
     agent.my_list.insert(0, 5)
+    handler.assert_called()
+    agent.unobserve("my_list", "insert", handler)
 
     # overwrite
+    handler = Mock()
+    agent.observe("my_list", "replace", handler)
     agent.my_list[0] = 10
     assert agent.my_list[0] == 10
+    handler.assert_called_once()
+    agent.unobserve("my_list", "replace", handler)
 
     # combine two lists
+    handler = Mock()
+    agent.observe("my_list", "append", handler)
     a_list = [1, 2, 3, 4, 5]
     agent.my_list = a_list
     assert len(agent.my_list) == len(a_list)
     agent.my_list += a_list
     assert len(agent.my_list) == 2 * len(a_list)
+    handler.assert_called()
 
+    # some more non signalling functionality tests
     assert 5 in agent.my_list
-
     assert agent.my_list.index(5) == 4
+
+
+
+def test_AttributeDict():
+    """Test AttributeDict."""
+    class MyAgent(Agent, HasObservables):
+        some_attribute = Observable()
+
+        def __init__(self, model, value):
+            super().__init__(model)
+            self.some_attribute = value
+
+    def on_change(signal):
+        assert signal.name == "some_attribute"
+        assert signal.type == "change"
+        assert signal.old == 10
+        assert signal.new == 5
+        assert signal.owner == agent
+
+        items = dir(signal)
+        for entry in ["name", "type", "old", "new", "owner"]:
+            assert entry in items
+
+    model = Model(seed=42)
+    agent = MyAgent(model, 10)
+    agent.observe("some_attribute", "change", on_change)
+    agent.some_attribute = 5
 
 
 def test_Computable():

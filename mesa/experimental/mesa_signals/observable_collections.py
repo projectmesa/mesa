@@ -21,7 +21,13 @@ class ObservableList(BaseObservable):
     def __init__(self):
         """Initialize the ObservableList."""
         super().__init__()
-        self.signal_types: set = {"removed", "replaced", "change", "insert" "append"}
+        self.signal_types: set = {
+            "remove",
+            "replace",
+            "change",
+            "insert",
+            "append"
+        }
         self.fallback_value = []
 
     def __set__(self, instance: "HasObservables", value: Iterable):
@@ -68,7 +74,7 @@ class SignalingList(MutableSequence[Any]):
         """
         old_value = self.data[index]
         self.data[index] = value
-        self.owner.notify(self.name, old_value, value, "replaced", index=index)
+        self.owner.notify(self.name, old_value, value, "replace", index=index)
 
     def __delitem__(self, index: int) -> None:
         """Delete item at index.
@@ -79,7 +85,7 @@ class SignalingList(MutableSequence[Any]):
         """
         old_value = self.data
         del self.data[index]
-        self.owner.notify(self.name, old_value, None, "removed", index=index)
+        self.owner.notify(self.name, old_value, None, "remove", index=index)
 
     def __getitem__(self, index) -> Any:
         """Get item at index.
