@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import random
 import sys
-import warnings
 from collections.abc import Sequence
 
 # mypy
@@ -105,7 +104,13 @@ class Model:
         self.step = self._wrapped_step
 
         # setup agent registration data structures
-        self._setup_agent_registration()
+        self._agents = {}  # the hard references to all agents in the model
+        self._agents_by_type: dict[
+            type[Agent], AgentSet
+        ] = {}  # a dict with an agentset for each class of agents
+        self._all_agents = AgentSet(
+            [], random=self.random
+        )  # an agenset with all agents
 
     @method_logger(__name__)
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
@@ -138,15 +143,6 @@ class Model:
         """A dictionary where the keys are agent types and the values are the corresponding AgentSets."""
         return self._agents_by_type
 
-    def _setup_agent_registration(self):
-        """Helper method to initialize the agent registration datastructures."""
-        self._agents = {}  # the hard references to all agents in the model
-        self._agents_by_type: dict[
-            type[Agent], AgentSet
-        ] = {}  # a dict with an agentset for each class of agents
-        self._all_agents = AgentSet(
-            [], random=self.random
-        )  # an agenset with all agents
 
     @method_logger(__name__)
     def register_agent(self, agent):
@@ -160,16 +156,6 @@ class Model:
             if you are subclassing Agent and calling its super in the ``__init__`` method.
 
         """
-        if not hasattr(self, "_agents"):
-            self._setup_agent_registration()
-
-            warnings.warn(
-                "The Mesa Model class was not initialized. In the future, you need to explicitly initialize "
-                "the Model by calling super().__init__() on initialization.",
-                FutureWarning,
-                stacklevel=2,
-            )
-
         self._agents[agent] = None
 
         # because AgentSet requires model, we cannot use defaultdict

@@ -583,6 +583,40 @@ def test_cell_collection():
     assert len(cells) == len(collection)
 
 
+def test_empty_cell_collection():
+    """Test that CellCollection properly handles empty collections."""
+    rng = random.Random(42)
+
+    # Test initializing with empty collection
+    collection = CellCollection([], random=rng)
+    assert len(collection) == 0
+    assert collection._capacity is None
+    assert list(collection.cells) == []
+    assert list(collection.agents) == []
+
+    # Test selecting from empty collection
+    selected = collection.select(lambda cell: True)
+    assert len(selected) == 0
+    assert selected._capacity is None
+
+    # Test filtering to empty collection
+    n = 10
+    full_collection = CellCollection(
+        [Cell((i,), random=rng) for i in range(n)], random=rng
+    )
+    assert len(full_collection) == n
+
+    # Filter to empty collection
+    empty_result = full_collection.select(lambda cell: False)
+    assert len(empty_result) == 0
+    assert empty_result._capacity is None
+
+    # Test at_most with empty collection
+    at_most_result = full_collection.select(lambda cell: False, at_most=5)
+    assert len(at_most_result) == 0
+    assert at_most_result._capacity is None
+
+
 ### PropertyLayer tests
 def test_property_layer_integration():
     """Test integration of PropertyLayer with DiscrateSpace and Cell."""

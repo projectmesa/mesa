@@ -35,6 +35,11 @@ def get_resistant_susceptible_ratio(model):
 
 
 model_params = {
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "num_nodes": Slider(
         label="Number of agents",
         value=10,

@@ -20,6 +20,11 @@ def post_process(ax):
 
 
 model_params = {
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "width": {
         "type": "SliderInt",
         "value": 50,
