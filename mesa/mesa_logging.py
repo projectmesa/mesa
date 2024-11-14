@@ -79,7 +79,9 @@ def method_logger(name: str):
         def wrapper(*args, **kwargs):
             # hack, because log is applied to methods, we can get
             # object instance as first arguments in args
-            logger.debug(f"calling {classname}.{func.__name__} with {args[1::]} and {kwargs}")
+            logger.debug(
+                f"calling {classname}.{func.__name__} with {args[1::]} and {kwargs}"
+            )
             res = func(*args, **kwargs)
             return res
 
