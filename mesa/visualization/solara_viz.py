@@ -216,6 +216,7 @@ def ModelController(
         """Reset the model to its initial state."""
         playing.value = False
         running.value = True
+        _mesa_logger.log(10, f"creating new {model.value.__class__} instance with {model_parameters.value}")
         model.value = model.value = model.value.__class__(**model_parameters.value)
 
     @function_logger(__name__)
@@ -401,6 +402,7 @@ def ModelCreator(
         [],
     )
 
+    @function_logger(__name__)
     def on_change(name, value):
         model_parameters.value = {**model_parameters.value, name: value}
 

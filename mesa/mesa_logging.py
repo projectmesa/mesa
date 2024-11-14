@@ -61,7 +61,7 @@ _rootlogger = None
 _module_loggers = {}
 _logger = get_module_logger(__name__)
 
-LOG_FORMAT = "[%(processName)s/%(levelname)s] %(message)s"
+LOG_FORMAT = "[%(name)s %(levelname)s] %(message)s"
 
 
 def method_logger(name: str):
@@ -79,9 +79,8 @@ def method_logger(name: str):
         def wrapper(*args, **kwargs):
             # hack, because log is applied to methods, we can get
             # object instance as first arguments in args
-            logger.debug(f"calling {func.__name__} on {classname}")
+            logger.debug(f"calling {classname}.{func.__name__} with {args[1::]} and {kwargs}")
             res = func(*args, **kwargs)
-            logger.debug(f"completed calling {func.__name__} on {classname}")
             return res
 
         return wrapper
@@ -101,11 +100,8 @@ def function_logger(name):
     def real_decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # hack, because log is applied to methods, we can get
-            # object instance as first arguments in args
-            logger.debug(f"calling {func.__name__}")
+            logger.debug(f"calling {func.__name__} with {args} and {kwargs}")
             res = func(*args, **kwargs)
-            logger.debug(f"completed calling {func.__name__}")
             return res
 
         return wrapper
