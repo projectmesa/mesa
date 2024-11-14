@@ -6,7 +6,7 @@ from mesa.space import SingleGrid
 class ConwaysGameOfLife(Model):
     """Represents the 2-dimensional array of cells in Conway's Game of Life."""
 
-    def __init__(self, width=50, height=50, seed=None):
+    def __init__(self, width=50, height=50, initial_fraction_alive=0.2, seed=None):
         """Create a new playing area of (width, height) cells."""
         super().__init__(seed=seed)
         # Use a simple grid, where edges wrap around.
@@ -16,7 +16,7 @@ class ConwaysGameOfLife(Model):
         # ALIVE and some to DEAD.
         for _contents, (x, y) in self.grid.coord_iter():
             cell = Cell((x, y), self)
-            if self.random.random() < 0.1:
+            if self.random.random() < initial_fraction_alive:
                 cell.state = cell.ALIVE
             self.grid.place_agent(cell, (x, y))
 

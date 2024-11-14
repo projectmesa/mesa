@@ -110,6 +110,12 @@ class AgentSet(MutableSet, Sequence):
         without preventing garbage collection. It is associated with a specific model instance, enabling
         interactions with the model's environment and other agents.The implementation uses a WeakKeyDictionary to store agents,
         which means that agents not referenced elsewhere in the program may be automatically removed from the AgentSet.
+
+    Notes:
+        A `UserWarning` is issued if `random=None`. You can resolve this warning by explicitly
+        passing a random number generator. In most cases, this will be the seeded random number
+        generator in the model. So, you would do `random=self.random` in a `Model` or `Agent` instance.
+
     """
 
     def __init__(self, agents: Iterable[Agent], random: Random | None = None):
@@ -120,6 +126,11 @@ class AgentSet(MutableSet, Sequence):
             random (Random): the random number generator
         """
         if random is None:
+            warnings.warn(
+                "Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
+                UserWarning,
+                stacklevel=2,
+            )
             random = (
                 Random()
             )  # FIXME see issue 1981, how to get the central rng from model
@@ -144,7 +155,6 @@ class AgentSet(MutableSet, Sequence):
         at_most: int | float = float("inf"),
         inplace: bool = False,
         agent_type: type[Agent] | None = None,
-        n: int | None = None,
     ) -> AgentSet:
         """Select a subset of agents from the AgentSet based on a filter function and/or quantity limit.
 
@@ -156,7 +166,6 @@ class AgentSet(MutableSet, Sequence):
               - If a float between 0 and 1, at most that fraction of original the agents are selected.
             inplace (bool, optional): If True, modifies the current AgentSet; otherwise, returns a new AgentSet. Defaults to False.
             agent_type (type[Agent], optional): The class type of the agents to select. Defaults to None, meaning no type filtering is applied.
-            n (int): deprecated, use at_most instead
 
         Returns:
             AgentSet: A new AgentSet containing the selected agents, unless inplace is True, in which case the current AgentSet is updated.
@@ -165,14 +174,6 @@ class AgentSet(MutableSet, Sequence):
             - at_most just return the first n or fraction of agents. To take a random sample, shuffle() beforehand.
             - at_most is an upper limit. When specifying other criteria, the number of agents returned can be smaller.
         """
-        if n is not None:
-            warnings.warn(
-                "The parameter 'n' is deprecated. Use 'at_most' instead.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            at_most = n
-
         inf = float("inf")
         if filter_func is None and agent_type is None and at_most == inf:
             return self if inplace else copy.copy(self)
@@ -270,20 +271,6 @@ class AgentSet(MutableSet, Sequence):
         Returns:
             AgentSet | list[Any]: The results of the callable calls if return_results is True, otherwise the AgentSet itself.
         """
-        try:
-            return_results = kwargs.pop("return_results")
-        except KeyError:
-            return_results = False
-        else:
-            warnings.warn(
-                "Using return_results is deprecated. Use AgenSet.do in case of return_results=False, and "
-                "AgentSet.map in case of return_results=True",
-                stacklevel=2,
-            )
-
-        if return_results:
-            return self.map(method, *args, **kwargs)
-
         # we iterate over the actual weakref keys and check if weakref is alive before calling the method
         if isinstance(method, str):
             for agentref in self._agents.keyrefs():

@@ -44,6 +44,11 @@ def post_process(ax):
 
 
 model_params = {
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "height": 40,
     "width": 40,
     "citizen_density": Slider("Initial Agent Density", 0.7, 0.0, 0.9, 0.1),

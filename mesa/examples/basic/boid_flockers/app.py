@@ -3,10 +3,7 @@ from mesa.visualization import Slider, SolaraViz, make_space_component
 
 
 def boid_draw(agent):
-    if not agent.neighbors:  # Only for the first Frame
-        neighbors = len(agent.model.space.get_neighbors(agent.pos, agent.vision, False))
-    else:
-        neighbors = len(agent.neighbors)
+    neighbors = len(agent.neighbors)
 
     if neighbors <= 1:
         return {"color": "red", "size": 20}
@@ -15,6 +12,11 @@ def boid_draw(agent):
 
 
 model_params = {
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "population": Slider(
         label="Number of boids",
         value=100,
@@ -51,7 +53,7 @@ model = BoidFlockers()
 
 page = SolaraViz(
     model,
-    [make_space_component(agent_portrayal=boid_draw, backend="matplotlib")],
+    components=[make_space_component(agent_portrayal=boid_draw, backend="matplotlib")],
     model_params=model_params,
     name="Boid Flocking Model",
 )

@@ -7,11 +7,6 @@ def test_import():
     See https://github.com/projectmesa/mesa/pull/1294.
     """
     import mesa
-    from mesa.time import RandomActivation
-
-    _ = mesa.time.RandomActivation
-    _ = RandomActivation
-
     from mesa.space import MultiGrid
 
     _ = mesa.space.MultiGrid

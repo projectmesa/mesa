@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import random
 import sys
-import warnings
 from collections.abc import Sequence
 
 # mypy
@@ -18,7 +17,6 @@ from typing import Any
 import numpy as np
 
 from mesa.agent import Agent, AgentSet
-from mesa.datacollection import DataCollector
 
 SeedLike = int | np.integer | Sequence[int] | np.random.SeedSequence
 RNGLike = np.random.Generator | np.random.BitGenerator
@@ -33,7 +31,6 @@ class Model:
 
     Attributes:
         running: A boolean indicating if the model should continue running.
-        schedule: An object to manage the order and execution of agent steps.
         steps: the number of times `model.step()` has been called.
         random: a seeded python.random number generator.
         rng : a seeded numpy.random.Generator
@@ -103,7 +100,13 @@ class Model:
         self.step = self._wrapped_step
 
         # setup agent registration data structures
-        self._setup_agent_registration()
+        self._agents = {}  # the hard references to all agents in the model
+        self._agents_by_type: dict[
+            type[Agent], AgentSet
+        ] = {}  # a dict with an agentset for each class of agents
+        self._all_agents = AgentSet(
+            [], random=self.random
+        )  # an agenset with all agents
 
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
         """Automatically increments time and steps after calling the user's step method."""
@@ -111,14 +114,6 @@ class Model:
         self.steps += 1
         # Call the original user-defined step method
         self._user_step(*args, **kwargs)
-
-    def next_id(self) -> int:  # noqa: D102
-        warnings.warn(
-            "using model.next_id() is deprecated. Agents track their unique ID automatically",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return 0
 
     @property
     def agents(self) -> AgentSet:
@@ -143,26 +138,6 @@ class Model:
         """A dictionary where the keys are agent types and the values are the corresponding AgentSets."""
         return self._agents_by_type
 
-    def get_agents_of_type(self, agenttype: type[Agent]) -> AgentSet:
-        """Deprecated: Retrieves an AgentSet containing all agents of the specified type."""
-        warnings.warn(
-            f"Model.get_agents_of_type() is deprecated, please replace get_agents_of_type({agenttype})"
-            f"with the property agents_by_type[{agenttype}].",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return self.agents_by_type[agenttype]
-
-    def _setup_agent_registration(self):
-        """Helper method to initialize the agent registration datastructures."""
-        self._agents = {}  # the hard references to all agents in the model
-        self._agents_by_type: dict[
-            type[Agent], AgentSet
-        ] = {}  # a dict with an agentset for each class of agents
-        self._all_agents = AgentSet(
-            [], random=self.random
-        )  # an agenset with all agents
-
     def register_agent(self, agent):
         """Register the agent with the model.
 
@@ -174,16 +149,6 @@ class Model:
             if you are subclassing Agent and calling its super in the ``__init__`` method.
 
         """
-        if not hasattr(self, "_agents"):
-            self._setup_agent_registration()
-
-            warnings.warn(
-                "The Mesa Model class was not initialized. In the future, you need to explicitly initialize "
-                "the Model by calling super().__init__() on initialization.",
-                FutureWarning,
-                stacklevel=2,
-            )
-
         self._agents[agent] = None
 
         # because AgentSet requires model, we cannot use defaultdict
@@ -244,38 +209,6 @@ class Model:
         """
         self.rng = np.random.default_rng(rng)
         self._rng = self.rng.bit_generator.state
-
-    def initialize_data_collector(
-        self,
-        model_reporters=None,
-        agent_reporters=None,
-        agenttype_reporters=None,
-        tables=None,
-    ) -> None:
-        """Initialize the data collector for the model.
-
-        Args:
-            model_reporters: model reporters to collect
-            agent_reporters: agent reporters to collect
-            agenttype_reporters: agent type reporters to collect
-            tables: tables to collect
-
-        """
-        warnings.warn(
-            "initialize_data_collector() is deprecated. Please use the DataCollector class directly. "
-            "by using `self.datacollector = DataCollector(...)`.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        self.datacollector = DataCollector(
-            model_reporters=model_reporters,
-            agent_reporters=agent_reporters,
-            agenttype_reporters=agenttype_reporters,
-            tables=tables,
-        )
-        # Collect data for the first time during initialization.
-        self.datacollector.collect(self)
 
     def remove_all_agents(self):
         """Remove all agents from the model.

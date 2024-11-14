@@ -1,4 +1,4 @@
-from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealthModel
+from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealth
 from mesa.visualization import (
     SolaraViz,
     make_plot_component,
@@ -12,6 +12,11 @@ def agent_portrayal(agent):
 
 
 model_params = {
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "n": {
         "type": "SliderInt",
         "value": 50,
@@ -19,11 +24,6 @@ model_params = {
         "min": 10,
         "max": 100,
         "step": 1,
-    },
-    "seed": {
-        "type": "InputText",
-        "value": 42,
-        "label": "Random Seed",
     },
     "width": 10,
     "height": 10,
@@ -35,7 +35,7 @@ def post_process(ax):
 
 
 # Create initial model instance
-model = BoltzmannWealthModel(50, 10, 10)
+model = BoltzmannWealth(50, 10, 10)
 
 # Create visualization elements. The visualization elements are solara components
 # that receive the model instance as a "prop" and display it in a certain way.

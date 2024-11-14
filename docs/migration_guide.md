@@ -12,8 +12,8 @@ _This guide is a work in progress. The development of it is tracked in [Issue #2
 
 ### Upgrade strategy
 We recommend the following upgrade strategy:
-- Update the the latest Mesa 2.x release (`mesa<3`).
-- Update the the latest Mesa 3.0.x release (`mesa<3.1`).
+- Update to the latest Mesa 2.x release (`mesa<3`).
+- Update to the latest Mesa 3.0.x release (`mesa<3.1`).
 - Update to the latest Mesa 3.x release (`mesa<4`).
 
 With each update, resolve all errors and warnings, before updating to the next one.
@@ -146,7 +146,7 @@ You can access it by `Model.steps`, and it's internally in the datacollector, ba
 - The `Model._advance_time()` method is removed. This now happens automatically.
 
 #### Replacing Schedulers with AgentSet functionality
-The whole Time module in Mesa is deprecated, and all schedulers are being replaced with AgentSet functionality and the internal `Model.steps` counter. This allows much more flexibility in how to activate Agents and makes it explicit what's done exactly.
+The whole Time module in Mesa is deprecated and will be removed in Mesa 3.1. All schedulers should be replaced with AgentSet functionality and the internal `Model.steps` counter. This allows much more flexibility in how to activate Agents and makes it explicit what's done exactly.
 
 Here's how to replace each scheduler:
 
