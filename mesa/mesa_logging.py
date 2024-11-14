@@ -25,7 +25,7 @@ LOGGER_NAME = "MESA"
 DEFAULT_LEVEL = DEBUG
 
 
-def create_module_logger(name:str|None=None):
+def create_module_logger(name: str | None = None):
     """Helper function for creating a module logger.
 
     Args:
@@ -42,7 +42,7 @@ def create_module_logger(name:str|None=None):
     return logger
 
 
-def get_module_logger(name:str):
+def get_module_logger(name: str):
     """Helper function for getting the module logger.
 
     Args:
@@ -64,9 +64,7 @@ _logger = get_module_logger(__name__)
 LOG_FORMAT = "[%(processName)s/%(levelname)s] %(message)s"
 
 
-
-
-def method_logger(name:str):
+def method_logger(name: str):
     """Decorator for adding logging to a method.
 
     Args:
@@ -89,6 +87,7 @@ def method_logger(name:str):
         return wrapper
 
     return real_decorator
+
 
 def function_logger(name):
     """Decorator for adding logging to a Function.
@@ -148,7 +147,9 @@ def log_to_stderr(level: int | None = None, pass_root_logger_level: bool = False
 
     # avoid creation of multiple stream handlers for logging to console
     for entry in logger.handlers:
-        if (isinstance(entry, logging.StreamHandler)) and (entry.formatter._fmt == LOG_FORMAT):
+        if (isinstance(entry, logging.StreamHandler)) and (
+            entry.formatter._fmt == LOG_FORMAT
+        ):
             return logger
 
     formatter = logging.Formatter(LOG_FORMAT)

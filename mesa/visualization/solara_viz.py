@@ -33,15 +33,15 @@ import solara
 
 import mesa.visualization.components.altair_components as components_altair
 from mesa.experimental.devs.simulator import Simulator
+from mesa.mesa_logging import create_module_logger, function_logger
 from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
-from mesa.mesa_logging import create_module_logger, function_logger
-
 
 if TYPE_CHECKING:
     from mesa.model import Model
 
 _mesa_logger = create_module_logger()
+
 
 @solara.component
 @function_logger(__name__)

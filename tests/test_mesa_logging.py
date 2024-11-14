@@ -1,9 +1,8 @@
 """Unit tests for mesa_logging."""
-import pytest
 
 import logging
 
-import unittest
+import pytest
 
 from mesa import mesa_logging
 
@@ -46,6 +45,3 @@ def test_log_to_stderr():
     logger = mesa_logging.log_to_stderr()
     assert len(logger.handlers) == 2
     assert logger.level == mesa_logging.DEFAULT_LEVEL
-
-
-

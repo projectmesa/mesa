@@ -25,6 +25,7 @@ RNGLike = np.random.Generator | np.random.BitGenerator
 
 _mesa_logger = create_module_logger()
 
+
 class Model:
     """Base class for models in the Mesa ABM library.
 
@@ -142,7 +143,6 @@ class Model:
     def agents_by_type(self) -> dict[type[Agent], AgentSet]:
         """A dictionary where the keys are agent types and the values are the corresponding AgentSets."""
         return self._agents_by_type
-
 
     @method_logger(__name__)
     def register_agent(self, agent):
