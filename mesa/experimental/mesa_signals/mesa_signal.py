@@ -387,9 +387,7 @@ class HasObservables:
                 del self.subscribers[name]
                 # ignore when unsubscribing to Observables that have no subscription
         else:
-            self.subscribers = defaultdict(
-                functools.partial(defaultdict, list)
-            )
+            self.subscribers = defaultdict(functools.partial(defaultdict, list))
 
     def notify(
         self,
