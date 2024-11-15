@@ -113,6 +113,9 @@ class Computable(BaseObservable):
                 wealth = Computed(func, args, kwargs)
 
     """
+    # fixme, with new _register_observable thing
+    #  we can do computed without a descriptor, but then you
+    #  don't have attribute like access, you would need to do a call operation to get the value
 
     def __init__(self):
         """Initialize a Computable."""
@@ -277,17 +280,26 @@ class HasObservables:
     # we can't use a weakset here because it does not handle bound methods correctly
     # also, a list is faster for our use case
     subscribers: dict[str, dict[str, list]]
-
-    # fixme, we only really need the name and the signal types I guess
-    #  so we might turn this into dict[str, set]
-    #  we can then add a register_signal method to allow not descriptor signals
-    observables: dict[str, BaseObservable]
+    observables: dict[str, set[str]]
 
     def __init__(self, *args, **kwargs) -> None:
         """Initialize a HasObservables."""
         super().__init__(*args, **kwargs)
         self.subscribers = defaultdict(functools.partial(defaultdict, list))
         self.observables = dict(descriptor_generator(self))
+
+    def _register_signal_emitter(self, name:str, signal_types: set[str]):
+        """Helper function to register an observable.
+
+        this method can be used to register custom signals that are emitted by
+        the class for a given attribute, but which cannot be covered by the Observable descriptor
+
+        Args:
+            name: the name of the signal emitter
+            signal_types: the set of signals that migth be emitted
+
+        """
+        self.observables[name] = signal_types
 
     def observe(
         self,
@@ -322,7 +334,7 @@ class HasObservables:
 
         for name in names:
             if not isinstance(signal_type, All):
-                if signal_type not in self.observables[name].signal_types:
+                if signal_type not in self.observables[name]:
                     raise ValueError(
                         f"you are trying to subscribe to a signal of {signal_type} "
                         f"on Observable {name}, which does not emit this signal_type"
@@ -332,7 +344,7 @@ class HasObservables:
                         signal_type,
                     ]
             else:
-                signal_types = self.observables[name].signal_types
+                signal_types = self.observables[name]
 
             ref = create_weakref(handler)
             for signal_type in signal_types:
@@ -359,7 +371,7 @@ class HasObservables:
             # we need to do this here because signal types might
             # differ for name so for each name we need to check
             if isinstance(signal_type, All):
-                signal_types = self.observables[name].signal_types
+                signal_types = self.observables[name]
             else:
                 signal_types = [
                     signal_type,
@@ -448,7 +460,7 @@ class HasObservables:
 
 
 def descriptor_generator(obj) -> [str, BaseObservable]:
-    """Yield defined Observables on obj."""
+    """Yield the name and signal_types for each Observable defined on obj."""
     # we need to traverse the entire class hierarchy to properly get
     # also observables defined in super classes
     for base in type(obj).__mro__:
@@ -456,4 +468,4 @@ def descriptor_generator(obj) -> [str, BaseObservable]:
 
         for entry in base_dict.values():
             if isinstance(entry, BaseObservable):
-                yield entry.public_name, entry
+                yield entry.public_name, entry.signal_types
