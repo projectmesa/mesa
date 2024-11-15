@@ -277,6 +277,10 @@ class HasObservables:
     # we can't use a weakset here because it does not handle bound methods correctly
     # also, a list is faster for our use case
     subscribers: dict[str, dict[str, list]]
+
+    # fixme, we only really need the name and the signal types I guess
+    #  so we might turn this into dict[str, set]
+    #  we can then add a register_signal method to allow not descriptor signals
     observables: dict[str, BaseObservable]
 
     def __init__(self, *args, **kwargs) -> None:
@@ -384,7 +388,7 @@ class HasObservables:
                 # ignore when unsubscribing to Observables that have no subscription
         else:
             self.subscribers = defaultdict(
-                functools.partial(defaultdict, weakref.WeakSet)
+                functools.partial(defaultdict, list)
             )
 
     def notify(
