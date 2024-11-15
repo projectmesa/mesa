@@ -118,11 +118,15 @@ class Computable(BaseObservable):
         """Initialize a Computable."""
         super().__init__()
 
+        # fixme have 2 signal: change and is_dirty?
+        self.signal_types: set = {
+            "change",
+        }
+
     def __get__(self, instance, owner):  # noqa: D105
         computed = getattr(instance, self.private_name)
         old_value = computed._value
 
-        # fixme, we are not detecting if one computable is dependent on another
         if CURRENT_COMPUTED is not None:
             CURRENT_COMPUTED._add_parent(instance, self.public_name, old_value)
 
@@ -139,11 +143,14 @@ class Computable(BaseObservable):
         else:
             return old_value
 
-    def __set__(self, instance: HasObservables, value):  # noqa D103
-        # no on change event?
+    def __set__(self, instance: HasObservables, value: Computed):  # noqa D103
+        if not isinstance(value, Computed):
+            raise ValueError("value has to be a Computable instance")
+
         setattr(instance, self.private_name, value)
         value.name = self.public_name
         value.owner = instance
+        getattr(instance, self.public_name)  # force evaluation of the computed to build the dependency graph
 
 
 class Computed:
@@ -191,7 +198,7 @@ class Computed:
         """Remove all parent Observables."""
         # we can unsubscribe from everything on each parent
         for parent in self.parents:
-            parent.unobserve(All(), All())
+            parent.unobserve(All(), All(), self._set_dirty)
 
     def __call__(self):
         global CURRENT_COMPUTED  # noqa: PLW0603
@@ -208,25 +215,26 @@ class Computed:
             # we might be dirty but values might have changed
             # back and forth in our parents so let's check to make sure we
             # really need to recalculate
-            for parent in self.parents.keyrefs():
-                # does parent still exist?
-                if parent := parent():
-                    # if yes, compare old and new values for all
-                    # tracked observables on this parent
-                    for name, old_value in self.parents[parent].items():
-                        new_value = getattr(parent, name)
-                        if new_value != old_value:
-                            changed = True
-                            break  # we need to recalculate
+            if not changed:
+                for parent in self.parents.keyrefs():
+                    # does parent still exist?
+                    if parent := parent():
+                        # if yes, compare old and new values for all
+                        # tracked observables on this parent
+                        for name, old_value in self.parents[parent].items():
+                            new_value = getattr(parent, name)
+                            if new_value != old_value:
+                                changed = True
+                                break  # we need to recalculate
+                        else:
+                            # trick for breaking cleanly out of nested for loops
+                            # see https://stackoverflow.com/questions/653509/breaking-out-of-nested-loops
+                            continue
+                        break
                     else:
-                        # trick for breaking cleanly out of nested for loops
-                        # see https://stackoverflow.com/questions/653509/breaking-out-of-nested-loops
-                        continue
-                    break
-                else:
-                    # one of our parents no longer exists
-                    changed = True
-                    break
+                        # one of our parents no longer exists
+                        changed = True
+                        break
 
             if changed:
                 # the dependencies of the computable function might have changed

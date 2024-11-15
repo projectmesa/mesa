@@ -247,4 +247,41 @@ def test_Computable():
 
         def __init__(self, model, value):
             super().__init__(model)
-            some_attribute = Computed(lambda x: x, self)  # noqa: F841
+            self.some_other_attribute = value
+            self.some_attribute = Computed(lambda x: x.some_other_attribute*2, self)
+
+    model = Model(seed=42)
+    agent = MyAgent(model, 10)
+    assert agent.some_attribute == 20
+
+    handler = Mock()
+    agent.observe("some_attribute", "change", handler)
+    agent.some_other_attribute = 9  # we change the dependency of computed
+    handler.assert_called_once()
+    agent.unobserve("some_attribute", "change", handler)
+
+    handler = Mock()
+    agent.observe("some_attribute", "change", handler)
+    assert agent.some_attribute == 18  # this forces a re-evaluation of the value of computed
+    handler.assert_called_once()  # and so, our change handler should be called
+    agent.unobserve("some_attribute", "change", handler)
+
+    # cyclical dependencies
+    def computed_func(agent):
+        # this creates a cyclical dependency
+        # our computed is dependent on o1, but also modifies o1
+        agent.o1 = agent.o1 - 1
+    class MyAgent(Agent, HasObservables):
+        c1 = Computable()
+        o1 = Observable()
+
+        def __init__(self, model, value):
+            super().__init__(model)
+            self.o1 = value
+            self.c1 = Computed(computed_func, self)
+
+    model = Model(seed=42)
+    with pytest.raises(ValueError):
+        MyAgent(model, 10)
+
+    # parents disappearing
