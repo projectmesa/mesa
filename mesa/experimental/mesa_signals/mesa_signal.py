@@ -150,7 +150,9 @@ class Computable(BaseObservable):
         setattr(instance, self.private_name, value)
         value.name = self.public_name
         value.owner = instance
-        getattr(instance, self.public_name)  # force evaluation of the computed to build the dependency graph
+        getattr(
+            instance, self.public_name
+        )  # force evaluation of the computed to build the dependency graph
 
 
 class Computed:
