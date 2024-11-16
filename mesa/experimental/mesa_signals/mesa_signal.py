@@ -113,6 +113,7 @@ class Computable(BaseObservable):
                 wealth = Computed(func, args, kwargs)
 
     """
+
     # fixme, with new _register_observable thing
     #  we can do computed without a descriptor, but then you
     #  don't have attribute like access, you would need to do a call operation to get the value
@@ -288,7 +289,7 @@ class HasObservables:
         self.subscribers = defaultdict(functools.partial(defaultdict, list))
         self.observables = dict(descriptor_generator(self))
 
-    def _register_signal_emitter(self, name:str, signal_types: set[str]):
+    def _register_signal_emitter(self, name: str, signal_types: set[str]):
         """Helper function to register an observable.
 
         this method can be used to register custom signals that are emitted by
