@@ -425,7 +425,9 @@ def _check_model_params(init_func, model_params):
     model_parameters = inspect.signature(init_func).parameters
     for name in model_parameters:
         if name not in model_parameters:
-            raise TypeError(f"The parameter '{name}' is not accepted as a keyword argument in the model's __init__ method.")
+            raise TypeError(
+                f"The parameter '{name}' is not accepted as a keyword argument in the model's __init__ method."
+            )
         if (
             model_parameters[name].default == inspect.Parameter.empty
             and name not in model_params
