@@ -290,14 +290,14 @@ class HasObservables:
         self.observables = dict(descriptor_generator(self))
 
     def _register_signal_emitter(self, name: str, signal_types: set[str]):
-        """Helper function to register an observable.
+        """Helper function to register an Observable.
 
-        this method can be used to register custom signals that are emitted by
+        This method can be used to register custom signals that are emitted by
         the class for a given attribute, but which cannot be covered by the Observable descriptor
 
         Args:
             name: the name of the signal emitter
-            signal_types: the set of signals that migth be emitted
+            signal_types: the set of signals that might be emitted
 
         """
         self.observables[name] = signal_types
