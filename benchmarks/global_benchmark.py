@@ -12,9 +12,8 @@ import timeit
 sys.path.insert(0, os.path.abspath(".."))
 
 from configurations import configurations
+
 from mesa.experimental.devs.simulator import ABMSimulator
-
-
 
 
 # Generic function to initialize and run a model
