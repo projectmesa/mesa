@@ -265,7 +265,7 @@ With the introduction of SolaraViz in Mesa 3.0, models are now instantiated usin
 
 ```python
 class MyModel(mesa.Model):
-    def __init__(self, n_agents, seed=None):
+    def __init__(self, n_agents=10, seed=None):
         super().__init__(seed=seed)
         # Initialize the model with N agents
 ```
