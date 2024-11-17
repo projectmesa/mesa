@@ -404,7 +404,7 @@ class PropertyDescriptor:
 
     def __init__(self, property_layer: PropertyLayer):  # noqa: D105
         self.layer = property_layer.data
-    def __get__(self, instance: Cell):  # noqa: D105
+    def __get__(self, instance: Cell, owner):  # noqa: D105
         return self.layer[self.coordinate]
     def __set__(self, instance: Cell, value):  # noqa: D105
         self.layer[self.coordinate] = value
