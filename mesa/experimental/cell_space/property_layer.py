@@ -1,13 +1,12 @@
 
 import inspect
 import warnings
-from collections.abc import Callable
-from typing import Any, TypeVar, Sequence
+from collections.abc import Callable, Sequence
+from typing import Any, TypeVar
 
 import numpy as np
 
 from .cell import Cell
-from .grid import Grid
 
 Coordinate = Sequence[int]
 T = TypeVar("T", bound=Cell)
@@ -401,16 +400,17 @@ class HasProperties:
 
 
 class PropertyDescriptor:
+    """Descriptor for giving cells attribute like access to values defined in property layers."""
 
-    def __get__(self):
-        pass
-
-    def __set__(self, value):
-        pass
-
-    def __set_name__(self, owner, name):
-        pass
-
+    def __init__(self, property_layer: PropertyLayer):  # noqa: D105
+        self.layer = property_layer.data
+    def __get__(self, instance: Cell):  # noqa: D105
+        return self.layer[self.coordinate]
+    def __set__(self, instance: Cell, value):  # noqa: D105
+        self.layer[self.coordinate] = value
+    def __set_name__(self, owner: Cell, name: str):  # noqa: D105
+        self.public_name = name
+        self.private_name = f"_{name}"
 
 def is_single_argument_function(function):
     """Check if a function is a single argument function."""
