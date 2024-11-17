@@ -186,9 +186,9 @@ Ensure your model's `__init__` method accepts keyword arguments matching the `mo
 
 ```python
 class MyModel(Model):
-    def __init__(self, n_agents):
+    def __init__(self, n_agents=10, seed=None):
+        super().__init__(seed=seed)
         # Initialize the model with N agents
-```
 
 The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace
 
