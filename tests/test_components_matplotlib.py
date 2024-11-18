@@ -231,7 +231,7 @@ def test_draw_property_layers():
 
     model = Model(seed=42)
     grid = OrthogonalMooreGrid((10, 10), torus=True, random=model.random, capacity=1)
-    grid.add_property_layer(PropertyLayer("test", grid.width, grid.height, 0))
+    grid.create_property_layer("test",0.0)
 
     fig, ax = plt.subplots()
     draw_property_layers(grid, {"test": {"colormap": "viridis", "colorbar": True}}, ax)
