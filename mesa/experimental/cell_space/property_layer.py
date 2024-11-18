@@ -3,7 +3,7 @@
 import inspect
 import warnings
 from collections.abc import Callable, Sequence
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, TypeVar
 
 import numpy as np
 
@@ -31,7 +31,7 @@ class PropertyLayer:
     propertylayer_experimental_warning_given = False
 
     def __init__(
-            self, name: str, dimensions: Sequence[int], default_value=0.0, dtype=float
+        self, name: str, dimensions: Sequence[int], default_value=0.0, dtype=float
     ):
         """Initializes a new PropertyLayer instance.
 
@@ -90,8 +90,8 @@ class PropertyLayer:
                 condition_result = vectorized_condition(self.data)
 
             if (
-                    not isinstance(condition_result, np.ndarray)
-                    or condition_result.shape != self.data.shape
+                not isinstance(condition_result, np.ndarray)
+                or condition_result.shape != self.data.shape
             ):
                 raise ValueError(
                     "Result of condition must be a NumPy array with the same shape as the grid."
@@ -99,7 +99,12 @@ class PropertyLayer:
 
             np.copyto(self.data, value, where=condition_result)
 
-    def modify_cells(self, operation: Callable, value=None, condition_function: Callable | None = None):
+    def modify_cells(
+        self,
+        operation: Callable,
+        value=None,
+        condition_function: Callable | None = None,
+    ):
         """Modify cells using an operation, which can be a lambda function or a NumPy ufunc.
 
         If a NumPy ufunc is used, an additional value should be provided.
@@ -183,7 +188,10 @@ class HasPropertyLayers:
         # self.create_property_layer("empty", True, dtype=bool)
 
     def create_property_layer(
-            self, name: str, default_value=0.0, dtype=float,
+        self,
+        name: str,
+        default_value=0.0,
+        dtype=float,
     ):
         """Add a property layer to the grid.
 
@@ -194,7 +202,9 @@ class HasPropertyLayers:
         """
         # fixme, do we want to have the ability to add both predefined layers
         #  as well as just by name?
-        layer = PropertyLayer(name, self.dimensions, default_value=default_value, dtype=dtype)
+        layer = PropertyLayer(
+            name, self.dimensions, default_value=default_value, dtype=dtype
+        )
         self._mesa_property_layers[name] = layer
 
         # fixme: how will this interact with slots and can I dynamically change slots?
@@ -211,9 +221,13 @@ class HasPropertyLayers:
 
         """
         if layer.dimensions != self.dimensions:
-            raise ValueError("Dimensions of property layer do not match the dimensions of the grid")
+            raise ValueError(
+                "Dimensions of property layer do not match the dimensions of the grid"
+            )
         self._mesa_property_layers[layer.name] = layer
-        setattr(self.cell_klass, layer.name, PropertyDescriptor(layer))  # fixme: curious to see if this works
+        setattr(
+            self.cell_klass, layer.name, PropertyDescriptor(layer)
+        )  # fixme: curious to see if this works
 
     def remove_property_layer(self, property_name: str):
         """Remove a property layer from the grid.
@@ -226,7 +240,7 @@ class HasPropertyLayers:
         delattr(Cell, property_name)
 
     def set_property(
-            self, property_name: str, value, condition: Callable[[T], bool] | None = None
+        self, property_name: str, value, condition: Callable[[T], bool] | None = None
     ):
         """Set the value of a property for all cells in the grid.
 
@@ -238,11 +252,11 @@ class HasPropertyLayers:
         self._mesa_property_layers[property_name].set_cells(value, condition)
 
     def modify_properties(
-            self,
-            property_name: str,
-            operation: Callable,
-            value: Any = None,
-            condition: Callable[[T], bool] | None = None,
+        self,
+        property_name: str,
+        operation: Callable,
+        value: Any = None,
+        condition: Callable[[T], bool] | None = None,
     ):
         """Modify the values of a specific property for all cells in the grid.
 
@@ -252,10 +266,12 @@ class HasPropertyLayers:
             value: the value to use in the operation
             condition: a function that takes a cell and returns a boolean (used to filter cells)
         """
-        self._mesa_property_layers[property_name].modify_cells(operation, value, condition)
+        self._mesa_property_layers[property_name].modify_cells(
+            operation, value, condition
+        )
 
     def get_neighborhood_mask(
-            self, pos: Coordinate, include_center: bool, radius: int
+        self, pos: Coordinate, include_center: bool, radius: int
     ) -> np.ndarray:
         """Generate a boolean mask representing the neighborhood.
 
@@ -267,21 +283,25 @@ class HasPropertyLayers:
         Returns:
             np.ndarray: A boolean mask representing the neighborhood.
         """
-        neighborhood = self._cells[pos].get_neighborhood(include_center=include_center, radius=radius)
+        neighborhood = self._cells[pos].get_neighborhood(
+            include_center=include_center, radius=radius
+        )
         mask = np.zeros(self.dimensions, dtype=bool)
 
         # Convert the neighborhood list to a NumPy array and use advanced indexing
         coords = np.array(c.dimenions for c in neighborhood)
-        mask[coords[:, 0], coords[:, 1]] = True  # fixme, must work for nd, so coords must be valid for indexing
+        mask[coords[:, 0], coords[:, 1]] = (
+            True  # fixme, must work for nd, so coords must be valid for indexing
+        )
         return mask
 
     def select_cells(
-            self,
-            conditions: dict | None = None,
-            extreme_values: dict | None = None,
-            masks: np.ndarray | list[np.ndarray] = None,
-            only_empty: bool = False,
-            return_list: bool = True,
+        self,
+        conditions: dict | None = None,
+        extreme_values: dict | None = None,
+        masks: np.ndarray | list[np.ndarray] = None,
+        only_empty: bool = False,
+        return_list: bool = True,
     ) -> list[Coordinate] | np.ndarray:
         """Select cells based on property conditions, extreme values, and/or masks, with an option to only select empty cells.
 
@@ -372,8 +392,8 @@ class PropertyDescriptor:
 def is_single_argument_function(function):
     """Check if a function is a single argument function."""
     return (
-            inspect.isfunction(function)
-            and len(inspect.signature(function).parameters) == 1
+        inspect.isfunction(function)
+        and len(inspect.signature(function).parameters) == 1
     )
 
 

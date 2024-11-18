@@ -16,10 +16,9 @@ from mesa.experimental.cell_space import (
     Network,
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
+    PropertyLayer,
     VoronoiGrid,
-    PropertyLayer
 )
-
 
 
 def test_orthogonal_grid_neumann():
@@ -661,6 +660,8 @@ def test_property_layer_integration():
     grid.remove_property_layer("elevation")
     assert "elevation" not in grid._mesa_property_layers
     assert not hasattr(cell, "elevation")
+
+
 #
 #
 # def test_multiple_property_layers():
