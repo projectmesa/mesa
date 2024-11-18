@@ -194,6 +194,7 @@ def test_model_param_checks():  # noqa: D103
     # test hat kwargs are accepted even if no model_params are specified
     _check_model_params(ModelWithKwargs.__init__, {})
 
+
     # Test invalid parameter name raises ValueError
     with pytest.raises(ValueError, match="Invalid model parameter: invalid_param"):
         _check_model_params(
