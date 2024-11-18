@@ -186,7 +186,7 @@ def draw_property_layers(
             continue
 
         data = layer.data.astype(float) if layer.data.dtype == bool else layer.data
-        width, height = data.shape # if space is None else (space.width, space.height)
+        width, height = data.shape  # if space is None else (space.width, space.height)
 
         if space and data.shape != (width, height):
             warnings.warn(
