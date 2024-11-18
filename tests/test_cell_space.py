@@ -661,23 +661,24 @@ def test_property_layer_integration():
     assert "elevation" not in grid._mesa_property_layers
     assert not hasattr(cell, "elevation")
 
+
 def test_multiple_property_layers():
     """Test initialization of DiscrateSpace with PropertyLayers."""
     dimensions = (5, 5)
     elevation = PropertyLayer("elevation", dimensions, default_value=0.0)
     temperature = PropertyLayer("temperature", dimensions, default_value=20.0)
-#
+    #
     # Test initialization with a single PropertyLayer
     grid1 = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     grid1.add_property_layer(elevation)
     assert "elevation" in grid1._mesa_property_layers
     assert len(grid1._mesa_property_layers) == 1
-#
+    #
     # Test initialization with multiple PropertyLayers
     grid2 = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     grid2.add_property_layer(temperature)
     grid2.add_property_layer(elevation)
-#
+    #
     assert "temperature" in grid2._mesa_property_layers
     assert "elevation" in grid2._mesa_property_layers
     assert len(grid2._mesa_property_layers) == 2
@@ -695,7 +696,7 @@ def test_property_layer_errors():
     """Test error handling for PropertyLayers."""
     dimensions = 5, 5
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
-    elevation = PropertyLayer("elevation",dimensions, default_value=0.0)
+    elevation = PropertyLayer("elevation", dimensions, default_value=0.0)
 
     # Test adding a PropertyLayer with an existing name
     grid.add_property_layer(elevation)
@@ -706,7 +707,10 @@ def test_property_layer_errors():
     dimensions = 5, 5
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     elevation = PropertyLayer("elevation", (10, 10), default_value=0.0)
-    with pytest.raises(ValueError, match="Dimensions of property layer do not match the dimensions of the grid"):
+    with pytest.raises(
+        ValueError,
+        match="Dimensions of property layer do not match the dimensions of the grid",
+    ):
         grid.add_property_layer(elevation)
 
 
