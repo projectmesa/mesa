@@ -179,8 +179,8 @@ class HasPropertyLayers:
         # Initialize an empty mask as a boolean NumPy array
 
         # fixme: in space.py this is a boolean mask with empty and non empty cells
-        #  this does not easily translate (unless we handle it in the celll, via add and remove agents?)
-        #  but then we might better treat this as a default property layer that is just allways added
+        #  this does not easily translate (unless we handle it in the cell, via add and remove agents?)
+        #  but then we might better treat this as a default property layer that is just always added
         #
         # fixme this won't work at the moment with the descriptor like access.....
         #   we might make some modifications to is_empty?
@@ -289,9 +289,9 @@ class HasPropertyLayers:
         mask = np.zeros(self.dimensions, dtype=bool)
 
         # Convert the neighborhood list to a NumPy array and use advanced indexing
-        coords = np.array(c.dimenions for c in neighborhood)
+        coords = np.array(c.dimensions for c in neighborhood)
         mask[coords[:, 0], coords[:, 1]] = (
-            True  # fixme, must work for nd, so coords must be valid for indexing
+            True  # fixme, must work for n dimensions, so coords must be valid for indexing
         )
         return mask
 
