@@ -661,41 +661,36 @@ def test_property_layer_integration():
     assert "elevation" not in grid._mesa_property_layers
     assert not hasattr(cell, "elevation")
 
+def test_multiple_property_layers():
+    """Test initialization of DiscrateSpace with PropertyLayers."""
+    dimensions = (5, 5)
+    elevation = PropertyLayer("elevation", dimensions, default_value=0.0)
+    temperature = PropertyLayer("temperature", dimensions, default_value=20.0)
+#
+    # Test initialization with a single PropertyLayer
+    grid1 = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    grid1.add_property_layer(elevation)
+    assert "elevation" in grid1._mesa_property_layers
+    assert len(grid1._mesa_property_layers) == 1
+#
+    # Test initialization with multiple PropertyLayers
+    grid2 = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    grid2.add_property_layer(temperature)
+    grid2.add_property_layer(elevation)
+#
+    assert "temperature" in grid2._mesa_property_layers
+    assert "elevation" in grid2._mesa_property_layers
+    assert len(grid2._mesa_property_layers) == 2
 
-#
-#
-# def test_multiple_property_layers():
-#     """Test initialization of DiscrateSpace with PropertyLayers."""
-#     width, height = 5, 5
-#     elevation = PropertyLayer("elevation", width, height, default_value=0)
-#     temperature = PropertyLayer("temperature", width, height, default_value=20)
-#
-#     # Test initialization with a single PropertyLayer
-#     grid1 = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
-#     grid1.add_property_layer(elevation)
-#     assert "elevation" in grid1.property_layers
-#     assert len(grid1.property_layers) == 1
-#
-#     # Test initialization with multiple PropertyLayers
-#     grid2 = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
-#     grid2.add_property_layer(temperature, add_to_cells=False)
-#     grid2.add_property_layer(elevation, add_to_cells=True)
-#
-#     assert "temperature" in grid2.property_layers
-#     assert "elevation" in grid2.property_layers
-#     assert len(grid2.property_layers) == 2
-#
-#     # Modify properties
-#     grid2.modify_properties("elevation", lambda x: x + 10)
-#     grid2.modify_properties("temperature", lambda x: x + 5)
-#
-#     for cell in grid2.all_cells:
-#         assert cell.get_property("elevation") == 10
-#         # Assert error temperature, since it was not added to cells
-#         with pytest.raises(KeyError):
-#             cell.get_property("temperature")
-#
-#
+    # Modify properties
+    grid2.modify_properties("elevation", lambda x: x + 10)
+    grid2.modify_properties("temperature", lambda x: x + 5)
+
+    for cell in grid2.all_cells:
+        assert cell.elevation == 10
+        assert cell.temperature == 25
+
+
 # def test_property_layer_errors():
 #     """Test error handling for PropertyLayers."""
 #     width, height = 5, 5
