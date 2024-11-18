@@ -224,6 +224,9 @@ class HasPropertyLayers:
             raise ValueError(
                 "Dimensions of property layer do not match the dimensions of the grid"
             )
+        if layer.name in self._mesa_property_layers:
+            raise ValueError(f"Property layer {layer.name} already exists.")
+
         self._mesa_property_layers[layer.name] = layer
         setattr(
             self.cell_klass, layer.name, PropertyDescriptor(layer)

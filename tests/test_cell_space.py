@@ -691,16 +691,23 @@ def test_multiple_property_layers():
         assert cell.temperature == 25
 
 
-# def test_property_layer_errors():
-#     """Test error handling for PropertyLayers."""
-#     width, height = 5, 5
-#     grid = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
-#     elevation = PropertyLayer("elevation", width, height, default_value=0)
-#
-#     # Test adding a PropertyLayer with an existing name
-#     grid.add_property_layer(elevation)
-#     with pytest.raises(ValueError, match="Property layer elevation already exists."):
-#         grid.add_property_layer(elevation)
+def test_property_layer_errors():
+    """Test error handling for PropertyLayers."""
+    dimensions = 5, 5
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    elevation = PropertyLayer("elevation",dimensions, default_value=0.0)
+
+    # Test adding a PropertyLayer with an existing name
+    grid.add_property_layer(elevation)
+    with pytest.raises(ValueError, match="Property layer elevation already exists."):
+        grid.add_property_layer(elevation)
+
+    # test adding a layer with different dimensions than space
+    dimensions = 5, 5
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    elevation = PropertyLayer("elevation", (10, 10), default_value=0.0)
+    with pytest.raises(ValueError, match="Dimensions of property layer do not match the dimensions of the grid"):
+        grid.add_property_layer(elevation)
 
 
 def test_cell_agent():  # noqa: D103
