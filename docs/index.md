@@ -43,6 +43,10 @@ To also install our recommended dependencies:
 pip install -U mesa[rec]
 ```
 
+On a Mac, this command might cause an error stating `zsh: no matches found: mesa[all]`.
+In that case, change the command to `pip install -U "mesa[rec]"`.
+
+
 To install our latest pre-release:
 
 ```bash
