@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Any
 
 from mesa.experimental.cell_space.cell_agent import CellAgent
 from mesa.experimental.cell_space.cell_collection import CellCollection
-from mesa.space import PropertyLayer
 
 if TYPE_CHECKING:
     from mesa.agent import Agent
@@ -24,7 +23,6 @@ class Cell:
         coordinate (Tuple[int, int]) : the position of the cell in the discrete space
         agents (List[Agent]): the agents occupying the cell
         capacity (int): the maximum number of agents that can simultaneously occupy the cell
-        properties (dict[str, Any]): the properties of the cell
         random (Random): the random number generator
 
     """
@@ -34,20 +32,9 @@ class Cell:
         "connections",
         "agents",
         "capacity",
-        "properties",
         "random",
-        "_mesa_property_layers",
         "__dict__",
     ]
-
-    # def __new__(cls,
-    #     coordinate: tuple[int, ...],
-    #     capacity: float | None = None,
-    #     random: Random | None = None,):
-    #     if capacity != 1:
-    #         return object.__new__(cls)
-    #     else:
-    #         return object.__new__(SingleAgentCell)
 
     def __init__(
         self,
@@ -69,10 +56,9 @@ class Cell:
         self.agents: list[
             Agent
         ] = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
+        self.properties = {}  # fixme still used by voronoi mesh
         self.capacity: int | None = capacity
-        self.properties: dict[Coordinate, object] = {}
         self.random = random
-        self._mesa_property_layers: dict[str, PropertyLayer] = {}
 
     def connect(self, other: Cell, key: Coordinate | None = None) -> None:
         """Connects this cell to another cell.

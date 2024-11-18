@@ -8,11 +8,12 @@ from random import Random
 from typing import Generic, TypeVar
 
 from mesa.experimental.cell_space import Cell, DiscreteSpace
+from mesa.experimental.cell_space.property_layer import HasPropertyLayers
 
 T = TypeVar("T", bound=Cell)
 
 
-class Grid(DiscreteSpace[T], Generic[T]):
+class Grid(DiscreteSpace[T], Generic[T], HasPropertyLayers):
     """Base class for all grid classes.
 
     Attributes:

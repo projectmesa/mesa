@@ -3,15 +3,13 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Callable
 from functools import cached_property
 from random import Random
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from mesa.agent import AgentSet
 from mesa.experimental.cell_space.cell import Cell
 from mesa.experimental.cell_space.cell_collection import CellCollection
-from mesa.space import PropertyLayer
 
 T = TypeVar("T", bound=Cell)
 
