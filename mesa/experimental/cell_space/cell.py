@@ -56,8 +56,8 @@ class Cell:
         self.agents: list[
             Agent
         ] = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
-        self.properties = {}  # fixme still used by voronoi mesh
         self.capacity: int | None = capacity
+        self.properties: dict[Coordinate, object] = {} # fixme still used by voronoi mesh
         self.random = random
 
     def connect(self, other: Cell, key: Coordinate | None = None) -> None:
