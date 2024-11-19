@@ -274,7 +274,7 @@ class HasPropertyLayers:
         )
 
     def get_neighborhood_mask(
-        self, pos: Coordinate, include_center: bool, radius: int
+        self, coordinate: Coordinate, include_center: bool=True, radius: int=1
     ) -> np.ndarray:
         """Generate a boolean mask representing the neighborhood.
 
@@ -286,16 +286,16 @@ class HasPropertyLayers:
         Returns:
             np.ndarray: A boolean mask representing the neighborhood.
         """
-        neighborhood = self._cells[pos].get_neighborhood(
+        cell = self._cells[coordinate]
+        neighborhood = cell.get_neighborhood(
             include_center=include_center, radius=radius
         )
         mask = np.zeros(self.dimensions, dtype=bool)
 
         # Convert the neighborhood list to a NumPy array and use advanced indexing
-        coords = np.array(c.dimensions for c in neighborhood)
-        mask[coords[:, 0], coords[:, 1]] = (
-            True  # fixme, must work for n dimensions, so coords must be valid for indexing
-        )
+        coords = np.array(list(c.coordinate for c in neighborhood))
+        indices = [coords[:, i] for i in range(coords.shape[1])]
+        mask[*indices] = True
         return mask
 
     def select_cells(
@@ -386,10 +386,6 @@ class PropertyDescriptor:
 
     def __set__(self, instance: Cell, value):  # noqa: D105
         self.layer.data[instance.coordinate] = value
-
-    def __set_name__(self, owner: Cell, name: str):  # noqa: D105
-        self.public_name = name
-        self.private_name = f"_{name}"
 
 
 def is_single_argument_function(function):

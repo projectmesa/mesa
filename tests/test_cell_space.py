@@ -691,6 +691,16 @@ def test_multiple_property_layers():
         assert cell.elevation == 10
         assert cell.temperature == 25
 
+# test masks ets
+def test_property_layer_masks():
+    dimensions = (5, 5)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    grid.create_property_layer("elevation", default_value=0.0)
+
+    # elevation.select_cells()
+    grid.get_neighborhood_mask((2, 2))
+#
+
 
 def test_property_layer_errors():
     """Test error handling for PropertyLayers."""
