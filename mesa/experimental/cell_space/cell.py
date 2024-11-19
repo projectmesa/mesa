@@ -93,6 +93,7 @@ class Cell:
 
         """
         n = len(self.agents)
+        self.empty = False
 
         if self.capacity and n >= self.capacity:
             raise Exception(
@@ -109,6 +110,7 @@ class Cell:
 
         """
         self.agents.remove(agent)
+        self.empty = self.is_empty
 
     @property
     def is_empty(self) -> bool:

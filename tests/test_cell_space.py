@@ -627,7 +627,7 @@ def test_property_layer_integration():
     elevation = PropertyLayer("elevation", dimensions, default_value=0.0)
     grid.add_property_layer(elevation)
     assert "elevation" in grid._mesa_property_layers
-    assert len(grid._mesa_property_layers) == 1
+    assert len(grid._mesa_property_layers) == 2 ## empty is allways there
 
     # Test accessing PropertyLayer from a cell
     cell = grid._cells[(0, 0)]
@@ -667,13 +667,13 @@ def test_multiple_property_layers():
     dimensions = (5, 5)
     elevation = PropertyLayer("elevation", dimensions, default_value=0.0)
     temperature = PropertyLayer("temperature", dimensions, default_value=20.0)
-    #
+
     # Test initialization with a single PropertyLayer
     grid1 = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     grid1.add_property_layer(elevation)
     assert "elevation" in grid1._mesa_property_layers
-    assert len(grid1._mesa_property_layers) == 1
-    #
+    assert len(grid1._mesa_property_layers) == 2  ## empty is already there
+
     # Test initialization with multiple PropertyLayers
     grid2 = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     grid2.add_property_layer(temperature)
@@ -681,7 +681,7 @@ def test_multiple_property_layers():
     #
     assert "temperature" in grid2._mesa_property_layers
     assert "elevation" in grid2._mesa_property_layers
-    assert len(grid2._mesa_property_layers) == 2
+    assert len(grid2._mesa_property_layers) == 3
 
     # Modify properties
     grid2.modify_properties("elevation", lambda x: x + 10)

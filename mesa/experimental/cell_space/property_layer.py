@@ -240,7 +240,7 @@ class HasPropertyLayers:
             remove_from_cells: whether to remove the property layer from all cells (default: True)
         """
         del self._mesa_property_layers[property_name]
-        delattr(Cell, property_name)
+        delattr(self.cell_klass, property_name)
 
     def set_property(
         self, property_name: str, value, condition: Callable[[T], bool] | None = None
@@ -386,14 +386,6 @@ class PropertyDescriptor:
 
     def __set__(self, instance: Cell, value):  # noqa: D105
         self.layer.data[instance.coordinate] = value
-
-
-def is_single_argument_function(function):
-    """Check if a function is a single argument function."""
-    return (
-        inspect.isfunction(function)
-        and len(inspect.signature(function).parameters) == 1
-    )
 
 
 def ufunc_requires_additional_input(ufunc):  # noqa: D103
