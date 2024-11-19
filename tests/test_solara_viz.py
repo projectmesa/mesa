@@ -213,3 +213,19 @@ def test_model_param_checks():  # noqa: D103
     # Test empty params dict raises ValueError if required params
     with pytest.raises(ValueError, match="Missing required model parameter"):
         _check_model_params(ModelWithOnlyRequired.__init__, {})
+
+
+# Test to check if params are arguments and keyword arguments
+def test_check_model_params_with_both_args_and_kwargs():
+    """Test that _check_model_params raises ValueError when both *args and **kwargs are present in model initialization."""
+
+    class ModelWithArgsAndKwargs:
+        def __init__(self, param1, *args, **kwargs):
+            pass
+
+    model_params = {"param1": 1}
+
+    with pytest.raises(
+        ValueError, match="Models with both \\*args and \\*\\*kwargs are not supported"
+    ):
+        _check_model_params(ModelWithArgsAndKwargs.__init__, model_params)

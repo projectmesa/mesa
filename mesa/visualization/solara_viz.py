@@ -423,11 +423,20 @@ def _check_model_params(init_func, model_params):
         ValueError: If a parameter is not valid for the model's initialization function
     """
     model_parameters = inspect.signature(init_func).parameters
+
+    has_var_positional = any(
+        param.kind == inspect.Parameter.VAR_POSITIONAL
+        for param in model_parameters.values()
+    )
+    has_var_keyword = any(
+        param.kind == inspect.Parameter.VAR_KEYWORD
+        for param in model_parameters.values()
+    )
+
+    if has_var_positional and has_var_keyword:
+        raise ValueError("Models with both *args and **kwargs are not supported")
+
     for name in model_parameters:
-        if name not in model_parameters:
-            raise TypeError(
-                f"The parameter '{name}' is not accepted as a keyword argument in the model's __init__ method."
-            )
         if (
             model_parameters[name].default == inspect.Parameter.empty
             and name not in model_params
