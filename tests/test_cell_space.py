@@ -691,6 +691,7 @@ def test_multiple_property_layers():
         assert cell.elevation == 10
         assert cell.temperature == 25
 
+
 # test masks ets
 def test_property_layer_masks():
     dimensions = (5, 5)
@@ -699,6 +700,8 @@ def test_property_layer_masks():
 
     # elevation.select_cells()
     grid.get_neighborhood_mask((2, 2))
+
+
 #
 
 

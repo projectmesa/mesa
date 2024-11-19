@@ -274,7 +274,7 @@ class HasPropertyLayers:
         )
 
     def get_neighborhood_mask(
-        self, coordinate: Coordinate, include_center: bool=True, radius: int=1
+        self, coordinate: Coordinate, include_center: bool = True, radius: int = 1
     ) -> np.ndarray:
         """Generate a boolean mask representing the neighborhood.
 
