@@ -708,7 +708,7 @@ def test_get_neighborhood_mask():
     mask = grid.get_neighborhood_mask((2, 2), include_center=False)
     for cell in grid._cells[(2, 2)].connections.values():
         assert mask[cell.coordinate]
-    assert mask[grid._cells[(2, 2)].coordinate] == False
+    assert not mask[grid._cells[(2, 2)].coordinate]
 
 
 def test_select_cells():
