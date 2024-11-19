@@ -627,7 +627,7 @@ def test_property_layer_integration():
     elevation = PropertyLayer("elevation", dimensions, default_value=0.0)
     grid.add_property_layer(elevation)
     assert "elevation" in grid._mesa_property_layers
-    assert len(grid._mesa_property_layers) == 2 ## empty is allways there
+    assert len(grid._mesa_property_layers) == 2  ## empty is allways there
 
     # Test accessing PropertyLayer from a cell
     cell = grid._cells[(0, 0)]

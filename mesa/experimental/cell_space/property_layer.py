@@ -1,6 +1,5 @@
 """This module provides functionality for working with property layers in grids."""
 
-import inspect
 import warnings
 from collections.abc import Callable, Sequence
 from typing import Any, TypeVar

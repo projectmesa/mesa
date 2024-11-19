@@ -61,7 +61,9 @@ class Grid(DiscreteSpace[T], Generic[T], HasPropertyLayers):
         self._try_random = True
         self._ndims = len(dimensions)
         self._validate_parameters()
-        self.cell_klass = type('GridCell', (self.cell_klass,), {})  # fixme name needs to dynamic to support multiple grids in parallel
+        self.cell_klass = type(
+            "GridCell", (self.cell_klass,), {}
+        )  # fixme name needs to dynamic to support multiple grids in parallel
 
         coordinates = product(*(range(dim) for dim in self.dimensions))
 
