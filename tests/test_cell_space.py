@@ -701,18 +701,18 @@ def test_get_neighborhood_mask():
     grid.get_neighborhood_mask((2, 2))
 
     mask = grid.get_neighborhood_mask((2, 2))
-    for cell in grid._cells[(2,2)].connections.values():
+    for cell in grid._cells[(2, 2)].connections.values():
         assert mask[cell.coordinate]
-    assert mask[grid._cells[(2,2)].coordinate]
+    assert mask[grid._cells[(2, 2)].coordinate]
 
     mask = grid.get_neighborhood_mask((2, 2), include_center=False)
-    for cell in grid._cells[(2,2)].connections.values():
+    for cell in grid._cells[(2, 2)].connections.values():
         assert mask[cell.coordinate]
-    assert mask[grid._cells[(2,2)].coordinate] == False
+    assert mask[grid._cells[(2, 2)].coordinate] == False
 
 
 def test_select_cells():
-    """test select_cells."""
+    """Test select_cells."""
     dimensions = (5, 5)
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     grid.create_property_layer("elevation", default_value=0.0)
