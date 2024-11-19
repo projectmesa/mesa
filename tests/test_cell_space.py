@@ -692,17 +692,30 @@ def test_multiple_property_layers():
         assert cell.temperature == 25
 
 
-# test masks ets
-def test_property_layer_masks():
+def test_get_neighborhood_mask():
+    """Test get_neighborhood_mask."""
     dimensions = (5, 5)
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     grid.create_property_layer("elevation", default_value=0.0)
 
-    # elevation.select_cells()
     grid.get_neighborhood_mask((2, 2))
 
+    mask = grid.get_neighborhood_mask((2, 2))
+    for cell in grid._cells[(2,2)].connections.values():
+        assert mask[cell.coordinate]
+    assert mask[grid._cells[(2,2)].coordinate]
 
-#
+    mask = grid.get_neighborhood_mask((2, 2), include_center=False)
+    for cell in grid._cells[(2,2)].connections.values():
+        assert mask[cell.coordinate]
+    assert mask[grid._cells[(2,2)].coordinate] == False
+
+
+def test_select_cells():
+    """test select_cells."""
+    dimensions = (5, 5)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    grid.create_property_layer("elevation", default_value=0.0)
 
 
 def test_property_layer_errors():

@@ -279,9 +279,9 @@ class HasPropertyLayers:
         """Generate a boolean mask representing the neighborhood.
 
         Args:
-            pos (Coordinate): Center of the neighborhood.
-            include_center (bool): Include the central cell in the neighborhood.
-            radius (int): The radius of the neighborhood.
+            coordinate: Center of the neighborhood.
+            include_center: Include the central cell in the neighborhood.
+            radius: The radius of the neighborhood.
 
         Returns:
             np.ndarray: A boolean mask representing the neighborhood.
@@ -293,7 +293,7 @@ class HasPropertyLayers:
         mask = np.zeros(self.dimensions, dtype=bool)
 
         # Convert the neighborhood list to a NumPy array and use advanced indexing
-        coords = np.array(list(c.coordinate for c in neighborhood))
+        coords = np.array([c.coordinate for c in neighborhood])
         indices = [coords[:, i] for i in range(coords.shape[1])]
         mask[*indices] = True
         return mask
