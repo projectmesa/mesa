@@ -69,23 +69,23 @@ class PropertyLayer:
             )
             self.__class__.propertylayer_experimental_warning_given = True
 
-
     @classmethod
-    def from_data(cls, name:str, data:np.ndarray):
-        """create a property layer from a NumPy array.
+    def from_data(cls, name: str, data: np.ndarray):
+        """Create a property layer from a NumPy array.
 
         Args:
             name: The name of the property layer.
             data: A NumPy array representing the grid data.
 
         """
-
-        layer = cls(name, data.shape, default_value=data[*[0 for _ in range(len(data.shape))]], dtype=data.dtype.type)
+        layer = cls(
+            name,
+            data.shape,
+            default_value=data[*[0 for _ in range(len(data.shape))]],
+            dtype=data.dtype.type,
+        )
         layer.set_cells(data)
         return layer
-
-
-
 
     def set_cells(self, value, condition: Callable | None = None):
         """Perform a batch update either on the entire grid or conditionally, in-place.
@@ -353,7 +353,9 @@ class HasPropertyLayers:
 
         # Apply the empty mask if only_empty is True
         if only_empty:
-            combined_mask = np.logical_and(combined_mask, self._mesa_property_layers["empty"])
+            combined_mask = np.logical_and(
+                combined_mask, self._mesa_property_layers["empty"]
+            )
 
         # Apply conditions
         if conditions:
