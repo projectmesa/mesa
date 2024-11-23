@@ -113,11 +113,11 @@ class Model:
             [], random=self.random
         )  # an agenset with all agents
 
-    @method_logger(__name__)
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
         """Automatically increments time and steps after calling the user's step method."""
         # Automatically increment time and step counters
         self.steps += 1
+        _mesa_logger.debug(f"calling model.step for timestep {self.steps} ")
         # Call the original user-defined step method
         self._user_step(*args, **kwargs)
 
@@ -144,7 +144,6 @@ class Model:
         """A dictionary where the keys are agent types and the values are the corresponding AgentSets."""
         return self._agents_by_type
 
-    @method_logger(__name__)
     def register_agent(self, agent):
         """Register the agent with the model.
 
@@ -171,6 +170,7 @@ class Model:
             )
 
         self._all_agents.add(agent)
+        _mesa_logger.debug(f"registered agent with agent_id {agent.agent_id}")
 
     def deregister_agent(self, agent):
         """Deregister the agent with the model.
@@ -185,6 +185,7 @@ class Model:
         del self._agents[agent]
         self._agents_by_type[type(agent)].remove(agent)
         self._all_agents.remove(agent)
+        _mesa_logger.debug(f"deregistered agent with agent_id {agent.agent_id}")
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached.
