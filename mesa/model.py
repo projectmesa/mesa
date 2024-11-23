@@ -170,7 +170,7 @@ class Model:
             )
 
         self._all_agents.add(agent)
-        _mesa_logger.debug(f"registered agent with agent_id {agent.agent_id}")
+        _mesa_logger.debug(f"registered agent with agent_id {agent.unique_id}")
 
     def deregister_agent(self, agent):
         """Deregister the agent with the model.
@@ -185,7 +185,7 @@ class Model:
         del self._agents[agent]
         self._agents_by_type[type(agent)].remove(agent)
         self._all_agents.remove(agent)
-        _mesa_logger.debug(f"deregistered agent with agent_id {agent.agent_id}")
+        _mesa_logger.debug(f"deregistered agent with agent_id {agent.unique_id}")
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached.
