@@ -193,16 +193,6 @@ class HasPropertyLayers:
         """Initialize a HasPropertyLayers instance."""
         super().__init__(*args, **kwargs)
         self._mesa_property_layers = {}
-        # Initialize an empty mask as a boolean NumPy array
-
-        # fixme: in space.py this is a boolean mask with empty and non empty cells
-        #  this does not easily translate (unless we handle it in the cell, via add and remove agents?)
-        #  but then we might better treat this as a default property layer that is just always added
-        #
-        # fixme this won't work at the moment with the descriptor like access.....
-        #   we might make some modifications to is_empty?
-        #  I cannot add a layer here because the init of the other classes has not yet completed
-        # self.create_property_layer("empty", True, dtype=bool)
 
     def create_property_layer(
         self,
@@ -222,10 +212,7 @@ class HasPropertyLayers:
         layer = PropertyLayer(
             name, self.dimensions, default_value=default_value, dtype=dtype
         )
-        self._mesa_property_layers[name] = layer
-
-        # fixme: how will this interact with slots and can I dynamically change slots?
-        setattr(self.cell_klass, name, PropertyDescriptor(layer))
+        self.add_property_layer(layer)
 
     def add_property_layer(self, layer: PropertyLayer):
         """Add a predefined property layer to the grid.
