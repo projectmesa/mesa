@@ -170,7 +170,9 @@ class Model:
             )
 
         self._all_agents.add(agent)
-        _mesa_logger.debug(f"registered {agent.__class__.__name__} with agent_id {agent.unique_id}")
+        _mesa_logger.debug(
+            f"registered {agent.__class__.__name__} with agent_id {agent.unique_id}"
+        )
 
     def deregister_agent(self, agent):
         """Deregister the agent with the model.
