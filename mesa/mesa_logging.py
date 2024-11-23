@@ -61,8 +61,31 @@ _rootlogger = None
 _module_loggers = {}
 _logger = get_module_logger(__name__)
 
-LOG_FORMAT = "[%(name)s %(levelname)s] %(message)s"
 
+class MESAColorFormatter(logging.Formatter):
+    """Custom formatter for color based formatting."""
+
+    grey = "\x1b[38;20m"
+    green = "\x1b[32m"
+    yellow = "\x1b[33;20m"
+    red = "\x1b[31;20m"
+    bold_red = "\x1b[31;1m"
+    reset = "\x1b[0m"
+    format = "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s [%(filename)s:%(lineno)d]"
+
+    FORMATS = {
+        logging.DEBUG: grey + format + reset,
+        logging.INFO: green + format + reset,
+        logging.WARNING: yellow + format + reset,
+        logging.ERROR: red + format + reset,
+        logging.CRITICAL: bold_red + format + reset
+    }
+
+    def format(self, record):
+        """Format record."""
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt)
+        return formatter.format(record)
 
 def method_logger(name: str):
     """Decorator for adding logging to a method.
@@ -146,11 +169,11 @@ def log_to_stderr(level: int | None = None, pass_root_logger_level: bool = False
     # avoid creation of multiple stream handlers for logging to console
     for entry in logger.handlers:
         if (isinstance(entry, logging.StreamHandler)) and (
-            entry.formatter._fmt == LOG_FORMAT
+            entry.setFormatter(MESAColorFormatter())
         ):
             return logger
 
-    formatter = logging.Formatter(LOG_FORMAT)
+    formatter = MESAColorFormatter()
     handler = logging.StreamHandler()
     handler.setLevel(level)
     handler.setFormatter(formatter)

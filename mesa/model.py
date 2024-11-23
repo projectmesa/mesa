@@ -117,7 +117,7 @@ class Model:
         """Automatically increments time and steps after calling the user's step method."""
         # Automatically increment time and step counters
         self.steps += 1
-        _mesa_logger.debug(f"calling model.step for timestep {self.steps} ")
+        _mesa_logger.info(f"calling model.step for timestep {self.steps} ")
         # Call the original user-defined step method
         self._user_step(*args, **kwargs)
 
@@ -170,7 +170,7 @@ class Model:
             )
 
         self._all_agents.add(agent)
-        _mesa_logger.debug(f"registered agent with agent_id {agent.unique_id}")
+        _mesa_logger.debug(f"registered {agent.__class__.__name__} with agent_id {agent.unique_id}")
 
     def deregister_agent(self, agent):
         """Deregister the agent with the model.
