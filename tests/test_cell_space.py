@@ -715,8 +715,32 @@ def test_select_cells():
     """Test select_cells."""
     dimensions = (5, 5)
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
-    grid.create_property_layer("elevation", default_value=0.0)
 
+    data = np.random.default_rng(12456).random((5,5))
+    grid.add_property_layer(PropertyLayer.from_data("elevation", data))
+
+    # fixme, add an agent and update the np.all test accordingly
+    mask = grid.select_cells(conditions={"elevation": lambda x: x > 0.5}, return_list=False, only_empty=True)
+    assert mask.shape == (5, 5)
+    assert np.all(mask == (data > 0.5))
+
+    mask = grid.select_cells(conditions={"elevation": lambda x: x > 0.5}, return_list=False, only_empty=False)
+    assert mask.shape == (5, 5)
+    assert np.all(mask == (data > 0.5))
+
+    # fixme add extreme_values heighest and lowest
+    mask = grid.select_cells(extreme_values={'elevation' : 'highest'}, return_list=False, only_empty=False)
+    assert mask.shape == (5, 5)
+    assert np.all(mask == (data==data.max()))
+
+    mask = grid.select_cells(extreme_values={'elevation' : 'lowest'}, return_list=False, only_empty=False)
+    assert mask.shape == (5, 5)
+    assert np.all(mask == (data==data.min()))
+
+    with pytest.raises(ValueError):
+        grid.select_cells(extreme_values={'elevation': 'weird'}, return_list=False, only_empty=False)
+
+    # fixme add pre-specified mask to any other option
 
 def test_property_layer_errors():
     """Test error handling for PropertyLayers."""

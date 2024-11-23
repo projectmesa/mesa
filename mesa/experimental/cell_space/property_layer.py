@@ -6,7 +6,7 @@ from typing import Any, TypeVar
 
 import numpy as np
 
-from .cell import Cell
+from mesa.experimental.cell_space import Cell
 
 Coordinate = Sequence[int]
 T = TypeVar("T", bound=Cell)
@@ -68,6 +68,24 @@ class PropertyLayer:
                 stacklevel=2,
             )
             self.__class__.propertylayer_experimental_warning_given = True
+
+
+    @classmethod
+    def from_data(cls, name:str, data:np.ndarray):
+        """create a property layer from a NumPy array.
+
+        Args:
+            name: The name of the property layer.
+            data: A NumPy array representing the grid data.
+
+        """
+
+        layer = cls(name, data.shape, default_value=data[*[0 for _ in range(len(data.shape))]], dtype=data.dtype.type)
+        layer.set_cells(data)
+        return layer
+
+
+
 
     def set_cells(self, value, condition: Callable | None = None):
         """Perform a batch update either on the entire grid or conditionally, in-place.
@@ -334,8 +352,8 @@ class HasPropertyLayers:
                 combined_mask = np.logical_and(combined_mask, masks)
 
         # Apply the empty mask if only_empty is True
-        if only_empty:  # fixme does not currently work
-            combined_mask = np.logical_and(combined_mask, self.empty_mask)
+        if only_empty:
+            combined_mask = np.logical_and(combined_mask, self._mesa_property_layers["empty"])
 
         # Apply conditions
         if conditions:
