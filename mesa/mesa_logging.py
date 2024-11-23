@@ -172,7 +172,7 @@ def log_to_stderr(level: int | None = None, pass_root_logger_level: bool = False
     # avoid creation of multiple stream handlers for logging to console
     for entry in logger.handlers:
         if (isinstance(entry, logging.StreamHandler)) and (
-            entry.setFormatter(MESAColorFormatter())
+            isinstance(entry.formatter, MESAColorFormatter)
         ):
             return logger
 
