@@ -23,6 +23,7 @@ class PropertyLayer:
         data: A NumPy array representing the grid data.
 
     """
+
     # Fixme do we need this class at all?
     #  what does it add to just a numpy array?
 
