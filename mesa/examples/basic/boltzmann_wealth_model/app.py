@@ -1,8 +1,3 @@
-import os.path
-import sys
-
-sys.path.insert(0, os.path.abspath("../../../.."))
-
 from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealth
 from mesa.mesa_logging import DEBUG, log_to_stderr
 from mesa.visualization import (
