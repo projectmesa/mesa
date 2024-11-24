@@ -92,35 +92,20 @@ class PropertyLayer:
 
         Args:
             value: The value to be used for the update.
-            condition: (Optional) A callable (like a lambda function or a NumPy ufunc)
-                       that returns a boolean array when applied to the data.
+            condition: (Optional) A callable that returns a boolean array when applied to the data.
         """
         if condition is None:
             np.copyto(self.data, value)  # In-place update
         else:
-            if isinstance(condition, np.ufunc):
-                # Directly apply NumPy ufunc
-                condition_result = condition(self.data)
-            else:
-                # Vectorize non-ufunc conditions
-                vectorized_condition = np.vectorize(condition)
-                condition_result = vectorized_condition(self.data)
-
-            if (
-                not isinstance(condition_result, np.ndarray)
-                or condition_result.shape != self.data.shape
-            ):
-                raise ValueError(
-                    "Result of condition must be a NumPy array with the same shape as the grid."
-                )
-
+            vectorized_condition = np.vectorize(condition)
+            condition_result = vectorized_condition(self.data)
             np.copyto(self.data, value, where=condition_result)
 
     def modify_cells(
         self,
         operation: Callable,
         value=None,
-        condition_function: Callable | None = None,
+        condition: Callable | None = None,
     ):
         """Modify cells using an operation, which can be a lambda function or a NumPy ufunc.
 
@@ -129,17 +114,14 @@ class PropertyLayer:
         Args:
             operation: A function to apply. Can be a lambda function or a NumPy ufunc.
             value: The value to be used if the operation is a NumPy ufunc. Ignored for lambda functions.
-            condition_function: (Optional) A callable that returns a boolean array when applied to the data.
+            condition: (Optional) A callable that returns a boolean array when applied to the data.
         """
         condition_array = np.ones_like(
             self.data, dtype=bool
         )  # Default condition (all cells)
-        if condition_function is not None:
-            if isinstance(condition_function, np.ufunc):
-                condition_array = condition_function(self.data)
-            else:
-                vectorized_condition = np.vectorize(condition_function)
-                condition_array = vectorized_condition(self.data)
+        if condition is not None:
+            vectorized_condition = np.vectorize(condition)
+            condition_array = vectorized_condition(self.data)
 
         # Check if the operation is a lambda function or a NumPy ufunc
         if isinstance(operation, np.ufunc):
@@ -176,7 +158,7 @@ class PropertyLayer:
         else:
             return condition_array
 
-    def aggregate_property(self, operation: Callable):
+    def aggregate(self, operation: Callable):
         """Perform an aggregate operation (e.g., sum, mean) on a property across all cells.
 
         Args:

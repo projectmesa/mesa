@@ -732,7 +732,7 @@ def test_select_cells():
     assert mask.shape == (5, 5)
     assert np.all(mask == (data > 0.5))
 
-    # fixme add extreme_values heighest and lowest
+    # fixme add extreme_values highest and lowest
     mask = grid.select_cells(
         extreme_values={"elevation": "highest"}, return_list=False, only_empty=False
     )
@@ -751,6 +751,51 @@ def test_select_cells():
         )
 
     # fixme add pre-specified mask to any other option
+
+
+def test_property_layer():
+    """Test various property layer methods."""
+    elevation = PropertyLayer("elevation", (5,5), default_value=0.0)
+
+    # test set_cells
+    elevation.set_cells(10)
+    assert np.all(elevation.data==10)
+
+    elevation.set_cells(np.ones((5,5)))
+    assert np.all(elevation.data==1)
+
+    with pytest.raises(ValueError):
+        elevation.set_cells(np.ones((6, 6)))
+
+    data = np.random.default_rng(42).random((5, 5))
+    layer = PropertyLayer.from_data("some_name", data)
+
+    def condition(x):
+        return x > 0.5
+
+    layer.set_cells(1, condition=condition)
+    assert np.all((layer.data == 1) == (data > 0.5))
+
+    # modify_cells
+    layer.data = np.zeros((10, 10))
+    layer.modify_cells(lambda x: x + 2)
+    assert np.all(layer.data == 2)
+
+    layer.data = np.ones((10, 10))
+    layer.modify_cells(np.multiply, 3)
+    assert np.all(layer.data[3, 3] == 3)
+
+    data = np.random.default_rng(42).random((5, 5))
+    layer.data = np.random.default_rng(42).random((5, 5))
+    layer.modify_cells(np.add, value=3, condition=condition)
+    assert np.all((layer.data > 3.5) == (data > 0.5))
+
+    with pytest.raises(ValueError):
+        layer.modify_cells(np.add)  # Missing value for ufunc
+
+    # aggregate
+    layer.data = np.ones((10, 10))
+    assert layer.aggregate(np.sum) == 100
 
 
 def test_property_layer_errors():
@@ -773,6 +818,9 @@ def test_property_layer_errors():
         match="Dimensions of property layer do not match the dimensions of the grid",
     ):
         grid.add_property_layer(elevation)
+
+    with pytest.warns(UserWarning):
+        PropertyLayer("elevation", (10, 10), default_value=0, dtype=float)
 
 
 def test_cell_agent():  # noqa: D103
