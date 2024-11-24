@@ -34,7 +34,9 @@ class PropertyLayer:
     @data.setter
     def data(self, value):
         if value.shape != self._mesa_data.shape:
-            raise ValueError(f"dimensions of value don't match dimensions of property layer: is {value.shape}, should be {self.dimensions}")
+            raise ValueError(
+                f"dimensions of value don't match dimensions of property layer: is {value.shape}, should be {self.dimensions}"
+            )
 
         self._mesa_data = value
 
