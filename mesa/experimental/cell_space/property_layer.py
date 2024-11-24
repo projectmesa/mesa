@@ -24,8 +24,10 @@ class PropertyLayer:
 
     """
 
-    # Fixme do we need this class at all?
-    #  what does it add to just a numpy array?
+    # Fixme
+    #  can't we simplify this a lot
+    #  in essence, this is just a numpy array with a name and fixed dimensions
+    #  all other functionality seems redundant to me?
 
     @property
     def data(self):  # noqa: D102
@@ -33,12 +35,7 @@ class PropertyLayer:
 
     @data.setter
     def data(self, value):
-        if value.shape != self._mesa_data.shape:
-            raise ValueError(
-                f"dimensions of value don't match dimensions of property layer: is {value.shape}, should be {self.dimensions}"
-            )
-
-        self._mesa_data = value
+        self.set_cells(value)
 
     propertylayer_experimental_warning_given = False
 
