@@ -28,7 +28,7 @@ class PropertyLayer:
     #  what does it add to just a numpy array?
 
     @property
-    def data(self):
+    def data(self):  # noqa: D102
         return self._mesa_data
 
     @data.setter
