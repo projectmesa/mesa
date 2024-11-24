@@ -755,14 +755,14 @@ def test_select_cells():
 
 def test_property_layer():
     """Test various property layer methods."""
-    elevation = PropertyLayer("elevation", (5,5), default_value=0.0)
+    elevation = PropertyLayer("elevation", (5, 5), default_value=0.0)
 
     # test set_cells
     elevation.set_cells(10)
-    assert np.all(elevation.data==10)
+    assert np.all(elevation.data == 10)
 
-    elevation.set_cells(np.ones((5,5)))
-    assert np.all(elevation.data==1)
+    elevation.set_cells(np.ones((5, 5)))
+    assert np.all(elevation.data == 1)
 
     with pytest.raises(ValueError):
         elevation.set_cells(np.ones((6, 6)))
