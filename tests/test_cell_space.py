@@ -777,6 +777,9 @@ def test_property_layer():
     assert np.all((layer.data == 1) == (data > 0.5))
 
     # modify_cells
+    data = np.zeros((10, 10))
+    layer = PropertyLayer.from_data("some_name", data)
+
     layer.data = np.zeros((10, 10))
     layer.modify_cells(lambda x: x + 2)
     assert np.all(layer.data == 2)
@@ -785,8 +788,8 @@ def test_property_layer():
     layer.modify_cells(np.multiply, 3)
     assert np.all(layer.data[3, 3] == 3)
 
-    data = np.random.default_rng(42).random((5, 5))
-    layer.data = np.random.default_rng(42).random((5, 5))
+    data = np.random.default_rng(42).random((10, 10))
+    layer.data = np.random.default_rng(42).random((10, 10))
     layer.modify_cells(np.add, value=3, condition=condition)
     assert np.all((layer.data > 3.5) == (data > 0.5))
 

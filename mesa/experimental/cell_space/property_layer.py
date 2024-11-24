@@ -27,6 +27,17 @@ class PropertyLayer:
     # Fixme do we need this class at all?
     #  what does it add to just a numpy array?
 
+    @property
+    def data(self):
+        return self._mesa_data
+
+    @data.setter
+    def data(self, value):
+        if value.shape != self._mesa_data.shape:
+            raise ValueError(f"dimensions of value don't match dimensions of property layer: is {value.shape}, should be {self.dimensions}")
+
+        self._mesa_data = value
+
     propertylayer_experimental_warning_given = False
 
     def __init__(
@@ -58,7 +69,7 @@ class PropertyLayer:
             )
 
         # fixme why not initialize with empty?
-        self.data = np.full(self.dimensions, default_value, dtype=dtype)
+        self._mesa_data = np.full(self.dimensions, default_value, dtype=dtype)
 
         if not self.__class__.propertylayer_experimental_warning_given:
             warnings.warn(
@@ -95,11 +106,11 @@ class PropertyLayer:
             condition: (Optional) A callable that returns a boolean array when applied to the data.
         """
         if condition is None:
-            np.copyto(self.data, value)  # In-place update
+            np.copyto(self._mesa_data, value)  # In-place update
         else:
             vectorized_condition = np.vectorize(condition)
-            condition_result = vectorized_condition(self.data)
-            np.copyto(self.data, value, where=condition_result)
+            condition_result = vectorized_condition(self._mesa_data)
+            np.copyto(self._mesa_data, value, where=condition_result)
 
     def modify_cells(
         self,
@@ -117,26 +128,26 @@ class PropertyLayer:
             condition: (Optional) A callable that returns a boolean array when applied to the data.
         """
         condition_array = np.ones_like(
-            self.data, dtype=bool
+            self._mesa_data, dtype=bool
         )  # Default condition (all cells)
         if condition is not None:
             vectorized_condition = np.vectorize(condition)
-            condition_array = vectorized_condition(self.data)
+            condition_array = vectorized_condition(self._mesa_data)
 
         # Check if the operation is a lambda function or a NumPy ufunc
         if isinstance(operation, np.ufunc):
             if ufunc_requires_additional_input(operation):
                 if value is None:
                     raise ValueError("This ufunc requires an additional input value.")
-                modified_data = operation(self.data, value)
+                modified_data = operation(self._mesa_data, value)
             else:
-                modified_data = operation(self.data)
+                modified_data = operation(self._mesa_data)
         else:
             # Vectorize non-ufunc operations
             vectorized_operation = np.vectorize(operation)
-            modified_data = vectorized_operation(self.data)
+            modified_data = vectorized_operation(self._mesa_data)
 
-        self.data = np.where(condition_array, modified_data, self.data)
+        self._mesa_data = np.where(condition_array, modified_data, self._mesa_data)
 
     def select_cells(self, condition: Callable, return_list=True):
         """Find cells that meet a specified condition using NumPy's boolean indexing, in-place.
@@ -152,7 +163,7 @@ class PropertyLayer:
         Returns:
             A list of (x, y) tuples or a boolean array.
         """
-        condition_array = condition(self.data)
+        condition_array = condition(self._mesa_data)
         if return_list:
             return list(zip(*np.where(condition_array)))
         else:
@@ -164,7 +175,7 @@ class PropertyLayer:
         Args:
             operation: A function to apply. Can be a lambda function or a NumPy ufunc.
         """
-        return operation(self.data)
+        return operation(self._mesa_data)
 
 
 class HasPropertyLayers:
