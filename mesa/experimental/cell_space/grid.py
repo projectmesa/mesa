@@ -17,7 +17,6 @@ from mesa.experimental.cell_space.property_layer import (
 T = TypeVar("T", bound=Cell)
 
 
-
 def pickle_gridcell(obj):
     """Helper function for pickling GridCell instances."""
     # we have the base class, the dict, and the slots
