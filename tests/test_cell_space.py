@@ -434,7 +434,7 @@ def test_networkgrid():
 
     import pickle
 
-    pickle.loads(pickle.dumps(grid))
+    pickle.loads(pickle.dumps(grid))  # noqa: S301
 
 
 def test_voronoigrid():
@@ -674,6 +674,7 @@ def test_property_layer_integration():
 
 
 def test_copy_pickle_with_propertylayers():
+    """Test deepcopy and pickle with dynamically created GridClass and ProperyLayer descriptors."""
     import copy
     import pickle
 
@@ -687,12 +688,14 @@ def test_copy_pickle_with_propertylayers():
     grid2._cells[(0, 0)].empty = False
     assert grid2._cells[(0, 0)].empty == data[0, 0]
 
-    # fixme this currently fails
     dimensions = (10, 10)
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     dump = pickle.dumps(grid)
-    grid2 = pickle.loads(dump)
+    grid2 = pickle.loads(dump)   # noqa: S301
     assert grid2._cells[(0, 0)].empty
+    data = grid2._mesa_property_layers["empty"].data
+    grid2._cells[(0, 0)].empty = False
+    assert grid2._cells[(0, 0)].empty == data[0, 0]
 
 
 def test_multiple_property_layers():
@@ -974,6 +977,3 @@ def test_copying_discrete_spaces():  # noqa: D103
         for k, v in c1.connections.items():
             assert v.coordinate == c2.connections[k].coordinate
 
-
-if __name__ == "__main__":
-    test_copy_pickle_with_propertylayers()
