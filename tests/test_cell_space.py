@@ -691,7 +691,7 @@ def test_copy_pickle_with_propertylayers():
     dimensions = (10, 10)
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     dump = pickle.dumps(grid)
-    grid2 = pickle.loads(dump)   # noqa: S301
+    grid2 = pickle.loads(dump)  # noqa: S301
     assert grid2._cells[(0, 0)].empty
     data = grid2._mesa_property_layers["empty"].data
     grid2._cells[(0, 0)].empty = False
@@ -976,4 +976,3 @@ def test_copying_discrete_spaces():  # noqa: D103
     for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
         for k, v in c1.connections.items():
             assert v.coordinate == c2.connections[k].coordinate
-
