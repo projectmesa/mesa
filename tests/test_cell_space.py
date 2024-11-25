@@ -868,8 +868,8 @@ def test_property_layer_errors():
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     elevation = PropertyLayer("elevation", (10, 10), default_value=0.0)
     with pytest.raises(
-            ValueError,
-            match="Dimensions of property layer do not match the dimensions of the grid",
+        ValueError,
+        match="Dimensions of property layer do not match the dimensions of the grid",
     ):
         grid.add_property_layer(elevation)
 
