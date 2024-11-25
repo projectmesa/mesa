@@ -10,5 +10,6 @@ space
 datacollection
 batchrunner
 visualization
+logging
 experimental
 ```
