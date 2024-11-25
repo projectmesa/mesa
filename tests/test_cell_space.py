@@ -163,7 +163,7 @@ def test_orthogonal_grid_moore():
     for connection in grid._cells[(5, 5)].connections.values():
         # fmt: off
         assert connection.coordinate in {(4, 4), (4, 5), (4, 6),
-                                         (5, 4),         (5, 6),
+                                         (5, 4), (5, 6),
                                          (6, 4), (6, 5), (6, 6)}
         # fmt: on
 
@@ -175,7 +175,7 @@ def test_orthogonal_grid_moore():
     for connection in grid._cells[(0, 0)].connections.values():
         # fmt: off
         assert connection.coordinate in {(9, 9), (9, 0), (9, 1),
-                                         (0, 9),         (0, 1),
+                                         (0, 9), (0, 1),
                                          (1, 9), (1, 0), (1, 1)}
         # fmt: on
 
@@ -206,9 +206,12 @@ def test_orthogonal_grid_moore_3d():
     assert len(grid._cells[(5, 5, 5)].connections.values()) == 26
     for connection in grid._cells[(5, 5, 5)].connections.values():
         # fmt: off
-        assert connection.coordinate in {(4, 4, 4), (4, 4, 5), (4, 4, 6), (4, 5, 4), (4, 5, 5), (4, 5, 6), (4, 6, 4), (4, 6, 5), (4, 6, 6),
-                                         (5, 4, 4), (5, 4, 5), (5, 4, 6), (5, 5, 4),             (5, 5, 6), (5, 6, 4), (5, 6, 5), (5, 6, 6),
-                                         (6, 4, 4), (6, 4, 5), (6, 4, 6), (6, 5, 4), (6, 5, 5), (6, 5, 6), (6, 6, 4), (6, 6, 5), (6, 6, 6)}
+        assert connection.coordinate in {(4, 4, 4), (4, 4, 5), (4, 4, 6), (4, 5, 4), (4, 5, 5), (4, 5, 6), (4, 6, 4),
+                                         (4, 6, 5), (4, 6, 6),
+                                         (5, 4, 4), (5, 4, 5), (5, 4, 6), (5, 5, 4), (5, 5, 6), (5, 6, 4), (5, 6, 5),
+                                         (5, 6, 6),
+                                         (6, 4, 4), (6, 4, 5), (6, 4, 6), (6, 5, 4), (6, 5, 5), (6, 5, 6), (6, 6, 4),
+                                         (6, 6, 5), (6, 6, 6)}
         # fmt: on
 
     # Moore neighborhood, torus True, top corner
@@ -218,9 +221,12 @@ def test_orthogonal_grid_moore_3d():
     assert len(grid._cells[(0, 0, 0)].connections.values()) == 26
     for connection in grid._cells[(0, 0, 0)].connections.values():
         # fmt: off
-        assert connection.coordinate in {(9, 9, 9), (9, 9, 0), (9, 9, 1), (9, 0, 9), (9, 0, 0), (9, 0, 1), (9, 1, 9), (9, 1, 0), (9, 1, 1),
-                                         (0, 9, 9), (0, 9, 0), (0, 9, 1), (0, 0, 9),             (0, 0, 1), (0, 1, 9), (0, 1, 0), (0, 1, 1),
-                                         (1, 9, 9), (1, 9, 0), (1, 9, 1), (1, 0, 9), (1, 0, 0), (1, 0, 1), (1, 1, 9), (1, 1, 0), (1, 1, 1)}
+        assert connection.coordinate in {(9, 9, 9), (9, 9, 0), (9, 9, 1), (9, 0, 9), (9, 0, 0), (9, 0, 1), (9, 1, 9),
+                                         (9, 1, 0), (9, 1, 1),
+                                         (0, 9, 9), (0, 9, 0), (0, 9, 1), (0, 0, 9), (0, 0, 1), (0, 1, 9), (0, 1, 0),
+                                         (0, 1, 1),
+                                         (1, 9, 9), (1, 9, 0), (1, 9, 1), (1, 0, 9), (1, 0, 0), (1, 0, 1), (1, 1, 9),
+                                         (1, 1, 0), (1, 1, 1)}
         # fmt: on
 
 
@@ -262,15 +268,24 @@ def test_orthogonal_grid_moore_4d():
     assert len(grid._cells[(5, 5, 5, 5)].connections.values()) == 80
     for connection in grid._cells[(5, 5, 5, 5)].connections.values():
         # fmt: off
-        assert connection.coordinate in {(4, 4, 4, 4), (4, 4, 4, 5), (4, 4, 4, 6), (4, 4, 5, 4), (4, 4, 5, 5), (4, 4, 5, 6), (4, 4, 6, 4), (4, 4, 6, 5), (4, 4, 6, 6),
-                                         (4, 5, 4, 4), (4, 5, 4, 5), (4, 5, 4, 6), (4, 5, 5, 4), (4, 5, 5, 5), (4, 5, 5, 6), (4, 5, 6, 4), (4, 5, 6, 5), (4, 5, 6, 6),
-                                            (4, 6, 4, 4), (4, 6, 4, 5), (4, 6, 4, 6), (4, 6, 5, 4), (4, 6, 5, 5), (4, 6, 5, 6), (4, 6, 6, 4), (4, 6, 6, 5), (4, 6, 6, 6),
-                                            (5, 4, 4, 4), (5, 4, 4, 5), (5, 4, 4, 6), (5, 4, 5, 4), (5, 4, 5, 5), (5, 4, 5, 6), (5, 4, 6, 4), (5, 4, 6, 5), (5, 4, 6, 6),
-                                            (5, 5, 4, 4), (5, 5, 4, 5), (5, 5, 4, 6), (5, 5, 5, 4),             (5, 5, 5, 6), (5, 5, 6, 4), (5, 5, 6, 5), (5, 5, 6, 6),
-                                            (5, 6, 4, 4), (5, 6, 4, 5), (5, 6, 4, 6), (5, 6, 5, 4), (5, 6, 5, 5), (5, 6, 5, 6), (5, 6, 6, 4), (5, 6, 6, 5), (5, 6, 6, 6),
-                                            (6, 4, 4, 4), (6, 4, 4, 5), (6, 4, 4, 6), (6, 4, 5, 4), (6, 4, 5, 5), (6, 4, 5, 6), (6, 4, 6, 4), (6, 4, 6, 5), (6, 4, 6, 6),
-                                            (6, 5, 4, 4), (6, 5, 4, 5), (6, 5, 4, 6), (6, 5, 5, 4), (6, 5, 5, 5), (6, 5, 5, 6), (6, 5, 6, 4), (6, 5, 6, 5), (6, 5, 6, 6),
-                                            (6, 6, 4, 4), (6, 6, 4, 5), (6, 6, 4, 6), (6, 6, 5, 4), (6, 6, 5, 5), (6, 6, 5, 6), (6, 6, 6, 4), (6, 6, 6, 5), (6, 6, 6, 6)}
+        assert connection.coordinate in {(4, 4, 4, 4), (4, 4, 4, 5), (4, 4, 4, 6), (4, 4, 5, 4), (4, 4, 5, 5),
+                                         (4, 4, 5, 6), (4, 4, 6, 4), (4, 4, 6, 5), (4, 4, 6, 6),
+                                         (4, 5, 4, 4), (4, 5, 4, 5), (4, 5, 4, 6), (4, 5, 5, 4), (4, 5, 5, 5),
+                                         (4, 5, 5, 6), (4, 5, 6, 4), (4, 5, 6, 5), (4, 5, 6, 6),
+                                         (4, 6, 4, 4), (4, 6, 4, 5), (4, 6, 4, 6), (4, 6, 5, 4), (4, 6, 5, 5),
+                                         (4, 6, 5, 6), (4, 6, 6, 4), (4, 6, 6, 5), (4, 6, 6, 6),
+                                         (5, 4, 4, 4), (5, 4, 4, 5), (5, 4, 4, 6), (5, 4, 5, 4), (5, 4, 5, 5),
+                                         (5, 4, 5, 6), (5, 4, 6, 4), (5, 4, 6, 5), (5, 4, 6, 6),
+                                         (5, 5, 4, 4), (5, 5, 4, 5), (5, 5, 4, 6), (5, 5, 5, 4), (5, 5, 5, 6),
+                                         (5, 5, 6, 4), (5, 5, 6, 5), (5, 5, 6, 6),
+                                         (5, 6, 4, 4), (5, 6, 4, 5), (5, 6, 4, 6), (5, 6, 5, 4), (5, 6, 5, 5),
+                                         (5, 6, 5, 6), (5, 6, 6, 4), (5, 6, 6, 5), (5, 6, 6, 6),
+                                         (6, 4, 4, 4), (6, 4, 4, 5), (6, 4, 4, 6), (6, 4, 5, 4), (6, 4, 5, 5),
+                                         (6, 4, 5, 6), (6, 4, 6, 4), (6, 4, 6, 5), (6, 4, 6, 6),
+                                         (6, 5, 4, 4), (6, 5, 4, 5), (6, 5, 4, 6), (6, 5, 5, 4), (6, 5, 5, 5),
+                                         (6, 5, 5, 6), (6, 5, 6, 4), (6, 5, 6, 5), (6, 5, 6, 6),
+                                         (6, 6, 4, 4), (6, 6, 4, 5), (6, 6, 4, 6), (6, 6, 5, 4), (6, 6, 5, 5),
+                                         (6, 6, 5, 6), (6, 6, 6, 4), (6, 6, 6, 5), (6, 6, 6, 6)}
         # fmt: on
 
 
@@ -379,7 +394,7 @@ def test_hexgrid():
     for connection in grid._cells[(1, 0)].connections.values():
         # fmt: off
         assert connection.coordinate in {(0, 0), (0, 1),
-                                                    (1, 1),
+                                         (1, 1),
                                          (2, 0), (2, 1)}
 
     # middle odd row
@@ -387,7 +402,7 @@ def test_hexgrid():
     for connection in grid._cells[(5, 5)].connections.values():
         # fmt: off
         assert connection.coordinate in {(4, 5), (4, 6),
-                                      (5, 4),       (5, 6),
+                                         (5, 4), (5, 6),
                                          (6, 5), (6, 6)}
 
         # fmt: on
@@ -397,7 +412,7 @@ def test_hexgrid():
     for connection in grid._cells[(4, 4)].connections.values():
         # fmt: off
         assert connection.coordinate in {(3, 3), (3, 4),
-                                      (4, 3),       (4, 5),
+                                         (4, 3), (4, 5),
                                          (5, 3), (5, 4)}
 
         # fmt: on
@@ -410,7 +425,7 @@ def test_hexgrid():
     for connection in grid._cells[(0, 0)].connections.values():
         # fmt: off
         assert connection.coordinate in {(9, 9), (9, 0),
-                                      (0, 9),       (0, 1),
+                                         (0, 9), (0, 1),
                                          (1, 9), (1, 0)}
 
         # fmt: on
@@ -665,7 +680,7 @@ def test_property_layer_integration():
     assert "elevation" not in grid._mesa_property_layers
     assert not hasattr(cell, "elevation")
 
-    # what happens if we add a layer whose name clashes with an existing cell atttribute?
+    # what happens if we add a layer whose name clashes with an existing cell attribute?
     dimensions = (10, 10)
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
 
@@ -853,8 +868,8 @@ def test_property_layer_errors():
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     elevation = PropertyLayer("elevation", (10, 10), default_value=0.0)
     with pytest.raises(
-        ValueError,
-        match="Dimensions of property layer do not match the dimensions of the grid",
+            ValueError,
+            match="Dimensions of property layer do not match the dimensions of the grid",
     ):
         grid.add_property_layer(elevation)
 
