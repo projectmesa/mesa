@@ -5,36 +5,42 @@ from __future__ import annotations
 from collections.abc import Sequence
 from itertools import product
 from random import Random
-from typing import Generic, TypeVar, Any
+from typing import Any, Generic, TypeVar
 
 from mesa.experimental.cell_space import Cell, DiscreteSpace
-from mesa.experimental.cell_space.property_layer import HasPropertyLayers, PropertyDescriptor
+from mesa.experimental.cell_space.property_layer import (
+    HasPropertyLayers,
+    PropertyDescriptor,
+)
 
 T = TypeVar("T", bound=Cell)
 
 import copyreg
 
+
 def pickle_gridcell(obj):
-    """helper function for pickling GridCell instances."""
+    """Helper function for pickling GridCell instances."""
     # we have the base class, the dict, and the slots
     args = obj.__class__.__bases__[0], obj.__getstate__()
     return unpickle_gridcell, args
 
+
 def unpickle_gridcell(parent, fields):
-    """helper function for unpickling GridCell instances."""
+    """Helper function for unpickling GridCell instances."""
     # since the class is dynamically created, we recreate it here
     cell_klass = type(
         "GridCell",
         (parent,),
         {"_mesa_properties": set()},
     )
-    instance = cell_klass((0,0))  # we use a default coordinate and overwrite it with the correct value next
+    instance = cell_klass(
+        (0, 0)
+    )  # we use a default coordinate and overwrite it with the correct value next
 
     instance.__dict__ = fields[0]
     for k, v in fields[1].items():
         if k != "__dict__":
             setattr(instance, k, v)
-
 
     return instance
 
@@ -163,17 +169,19 @@ class Grid(DiscreteSpace[T], Generic[T], HasPropertyLayers):
                 cell.connect(self._cells[ni, nj], (di, dj))
 
     def __getstate__(self) -> dict[str, Any]:
-        """custom __getstate__ for handling dynamic GridCell class and PropertyDescriptors."""
+        """Custom __getstate__ for handling dynamic GridCell class and PropertyDescriptors."""
         state = super().__getstate__()
-        state = {k:v for k, v in state.items() if k!="cell_klass"}
+        state = {k: v for k, v in state.items() if k != "cell_klass"}
         return state
 
     def __setstate__(self, state: dict[str, Any]) -> None:
-        """custom __setstate__ for handling dynamic GridCell class and PropertyDescriptors."""
+        """Custom __setstate__ for handling dynamic GridCell class and PropertyDescriptors."""
         self.__dict__ = state
         self._connect_cells()  # using super fails for this for some reason, so we repeat ourselves
 
-        self.cell_klass = type(self._cells[(0,0)])  # the __reduce__ function handles this for us nicely
+        self.cell_klass = type(
+            self._cells[(0, 0)]
+        )  # the __reduce__ function handles this for us nicely
         for layer in self._mesa_property_layers.values():
             setattr(self.cell_klass, layer.name, PropertyDescriptor(layer))
 

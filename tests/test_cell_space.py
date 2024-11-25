@@ -432,7 +432,6 @@ def test_networkgrid():
         for connection in cell.connections.values():
             assert connection.coordinate in G.neighbors(i)
 
-
     import pickle
 
     pickle.loads(pickle.dumps(grid))
@@ -675,7 +674,8 @@ def test_property_layer_integration():
 
 
 def test_copy_pickle_with_propertylayers():
-    import copy, pickle
+    import copy
+    import pickle
 
     dimensions = (10, 10)
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
@@ -687,14 +687,11 @@ def test_copy_pickle_with_propertylayers():
     grid2._cells[(0, 0)].empty = False
     assert grid2._cells[(0, 0)].empty == data[0, 0]
 
-
     # fixme this currently fails
     dimensions = (10, 10)
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     dump = pickle.dumps(grid)
-    grid2 = pickle.loads(
-        dump
-    )
+    grid2 = pickle.loads(dump)
     assert grid2._cells[(0, 0)].empty
 
 
@@ -943,6 +940,7 @@ def test_copying_discrete_spaces():  # noqa: D103
     # inspired by #2373
     # we use deepcopy but this also applies to pickle
     import copy
+
     import networkx as nx
 
     grid = OrthogonalMooreGrid((100, 100), random=random.Random(42))
