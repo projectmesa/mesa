@@ -19,7 +19,7 @@ T = TypeVar("T", bound=Cell)
 
 def pickle_gridcell(obj):
     """Helper function for pickling GridCell instances."""
-    # we have the base class, the dict, and the slots
+    # we have the base class and the state via __getstate__
     args = obj.__class__.__bases__[0], obj.__getstate__()
     return unpickle_gridcell, args
 
@@ -36,7 +36,8 @@ def unpickle_gridcell(parent, fields):
         (0, 0)
     )  # we use a default coordinate and overwrite it with the correct value next
 
-    instance.__dict__ = fields[0]
+    # __gestate__ returns a tuple with dict and slots, but slots contains the dict so we can just use the
+    # second item only
     for k, v in fields[1].items():
         if k != "__dict__":
             setattr(instance, k, v)
