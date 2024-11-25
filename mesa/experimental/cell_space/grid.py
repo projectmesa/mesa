@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copyreg
 from collections.abc import Sequence
 from itertools import product
 from random import Random
@@ -15,7 +16,6 @@ from mesa.experimental.cell_space.property_layer import (
 
 T = TypeVar("T", bound=Cell)
 
-import copyreg
 
 
 def pickle_gridcell(obj):
