@@ -680,10 +680,11 @@ def test_property_layer_integration():
 #
 #     # fixme this currently fails
 #     dump = pickle.dumps(grid)
-#     grid2 = pickle.loads(  # noqa: S301
+#     grid2 = pickle.loads(
 #         dump
 #     )
 #     assert grid2._cells[(0, 0)].empty
+
 
 def test_multiple_property_layers():
     """Test initialization of DiscrateSpace with PropertyLayers."""
@@ -822,8 +823,6 @@ def test_property_layer():
     # aggregate
     layer.data = np.ones((10, 10))
     assert layer.aggregate(np.sum) == 100
-
-
 
 
 def test_property_layer_errors():

@@ -225,13 +225,16 @@ class HasPropertyLayers:
             )
         if layer.name in self._mesa_property_layers:
             raise ValueError(f"Property layer {layer.name} already exists.")
-        if layer.name in self.cell_klass.__slots__ or layer.name in self.cell_klass.__dict__:
-            raise ValueError(f"Property layer {layer.name} clashes with existing attribute in {self.cell_klass.__name__}")
+        if (
+            layer.name in self.cell_klass.__slots__
+            or layer.name in self.cell_klass.__dict__
+        ):
+            raise ValueError(
+                f"Property layer {layer.name} clashes with existing attribute in {self.cell_klass.__name__}"
+            )
 
         self._mesa_property_layers[layer.name] = layer
-        setattr(
-            self.cell_klass, layer.name, PropertyDescriptor(layer)
-        )
+        setattr(self.cell_klass, layer.name, PropertyDescriptor(layer))
         self.cell_klass._mesa_properties.add(layer.name)
 
     def remove_property_layer(self, property_name: str):

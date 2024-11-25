@@ -17,7 +17,6 @@ def create_gridclass(*args):
     # fixme, we need to add the state info back in here as well from the looks of things
     klass = type("GridCell", (Cell,), {"__reduce__": _reduce})
 
-
     # fixme: I only have the names but not the layers themselves
     #  so this needs to be handled in __getstate__ / __setstate__
     #  also, why did copy initialy work just fine?
@@ -26,11 +25,13 @@ def create_gridclass(*args):
 
     return klass.__new__(klass)
 
+
 def _reduce(self):
     # fixme this should be changed to the correct parent class
     reductor = super(Cell, self).__reduce__()
     modified_reductor = (create_gridclass, (self._mesa_properties,), *reductor[2::])
     return modified_reductor
+
 
 class Grid(DiscreteSpace[T], Generic[T], HasPropertyLayers):
     """Base class for all grid classes.
@@ -81,8 +82,9 @@ class Grid(DiscreteSpace[T], Generic[T], HasPropertyLayers):
         self._ndims = len(dimensions)
         self._validate_parameters()
         self.cell_klass = type(
-            "GridCell", (self.cell_klass,),
-            {"_mesa_properties": set()}
+            "GridCell",
+            (self.cell_klass,),
+            {"_mesa_properties": set()},
             # {"__reduce__": _reduce, "_mesa_properties": set()}
         )
 
