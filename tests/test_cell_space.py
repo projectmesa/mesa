@@ -661,6 +661,29 @@ def test_property_layer_integration():
     assert "elevation" not in grid._mesa_property_layers
     assert not hasattr(cell, "elevation")
 
+    # what happens if we add a layer whose name clashes with an existing cell atttribute?
+    dimensions = (10, 10)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+
+    with pytest.raises(ValueError):
+        grid.create_property_layer("capacity", 1, dtype=int)
+
+
+# def test_copy_pickle_with_propertylayers():
+#     import copy, pickle
+#
+#     dimensions = (10, 10)
+#     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+#
+#     grid2 = copy.deepcopy(grid)
+#     assert grid2._cells[(0,0)].empty
+#
+#     # fixme this currently fails
+#     dump = pickle.dumps(grid)
+#     grid2 = pickle.loads(  # noqa: S301
+#         dump
+#     )
+#     assert grid2._cells[(0, 0)].empty
 
 def test_multiple_property_layers():
     """Test initialization of DiscrateSpace with PropertyLayers."""
@@ -799,6 +822,8 @@ def test_property_layer():
     # aggregate
     layer.data = np.ones((10, 10))
     assert layer.aggregate(np.sum) == 100
+
+
 
 
 def test_property_layer_errors():

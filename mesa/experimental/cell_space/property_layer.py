@@ -151,10 +151,6 @@ class PropertyLayer:
     def select_cells(self, condition: Callable, return_list=True):
         """Find cells that meet a specified condition using NumPy's boolean indexing, in-place.
 
-        # fixme: consider splitting into two separate functions
-        #  select_cells_boolean
-        #  select_cells_index
-
         Args:
             condition: A callable that returns a boolean array when applied to the data.
             return_list: (Optional) If True, return a list of (x, y) tuples. Otherwise, return a boolean array.
@@ -162,6 +158,10 @@ class PropertyLayer:
         Returns:
             A list of (x, y) tuples or a boolean array.
         """
+        # fixme: consider splitting into two separate functions
+        #  select_cells_boolean
+        #  select_cells_index
+
         condition_array = condition(self._mesa_data)
         if return_list:
             return list(zip(*np.where(condition_array)))
@@ -198,13 +198,16 @@ class HasPropertyLayers:
             name: The name of the property layer.
             default_value: The default value of the property layer.
             dtype: The data type of the property layer.
+
+        Returns:
+              Property layer instance.
+
         """
-        # fixme, do we want to have the ability to add both predefined layers
-        #  as well as just by name?
         layer = PropertyLayer(
             name, self.dimensions, default_value=default_value, dtype=dtype
         )
         self.add_property_layer(layer)
+        return layer
 
     def add_property_layer(self, layer: PropertyLayer):
         """Add a predefined property layer to the grid.
@@ -222,11 +225,14 @@ class HasPropertyLayers:
             )
         if layer.name in self._mesa_property_layers:
             raise ValueError(f"Property layer {layer.name} already exists.")
+        if layer.name in self.cell_klass.__slots__ or layer.name in self.cell_klass.__dict__:
+            raise ValueError(f"Property layer {layer.name} clashes with existing attribute in {self.cell_klass.__name__}")
 
         self._mesa_property_layers[layer.name] = layer
         setattr(
             self.cell_klass, layer.name, PropertyDescriptor(layer)
-        )  # fixme: curious to see if this works
+        )
+        self.cell_klass._mesa_properties.add(layer.name)
 
     def remove_property_layer(self, property_name: str):
         """Remove a property layer from the grid.
@@ -237,6 +243,7 @@ class HasPropertyLayers:
         """
         del self._mesa_property_layers[property_name]
         delattr(self.cell_klass, property_name)
+        self.cell_klass._mesa_properties.remove(property_name)
 
     def set_property(
         self, property_name: str, value, condition: Callable[[T], bool] | None = None
@@ -375,7 +382,7 @@ class PropertyDescriptor:
     """Descriptor for giving cells attribute like access to values defined in property layers."""
 
     def __init__(self, property_layer: PropertyLayer):  # noqa: D107
-        self.layer: np.ndarray = property_layer
+        self.layer: PropertyLayer = property_layer
         self.public_name: str
         self.private_name: str
 
