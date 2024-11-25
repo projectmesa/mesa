@@ -5,32 +5,38 @@ from __future__ import annotations
 from collections.abc import Sequence
 from itertools import product
 from random import Random
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Any
 
 from mesa.experimental.cell_space import Cell, DiscreteSpace
-from mesa.experimental.cell_space.property_layer import HasPropertyLayers
+from mesa.experimental.cell_space.property_layer import HasPropertyLayers, PropertyDescriptor
 
 T = TypeVar("T", bound=Cell)
 
+import copyreg
 
-def create_gridclass(*args):
-    # fixme, we need to add the state info back in here as well from the looks of things
-    klass = type("GridCell", (Cell,), {"__reduce__": _reduce})
+def pickle_gridcell(obj):
+    """helper function for pickling GridCell instances."""
+    # we have the base class, the dict, and the slots
+    args = obj.__class__.__bases__[0], obj.__getstate__()
+    return unpickle_gridcell, args
 
-    # fixme: I only have the names but not the layers themselves
-    #  so this needs to be handled in __getstate__ / __setstate__
-    #  also, why did copy initialy work just fine?
-    for entry in args:
-        setattr()
+def unpickle_gridcell(parent, fields):
+    """helper function for unpickling GridCell instances."""
+    # since the class is dynamically created, we recreate it here
+    cell_klass = type(
+        "GridCell",
+        (parent,),
+        {"_mesa_properties": set()},
+    )
+    instance = cell_klass((0,0))  # we use a default coordinate and overwrite it with the correct value next
 
-    return klass.__new__(klass)
+    instance.__dict__ = fields[0]
+    for k, v in fields[1].items():
+        if k != "__dict__":
+            setattr(instance, k, v)
 
 
-def _reduce(self):
-    # fixme this should be changed to the correct parent class
-    reductor = super(Cell, self).__reduce__()
-    modified_reductor = (create_gridclass, (self._mesa_properties,), *reductor[2::])
-    return modified_reductor
+    return instance
 
 
 class Grid(DiscreteSpace[T], Generic[T], HasPropertyLayers):
@@ -85,8 +91,10 @@ class Grid(DiscreteSpace[T], Generic[T], HasPropertyLayers):
             "GridCell",
             (self.cell_klass,),
             {"_mesa_properties": set()},
-            # {"__reduce__": _reduce, "_mesa_properties": set()}
         )
+
+        # we register the pickle_gridcell helper function
+        copyreg.pickle(self.cell_klass, pickle_gridcell)
 
         coordinates = product(*(range(dim) for dim in self.dimensions))
 
@@ -153,6 +161,21 @@ class Grid(DiscreteSpace[T], Generic[T], HasPropertyLayers):
                 ni, nj = ni % height, nj % width
             if 0 <= ni < height and 0 <= nj < width:
                 cell.connect(self._cells[ni, nj], (di, dj))
+
+    def __getstate__(self) -> dict[str, Any]:
+        """custom __getstate__ for handling dynamic GridCell class and PropertyDescriptors."""
+        state = super().__getstate__()
+        state = {k:v for k, v in state.items() if k!="cell_klass"}
+        return state
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """custom __setstate__ for handling dynamic GridCell class and PropertyDescriptors."""
+        self.__dict__ = state
+        self._connect_cells()  # using super fails for this for some reason, so we repeat ourselves
+
+        self.cell_klass = type(self._cells[(0,0)])  # the __reduce__ function handles this for us nicely
+        for layer in self._mesa_property_layers.values():
+            setattr(self.cell_klass, layer.name, PropertyDescriptor(layer))
 
 
 class OrthogonalMooreGrid(Grid[T]):

@@ -59,8 +59,6 @@ class DiscreteSpace(Generic[T]):
         self.cell_klass = cell_klass
 
         self._empties: dict[tuple[int, ...], None] = {}
-        # self._empties_initialized = False
-        # self.property_layers: dict[str, PropertyLayer] = {}
 
     @property
     def cutoff_empties(self):  # noqa

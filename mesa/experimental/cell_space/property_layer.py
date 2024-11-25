@@ -1,8 +1,10 @@
 """This module provides functionality for working with property layers in grids."""
 
-import warnings
+import copyreg
 from collections.abc import Callable, Sequence
 from typing import Any, TypeVar
+import warnings
+
 
 import numpy as np
 
@@ -400,3 +402,5 @@ def ufunc_requires_additional_input(ufunc):  # noqa: D103
     # NumPy ufuncs have a 'nargs' attribute indicating the number of input arguments
     # For binary ufuncs (like np.add), nargs is 2
     return ufunc.nargs > 1
+
+

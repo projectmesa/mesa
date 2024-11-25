@@ -433,6 +433,11 @@ def test_networkgrid():
             assert connection.coordinate in G.neighbors(i)
 
 
+    import pickle
+
+    pickle.loads(pickle.dumps(grid))
+
+
 def test_voronoigrid():
     """Test VoronoiGrid."""
     points = [[0, 1], [1, 3], [1.1, 1], [1, 1]]
@@ -669,21 +674,28 @@ def test_property_layer_integration():
         grid.create_property_layer("capacity", 1, dtype=int)
 
 
-# def test_copy_pickle_with_propertylayers():
-#     import copy, pickle
-#
-#     dimensions = (10, 10)
-#     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
-#
-#     grid2 = copy.deepcopy(grid)
-#     assert grid2._cells[(0,0)].empty
-#
-#     # fixme this currently fails
-#     dump = pickle.dumps(grid)
-#     grid2 = pickle.loads(
-#         dump
-#     )
-#     assert grid2._cells[(0, 0)].empty
+def test_copy_pickle_with_propertylayers():
+    import copy, pickle
+
+    dimensions = (10, 10)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+
+    grid2 = copy.deepcopy(grid)
+    assert grid2._cells[(0, 0)].empty
+
+    data = grid2._mesa_property_layers["empty"].data
+    grid2._cells[(0, 0)].empty = False
+    assert grid2._cells[(0, 0)].empty == data[0, 0]
+
+
+    # fixme this currently fails
+    dimensions = (10, 10)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    dump = pickle.dumps(grid)
+    grid2 = pickle.loads(
+        dump
+    )
+    assert grid2._cells[(0, 0)].empty
 
 
 def test_multiple_property_layers():
@@ -931,7 +943,6 @@ def test_copying_discrete_spaces():  # noqa: D103
     # inspired by #2373
     # we use deepcopy but this also applies to pickle
     import copy
-
     import networkx as nx
 
     grid = OrthogonalMooreGrid((100, 100), random=random.Random(42))
@@ -964,3 +975,7 @@ def test_copying_discrete_spaces():  # noqa: D103
     for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
         for k, v in c1.connections.items():
             assert v.coordinate == c2.connections[k].coordinate
+
+
+if __name__ == "__main__":
+    test_copy_pickle_with_propertylayers()
