@@ -19,22 +19,23 @@ class SchellingAgent(Agent):
             self.pos, moore=True, radius=self.model.radius
         )
 
-        # Filter out empty cells
-        similar_neighbors = [
-            neighbor
-            for neighbor in neighbors
-            if hasattr(neighbor, "type") and neighbor.type == self.type
-        ]
-        total_neighbors = [
-            neighbor for neighbor in neighbors if hasattr(neighbor, "type")
-        ]
+        valid_neighbors = 0
+        similar_neighbors = 0
 
-        # Calculate fraction of similar neighbors
-        if len(total_neighbors) > 0:
-            similarity_fraction = len(similar_neighbors) / len(total_neighbors)
+        for neighbor in neighbors:
+            if hasattr(neighbor, "type"):  # Exclude empty cells
+                valid_neighbors += 1
+                if neighbor.type == self.type:  # Count similar neighbors
+                    similar_neighbors += 1
+
+        # Calculate the fraction of similar neighbors
+        if valid_neighbors > 0:
+            similarity_fraction = similar_neighbors / valid_neighbors
 
             # If unhappy, move to a random empty cell
-            if similarity_fraction < self.model.homophily / 8.0:
+            if similarity_fraction < self.model.homophily:
                 self.model.grid.move_to_empty(self)
             else:
                 self.model.happy += 1
+        else:
+            self.model.happy += 1
