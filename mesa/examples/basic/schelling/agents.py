@@ -23,7 +23,7 @@ class SchellingAgent(Agent):
         similar_neighbors = len([n for n in neighbors if n.type == self.type])
 
         # Calculate the fraction of similar neighbors
-        if (valid_neighbors := len(neighbors) )> 0:
+        if (valid_neighbors := len(neighbors)) > 0:
             similarity_fraction = similar_neighbors / valid_neighbors
 
             # If unhappy, move to a random empty cell
