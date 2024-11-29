@@ -115,7 +115,7 @@ def _make_model_kwargs(
         Not allowed:
         - Empty lists or empty iterables (e.g., `[]`, `()`, etc.). These should be removed manually.
 
-    Returns
+    Returns:
     -------
     List[Dict[str, Any]]
         A list of all kwargs combinations.
@@ -127,8 +127,10 @@ def _make_model_kwargs(
             all_values = [(param, values)]
         elif isinstance(values, list | tuple | set) and len(values) == 0:
             # If it's an empty iterable, raise an error
-            raise ValueError(f"Parameter '{param}' contains an empty iterable, which is not allowed.")
-        
+            raise ValueError(
+                f"Parameter '{param}' contains an empty iterable, which is not allowed."
+            )
+
         else:
             try:
                 all_values = [(param, value) for value in values]
