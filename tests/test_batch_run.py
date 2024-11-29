@@ -25,6 +25,8 @@ def test_make_model_kwargs():  # noqa: D103
 
 
 def test_batch_run_with_params_with_empty_content():
+    """Test handling of empty iterables in model kwargs."""
+    
     # If "a" is a single value and "b" is an empty list (should raise error for the empty list)
     parameters_with_empty_list = {
         "a": 3,
@@ -33,7 +35,7 @@ def test_batch_run_with_params_with_empty_content():
 
     try:
         _make_model_kwargs(parameters_with_empty_list)
-        assert False, "Expected ValueError for empty iterable but no error was raised."
+        raise AssertionError("Expected ValueError for empty iterable but no error was raised.")
     except ValueError as e:
         assert "contains an empty iterable" in str(e)
 
@@ -45,7 +47,7 @@ def test_batch_run_with_params_with_empty_content():
 
     try:
         _make_model_kwargs(parameters_with_empty_b)
-        assert False, "Expected ValueError for empty iterable but no error was raised."
+        raise AssertionError("Expected ValueError for empty iterable but no error was raised.")
     except ValueError as e:
         assert "contains an empty iterable" in str(e)
 

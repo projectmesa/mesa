@@ -125,7 +125,7 @@ def _make_model_kwargs(
         if isinstance(values, str):
             # The values is a single string, so we shouldn't iterate over it.
             all_values = [(param, values)]
-        elif isinstance(values, (list, tuple, set)) and len(values) == 0:
+        elif isinstance(values, list | tuple | set) and len(values) == 0:
             # If it's an empty iterable, raise an error
             raise ValueError(
                 f"Parameter '{param}' contains an empty iterable, which is not allowed."
