@@ -15,21 +15,15 @@ class SchellingAgent(Agent):
 
     def step(self) -> None:
         """Determine if agent is happy and move if necessary."""
-        neighbors = self.model.grid.iter_neighbors(
+        neighbors = self.model.grid.get_neighbors(
             self.pos, moore=True, radius=self.model.radius
         )
 
-        valid_neighbors = 0
-        similar_neighbors = 0
-
-        for neighbor in neighbors:
-            if hasattr(neighbor, "type"):  # Exclude empty cells
-                valid_neighbors += 1
-                if neighbor.type == self.type:  # Count similar neighbors
-                    similar_neighbors += 1
+        # Count similar neighbors
+        similar_neighbors = len([n for n in neighbors if n.type == self.type])
 
         # Calculate the fraction of similar neighbors
-        if valid_neighbors > 0:
+        if (valid_neighbors := len(neighbors) )> 0:
             similarity_fraction = similar_neighbors / valid_neighbors
 
             # If unhappy, move to a random empty cell
@@ -37,5 +31,3 @@ class SchellingAgent(Agent):
                 self.model.grid.move_to_empty(self)
             else:
                 self.model.happy += 1
-        else:
-            self.model.happy += 1
