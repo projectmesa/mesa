@@ -242,7 +242,6 @@ class HasPropertyLayers:
         setattr(self.cell_klass, layer.name, PropertyDescriptor(layer))
         self.cell_klass._mesa_properties.add(layer.name)
 
-
     def remove_property_layer(self, property_name: str):
         """Remove a property layer from the grid.
 
@@ -390,7 +389,9 @@ class HasPropertyLayers:
         try:
             return self._mesa_property_layers[name]
         except KeyError:
-            raise AttributeError(f"'{type(self).__name__}' object has no property layer called '{name}'")
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no property layer called '{name}'"
+            )
 
 
 class PropertyDescriptor:
