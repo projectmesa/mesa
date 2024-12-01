@@ -395,6 +395,9 @@ class HasPropertyLayers:
 
 
     def __setattr__(self, key, value): # noqa: D105
+        # fixme
+        #  this might be done more elegantly, the main problem is that _mesa_property_layers must already be defined to avoid infinte recursion errors from happening
+        #  also, this protection only works if the attribute is added after the layer, not the other way around
         try:
             layers = self.__dict__["_mesa_property_layers"]
         except KeyError as e:
