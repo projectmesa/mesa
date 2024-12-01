@@ -649,6 +649,9 @@ def test_property_layer_integration():
     assert len(grid._mesa_property_layers) == 2  ## empty is always there
     assert grid.elevation is elevation
 
+    with pytest.raises(AttributeError):
+        grid.elevation = 0
+
     # Test accessing PropertyLayer from a cell
     cell = grid._cells[(0, 0)]
     assert hasattr(cell, "elevation")

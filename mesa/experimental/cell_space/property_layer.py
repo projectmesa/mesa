@@ -394,6 +394,18 @@ class HasPropertyLayers:
             ) from e
 
 
+    def __setattr__(self, key, value): # noqa: D105
+        try:
+            layers = self.__dict__["_mesa_property_layers"]
+        except KeyError as e:
+            super().__setattr__(key, value)
+        else:
+            if key in layers:
+                raise AttributeError(f"'{type(self).__name__}' object already has a property layer with name '{key}'")
+            else:
+                super().__setattr__(key, value)
+
+
 class PropertyDescriptor:
     """Descriptor for giving cells attribute like access to values defined in property layers."""
 
