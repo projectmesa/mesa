@@ -389,7 +389,9 @@ class HasPropertyLayers:
         try:
             return self._mesa_property_layers[name]
         except KeyError as e:
-            raise AttributeError(f"'{type(self).__name__}' object has no property layer called '{name}'") from e
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no property layer called '{name}'"
+            ) from e
 
 
 class PropertyDescriptor:
