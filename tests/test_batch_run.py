@@ -24,6 +24,37 @@ def test_make_model_kwargs():  # noqa: D103
     assert _make_model_kwargs({"a": "value"}) == [{"a": "value"}]
 
 
+def test_batch_run_with_params_with_empty_content():
+    """Test handling of empty iterables in model kwargs."""
+    # If "a" is a single value and "b" is an empty list (should raise error for the empty list)
+    parameters_with_empty_list = {
+        "a": 3,
+        "b": [],
+    }
+
+    try:
+        _make_model_kwargs(parameters_with_empty_list)
+        raise AssertionError(
+            "Expected ValueError for empty iterable but no error was raised."
+        )
+    except ValueError as e:
+        assert "contains an empty iterable" in str(e)
+
+    # If "a" is a iterable and "b" is an empty list (should still raise error)
+    parameters_with_empty_b = {
+        "a": [1, 2],
+        "b": [],
+    }
+
+    try:
+        _make_model_kwargs(parameters_with_empty_b)
+        raise AssertionError(
+            "Expected ValueError for empty iterable but no error was raised."
+        )
+    except ValueError as e:
+        assert "contains an empty iterable" in str(e)
+
+
 class MockAgent(Agent):
     """Minimalistic agent implementation for testing purposes."""
 
