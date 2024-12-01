@@ -178,7 +178,12 @@ class PropertyLayer:
 
 
 class HasPropertyLayers:
-    """Mixin-like class to add property layer functionality to Grids."""
+    """Mixin-like class to add property layer functionality to Grids.
+
+    Property layers can be added to a grid using create_property_layer or add_property_layer. Once created, property
+    layers can be accessed as attributes if the name used for the layer is a valid python identifier.
+
+    """
 
     # fixme is there a way to indicate that a mixin only works with specific classes?
     def __init__(self, *args, **kwargs):
@@ -236,6 +241,7 @@ class HasPropertyLayers:
         self._mesa_property_layers[layer.name] = layer
         setattr(self.cell_klass, layer.name, PropertyDescriptor(layer))
         self.cell_klass._mesa_properties.add(layer.name)
+
 
     def remove_property_layer(self, property_name: str):
         """Remove a property layer from the grid.
@@ -380,14 +386,18 @@ class HasPropertyLayers:
         else:
             return combined_mask
 
+    def __getattr__(self, name: str) -> Any:
+        try:
+            return self._mesa_property_layers[name]
+        except KeyError:
+            raise AttributeError(f"'{type(self).__name__}' object has no property layer called '{name}'")
+
 
 class PropertyDescriptor:
     """Descriptor for giving cells attribute like access to values defined in property layers."""
 
     def __init__(self, property_layer: PropertyLayer):  # noqa: D107
         self.layer: PropertyLayer = property_layer
-        self.public_name: str
-        self.private_name: str
 
     def __get__(self, instance: Cell, owner):  # noqa: D105
         return self.layer.data[instance.coordinate]
