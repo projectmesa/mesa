@@ -7,8 +7,8 @@ FROM python:bookworm
 LABEL maintainer="rht <rhtbot@protonmail.com>"
 
 # To use this Dockerfile:
-# 1. `docker build . -t mymesa_image`
-# 2. `docker run --name mymesa_instance -p 8765:8765 -it mymesa_image`
+# 1. `docker build . -t mesa_image`
+# 2. `docker run --name mesa_instance -p 8765:8765 -it mesa_image`
 # 3. In your browser, visit http://127.0.0.1:8765
 #
 # Currently, this Dockerfile defaults to running the Schelling model, as an
@@ -19,7 +19,7 @@ LABEL maintainer="rht <rhtbot@protonmail.com>"
 # `docker run --name mymesa_instance -p 8765:8765 -e MODEL_DIR=/mesa-examples/examples/sugarscape_cg -it mymesa_image`
 # Note: the model directory MUST contain an app.py file.
 
-ENV MODEL_DIR=/mesa-examples/examples/schelling_experimental
+ENV MODEL_DIR=/opt/mesa/mesa/examples/basic/schelling
 
 # Don't buffer output:
 # https://docs.python.org/3.10/using/cmdline.html?highlight=pythonunbuffered#envvar-PYTHONUNBUFFERED
@@ -29,10 +29,11 @@ WORKDIR /opt/mesa
 
 COPY . /opt/mesa
 
-RUN cd / && git clone https://github.com/projectmesa/mesa-examples.git
-
 EXPOSE 8765/tcp
 
-RUN pip3 install -e /opt/mesa
+RUN pip3 install -e /opt/mesa[all]
 
 CMD ["sh", "-c", "cd $MODEL_DIR && solara run app.py --host=0.0.0.0"]
+
+# To check file system:
+# docker exec -it mesa_instance bash
