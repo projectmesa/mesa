@@ -385,13 +385,11 @@ class HasPropertyLayers:
         else:
             return combined_mask
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name: str) -> Any:  # noqa: D105
         try:
             return self._mesa_property_layers[name]
-        except KeyError:
-            raise AttributeError(
-                f"'{type(self).__name__}' object has no property layer called '{name}'"
-            )
+        except KeyError as e:
+            raise AttributeError(f"'{type(self).__name__}' object has no property layer called '{name}'") from e
 
 
 class PropertyDescriptor:
