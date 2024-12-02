@@ -1,10 +1,8 @@
 # We can't use slim because we need either git/wget/curl to
 # download mesa-examples, and so installing them requires
 # updating the system anyway.
-# We can't use alpine because NumPy doesn't support musllinux yet.
-# But it's in the RC version https://github.com/numpy/numpy/issues/20089.
 FROM python:bookworm
-LABEL maintainer="rht <rhtbot@protonmail.com>"
+LABEL maintainer="projectmesa maintainers@projectmesa.dev"
 
 # To use this Dockerfile:
 # 1. `docker build . -t mesa_image`
