@@ -30,14 +30,14 @@ class Cell:
     """
 
     __slots__ = [
-        "coordinate",
-        "connections",
+        "__dict__",
+        "_mesa_property_layers",
         "agents",
         "capacity",
+        "connections",
+        "coordinate",
         "properties",
         "random",
-        "_mesa_property_layers",
-        "__dict__",
     ]
 
     # def __new__(cls,
