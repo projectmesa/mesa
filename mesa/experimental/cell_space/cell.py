@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from functools import cache, cached_property
 from random import Random
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from mesa.experimental.cell_space.cell_agent import CellAgent
 from mesa.experimental.cell_space.cell_collection import CellCollection
