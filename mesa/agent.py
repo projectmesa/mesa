@@ -122,10 +122,13 @@ class Agent:
             else:
                 listlike_kwargs[k] = ListLike(v)
 
+        agents = []
         for i in range(n):
             instance_args = [arg[i] for arg in listlike_args]
             instance_kwargs = {k: v[i] for k, v in listlike_kwargs.items()}
-            cls(model, *instance_args, **instance_kwargs)
+            agent = cls(model, *instance_args, **instance_kwargs)
+            agents.append(agent)
+        return AgentSet(agents, random=cls.random)
 
     @property
     def random(self) -> Random:
