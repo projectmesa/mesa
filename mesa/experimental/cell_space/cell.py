@@ -29,7 +29,6 @@ class Cell:
 
     __slots__ = [
         "__dict__",
-        "_mesa_property_layers",
         "agents",
         "capacity",
         "connections",
@@ -64,7 +63,6 @@ class Cell:
             Coordinate, object
         ] = {}  # fixme still used by voronoi mesh
         self.random = random
-        self._mesa_property_layers: dict[str, PropertyLayer] = {}
 
     def connect(self, other: Cell, key: Coordinate | None = None) -> None:
         """Connects this cell to another cell.
@@ -188,23 +186,6 @@ class Cell:
             if not include_center:
                 neighborhood.pop(self, None)
             return neighborhood
-
-    # PropertyLayer methods
-    def get_property(self, property_name: str) -> Any:
-        """Get the value of a property."""
-        return self._mesa_property_layers[property_name].data[self.coordinate]
-
-    def set_property(self, property_name: str, value: Any):
-        """Set the value of a property."""
-        self._mesa_property_layers[property_name].set_cell(self.coordinate, value)
-
-    def modify_property(
-        self, property_name: str, operation: Callable, value: Any = None
-    ):
-        """Modify the value of a property."""
-        self._mesa_property_layers[property_name].modify_cell(
-            self.coordinate, operation, value
-        )
 
     def __getstate__(self):
         """Return state of the Cell with connections set to empty."""
