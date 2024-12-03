@@ -3,4 +3,4 @@
 from .eventlist import Priority, SimulationEvent
 from .simulator import ABMSimulator, DEVSimulator
 
-__all__ = ["ABMSimulator", "DEVSimulator", "SimulationEvent", "Priority"]
+__all__ = ["ABMSimulator", "DEVSimulator", "Priority", "SimulationEvent"]

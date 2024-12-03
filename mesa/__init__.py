@@ -13,12 +13,12 @@ from mesa.datacollection import DataCollector
 from mesa.model import Model
 
 __all__ = [
-    "Model",
     "Agent",
-    "space",
     "DataCollector",
+    "Model",
     "batch_run",
     "experimental",
+    "space",
 ]
 
 __title__ = "mesa"
