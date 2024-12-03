@@ -35,6 +35,6 @@ __all__ = [
     "Network",
     "OrthogonalMooreGrid",
     "OrthogonalVonNeumannGrid",
-    "VoronoiGrid",
     "PropertyLayer",
+    "VoronoiGrid",
 ]

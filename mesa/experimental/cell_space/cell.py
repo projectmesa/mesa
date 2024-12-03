@@ -32,10 +32,10 @@ class Cell:
         "_mesa_property_layers",
         "agents",
         "capacity",
-        "random",
         "connections",
         "coordinate",
         "properties",
+        "random",
         "random",
     ]
 
