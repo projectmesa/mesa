@@ -56,16 +56,6 @@
     :show-inheritance:
 ```
 
-## mesa.time module
-
-```{eval-rst}
-.. automodule:: mesa.time
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-```
-
 ## Module contents
 
 ```{eval-rst}

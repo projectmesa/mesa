@@ -19,6 +19,11 @@ def agent_portrayal(agent):
 
 
 model_params = {
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "density": Slider("Agent density", 0.8, 0.1, 1.0, 0.1),
     "minority_pc": Slider("Fraction minority", 0.2, 0.0, 1.0, 0.05),
     "homophily": Slider("Homophily", 3, 0, 8, 1),
@@ -26,7 +31,7 @@ model_params = {
     "height": 20,
 }
 
-model1 = Schelling(20, 20, 0.8, 0.2, 3)
+model1 = Schelling()
 
 HappyPlot = make_plot_component({"happy": "tab:green"})
 

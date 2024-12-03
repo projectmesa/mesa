@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+import warnings
 from collections.abc import Callable, Iterable, Mapping
 from functools import cached_property
 from random import Random
@@ -23,6 +24,12 @@ class CellCollection(Generic[T]):
         agents (List[CellAgent]) : List of agents occupying the cells in this collection
         random (Random) : The random number generator
 
+    Notes:
+        A `UserWarning` is issued if `random=None`. You can resolve this warning by explicitly
+        passing a random number generator. In most cases, this will be the seeded random number
+        generator in the model. So, you would do `random=self.random` in a `Model` or `Agent` instance.
+
+
     """
 
     def __init__(
@@ -41,11 +48,18 @@ class CellCollection(Generic[T]):
         else:
             self._cells = {cell: cell.agents for cell in cells}
 
-        #
-        self._capacity: int = next(iter(self._cells.keys())).capacity
+        # Get capacity from first cell if collection is not empty
+        self._capacity: int | None = (
+            next(iter(self._cells.keys())).capacity if self._cells else None
+        )
 
         if random is None:
-            random = Random()  # FIXME
+            warnings.warn(
+                "Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
+                UserWarning,
+                stacklevel=2,
+            )
+            random = Random()
         self.random = random
 
     def __iter__(self):  # noqa
@@ -115,4 +129,4 @@ class CellCollection(Generic[T]):
                     yield cell
                     count += 1
 
-        return CellCollection(cell_generator(filter_func, at_most))
+        return CellCollection(cell_generator(filter_func, at_most), random=self.random)

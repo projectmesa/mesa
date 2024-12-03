@@ -37,8 +37,6 @@ jobs:
             python-version: "3.12"
           - os: ubuntu
             python-version: "3.11"
-          - os: ubuntu
-            python-version: "3.10"
           # Disabled for now. See https://github.com/projectmesa/mesa/issues/1253
           #- os: ubuntu
           #  python-version: 'pypy-3.8'
@@ -59,7 +57,7 @@ jobs:
       run: pytest --durations=10 --cov=mesa tests/ --cov-report=xml
     - if: matrix.os == 'ubuntu'
       name: Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         fail_ci_if_error: true
         token: ${{ secrets.CODECOV_TOKEN }}

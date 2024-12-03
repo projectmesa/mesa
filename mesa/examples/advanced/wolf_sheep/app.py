@@ -1,5 +1,6 @@
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.examples.advanced.wolf_sheep.model import WolfSheep
+from mesa.experimental.devs import ABMSimulator
 from mesa.visualization import (
     Slider,
     SolaraViz,
@@ -36,7 +37,11 @@ def wolf_sheep_portrayal(agent):
 
 
 model_params = {
-    # The following line is an example to showcase StaticText.
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "grass": {
         "type": "Select",
         "value": True,
@@ -59,26 +64,32 @@ model_params = {
 }
 
 
-def post_process(ax):
+def post_process_space(ax):
     ax.set_aspect("equal")
     ax.set_xticks([])
     ax.set_yticks([])
 
 
+def post_process_lines(ax):
+    ax.legend(loc="center left", bbox_to_anchor=(1, 0.9))
+
+
 space_component = make_space_component(
-    wolf_sheep_portrayal, draw_grid=False, post_process=post_process
+    wolf_sheep_portrayal, draw_grid=False, post_process=post_process_space
 )
 lineplot_component = make_plot_component(
-    {"Wolves": "tab:orange", "Sheep": "tab:cyan", "Grass": "tab:green"}
+    {"Wolves": "tab:orange", "Sheep": "tab:cyan", "Grass": "tab:green"},
+    post_process=post_process_lines,
 )
 
-model = WolfSheep(grass=True)
-
+simulator = ABMSimulator()
+model = WolfSheep(simulator=simulator, grass=True)
 
 page = SolaraViz(
     model,
     components=[space_component, lineplot_component],
     model_params=model_params,
     name="Wolf Sheep",
+    simulator=simulator,
 )
 page  # noqa

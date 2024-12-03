@@ -1,6 +1,6 @@
 """Tests for experimental Simulator classes."""
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
 import pytest
 
@@ -55,6 +55,23 @@ def test_devs_simulator():
     with pytest.raises(ValueError):
         simulator.schedule_event_absolute(fn2, 0.5)
 
+    # step
+    simulator = DEVSimulator()
+    model = MagicMock(spec=Model)
+    simulator.setup(model)
+
+    fn = MagicMock()
+    simulator.schedule_event_absolute(fn, 1.0)
+    simulator.run_next_event()
+    fn.assert_called_once()
+    assert simulator.time == 1.0
+    simulator.run_next_event()
+    assert simulator.time == 1.0
+
+    simulator = DEVSimulator()
+    with pytest.raises(Exception):
+        simulator.run_next_event()
+
     # cancel_event
     simulator = DEVSimulator()
     model = MagicMock(spec=Model)
@@ -69,6 +86,24 @@ def test_devs_simulator():
     assert len(simulator.event_list) == 0
     assert simulator.model is None
     assert simulator.time == 0.0
+
+    # run without setup
+    simulator = DEVSimulator()
+    with pytest.raises(Exception):
+        simulator.run_until(10)
+
+    # setup with time advanced
+    simulator = DEVSimulator()
+    simulator.time = simulator.start_time + 1
+    model = MagicMock(spec=Model)
+    with pytest.raises(Exception):
+        simulator.setup(model)
+
+    # setup with event scheduled
+    simulator = DEVSimulator()
+    simulator.schedule_event_now(Mock())
+    with pytest.raises(Exception):
+        simulator.setup(model)
 
 
 def test_abm_simulator():
@@ -86,7 +121,12 @@ def test_abm_simulator():
 
     simulator.run_for(3)
     assert model.step.call_count == 3
-    assert simulator.time == 2
+    assert simulator.time == 3
+
+    # run without setup
+    simulator = ABMSimulator()
+    with pytest.raises(Exception):
+        simulator.run_until(10)
 
 
 def test_simulation_event():

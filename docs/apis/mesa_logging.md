@@ -1,7 +1,7 @@
-# Time
+# logging
 
 ```{eval-rst}
-.. automodule:: mesa.time
+.. automodule:: mesa.mesa_logging
    :members:
    :inherited-members:
 ```

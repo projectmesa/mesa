@@ -33,14 +33,21 @@ Mesa allows users to quickly create agent-based models using built-in core compo
 
 ## Using Mesa
 ### Installation Options
-
-To install our latest stable release (2.4.x), run:
+To install our latest stable release (3.0.x), run:
 
 ```bash
 pip install -U mesa
 ```
+To also install our recommended dependencies:
+```bash
+pip install -U mesa[rec]
+```
 
-To install our latest Mesa 3.0 beta with recommended dependencies:
+On a Mac, this command might cause an error stating `zsh: no matches found: mesa[all]`.
+In that case, change the command to `pip install -U "mesa[rec]"`.
+
+
+To install our latest pre-release:
 
 ```bash
 pip install -U --pre mesa[rec]

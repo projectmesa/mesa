@@ -24,6 +24,11 @@ def pd_agent_portrayal(agent):
 
 # Model parameters
 model_params = {
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
     "width": Slider("Grid Width", value=50, min=10, max=100, step=1),
     "height": Slider("Grid Height", value=50, min=10, max=100, step=1),
     "activation_order": {

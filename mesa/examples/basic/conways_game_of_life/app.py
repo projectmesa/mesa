@@ -20,12 +20,39 @@ def post_process(ax):
 
 
 model_params = {
-    "width": 50,
-    "height": 50,
+    "seed": {
+        "type": "InputText",
+        "value": 42,
+        "label": "Random Seed",
+    },
+    "width": {
+        "type": "SliderInt",
+        "value": 50,
+        "label": "Width",
+        "min": 5,
+        "max": 60,
+        "step": 1,
+    },
+    "height": {
+        "type": "SliderInt",
+        "value": 50,
+        "label": "Height",
+        "min": 5,
+        "max": 60,
+        "step": 1,
+    },
+    "initial_fraction_alive": {
+        "type": "SliderFloat",
+        "value": 0.2,
+        "label": "Cells initially alive",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+    },
 }
 
 # Create initial model instance
-model1 = ConwaysGameOfLife(50, 50)
+model1 = ConwaysGameOfLife()
 
 # Create visualization elements. The visualization elements are solara components
 # that receive the model instance as a "prop" and display it in a certain way.
