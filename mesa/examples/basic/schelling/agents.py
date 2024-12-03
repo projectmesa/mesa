@@ -26,9 +26,9 @@ class SchellingAgent(Agent):
         if (valid_neighbors := len(neighbors)) > 0:
             similarity_fraction = similar_neighbors / valid_neighbors
         else:
-        # If there are no neighbors, the similarity fraction is 0
+            # If there are no neighbors, the similarity fraction is 0
             similarity_fraction = 0.0
-        
+
         # Move if unhappy
         if similarity_fraction < self.model.homophily:
             self.model.grid.move_to_empty(self)
