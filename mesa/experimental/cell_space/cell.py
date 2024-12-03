@@ -28,12 +28,15 @@ class Cell:
     """
 
     __slots__ = [
-        "coordinate",
-        "connections",
+        "__dict__",
+        "_mesa_property_layers",
         "agents",
         "capacity",
         "random",
-        "__dict__",
+        "connections",
+        "coordinate",
+        "properties",
+        "random",
     ]
 
     def __init__(
@@ -61,6 +64,7 @@ class Cell:
             Coordinate, object
         ] = {}  # fixme still used by voronoi mesh
         self.random = random
+        self._mesa_property_layers: dict[str, PropertyLayer] = {}
 
     def connect(self, other: Cell, key: Coordinate | None = None) -> None:
         """Connects this cell to another cell.

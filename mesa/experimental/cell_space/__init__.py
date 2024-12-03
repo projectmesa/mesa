@@ -24,17 +24,17 @@ from mesa.experimental.cell_space.property_layer import PropertyLayer
 from mesa.experimental.cell_space.voronoi import VoronoiGrid
 
 __all__ = [
-    "CellCollection",
     "Cell",
     "CellAgent",
-    "Grid2DMovingAgent",
-    "FixedAgent",
+    "CellCollection",
     "DiscreteSpace",
+    "FixedAgent",
     "Grid",
+    "Grid2DMovingAgent",
     "HexGrid",
+    "Network",
     "OrthogonalMooreGrid",
     "OrthogonalVonNeumannGrid",
-    "Network",
     "VoronoiGrid",
     "PropertyLayer",
 ]

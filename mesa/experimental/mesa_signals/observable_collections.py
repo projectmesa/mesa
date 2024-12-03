@@ -43,7 +43,7 @@ class ObservableList(BaseObservable):
 class SignalingList(MutableSequence[Any]):
     """A basic lists that emits signals on changes."""
 
-    __slots__ = ["owner", "name", "data"]
+    __slots__ = ["data", "name", "owner"]
 
     def __init__(self, iterable: Iterable, owner: HasObservables, name: str):
         """Initialize a SignalingList.

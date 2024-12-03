@@ -12,7 +12,7 @@ from typing import Any
 
 from mesa.experimental.mesa_signals.signals_util import AttributeDict, create_weakref
 
-__all__ = ["Observable", "HasObservables", "All", "Computable"]
+__all__ = ["All", "Computable", "HasObservables", "Observable"]
 
 _hashable_signal = namedtuple("_HashableSignal", "instance name")
 

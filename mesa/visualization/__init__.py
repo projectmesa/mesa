@@ -17,10 +17,10 @@ from .user_param import Slider
 
 __all__ = [
     "JupyterViz",
-    "SolaraViz",
     "Slider",
-    "make_space_altair",
+    "SolaraViz",
     "draw_space",
     "make_plot_component",
+    "make_space_altair",
     "make_space_component",
 ]
