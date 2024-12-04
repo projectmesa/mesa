@@ -1,4 +1,19 @@
-"""Core classes for Observables."""
+"""Core implementation of Mesa's reactive programming system.
+
+This module provides the foundational classes for Mesa's observable/reactive programming
+functionality:
+
+- BaseObservable: Abstract base class defining the interface for all observables
+- Observable: Main class for creating observable properties that emit change signals
+- Computable: Class for properties that automatically update based on other observables
+- HasObservables: Mixin class that enables an object to contain and manage observables
+- All: Helper class for subscribing to all signals from an observable
+
+The module implements a robust reactive system where changes to observable properties
+automatically trigger updates to dependent computed values and notify subscribed
+observers. This enables building models with complex interdependencies while maintaining
+clean separation of concerns.
+"""
 
 from __future__ import annotations
 

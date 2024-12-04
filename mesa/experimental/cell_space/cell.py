@@ -1,4 +1,16 @@
-"""The Cell in a cell space."""
+"""Cells are positions in space that can have properties and contain agents.
+
+A cell represents a location that can:
+- Have properties (like temperature or resources)
+- Track and limit the agents it contains
+- Connect to neighboring cells
+- Provide neighborhood information
+
+Cells form the foundation of the cell space system, enabling rich spatial
+environments where both location properties and agent behaviors matter. They're
+useful for modeling things like varying terrain, infrastructure capacity, or
+environmental conditions.
+"""
 
 from __future__ import annotations
 

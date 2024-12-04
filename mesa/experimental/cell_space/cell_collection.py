@@ -1,4 +1,17 @@
-"""CellCollection class."""
+"""Collection class for managing and querying groups of cells.
+
+The CellCollection class provides a consistent interface for operating on multiple
+cells, supporting:
+- Filtering and selecting cells based on conditions
+- Random cell and agent selection
+- Access to contained agents
+- Group operations
+
+This is useful for implementing area effects, zones, or any operation that needs
+to work with multiple cells as a unit. The collection handles efficient iteration
+and agent access across cells. The class is used throughout the cell space
+implementation to represent neighborhoods, selections, and other cell groupings.
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,17 @@
-"""DiscreteSpace base class."""
+"""Base class for building cell-based spatial environments.
+
+DiscreteSpace provides the core functionality needed by all cell-based spaces:
+- Cell creation and tracking
+- Agent-cell relationship management
+- Property layer support
+- Random selection capabilities
+- Capacity management
+
+This serves as the foundation for specific space implementations like grids
+and networks, ensuring consistent behavior and shared functionality across
+different space types. All concrete cell space implementations (grids, networks, etc.)
+inherit from this class.
+"""
 
 from __future__ import annotations
 
