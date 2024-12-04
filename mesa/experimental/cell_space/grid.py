@@ -1,4 +1,15 @@
-"""Various Grid Spaces."""
+"""Grid-based cell space implementations with different connection patterns.
+
+Provides several grid types for organizing cells:
+- OrthogonalMooreGrid: 8 neighbors in 2D, (3^n)-1 in nD
+- OrthogonalVonNeumannGrid: 4 neighbors in 2D, 2n in nD
+- HexGrid: 6 neighbors in hexagonal pattern (2D only)
+
+Each grid type supports optional wrapping (torus) and cell capacity limits.
+Choose based on how movement and connectivity should work in your model -
+Moore for unrestricted movement, Von Neumann for orthogonal-only movement,
+or Hex for more uniform distances.
+"""
 
 from __future__ import annotations
 

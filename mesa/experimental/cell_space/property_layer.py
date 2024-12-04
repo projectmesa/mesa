@@ -1,4 +1,19 @@
-"""This module provides functionality for working with property layers in grids."""
+"""Efficient storage and manipulation of cell properties across spaces.
+
+PropertyLayers provide a way to associate properties with cells in a space efficiently.
+The module includes:
+- PropertyLayer class for managing grid-wide properties
+- Property access descriptors for cells
+- Batch operations for property modification
+- Property-based cell selection
+- Integration with numpy for efficient operations
+
+This system separates property storage from cells themselves, enabling
+fast bulk operations and sophisticated property-based behaviors while
+maintaining an intuitive interface through cell attributes. Properties
+can represent environmental factors, cell states, or any other grid-wide
+attributes.
+"""
 
 import warnings
 from collections.abc import Callable, Sequence
