@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from functools import cache, cached_property
 from random import Random
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from mesa.experimental.cell_space.cell_agent import CellAgent
 from mesa.experimental.cell_space.cell_collection import CellCollection
-from mesa.space import PropertyLayer
 
 if TYPE_CHECKING:
     from mesa.agent import Agent
@@ -24,14 +22,12 @@ class Cell:
         coordinate (Tuple[int, int]) : the position of the cell in the discrete space
         agents (List[Agent]): the agents occupying the cell
         capacity (int): the maximum number of agents that can simultaneously occupy the cell
-        properties (dict[str, Any]): the properties of the cell
         random (Random): the random number generator
 
     """
 
     __slots__ = [
         "__dict__",
-        "_mesa_property_layers",
         "agents",
         "capacity",
         "connections",
@@ -39,15 +35,6 @@ class Cell:
         "properties",
         "random",
     ]
-
-    # def __new__(cls,
-    #     coordinate: tuple[int, ...],
-    #     capacity: float | None = None,
-    #     random: Random | None = None,):
-    #     if capacity != 1:
-    #         return object.__new__(cls)
-    #     else:
-    #         return object.__new__(SingleAgentCell)
 
     def __init__(
         self,
@@ -70,9 +57,10 @@ class Cell:
             Agent
         ] = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity: int | None = capacity
-        self.properties: dict[Coordinate, object] = {}
+        self.properties: dict[
+            Coordinate, object
+        ] = {}  # fixme still used by voronoi mesh
         self.random = random
-        self._mesa_property_layers: dict[str, PropertyLayer] = {}
 
     def connect(self, other: Cell, key: Coordinate | None = None) -> None:
         """Connects this cell to another cell.
@@ -105,6 +93,7 @@ class Cell:
 
         """
         n = len(self.agents)
+        self.empty = False
 
         if self.capacity and n >= self.capacity:
             raise Exception(
@@ -121,6 +110,7 @@ class Cell:
 
         """
         self.agents.remove(agent)
+        self.empty = self.is_empty
 
     @property
     def is_empty(self) -> bool:
@@ -194,23 +184,6 @@ class Cell:
             if not include_center:
                 neighborhood.pop(self, None)
             return neighborhood
-
-    # PropertyLayer methods
-    def get_property(self, property_name: str) -> Any:
-        """Get the value of a property."""
-        return self._mesa_property_layers[property_name].data[self.coordinate]
-
-    def set_property(self, property_name: str, value: Any):
-        """Set the value of a property."""
-        self._mesa_property_layers[property_name].set_cell(self.coordinate, value)
-
-    def modify_property(
-        self, property_name: str, operation: Callable, value: Any = None
-    ):
-        """Modify the value of a property."""
-        self._mesa_property_layers[property_name].modify_cell(
-            self.coordinate, operation, value
-        )
 
     def __getstate__(self):
         """Return state of the Cell with connections set to empty."""

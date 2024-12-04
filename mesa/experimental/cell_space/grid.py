@@ -2,17 +2,50 @@
 
 from __future__ import annotations
 
+import copyreg
 from collections.abc import Sequence
 from itertools import product
 from random import Random
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from mesa.experimental.cell_space import Cell, DiscreteSpace
+from mesa.experimental.cell_space.property_layer import (
+    HasPropertyLayers,
+    PropertyDescriptor,
+)
 
 T = TypeVar("T", bound=Cell)
 
 
-class Grid(DiscreteSpace[T], Generic[T]):
+def pickle_gridcell(obj):
+    """Helper function for pickling GridCell instances."""
+    # we have the base class and the state via __getstate__
+    args = obj.__class__.__bases__[0], obj.__getstate__()
+    return unpickle_gridcell, args
+
+
+def unpickle_gridcell(parent, fields):
+    """Helper function for unpickling GridCell instances."""
+    # since the class is dynamically created, we recreate it here
+    cell_klass = type(
+        "GridCell",
+        (parent,),
+        {"_mesa_properties": set()},
+    )
+    instance = cell_klass(
+        (0, 0)
+    )  # we use a default coordinate and overwrite it with the correct value next
+
+    # __gestate__ returns a tuple with dict and slots, but slots contains the dict so we can just use the
+    # second item only
+    for k, v in fields[1].items():
+        if k != "__dict__":
+            setattr(instance, k, v)
+
+    return instance
+
+
+class Grid(DiscreteSpace[T], Generic[T], HasPropertyLayers):
     """Base class for all grid classes.
 
     Attributes:
@@ -60,14 +93,23 @@ class Grid(DiscreteSpace[T], Generic[T]):
         self._try_random = True
         self._ndims = len(dimensions)
         self._validate_parameters()
+        self.cell_klass = type(
+            "GridCell",
+            (self.cell_klass,),
+            {"_mesa_properties": set()},
+        )
+
+        # we register the pickle_gridcell helper function
+        copyreg.pickle(self.cell_klass, pickle_gridcell)
 
         coordinates = product(*(range(dim) for dim in self.dimensions))
 
         self._cells = {
-            coord: cell_klass(coord, capacity, random=self.random)
+            coord: self.cell_klass(coord, capacity, random=self.random)
             for coord in coordinates
         }
         self._connect_cells()
+        self.create_property_layer("empty", default_value=True, dtype=bool)
 
     def _connect_cells(self) -> None:
         if self._ndims == 2:
@@ -125,6 +167,23 @@ class Grid(DiscreteSpace[T], Generic[T]):
                 ni, nj = ni % height, nj % width
             if 0 <= ni < height and 0 <= nj < width:
                 cell.connect(self._cells[ni, nj], (di, dj))
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Custom __getstate__ for handling dynamic GridCell class and PropertyDescriptors."""
+        state = super().__getstate__()
+        state = {k: v for k, v in state.items() if k != "cell_klass"}
+        return state
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """Custom __setstate__ for handling dynamic GridCell class and PropertyDescriptors."""
+        self.__dict__ = state
+        self._connect_cells()  # using super fails for this for some reason, so we repeat ourselves
+
+        self.cell_klass = type(
+            self._cells[(0, 0)]
+        )  # the __reduce__ function handles this for us nicely
+        for layer in self._mesa_property_layers.values():
+            setattr(self.cell_klass, layer.name, PropertyDescriptor(layer))
 
 
 class OrthogonalMooreGrid(Grid[T]):
