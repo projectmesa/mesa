@@ -27,6 +27,7 @@ In addition to the major new features, this release includes a number of smaller
 ### 📜 Documentation improvements
 * doc fix for pip install error on mac by @quaquel in https://github.com/projectmesa/mesa/pull/2508
 * Refactored docs for Introductory Tutorial by @Spartan-71 in https://github.com/projectmesa/mesa/pull/2511
+* Add module-level docstring to experimental features by @EwoutH in https://github.com/projectmesa/mesa/pull/2532
 ### 🔧 Maintenance
 * Remove deprecated time module by @EwoutH in https://github.com/projectmesa/mesa/pull/2476
 * Drop support for Python 3.10, require Python >= 3.11 by @EwoutH in https://github.com/projectmesa/mesa/pull/2474
