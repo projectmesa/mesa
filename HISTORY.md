@@ -1,6 +1,81 @@
 ---
 title: Release History
 ---
+# 3.1.0 (2024-12-04)
+## Highlights
+With Mesa 3.1.0 we're back on our regular release schedule after the big Mesa 3.0 release, with some exciting new features.
+
+This release adds experimental support for Observables and Computed, enabling a more reactive and responsive programming model for agent-based simulations. The new `Observable` and `Computable` classes allow developers to declaratively define attributes that automatically emit signals when their values change, and compute derived values that update dynamically. This lays the groundwork for more advanced event handling and data visualization features in future releases (#2291).
+
+The experimental cell space module has been updated with full support for n-dimensional property layers. These allow agents to easily interact with and modify spatial properties of the environment, such as terrain, resources, or environmental conditions. The new implementation provides a more intuitive attribute-based API and ensures tight integration with the cell space architecture (#2512).
+
+Mesa now includes built-in support for logging using the standard Python `logging` module. This provides developers with a flexible and powerful way to add structured diagnostic and debug output to their simulations, without the need for custom logging solutions. The logging system is integrated throughout the library, including the new SolaraViz visualization system (#2506).
+
+Creating multiple agents with varying initialization parameters is now significantly easier with the new `Agent.create_agents` class method. This factory function supports both uniform and per-agent parameters, simplifying the code required to set up a simulation with a large number of heterogeneous agents (#2351).
+
+In addition to the major new features, this release includes a number of smaller enhancements and bug fixes that improve the overall developer experience. These include removing deprecated functionality, cleaning up examples, and addressing various edge cases reported by the community. Mesa 3.1 requires Python 3.11 or higher.
+
+## What's Changed
+### 🧪 Experimental features
+* Add support for Observables to MESA by @quaquel in https://github.com/projectmesa/mesa/pull/2291
+* Add full support for property layers to cell spaces by @quaquel in https://github.com/projectmesa/mesa/pull/2512
+### 🎉 New features added
+* Add logging to MESA by @quaquel in https://github.com/projectmesa/mesa/pull/2506
+* Add `create_agents` factory method to Agent by @quaquel in https://github.com/projectmesa/mesa/pull/2351
+### 🔍 Examples updated
+* Add seed control to all examples by @quaquel in https://github.com/projectmesa/mesa/pull/2496
+### 📜 Documentation improvements
+* doc fix for pip install error on mac by @quaquel in https://github.com/projectmesa/mesa/pull/2508
+* Refactored docs for Introductory Tutorial by @Spartan-71 in https://github.com/projectmesa/mesa/pull/2511
+* Add module-level docstring to experimental features by @EwoutH in https://github.com/projectmesa/mesa/pull/2532
+### 🔧 Maintenance
+* Remove deprecated time module by @EwoutH in https://github.com/projectmesa/mesa/pull/2476
+* Drop support for Python 3.10, require Python >= 3.11 by @EwoutH in https://github.com/projectmesa/mesa/pull/2474
+* Remove deprecated functionality by @EwoutH in https://github.com/projectmesa/mesa/pull/2483
+* Remove visualization modules from `mesa.experimental` by @quaquel in https://github.com/projectmesa/mesa/pull/2495
+* Cleanup two occurrences of removed scheduler by @EwoutH in https://github.com/projectmesa/mesa/pull/2499
+* move _setup_agent_registration into `Model.__init__` by @quaquel in https://github.com/projectmesa/mesa/pull/2501
+* remove devs related examples from devs/examples by @quaquel in https://github.com/projectmesa/mesa/pull/2507
+* added empty iterable checks and updated tests by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2523
+* Fix: running Mesa in Docker with Schelling model by @AdamZh0u in https://github.com/projectmesa/mesa/pull/2524
+
+## New Contributors
+* @Spartan-71 made their first contribution in https://github.com/projectmesa/mesa/pull/2511
+* @Sahil-Chhoker made their first contribution in https://github.com/projectmesa/mesa/pull/2523
+* @AdamZh0u made their first contribution in https://github.com/projectmesa/mesa/pull/2524
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.3...v3.1.0
+
+# 3.0.3 (2024-11-14)
+## Highlights
+A small bugfix release that fixes two bugs.
+
+## What's Changed
+### 🧪 Experimental features
+* cell_space: Allow CellCollection to be empty by @EwoutH in https://github.com/projectmesa/mesa/pull/2502
+### 🐛 Bugs fixed
+* Only set model_parameters once by @Corvince in https://github.com/projectmesa/mesa/pull/2505
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.2...v3.0.3
+
+# 3.0.2 (2024-11-11)
+## Highlighst
+Mesa 3.0.2 is a small follow-up patch release, in which we fixed a lot of small bugs in the example models their visualisation, and improved their testing.
+
+## What's Changed
+### 🐛 Bugs fixed
+* allow components as a positional argument again by @Corvince in https://github.com/projectmesa/mesa/pull/2488
+### 🔍 Examples updated
+* examples: Add required components keyword by @EwoutH in https://github.com/projectmesa/mesa/pull/2485
+* examples: Fix boid_flockers viz by @EwoutH in https://github.com/projectmesa/mesa/pull/2492
+* examples: Fix schelling viz by @EwoutH in https://github.com/projectmesa/mesa/pull/2490
+* example: Add input sliders to Sugerscape viz by @EwoutH in https://github.com/projectmesa/mesa/pull/2487
+* examples/gol: Add initial fraction alive, add sliders to viz by @EwoutH in https://github.com/projectmesa/mesa/pull/2489
+### 🔧 Maintenance
+* test app init of examples by @Corvince in https://github.com/projectmesa/mesa/pull/2491
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.0.1...v3.0.2
+
 # 3.0.1 (2024-11-11)
 ## Highlights
 After our huge [3.0.0 release](https://github.com/projectmesa/mesa/releases/tag/v3.0.0), Mesa 3.0.1 follows up with two improvements to experimental features, examples and docs.
