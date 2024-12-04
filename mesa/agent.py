@@ -86,7 +86,7 @@ class Agent:
         pass
 
     @classmethod
-    def create_agents(cls, model: Model, n: int, *args, **kwargs):
+    def create_agents(cls, model: Model, n: int, *args, **kwargs) -> AgentSet[Agent]:
         """Create N agents.
 
         Args:
@@ -96,6 +96,9 @@ class Agent:
             n: the number of agents to create
             kwargs: keyword arguments to pass onto agent instances
                    each keyword arg is either a single object or a sequence of length n
+
+        Returns:
+            AgentSet containing the agents created.
 
         """
 
