@@ -16,6 +16,6 @@ services:
       # within the current directory.
       # E.g. if it is at my-model, then you specify it as
       # /opt/mesa/my-model.
-      MODEL_DIR: /mesa-examples/examples/schelling_experimental
+      MODEL_DIR: /opt/mesa/mesa/examples/basic/schelling
     ports:
       - 8765:8765

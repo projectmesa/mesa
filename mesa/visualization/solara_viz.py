@@ -33,14 +33,18 @@ import solara
 
 import mesa.visualization.components.altair_components as components_altair
 from mesa.experimental.devs.simulator import Simulator
+from mesa.mesa_logging import create_module_logger, function_logger
 from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
 
 if TYPE_CHECKING:
     from mesa.model import Model
 
+_mesa_logger = create_module_logger()
+
 
 @solara.component
+@function_logger(__name__)
 def SolaraViz(
     model: Model | solara.Reactive[Model],
     components: list[reacton.core.Component]
@@ -200,18 +204,25 @@ def ModelController(
         step, dependencies=[playing.value, running.value], prefer_threaded=False
     )
 
+    @function_logger(__name__)
     def do_step():
         """Advance the model by one step."""
         model.value.step()
         running.value = model.value.running
         force_update()
 
+    @function_logger(__name__)
     def do_reset():
         """Reset the model to its initial state."""
         playing.value = False
         running.value = True
+        _mesa_logger.log(
+            10,
+            f"creating new {model.value.__class__} instance with {model_parameters.value}",
+        )
         model.value = model.value = model.value.__class__(**model_parameters.value)
 
+    @function_logger(__name__)
     def do_play_pause():
         """Toggle play/pause."""
         playing.value = not playing.value
@@ -394,6 +405,7 @@ def ModelCreator(
         [],
     )
 
+    @function_logger(__name__)
     def on_change(name, value):
         model_parameters.value = {**model_parameters.value, name: value}
 

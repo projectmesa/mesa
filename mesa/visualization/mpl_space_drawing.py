@@ -178,7 +178,7 @@ def draw_property_layers(
         property_layers = space.properties
     except AttributeError:
         # new style spaces
-        property_layers = space.property_layers
+        property_layers = space._mesa_property_layers
 
     for layer_name, portrayal in propertylayer_portrayal.items():
         layer = property_layers.get(layer_name, None)
@@ -186,7 +186,7 @@ def draw_property_layers(
             continue
 
         data = layer.data.astype(float) if layer.data.dtype == bool else layer.data
-        width, height = data.shape if space is None else (space.width, space.height)
+        width, height = data.shape  # if space is None else (space.width, space.height)
 
         if space and data.shape != (width, height):
             warnings.warn(

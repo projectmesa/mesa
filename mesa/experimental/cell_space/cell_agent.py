@@ -1,4 +1,15 @@
-"""An agent with movement methods for cell spaces."""
+"""Agents that understand how to exist in and move through cell spaces.
+
+Provides specialized agent classes that handle cell occupation, movement, and
+proper registration:
+- CellAgent: Mobile agents that can move between cells
+- FixedAgent: Immobile agents permanently fixed to cells
+- Grid2DMovingAgent: Agents with grid-specific movement capabilities
+
+These classes ensure consistent agent-cell relationships and proper state management
+as agents move through the space. They can be used directly or as examples for
+creating custom cell-aware agents.
+"""
 
 from __future__ import annotations
 

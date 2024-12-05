@@ -12,10 +12,10 @@ __all__ = [
     "BoidFlockers",
     "BoltzmannWealth",
     "ConwaysGameOfLife",
-    "Schelling",
-    "VirusOnNetwork",
     "EpsteinCivilViolence",
     "PdGrid",
+    "Schelling",
     "SugarscapeG1mt",
+    "VirusOnNetwork",
     "WolfSheep",
 ]

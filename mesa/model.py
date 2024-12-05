@@ -17,9 +17,13 @@ from typing import Any
 import numpy as np
 
 from mesa.agent import Agent, AgentSet
+from mesa.mesa_logging import create_module_logger, method_logger
 
 SeedLike = int | np.integer | Sequence[int] | np.random.SeedSequence
 RNGLike = np.random.Generator | np.random.BitGenerator
+
+
+_mesa_logger = create_module_logger()
 
 
 class Model:
@@ -42,6 +46,7 @@ class Model:
 
     """
 
+    @method_logger(__name__)
     def __init__(
         self,
         *args: Any,
@@ -112,6 +117,7 @@ class Model:
         """Automatically increments time and steps after calling the user's step method."""
         # Automatically increment time and step counters
         self.steps += 1
+        _mesa_logger.info(f"calling model.step for timestep {self.steps} ")
         # Call the original user-defined step method
         self._user_step(*args, **kwargs)
 
@@ -164,6 +170,9 @@ class Model:
             )
 
         self._all_agents.add(agent)
+        _mesa_logger.debug(
+            f"registered {agent.__class__.__name__} with agent_id {agent.unique_id}"
+        )
 
     def deregister_agent(self, agent):
         """Deregister the agent with the model.
@@ -178,6 +187,7 @@ class Model:
         del self._agents[agent]
         self._agents_by_type[type(agent)].remove(agent)
         self._all_agents.remove(agent)
+        _mesa_logger.debug(f"deregistered agent with agent_id {agent.unique_id}")
 
     def run_model(self) -> None:
         """Run the model until the end condition is reached.

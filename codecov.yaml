@@ -7,7 +7,6 @@ coverage:
 
 ignore:
   - "benchmarks/**"
-  - "mesa/experimental/**"
   - "mesa/visualization/**"
 
 comment: off

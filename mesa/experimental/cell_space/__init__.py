@@ -1,8 +1,18 @@
-"""Cell spaces.
+"""Cell spaces for active, property-rich spatial modeling in Mesa.
 
-Cell spaces offer an alternative API for discrete spaces. It is experimental and under development. The API is more
-expressive that the default grids available in `mesa.space`.
+Cell spaces extend Mesa's spatial modeling capabilities by making the space itself active -
+each position (cell) can have properties and behaviors rather than just containing agents.
+This enables more sophisticated environmental modeling and agent-environment interactions.
 
+Key components:
+- Cells: Active positions that can have properties and contain agents
+- CellAgents: Agents that understand how to interact with cells
+- Spaces: Different cell organization patterns (grids, networks, etc.)
+- PropertyLayers: Efficient property storage and manipulation
+
+This is particularly useful for models where the environment plays an active role,
+like resource growth, pollution diffusion, or infrastructure networks. The cell
+space system is experimental and under active development.
 """
 
 from mesa.experimental.cell_space.cell import Cell
@@ -20,19 +30,21 @@ from mesa.experimental.cell_space.grid import (
     OrthogonalVonNeumannGrid,
 )
 from mesa.experimental.cell_space.network import Network
+from mesa.experimental.cell_space.property_layer import PropertyLayer
 from mesa.experimental.cell_space.voronoi import VoronoiGrid
 
 __all__ = [
-    "CellCollection",
     "Cell",
     "CellAgent",
-    "Grid2DMovingAgent",
-    "FixedAgent",
+    "CellCollection",
     "DiscreteSpace",
+    "FixedAgent",
     "Grid",
+    "Grid2DMovingAgent",
     "HexGrid",
+    "Network",
     "OrthogonalMooreGrid",
     "OrthogonalVonNeumannGrid",
-    "Network",
+    "PropertyLayer",
     "VoronoiGrid",
 ]

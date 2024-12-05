@@ -13,16 +13,16 @@ from mesa.datacollection import DataCollector
 from mesa.model import Model
 
 __all__ = [
-    "Model",
     "Agent",
-    "space",
     "DataCollector",
+    "Model",
     "batch_run",
     "experimental",
+    "space",
 ]
 
 __title__ = "mesa"
-__version__ = "3.1.0.dev"
+__version__ = "3.1.0"
 __license__ = "Apache 2.0"
 _this_year = datetime.datetime.now(tz=datetime.UTC).date().year
 __copyright__ = f"Copyright {_this_year} Project Mesa Team"
