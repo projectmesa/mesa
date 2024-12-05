@@ -50,7 +50,7 @@ Mesa 3.0 introduces a new agent management system centered around the AgentSet c
 - Built-in support for agent types and hierarchies
 
 ```python
-# Select agents meeting specific criteria and calucate an aggegrate value
+# Select agents meeting specific criteria and calculate an aggegrate value
 wealthy_agents = model.agents.select(lambda a: a.wealth > 1000)
 avg_wealth = wealthy_agents.agg("wealth", func=np.mean)
 ```
