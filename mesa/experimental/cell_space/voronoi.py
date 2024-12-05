@@ -1,4 +1,16 @@
-"""Support for Voronoi meshed grids."""
+"""Cell spaces based on Voronoi tessellation around seed points.
+
+Creates irregular spatial divisions by building cells around seed points,
+where each cell contains the area closer to its seed than any other.
+Features:
+- Organic-looking spaces from point sets
+- Automatic neighbor determination
+- Area-based cell capacities
+- Natural regional divisions
+
+Useful for models requiring irregular but mathematically meaningful spatial
+divisions, like territories, service areas, or natural regions.
+"""
 
 from collections.abc import Sequence
 from itertools import combinations

@@ -1,8 +1,15 @@
-"""This module defines observable collections classes.
+"""Observable collection types that emit signals when modified.
 
-Observable collections behave like Observable but then for collections.
+This module extends Mesa's reactive programming capabilities to collection types like
+lists. Observable collections emit signals when items are added, removed, or modified,
+allowing other components to react to changes in the collection's contents.
 
+The module provides:
+- ObservableList: A list descriptor that emits signals on modifications
+- SignalingList: The underlying list implementation that manages signal emission
 
+These classes enable building models where components need to track and react to
+changes in collections of agents, resources, or other model elements.
 """
 
 from collections.abc import Iterable, MutableSequence

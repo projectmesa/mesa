@@ -1,8 +1,23 @@
-"""Provides several simulator classes.
+"""Simulator implementations for different time advancement approaches in Mesa.
 
-A Simulator is responsible for executing a simulation model. It controls time advancement and enables event scheduling.
+This module provides simulator classes that control how simulation time advances and how
+events are executed. It supports both discrete-time and continuous-time simulations through
+three main classes:
 
+- Simulator: Base class defining the core simulation control interface
+- ABMSimulator: A simulator for agent-based models that combines fixed time steps with
+  event scheduling. Uses integer time units and automatically schedules model.step()
+- DEVSimulator: A pure discrete event simulator using floating-point time units for
+  continuous time simulation
 
+Key features:
+- Flexible time units (integer or float)
+- Event scheduling using absolute or relative times
+- Priority-based event execution
+- Support for running simulations for specific durations or until specific end times
+
+The simulators enable Mesa models to use traditional time-step based approaches, pure
+event-driven approaches, or hybrid combinations of both.
 """
 
 from __future__ import annotations
