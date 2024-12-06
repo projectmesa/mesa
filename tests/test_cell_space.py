@@ -601,6 +601,12 @@ def test_cell_collection():
     cells = collection.select()
     assert len(cells) == len(collection)
 
+    cells = collection.sample_random_cells(k=10)
+    assert len(cells) == 10
+
+    cells = collection.choices_random_cells(k=5)
+    assert len(cells) == 5
+
 
 def test_empty_cell_collection():
     """Test that CellCollection properly handles empty collections."""
