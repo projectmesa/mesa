@@ -13,7 +13,7 @@ class Schelling(Model):
         width: int = 40,
         density: float = 0.8,
         minority_pc: float = 0.5,
-        homophily: int = 3,
+        homophily_ratio: float = 0.3,
         radius: int = 1,
         seed=None,
     ):
@@ -24,7 +24,7 @@ class Schelling(Model):
             height: Height of the grid
             density: Initial chance for a cell to be populated (0-1)
             minority_pc: Chance for an agent to be in minority class (0-1)
-            homophily: Minimum number of similar neighbors needed for happiness
+            homophily_ratio: Ratio of similar neighbors to total neighbors needed for happiness
             radius: Search radius for checking neighbor similarity
             seed: Seed for reproducibility
         """
@@ -35,7 +35,7 @@ class Schelling(Model):
         self.width = width
         self.density = density
         self.minority_pc = minority_pc
-        self.homophily = homophily
+        self.homophily_ratio = homophily_ratio
         self.radius = radius
 
         # Initialize grid
