@@ -110,6 +110,38 @@ class CellCollection(Generic[T]):
         """
         return self.random.choice(list(self.agents))
 
+
+    def sample_random_cells(self, k:int=1, counts:list|None=None) -> list[Cell]:
+        """Sample k unique cells from the cell collection.
+
+        See random.sample for more information.
+
+        Args:
+            k: number of cells to sample
+            counts: The number of repeated elements, see random.sample for more details
+
+        Returns:
+            a list of sampled cells
+
+        """
+        return self.random.sample(self.cells, k, counts=counts)
+
+    def choices_random_cells(self, weights: list|None=None, cum_weights:list|None=None, k:int=1) -> list[Cell]:
+        """Return a k sized list of population elements chosen with replacement.
+
+        See random.choices for more information.
+
+        Args:
+            weights: weights for each cell
+            cum_weights: cumulative weights for each cell
+            k: number of cells to sample
+
+        Returns:
+            a list of chosen cells
+
+        """
+        return self.random.choices(list(self._cells.keys()), weights=weights, cum_weights=cum_weights, k=k)
+
     def select(
         self,
         filter_func: Callable[[T], bool] | None = None,
