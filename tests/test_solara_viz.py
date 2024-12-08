@@ -215,17 +215,15 @@ def test_model_param_checks():  # noqa: D103
         _check_model_params(ModelWithOnlyRequired.__init__, {})
 
 
-# Test to check if params are arguments and keyword arguments
-def test_check_model_params_with_both_args_and_kwargs():
-    """Test that _check_model_params raises ValueError when both *args and **kwargs are present in model initialization."""
-
-    class ModelWithArgsAndKwargs:
-        def __init__(self, param1, *args, **kwargs):
+ #test that _check_model_params raises ValueError when *args are present
+def test_check_model_params_with_args_only():
+    """Test that _check_model_params raises ValueError when *args are present."""
+    
+    class ModelWithArgsOnly:
+        def __init__(self, param1, *args):
             pass
 
     model_params = {"param1": 1}
 
-    with pytest.raises(
-        ValueError, match="Models with both \\*args and \\*\\*kwargs are not supported"
-    ):
-        _check_model_params(ModelWithArgsAndKwargs.__init__, model_params)
+    with pytest.raises(ValueError, match= "Mesa's visualization requires the use of keyword arguments to ensure the parameters are passed to Solara correctly. Please ensure all model parameters are of form param=value"):
+        _check_model_params(ModelWithArgsOnly.__init__, model_params)
