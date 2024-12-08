@@ -428,14 +428,10 @@ def _check_model_params(init_func, model_params):
         param.kind == inspect.Parameter.VAR_POSITIONAL
         for param in model_parameters.values()
     )
-    has_var_keyword = any(
-        param.kind == inspect.Parameter.VAR_KEYWORD
-        for param in model_parameters.values()
-    )
-
-    if has_var_positional and has_var_keyword:
-        raise ValueError("Models with both *args and **kwargs are not supported")
-
+    
+    if has_var_positional: 
+      raise ValueError("Mesa's visualization requires the use of keyword arguments to ensure the parameters are passed to Solara correctly. Please ensure all model parameters are of form param=value" )
+        
     for name in model_parameters:
         if (
             model_parameters[name].default == inspect.Parameter.empty
