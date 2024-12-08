@@ -102,24 +102,33 @@ def SolaraViz(
 
     # set up reactive model_parameters shared by ModelCreator and ModelController
     reactive_model_parameters = solara.use_reactive({})
+    reactive_play_interval = solara.use_reactive(play_interval)
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
 
     with solara.Sidebar(), solara.Column():
         with solara.Card("Controls"):
+            solara.SliderInt(
+                label="Play Interval (ms)",
+                value=reactive_play_interval.value,
+                on_value=lambda v: reactive_play_interval.set(v),
+                min=1,
+                max=500,
+                step=10,
+            )
             if not isinstance(simulator, Simulator):
                 ModelController(
                     model,
                     model_parameters=reactive_model_parameters,
-                    play_interval=play_interval,
+                    play_interval=reactive_play_interval.value,
                 )
             else:
                 SimulatorController(
                     model,
                     simulator,
                     model_parameters=reactive_model_parameters,
-                    play_interval=play_interval,
+                    play_interval=reactive_play_interval.value,
                 )
         with solara.Card("Model Parameters"):
             ModelCreator(
