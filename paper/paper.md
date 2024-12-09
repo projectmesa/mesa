@@ -75,7 +75,22 @@ grid.add_property_layer(elevation)
 grid.properties["elevation"].modify_cells(np.multiply, 2)
 ```
 
-This system facilitates the modeling of complex environments where spatial properties influence agent behavior.
+These modules facilitate the modeling of complex environments, including grids and networks, where spatial properties influence agent behavior.
+
+## Visualization
+Mesa 3.0 introduces SolaraViz, a modern visualization system that provides interactive browser-based model exploration:
+
+```python
+visualization = SolaraViz(
+    model,
+    components=[space_component, lineplot_component],
+    model_params=model_params,
+    name="Wolf Sheep",
+    simulator=simulator,
+)
+```
+
+![A screenshot of the WolfSheep Model in Mesa](../docs/images/wolf_sheep.png)
 
 ## Data collection and analysis
 The DataCollector component has been expanded to support collecting different metrics for different agent types:
@@ -91,23 +106,6 @@ datacollector = DataCollector(
 ```
 
 This enables more nuanced analysis of heterogeneous agent populations while maintaining integration with the pandas ecosystem for data analysis.
-
-## Visualization
-Mesa 3.0 introduces SolaraViz, a modern visualization system that provides interactive browser-based model exploration:
-
-```python
-visualization = SolaraViz(
-    model,
-    components=[space_component, lineplot_component],
-    model_params=model_params,
-    name="Wolf Sheep",
-    simulator=simulator,
-)
-```
-
-The system supports both grid-based and network models, with capabilities for real-time updates and custom visualization components.
-
-![A screenshot of the WolfSheep Model in Mesa](../docs/images/wolf_sheep.png)
 
 ## Experimental features
 Mesa 3.0 introduces several experimental features for advanced modeling scenarios:
