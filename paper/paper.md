@@ -108,11 +108,12 @@ datacollector = DataCollector(
 This enables more nuanced analysis of heterogeneous agent populations while maintaining integration with the pandas ecosystem for data analysis.
 
 ## Experimental features
-Mesa 3.0 introduces several experimental features for advanced modeling scenarios:
+Mesa 3.0 and 3.1 introduces several experimental features for advanced modeling scenarios:
 
-- PropertyLayer: A high-performance system for managing spatial environmental properties
-- Cell Space: An improved architecture for cellular automata and grid-based models
-- Event scheduling: Capabilities for discrete event simulation
+- PropertyLayer: An NumPy ndarray-based system for adding and managing layers of spatially-distributed properties (like elevation, temperature, or resources) to grid spaces, enabling bulk operations and fast selection of cells based on their properties, with  integration into both the current Grid spaces and the new Cell spaces.
+- Cell Space: A cell-centric approach to spatial modeling where cells are active entities with properties and behaviors rather than just containers for agents, enabling more sophisticated environmental modeling through cells that can have their own properties and interact with agents.
+- Discrete Event Scheduling: A system for scheduling events at arbitrary (non-integer) time points with priority-based ordering, supporting both pure discrete event simulation and hybrid approaches that combine agent-based modeling with event scheduling.
+- Mesa Signals (Observables): A reactive programming capability that enables tracking changes to properties and state in models, allowing components to observe and automatically react to changes in other components' state through a system of signals and computed values.
 
 # Implementation and architecture
 Mesa 3.0 is implemented in pure Python and requires Python 3.10 or higher. The framework follows a modular design with clear separation between:
