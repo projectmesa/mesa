@@ -97,7 +97,11 @@ class CellCollection(Generic[T]):
         return itertools.chain.from_iterable(self._cells.values())
 
     def select_random_cell(self) -> T:
-        """Select a random cell."""
+        """Select a random cell.
+
+        See Python's random.choice at python.docs.org for more information.
+
+        """
         return self.random.choice(self.cells)
 
     def select_random_agent(self) -> CellAgent:
@@ -113,7 +117,7 @@ class CellCollection(Generic[T]):
     def sample_random_cells(self, k: int = 1, counts: list | None = None) -> list[Cell]:
         """Sample k unique cells from the cell collection.
 
-        See random.sample for more information.
+        See Python's random.sample at python.docs.org for more information.
 
         Args:
             k: number of cells to sample
@@ -130,7 +134,7 @@ class CellCollection(Generic[T]):
     ) -> list[Cell]:
         """Return a k sized list of population elements chosen with replacement.
 
-        See random.choices for more information.
+        See Python's random.choices at python.docs.org for more information
 
         Args:
             weights: weights for each cell
