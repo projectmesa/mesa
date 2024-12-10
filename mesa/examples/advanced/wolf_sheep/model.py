@@ -89,17 +89,24 @@ class WolfSheep(Model):
 
         self.datacollector = DataCollector(model_reporters)
 
-
         # Create sheep:
-        Sheep.create_agents(self, initial_sheep,
-                            self.rng.random((initial_sheep,))*2 * sheep_gain_from_food,
-                            sheep_reproduce, sheep_gain_from_food,
-                            self.random.choices(self.grid.all_cells, k=initial_sheep))
+        Sheep.create_agents(
+            self,
+            initial_sheep,
+            self.rng.random((initial_sheep,)) * 2 * sheep_gain_from_food,
+            sheep_reproduce,
+            sheep_gain_from_food,
+            self.random.choices(self.grid.all_cells, k=initial_sheep),
+        )
         # Create Wolves:
-        Wolf.create_agents(self, initial_wolves,
-                           self.rng.random((initial_sheep,)) * 2 * wolf_gain_from_food,
-                           wolf_reproduce, wolf_gain_from_food,
-                           self.random.choices(self.grid.all_cells, k=initial_wolves))
+        Wolf.create_agents(
+            self,
+            initial_wolves,
+            self.rng.random((initial_sheep,)) * 2 * wolf_gain_from_food,
+            wolf_reproduce,
+            wolf_gain_from_food,
+            self.random.choices(self.grid.all_cells, k=initial_wolves),
+        )
 
         # Create grass patches if enabled
         if grass:
