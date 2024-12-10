@@ -146,7 +146,7 @@ class CellCollection(Generic[T]):
 
         """
         return self.random.choices(
-            list(self._cells.keys()), weights=weights, cum_weights=cum_weights, k=k
+            self.cells, weights=weights, cum_weights=cum_weights, k=k
         )
 
     def select(
