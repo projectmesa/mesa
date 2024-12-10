@@ -62,10 +62,10 @@ class MoneyModel(mesa.Model):
         self.grid = mesa.space.MultiGrid(width, height, True)
 
         # Create agents
-        agents = MoneyAgent.create_agents(self,n)
+        agents = MoneyAgent.create_agents(model=self,n=n)
         # Create x and y positions for agents
-        x = self.rng.integers(0, self.grid.width, size=(self.num_agents,))
-        y = self.rng.integers(0, self.grid.height, size=(self.num_agents,))
+        x = self.rng.integers(0, self.grid.width, size=(n,))
+        y = self.rng.integers(0, self.grid.height, size=(n,))
         for a, i, j in zip(agents, x, y):
             # Add the agent to a random grid cell
             self.grid.place_agent(a, (i, j))
