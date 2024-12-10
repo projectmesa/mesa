@@ -111,7 +111,7 @@ def SolaraViz(
         with solara.Card("Controls"):
             solara.SliderInt(
                 label="Play Interval (ms)",
-                value=reactive_play_interval.value,
+                value=reactive_play_interval,
                 on_value=lambda v: reactive_play_interval.set(v),
                 min=1,
                 max=500,
@@ -121,14 +121,14 @@ def SolaraViz(
                 ModelController(
                     model,
                     model_parameters=reactive_model_parameters,
-                    play_interval=reactive_play_interval.value,
+                    play_interval=reactive_play_interval,
                 )
             else:
                 SimulatorController(
                     model,
                     simulator,
                     model_parameters=reactive_model_parameters,
-                    play_interval=reactive_play_interval.value,
+                    play_interval=reactive_play_interval,
                 )
         with solara.Card("Model Parameters"):
             ModelCreator(
@@ -188,7 +188,7 @@ def ModelController(
     model: solara.Reactive[Model],
     *,
     model_parameters: dict | solara.Reactive[dict] = None,
-    play_interval: int = 100,
+    play_interval: int | solara.Reactive[int] = 100,
 ):
     """Create controls for model execution (step, play, pause, reset).
 
@@ -206,7 +206,7 @@ def ModelController(
 
     async def step():
         while playing.value and running.value:
-            await asyncio.sleep(play_interval / 1000)
+            await asyncio.sleep(play_interval.value / 1000)
             do_step()
 
     solara.lab.use_task(
@@ -258,7 +258,7 @@ def SimulatorController(
     simulator,
     *,
     model_parameters: dict | solara.Reactive[dict] = None,
-    play_interval: int = 100,
+    play_interval: int | solara.Reactive[int] = 100,
 ):
     """Create controls for model execution (step, play, pause, reset).
 
@@ -277,7 +277,7 @@ def SimulatorController(
 
     async def step():
         while playing.value and running.value:
-            await asyncio.sleep(play_interval / 1000)
+            await asyncio.sleep(play_interval.value / 1000)
             do_step()
 
     solara.lab.use_task(
