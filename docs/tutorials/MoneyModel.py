@@ -63,11 +63,12 @@ class MoneyModel(mesa.Model):
 
         # Create agents
         agents = MoneyAgent.create_agents(self,n)
-        for a in agents:
+        # Create x and y positions for agents
+        x = self.rng.integers(0, self.grid.width, size=(self.num_agents,))
+        y = self.rng.integers(0, self.grid.height, size=(self.num_agents,))
+        for a, i, j in zip(agents, x, y):
             # Add the agent to a random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(a, (x, y))
+            self.grid.place_agent(a, (i, j))
 
         self.datacollector = mesa.DataCollector(
             model_reporters={"Gini": compute_gini}, agent_reporters={"Wealth": "wealth"}
