@@ -4,7 +4,7 @@ from mesa.experimental.cell_space import CellAgent, FixedAgent
 class Animal(CellAgent):
     """The base animal class."""
 
-    def __init__(self, model, energy, p_reproduce, energy_from_food, cell):
+    def __init__(self, model, energy=0, p_reproduce=0.2, energy_from_food=1, cell=None):
         """Initialize an animal.
 
         Args:
