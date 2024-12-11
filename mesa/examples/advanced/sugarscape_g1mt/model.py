@@ -60,7 +60,6 @@ class SugarscapeG1mt(mesa.Model):
         self.height = height
         # Initiate population attributes
 
-
         self.enable_trade = enable_trade
         self.running = True
 
@@ -91,15 +90,26 @@ class SugarscapeG1mt(mesa.Model):
             max_spice = spice_distribution[cell.coordinate]
             Resource(self, max_sugar, max_spice, cell)
 
-        Trader.create_agents(self, initial_population,
-                             self.random.choices(self.grid.all_cells.cells, k=initial_population),
-                             sugar=self.rng.integers(endowment_min, endowment_max, (initial_population, ), endpoint=True),
-                             spice=self.rng.integers(endowment_min, endowment_max, (initial_population, ), endpoint=True),
-                             metabolism_sugar=self.rng.integers(metabolism_min, metabolism_max, (initial_population, ), endpoint=True),
-                             metabolism_spice=self.rng.integers(metabolism_min, metabolism_max, (initial_population, ), endpoint=True),
-                             vision=self.rng.integers(vision_min, vision_max, (initial_population, ), endpoint=True),
+        Trader.create_agents(
+            self,
+            initial_population,
+            self.random.choices(self.grid.all_cells.cells, k=initial_population),
+            sugar=self.rng.integers(
+                endowment_min, endowment_max, (initial_population,), endpoint=True
+            ),
+            spice=self.rng.integers(
+                endowment_min, endowment_max, (initial_population,), endpoint=True
+            ),
+            metabolism_sugar=self.rng.integers(
+                metabolism_min, metabolism_max, (initial_population,), endpoint=True
+            ),
+            metabolism_spice=self.rng.integers(
+                metabolism_min, metabolism_max, (initial_population,), endpoint=True
+            ),
+            vision=self.rng.integers(
+                vision_min, vision_max, (initial_population,), endpoint=True
+            ),
         )
-
 
     def step(self):
         """
