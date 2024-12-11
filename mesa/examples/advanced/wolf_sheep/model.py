@@ -96,7 +96,7 @@ class WolfSheep(Model):
             energy=self.rng.random((initial_sheep,)) * 2 * sheep_gain_from_food,
             p_reproduce=sheep_reproduce,
             energy_from_food=sheep_gain_from_food,
-            cell=self.random.choices(self.grid.all_cells, k=initial_sheep),
+            cell=self.random.choices(self.grid.all_cells.cells, k=initial_sheep),
         )
         # Create Wolves:
         Wolf.create_agents(
@@ -105,7 +105,7 @@ class WolfSheep(Model):
             energy=self.rng.random((initial_sheep,)) * 2 * wolf_gain_from_food,
             p_reproduce=wolf_reproduce,
             energy_from_food=wolf_gain_from_food,
-            cell=self.random.choices(self.grid.all_cells, k=initial_wolves),
+            cell=self.random.choices(self.grid.all_cells.cells, k=initial_wolves),
         )
 
         # Create grass patches if enabled
