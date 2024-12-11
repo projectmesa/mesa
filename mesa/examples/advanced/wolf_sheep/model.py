@@ -102,7 +102,7 @@ class WolfSheep(Model):
         Wolf.create_agents(
             self,
             initial_wolves,
-            energy=self.rng.random((initial_sheep,)) * 2 * wolf_gain_from_food,
+            energy=self.rng.random((initial_wolves,)) * 2 * wolf_gain_from_food,
             p_reproduce=wolf_reproduce,
             energy_from_food=wolf_gain_from_food,
             cell=self.random.choices(self.grid.all_cells.cells, k=initial_wolves),
