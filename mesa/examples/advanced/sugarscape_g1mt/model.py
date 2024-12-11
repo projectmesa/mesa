@@ -59,13 +59,8 @@ class SugarscapeG1mt(mesa.Model):
         self.width = width
         self.height = height
         # Initiate population attributes
-        self.initial_population = initial_population
-        self.endowment_min = endowment_min
-        self.endowment_max = endowment_max
-        self.metabolism_min = metabolism_min
-        self.metabolism_max = metabolism_max
-        self.vision_min = vision_min
-        self.vision_max = vision_max
+
+
         self.enable_trade = enable_trade
         self.running = True
 
@@ -96,35 +91,15 @@ class SugarscapeG1mt(mesa.Model):
             max_spice = spice_distribution[cell.coordinate]
             Resource(self, max_sugar, max_spice, cell)
 
-        for _ in range(self.initial_population):
-            # get agent position
-            x = self.random.randrange(self.width)
-            y = self.random.randrange(self.height)
-            # see Growing Artificial Societies p. 108 for initialization
-            # give agents initial endowment
-            sugar = int(self.random.uniform(self.endowment_min, self.endowment_max + 1))
-            spice = int(self.random.uniform(self.endowment_min, self.endowment_max + 1))
-            # give agents initial metabolism
-            metabolism_sugar = int(
-                self.random.uniform(self.metabolism_min, self.metabolism_max + 1)
-            )
-            metabolism_spice = int(
-                self.random.uniform(self.metabolism_min, self.metabolism_max + 1)
-            )
-            # give agents vision
-            vision = int(self.random.uniform(self.vision_min, self.vision_max + 1))
+        Trader.create_agents(self, initial_population,
+                             self.random.choices(self.grid.all_cells.cells, k=initial_population),
+                             sugar=self.rng.integers(endowment_min, endowment_max, (initial_population, ), endpoint=True),
+                             spice=self.rng.integers(endowment_min, endowment_max, (initial_population, ), endpoint=True),
+                             metabolism_sugar=self.rng.integers(metabolism_min, metabolism_max, (initial_population, ), endpoint=True),
+                             metabolism_spice=self.rng.integers(metabolism_min, metabolism_max, (initial_population, ), endpoint=True),
+                             vision=self.rng.integers(vision_min, vision_max, (initial_population, ), endpoint=True),
+        )
 
-            cell = self.grid[(x, y)]
-            # create Trader object
-            Trader(
-                self,
-                cell,
-                sugar=sugar,
-                spice=spice,
-                metabolism_sugar=metabolism_sugar,
-                metabolism_spice=metabolism_spice,
-                vision=vision,
-            )
 
     def step(self):
         """
