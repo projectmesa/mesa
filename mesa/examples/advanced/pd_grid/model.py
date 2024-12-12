@@ -32,7 +32,9 @@ class PdGrid(mesa.Model):
         if payoffs is not None:
             self.payoff = payoffs
 
-        PDAgent.create_agents(self, len(self.grid.all_cells.cells), cell=self.grid.all_cells.cells)
+        PDAgent.create_agents(
+            self, len(self.grid.all_cells.cells), cell=self.grid.all_cells.cells
+        )
 
         self.datacollector = mesa.DataCollector(
             {
