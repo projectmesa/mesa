@@ -1,6 +1,6 @@
 import math
 
-from mesa.experimental.cell_space import CellAgent, FixedAgent
+from mesa.experimental.cell_space import CellAgent
 
 
 # Helper function

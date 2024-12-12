@@ -1,11 +1,11 @@
 from pathlib import Path
 
 import numpy as np
-from mesa.experimental.cell_space.property_layer import PropertyLayer
 
 import mesa
 from mesa.examples.advanced.sugarscape_g1mt.agents import Trader
 from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
+from mesa.experimental.cell_space.property_layer import PropertyLayer
 
 
 # Helper Functions
@@ -72,9 +72,7 @@ class SugarscapeG1mt(mesa.Model):
         self.datacollector = mesa.DataCollector(
             model_reporters={
                 "#Traders": lambda m: len(m.agents),
-                "Trade Volume": lambda m: sum(
-                    len(a.trade_partners) for a in m.agents
-                ),
+                "Trade Volume": lambda m: sum(len(a.trade_partners) for a in m.agents),
                 "Price": lambda m: geometric_mean(
                     flatten([a.prices for a in m.agents])
                 ),
@@ -86,8 +84,12 @@ class SugarscapeG1mt(mesa.Model):
         self.sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map.txt")
         self.spice_distribution = np.flip(self.sugar_distribution, 1)
 
-        self.grid.add_property_layer(PropertyLayer.from_data("sugar", self.sugar_distribution))
-        self.grid.add_property_layer(PropertyLayer.from_data("spice", self.spice_distribution))
+        self.grid.add_property_layer(
+            PropertyLayer.from_data("sugar", self.sugar_distribution)
+        )
+        self.grid.add_property_layer(
+            PropertyLayer.from_data("spice", self.spice_distribution)
+        )
 
         Trader.create_agents(
             self,
@@ -116,8 +118,12 @@ class SugarscapeG1mt(mesa.Model):
         and then randomly activates traders
         """
         # step Resource agents
-        self.grid.sugar.data = np.minimum(self.grid.sugar.data+1, self.sugar_distribution)
-        self.grid.spice.data = np.minimum(self.grid.spice.data+1, self.spice_distribution)
+        self.grid.sugar.data = np.minimum(
+            self.grid.sugar.data + 1, self.sugar_distribution
+        )
+        self.grid.spice.data = np.minimum(
+            self.grid.spice.data + 1, self.spice_distribution
+        )
 
         # step trader agents
         # to account for agent death and removal we need a separate data structure to
