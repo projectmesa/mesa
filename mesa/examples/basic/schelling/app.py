@@ -26,7 +26,7 @@ model_params = {
     },
     "density": Slider("Agent density", 0.8, 0.1, 1.0, 0.1),
     "minority_pc": Slider("Fraction minority", 0.2, 0.0, 1.0, 0.05),
-    "homophily": Slider("Homophily", 3, 0, 8, 1),
+    "homophily": Slider("Homophily", 0.3, 0.0, 0.8, 0.1),
     "width": 20,
     "height": 20,
 }
