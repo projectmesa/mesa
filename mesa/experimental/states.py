@@ -22,9 +22,8 @@ from mesa import Agent
 class State:
     """Base class for all states."""
 
-    def __init__(self, name: str, initial_value: Any):
+    def __init__(self, initial_value: Any):
         """Create a new state."""
-        self.name = name
         self._value = initial_value
         self._last_update_time = 0
         self.model = None  # Set when state is added to agent
@@ -61,12 +60,11 @@ class ContinuousState(State):
 
     def __init__(
         self,
-        name: str,
         initial_value: float,
         rate_function: Callable[[float, float], float],
     ):
         """Create a new continuous state."""
-        super().__init__(name, initial_value)
+        super().__init__(initial_value)
         self.rate_function = rate_function
 
     @property
@@ -89,14 +87,13 @@ class CompositeState(State):
 
     def __init__(
         self,
-        name: str,
         dependent_states: list[State],
         computation_function: Callable[..., Any],
     ):
         """Create a new composite state."""
         self.dependent_states = dependent_states
         self.computation_function = computation_function
-        super().__init__(name, None)  # Value computed on first access
+        super().__init__(None)  # Value computed on first access
 
     @property
     def value(self) -> Any:
@@ -144,11 +141,6 @@ class StateAgent(Agent):
         states = object.__getattribute__(self, "states")
         # If setting a State object, add or update the states dictionary
         if isinstance(value, State):
-            # The state's name should match the attribute name
-            if value.name != name:
-                raise ValueError(
-                    f"State name '{value.name}' does not match attribute name '{name}'"
-                )
             states[name] = value
             value.model = self.model
         else:
