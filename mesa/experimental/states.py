@@ -80,7 +80,7 @@ class ContinuousState(State):
     def update(self, time: float) -> None:
         """Update state value based on elapsed time."""
         elapsed = time - self._last_update_time
-        self._value = self._value + self.rate_function(self._value, elapsed)
+        self._value += self.rate_function(self._value, elapsed)
         self._last_update_time = time
 
 
@@ -111,30 +111,46 @@ class CompositeState(State):
 
 
 class StateAgent(Agent):
-    """An agent with integrated state management."""
+    """An agent with integrated state management that allows direct attribute-based state access."""
 
-    def __init__(self, model) -> None:
+    def __init__(self, model):
         """Create a new agent with state management."""
         super().__init__(model)
-        self.states = {}  # name -> State mapping
-
-    def add_state(self, state: State) -> None:
-        """Add a new state to the agent."""
-        state.model = self.model
-        self.states[state.name] = state
-
-    def get_state(self, name: str) -> Any:
-        """Get the current value of a state."""
-        return self.states[name].value
-
-    def set_state(self, name: str, value: Any) -> None:
-        """Set value for a discrete state."""
-        if isinstance(self.states[name], DiscreteState):
-            self.states[name].value = value
-        else:
-            raise ValueError("Cannot directly set value of non-discrete state")
+        object.__setattr__(self, "states", {})  # Use object.__setattr__ to avoid recursion
 
     def update_states(self) -> None:
         """Update all states to current time."""
         for state in self.states.values():
             state.update(self.model.time)
+
+    def __getattribute__(self, name: str) -> Any:
+        """Get an attribute, routing state access to its value."""
+        states = object.__getattribute__(self, "states")
+        if name in states:
+            # If it's a known state, return its current value
+            return states[name].value
+        else:
+            # Otherwise, return the attribute normally
+            return object.__getattribute__(self, name)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Set an attribute, allowing direct state assignment or updates."""
+        states = object.__getattribute__(self, "states")
+        # If setting a State object, add or update the states dictionary
+        if isinstance(value, State):
+            # The state's name should match the attribute name
+            if value.name != name:
+                raise ValueError(f"State name '{value.name}' does not match attribute name '{name}'")
+            states[name] = value
+            value.model = self.model
+        else:
+            # If we're setting a non-state value and a corresponding state exists
+            if name in states:
+                # The state must be discrete to allow direct setting
+                if isinstance(states[name], DiscreteState):
+                    states[name].value = value
+                else:
+                    raise ValueError("Cannot directly set value of non-discrete state")
+            else:
+                # Otherwise, it's just a normal attribute
+                object.__setattr__(self, name, value)
