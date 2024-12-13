@@ -129,8 +129,12 @@ class StateAgent(Agent):
         """Get an attribute, routing state access to its value."""
         states = object.__getattribute__(self, "states")
         if name in states:
-            # If it's a known state, return its current value
-            return states[name].value
+            # If it's a known state, ensure it is updated before returning its value
+            state = states[name]
+            current_time = object.__getattribute__(self.model, "time")
+            if current_time > state._last_update_time:
+                state.update(current_time)
+            return state.value
         else:
             # Otherwise, return the attribute normally
             return object.__getattribute__(self, name)
