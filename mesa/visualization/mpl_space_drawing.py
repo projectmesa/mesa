@@ -181,8 +181,9 @@ def draw_property_layers(
         property_layers = space._mesa_property_layers
 
     for layer_name, portrayal in propertylayer_portrayal.items():
+        print(layer_name)
         layer = property_layers.get(layer_name, None)
-        if not isinstance(layer, PropertyLayer):
+        if not isinstance(layer, PropertyLayer | mesa.experimental.cell_space.property_layer.PropertyLayer):
             continue
 
         data = layer.data.astype(float) if layer.data.dtype == bool else layer.data
@@ -212,7 +213,7 @@ def draw_property_layers(
                 layer_name, [(0, 0, 0, 0), (*rgba_color[:3], alpha)]
             )
             im = ax.imshow(
-                rgba_data.transpose(1, 0, 2),
+                rgba_data,
                 origin="lower",
             )
             if colorbar:
@@ -226,7 +227,7 @@ def draw_property_layers(
             if isinstance(cmap, list):
                 cmap = LinearSegmentedColormap.from_list(layer_name, cmap)
             im = ax.imshow(
-                data.T,
+                data,
                 cmap=cmap,
                 alpha=alpha,
                 vmin=vmin,
