@@ -116,7 +116,9 @@ class StateAgent(Agent):
     def __init__(self, model):
         """Create a new agent with state management."""
         super().__init__(model)
-        object.__setattr__(self, "states", {})  # Use object.__setattr__ to avoid recursion
+        object.__setattr__(
+            self, "states", {}
+        )  # Use object.__setattr__ to avoid recursion
 
     def update_states(self) -> None:
         """Update all states to current time."""
@@ -140,7 +142,9 @@ class StateAgent(Agent):
         if isinstance(value, State):
             # The state's name should match the attribute name
             if value.name != name:
-                raise ValueError(f"State name '{value.name}' does not match attribute name '{name}'")
+                raise ValueError(
+                    f"State name '{value.name}' does not match attribute name '{name}'"
+                )
             states[name] = value
             value.model = self.model
         else:
