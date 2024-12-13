@@ -183,7 +183,10 @@ def draw_property_layers(
     for layer_name, portrayal in propertylayer_portrayal.items():
         print(layer_name)
         layer = property_layers.get(layer_name, None)
-        if not isinstance(layer, PropertyLayer | mesa.experimental.cell_space.property_layer.PropertyLayer):
+        if not isinstance(
+            layer,
+            PropertyLayer | mesa.experimental.cell_space.property_layer.PropertyLayer,
+        ):
             continue
 
         data = layer.data.astype(float) if layer.data.dtype == bool else layer.data
