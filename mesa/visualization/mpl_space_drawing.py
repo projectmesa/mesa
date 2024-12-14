@@ -181,7 +181,6 @@ def draw_property_layers(
         property_layers = space._mesa_property_layers
 
     for layer_name, portrayal in propertylayer_portrayal.items():
-        print(layer_name)
         layer = property_layers.get(layer_name, None)
         if not isinstance(
             layer,
