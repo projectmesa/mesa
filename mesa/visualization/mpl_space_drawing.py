@@ -501,7 +501,7 @@ def draw_voronoi_grid(
     ax: Axes | None = None,
     # According to voronoi.py, set the initial value to 0
     cell_coloring_property: float = 0.0,
-    **kwargs
+    **kwargs,
 ):
     """Visualize a voronoi grid.
 
