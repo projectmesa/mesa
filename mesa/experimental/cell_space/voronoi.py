@@ -186,7 +186,8 @@ class VoronoiGrid(DiscreteSpace):
         random: Random | None = None,
         cell_klass: type[Cell] = Cell,
         capacity_function: callable = round_float,
-        cell_coloring_property: str | None = None,
+        # Remove cell_coloring_property from VoronoiGrid
+        # cell_coloring_property: str | None = None,
     ) -> None:
         """A Voronoi Tessellation Grid.
 
@@ -200,7 +201,7 @@ class VoronoiGrid(DiscreteSpace):
             random (Random): random number generator
             cell_klass (type[Cell]): type of cell class
             capacity_function (Callable): function to compute (int) capacity according to (float) area
-            cell_coloring_property (str): voronoi visualization polygon fill property
+            cell_coloring_property (str): voronoi visualization polygon fill property, however this is visualization specific and does not belong in the grid class
         """
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
         self.centroids_coordinates = centroids_coordinates
@@ -215,7 +216,8 @@ class VoronoiGrid(DiscreteSpace):
         self.triangulation = None
         self.voronoi_coordinates = None
         self.capacity_function = capacity_function
-        self.cell_coloring_property = cell_coloring_property
+        # Remove cell_coloring_property from VoronoiGrid
+        # self.cell_coloring_property = cell_coloring_property
 
         self._connect_cells()
         self._build_cell_polygons()
@@ -266,4 +268,5 @@ class VoronoiGrid(DiscreteSpace):
             polygon_area = self._compute_polygon_area(polygon)
             self._cells[region].properties["area"] = polygon_area
             self._cells[region].capacity = self.capacity_function(polygon_area)
-            self._cells[region].properties[self.cell_coloring_property] = 0
+            # Remove cell_coloring_property from VoronoiGrid
+            # self._cells[region].properties[self.cell_coloring_property] = 0

@@ -496,7 +496,12 @@ def draw_continuous_space(
 
 
 def draw_voronoi_grid(
-    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
+    space: VoronoiGrid,
+    agent_portrayal: Callable,
+    ax: Axes | None = None,
+    # According to voronoi.py, set the initial value to 0
+    cell_coloring_property: float = 0.0,
+    **kwargs
 ):
     """Visualize a voronoi grid.
 
@@ -504,8 +509,8 @@ def draw_voronoi_grid(
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        cell_coloring_property: define the transparency of the polygon
         kwargs: additional keyword arguments passed to ax.scatter
-
     Returns:
         Returns the Axes object with the plot drawn onto it.
 
@@ -540,7 +545,8 @@ def draw_voronoi_grid(
         polygon = cell.properties["polygon"]
         ax.fill(
             *zip(*polygon),
-            alpha=min(1, cell.properties[space.cell_coloring_property]),
+            # alpha=min(1, cell.properties[space.cell_coloring_property]),
+            alpha=min(1, cell_coloring_property),
             c="red",
             zorder=0,
         )  # Plot filled polygon
