@@ -2,7 +2,6 @@ import numpy as np
 import solara
 from matplotlib.figure import Figure
 
-from mesa.examples.advanced.sugarscape_g1mt.agents import Trader
 from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt
 from mesa.visualization import Slider, SolaraViz, make_plot_component
 
@@ -10,24 +9,13 @@ from mesa.visualization import Slider, SolaraViz, make_plot_component
 def SpaceDrawer(model):
     def portray(g):
         layers = {
-            "sugar": [[np.nan for j in range(g.height)] for i in range(g.width)],
-            "spice": [[np.nan for j in range(g.height)] for i in range(g.width)],
             "trader": {"x": [], "y": [], "c": "tab:red", "marker": "o", "s": 10},
         }
 
         for agent in g.all_cells.agents:
             i, j = agent.cell.coordinate
-            if isinstance(agent, Trader):
-                layers["trader"]["x"].append(i)
-                layers["trader"]["y"].append(j)
-            else:
-                # Don't visualize resource with value <= 1.
-                layers["sugar"][i][j] = (
-                    agent.sugar_amount if agent.sugar_amount > 1 else np.nan
-                )
-                layers["spice"][i][j] = (
-                    agent.spice_amount if agent.spice_amount > 1 else np.nan
-                )
+            layers["trader"]["x"].append(i)
+            layers["trader"]["y"].append(j)
         return layers
 
     fig = Figure()
@@ -36,10 +24,18 @@ def SpaceDrawer(model):
     # Sugar
     # Important note: imshow by default draws from upper left. You have to
     # always explicitly specify origin="lower".
-    im = ax.imshow(out["sugar"], cmap="spring", origin="lower")
+    im = ax.imshow(
+        np.ma.masked_where(model.grid.sugar.data <= 1, model.grid.sugar.data),
+        cmap="spring",
+        origin="lower",
+    )
     fig.colorbar(im, orientation="vertical")
     # Spice
-    ax.imshow(out["spice"], cmap="winter", origin="lower")
+    ax.imshow(
+        np.ma.masked_where(model.grid.spice.data <= 1, model.grid.spice.data),
+        cmap="winter",
+        origin="lower",
+    )
     # Trader
     ax.scatter(**out["trader"])
     ax.set_axis_off()
@@ -75,7 +71,11 @@ model = SugarscapeG1mt()
 
 page = SolaraViz(
     model,
-    components=[SpaceDrawer, make_plot_component(["Trader", "Price"])],
+    components=[
+        SpaceDrawer,
+        make_plot_component("#Traders"),
+        make_plot_component("Price"),
+    ],
     model_params=model_params,
     name="Sugarscape {G1, M, T}",
     play_interval=150,
