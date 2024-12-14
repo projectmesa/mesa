@@ -1,9 +1,3 @@
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath("../../../.."))
-
-
 import numpy as np
 import solara
 from matplotlib.figure import Figure
