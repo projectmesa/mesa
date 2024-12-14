@@ -1,6 +1,34 @@
 ---
 title: Release History
 ---
+## Highlights
+Mesa 3.1.1 is a maintenance release that includes visualization improvements and documentation updates. The key enhancement is the addition of an interactive play interval control to the visualization interface, allowing users to dynamically adjust simulation speed between 1ms and 500ms through a slider in the Controls panel.
+
+Several example models were updated to use Mesa 3.1's recommended practices, particularly the `create_agents()` method for more efficient agent creation and NumPy's `rng.integers()` for random number generation. The Sugarscape example was modernized to use PropertyLayers.
+
+Bug fixes include improvements to PropertyLayer visualization and a correction to the Schelling model's neighbor similarity calculation. The tutorials were also updated to reflect current best practices in Mesa 3.1.
+
+## What's Changed
+### 🎉 New features added
+* Add Interactive Play Interval Control to Mesa Visualization by @AdamZh0u in https://github.com/projectmesa/mesa/pull/2540
+### 🐛 Bugs fixed
+* bug fixes for draw_property_layers by @quaquel in https://github.com/projectmesa/mesa/pull/2548
+### 🔍 Examples updated
+* Wolf-sheep to use `create_agent` by @quaquel in https://github.com/projectmesa/mesa/pull/2543
+* Shift sugarscape example to using create_agent by @quaquel in https://github.com/projectmesa/mesa/pull/2544
+* Fix: Schelling Model Neighbor Similarity Calculation by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2518
+* Change pd_grid example to use create_agents by @quaquel in https://github.com/projectmesa/mesa/pull/2545
+* Switch sugarscape to using property layers by @quaquel in https://github.com/projectmesa/mesa/pull/2546
+### 📜 Documentation improvements
+* Updated docs and check_model param by @nissu99 in https://github.com/projectmesa/mesa/pull/2510
+* Update tutorials to use `create_agents` and `rng.integers` by @DarshPareek in https://github.com/projectmesa/mesa/pull/2541
+
+## New Contributors
+* @nissu99 made their first contribution in https://github.com/projectmesa/mesa/pull/2510
+* @DarshPareek made their first contribution in https://github.com/projectmesa/mesa/pull/2541
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.1.0...3.1.1
+
 # 3.1.0 (2024-12-04)
 ## Highlights
 With Mesa 3.1.0 we're back on our regular release schedule after the big Mesa 3.0 release, with some exciting new features.
