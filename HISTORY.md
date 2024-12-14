@@ -1,6 +1,7 @@
 ---
 title: Release History
 ---
+# 3.1.1 (2024-12-14)
 ## Highlights
 Mesa 3.1.1 is a maintenance release that includes visualization improvements and documentation updates. The key enhancement is the addition of an interactive play interval control to the visualization interface, allowing users to dynamically adjust simulation speed between 1ms and 500ms through a slider in the Controls panel.
 
