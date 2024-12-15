@@ -22,6 +22,7 @@ authors:
   - name: Jackie Kazil
     orcid: 0000-0002-6666-8506
 date: 5 December 2024
+bibliography: paper.bib
 
 # Optional fields
 repository-code: https://github.com/projectmesa/mesa
@@ -142,6 +143,7 @@ The improvements in Mesa 3.0 make it particularly suitable for:
 
 # Community and Ecosystem
 Mesa has grown into a complete ecosystem for agent-based modeling, with extensions including:
+
 - [Mesa-Geo](https://github.com/projectmesa/mesa-geo) for geospatial modeling
 - [Mesa-Frames](https://github.com/projectmesa/mesa-frames) for high-performance simulations
 - A rich collection of example models and tutorials
