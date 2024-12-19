@@ -117,7 +117,6 @@ def draw_space(
         agent_portrayal: A callable that returns a dict specifying how to show the agent
         propertylayer_portrayal: a dict specifying how to show propertylayer(s)
         ax: the axes upon which to draw the plot
-        post_process: a callable called with the Axes instance
         space_drawing_kwargs: any additional keyword arguments to be passed on to the underlying function for drawing the space.
 
     Returns:
