@@ -47,7 +47,7 @@ configurations = {
             "parameters": {
                 "height": 100,
                 "width": 100,
-                "homophily": 0.4,
+                "homophily": 1,
                 "radius": 2,
                 "density": 0.8,
             },
