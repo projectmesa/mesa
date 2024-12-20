@@ -151,7 +151,7 @@ class Agent:
 
         Returns:
             Adds the new meta-agent instance to agentset if adding agent to new class or new agent instance
-            - None if adding agent to exsiting class
+            - None if adding agent to existing class
             - New class instance if created a new instance of a dynamically created agent type
             - New class instance if created a new dynamically created agent type
 
@@ -196,7 +196,7 @@ class Agent:
                 # TODO: Add way for user to add function to specify how agents join metaagent
 
         else:
-            # Path 2 - Create a new instance of an exsiting meta-agent class
+            # Path 2 - Create a new instance of an existing meta-agent class
             agent_class = next(
                 (
                     agent_type
