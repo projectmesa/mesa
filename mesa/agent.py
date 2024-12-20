@@ -69,8 +69,8 @@ class Agent:
         self.model.register_agent(self)
         # Private attribute to track parent agent if metaagents are created
         # Uses name mangling to prevent name clashes
-        self.__metaagent = None # Currently restricted to one parent agent
-        
+        self.__metaagent = None  # Currently restricted to one parent agent
+
     def remove(self) -> None:
         """Remove and delete the agent from the model.
 
@@ -135,9 +135,13 @@ class Agent:
             agent = cls(model, *instance_args, **instance_kwargs)
             agents.append(agent)
         return AgentSet(agents, random=model.random)
-    
-    def create_metaagent(self, new_agent_class: str, agents: Iterable[Agent], **unique_attributes_functions) -> None:
 
+    def create_metaagent(
+        self,
+        new_agent_class: str,
+        agents: Iterable[Agent],
+        **unique_attributes_functions,
+    ) -> None:
         """Dynamically create a new meta-agent class and instantiate agents in that class.
 
         Args:
@@ -172,17 +176,17 @@ class Agent:
         def update_agents_metaagent(agents, metaagent):
             for agent in agents:
                 agent._Agent__metaagent = metaagent
-  
+
         # Path 1 - Add agents to existing meta-agent
         subagents = [agent for agent in agents if agent._Agent__metaagent is not None]
-        
+
         if len(subagents) > 0:
-            if len(subagents) == 1: 
+            if len(subagents) == 1:
                 # Update metaagents agent set with new agents
                 subagents[0]._Agent__metaagent.agents.update(agents)
                 # Update subagents with metaagent
                 update_agents_metaagent(agents, subagents[0]._Agent__metaagent)
-            else: 
+            else:
                 # If there are multiple subagents, one is chosen at random to be the parent metaagent
                 subagent = self.random.choice(subagents)
                 # Remove agent who are already part of metaagent
@@ -190,45 +194,56 @@ class Agent:
                 subagent._Agent__metaagent.agents.update(agents)
                 update_agents_metaagent(agents, subagent._Agent__metaagent)
                 # TODO: Add way for user to add function to specify how agents join metaagent
-                    
-        else:      
+
+        else:
             # Path 2 - Create a new instance of an exsiting meta-agent class
-            agent_class = next((agent_type for agent_type in self.model.agent_types if agent_type.__name__ == new_agent_class), None)
+            agent_class = next(
+                (
+                    agent_type
+                    for agent_type in self.model.agent_types
+                    if agent_type.__name__ == new_agent_class
+                ),
+                None,
+            )
             if agent_class:
                 # Create an instance of the meta-agent class
-                meta_agent_instance = agent_class(self.model, **unique_attributes_functions)
+                meta_agent_instance = agent_class(
+                    self.model, **unique_attributes_functions
+                )
                 # Add agents to meta-agent instance
                 meta_agent_instance.agents = agents
                 # Update subagents Agent.__metaagent attribute
-                update_agents_metaagent(agents, meta_agent_instance)  
+                update_agents_metaagent(agents, meta_agent_instance)
                 # Register the new meta-agent instance
                 self.model.register_agent(meta_agent_instance)
 
-                return meta_agent_instance 
-                
+                return meta_agent_instance
+
             # Path 3 - Create a new meta-agent class
-            else: 
+            else:
                 # Get agent types of subagents to create the new meta-agent class
-                agent_types = tuple(set((type(agent) for agent in agents)))
+                agent_types = tuple({type(agent) for agent in agents})
 
                 meta_agent_class = type(
                     new_agent_class,
                     agent_types,
                     {
                         "unique_id": None,
-                        "agents": agents, 
-                    }
+                        "agents": agents,
+                    },
                 )
-                
+
                 # Create an instance of the meta-agent class
-                meta_agent_instance = meta_agent_class(self.model, **unique_attributes_functions)
+                meta_agent_instance = meta_agent_class(
+                    self.model, **unique_attributes_functions
+                )
                 # Register the new meta-agent instance
                 self.model.register_agent(meta_agent_instance)
                 # Update subagents Agent.__metaagent attribute
-                update_agents_metaagent(agents, meta_agent_instance) 
+                update_agents_metaagent(agents, meta_agent_instance)
 
-                return meta_agent_instance  
-    
+                return meta_agent_instance
+
     @property
     def random(self) -> Random:
         """Return a seeded stdlib rng."""
