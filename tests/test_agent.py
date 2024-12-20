@@ -682,3 +682,51 @@ def test_agentset_groupby():
     assert custom_result[False] == custom_agg(
         [agent.value for agent in agents if not agent.even]
     )
+
+
+class TestMetaAgent(Agent):
+    """Test MetaAgent creation."""
+
+    def __init__(self, model, power, position, hierarchy=0):
+        """Initialize a TestMetaAgent."""
+        super().__init__(model)
+        self.power = power
+        self.position = position
+        self.hierarchy = hierarchy
+
+
+def test_create_metaagent():
+    """Test creating a new meta-agent class."""
+    model = Model()
+    agent1 = TestMetaAgent(model, power=0.5, position=0.5)
+    agent2 = TestMetaAgent(model, power=0.6, position=0.6)
+    agent3 = TestMetaAgent(model, power=0.7, position=0.7)
+    agent4 = TestMetaAgent(model, power=0.8, position=0.8)
+
+    # Test creating a new meta-agent class
+    meta = agent1.create_metaagent(
+        "MetaAgentClass1", {agent1, agent2}, power=1.1, position=0.55, hierarchy=1
+    )
+    assert len(model.agent_types) == 2
+    assert len(model.agents) == 5
+    assert meta.power == 1.1
+    assert meta.position == 0.55
+    assert meta.hierarchy == 1
+
+    # Test adding agents to an existing meta-agent
+    agent1.create_metaagent(
+        "MetaAgentClass1", {agent3, agent2}, power=1.8, position=0.65, hierarchy=1
+    )
+    assert len(model.agent_types) == 2
+    assert len(model.agents) == 5
+    assert len(meta.agents) == 3
+
+    # Test creating a new instance of an existing meta-agent class
+    meta2 = agent4.create_metaagent(
+        "MetaAgentClass2", {agent4}, power=0.8, position=0.8, hierarchy=2
+    )
+    assert len(model.agent_types) == 3
+    assert len(model.agents) == 6
+    assert meta2.power == 0.8
+    assert meta2.position == 0.8
+    assert meta2.hierarchy == 2
