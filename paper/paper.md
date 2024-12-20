@@ -108,7 +108,7 @@ class ForestCell(Cell):
             self.spread_fire()
 ```
 
-### Time management 
+### Time management
 Mesa offers flexible approaches to time management:
 
 1. Simple step-based progression:
