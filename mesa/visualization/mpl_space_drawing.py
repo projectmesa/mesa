@@ -271,8 +271,10 @@ def draw_orthogonal_grid(
 
     # First draw cell colors if they exist
     if hasattr(space, "all_cells"):  # Check if it's a cell space
-        cell_colors = np.full((space.height, space.width, 4), [1, 1, 1, 0])  # Transparent default
-        
+        cell_colors = np.full(
+            (space.height, space.width, 4), [1, 1, 1, 0]
+        )  # Transparent default
+
         for cell in space.all_cells:
             if hasattr(cell, "color"):
                 x, y = cell.coordinate
@@ -285,9 +287,9 @@ def draw_orthogonal_grid(
                         UserWarning,
                         stacklevel=2,
                     )
-        
+
         # Plot the cell colors
-        ax.imshow(cell_colors, origin='lower', interpolation='nearest')
+        ax.imshow(cell_colors, origin="lower", interpolation="nearest")
 
     # gather agent data
     s_default = (180 / max(space.width, space.height)) ** 2
@@ -308,6 +310,7 @@ def draw_orthogonal_grid(
             ax.axhline(y, color="gray", linestyle=":")
 
     return ax
+
 
 def draw_hex_grid(
     space: HexGrid,
@@ -338,20 +341,20 @@ def draw_hex_grid(
     if hasattr(space, "all_cells"):
         patches = []
         offset = math.sqrt(0.75)
-        
+
         for cell in space.all_cells:
             x, y = cell.coordinate
             if y % 2 == 0:
                 x += 0.5
             y *= offset
-            
+
             hex_patch = RegularPolygon(
                 (x, y),
                 numVertices=6,
                 radius=math.sqrt(1 / 3),
                 orientation=np.radians(120),
             )
-            
+
             if hasattr(cell, "color"):
                 try:
                     hex_patch.set_facecolor(cell.color)
@@ -361,12 +364,12 @@ def draw_hex_grid(
                         UserWarning,
                         stacklevel=2,
                     )
-                    hex_patch.set_facecolor('none')
+                    hex_patch.set_facecolor("none")
             else:
-                hex_patch.set_facecolor('none')
-                
+                hex_patch.set_facecolor("none")
+
             patches.append(hex_patch)
-        
+
         # Add colored hexagons
         cell_collection = PatchCollection(patches, match_original=True)
         ax.add_collection(cell_collection)
