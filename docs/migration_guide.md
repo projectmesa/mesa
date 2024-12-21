@@ -259,6 +259,17 @@ the import from mesa.experimental. Otherwise here is a list of things you need t
 
 Previously SolaraViz was initialized by providing a `model_cls` and a `model_params`. This has changed to expect a model instance `model`. You can still provide (user-settable) `model_params`, but only if users should be able to change them. It is now also possible to pass in a "reactive model" by first calling `model = solara.reactive(model)`. This is useful for notebook environments. It allows you to pass the model to the SolaraViz Module, but continue to use the model. For example calling `model.value.step()` (notice the extra .value) will automatically update the plots. This currently only automatically works for the step method, you can force visualization updates by calling `model.value.force_update()`.
 
+### Model Initialization with Keyword Arguments
+
+With the introduction of SolaraViz in Mesa 3.0, models are now instantiated using `**model_parameters.value`. This means all inputs for initializing a new model must be keyword arguments. Ensure your model's `__init__` method accepts keyword arguments matching the keys in `model_params`.
+
+```python
+class MyModel(mesa.Model):
+    def __init__(self, n_agents=10, seed=None):
+        super().__init__(seed=seed)
+        # Initialize the model with N agents
+```
+
 #### Default space visualization
 
 Previously we included a default space drawer that you could configure with an `agent_portrayal` function. You now have to explicitly create a space drawer with the `agent_portrayal` function

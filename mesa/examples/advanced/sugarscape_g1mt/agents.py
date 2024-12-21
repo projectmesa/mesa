@@ -1,6 +1,6 @@
 import math
 
-from mesa.experimental.cell_space import CellAgent, FixedAgent
+from mesa.experimental.cell_space import CellAgent
 
 
 # Helper function
@@ -16,31 +16,6 @@ def get_distance(cell_1, cell_2):
     dx = x1 - x2
     dy = y1 - y2
     return math.sqrt(dx**2 + dy**2)
-
-
-class Resource(FixedAgent):
-    """
-    Resource:
-    - contains an amount of sugar and spice
-    - grows 1 amount of sugar at each turn
-    - grows 1 amount of spice at each turn
-    """
-
-    def __init__(self, model, max_sugar, max_spice, cell):
-        super().__init__(model)
-        self.sugar_amount = max_sugar
-        self.max_sugar = max_sugar
-        self.spice_amount = max_spice
-        self.max_spice = max_spice
-        self.cell = cell
-
-    def step(self):
-        """
-        Growth function, adds one unit of sugar and spice each step up to
-        max amount
-        """
-        self.sugar_amount = min([self.max_sugar, self.sugar_amount + 1])
-        self.spice_amount = min([self.max_spice, self.spice_amount + 1])
 
 
 class Trader(CellAgent):
@@ -70,12 +45,6 @@ class Trader(CellAgent):
         self.prices = []
         self.trade_partners = []
 
-    def get_resource(self, cell):
-        for agent in cell.agents:
-            if isinstance(agent, Resource):
-                return agent
-        raise Exception(f"Resource agent not found in the position {cell.coordinate}")
-
     def get_trader(self, cell):
         """
         helper function used in self.trade_with_neighbors()
@@ -84,17 +53,6 @@ class Trader(CellAgent):
         for agent in cell.agents:
             if isinstance(agent, Trader):
                 return agent
-
-    def is_occupied_by_other(self, cell):
-        """
-        helper function part 1 of self.move()
-        """
-
-        if cell is self.cell:
-            # agent's position is considered unoccupied as agent can stay there
-            return False
-        # get contents of each cell in neighborhood
-        return any(isinstance(a, Trader) for a in cell.agents)
 
     def calculate_welfare(self, sugar, spice):
         """
@@ -264,15 +222,15 @@ class Trader(CellAgent):
         neighboring_cells = [
             cell
             for cell in self.cell.get_neighborhood(self.vision, include_center=True)
-            if not self.is_occupied_by_other(cell)
+            if cell.is_empty
         ]
 
         # 2. determine which move maximizes welfare
 
         welfares = [
             self.calculate_welfare(
-                self.sugar + self.get_resource(cell).sugar_amount,
-                self.spice + self.get_resource(cell).spice_amount,
+                self.sugar + cell.sugar,
+                self.spice + cell.spice,
             )
             for cell in neighboring_cells
         ]
@@ -282,6 +240,7 @@ class Trader(CellAgent):
         # find the highest welfare in welfares
         max_welfare = max(welfares)
         # get the index of max welfare cells
+        # fixme: rewrite using enumerate and single loop
         candidate_indices = [
             i for i in range(len(welfares)) if math.isclose(welfares[i], max_welfare)
         ]
@@ -296,19 +255,17 @@ class Trader(CellAgent):
             for cell in candidates
             if math.isclose(get_distance(self.cell, cell), min_dist, rel_tol=1e-02)
         ]
+
         # 4. Move Agent
         self.cell = self.random.choice(final_candidates)
 
     def eat(self):
-        patch = self.get_resource(self.cell)
-        if patch.sugar_amount > 0:
-            self.sugar += patch.sugar_amount
-            patch.sugar_amount = 0
+        self.sugar += self.cell.sugar
+        self.cell.sugar = 0
         self.sugar -= self.metabolism_sugar
 
-        if patch.spice_amount > 0:
-            self.spice += patch.spice_amount
-            patch.spice_amount = 0
+        self.spice += self.cell.spice
+        self.cell.spice = 0
         self.spice -= self.metabolism_spice
 
     def maybe_die(self):
@@ -327,18 +284,8 @@ class Trader(CellAgent):
         2- trade (2 sessions)
         3- collect data
         """
-
-        neighbor_agents = [
-            self.get_trader(cell)
-            for cell in self.cell.get_neighborhood(radius=self.vision)
-            if self.is_occupied_by_other(cell)
-        ]
-
-        if len(neighbor_agents) == 0:
-            return
-
-            # iterate through traders in neighboring cells and trade
-        for a in neighbor_agents:
+        # iterate through traders in neighboring cells and trade
+        for a in self.cell.get_neighborhood(radius=self.vision).agents:
             self.trade(a)
 
         return
