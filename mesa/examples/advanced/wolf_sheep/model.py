@@ -92,19 +92,19 @@ class WolfSheep(Model):
 
         self.datacollector = DataCollector(model_reporters)
 
-        obstructionArr = [[False]*self.width for i in range(self.height)]
+        cliff_arr = [[False]*self.width for i in range(self.height)]
         
-        obstructionCoord = set([(random.randrange(self.height), random.randrange(self.width)) for i in range(10)] ) # set is used because the random number gen might return the same coordinate
-        for i,j in obstructionCoord:
-            obstructionArr[i][j] = True
+        cliff_coord = set([(random.randrange(self.height), random.randrange(self.width)) for i in range((width*height)//3)] ) # set is used because the random number gen might return the same coordinate
+        for i,j in cliff_coord:
+            cliff_arr[i][j] = True
 
-        obstructionArr = np.array(obstructionArr)
+        cliff_arr = np.array(cliff_arr)
 
-        self.grid.add_property_layer(PropertyLayer.from_data("obstruction", obstructionArr))
+        self.grid.add_property_layer(PropertyLayer.from_data("cliff", cliff_arr))
 
         possibleCells = []
         for cell in self.grid.all_cells.cells:
-            if (cell.coordinate[0], cell.coordinate[1]) not in obstructionCoord: # so we don't create wolf or sheep on obstructed cells
+            if (cell.coordinate[0], cell.coordinate[1]) not in cliff_coord: # so we don't create wolf or sheep on cliff cells
                 possibleCells.append(cell)
 
         # Create sheep:
