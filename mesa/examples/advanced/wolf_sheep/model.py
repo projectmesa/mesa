@@ -99,8 +99,8 @@ class WolfSheep(Model):
         cliff_arr = [[False] * self.width for i in range(self.height)]
 
         cliff_coord = {
-                (random.randrange(self.height), random.randrange(self.width))
-                for i in range((width * height) // 3)
+            (random.randrange(self.height), random.randrange(self.width))
+            for i in range((width * height) // 3)
         }  # set is used because the random number gen might return the same coordinate
         for i, j in cliff_coord:
             cliff_arr[i][j] = True
