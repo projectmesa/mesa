@@ -16,6 +16,9 @@ from mesa.datacollection import DataCollector
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
 from mesa.experimental.devs import ABMSimulator
+from mesa.experimental.cell_space.property_layer import PropertyLayer
+import numpy as np
+import random
 
 
 class WolfSheep(Model):
@@ -71,7 +74,7 @@ class WolfSheep(Model):
 
         # Create grid using experimental cell space
         self.grid = OrthogonalVonNeumannGrid(
-            [self.height, self.width],
+            (self.height, self.width), # use tuple instead of list, otherwise it would fail the dimension check in add_property_layer
             torus=True,
             capacity=math.inf,
             random=self.random,
@@ -89,6 +92,21 @@ class WolfSheep(Model):
 
         self.datacollector = DataCollector(model_reporters)
 
+        obstructionArr = [[False]*self.width for i in range(self.height)]
+        
+        obstructionCoord = set([(random.randrange(self.height), random.randrange(self.width)) for i in range(10)] ) # set is used because the random number gen might return the same coordinate
+        for i,j in obstructionCoord:
+            obstructionArr[i][j] = True
+
+        obstructionArr = np.array(obstructionArr)
+
+        self.grid.add_property_layer(PropertyLayer.from_data("obstruction", obstructionArr))
+
+        possibleCells = []
+        for cell in self.grid.all_cells.cells:
+            if (cell.coordinate[0], cell.coordinate[1]) not in obstructionCoord: # so we don't create wolf or sheep on obstructed cells
+                possibleCells.append(cell)
+
         # Create sheep:
         Sheep.create_agents(
             self,
@@ -96,7 +114,7 @@ class WolfSheep(Model):
             energy=self.rng.random((initial_sheep,)) * 2 * sheep_gain_from_food,
             p_reproduce=sheep_reproduce,
             energy_from_food=sheep_gain_from_food,
-            cell=self.random.choices(self.grid.all_cells.cells, k=initial_sheep),
+            cell=self.random.choices(possibleCells, k=initial_sheep),
         )
         # Create Wolves:
         Wolf.create_agents(
@@ -105,7 +123,7 @@ class WolfSheep(Model):
             energy=self.rng.random((initial_wolves,)) * 2 * wolf_gain_from_food,
             p_reproduce=wolf_reproduce,
             energy_from_food=wolf_gain_from_food,
-            cell=self.random.choices(self.grid.all_cells.cells, k=initial_wolves),
+            cell=self.random.choices(possibleCells, k=initial_wolves),
         )
 
         # Create grass patches if enabled
