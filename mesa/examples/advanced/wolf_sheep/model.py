@@ -10,15 +10,16 @@ Replication of the model found in NetLogo:
 """
 
 import math
+import random
+
+import numpy as np
 
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
-from mesa.experimental.devs import ABMSimulator
 from mesa.experimental.cell_space.property_layer import PropertyLayer
-import numpy as np
-import random
+from mesa.experimental.devs import ABMSimulator
 
 
 class WolfSheep(Model):
@@ -74,7 +75,10 @@ class WolfSheep(Model):
 
         # Create grid using experimental cell space
         self.grid = OrthogonalVonNeumannGrid(
-            (self.height, self.width), # use tuple instead of list, otherwise it would fail the dimension check in add_property_layer
+            (
+                self.height,
+                self.width,
+            ),  # use tuple instead of list, otherwise it would fail the dimension check in add_property_layer
             torus=True,
             capacity=math.inf,
             random=self.random,
@@ -92,10 +96,13 @@ class WolfSheep(Model):
 
         self.datacollector = DataCollector(model_reporters)
 
-        cliff_arr = [[False]*self.width for i in range(self.height)]
-        
-        cliff_coord = set([(random.randrange(self.height), random.randrange(self.width)) for i in range((width*height)//3)] ) # set is used because the random number gen might return the same coordinate
-        for i,j in cliff_coord:
+        cliff_arr = [[False] * self.width for i in range(self.height)]
+
+        cliff_coord = {
+                (random.randrange(self.height), random.randrange(self.width))
+                for i in range((width * height) // 3)
+        }  # set is used because the random number gen might return the same coordinate
+        for i, j in cliff_coord:
             cliff_arr[i][j] = True
 
         cliff_arr = np.array(cliff_arr)
@@ -104,7 +111,10 @@ class WolfSheep(Model):
 
         possibleCells = []
         for cell in self.grid.all_cells.cells:
-            if (cell.coordinate[0], cell.coordinate[1]) not in cliff_coord: # so we don't create wolf or sheep on cliff cells
+            if (
+                cell.coordinate[0],
+                cell.coordinate[1],
+            ) not in cliff_coord:  # so we don't create wolf or sheep on cliff cells
                 possibleCells.append(cell)
 
         # Create sheep:
