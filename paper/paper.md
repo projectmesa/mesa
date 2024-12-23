@@ -90,7 +90,7 @@ The framework automatically handles agent lifecycle management, including:
 
 
 ### Spaces
-Mesa offers a variaty of spaces within which agents can be located. A basic distinction is between discrete or cell-based spaces, and continous space. In discrete spaces, the space consists of a collection of cells and agents occupy a cell. Examples of this include orthogonal grids, hexgrids, voroinoi meshes, or networks. In a continous space, in constrast, an agent has a location. 
+Mesa offers a variaty of spaces within which agents can be located. A basic distinction is between discrete or cell-based spaces, and continous space. In discrete spaces, the space consists of a collection of cells and agents occupy a cell. Examples of this include orthogonal grids, hexgrids, voroinoi meshes, or networks. In a continous space, in constrast, an agent has a location.
 
 Mesa comes with a wide variety of discrete spaces, including OrthogonalMooreGrid, OrthogonalVonNeumanGrid, Hexgrid, Network, and VoroinoiMesh. These are all implemented using a doubly linked data structure where each cell has connections to its neighboring cells. The different discrete spaces differ with respect to how they are "wired-up", but the API is uniform across all of them.
 
