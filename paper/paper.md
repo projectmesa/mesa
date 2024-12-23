@@ -34,23 +34,40 @@ preferred-citation: article
 ---
 
 # Summary
-Mesa is an open-source Python framework for agent-based modeling (ABM) that enables researchers to create, analyze and visualize agent-based simulations. Mesa provides a comprehensive set of tools and abstractions for modeling complex systems, with capabilities spanning from basic agent management to sophisticated environmental modeling and interactive visualization. By leveraging Python's scientific computing ecosystem, Mesa offers a powerful yet accessible platform for researchers across disciplines. This paper presents Mesa in its current version (3.1.1) as of late 2024.
+Mesa is an open-source Python framework for agent-based modeling (ABM) that enables researchers to create, analyze, and visualize agent-based simulations. Mesa provides a comprehensive set of tools and abstractions for modeling complex systems, with capabilities spanning from basic agent management to sophisticated representation of spaces within which agents interact. By leveraging Python's scientific computing ecosystem, Mesa offers a powerful yet accessible platform for researchers across disciplines. This paper presents Mesa in its current version (3.1.1) as of late 2024.
 
 # Statement of need
-Agent-based modeling is a powerful approach for studying complex systems across many disciplines, from economics and sociology to ecology and epidemiology. As simulations grow more sophisticated, researchers need frameworks that can efficiently handle complex agents and environments while remaining approachable and flexible. While established platforms like NetLogo and MASON exist, there is a clear need for a modern, Python-based framework that integrates with the scientific Python ecosystem and provides robust ABM capabilities.
+Agent-based modeling is a powerful approach for studying complex systems across many disciplines, from economics and sociology to ecology and epidemiology. As simulations grow more sophisticated, researchers need frameworks that can efficiently handle complex agents and their environments, while remaining approachable and flexible. While established platforms like NetLogo and MASON exist, there is a clear need for a modern, Python-based framework that integrates with the scientific Python ecosystem and provides robust ABM capabilities.
 
 Mesa addresses this need by offering a modular, extensible framework that leverages Python's strengths in scientific computing and data analysis. It provides a comprehensive set of tools for creating, running, and analyzing agent-based models while maintaining Python's emphasis on readability and simplicity.
 
 # Core capabilities
+Agent-based models, or artificial societies, are composed of autonomous heteregouneous agents that are positioned in one or more space(s). Given a space, agents have *local* interactions with their neighbors. The aggregate dynamics of a system under study emerges from these local interactions (Epstein, chapter 2, AGENT-BASED COMPUTATIONAL MODELS AND GENERATIVE SOCIAL SCIENCE; Epstein Axtel (1996)). That is, "*situate an initial population of autonomous heterogeneous agents in a relevant spatial environment; allow them to interact according to simple local rules, and thereby generate—or “grow”—the macroscopic regularity from the bottom up*" (Epstein, axtel 1996; add page number!). 
+
+
 Mesa is implemented in pure Python (3.11+) with a modular architecture separating:
-1. Core ABM components (agents, spaces, model management)
-2. Data collection and analysis
+1. Core ABM components (*i.e.,* agents, spaces, agent activation, control over random numbers)
+2. Data collection and support for model experimentation
 3. Visualization systems
 
 This design allows selective use of components while enabling extension and customization. The framework integrates with the scientific Python ecosystem including NumPy, pandas, and Matplotlib.
 
 ## Core ABM components
+
+some prelim stuff on rng and the model class
+
+
+### Agents
+
+* the agent is a central concept in ABM
+* in mesa it is a class that is designed to be subclassed by the user
+* basic structure: `__init__` and `__step__`
+* various subclasses are availble for more sophisticated functionality
+* the risk of memory leaks, so agents automatigcally register themselves with the model and have a remove method 
+
 ### Agent management
+since memory leaks are key thing, agent sets internally use weakrefs
+
 Mesa's agent management system is built around the central concept of AgentSets, which provide intuitive ways to organize and manipulate collections of agents:
 
 ```python
@@ -67,11 +84,18 @@ for species, agents in grouped:
 The framework automatically handles agent lifecycle management, including:
 - Unique ID assignment
 - Agent registration and removal
-- Type-based organization
+- Agent subclass-based organization
 - Efficient collective operations
 
-### Spatial modeling
+
+
+### Spaces
 Mesa supports multiple approaches to spatial modeling:
+
+1. discrete spaces
+
+* grids, latices, networks, meshes
+* property layers
 
 1. Grid-based spaces:
 ```python
@@ -84,12 +108,6 @@ neighbors = grid.get_neighbors(pos, moore=True)
 ```python
 network = NetworkGrid(networkx_graph)
 network.get_neighbors(agent, include_center=False)
-```
-
-3. Continuous spaces:
-```python
-space = ContinuousSpace(x_max, y_max, torus=True)
-space.move_agent(agent, (new_x, new_y))
 ```
 
 Environmental properties can be modeled using PropertyLayers:
@@ -108,25 +126,88 @@ class ForestCell(Cell):
             self.spread_fire()
 ```
 
-### Time management
-Mesa offers flexible approaches to time management:
 
-1. Simple step-based progression:
+2. Continuous spaces:
+
+```python
+space = ContinuousSpace(x_max, y_max, torus=True)
+space.move_agent(agent, (new_x, new_y))
+```
+
+
+
+
+### Time advancement
+Typically agent based models rely on discrete time advancement, or ticks. For each tick, the step method of the model is called. This in turn activates activates the agents in some way. The most frequent encountered approach is shown below, which runs a model for 100 ticks.
+
+```python
+
+model = Model(seed=42)
+
+for _ in range(100):
+    model.step()
+
+```
+
+Generally, within the step method of the model, one activates all the agents. The AgentSet class can be used for this. Some common agent activation patterns are shown below
+
+1. Deterministic activation of agent
+```python
+model.agents.do("step")  # Random activation
+```
+
+2. Random activation of agents
 ```python
 model.agents.shuffle_do("step")  # Random activation
 ```
 
-2. Multi-stage activation:
+3. Multi-stage activation:
 ```python
 for stage in ["move", "eat", "reproduce"]:
     model.agents.do(stage)
 ```
 
-3. Event-based scheduling for non-uniform time steps:
+4. Activation by agent subclass:
 ```python
-scheduler = DiscreteEventScheduler(model)
-scheduler.add_event(SimEvent(time=3.5, target=agent))
+for klass in model.agent_types:
+    model.agents_by_type[klass].do("step")
 ```
+
+Evidently, these activation patterns can be combined to create more sophisticated and complex activation patterns. For example
+
+
+4. Activation by agent subclass:
+```python
+agent_klasses = model.agent_types
+model.random.shuffle(agent_klasses)
+for klass in agent_klasses:
+    model.agents_by_type[klass].shuffle_do("step")
+```
+
+
+A more advanced alternative to discrete time advancement is discrete event simulation. Here, the simulation consists of a series of time stamped events. The simulation executes the events for a given timestep, Next, the simulation clock is advancent to the time stamp of the next event. Mesa offers basic support for discrete event simulation using a Discrete event simulator. The design is inspired by Ziegler (add ref), and the java-based DSOL library (add ref).
+
+
+1. Event-based scheduling for non-uniform time steps:
+```python
+devs_simulator = DiscreteEventSimulator()
+model = Model(seed=42, simulator=devs_simulator)
+
+devs_simulator.schedule_event_relative(some_function_to_execute, some_time_interval)
+devs_simulator.run_until(end_time)
+```
+
+It is also possible to create hybrid models that combine discrete time advancement as typically seen in agent based models, with event scheduling. For this, MESA comes with an ABMSimulator. This simulator has integer based time steps. It automatically schedules the step method of the model for each time tick. However, it is also possible to schedule events on these ticks. This allows for hybrid models combining the ease of discrete time advancement seen in typical ABMs, with the power, flexibility, and potential for substantial runtime reductions of event scheduling. 
+
+1. Hybrid discrete time advancement with event scheduling
+```python
+abm_simulator = ABMSimulator()
+model = Model(seed=42, simulator=devs_simulator)
+
+abm_simulator.schedule_event_relative(some_function_to_execute, some_time_interval)
+abm_simulator.run_until(end_time)
+```
+
 
 ## Visualization
 Mesa's visualization system, SolaraViz, provides interactive browser-based model exploration:
