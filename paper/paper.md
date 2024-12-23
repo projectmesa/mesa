@@ -42,7 +42,7 @@ Agent-based modeling is a powerful approach for studying complex systems across 
 Mesa addresses this need by offering a modular, extensible framework that leverages Python's strengths in scientific computing and data analysis. It provides a comprehensive set of tools for creating, running, and analyzing agent-based models while maintaining Python's emphasis on readability and simplicity.
 
 # Core capabilities
-Agent-based models, or artificial societies, are composed of autonomous heteregouneous agents that are positioned in one or more space(s). Given a space, agents have *local* interactions with their neighbors. The aggregate dynamics of a system under study emerges from these local interactions (Epstein, chapter 2, AGENT-BASED COMPUTATIONAL MODELS AND GENERATIVE SOCIAL SCIENCE; Epstein Axtel (1996)). That is, "*situate an initial population of autonomous heterogeneous agents in a relevant spatial environment; allow them to interact according to simple local rules, and thereby generate—or “grow”—the macroscopic regularity from the bottom up*" (Epstein, axtel 1996; add page number!). 
+Agent-based models, or artificial societies, are composed of autonomous heteregouneous agents that are positioned in one or more space(s). Given a space, agents have *local* interactions with their neighbors. The aggregate dynamics of a system under study emerges from these local interactions (Epstein, chapter 2, AGENT-BASED COMPUTATIONAL MODELS AND GENERATIVE SOCIAL SCIENCE; Epstein Axtel (1996)). That is, "*situate an initial population of autonomous heterogeneous agents in a relevant spatial environment; allow them to interact according to simple local rules, and thereby generate—or “grow”—the macroscopic regularity from the bottom up*" (Epstein, axtel 1996; add page number!).
 
 
 Mesa is implemented in pure Python (3.11+) with a modular architecture separating:
@@ -63,7 +63,7 @@ some prelim stuff on rng and the model class
 * in mesa it is a class that is designed to be subclassed by the user
 * basic structure: `__init__` and `__step__`
 * various subclasses are availble for more sophisticated functionality
-* the risk of memory leaks, so agents automatigcally register themselves with the model and have a remove method 
+* the risk of memory leaks, so agents automatigcally register themselves with the model and have a remove method
 
 ### Agent management
 since memory leaks are key thing, agent sets internally use weakrefs
@@ -197,7 +197,7 @@ devs_simulator.schedule_event_relative(some_function_to_execute, some_time_inter
 devs_simulator.run_until(end_time)
 ```
 
-It is also possible to create hybrid models that combine discrete time advancement as typically seen in agent based models, with event scheduling. For this, MESA comes with an ABMSimulator. This simulator has integer based time steps. It automatically schedules the step method of the model for each time tick. However, it is also possible to schedule events on these ticks. This allows for hybrid models combining the ease of discrete time advancement seen in typical ABMs, with the power, flexibility, and potential for substantial runtime reductions of event scheduling. 
+It is also possible to create hybrid models that combine discrete time advancement as typically seen in agent based models, with event scheduling. For this, MESA comes with an ABMSimulator. This simulator has integer based time steps. It automatically schedules the step method of the model for each time tick. However, it is also possible to schedule events on these ticks. This allows for hybrid models combining the ease of discrete time advancement seen in typical ABMs, with the power, flexibility, and potential for substantial runtime reductions of event scheduling.
 
 1. Hybrid discrete time advancement with event scheduling
 ```python
