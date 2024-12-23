@@ -90,14 +90,16 @@ The framework automatically handles agent lifecycle management, including:
 
 
 ### Spaces
-Mesa supports multiple approaches to spatial modeling:
+Mesa offers a variaty of spaces within which agents can be located. A basic distinction is between discrete or cell-based spaces, and continous space. In discrete spaces, the space consists of a collection of cells and agents occupy a cell. Examples of this include orthogonal grids, hexgrids, voroinoi meshes, or networks. In a continous space, in constrast, an agent has a location. 
 
-1. discrete spaces
+Mesa comes with a wide variety of discrete spaces, including OrthogonalMooreGrid, OrthogonalVonNeumanGrid, Hexgrid, Network, and VoroinoiMesh. These are all implemented using a doubly linked data structure where each cell has connections to its neighboring cells. The different discrete spaces differ with respect to how they are "wired-up", but the API is uniform across all of them.
 
-* grids, latices, networks, meshes
+Mesa also offers 3 subclasses of the Agent class that are designed to be used in conjunction with these discrete spaces: FixedAgent, CellAgent, and Grid2DMovingAgent. FixedAgent is assigned to a given cell and can access this cell via `self.cell`. However, once assigned to a given cell, it can not be moved. A CellAgent, like a FixedAgent, has access to the cell it currently occupies. However, it can update this attribute making it possible to move around. A Grid2DMovingAgent extends CellAgent by offering a move method with short hand for the direction of movement.
+
+<!-- * grids, latices, networks, meshes
 * property layers
 
-1. Grid-based spaces:
+. Grid-based spaces:
 ```python
 grid = MultiGrid(width, height, torus=True)
 grid.place_agent(agent, (x, y))
@@ -108,23 +110,17 @@ neighbors = grid.get_neighbors(pos, moore=True)
 ```python
 network = NetworkGrid(networkx_graph)
 network.get_neighbors(agent, include_center=False)
-```
+``` -->
 
-Environmental properties can be modeled using PropertyLayers:
-```python
+The OrthogonalMooreGrid, OrthogonalVonNeumanGrid and Hexgrid come with support for numpy based layers with additional data: PropertyLayers. Cells have attribute access to their value in each of these property layers, while the entire layer can be accessed from the space itself.
+
+<!-- ```python
 elevation = PropertyLayer("elevation", width, height)
 grid.add_property_layer(elevation)
 high_ground = grid.properties["elevation"].select_cells(lambda x: x > 50)
-```
+``` -->
 
-For more sophisticated environmental modeling, the experimental cell space system enables active cells with their own properties and behaviors:
 
-```python
-class ForestCell(Cell):
-    def step(self):
-        if self.on_fire:
-            self.spread_fire()
-```
 
 
 2. Continuous spaces:
@@ -175,15 +171,13 @@ for klass in model.agent_types:
 
 Evidently, these activation patterns can be combined to create more sophisticated and complex activation patterns. For example
 
-
-4. Activation by agent subclass:
+4. Random activation of random agent subclass
 ```python
 agent_klasses = model.agent_types
 model.random.shuffle(agent_klasses)
 for klass in agent_klasses:
     model.agents_by_type[klass].shuffle_do("step")
 ```
-
 
 A more advanced alternative to discrete time advancement is discrete event simulation. Here, the simulation consists of a series of time stamped events. The simulation executes the events for a given timestep, Next, the simulation clock is advancent to the time stamp of the next event. Mesa offers basic support for discrete event simulation using a Discrete event simulator. The design is inspired by Ziegler (add ref), and the java-based DSOL library (add ref).
 
@@ -193,7 +187,7 @@ A more advanced alternative to discrete time advancement is discrete event simul
 devs_simulator = DiscreteEventSimulator()
 model = Model(seed=42, simulator=devs_simulator)
 
-devs_simulator.schedule_event_relative(some_function_to_execute, some_time_interval)
+devs_simulator.schedule_event_relative(some_function_to_execute, 3.1415)
 devs_simulator.run_until(end_time)
 ```
 
@@ -202,9 +196,9 @@ It is also possible to create hybrid models that combine discrete time advanceme
 1. Hybrid discrete time advancement with event scheduling
 ```python
 abm_simulator = ABMSimulator()
-model = Model(seed=42, simulator=devs_simulator)
+model = Model(seed=42, simulator=abm_simulator)
 
-abm_simulator.schedule_event_relative(some_function_to_execute, some_time_interval)
+abm_simulator.schedule_event_next_tick(some_function_to_execute)
 abm_simulator.run_until(end_time)
 ```
 
