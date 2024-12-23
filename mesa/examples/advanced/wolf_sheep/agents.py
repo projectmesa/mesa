@@ -40,7 +40,7 @@ class Animal(CellAgent):
         """Execute one step of the animal's behavior."""
         # Move to random neighboring cell
         self.move()
-        is_cliff = self.grid.model.cliff.data[self.cell.coordinate[0]][
+        is_cliff = self.model.grid.cliff.data[self.cell.coordinate[0]][
             self.cell.coordinate[1]
         ]
         if is_cliff:  # if the cell is a cliff, then the animal dies
