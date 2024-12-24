@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      
+
       - name: Set up Vale
         run: |
           curl -sSL https://github.com/errata-ai/vale/releases/download/v2.12.0/vale_2.12.0_Linux_64-bit.tar.gz | tar -xz -C /tmp
