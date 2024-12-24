@@ -53,7 +53,7 @@ This design allows selective use of components while enabling extension and cust
 The central class in MESA is the Model. Mesa provides a base model class that the user is expected to extend. Within this model, the user instantiates the space and populates it with agent instances. Since ABMs are typically stochastic simulations, the model also controls the random number generation.
 
 ### Agents
-Central to ABMs are the autonomous heterogenous agents. Mesa provides a variety of base agent classes which the user can subclass. In its most basic implementation, such an agent subclass specifies the  `__init__` and `step` method. Any subclass of the basic mesa agent subclass registers itself with the specified model instance, and via `agent.remove` it will remove itself from the model. It is strongly encouraged to rely on `remove`, and even extent it if needed to ensure agents are fully removed from the simulation.
+Central to ABMs are the autonomous heterogeneous agents. Mesa provides a variety of base agent classes which the user can subclass. In its most basic implementation, such an agent subclass specifies the  `__init__` and `step` method. Any subclass of the basic mesa agent subclass registers itself with the specified model instance, and via `agent.remove` it will remove itself from the model. It is strongly encouraged to rely on `remove`, and even extent it if needed to ensure agents are fully removed from the simulation.
 
 ### Agent management
 The management of large groups of agents is criticical in ABMs. Mesa's agent management system is built around the central concept of AgentSet, which provide intuitive ways to organize and manipulate collections of agents:
@@ -70,7 +70,7 @@ for species, agents in grouped:
 ```
 
 ### Spaces
-Mesa offers a variety of spaces within which agents can be located. A basic distinction is between discrete or cell-based spaces, and continous space. In discrete spaces, the space consists of a collection of cells and agents occupy a cell. Examples of this include orthogonal grids, hexgrids, voroinoi meshes, or networks. In a continous space, in constrast, an agent has a location.
+Mesa offers a variety of spaces within which agents can be located. A basic distinction is between discrete or cell-based spaces, and continuous space. In discrete spaces, the space consists of a collection of cells and agents occupy a cell. Examples of this include orthogonal grids, hexgrids, voroinoi meshes, or networks. In a continuous space, in constrast, an agent has a location.
 
 Mesa comes with a wide variety of discrete spaces, including OrthogonalMooreGrid, OrthogonalVonNeumanGrid, Hexgrid, Network, and VoroinoiMesh. These are all implemented using a doubly linked data structure where each cell has connections to its neighboring cells. The different discrete spaces differ with respect to how they are "wired-up", but the API is uniform across all of them.
 
