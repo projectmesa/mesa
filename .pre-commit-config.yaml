@@ -32,3 +32,4 @@ repos:
         "--ignore-words",
         ".codespellignore",
       ]
+      exclude: .vale/styles/Microsoft/Avoid.yml
