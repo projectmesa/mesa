@@ -70,7 +70,7 @@ for species, agents in grouped:
 ```
 
 ### Spaces
-Mesa offers a variety of spaces within which agents can be located. A basic distinction is between discrete or cell-based spaces, and continuous space. In discrete spaces, the space consists of a collection of cells and agents occupy a cell. Examples of this include orthogonal grids, hexgrids, voroinoi meshes, or networks. In a continuous space, in constrast, an agent has a location.
+Mesa offers a variety of spaces within which agents can be located. A basic distinction is between discrete or cell-based spaces, and continuous space. In discrete spaces, the space consists of a collection of cells and agents occupy a cell. Examples of this include orthogonal grids, hexgrids, voroinoi meshes, or networks. In a continuous space, in contrast, an agent has a location.
 
 Mesa comes with a wide variety of discrete spaces, including OrthogonalMooreGrid, OrthogonalVonNeumanGrid, Hexgrid, Network, and VoroinoiMesh. These are all implemented using a doubly linked data structure where each cell has connections to its neighboring cells. The different discrete spaces differ with respect to how they are "wired-up", but the API is uniform across all of them.
 
@@ -156,7 +156,7 @@ devs_simulator.run_until(end_time)
 
 It is also possible to create hybrid models that combine discrete time advancement as typically seen in agent based models, with event scheduling. For this, MESA comes with an ABMSimulator. This simulator has integer based time steps. It automatically schedules the step method of the model for each time tick. However, it is also possible to schedule events on these ticks. This allows for hybrid models combining the ease of discrete time advancement seen in typical ABMs, with the power, flexibility, and potential for substantial runtime reductions of event scheduling.
 
-1. Hybrid discrete time advancement with event scheduling
+2. Hybrid discrete time advancement with event scheduling
 ```python
 abm_simulator = ABMSimulator()
 model = Model(seed=42, simulator=abm_simulator)
