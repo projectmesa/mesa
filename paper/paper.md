@@ -37,15 +37,12 @@ preferred-citation: article
 Mesa is an open-source Python framework for agent-based modeling (ABM) that enables researchers to create, analyze, and visualize agent-based simulations. Mesa provides a comprehensive set of tools and abstractions for modeling complex systems, with capabilities spanning from basic agent management to sophisticated representation of spaces within which agents interact. By leveraging Python's scientific computing ecosystem, Mesa offers a powerful yet accessible platform for researchers across disciplines. This paper presents Mesa in its current version (3.1.1) as of late 2024.
 
 # Statement of need
-Agent-based modeling is a powerful approach for studying complex systems across many disciplines, from economics and sociology to ecology and epidemiology. As simulations grow more sophisticated, researchers need frameworks that can efficiently handle complex agents and their environments, while remaining approachable and flexible. While established platforms like NetLogo and MASON exist, there is a clear need for a modern, Python-based framework that integrates with the scientific Python ecosystem and provides robust ABM capabilities.
-
-Mesa addresses this need by offering a modular, extensible framework that leverages Python's strengths in scientific computing and data analysis. It provides a comprehensive set of tools for creating, running, and analyzing agent-based models while maintaining Python's emphasis on readability and simplicity.
-
-# Core capabilities
 Agent-based models, or artificial societies, are composed of autonomous heteregouneous agents that are positioned in one or more space(s). Given a space, agents have *local* interactions with their neighbors. The aggregate dynamics of a system under study emerges from these local interactions (Epstein, chapter 2, AGENT-BASED COMPUTATIONAL MODELS AND GENERATIVE SOCIAL SCIENCE; Epstein Axtel (1996)). That is, "*situate an initial population of autonomous heterogeneous agents in a relevant spatial environment; allow them to interact according to simple local rules, and thereby generate—or “grow”—the macroscopic regularity from the bottom up*" (Epstein, axtel 1996; add page number!).
 
+Agent-based modeling is a powerful approach for studying complex systems across many disciplines, from economics and sociology to ecology and epidemiology. As simulations grow more sophisticated, researchers need frameworks that can efficiently handle complex agents and their environments, while remaining approachable and flexible. While established platforms like NetLogo and MASON exist, there is a clear need for a modern, Python-based framework for ABM that integrates with the scientific Python ecosystem.
 
-Mesa is implemented in pure Python (3.11+) with a modular architecture separating:
+# Core capabilities
+Mesa offers a Python based framework for ABM that integrates with the wider scientific python ecosystem. Mesa provides a comprehensive set of tools for creating, running, and analyzing agent-based models while maintaining Python's emphasis on readability and simplicity. Mesa is implemented in pure Python (3.11+) with a modular architecture separating:
 1. Core ABM components (*i.e.,* agents, spaces, agent activation, control over random numbers)
 2. Data collection and support for model experimentation
 3. Visualization systems
@@ -53,22 +50,13 @@ Mesa is implemented in pure Python (3.11+) with a modular architecture separatin
 This design allows selective use of components while enabling extension and customization. The framework integrates with the scientific Python ecosystem including NumPy, pandas, and Matplotlib.
 
 ## Core ABM components
-
-some prelim stuff on rng and the model class
-
+The central class in MESA is the Model. Mesa provides a base model class that the user is expected to extend. Within this model, the user instantiates the space and populates it with agent instances. Since ABMs are typically stochastic simulations, the model also controls the random number generation. 
 
 ### Agents
-
-* the agent is a central concept in ABM
-* in mesa it is a class that is designed to be subclassed by the user
-* basic structure: `__init__` and `step`
-* various subclasses are availble for more sophisticated functionality
-* the risk of memory leaks, so agents automatigcally register themselves with the model and have a remove method
+Central to ABMs are the autonomous heterogenous agents. Mesa provides a variety of base agent classes which the user can subclass. In its most basic implementation, such an agent subclass specifies the  `__init__` and `step` method. Any subclass of the basic mesa agent subclass registers itself with the specified model instance, and via `agent.remove` it will remove itself from the model. It is strongly encouraged to rely on `remove`, and even extent it if needed to ensure agents are fully removed from the simulation.
 
 ### Agent management
-since memory leaks are key thing, agent sets internally use weakrefs
-
-Mesa's agent management system is built around the central concept of AgentSets, which provide intuitive ways to organize and manipulate collections of agents:
+The management of large groups of agents is criticical in ABMs. Mesa's agent management system is built around the central concept of AgentSet, which provide intuitive ways to organize and manipulate collections of agents:
 
 ```python
 # Select wealthy agents and calculate average wealth
@@ -81,46 +69,38 @@ for species, agents in grouped:
     agents.shuffle_do("reproduce")
 ```
 
-The framework automatically handles agent lifecycle management, including:
-- Unique ID assignment
-- Agent registration and removal
-- Agent subclass-based organization
-- Efficient collective operations
-
-
-
 ### Spaces
-Mesa offers a variaty of spaces within which agents can be located. A basic distinction is between discrete or cell-based spaces, and continous space. In discrete spaces, the space consists of a collection of cells and agents occupy a cell. Examples of this include orthogonal grids, hexgrids, voroinoi meshes, or networks. In a continous space, in constrast, an agent has a location.
+Mesa offers a variety of spaces within which agents can be located. A basic distinction is between discrete or cell-based spaces, and continous space. In discrete spaces, the space consists of a collection of cells and agents occupy a cell. Examples of this include orthogonal grids, hexgrids, voroinoi meshes, or networks. In a continous space, in constrast, an agent has a location.
 
 Mesa comes with a wide variety of discrete spaces, including OrthogonalMooreGrid, OrthogonalVonNeumanGrid, Hexgrid, Network, and VoroinoiMesh. These are all implemented using a doubly linked data structure where each cell has connections to its neighboring cells. The different discrete spaces differ with respect to how they are "wired-up", but the API is uniform across all of them.
 
 Mesa also offers 3 subclasses of the Agent class that are designed to be used in conjunction with these discrete spaces: FixedAgent, CellAgent, and Grid2DMovingAgent. FixedAgent is assigned to a given cell and can access this cell via `self.cell`. However, once assigned to a given cell, it can not be moved. A CellAgent, like a FixedAgent, has access to the cell it currently occupies. However, it can update this attribute making it possible to move around. A Grid2DMovingAgent extends CellAgent by offering a move method with short hand for the direction of movement.
 
-<!-- * grids, latices, networks, meshes
-* property layers
-
 . Grid-based spaces:
 ```python
-grid = MultiGrid(width, height, torus=True)
-grid.place_agent(agent, (x, y))
-neighbors = grid.get_neighbors(pos, moore=True)
+grid = OrthogonalVonNeumannGrid(
+    (width, height), torus=False, random=model.random
+)
+
+# create a network space with a capacity of 1 agent per node
+grid = Network(networkx_graph, capacity=1, random=model.random)
 ```
 
 2. Network spaces:
 ```python
 network = NetworkGrid(networkx_graph)
 network.get_neighbors(agent, include_center=False)
-``` -->
+```
 
 The OrthogonalMooreGrid, OrthogonalVonNeumanGrid and Hexgrid come with support for numpy based layers with additional data: PropertyLayers. Cells have attribute access to their value in each of these property layers, while the entire layer can be accessed from the space itself.
 
-<!-- ```python
-elevation = PropertyLayer("elevation", width, height)
-grid.add_property_layer(elevation)
-high_ground = grid.properties["elevation"].select_cells(lambda x: x > 50)
-``` -->
+```python
+# initialize a property layer with a default value
+grid.create_property_layer("elevation", default_value=10)
 
-
+# get indices for cells with elevation above 50
+high_ground = grid.elevation.select_cells(lambda x: x > 50)
+```
 
 
 2. Continuous spaces:
@@ -145,41 +125,24 @@ for _ in range(100):
 
 ```
 
-Generally, within the step method of the model, one activates all the agents. The AgentSet class can be used for this. Some common agent activation patterns are shown below
+Generally, within the step method of the model, one activates all the agents. The AgentSet class can be used for this. Some common agent activation patterns are shown below. Evidently, these activation patterns can be combined to create more sophisticated and complex activation patterns. 
 
 1. Deterministic activation of agent
 ```python
 model.agents.do("step")  # Random activation
-```
 
-2. Random activation of agents
-```python
 model.agents.shuffle_do("step")  # Random activation
-```
 
-3. Multi-stage activation:
-```python
+# Multi-stage activation:
 for stage in ["move", "eat", "reproduce"]:
     model.agents.do(stage)
-```
 
-4. Activation by agent subclass:
-```python
+# Activation by agent subclass:
 for klass in model.agent_types:
     model.agents_by_type[klass].do("step")
 ```
 
-Evidently, these activation patterns can be combined to create more sophisticated and complex activation patterns. For example
-
-4. Random activation of random agent subclass
-```python
-agent_klasses = model.agent_types
-model.random.shuffle(agent_klasses)
-for klass in agent_klasses:
-    model.agents_by_type[klass].shuffle_do("step")
-```
-
-A more advanced alternative to discrete time advancement is discrete event simulation. Here, the simulation consists of a series of time stamped events. The simulation executes the events for a given timestep, Next, the simulation clock is advancent to the time stamp of the next event. Mesa offers basic support for discrete event simulation using a Discrete event simulator. The design is inspired by Ziegler (add ref), and the java-based DSOL library (add ref).
+A more advanced alternative to discrete time advancement is discrete event simulation. Here, the simulation consists of a series of time stamped events. The simulation executes the events for a given timestep, Next, the simulation clock is advanced to the time stamp of the next event. Mesa offers basic support for discrete event simulation using a Discrete event simulator. The design is inspired by Ziegler (add ref), and the java-based DSOL library (add ref).
 
 
 1. Event-based scheduling for non-uniform time steps:
