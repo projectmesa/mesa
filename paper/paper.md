@@ -61,7 +61,7 @@ some prelim stuff on rng and the model class
 
 * the agent is a central concept in ABM
 * in mesa it is a class that is designed to be subclassed by the user
-* basic structure: `__init__` and `__step__`
+* basic structure: `__init__` and `step`
 * various subclasses are availble for more sophisticated functionality
 * the risk of memory leaks, so agents automatigcally register themselves with the model and have a remove method
 
