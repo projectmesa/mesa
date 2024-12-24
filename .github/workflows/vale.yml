@@ -3,6 +3,9 @@ name: Check Prose with Vale
 on:
   pull_request:
     paths:
+      - '**/*.md'
+  push:
+    paths:
       - '**/*.md'  # You can specify other file extensions or directories if needed
 
 jobs:
