@@ -50,7 +50,7 @@ Mesa offers a Python based framework for ABM that integrates with the wider scie
 This design allows selective use of components while enabling extension and customization. The framework integrates with the scientific Python ecosystem including NumPy, pandas, and Matplotlib.
 
 ## Core ABM components
-The central class in MESA is the Model. Mesa provides a base model class that the user is expected to extend. Within this model, the user instantiates the space and populates it with agent instances. Since ABMs are typically stochastic simulations, the model also controls the random number generation. 
+The central class in MESA is the Model. Mesa provides a base model class that the user is expected to extend. Within this model, the user instantiates the space and populates it with agent instances. Since ABMs are typically stochastic simulations, the model also controls the random number generation.
 
 ### Agents
 Central to ABMs are the autonomous heterogenous agents. Mesa provides a variety of base agent classes which the user can subclass. In its most basic implementation, such an agent subclass specifies the  `__init__` and `step` method. Any subclass of the basic mesa agent subclass registers itself with the specified model instance, and via `agent.remove` it will remove itself from the model. It is strongly encouraged to rely on `remove`, and even extent it if needed to ensure agents are fully removed from the simulation.
@@ -125,7 +125,7 @@ for _ in range(100):
 
 ```
 
-Generally, within the step method of the model, one activates all the agents. The AgentSet class can be used for this. Some common agent activation patterns are shown below. Evidently, these activation patterns can be combined to create more sophisticated and complex activation patterns. 
+Generally, within the step method of the model, one activates all the agents. The AgentSet class can be used for this. Some common agent activation patterns are shown below. Evidently, these activation patterns can be combined to create more sophisticated and complex activation patterns.
 
 1. Deterministic activation of agent
 ```python
