@@ -1,0 +1,13 @@
+{
+    "Styles": [
+      {
+        "Name": "Microsoft",
+        "Path": "https://github.com/errata-ai/vale/tree/master/styles/Microsoft"
+      }
+    ],
+    "MinAlertLevel": "warning",
+    "Extensions": [
+      "md"
+    ]
+  }
+  

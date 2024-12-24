@@ -1,0 +1,22 @@
+name: Check Prose with Vale
+
+on:
+  pull_request:
+    paths:
+      - '**/*.md'  # You can specify other file extensions or directories if needed
+
+jobs:
+  vale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      
+      - name: Set up Vale
+        run: |
+          curl -sSL https://github.com/errata-ai/vale/releases/download/v2.12.0/vale_2.12.0_Linux_64-bit.tar.gz | tar -xz -C /tmp
+          sudo mv /tmp/vale /usr/local/bin/vale
+
+      - name: Run Vale
+        run: |
+          vale .
