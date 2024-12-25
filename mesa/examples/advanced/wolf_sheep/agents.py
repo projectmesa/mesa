@@ -40,13 +40,6 @@ class Animal(CellAgent):
         """Execute one step of the animal's behavior."""
         # Move to random neighboring cell
         self.move()
-        is_cliff = self.model.grid.cliff.data[self.cell.coordinate[0]][
-            self.cell.coordinate[1]
-        ]
-        if is_cliff:  # if the cell is a cliff, then the animal dies
-            self.remove()
-            return
-
         self.energy -= 1
 
         # Try to feed
@@ -78,6 +71,15 @@ class Sheep(Animal):
         )
         # If all surrounding cells have wolves, stay put
         if len(cells_without_wolves) == 0:
+            return
+
+        target_cells_not_walls = cells_without_wolves.select(
+            lambda cell: not self.model.grid.wall.data[cell.coordinate[0]][
+                cell.coordinate[1]
+            ]
+        )
+
+        if len(target_cells_not_walls) == 0:
             return
 
         # Among safe cells, prefer those with grown grass
