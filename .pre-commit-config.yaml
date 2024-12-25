@@ -41,7 +41,7 @@ repos:
       - id: vale
         name: Vale
         entry: vale
-        language: docker
+        language: system
         types: [file]
         files: \.(md|txt|rst)$  # Adjust file extensions as needed
 
