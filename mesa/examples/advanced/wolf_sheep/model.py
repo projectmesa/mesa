@@ -22,6 +22,29 @@ from mesa.experimental.cell_space.property_layer import PropertyLayer
 from mesa.experimental.devs import ABMSimulator
 
 
+def is_trapped_in_wall(
+    cell, wall_coord, width, height
+):  # true if cell is trapped of walls
+    north = (cell.coordinate[0] - 1, cell.coordinate[1])
+    south = (cell.coordinate[0] + 1, cell.coordinate[1])
+    west = (cell.coordinate[0], cell.coordinate[1] - 1)
+    east = (cell.coordinate[0], cell.coordinate[1] + 1)
+
+    coord = (cell.coordinate[0], cell.coordinate[1])
+
+    # 'corner' cases (pun intended)
+    if coord == (0, 0):  # top left corner
+        return {east, south}.issubset(wall_coord)
+    if coord == (height - 1, 0):  # bottom left corner
+        return {north, east}.issubset(wall_coord)
+    if coord == (0, width - 1):  # top right corner
+        return {west, south}.issubset(wall_coord)
+    if coord == (height - 1, width - 1):  # bottom right corner
+        return {north, west}.issubset(wall_coord)
+
+    return {north, south, west, east}.issubset(wall_coord)
+
+
 class WolfSheep(Model):
     """Wolf-Sheep Predation Model.
 
@@ -96,25 +119,29 @@ class WolfSheep(Model):
 
         self.datacollector = DataCollector(model_reporters)
 
-        cliff_arr = [[False] * self.width for i in range(self.height)]
+        wall_arr = [[False] * self.width for i in range(self.height)]
 
-        cliff_coord = {
+        wall_coord = {
             (random.randrange(self.height), random.randrange(self.width))
-            for i in range((width * height) // 3)
+            for i in range((width * height) // 10)
         }  # set is used because the random number gen might return the same coordinate
-        for i, j in cliff_coord:
-            cliff_arr[i][j] = True
+        for i, j in wall_coord:
+            wall_arr[i][j] = True
 
-        cliff_arr = np.array(cliff_arr)
+        wall_arr = np.array(wall_arr)
 
-        self.grid.add_property_layer(PropertyLayer.from_data("cliff", cliff_arr))
+        self.grid.add_property_layer(PropertyLayer.from_data("wall", wall_arr))
 
         possible_cells = []
         for cell in self.grid.all_cells.cells:
             if (
-                cell.coordinate[0],
-                cell.coordinate[1],
-            ) not in cliff_coord:  # so we don't create wolf or sheep on cliff cells
+                (
+                    cell.coordinate[0],
+                    cell.coordinate[1],
+                )
+                not in wall_coord
+                and not is_trapped_in_wall(cell, wall_coord, width, height)
+            ):  # so we don't create an animal at wall cells. and make sure the animal is not trapped in walls
                 possible_cells.append(cell)
 
         # Create sheep:
