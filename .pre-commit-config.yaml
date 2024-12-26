@@ -40,7 +40,7 @@ repos:
     hooks:
       - id: vale
         name: Vale
-        entry: bash -c 'curl -sSL https://github.com/errata-ai/vale/releases/download/v3.9.1/vale_3.9.1_Linux_64-bit.tar.gz | tar -xz -C /tmp && /tmp/vale "$@"' --
+        entry: bash -c 'wget https://raw.githubusercontent.com/errata-ai/vale/v3.9.1/vale -O /tmp/vale && chmod +x /tmp/vale && /tmp/vale "$@"' --
         language: system
         types: [file]
         files: \.(md|txt|rst)$  # Adjust file extensions as needed
