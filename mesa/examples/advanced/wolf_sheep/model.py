@@ -27,8 +27,8 @@ def is_trapped_in_wall(
 ):  # true if cell is trapped of walls
     north = (cell.coordinate[0] - 1, cell.coordinate[1])
     south = (cell.coordinate[0] + 1, cell.coordinate[1])
-    west = (cell.coordinate[0], cell.coordinate[1] - 1)
     east = (cell.coordinate[0], cell.coordinate[1] + 1)
+    west = (cell.coordinate[0], cell.coordinate[1] - 1)
 
     coord = (cell.coordinate[0], cell.coordinate[1])
 
@@ -41,6 +41,14 @@ def is_trapped_in_wall(
         return {west, south}.issubset(wall_coord)
     if coord == (height - 1, width - 1):  # bottom right corner
         return {north, west}.issubset(wall_coord)
+    if coord[0] == 0:  # for cells at top row
+        return {south, west, east}.issubset(wall_coord)
+    if coord[1] == 0:  # for cells at leftmost column
+        return {north, south, east}.issubset(wall_coord)
+    if coord[0] == height - 1:  # for cells at the bottom row
+        return {north, east, west}.issubset(wall_coord)
+    if coord[1] == width - 1:  # for cells at rightmost column
+        return {north, south, west}.issubset(wall_coord)
 
     return {north, south, west, east}.issubset(wall_coord)
 
