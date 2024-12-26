@@ -49,12 +49,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
         cache: 'pip'
-    - name: Set up Vale
-      run: |
-        curl -sSL https://github.com/errata-ai/vale/releases/download/v3.9.1/vale_3.9.1_Linux_64-bit.tar.gz | tar -xz -C /tmp
-        sudo mv /tmp/vale /usr/local/bin/vale
-        chmod +x /usr/local/bin/vale
-      if: runner.os == 'Linux'  # Only install on Linux runners
     - name: Install uv
       run: pip install uv
     - name: Install Mesa and dependencies
