@@ -40,6 +40,8 @@ repos:
     hooks:
       - id: vale
         name: Vale
+        entry: vale
+        language: golang
         types: [file]
         files: \.(md|txt|rst)$  # Adjust file extensions as needed
 
