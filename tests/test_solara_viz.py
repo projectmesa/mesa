@@ -92,7 +92,8 @@ class TestMakeUserInput(unittest.TestCase):  # noqa: D101
         assert slider_int.step is None
 
 
-def test_call_space_drawer(mocker):  # noqa: D103
+def test_call_space_drawer(mocker):
+    """Test the call to space drawer."""
     mock_space_matplotlib = mocker.spy(
         mesa.visualization.components.matplotlib_components, "SpaceMatplotlib"
     )
@@ -153,7 +154,8 @@ def test_call_space_drawer(mocker):  # noqa: D103
     )
 
 
-def test_slider():  # noqa: D103
+def test_slider():
+    """Test the Slider component."""
     slider_float = Slider("Agent density", 0.8, 0.1, 1.0, 0.1)
     assert slider_float.is_float_slider
     assert slider_float.value == 0.8
@@ -167,7 +169,9 @@ def test_slider():  # noqa: D103
     assert slider_dtype_float.is_float_slider
 
 
-def test_model_param_checks():  # noqa: D103
+def test_model_param_checks():
+    """Test the model parameter checks."""
+
     class ModelWithOptionalParams:
         def __init__(self, required_param, optional_param=10):
             pass
