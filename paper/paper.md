@@ -221,6 +221,7 @@ Mesa has been applied across diverse domains, including:
 - Market modeling, including renewable energy auctions and consumer behavior [@anatolitis2017putting]
 - Transportation optimization, such as combined truck-drone delivery routing [@leon2022multi]
 - Recommender systems analysis examining consumer-business value tradeoffs over time [@ghanem2022balancing]
+- Climate adaptation modeling examining household-level behavioral responses to environmental shocks [@taberna2023uncertainty]
 
 These applications showcase Mesa's versatility in modeling complex systems with autonomous interacting agents, whether representing individual consumers, infrastructure components, buildings, or vehicles.
 
