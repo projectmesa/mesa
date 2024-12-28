@@ -72,7 +72,6 @@ for species, agents in grouped:
 ### Spaces
 Mesa 3 provides multiple spatial environments where agents interact, offering both discrete (cell-based) and continuous space implementations:
 
-#### Discrete Spaces
 In discrete spaces, agents occupy distinct cells or nodes. Mesa implements these using a doubly-linked structure where each cell maintains connections to its neighbors. The framework includes several discrete space variants with a consistent API:
 
 - Grid-based: `OrthogonalMooreGrid`, `OrthogonalVonNeumanGrid`, and `HexGrid`
@@ -92,14 +91,12 @@ grid.create_property_layer("elevation", default_value=10)
 high_ground = grid.elevation.select_cells(lambda x: x > 50)
 ```
 
-#### Continuous Space
 For models requiring precise positioning, `ContinuousSpace` allows agents to occupy any coordinate within defined boundaries:
 ```python
 space = ContinuousSpace(x_max, y_max, torus=True)
 space.move_agent(agent, (new_x, new_y))
 ```
 
-#### Agent Types for Spaces
 Mesa provides specialized agent classes for spatial interactions:
 
 - `FixedAgent`: Remains at its assigned cell
