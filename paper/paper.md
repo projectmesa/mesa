@@ -70,9 +70,7 @@ for species, agents in grouped:
 ```
 
 ### Spaces
-Mesa 3 provides multiple spatial environments where agents interact, offering both discrete (cell-based) and continuous space implementations:
-
-In discrete spaces, an agent occupies a cell. Mesa implements discrete spaces using a doubly-linked structure where each cell maintains connections to its neighbors. The framework includes several discrete space variants with a consistent API:
+Mesa 3 provides both discrete (cell-based) and continuous space implementations. In discrete spaces, an agent occupies a cell. Mesa implements discrete spaces using a doubly-linked structure where each cell maintains connections to its neighbors. The framework includes several discrete space variants with a consistent API:
 
 - Grid-based: `OrthogonalMooreGrid`, `OrthogonalVonNeumanGrid`, and `HexGrid`
 - Network-based: `Network` for graph-based topologies
@@ -87,11 +85,11 @@ grid = OrthogonalVonNeumannGrid(
 
 Mesa provides specialized agent classes for spatial interactions in the discrete spaces:
 
-- `FixedAgent`: Remains at its assigned cell
-- `CellAgent`: Can move between cells and access its current location
+- `FixedAgent`: Is assigned to a cell, can access this cell, but cannot move to another cell.
+- `CellAgent`: Can move between cells
 - `Grid2DMovingAgent`: Extends `CellAgent` with directional movement methods
 
-All discrete spaces support PropertyLayers - efficient numpy-based arrays for storing environmental data:
+All discrete spaces support PropertyLayers - efficient numpy-based arrays for storing cell-level properties:
 ```python
 grid.create_property_layer("elevation", default_value=10)
 high_ground = grid.elevation.select_cells(lambda x: x > 50)
