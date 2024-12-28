@@ -85,6 +85,12 @@ grid = OrthogonalVonNeumannGrid(
 )
 ```
 
+Mesa provides specialized agent classes for spatial interactions in the discrete spaces:
+
+- `FixedAgent`: Remains at its assigned cell
+- `CellAgent`: Can move between cells and access its current location
+- `Grid2DMovingAgent`: Extends `CellAgent` with directional movement methods
+
 All discrete spaces support PropertyLayers - efficient numpy-based arrays for storing environmental data:
 ```python
 grid.create_property_layer("elevation", default_value=10)
@@ -96,14 +102,6 @@ For models where agents need to move continuously through space rather than betw
 space = ContinuousSpace(x_max, y_max, torus=True)
 space.move_agent(agent, (new_x, new_y))
 ```
-
-Mesa provides specialized agent classes for spatial interactions:
-
-- `FixedAgent`: Remains at its assigned cell
-- `CellAgent`: Can move between cells and access its current location
-- `Grid2DMovingAgent`: Extends `CellAgent` with directional movement methods
-
-These agent types interface with Mesa's spaces while enforcing appropriate movement constraints and cell access patterns.
 
 ### Time advancement
 Typically, agent-based models rely on incremental time progression or ticks. For each tick, the step method of the model is called. This activates the agents in some way. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
