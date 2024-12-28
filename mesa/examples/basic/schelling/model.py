@@ -9,11 +9,11 @@ class Schelling(Model):
 
     def __init__(
         self,
-        height: int = 40,
-        width: int = 40,
+        height: int = 20,
+        width: int = 20,
         density: float = 0.8,
         minority_pc: float = 0.5,
-        homophily: int = 3,
+        homophily: float = 0.4,
         radius: int = 1,
         seed=None,
     ):
