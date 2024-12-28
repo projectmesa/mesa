@@ -70,40 +70,43 @@ for species, agents in grouped:
 ```
 
 ### Spaces
-Mesa 3 provides multiple types of spaces for agent interactions, broadly categorized into discrete (cell-based) and continuous spaces. Each type serves different modeling needs while maintaining a consistent API.
+Mesa 3 provides multiple spatial environments where agents interact, offering both discrete (cell-based) and continuous space implementations:
 
 #### Discrete Spaces
-In discrete spaces, agents occupy specific cells or nodes. Mesa offers several implementations:
+In discrete spaces, agents occupy distinct cells or nodes. Mesa implements these using a doubly-linked structure where each cell maintains connections to its neighbors. The framework includes several discrete space variants with a consistent API:
 
-- Grid-based spaces (OrthogonalMooreGrid, OrthogonalVonNeumannGrid, Hexgrid)
-- Network spaces where agents occupy nodes
-- Voronoi meshes for irregular cell patterns
+- Grid-based: `OrthogonalMooreGrid`, `OrthogonalVonNeumanGrid`, and `HexGrid`
+- Network-based: `Network` for graph-based topologies
+- Voronoi-based: `VoronoiMesh` for irregular tessellations
 
-These spaces use a doubly-linked structure where cells maintain connections to their neighbors. A key feature is the PropertyLayer system, which enables efficient storage and manipulation of environmental data across the space:
-
+Example grid creation:
 ```python
-# Create a grid with an elevation layer
-grid = OrthogonalMooreGrid((width, height), torus=False)
-grid.create_property_layer("elevation", default_value=10)
+grid = OrthogonalVonNeumannGrid(
+    (width, height), torus=False, random=model.random
+)
+```
 
-# Select cells above a threshold
+All discrete spaces support PropertyLayers - efficient numpy-based arrays for storing environmental data:
+```python
+grid.create_property_layer("elevation", default_value=10)
 high_ground = grid.elevation.select_cells(lambda x: x > 50)
 ```
 
-To facilitate agent-space interactions, Mesa provides specialized agent classes:
-- FixedAgent: Remains at its assigned cell
-- CellAgent: Can move between cells
-- Grid2DMovingAgent: Adds directional movement shortcuts
-
 #### Continuous Space
-For models requiring precise positioning, continuous space allows agents to have any coordinate location:
-
+For models requiring precise positioning, `ContinuousSpace` allows agents to occupy any coordinate within defined boundaries:
 ```python
 space = ContinuousSpace(x_max, y_max, torus=True)
 space.move_agent(agent, (new_x, new_y))
 ```
 
-All space types can be configured as toroidal (wrapping at edges) or bounded.
+#### Agent Types for Spaces
+Mesa provides specialized agent classes for spatial interactions:
+
+- `FixedAgent`: Remains at its assigned cell
+- `CellAgent`: Can move between cells and access its current location
+- `Grid2DMovingAgent`: Extends `CellAgent` with directional movement methods
+
+These agent types interface with Mesa's spaces while enforcing appropriate movement constraints and cell access patterns.
 
 ### Time advancement
 Typically, agent-based models rely on incremental time progression or ticks. For each tick, the step method of the model is called. This activates the agents in some way. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
