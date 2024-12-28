@@ -70,44 +70,40 @@ for species, agents in grouped:
 ```
 
 ### Spaces
-Mesa offers a variety of spaces within which agents can be located. A basic distinction is between discrete or cell-based spaces, and continuous space. In discrete spaces, the space consists of a collection of cells and agents occupy a cell. Examples of this include orthogonal grids, hexgrids, voroinoi meshes, or networks. In a continuous space, in contrast, an agent has a location.
+Mesa 3 provides multiple types of spaces for agent interactions, broadly categorized into discrete (cell-based) and continuous spaces. Each type serves different modeling needs while maintaining a consistent API.
 
-Mesa comes with a wide variety of discrete spaces, including OrthogonalMooreGrid, OrthogonalVonNeumanGrid, Hexgrid, Network, and VoroinoiMesh. These are all implemented using a doubly linked data structure where each cell has connections to its neighboring cells. The different discrete spaces differ with respect to how they are "wired-up", but the API is uniform across all of them.
+#### Discrete Spaces
+In discrete spaces, agents occupy specific cells or nodes. Mesa offers several implementations:
 
-Mesa also offers three subclasses of the Agent class designed to be used in conjunction with these discrete spaces: FixedAgent, CellAgent, and Grid2DMovingAgent. FixedAgent is assigned to a given cell and can access this cell via self.cell. However, it cannot be moved once assigned to a given cell. A CellAgent, like a FixedAgent, has access to the cell it currently occupies. However, it can update this attribute, making it possible to move around. A Grid2DMovingAgent extends CellAgent by offering a move method with shorthand for the direction of movement.
+- Grid-based spaces (OrthogonalMooreGrid, OrthogonalVonNeumannGrid, Hexgrid)
+- Network spaces where agents occupy nodes
+- Voronoi meshes for irregular cell patterns
 
-1. Grid-based spaces:
-```python
-grid = OrthogonalVonNeumannGrid(
-    (width, height), torus=False, random=model.random
-)
-
-# create a network space with a capacity of 1 agent per node
-grid = Network(networkx_graph, capacity=1, random=model.random)
-```
-
-2. Network spaces:
-```python
-network = NetworkGrid(networkx_graph)
-network.get_neighbors(agent, include_center=False)
-```
-
-The OrthogonalMooreGrid, OrthogonalVonNeumanGrid and Hexgrid come with support for numpy based layers with additional data: PropertyLayers. Cells have attribute access to their value in each of these property layers, while the entire layer can be accessed from the space itself.
+These spaces use a doubly-linked structure where cells maintain connections to their neighbors. A key feature is the PropertyLayer system, which enables efficient storage and manipulation of environmental data across the space:
 
 ```python
-# initialize a property layer with a default value
+# Create a grid with an elevation layer
+grid = OrthogonalMooreGrid((width, height), torus=False)
 grid.create_property_layer("elevation", default_value=10)
 
-# get indices for cells with elevation above 50
+# Select cells above a threshold
 high_ground = grid.elevation.select_cells(lambda x: x > 50)
 ```
 
-3. Continuous spaces:
+To facilitate agent-space interactions, Mesa provides specialized agent classes:
+- FixedAgent: Remains at its assigned cell
+- CellAgent: Can move between cells
+- Grid2DMovingAgent: Adds directional movement shortcuts
+
+#### Continuous Space
+For models requiring precise positioning, continuous space allows agents to have any coordinate location:
 
 ```python
 space = ContinuousSpace(x_max, y_max, torus=True)
 space.move_agent(agent, (new_x, new_y))
 ```
+
+All space types can be configured as toroidal (wrapping at edges) or bounded.
 
 ### Time advancement
 Typically, agent-based models rely on incremental time progression or ticks. For each tick, the step method of the model is called. This activates the agents in some way. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
