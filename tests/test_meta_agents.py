@@ -35,7 +35,8 @@ def setup_agents():
     agent1 = Agent(model)
     agent2 = Agent(model)
     agent3 = Agent(model)
-    agent4 = CustomAgent(model)
+    agent4 = Agent(model)
+    agent4.custom_attribute = "custom_value"
     agents = [agent1, agent2, agent3, agent4]
     return model, agents
 
@@ -47,23 +48,20 @@ def test_create_meta_agent_new_class(setup_agents):
         setup_agents (tuple): The model and agents fixture.
     """
     model, agents = setup_agents
-    meta_agent = multi_level_agents(
+    meta_agent = create_meta_agent(
         model,
         "MetaAgentClass",
         agents,
         meta_attributes={"attribute1": "value1"},
-        meta_methods={"function1": lambda self: "function1"},
+        meta_functions={"function1": lambda self: "function1"},
         retain_subagent_attributes=True,
-        retain_subagent_methods=True,
     )
     assert meta_agent is not None
     assert meta_agent.attribute1 == "value1"
     assert meta_agent.function1() == "function1"
-    assert meta_agent._subset == set(agents)
+    assert meta_agent.agents == set(agents)
     assert hasattr(meta_agent, "custom_attribute")
     assert meta_agent.custom_attribute == "custom_value"
-    assert hasattr(meta_agent, "custom_method")
-    assert meta_agent.custom_method() == "custom_method_value"
 
 
 def test_create_meta_agent_existing_class(setup_agents):
@@ -74,35 +72,32 @@ def test_create_meta_agent_existing_class(setup_agents):
     """
     model, agents = setup_agents
 
-    # Create Meta Agent Class
-    meta_agent = multi_level_agents(
+    # Create Met Agent Class
+    meta_agent = create_meta_agent(
         model,
         "MetaAgentClass",
         [agents[0], agents[2]],
         meta_attributes={"attribute1": "value1"},
-        meta_methods={"function1": lambda self: "function1"},
+        meta_functions={"function1": lambda self: "function1"},
     )
 
     # Create new meta-agent instance with existing class
-    meta_agent2 = multi_level_agents(
+    meta_agent2 = create_meta_agent(
         model,
         "MetaAgentClass",
         [agents[1], agents[3]],
         meta_attributes={"attribute2": "value2"},
-        meta_methods={"function2": lambda self: "function2"},
+        meta_functions={"function2": lambda self: "function2"},
         retain_subagent_attributes=True,
-        retain_subagent_methods=True,
     )
     assert meta_agent is not None
     assert meta_agent2.attribute2 == "value2"
     assert meta_agent.function1() == "function1"
-    assert meta_agent._subset == {agents[2], agents[0]}
+    assert meta_agent.agents == {agents[2], agents[0]}
     assert meta_agent2.function2() == "function2"
-    assert meta_agent2._subset == {agents[1], agents[3]}
+    assert meta_agent2.agents == {agents[1], agents[3]}
     assert hasattr(meta_agent2, "custom_attribute")
     assert meta_agent2.custom_attribute == "custom_value"
-    assert hasattr(meta_agent2, "custom_method")
-    assert meta_agent2.custom_method() == "custom_method_value"
 
 
 def test_add_agents_to_existing_meta_agent(setup_agents):
@@ -113,24 +108,22 @@ def test_add_agents_to_existing_meta_agent(setup_agents):
     """
     model, agents = setup_agents
 
-    meta_agent1 = multi_level_agents(
+    meta_agent1 = create_meta_agent(
         model,
         "MetaAgentClass",
         [agents[0], agents[3]],
         meta_attributes={"attribute1": "value1"},
-        meta_methods={"function1": lambda self: "function1"},
+        meta_functions={"function1": lambda self: "function1"},
         retain_subagent_attributes=True,
-        retain_subagent_methods=True,
     )
 
-    multi_level_agents(
+    create_meta_agent(
         model,
         "MetaAgentClass",
         [agents[1], agents[0], agents[2]],
         retain_subagent_attributes=True,
-        retain_subagent_methods=True,
     )
-    assert meta_agent1._subset == {agents[0], agents[1], agents[2], agents[3]}
+    assert meta_agent1.agents == {agents[0], agents[1], agents[2], agents[3]}
     assert meta_agent1.function1() == "function1"
     assert meta_agent1.attribute1 == "value1"
     assert hasattr(meta_agent1, "custom_attribute")

@@ -1,7 +1,8 @@
 # Alliance Formation Model
 
 ## Summary
-This model demonstrates Mesa's ability to dynamically create new classes of agents that are composed of existing agents. These meta-agents  inherits functions and attributes from their sub-agents and users can specify new functionality or attributes they want the meta agent to have. For example, if a user is doing a factory simulation with autonomous systems, each major component of that system can be a sub-agent of the overall robot agent. Or, if someone is doing a simulation of an organization, individuals can be part of different organizational units that are working for some purpose.
+
+This model demonstrates Mesa's ability to dynamically create new classes of agents that are composed of existing agents. These meta-agents inherits functions and attributes from their sub-agents and users can specify new functionality or attributes they want the meta agent to have. For example, if a user is doing a factory simulation with autonomous systems, each major component of that system can be a sub-agent of the overall robot agent. Or, if someone is doing a simulation of an organization, individuals can be part of different organizational units that are working for some purpose.
 
 To provide a simple demonstration of this capability is an alliance formation model.
 
@@ -12,6 +13,7 @@ In its current configuration, agents being part of multiple meta-agents is not s
 ## Installation
 
 This model requires Mesa's recommended install and scipy
+
 ```
     $ pip install mesa[rec]
 ```
@@ -26,9 +28,9 @@ To run the model interactively, in this directory, run the following command
 
 ## Files
 
-* ``model.py``: Contains creation of agents, the network and management of agent execution.
-* ``agents.py``: Contains logic for forming alliances and creation of new agents
-* ``app.py``: Contains the code for the interactive Solara visualization.
+- `model.py`: Contains creation of agents, the network and management of agent execution.
+- `agents.py`: Contains logic for forming alliances and creation of new agents
+- `app.py`: Contains the code for the interactive Solara visualization.
 
 ## Further Reading
 
@@ -37,4 +39,3 @@ https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html
 
 An example of the bilateral shapley value in another model:
 [Techno-Social Energy Infrastructure Siting: Sustainable Energy Modeling Programming (SEMPro)](https://www.jasss.org/16/3/6.html)
-

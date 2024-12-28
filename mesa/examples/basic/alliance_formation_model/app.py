@@ -62,7 +62,6 @@ model = MultiLevelAllianceModel(50)
 # Display it using the following command in the example directory:
 # solara run app.py
 # It will automatically update and display any changes made to this file
-
 page = SolaraViz(
     model,
     components=[plot_network],
