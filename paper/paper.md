@@ -27,20 +27,18 @@ authors:
     affiliation: "5"
   - name: Jackie Kazil
     orcid: 0000-0002-8300-7384
-    affiliation: "6"
+    affiliation: "3"
 affiliations:
   - name: Delft University of Technology (Faculty of Technology, Policy and Management)
     index: 1
   - name: Independent Researcher, Germany
     index: 2
-  - name: Independent Researcher, USA
+  - name: George Mason University (Department of Computational Social Science)
     index: 3
   - name: University at Buffalo (Department of Geography)
     index: 4
   - name: Independent Researcher
     index: 5
-  - name: George Mason University (Department of Computational Social Science)
-    index: 6
 date: 5 December 2024
 bibliography: paper.bib
 
