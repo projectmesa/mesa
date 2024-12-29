@@ -205,12 +205,17 @@ results = mesa.batch_run(
 ```
 
 # Applications
-Mesa has been applied across diverse domains including:
-- Epidemiology and public health modeling
-- Economic and market simulations
-- Social network analysis
-- Urban planning and transportation
-- Ecological modeling
+Mesa has been applied across diverse domains, including:
+
+- Sustainability and food security modeling, including supply chain optimization and resource allocation [@namany2020sustainable]
+- Infrastructure resilience and post-disaster recovery planning [@sun2020post]
+- Building stock modeling for energy demand and emissions analysis [@nageli2020towards]
+- Market modeling, including renewable energy auctions and consumer behavior [@anatolitis2017putting]
+- Transportation optimization, such as combined truck-drone delivery routing [@leon2022multi]
+- Recommender systems analysis examining consumer-business value tradeoffs over time [@ghanem2022balancing]
+- Climate adaptation modeling examining household-level behavioral responses to environmental shocks [@taberna2023uncertainty]
+
+These applications showcase Mesa's versatility in modeling complex systems with autonomous interacting agents, whether representing individual consumers, infrastructure components, buildings, or vehicles.
 
 The framework is particularly suited for:
 - Models with heterogeneous agent populations
@@ -220,7 +225,7 @@ The framework is particularly suited for:
 
 # Community and ecosystem
 Mesa has grown into a complete ecosystem with extensions including:
-- [Mesa-Geo](https://github.com/projectmesa/mesa-geo) for geospatial modeling
+- [Mesa-Geo](https://github.com/projectmesa/mesa-geo) for geospatial modeling [wang2022mesa]
 - [Mesa-Frames](https://github.com/projectmesa/mesa-frames) for high-performance simulations
 - A rich collection of community-contributed extensions, example models, and tutorials
 
