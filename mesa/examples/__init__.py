@@ -7,8 +7,10 @@ from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealth
 from mesa.examples.basic.conways_game_of_life.model import ConwaysGameOfLife
 from mesa.examples.basic.schelling.model import Schelling
 from mesa.examples.basic.virus_on_network.model import VirusOnNetwork
+from mesa.examples.basic.alliance_formation_model.model import AllianceModel
 
 __all__ = [
+    "AllianceModel",
     "BoidFlockers",
     "BoltzmannWealth",
     "ConwaysGameOfLife",
