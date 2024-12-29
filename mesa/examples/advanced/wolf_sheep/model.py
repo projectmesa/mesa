@@ -22,37 +22,6 @@ from mesa.experimental.cell_space.property_layer import PropertyLayer
 from mesa.experimental.devs import ABMSimulator
 
 
-def is_trapped_in_wall(
-    cell, wall_coord, width, height
-):  # true if cell is trapped of walls
-    north = (cell.coordinate[0] - 1, cell.coordinate[1])
-    south = (cell.coordinate[0] + 1, cell.coordinate[1])
-    east = (cell.coordinate[0], cell.coordinate[1] + 1)
-    west = (cell.coordinate[0], cell.coordinate[1] - 1)
-
-    coord = (cell.coordinate[0], cell.coordinate[1])
-
-    # 'corner' cases (pun intended)
-    if coord == (0, 0):  # top left corner
-        return {east, south}.issubset(wall_coord)
-    if coord == (height - 1, 0):  # bottom left corner
-        return {north, east}.issubset(wall_coord)
-    if coord == (0, width - 1):  # top right corner
-        return {west, south}.issubset(wall_coord)
-    if coord == (height - 1, width - 1):  # bottom right corner
-        return {north, west}.issubset(wall_coord)
-    if coord[0] == 0:  # for cells at top row
-        return {south, west, east}.issubset(wall_coord)
-    if coord[1] == 0:  # for cells at leftmost column
-        return {north, south, east}.issubset(wall_coord)
-    if coord[0] == height - 1:  # for cells at the bottom row
-        return {north, east, west}.issubset(wall_coord)
-    if coord[1] == width - 1:  # for cells at rightmost column
-        return {north, south, west}.issubset(wall_coord)
-
-    return {north, south, west, east}.issubset(wall_coord)
-
-
 class WolfSheep(Model):
     """Wolf-Sheep Predation Model.
 
@@ -140,17 +109,25 @@ class WolfSheep(Model):
 
         self.grid.add_property_layer(PropertyLayer.from_data("wall", wall_arr))
 
-        possible_cells = []
-        for cell in self.grid.all_cells.cells:
-            if (
-                (
-                    cell.coordinate[0],
-                    cell.coordinate[1],
-                )
-                not in wall_coord
-                and not is_trapped_in_wall(cell, wall_coord, width, height)
-            ):  # so we don't create an animal at wall cells. and make sure the animal is not trapped in walls
-                possible_cells.append(cell)
+        def is_wall(row, col):
+            return (
+                True
+                if row < 0 or col < 0 or row >= height or col >= width  # corner case
+                else wall_arr[row][col]
+            )
+
+        def is_trapped_in_walls(row, col):
+            return (
+                is_wall(row + 1, col)
+                and is_wall(row - 1, col)
+                and is_wall(row, col + 1)
+                and is_wall(row, col - 1)
+            )
+
+        possible_cells = self.grid.all_cells.select(
+            lambda cell: not wall_arr[cell.coordinate[0]][cell.coordinate[1]]
+            and not is_trapped_in_walls(cell.coordinate[0], cell.coordinate[1])
+        ).cells  # so we don't create an animal at wall cells. and make sure the animal is not trapped in walls
 
         # Create sheep:
         Sheep.create_agents(
