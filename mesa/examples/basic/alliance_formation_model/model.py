@@ -1,8 +1,8 @@
 import networkx as nx
 import numpy as np
-from mesa.examples.basic.alliance_formation_model.agents import AllianceAgent
 
 import mesa
+from mesa.examples.basic.alliance_formation_model.agents import AllianceAgent
 
 
 class AllianceModel(mesa.Model):

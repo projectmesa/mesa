@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import solara
 from matplotlib.figure import Figure
-from mesa.examples.basic.alliance_formation_model.model import AllianceModel
 
+from mesa.examples.basic.alliance_formation_model.model import AllianceModel
 from mesa.mesa_logging import DEBUG, log_to_stderr
 from mesa.visualization import SolaraViz
 from mesa.visualization.utils import update_counter

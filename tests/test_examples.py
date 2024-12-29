@@ -108,6 +108,7 @@ def test_wolf_sheep():  # noqa: D103
     WolfSheep(seed=42, simulator=simulator)
     simulator.run_for(10)
 
+
 def test_alliance_formation_model():  # noqa: D103
     from mesa.examples.basic.alliance_formation_model import app
 
