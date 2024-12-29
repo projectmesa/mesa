@@ -11,16 +11,34 @@ tags:
 authors:
   - name: Ewout ter Hoeven
     orcid: 0009-0002-0805-3425
+    affiliation: "1"
   - name: Jan Kwakkel
     orcid: 0000-0001-9447-2954
+    affiliation: "1"
   - name: Vincent Hess
+    affiliation: "2"
   - name: Thomas D. Pike
     orcid: 0000-0003-1576-0283
+    affiliation: "3"
   - name: Boyu Wang
     orcid: 0000-0001-9879-2138
+    affiliation: "4"
   - name: rht
+    affiliation: "5"
   - name: Jackie Kazil
-    orcid: 0000-0002-6666-8506
+    orcid: 0000-0002-8300-7384
+    affiliation: "3"
+affiliations:
+  - name: Delft University of Technology (Faculty of Technology, Policy and Management)
+    index: 1
+  - name: Independent Researcher, Germany
+    index: 2
+  - name: George Mason University (Department of Computational Social Science)
+    index: 3
+  - name: University at Buffalo (Department of Geography)
+    index: 4
+  - name: Independent Researcher
+    index: 5
 date: 5 December 2024
 bibliography: paper.bib
 
