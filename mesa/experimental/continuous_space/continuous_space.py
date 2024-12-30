@@ -64,9 +64,9 @@ class ContinuousSpace:
         try:
             return self._agent_to_index[agent]
         except KeyError:
-            indices = np.where(self._positions_in_use == False)[0]
+            indices = np.where(not self._positions_in_use)[0]
 
-            if indices.size:
+            if indices.size>0:
                 index = indices[0]
             else:
                 # we are out of space
