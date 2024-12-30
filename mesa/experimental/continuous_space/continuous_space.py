@@ -97,11 +97,11 @@ class ContinuousSpace:
     def calculate_distances(self, point):
         """Calculate the distance between the point and all agents."""
         if self.torus:
-            delta = np.abs(point[np.newaxis, :] - self._agent_positions)
+            delta = np.abs(point[np.newaxis, :] - self.agent_positions)
             delta = np.minimum(delta, 1 - delta)
             dists = np.linalg.norm(delta, axis=1)
         else:
-            dists = cdist(point[np.newaxis, :], self._agent_positions)
+            dists = cdist(point[np.newaxis, :], self.agent_positions)
         return dists
 
     def in_bounds(self, point) -> bool:
