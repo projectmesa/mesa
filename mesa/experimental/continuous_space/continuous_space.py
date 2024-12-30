@@ -66,7 +66,7 @@ class ContinuousSpace:
         except KeyError:
             indices = np.where(not self._positions_in_use)[0]
 
-            if indices.size>0:
+            if indices.size > 0:
                 index = indices[0]
             else:
                 # we are out of space
