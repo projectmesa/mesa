@@ -237,7 +237,7 @@ The framework is particularly suited for:
 # Community and ecosystem
 Mesa has grown into a complete ecosystem with extensions including:
 
-- [Mesa-Geo](https://github.com/projectmesa/mesa-geo) for geospatial modeling [wang2022mesa]
+- [Mesa-Geo](https://github.com/projectmesa/mesa-geo) for geospatial modeling [@wang2022mesa]
 - [Mesa-Frames](https://github.com/projectmesa/mesa-frames) for high-performance simulations
 - A rich collection of community-contributed extensions, [example models](https://github.com/projectmesa/mesa-examples), and tutorials
 
