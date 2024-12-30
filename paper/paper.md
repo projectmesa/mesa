@@ -246,3 +246,5 @@ The advancements leading to Mesa 3 were developed by six maintainers (the author
 
 # Conclusions
 Mesa 3 introduces significant advancements to the Python ABM framework, enhancing the core toolkit with greater control, interactivity, and speed for researchers. These notable improvements, paired with its foundational integration with the scientific Python ecosystem, modular architecture, and active community, make it an indispensable tool for researchers across disciplines working in Python who need to create and analyze agent-based models.
+
+# References
