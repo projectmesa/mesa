@@ -74,14 +74,14 @@ Central to ABMs are the autonomous heterogeneous agents. Mesa provides a variety
 One significant advancement of Mesa 3+ is expanded functionality around agent management. The new [`AgentSet`](https://mesa.readthedocs.io/latest/apis/agent.html#mesa.agent.AgentSet) class provides methods that allow users to filter, group, and analyze agents, making it easier to express complex model logic.
 
 ```python
-# Select wealthy agents and calculate average wealth
-wealthy = model.agents.select(lambda a: a.wealth > 1000)
-avg_wealth = wealthy.agg("wealth", func=np.mean)
-
-# Group agents by type and apply behaviors
-grouped = model.agents.groupby("species")
-for species, agents in grouped:
-    agents.shuffle_do("reproduce")
+    # Select wealthy agents and calculate average wealth
+    wealthy = model.agents.select(lambda a: a.wealth > 1000)
+    avg_wealth = wealthy.agg("wealth", func=np.mean)
+    
+    # Group agents by type and apply behaviors
+    grouped = model.agents.groupby("species")
+    for species, agents in grouped:
+        agents.shuffle_do("reproduce")
 ```
 
 ### Spaces
@@ -92,10 +92,11 @@ Mesa 3 provides both discrete (cell-based) and continuous space implementations.
 - Voronoi-based: `VoronoiMesh` for irregular tessellations
 
 Example grid creation:
+
 ```python
-grid = OrthogonalVonNeumannGrid(
-    (width, height), torus=False, random=model.random
-)
+    grid = OrthogonalVonNeumannGrid(
+        (width, height), torus=False, random=model.random
+    )
 ```
 
 Mesa provides specialized agent classes for spatial interactions in the discrete spaces:
@@ -105,74 +106,77 @@ Mesa provides specialized agent classes for spatial interactions in the discrete
 - `Grid2DMovingAgent`: Extends `CellAgent` with directional movement methods
 
 All discrete spaces support PropertyLayers - efficient numpy-based arrays for storing cell-level properties:
+
 ```python
-grid.create_property_layer("elevation", default_value=10)
-high_ground = grid.elevation.select_cells(lambda x: x > 50)
+    grid.create_property_layer("elevation", default_value=10)
+    high_ground = grid.elevation.select_cells(lambda x: x > 50)
 ```
 
 For models where agents need to move continuously through space rather than between discrete locations, `ContinuousSpace` allows agents to occupy any coordinate within defined boundaries:
+
 ```python
-space = ContinuousSpace(x_max, y_max, torus=True)
-space.move_agent(agent, (new_x, new_y))
+    space = ContinuousSpace(x_max, y_max, torus=True)
+    space.move_agent(agent, (new_x, new_y))
 ```
 
 ### Time advancement
 Typically, ABMs rely on incremental time progression or ticks. For each tick, the step method of the model is called. This activates the agents in some way. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
 
 ```python
-model = Model(seed=42)
-
-for _ in range(100):
-    model.step()
+    model = Model(seed=42)
+    
+    for _ in range(100):
+        model.step()
 ```
 
 Generally, within the step method of the model, one activates all the agents. The newly added `AgentSet` class provides a more flexible way to activate agents replacing the fixed patterns previously available.
 
 ```python
-model.agents.do("step")  # Sequential activation
-
-model.agents.shuffle_do("step")  # Random activation
-
-# Multi-stage activation:
-for stage in ["move", "eat", "reproduce"]:
-    model.agents.do(stage)
-
-# Activation by agent subclass:
-for klass in model.agent_types:
-    model.agents_by_type[klass].do("step")
+    model.agents.do("step")  # Sequential activation
+    
+    model.agents.shuffle_do("step")  # Random activation
+    
+    # Multi-stage activation:
+    for stage in ["move", "eat", "reproduce"]:
+        model.agents.do(stage)
+    
+    # Activation by agent subclass:
+    for klass in model.agent_types:
+        model.agents_by_type[klass].do("step")
 ```
 
 Mesa also supports next-event time progression. In this approach, the simulation consists of time-stamped events that are executed chronologically, with the simulation clock advancing to each event's timestamp. This enables both pure discrete event-based models and hybrid approaches combining incremental time progression with event scheduling on the ticks as shown below.. This latter hybrid approach allows combining traditional ABM time steps with the flexibility and potential performance benefits of event scheduling.
 
 ```python
-# Pure event-based scheduling
-simulator = DiscreteEventSimulator()
-model = Model(seed=42, simulator=simulator)
-simulator.schedule_event_relative(some_function, 3.1415)
-
-# Hybrid time-step and event scheduling
-model = Model(seed=42, simulator=ABMSimulator())
-model.simulator.schedule_event_next_tick(some_function)
+    # Pure event-based scheduling
+    simulator = DiscreteEventSimulator()
+    model = Model(seed=42, simulator=simulator)
+    simulator.schedule_event_relative(some_function, 3.1415)
+    
+    # Hybrid time-step and event scheduling
+    model = Model(seed=42, simulator=ABMSimulator())
+    model.simulator.schedule_event_next_tick(some_function)
 ```
 
 ## Visualization
 Mesa's visualization system, [SolaraViz](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html), provides interactive browser-based model exploration:
 
 ```python
-visualization = SolaraViz(
-    model,
-    [
-        make_space_component(agent_portrayal),
-        make_plot_component(["population", "average_wealth"]),
-        lambda m: f"Step {m.steps}: {len(m.agents)} agents"
-    ],
-    model_params=parameter_controls
-)
+    visualization = SolaraViz(
+        model,
+        [
+            make_space_component(agent_portrayal),
+            make_plot_component(["population", "average_wealth"]),
+            lambda m: f"Step {m.steps}: {len(m.agents)} agents"
+        ],
+        model_params=parameter_controls
+    )
 ```
 
 ![A screenshot of the WolfSheep Model in Mesa](../docs/images/wolf_sheep.png)
 
 Key features include:
+
 - Interactive model controls
 - Real-time data visualization
 - Customizable agent and space portrayal
@@ -184,36 +188,31 @@ Key features include:
 Mesa's DataCollector enables systematic data gathering during simulations:
 
 ```python
-collector = DataCollector(
-    model_reporters={"population": lambda m: len(m.agents)},
-    agent_reporters={"wealth": "wealth"},
-    agenttype_reporters={
-        Predator: {"kills": "kills_count"},
-        Prey: {"distance_fled": "flight_distance"}
-    }
-)
+    collector = DataCollector(
+        model_reporters={"population": lambda m: len(m.agents)},
+        agent_reporters={"wealth": "wealth"},
+        agenttype_reporters={
+            Predator: {"kills": "kills_count"},
+            Prey: {"distance_fled": "flight_distance"}
+        }
+    )
 ```
 
 The collected data integrates seamlessly with pandas for analysis:
 ```python
-model_data = collector.get_model_vars_dataframe()
-agent_data = collector.get_agent_vars_dataframe()
+    model_data = collector.get_model_vars_dataframe()
+    agent_data = collector.get_agent_vars_dataframe()
 ```
 
 ### Parameter sweeps
 Mesa supports systematic parameter exploration:
 
 ```python
-parameters = {
-    "num_agents": range(10, 100, 10),
-    "growth_rate": [0.1, 0.2, 0.3]
-}
-results = mesa.batch_run(
-    MyModel,
-    parameters,
-    iterations=5,
-    max_steps=100
-)
+    parameters = {
+        "num_agents": range(10, 100, 10),
+        "growth_rate": [0.1, 0.2, 0.3]
+    }
+    results = mesa.batch_run(MyModel, parameters, iterations=5, max_steps=10)
 ```
 
 # Applications
@@ -237,6 +236,7 @@ The framework is particularly suited for:
 
 # Community and ecosystem
 Mesa has grown into a complete ecosystem with extensions including:
+
 - [Mesa-Geo](https://github.com/projectmesa/mesa-geo) for geospatial modeling [wang2022mesa]
 - [Mesa-Frames](https://github.com/projectmesa/mesa-frames) for high-performance simulations
 - A rich collection of community-contributed extensions, [example models](https://github.com/projectmesa/mesa-examples), and tutorials
