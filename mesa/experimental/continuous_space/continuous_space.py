@@ -83,7 +83,7 @@ class ContinuousSpace:
                 self._positions_in_use = np.hstack(
                     [self._positions_in_use, np.zeros((n,), dtype=bool)]
                 )
-                index = np.where(self._positions_in_use == False)[0][0]
+                index = np.where(not self._positions_in_use)[0][0]
 
         self._positions_in_use[index] = True
         self._agent_to_index[agent] = index
