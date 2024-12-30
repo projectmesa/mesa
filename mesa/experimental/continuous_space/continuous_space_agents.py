@@ -13,8 +13,9 @@ class HasPositionProtocol(Protocol):
 
     position: np.ndarray
 
+
 class ContinuousSpaceAgent(Agent):
-    __slots__ = ["space", "_mesa_index"]
+    __slots__ = ["_mesa_index", "space"]
 
     @property
     def position(self) -> np.ndarray:
@@ -24,7 +25,7 @@ class ContinuousSpaceAgent(Agent):
     def position(self, value: np.ndarray) -> None:
         if not self.space.in_bounds(value):
             if self.space.torus:
-                value =  self.space.torus_correct(value)
+                value = self.space.torus_correct(value)
             else:
                 raise ValueError(f"point {value} is outside the bounds of the space")
 
@@ -47,7 +48,11 @@ class ContinuousSpaceAgent(Agent):
         indices = np.where(distances < radius)[0]
 
         # don't forget to remove our self
-        agents = [self.space._index_to_agent[index] for index in indices if index != self._mesa_index]
+        agents = [
+            self.space._index_to_agent[index]
+            for index in indices
+            if index != self._mesa_index
+        ]
         return agents
 
     def get_nearest_neighbors(self, k=1):
@@ -57,5 +62,9 @@ class ContinuousSpaceAgent(Agent):
         indices = np.argpartition(distances, k)[:k]
 
         # don't forget to remove our self
-        agents = [self.space._index_to_agent[index] for index in indices if index != self._mesa_index]
+        agents = [
+            self.space._index_to_agent[index]
+            for index in indices
+            if index != self._mesa_index
+        ]
         return agents

@@ -1,6 +1,5 @@
 """A Continous Space class."""
 
-
 import warnings
 from collections.abc import Sequence
 from random import Random
@@ -12,9 +11,7 @@ from mesa.agent import Agent, AgentSet
 
 
 class ContinuousSpace:
-    """Continuous space where each agent can have an arbitrary position.
-
-    """
+    """Continuous space where each agent can have an arbitrary position."""
 
     def __init__(
         self,
@@ -39,10 +36,11 @@ class ContinuousSpace:
 
         self.torus = torus
 
-
         n = 100
         self._agent_positions = np.zeros((n, self.dimensions.shape[0]))
-        self._positions_in_use = np.zeros((n,), dtype=bool)  # effectively a mask over _agent_positions
+        self._positions_in_use = np.zeros(
+            (n,), dtype=bool
+        )  # effectively a mask over _agent_positions
         self._index_to_agent: dict[int, Agent] = {}
         self._agent_to_index: dict[Agent, int | None] = {}
 
@@ -64,7 +62,7 @@ class ContinuousSpace:
 
         """
         try:
-           return self._agent_to_index[agent]
+            return self._agent_to_index[agent]
         except KeyError:
             indices = np.where(self._positions_in_use == False)[0]
 
@@ -74,11 +72,17 @@ class ContinuousSpace:
                 # we are out of space
                 fraction = 0.2  # we add 20%
                 n = int(round(fraction * self._agent_positions.shape[0]))
-                self._agent_positions = np.vstack([self._agent_positions,
-                                                  np.zeros((n, self.dimensions.shape[0]),)]
-                                                  )
-                self._positions_in_use = np.hstack([self._positions_in_use,
-                                                    np.zeros((n,), dtype=bool)])
+                self._agent_positions = np.vstack(
+                    [
+                        self._agent_positions,
+                        np.zeros(
+                            (n, self.dimensions.shape[0]),
+                        ),
+                    ]
+                )
+                self._positions_in_use = np.hstack(
+                    [self._positions_in_use, np.zeros((n,), dtype=bool)]
+                )
                 index = np.where(self._positions_in_use == False)[0][0]
 
         self._positions_in_use[index] = True
@@ -106,7 +110,9 @@ class ContinuousSpace:
 
     def in_bounds(self, point) -> bool:
         """Check if point is inside the bounds of the space."""
-        return ((point >= self.dimensions[:, 0]) & (point <= self.dimensions[:, 1])).all()
+        return (
+            (point >= self.dimensions[:, 0]) & (point <= self.dimensions[:, 1])
+        ).all()
 
     def torus_correct(self, point) -> np.ndarray:
         """Apply a torus correction to the point."""
