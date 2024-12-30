@@ -55,26 +55,27 @@ preferred-citation: article
 Mesa is an open-source Python framework for agent-based modeling (ABM) that enables researchers to create, analyze, and visualize agent-based simulations. Mesa provides a comprehensive set of tools and abstractions for modeling complex systems, with capabilities spanning from basic agent management to sophisticated representation of spaces within which agents interact. First introduced in 2014 [@masad2015], with updates published in [@kazil2020], this paper presents Mesa in its current version (3.1.1) as of late 2024.
 
 # Statement of need
-Agent-based models, or artificial societies, are composed of autonomous heterogeneous agents positioned in one or more space(s). Given a space, agents have *local* interactions with their neighbors. The aggregate dynamics of a system under study emerge from these local interactions [@epstein_axtell_1996][@epstein1999]. Simulations quickly grew more sophisticated, requiring frameworks to execute them. This led to the establishment of  NetLogo and MASON.
+Agent-based models (ABMs), or artificial societies, are composed of autonomous heterogeneous agents interacting locally with other agents. These interactions give rise to emergent phenomena. The aggregate dynamics of a system under study emerge from these local interactions [@epstein_axtell_1996] [@epstein1999]. This type of modeling quickly grew more sophisticated, requiring frameworks to execute them. This led to the establishment of NetLogo and MASON.
 
-However, before Mesa, there was no modern Python-based framework for ABM that integrated with the scientific Python ecosystem. Mesa has been applied to modeling everything from economics and sociology to ecology and epidemiology and has been cited in more than 500 papers and 800 authors. As the adoption of Mesa grew, key features were added and present in Mesa 3.0+ to advance and stabilize functionality. These features include enhanced management of agents, data collection advancements, improved visualization framework, and making it easier for researchers to create and analyze complex simulations.
+However, before Mesa, there was no modern Python-based framework for ABMs that integrated with the scientific Python ecosystem. Since it’s creation in 2014, Mesa has been applied to modeling everything from economics and sociology to ecology and epidemiology and has been cited in more than 500 papers and 800 authors. Today, Mesa advanced usability and stabilized functionality with its most recent major release (3+). These features include enhanced management of agents, data collection advancements, improved visualization framework, and making it easier for researchers to create and analyze complex simulations.
 
 # Core capabilities
-Mesa offers a Python-based framework for ABM that integrates with the wider scientific python ecosystem. Mesa provides a comprehensive set of tools for creating, running, and analyzing agent-based models while maintaining Python's emphasis on readability and simplicity. Mesa is implemented in pure Python (3.11+) with a modular architecture separating:
+Mesa is a Python-based framework for ABM that provides a comprehensive set of tools for creating, running, and analyzing ABMs. Mesa integrates with the wider scientific Python ecosystem with libraries such as NumPy, pandas, Matplotlib, NetworkX, and more. Mesa is implemented in pure Python (3.11+) with a modular architecture separating:
 1. Core ABM components (*i.e.,* agents, spaces, agent activation, control over random numbers)
 2. Data collection and support for model experimentation
 3. Visualization systems
 
-This design allows selective use of components while enabling extension and customization. The framework integrates with the scientific Python ecosystem including NumPy, pandas, and Matplotlib.
+This design allows selective use of components while enabling extension and customization.
 
 ## Core ABM components
-The central class in MESA is the Model. Mesa provides a base model class that the user is expected to extend. Within this model, the user instantiates the space and populates it with agent instances. Since (agent-based models) ABMs are typically stochastic simulations, the model also controls the random number generation.
+### Model
+The central class in Mesa is the Model. The user extends the model. Within it, the user instantiates the space and populates it with agent instances. Since ABMs are typically stochastic simulations, the model also controls the random number generation.
 
 ### Agents
 Central to ABMs are the autonomous heterogeneous agents. Mesa provides a variety of base agent classes which the user can subclass. In its most basic implementation, such an agent subclass specifies the `__init__` and `step` method. Any subclass of the basic mesa agent subclass registers itself with the specified model instance, and via `agent.remove` it will remove itself from the model. It is strongly encouraged to rely on `remove`, and even extend it if needed to ensure agents are fully removed from the simulation.
 
 ### Agent management
-The management of large groups of agents is critical in ABMs. Mesa's agent management system is built around the concept of AgentSet, which provide intuitive ways to organize and manipulate collections of agents:
+One significant advancement of Mesa 3+ is expanded functionality around agent management. The new `AgentSet` class provides methods that allow users to filter, group, and analyze agents, making it easier to express complex model logic.
 
 ```python
 # Select wealthy agents and calculate average wealth
@@ -120,20 +121,17 @@ space.move_agent(agent, (new_x, new_y))
 ```
 
 ### Time advancement
-Typically, agent-based models rely on incremental time progression or ticks. For each tick, the step method of the model is called. This activates the agents in some way. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
+Typically, ABMs rely on incremental time progression or ticks. For each tick, the step method of the model is called. This activates the agents in some way. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
 
 ```python
-
 model = Model(seed=42)
 
 for _ in range(100):
     model.step()
-
 ```
 
-Generally, within the step method of the model, one activates all the agents. The AgentSet can be used for this. Some common agent activation patterns are shown below, which alsocan be combined to create more sophisticated and complex ones.
+Generally, within the step method of the model, one activates all the agents. The newly added AgentSet class provides a more flexible way to activate agents replacing the fixed patterns previously available.
 
-1. Deterministic activation of agent
 ```python
 model.agents.do("step")  # Sequential activation
 
