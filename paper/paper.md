@@ -73,16 +73,16 @@ Central to ABMs are the autonomous heterogeneous agents. Mesa provides a variety
 ### Agent management
 One significant advancement of Mesa 3+ is expanded functionality around agent management. The new [`AgentSet`](https://mesa.readthedocs.io/latest/apis/agent.html#mesa.agent.AgentSet) class provides methods that allow users to filter, group, and analyze agents, making it easier to express complex model logic.
 
-```python
-# Select wealthy agents and calculate average wealth
-wealthy = model.agents.select(lambda a: a.wealth > 1000)
-avg_wealth = wealthy.agg("wealth", func=np.mean)
-
-# Group agents by type and apply behaviors
-grouped = model.agents.groupby("species")
-for species, agents in grouped:
-    agents.shuffle_do("reproduce")
-```
+    ```python
+    # Select wealthy agents and calculate average wealth
+    wealthy = model.agents.select(lambda a: a.wealth > 1000)
+    avg_wealth = wealthy.agg("wealth", func=np.mean)
+    
+    # Group agents by type and apply behaviors
+    grouped = model.agents.groupby("species")
+    for species, agents in grouped:
+        agents.shuffle_do("reproduce")
+    ```
 
 ### Spaces
 Mesa 3 provides both discrete (cell-based) and continuous space implementations. In discrete spaces, an agent occupies a cell. Mesa implements discrete spaces using a doubly-linked structure where each cell maintains connections to its neighbors. The framework includes several discrete space variants with a consistent API:
@@ -92,10 +92,11 @@ Mesa 3 provides both discrete (cell-based) and continuous space implementations.
 - Voronoi-based: `VoronoiMesh` for irregular tessellations
 
 Example grid creation:
+
 ```python
-grid = OrthogonalVonNeumannGrid(
-    (width, height), torus=False, random=model.random
-)
+    grid = OrthogonalVonNeumannGrid(
+        (width, height), torus=False, random=model.random
+    )
 ```
 
 Mesa provides specialized agent classes for spatial interactions in the discrete spaces:
@@ -173,6 +174,7 @@ visualization = SolaraViz(
 ![A screenshot of the WolfSheep Model in Mesa](../docs/images/wolf_sheep.png)
 
 Key features include:
+
 - Interactive model controls
 - Real-time data visualization
 - Customizable agent and space portrayal
@@ -230,6 +232,7 @@ Mesa has been applied across diverse domains, including:
 These applications showcase Mesa's versatility in modeling complex systems with autonomous interacting agents, whether representing individual consumers, infrastructure components, buildings, or vehicles.
 
 The framework is particularly suited for:
+
 - Models with heterogeneous agent populations
 - Systems requiring sophisticated spatial interactions
 - Interactive exploration of parameter spaces
@@ -237,6 +240,7 @@ The framework is particularly suited for:
 
 # Community and ecosystem
 Mesa has grown into a complete ecosystem with extensions including:
+
 - [Mesa-Geo](https://github.com/projectmesa/mesa-geo) for geospatial modeling [wang2022mesa]
 - [Mesa-Frames](https://github.com/projectmesa/mesa-frames) for high-performance simulations
 - A rich collection of community-contributed extensions, [example models](https://github.com/projectmesa/mesa-examples), and tutorials
