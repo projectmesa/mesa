@@ -39,7 +39,7 @@ affiliations:
     index: 4
   - name: Independent Researcher
     index: 5
-date: 5 December 2024
+date: 30 December 2024
 bibliography: paper.bib
 
 # Optional fields
