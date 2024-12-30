@@ -94,9 +94,7 @@ Mesa 3 provides both discrete (cell-based) and continuous space implementations.
 Example grid creation:
 
 ```python
-    grid = OrthogonalVonNeumannGrid(
-        (width, height), torus=False, random=model.random
-    )
+    grid = OrthogonalVonNeumannGrid((width, height), torus=False, random=model.random)
 ```
 
 Mesa provides specialized agent classes for spatial interactions in the discrete spaces:
