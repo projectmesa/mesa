@@ -23,6 +23,9 @@ authors:
   - name: Boyu Wang
     orcid: 0000-0001-9879-2138
     affiliation: "4"
+  - name: rht
+    orcid: 0009-0002-6902-111X
+    affiliation: "5"
   - name: Jackie Kazil
     orcid: 0000-0002-8300-7384
     affiliation: "3"
@@ -35,6 +38,8 @@ affiliations:
     index: 3
   - name: University at Buffalo (Department of Geography), United States
     index: 4
+  - name: Independent Researcher
+    index: 5
 date: 30 December 2024
 bibliography: paper.bib
 
@@ -240,7 +245,7 @@ Mesa has grown into a complete ecosystem with extensions including:
 - A rich collection of community-contributed extensions, [example models](https://github.com/projectmesa/mesa-examples), and tutorials
 
 # Acknowledgements
-The advancements leading to Mesa 3 were developed by six maintainers (the authors) and an active community with over 140 [contributors](https://github.com/projectmesa/mesa/graphs/contributors). We would especially like to thank [David Masad](https://github.com/dmasad) for his foundational work on Mesa and [rht](https://github.com/rht) for his work as maintainer in 2022 to 2024.
+The advancements leading to Mesa 3 were developed by six maintainers (the authors) and an active community with over 140 [contributors](https://github.com/projectmesa/mesa/graphs/contributors). We would especially like to thank [David Masad](https://github.com/dmasad) for his foundational work on Mesa.
 
 # Conclusions
 Mesa 3 introduces significant advancements to the Python ABM framework, enhancing the core toolkit with greater control, interactivity, and speed for researchers. These notable improvements, paired with its foundational integration with the scientific Python ecosystem, modular architecture, and active community, make it an indispensable tool for researchers across disciplines working in Python who need to create and analyze agent-based models.
