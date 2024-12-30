@@ -27,13 +27,13 @@ authors:
     orcid: 0000-0002-8300-7384
     affiliation: "3"
 affiliations:
-  - name: Delft University of Technology (Faculty of Technology, Policy and Management)
+  - name: Delft University of Technology (Faculty of Technology, Policy and Management), the Netherlands
     index: 1
   - name: Independent Researcher, Germany
     index: 2
-  - name: George Mason University (Department of Computational Social Science)
+  - name: George Mason University (Department of Computational Social Science), United States
     index: 3
-  - name: University at Buffalo (Department of Geography)
+  - name: University at Buffalo (Department of Geography), United States
     index: 4
 date: 30 December 2024
 bibliography: paper.bib
