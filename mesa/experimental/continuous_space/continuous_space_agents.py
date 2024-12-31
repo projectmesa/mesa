@@ -5,7 +5,7 @@ from typing import Protocol
 import numpy as np
 
 from mesa.agent import Agent
-from mesa.experimental.continuous_space.continuous_space import ContinuousSpace
+from mesa.experimental.continuous_space import ContinuousSpace
 
 
 class HasPositionProtocol(Protocol):
@@ -45,7 +45,7 @@ class ContinuousSpaceAgent(Agent):
 
     def get_neigbors_in_radius(self, radius=1):
         distances = self.space.calculate_distances(self.position)
-        indices = np.where(distances < radius)[0]
+        indices = np.where(distances <= radius)[0]
 
         # don't forget to remove our self
         agents = [

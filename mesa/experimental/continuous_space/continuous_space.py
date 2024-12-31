@@ -1,4 +1,4 @@
-"""A Continous Space class."""
+"""A Continyous Space class."""
 
 import warnings
 from collections.abc import Sequence
@@ -18,6 +18,7 @@ class ContinuousSpace:
         dimensions: Sequence[Sequence[float]],
         torus: bool = False,
         random: Random | None = None,
+        n_agents: int = 100,
     ) -> None:
         """Create a new continuous space."""
         if random is None:
@@ -36,10 +37,9 @@ class ContinuousSpace:
 
         self.torus = torus
 
-        n = 100
-        self._agent_positions = np.zeros((n, self.dimensions.shape[0]))
+        self._agent_positions = np.zeros((n_agents, self.dimensions.shape[0]), dtype=float)
         self._positions_in_use = np.zeros(
-            (n,), dtype=bool
+            (n_agents,), dtype=bool
         )  # effectively a mask over _agent_positions
         self._index_to_agent: dict[int, Agent] = {}
         self._agent_to_index: dict[Agent, int | None] = {}
@@ -64,13 +64,13 @@ class ContinuousSpace:
         try:
             return self._agent_to_index[agent]
         except KeyError:
-            indices = np.where(not self._positions_in_use)[0]
+            indices = np.where(~self._positions_in_use)[0]
 
             if indices.size > 0:
                 index = indices[0]
             else:
                 # we are out of space
-                fraction = 0.2  # we add 20%
+                fraction = 0.2  # we add 20%  Fixme
                 n = int(round(fraction * self._agent_positions.shape[0]))
                 self._agent_positions = np.vstack(
                     [
@@ -83,7 +83,7 @@ class ContinuousSpace:
                 self._positions_in_use = np.hstack(
                     [self._positions_in_use, np.zeros((n,), dtype=bool)]
                 )
-                index = np.where(not self._positions_in_use)[0][0]
+                index = np.where(~self._positions_in_use)[0][0]
 
         self._positions_in_use[index] = True
         self._agent_to_index[agent] = index
@@ -102,7 +102,7 @@ class ContinuousSpace:
         """Calculate the distance between the point and all agents."""
         if self.torus:
             delta = np.abs(point[np.newaxis, :] - self.agent_positions)
-            delta = np.minimum(delta, 1 - delta)
+            delta = np.minimum(delta, 1 - delta)  # fixme, should be based on size
             dists = np.linalg.norm(delta, axis=1)
         else:
             dists = cdist(point[np.newaxis, :], self.agent_positions)
