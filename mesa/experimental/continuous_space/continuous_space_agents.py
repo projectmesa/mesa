@@ -1,3 +1,5 @@
+"""Continuous space agents."""
+
 from __future__ import annotations
 
 from typing import Protocol, overload
