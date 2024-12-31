@@ -24,6 +24,7 @@ class ContinuousSpaceAgent(Agent):
         position (np.ndarray): the position of the agent
 
     """
+
     __slots__ = ["_mesa_index", "space"]
 
     @property
@@ -62,13 +63,16 @@ class ContinuousSpaceAgent(Agent):
         self.space = None
 
     @overload
-    def get_neighbors_in_radius(self, radius:int=1, include_distance:bool=False) -> list[ContinuousSpaceAgent]: ...
+    def get_neighbors_in_radius(
+        self, radius: int = 1, include_distance: bool = False
+    ) -> list[ContinuousSpaceAgent]: ...
 
     @overload
-    def get_neighbors_in_radius(self, radius=1, include_distance:bool=True) -> list[tuple[ContinuousSpaceAgent, float]]: ...
+    def get_neighbors_in_radius(
+        self, radius=1, include_distance: bool = True
+    ) -> list[tuple[ContinuousSpaceAgent, float]]: ...
 
-
-    def get_neighbors_in_radius(self, radius=1, include_distance = False):
+    def get_neighbors_in_radius(self, radius=1, include_distance=False):
         """Get neighbors within radius.
 
         Args:
@@ -96,13 +100,16 @@ class ContinuousSpaceAgent(Agent):
         return agents
 
     @overload
-    def get_nearest_neighbors(self, k:int=1, include_distance:bool=False) -> list[ContinuousSpaceAgent]: ...
+    def get_nearest_neighbors(
+        self, k: int = 1, include_distance: bool = False
+    ) -> list[ContinuousSpaceAgent]: ...
 
     @overload
-    def get_nearest_neighbors(self, k=1, include_distance:bool=True) -> list[tuple[ContinuousSpaceAgent, float]]: ...
+    def get_nearest_neighbors(
+        self, k=1, include_distance: bool = True
+    ) -> list[tuple[ContinuousSpaceAgent, float]]: ...
 
-
-    def get_nearest_neighbors(self, k=1, include_distance = False):
+    def get_nearest_neighbors(self, k=1, include_distance=False):
         """Get neighbors within radius.
 
         Args:
@@ -110,7 +117,6 @@ class ContinuousSpaceAgent(Agent):
             include_distance: include the distance information for each neighbor
 
         """
-
         distances = self.space.calculate_distances(self.position)
 
         k += 1  # the distance calculation includes self, with a distance of 0, so we remove this later
