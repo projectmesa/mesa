@@ -37,7 +37,9 @@ class ContinuousSpace:
 
         self.torus = torus
 
-        self._agent_positions = np.zeros((n_agents, self.dimensions.shape[0]), dtype=float)
+        self._agent_positions = np.zeros(
+            (n_agents, self.dimensions.shape[0]), dtype=float
+        )
         self._positions_in_use = np.zeros(
             (n_agents,), dtype=bool
         )  # effectively a mask over _agent_positions

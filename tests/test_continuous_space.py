@@ -1,17 +1,13 @@
 import numpy as np
-import pytest
 
 from mesa import Model
-
 from mesa.experimental.continuous_space import ContinuousSpace, ContinuousSpaceAgent
-
 
 
 def test_continuous_space():
     model = Model(seed=42)
 
-    dimensions = np.asarray([[0, 1],
-                             [-1, 0]])
+    dimensions = np.asarray([[0, 1], [-1, 0]])
     space = ContinuousSpace(dimensions, torus=False, random=model.random)
 
     # check some default fields
@@ -23,9 +19,9 @@ def test_continuous_space():
     # check in_bounds
     assert space.in_bounds([0.5, -0.5])
     assert not space.in_bounds([-0.5, -0.5])
-    assert not space.in_bounds([ 1.5, -0.5])
-    assert not space.in_bounds([ 0.5,  0.5])
-    assert not space.in_bounds([ 0.5, -1.5])
+    assert not space.in_bounds([1.5, -0.5])
+    assert not space.in_bounds([0.5, 0.5])
+    assert not space.in_bounds([0.5, -1.5])
 
     # check torus correction
     space = ContinuousSpace(dimensions, torus=True, random=model.random)
@@ -36,9 +32,7 @@ def test_continuous_space():
     assert np.all(space.torus_correct([0.5, -1.5]) == [0.5, -0.5])
 
     # check 3d
-    dimensions = np.asarray([[0, 2],
-                             [-2, 0],
-                             [-2, 2]])
+    dimensions = np.asarray([[0, 2], [-2, 0], [-2, 2]])
     space = ContinuousSpace(dimensions, torus=False, random=model.random)
 
     # check some default fields
@@ -50,18 +44,18 @@ def test_continuous_space():
     assert space.in_bounds([1, -1, 0])
     assert not space.in_bounds([-0.5, -1, 0])
     assert not space.in_bounds([2.5, -1, 0])
-    assert not space.in_bounds([ 1, 0.5, 0])
-    assert not space.in_bounds([ 1, -2.5, 0])
-    assert not space.in_bounds([ 1, -1, -3])
-    assert not space.in_bounds([ 1, -1, 3])
+    assert not space.in_bounds([1, 0.5, 0])
+    assert not space.in_bounds([1, -2.5, 0])
+    assert not space.in_bounds([1, -1, -3])
+    assert not space.in_bounds([1, -1, 3])
     assert not space.in_bounds([-0.5, -1, 3])
     assert not space.in_bounds([1, 0.5, 3])
+
 
 def test_continuous_agent():
     model = Model(seed=42)
 
-    dimensions = np.asarray([[0, 1],
-                             [0, 1]])
+    dimensions = np.asarray([[0, 1], [0, 1]])
     space = ContinuousSpace(dimensions, torus=False, random=model.random)
 
     for _ in range(10):
@@ -70,7 +64,9 @@ def test_continuous_agent():
 
     assert space.agent_positions.shape == (10, 2)
     for agent in space.agents:
-        assert np.all(agent.position == space.agent_positions[space._get_index_for_agent(agent)])
+        assert np.all(
+            agent.position == space.agent_positions[space._get_index_for_agent(agent)]
+        )
 
     # add more agents, triggering a resizeing of the array
     for _ in range(100):
@@ -79,12 +75,14 @@ def test_continuous_agent():
 
     assert space.agent_positions.shape == (110, 2)
     for agent in space.agents:
-        assert np.all(agent.position == space.agent_positions[space._get_index_for_agent(agent)])
+        assert np.all(
+            agent.position == space.agent_positions[space._get_index_for_agent(agent)]
+        )
 
     # remove all agents and check if the view is updated throughout correctly
     for i, agent in enumerate(space.agents):
         agent.remove()
-        assert space.agent_positions.shape == (110-1-i, 2)
+        assert space.agent_positions.shape == (110 - 1 - i, 2)
 
 
 # class TestSpaceToroidal(unittest.TestCase):
@@ -128,7 +126,7 @@ def test_continuous_agent():
 #         pos_7 = (21, -5)
 #         assert self.space.get_distance(pos_6, pos_7) == np.sqrt(49**2 + 24**2)
 #
-#     def test_heading(self):  # noqa: D102
+#     def test_heading(self):
 #         pos_1 = (-30, -30)
 #         pos_2 = (70, 20)
 #         self.assertEqual((0, 0), self.space.get_heading(pos_1, pos_2))
