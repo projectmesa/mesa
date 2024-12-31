@@ -33,7 +33,7 @@ repos:
         args:
           - "--ignore-words"
           - ".codespellignore"
-        exclude: .vale/styles/Microsoft/Avoid.yml
+        exclude: .github/styles/Microsoft/Avoid.yml
 
   - repo: https://github.com/errata-ai/vale
     rev: v3.9.1  # Use the version of Vale you want
