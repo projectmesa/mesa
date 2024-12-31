@@ -7,6 +7,7 @@ from mesa.examples.basic.alliance_formation_model.model import AllianceModel
 from mesa.mesa_logging import DEBUG, log_to_stderr
 from mesa.visualization import SolaraViz
 from mesa.visualization.utils import update_counter
+from multi_level_alliance.model import AllianceModel
 
 log_to_stderr(DEBUG)
 

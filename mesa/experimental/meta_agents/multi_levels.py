@@ -17,14 +17,16 @@ See alliance formation model in basic examples for usage.
 
 from types import MethodType
 
+from mesa.experimental.meta_agents.meta_agent import MetaAgent
 
-def create_meta_agent(
+
+def create_multi_levels(
     model,
     new_agent_class: str,
     agents,
     meta_attributes=dict(),  # noqa B006
     meta_functions=dict(),  # noqa B006
-    retain_subagent_functions=True,
+    retain_subagent_functions=False,
     retain_subagent_attributes=False,
 ):
     """Dynamically create a new meta-agent class and instantiate agents in that class.
@@ -44,23 +46,8 @@ def create_meta_agent(
         created agent type
         - New class instance if created a new dynamically created agent type
     """
-    from mesa import (
-        Agent,  # Import the Agent class from Mesa locally to avoid circular import
-    )
-
     # Convert agents to set to ensure uniqueness
     agents = set(agents)
-
-    def add_agents(meta_agent, new_agents: set[Agent]):
-        """Update agents' meta-agent attribute and store agent's meta-agent.
-
-        Parameters:
-        meta_agent (MetaAgent): The meta-agent instance.
-        new_agents (Set[Agent]): The new agents to be added.
-        """
-        meta_agent.agents.update(new_agents)
-        for agent in new_agents:
-            agent.meta_agent = meta_agent
 
     def add_functions(meta_agent_instance, agents, meta_functions):
         """Add functions to the meta-agent instance.
@@ -73,17 +60,16 @@ def create_meta_agent(
         if retain_subagent_functions:
             agent_classes = {type(agent) for agent in agents}
             for agent_class in agent_classes:
-                for name in dir(agent_class):
+                for name in agent_class.__dict__:
                     if callable(getattr(agent_class, name)) and not name.startswith(
                         "__"
                     ):
                         original_method = getattr(agent_class, name)
                         meta_functions[name] = original_method
 
-        if meta_functions:
-            for name, func in meta_functions.items():
-                bound_method = MethodType(func, meta_agent_instance)
-                setattr(meta_agent_instance, name, bound_method)
+        for name, func in meta_functions.items():
+            bound_method = MethodType(func, meta_agent_instance)
+            setattr(meta_agent_instance, name, bound_method)
 
     def add_attributes(meta_agent_instance, agents, meta_attributes):
         """Add attributes to the meta-agent instance.
@@ -99,9 +85,8 @@ def create_meta_agent(
                     if not callable(value):
                         meta_attributes[name] = value
 
-        if meta_attributes:
-            for key, value in meta_attributes.items():
-                setattr(meta_agent_instance, key, value)
+        for key, value in meta_attributes.items():
+            setattr(meta_agent_instance, key, value)
 
     # Path 1 - Add agents to existing meta-agent
     subagents = [a for a in agents if hasattr(a, "meta_agent")]
@@ -109,13 +94,14 @@ def create_meta_agent(
         if len(subagents) == 1:
             add_attributes(subagents[0].meta_agent, agents, meta_attributes)
             add_functions(subagents[0].meta_agent, agents, meta_functions)
-            add_agents(subagents[0].meta_agent, agents)
+            subagents[0].meta_agent.add_subagents(agents)
+
         else:
             subagent = model.random.choice(subagents)
             agents = set(agents) - set(subagents)
             add_attributes(subagent.meta_agent, agents, meta_attributes)
             add_functions(subagent.meta_agent, agents, meta_functions)
-            add_agents(subagent.meta_agent, agents)
+            subagent.meta_agent.add_subagents(agents)
             # TODO: Add way for user to specify how agents join meta-agent instead of random choice
     else:
         # Path 2 - Create a new instance of an existing meta-agent class
@@ -132,28 +118,21 @@ def create_meta_agent(
             meta_agent_instance = agent_class(model, agents)
             add_attributes(meta_agent_instance, agents, meta_attributes)
             add_functions(meta_agent_instance, agents, meta_functions)
-            add_agents(meta_agent_instance, agents)
             model.register_agent(meta_agent_instance)
             return meta_agent_instance
         else:
             # Path 3 - Create a new meta-agent class
-            class MetaAgentClass(Agent):
-                def __init__(self, model, agents):
-                    super().__init__(model)
-                    self.agents = agents
-
             meta_agent_class = type(
                 new_agent_class,
-                (MetaAgentClass,),
+                (MetaAgent,),
                 {
                     "unique_id": None,
-                    "agents": None,
+                    "_subset": None,
                 },
             )
 
-            meta_agent_instance = meta_agent_class(model=model, agents=agents)
+            meta_agent_instance = meta_agent_class(model, agents)
             add_attributes(meta_agent_instance, agents, meta_attributes)
             add_functions(meta_agent_instance, agents, meta_functions)
             model.register_agent(meta_agent_instance)
-            add_agents(meta_agent_instance, agents)
             return meta_agent_instance

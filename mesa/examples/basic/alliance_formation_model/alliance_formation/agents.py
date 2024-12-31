@@ -1,5 +1,5 @@
 import mesa
-from mesa.experimental.meta_agents import create_meta_agent
+from mesa.experimental.meta_agents import create_multi_levels
 
 
 def calculate_shapley_value(calling_agent, other_agent):
@@ -15,29 +15,29 @@ def calculate_shapley_value(calling_agent, other_agent):
 
     # Determine if there is value in the alliance
     if value_me > calling_agent.power and value_other > other_agent.power:
-        if other_agent.hierarchy > calling_agent.hierarchy:
-            hierarchy = other_agent.hierarchy
-        elif other_agent.hierarchy == calling_agent.hierarchy:
-            hierarchy = calling_agent.hierarchy + 1
+        if other_agent.level > calling_agent.level:
+            level = other_agent.level
+        elif other_agent.level == calling_agent.level:
+            level = calling_agent.level + 1
         else:
-            hierarchy = calling_agent.hierarchy
+            level = calling_agent.level
 
-        return (potential_utility, new_position, hierarchy)
+        return (potential_utility, new_position, level)
     else:
         return None
 
 
 class AllianceAgent(mesa.Agent):
     """
-    Agent has three attributes power (float), position (float) and hierarchy (int)
+    Agent has three attributes power (float), position (float) and level (int)
 
     """
 
-    def __init__(self, model, power, position, hierarchy=0):
+    def __init__(self, model, power, position, level=0):
         super().__init__(model)
         self.power = power
         self.position = position
-        self.hierarchy = hierarchy
+        self.level = level
 
     def form_alliance(self):
         # Randomly select another agent of the same type
@@ -50,22 +50,23 @@ class AllianceAgent(mesa.Agent):
             other_agent = self.random.choice(other_agents)
             shapley_value = calculate_shapley_value(self, other_agent)
             if shapley_value:
-                class_name = f"MetaAgentHierarchy{shapley_value[2]}"
-                meta = create_meta_agent(
+                class_name = f"MetaAgentLevel{shapley_value[2]}"
+                meta = create_multi_levels(
                     self.model,
                     class_name,
                     {other_agent, self},
                     meta_attributes={
-                        "hierarchy": shapley_value[2],
+                        "level": shapley_value[2],
                         "power": shapley_value[0],
                         "position": shapley_value[1],
                     },
+                    retain_subagent_functions=True,
                 )
 
                 # Update the network if a new meta agent instance created
                 if meta:
                     self.model.network.add_node(
                         meta.unique_id,
-                        size=(meta.hierarchy + 1) * 300,
-                        hierarchy=meta.hierarchy,
+                        size=(meta.level + 1) * 300,
+                        level=meta.level,
                     )

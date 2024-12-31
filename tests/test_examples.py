@@ -110,7 +110,7 @@ def test_wolf_sheep():  # noqa: D103
 
 
 def test_alliance_formation_model():  # noqa: D103
-    from mesa.examples.basic.alliance_formation_model import app
+    from multi_level_alliance import app
 
     app.page  # noqa: B018
 

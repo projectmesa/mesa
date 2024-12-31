@@ -1,8 +1,8 @@
 import networkx as nx
 import numpy as np
+from multi_level_alliance.agents import AllianceAgent
 
 import mesa
-from mesa.examples.basic.alliance_formation_model.agents import AllianceAgent
 
 
 class AllianceModel(mesa.Model):
@@ -19,7 +19,7 @@ class AllianceModel(mesa.Model):
         position = np.clip(position, 0, 1)
         AllianceAgent.create_agents(self, n, power, position)
         agent_ids = [
-            (agent.unique_id, {"size": 300, "hierarchy": 0}) for agent in self.agents
+            (agent.unique_id, {"size": 300, "level": 0}) for agent in self.agents
         ]
         self.network.add_nodes_from(agent_ids)
 
@@ -36,4 +36,4 @@ class AllianceModel(mesa.Model):
             # Update graph
             if agent_class is not AllianceAgent:
                 for meta_agent in self.agents_by_type[agent_class]:
-                    self.add_link(meta_agent, meta_agent.agents)
+                    self.add_link(meta_agent, meta_agent.subset)

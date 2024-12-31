@@ -3,7 +3,7 @@
 import pytest
 
 from mesa import Agent, Model
-from mesa.experimental.meta_agents.meta_agents import create_meta_agent
+from mesa.experimental.meta_agents.multi_levels import create_meta_agent
 
 
 @pytest.fixture
