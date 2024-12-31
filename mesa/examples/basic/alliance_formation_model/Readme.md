@@ -13,7 +13,7 @@ In its current configuration, agents being part of multiple meta-agents is not s
 
 This model requires Mesa's recommended install and scipy
 ```
-    $ pip install mesa[rec] scipy
+    $ pip install mesa[rec]
 ```
 
 ## How to Run

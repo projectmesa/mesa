@@ -1,10 +1,10 @@
 # noqa: D100
 from mesa.examples import (
-    AllianceModel,
     BoidFlockers,
     BoltzmannWealth,
     ConwaysGameOfLife,
     EpsteinCivilViolence,
+    MultiLevelAllianceModel,
     PdGrid,
     Schelling,
     SugarscapeG1mt,
@@ -114,7 +114,9 @@ def test_alliance_formation_model():  # noqa: D103
 
     app.page  # noqa: B018
 
-    model = AllianceModel(50, seed=42)
+    model = MultiLevelAllianceModel(50, seed=42)
 
     for _i in range(10):
         model.step()
+
+    assert len(model.agents) == len(model.network.nodes)
