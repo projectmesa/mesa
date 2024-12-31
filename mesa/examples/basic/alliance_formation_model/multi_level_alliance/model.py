@@ -2,7 +2,9 @@ import networkx as nx
 import numpy as np
 
 import mesa
-from mesa.examples.basic.alliance_formation_model.multi_level_alliance.agents import AllianceAgent
+from mesa.examples.basic.alliance_formation_model.multi_level_alliance.agents import (
+    AllianceAgent,
+)
 
 
 class AllianceModel(mesa.Model):
