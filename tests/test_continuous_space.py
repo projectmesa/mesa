@@ -5,6 +5,7 @@ from mesa.experimental.continuous_space import ContinuousSpace, ContinuousSpaceA
 
 
 def test_continuous_space():
+    """Test ContinuousSpace class."""
     model = Model(seed=42)
 
     dimensions = np.asarray([[0, 1], [-1, 0]])
@@ -53,6 +54,7 @@ def test_continuous_space():
 
 
 def test_continuous_agent():
+    """Test ContinuousSpaceAgent class."""
     model = Model(seed=42)
 
     dimensions = np.asarray([[0, 1], [0, 1]])
@@ -86,6 +88,7 @@ def test_continuous_agent():
 
 
 def test_distances():
+    """Test ContinuousSpace.distance method."""
     # non torus
     model = Model(seed=42)
     dimensions = np.asarray([[0, 1], [0, 1]])

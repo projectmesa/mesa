@@ -118,10 +118,6 @@ class ContinuousSpaceAgent(Agent):
         k += 1  # the distance calculation includes self, with a distance of 0, so we remove this later
         indices = np.argpartition(dists, k)[:k]
 
-        # fixme
-        #  indices mismatch, because it is the index in the distances
-        #  but this is not the same as the indices in agent_positions
-
         # don't forget to remove our self
         if include_distance:
             # don't forget to remove our self

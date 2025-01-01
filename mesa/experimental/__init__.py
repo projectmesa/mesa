@@ -17,4 +17,4 @@ Notes:
 
 from mesa.experimental import cell_space, continuous_space, devs, mesa_signals
 
-__all__ = ["cell_space", "devs", "mesa_signals"]
+__all__ = ["cell_space", "devs", "mesa_signals", "continuous_space"]
