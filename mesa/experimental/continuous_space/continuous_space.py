@@ -119,9 +119,9 @@ class ContinuousSpace:
 
     def in_bounds(self, point) -> bool:
         """Check if point is inside the bounds of the space."""
-        return (
+        return bool((
             (point >= self.dimensions[:, 0]) & (point <= self.dimensions[:, 1])
-        ).all()
+        ).all())
 
     def torus_correct(self, point) -> np.ndarray:
         """Apply a torus correction to the point."""
