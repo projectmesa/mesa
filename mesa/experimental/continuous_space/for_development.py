@@ -1,8 +1,7 @@
 # to be removed once further into the development
-import numpy as np
-
 from random import Random
 
+import numpy as np
 from continuous_space import ContinuousSpace
 from continuous_space_agents import ContinuousSpaceAgent
 
