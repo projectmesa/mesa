@@ -87,9 +87,7 @@ class ContinuousSpace:
                 self._positions_in_use = np.hstack(
                     [self._positions_in_use, np.zeros((n,), dtype=bool)]
                 )
-                self._agents = np.hstack(
-                    [self._agents, np.zeros((n,), dtype=object)]
-                )
+                self._agents = np.hstack([self._agents, np.zeros((n,), dtype=object)])
                 index = np.where(~self._positions_in_use)[0][0]
 
         self._positions_in_use[index] = True
