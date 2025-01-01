@@ -30,18 +30,18 @@ class ContinuousSpace:
             random = Random()
         self.random = random
 
-        self.dimensions = np.asarray(dimensions)
-        self.ndims = self.dimensions.shape[0]
-        self.size = self.dimensions[:, 1] - self.dimensions[:, 0]
-        self.center = np.sum(self.dimensions, axis=1) / 2
+        self.dimensions: np.array = np.asarray(dimensions)
+        self.ndims : int = self.dimensions.shape[0]
+        self.size: np.array = self.dimensions[:, 1] - self.dimensions[:, 0]
+        self.center: np.array = np.sum(self.dimensions, axis=1) / 2
 
-        self.torus = torus
+        self.torus: bool = torus
 
-        self._agent_positions = np.zeros(
+        self._agent_positions: np.array = np.zeros(
             (n_agents, self.dimensions.shape[0]), dtype=float
         )
-        self._agents = np.zeros((n_agents,), dtype=object)
-        self._positions_in_use = np.zeros(
+        self._agents: np.array = np.zeros((n_agents,), dtype=object)
+        self._positions_in_use: np.array = np.zeros(
             (n_agents,), dtype=bool
         )  # effectively a mask over _agent_positions
 
@@ -105,8 +105,10 @@ class ContinuousSpace:
         self._positions_in_use[index] = False
         self._agents[index] = None
 
-    def calculate_distances(self, point):
+    def calculate_distances(self, point) -> tuple[np.ndarray, np.ndarray]:
         """Calculate the distance between the point and all agents."""
+        point = np.asanyarray(point)
+
         if self.torus:
             delta = np.abs(point[np.newaxis, :] - self.agent_positions)
             delta = np.minimum(
@@ -114,7 +116,7 @@ class ContinuousSpace:
             )  # fixme, should be based on size or maxima?
             dists = np.linalg.norm(delta, axis=1)
         else:
-            dists = cdist(point[np.newaxis, :], self.agent_positions)
+            dists = cdist(point[np.newaxis, :], self.agent_positions)[:, 0]
         return dists, self._agents[self._positions_in_use]
 
     def in_bounds(self, point) -> bool:

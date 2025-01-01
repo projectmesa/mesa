@@ -84,6 +84,42 @@ def test_continuous_agent():
         agent.remove()
         assert space.agent_positions.shape == (110 - 1 - i, 2)
 
+def test_distances():
+    # non torus
+    model = Model(seed=42)
+    dimensions = np.asarray([[0, 1], [0, 1]])
+    space = ContinuousSpace(dimensions, torus=False, random=model.random)
+
+    agent = ContinuousSpaceAgent(space, model)
+    agent.position = [0.1, 0.1]
+
+    distances, agents = space.calculate_distances([0.1, 0.9])
+    assert np.all(distances == [0.8,])
+    assert np.all(agents == [agent,])
+
+    distances, agents = space.calculate_distances([0.9, 0.1])
+    assert np.all(distances == [0.8,])
+    assert np.all(agents == [agent, ])
+
+    # torus
+    model = Model(seed=42)
+    dimensions = np.asarray([[0, 1], [0, 1]])
+    space = ContinuousSpace(dimensions, torus=True, random=model.random)
+
+    agent = ContinuousSpaceAgent(space, model)
+    agent.position = [0.1, 0.1]
+
+    distances, agents = space.calculate_distances([0.1, 0.9])
+    assert np.all(np.isclose(distances, [0.2,]))
+    assert np.all(agents == [agent,])
+
+    distances, agents = space.calculate_distances([0.9, 0.1])
+    assert np.all(np.isclose(distances, [0.2,]))
+    assert np.all(agents == [agent, ])
+
+    distances, agents = space.calculate_distances([0.9, 0.9])
+    assert np.all(np.isclose(distances, [0.2*2**0.5,]))
+    assert np.all(agents == [agent, ])
 
 # class TestSpaceToroidal(unittest.TestCase):
 #     """Testing a toroidal continuous space."""
@@ -146,19 +182,4 @@ def test_continuous_agent():
 #         neighbors_3 = self.space.get_neighbors((-30, -30), 10)
 #         assert len(neighbors_3) == 1
 #
-#     def test_bounds(self):
-#         """Test positions outside of boundary."""
-#         boundary_agents = []
-#         for i, pos in enumerate(OUTSIDE_POSITIONS):
-#             a = MockAgent(len(self.agents) + i)
-#             boundary_agents.append(a)
-#             self.space.place_agent(a, pos)
-#
-#         for a, pos in zip(boundary_agents, OUTSIDE_POSITIONS):
-#             adj_pos = self.space.torus_adj(pos)
-#             assert a.pos == adj_pos
-#
-#         a = self.agents[0]
-#         for pos in OUTSIDE_POSITIONS:
-#             assert self.space.out_of_bounds(pos)
-#             self.space.move_agent(a, pos)
+
