@@ -84,6 +84,7 @@ def test_continuous_agent():
         agent.remove()
         assert space.agent_positions.shape == (110 - 1 - i, 2)
 
+
 def test_distances():
     # non torus
     model = Model(seed=42)
@@ -94,12 +95,32 @@ def test_distances():
     agent.position = [0.1, 0.1]
 
     distances, agents = space.calculate_distances([0.1, 0.9])
-    assert np.all(distances == [0.8,])
-    assert np.all(agents == [agent,])
+    assert np.all(
+        distances
+        == [
+            0.8,
+        ]
+    )
+    assert np.all(
+        agents
+        == [
+            agent,
+        ]
+    )
 
     distances, agents = space.calculate_distances([0.9, 0.1])
-    assert np.all(distances == [0.8,])
-    assert np.all(agents == [agent, ])
+    assert np.all(
+        distances
+        == [
+            0.8,
+        ]
+    )
+    assert np.all(
+        agents
+        == [
+            agent,
+        ]
+    )
 
     # torus
     model = Model(seed=42)
@@ -110,16 +131,53 @@ def test_distances():
     agent.position = [0.1, 0.1]
 
     distances, agents = space.calculate_distances([0.1, 0.9])
-    assert np.all(np.isclose(distances, [0.2,]))
-    assert np.all(agents == [agent,])
+    assert np.all(
+        np.isclose(
+            distances,
+            [
+                0.2,
+            ],
+        )
+    )
+    assert np.all(
+        agents
+        == [
+            agent,
+        ]
+    )
 
     distances, agents = space.calculate_distances([0.9, 0.1])
-    assert np.all(np.isclose(distances, [0.2,]))
-    assert np.all(agents == [agent, ])
+    assert np.all(
+        np.isclose(
+            distances,
+            [
+                0.2,
+            ],
+        )
+    )
+    assert np.all(
+        agents
+        == [
+            agent,
+        ]
+    )
 
     distances, agents = space.calculate_distances([0.9, 0.9])
-    assert np.all(np.isclose(distances, [0.2*2**0.5,]))
-    assert np.all(agents == [agent, ])
+    assert np.all(
+        np.isclose(
+            distances,
+            [
+                0.2 * 2**0.5,
+            ],
+        )
+    )
+    assert np.all(
+        agents
+        == [
+            agent,
+        ]
+    )
+
 
 # class TestSpaceToroidal(unittest.TestCase):
 #     """Testing a toroidal continuous space."""
@@ -182,4 +240,3 @@ def test_distances():
 #         neighbors_3 = self.space.get_neighbors((-30, -30), 10)
 #         assert len(neighbors_3) == 1
 #
-

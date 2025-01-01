@@ -31,7 +31,7 @@ class ContinuousSpace:
         self.random = random
 
         self.dimensions: np.array = np.asarray(dimensions)
-        self.ndims : int = self.dimensions.shape[0]
+        self.ndims: int = self.dimensions.shape[0]
         self.size: np.array = self.dimensions[:, 1] - self.dimensions[:, 0]
         self.center: np.array = np.sum(self.dimensions, axis=1) / 2
 
@@ -121,9 +121,9 @@ class ContinuousSpace:
 
     def in_bounds(self, point) -> bool:
         """Check if point is inside the bounds of the space."""
-        return bool((
-            (point >= self.dimensions[:, 0]) & (point <= self.dimensions[:, 1])
-        ).all())
+        return bool(
+            ((point >= self.dimensions[:, 0]) & (point <= self.dimensions[:, 1])).all()
+        )
 
     def torus_correct(self, point) -> np.ndarray:
         """Apply a torus correction to the point."""
