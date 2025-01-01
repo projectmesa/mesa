@@ -82,7 +82,7 @@ One significant advancement of Mesa 3+ is expanded functionality around agent ma
     # Select wealthy agents and calculate average wealth
     wealthy = model.agents.select(lambda a: a.wealth > 1000)
     avg_wealth = wealthy.agg("wealth", func=np.mean)
-    
+
     # Group agents by type and apply behaviors
     grouped = model.agents.groupby("species")
     for species, agents in grouped:
@@ -127,7 +127,7 @@ Typically, ABMs rely on incremental time progression or ticks. For each tick, th
 
 ```python
     model = Model(seed=42)
-    
+
     for _ in range(100):
         model.step()
 ```
@@ -136,13 +136,13 @@ Generally, within the step method of the model, one activates all the agents. Th
 
 ```python
     model.agents.do("step")  # Sequential activation
-    
+
     model.agents.shuffle_do("step")  # Random activation
-    
+
     # Multi-stage activation:
     for stage in ["move", "eat", "reproduce"]:
         model.agents.do(stage)
-    
+
     # Activation by agent subclass:
     for klass in model.agent_types:
         model.agents_by_type[klass].do("step")
@@ -155,7 +155,7 @@ Mesa also supports next-event time progression. In this approach, the simulation
     simulator = DiscreteEventSimulator()
     model = Model(seed=42, simulator=simulator)
     simulator.schedule_event_relative(some_function, 3.1415)
-    
+
     # Hybrid time-step and event scheduling
     model = Model(seed=42, simulator=ABMSimulator())
     model.simulator.schedule_event_next_tick(some_function)
