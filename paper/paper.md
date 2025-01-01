@@ -121,6 +121,7 @@ For models where agents need to move continuously through space rather than betw
     space = ContinuousSpace(x_max, y_max, torus=True)
     space.move_agent(agent, (new_x, new_y))
 ```
+The new cell-based spaces are feature complete but still in experimental state. A new ContinuousSpace implementation is in active development.
 
 ### Time advancement
 Typically, ABMs rely on incremental time progression or ticks. For each tick, the step method of the model is called. This activates the agents in some way. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
@@ -148,7 +149,7 @@ Generally, within the step method of the model, one activates all the agents. Th
         model.agents_by_type[klass].do("step")
 ```
 
-Mesa also supports next-event time progression. In this approach, the simulation consists of time-stamped events that are executed chronologically, with the simulation clock advancing to each event's timestamp. This enables both pure discrete event-based models and hybrid approaches combining incremental time progression with event scheduling on the ticks as shown below.. This latter hybrid approach allows combining traditional ABM time steps with the flexibility and potential performance benefits of event scheduling.
+Mesa also supports next-event time progression, currently in experimental state. In this approach, the simulation consists of time-stamped events that are executed chronologically, with the simulation clock advancing to each event's timestamp. This enables both pure discrete event-based models and hybrid approaches combining incremental time progression with event scheduling on the ticks as shown below.. This latter hybrid approach allows combining traditional ABM time steps with the flexibility and potential performance benefits of event scheduling.
 
 ```python
     # Pure event-based scheduling
