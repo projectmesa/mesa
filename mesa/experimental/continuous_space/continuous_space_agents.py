@@ -92,11 +92,7 @@ class ContinuousSpaceAgent(Agent):
             ]
         else:
             # don't forget to remove our self
-            agents = [
-                agents[index]
-                for index in indices
-                if index != self._mesa_index
-            ]
+            agents = [agents[index] for index in indices if index != self._mesa_index]
         return agents
 
     @overload
@@ -136,9 +132,5 @@ class ContinuousSpaceAgent(Agent):
             ]
         else:
             # don't forget to remove our self
-            agents = [
-                agents[index]
-                for index in indices
-                if index != self._mesa_index
-            ]
+            agents = [agents[index] for index in indices if index != self._mesa_index]
         return agents
