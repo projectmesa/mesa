@@ -80,20 +80,20 @@ class ContinuousSpaceAgent(Agent):
             include_distance: include the distance information for each neighbor
 
         """
-        distances = self.space.calculate_distances(self.position)
-        indices = np.where(distances <= radius)[0]
+        dists, agents = self.space.calculate_distances(self.position)
+        indices = np.where(dists <= radius)[0]
 
         if include_distance:
             # don't forget to remove our self
             agents = [
-                (self.space._index_to_agent[index], distances[index])
+                (agents[index], dists[index])
                 for index in indices
                 if index != self._mesa_index
             ]
         else:
             # don't forget to remove our self
             agents = [
-                self.space._index_to_agent[index]
+                agents[index]
                 for index in indices
                 if index != self._mesa_index
             ]
@@ -117,10 +117,10 @@ class ContinuousSpaceAgent(Agent):
             include_distance: include the distance information for each neighbor
 
         """
-        distances = self.space.calculate_distances(self.position)
+        dists, agents = self.space.calculate_distances(self.position)
 
         k += 1  # the distance calculation includes self, with a distance of 0, so we remove this later
-        indices = np.argpartition(distances, k)[:k]
+        indices = np.argpartition(dists, k)[:k]
 
         # fixme
         #  indices mismatch, because it is the index in the distances
@@ -130,14 +130,14 @@ class ContinuousSpaceAgent(Agent):
         if include_distance:
             # don't forget to remove our self
             agents = [
-                (self.space._index_to_agent[index], distances[index])
+                (agents[index], dists[index])
                 for index in indices
                 if index != self._mesa_index
             ]
         else:
             # don't forget to remove our self
             agents = [
-                self.space._index_to_agent[index]
+                agents[index]
                 for index in indices
                 if index != self._mesa_index
             ]

@@ -40,6 +40,7 @@ class ContinuousSpace:
         self._agent_positions = np.zeros(
             (n_agents, self.dimensions.shape[0]), dtype=float
         )
+        self._agents = np.zeros((n_agents, ), dtype=object)
         self._positions_in_use = np.zeros(
             (n_agents,), dtype=bool
         )  # effectively a mask over _agent_positions
@@ -49,7 +50,7 @@ class ContinuousSpace:
     @property
     def agents(self) -> AgentSet:
         """Return an AgentSet with the agents in the space."""
-        return AgentSet(list(self._agent_to_index), random=self.random)
+        return AgentSet(self._agents[self._positions_in_use], random=self.random)
 
     @property
     def agent_positions(self) -> np.ndarray:
@@ -88,6 +89,7 @@ class ContinuousSpace:
                 index = np.where(~self._positions_in_use)[0][0]
 
         self._positions_in_use[index] = True
+        self._agents[index] = agent
         self._agent_to_index[agent] = index
         self._index_to_agent[index] = agent
 
@@ -99,18 +101,19 @@ class ContinuousSpace:
         self._agent_to_index.pop(agent, None)
         self._index_to_agent.pop(index, None)
         self._positions_in_use[index] = False
+        self._agents[index] = None
 
     def calculate_distances(self, point):
         """Calculate the distance between the point and all agents."""
         if self.torus:
-            delta = np.abs(point[np.newaxis, :] - self._agent_positions)
+            delta = np.abs(point[np.newaxis, :] - self.agent_positions)
             delta = np.minimum(
                 delta, 1 - delta
             )  # fixme, should be based on size or maxima?
             dists = np.linalg.norm(delta, axis=1)
         else:
             dists = cdist(point[np.newaxis, :], self.agent_positions)
-        return dists
+        return dists, self._agents[self._positions_in_use]
 
     def in_bounds(self, point) -> bool:
         """Check if point is inside the bounds of the space."""
