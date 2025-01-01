@@ -1,5 +1,5 @@
 # to be removed once further into the development
-
+import numpy as np
 
 from random import Random
 
@@ -14,12 +14,13 @@ if __name__ == "__main__":
     model = Model(seed=42)
     space = ContinuousSpace(dimensions, random=Random(42), torus=True)
 
-    for _ in range(101):
+    for _ in range(2):
         agent = ContinuousSpaceAgent(
             space,
             model,
         )
         agent.position = [agent.random.random(), agent.random.random()]
-        agent.position += [1, 0.01]
+
+    distances = space.calculate_distances(np.asarray([0.5, 0.5]))
 
     print("blaat")
