@@ -44,6 +44,7 @@ class ContinuousSpace:
         self._positions_in_use = np.zeros(
             (n_agents,), dtype=bool
         )  # effectively a mask over _agent_positions
+
         self._index_to_agent: dict[int, Agent] = {}
         self._agent_to_index: dict[Agent, int | None] = {}
 
@@ -85,6 +86,9 @@ class ContinuousSpace:
                 )
                 self._positions_in_use = np.hstack(
                     [self._positions_in_use, np.zeros((n,), dtype=bool)]
+                )
+                self._agents = np.hstack(
+                    [self._agents, np.zeros((n,), dtype=object)]
                 )
                 index = np.where(~self._positions_in_use)[0][0]
 
