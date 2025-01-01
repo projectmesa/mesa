@@ -1,5 +1,5 @@
 ---
-title: 'Mesa 3: Agent-based modelling with Python in 2024'
+title: 'Mesa 3: Agent-based modeling with Python in 2025'
 tags:
   - Python
   - agent-based modeling
@@ -40,7 +40,7 @@ affiliations:
     index: 4
   - name: Independent Researcher
     index: 5
-date: 30 December 2024
+date: 1 January 2025
 bibliography: paper.bib
 
 # Optional fields
