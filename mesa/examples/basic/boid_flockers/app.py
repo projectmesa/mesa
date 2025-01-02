@@ -22,7 +22,7 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
-    "population": Slider(
+    "population_size": Slider(
         label="Number of boids",
         value=100,
         min=10,
