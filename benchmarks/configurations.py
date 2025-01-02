@@ -90,7 +90,12 @@ configurations = {
             "seeds": 25,
             "replications": 3,
             "steps": 20,
-            "parameters": {"population_size": 200, "width": 100, "height": 100, "vision": 5},
+            "parameters": {
+                "population_size": 200,
+                "width": 100,
+                "height": 100,
+                "vision": 5,
+            },
         },
         "large": {
             "seeds": 10,
