@@ -65,12 +65,12 @@ class ContinuousSpaceAgent(Agent):
     @overload
     def get_neighbors_in_radius(
         self, radius: int = 1, include_distance: bool = False
-    ) -> list[ContinuousSpaceAgent]: ...
+    ) -> np.ndarray[ContinuousSpaceAgent]: ...
 
     @overload
     def get_neighbors_in_radius(
         self, radius=1, include_distance: bool = True
-    ) -> list[tuple[ContinuousSpaceAgent, float]]: ...
+    ) -> tuple[np.ndarray[ContinuousSpaceAgent], np.ndarray[float]]: ...
 
     def get_neighbors_in_radius(self, radius=1, include_distance=False):
         """Get neighbors within radius.
@@ -82,18 +82,12 @@ class ContinuousSpaceAgent(Agent):
         """
         dists, agents = self.space.calculate_distances(self.position)
         indices = np.where(dists <= radius)[0]
+        indices = indices[indices != self._mesa_index]
 
         if include_distance:
-            # don't forget to remove our self
-            agents = [
-                (agents[index], dists[index])
-                for index in indices
-                if index != self._mesa_index
-            ]
+            return agents[indices], dists[indices]
         else:
-            # don't forget to remove our self
-            agents = [agents[index] for index in indices if index != self._mesa_index]
-        return agents
+            return agents[indices]
 
     @overload
     def get_nearest_neighbors(
@@ -118,15 +112,7 @@ class ContinuousSpaceAgent(Agent):
         k += 1  # the distance calculation includes self, with a distance of 0, so we remove this later
         indices = np.argpartition(dists, k)[:k]
 
-        # don't forget to remove our self
         if include_distance:
-            # don't forget to remove our self
-            agents = [
-                (agents[index], dists[index])
-                for index in indices
-                if index != self._mesa_index
-            ]
+            return agents[indices], dists[indices]
         else:
-            # don't forget to remove our self
-            agents = [agents[index] for index in indices if index != self._mesa_index]
-        return agents
+            return agents[indices]

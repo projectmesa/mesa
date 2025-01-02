@@ -1,3 +1,5 @@
+"""Tests for continuous space."""
+
 import numpy as np
 
 from mesa import Model

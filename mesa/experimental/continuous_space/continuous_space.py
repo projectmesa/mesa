@@ -105,19 +105,36 @@ class ContinuousSpace:
         self._positions_in_use[index] = False
         self._agents[index] = None
 
-    def calculate_distances(self, point) -> tuple[np.ndarray, np.ndarray]:
-        """Calculate the distance between the point and all agents."""
+    def calculate_difference_vector(self, point: np.ndarray, indices=None) -> np.ndarray:
+        """Calculate the difference vector between the point and all agents"""
         point = np.asanyarray(point)
+        positions = self._agent_positions[indices] if indices is not None else self.agent_positions
 
         if self.torus:
-            delta = np.abs(point[np.newaxis, :] - self.agent_positions)
+            delta = np.abs(point[np.newaxis, :] - positions)
             delta = np.minimum(
-                delta, 1 - delta
+                delta, self.size - delta
+            )  # fixme, should be based on size or maxima?
+        else:
+            delta = point[np.newaxis, :] - positions
+
+        return delta
+
+    def calculate_distances(self, point, indices=None) -> tuple[np.ndarray, np.ndarray]:
+        """Calculate the distance between the point and all agents."""
+        point = np.asanyarray(point)
+        positions = self._agent_positions[indices] if indices is not None else self.agent_positions
+        agents = self._agents[indices] if indices is not None else self._agents[self._positions_in_use]
+
+        if self.torus:
+            delta = np.abs(point[np.newaxis, :] - positions)
+            delta = np.minimum(
+                delta, self.size - delta
             )  # fixme, should be based on size or maxima?
             dists = np.linalg.norm(delta, axis=1)
         else:
-            dists = cdist(point[np.newaxis, :], self.agent_positions)[:, 0]
-        return dists, self._agents[self._positions_in_use]
+            dists = cdist(point[np.newaxis, :], positions)[:, 0]
+        return dists, agents
 
     def in_bounds(self, point) -> bool:
         """Check if point is inside the bounds of the space."""

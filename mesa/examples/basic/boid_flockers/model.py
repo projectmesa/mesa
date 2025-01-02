@@ -9,7 +9,7 @@ import numpy as np
 
 from mesa import Model
 from mesa.examples.basic.boid_flockers.agents import Boid
-from mesa.space import ContinuousSpace
+from mesa.experimental.continuous_space import ContinuousSpace
 
 
 class BoidFlockers(Model):
@@ -17,7 +17,7 @@ class BoidFlockers(Model):
 
     def __init__(
         self,
-        population=100,
+        population_size=100,
         width=100,
         height=100,
         speed=1,
@@ -31,7 +31,7 @@ class BoidFlockers(Model):
         """Create a new Boids Flocking model.
 
         Args:
-            population: Number of Boids in the simulation (default: 100)
+            population_size: Number of Boids in the simulation (default: 100)
             width: Width of the space (default: 100)
             height: Height of the space (default: 100)
             speed: How fast the Boids move (default: 1)
@@ -44,47 +44,21 @@ class BoidFlockers(Model):
         """
         super().__init__(seed=seed)
 
-        # Model Parameters
-        self.population = population
-        self.vision = vision
-        self.speed = speed
-        self.separation = separation
-
         # Set up the space
-        self.space = ContinuousSpace(width, height, torus=True)
-
-        # Store flocking weights
-        self.factors = {"cohere": cohere, "separate": separate, "match": match}
+        self.space = ContinuousSpace([[0, width],
+                                      [0, height]],
+                                     torus=True, random=self.random)
 
         # Create and place the Boid agents
-        self.make_agents()
+        position = self.rng.random(size=(population_size, 2)) * self.space.size
+        direction = self.rng.uniform(-1, 1, size=(population_size, 2))
+        Boid.create_agents(self, population_size, self.space, position=position, direction=direction,
+                           cohere=cohere, separate=separate, match=match, speed=speed, vision=vision,
+                           separation=separation)
 
         # For tracking statistics
         self.average_heading = None
         self.update_average_heading()
-
-    def make_agents(self):
-        """Create and place all Boid agents randomly in the space."""
-        for _ in range(self.population):
-            # Random position
-            x = self.random.random() * self.space.x_max
-            y = self.random.random() * self.space.y_max
-            pos = np.array((x, y))
-
-            # Random initial direction
-            direction = np.random.random(2) * 2 - 1  # Random vector between -1 and 1
-            direction /= np.linalg.norm(direction)  # Normalize
-
-            # Create and place the Boid
-            boid = Boid(
-                model=self,
-                speed=self.speed,
-                direction=direction,
-                vision=self.vision,
-                separation=self.separation,
-                **self.factors,
-            )
-            self.space.place_agent(boid, pos)
 
     def update_average_heading(self):
         """Calculate the average heading (direction) of all Boids."""
@@ -103,3 +77,8 @@ class BoidFlockers(Model):
         """
         self.agents.shuffle_do("step")
         self.update_average_heading()
+
+
+if __name__ == '__main__':
+    model = BoidFlockers()
+    model.step()

@@ -1,3 +1,8 @@
+import sys, os
+
+
+sys.path.insert(0, os.path.abspath('../../../..'))
+
 from mesa.examples.basic.boid_flockers.model import BoidFlockers
 from mesa.visualization import Slider, SolaraViz, make_space_component
 
