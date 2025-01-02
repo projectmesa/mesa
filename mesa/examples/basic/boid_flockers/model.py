@@ -45,16 +45,26 @@ class BoidFlockers(Model):
         super().__init__(seed=seed)
 
         # Set up the space
-        self.space = ContinuousSpace([[0, width],
-                                      [0, height]],
-                                     torus=True, random=self.random)
+        self.space = ContinuousSpace(
+            [[0, width], [0, height]], torus=True, random=self.random
+        )
 
         # Create and place the Boid agents
         position = self.rng.random(size=(population_size, 2)) * self.space.size
         direction = self.rng.uniform(-1, 1, size=(population_size, 2))
-        Boid.create_agents(self, population_size, self.space, position=position, direction=direction,
-                           cohere=cohere, separate=separate, match=match, speed=speed, vision=vision,
-                           separation=separation)
+        Boid.create_agents(
+            self,
+            population_size,
+            self.space,
+            position=position,
+            direction=direction,
+            cohere=cohere,
+            separate=separate,
+            match=match,
+            speed=speed,
+            vision=vision,
+            separation=separation,
+        )
 
         # For tracking statistics
         self.average_heading = None
@@ -79,6 +89,6 @@ class BoidFlockers(Model):
         self.update_average_heading()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     model = BoidFlockers()
     model.step()

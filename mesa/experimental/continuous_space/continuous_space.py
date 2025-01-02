@@ -105,10 +105,16 @@ class ContinuousSpace:
         self._positions_in_use[index] = False
         self._agents[index] = None
 
-    def calculate_difference_vector(self, point: np.ndarray, indices=None) -> np.ndarray:
+    def calculate_difference_vector(
+        self, point: np.ndarray, indices=None
+    ) -> np.ndarray:
         """Calculate the difference vector between the point and all agents"""
         point = np.asanyarray(point)
-        positions = self._agent_positions[indices] if indices is not None else self.agent_positions
+        positions = (
+            self._agent_positions[indices]
+            if indices is not None
+            else self.agent_positions
+        )
 
         if self.torus:
             delta = np.abs(point[np.newaxis, :] - positions)
@@ -123,8 +129,16 @@ class ContinuousSpace:
     def calculate_distances(self, point, indices=None) -> tuple[np.ndarray, np.ndarray]:
         """Calculate the distance between the point and all agents."""
         point = np.asanyarray(point)
-        positions = self._agent_positions[indices] if indices is not None else self.agent_positions
-        agents = self._agents[indices] if indices is not None else self._agents[self._positions_in_use]
+        positions = (
+            self._agent_positions[indices]
+            if indices is not None
+            else self.agent_positions
+        )
+        agents = (
+            self._agents[indices]
+            if indices is not None
+            else self._agents[self._positions_in_use]
+        )
 
         if self.torus:
             delta = np.abs(point[np.newaxis, :] - positions)

@@ -23,14 +23,13 @@ class Boid(ContinuousSpaceAgent):
     any other Boid.
     """
 
-
     def __init__(
         self,
         model,
         space,
-        position=(0,0),
+        position=(0, 0),
         speed=1,
-        direction=(1,1),
+        direction=(1, 1),
         vision=1,
         separation=1,
         cohere=0.03,
@@ -68,22 +67,32 @@ class Boid(ContinuousSpaceAgent):
     def pos(self, value):
         pass
 
-
     def step(self):
         """Get the Boid's neighbors, compute the new vector, and move accordingly."""
-        neighbors, distances = self.get_neighbors_in_radius(radius=self.vision, include_distance=True)
+        neighbors, distances = self.get_neighbors_in_radius(
+            radius=self.vision, include_distance=True
+        )
         self.neighbors = neighbors.tolist()
 
         # If no neighbors, maintain current direction
-        if neighbors.size==0:
+        if neighbors.size == 0:
             self.position += self.direction * self.speed
             return
 
-        delta = self.space.calculate_difference_vector(self.position, [n._mesa_index for n in neighbors])
+        delta = self.space.calculate_difference_vector(
+            self.position, [n._mesa_index for n in neighbors]
+        )
 
         cohere = np.sum(delta, axis=0) * self.cohere_factor
-        separation_vector = -1 * np.sum(delta[distances < self.separation], axis=0) * self.separate_factor
-        match_vector = np.sum(np.asarray([n.direction for n in neighbors]), axis=0) * self.match_factor
+        separation_vector = (
+            -1
+            * np.sum(delta[distances < self.separation], axis=0)
+            * self.separate_factor
+        )
+        match_vector = (
+            np.sum(np.asarray([n.direction for n in neighbors]), axis=0)
+            * self.match_factor
+        )
 
         # Update direction based on the three behaviors
         self.direction += (cohere + separation_vector + match_vector) / len(neighbors)

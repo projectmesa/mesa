@@ -143,7 +143,10 @@ def draw_space(
             draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
             draw_network(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
-        case mesa.space.ContinuousSpace() | mesa.experimental.continuous_space.ContinuousSpace():
+        case (
+            mesa.space.ContinuousSpace()
+            | mesa.experimental.continuous_space.ContinuousSpace()
+        ):
             draw_continuous_space(space, agent_portrayal, ax=ax)
         case VoronoiGrid():
             draw_voronoi_grid(space, agent_portrayal, ax=ax)
@@ -474,7 +477,6 @@ def draw_continuous_space(
     # space related setup
     width = space.size[0]
     height = space.size[1]
-
 
     # width = space.x_max - space.x_min
     x_padding = width / 20
