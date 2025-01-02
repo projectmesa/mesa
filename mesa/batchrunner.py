@@ -175,7 +175,7 @@ def _model_run_func(
 
     # steps for data collection
     steps = list(range(0, model.steps, data_collection_period))
-    
+
     # final step for data collection
     if steps and steps[-1] != model.steps:
         steps.append(model.steps)
