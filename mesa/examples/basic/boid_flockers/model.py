@@ -4,6 +4,12 @@ Boids Flocking Model
 A Mesa implementation of Craig Reynolds's Boids flocker model.
 Uses numpy arrays to represent vectors.
 """
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath("../../../.."))
+
+
 
 import numpy as np
 
@@ -46,7 +52,7 @@ class BoidFlockers(Model):
 
         # Set up the space
         self.space = ContinuousSpace(
-            [[0, width], [0, height]], torus=True, random=self.random
+            [[0, width], [0, height]], torus=True, random=self.random, n_agents=population_size
         )
 
         # Create and place the Boid agents
@@ -90,5 +96,7 @@ class BoidFlockers(Model):
 
 
 if __name__ == "__main__":
-    model = BoidFlockers()
-    model.step()
+    model = BoidFlockers(population_size=200, width=100, height=100, vision=5, seed=42)
+
+    for i in range(100):
+        model.step()
