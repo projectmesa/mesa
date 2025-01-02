@@ -115,11 +115,15 @@ class ContinuousSpace:
             if indices is not None
             else self.agent_positions
         )
-        delta = point[np.newaxis, :] - positions
+        delta = positions - point[np.newaxis, :]
 
         if self.torus:
-            delta = np.abs(delta, out=delta)
-            delta = np.minimum(delta, self.size - delta, out=delta)
+            inverse_delta = delta - np.sign(delta) * self.size
+            logical = np.abs(delta) < np.abs(inverse_delta)
+            out = np.zeros(delta.shape)
+            out[logical] = delta[logical]
+            out[~logical] = inverse_delta[~logical]
+            delta = out
 
         return delta
 
@@ -138,7 +142,13 @@ class ContinuousSpace:
         )
 
         if self.torus:
-            delta = self.calculate_difference_vector(point)
+            delta = point[np.newaxis, :] - positions
+
+            delta = np.abs(delta, out=delta)
+            delta = np.minimum(
+                delta, self.size - delta, out=delta
+            )
+
             dists = np.linalg.norm(delta, axis=1)
         else:
             dists = cdist(point[np.newaxis, :], positions)[:, 0]
