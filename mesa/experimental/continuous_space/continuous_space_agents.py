@@ -111,6 +111,7 @@ class ContinuousSpaceAgent(Agent):
 
         k += 1  # the distance calculation includes self, with a distance of 0, so we remove this later
         indices = np.argpartition(dists, k)[:k]
+        indices = indices[indices != self._mesa_index]
 
         if include_distance:
             return agents[indices], dists[indices]
