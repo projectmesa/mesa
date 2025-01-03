@@ -9,9 +9,40 @@ from scipy.spatial.distance import cdist
 
 from mesa.agent import Agent, AgentSet
 
+from line_profiler_pycharm import profile
 
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position."""
+
+    @property
+    def x_min(self):
+        # compatability with solara_viz
+        return self.dimensions[0,0]
+
+    @property
+    def x_max(self):
+        # compatability with solara_viz
+        return self.dimensions[0,1]
+
+    @property
+    def y_min(self):
+        # compatability with solara_viz
+        return self.dimensions[1,0]
+
+    @property
+    def y_max(self):
+        # compatability with solara_viz
+        return self.dimensions[1,1]
+
+    @property
+    def width(self):
+        # compatability with solara_viz
+        return self.size[0]
+
+    @property
+    def height(self):
+        # compatability with solara_viz
+        return self.size[1]
 
     def __init__(
         self,
@@ -53,10 +84,10 @@ class ContinuousSpace:
         """Return an AgentSet with the agents in the space."""
         return AgentSet(self._agents[self._positions_in_use], random=self.random)
 
-    @property
-    def agent_positions(self) -> np.ndarray:
-        """Return the positions of the agents in the space."""
-        return self._agent_positions[self._positions_in_use]
+    # @property
+    # def agent_positions(self) -> np.ndarray:
+    #     """Return the positions of the agents in the space."""
+    #     return self._agent_positions[self._positions_in_use]
 
     def _get_index_for_agent(self, agent: Agent) -> int:
         """Helper method to get the index for the agent.
@@ -95,6 +126,9 @@ class ContinuousSpace:
         self._agent_to_index[agent] = index
         self._index_to_agent[index] = agent
 
+        self.agent_positions = self._agent_positions[self._positions_in_use]
+        self.active_agents = self._agents[self._positions_in_use]
+
         return index
 
     def _remove_agent(self, agent: Agent) -> None:
@@ -106,40 +140,38 @@ class ContinuousSpace:
         self._agents[index] = None
 
     def calculate_difference_vector(
-        self, point: np.ndarray, indices=None
+        self, point: np.ndarray, agents=None
     ) -> np.ndarray:
-        """Calculate the difference vector between the point and all agents"""
+        """Calculate the difference vector between the point and all agents."""
         point = np.asanyarray(point)
-        positions = (
-            self._agent_positions[indices]
-            if indices is not None
-            else self.agent_positions
-        )
+        positions = self.agent_positions if agents is None else self._agent_positions[[self._agent_to_index[a] for a in agents]]
+
         delta = positions - point[np.newaxis, :]
 
         if self.torus:
             inverse_delta = delta - np.sign(delta) * self.size
+
+            # we need to use the lowest absolute value from delta and inverse delta
             logical = np.abs(delta) < np.abs(inverse_delta)
+
             out = np.zeros(delta.shape)
             out[logical] = delta[logical]
             out[~logical] = inverse_delta[~logical]
+
             delta = out
 
         return delta
 
-    def calculate_distances(self, point, indices=None) -> tuple[np.ndarray, np.ndarray]:
+    def calculate_distances(self, point, agents=None) -> tuple[np.ndarray, np.ndarray]:
         """Calculate the distance between the point and all agents."""
         point = np.asanyarray(point)
-        positions = (
-            self._agent_positions[indices]
-            if indices is not None
-            else self.agent_positions
-        )
-        agents = (
-            self._agents[indices]
-            if indices is not None
-            else self._agents[self._positions_in_use]
-        )
+
+        if agents is None:
+            positions = self.agent_positions
+            agents = self.active_agents
+        else:
+            positions = self._agent_positions[[self._agent_to_index[a] for a in agents]]
+            agents = np.asarray(agents)
 
         if self.torus:
             delta = point[np.newaxis, :] - positions

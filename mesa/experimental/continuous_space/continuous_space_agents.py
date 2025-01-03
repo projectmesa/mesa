@@ -42,6 +42,16 @@ class ContinuousSpaceAgent(Agent):
 
         self.space._agent_positions[self._mesa_index] = value
 
+    @property
+    def pos(self):
+        # just here for compatability with solara_viz.
+        return self.position
+
+    @pos.setter
+    def pos(self, value):
+        # just here for compatability solara_viz.
+        pass
+
     def __init__(self, space: ContinuousSpace, model):
         """Initialize a continuous space agent.
 
