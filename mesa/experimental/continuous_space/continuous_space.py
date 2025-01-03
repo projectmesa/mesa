@@ -14,33 +14,33 @@ class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position."""
 
     @property
-    def x_min(self):
-        # compatability with solara_viz
+    def x_min(self):  # noqa: D102
+        # compatibility with solara_viz
         return self.dimensions[0, 0]
 
     @property
-    def x_max(self):
-        # compatability with solara_viz
+    def x_max(self):  # noqa: D102
+        # compatibility with solara_viz
         return self.dimensions[0, 1]
 
     @property
-    def y_min(self):
-        # compatability with solara_viz
+    def y_min(self):  # noqa: D102
+        # compatibility with solara_viz
         return self.dimensions[1, 0]
 
     @property
-    def y_max(self):
-        # compatability with solara_viz
+    def y_max(self):  # noqa: D102
+        # compatibility with solara_viz
         return self.dimensions[1, 1]
 
     @property
-    def width(self):
-        # compatability with solara_viz
+    def width(self):  # noqa: D102
+        # compatibility with solara_viz
         return self.size[0]
 
     @property
-    def height(self):
-        # compatability with solara_viz
+    def height(self):  # noqa: D102
+        # compatibility with solara_viz
         return self.size[1]
 
     def __init__(
