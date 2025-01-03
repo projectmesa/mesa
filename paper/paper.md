@@ -72,7 +72,7 @@ This decoupled design allows selective use of components while enabling extensio
 
 ## Core ABM components
 ### Model
-The central class in Mesa is the Model. The user extends the model. Within it, the user instantiates the space and populates it with agent instances. Since ABMs are typically stochastic simulations, the model also controls the random number generation.
+The central class in Mesa is the Model. To build a model, the user instantiates a the model, then within it, the user instantiates the space and populates the space with agent instances. Since ABMs are typically stochastic simulations, Mesa was built with a random number generation, and for reproductility proposes, the ability to pass a seed.
 
 ### Agents
 Central to ABMs are the autonomous heterogeneous agents. Mesa provides a variety of base agent classes which the user can subclass. In its most basic implementation, such an agent subclass specifies the `__init__` and `step` method. Any subclass of the basic mesa agent subclass registers itself with the specified model instance, and via `agent.remove` it will remove itself from the model. It is strongly encouraged to rely on `remove`, and even extend it if needed to ensure agents are fully removed from the simulation.
