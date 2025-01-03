@@ -48,7 +48,7 @@ class ContinuousSpaceAgent(Agent):
         return self.position
 
     @pos.setter
-    def pos(self, value):  # noqa: D102
+    def pos(self, value):
         # just here for compatability solara_viz.
         pass
 
