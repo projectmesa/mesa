@@ -151,7 +151,7 @@ class ContinuousSpace:
             else self._agent_positions[[self._agent_to_index[a] for a in agents]]
         )
 
-        delta = positions - point[np.newaxis, :]
+        delta = positions - point
 
         if self.torus:
             inverse_delta = delta - np.sign(delta) * self.size
@@ -179,7 +179,7 @@ class ContinuousSpace:
             agents = np.asarray(agents)
 
         if self.torus:
-            delta = np.abs(point[np.newaxis, :] - positions)
+            delta = np.abs(positions - point)
             delta = np.minimum(delta, self.size - delta, out=delta)
             dists = np.linalg.norm(delta, axis=1)
         else:
