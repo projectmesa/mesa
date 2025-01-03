@@ -145,9 +145,7 @@ class ContinuousSpace:
             delta = point[np.newaxis, :] - positions
 
             delta = np.abs(delta, out=delta)
-            delta = np.minimum(
-                delta, self.size - delta, out=delta
-            )
+            delta = np.minimum(delta, self.size - delta, out=delta)
 
             dists = np.linalg.norm(delta, axis=1)
         else:
