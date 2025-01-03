@@ -43,12 +43,12 @@ class ContinuousSpaceAgent(Agent):
         self.space._agent_positions[self._mesa_index] = value
 
     @property
-    def pos(self):
+    def pos(self):  # noqa: D102
         # just here for compatability with solara_viz.
         return self.position
 
     @pos.setter
-    def pos(self, value):
+    def pos(self, value):  # noqa: D102
         # just here for compatability solara_viz.
         pass
 
