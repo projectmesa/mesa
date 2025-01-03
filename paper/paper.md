@@ -53,27 +53,29 @@ preferred-citation: article
 ---
 
 # Summary
-Mesa is an open-source Python framework for agent-based modeling (ABM) that enables researchers to create, analyze, and visualize agent-based simulations. Mesa provides a comprehensive set of tools and abstractions for modeling complex systems, with capabilities spanning from basic agent management to sophisticated representation of spaces within which agents interact. First released in 2014 and published in @masad2015 (with updates published in @kazil2020), this paper presents Mesa in its current version (3.1.1) as of late 2024.
+Mesa is an open-source Python framework for agent-based modeling (ABM) that enables researchers to create, analyze, and visualize agent-based simulations. Mesa provides a comprehensive set of tools and abstractions for modeling complex systems, with capabilities spanning from basic agent management to sophisticated representation of spaces where agents interact. First released in 2014 and published in @masad2015 (with updates published in @kazil2020), this paper highlights advancements and presents Mesa in its current version (3.1.1) as of late 2024.
 
 # Statement of need
 Agent-based models (ABMs), or artificial societies, are composed of autonomous heterogeneous agents interacting locally with other agents. These interactions give rise to emergent phenomena. The aggregate dynamics of a system under study emerge from these local interactions [@epstein_axtell_1996] [@epstein1999]. This type of modeling quickly grew more sophisticated, requiring frameworks to execute them. This led to the establishment of [NetLogo](https://ccl.northwestern.edu/netlogo/) and [MASON](https://cs.gmu.edu/~eclab/projects/mason/).
 
-However, before Mesa, there was no modern Python-based framework for ABMs that integrated with the scientific Python ecosystem. Since it’s creation in 2014, Mesa has been applied to modeling everything from economics and sociology to ecology and epidemiology and has been cited in more than 500 papers and 800 authors. Today, Mesa advanced usability and stabilized functionality with its most recent major release (3+). These features include enhanced management of agents, data collection advancements, improved visualization framework, and making it easier for researchers to create and analyze complex simulations.
+However, before Mesa, there was no modern Python-based framework for ABMs that integrated with the scientific Python ecosystem. Since its creation in 2014, Mesa has been applied to modeling everything from economics and sociology to ecology and epidemiology and has been cited in more than 500 papers and 800 authors. With its most recent major release, Mesa has advanced usability and stabilized functionality. These features include enhanced management of agents, data collection advancements, improved visualization framework, and making it easier for researchers to create and analyze complex simulations.
 
 # Core capabilities
-Mesa is a Python-based framework for ABM that provides a comprehensive set of tools for creating, running, and analyzing ABMs. Mesa integrates with the wider scientific Python ecosystem with libraries such as [NumPy](https://numpy.org/), [pandas](https://pandas.pydata.org/), [Matplotlib](https://matplotlib.org/), [NetworkX](https://networkx.org/), and more. Mesa is implemented in pure Python (3.11+) with a modular architecture separating:
-1. Core ABM components (*i.e.,* agents, spaces, agent activation, control over random numbers)
+Mesa is a Python-based framework for ABM that provides a comprehensive set of tools for creating, running, and analyzing ABMs. Mesa integrates with the wider scientific Python ecosystem with libraries such as [NumPy](https://numpy.org/), [pandas](https://pandas.pydata.org/), [Matplotlib](https://matplotlib.org/), [NetworkX](https://networkx.org/), and more. Mesa is implemented in pure Python (3+) with a modular architecture comprised of three main components:
+1. Core ABM components (*i.e.,* agents, spaces, agent activation, control over random numbers)to build models
 2. Data collection and support for model experimentation
 3. Visualization systems
 
-This design allows selective use of components while enabling extension and customization.
+
+This decoupled design allows selective use of components while enabling extension and customization.
+
 
 ## Core ABM components
 ### Model
-The central class in Mesa is the Model. The user extends the model. Within it, the user instantiates the space and populates it with agent instances. Since ABMs are typically stochastic simulations, the model also controls the random number generation.
+The central class in Mesa is the Model. To build a model, the user instantiates a the model, then within it, the user instantiates the space and populates the space with agent instances. Since ABMs are typically stochastic simulations, Mesa was built with a random number generation, and for reproductility proposes, the ability to pass a seed.
 
 ### Agents
-Central to ABMs are the autonomous heterogeneous agents. Mesa provides a variety of base agent classes which the user can subclass. In its most basic implementation, such an agent subclass specifies the `__init__` and `step` method. Any subclass of the basic mesa agent subclass registers itself with the specified model instance, and via `agent.remove` it will remove itself from the model. It is strongly encouraged to rely on `remove`, and even extend it if needed to ensure agents are fully removed from the simulation.
+Central to ABMs are the autonomous heterogeneous agents. Mesa provides a variety of base agent classes which the user can subclass. In its most basic implementation, an agent subclass specifies the `__init__` and `step` method. Any subclass of the basic mesa agent subclass registers itself with the specified model instance, and via `agent.remove` it will remove itself from the model. It is strongly encouraged to rely on `remove`, and even extend it if needed to ensure agents are fully removed from the simulation.
 
 ### Agent management
 One significant advancement of Mesa 3+ is expanded functionality around agent management. The new [`AgentSet`](https://mesa.readthedocs.io/latest/apis/agent.html#mesa.agent.AgentSet) class provides methods that allow users to filter, group, and analyze agents, making it easier to express complex model logic.
