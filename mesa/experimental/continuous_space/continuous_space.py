@@ -1,4 +1,4 @@
-"""A Continyous Space class."""
+"""A Continuous Space class."""
 
 import warnings
 from collections.abc import Sequence
