@@ -71,9 +71,7 @@ class Boid(ContinuousSpaceAgent):
             self.position += self.direction * self.speed
             return
 
-        delta = self.space.calculate_difference_vector(
-            self.position, agents=neighbors
-        )
+        delta = self.space.calculate_difference_vector(self.position, agents=neighbors)
 
         cohere_vector = np.sum(delta, axis=0) * self.cohere_factor
         separation_vector = (
@@ -87,7 +85,9 @@ class Boid(ContinuousSpaceAgent):
         )
 
         # Update direction based on the three behaviors
-        self.direction += (cohere_vector + separation_vector + match_vector) / len(neighbors)
+        self.direction += (cohere_vector + separation_vector + match_vector) / len(
+            neighbors
+        )
 
         # Normalize direction vector
         self.direction /= np.linalg.norm(self.direction)

@@ -9,7 +9,6 @@ from scipy.spatial.distance import cdist
 
 from mesa.agent import Agent, AgentSet
 
-from line_profiler_pycharm import profile
 
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position."""
@@ -17,22 +16,22 @@ class ContinuousSpace:
     @property
     def x_min(self):
         # compatability with solara_viz
-        return self.dimensions[0,0]
+        return self.dimensions[0, 0]
 
     @property
     def x_max(self):
         # compatability with solara_viz
-        return self.dimensions[0,1]
+        return self.dimensions[0, 1]
 
     @property
     def y_min(self):
         # compatability with solara_viz
-        return self.dimensions[1,0]
+        return self.dimensions[1, 0]
 
     @property
     def y_max(self):
         # compatability with solara_viz
-        return self.dimensions[1,1]
+        return self.dimensions[1, 1]
 
     @property
     def width(self):
@@ -139,12 +138,14 @@ class ContinuousSpace:
         self._positions_in_use[index] = False
         self._agents[index] = None
 
-    def calculate_difference_vector(
-        self, point: np.ndarray, agents=None
-    ) -> np.ndarray:
+    def calculate_difference_vector(self, point: np.ndarray, agents=None) -> np.ndarray:
         """Calculate the difference vector between the point and all agents."""
         point = np.asanyarray(point)
-        positions = self.agent_positions if agents is None else self._agent_positions[[self._agent_to_index[a] for a in agents]]
+        positions = (
+            self.agent_positions
+            if agents is None
+            else self._agent_positions[[self._agent_to_index[a] for a in agents]]
+        )
 
         delta = positions - point[np.newaxis, :]
 
