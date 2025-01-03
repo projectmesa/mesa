@@ -129,6 +129,7 @@ class ContinuousSpace:
         return index
 
     def _update_stuff(self):
+        """Fixme: Needs a better name."""
         self.agent_positions = self._agent_positions[self._positions_in_use]
         self.active_agents = self._agents[self._positions_in_use]
 
