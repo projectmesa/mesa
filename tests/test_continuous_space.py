@@ -68,9 +68,9 @@ def test_continuous_agent():
 
     assert space.agent_positions.shape == (10, 2)
     for agent in space.agents:
-        assert np.all(
-            agent.position == space.agent_positions[space._get_index_for_agent(agent)]
-        )
+        a = agent.position
+        b = space._agent_positions[space._get_index_for_agent(agent)]
+        assert np.all(a == b)
 
     # add more agents, triggering a resizeing of the array
     for _ in range(100):
@@ -79,9 +79,9 @@ def test_continuous_agent():
 
     assert space.agent_positions.shape == (110, 2)
     for agent in space.agents:
-        assert np.all(
-            agent.position == space.agent_positions[space._get_index_for_agent(agent)]
-        )
+        a = agent.position
+        b = space._agent_positions[space._get_index_for_agent(agent)]
+        assert np.all(a == b)
 
     # remove all agents and check if the view is updated throughout correctly
     for i, agent in enumerate(space.agents):
