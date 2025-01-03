@@ -143,10 +143,7 @@ def draw_space(
             draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
             draw_network(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
-        case (
-            mesa.space.ContinuousSpace()
-            | mesa.experimental.continuous_space.ContinuousSpace()
-        ):
+        case mesa.space.ContinuousSpace():
             draw_continuous_space(space, agent_portrayal, ax=ax)
         case VoronoiGrid():
             draw_voronoi_grid(space, agent_portrayal, ax=ax)
@@ -475,12 +472,9 @@ def draw_continuous_space(
         fig, ax = plt.subplots()
 
     # space related setup
-    width = space.size[0]
-    height = space.size[1]
-
-    # width = space.x_max - space.x_min
+    width = space.x_max - space.x_min
     x_padding = width / 20
-    # height = space.y_max - space.y_min
+    height = space.y_max - space.y_min
     y_padding = height / 20
 
     # gather agent data
@@ -497,8 +491,8 @@ def draw_continuous_space(
         spine.set_color("black")
         spine.set_linestyle(border_style)
 
-    ax.set_xlim(space.dimensions[0, 0] - x_padding, space.dimensions[0, 1] + x_padding)
-    ax.set_ylim(space.dimensions[1, 0] - y_padding, space.dimensions[1, 1] + y_padding)
+    ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
+    ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
 
     return ax
 
