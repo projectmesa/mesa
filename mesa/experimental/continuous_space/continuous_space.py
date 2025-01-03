@@ -124,11 +124,13 @@ class ContinuousSpace:
         self._agents[index] = agent
         self._agent_to_index[agent] = index
         self._index_to_agent[index] = agent
-
-        self.agent_positions = self._agent_positions[self._positions_in_use]
-        self.active_agents = self._agents[self._positions_in_use]
+        self._update_stuff()
 
         return index
+
+    def _update_stuff(self):
+        self.agent_positions = self._agent_positions[self._positions_in_use]
+        self.active_agents = self._agents[self._positions_in_use]
 
     def _remove_agent(self, agent: Agent) -> None:
         """Remove an agent from the space."""
@@ -137,6 +139,7 @@ class ContinuousSpace:
         self._index_to_agent.pop(index, None)
         self._positions_in_use[index] = False
         self._agents[index] = None
+        self._update_stuff()
 
     def calculate_difference_vector(self, point: np.ndarray, agents=None) -> np.ndarray:
         """Calculate the difference vector between the point and all agents."""
@@ -175,11 +178,8 @@ class ContinuousSpace:
             agents = np.asarray(agents)
 
         if self.torus:
-            delta = point[np.newaxis, :] - positions
-
-            delta = np.abs(delta, out=delta)
+            delta = np.abs(point[np.newaxis, :] - positions)
             delta = np.minimum(delta, self.size - delta, out=delta)
-
             dists = np.linalg.norm(delta, axis=1)
         else:
             dists = cdist(point[np.newaxis, :], positions)[:, 0]

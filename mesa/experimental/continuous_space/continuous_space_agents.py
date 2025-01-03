@@ -9,6 +9,7 @@ import numpy as np
 from mesa.agent import Agent
 from mesa.experimental.continuous_space import ContinuousSpace
 
+from line_profiler_pycharm import profile
 
 class HasPositionProtocol(Protocol):
     """Protocol for continuous space position holders."""
