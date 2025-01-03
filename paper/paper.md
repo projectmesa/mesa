@@ -61,12 +61,14 @@ Agent-based models (ABMs), or artificial societies, are composed of autonomous h
 However, before Mesa, there was no modern Python-based framework for ABMs that integrated with the scientific Python ecosystem. Since its creation in 2014, Mesa has been applied to modeling everything from economics and sociology to ecology and epidemiology and has been cited in more than 500 papers and 800 authors. With its most recent major release (3+), Mesa has advanced usability and stabilized functionality. These features include enhanced management of agents, data collection advancements, improved visualization framework, and making it easier for researchers to create and analyze complex simulations.
 
 # Core capabilities
-Mesa is a Python-based framework for ABM that provides a comprehensive set of tools for creating, running, and analyzing ABMs. Mesa integrates with the wider scientific Python ecosystem with libraries such as [NumPy](https://numpy.org/), [pandas](https://pandas.pydata.org/), [Matplotlib](https://matplotlib.org/), [NetworkX](https://networkx.org/), and more. Mesa is implemented in pure Python (3.11+) with a modular architecture separating:
-1. Core ABM components (*i.e.,* agents, spaces, agent activation, control over random numbers)
+Mesa is a Python-based framework for ABM that provides a comprehensive set of tools for creating, running, and analyzing ABMs. Mesa integrates with the wider scientific Python ecosystem with libraries such as [NumPy](https://numpy.org/), [pandas](https://pandas.pydata.org/), [Matplotlib](https://matplotlib.org/), [NetworkX](https://networkx.org/), and more. Mesa is implemented in pure Python (3.11+) with a modular architecture comprised of three main components:
+1. Core ABM components (*i.e.,* agents, spaces, agent activation, control over random numbers)to build models
 2. Data collection and support for model experimentation
 3. Visualization systems
 
-This design allows selective use of components while enabling extension and customization.
+
+This decoupled design allows selective use of components while enabling extension and customization.
+
 
 ## Core ABM components
 ### Model
