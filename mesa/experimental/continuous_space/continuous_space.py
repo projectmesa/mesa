@@ -9,6 +9,7 @@ from scipy.spatial.distance import cdist
 
 from mesa.agent import Agent, AgentSet
 
+from line_profiler_pycharm import profile
 
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position."""
@@ -125,12 +126,16 @@ class ContinuousSpace:
         self._agent_to_index[agent] = index
         self._index_to_agent[index] = agent
         self.active_agents = self._agents[self._positions_in_use]
+        self._is_full = bool(np.all(self._positions_in_use))
 
         return index
 
     @property
     def agent_positions(self):
         """Return the positions of the agents in the space."""
+        if self._is_full:
+            return self._agent_positions
+
         return self._agent_positions[self._positions_in_use]
 
     def _remove_agent(self, agent: Agent) -> None:
@@ -141,6 +146,7 @@ class ContinuousSpace:
         self._positions_in_use[index] = False
         self._agents[index] = None
         self.active_agents = self._agents[self._positions_in_use]
+        self._is_full = False
 
     def calculate_difference_vector(self, point: np.ndarray, agents=None) -> np.ndarray:
         """Calculate the difference vector between the point and all agents."""
@@ -167,12 +173,13 @@ class ContinuousSpace:
 
         return delta
 
+    @profile
     def calculate_distances(self, point, agents=None) -> tuple[np.ndarray, np.ndarray]:
         """Calculate the distance between the point and all agents."""
         point = np.asanyarray(point)
 
         if agents is None:
-            positions = self.agent_positions
+            positions = self._agent_positions
             agents = self.active_agents
         else:
             positions = self._agent_positions[[self._agent_to_index[a] for a in agents]]
