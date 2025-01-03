@@ -1,5 +1,6 @@
 # noqa: D100
 from mesa.examples import (
+    AllianceModel,
     BoidFlockers,
     BoltzmannWealth,
     ConwaysGameOfLife,
@@ -106,3 +107,14 @@ def test_wolf_sheep():  # noqa: D103
     simulator = ABMSimulator()
     WolfSheep(seed=42, simulator=simulator)
     simulator.run_for(10)
+
+
+def test_alliance_formation_model():  # noqa: D103
+    from multi_level_alliance import app
+
+    app.page  # noqa: B018
+
+    model = AllianceModel(50, seed=42)
+
+    for _i in range(10):
+        model.step()
