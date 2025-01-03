@@ -1,3 +1,8 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath("../../../.."))
+
 from mesa.examples.basic.boid_flockers.model import BoidFlockers
 from mesa.visualization import Slider, SolaraViz, make_space_component
 
@@ -17,7 +22,7 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
-    "population": Slider(
+    "population_size": Slider(
         label="Number of boids",
         value=100,
         min=10,
