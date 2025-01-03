@@ -10,11 +10,15 @@ Replication of the model found in NetLogo:
 """
 
 import math
+import random
+
+import numpy as np
 
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
+from mesa.experimental.cell_space.property_layer import PropertyLayer
 from mesa.experimental.devs import ABMSimulator
 
 
@@ -71,7 +75,10 @@ class WolfSheep(Model):
 
         # Create grid using experimental cell space
         self.grid = OrthogonalVonNeumannGrid(
-            [self.height, self.width],
+            (
+                self.height,
+                self.width,
+            ),  # use tuple instead of list, otherwise it would fail the dimension check in add_property_layer
             torus=True,
             capacity=math.inf,
             random=self.random,
@@ -89,6 +96,39 @@ class WolfSheep(Model):
 
         self.datacollector = DataCollector(model_reporters)
 
+        wall_arr = [[False] * self.width for i in range(self.height)]
+
+        wall_coord = {
+            (random.randrange(self.height), random.randrange(self.width))
+            for i in range((width * height) // 10)
+        }  # set is used because the random number gen might return the same coordinate
+        for i, j in wall_coord:
+            wall_arr[i][j] = True
+
+        wall_arr = np.array(wall_arr)
+
+        self.grid.add_property_layer(PropertyLayer.from_data("wall", wall_arr))
+
+        def is_wall(row, col):
+            return (
+                True
+                if row < 0 or col < 0 or row >= height or col >= width  # corner case
+                else wall_arr[row][col]
+            )
+
+        def is_trapped_in_walls(row, col):
+            return (
+                is_wall(row + 1, col)
+                and is_wall(row - 1, col)
+                and is_wall(row, col + 1)
+                and is_wall(row, col - 1)
+            )
+
+        possible_cells = self.grid.all_cells.select(
+            lambda cell: not wall_arr[cell.coordinate[0]][cell.coordinate[1]]
+            and not is_trapped_in_walls(cell.coordinate[0], cell.coordinate[1])
+        ).cells  # so we don't create an animal at wall cells. and make sure the animal is not trapped in walls
+
         # Create sheep:
         Sheep.create_agents(
             self,
@@ -96,7 +136,7 @@ class WolfSheep(Model):
             energy=self.rng.random((initial_sheep,)) * 2 * sheep_gain_from_food,
             p_reproduce=sheep_reproduce,
             energy_from_food=sheep_gain_from_food,
-            cell=self.random.choices(self.grid.all_cells.cells, k=initial_sheep),
+            cell=self.random.choices(possible_cells, k=initial_sheep),
         )
         # Create Wolves:
         Wolf.create_agents(
@@ -105,7 +145,7 @@ class WolfSheep(Model):
             energy=self.rng.random((initial_wolves,)) * 2 * wolf_gain_from_food,
             p_reproduce=wolf_reproduce,
             energy_from_food=wolf_gain_from_food,
-            cell=self.random.choices(self.grid.all_cells.cells, k=initial_wolves),
+            cell=self.random.choices(possible_cells, k=initial_wolves),
         )
 
         # Create grass patches if enabled
