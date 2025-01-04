@@ -7,10 +7,8 @@ from random import Random
 import numpy as np
 from scipy.spatial.distance import cdist
 
-
 from mesa.agent import Agent, AgentSet
 
-from line_profiler_pycharm import profile
 
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position."""
@@ -84,11 +82,6 @@ class ContinuousSpace:
     def agents(self) -> AgentSet:
         """Return an AgentSet with the agents in the space."""
         return AgentSet(self._agents[self._positions_in_use], random=self.random)
-
-    # @property
-    # def agent_positions(self) -> np.ndarray:
-    #     """Return the positions of the agents in the space."""
-    #     return self._agent_positions[self._positions_in_use]
 
     def _get_index_for_agent(self, agent: Agent) -> int:
         """Helper method to get the index for the agent.
@@ -174,7 +167,6 @@ class ContinuousSpace:
 
         return delta
 
-    @profile
     def calculate_distances(self, point, agents=None) -> tuple[np.ndarray, np.ndarray]:
         """Calculate the distance between the point and all agents."""
         point = np.asanyarray(point)
@@ -198,6 +190,21 @@ class ContinuousSpace:
         else:
             dists = cdist(point[np.newaxis, :], positions)[:, 0]
         return dists, agents
+
+    def get_agents_in_radius(self, point, radius=1) -> tuple[np.ndarray, np.ndarray]:
+        """Return the agents and their distances within a radius for the point."""
+        distances, agents = self.calculate_distances(point)
+        logical = distances <= radius
+
+        return distances[logical], agents[logical]
+
+    def get_k_nearest_agents(self, point, k=1) -> tuple[np.ndarray, np.ndarray]:
+        """Return the k nearest agents and their distances to the point."""
+        dists, agents = self.calculate_distances(point)
+
+        k += 1  # the distance calculation includes self, with a distance of 0, so we remove this later
+        indices = np.argpartition(dists, k)[:k]
+        return dists[indices], agents[indices]
 
     def in_bounds(self, point) -> bool:
         """Check if point is inside the bounds of the space."""

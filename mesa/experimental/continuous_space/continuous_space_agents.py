@@ -9,8 +9,6 @@ import numpy as np
 from mesa.agent import Agent
 from mesa.experimental.continuous_space import ContinuousSpace
 
-# from line_profiler_pycharm import profile
-
 class HasPositionProtocol(Protocol):
     """Protocol for continuous space position holders."""
 
@@ -92,14 +90,13 @@ class ContinuousSpaceAgent(Agent):
             include_distance: include the distance information for each neighbor
 
         """
-        dists, agents = self.space.calculate_distances(self.position)
-        indices = np.where(dists <= radius)[0]
-        indices = indices[indices != self._mesa_index]
+        dists, agents = self.space.get_agents_in_radius(self.position, radius=radius)
+        logical = agents != self
 
         if include_distance:
-            return agents[indices], dists[indices]
+            return agents[logical], dists[logical]
         else:
-            return agents[indices]
+            return agents[logical]
 
     @overload
     def get_nearest_neighbors(
@@ -119,13 +116,10 @@ class ContinuousSpaceAgent(Agent):
             include_distance: include the distance information for each neighbor
 
         """
-        dists, agents = self.space.calculate_distances(self.position)
-
-        k += 1  # the distance calculation includes self, with a distance of 0, so we remove this later
-        indices = np.argpartition(dists, k)[:k]
-        indices = indices[indices != self._mesa_index]
+        dists, agents = self.space.get_k_nearest_agents(self.position, k=k)
+        logical = agents != self
 
         if include_distance:
-            return agents[indices], dists[indices]
+            return agents[logical], dists[logical]
         else:
-            return agents[indices]
+            return agents[logical]
