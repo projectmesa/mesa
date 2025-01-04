@@ -20,7 +20,6 @@ def post_process(ax):
 
 
 model_params = {
-
     "seed": {
         "type": "InputText",
         "value": 42,

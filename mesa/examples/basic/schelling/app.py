@@ -24,7 +24,7 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
-    "stepsize":Slider("Step Interval",1,1,100,1),
+    "stepsize": Slider("Step Interval", 1, 1, 100, 1),
     "density": Slider("Agent density", 0.8, 0.1, 1.0, 0.1),
     "minority_pc": Slider("Fraction minority", 0.2, 0.0, 1.0, 0.05),
     "homophily": Slider("Homophily", 0.4, 0.0, 1.0, 0.125),

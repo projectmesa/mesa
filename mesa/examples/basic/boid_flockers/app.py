@@ -17,7 +17,7 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
-        "stepsize": Slider(
+    "stepsize": Slider(
         label="Steps Interval",
         value=1,
         min=1,

@@ -40,7 +40,7 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
-        "stepsize": {
+    "stepsize": {
         "type": "SliderInt",
         "value": 1,
         "label": "Steps Interval:",

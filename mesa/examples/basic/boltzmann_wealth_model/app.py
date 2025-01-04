@@ -28,7 +28,7 @@ model_params = {
         "max": 100,
         "step": 1,
     },
-        "stepsize": {
+    "stepsize": {
         "type": "SliderInt",
         "value": 1,
         "label": "Steps Interval:",

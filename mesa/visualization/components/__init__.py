@@ -13,14 +13,12 @@ from .matplotlib_components import (
 
 
 def make_space_component(
-    
     agent_portrayal: Callable | None = None,
     propertylayer_portrayal: dict | None = None,
     post_process: Callable | None = None,
     backend: str = "matplotlib",
     model_parameters: dict | None = None,
     **space_drawing_kwargs,
-    
 ) -> SpaceMatplotlib | SpaceAltair:
     """Create a Matplotlib-based space visualization component.
 
