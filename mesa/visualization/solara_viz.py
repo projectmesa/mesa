@@ -216,13 +216,11 @@ def ModelController(
     @function_logger(__name__)
     def do_step():
         """Advance the model by one step."""
-        
-        for _ in range(model_parameters.value['stepsize']):
-
+        for _ in range(model_parameters.value["stepsize"]):
             model.value.step()
 
         running.value = model.value.running
-        
+
         force_update()
 
     @function_logger(__name__)
