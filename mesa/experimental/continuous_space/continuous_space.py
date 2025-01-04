@@ -186,7 +186,7 @@ class ContinuousSpace:
             # would be good to test again once numpy 2.x is default in anaconda.
             # dists = np.linalg.norm(delta, axis=1)
             delta_T = delta.T
-            dists = np.sqrt(np.einsum('ij,ij->j', delta_T, delta_T))
+            dists = np.sqrt(np.einsum("ij,ij->j", delta_T, delta_T))
         else:
             dists = cdist(point[np.newaxis, :], positions)[:, 0]
         return dists, agents
