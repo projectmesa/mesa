@@ -7,6 +7,7 @@ from random import Random
 import numpy as np
 from scipy.spatial.distance import cdist
 
+
 from mesa.agent import Agent, AgentSet
 
 from line_profiler_pycharm import profile
@@ -179,7 +180,7 @@ class ContinuousSpace:
         point = np.asanyarray(point)
 
         if agents is None:
-            positions = self._agent_positions
+            positions = self.agent_positions
             agents = self.active_agents
         else:
             positions = self._agent_positions[[self._agent_to_index[a] for a in agents]]
@@ -188,7 +189,12 @@ class ContinuousSpace:
         if self.torus:
             delta = np.abs(positions - point)
             delta = np.minimum(delta, self.size - delta, out=delta)
-            dists = np.linalg.norm(delta, axis=1)
+            # this is obscure: see https://stackoverflow.com/questions/7741878/how-to-apply-numpy-linalg-norm-to-each-row-of-a-matrix
+            # Also, this might be highly numpy version dependent and even cpu architecture dependent.
+            # would be good to test again once numpy 2.x is default in anaconda.
+            # dists = np.linalg.norm(delta, axis=1)
+            delta_T = delta.T
+            dists = np.sqrt(np.einsum('ij,ij->j', delta_T, delta_T))
         else:
             dists = cdist(point[np.newaxis, :], positions)[:, 0]
         return dists, agents

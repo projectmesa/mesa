@@ -9,7 +9,7 @@ import numpy as np
 from mesa.agent import Agent
 from mesa.experimental.continuous_space import ContinuousSpace
 
-from line_profiler_pycharm import profile
+# from line_profiler_pycharm import profile
 
 class HasPositionProtocol(Protocol):
     """Protocol for continuous space position holders."""
@@ -83,7 +83,7 @@ class ContinuousSpaceAgent(Agent):
         self, radius=1, include_distance: bool = True
     ) -> tuple[np.ndarray[ContinuousSpaceAgent], np.ndarray[float]]: ...
 
-    @profile
+    # @profile
     def get_neighbors_in_radius(self, radius=1, include_distance=False):
         """Get neighbors within radius.
 
