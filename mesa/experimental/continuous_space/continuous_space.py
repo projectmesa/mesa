@@ -67,7 +67,7 @@ class ContinuousSpace:
 
         self.torus: bool = torus
 
-        self._agent_positions: np.array = np.zeros(
+        self._agent_positions: np.array = np.empty(
             (n_agents, self.dimensions.shape[0]), dtype=float
         )
         self._agents: np.array = np.zeros((n_agents,), dtype=object)
@@ -104,7 +104,7 @@ class ContinuousSpace:
                 self._agent_positions = np.vstack(
                     [
                         self._agent_positions,
-                        np.zeros(
+                        np.empty(
                             (n, self.dimensions.shape[0]),
                         ),
                     ]
@@ -185,7 +185,7 @@ class ContinuousSpace:
             # Also, this might be highly numpy version dependent and even cpu architecture dependent.
             # would be good to test again once numpy 2.x is default in anaconda.
             # dists = np.linalg.norm(delta, axis=1)
-            delta_T = delta.T
+            delta_T = delta.T  # noqa: N806
             dists = np.sqrt(np.einsum("ij,ij->j", delta_T, delta_T))
         else:
             dists = cdist(point[np.newaxis, :], positions)[:, 0]

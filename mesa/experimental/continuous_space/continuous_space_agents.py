@@ -63,7 +63,7 @@ class ContinuousSpaceAgent(Agent):
         super().__init__(model)
         self.space: ContinuousSpace = space
         self._mesa_index = self.space._get_index_for_agent(self)
-        self.position[:] = np.nan
+        # self.position[:] = np.nan
 
     def remove(self) -> None:
         """Remove and delete the agent from the model."""
