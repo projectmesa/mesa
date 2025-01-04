@@ -1,6 +1,26 @@
 ---
 title: Release History
 ---
+# 3.1.2 (2025-01-04)
+## Highlights
+Mesa v3.1.2 is a patch release containing updates to our wolf-sheep, shelling and prisoner's dilemma example models and improving documentation in the tutorials and visualisation docstring. No functional changes to the core library were made.
+
+## What's Changed
+### 🔍 Examples updated
+* examples/wolf_sheep: Don't allow dumb moves by @EwoutH in https://github.com/projectmesa/mesa/pull/2503
+* Added homophily ratio in basic schelling example by @vbv-shm in https://github.com/projectmesa/mesa/pull/2520
+* examples: Update pd_grid analysis.ipynb to use new spaces by @quaquel in https://github.com/projectmesa/mesa/pull/2553
+### 📜 Documentation improvements
+* Corrected a few errors in Intro tutorial by @sanika-n in https://github.com/projectmesa/mesa/pull/2583
+* Small draw_space docstring fix by @quaquel in https://github.com/projectmesa/mesa/pull/2554
+* fix: model name in visualization tutorial by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2591
+
+## New Contributors
+* @vbv-shm made their first contribution in https://github.com/projectmesa/mesa/pull/2520
+* @sanika-n made their first contribution in https://github.com/projectmesa/mesa/pull/2583
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.1.1...v3.1.2
+
 # 3.1.1 (2024-12-14)
 ## Highlights
 Mesa 3.1.1 is a maintenance release that includes visualization improvements and documentation updates. The key enhancement is the addition of an interactive play interval control to the visualization interface, allowing users to dynamically adjust simulation speed between 1ms and 500ms through a slider in the Controls panel.
