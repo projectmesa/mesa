@@ -16,6 +16,7 @@ class Schelling(Model):
         homophily: float = 0.4,
         radius: int = 1,
         seed=None,
+        stepsize=1,
     ):
         """Create a new Schelling model.
 

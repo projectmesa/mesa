@@ -48,6 +48,7 @@ model_params = {
         "values": [True, False],
         "label": "grass regrowth enabled?",
     },
+    
     "grass_regrowth_time": Slider("Grass Regrowth Time", 20, 1, 50),
     "initial_sheep": Slider("Initial Sheep Population", 100, 10, 300),
     "sheep_reproduce": Slider("Sheep Reproduction Rate", 0.04, 0.01, 1.0, 0.01),

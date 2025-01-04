@@ -36,6 +36,7 @@ class VirusOnNetwork(Model):
         recovery_chance=0.3,
         gain_resistance_chance=0.5,
         seed=None,
+        stepsize=1,
     ):
         super().__init__(seed=seed)
         self.num_nodes = num_nodes

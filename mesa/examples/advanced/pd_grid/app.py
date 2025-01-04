@@ -29,6 +29,7 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
+    "stepsize":Slider("Step Interval",1,1,20,1),
     "width": Slider("Grid Width", value=50, min=10, max=100, step=1),
     "height": Slider("Grid Height", value=50, min=10, max=100, step=1),
     "activation_order": {

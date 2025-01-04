@@ -10,6 +10,7 @@ import logging
 from functools import wraps
 from logging import DEBUG, INFO
 
+
 __all__ = [
     "DEBUG",
     "DEFAULT_LEVEL",

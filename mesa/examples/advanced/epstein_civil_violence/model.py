@@ -48,6 +48,7 @@ class EpsteinCivilViolence(mesa.Model):
         movement=True,
         max_iters=1000,
         seed=None,
+        stepsize=1,
     ):
         super().__init__(seed=seed)
         self.movement = movement

@@ -27,6 +27,7 @@ class BoidFlockers(Model):
         separate=0.015,
         match=0.05,
         seed=None,
+        stepsize=1,
     ):
         """Create a new Boids Flocking model.
 

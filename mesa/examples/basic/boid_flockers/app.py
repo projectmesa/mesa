@@ -17,6 +17,13 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
+        "stepsize": Slider(
+        label="Steps Interval",
+        value=1,
+        min=1,
+        max=20,
+        step=1,
+    ),
     "population": Slider(
         label="Number of boids",
         value=100,
