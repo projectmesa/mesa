@@ -91,7 +91,9 @@ def test_continuous_agent():
 
     # remove all agents and check if the view is updated throughout correctly
     for i, agent in enumerate(space.agents):
-        assert np.all(agent.position == agent.coordinate) ## check if updates of indices is correctly done
+        assert np.all(
+            agent.position == agent.coordinate
+        )  ## check if updates of indices is correctly done
         agent.remove()
         assert space.agent_positions.shape == (110 - 1 - i, 2)
 
