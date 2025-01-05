@@ -64,27 +64,34 @@ def test_continuous_agent():
 
     for _ in range(10):
         agent = ContinuousSpaceAgent(space, model)
-        agent.position = [agent.random.random(), agent.random.random()]
+        position = [agent.random.random(), agent.random.random()]
+        agent.position = position
+        agent.coordinate = position
 
     assert space.agent_positions.shape == (10, 2)
     for agent in space.agents:
         a = agent.position
         b = space._agent_positions[space._agent_to_index[agent]]
         assert np.all(a == b)
+        assert np.all(agent.position == agent.coordinate)
 
     # add more agents, triggering a resizeing of the array
     for _ in range(100):
         agent = ContinuousSpaceAgent(space, model)
-        agent.position = [agent.random.random(), agent.random.random()]
+        position = [agent.random.random(), agent.random.random()]
+        agent.position = position
+        agent.coordinate = position
 
     assert space.agent_positions.shape == (110, 2)
     for agent in space.agents:
         a = agent.position
         b = space._agent_positions[space._agent_to_index[agent]]
         assert np.all(a == b)
+        assert np.all(agent.position == agent.coordinate)
 
     # remove all agents and check if the view is updated throughout correctly
     for i, agent in enumerate(space.agents):
+        assert np.all(agent.position == agent.coordinate) ## check if updates of indices is correctly done
         agent.remove()
         assert space.agent_positions.shape == (110 - 1 - i, 2)
 
