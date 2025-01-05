@@ -85,7 +85,7 @@ class ContinuousSpaceAgent(Agent):
         if dists.size == 0:
             return dists, agents
 
-        logical = np.asarray([True if agent is not self else False for agent in agents])
+        logical = np.asarray([agent is not self for agent in agents])
         agents = list(compress(agents, logical))
         return agents, dists[logical]
 
@@ -97,6 +97,6 @@ class ContinuousSpaceAgent(Agent):
 
         """
         dists, agents = self.space.get_k_nearest_agents(self.position, k=k)
-        logical = np.asarray([True if agent is not self else False for agent in agents])
+        logical = np.asarray([agent is not self for agent in agents])
         agents = list(compress(agents, logical))
         return agents, dists[logical]
