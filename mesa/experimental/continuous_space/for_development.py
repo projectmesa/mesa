@@ -1,12 +1,10 @@
 """to be removed once further into the development."""
 
-
 if __name__ == "__main__":
-    from mesa import Model, Agent
-    from mesa.space import ContinuousSpace as OldStyleSpace
-
+    from mesa import Agent, Model
     from mesa.experimental.continuous_space import ContinuousSpace as NewStyleSpace
     from mesa.experimental.continuous_space import ContinuousSpaceAgent
+    from mesa.space import ContinuousSpace as OldStyleSpace
 
     n = 400
 
@@ -19,11 +17,12 @@ if __name__ == "__main__":
         space.place_agent(agent, pos)
 
     for _ in range(100):
-        space.get_neighbors([50,50], radius=5, include_center=False)
-
+        space.get_neighbors([50, 50], radius=5, include_center=False)
 
     model = Model(rng=42)
-    space = NewStyleSpace([[0,100], [0,100]], torus=True, random=model.random, n_agents=n)
+    space = NewStyleSpace(
+        [[0, 100], [0, 100]], torus=True, random=model.random, n_agents=n
+    )
 
     positions = model.rng.random((n, 2)) * n
     for pos in positions:

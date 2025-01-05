@@ -9,6 +9,7 @@ from scipy.spatial.distance import cdist
 
 from mesa.agent import Agent, AgentSet
 
+
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position."""
 
@@ -180,9 +181,9 @@ class ContinuousSpace:
         if self.torus:
             delta = np.abs(positions - point)
             delta = np.minimum(delta, self.size - delta, out=delta)
-            dists = delta[:, 0]**2
+            dists = delta[:, 0] ** 2
             for i in range(1, self.ndims):
-                dists += delta[:,i]**2
+                dists += delta[:, i] ** 2
             dists = np.sqrt(dists)
         else:
             dists = cdist(point[np.newaxis, :], positions)[0, :]

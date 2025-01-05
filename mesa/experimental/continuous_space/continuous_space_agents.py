@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Protocol, overload
+from typing import Protocol
 
 import numpy as np
 
@@ -97,4 +97,3 @@ class ContinuousSpaceAgent(Agent):
         logical = agents != self
 
         return agents[logical], dists[logical]
-
