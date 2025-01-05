@@ -72,7 +72,9 @@ class ContinuousSpaceAgent(Agent):
         self._mesa_index = None
         self.space = None
 
-    def get_neighbors_in_radius(self, radius:float=1) -> tuple[np.ndarray, np.ndarray]:
+    def get_neighbors_in_radius(
+        self, radius: float = 1
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Get neighbors within radius.
 
         Args:
@@ -87,7 +89,7 @@ class ContinuousSpaceAgent(Agent):
         logical = np.asarray([True if agent is not self else False for agent in agents])
         return agents[logical], dists[logical]
 
-    def get_nearest_neighbors(self, k:int=1) -> tuple[np.ndarray, np.ndarray]:
+    def get_nearest_neighbors(self, k: int = 1) -> tuple[np.ndarray, np.ndarray]:
         """Get neighbors within radius.
 
         Args:

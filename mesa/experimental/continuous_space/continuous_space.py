@@ -73,19 +73,19 @@ class ContinuousSpace:
         self._agents: np.array = np.zeros((n_agents,), dtype=object)
 
         self.active_agents: np.array  # a view on _agents containing all active agents
-        self.agent_positions: np.array  # a view on _agent_positions containing all active positions
+        self.agent_positions: (
+            np.array
+        )  # a view on _agent_positions containing all active positions
 
         self._n_agents = 0
 
         self._index_to_agent: dict[int, Agent] = {}
         self._agent_to_index: dict[Agent, int | None] = {}
 
-
     @property
     def agents(self) -> AgentSet:
         """Return an AgentSet with the agents in the space."""
         return AgentSet(self.active_agents, random=self.random)
-
 
     def _add_agent(self, agent: Agent) -> int:
         """Helper method to get the index for the agent.
@@ -117,8 +117,8 @@ class ContinuousSpace:
 
         # we want to maintain a view rather than a copy on the active agents and positions
         # this is essential for the performance of the rest of this code
-        self.active_agents = self._agents[0:self._n_agents]
-        self.agent_positions = self._agent_positions[0:self._n_agents]
+        self.active_agents = self._agents[0 : self._n_agents]
+        self.agent_positions = self._agent_positions[0 : self._n_agents]
 
         return index
 
@@ -133,10 +133,12 @@ class ContinuousSpace:
             self._index_to_agent[i] = agent
 
         # we move all data below the removed agent one row up
-        self._agent_positions[index:self._n_agents-1] = self._agent_positions[index+1:self._n_agents]
+        self._agent_positions[index : self._n_agents - 1] = self._agent_positions[
+            index + 1 : self._n_agents
+        ]
         self._n_agents -= 1
-        self.active_agents = self._agents[0:self._n_agents]
-        self.agent_positions = self._agent_positions[0:self._n_agents]
+        self.active_agents = self._agents[0 : self._n_agents]
+        self.agent_positions = self._agent_positions[0 : self._n_agents]
 
     def calculate_difference_vector(self, point: np.ndarray, agents=None) -> np.ndarray:
         """Calculate the difference vector between the point and all agents."""
@@ -175,7 +177,7 @@ class ContinuousSpace:
             agents = np.asarray(agents)
 
         if self.torus:
-            delta = np.abs(point-positions)
+            delta = np.abs(point - positions)
             delta = np.minimum(delta, self.size - delta, out=delta)
 
             # + is much faster than np.sum or array.sum

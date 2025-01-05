@@ -73,13 +73,10 @@ class Boid(ContinuousSpaceAgent):
 
         cohere_vector = delta.sum(axis=0) * self.cohere_factor
         separation_vector = (
-            -1
-            * delta[distances < self.separation].sum(axis=0)
-            * self.separate_factor
+            -1 * delta[distances < self.separation].sum(axis=0) * self.separate_factor
         )
         match_vector = (
-            np.asarray([n.direction for n in neighbors]).sum(axis=0)
-            * self.match_factor
+            np.asarray([n.direction for n in neighbors]).sum(axis=0) * self.match_factor
         )
 
         # Update direction based on the three behaviors
