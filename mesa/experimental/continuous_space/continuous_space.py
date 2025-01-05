@@ -2,8 +2,8 @@
 
 import warnings
 from collections.abc import Sequence
-from random import Random
 from itertools import compress
+from random import Random
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -111,7 +111,6 @@ class ContinuousSpace:
                 ]
             )
 
-
         self._agent_to_index[agent] = index
         self._index_to_agent[index] = agent
 
@@ -135,8 +134,8 @@ class ContinuousSpace:
         # we update all indices
         for agent in self.active_agents[index::]:
             old_index = self._agent_to_index[agent]
-            self._agent_to_index[agent] = old_index-1
-            self._index_to_agent[old_index-1] = agent
+            self._agent_to_index[agent] = old_index - 1
+            self._index_to_agent[old_index - 1] = agent
 
         # we move all data below the removed agent one row up
         self._agent_positions[index : self._n_agents - 1] = self._agent_positions[
@@ -201,7 +200,7 @@ class ContinuousSpace:
         agents = list(compress(agents, logical))
         return distances[logical], agents
 
-    def get_k_nearest_agents(self, point, k=1) -> tuple[np.ndarray,list]:
+    def get_k_nearest_agents(self, point, k=1) -> tuple[np.ndarray, list]:
         """Return the k nearest agents and their distances to the point."""
         dists, agents = self.calculate_distances(point)
 

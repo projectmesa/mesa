@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from itertools import compress
-
 from typing import Protocol
 
 import numpy as np
@@ -74,9 +73,7 @@ class ContinuousSpaceAgent(Agent):
         self._mesa_index = None
         self.space = None
 
-    def get_neighbors_in_radius(
-        self, radius: float = 1
-    ) -> tuple[list, np.ndarray]:
+    def get_neighbors_in_radius(self, radius: float = 1) -> tuple[list, np.ndarray]:
         """Get neighbors within radius.
 
         Args:
