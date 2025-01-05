@@ -1,26 +1,34 @@
 """to be removed once further into the development."""
 
-from random import Random
-
-import numpy as np
-from continuous_space import ContinuousSpace
-from continuous_space_agents import ContinuousSpaceAgent
-
-from mesa import Model
 
 if __name__ == "__main__":
-    dimensions = [[0, 1], [0, 1]]
+    from mesa import Model, Agent
+    from mesa.space import ContinuousSpace as OldStyleSpace
 
-    model = Model(seed=42)
-    space = ContinuousSpace(dimensions, random=Random(42), torus=True)
+    from mesa.experimental.continuous_space import ContinuousSpace as NewStyleSpace
+    from mesa.experimental.continuous_space import ContinuousSpaceAgent
 
-    for _ in range(2):
-        agent = ContinuousSpaceAgent(
-            space,
-            model,
-        )
-        agent.position = [agent.random.random(), agent.random.random()]
+    n = 400
 
-    distances = space.calculate_distances(np.asarray([0.5, 0.5]))
+    model = Model(rng=42)
+    space = OldStyleSpace(100, 100, torus=True)
 
-    print("blaat")
+    positions = model.rng.random((n, 2)) * n
+    for pos in positions:
+        agent = Agent(model)
+        space.place_agent(agent, pos)
+
+    for _ in range(100):
+        space.get_neighbors([50,50], radius=5, include_center=False)
+
+
+    model = Model(rng=42)
+    space = NewStyleSpace([[0,100], [0,100]], torus=True, random=model.random, n_agents=n)
+
+    positions = model.rng.random((n, 2)) * n
+    for pos in positions:
+        agent = ContinuousSpaceAgent(space, model)
+        agent.position = pos
+
+    for _ in range(100):
+        space.get_agents_in_radius([50, 50], radius=5)

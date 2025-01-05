@@ -72,18 +72,7 @@ class ContinuousSpaceAgent(Agent):
         self._mesa_index = None
         self.space = None
 
-    @overload
-    def get_neighbors_in_radius(
-        self, radius: int = 1, include_distance: bool = False
-    ) -> np.ndarray[ContinuousSpaceAgent]: ...
-
-    @overload
-    def get_neighbors_in_radius(
-        self, radius=1, include_distance: bool = True
-    ) -> tuple[np.ndarray[ContinuousSpaceAgent], np.ndarray[float]]: ...
-
-    # @profile
-    def get_neighbors_in_radius(self, radius=1, include_distance=False):
+    def get_neighbors_in_radius(self, radius=1):
         """Get neighbors within radius.
 
         Args:
@@ -94,22 +83,9 @@ class ContinuousSpaceAgent(Agent):
         dists, agents = self.space.get_agents_in_radius(self.position, radius=radius)
         logical = agents != self
 
-        if include_distance:
-            return agents[logical], dists[logical]
-        else:
-            return agents[logical]
+        return agents[logical], dists[logical]
 
-    @overload
-    def get_nearest_neighbors(
-        self, k: int = 1, include_distance: bool = False
-    ) -> list[ContinuousSpaceAgent]: ...
-
-    @overload
-    def get_nearest_neighbors(
-        self, k=1, include_distance: bool = True
-    ) -> list[tuple[ContinuousSpaceAgent, float]]: ...
-
-    def get_nearest_neighbors(self, k=1, include_distance=False):
+    def get_nearest_neighbors(self, k=1):
         """Get neighbors within radius.
 
         Args:
@@ -120,7 +96,5 @@ class ContinuousSpaceAgent(Agent):
         dists, agents = self.space.get_k_nearest_agents(self.position, k=k)
         logical = agents != self
 
-        if include_distance:
-            return agents[logical], dists[logical]
-        else:
-            return agents[logical]
+        return agents[logical], dists[logical]
+

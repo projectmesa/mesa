@@ -9,7 +9,6 @@ from scipy.spatial.distance import cdist
 
 from mesa.agent import Agent, AgentSet
 
-
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position."""
 
@@ -181,14 +180,12 @@ class ContinuousSpace:
         if self.torus:
             delta = np.abs(positions - point)
             delta = np.minimum(delta, self.size - delta, out=delta)
-            # this is obscure: see https://stackoverflow.com/questions/7741878/how-to-apply-numpy-linalg-norm-to-each-row-of-a-matrix
-            # Also, this might be highly numpy version dependent and even cpu architecture dependent.
-            # would be good to test again once numpy 2.x is default in anaconda.
-            # dists = np.linalg.norm(delta, axis=1)
-            delta_T = delta.T  # noqa: N806
-            dists = np.sqrt(np.einsum("ij,ij->j", delta_T, delta_T))
+            dists = delta[:, 0]**2
+            for i in range(1, self.ndims):
+                dists += delta[:,i]**2
+            dists = np.sqrt(dists)
         else:
-            dists = cdist(point[np.newaxis, :], positions)[:, 0]
+            dists = cdist(point[np.newaxis, :], positions)[0, :]
         return dists, agents
 
     def get_agents_in_radius(self, point, radius=1) -> tuple[np.ndarray, np.ndarray]:

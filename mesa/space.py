@@ -25,6 +25,7 @@ Classes
 # Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
+
 import collections
 import contextlib
 import inspect
@@ -1402,6 +1403,7 @@ class ContinuousSpace:
 
         self._invalidate_agent_cache()
         agent.pos = None
+
 
     def get_neighbors(
         self, pos: FloatCoordinate, radius: float, include_center: bool = True
