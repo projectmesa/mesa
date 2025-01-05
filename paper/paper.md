@@ -94,46 +94,36 @@ One significant advancement of Mesa 3+ is expanded functionality around agent ma
 ### Spaces
 Mesa 3 provides both discrete (cell-based) and continuous space implementations. In discrete spaces, an agent occupies a cell. Mesa implements discrete spaces using a doubly-linked structure where each cell maintains connections to its neighbors. The framework includes several discrete space variants with a consistent API:
 
-
 - Grid-based: `OrthogonalMooreGrid`, `OrthogonalVonNeumanGrid`, and `HexGrid`
 - Network-based: `Network` for graph-based topologies
 - Voronoi-based: `VoronoiMesh` for irregular tessellations
 
-
 Example grid creation:
-
 
 ```python
    grid = OrthogonalVonNeumannGrid((width, height), torus=False, random=model.random)
 ```
 
-
 In Mesa 3, specialized agent classes for spatial interactions in discrete spaces were added:
-
 
 - `FixedAgent`: Is assigned to a cell, can access this cell, but cannot move to another cell.
 - `CellAgent`: Can move between cells
 - `Grid2DMovingAgent`: Extends `CellAgent` with directional movement methods
 
-
 All discrete spaces support PropertyLayers - efficient numpy-based arrays for storing cell-level properties. This newly added feature allows for agents to interact with spatial properties of the cell more easily:
-
 
 ```python
    grid.create_property_layer("elevation", default_value=10)
    high_ground = grid.elevation.select_cells(lambda x: x > 50)
 ```
 
-
 For models where agents need to move continuously through space rather than between discrete locations, `ContinuousSpace` allows agents to occupy any coordinate within defined boundaries:
-
 
 ```python
    space = ContinuousSpace(x_max, y_max, torus=True)
    space.move_agent(agent, (new_x, new_y))
 ```
 The space module is stable but under active development. The new cell-based spaces in Mesa 3 are currently being tested and considered feature-complete. The code snippets reflected in this paper are the future expected state of Mesa. Features not yet merged into core are imported from experimental:  
-
 
 ```python
 from mesa.experimental.cell_space ... 
