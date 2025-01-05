@@ -30,7 +30,7 @@ class ContinuousSpaceAgent(Agent):
     @property
     def position(self) -> np.ndarray:
         """Position of the agent."""
-        return self.space._agent_positions[self._mesa_index]
+        return self.space.agent_positions[self.space._agent_to_index[self]]
 
     @position.setter
     def position(self, value: np.ndarray) -> None:
@@ -40,7 +40,7 @@ class ContinuousSpaceAgent(Agent):
             else:
                 raise ValueError(f"point {value} is outside the bounds of the space")
 
-        self.space._agent_positions[self._mesa_index] = value
+        self.space.agent_positions[self.space._agent_to_index[self]] = value
 
     @property
     def pos(self):  # noqa: D102
@@ -62,7 +62,7 @@ class ContinuousSpaceAgent(Agent):
         """
         super().__init__(model)
         self.space: ContinuousSpace = space
-        self._mesa_index = self.space._get_index_for_agent(self)
+        self.space._add_agent(self)
         # self.position[:] = np.nan
 
     def remove(self) -> None:

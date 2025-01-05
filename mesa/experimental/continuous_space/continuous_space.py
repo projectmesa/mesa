@@ -71,79 +71,72 @@ class ContinuousSpace:
             (n_agents, self.dimensions.shape[0]), dtype=float
         )
         self._agents: np.array = np.zeros((n_agents,), dtype=object)
-        self._positions_in_use: np.array = np.zeros(
-            (n_agents,), dtype=bool
-        )  # effectively a mask over _agent_positions
-        self._is_full = False
+
+        self.active_agents: np.array  # a view on _agents containing all active agents
+        self.agent_positions: np.array  # a view on _agent_positions containing all active positions
+
+        self._n_agents = 0
 
         self._index_to_agent: dict[int, Agent] = {}
         self._agent_to_index: dict[Agent, int | None] = {}
 
+
     @property
     def agents(self) -> AgentSet:
         """Return an AgentSet with the agents in the space."""
-        return AgentSet(self._agents[self._positions_in_use], random=self.random)
+        return AgentSet(self.active_agents, random=self.random)
 
-    def _get_index_for_agent(self, agent: Agent) -> int:
+
+    def _add_agent(self, agent: Agent) -> int:
         """Helper method to get the index for the agent.
 
         This method manages the numpy array with the agent positions and ensuring it is
         enlarged if and when needed.
 
         """
-        try:
-            return self._agent_to_index[agent]
-        except KeyError:
-            indices = np.where(~self._positions_in_use)[0]
+        index = self._n_agents
+        self._n_agents += 1
 
-            if indices.size > 0:
-                index = indices[0]
-            else:
-                # we are out of space
-                fraction = 0.2  # we add 20%  Fixme
-                n = int(round(fraction * self._agent_positions.shape[0]))
-                self._agent_positions = np.vstack(
-                    [
-                        self._agent_positions,
-                        np.empty(
-                            (n, self.dimensions.shape[0]),
-                        ),
-                    ]
-                )
-                self._positions_in_use = np.hstack(
-                    [self._positions_in_use, np.zeros((n,), dtype=bool)]
-                )
-                self._agents = np.hstack([self._agents, np.zeros((n,), dtype=object)])
-                index = np.where(~self._positions_in_use)[0][0]
-
-        self._positions_in_use[index] = True
+        if self._agent_positions.shape[0] <= index:
+            # we are out of space
+            fraction = 0.2  # we add 20%  Fixme
+            n = int(round(fraction * self._n_agents))
+            self._agent_positions = np.vstack(
+                [
+                    self._agent_positions,
+                    np.empty(
+                        (n, self.dimensions.shape[0]),
+                    ),
+                ]
+            )
+            self._agents = np.hstack([self._agents, np.zeros((n,), dtype=object)])
 
         self._agents[index] = agent
         self._agent_to_index[agent] = index
         self._index_to_agent[index] = agent
 
-        self.active_agents = self._agents[self._positions_in_use]
-        self._is_full = bool(np.all(self._positions_in_use))
+        # we want to maintain a view rather than a copy on the active agents and positions
+        # this is essential for the performance of the rest of this code
+        self.active_agents = self._agents[0:self._n_agents]
+        self.agent_positions = self._agent_positions[0:self._n_agents]
 
         return index
 
-    @property
-    def agent_positions(self):
-        """Return the positions of the agents in the space."""
-        if self._is_full:
-            return self._agent_positions
-
-        return self._agent_positions[self._positions_in_use]
-
     def _remove_agent(self, agent: Agent) -> None:
         """Remove an agent from the space."""
-        index = self._get_index_for_agent(agent)
+        index = self._agent_to_index[agent]
         self._agent_to_index.pop(agent, None)
         self._index_to_agent.pop(index, None)
-        self._positions_in_use[index] = False
-        self._agents[index] = None
-        self.active_agents = self._agents[self._positions_in_use]
-        self._is_full = False
+
+        for i in range(index, self._n_agents):
+            self._agent_to_index[agent] = i
+            self._index_to_agent[i] = agent
+
+        # we move all data below the removed agent one row up
+        self._agent_positions[index:self._n_agents-1] = self._agent_positions[index+1:self._n_agents]
+        self._n_agents -= 1
+        self.active_agents = self._agents[0:self._n_agents]
+        self.agent_positions = self._agent_positions[0:self._n_agents]
 
     def calculate_difference_vector(self, point: np.ndarray, agents=None) -> np.ndarray:
         """Calculate the difference vector between the point and all agents."""
