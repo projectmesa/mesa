@@ -71,14 +71,14 @@ class Boid(ContinuousSpaceAgent):
 
         delta = self.space.calculate_difference_vector(self.position, agents=neighbors)
 
-        cohere_vector = np.sum(delta, axis=0) * self.cohere_factor
+        cohere_vector = delta.sum(axis=0) * self.cohere_factor
         separation_vector = (
             -1
-            * np.sum(delta[distances < self.separation], axis=0)
+            * delta[distances < self.separation].sum(axis=0)
             * self.separate_factor
         )
         match_vector = (
-            np.sum(np.asarray([n.direction for n in neighbors]), axis=0)
+            np.asarray([n.direction for n in neighbors]).sum(axis=0)
             * self.match_factor
         )
 

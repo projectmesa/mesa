@@ -74,6 +74,7 @@ class ContinuousSpace:
         self._positions_in_use: np.array = np.zeros(
             (n_agents,), dtype=bool
         )  # effectively a mask over _agent_positions
+        self._is_full = False
 
         self._index_to_agent: dict[int, Agent] = {}
         self._agent_to_index: dict[Agent, int | None] = {}
@@ -116,9 +117,11 @@ class ContinuousSpace:
                 index = np.where(~self._positions_in_use)[0][0]
 
         self._positions_in_use[index] = True
+
         self._agents[index] = agent
         self._agent_to_index[agent] = index
         self._index_to_agent[index] = agent
+
         self.active_agents = self._agents[self._positions_in_use]
         self._is_full = bool(np.all(self._positions_in_use))
 
@@ -179,8 +182,10 @@ class ContinuousSpace:
             agents = np.asarray(agents)
 
         if self.torus:
-            delta = np.abs(positions - point)
+            delta = np.abs(point-positions)
             delta = np.minimum(delta, self.size - delta, out=delta)
+
+            # + is much faster than np.sum or array.sum
             dists = delta[:, 0] ** 2
             for i in range(1, self.ndims):
                 dists += delta[:, i] ** 2
@@ -193,7 +198,6 @@ class ContinuousSpace:
         """Return the agents and their distances within a radius for the point."""
         distances, agents = self.calculate_distances(point)
         logical = distances <= radius
-
         return distances[logical], agents[logical]
 
     def get_k_nearest_agents(self, point, k=1) -> tuple[np.ndarray, np.ndarray]:
