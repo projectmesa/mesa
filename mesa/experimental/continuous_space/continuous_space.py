@@ -3,6 +3,7 @@
 import warnings
 from collections.abc import Sequence
 from random import Random
+from itertools import compress
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -70,9 +71,9 @@ class ContinuousSpace:
         self._agent_positions: np.array = np.empty(
             (n_agents, self.dimensions.shape[0]), dtype=float
         )
-        self._agents: np.array = np.zeros((n_agents,), dtype=object)
+        # self._agents: np.array = np.zeros((n_agents,), dtype=object)
 
-        self.active_agents: np.array  # a view on _agents containing all active agents
+        self.active_agents = []
         self.agent_positions: (
             np.array
         )  # a view on _agent_positions containing all active positions
@@ -109,15 +110,14 @@ class ContinuousSpace:
                     ),
                 ]
             )
-            self._agents = np.hstack([self._agents, np.zeros((n,), dtype=object)])
 
-        self._agents[index] = agent
+
         self._agent_to_index[agent] = index
         self._index_to_agent[index] = agent
 
         # we want to maintain a view rather than a copy on the active agents and positions
         # this is essential for the performance of the rest of this code
-        self.active_agents = self._agents[0 : self._n_agents]
+        self.active_agents.append(agent)
         self.agent_positions = self._agent_positions[0 : self._n_agents]
 
         return index
@@ -127,17 +127,22 @@ class ContinuousSpace:
         index = self._agent_to_index[agent]
         self._agent_to_index.pop(agent, None)
         self._index_to_agent.pop(index, None)
+        try:
+            del self.active_agents[index]
+        except IndexError as e:
+            raise e
 
-        for i in range(index, self._n_agents):
-            self._agent_to_index[agent] = i
-            self._index_to_agent[i] = agent
+        # we update all indices
+        for agent in self.active_agents[index::]:
+            old_index = self._agent_to_index[agent]
+            self._agent_to_index[agent] = old_index-1
+            self._index_to_agent[old_index-1] = agent
 
         # we move all data below the removed agent one row up
         self._agent_positions[index : self._n_agents - 1] = self._agent_positions[
             index + 1 : self._n_agents
         ]
         self._n_agents -= 1
-        self.active_agents = self._agents[0 : self._n_agents]
         self.agent_positions = self._agent_positions[0 : self._n_agents]
 
     def calculate_difference_vector(self, point: np.ndarray, agents=None) -> np.ndarray:
@@ -165,7 +170,7 @@ class ContinuousSpace:
 
         return delta
 
-    def calculate_distances(self, point, agents=None) -> tuple[np.ndarray, np.ndarray]:
+    def calculate_distances(self, point, agents=None) -> tuple[np.ndarray, list]:
         """Calculate the distance between the point and all agents."""
         point = np.asanyarray(point)
 
@@ -189,19 +194,21 @@ class ContinuousSpace:
             dists = cdist(point[np.newaxis, :], positions)[0, :]
         return dists, agents
 
-    def get_agents_in_radius(self, point, radius=1) -> tuple[np.ndarray, np.ndarray]:
+    def get_agents_in_radius(self, point, radius=1) -> tuple[np.ndarray, list]:
         """Return the agents and their distances within a radius for the point."""
         distances, agents = self.calculate_distances(point)
         logical = distances <= radius
-        return distances[logical], agents[logical]
+        agents = list(compress(agents, logical))
+        return distances[logical], agents
 
-    def get_k_nearest_agents(self, point, k=1) -> tuple[np.ndarray, np.ndarray]:
+    def get_k_nearest_agents(self, point, k=1) -> tuple[np.ndarray,list]:
         """Return the k nearest agents and their distances to the point."""
         dists, agents = self.calculate_distances(point)
 
         k += 1  # the distance calculation includes self, with a distance of 0, so we remove this later
         indices = np.argpartition(dists, k)[:k]
-        return dists[indices], agents[indices]
+        agents = [agents[i] for i in indices]
+        return dists[indices], agents
 
     def in_bounds(self, point) -> bool:
         """Check if point is inside the bounds of the space."""

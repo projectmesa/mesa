@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from itertools import compress
+
 from typing import Protocol
 
 import numpy as np
@@ -74,7 +76,7 @@ class ContinuousSpaceAgent(Agent):
 
     def get_neighbors_in_radius(
         self, radius: float = 1
-    ) -> tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[list, np.ndarray]:
         """Get neighbors within radius.
 
         Args:
@@ -87,9 +89,10 @@ class ContinuousSpaceAgent(Agent):
             return dists, agents
 
         logical = np.asarray([True if agent is not self else False for agent in agents])
-        return agents[logical], dists[logical]
+        agents = list(compress(agents, logical))
+        return agents, dists[logical]
 
-    def get_nearest_neighbors(self, k: int = 1) -> tuple[np.ndarray, np.ndarray]:
+    def get_nearest_neighbors(self, k: int = 1) -> tuple[list, np.ndarray]:
         """Get neighbors within radius.
 
         Args:
@@ -97,6 +100,6 @@ class ContinuousSpaceAgent(Agent):
 
         """
         dists, agents = self.space.get_k_nearest_agents(self.position, k=k)
-        logical = agents != self
-
-        return agents[logical], dists[logical]
+        logical = np.asarray([True if agent is not self else False for agent in agents])
+        agents = list(compress(agents, logical))
+        return agents, dists[logical]

@@ -65,7 +65,7 @@ class Boid(ContinuousSpaceAgent):
         self.neighbors = neighbors
 
         # If no neighbors, maintain current direction
-        if neighbors.size == 0:
+        if not neighbors:
             self.position += self.direction * self.speed
             return
 
