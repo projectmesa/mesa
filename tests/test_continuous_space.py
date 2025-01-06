@@ -290,11 +290,13 @@ def test_continuous_space_get_agents_in_radius():
     dimensions = np.asarray([[0, 1], [0, 1]])
     space = ContinuousSpace(dimensions, torus=False, random=model.random)
 
-    positions = [[0.1, 0.1],
-                 [0.1, 0.9],
-                 [0.9, 0.1],
-                 [0.9, 0.9],
-                 [0.5, 0.5],]
+    positions = [
+        [0.1, 0.1],
+        [0.1, 0.9],
+        [0.9, 0.1],
+        [0.9, 0.9],
+        [0.5, 0.5],
+    ]
 
     for position in positions:
         agent = ContinuousSpaceAgent(space, model)
@@ -321,11 +323,13 @@ def test_continuous_space_get_agents_in_radius():
     dimensions = np.asarray([[0, 1], [0, 1]])
     space = ContinuousSpace(dimensions, torus=True, random=model.random)
 
-    positions = [[0.1, 0.1],
-                 [0.1, 0.9],
-                 [0.9, 0.1],
-                 [0.9, 0.9],
-                 [0.5, 0.5],]
+    positions = [
+        [0.1, 0.1],
+        [0.1, 0.9],
+        [0.9, 0.1],
+        [0.9, 0.9],
+        [0.5, 0.5],
+    ]
 
     for position in positions:
         agent = ContinuousSpaceAgent(space, model)
