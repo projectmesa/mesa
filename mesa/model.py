@@ -94,7 +94,7 @@ class Model:
             self._seed = seed  # this allows for reproducing stdlib.random
 
             try:
-                self.rng: np.random.Generator = np.random.default_rng(rng)
+                self.rng: np.random.Generator = np.random.default_rng(seed)
             except TypeError:
                 rng = self.random.randint(0, sys.maxsize)
                 self.rng: np.random.Generator = np.random.default_rng(rng)
