@@ -16,6 +16,7 @@ authors:
     orcid: 0000-0001-9447-2954
     affiliation: "1"
   - name: Vincent Hess
+    orcid: 0000-0002-9242-8500
     affiliation: "2"
   - name: Thomas D. Pike
     orcid: 0000-0003-1576-0283
