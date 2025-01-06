@@ -1420,7 +1420,7 @@ class ContinuousSpace:
             If 1 or more agents are located on pos, include_center=True will remove these agents
             from the results. So, if you really want to get the neighbors of a given agent,
             you should set include_center to true and filter the list of agents to remove
-            the given agent. 
+            the given agent.
 
         """
         if self._agent_points is None:
