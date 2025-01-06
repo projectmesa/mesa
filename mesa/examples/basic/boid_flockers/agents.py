@@ -61,8 +61,8 @@ class Boid(ContinuousSpaceAgent):
 
     def step(self):
         """Get the Boid's neighbors, compute the new vector, and move accordingly."""
-        neighbors, distances = self.get_neighbors_in_radius(radius=self.vision)
-        self.neighbors = neighbors
+        neighbors = self.model.space.get_neighbors(self.pos, self.vision, True)
+        self.neighbors = [n for n in neighbors if n is not self]
 
         # If no neighbors, maintain current direction
         if not neighbors:
