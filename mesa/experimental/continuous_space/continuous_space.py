@@ -126,10 +126,7 @@ class ContinuousSpace:
         index = self._agent_to_index[agent]
         self._agent_to_index.pop(agent, None)
         self._index_to_agent.pop(index, None)
-        try:
-            del self.active_agents[index]
-        except IndexError as e:
-            raise e
+        del self.active_agents[index]
 
         # we update all indices
         for agent in self.active_agents[index::]:

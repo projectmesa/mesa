@@ -193,6 +193,45 @@ def test_distances():
     )
 
 
+def test_difference_vector():
+    """Test ContinuousSpace.distance method."""
+    # non torus
+    model = Model(seed=42)
+    dimensions = np.asarray([[0, 1], [0, 1]])
+    space = ContinuousSpace(dimensions, torus=False, random=model.random)
+
+    agent = ContinuousSpaceAgent(space, model)
+    agent.position = [0.1, 0.1]
+
+    vector = space.calculate_difference_vector([0.1, 0.9])
+    assert np.all(
+        vector
+        == [0, -0.8]
+    )
+
+    vector = space.calculate_difference_vector([0.9, 0.1])
+    assert np.all(
+        vector
+        == [-0.8, 0]
+    )
+
+    # torus
+    model = Model(seed=42)
+    dimensions = np.asarray([[0, 1], [0, 1]])
+    space = ContinuousSpace(dimensions, torus=True, random=model.random)
+
+    agent = ContinuousSpaceAgent(space, model)
+    agent.position = [0.1, 0.1]
+
+    vector = space.calculate_difference_vector([0.1, 0.9])
+    assert np.allclose(vector, [0, 0.2])
+
+    vector = space.calculate_difference_vector([0.9, 0.1])
+    assert np.allclose(vector, [0.2, 0])
+
+    vector = space.calculate_difference_vector([0.9, 0.9])
+    assert np.allclose(vector, [0.2, 0.2])
+
 # class TestSpaceToroidal(unittest.TestCase):
 #     """Testing a toroidal continuous space."""
 #
