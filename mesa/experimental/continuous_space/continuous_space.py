@@ -195,7 +195,10 @@ class ContinuousSpace:
         distances, agents = self.calculate_distances(point)
         logical = distances <= radius
         agents = list(compress(agents, logical))
-        return agents, distances[logical],
+        return (
+            agents,
+            distances[logical],
+        )
 
     def get_k_nearest_agents(self, point, k=1) -> tuple[list, np.ndarray]:
         """Return the k nearest agents and their distances to the point.

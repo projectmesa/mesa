@@ -249,15 +249,20 @@ def test_continuous_space_get_k_nearest_agents():
     agent.position = [0.5, 0.5]
 
     agents, distances = space.get_k_nearest_agents([0.1, 0.1], k=1)
-    assert len(agents)==1
-    assert np.allclose(distances, [0,])
+    assert len(agents) == 1
+    assert np.allclose(
+        distances,
+        [
+            0,
+        ],
+    )
 
     agents, distances = space.get_k_nearest_agents([0.5, 0.1], k=1)
-    assert len(agents)==1
+    assert len(agents) == 1
     assert np.allclose(distances, [0.4, 0.4])
 
     agents, distances = space.get_k_nearest_agents([0.5, 0.1], k=2)
-    assert len(agents)==2
+    assert len(agents) == 2
     assert np.allclose(distances, [0.4, 0.4])
 
     # torus
@@ -275,11 +280,13 @@ def test_continuous_space_get_k_nearest_agents():
     agent.position = [0.9, 0.9]
 
     agents, distances = space.get_k_nearest_agents([0.0, 0.1], k=2)
-    assert len(agents)==2
+    assert len(agents) == 2
     assert np.allclose(distances, [0.1, 0.1])
+
 
 def test_continuous_space_get_agents_in_radius():
     pass
+
 
 # class TestSpaceToroidal(unittest.TestCase):
 #     """Testing a toroidal continuous space."""

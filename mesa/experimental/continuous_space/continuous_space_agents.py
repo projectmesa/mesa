@@ -97,7 +97,7 @@ class ContinuousSpaceAgent(Agent):
 
         """
         # return includes self, so we need to get k+1
-        agents, dists = self.space.get_k_nearest_agents(self.position, k=k+1)
+        agents, dists = self.space.get_k_nearest_agents(self.position, k=k + 1)
         logical = np.asarray([agent is not self for agent in agents])
         agents = list(compress(agents, logical))
         return agents, dists[logical]
