@@ -1415,6 +1415,11 @@ class ContinuousSpace:
                             coordinates. i.e. if you are searching for the
                             neighbors of a given agent, True will include that
                             agent in the results.
+
+        Notes:
+            If 1 or more agents are located on pos, include_center=True will remove these agents
+            from the results.
+
         """
         if self._agent_points is None:
             self._build_agent_cache()
