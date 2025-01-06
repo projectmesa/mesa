@@ -80,7 +80,7 @@ class ContinuousSpaceAgent(Agent):
             radius: radius within which to look for neighbors
 
         """
-        dists, agents = self.space.get_agents_in_radius(self.position, radius=radius)
+        agents, dists = self.space.get_agents_in_radius(self.position, radius=radius)
 
         if dists.size == 0:
             return dists, agents
@@ -96,7 +96,8 @@ class ContinuousSpaceAgent(Agent):
             k: the number of nearest neighbors to return
 
         """
-        dists, agents = self.space.get_k_nearest_agents(self.position, k=k)
+        # return includes self, so we need to get k+1
+        agents, dists = self.space.get_k_nearest_agents(self.position, k=k+1)
         logical = np.asarray([agent is not self for agent in agents])
         agents = list(compress(agents, logical))
         return agents, dists[logical]

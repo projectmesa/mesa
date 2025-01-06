@@ -190,21 +190,25 @@ class ContinuousSpace:
             dists = cdist(point[np.newaxis, :], positions)[0, :]
         return dists, agents
 
-    def get_agents_in_radius(self, point, radius=1) -> tuple[np.ndarray, list]:
+    def get_agents_in_radius(self, point, radius=1) -> tuple[list, np.ndarray]:
         """Return the agents and their distances within a radius for the point."""
         distances, agents = self.calculate_distances(point)
         logical = distances <= radius
         agents = list(compress(agents, logical))
-        return distances[logical], agents
+        return agents, distances[logical],
 
-    def get_k_nearest_agents(self, point, k=1) -> tuple[np.ndarray, list]:
-        """Return the k nearest agents and their distances to the point."""
+    def get_k_nearest_agents(self, point, k=1) -> tuple[list, np.ndarray]:
+        """Return the k nearest agents and their distances to the point.
+
+        Notes:
+            This method returns the k nearest agents and ignores ties.
+
+        """
         dists, agents = self.calculate_distances(point)
 
-        k += 1  # the distance calculation includes self, with a distance of 0, so we remove this later
         indices = np.argpartition(dists, k)[:k]
         agents = [agents[i] for i in indices]
-        return dists[indices], agents
+        return agents, dists[indices]
 
     def in_bounds(self, point) -> bool:
         """Check if point is inside the bounds of the space."""
