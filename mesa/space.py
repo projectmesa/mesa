@@ -1421,7 +1421,7 @@ class ContinuousSpace:
             from the results. So, if you really want to get the neighbors of a given agent,
             you should set include_center=True, and then filter the list of agents to remove
             the given agent (i.e., self when calling it from an agent).
-            
+
         """
         if self._agent_points is None:
             self._build_agent_cache()
