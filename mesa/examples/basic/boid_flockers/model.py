@@ -96,10 +96,3 @@ class BoidFlockers(Model):
         """
         self.agents.shuffle_do("step")
         self.update_average_heading()
-
-
-if __name__ == "__main__":
-    model = BoidFlockers(population_size=200, width=100, height=100, vision=5, seed=42)
-
-    for _i in range(20):
-        model.step()
