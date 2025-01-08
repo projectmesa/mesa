@@ -1,7 +1,7 @@
 """A Continuous Space class."""
 
 import warnings
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable
 from itertools import compress
 from random import Random
 
@@ -80,7 +80,6 @@ class ContinuousSpace:
         self.center: np.array = np.sum(self.dimensions, axis=1) / 2
 
         self.torus: bool = torus
-
 
         # self._agent_positions is the array containing all agent positions
         # plus potential extra empty rows
@@ -256,12 +255,17 @@ class ContinuousSpace:
         agents = [agents[i] for i in indices]
         return agents, dists[indices]
 
-    def in_bounds(self, point:ArrayLike) -> bool:
+    def in_bounds(self, point: ArrayLike) -> bool:
         """Check if point is inside the bounds of the space."""
         return bool(
-            ((np.asanyarray(point) >= self.dimensions[:, 0]) & (point <= self.dimensions[:, 1])).all()
+            (
+                (np.asanyarray(point) >= self.dimensions[:, 0])
+                & (point <= self.dimensions[:, 1])
+            ).all()
         )
 
-    def torus_correct(self, point:ArrayLike) -> np.ndarray:
+    def torus_correct(self, point: ArrayLike) -> np.ndarray:
         """Apply a torus correction to the point."""
-        return self.dimensions[:, 0] + np.mod(np.asanyarray(point) - self.dimensions[:, 0], self.size)
+        return self.dimensions[:, 0] + np.mod(
+            np.asanyarray(point) - self.dimensions[:, 0], self.size
+        )
