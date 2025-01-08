@@ -192,6 +192,22 @@ def test_continous_space_calculate_distances():
         ]
     )
 
+    distances, agents = space.calculate_distances([0.9, 0.9], agents=[agent,])
+    assert np.all(
+        np.isclose(
+            distances,
+            [
+                0.2 * 2**0.5,
+            ],
+        )
+    )
+    assert np.all(
+        agents
+        == [
+            agent,
+        ]
+    )
+
 
 def test_continous_space_difference_vector():
     """Test ContinuousSpace.distance method."""
@@ -317,6 +333,7 @@ def test_continuous_space_get_agents_in_radius():
 
     agents, distances = space.get_agents_in_radius([0.5, 0.5], radius=1)
     assert len(agents) == 5
+
 
     # torus
     model = Model(seed=42)

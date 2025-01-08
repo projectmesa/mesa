@@ -10,6 +10,8 @@ from scipy.spatial.distance import cdist
 
 from mesa.agent import Agent, AgentSet
 
+from typing import Iterable, Sequence
+from numpy.typing import ArrayLike
 
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position."""
@@ -166,7 +168,7 @@ class ContinuousSpace:
 
         return delta
 
-    def calculate_distances(self, point, agents=None) -> tuple[np.ndarray, list]:
+    def calculate_distances(self, point:ArrayLike, agents:Iterable[Agent]|None=None) -> tuple[np.ndarray, list]:
         """Calculate the distance between the point and all agents."""
         point = np.asanyarray(point)
 
@@ -190,7 +192,7 @@ class ContinuousSpace:
             dists = cdist(point[np.newaxis, :], positions)[0, :]
         return dists, agents
 
-    def get_agents_in_radius(self, point, radius=1) -> tuple[list, np.ndarray]:
+    def get_agents_in_radius(self, point:ArrayLike, radius:float|int=1) -> tuple[list, np.ndarray]:
         """Return the agents and their distances within a radius for the point."""
         distances, agents = self.calculate_distances(point)
         logical = distances <= radius
@@ -200,11 +202,11 @@ class ContinuousSpace:
             distances[logical],
         )
 
-    def get_k_nearest_agents(self, point, k=1) -> tuple[list, np.ndarray]:
+    def get_k_nearest_agents(self, point:ArrayLike, k:int=1) -> tuple[list, np.ndarray]:
         """Return the k nearest agents and their distances to the point.
 
         Notes:
-            This method returns the k nearest agents and ignores ties.
+            This method returns exactly k agents, ignoring ties
 
         """
         dists, agents = self.calculate_distances(point)
