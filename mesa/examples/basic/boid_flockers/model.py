@@ -59,14 +59,14 @@ class BoidFlockers(Model):
         )
 
         # Create and place the Boid agents
-        position = self.rng.random(size=(population_size, 2)) * self.space.size
-        direction = self.rng.uniform(-1, 1, size=(population_size, 2))
+        positions = self.rng.random(size=(population_size, 2)) * self.space.size
+        directions = self.rng.uniform(-1, 1, size=(population_size, 2))
         Boid.create_agents(
             self,
             population_size,
             self.space,
-            position=position,
-            direction=direction,
+            position=positions,
+            direction=directions,
             cohere=cohere,
             separate=separate,
             match=match,
