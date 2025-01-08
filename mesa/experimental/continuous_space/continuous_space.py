@@ -47,12 +47,24 @@ class ContinuousSpace:
 
     def __init__(
         self,
-        dimensions: Sequence[Sequence[float]],
+        dimensions: ArrayLike,
         torus: bool = False,
         random: Random | None = None,
         n_agents: int = 100,
     ) -> None:
-        """Create a new continuous space."""
+        """Create a new continuous space.
+
+        Args:
+            dimensions: a numpy array like object where eahc row specifies the minimum and maximum value of that dimesnion
+            torus: boolean for whether the space wraps around or not
+            random: a seeded stdlib random.Random instance
+            n_agents: the expected number of agents in the space
+
+        Internally, a numpy array is used to store the positions of all agents. This is resized if needed,
+        but you can control the initial size explicitly by passing n_agents.
+
+
+        """
         if random is None:
             warnings.warn(
                 "Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
@@ -62,25 +74,29 @@ class ContinuousSpace:
             random = Random()
         self.random = random
 
-        self.dimensions: np.array = np.asarray(dimensions)
+        self.dimensions: np.array = np.asanarray(dimensions)
         self.ndims: int = self.dimensions.shape[0]
         self.size: np.array = self.dimensions[:, 1] - self.dimensions[:, 0]
         self.center: np.array = np.sum(self.dimensions, axis=1) / 2
 
         self.torus: bool = torus
 
+
+        # self._agent_positions is the array containing all agent positions
+        # plus potential extra empty rows
+        # agent_positions is a view into _agent_positions containing only the filled rows
         self._agent_positions: np.array = np.empty(
             (n_agents, self.dimensions.shape[0]), dtype=float
         )
-        # self._agents: np.array = np.zeros((n_agents,), dtype=object)
-
-        self.active_agents = []
         self.agent_positions: (
             np.array
         )  # a view on _agent_positions containing all active positions
 
-        self._n_agents = 0
+        # the list of agents in the space
+        self.active_agents = []
+        self._n_agents = 0  # the number of active agents in the space
 
+        #  a mapping from agents to index and vice versa
         self._index_to_agent: dict[int, Agent] = {}
         self._agent_to_index: dict[Agent, int | None] = {}
 
@@ -90,10 +106,10 @@ class ContinuousSpace:
         return AgentSet(self.active_agents, random=self.random)
 
     def _add_agent(self, agent: Agent) -> int:
-        """Helper method to get the index for the agent.
+        """Helper method for adding an agent to the space.
 
         This method manages the numpy array with the agent positions and ensuring it is
-        enlarged if and when needed.
+        enlarged if and when needed. It is called automatically by ContinousSpaceAgent when created.
 
         """
         index = self._n_agents
@@ -123,7 +139,11 @@ class ContinuousSpace:
         return index
 
     def _remove_agent(self, agent: Agent) -> None:
-        """Remove an agent from the space."""
+        """Remove an agent from the space.
+
+        This method is automatically called by ContinuousSpaceAgent.remove.
+
+        """
         index = self._agent_to_index[agent]
         self._agent_to_index.pop(agent, None)
         self._index_to_agent.pop(index, None)
@@ -143,7 +163,15 @@ class ContinuousSpace:
         self.agent_positions = self._agent_positions[0 : self._n_agents]
 
     def calculate_difference_vector(self, point: np.ndarray, agents=None) -> np.ndarray:
-        """Calculate the difference vector between the point and all agents."""
+        """Calculate the difference vector between the point and all agenents.
+
+        Args:
+            point: the point to calculate the difference vector for
+            agents: the agents to calculate the difference vector of point with. By default,
+                    all agents are considered.
+
+
+        """
         point = np.asanyarray(point)
         positions = (
             self.agent_positions
@@ -170,7 +198,14 @@ class ContinuousSpace:
     def calculate_distances(
         self, point: ArrayLike, agents: Iterable[Agent] | None = None
     ) -> tuple[np.ndarray, list]:
-        """Calculate the distance between the point and all agents."""
+        """Calculate the distance between the point and all agents.
+
+        Args:
+            point: the point to calculate the difference vector for
+            agents: the agents to calculate the difference vector of point with. By default,
+                    all agents are considered.
+
+        """
         point = np.asanyarray(point)
 
         if agents is None:
@@ -211,7 +246,8 @@ class ContinuousSpace:
         """Return the k nearest agents and their distances to the point.
 
         Notes:
-            This method returns exactly k agents, ignoring ties
+            This method returns exactly k agents, ignoring ties. In case of ties, the
+            earlier an agent is inserted the higher it will rank.
 
         """
         dists, agents = self.calculate_distances(point)
@@ -220,12 +256,12 @@ class ContinuousSpace:
         agents = [agents[i] for i in indices]
         return agents, dists[indices]
 
-    def in_bounds(self, point) -> bool:
+    def in_bounds(self, point:ArrayLike) -> bool:
         """Check if point is inside the bounds of the space."""
         return bool(
-            ((point >= self.dimensions[:, 0]) & (point <= self.dimensions[:, 1])).all()
+            ((np.asanyarray(point) >= self.dimensions[:, 0]) & (point <= self.dimensions[:, 1])).all()
         )
 
-    def torus_correct(self, point) -> np.ndarray:
+    def torus_correct(self, point:ArrayLike) -> np.ndarray:
         """Apply a torus correction to the point."""
-        return self.dimensions[:, 0] + np.mod(point - self.dimensions[:, 0], self.size)
+        return self.dimensions[:, 0] + np.mod(np.asanyarray(point) - self.dimensions[:, 0], self.size)

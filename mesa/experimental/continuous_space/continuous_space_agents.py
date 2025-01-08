@@ -67,13 +67,13 @@ class ContinuousSpaceAgent(Agent):
         # self.position[:] = np.nan
 
     def remove(self) -> None:
-        """Remove and delete the agent from the model."""
+        """Remove and delete the agent from the model and continuous space"""
         super().remove()
         self.space._remove_agent(self)
         self._mesa_index = None
         self.space = None
 
-    def get_neighbors_in_radius(self, radius: float = 1) -> tuple[list, np.ndarray]:
+    def get_neighbors_in_radius(self, radius: float|int = 1) -> tuple[list, np.ndarray]:
         """Get neighbors within radius.
 
         Args:
