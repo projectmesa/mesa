@@ -1,6 +1,7 @@
 """Tests for continuous space."""
 
 import numpy as np
+import pytest
 
 from mesa import Model
 from mesa.experimental.continuous_space import ContinuousSpace, ContinuousSpaceAgent
@@ -96,6 +97,21 @@ def test_continuous_agent():
         )  ## check if updates of indices is correctly done
         agent.remove()
         assert space.agent_positions.shape == (110 - 1 - i, 2)
+
+    model = Model(seed=42)
+
+    dimensions = np.asarray([[0, 1], [0, 1]])
+    space = ContinuousSpace(dimensions, torus=True, random=model.random)
+    agent = ContinuousSpaceAgent(space, model)
+    agent.position =[1.1, 1.1]
+    assert np.allclose(agent.position, [0.1, 0.1])
+
+    dimensions = np.asarray([[0, 1], [0, 1]])
+    space = ContinuousSpace(dimensions, torus=False, random=model.random)
+    agent = ContinuousSpaceAgent(space, model)
+    with pytest.raises(ValueError):
+        agent.position =[1.1, 1.1]
+
 
 
 def test_continous_space_calculate_distances():
@@ -215,7 +231,7 @@ def test_continous_space_calculate_distances():
 
 
 def test_continous_space_difference_vector():
-    """Test ContinuousSpace.distance method."""
+    """Test ContinuousSpace.get_difference_vector method."""
     # non torus
     model = Model(seed=42)
     dimensions = np.asarray([[0, 1], [0, 1]])
@@ -248,7 +264,7 @@ def test_continous_space_difference_vector():
     assert np.allclose(vector, [0.2, 0.2])
 
 
-def test_continuous_space_get_k_nearest_agents():
+def test_continuous_space_get_k_nearest_agents():  # noqa: D103
     # non torus
     model = Model(seed=42)
     dimensions = np.asarray([[0, 1], [0, 1]])
@@ -305,7 +321,7 @@ def test_continuous_space_get_k_nearest_agents():
     assert np.allclose(distances, [0.1, 0.1])
 
 
-def test_continuous_space_get_agents_in_radius():
+def test_continuous_space_get_agents_in_radius():  # noqa: D103
     # non torus
     model = Model(seed=42)
     dimensions = np.asarray([[0, 1], [0, 1]])
@@ -359,3 +375,59 @@ def test_continuous_space_get_agents_in_radius():
     agents, distances = space.get_agents_in_radius([0.0, 0.1], radius=0.1)
     assert len(agents) == 2
     assert np.allclose(distances, [0.1, 0.1])
+
+
+def test_get_neighbor_methos():  # noqa: D103
+    # non torus
+    model = Model(seed=42)
+    dimensions = np.asarray([[0, 1], [0, 1]])
+    space = ContinuousSpace(dimensions, torus=False, random=model.random)
+
+    positions = [
+        [0.1, 0.1],
+        [0.1, 0.9],
+        [0.9, 0.1],
+        [0.9, 0.9],
+        [0.5, 0.5],
+    ]
+
+    for position in positions:
+        agent = ContinuousSpaceAgent(space, model)
+        agent.position = position
+
+    agent: ContinuousSpaceAgent = model.agents[-1]  # 0.5, 0.5
+    agents, distances = agent.get_neighbors_in_radius(1)
+    assert len(agents) == 4
+
+    agents, distances = agent.get_neighbors_in_radius(0.1)
+    assert len(agents) == 0
+
+    agent: ContinuousSpaceAgent = model.agents[0]  # 0.1, 0.1
+    agents, distances = agent.get_nearest_neighbors(k=2)
+    assert len(agents) == 2
+
+    # torus
+    model = Model(seed=42)
+    dimensions = np.asarray([[0, 1], [0, 1]])
+    space = ContinuousSpace(dimensions, torus=True, random=model.random)
+
+    positions = [
+        [0.1, 0.1],
+        [0.1, 0.9],
+        [0.9, 0.1],
+        [0.9, 0.9],
+        [0.5, 0.5],
+    ]
+
+    for position in positions:
+        agent = ContinuousSpaceAgent(space, model)
+        agent.position = position
+
+    agent: ContinuousSpaceAgent = model.agents[-1]  # 0.5, 0.5
+    agents, distances = agent.get_neighbors_in_radius(1)
+    assert len(agents) == 4
+
+    agent: ContinuousSpaceAgent = model.agents[0]  # 0.1, 0.1
+    agents, distances = agent.get_nearest_neighbors(k=2)
+    assert len(agents) == 2
+    assert np.allclose(distances, [0.2, 0.2])

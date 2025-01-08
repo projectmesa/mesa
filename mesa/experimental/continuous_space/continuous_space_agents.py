@@ -81,10 +81,6 @@ class ContinuousSpaceAgent(Agent):
 
         """
         agents, dists = self.space.get_agents_in_radius(self.position, radius=radius)
-
-        if dists.size == 0:
-            return agents, dists
-
         logical = np.asarray([agent is not self for agent in agents])
         agents = list(compress(agents, logical))
         return agents, dists[logical]
