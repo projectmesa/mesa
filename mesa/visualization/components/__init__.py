@@ -17,7 +17,6 @@ def make_space_component(
     propertylayer_portrayal: dict | None = None,
     post_process: Callable | None = None,
     backend: str = "matplotlib",
-    model_parameters: dict | None = None,
     **space_drawing_kwargs,
 ) -> SpaceMatplotlib | SpaceAltair:
     """Create a Matplotlib-based space visualization component.
