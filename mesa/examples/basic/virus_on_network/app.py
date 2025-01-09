@@ -40,14 +40,6 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
-    "stepsize": {
-        "type": "SliderInt",
-        "value": 1,
-        "label": "Steps Interval:",
-        "min": 1,
-        "max": 100,
-        "step": 1,
-    },
     "num_nodes": Slider(
         label="Number of agents",
         value=10,

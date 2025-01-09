@@ -20,7 +20,6 @@ class PdGrid(mesa.Model):
         activation_order="Random",
         payoffs=None,
         seed=None,
-        stepsize=1,
     ):
         """
         Create a new Spatial Prisoners' Dilemma Model.

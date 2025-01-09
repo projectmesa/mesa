@@ -27,7 +27,7 @@ class BoltzmannWealth(Model):
         datacollector (DataCollector): Collects and stores model data
     """
 
-    def __init__(self, n=100, width=10, height=10, seed=None, stepsize=5):
+    def __init__(self, n=100, width=10, height=10, seed=None):
         """Initialize the model.
 
         Args:
