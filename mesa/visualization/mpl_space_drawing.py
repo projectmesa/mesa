@@ -20,7 +20,7 @@ from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
-from matplotlib.patches import RegularPolygon
+from matplotlib.patches import Polygon, RegularPolygon
 
 import mesa
 from mesa.experimental.cell_space import (
@@ -501,7 +501,11 @@ def draw_continuous_space(
 
 
 def draw_voronoi_grid(
-    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None, **kwargs
+    space: VoronoiGrid,
+    agent_portrayal: Callable,
+    ax: Axes | None = None,
+    draw_grid: bool = True,
+    **kwargs,
 ):
     """Visualize a voronoi grid.
 
@@ -509,6 +513,7 @@ def draw_voronoi_grid(
         space: the space to visualize
         agent_portrayal: a callable that is called with the agent and returns a dict
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
+        draw_grid: whether to draw the grid or not
         kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
@@ -541,16 +546,18 @@ def draw_voronoi_grid(
 
     _scatter(ax, arguments, **kwargs)
 
-    for cell in space.all_cells:
-        polygon = cell.properties["polygon"]
-        ax.fill(
-            *zip(*polygon),
-            alpha=min(1, cell.properties[space.cell_coloring_property]),
-            c="red",
-            zorder=0,
-        )  # Plot filled polygon
-        ax.plot(*zip(*polygon), color="black")  # Plot polygon edges in black
+    def setup_voroinoimesh(cells):
+        patches = []
+        for cell in cells:
+            patch = Polygon(cell.properties["polygon"])
+            patches.append(patch)
+        mesh = PatchCollection(
+            patches, edgecolor="k", facecolor=(1, 1, 1, 0), linestyle="dotted", lw=1
+        )
+        return mesh
 
+    if draw_grid:
+        ax.add_collection(setup_voroinoimesh(space.all_cells.cells))
     return ax
 
 
