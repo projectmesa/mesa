@@ -20,7 +20,7 @@ from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
-from matplotlib.patches import RegularPolygon, Polygon
+from matplotlib.patches import Polygon, RegularPolygon
 
 import mesa
 from mesa.experimental.cell_space import (
@@ -501,8 +501,11 @@ def draw_continuous_space(
 
 
 def draw_voronoi_grid(
-    space: VoronoiGrid, agent_portrayal: Callable, ax: Axes | None = None,
-    draw_grid: bool = True, **kwargs
+    space: VoronoiGrid,
+    agent_portrayal: Callable,
+    ax: Axes | None = None,
+    draw_grid: bool = True,
+    **kwargs,
 ):
     """Visualize a voronoi grid.
 
@@ -554,9 +557,7 @@ def draw_voronoi_grid(
         return mesh
 
     if draw_grid:
-        ax.add_collection(
-            setup_voroinoimesh(space.all_cells.cells)
-        )
+        ax.add_collection(setup_voroinoimesh(space.all_cells.cells))
     return ax
 
 
