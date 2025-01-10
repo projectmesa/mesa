@@ -12,12 +12,13 @@ import warnings
 from collections.abc import Callable
 from typing import Any
 
+from matplotlib.patches import Polygon
 import networkx as nx
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
-from matplotlib.collections import LineCollection
+from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 
 import mesa
