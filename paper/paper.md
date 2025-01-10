@@ -131,42 +131,44 @@ from mesa.experimental.cell_space ...
 ```
 
 ### Time advancement
-Typically, ABMs rely on incremental time progression or ticks. For each tick, the step method of the model is called. This activates the agents in some way. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
+Typically, ABMs represent time incrementally and call the units ticks. For each tick, the step method of the model is called, and the agents are activated to take their designated actions. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
 
 ```python
-    model = Model(seed=42)
+   model = Model(seed=42)
 
-    for _ in range(100):
-        model.step()
+
+   for _ in range(100):
+       model.step()
 ```
 
-Generally, within the step method of the model, one activates all the agents. The newly added `AgentSet` class provides a more flexible way to activate agents replacing the fixed patterns previously available.
+Before Mesa 3+, all agents were activated within the step method of the model. However, the newly added `AgentSet` class provides a more flexible way to activate agents. These changes include the depreciation of the Scheduler API and replacing previously available fixed patterns. 
+
 
 ```python
-    model.agents.do("step")  # Sequential activation
+   model.agents.do("step")  # Sequential activation
 
-    model.agents.shuffle_do("step")  # Random activation
+   model.agents.shuffle_do("step")  # Random activation
 
-    # Multi-stage activation:
-    for stage in ["move", "eat", "reproduce"]:
-        model.agents.do(stage)
+   # Multi-stage activation:
+   for stage in ["move", "eat", "reproduce"]:
+       model.agents.do(stage)
 
-    # Activation by agent subclass:
-    for klass in model.agent_types:
-        model.agents_by_type[klass].do("step")
+   # Activation by agent subclass:
+   for klass in model.agent_types:
+       model.agents_by_type[klass].do("step")
 ```
 
-Mesa also supports next-event time progression, currently in experimental state. In this approach, the simulation consists of time-stamped events that are executed chronologically, with the simulation clock advancing to each event's timestamp. This enables both pure discrete event-based models and hybrid approaches combining incremental time progression with event scheduling on the ticks as shown below.. This latter hybrid approach allows combining traditional ABM time steps with the flexibility and potential performance benefits of event scheduling.
+Next-event time progression is an additional feature, which is currently in an experimental state with plans for support in the future. In this approach, the simulation consists of time-stamped events executed chronologically, with the simulation clock advancing to each event's timestamp. This enables both pure discrete event-based models and hybrid approaches combining incremental time progression with event scheduling on the ticks, as shown below. The latter hybrid approach combines traditional ABM time steps with the flexibility and potential performance benefits of event scheduling.
 
 ```python
-    # Pure event-based scheduling
-    simulator = DiscreteEventSimulator()
-    model = Model(seed=42, simulator=simulator)
-    simulator.schedule_event_relative(some_function, 3.1415)
+   # Pure event-based scheduling
+   simulator = DiscreteEventSimulator()
+   model = Model(seed=42, simulator=simulator)
+   simulator.schedule_event_relative(some_function, 3.1415)
 
-    # Hybrid time-step and event scheduling
-    model = Model(seed=42, simulator=ABMSimulator())
-    model.simulator.schedule_event_next_tick(some_function)
+   # Hybrid time-step and event scheduling
+   model = Model(seed=42, simulator=ABMSimulator())
+   model.simulator.schedule_event_next_tick(some_function)
 ```
 
 ## Visualization
