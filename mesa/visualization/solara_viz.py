@@ -73,9 +73,8 @@ def SolaraViz(
             Defaults to "default", which uses the default Altair space visualization.
         play_interval (int, optional): Interval for playing the model steps in milliseconds.
             This controls the speed of the model's automatic stepping. Defaults to 100 ms.
-        step_interval (int, optional): Interval for updating the visualization every n steps.
-            This controls how often the visualization is updated during the model's execution.
-
+        step_interval (int, optional): Controls how often plots are updated during a simulation,
+            allowing users to skip intermediate steps and update graphs less frequently.
         simulator: A simulator that controls the model (optional)
         model_params (dict, optional): Parameters for (re-)instantiating a model.
             Can include user-adjustable parameters and fixed parameters. Defaults to None.
@@ -94,6 +93,8 @@ def SolaraViz(
           model instance is provided, it will be converted to a reactive model using `solara.use_reactive`.
         - The `play_interval` argument controls the speed of the model's automatic stepping. A lower
           value results in faster stepping, while a higher value results in slower stepping.
+        - The `step_interval` argument determines how often plots are updated during simulation. Higher values
+          reduce update frequency,resulting in faster execution.
     """
     if components == "default":
         components = [components_altair.make_altair_space()]
@@ -211,8 +212,7 @@ def ModelController(
         model: Reactive model instance
         model_parameters: Reactive parameters for (re-)instantiating a model.
         play_interval: Interval for playing the model steps in milliseconds.
-        step_interval: Interval for updating the visualization every n steps.
-
+        step_interval: Controls how often the plots are updated during simulation steps.Higher value reduce update frequency.
     """
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
@@ -287,8 +287,8 @@ def SimulatorController(
         simulator: Simulator instance
         model_parameters: Reactive parameters for (re-)instantiating a model.
         play_interval: Interval for playing the model steps in milliseconds.
-        step_interval: Interval for updating the visualization every n steps.
-
+        step_interval: Controls how often the plots are updated during simulation steps.
+                       Higher values reduce update frequency.
     """
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
