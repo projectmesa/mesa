@@ -195,7 +195,7 @@ class ContinuousSpace:
         return delta
 
     def calculate_distances(
-        self, point: ArrayLike, agents: Iterable[Agent] | None = None
+        self, point: ArrayLike, agents: Iterable[Agent] | None = None, **kwargs
     ) -> tuple[np.ndarray, list]:
         """Calculate the distance between the point and all agents.
 
@@ -203,6 +203,8 @@ class ContinuousSpace:
             point: the point to calculate the difference vector for
             agents: the agents to calculate the difference vector of point with. By default,
                     all agents are considered.
+            kwargs: any additional keyword arguments are passed to scipy's cdist, which is used
+                    only if torus is False. This allows for non-Euclidian distance measures.
 
         """
         point = np.asanyarray(point)
@@ -224,7 +226,7 @@ class ContinuousSpace:
                 dists += delta[:, i] ** 2
             dists = np.sqrt(dists)
         else:
-            dists = cdist(point[np.newaxis, :], positions)[0, :]
+            dists = cdist(point[np.newaxis, :], positions, **kwargs)[0, :]
         return dists, agents
 
     def get_agents_in_radius(
