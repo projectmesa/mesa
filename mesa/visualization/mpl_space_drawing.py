@@ -318,7 +318,7 @@ def draw_hex_grid(
     size = 1.0
     x_spacing = np.sqrt(3) * size
     y_spacing = 1.5 * size
-    
+
     loc = arguments["loc"].astype(float)
     # Calculate hexagon centers
     loc[:, 0] = loc[:, 0] * x_spacing + (loc[:, 1] % 2) * (x_spacing / 2)
@@ -333,9 +333,11 @@ def draw_hex_grid(
     y_max = space.height * y_spacing
 
     # Add padding that accounts for the hexagon points
-    x_padding = size * np.sqrt(3)/2  # Distance from center to rightmost point of hexagon
+    x_padding = (
+        size * np.sqrt(3) / 2
+    )  # Distance from center to rightmost point of hexagon
     y_padding = size  # Distance from center to topmost point of hexagon
-    
+
     # Plot limits to perfectly contain the hexagonal grid
     # Determined through physical testing.
     ax.set_xlim(-2 * x_padding, x_max + x_padding)
@@ -347,16 +349,18 @@ def draw_hex_grid(
         size = 1.0
         x_spacing = np.sqrt(3) * size
         y_spacing = 1.5 * size
-        
-        def get_hex_vertices(center_x: float, center_y: float) -> list[tuple[float, float]]:
+
+        def get_hex_vertices(
+            center_x: float, center_y: float
+        ) -> list[tuple[float, float]]:
             """Get vertices for a hexagon centered at (center_x, center_y)."""
             vertices = [
-                (center_x, center_y + size),                          # top
-                (center_x + size * np.sqrt(3)/2, center_y + size/2),  # top right
-                (center_x + size * np.sqrt(3)/2, center_y - size/2),  # bottom right
-                (center_x, center_y - size),                          # bottom
-                (center_x - size * np.sqrt(3)/2, center_y - size/2),  # bottom left
-                (center_x - size * np.sqrt(3)/2, center_y + size/2),  # top left
+                (center_x, center_y + size),  # top
+                (center_x + size * np.sqrt(3) / 2, center_y + size / 2),  # top right
+                (center_x + size * np.sqrt(3) / 2, center_y - size / 2),  # bottom right
+                (center_x, center_y - size),  # bottom
+                (center_x - size * np.sqrt(3) / 2, center_y - size / 2),  # bottom left
+                (center_x - size * np.sqrt(3) / 2, center_y + size / 2),  # top left
             ]
             return vertices
 
@@ -365,36 +369,29 @@ def draw_hex_grid(
             # Calculate center position for each hexagon with offset for even rows
             x = col * x_spacing + (row % 2) * (x_spacing / 2)
             y = row * y_spacing
-            
+
             vertices = get_hex_vertices(x, y)
-            
+
             # Edge logic, connecting each vertex to the next
             for i in range(len(vertices)):
                 v1 = vertices[i]
                 v2 = vertices[(i + 1) % len(vertices)]
-                
+
                 # Sort vertices to ensure consistent edge representation
-                edge = tuple(sorted([
-                    tuple(np.round(v1, 6)),
-                    tuple(np.round(v2, 6))
-                ]))
+                edge = tuple(sorted([tuple(np.round(v1, 6)), tuple(np.round(v2, 6))]))
                 edges.add(edge)
 
         # Convert to LineCollection format
         edges_list = [np.array(edge) for edge in edges]
         return LineCollection(
-            edges_list,
-            linestyle=':',
-            color='black',
-            linewidth=1,
-            alpha=1
+            edges_list, linestyle=":", color="black", linewidth=1, alpha=1
         )
 
     if draw_grid:
         ax.add_collection(setup_hexmesh(space.width, space.height))
-    
+
     # Set aspect ratio to 'equal' to ensure hexagons appear regular
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
     return ax
 
 
