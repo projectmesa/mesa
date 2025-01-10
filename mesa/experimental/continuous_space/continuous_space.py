@@ -55,7 +55,7 @@ class ContinuousSpace:
         """Create a new continuous space.
 
         Args:
-            dimensions: a numpy array like object where eahc row specifies the minimum and maximum value of that dimesnion
+            dimensions: a numpy array like object where each row specifies the minimum and maximum value of that dimension.
             torus: boolean for whether the space wraps around or not
             random: a seeded stdlib random.Random instance
             n_agents: the expected number of agents in the space
