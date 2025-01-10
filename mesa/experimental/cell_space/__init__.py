@@ -51,6 +51,9 @@ __all__ = [
     "VoronoiGrid",
 ]
 
-warnings.warn("you are importing from mesa.discrete_space,"
-              "all cell spaces have been moved to mesa.discrete_space", DeprecationWarning,
-              stacklevel=2,)
+warnings.warn(
+    "you are importing from mesa.discrete_space,"
+    "all cell spaces have been moved to mesa.discrete_space",
+    DeprecationWarning,
+    stacklevel=2,
+)
