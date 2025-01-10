@@ -14,12 +14,7 @@ class PdGrid(mesa.Model):
     payoff = {("C", "C"): 1, ("C", "D"): 0, ("D", "C"): 1.6, ("D", "D"): 0}
 
     def __init__(
-        self,
-        width=50,
-        height=50,
-        activation_order="Random",
-        payoffs=None,
-        seed=None,
+        self, width=50, height=50, activation_order="Random", payoffs=None, seed=None
     ):
         """
         Create a new Spatial Prisoners' Dilemma Model.
