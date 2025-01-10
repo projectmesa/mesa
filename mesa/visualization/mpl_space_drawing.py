@@ -23,7 +23,7 @@ from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.patches import Polygon, RegularPolygon
 
 import mesa
-from mesa.experimental.cell_space import (
+from mesa.discrete_space import (
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
     VoronoiGrid,
@@ -39,8 +39,8 @@ from mesa.space import (
 )
 
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
-HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
-Network = NetworkGrid | mesa.experimental.cell_space.Network
+HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
+Network = NetworkGrid | mesa.discrete_space.Network
 
 
 def collect_agent_data(
@@ -132,7 +132,7 @@ def draw_space(
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
         # order matters here given the class structure of old-style grid spaces
-        case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
+        case HexSingleGrid() | HexMultiGrid() | mesa.discrete_space.HexGrid():
             draw_hex_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case (
             mesa.space.SingleGrid()
@@ -141,7 +141,7 @@ def draw_space(
             | mesa.space.MultiGrid()
         ):
             draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
-        case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
+        case mesa.space.NetworkGrid() | mesa.discrete_space.Network():
             draw_network(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case (
             mesa.space.ContinuousSpace()
@@ -186,7 +186,7 @@ def draw_property_layers(
         layer = property_layers.get(layer_name, None)
         if not isinstance(
             layer,
-            PropertyLayer | mesa.experimental.cell_space.property_layer.PropertyLayer,
+            PropertyLayer | mesa.discrete_space.property_layer.PropertyLayer,
         ):
             continue
 

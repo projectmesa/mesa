@@ -14,7 +14,7 @@ import math
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
-from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
+from mesa.discrete_space import OrthogonalVonNeumannGrid
 from mesa.experimental.devs import ABMSimulator
 
 

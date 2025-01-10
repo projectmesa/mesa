@@ -4,8 +4,8 @@ import numpy as np
 
 import mesa
 from mesa.examples.advanced.sugarscape_g1mt.agents import Trader
-from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
-from mesa.experimental.cell_space.property_layer import PropertyLayer
+from mesa.discrete_space import OrthogonalVonNeumannGrid
+from mesa.discrete_space.property_layer import PropertyLayer
 
 
 # Helper Functions

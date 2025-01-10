@@ -33,8 +33,6 @@ from mesa.discrete_space.network import Network
 from mesa.discrete_space.property_layer import PropertyLayer
 from mesa.discrete_space.voronoi import VoronoiGrid
 
-import warnings
-
 __all__ = [
     "Cell",
     "CellAgent",
@@ -50,6 +48,3 @@ __all__ = [
     "PropertyLayer",
     "VoronoiGrid",
 ]
-
-warnings.warn("you are importing from mesa.discrete_space,"
-              "all cell spaces have been moved to mesa.discrete_space", DeprecationWarning)
