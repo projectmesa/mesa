@@ -123,7 +123,7 @@ def SolaraViz(
                 step=10,
             )
             solara.SliderInt(
-                label="Render Interval",
+                label="Render Interval (steps)",
                 value=reactive_render_interval,
                 on_value=lambda v: reactive_render_interval.set(v),
                 min=1,
