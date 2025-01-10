@@ -8,7 +8,6 @@ for a paper.
 
 import contextlib
 import itertools
-import math
 import warnings
 from collections.abc import Callable
 from typing import Any
@@ -18,9 +17,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
-from matplotlib.collections import LineCollection, PatchCollection
+from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
-from matplotlib.patches import RegularPolygon
 
 import mesa
 from mesa.experimental.cell_space import (
