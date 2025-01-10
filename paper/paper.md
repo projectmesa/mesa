@@ -79,7 +79,7 @@ The central class in Mesa is the Model. To build a model, the user instantiates 
 Central to ABMs are the autonomous heterogeneous agents. Mesa provides a variety of base agent classes which the user can subclass. In its most basic implementation, an agent subclass specifies the `__init__` and `step` method. Any subclass of the basic mesa agent subclass registers itself with the specified model instance, and via `agent.remove` it will remove itself from the model. It is strongly encouraged to rely on `remove`, and even extend it if needed to ensure agents are fully removed from the simulation.
 
 ### Agent management
-One significant advancement of Mesa 3+ is expanded functionality around agent management. The new [`AgentSet`](https://mesa.readthedocs.io/latest/apis/agent.html#mesa.agent.AgentSet) class provides methods that allow users to filter, group, and analyze agents, making it easier to express complex model logic.
+One significant advancement of Mesa 3 is expanded functionality around agent management. The new [`AgentSet`](https://mesa.readthedocs.io/latest/apis/agent.html#mesa.agent.AgentSet) class provides methods that allow users to filter, group, and analyze agents, making it easier to express complex model logic.
 
 ```python
     # Select wealthy agents and calculate average wealth
@@ -141,7 +141,7 @@ Typically, ABMs represent time incrementally and call the units ticks. For each 
        model.step()
 ```
 
-Before Mesa 3+, all agents were activated within the step method of the model. However, the newly added `AgentSet` class provides a more flexible way to activate agents. These changes include the depreciation of the Scheduler API and replacing previously available fixed patterns. 
+Before Mesa 3, all agents were activated within the step method of the model. However, the newly added `AgentSet` class provides a more flexible way to activate agents. These changes include the depreciation of the Scheduler API and replacing previously available fixed patterns. 
 
 
 ```python
