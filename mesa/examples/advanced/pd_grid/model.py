@@ -1,6 +1,6 @@
 import mesa
-from mesa.examples.advanced.pd_grid.agents import PDAgent
 from mesa.discrete_space import OrthogonalMooreGrid
+from mesa.examples.advanced.pd_grid.agents import PDAgent
 
 
 class PdGrid(mesa.Model):
