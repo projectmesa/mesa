@@ -414,7 +414,6 @@ def ModelCreator(
           or are dictionaries containing parameter details such as type, value, min, and max.
         - The `seed` argument ensures reproducibility by setting the initial seed for the model's random number generator.
         - The component provides an interface for adjusting user-defined parameters and reseeding the model.
-        -
     """
     if model_parameters is None:
         model_parameters = {}
