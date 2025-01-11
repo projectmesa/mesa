@@ -52,7 +52,7 @@ __all__ = [
 ]
 
 warnings.warn(
-    "you are importing from mesa.discrete_space, "
+    "you are importing from mesa.experimental.cell_space, "
     "all cell spaces have been moved to mesa.discrete_space",
     DeprecationWarning,
     stacklevel=2,
