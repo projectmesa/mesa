@@ -54,3 +54,15 @@ This namespace contains experimental features. These are under development, and 
 .. automodule:: experimental.devs.simulator
    :members:
 ```
+
+## Continuous Space
+
+```{eval-rst}
+.. automodule:: experimental.continuous_space.continuous_space
+   :members:
+```
+
+```{eval-rst}
+.. automodule:: experimental.continuous_space.continuous_space_agents
+   :members:
+```
