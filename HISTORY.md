@@ -3,7 +3,7 @@ title: Release History
 ---
 # 3.1.3 (2025-01-11)
 ## Highlights
-Mesa 3.1.3 introduces a major reimplementation of Mesa's continuous space, providing an intuitive agent-centric API and significant performance improvements. The new implementation supports n-dimensional spaces and offers streamlined methods for agent movement and neighbor calculations.
+Mesa 3.1.3 introduces a major experimental reimplementation of Mesa's continuous space, providing an intuitive agent-centric API and significant performance improvements. The new implementation supports n-dimensional spaces and offers streamlined methods for agent movement and neighbor calculations.
 
 ### New Continuous Space Features
 - Agent-centric movement API similar to cell spaces
