@@ -1,6 +1,60 @@
 ---
 title: Release History
 ---
+# 3.1.3 (2025-01-11)
+## Highlights
+Mesa 3.1.3 introduces a major reimplementation of Mesa's continuous space, providing an intuitive agent-centric API and significant performance improvements. The new implementation supports n-dimensional spaces and offers streamlined methods for agent movement and neighbor calculations.
+
+### New Continuous Space Features
+- Agent-centric movement API similar to cell spaces
+- Efficient neighbor calculations and position updates
+- Support for n-dimensional spaces
+- Improved memory management with dynamic array resizing
+
+Here's a quick look at the new API:
+
+```python
+# Create a 2D continuous space
+space = ContinuousSpace(
+    dimensions=[[0, 1], [0, 1]],
+    torus=True,
+    random=model.random
+)
+
+# Create and position an agent
+agent = ContinuousSpaceAgent(space, model)
+agent.position = [0.5, 0.5]
+
+# Move agent using vector arithmetic
+agent.position += [0.1, 0.1]
+
+# Get neighbors within radius
+neighbors, distances = agent.get_neighbors_in_radius(radius=0.2)
+
+# Find k nearest neighbors
+nearest, distances = agent.get_nearest_neighbors(k=5)
+```
+
+The new implementation particularly benefits models requiring frequent position updates and neighbor queries, such as flocking simulations or particle systems. Note that this is an API-breaking change, and existing models using continuous space will need to be updated to use the new agent-centric approach. See [#2584](https://github.com/projectmesa/mesa/pull/2584) for more details. We would love to get feedback on the new Continuous Space in [#2611](https://github.com/projectmesa/mesa/discussions/2611).
+
+Other improvements in this release include consistent visualization behavior across space types with the reimplementation of `draw_voronoi` [#2608](https://github.com/projectmesa/mesa/pull/2608), and a new render interval slider for controlling visualization update frequency in SolaraViz, which helps improve performance when working with complex visualizations [#2596](https://github.com/projectmesa/mesa/pull/2596).
+
+## What's Changed
+### 🧪 Experimental features
+* Reimplementation of Continuous Space by @quaquel in https://github.com/projectmesa/mesa/pull/2584
+### 🛠 Enhancements made
+* reimplementation of draw_voroinoi by @quaquel in https://github.com/projectmesa/mesa/pull/2608
+* Add render interval slider to control visualization update frequency by @HMNS19 in https://github.com/projectmesa/mesa/pull/2596
+### 🐛 Bugs fixed
+* Bugfix for non deterministic rng behavior by @quaquel in https://github.com/projectmesa/mesa/pull/2598
+### 🔍 Examples updated
+* Clarify ContinuousSpace.get_neighbors behavior with multiple agents at same position by @quaquel in https://github.com/projectmesa/mesa/pull/2599
+
+## New Contributors
+* @HMNS19 made their first contribution in https://github.com/projectmesa/mesa/pull/2596
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.1.2...v3.1.3
+
 # 3.1.2 (2025-01-04)
 ## Highlights
 Mesa v3.1.2 is a patch release containing updates to our wolf-sheep, shelling and prisoner's dilemma example models and improving documentation in the tutorials and visualisation docstring. No functional changes to the core library were made.
