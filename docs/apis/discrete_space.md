@@ -1,41 +1,41 @@
 ## Discrete Space
 
 ```{eval-rst}
-.. automodule:: experimental.cell_space.__init__
+.. automodule:: mesa.discrete_space.__init__
    :members:
 ```
 
 ```{eval-rst}
-.. automodule:: experimental.cell_space.cell
+.. automodule:: mesa.discrete_space.cell
    :members:
 ```
 
 ```{eval-rst}
-.. automodule:: experimental.cell_space.cell_agent
+.. automodule:: mesa.discrete_space.cell_agent
    :members:
 ```
 
 ```{eval-rst}
-.. automodule:: experimental.cell_space.cell_collection
+.. automodule:: mesa.discrete_space.cell_collection
    :members:
 ```
 
 ```{eval-rst}
-.. automodule:: experimental.cell_space.discrete_space
+.. automodule:: mesa.discrete_space.discrete_space
    :members:
 ```
 
 ```{eval-rst}
-.. automodule:: experimental.cell_space.grid
+.. automodule:: mesa.discrete_space.grid
    :members:
 ```
 
 ```{eval-rst}
-.. automodule:: experimental.cell_space.network
+.. automodule:: mesa.discrete_space.network
    :members:
 ```
 
 ```{eval-rst}
-.. automodule:: experimental.cell_space.voronoi
+.. automodule:: mesa.discrete_space.voronoi
    :members:
 ```
