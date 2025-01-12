@@ -172,28 +172,27 @@ Next-event time progression is an additional feature, which is currently in an e
 ```
 
 ## Visualization
-Mesa's visualization system, [SolaraViz](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html), provides interactive browser-based model exploration:
+Mesa’s visualization module, [SolaraViz](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html,  allows for interactive browser-based model exploration. Advancements with Mesa 3 update the visualization from harder-to-maintain custom code to Solara, a standardized library. Usage of the visualization module can be seen below:
 
 ```python
-    visualization = SolaraViz(
-        model,
-        [
-            make_space_component(agent_portrayal),
-            make_plot_component(["population", "average_wealth"]),
-            lambda m: f"Step {m.steps}: {len(m.agents)} agents"
-        ],
-        model_params=parameter_controls
-    )
+   visualization = SolaraViz(
+       model,
+       [
+           make_space_component(agent_portrayal),
+           make_plot_component(["population", "average_wealth"]),
+           lambda m: f"Step {m.steps}: {len(m.agents)} agents"
+       ],
+       model_params=parameter_controls
+   )
 ```
 
 ![A screenshot of the WolfSheep Model in Mesa](../docs/images/wolf_sheep.png)
 
 Key features include:
-
 - Interactive model controls
 - Real-time data visualization
 - Customizable agent and space portrayal
-- Support for multiple visualization types including grids, networks, and charts
+- Support for multiple visualization types, including grids, networks, and charts
 
 ## Experimentation and analysis
 
