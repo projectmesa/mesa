@@ -102,7 +102,7 @@ Mesa 3 provides both discrete (cell-based) and continuous space implementations.
 Example grid creation:
 
 ```python
-   grid = OrthogonalVonNeumannGrid((width, height), torus=False, random=model.random)
+    grid = OrthogonalVonNeumannGrid((width, height), torus=False, random=model.random)
 ```
 
 In Mesa 3, specialized agent classes for spatial interactions in discrete spaces were added:
@@ -114,15 +114,15 @@ In Mesa 3, specialized agent classes for spatial interactions in discrete spaces
 All discrete spaces support PropertyLayers - efficient numpy-based arrays for storing cell-level properties. This newly added feature allows for agents to interact with spatial properties of the cell more easily:
 
 ```python
-   grid.create_property_layer("elevation", default_value=10)
-   high_ground = grid.elevation.select_cells(lambda x: x > 50)
+    grid.create_property_layer("elevation", default_value=10)
+    high_ground = grid.elevation.select_cells(lambda x: x > 50)
 ```
 
 For models where agents need to move continuously through space rather than between discrete locations, `ContinuousSpace` allows agents to occupy any coordinate within defined boundaries:
 
 ```python
-   space = ContinuousSpace(x_max, y_max, torus=True)
-   space.move_agent(agent, (new_x, new_y))
+    space = ContinuousSpace(x_max, y_max, torus=True)
+    space.move_agent(agent, (new_x, new_y))
 ```
 The space module is stable but under active development. The new cell-based spaces in Mesa 3 are currently being tested and considered feature-complete. The code snippets reflected in this paper are the future expected state of Mesa. Features not yet merged into core are imported from experimental:
 
@@ -134,61 +134,60 @@ from mesa.experimental.cell_space ...
 Typically, ABMs represent time incrementally and call the units ticks. For each tick, the step method of the model is called, and the agents are activated to take their designated actions. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
 
 ```python
-   model = Model(seed=42)
+    model = Model(seed=42)
 
-
-   for _ in range(100):
-       model.step()
+    for _ in range(100):
+        model.step()
 ```
 
-Before Mesa 3, all agents were activated within the step method of the model. However, the newly added `AgentSet` class provides a more flexible way to activate agents. These changes include the depreciation of the Scheduler API and replacing previously available fixed patterns. 
-
+Before Mesa 3, all agents were activated within the step method of the model. However, the newly added `AgentSet` class provides a more flexible way to activate agents. These changes include the depreciation of the Scheduler API and replacing previously available fixed patterns.
 
 ```python
-   model.agents.do("step")  # Sequential activation
+    model.agents.do("step")  # Sequential activation
 
-   model.agents.shuffle_do("step")  # Random activation
+    model.agents.shuffle_do("step")  # Random activation
 
-   # Multi-stage activation:
-   for stage in ["move", "eat", "reproduce"]:
-       model.agents.do(stage)
+    # Multi-stage activation:
+    for stage in ["move", "eat", "reproduce"]:
+        model.agents.do(stage)
 
-   # Activation by agent subclass:
-   for klass in model.agent_types:
-       model.agents_by_type[klass].do("step")
+    # Activation by agent subclass:
+    for klass in model.agent_types:
+        model.agents_by_type[klass].do("step")
 ```
 
 Next-event time progression is an additional feature, which is currently in an experimental state with plans for support in the future. In this approach, the simulation consists of time-stamped events executed chronologically, with the simulation clock advancing to each event's timestamp. This enables both pure discrete event-based models and hybrid approaches combining incremental time progression with event scheduling on the ticks, as shown below. The latter hybrid approach combines traditional ABM time steps with the flexibility and potential performance benefits of event scheduling.
 
 ```python
-   # Pure event-based scheduling
-   simulator = DiscreteEventSimulator()
-   model = Model(seed=42, simulator=simulator)
-   simulator.schedule_event_relative(some_function, 3.1415)
+    # Pure event-based scheduling
+    simulator = DiscreteEventSimulator()
+    model = Model(seed=42, simulator=simulator)
+    simulator.schedule_event_relative(some_function, 3.1415)
 
-   # Hybrid time-step and event scheduling
-   model = Model(seed=42, simulator=ABMSimulator())
-   model.simulator.schedule_event_next_tick(some_function)
+    # Hybrid time-step and event scheduling
+    model = Model(seed=42, simulator=ABMSimulator())
+    model.simulator.schedule_event_next_tick(some_function)
 ```
 
 ## Visualization
 Mesa’s visualization module, [SolaraViz](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html,  allows for interactive browser-based model exploration. Advancements with Mesa 3 update the visualization from harder-to-maintain custom code to Solara, a standardized library. Usage of the visualization module can be seen below:
 
 ```python
-   visualization = SolaraViz(
-       model,
-       [
-           make_space_component(agent_portrayal),
-           make_plot_component(["population", "average_wealth"]),
-           lambda m: f"Step {m.steps}: {len(m.agents)} agents"
-       ],
-       model_params=parameter_controls
-   )
+    visualization = SolaraViz(
+        model,
+        [
+            make_space_component(agent_portrayal),
+            make_plot_component(["population", "average_wealth"]),
+            lambda m: f"Step {m.steps}: {len(m.agents)} agents"
+        ],
+        model_params=parameter_controls
+    )
 ```
 
 ![A screenshot of the WolfSheep Model in Mesa](../docs/images/wolf_sheep.png)
 
 Key features include:
+
 - Interactive model controls
 - Real-time data visualization
 - Customizable agent and space portrayal
