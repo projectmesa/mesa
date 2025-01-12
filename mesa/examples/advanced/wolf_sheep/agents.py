@@ -73,15 +73,6 @@ class Sheep(Animal):
         if len(cells_without_wolves) == 0:
             return
 
-        target_cells_not_walls = cells_without_wolves.select(
-            lambda cell: not self.model.grid.wall.data[cell.coordinate[0]][
-                cell.coordinate[1]
-            ]
-        )
-
-        if len(target_cells_not_walls) == 0:
-            return
-
         # Among safe cells, prefer those with grown grass
         cells_with_grass = cells_without_wolves.select(
             lambda cell: any(
@@ -133,11 +124,15 @@ class GrassPatch(FixedAgent):
         if not value:  # If grass was just eaten
             self.model.simulator.schedule_event_relative(
                 setattr,
-                self.grass_regrowth_time,
+                int(
+                    self.model.grid.grass_regrowth_time.data[self.cell.coordinate[0]][
+                        self.cell.coordinate[1]
+                    ]
+                ),
                 function_args=[self, "fully_grown", True],
             )
 
-    def __init__(self, model, countdown, grass_regrowth_time, cell):
+    def __init__(self, model, countdown, cell):
         """Create a new patch of grass.
 
         Args:
@@ -148,7 +143,6 @@ class GrassPatch(FixedAgent):
         """
         super().__init__(model)
         self._fully_grown = countdown == 0
-        self.grass_regrowth_time = grass_regrowth_time
         self.cell = cell
 
         # Schedule initial growth if not fully grown
