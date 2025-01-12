@@ -42,7 +42,7 @@ class WolfSheep(Model):
         wolf_reproduce=0.05,
         wolf_gain_from_food=20,
         grass=True,
-        grass_regrowth_time=30,
+        max_grass_regrowth_time=30,
         sheep_gain_from_food=4,
         seed=None,
         simulator: ABMSimulator = None,
@@ -100,7 +100,7 @@ class WolfSheep(Model):
             rows, cols = height, width
 
             seeds = np.zeros((rows, cols))
-            num_seeds = grass_regrowth_time
+            num_seeds = max_grass_regrowth_time
 
             for _ in range(num_seeds):
                 x, y = np.random.randint(0, rows), np.random.randint(0, cols)
