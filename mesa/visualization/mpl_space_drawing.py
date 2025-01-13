@@ -375,7 +375,7 @@ def draw_hex_grid(
             vertices = get_hex_vertices(x, y)
 
             # Edge logic, connecting each vertex to the next
-            for v1, v2 in pairwise(vertices + [vertices[0]]):
+            for v1, v2 in pairwise([*vertices, vertices[0]]):
                 # Sort vertices to ensure consistent edge representation and avoid duplicates.
                 edge = tuple(sorted([tuple(np.round(v1, 6)), tuple(np.round(v2, 6))]))
                 if edge not in edges:
