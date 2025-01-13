@@ -382,9 +382,7 @@ def draw_hex_grid(
                     edges.append(edge)
 
         # Return LineCollection for hexmesh
-        return LineCollection(
-            edges, linestyle=":", color="black", linewidth=1, alpha=1
-        )
+        return LineCollection(edges, linestyle=":", color="black", linewidth=1, alpha=1)
 
     if draw_grid:
         ax.add_collection(setup_hexmesh(space.width, space.height))
