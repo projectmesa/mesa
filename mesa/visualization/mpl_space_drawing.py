@@ -347,7 +347,7 @@ def draw_hex_grid(
 
     def setup_hexmesh(width, height):
         """Helper function for creating the hexmesh with unique edges."""
-        edges = []
+        edges = set()
         size = 1.0
         x_spacing = np.sqrt(3) * size
         y_spacing = 1.5 * size
@@ -378,8 +378,7 @@ def draw_hex_grid(
             for v1, v2 in pairwise([*vertices, vertices[0]]):
                 # Sort vertices to ensure consistent edge representation and avoid duplicates.
                 edge = tuple(sorted([tuple(np.round(v1, 6)), tuple(np.round(v2, 6))]))
-                if edge not in edges:
-                    edges.append(edge)
+                edges.add(edge)
 
         # Return LineCollection for hexmesh
         return LineCollection(edges, linestyle=":", color="black", linewidth=1, alpha=1)
@@ -387,8 +386,6 @@ def draw_hex_grid(
     if draw_grid:
         ax.add_collection(setup_hexmesh(space.width, space.height))
 
-    # Set aspect ratio to 'equal' to ensure hexagons appear regular
-    ax.set_aspect("equal")
     return ax
 
 
