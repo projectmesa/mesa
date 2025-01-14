@@ -140,7 +140,7 @@ Typically, ABMs represent time incrementally and call the units ticks. For each 
         model.step()
 ```
 
-Before Mesa 3, all agents were activated within the step method of the model. However, the newly added `AgentSet` class provides a more flexible way to activate agents. These changes include the depreciation of the Scheduler API and replacing previously available fixed patterns.
+Before Mesa 3, all agents were activated within the step method of the model. However, the newly added `AgentSet` class provides a more flexible way to activate agents. These changes include the removal of the Scheduler API and its previously available fixed patterns.
 
 ```python
     model.agents.do("step")  # Sequential activation
