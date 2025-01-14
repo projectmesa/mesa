@@ -68,7 +68,6 @@ model.step()
 
 You should see agents 1-5, activated in random order. See the [tutorial](tutorials/intro_tutorial) or API documentation for more detail on how to add model functionality.
 
-To bootstrap a new model install mesa and run `mesa startproject`
 
 ### AgentSet and model.agents
 Mesa 3.0 makes `model.agents` and the AgentSet class central in managing and activating agents.

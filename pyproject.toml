@@ -82,9 +82,6 @@ docs = [
 homepage = "https://github.com/projectmesa/mesa"
 repository = "https://github.com/projectmesa/mesa"
 
-[project.scripts]
-mesa = "mesa.main:cli"
-
 [tool.hatch.build.targets.wheel]
 packages = ["mesa"]
 
