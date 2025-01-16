@@ -29,13 +29,14 @@ def SpaceDrawer(model):
         cmap="spring",
         origin="lower",
     )
-    fig.colorbar(im, orientation="vertical")
+    fig.colorbar(im, ax=ax, orientation="vertical", pad=0.1, fraction=0.046)
     # Spice
-    ax.imshow(
+    im_spice = ax.imshow(
         np.ma.masked_where(model.grid.spice.data <= 1, model.grid.spice.data),
         cmap="winter",
         origin="lower",
     )
+    fig.colorbar(im_spice, ax=ax, orientation="vertical", fraction=0.046, pad=0.04)
     # Trader
     ax.scatter(**out["trader"])
     ax.set_axis_off()
