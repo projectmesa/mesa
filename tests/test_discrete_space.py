@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from mesa import Model
-from mesa.experimental.cell_space import (
+from mesa.discrete_space import (
     Cell,
     CellAgent,
     CellCollection,

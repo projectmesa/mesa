@@ -19,8 +19,8 @@ from itertools import product
 from random import Random
 from typing import Any, Generic, TypeVar
 
-from mesa.experimental.cell_space import Cell, DiscreteSpace
-from mesa.experimental.cell_space.property_layer import (
+from mesa.discrete_space import Cell, DiscreteSpace
+from mesa.discrete_space.property_layer import (
     HasPropertyLayers,
     PropertyDescriptor,
 )

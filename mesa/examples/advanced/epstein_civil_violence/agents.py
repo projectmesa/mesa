@@ -10,7 +10,7 @@ class CitizenState(Enum):
     ARRESTED = 3
 
 
-class EpsteinAgent(mesa.experimental.cell_space.CellAgent):
+class EpsteinAgent(mesa.discrete_space.CellAgent):
     def update_neighbors(self):
         """
         Look around and see who my neighbors are

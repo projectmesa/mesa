@@ -18,8 +18,8 @@ from functools import cache, cached_property
 from random import Random
 from typing import TYPE_CHECKING
 
-from mesa.experimental.cell_space.cell_agent import CellAgent
-from mesa.experimental.cell_space.cell_collection import CellCollection
+from mesa.discrete_space.cell_agent import CellAgent
+from mesa.discrete_space.cell_collection import CellCollection
 
 if TYPE_CHECKING:
     from mesa.agent import Agent

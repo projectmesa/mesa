@@ -15,8 +15,8 @@ or any environment where connectivity matters more than physical location.
 from random import Random
 from typing import Any
 
-from mesa.experimental.cell_space.cell import Cell
-from mesa.experimental.cell_space.discrete_space import DiscreteSpace
+from mesa.discrete_space.cell import Cell
+from mesa.discrete_space.discrete_space import DiscreteSpace
 
 
 class Network(DiscreteSpace[Cell]):

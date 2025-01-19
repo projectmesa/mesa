@@ -1,4 +1,4 @@
-from mesa.experimental.cell_space import CellAgent, FixedAgent
+from mesa.discrete_space import CellAgent, FixedAgent
 
 
 class Animal(CellAgent):
