@@ -54,7 +54,7 @@ For help getting started with Mesa, check out these resources:
 - [Getting started] - Learn about Mesa's core concepts and components
 - [Migration Guide] - Upgrade to Mesa 3.0
 - [Mesa Examples] - Browse user-contributed models and implementations
-- [Mesa Extensions] - Overview of mesa's Extentions
+- [Mesa Extensions] - Overview of mesa's Extensions
 - [GitHub Discussions] - Ask questions and discuss Mesa
 - [Matrix Chat Room] - Real-time chat with the Mesa community
 
