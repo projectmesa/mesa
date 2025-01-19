@@ -219,14 +219,23 @@ def ModelController(
     if model_parameters is None:
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
+    pause_event = asyncio.Event() 
 
     async def step():
-        while playing.value and running.value:
-            await asyncio.sleep(play_interval.value / 1000)
-            do_step()
-
+        try:
+            while running.value:
+                if not playing.value:
+                    pause_event.clear()
+                    await pause_event.wait()
+                await asyncio.sleep(play_interval.value / 1000)
+                do_step()
+        except asyncio.CancelledError:
+            # Handle the cancellation explicitly to avoid the exception from being unhandled
+            print("Step task was cancelled.")
+            return
+    
     solara.lab.use_task(
-        step, dependencies=[playing.value, running.value], prefer_threaded=False
+        step, dependencies=[playing.value, running.value], prefer_threaded=True
     )
 
     @function_logger(__name__)
@@ -234,7 +243,8 @@ def ModelController(
         """Advance the model by the number of steps specified by the render_interval slider."""
         for _ in range(render_interval.value):
             model.value.step()
-
+            if not playing.value:
+                break
         running.value = model.value.running
 
         force_update()
@@ -305,7 +315,7 @@ def SimulatorController(
             do_step()
 
     solara.lab.use_task(
-        step, dependencies=[playing.value, running.value], prefer_threaded=False
+        step, dependencies=[playing.value, running.value], prefer_threaded=True
     )
 
     def do_step():
