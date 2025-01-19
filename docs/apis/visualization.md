@@ -37,6 +37,12 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
    :show-inheritance:
 ```
 
+```{eval-rst}
+.. automodule:: mesa.visualization.components.__init__
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
 ## Altair-based visualizations
 
 ```{eval-rst}
