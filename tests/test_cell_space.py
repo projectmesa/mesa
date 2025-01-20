@@ -387,7 +387,7 @@ def test_hexgrid():
     # first row
     assert len(grid._cells[(0, 0)].connections.values()) == 3
     for connection in grid._cells[(0, 0)].connections.values():
-        assert connection.coordinate in {(0, 1), (1, 0), (1,1)}
+        assert connection.coordinate in {(0, 1), (1, 0), (1, 1)}
 
     # second row
     assert len(grid._cells[(1, 0)].connections.values()) == 4
