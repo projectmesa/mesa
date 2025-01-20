@@ -273,19 +273,19 @@ class HexGrid(Grid[T]):
     def _connect_cells_2d(self) -> None:
         # fmt: off
         even_offsets = [
-                        (-1, -1), (-1, 0),
-                    ( 0, -1),        ( 0, 1),
-                        ( 1, -1), ( 1, 0),
+                        (-1, -1), (0, -1),
+                    ( -1, 0),        ( 1, 0),
+                        ( -1, 1), (0, 1),
                 ]
         odd_offsets = [
-                        (-1, 0), (-1, 1),
-                    ( 0, -1),       ( 0, 1),
-                        ( 1, 0), ( 1, 1),
+                        (0, -1), (1, -1),
+                    ( -1, 0),       ( 1, 0),
+                        ( 0, 1), ( 1, 1),
                 ]
         # fmt: on
 
         for cell in self.all_cells:
-            i = cell.coordinate[0]
+            i = cell.coordinate[1]
             offsets = even_offsets if i % 2 == 0 else odd_offsets
             self._connect_single_cell_2d(cell, offsets=offsets)
 
