@@ -322,13 +322,14 @@ def draw_hex_grid(
     y_spacing = 1.5 * size
 
     loc = arguments["loc"].astype(float)
-    # Calculate hexagon centers
-    loc[:, 0] = loc[:, 0] * x_spacing + (loc[:, 1] % 2) * (x_spacing / 2)
-    loc[:, 1] = loc[:, 1] * y_spacing
-    arguments["loc"] = loc
+    # Calculate hexagon centers for agents if agents are present and plot them.
+    if loc.size > 0:
+        loc[:, 0] = loc[:, 0] * x_spacing + ((loc[:, 1]-1) % 2) * (x_spacing / 2)
+        loc[:, 1] = loc[:, 1] * y_spacing
+        arguments["loc"] = loc
 
-    # plot the agents
-    _scatter(ax, arguments, **kwargs)
+        # plot the agents
+        _scatter(ax, arguments, **kwargs)
 
     # Calculate proper bounds that account for the full hexagon width and height
     x_max = space.width * x_spacing + (space.height % 2) * (x_spacing / 2)
@@ -369,7 +370,7 @@ def draw_hex_grid(
         # Generate edges for each hexagon
         for row, col in itertools.product(range(height), range(width)):
             # Calculate center position for each hexagon with offset for even rows
-            x = col * x_spacing + (row % 2) * (x_spacing / 2)
+            x = col * x_spacing + (row % 2 == 0) * (x_spacing / 2)
             y = row * y_spacing
 
             vertices = get_hex_vertices(x, y)
