@@ -324,7 +324,7 @@ def draw_hex_grid(
     loc = arguments["loc"].astype(float)
     # Calculate hexagon centers for agents if agents are present and plot them.
     if loc.size > 0:
-        loc[:, 0] = loc[:, 0] * x_spacing + ((loc[:, 1]-1) % 2) * (x_spacing / 2)
+        loc[:, 0] = loc[:, 0] * x_spacing + ((loc[:, 1] - 1) % 2) * (x_spacing / 2)
         loc[:, 1] = loc[:, 1] * y_spacing
         arguments["loc"] = loc
 
