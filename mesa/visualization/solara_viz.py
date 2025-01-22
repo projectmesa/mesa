@@ -30,7 +30,7 @@ from typing import TYPE_CHECKING, Literal
 
 import reacton.core
 import solara
-
+import threading
 import mesa.visualization.components.altair_components as components_altair
 from mesa.experimental.devs.simulator import Simulator
 from mesa.mesa_logging import create_module_logger, function_logger
@@ -219,21 +219,33 @@ def ModelController(
     if model_parameters is None:
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
-    pause_event = asyncio.Event() 
+    pause_event = asyncio.Event()
 
     async def step():
         try:
+            current_thread = threading.Thread(target=vis, daemon=True)
+            current_thread.start()
+            print("thread started")
             while running.value:
                 if not playing.value:
                     pause_event.clear()
                     await pause_event.wait()
                 await asyncio.sleep(play_interval.value / 1000)
                 do_step()
+
+            current_thread.join()
         except asyncio.CancelledError:
             # Handle the cancellation explicitly to avoid the exception from being unhandled
             print("Step task was cancelled.")
             return
-    
+
+    def vis():
+        print("entered")
+        while playing.value:
+            print("Rendering")
+            force_update()
+        print("leaving")
+
     solara.lab.use_task(
         step, dependencies=[playing.value, running.value], prefer_threaded=True
     )
@@ -241,13 +253,10 @@ def ModelController(
     @function_logger(__name__)
     def do_step():
         """Advance the model by the number of steps specified by the render_interval slider."""
-        for _ in range(render_interval.value):
-            model.value.step()
-            if not playing.value:
-                break
+        model.value.step()
         running.value = model.value.running
 
-        force_update()
+
 
     @function_logger(__name__)
     def do_reset():
