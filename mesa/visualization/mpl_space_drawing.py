@@ -276,8 +276,9 @@ def draw_orthogonal_grid(
     s_default = (180 / max(space.width, space.height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
-    # plot the agents
-    _scatter(ax, arguments, **kwargs)
+    if arguments["loc"].size > 0:
+        # plot the agents
+        _scatter(ax, arguments, **kwargs)
 
     # further styling
     ax.set_xlim(-0.5, space.width - 0.5)
@@ -433,10 +434,12 @@ def draw_network(
     # this assumes that nodes are identified by an integer
     # which is true for default nx graphs but might user changeable
     pos = np.asarray(list(pos.values()))
-    arguments["loc"] = pos[arguments["loc"]]
 
-    # plot the agents
-    _scatter(ax, arguments, **kwargs)
+    if arguments["loc"].size > 0:
+        arguments["loc"] = pos[arguments["loc"]]
+
+        # plot the agents
+        _scatter(ax, arguments, **kwargs)
 
     # further styling
     ax.set_axis_off()
@@ -484,8 +487,9 @@ def draw_continuous_space(
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
-    # plot the agents
-    _scatter(ax, arguments, **kwargs)
+    if arguments["loc"].size > 0:
+        # plot the agents
+        _scatter(ax, arguments, **kwargs)
 
     # further visual styling
     border_style = "solid" if not space.torus else (0, (5, 10))
@@ -544,7 +548,8 @@ def draw_voronoi_grid(
     ax.set_xlim(x_min - x_padding, x_max + x_padding)
     ax.set_ylim(y_min - y_padding, y_max + y_padding)
 
-    _scatter(ax, arguments, **kwargs)
+    if arguments["loc"].size > 0:
+        _scatter(ax, arguments, **kwargs)
 
     def setup_voroinoimesh(cells):
         patches = []
