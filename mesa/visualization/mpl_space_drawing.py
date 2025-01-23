@@ -192,8 +192,9 @@ def draw_property_layers(
 
         data = layer.data.astype(float) if layer.data.dtype == bool else layer.data
         width, height = data.shape  # if space is None else (space.width, space.height)
+        data = data.T
 
-        if space and data.shape != (width, height):
+        if space.dimensions != (width, height):
             warnings.warn(
                 f"Layer {layer_name} dimensions ({data.shape}) do not match space dimensions ({width}, {height}).",
                 UserWarning,
