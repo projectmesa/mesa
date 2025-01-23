@@ -194,7 +194,7 @@ def draw_property_layers(
 
         if (space.width, space.height) != data.shape:
             warnings.warn(
-                f"Layer {layer_name} dimensions ({data.shape}) do not match space dimensions ({width}, {height}).",
+                f"Layer {layer_name} dimensions ({data.shape}) do not match space dimensions ({space.width}, {space.height}).",
                 UserWarning,
                 stacklevel=2,
             )
@@ -207,6 +207,7 @@ def draw_property_layers(
 
         # Draw the layer
         if "color" in portrayal:
+            data = data.T
             rgba_color = to_rgba(portrayal["color"])
             normalized_data = (data - vmin) / (vmax - vmin)
             rgba_data = np.full((*data.shape, 4), rgba_color)
@@ -216,7 +217,7 @@ def draw_property_layers(
                 layer_name, [(0, 0, 0, 0), (*rgba_color[:3], alpha)]
             )
             im = ax.imshow(
-                rgba_data.T,
+                rgba_data,
                 origin="lower",
             )
             if colorbar:
