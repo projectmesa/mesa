@@ -191,10 +191,8 @@ def draw_property_layers(
             continue
 
         data = layer.data.astype(float) if layer.data.dtype == bool else layer.data
-        width, height = data.shape  # if space is None else (space.width, space.height)
-        data = data.T
 
-        if space.dimensions != (width, height):
+        if space.dimensions != data.shape:
             warnings.warn(
                 f"Layer {layer_name} dimensions ({data.shape}) do not match space dimensions ({width}, {height}).",
                 UserWarning,
@@ -218,7 +216,7 @@ def draw_property_layers(
                 layer_name, [(0, 0, 0, 0), (*rgba_color[:3], alpha)]
             )
             im = ax.imshow(
-                rgba_data,
+                rgba_data.T,
                 origin="lower",
             )
             if colorbar:
@@ -232,7 +230,7 @@ def draw_property_layers(
             if isinstance(cmap, list):
                 cmap = LinearSegmentedColormap.from_list(layer_name, cmap)
             im = ax.imshow(
-                data,
+                data.T,
                 cmap=cmap,
                 alpha=alpha,
                 vmin=vmin,
