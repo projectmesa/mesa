@@ -25,12 +25,13 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+import threading
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
 import reacton.core
 import solara
-import threading
+
 import mesa.visualization.components.altair_components as components_altair
 from mesa.experimental.devs.simulator import Simulator
 from mesa.mesa_logging import create_module_logger, function_logger
@@ -223,28 +224,43 @@ def ModelController(
 
     async def step():
         try:
-            current_thread = threading.Thread(target=vis, daemon=True)
-            current_thread.start()
-            print("thread started")
-            while running.value:
-                if not playing.value:
-                    pause_event.clear()
-                    await pause_event.wait()
-                await asyncio.sleep(play_interval.value / 1000)
-                do_step()
 
-            current_thread.join()
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            current_thread = threading.Thread(target=vis, daemon=True)
+            if playing.value:          
+                
+                current_thread.start()
+                print("thread started")
+            
+            while running.value and playing.value:
+                
+                    
+                await asyncio.sleep(play_interval.value / 1000)
+                do_step()    
+            else:
+                if current_thread.is_alive():           
+                    current_thread.join()
+                    print("thread stopped")
+                pause_event.clear()
+                await pause_event.wait()
         except asyncio.CancelledError:
-            # Handle the cancellation explicitly to avoid the exception from being unhandled
+            
             print("Step task was cancelled.")
             return
 
     def vis():
-        print("entered")
-        while playing.value:
-            print("Rendering")
-            force_update()
-        print("leaving")
+        try:
+            
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            print("entered")
+            while playing.value:
+                print("Rendering")
+                force_update()  
+            print("leaving")
+        except Exception as e:
+            print(f"Error in vis thread: {e}")
 
     solara.lab.use_task(
         step, dependencies=[playing.value, running.value], prefer_threaded=True
@@ -253,10 +269,9 @@ def ModelController(
     @function_logger(__name__)
     def do_step():
         """Advance the model by the number of steps specified by the render_interval slider."""
+        print("Called")
         model.value.step()
         running.value = model.value.running
-
-
 
     @function_logger(__name__)
     def do_reset():
