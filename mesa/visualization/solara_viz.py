@@ -224,40 +224,36 @@ def ModelController(
 
     async def step():
         try:
-
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             current_thread = threading.Thread(target=vis, daemon=True)
-            if playing.value:          
-                
+            if playing.value:
                 current_thread.start()
                 print("thread started")
-            
+
             while running.value and playing.value:
-                
-                    
                 await asyncio.sleep(play_interval.value / 1000)
-                do_step()    
-            else:
-                if current_thread.is_alive():           
-                    current_thread.join()
-                    print("thread stopped")
-                pause_event.clear()
-                await pause_event.wait()
+                do_step()
+            if current_thread.is_alive():
+                current_thread.join()
+                print("thread stopped")
+            pause_event.clear()
+            await pause_event.wait()
         except asyncio.CancelledError:
-            
             print("Step task was cancelled.")
             return
 
     def vis():
         try:
-            
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             print("entered")
             while playing.value:
                 print("Rendering")
-                force_update()  
+                if model.value.steps % render_interval.value == 0:
+                    print("Rendering")
+                    force_update()
+
             print("leaving")
         except Exception as e:
             print(f"Error in vis thread: {e}")
@@ -269,9 +265,16 @@ def ModelController(
     @function_logger(__name__)
     def do_step():
         """Advance the model by the number of steps specified by the render_interval slider."""
-        print("Called")
-        model.value.step()
-        running.value = model.value.running
+        if playing.value:
+            print("Called")
+            model.value.step()
+            running.value = model.value.running
+        else:
+            print("Called")
+            for _ in range(render_interval.value):
+                model.value.step()
+                running.value = model.value.running
+            force_update()
 
     @function_logger(__name__)
     def do_reset():
