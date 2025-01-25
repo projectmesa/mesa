@@ -57,6 +57,7 @@ def SolaraViz(
     simulator: Simulator | None = None,
     model_params=None,
     name: str | None = None,
+    use_threads: bool = False,
 ):
     """Solara visualization component.
 
@@ -76,6 +77,8 @@ def SolaraViz(
             This controls the speed of the model's automatic stepping. Defaults to 100 ms.
         render_interval (int, optional): Controls how often plots are updated during a simulation,
             allowing users to skip intermediate steps and update graphs less frequently.
+        use_threads: Flag for indicating whether to utilize multi-threading for model execution.
+            When checked, the model will utilize multiple threads,adjust based on system capabilities.
         simulator: A simulator that controls the model (optional)
         model_params (dict, optional): Parameters for (re-)instantiating a model.
             Can include user-adjustable parameters and fixed parameters. Defaults to None.
@@ -110,6 +113,7 @@ def SolaraViz(
     reactive_model_parameters = solara.use_reactive({})
     reactive_play_interval = solara.use_reactive(play_interval)
     reactive_render_interval = solara.use_reactive(render_interval)
+    reactive_use_threads = solara.use_reactive(use_threads)
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
 
@@ -131,12 +135,19 @@ def SolaraViz(
                 max=100,
                 step=2,
             )
+            solara.Checkbox(
+                label="Use Threads",
+                value=reactive_use_threads,
+                on_value=lambda v: reactive_use_threads.set(v),
+            )
+
             if not isinstance(simulator, Simulator):
                 ModelController(
                     model,
                     model_parameters=reactive_model_parameters,
                     play_interval=reactive_play_interval,
                     render_interval=reactive_render_interval,
+                    use_threads=reactive_use_threads,
                 )
             else:
                 SimulatorController(
@@ -206,6 +217,7 @@ def ModelController(
     model_parameters: dict | solara.Reactive[dict] = None,
     play_interval: int | solara.Reactive[int] = 100,
     render_interval: int | solara.Reactive[int] = 1,
+    use_threads: bool | solara.Reactive[bool] = False,
 ):
     """Create controls for model execution (step, play, pause, reset).
 
@@ -214,50 +226,52 @@ def ModelController(
         model_parameters: Reactive parameters for (re-)instantiating a model.
         play_interval: Interval for playing the model steps in milliseconds.
         render_interval: Controls how often the plots are updated during simulation steps.Higher value reduce update frequency.
+        use_threads: Flag for indicating whether to utilize multi-threading for model execution.
     """
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
     if model_parameters is None:
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
+    pause_vis_event = threading.Event()
+    pause_step_event = threading.Event()
 
     def step():
         try:
-            if playing.value:
-                current_thread = threading.Thread(target=vis, daemon=True)
-                if playing.value:
-                    current_thread.start()
-                    print("thread started")
-
-                while running.value and playing.value:
-                    time.sleep(play_interval.value / 1000)
-                    do_step()
-                if current_thread.is_alive():
-                    current_thread.join()
-                    print("thread stopped")
-
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            while running.value and playing.value:
+                await asyncio.sleep(play_interval.value / 1000)
+                if use_threads.value:
+                    pause_step_event.wait()
+                    pause_step_event.clear()
+                do_step()
+                if use_threads.value:
+                    pause_vis_event.set()
         except asyncio.CancelledError:
             print("Step task was cancelled.")
             return
 
     def vis():
-        try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            print("entered")
-            while playing.value:
-                print("model.value.steps:", model.value.steps)
-                if model.value.steps % render_interval.value == 0:
-                    print("Rendering")
+        if use_threads.value:
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                pause_step_event.set()
+                while playing.value and running.value:
+                    pause_vis_event.wait()
+                    pause_vis_event.clear()
                     force_update()
+                    pause_step_event.set()
+            except Exception as e:
+                print(f"Error in vis task: {e}")
+            finally:
+                loop.close()
 
-            print("leaving")
-        except Exception as e:
-            print(f"Error in vis thread: {e}")
+    # h216 result error?
+    solara.lab.use_task(step, dependencies=[playing.value, running.value])
 
-    solara.lab.use_task(
-        step, dependencies=[playing.value, running.value], prefer_threaded=True
-    )
+    solara.use_thread(vis, dependencies=[playing.value])
 
     @function_logger(__name__)
     def do_step():
@@ -266,8 +280,13 @@ def ModelController(
             for _ in range(render_interval.value):
                 model.value.step()
                 running.value = model.value.running
+                if not playing.value:
+                    break
+
+            if not use_threads.value:
+                force_update()
+
         else:
-            print("Called2")
             for _ in range(render_interval.value):
                 model.value.step()
                 running.value = model.value.running
