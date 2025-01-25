@@ -249,7 +249,7 @@ def ModelController(
             asyncio.set_event_loop(loop)
             print("entered")
             while playing.value:
-                print("Rendering")
+                print("model.value.steps:",model.value.steps)
                 if model.value.steps % render_interval.value == 0:
                     print("Rendering")
                     force_update()
@@ -266,11 +266,11 @@ def ModelController(
     def do_step():
         """Advance the model by the number of steps specified by the render_interval slider."""
         if playing.value:
-            print("Called")
-            model.value.step()
-            running.value = model.value.running
+            for _ in range(render_interval.value):
+                model.value.step()
+                running.value = model.value.running
         else:
-            print("Called")
+            print("Called2")
             for _ in range(render_interval.value):
                 model.value.step()
                 running.value = model.value.running
