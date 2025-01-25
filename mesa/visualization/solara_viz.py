@@ -220,25 +220,22 @@ def ModelController(
     if model_parameters is None:
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
-    pause_event = asyncio.Event()
 
     async def step():
         try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            current_thread = threading.Thread(target=vis, daemon=True)
             if playing.value:
-                current_thread.start()
-                print("thread started")
+                current_thread = threading.Thread(target=vis, daemon=True)
+                if playing.value:
+                    current_thread.start()
+                    print("thread started")
 
-            while running.value and playing.value:
-                await asyncio.sleep(play_interval.value / 1000)
-                do_step()
-            if current_thread.is_alive():
-                current_thread.join()
-                print("thread stopped")
-            pause_event.clear()
-            await pause_event.wait()
+                while running.value and playing.value:
+                    await asyncio.sleep(play_interval.value / 1000)
+                    do_step()
+                if current_thread.is_alive():
+                    current_thread.join()
+                    print("thread stopped")
+
         except asyncio.CancelledError:
             print("Step task was cancelled.")
             return
