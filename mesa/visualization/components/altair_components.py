@@ -46,13 +46,15 @@ def make_altair_space(
             return {"id": a.unique_id}
 
     def MakeSpaceAltair(model):
-        return SpaceAltair(model, agent_portrayal)
+        return SpaceAltair(model, agent_portrayal, post_process=post_process)
 
     return MakeSpaceAltair
 
 
 @solara.component
-def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):
+def SpaceAltair(
+    model, agent_portrayal, dependencies: list[any] | None = None, post_process=None
+):
     """Create an Altair-based space visualization component.
 
     Returns:
@@ -65,6 +67,9 @@ def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):
         space = model.space
 
     chart = _draw_grid(space, agent_portrayal)
+    # Apply post-processing if provided
+    if post_process is not None:
+        chart = post_process(chart)
     solara.FigureAltair(chart)
 
 
