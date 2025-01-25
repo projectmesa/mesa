@@ -249,7 +249,7 @@ def ModelController(
             asyncio.set_event_loop(loop)
             print("entered")
             while playing.value:
-                print("model.value.steps:",model.value.steps)
+                print("model.value.steps:", model.value.steps)
                 if model.value.steps % render_interval.value == 0:
                     print("Rendering")
                     force_update()
