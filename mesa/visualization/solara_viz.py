@@ -37,7 +37,7 @@ from mesa.experimental.devs.simulator import Simulator
 from mesa.mesa_logging import create_module_logger, function_logger
 from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
-
+import time
 if TYPE_CHECKING:
     from mesa.model import Model
 
@@ -221,7 +221,7 @@ def ModelController(
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
 
-    async def step():
+    def step():
         try:
             if playing.value:
                 current_thread = threading.Thread(target=vis, daemon=True)
@@ -230,7 +230,7 @@ def ModelController(
                     print("thread started")
 
                 while running.value and playing.value:
-                    await asyncio.sleep(play_interval.value / 1000)
+                    time.sleep(play_interval.value / 1000)
                     do_step()
                 if current_thread.is_alive():
                     current_thread.join()
