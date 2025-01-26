@@ -138,7 +138,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
     def mock_post_process(chart):
         return chart.configure_legend(titleFontSize=14, labelFontSize=12)
 
-    mock_post_process_spy = mocker.spy(mock_post_process)
+    mock_post_process_spy = mocker.spy(mock_post_process, "__call__")
     solara.render(
         SolaraViz(
             model,
