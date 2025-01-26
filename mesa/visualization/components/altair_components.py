@@ -1,10 +1,10 @@
 """Altair based solara components for visualization mesa spaces."""
 
 import contextlib
-from typing import Callable
 import warnings
-import solara
+from collections.abc import Callable
 
+import solara
 
 with contextlib.suppress(ImportError):
     import altair as alt
@@ -24,8 +24,8 @@ def make_space_altair(*args, **kwargs):  # noqa: D103
 
 
 def make_altair_space_component(*args, **kwargs):
-
     return make_altair_space(*args, **kwargs)
+
 
 def make_altair_space(
     agent_portrayal, propertylayer_portrayal, post_process, **space_drawing_kwargs
@@ -56,7 +56,6 @@ def make_altair_space(
     return MakeSpaceAltair
 
 
-
 def make_altair_plot_component(
     measure: str | dict[str, str] | list[str] | tuple[str],
     post_process: Callable | None = None,
@@ -77,14 +76,12 @@ def make_altair_plot_component(
     Returns:
         function: A function that creates a PlotAltair component
     """
+
     def MakePlotAltair(model):
         return PlotAltair(
-            model,
-            measure,
-            post_process=post_process,
-            width=width,
-            height=height
+            model, measure, post_process=post_process, width=width, height=height
         )
+
     return MakePlotAltair
 
 
@@ -97,63 +94,74 @@ def PlotAltair(
     height: int = 300,
 ) -> solara.FigureAltair:
     """Create an Altair plot for model."""
-    
     update_counter.get()
     df = model.datacollector.get_model_vars_dataframe().reset_index()
 
     if isinstance(measure, str):
         # Single measure - no transformation needed
-        chart = alt.Chart(df).encode(
-            x='Step:Q',
-            y=alt.Y(f'{measure}:Q', title=measure),
-            tooltip=[alt.Tooltip('Step:Q'), alt.Tooltip(f'{measure}:Q')]
-        ).mark_line()
+        chart = (
+            alt.Chart(df)
+            .encode(
+                x="Step:Q",
+                y=alt.Y(f"{measure}:Q", title=measure),
+                tooltip=[alt.Tooltip("Step:Q"), alt.Tooltip(f"{measure}:Q")],
+            )
+            .mark_line()
+        )
 
     elif isinstance(measure, (list, tuple)):
         # Multiple measures - melt dataframe
         value_vars = list(measure)
-        melted_df = df.melt('Step', value_vars=value_vars, 
-                           var_name='Measure', value_name='Value')
-        
-        chart = alt.Chart(melted_df).encode(
-            x='Step:Q',
-            y=alt.Y('Value:Q'),
-            color='Measure:N',
-            tooltip=['Step:Q', 'Value:Q', 'Measure:N']
-        ).mark_line()
+        melted_df = df.melt(
+            "Step", value_vars=value_vars, var_name="Measure", value_name="Value"
+        )
+
+        chart = (
+            alt.Chart(melted_df)
+            .encode(
+                x="Step:Q",
+                y=alt.Y("Value:Q"),
+                color="Measure:N",
+                tooltip=["Step:Q", "Value:Q", "Measure:N"],
+            )
+            .mark_line()
+        )
 
     elif isinstance(measure, dict):
         # Dictionary with colors - melt dataframe
         value_vars = list(measure.keys())
-        melted_df = df.melt('Step', value_vars=value_vars,
-        var_name='Measure', value_name='Value')
-        
+        melted_df = df.melt(
+            "Step", value_vars=value_vars, var_name="Measure", value_name="Value"
+        )
+
         # Create color scale from measure dict
         domain = list(measure.keys())
         range_ = list(measure.values())
-        
-        chart = alt.Chart(melted_df).encode(
-            x='Step:Q',
-            y=alt.Y('Value:Q'),
-            color=alt.Color('Measure:N', scale=alt.Scale(domain=domain, range=range_)),
-            tooltip=['Step:Q', 'Value:Q', 'Measure:N']
-        ).mark_line()
-    
+
+        chart = (
+            alt.Chart(melted_df)
+            .encode(
+                x="Step:Q",
+                y=alt.Y("Value:Q"),
+                color=alt.Color(
+                    "Measure:N", scale=alt.Scale(domain=domain, range=range_)
+                ),
+                tooltip=["Step:Q", "Value:Q", "Measure:N"],
+            )
+            .mark_line()
+        )
+
     else:
         raise ValueError("Unsupported measure type")
 
     # Configure chart properties
-    chart = chart.properties(
-        width=width,
-        height=height
-    ).configure_axis(
-        grid=True
-    )
+    chart = chart.properties(width=width, height=height).configure_axis(grid=True)
 
     if post_process is not None:
         chart = post_process(chart)
-        
+
     return solara.FigureAltair(chart)
+
 
 @solara.component
 def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):
