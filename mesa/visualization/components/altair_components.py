@@ -15,12 +15,16 @@ from mesa.visualization.utils import update_counter
 
 def make_space_altair(*args, **kwargs):  # noqa: D103
     warnings.warn(
-        "make_space_altair has been renamed to make_altair_space",
+        "make_space_altair has been renamed to make_altair_space_component",
         DeprecationWarning,
         stacklevel=2,
     )
-    return make_altair_space(*args, **kwargs)
+    return make_altair_space_component(*args, **kwargs)
 
+
+def make_altair_space_component(*args, **kwargs):
+
+    return make_altair_space(*args, **kwargs)
 
 def make_altair_space(
     agent_portrayal, propertylayer_portrayal, post_process, **space_drawing_kwargs
