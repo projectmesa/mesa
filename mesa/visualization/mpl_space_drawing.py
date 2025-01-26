@@ -18,7 +18,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
-from matplotlib.collections import LineCollection, PatchCollection
+from matplotlib.collections import LineCollection, PatchCollection, PolyCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.patches import Polygon
 
@@ -159,6 +159,22 @@ def draw_space(
     return ax
 
 
+# Helper function for getting the vertices of a hexagon given the center and size
+def _get_hex_vertices(
+    center_x: float, center_y: float, size: float
+) -> list[tuple[float, float]]:
+    """Get vertices for a hexagon centered at (center_x, center_y)."""
+    vertices = [
+        (center_x, center_y + size),  # top
+        (center_x + size * np.sqrt(3) / 2, center_y + size / 2),  # top right
+        (center_x + size * np.sqrt(3) / 2, center_y - size / 2),  # bottom right
+        (center_x, center_y - size),  # bottom
+        (center_x - size * np.sqrt(3) / 2, center_y - size / 2),  # bottom left
+        (center_x - size * np.sqrt(3) / 2, center_y + size / 2),  # top left
+    ]
+    return vertices
+
+
 def draw_property_layers(
     space, propertylayer_portrayal: dict[str, dict[str, Any]], ax: Axes
 ):
@@ -175,12 +191,34 @@ def draw_property_layers(
         so you can do `{"some_layer":{"colormap":'viridis', 'alpha':.25, "colorbar":False}}`
 
     """
+
+    def get_hexmesh(width: int, height: int) -> list[list[tuple[float, float]]]:
+        """Create hexagon vertices for the mesh."""
+
+        hexagons = []
+        size = 1
+        x_spacing = np.sqrt(3) * size
+        y_spacing = 1.5 * size
+
+        for row in range(height):
+            for col in range(width):
+                # Calculate center position with offset for even rows
+                x = col * x_spacing + (row % 2 == 0) * (x_spacing / 2)
+                y = row * y_spacing
+                vertices = _get_hex_vertices(x, y, size)
+                hexagons.append(vertices)
+
+        return hexagons
+    
     try:
         # old style spaces
         property_layers = space.properties
     except AttributeError:
         # new style spaces
         property_layers = space._mesa_property_layers
+
+    # Check space type once
+    is_hex_grid = isinstance(space, HexGrid)
 
     for layer_name, portrayal in propertylayer_portrayal.items():
         layer = property_layers.get(layer_name, None)
@@ -205,45 +243,68 @@ def draw_property_layers(
         vmax = portrayal.get("vmax", np.max(data))
         colorbar = portrayal.get("colorbar", True)
 
-        # Draw the layer
+        # Prepare colormap
         if "color" in portrayal:
-            data = data.T
             rgba_color = to_rgba(portrayal["color"])
-            normalized_data = (data - vmin) / (vmax - vmin)
-            rgba_data = np.full((*data.shape, 4), rgba_color)
-            rgba_data[..., 3] *= normalized_data * alpha
-            rgba_data = np.clip(rgba_data, 0, 1)
             cmap = LinearSegmentedColormap.from_list(
                 layer_name, [(0, 0, 0, 0), (*rgba_color[:3], alpha)]
             )
-            im = ax.imshow(
-                rgba_data,
-                origin="lower",
-            )
-            if colorbar:
-                norm = Normalize(vmin=vmin, vmax=vmax)
-                sm = ScalarMappable(norm=norm, cmap=cmap)
-                sm.set_array([])
-                ax.figure.colorbar(sm, ax=ax, orientation="vertical")
-
         elif "colormap" in portrayal:
             cmap = portrayal.get("colormap", "viridis")
             if isinstance(cmap, list):
                 cmap = LinearSegmentedColormap.from_list(layer_name, cmap)
-            im = ax.imshow(
-                data.T,
-                cmap=cmap,
-                alpha=alpha,
-                vmin=vmin,
-                vmax=vmax,
-                origin="lower",
-            )
-            if colorbar:
-                plt.colorbar(im, ax=ax, label=layer_name)
+            elif isinstance(cmap, str):
+                cmap = plt.get_cmap(cmap)
         else:
             raise ValueError(
                 f"PropertyLayer {layer_name} portrayal must include 'color' or 'colormap'."
             )
+
+        if is_hex_grid:
+            width, height = data.shape
+            
+            # Generate hexagon mesh
+            hexagons = get_hexmesh(width, height)
+
+            # Normalize colors
+            norm = Normalize(vmin=vmin, vmax=vmax)
+            colors = data.ravel() # flatten data to 1D array
+
+            if "color" in portrayal:
+                normalized_colors = np.clip(norm(colors), 0, 1)
+                rgba_colors = np.full((len(colors), 4), rgba_color)
+                rgba_colors[:, 3] = normalized_colors * alpha
+            else:
+                rgba_colors = cmap(norm(colors))
+
+            # Draw hexagons
+            collection = PolyCollection(hexagons, facecolors=rgba_colors, zorder=-1)
+            im = ax.add_collection(collection)
+        else:
+            # Rectangular grid rendering
+            if "color" in portrayal:
+                data = data.T
+                normalized_data = (data - vmin) / (vmax - vmin)
+                rgba_data = np.full((*data.shape, 4), rgba_color)
+                rgba_data[..., 3] *= normalized_data * alpha
+                rgba_data = np.clip(rgba_data, 0, 1)
+                im = ax.imshow(rgba_data, origin="lower")
+            else:
+                im = ax.imshow(
+                    data.T,
+                    cmap=cmap,
+                    alpha=alpha,
+                    vmin=vmin,
+                    vmax=vmax,
+                    origin="lower",
+                )
+
+        # Add colorbar if requested
+        if colorbar:
+            norm = Normalize(vmin=vmin, vmax=vmax)
+            sm = ScalarMappable(norm=norm, cmap=cmap)
+            sm.set_array([])
+            plt.colorbar(sm, ax=ax, label=layer_name)
 
 
 def draw_orthogonal_grid(
@@ -353,27 +414,13 @@ def draw_hex_grid(
         x_spacing = np.sqrt(3) * size
         y_spacing = 1.5 * size
 
-        def get_hex_vertices(
-            center_x: float, center_y: float
-        ) -> list[tuple[float, float]]:
-            """Get vertices for a hexagon centered at (center_x, center_y)."""
-            vertices = [
-                (center_x, center_y + size),  # top
-                (center_x + size * np.sqrt(3) / 2, center_y + size / 2),  # top right
-                (center_x + size * np.sqrt(3) / 2, center_y - size / 2),  # bottom right
-                (center_x, center_y - size),  # bottom
-                (center_x - size * np.sqrt(3) / 2, center_y - size / 2),  # bottom left
-                (center_x - size * np.sqrt(3) / 2, center_y + size / 2),  # top left
-            ]
-            return vertices
-
         # Generate edges for each hexagon
         for row, col in itertools.product(range(height), range(width)):
             # Calculate center position for each hexagon with offset for even rows
             x = col * x_spacing + (row % 2 == 0) * (x_spacing / 2)
             y = row * y_spacing
 
-            vertices = get_hex_vertices(x, y)
+            vertices = _get_hex_vertices(x, y, size)
 
             # Edge logic, connecting each vertex to the next
             for v1, v2 in pairwise([*vertices, vertices[0]]):
