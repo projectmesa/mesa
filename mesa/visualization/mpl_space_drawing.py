@@ -194,7 +194,6 @@ def draw_property_layers(
 
     def get_hexmesh(width: int, height: int) -> list[list[tuple[float, float]]]:
         """Create hexagon vertices for the mesh."""
-
         hexagons = []
         size = 1
         x_spacing = np.sqrt(3) * size
@@ -209,7 +208,7 @@ def draw_property_layers(
                 hexagons.append(vertices)
 
         return hexagons
-    
+
     try:
         # old style spaces
         property_layers = space.properties
@@ -262,13 +261,13 @@ def draw_property_layers(
 
         if is_hex_grid:
             width, height = data.shape
-            
+
             # Generate hexagon mesh
             hexagons = get_hexmesh(width, height)
 
             # Normalize colors
             norm = Normalize(vmin=vmin, vmax=vmax)
-            colors = data.ravel() # flatten data to 1D array
+            colors = data.ravel()  # flatten data to 1D array
 
             if "color" in portrayal:
                 normalized_colors = np.clip(norm(colors), 0, 1)
@@ -279,7 +278,7 @@ def draw_property_layers(
 
             # Draw hexagons
             collection = PolyCollection(hexagons, facecolors=rgba_colors, zorder=-1)
-            im = ax.add_collection(collection)
+            ax.add_collection(collection)
         else:
             # Rectangular grid rendering
             if "color" in portrayal:
@@ -288,9 +287,9 @@ def draw_property_layers(
                 rgba_data = np.full((*data.shape, 4), rgba_color)
                 rgba_data[..., 3] *= normalized_data * alpha
                 rgba_data = np.clip(rgba_data, 0, 1)
-                im = ax.imshow(rgba_data, origin="lower")
+                ax.imshow(rgba_data, origin="lower")
             else:
-                im = ax.imshow(
+                ax.imshow(
                     data.T,
                     cmap=cmap,
                     alpha=alpha,
