@@ -29,7 +29,7 @@ def make_altair_space(
 
     Args:
         agent_portrayal: Function to portray agents.
-        propertylayer_portrayal: not yet implemented
+        propertylayer_portrayal: A user specified callable that will be called with the Chart instance from Altair. Allows for fine tuning plots (e.g., control ticks)
         post_process :not yet implemented
         space_drawing_kwargs : not yet implemented
 
