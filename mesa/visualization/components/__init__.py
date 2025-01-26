@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from .altair_components import SpaceAltair, make_altair_space
+from .altair_components import SpaceAltair, make_altair_space,make_altair_plot_component
 from .matplotlib_components import (
     SpaceMatplotlib,
     make_mpl_plot_component,
@@ -76,7 +76,7 @@ def make_plot_component(
     if backend == "matplotlib":
         return make_mpl_plot_component(measure, post_process, **plot_drawing_kwargs)
     elif backend == "altair":
-        raise NotImplementedError("altair line plots are not yet implemented")
+        return make_altair_plot_component(measure, post_process, **plot_drawing_kwargs)
     else:
         raise ValueError(
             f"unknown backend {backend}, must be one of matplotlib, altair"

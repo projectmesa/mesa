@@ -11,7 +11,7 @@ from mesa.visualization.mpl_space_drawing import (
 )
 
 from .components import make_plot_component, make_space_component
-from .components.altair_components import make_space_altair
+from .components.altair_components import make_space_altair,make_altair_plot_component
 from .solara_viz import JupyterViz, SolaraViz
 from .user_param import Slider
 
@@ -22,5 +22,6 @@ __all__ = [
     "draw_space",
     "make_plot_component",
     "make_space_altair",
+    "make_altair_plot_component",
     "make_space_component",
 ]
