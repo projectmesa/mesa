@@ -136,12 +136,14 @@ def SolaraViz(
                 max=100,
                 step=2,
             )
+            if reactive_use_threads.value:
+                solara.Text("Adjust play interval to avoid skipping plots")
+
             solara.Checkbox(
                 label="Use Threads",
                 value=reactive_use_threads,
                 on_value=lambda v: reactive_use_threads.set(v),
             )
-
             if not isinstance(simulator, Simulator):
                 ModelController(
                     model,
@@ -235,7 +237,7 @@ def ModelController(
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
     pause_vis_event = threading.Event()
-    
+
     def step():
         try:
             loop = asyncio.new_event_loop()
@@ -280,7 +282,7 @@ def ModelController(
                     break
             if not use_threads.value:
                 force_update()
-               
+
         else:
             for _ in range(render_interval.value):
                 model.value.step()
