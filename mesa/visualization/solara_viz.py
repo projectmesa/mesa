@@ -234,35 +234,43 @@ def ModelController(
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
     pause_vis_event = threading.Event()
-    pause_step_event = threading.Event()
+    #pause_step_event = threading.Event()
 
     def step():
         try:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             while running.value and playing.value:
-                await asyncio.sleep(play_interval.value / 1000)
-                if use_threads.value:
-                    pause_step_event.wait()
-                    pause_step_event.clear()
+                time.sleep(play_interval.value / 1000)
+                #if use_threads.value:
+                    #pause_step_event.wait()
+                    #pause_step_event.clear()
                 do_step()
                 if use_threads.value:
                     pause_vis_event.set()
         except asyncio.CancelledError:
             print("Step task was cancelled.")
             return
+        finally:
+            loop.close()
 
     def vis():
         if use_threads.value:
             try:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                pause_step_event.set()
+                #pause_step_event.set()
+                #render_step=-1
                 while playing.value and running.value:
+                    #if render_step!=model.value.steps:
+                    print("before waiting",model.value.steps)
                     pause_vis_event.wait()
                     pause_vis_event.clear()
+                    print("after waiting",model.value.steps)
                     force_update()
-                    pause_step_event.set()
+                    print("after rendering",model.value.steps)
+                    #    render_step=model.value.steps
+                    #pause_step_event.set()
             except Exception as e:
                 print(f"Error in vis task: {e}")
             finally:
@@ -278,17 +286,21 @@ def ModelController(
         """Advance the model by the number of steps specified by the render_interval slider."""
         if playing.value:
             for _ in range(render_interval.value):
+                print("model step:",model.value.steps)
                 model.value.step()
                 running.value = model.value.running
                 if not playing.value:
                     break
 
             if not use_threads.value:
+                print("rendering")
                 force_update()
+                print("renderedd")
 
         else:
             for _ in range(render_interval.value):
                 model.value.step()
+                print("model step:",model.value.steps)
                 running.value = model.value.running
             force_update()
 
