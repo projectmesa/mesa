@@ -1,10 +1,13 @@
 """Altair based solara components for visualization mesa spaces."""
-
+import contextlib
 import warnings
 from collections.abc import Callable
 
 import solara
 
+with contextlib.suppress(ImportError):
+    import altair as alt
+    
 from mesa.experimental.cell_space import DiscreteSpace, Grid
 from mesa.space import ContinuousSpace, _Grid
 from mesa.visualization.utils import update_counter
@@ -20,6 +23,18 @@ def make_space_altair(*args, **kwargs):  # noqa: D103
 
 
 def make_altair_space_component(*args, **kwargs):
+    """Create an Altair-based space visualization component.
+
+    Args:
+        *args: Positional arguments passed to make_altair_space
+        **kwargs: Keyword arguments passed to make_altair_space
+
+    Returns:
+        function: A function that creates an Altair space visualization component
+
+    See Also:
+        make_altair_space: The underlying implementation
+    """
     return make_altair_space(*args, **kwargs)
 
 
