@@ -9,10 +9,10 @@ for a paper.
 import contextlib
 import itertools
 import warnings
-from collections.abc import Callable
-from itertools import pairwise
-from typing import Any, Iterator
+from collections.abc import Callable, Iterator
 from functools import lru_cache
+from itertools import pairwise
+from typing import Any
 
 import networkx as nx
 import numpy as np
@@ -177,13 +177,13 @@ def _get_hex_vertices(
 
 
 @lru_cache(maxsize=1024, typed=True)
-def _get_hexmesh(width: int, height: int, size: float) -> Iterator[list[tuple[float, float]]]:
-    """
-    Generate hexagon vertices for the mesh. Yields list of vertex coordinates for each hexagon
-    """
+def _get_hexmesh(
+    width: int, height: int, size: float
+) -> Iterator[list[tuple[float, float]]]:
+    """Generate hexagon vertices for the mesh. Yields list of vertex coordinates for each hexagon."""
     x_spacing = np.sqrt(3) * size
     y_spacing = 1.5 * size
-    
+
     for row, col in itertools.product(range(height), range(width)):
         # Calculate center position with offset for even rows
         x = col * x_spacing + (row % 2 == 0) * (x_spacing / 2)
@@ -207,7 +207,6 @@ def draw_property_layers(
         so you can do `{"some_layer":{"colormap":'viridis', 'alpha':.25, "colorbar":False}}`
 
     """
-
     try:
         # old style spaces
         property_layers = space.properties
@@ -419,7 +418,7 @@ def draw_hex_grid(
                 # Sort vertices to ensure consistent edge representation
                 edge = tuple(sorted([tuple(np.round(v1, 6)), tuple(np.round(v2, 6))]))
                 edges.add(edge)
-        
+
         return LineCollection(edges, linestyle=":", color="black", linewidth=1, alpha=1)
 
     if draw_grid:
