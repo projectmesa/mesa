@@ -11,7 +11,8 @@ import itertools
 import warnings
 from collections.abc import Callable
 from itertools import pairwise
-from typing import Any
+from typing import Any, Iterator
+from functools import lru_cache
 
 import networkx as nx
 import numpy as np
@@ -175,6 +176,21 @@ def _get_hex_vertices(
     return vertices
 
 
+@lru_cache(maxsize=1024, typed=True)
+def _get_hexmesh(width: int, height: int, size: float) -> Iterator[list[tuple[float, float]]]:
+    """
+    Generate hexagon vertices for the mesh. Yields list of vertex coordinates for each hexagon
+    """
+    x_spacing = np.sqrt(3) * size
+    y_spacing = 1.5 * size
+    
+    for row, col in itertools.product(range(height), range(width)):
+        # Calculate center position with offset for even rows
+        x = col * x_spacing + (row % 2 == 0) * (x_spacing / 2)
+        y = row * y_spacing
+        yield _get_hex_vertices(x, y, size)
+
+
 def draw_property_layers(
     space, propertylayer_portrayal: dict[str, dict[str, Any]], ax: Axes
 ):
@@ -192,32 +208,12 @@ def draw_property_layers(
 
     """
 
-    def get_hexmesh(width: int, height: int) -> list[list[tuple[float, float]]]:
-        """Create hexagon vertices for the mesh."""
-        hexagons = []
-        size = 1
-        x_spacing = np.sqrt(3) * size
-        y_spacing = 1.5 * size
-
-        for row in range(height):
-            for col in range(width):
-                # Calculate center position with offset for even rows
-                x = col * x_spacing + (row % 2 == 0) * (x_spacing / 2)
-                y = row * y_spacing
-                vertices = _get_hex_vertices(x, y, size)
-                hexagons.append(vertices)
-
-        return hexagons
-
     try:
         # old style spaces
         property_layers = space.properties
     except AttributeError:
         # new style spaces
         property_layers = space._mesa_property_layers
-
-    # Check space type once
-    is_hex_grid = isinstance(space, HexGrid)
 
     for layer_name, portrayal in propertylayer_portrayal.items():
         layer = property_layers.get(layer_name, None)
@@ -259,28 +255,7 @@ def draw_property_layers(
                 f"PropertyLayer {layer_name} portrayal must include 'color' or 'colormap'."
             )
 
-        if is_hex_grid:
-            width, height = data.shape
-
-            # Generate hexagon mesh
-            hexagons = get_hexmesh(width, height)
-
-            # Normalize colors
-            norm = Normalize(vmin=vmin, vmax=vmax)
-            colors = data.ravel()  # flatten data to 1D array
-
-            if "color" in portrayal:
-                normalized_colors = np.clip(norm(colors), 0, 1)
-                rgba_colors = np.full((len(colors), 4), rgba_color)
-                rgba_colors[:, 3] = normalized_colors * alpha
-            else:
-                rgba_colors = cmap(norm(colors))
-
-            # Draw hexagons
-            collection = PolyCollection(hexagons, facecolors=rgba_colors, zorder=-1)
-            ax.add_collection(collection)
-        else:
-            # Rectangular grid rendering
+        if isinstance(space, OrthogonalGrid):
             if "color" in portrayal:
                 data = data.T
                 normalized_data = (data - vmin) / (vmax - vmin)
@@ -297,6 +272,32 @@ def draw_property_layers(
                     vmax=vmax,
                     origin="lower",
                 )
+
+        elif isinstance(space, HexGrid):
+            width, height = data.shape
+
+            # Generate hexagon mesh
+            hexagons = _get_hexmesh(width, height, size=1)
+
+            # Normalize colors
+            norm = Normalize(vmin=vmin, vmax=vmax)
+            colors = data.ravel()  # flatten data to 1D array
+
+            if "color" in portrayal:
+                normalized_colors = np.clip(norm(colors), 0, 1)
+                rgba_colors = np.full((len(colors), 4), rgba_color)
+                rgba_colors[:, 3] = normalized_colors * alpha
+            else:
+                rgba_colors = cmap(norm(colors))
+
+            # Draw hexagons
+            collection = PolyCollection(hexagons, facecolors=rgba_colors, zorder=-1)
+            ax.add_collection(collection)
+
+        else:
+            raise NotImplementedError(
+                f"PropertyLayer visualization not implemented for {type(space)}."
+            )
 
         # Add colorbar if requested
         if colorbar:
@@ -410,24 +411,15 @@ def draw_hex_grid(
         """Helper function for creating the hexmesh with unique edges."""
         edges = set()
         size = 1.0
-        x_spacing = np.sqrt(3) * size
-        y_spacing = 1.5 * size
 
         # Generate edges for each hexagon
-        for row, col in itertools.product(range(height), range(width)):
-            # Calculate center position for each hexagon with offset for even rows
-            x = col * x_spacing + (row % 2 == 0) * (x_spacing / 2)
-            y = row * y_spacing
-
-            vertices = _get_hex_vertices(x, y, size)
-
+        for vertices in _get_hexmesh(width, height, size):
             # Edge logic, connecting each vertex to the next
             for v1, v2 in pairwise([*vertices, vertices[0]]):
-                # Sort vertices to ensure consistent edge representation and avoid duplicates.
+                # Sort vertices to ensure consistent edge representation
                 edge = tuple(sorted([tuple(np.round(v1, 6)), tuple(np.round(v2, 6))]))
                 edges.add(edge)
-
-        # Return LineCollection for hexmesh
+        
         return LineCollection(edges, linestyle=":", color="black", linewidth=1, alpha=1)
 
     if draw_grid:
