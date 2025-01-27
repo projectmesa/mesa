@@ -6,7 +6,6 @@ from collections.abc import Callable
 
 import solara
 
-alt = None
 with contextlib.suppress(ImportError):
     import altair as alt
 
