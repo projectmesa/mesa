@@ -9,6 +9,7 @@ import solara
 import mesa
 import mesa.visualization.components.altair_components
 import mesa.visualization.components.matplotlib_components
+from mesa.space import MultiGrid
 from mesa.visualization.components.altair_components import make_altair_space
 from mesa.visualization.components.matplotlib_components import make_mpl_space_component
 from mesa.visualization.solara_viz import (
@@ -102,17 +103,22 @@ def test_call_space_drawer(mocker):  # noqa: D103
         mesa.visualization.components.altair_components, "SpaceAltair"
     )
 
+    class MockAgent(mesa.Agent):
+        def __init__(self, model):
+            super().__init__(model)
+
     class MockModel(mesa.Model):
         def __init__(self, seed=None):
             super().__init__(seed=seed)
+            self.grid = MultiGrid(width=10, height=10, torus=True)
+            a = MockAgent(self)
+            self.grid.place_agent(a, (5, 5))
 
     model = MockModel()
-    mocker.patch.object(mesa.Model, "__init__", return_value=None)
 
-    agent_portrayal = {
-        "marker": "circle",
-        "color": "gray",
-    }
+    def agent_portrayal(agent):
+        return {"marker": "o", "color": "gray"}
+
     propertylayer_portrayal = None
     # initialize with space drawer unspecified (use default)
     # component must be rendered for code to run
@@ -132,13 +138,11 @@ def test_call_space_drawer(mocker):  # noqa: D103
     solara.render(SolaraViz(model))
     # should call default method with class instance and agent portrayal
     assert mock_space_matplotlib.call_count == 0
-    assert mock_space_altair.call_count == 0
+    assert mock_space_altair.call_count == 1  # altair is the default method
 
     # checking if SpaceAltair is working as intended with post_process
-    def mock_post_process(chart):
-        return chart.configure_legend(titleFontSize=14, labelFontSize=12)
 
-    mock_post_process_spy = mocker.spy(mock_post_process, "__call__")
+    mock_post_process = mocker.MagicMock()
     solara.render(
         SolaraViz(
             model,
@@ -146,21 +150,21 @@ def test_call_space_drawer(mocker):  # noqa: D103
                 make_altair_space(
                     agent_portrayal,
                     propertylayer_portrayal,
-                    post_process=mock_post_process,
+                    mock_post_process,
                 )
             ],
         )
     )
 
-    mock_space_altair.assert_called_with(
-        model, agent_portrayal, propertylayer_portrayal, post_process=mock_post_process
-    )
-    mock_post_process_spy.assert_called_once()
+    args, kwargs = mock_space_altair.call_args
+    assert args == (model, agent_portrayal)
+    assert kwargs == {"post_process": mock_post_process}
+    mock_post_process.assert_called_once()
     assert mock_space_matplotlib.call_count == 0
 
     mock_space_altair.reset_mock()
     mock_space_matplotlib.reset_mock()
-    mock_post_process_spy.reset_mock()
+    mock_post_process.reset_mock()
 
     # specify a custom space method
     class AltSpace:
