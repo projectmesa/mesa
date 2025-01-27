@@ -53,6 +53,7 @@ network = [
 viz = [
   "matplotlib",
   "solara",
+  "altair",
 ]
 # Dev and CI stuff
 dev = [
