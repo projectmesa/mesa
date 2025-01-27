@@ -121,7 +121,7 @@ def PlotAltair(
             .mark_line()
         )
 
-    elif isinstance(measure, (list, tuple)):
+    elif isinstance(measure, list | tuple):
         # Multiple measures - melt dataframe
         value_vars = list(measure)
         melted_df = df.melt(
