@@ -160,27 +160,27 @@ def draw_space(
     return ax
 
 
-# Helper function for getting the vertices of a hexagon given the center and size
-def _get_hex_vertices(
-    center_x: float, center_y: float, size: float
-) -> list[tuple[float, float]]:
-    """Get vertices for a hexagon centered at (center_x, center_y)."""
-    vertices = [
-        (center_x, center_y + size),  # top
-        (center_x + size * np.sqrt(3) / 2, center_y + size / 2),  # top right
-        (center_x + size * np.sqrt(3) / 2, center_y - size / 2),  # bottom right
-        (center_x, center_y - size),  # bottom
-        (center_x - size * np.sqrt(3) / 2, center_y - size / 2),  # bottom left
-        (center_x - size * np.sqrt(3) / 2, center_y + size / 2),  # top left
-    ]
-    return vertices
-
-
 @lru_cache(maxsize=1024, typed=True)
 def _get_hexmesh(
-    width: int, height: int, size: float
+    width: int, height: int, size: float = 1.0
 ) -> Iterator[list[tuple[float, float]]]:
     """Generate hexagon vertices for the mesh. Yields list of vertex coordinates for each hexagon."""
+
+    # Helper function for getting the vertices of a hexagon given the center and size
+    def _get_hex_vertices(
+        center_x: float, center_y: float, size: float = 1.0
+    ) -> list[tuple[float, float]]:
+        """Get vertices for a hexagon centered at (center_x, center_y)."""
+        vertices = [
+            (center_x, center_y + size),  # top
+            (center_x + size * np.sqrt(3) / 2, center_y + size / 2),  # top right
+            (center_x + size * np.sqrt(3) / 2, center_y - size / 2),  # bottom right
+            (center_x, center_y - size),  # bottom
+            (center_x - size * np.sqrt(3) / 2, center_y - size / 2),  # bottom left
+            (center_x - size * np.sqrt(3) / 2, center_y + size / 2),  # top left
+        ]
+        return vertices
+
     x_spacing = np.sqrt(3) * size
     y_spacing = 1.5 * size
 
@@ -276,7 +276,7 @@ def draw_property_layers(
             width, height = data.shape
 
             # Generate hexagon mesh
-            hexagons = _get_hexmesh(width, height, size=1)
+            hexagons = _get_hexmesh(width, height)
 
             # Normalize colors
             norm = Normalize(vmin=vmin, vmax=vmax)
@@ -409,13 +409,12 @@ def draw_hex_grid(
     def setup_hexmesh(width, height):
         """Helper function for creating the hexmesh with unique edges."""
         edges = set()
-        size = 1.0
 
         # Generate edges for each hexagon
-        for vertices in _get_hexmesh(width, height, size):
+        for vertices in _get_hexmesh(width, height):
             # Edge logic, connecting each vertex to the next
             for v1, v2 in pairwise([*vertices, vertices[0]]):
-                # Sort vertices to ensure consistent edge representation
+                # Sort vertices to ensure consistent edge representation and avoid duplicates.
                 edge = tuple(sorted([tuple(np.round(v1, 6)), tuple(np.round(v2, 6))]))
                 edges.add(edge)
 
