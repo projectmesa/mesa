@@ -76,6 +76,7 @@ docs = [
   "seaborn",
   "myst-nb",
   "myst-parser",  # Markdown in Sphinx
+  "sphinx-copybutton", # Add a copy option in docs
 ]
 
 [project.urls]
