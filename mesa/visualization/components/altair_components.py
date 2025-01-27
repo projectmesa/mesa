@@ -1,13 +1,10 @@
 """Altair based solara components for visualization mesa spaces."""
 
-import contextlib
 import warnings
 from collections.abc import Callable
 
 import solara
 
-with contextlib.suppress(ImportError):
-    import altair as alt
 
 from mesa.experimental.cell_space import DiscreteSpace, Grid
 from mesa.space import ContinuousSpace, _Grid
