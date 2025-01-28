@@ -9,7 +9,7 @@ for a paper.
 import contextlib
 import itertools
 import warnings
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 from functools import lru_cache
 from itertools import pairwise
 from typing import Any
@@ -163,7 +163,7 @@ def draw_space(
 @lru_cache(maxsize=1024, typed=True)
 def _get_hexmesh(
     width: int, height: int, size: float = 1.0
-) -> Iterator[list[tuple[float, float]]]:
+) -> list[tuple[float, float]]:
     """Generate hexagon vertices for the mesh. Yields list of vertex coordinates for each hexagon."""
 
     # Helper function for getting the vertices of a hexagon given the center and size
@@ -183,12 +183,15 @@ def _get_hexmesh(
 
     x_spacing = np.sqrt(3) * size
     y_spacing = 1.5 * size
+    hexagons = []
 
     for row, col in itertools.product(range(height), range(width)):
         # Calculate center position with offset for even rows
         x = col * x_spacing + (row % 2 == 0) * (x_spacing / 2)
         y = row * y_spacing
-        yield _get_hex_vertices(x, y, size)
+        hexagons.append(_get_hex_vertices(x, y, size))
+
+    return hexagons
 
 
 def draw_property_layers(
@@ -411,7 +414,8 @@ def draw_hex_grid(
         edges = set()
 
         # Generate edges for each hexagon
-        for vertices in _get_hexmesh(width, height):
+        hexagons = _get_hexmesh(width, height)
+        for vertices in hexagons:
             # Edge logic, connecting each vertex to the next
             for v1, v2 in pairwise([*vertices, vertices[0]]):
                 # Sort vertices to ensure consistent edge representation and avoid duplicates.
