@@ -38,6 +38,7 @@ dependencies = [
   "numpy",
   "pandas",
   "tqdm",
+  "scipy"
 ]
 dynamic = ["version"]
 
@@ -75,14 +76,12 @@ docs = [
   "seaborn",
   "myst-nb",
   "myst-parser",  # Markdown in Sphinx
+  "sphinx-copybutton", # Add a copy option in docs
 ]
 
 [project.urls]
 homepage = "https://github.com/projectmesa/mesa"
 repository = "https://github.com/projectmesa/mesa"
-
-[project.scripts]
-mesa = "mesa.main:cli"
 
 [tool.hatch.build.targets.wheel]
 packages = ["mesa"]

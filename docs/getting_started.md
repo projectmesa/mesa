@@ -68,7 +68,6 @@ model.step()
 
 You should see agents 1-5, activated in random order. See the [tutorial](tutorials/intro_tutorial) or API documentation for more detail on how to add model functionality.
 
-To bootstrap a new model install mesa and run `mesa startproject`
 
 ### AgentSet and model.agents
 Mesa 3.0 makes `model.agents` and the AgentSet class central in managing and activating agents.
@@ -189,8 +188,8 @@ class MyModel(Model):
     def __init__(self, n_agents=10, seed=None):
         super().__init__(seed=seed)
         # Initialize the model with N agents
-
-The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace
+```
+The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace.
 
 Here's a basic example of how to set up a visualization:
 
