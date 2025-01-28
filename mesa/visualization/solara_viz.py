@@ -268,9 +268,13 @@ def ModelController(
             finally:
                 loop.close()
 
-    solara.lab.use_task(step, dependencies=[playing.value, running.value],prefer_threaded=True)
+    solara.lab.use_task(
+        step, dependencies=[playing.value, running.value], prefer_threaded=True
+    )
 
-    solara.lab.use_task(vis, dependencies=[playing.value,running.value],prefer_threaded=True)
+    solara.use_thread(
+        vis, dependencies=[playing.value, running.value], prefer_threaded=True
+    )
 
     @function_logger(__name__)
     def do_step():
@@ -341,6 +345,7 @@ def SimulatorController(
         play_interval: Interval for playing the model steps in milliseconds.
         render_interval: Controls how often the plots are updated during simulation steps.Higher values reduce update frequency.
         use_threads: Flag for indicating whether to utilize multi-threading for model execution.
+
     Notes:
         The `step button` increments the step by the value specified in the `render_interval` slider.
         This behavior ensures synchronization between simulation steps and plot updates.
@@ -375,8 +380,8 @@ def SimulatorController(
 
     solara.lab.use_task(step, dependencies=[playing.value, running.value])
 
-    solara.use_thread(vis, dependencies=[playing.value,running.value])
-    
+    solara.use_thread(vis, dependencies=[playing.value, running.value])
+
     def do_step():
         """Advance the model by the number of steps specified by the render_interval slider."""
         simulator.run_for(render_interval.value)
