@@ -237,7 +237,7 @@ def ModelController(
     if model_parameters is None:
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
-    pause_vis_event = threading.Event()
+    visualization_pause_event = threading.Event()
 
     def step():
         try:
@@ -247,24 +247,24 @@ def ModelController(
                 time.sleep(play_interval.value / 1000)
                 do_step()
                 if use_threads.value:
-                    pause_vis_event.set()
+                    visualization_pause_event.set()
         except asyncio.CancelledError:
             print("Step task was cancelled.")
             return
         finally:
             loop.close()
 
-    def vis():
+    def visualization_task():
         if use_threads.value:
             try:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 while playing.value and running.value:
-                    pause_vis_event.wait()
-                    pause_vis_event.clear()
+                    visualization_pause_event.wait()
+                    visualization_pause_event.clear()
                     force_update()
             except Exception as e:
-                print(f"Error in vis task: {e}")
+                print(f"Error in visualization_task task: {e}")
             finally:
                 loop.close()
 
@@ -273,7 +273,9 @@ def ModelController(
     )
 
     solara.use_thread(
-        vis, dependencies=[playing.value, running.value], prefer_threaded=True
+        visualization_task,
+        dependencies=[playing.value, running.value],
+        prefer_threaded=True,
     )
 
     @function_logger(__name__)
@@ -355,7 +357,7 @@ def SimulatorController(
     if model_parameters is None:
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
-    pause_vis_event = threading.Event()
+    visualization_pause_event = threading.Event()
 
     def step():
         try:
@@ -363,24 +365,24 @@ def SimulatorController(
                 time.sleep(play_interval.value / 1000)
                 do_step()
                 if use_threads.value:
-                    pause_vis_event.set()
+                    visualization_pause_event.set()
         except asyncio.CancelledError:
             print("Step task was cancelled.")
             return
 
-    def vis():
+    def visualization_task():
         if use_threads.value:
             try:
                 while playing.value and running.value:
-                    pause_vis_event.wait()
-                    pause_vis_event.clear()
+                    visualization_pause_event.wait()
+                    visualization_pause_event.clear()
                     force_update()
             except Exception as e:
-                print(f"Error in vis task: {e}")
+                print(f"Error in visualization_task: {e}")
 
     solara.lab.use_task(step, dependencies=[playing.value, running.value])
 
-    solara.use_thread(vis, dependencies=[playing.value, running.value])
+    solara.use_thread(visualization_task, dependencies=[playing.value, running.value])
 
     def do_step():
         """Advance the model by the number of steps specified by the render_interval slider."""
