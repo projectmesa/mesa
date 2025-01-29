@@ -1,8 +1,8 @@
-name: example-environment
+name: mesa-tutorials
 channels:
   - conda-forge
 dependencies:
-  - python
+  - python=3.9
   - numpy
   - pip
   - pip:
@@ -11,4 +11,4 @@ dependencies:
     - matplotlib
     - seaborn
     - solara
-    - mesa[rec]==3.0.0b1
+    - mesa[rec]
