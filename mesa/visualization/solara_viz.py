@@ -373,8 +373,6 @@ def SimulatorController(
                 if use_threads.value:
                     visualization_pause_event.set()
 
-
-
         except asyncio.CancelledError:
             print("Step task was cancelled.")
             return
@@ -398,11 +396,7 @@ def SimulatorController(
     # h216 result error?
     solara.lab.use_task(step, dependencies=[playing.value, running.value])
 
-
     solara.use_thread(visualization_task, dependencies=[playing.value])
-
-
-
 
     def do_step():
         """Advance the model by the number of steps specified by the render_interval slider."""
