@@ -8,13 +8,7 @@ def agent_portrayal(agent):
 
 
 propertylayer_portrayal = {
-    "sugar": {
-        "color": "blue",
-        "alpha": 0.8,
-        "colorbar": True,
-        "vmin": 0,
-        "vmax": 10,
-    },
+    "sugar": {"color": "blue", "alpha": 0.8, "colorbar": True, "vmin": 0, "vmax": 10},
     "spice": {"color": "red", "alpha": 0.8, "colorbar": True, "vmin": 0, "vmax": 10},
 }
 
