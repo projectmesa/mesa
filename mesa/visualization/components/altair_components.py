@@ -1,16 +1,19 @@
 """Altair based solara components for visualization mesa spaces."""
 
 import contextlib
+import math
 import warnings
 from collections.abc import Callable
 
 import solara
 
+import mesa
+
 with contextlib.suppress(ImportError):
     import altair as alt
 
-from mesa.experimental.cell_space import DiscreteSpace, Grid
-from mesa.space import ContinuousSpace, _Grid
+from mesa.experimental.cell_space import Grid, HexGrid
+from mesa.space import ContinuousSpace, NetworkGrid, _Grid
 from mesa.visualization.utils import update_counter
 
 
@@ -52,7 +55,6 @@ def make_altair_space(
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
     "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
-
 
     Returns:
         function: A function that creates a SpaceMatplotlib component
@@ -192,90 +194,103 @@ def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):
     solara.FigureAltair(chart)
 
 
-def _get_agent_data_old__discrete_space(space, agent_portrayal):
-    """Format agent portrayal data for old-style discrete spaces.
+def axial_to_pixel(q, r, size=1):
+    """Convert axial coordinates (q, r) to pixel coordinates for hexagonal grid."""
+    x = size * math.sqrt(3) * (q + r / 2)
+    y = size * 1.5 * r
+    return x, y
+
+
+def get_agent_data(space, agent_portrayal):
+    """Generic method to extract agent data for visualization across all space types.
 
     Args:
-        space: the mesa.space._Grid instance
-        agent_portrayal: the agent portrayal callable
+        space: Mesa space object
+        agent_portrayal: Function defining agent visualization properties
 
     Returns:
-        list of dicts
-
-    """
-    all_agent_data = []
-    for content, (x, y) in space.coord_iter():
-        if not content:
-            continue
-        if not hasattr(content, "__iter__"):
-            # Is a single grid
-            content = [content]  # noqa: PLW2901
-        for agent in content:
-            # use all data from agent portrayal, and add x,y coordinates
-            agent_data = agent_portrayal(agent)
-            agent_data["x"] = x
-            agent_data["y"] = y
-            all_agent_data.append(agent_data)
-    return all_agent_data
-
-
-def _get_agent_data_new_discrete_space(space: DiscreteSpace, agent_portrayal):
-    """Format agent portrayal data for new-style discrete spaces.
-
-    Args:
-        space: the mesa.experiment.cell_space.Grid instance
-        agent_portrayal: the agent portrayal callable
-
-    Returns:
-        list of dicts
-
+        List of agent data dictionaries with coordinates
     """
     all_agent_data = []
 
-    for cell in space.all_cells:
-        for agent in cell.agents:
-            agent_data = agent_portrayal(agent)
-            agent_data["x"] = cell.coordinate[0]
-            agent_data["y"] = cell.coordinate[1]
-            all_agent_data.append(agent_data)
-    return all_agent_data
+    # New DiscreteSpace
+    if isinstance(space, Grid):
+        for cell in space.all_cells:
+            for agent in cell.agents:
+                data = agent_portrayal(agent)
+                data.update({"x": cell.coordinate[0], "y": cell.coordinate[1]})
+                all_agent_data.append(data)
 
+    # Legacy Grid
+    elif isinstance(space, _Grid):
+        for content, (x, y) in space.coord_iter():
+            if not content:
+                continue
+            agents = [content] if not hasattr(content, "__iter__") else content
+            for agent in agents:
+                data = agent_portrayal(agent)
+                data.update({"x": x, "y": y})
+                all_agent_data.append(data)
 
-def _get_agent_data_continuous_space(space: ContinuousSpace, agent_portrayal):
-    """Format agent portrayal data for continuous space.
+    elif isinstance(space, HexGrid):
+        for content, (q, r) in space.coord_iter():
+            if content:
+                for agent in content:
+                    data = agent_portrayal(agent)
+                    x, y = axial_to_pixel(q, r)
+                    data.update({"x": x, "y": y})
+                    all_agent_data.append(data)
 
-    Args:
-        space: the ContinuousSpace instance
-        agent_portrayal: the agent portrayal callable
+    elif isinstance(space, NetworkGrid):
+        for node in space.G.nodes():
+            agents = space.G.nodes[node].get("agent", [])
+            if isinstance(agents, list):
+                agent_list = agents
+            else:
+                agent_list = [agents] if agents else []
 
-    Returns:
-        list of dicts
-    """
-    all_agent_data = []
-    for agent in space._agent_to_index:
-        agent_data = agent_portrayal(agent)
-        agent_data["x"] = agent.pos[0]
-        agent_data["y"] = agent.pos[1]
-        all_agent_data.append(agent_data)
+            for agent in agent_list:
+                if agent:
+                    pos = space.G.nodes[node].get("pos", (0, 0))
+                    data = agent_portrayal(agent)
+                    data.update({"x": pos[0], "y": pos[1]})
+                    all_agent_data.append(data)
+
+    elif isinstance(
+        space, ContinuousSpace | mesa.experimental.continuous_space.ContinuousSpace
+    ):
+        for agent in space.agents:
+            data = agent_portrayal(agent)
+            data.update({"x": agent.pos[0], "y": agent.pos[1]})
+            all_agent_data.append(data)
+
+    else:
+        raise NotImplementedError(f"Unsupported space type: {type(space)}")
+
     return all_agent_data
 
 
 def _draw_grid(space, agent_portrayal):
-    match space:
-        case Grid():
-            all_agent_data = _get_agent_data_new_discrete_space(space, agent_portrayal)
-        case _Grid():
-            all_agent_data = _get_agent_data_old__discrete_space(space, agent_portrayal)
-        case ContinuousSpace():
-            all_agent_data = _get_agent_data_continuous_space(space, agent_portrayal)
-        case _:
-            raise NotImplementedError(
-                f"visualizing {type(space)} is currently not supported through altair"
-            )
+    """Create Altair visualization for any supported space type."""
+    all_agent_data = get_agent_data(space, agent_portrayal)
+
+    # Handle empty state
+    if not all_agent_data:
+        return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
 
     invalid_tooltips = ["color", "size", "x", "y"]
 
-    x_y_type = "ordinal" if not isinstance(space, ContinuousSpace) else "nominal"
+    x_y_type = (
+        "quantitative"
+        if isinstance(
+            space,
+            ContinuousSpace
+            | HexGrid
+            | NetworkGrid
+            | mesa.experimental.continuous_space.ContinuousSpace,
+        )
+        else "ordinal"
+    )
 
     encoding_dict = {
         # no x-axis label
@@ -283,7 +298,7 @@ def _draw_grid(space, agent_portrayal):
         # no y-axis label
         "y": alt.Y("y", axis=None, type=x_y_type),
         "tooltip": [
-            alt.Tooltip(key, type=alt.utils.infer_vegalite_type([value]))
+            alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
             for key, value in all_agent_data[0].items()
             if key not in invalid_tooltips
         ],
@@ -305,7 +320,7 @@ def _draw_grid(space, agent_portrayal):
     )
     # This is the default value for the marker size, which auto-scales
     # according to the grid area.
-    if not has_size:
+    if not has_size and isinstance(space, _Grid | Grid):
         length = min(space.width, space.height)
         chart = chart.mark_point(size=30000 / length**2, filled=True)
 
