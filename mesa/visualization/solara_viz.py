@@ -264,7 +264,7 @@ def ModelController(
                     visualization_pause_event.clear()
                     force_update()
             except Exception as e:
-                print(f"Error in visualization_task task: {e}")
+                print(f"Error in visualization_task: {e}")
             finally:
                 loop.close()
 
@@ -275,7 +275,6 @@ def ModelController(
     solara.use_thread(
         visualization_task,
         dependencies=[playing.value, running.value],
-        prefer_threaded=True,
     )
 
     @function_logger(__name__)
@@ -301,6 +300,7 @@ def ModelController(
         """Reset the model to its initial state."""
         playing.value = False
         running.value = True
+        visualization_pause_event.clear()
         _mesa_logger.log(
             10,
             f"creating new {model.value.__class__} instance with {model_parameters.value}",
@@ -358,14 +358,23 @@ def SimulatorController(
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
     visualization_pause_event = threading.Event()
+    pause_step_event = threading.Event()
 
     def step():
         try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
             while running.value and playing.value:
                 time.sleep(play_interval.value / 1000)
+                if use_threads.value:
+                    pause_step_event.wait()
+                    pause_step_event.clear()
                 do_step()
                 if use_threads.value:
                     visualization_pause_event.set()
+
+
+
         except asyncio.CancelledError:
             print("Step task was cancelled.")
             return
@@ -373,22 +382,44 @@ def SimulatorController(
     def visualization_task():
         if use_threads.value:
             try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                pause_step_event.set()
                 while playing.value and running.value:
                     visualization_pause_event.wait()
                     visualization_pause_event.clear()
                     force_update()
+                    pause_step_event.set()
             except Exception as e:
                 print(f"Error in visualization_task: {e}")
+            finally:
+                loop.close()
 
+    # h216 result error?
     solara.lab.use_task(step, dependencies=[playing.value, running.value])
 
-    solara.use_thread(visualization_task, dependencies=[playing.value, running.value])
+
+    solara.use_thread(visualization_task, dependencies=[playing.value])
+
+
+
 
     def do_step():
         """Advance the model by the number of steps specified by the render_interval slider."""
-        simulator.run_for(render_interval.value)
-        running.value = model.value.running
-        force_update()
+        if playing.value:
+            for _ in range(render_interval.value):
+                simulator.run_for(1)
+                running.value = model.value.running
+                if not playing.value:
+                    break
+            if not use_threads.value:
+                force_update()
+
+        else:
+            for _ in range(render_interval.value):
+                simulator.run_for(1)
+                running.value = model.value.running
+            force_update()
 
     def do_reset():
         """Reset the model to its initial state."""
