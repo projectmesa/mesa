@@ -2,6 +2,7 @@
 
 import contextlib
 import math
+
 import warnings
 from collections.abc import Callable
 
@@ -16,6 +17,7 @@ with contextlib.suppress(ImportError):
 
 from mesa.experimental.cell_space import Grid
 from mesa.space import ContinuousSpace, NetworkGrid, _Grid
+
 from mesa.visualization.utils import update_counter
 
 
@@ -102,6 +104,7 @@ def make_altair_plot_component(
 
 
 @solara.component
+
 def PlotAltair(
     model,
     measure: str | dict[str, str] | list[str] | tuple[str],
