@@ -248,8 +248,8 @@ def ModelController(
                 do_step()
                 if use_threads.value:
                     visualization_pause_event.set()
-        except asyncio.CancelledError:
-            print("Step task was cancelled.")
+        except Exception as e:
+            print(f"Error in step: {e}")
             return
         finally:
             loop.close()
@@ -372,10 +372,10 @@ def SimulatorController(
                 do_step()
                 if use_threads.value:
                     visualization_pause_event.set()
-
-        except asyncio.CancelledError:
-            print("Step task was cancelled.")
-            return
+        except Exception as e:
+            print(f"Error in step: {e}")
+        finally:
+            loop.close()
 
     def visualization_task():
         if use_threads.value:
@@ -390,13 +390,14 @@ def SimulatorController(
                     pause_step_event.set()
             except Exception as e:
                 print(f"Error in visualization_task: {e}")
+                return
             finally:
                 loop.close()
 
-    # h216 result error?
-    solara.lab.use_task(step, dependencies=[playing.value, running.value])
-
-    solara.use_thread(visualization_task, dependencies=[playing.value])
+    solara.lab.use_task(
+        step, dependencies=[playing.value, running.value], prefer_threaded=False
+    )
+    solara.lab.use_task(visualization_task, dependencies=[playing.value])
 
     def do_step():
         """Advance the model by the number of steps specified by the render_interval slider."""
@@ -420,6 +421,8 @@ def SimulatorController(
         playing.value = False
         running.value = True
         simulator.reset()
+        visualization_pause_event.clear()
+        pause_step_event.clear()
         model.value = model.value = model.value.__class__(
             simulator=simulator, **model_parameters.value
         )
