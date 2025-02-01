@@ -143,7 +143,9 @@ def draw_space(
             | OrthogonalVonNeumannGrid()
             | mesa.space.MultiGrid()
         ):
-            draw_orthogonal_grid(space, agent_portrayal, ax=ax_grid, **space_drawing_kwargs)
+            draw_orthogonal_grid(
+                space, agent_portrayal, ax=ax_grid, **space_drawing_kwargs
+            )
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
             draw_network(space, agent_portrayal, ax=ax_grid, **space_drawing_kwargs)
         case mesa.space.ContinuousSpace():
