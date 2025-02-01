@@ -1,15 +1,11 @@
 """Altair based solara components for visualization mesa spaces."""
 
-import contextlib
 import warnings
 
-import solara
-
-with contextlib.suppress(ImportError):
-    import altair as alt
-
+import altair as alt
 import numpy as np
 import pandas as pd
+import solara
 from matplotlib.colors import to_rgba
 
 import mesa.experimental
@@ -51,7 +47,9 @@ def make_altair_space(
             return {"id": a.unique_id}
 
     def MakeSpaceAltair(model):
-        return SpaceAltair(model, agent_portrayal, propertylayer_portrayal)
+        return SpaceAltair(
+            model, agent_portrayal, propertylayer_portrayal, post_process=post_process
+        )
 
     return MakeSpaceAltair
 
@@ -62,6 +60,7 @@ def SpaceAltair(
     agent_portrayal,
     propertylayer_portrayal,
     dependencies: list[any] | None = None,
+    post_process=None,
 ):
     """Create an Altair-based space visualization component.
 
@@ -75,6 +74,10 @@ def SpaceAltair(
         space = model.space
 
     chart = _draw_grid(space, agent_portrayal, propertylayer_portrayal)
+    # Apply post-processing if provided
+    if post_process is not None:
+        chart = post_process(chart)
+
     solara.FigureAltair(chart)
 
 
@@ -169,7 +172,7 @@ def _draw_grid(space, agent_portrayal, propertylayer_portrayal):
         # no y-axis label
         "y": alt.Y("y", axis=None, type=x_y_type),
         "tooltip": [
-            alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas(value))
+            alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
             for key, value in all_agent_data[0].items()
             if key not in invalid_tooltips
         ],
