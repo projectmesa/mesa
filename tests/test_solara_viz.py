@@ -157,7 +157,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
     )
 
     args, kwargs = mock_space_altair.call_args
-    assert args == (model, agent_portrayal)
+    assert args == (model, agent_portrayal, propertylayer_portrayal)
     assert kwargs == {"post_process": mock_post_process}
     mock_post_process.assert_called_once()
     assert mock_space_matplotlib.call_count == 0
