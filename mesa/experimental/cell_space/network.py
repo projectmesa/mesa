@@ -1,4 +1,16 @@
-"""A Network grid."""
+"""Network-based cell space using arbitrary connection patterns.
+
+Creates spaces where cells connect based on network relationships rather than
+spatial proximity. Built on NetworkX graphs, this enables:
+- Arbitrary connectivity patterns between cells
+- Graph-based neighborhood definitions
+- Logical rather than physical distances
+- Dynamic connectivity changes
+- Integration with NetworkX's graph algorithms
+
+Useful for modeling systems like social networks, transportation systems,
+or any environment where connectivity matters more than physical location.
+"""
 
 from random import Random
 from typing import Any

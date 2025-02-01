@@ -16,9 +16,9 @@ from mesa.experimental.cell_space import (
     Network,
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
+    PropertyLayer,
     VoronoiGrid,
 )
-from mesa.space import PropertyLayer
 
 
 def test_orthogonal_grid_neumann():
@@ -163,7 +163,7 @@ def test_orthogonal_grid_moore():
     for connection in grid._cells[(5, 5)].connections.values():
         # fmt: off
         assert connection.coordinate in {(4, 4), (4, 5), (4, 6),
-                                         (5, 4),         (5, 6),
+                                         (5, 4), (5, 6),
                                          (6, 4), (6, 5), (6, 6)}
         # fmt: on
 
@@ -175,7 +175,7 @@ def test_orthogonal_grid_moore():
     for connection in grid._cells[(0, 0)].connections.values():
         # fmt: off
         assert connection.coordinate in {(9, 9), (9, 0), (9, 1),
-                                         (0, 9),         (0, 1),
+                                         (0, 9), (0, 1),
                                          (1, 9), (1, 0), (1, 1)}
         # fmt: on
 
@@ -206,9 +206,12 @@ def test_orthogonal_grid_moore_3d():
     assert len(grid._cells[(5, 5, 5)].connections.values()) == 26
     for connection in grid._cells[(5, 5, 5)].connections.values():
         # fmt: off
-        assert connection.coordinate in {(4, 4, 4), (4, 4, 5), (4, 4, 6), (4, 5, 4), (4, 5, 5), (4, 5, 6), (4, 6, 4), (4, 6, 5), (4, 6, 6),
-                                         (5, 4, 4), (5, 4, 5), (5, 4, 6), (5, 5, 4),             (5, 5, 6), (5, 6, 4), (5, 6, 5), (5, 6, 6),
-                                         (6, 4, 4), (6, 4, 5), (6, 4, 6), (6, 5, 4), (6, 5, 5), (6, 5, 6), (6, 6, 4), (6, 6, 5), (6, 6, 6)}
+        assert connection.coordinate in {(4, 4, 4), (4, 4, 5), (4, 4, 6), (4, 5, 4), (4, 5, 5), (4, 5, 6), (4, 6, 4),
+                                         (4, 6, 5), (4, 6, 6),
+                                         (5, 4, 4), (5, 4, 5), (5, 4, 6), (5, 5, 4), (5, 5, 6), (5, 6, 4), (5, 6, 5),
+                                         (5, 6, 6),
+                                         (6, 4, 4), (6, 4, 5), (6, 4, 6), (6, 5, 4), (6, 5, 5), (6, 5, 6), (6, 6, 4),
+                                         (6, 6, 5), (6, 6, 6)}
         # fmt: on
 
     # Moore neighborhood, torus True, top corner
@@ -218,9 +221,12 @@ def test_orthogonal_grid_moore_3d():
     assert len(grid._cells[(0, 0, 0)].connections.values()) == 26
     for connection in grid._cells[(0, 0, 0)].connections.values():
         # fmt: off
-        assert connection.coordinate in {(9, 9, 9), (9, 9, 0), (9, 9, 1), (9, 0, 9), (9, 0, 0), (9, 0, 1), (9, 1, 9), (9, 1, 0), (9, 1, 1),
-                                         (0, 9, 9), (0, 9, 0), (0, 9, 1), (0, 0, 9),             (0, 0, 1), (0, 1, 9), (0, 1, 0), (0, 1, 1),
-                                         (1, 9, 9), (1, 9, 0), (1, 9, 1), (1, 0, 9), (1, 0, 0), (1, 0, 1), (1, 1, 9), (1, 1, 0), (1, 1, 1)}
+        assert connection.coordinate in {(9, 9, 9), (9, 9, 0), (9, 9, 1), (9, 0, 9), (9, 0, 0), (9, 0, 1), (9, 1, 9),
+                                         (9, 1, 0), (9, 1, 1),
+                                         (0, 9, 9), (0, 9, 0), (0, 9, 1), (0, 0, 9), (0, 0, 1), (0, 1, 9), (0, 1, 0),
+                                         (0, 1, 1),
+                                         (1, 9, 9), (1, 9, 0), (1, 9, 1), (1, 0, 9), (1, 0, 0), (1, 0, 1), (1, 1, 9),
+                                         (1, 1, 0), (1, 1, 1)}
         # fmt: on
 
 
@@ -262,15 +268,24 @@ def test_orthogonal_grid_moore_4d():
     assert len(grid._cells[(5, 5, 5, 5)].connections.values()) == 80
     for connection in grid._cells[(5, 5, 5, 5)].connections.values():
         # fmt: off
-        assert connection.coordinate in {(4, 4, 4, 4), (4, 4, 4, 5), (4, 4, 4, 6), (4, 4, 5, 4), (4, 4, 5, 5), (4, 4, 5, 6), (4, 4, 6, 4), (4, 4, 6, 5), (4, 4, 6, 6),
-                                         (4, 5, 4, 4), (4, 5, 4, 5), (4, 5, 4, 6), (4, 5, 5, 4), (4, 5, 5, 5), (4, 5, 5, 6), (4, 5, 6, 4), (4, 5, 6, 5), (4, 5, 6, 6),
-                                            (4, 6, 4, 4), (4, 6, 4, 5), (4, 6, 4, 6), (4, 6, 5, 4), (4, 6, 5, 5), (4, 6, 5, 6), (4, 6, 6, 4), (4, 6, 6, 5), (4, 6, 6, 6),
-                                            (5, 4, 4, 4), (5, 4, 4, 5), (5, 4, 4, 6), (5, 4, 5, 4), (5, 4, 5, 5), (5, 4, 5, 6), (5, 4, 6, 4), (5, 4, 6, 5), (5, 4, 6, 6),
-                                            (5, 5, 4, 4), (5, 5, 4, 5), (5, 5, 4, 6), (5, 5, 5, 4),             (5, 5, 5, 6), (5, 5, 6, 4), (5, 5, 6, 5), (5, 5, 6, 6),
-                                            (5, 6, 4, 4), (5, 6, 4, 5), (5, 6, 4, 6), (5, 6, 5, 4), (5, 6, 5, 5), (5, 6, 5, 6), (5, 6, 6, 4), (5, 6, 6, 5), (5, 6, 6, 6),
-                                            (6, 4, 4, 4), (6, 4, 4, 5), (6, 4, 4, 6), (6, 4, 5, 4), (6, 4, 5, 5), (6, 4, 5, 6), (6, 4, 6, 4), (6, 4, 6, 5), (6, 4, 6, 6),
-                                            (6, 5, 4, 4), (6, 5, 4, 5), (6, 5, 4, 6), (6, 5, 5, 4), (6, 5, 5, 5), (6, 5, 5, 6), (6, 5, 6, 4), (6, 5, 6, 5), (6, 5, 6, 6),
-                                            (6, 6, 4, 4), (6, 6, 4, 5), (6, 6, 4, 6), (6, 6, 5, 4), (6, 6, 5, 5), (6, 6, 5, 6), (6, 6, 6, 4), (6, 6, 6, 5), (6, 6, 6, 6)}
+        assert connection.coordinate in {(4, 4, 4, 4), (4, 4, 4, 5), (4, 4, 4, 6), (4, 4, 5, 4), (4, 4, 5, 5),
+                                         (4, 4, 5, 6), (4, 4, 6, 4), (4, 4, 6, 5), (4, 4, 6, 6),
+                                         (4, 5, 4, 4), (4, 5, 4, 5), (4, 5, 4, 6), (4, 5, 5, 4), (4, 5, 5, 5),
+                                         (4, 5, 5, 6), (4, 5, 6, 4), (4, 5, 6, 5), (4, 5, 6, 6),
+                                         (4, 6, 4, 4), (4, 6, 4, 5), (4, 6, 4, 6), (4, 6, 5, 4), (4, 6, 5, 5),
+                                         (4, 6, 5, 6), (4, 6, 6, 4), (4, 6, 6, 5), (4, 6, 6, 6),
+                                         (5, 4, 4, 4), (5, 4, 4, 5), (5, 4, 4, 6), (5, 4, 5, 4), (5, 4, 5, 5),
+                                         (5, 4, 5, 6), (5, 4, 6, 4), (5, 4, 6, 5), (5, 4, 6, 6),
+                                         (5, 5, 4, 4), (5, 5, 4, 5), (5, 5, 4, 6), (5, 5, 5, 4), (5, 5, 5, 6),
+                                         (5, 5, 6, 4), (5, 5, 6, 5), (5, 5, 6, 6),
+                                         (5, 6, 4, 4), (5, 6, 4, 5), (5, 6, 4, 6), (5, 6, 5, 4), (5, 6, 5, 5),
+                                         (5, 6, 5, 6), (5, 6, 6, 4), (5, 6, 6, 5), (5, 6, 6, 6),
+                                         (6, 4, 4, 4), (6, 4, 4, 5), (6, 4, 4, 6), (6, 4, 5, 4), (6, 4, 5, 5),
+                                         (6, 4, 5, 6), (6, 4, 6, 4), (6, 4, 6, 5), (6, 4, 6, 6),
+                                         (6, 5, 4, 4), (6, 5, 4, 5), (6, 5, 4, 6), (6, 5, 5, 4), (6, 5, 5, 5),
+                                         (6, 5, 5, 6), (6, 5, 6, 4), (6, 5, 6, 5), (6, 5, 6, 6),
+                                         (6, 6, 4, 4), (6, 6, 4, 5), (6, 6, 4, 6), (6, 6, 5, 4), (6, 6, 5, 5),
+                                         (6, 6, 5, 6), (6, 6, 6, 4), (6, 6, 6, 5), (6, 6, 6, 6)}
         # fmt: on
 
 
@@ -339,7 +354,7 @@ def test_cell_neighborhood():
     grid = HexGrid(
         (width, height), torus=False, capacity=None, random=random.Random(42)
     )
-    for radius, n in zip(range(1, 4), [2, 6, 11]):
+    for radius, n in zip(range(1, 4), [3, 7, 13]):
         if radius == 1:
             neighborhood = grid._cells[(0, 0)].neighborhood
         else:
@@ -351,7 +366,7 @@ def test_cell_neighborhood():
     grid = HexGrid(
         (width, height), torus=False, capacity=None, random=random.Random(42)
     )
-    for radius, n in zip(range(1, 4), [5, 10, 17]):
+    for radius, n in zip(range(1, 4), [4, 10, 17]):
         if radius == 1:
             neighborhood = grid._cells[(1, 0)].neighborhood
         else:
@@ -370,25 +385,25 @@ def test_hexgrid():
     assert len(grid._cells) == width * height
 
     # first row
-    assert len(grid._cells[(0, 0)].connections.values()) == 2
+    assert len(grid._cells[(0, 0)].connections.values()) == 3
     for connection in grid._cells[(0, 0)].connections.values():
-        assert connection.coordinate in {(0, 1), (1, 0)}
+        assert connection.coordinate in {(0, 1), (1, 0), (1, 1)}
 
     # second row
-    assert len(grid._cells[(1, 0)].connections.values()) == 5
+    assert len(grid._cells[(1, 0)].connections.values()) == 4
     for connection in grid._cells[(1, 0)].connections.values():
         # fmt: off
-        assert connection.coordinate in {(0, 0), (0, 1),
-                                                    (1, 1),
-                                         (2, 0), (2, 1)}
+        assert connection.coordinate in {   (1, 1), (2, 1),
+                                         (0, 0),    (2, 0),}
+        # fmt: on
 
     # middle odd row
     assert len(grid._cells[(5, 5)].connections.values()) == 6
     for connection in grid._cells[(5, 5)].connections.values():
         # fmt: off
-        assert connection.coordinate in {(4, 5), (4, 6),
-                                      (5, 4),       (5, 6),
-                                         (6, 5), (6, 6)}
+        assert connection.coordinate in {  (4, 4), (5, 4),
+                                         (4, 5), (6, 5),
+                                         (4, 6), (5, 6)}
 
         # fmt: on
 
@@ -396,9 +411,9 @@ def test_hexgrid():
     assert len(grid._cells[(4, 4)].connections.values()) == 6
     for connection in grid._cells[(4, 4)].connections.values():
         # fmt: off
-        assert connection.coordinate in {(3, 3), (3, 4),
-                                      (4, 3),       (4, 5),
-                                         (5, 3), (5, 4)}
+        assert connection.coordinate in {(4, 3), (5, 3),
+                                         (3, 4), (5, 4),
+                                         (4, 5), (5, 5)}
 
         # fmt: on
 
@@ -409,9 +424,9 @@ def test_hexgrid():
     assert len(grid._cells[(0, 0)].connections.values()) == 6
     for connection in grid._cells[(0, 0)].connections.values():
         # fmt: off
-        assert connection.coordinate in {(9, 9), (9, 0),
-                                      (0, 9),       (0, 1),
-                                         (1, 9), (1, 0)}
+        assert connection.coordinate in {(0, 9), (1, 9),
+                                         (9, 0), (1, 0),
+                                         (0, 1), (1, 1)}
 
         # fmt: on
 
@@ -431,6 +446,10 @@ def test_networkgrid():
     for i, cell in grid._cells.items():
         for connection in cell.connections.values():
             assert connection.coordinate in G.neighbors(i)
+
+    import pickle
+
+    pickle.loads(pickle.dumps(grid))  # noqa: S301
 
 
 def test_voronoigrid():
@@ -620,87 +639,246 @@ def test_empty_cell_collection():
 ### PropertyLayer tests
 def test_property_layer_integration():
     """Test integration of PropertyLayer with DiscrateSpace and Cell."""
-    width, height = 10, 10
-    grid = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
+    dimensions = (10, 10)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
 
     # Test adding a PropertyLayer to the grid
-    elevation = PropertyLayer("elevation", width, height, default_value=0)
+    elevation = PropertyLayer("elevation", dimensions, default_value=0.0)
     grid.add_property_layer(elevation)
-    assert "elevation" in grid.property_layers
-    assert len(grid.property_layers) == 1
+    assert "elevation" in grid._mesa_property_layers
+    assert len(grid._mesa_property_layers) == 2  ## empty is always there
+    assert grid.elevation is elevation
+
+    with pytest.raises(AttributeError):
+        grid.elevation = 0
 
     # Test accessing PropertyLayer from a cell
     cell = grid._cells[(0, 0)]
-    assert "elevation" in cell._mesa_property_layers
-    assert cell.get_property("elevation") == 0
+    assert hasattr(cell, "elevation")
+    assert cell.elevation == 0.0
 
     # Test setting property value for a cell
-    cell.set_property("elevation", 100)
-    assert cell.get_property("elevation") == 100
+    cell.elevation = 100
+    assert cell.elevation == 100
+    assert elevation.data[0, 0] == 100
 
     # Test modifying property value for a cell
-    cell.modify_property("elevation", lambda x: x + 50)
-    assert cell.get_property("elevation") == 150
+    cell.elevation += 50
+    assert cell.elevation == 150
+    assert elevation.data[0, 0] == 150
 
-    cell.modify_property("elevation", np.add, 50)
-    assert cell.get_property("elevation") == 200
+    cell.elevation = np.add(cell.elevation, 50)
+    assert cell.elevation == 200
+    assert elevation.data[0, 0] == 200
 
     # Test modifying PropertyLayer values
     grid.set_property("elevation", 100, condition=lambda value: value == 200)
-    assert cell.get_property("elevation") == 100
+    assert cell.elevation == 100
 
     # Test modifying PropertyLayer using numpy operations
     grid.modify_properties("elevation", np.add, 50)
-    assert cell.get_property("elevation") == 150
+    assert cell.elevation == 150
 
     # Test removing a PropertyLayer
     grid.remove_property_layer("elevation")
-    assert "elevation" not in grid.property_layers
-    assert "elevation" not in cell._mesa_property_layers
+    assert "elevation" not in grid._mesa_property_layers
+    assert not hasattr(cell, "elevation")
+
+    # what happens if we add a layer whose name clashes with an existing cell attribute?
+    dimensions = (10, 10)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+
+    with pytest.raises(ValueError):
+        grid.create_property_layer("capacity", 1, dtype=int)
+
+
+def test_copy_pickle_with_propertylayers():
+    """Test deepcopy and pickle with dynamically created GridClass and ProperyLayer descriptors."""
+    import copy
+    import pickle
+
+    dimensions = (10, 10)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+
+    grid2 = copy.deepcopy(grid)
+    assert grid2._cells[(0, 0)].empty
+
+    data = grid2._mesa_property_layers["empty"].data
+    grid2._cells[(0, 0)].empty = False
+    assert grid2._cells[(0, 0)].empty == data[0, 0]
+
+    dimensions = (10, 10)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    dump = pickle.dumps(grid)
+    grid2 = pickle.loads(dump)  # noqa: S301
+    assert grid2._cells[(0, 0)].empty
+    data = grid2._mesa_property_layers["empty"].data
+    grid2._cells[(0, 0)].empty = False
+    assert grid2._cells[(0, 0)].empty == data[0, 0]
 
 
 def test_multiple_property_layers():
     """Test initialization of DiscrateSpace with PropertyLayers."""
-    width, height = 5, 5
-    elevation = PropertyLayer("elevation", width, height, default_value=0)
-    temperature = PropertyLayer("temperature", width, height, default_value=20)
+    dimensions = (5, 5)
+    elevation = PropertyLayer("elevation", dimensions, default_value=0.0)
+    temperature = PropertyLayer("temperature", dimensions, default_value=20.0)
 
     # Test initialization with a single PropertyLayer
-    grid1 = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
+    grid1 = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
     grid1.add_property_layer(elevation)
-    assert "elevation" in grid1.property_layers
-    assert len(grid1.property_layers) == 1
+    assert "elevation" in grid1._mesa_property_layers
+    assert len(grid1._mesa_property_layers) == 2  ## empty is already there
 
     # Test initialization with multiple PropertyLayers
-    grid2 = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
-    grid2.add_property_layer(temperature, add_to_cells=False)
-    grid2.add_property_layer(elevation, add_to_cells=True)
-
-    assert "temperature" in grid2.property_layers
-    assert "elevation" in grid2.property_layers
-    assert len(grid2.property_layers) == 2
+    grid2 = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    grid2.add_property_layer(temperature)
+    grid2.add_property_layer(elevation)
+    #
+    assert "temperature" in grid2._mesa_property_layers
+    assert "elevation" in grid2._mesa_property_layers
+    assert len(grid2._mesa_property_layers) == 3
 
     # Modify properties
     grid2.modify_properties("elevation", lambda x: x + 10)
     grid2.modify_properties("temperature", lambda x: x + 5)
 
     for cell in grid2.all_cells:
-        assert cell.get_property("elevation") == 10
-        # Assert error temperature, since it was not added to cells
-        with pytest.raises(KeyError):
-            cell.get_property("temperature")
+        assert cell.elevation == 10
+        assert cell.temperature == 25
+
+
+def test_get_neighborhood_mask():
+    """Test get_neighborhood_mask."""
+    dimensions = (5, 5)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    grid.create_property_layer("elevation", default_value=0.0)
+
+    grid.get_neighborhood_mask((2, 2))
+
+    mask = grid.get_neighborhood_mask((2, 2))
+    for cell in grid._cells[(2, 2)].connections.values():
+        assert mask[cell.coordinate]
+    assert mask[grid._cells[(2, 2)].coordinate]
+
+    mask = grid.get_neighborhood_mask((2, 2), include_center=False)
+    for cell in grid._cells[(2, 2)].connections.values():
+        assert mask[cell.coordinate]
+    assert not mask[grid._cells[(2, 2)].coordinate]
+
+
+def test_select_cells():
+    """Test select_cells."""
+    dimensions = (5, 5)
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+
+    data = np.random.default_rng(12456).random((5, 5))
+    grid.add_property_layer(PropertyLayer.from_data("elevation", data))
+
+    # fixme, add an agent and update the np.all test accordingly
+    mask = grid.select_cells(
+        conditions={"elevation": lambda x: x > 0.5}, return_list=False, only_empty=True
+    )
+    assert mask.shape == (5, 5)
+    assert np.all(mask == (data > 0.5))
+
+    mask = grid.select_cells(
+        conditions={"elevation": lambda x: x > 0.5}, return_list=False, only_empty=False
+    )
+    assert mask.shape == (5, 5)
+    assert np.all(mask == (data > 0.5))
+
+    # fixme add extreme_values highest and lowest
+    mask = grid.select_cells(
+        extreme_values={"elevation": "highest"}, return_list=False, only_empty=False
+    )
+    assert mask.shape == (5, 5)
+    assert np.all(mask == (data == data.max()))
+
+    mask = grid.select_cells(
+        extreme_values={"elevation": "lowest"}, return_list=False, only_empty=False
+    )
+    assert mask.shape == (5, 5)
+    assert np.all(mask == (data == data.min()))
+
+    with pytest.raises(ValueError):
+        grid.select_cells(
+            extreme_values={"elevation": "weird"}, return_list=False, only_empty=False
+        )
+
+    # fixme add pre-specified mask to any other option
+
+
+def test_property_layer():
+    """Test various property layer methods."""
+    elevation = PropertyLayer("elevation", (5, 5), default_value=0.0)
+
+    # test set_cells
+    elevation.set_cells(10)
+    assert np.all(elevation.data == 10)
+
+    elevation.set_cells(np.ones((5, 5)))
+    assert np.all(elevation.data == 1)
+
+    with pytest.raises(ValueError):
+        elevation.set_cells(np.ones((6, 6)))
+
+    data = np.random.default_rng(42).random((5, 5))
+    layer = PropertyLayer.from_data("some_name", data)
+
+    def condition(x):
+        return x > 0.5
+
+    layer.set_cells(1, condition=condition)
+    assert np.all((layer.data == 1) == (data > 0.5))
+
+    # modify_cells
+    data = np.zeros((10, 10))
+    layer = PropertyLayer.from_data("some_name", data)
+
+    layer.data = np.zeros((10, 10))
+    layer.modify_cells(lambda x: x + 2)
+    assert np.all(layer.data == 2)
+
+    layer.data = np.ones((10, 10))
+    layer.modify_cells(np.multiply, 3)
+    assert np.all(layer.data[3, 3] == 3)
+
+    data = np.random.default_rng(42).random((10, 10))
+    layer.data = np.random.default_rng(42).random((10, 10))
+    layer.modify_cells(np.add, value=3, condition=condition)
+    assert np.all((layer.data > 3.5) == (data > 0.5))
+
+    with pytest.raises(ValueError):
+        layer.modify_cells(np.add)  # Missing value for ufunc
+
+    # aggregate
+    layer.data = np.ones((10, 10))
+    assert layer.aggregate(np.sum) == 100
 
 
 def test_property_layer_errors():
     """Test error handling for PropertyLayers."""
-    width, height = 5, 5
-    grid = OrthogonalMooreGrid((width, height), torus=False, random=random.Random(42))
-    elevation = PropertyLayer("elevation", width, height, default_value=0)
+    dimensions = 5, 5
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    elevation = PropertyLayer("elevation", dimensions, default_value=0.0)
 
     # Test adding a PropertyLayer with an existing name
     grid.add_property_layer(elevation)
     with pytest.raises(ValueError, match="Property layer elevation already exists."):
         grid.add_property_layer(elevation)
+
+    # test adding a layer with different dimensions than space
+    dimensions = 5, 5
+    grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
+    elevation = PropertyLayer("elevation", (10, 10), default_value=0.0)
+    with pytest.raises(
+        ValueError,
+        match="Dimensions of property layer do not match the dimensions of the grid",
+    ):
+        grid.add_property_layer(elevation)
+
+    with pytest.warns(UserWarning):
+        PropertyLayer("elevation", (10, 10), default_value=0, dtype=float)
 
 
 def test_cell_agent():  # noqa: D103

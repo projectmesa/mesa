@@ -33,14 +33,18 @@ import solara
 
 import mesa.visualization.components.altair_components as components_altair
 from mesa.experimental.devs.simulator import Simulator
+from mesa.mesa_logging import create_module_logger, function_logger
 from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
 
 if TYPE_CHECKING:
     from mesa.model import Model
 
+_mesa_logger = create_module_logger()
+
 
 @solara.component
+@function_logger(__name__)
 def SolaraViz(
     model: Model | solara.Reactive[Model],
     components: list[reacton.core.Component]
@@ -48,6 +52,7 @@ def SolaraViz(
     | Literal["default"] = "default",
     *,
     play_interval: int = 100,
+    render_interval: int = 1,
     simulator: Simulator | None = None,
     model_params=None,
     name: str | None = None,
@@ -68,6 +73,8 @@ def SolaraViz(
             Defaults to "default", which uses the default Altair space visualization.
         play_interval (int, optional): Interval for playing the model steps in milliseconds.
             This controls the speed of the model's automatic stepping. Defaults to 100 ms.
+        render_interval (int, optional): Controls how often plots are updated during a simulation,
+            allowing users to skip intermediate steps and update graphs less frequently.
         simulator: A simulator that controls the model (optional)
         model_params (dict, optional): Parameters for (re-)instantiating a model.
             Can include user-adjustable parameters and fixed parameters. Defaults to None.
@@ -86,9 +93,15 @@ def SolaraViz(
           model instance is provided, it will be converted to a reactive model using `solara.use_reactive`.
         - The `play_interval` argument controls the speed of the model's automatic stepping. A lower
           value results in faster stepping, while a higher value results in slower stepping.
+        - The `render_interval` argument determines how often plots are updated during simulation. Higher values
+          reduce update frequency,resulting in faster execution.
     """
     if components == "default":
-        components = [components_altair.make_altair_space()]
+        components = [
+            components_altair.make_altair_space(
+                agent_portrayal=None, propertylayer_portrayal=None, post_process=None
+            )
+        ]
     if model_params is None:
         model_params = {}
 
@@ -98,24 +111,43 @@ def SolaraViz(
 
     # set up reactive model_parameters shared by ModelCreator and ModelController
     reactive_model_parameters = solara.use_reactive({})
-
+    reactive_play_interval = solara.use_reactive(play_interval)
+    reactive_render_interval = solara.use_reactive(render_interval)
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
 
     with solara.Sidebar(), solara.Column():
         with solara.Card("Controls"):
+            solara.SliderInt(
+                label="Play Interval (ms)",
+                value=reactive_play_interval,
+                on_value=lambda v: reactive_play_interval.set(v),
+                min=1,
+                max=500,
+                step=10,
+            )
+            solara.SliderInt(
+                label="Render Interval (steps)",
+                value=reactive_render_interval,
+                on_value=lambda v: reactive_render_interval.set(v),
+                min=1,
+                max=100,
+                step=2,
+            )
             if not isinstance(simulator, Simulator):
                 ModelController(
                     model,
                     model_parameters=reactive_model_parameters,
-                    play_interval=play_interval,
+                    play_interval=reactive_play_interval,
+                    render_interval=reactive_render_interval,
                 )
             else:
                 SimulatorController(
                     model,
                     simulator,
                     model_parameters=reactive_model_parameters,
-                    play_interval=play_interval,
+                    play_interval=reactive_play_interval,
+                    render_interval=reactive_render_interval,
                 )
         with solara.Card("Model Parameters"):
             ModelCreator(
@@ -175,7 +207,8 @@ def ModelController(
     model: solara.Reactive[Model],
     *,
     model_parameters: dict | solara.Reactive[dict] = None,
-    play_interval: int = 100,
+    play_interval: int | solara.Reactive[int] = 100,
+    render_interval: int | solara.Reactive[int] = 1,
 ):
     """Create controls for model execution (step, play, pause, reset).
 
@@ -183,7 +216,7 @@ def ModelController(
         model: Reactive model instance
         model_parameters: Reactive parameters for (re-)instantiating a model.
         play_interval: Interval for playing the model steps in milliseconds.
-
+        render_interval: Controls how often the plots are updated during simulation steps.Higher value reduce update frequency.
     """
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
@@ -193,25 +226,35 @@ def ModelController(
 
     async def step():
         while playing.value and running.value:
-            await asyncio.sleep(play_interval / 1000)
+            await asyncio.sleep(play_interval.value / 1000)
             do_step()
 
     solara.lab.use_task(
         step, dependencies=[playing.value, running.value], prefer_threaded=False
     )
 
+    @function_logger(__name__)
     def do_step():
-        """Advance the model by one step."""
-        model.value.step()
+        """Advance the model by the number of steps specified by the render_interval slider."""
+        for _ in range(render_interval.value):
+            model.value.step()
+
         running.value = model.value.running
+
         force_update()
 
+    @function_logger(__name__)
     def do_reset():
         """Reset the model to its initial state."""
         playing.value = False
         running.value = True
+        _mesa_logger.log(
+            10,
+            f"creating new {model.value.__class__} instance with {model_parameters.value}",
+        )
         model.value = model.value = model.value.__class__(**model_parameters.value)
 
+    @function_logger(__name__)
     def do_play_pause():
         """Toggle play/pause."""
         playing.value = not playing.value
@@ -238,7 +281,8 @@ def SimulatorController(
     simulator,
     *,
     model_parameters: dict | solara.Reactive[dict] = None,
-    play_interval: int = 100,
+    play_interval: int | solara.Reactive[int] = 100,
+    render_interval: int | solara.Reactive[int] = 1,
 ):
     """Create controls for model execution (step, play, pause, reset).
 
@@ -247,7 +291,11 @@ def SimulatorController(
         simulator: Simulator instance
         model_parameters: Reactive parameters for (re-)instantiating a model.
         play_interval: Interval for playing the model steps in milliseconds.
+        render_interval: Controls how often the plots are updated during simulation steps.Higher values reduce update frequency.
 
+    Notes:
+        The `step button` increments the step by the value specified in the `render_interval` slider.
+        This behavior ensures synchronization between simulation steps and plot updates.
     """
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
@@ -257,7 +305,7 @@ def SimulatorController(
 
     async def step():
         while playing.value and running.value:
-            await asyncio.sleep(play_interval / 1000)
+            await asyncio.sleep(play_interval.value / 1000)
             do_step()
 
     solara.lab.use_task(
@@ -265,8 +313,8 @@ def SimulatorController(
     )
 
     def do_step():
-        """Advance the model by one step."""
-        simulator.run_for(1)
+        """Advance the model by the number of steps specified by the render_interval slider."""
+        simulator.run_for(render_interval.value)
         running.value = model.value.running
         force_update()
 
@@ -370,7 +418,6 @@ def ModelCreator(
           or are dictionaries containing parameter details such as type, value, min, and max.
         - The `seed` argument ensures reproducibility by setting the initial seed for the model's random number generator.
         - The component provides an interface for adjusting user-defined parameters and reseeding the model.
-
     """
     if model_parameters is None:
         model_parameters = {}
@@ -394,6 +441,7 @@ def ModelCreator(
         [],
     )
 
+    @function_logger(__name__)
     def on_change(name, value):
         model_parameters.value = {**model_parameters.value, name: value}
 
@@ -411,6 +459,17 @@ def _check_model_params(init_func, model_params):
         ValueError: If a parameter is not valid for the model's initialization function
     """
     model_parameters = inspect.signature(init_func).parameters
+
+    has_var_positional = any(
+        param.kind == inspect.Parameter.VAR_POSITIONAL
+        for param in model_parameters.values()
+    )
+
+    if has_var_positional:
+        raise ValueError(
+            "Mesa's visualization requires the use of keyword arguments to ensure the parameters are passed to Solara correctly. Please ensure all model parameters are of form param=value"
+        )
+
     for name in model_parameters:
         if (
             model_parameters[name].default == inspect.Parameter.empty

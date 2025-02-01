@@ -1,4 +1,16 @@
-"""Support for Voronoi meshed grids."""
+"""Cell spaces based on Voronoi tessellation around seed points.
+
+Creates irregular spatial divisions by building cells around seed points,
+where each cell contains the area closer to its seed than any other.
+Features:
+- Organic-looking spaces from point sets
+- Automatic neighbor determination
+- Area-based cell capacities
+- Natural regional divisions
+
+Useful for models requiring irregular but mathematically meaningful spatial
+divisions, like territories, service areas, or natural regions.
+"""
 
 from collections.abc import Sequence
 from itertools import combinations
@@ -174,7 +186,6 @@ class VoronoiGrid(DiscreteSpace):
         random: Random | None = None,
         cell_klass: type[Cell] = Cell,
         capacity_function: callable = round_float,
-        cell_coloring_property: str | None = None,
     ) -> None:
         """A Voronoi Tessellation Grid.
 
@@ -188,7 +199,7 @@ class VoronoiGrid(DiscreteSpace):
             random (Random): random number generator
             cell_klass (type[Cell]): type of cell class
             capacity_function (Callable): function to compute (int) capacity according to (float) area
-            cell_coloring_property (str): voronoi visualization polygon fill property
+
         """
         super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
         self.centroids_coordinates = centroids_coordinates
@@ -203,7 +214,6 @@ class VoronoiGrid(DiscreteSpace):
         self.triangulation = None
         self.voronoi_coordinates = None
         self.capacity_function = capacity_function
-        self.cell_coloring_property = cell_coloring_property
 
         self._connect_cells()
         self._build_cell_polygons()
@@ -254,4 +264,3 @@ class VoronoiGrid(DiscreteSpace):
             polygon_area = self._compute_polygon_area(polygon)
             self._cells[region].properties["area"] = polygon_area
             self._cells[region].capacity = self.capacity_function(polygon_area)
-            self._cells[region].properties[self.cell_coloring_property] = 0

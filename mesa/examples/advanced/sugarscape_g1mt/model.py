@@ -3,8 +3,9 @@ from pathlib import Path
 import numpy as np
 
 import mesa
-from mesa.examples.advanced.sugarscape_g1mt.agents import Resource, Trader
+from mesa.examples.advanced.sugarscape_g1mt.agents import Trader
 from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
+from mesa.experimental.cell_space.property_layer import PropertyLayer
 
 
 # Helper Functions
@@ -58,14 +59,8 @@ class SugarscapeG1mt(mesa.Model):
         # Initiate width and height of sugarscape
         self.width = width
         self.height = height
+
         # Initiate population attributes
-        self.initial_population = initial_population
-        self.endowment_min = endowment_min
-        self.endowment_max = endowment_max
-        self.metabolism_min = metabolism_min
-        self.metabolism_max = metabolism_max
-        self.vision_min = vision_min
-        self.vision_max = vision_max
         self.enable_trade = enable_trade
         self.running = True
 
@@ -76,55 +71,46 @@ class SugarscapeG1mt(mesa.Model):
         # initiate datacollector
         self.datacollector = mesa.DataCollector(
             model_reporters={
-                "Trader": lambda m: len(m.agents_by_type[Trader]),
-                "Trade Volume": lambda m: sum(
-                    len(a.trade_partners) for a in m.agents_by_type[Trader]
-                ),
+                "#Traders": lambda m: len(m.agents),
+                "Trade Volume": lambda m: sum(len(a.trade_partners) for a in m.agents),
                 "Price": lambda m: geometric_mean(
-                    flatten([a.prices for a in m.agents_by_type[Trader]])
+                    flatten([a.prices for a in m.agents])
                 ),
             },
             agent_reporters={"Trade Network": lambda a: get_trade(a)},
         )
 
-        # read in landscape file from supplmentary material
-        sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map.txt")
-        spice_distribution = np.flip(sugar_distribution, 1)
+        # read in landscape file from supplementary material
+        self.sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map.txt")
+        self.spice_distribution = np.flip(self.sugar_distribution, 1)
 
-        for cell in self.grid.all_cells:
-            max_sugar = sugar_distribution[cell.coordinate]
-            max_spice = spice_distribution[cell.coordinate]
-            Resource(self, max_sugar, max_spice, cell)
+        self.grid.add_property_layer(
+            PropertyLayer.from_data("sugar", self.sugar_distribution)
+        )
+        self.grid.add_property_layer(
+            PropertyLayer.from_data("spice", self.spice_distribution)
+        )
 
-        for _ in range(self.initial_population):
-            # get agent position
-            x = self.random.randrange(self.width)
-            y = self.random.randrange(self.height)
-            # see Growing Artificial Societies p. 108 for initialization
-            # give agents initial endowment
-            sugar = int(self.random.uniform(self.endowment_min, self.endowment_max + 1))
-            spice = int(self.random.uniform(self.endowment_min, self.endowment_max + 1))
-            # give agents initial metabolism
-            metabolism_sugar = int(
-                self.random.uniform(self.metabolism_min, self.metabolism_max + 1)
-            )
-            metabolism_spice = int(
-                self.random.uniform(self.metabolism_min, self.metabolism_max + 1)
-            )
-            # give agents vision
-            vision = int(self.random.uniform(self.vision_min, self.vision_max + 1))
-
-            cell = self.grid[(x, y)]
-            # create Trader object
-            Trader(
-                self,
-                cell,
-                sugar=sugar,
-                spice=spice,
-                metabolism_sugar=metabolism_sugar,
-                metabolism_spice=metabolism_spice,
-                vision=vision,
-            )
+        Trader.create_agents(
+            self,
+            initial_population,
+            self.random.choices(self.grid.all_cells.cells, k=initial_population),
+            sugar=self.rng.integers(
+                endowment_min, endowment_max, (initial_population,), endpoint=True
+            ),
+            spice=self.rng.integers(
+                endowment_min, endowment_max, (initial_population,), endpoint=True
+            ),
+            metabolism_sugar=self.rng.integers(
+                metabolism_min, metabolism_max, (initial_population,), endpoint=True
+            ),
+            metabolism_spice=self.rng.integers(
+                metabolism_min, metabolism_max, (initial_population,), endpoint=True
+            ),
+            vision=self.rng.integers(
+                vision_min, vision_max, (initial_population,), endpoint=True
+            ),
+        )
 
     def step(self):
         """
@@ -132,7 +118,12 @@ class SugarscapeG1mt(mesa.Model):
         and then randomly activates traders
         """
         # step Resource agents
-        self.agents_by_type[Resource].do("step")
+        self.grid.sugar.data = np.minimum(
+            self.grid.sugar.data + 1, self.sugar_distribution
+        )
+        self.grid.spice.data = np.minimum(
+            self.grid.spice.data + 1, self.spice_distribution
+        )
 
         # step trader agents
         # to account for agent death and removal we need a separate data structure to
@@ -157,6 +148,8 @@ class SugarscapeG1mt(mesa.Model):
             agent.trade_with_neighbors()
 
         # collect model level data
+        # fixme we can already collect agent class data
+        # fixme, we don't have resource agents anymore so this can be done simpler
         self.datacollector.collect(self)
         """
         Mesa is working on updating datacollector agent reporter

@@ -4,7 +4,7 @@ from mesa.experimental.cell_space import CellAgent
 class PDAgent(CellAgent):
     """Agent member of the iterated, spatial prisoner's dilemma model."""
 
-    def __init__(self, model, starting_move=None):
+    def __init__(self, model, starting_move=None, cell=None):
         """
         Create a new Prisoner's Dilemma agent.
 
@@ -15,6 +15,7 @@ class PDAgent(CellAgent):
         """
         super().__init__(model)
         self.score = 0
+        self.cell = cell
         if starting_move:
             self.move = starting_move
         else:

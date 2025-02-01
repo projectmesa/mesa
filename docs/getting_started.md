@@ -68,7 +68,6 @@ model.step()
 
 You should see agents 1-5, activated in random order. See the [tutorial](tutorials/intro_tutorial) or API documentation for more detail on how to add model functionality.
 
-To bootstrap a new model install mesa and run `mesa startproject`
 
 ### AgentSet and model.agents
 Mesa 3.0 makes `model.agents` and the AgentSet class central in managing and activating agents.
@@ -180,7 +179,17 @@ Mesa now uses a new browser-based visualization system called SolaraViz. This al
 
 > **Note:** SolaraViz is experimental and still in active development for Mesa 3.0. While we attempt to minimize them, there might be API breaking changes between Mesa 3.0 and 3.1. There won't be breaking changes between Mesa 3.0.x patch releases.
 
-The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace
+> **Note:** SolaraViz instantiates new models using `**model_parameters.value`, so all model inputs must be keyword arguments.
+
+Ensure your model's `__init__` method accepts keyword arguments matching the `model_params` keys.
+
+```python
+class MyModel(Model):
+    def __init__(self, n_agents=10, seed=None):
+        super().__init__(seed=seed)
+        # Initialize the model with N agents
+```
+The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace.
 
 Here's a basic example of how to set up a visualization:
 

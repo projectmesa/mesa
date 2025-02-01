@@ -47,6 +47,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",  # for google style docstrings
     "myst_nb",  # For Markdown and Jupyter notebooks
+    "sphinx_copybutton" # For copying the code in the documentation
 ]
 
 # Add any paths that contain templates here, relative to this directory.
