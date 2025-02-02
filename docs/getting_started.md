@@ -187,8 +187,8 @@ class MyModel(Model):
     def __init__(self, n_agents=10, seed=None):
         super().__init__(seed=seed)
         # Initialize the model with N agents
-
-The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace
+```
+The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace.
 
 Here's a basic example of how to set up a visualization:
 
