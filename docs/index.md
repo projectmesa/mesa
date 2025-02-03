@@ -33,7 +33,7 @@ Mesa allows users to quickly create agent-based models using built-in core compo
 
 ## Using Mesa
 ### Installation Options
-To install our latest stable release (3.1.x), run:
+To install our latest stable release, run:
 
 ```bash
 pip install -U mesa
