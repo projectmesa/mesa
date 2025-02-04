@@ -108,7 +108,9 @@ def draw_space(
     space,
     agent_portrayal: Callable,
     propertylayer_portrayal: dict | None = None,
-    ax: Axes | None = None,
+    ax_grid: Axes | None = None,
+    ax_properties: Axes | None = None,
+    ax_agents: Axes | None = None,
     **space_drawing_kwargs,
 ):
     """Draw a Matplotlib-based visualization of the space.
@@ -127,37 +129,43 @@ def draw_space(
     "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
 
     """
-    if ax is None:
-        fig, ax = plt.subplots()
+    if ax_grid is None:
+        fig, ax_grid = plt.subplots()
 
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
         # order matters here given the class structure of old-style grid spaces
         case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
-            draw_hex_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
+            draw_hex_grid(space, agent_portrayal, ax=ax_grid, **space_drawing_kwargs)
         case (
             mesa.space.SingleGrid()
             | OrthogonalMooreGrid()
             | OrthogonalVonNeumannGrid()
             | mesa.space.MultiGrid()
         ):
-            draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
+            draw_orthogonal_grid(
+                space, agent_portrayal, ax=ax_grid, **space_drawing_kwargs
+            )
         case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
-            draw_network(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
-        case (
-            mesa.space.ContinuousSpace()
-            | mesa.experimental.continuous_space.ContinuousSpace()
-        ):
-            draw_continuous_space(space, agent_portrayal, ax=ax)
+            draw_network(space, agent_portrayal, ax=ax_grid, **space_drawing_kwargs)
+        case mesa.space.ContinuousSpace():
+            draw_continuous_space(space, agent_portrayal, ax=ax_grid)
         case VoronoiGrid():
-            draw_voronoi_grid(space, agent_portrayal, ax=ax)
+            draw_voronoi_grid(space, agent_portrayal, ax=ax_grid)
         case _:
             raise ValueError(f"Unknown space type: {type(space)}")
 
     if propertylayer_portrayal:
-        draw_property_layers(space, propertylayer_portrayal, ax=ax)
+        if ax_properties is None:
+            ax_properties = ax_grid
+        draw_property_layers(space, propertylayer_portrayal, ax=ax_properties)
 
-    return ax
+    if hasattr(space, "agents") and space.agents:
+        if ax_agents is None:
+            ax_agents = ax_grid
+        draw_agents(space, agent_portrayal, ax=ax_agents)
+
+    return ax_grid
 
 
 @lru_cache(maxsize=1024, typed=True)
