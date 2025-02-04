@@ -92,7 +92,7 @@ API Documentation <apis/api_main>
 [matrix chat room]: https://matrix.to/#/#project-mesa:matrix.org
 [mesa]: https://github.com/projectmesa/mesa/
 [mesa overview]: overview
-[mesa examples]: https://github.com/projectmesa/mesa-examples
+[mesa examples]: https://mesa.readthedocs.io/stable/examples.html
 [mesa introductory tutorial]: tutorials/intro_tutorial
 [mesa visualization tutorial]: tutorials/visualization_tutorial
 [migration guide]: migration_guide
