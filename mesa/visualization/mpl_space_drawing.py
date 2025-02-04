@@ -236,18 +236,22 @@ def draw_property_layers(
 
         # Get portrayal properties, or use defaults
         alpha = portrayal.get("alpha", 1)
-        vmin = portrayal.get("vmin", np.min(data))
-        vmax = portrayal.get("vmax", np.max(data))
+        vmin = portrayal.get("vmin")
+        vmax = portrayal.get("vmax")
         colorbar = portrayal.get("colorbar", True)
+        color = portrayal.get("color", None)
+        colormap = portrayal.get("colormap", None)
+        vmin = np.min(data) if vmin is None else vmin
+        vmax = np.max(data) if vmax is None else vmax
 
         # Prepare colormap
-        if "color" in portrayal:
-            rgba_color = to_rgba(portrayal["color"])
+        if color:
+            rgba_color = to_rgba(color)
             cmap = LinearSegmentedColormap.from_list(
                 layer_name, [(0, 0, 0, 0), (*rgba_color[:3], alpha)]
             )
         elif "colormap" in portrayal:
-            cmap = portrayal.get("colormap", "viridis")
+            cmap = colormap
             if isinstance(cmap, list):
                 cmap = LinearSegmentedColormap.from_list(layer_name, cmap)
             elif isinstance(cmap, str):
@@ -258,7 +262,7 @@ def draw_property_layers(
             )
 
         if isinstance(space, OrthogonalGrid):
-            if "color" in portrayal:
+            if color:
                 data = data.T
                 normalized_data = (data - vmin) / (vmax - vmin)
                 rgba_data = np.full((*data.shape, 4), rgba_color)
@@ -285,12 +289,13 @@ def draw_property_layers(
             norm = Normalize(vmin=vmin, vmax=vmax)
             colors = data.ravel()  # flatten data to 1D array
 
-            if "color" in portrayal:
+            if color:
                 normalized_colors = np.clip(norm(colors), 0, 1)
                 rgba_colors = np.full((len(colors), 4), rgba_color)
                 rgba_colors[:, 3] = normalized_colors * alpha
             else:
                 rgba_colors = cmap(norm(colors))
+                rgba_colors[..., 3] *= alpha
 
             # Draw hexagons
             collection = PolyCollection(hexagons, facecolors=rgba_colors, zorder=-1)
