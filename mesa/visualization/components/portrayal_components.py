@@ -100,6 +100,8 @@ class PropertyLayerStyle:
     def __post_init__(self):
         """Validate style attributes."""
         # Validate color/colormap exclusivity
+        if self.color is None and self.colormap is None:
+            raise ValueError("Please specify either color or colormap")
         if self.color is not None and self.colormap is not None:
             raise ValueError("Cannot specify both color and colormap")
 
