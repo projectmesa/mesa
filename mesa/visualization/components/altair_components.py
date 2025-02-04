@@ -1,12 +1,9 @@
 """Altair based solara components for visualization mesa spaces."""
 
-import contextlib
 import warnings
 
+import altair as alt
 import solara
-
-with contextlib.suppress(ImportError):
-    import altair as alt
 
 from mesa.experimental.cell_space import DiscreteSpace, Grid
 from mesa.space import ContinuousSpace, _Grid
@@ -30,7 +27,7 @@ def make_altair_space(
     Args:
         agent_portrayal: Function to portray agents.
         propertylayer_portrayal: not yet implemented
-        post_process :not yet implemented
+        post_process :A user specified callable that will be called with the Chart instance from Altair. Allows for fine tuning plots (e.g., control ticks)
         space_drawing_kwargs : not yet implemented
 
     ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
@@ -46,13 +43,15 @@ def make_altair_space(
             return {"id": a.unique_id}
 
     def MakeSpaceAltair(model):
-        return SpaceAltair(model, agent_portrayal)
+        return SpaceAltair(model, agent_portrayal, post_process=post_process)
 
     return MakeSpaceAltair
 
 
 @solara.component
-def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):
+def SpaceAltair(
+    model, agent_portrayal, dependencies: list[any] | None = None, post_process=None
+):
     """Create an Altair-based space visualization component.
 
     Returns:
@@ -65,6 +64,9 @@ def SpaceAltair(model, agent_portrayal, dependencies: list[any] | None = None):
         space = model.space
 
     chart = _draw_grid(space, agent_portrayal)
+    # Apply post-processing if provided
+    if post_process is not None:
+        chart = post_process(chart)
     solara.FigureAltair(chart)
 
 
@@ -159,7 +161,7 @@ def _draw_grid(space, agent_portrayal):
         # no y-axis label
         "y": alt.Y("y", axis=None, type=x_y_type),
         "tooltip": [
-            alt.Tooltip(key, type=alt.utils.infer_vegalite_type([value]))
+            alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
             for key, value in all_agent_data[0].items()
             if key not in invalid_tooltips
         ],
