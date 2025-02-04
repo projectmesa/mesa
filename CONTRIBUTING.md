@@ -137,6 +137,8 @@ To create a new release, follow these steps:
 9. The [`release.yml`](https://github.com/projectmesa/mesa/blob/main/.github/workflows/release.yml) CI workflow should automatically create and upload the package to PyPI. Verify this on [PyPI.org](https://pypi.org/project/mesa/).
 10. Finally, after release, open a new PR to update the version number in [`mesa/__init__.py`](https://github.com/projectmesa/mesa/blob/main/mesa/__init__.py) for the next release (e.g., `"3.1.0.dev"`).
 
+A recorded video of this process is [available here](https://youtu.be/JE44jkegmns).
+
 ## Special Thanks
 
 A special thanks to the following projects who offered inspiration for this contributing file.

@@ -1,5 +1,7 @@
 """Tests for model.py."""
 
+import numpy as np
+
 from mesa.agent import Agent, AgentSet
 from mesa.model import Model
 
@@ -36,6 +38,16 @@ def test_seed(seed=23):
     model2 = Model(seed=seed + 1)
     assert model2._seed == seed + 1
     assert model._seed == seed
+
+    assert Model(seed=42).random.random() == Model(seed=42).random.random()
+    assert np.all(
+        Model(seed=42).rng.random(
+            10,
+        )
+        == Model(seed=42).rng.random(
+            10,
+        )
+    )
 
 
 def test_reset_randomizer(newseed=42):

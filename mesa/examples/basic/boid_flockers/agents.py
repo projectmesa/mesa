@@ -6,10 +6,10 @@ of flocking behavior.
 
 import numpy as np
 
-from mesa import Agent
+from mesa.experimental.continuous_space import ContinuousSpaceAgent
 
 
-class Boid(Agent):
+class Boid(ContinuousSpaceAgent):
     """A Boid-style flocker agent.
 
     The agent follows three behaviors to flock:
@@ -26,10 +26,12 @@ class Boid(Agent):
     def __init__(
         self,
         model,
-        speed,
-        direction,
-        vision,
-        separation,
+        space,
+        position=(0, 0),
+        speed=1,
+        direction=(1, 1),
+        vision=1,
+        separation=1,
         cohere=0.03,
         separate=0.015,
         match=0.05,
@@ -46,7 +48,8 @@ class Boid(Agent):
             separate: Relative importance of avoiding close neighbors (default: 0.015)
             match: Relative importance of matching neighbors' directions (default: 0.05)
         """
-        super().__init__(model)
+        super().__init__(space, model)
+        self.position = position
         self.speed = speed
         self.direction = direction
         self.vision = vision
@@ -58,46 +61,31 @@ class Boid(Agent):
 
     def step(self):
         """Get the Boid's neighbors, compute the new vector, and move accordingly."""
-        self.neighbors = self.model.space.get_neighbors(self.pos, self.vision, False)
+        neighbors, distances = self.get_neighbors_in_radius(radius=self.vision)
+        self.neighbors = [n for n in neighbors if n is not self]
 
         # If no neighbors, maintain current direction
-        if not self.neighbors:
-            new_pos = self.pos + self.direction * self.speed
-            self.model.space.move_agent(self, new_pos)
+        if not neighbors:
+            self.position += self.direction * self.speed
             return
 
-        # Initialize vectors for the three flocking behaviors
-        cohere = np.zeros(2)  # Cohesion vector
-        match_vector = np.zeros(2)  # Alignment vector
-        separation_vector = np.zeros(2)  # Separation vector
+        delta = self.space.calculate_difference_vector(self.position, agents=neighbors)
 
-        # Calculate the contribution of each neighbor to the three behaviors
-        for neighbor in self.neighbors:
-            heading = self.model.space.get_heading(self.pos, neighbor.pos)
-            distance = self.model.space.get_distance(self.pos, neighbor.pos)
-
-            # Cohesion - steer towards the average position of neighbors
-            cohere += heading
-
-            # Separation - avoid getting too close
-            if distance < self.separation:
-                separation_vector -= heading
-
-            # Alignment - match neighbors' flying direction
-            match_vector += neighbor.direction
-
-        # Weight each behavior by its factor and normalize by number of neighbors
-        n = len(self.neighbors)
-        cohere = cohere * self.cohere_factor
-        separation_vector = separation_vector * self.separate_factor
-        match_vector = match_vector * self.match_factor
+        cohere_vector = delta.sum(axis=0) * self.cohere_factor
+        separation_vector = (
+            -1 * delta[distances < self.separation].sum(axis=0) * self.separate_factor
+        )
+        match_vector = (
+            np.asarray([n.direction for n in neighbors]).sum(axis=0) * self.match_factor
+        )
 
         # Update direction based on the three behaviors
-        self.direction += (cohere + separation_vector + match_vector) / n
+        self.direction += (cohere_vector + separation_vector + match_vector) / len(
+            neighbors
+        )
 
         # Normalize direction vector
         self.direction /= np.linalg.norm(self.direction)
 
         # Move boid
-        new_pos = self.pos + self.direction * self.speed
-        self.model.space.move_agent(self, new_pos)
+        self.position += self.direction * self.speed
