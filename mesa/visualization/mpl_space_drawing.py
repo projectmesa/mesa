@@ -291,6 +291,7 @@ def draw_property_layers(
                 rgba_colors[:, 3] = normalized_colors * alpha
             else:
                 rgba_colors = cmap(norm(colors))
+                rgba_colors[..., 3] *= alpha
 
             # Draw hexagons
             collection = PolyCollection(hexagons, facecolors=rgba_colors, zorder=-1)

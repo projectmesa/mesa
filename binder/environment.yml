@@ -1,4 +1,4 @@
-name: example-environment
+name: mesa-tutorials
 channels:
   - conda-forge
 dependencies:
