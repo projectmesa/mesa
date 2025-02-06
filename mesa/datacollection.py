@@ -164,13 +164,8 @@ class DataCollector:
                 ) from e
 
         # Type 2: Method of class/instance
-        if callable(reporter) and not isinstance(reporter, types.LambdaType):
-            try:
-                reporter(model)
-            except Exception as e:
-                raise RuntimeError(
-                    f"Method reporter '{name}' failed validation: {e!s}"
-                ) from e
+        if not callable(reporter) and not isinstance(reporter, types.LambdaType):
+            pass
 
         # Type 3: Model attribute (string)
         if isinstance(reporter, str):
