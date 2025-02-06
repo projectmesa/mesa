@@ -97,7 +97,11 @@ def SolaraViz(
           reduce update frequency,resulting in faster execution.
     """
     if components == "default":
-        components = [components_altair.make_altair_space()]
+        components = [
+            components_altair.make_altair_space(
+                agent_portrayal=None, propertylayer_portrayal=None, post_process=None
+            )
+        ]
     if model_params is None:
         model_params = {}
 
