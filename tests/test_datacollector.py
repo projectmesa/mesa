@@ -389,10 +389,13 @@ class TestDataCollectorErrorHandling(unittest.TestCase):
     def test_method_error(self):
         """Test error when accessing non-existent method."""
 
-        def bad_method(model):
-            raise Exception("Test error")
+        class BadCallable:
+            def __call__(self, model):
+                raise Exception("Callable error")
 
-        dc_method = DataCollector(model_reporters={"test": bad_method})
+        bad_reporter = BadCallable()
+
+        dc_method = DataCollector(model_reporters={"test": bad_reporter})
         with self.assertRaises(RuntimeError):
             dc_method.collect(self.model)
 

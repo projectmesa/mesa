@@ -166,7 +166,7 @@ class DataCollector:
         # Type 2: Method of class/instance
         if callable(reporter) and not isinstance(reporter, types.LambdaType):
             try:
-                callable(reporter)
+                reporter(model)
             except Exception as e:
                 raise RuntimeError(
                     f"Method reporter '{name}' failed validation: {e!s}"
@@ -178,33 +178,19 @@ class DataCollector:
                 if not hasattr(model, reporter):
                     raise AttributeError(
                         f"Model reporter '{name}' references non-existent attribute '{reporter}'\n"
-                        f"Available attributes: {', '.join(dir(model))}"
                     )
                 getattr(model, reporter)  # 验证属性是否可访问
             except AttributeError as e:
                 raise AttributeError(
                     f"Model reporter '{name}' attribute validation failed: {e!s}\n"
-                    f"Available attributes: {', '.join(dir(model))}"
-                ) from e
-            except Exception as e:
-                raise RuntimeError(
-                    f"Model reporter '{name}' attribute validation failed: {e!s}"
                 ) from e
 
         # Type 4: Function with parameters in list
-        if isinstance(reporter, list):
-            if not reporter or not callable(reporter[0]):
-                raise ValueError(
-                    f"Invalid function list format for reporter '{name}'\n"
-                    f"Expected: [function, [param1, param2]], got: {reporter}"
-                )
-            try:
-                reporter[0](*reporter[1])
-            except Exception as e:
-                raise RuntimeError(
-                    f"Function list reporter '{name}' failed validation: {e!s}\n"
-                    f"Example: [function, [param1, param2]]"
-                ) from e
+        if isinstance(reporter, list) and (not reporter or not callable(reporter[0])):
+            raise ValueError(
+                f"Invalid function list format for reporter '{name}'\n"
+                f"Expected: [function, [param1, param2]], got: {reporter}"
+            )
 
     def _new_model_reporter(self, name, reporter):
         """Add a new model-level reporter to collect.
