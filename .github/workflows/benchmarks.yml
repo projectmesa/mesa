@@ -28,8 +28,10 @@ jobs:
           python-version: '3.13'
       - name: Add project directory to PYTHONPATH
         run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+      - name: Install uv
+        run: pip install uv
       - name: Install dependencies
-        run: pip install numpy pandas tqdm tabulate matplotlib solara networkx
+        run: uv pip install --system numpy pandas tqdm tabulate matplotlib solara networkx scipy
       # Benchmarks on the projectmesa main branch
       - name: Checkout main branch
         uses: actions/checkout@v4
