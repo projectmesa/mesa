@@ -11,10 +11,14 @@ Replication of the model found in NetLogo:
 
 import math
 
+import numpy as np
+from scipy.ndimage import gaussian_filter
+
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.experimental.cell_space import OrthogonalVonNeumannGrid
+from mesa.experimental.cell_space.property_layer import PropertyLayer
 from mesa.experimental.devs import ABMSimulator
 
 
@@ -38,7 +42,7 @@ class WolfSheep(Model):
         wolf_reproduce=0.05,
         wolf_gain_from_food=20,
         grass=True,
-        grass_regrowth_time=30,
+        max_grass_regrowth_time=30,
         sheep_gain_from_food=4,
         seed=None,
         simulator: ABMSimulator = None,
@@ -71,7 +75,10 @@ class WolfSheep(Model):
 
         # Create grid using experimental cell space
         self.grid = OrthogonalVonNeumannGrid(
-            [self.height, self.width],
+            (
+                self.height,
+                self.width,
+            ),  # use tuple instead of list, otherwise it would fail the dimension check in add_property_layer
             torus=True,
             capacity=math.inf,
             random=self.random,
@@ -88,6 +95,33 @@ class WolfSheep(Model):
             )
 
         self.datacollector = DataCollector(model_reporters)
+
+        def generate_grass_regrowth_time_array():  # Using Gaussian filter to make it look like spatial distribution
+            rows, cols = height, width
+
+            seeds = np.zeros((rows, cols))
+            num_seeds = max_grass_regrowth_time
+
+            for _ in range(num_seeds):
+                x, y = np.random.randint(0, rows), np.random.randint(0, cols)
+                seeds[x, y] = np.random.randint(1, num_seeds)
+
+            # Smooth the array to create clustered patterns using SciPy's Gaussian filter
+            filtered_array = gaussian_filter(seeds, sigma=10)
+
+            # Normalize the array to the range [1, num_seeds]
+            filtered_array = (filtered_array - np.min(filtered_array)) / (
+                np.max(filtered_array) - np.min(filtered_array)
+            ) * (num_seeds - 1) + 1
+            filtered_array = filtered_array.astype(int)
+
+            return filtered_array
+
+        grass_regrowth_time_array = generate_grass_regrowth_time_array()
+
+        self.grid.add_property_layer(
+            PropertyLayer.from_data("grass_regrowth_time", grass_regrowth_time_array)
+        )
 
         # Create sheep:
         Sheep.create_agents(
@@ -114,9 +148,16 @@ class WolfSheep(Model):
             for cell in self.grid:
                 fully_grown = self.random.choice(possibly_fully_grown)
                 countdown = (
-                    0 if fully_grown else self.random.randrange(0, grass_regrowth_time)
+                    0
+                    if fully_grown
+                    else self.random.randrange(
+                        0,
+                        grass_regrowth_time_array[cell.coordinate[0]][
+                            cell.coordinate[1]
+                        ],
+                    )
                 )
-                GrassPatch(self, countdown, grass_regrowth_time, cell)
+                GrassPatch(self, countdown, cell)
 
         # Collect initial data
         self.running = True
