@@ -358,9 +358,9 @@ def draw_orthogonal_grid(
     if draw_grid:
         # Draw grid lines
         for x in np.arange(-0.5, space.width - 0.5, 1):
-            ax.axvline(x, color="gray", linestyle="-")
+            ax.axvline(x, color="gray", linestyle=":")
         for y in np.arange(-0.5, space.height - 0.5, 1):
-            ax.axhline(y, color="gray", linestyle="-")
+            ax.axhline(y, color="gray", linestyle=":")
 
     return ax
 
