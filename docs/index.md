@@ -73,6 +73,7 @@ The original Mesa conference paper is [available here](http://conference.scipy.o
 :maxdepth: 7
 
 Getting started <getting_started>
+Overview <overview>
 Examples <examples>
 Migration guide <migration_guide>
 API Documentation <apis/api_main>
