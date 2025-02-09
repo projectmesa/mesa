@@ -54,10 +54,10 @@ Mesa implements discrete spaces using a doubly-linked structure where each cell 
    ```python
    # Create a Von Neumann grid (4 neighbors per cell)
    grid = mesa.space.OrthogonalVonNeumannGrid((width, height), torus=False)
-   
+
    # Create a Moore grid (8 neighbors per cell)
    grid = mesa.space.OrthogonalMooreGrid((width, height), torus=True)
-   
+
    # Create a hexagonal grid
    grid = mesa.space.HexGrid((width, height), torus=False)
    ```
