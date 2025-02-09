@@ -67,9 +67,9 @@ Mesa is a Python-based framework for ABM that provides a comprehensive set of to
 2. Data collection and support for model experimentation
 3. Visualization systems
 
-
 This decoupled design allows selective use of components while enabling extension and customization.
 
+Mesa follows a two-track development model where new features are first released as experimental before being stabilized. Experimental features are clearly marked as such and may have their APIs change between releases. They are graduated to stable status once their APIs and implementations are proven through community testing and feedback.
 
 ## Core ABM components
 ### Model
@@ -156,15 +156,15 @@ Before Mesa 3, all agents were activated within the step method of the model. Ho
         model.agents_by_type[klass].do("step")
 ```
 
-Next-event time progression is an additional feature, which is currently in an experimental state with plans for support in the future. In this approach, the simulation consists of time-stamped events executed chronologically, with the simulation clock advancing to each event's timestamp. This enables both pure discrete event-based models and hybrid approaches combining incremental time progression with event scheduling on the ticks, as shown below. The latter hybrid approach combines traditional ABM time steps with the flexibility and potential performance benefits of event scheduling.
+Mesa also includes experimental support for next-event time progression through the `DiscreteEventSimulator`. This experimental feature allows scheduling events at arbitrary timestamps rather than fixed ticks, enabling both pure discrete event-based models and hybrid approaches. The latter hybrid approach combines traditional ABM time steps with the flexibility and potential performance benefits of event scheduling. While currently experimental, this capability is being actively developed and tested:
 
 ```python
-    # Pure event-based scheduling
+    # Pure event-based scheduling (experimental)
     simulator = DiscreteEventSimulator()
     model = Model(seed=42, simulator=simulator)
     simulator.schedule_event_relative(some_function, 3.1415)
 
-    # Hybrid time-step and event scheduling
+    # Hybrid time-step and event scheduling (experimental)
     model = Model(seed=42, simulator=ABMSimulator())
     model.simulator.schedule_event_next_tick(some_function)
 ```
