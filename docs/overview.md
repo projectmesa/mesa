@@ -43,15 +43,102 @@ class MyModel(mesa.Model):
         self.agents.shuffle_do("step")
 ```
 
-If you instantiate a model and run it for one step, like so:
+### Spaces in Mesa
+
+Mesa provides several types of spaces where agents can exist and interact:
+
+#### Discrete Spaces
+Mesa implements discrete spaces using a doubly-linked structure where each cell maintains connections to its neighbors. Available variants include:
+
+1. **Grid-based Spaces:**
+   ```python
+   # Create a Von Neumann grid (4 neighbors per cell)
+   grid = mesa.space.OrthogonalVonNeumannGrid((width, height), torus=False)
+   
+   # Create a Moore grid (8 neighbors per cell)
+   grid = mesa.space.OrthogonalMooreGrid((width, height), torus=True)
+   
+   # Create a hexagonal grid
+   grid = mesa.space.HexGrid((width, height), torus=False)
+   ```
+
+2. **Network Space:**
+   ```python
+   # Create a network-based space
+   network = mesa.space.NetworkGrid(network)
+   ```
+
+3. **Voronoi Space:**
+   ```python
+   # Create an irregular tessellation
+   mesh = mesa.space.VoronoiMesh(points)
+   ```
+
+#### Property Layers
+Discrete spaces support PropertyLayers - efficient numpy-based arrays for storing cell-level properties:
 
 ```python
-model = MyModel(5)
-model.step()
+# Create and use a property layer
+grid.create_property_layer("elevation", default_value=10)
+high_ground = grid.elevation.select_cells(lambda x: x > 50)
 ```
 
-You should see agents 1-5, activated in random order. See the [tutorial](tutorials/intro_tutorial) or API documentation for more detail on how to add model functionality.
+#### Continuous Space
+For models requiring continuous movement:
 
+```python
+# Create a continuous space
+space = mesa.space.ContinuousSpace(x_max, y_max, torus=True)
+
+# Move an agent to specific coordinates
+space.move_agent(agent, (new_x, new_y))
+```
+
+### Time Advancement and Agent Activation
+
+Mesa supports multiple approaches to advancing time and activating agents:
+
+#### Basic Time Steps
+The simplest approach runs the model for a specified number of steps:
+
+```python
+model = MyModel(seed=42)
+for _ in range(100):
+    model.step()
+```
+
+#### Agent Activation Patterns
+Mesa 3.0 provides flexible agent activation through the AgentSet API:
+
+```python
+# Sequential activation
+model.agents.do("step")
+
+# Random activation
+model.agents.shuffle_do("step")
+
+# Multi-stage activation
+for stage in ["move", "eat", "reproduce"]:
+    model.agents.do(stage)
+
+# Activation by agent type
+for klass in model.agent_types:
+    model.agents_by_type[klass].do("step")
+```
+
+#### Event-Based Scheduling
+Mesa also supports event-based time progression (experimental):
+
+```python
+# Pure event-based
+simulator = mesa.experimental.DiscreteEventSimulator()
+model = MyModel(seed=42, simulator=simulator)
+simulator.schedule_event_relative(some_function, 3.1415)
+
+# Hybrid time-step and event scheduling
+model = MyModel(seed=42, simulator=mesa.experimental.ABMSimulator())
+model.simulator.schedule_event_next_tick(some_function)
+```
 
 ### AgentSet and model.agents
 Mesa 3.0 makes `model.agents` and the AgentSet class central in managing and activating agents.
