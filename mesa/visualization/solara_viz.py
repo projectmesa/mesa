@@ -58,6 +58,7 @@ def SolaraViz(
     simulator: Simulator | None = None,
     model_params=None,
     name: str | None = None,
+    additional_imports: dict | None = None,
 ):
     """Solara visualization component.
 
@@ -81,6 +82,7 @@ def SolaraViz(
         model_params (dict, optional): Parameters for (re-)instantiating a model.
             Can include user-adjustable parameters and fixed parameters. Defaults to None.
         name (str | None, optional): Name of the visualization. Defaults to the models class name.
+        additional_imports (dict, optional): Dictionary of names to either import strings or objects
 
     Returns:
         solara.component: A Solara component that renders the visualization interface for the model.
@@ -158,7 +160,7 @@ def SolaraViz(
         with solara.Card("Information"):
             ShowSteps(model.value)
         with solara.Card("Command Center"):
-            CommandCenter(model.value)
+            CommandCenter(model.value, additional_imports)
 
     ComponentsView(components, model.value)
 
@@ -591,17 +593,17 @@ def ShowSteps(model):
 
 
 @solara.component
-def CommandCenter(model):
-    """Interactive command center for executing Python code against the model."""
-    # Access caller's global variables for execution context
-    frame = inspect.currentframe()
-    try:
-        global_env = frame.f_back.f_globals
-    finally:
-        del frame  # Prevent reference cycles
+def CommandCenter(model, additional_imports=None):
+    """Interactive command center for executing Python code against the model.
 
+    Args:
+        model: The model instance to execute code against
+        additional_imports (dict, optional): Dictionary of names to either import strings or objects
+            e.g. {'np': 'import numpy as np'} or {'MyClass': MyClass}
+    """
     code = solara.use_reactive("")
     output = solara.use_reactive("")
+    import_error = solara.use_reactive("")
 
     # Custom CSS styles for input area
     solara.Style("""
@@ -612,14 +614,39 @@ def CommandCenter(model):
 
     def handle_code_change(new_value):
         code.set(new_value)
+        import_error.set("")  # Clear any previous import errors
+
+    def setup_environment():
+        """Set up the execution environment with necessary imports and variables."""
+        exec_env = {"model": model}
+
+        # Handle imports dictionary
+        if additional_imports:
+            for name, value in additional_imports.items():
+                if isinstance(value, str):
+                    # Handle string-based imports
+                    try:
+                        exec(value, exec_env) # noqa: S102
+                    except ImportError as e:
+                        import_error.set(f"Failed to import {name}: {e!s}")
+                        return None
+                else:
+                    # Handle direct object injection
+                    exec_env[name] = value
+
+        return exec_env
 
     def handle_run():
         stdout = io.StringIO()
         try:
-            with contextlib.redirect_stdout(stdout):
-                exec_env = {"model": model, **global_env}
+            exec_env = setup_environment()
+            if exec_env is None:  # Import error occurred
+                return
 
-                exec(code.value, global_env, exec_env)  # noqa: S102
+            with contextlib.redirect_stdout(stdout):
+                exec( # noqa: S102
+                    code.value, exec_env, exec_env
+                )  # Using same dict for both globals and locals
 
                 # Force update to display any changes to the model
                 from mesa.visualization.utils import force_update
@@ -630,19 +657,23 @@ def CommandCenter(model):
         except Exception as e:
             output.set(f"Error: {e!s}")
 
-    solara.InputTextArea(
-        label="Enter Python code:",
-        value=code.value,
-        on_value=handle_code_change,
-        continuous_update=True,
-        rows=6,
-    )
+    with solara.Column():
+        if import_error.value:
+            solara.Error(import_error.value)
 
-    with solara.Row(justify="end"):
-        solara.Button("Run Code", on_click=handle_run, color="primary")
+        solara.InputTextArea(
+            label="Enter Python code:",
+            value=code.value,
+            on_value=handle_code_change,
+            continuous_update=True,
+            rows=6,
+        )
 
-    solara.Markdown("### Output")
-    if output.value:
-        solara.Markdown(f"```python\n{output.value}\n```")
-    else:
-        solara.Text("Output will appear here", style={"color": "#666"})
+        with solara.Row(justify="end"):
+            solara.Button("Run Code", on_click=handle_run, color="primary")
+
+        solara.Markdown("### Output")
+        if output.value:
+            solara.Markdown(f"```python\n{output.value}\n```")
+        else:
+            solara.Text("Output will appear here", style={"color": "#666"})
