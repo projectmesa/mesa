@@ -3,7 +3,7 @@ title: Release History
 ---
 # 3.1.4 (2025-02-09)
 ## Highlights
-This release contains various improvements and bugfixes to the matplotlib-based visualization of spaces. Hexgrids are now fully supported, including property layers. In making this possible various minor bugs were encoutered and also fixed. In addition to the visualization improvements, there are various minor convenience improvements to the docs.
+This release contains various improvements and bugfixes to the matplotlib-based visualization of spaces. Hexgrids are now fully supported, including property layers. In making this possible, various minor bugs were encountered and also fixed. In addition to the visualization improvements, there are various minor convenience improvements to the docs.
 
 
 ## What's Changed
