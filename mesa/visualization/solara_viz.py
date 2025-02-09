@@ -626,7 +626,7 @@ def CommandCenter(model, additional_imports=None):
                 if isinstance(value, str):
                     # Handle string-based imports
                     try:
-                        exec(value, exec_env) # noqa: S102
+                        exec(value, exec_env)  # noqa: S102
                     except ImportError as e:
                         import_error.set(f"Failed to import {name}: {e!s}")
                         return None
@@ -644,7 +644,7 @@ def CommandCenter(model, additional_imports=None):
                 return
 
             with contextlib.redirect_stdout(stdout):
-                exec( # noqa: S102
+                exec(  # noqa: S102
                     code.value, exec_env, exec_env
                 )  # Using same dict for both globals and locals
 
