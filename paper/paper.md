@@ -69,7 +69,7 @@ Mesa is a Python-based framework for ABM that provides a comprehensive set of to
 
 This decoupled design allows selective use of components while enabling extension and customization.
 
-Mesa follows a two-track development model where new features are first released as experimental before being stabilized. Experimental features are clearly marked as such and may have their APIs change between releases. They are graduated to stable status once their APIs and implementations are proven through community testing and feedback.
+Mesa follows a two-track development model where new features are first released as experimental before being stabilized. Experimental features are clearly marked as such and may have their APIs change between releases. They are graduated to stable status once their APIs and implementations are proven through community testing and feedback. Stable features follow semantic versioning.
 
 ## Core ABM components
 ### Model
