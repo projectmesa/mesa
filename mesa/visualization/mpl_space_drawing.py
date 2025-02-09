@@ -101,7 +101,15 @@ def collect_agent_data(
                 stacklevel=2,
             )
 
-    return {k: np.asarray(v) for k, v in arguments.items()}
+    data = {
+        k: (np.asarray(v, dtype=object) if k == "marker" else np.asarray(v))
+        for k, v in arguments.items()
+    }
+    # ensures that the tuples in marker dont get converted by numpy to an array resulting in a 2D array
+    arr = np.empty(len(arguments["marker"]), dtype=object)
+    arr[:] = arguments["marker"]
+    data["marker"] = arr
+    return data
 
 
 def draw_space(
@@ -638,8 +646,8 @@ def _scatter(ax: Axes, arguments, **kwargs):
                     f"{entry} is specified in agent portrayal and via plotting kwargs, you can only use one or the other"
                 )
 
-    for mark in np.unique(marker):
-        mark_mask = marker == mark
+    for mark in set(marker):
+        mark_mask = [m == mark for m in list(marker)]
         for z_order in np.unique(zorder):
             zorder_mask = z_order == zorder
             logical = mark_mask & zorder_mask
