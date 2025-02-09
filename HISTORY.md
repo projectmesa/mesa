@@ -9,29 +9,27 @@ This release contains various improvements and bugfixes to the matplotlib-based 
 ## What's Changed
 ### 🛠 Enhancements made
 * Fixed hex-space draw function to avoid overlaps by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2609
+* Fix: Property layer visualization for HexGrid by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2646
 * Enhance DataCollector to validate model_reporters functions by @peter-kinger in https://github.com/projectmesa/mesa/pull/2605
+* Implemented post_process in Altair based components by @sanika-n in https://github.com/projectmesa/mesa/pull/2641
 ### 🐛 Bugs fixed
 * bugfix for draw_property_layer by @quaquel in https://github.com/projectmesa/mesa/pull/2639
 * Uses array for hex grid property layer fix by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2651
 * Update Binder environment to use latest Mesa version (#2652) by @aarav-shukla07 in https://github.com/projectmesa/mesa/pull/2655
+* Change Hexgrid._connect_cells_2d to use x,y coordinates by @quaquel in https://github.com/projectmesa/mesa/pull/2632
 ### 🔍 Examples updated
 * Added property layer viz to sugarscape by @sanika-n in https://github.com/projectmesa/mesa/pull/2653
+* added color-bar for spice by @sanika-n in https://github.com/projectmesa/mesa/pull/2622
 ### 📜 Documentation improvements
 * remove any reference to using --pre by @quaquel in https://github.com/projectmesa/mesa/pull/2618
 * Updated Docs by @sanika-n in https://github.com/projectmesa/mesa/pull/2624
 * Fixed 404 error for Examples Tab in Introductory Tutorial (#2662) by @aarav-shukla07 in https://github.com/projectmesa/mesa/pull/2664
+* Documentation by @Spartan-71 in https://github.com/projectmesa/mesa/pull/2630
+* Adding a copy option at the top of the code written in the docs by @PrashantChoudhary13579 in https://github.com/projectmesa/mesa/pull/2628
+* Adding Mesa Extension page by @PrashantChoudhary13579 in https://github.com/projectmesa/mesa/pull/2627
 ### 🔧 Maintenance
 * remove remnants of mesa cli by @quaquel in https://github.com/projectmesa/mesa/pull/2617
 * benchmarks.yml: Install SciPy and use uv for pip install by @EwoutH in https://github.com/projectmesa/mesa/pull/2633
-### Other changes
-* added color-bar for spice by @sanika-n in https://github.com/projectmesa/mesa/pull/2622
-* Documentation by @Spartan-71 in https://github.com/projectmesa/mesa/pull/2630
-* Adding a copy option at the top of the code written in the docs by @PrashantChoudhary13579 in https://github.com/projectmesa/mesa/pull/2628
-* Change Hexgrid._connect_cells_2d to use x,y coordinates by @quaquel in https://github.com/projectmesa/mesa/pull/2632
-* Fix: Property layer visualization for HexGrid by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2646
-* Implemented post_process in Altair based components by @sanika-n in https://github.com/projectmesa/mesa/pull/2641
-* Fix: Alpha for colormaps in HexGrid by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2660
-* Adding Mesa Extension page by @PrashantChoudhary13579 in https://github.com/projectmesa/mesa/pull/2627
 * [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in https://github.com/projectmesa/mesa/pull/2659
 
 ## New Contributors
