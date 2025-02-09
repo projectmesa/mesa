@@ -24,7 +24,9 @@ See the Visualization Tutorial and example models for more details.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import inspect
+import io
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
@@ -155,6 +157,8 @@ def SolaraViz(
             )
         with solara.Card("Information"):
             ShowSteps(model.value)
+        with solara.Card("Command Center"):
+            CommandCenter(model.value)
 
     ComponentsView(components, model.value)
 
@@ -584,3 +588,61 @@ def ShowSteps(model):
     """Display the current step of the model."""
     update_counter.get()
     return solara.Text(f"Step: {model.steps}")
+
+
+@solara.component
+def CommandCenter(model):
+    """Interactive command center for executing Python code against the model."""
+    # Access caller's global variables for execution context
+    frame = inspect.currentframe()
+    try:
+        global_env = frame.f_back.f_globals
+    finally:
+        del frame  # Prevent reference cycles
+
+    code = solara.use_reactive("")
+    output = solara.use_reactive("")
+
+    # Custom CSS styles for input area
+    solara.Style("""
+    .v-text-field__slot textarea {
+        font-family: monospace !important;
+    }
+    """)
+
+    def handle_code_change(new_value):
+        code.set(new_value)
+
+    def handle_run():
+        stdout = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(stdout):
+                exec_env = {"model": model, **global_env}
+
+                exec(code.value, global_env, exec_env)  # noqa: S102
+
+                # Force update to display any changes to the model
+                from mesa.visualization.utils import force_update
+
+                force_update()
+
+            output.set(stdout.getvalue())
+        except Exception as e:
+            output.set(f"Error: {e!s}")
+
+    solara.InputTextArea(
+        label="Enter Python code:",
+        value=code.value,
+        on_value=handle_code_change,
+        continuous_update=True,
+        rows=6,
+    )
+
+    with solara.Row(justify="end"):
+        solara.Button("Run Code", on_click=handle_run, color="primary")
+
+    solara.Markdown("### Output")
+    if output.value:
+        solara.Markdown(f"```python\n{output.value}\n```")
+    else:
+        solara.Text("Output will appear here", style={"color": "#666"})
