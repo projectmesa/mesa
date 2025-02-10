@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Protocol
 from mesa.agent import Agent
 
 if TYPE_CHECKING:
-    from mesa.experimental.cell_space import Cell
+    from mesa.discrete_space import Cell
 
 
 class HasCellProtocol(Protocol):

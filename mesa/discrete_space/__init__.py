@@ -15,8 +15,6 @@ like resource growth, pollution diffusion, or infrastructure networks. The cell
 space system is experimental and under active development.
 """
 
-import warnings
-
 from mesa.discrete_space.cell import Cell
 from mesa.discrete_space.cell_agent import (
     CellAgent,
@@ -50,11 +48,3 @@ __all__ = [
     "PropertyLayer",
     "VoronoiGrid",
 ]
-
-
-warnings.warn(
-    "you are importing from mesa.experimental.cell_space, "
-    "all cell spaces have been moved to mesa.discrete_space",
-    DeprecationWarning,
-    stacklevel=2,
-)
