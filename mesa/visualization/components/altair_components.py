@@ -5,7 +5,7 @@ import warnings
 import altair as alt
 import solara
 
-from mesa.experimental.cell_space import DiscreteSpace, Grid
+from mesa.discrete_space import DiscreteSpace, Grid
 from mesa.space import ContinuousSpace, _Grid
 from mesa.visualization.utils import update_counter
 
