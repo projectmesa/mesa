@@ -619,7 +619,10 @@ class _SecureCodeValidator(ast.NodeVisitor):
                 self.errors.append(
                     f"Use of forbidden built-in '{node.func.id}()' is not allowed for security reasons"
                 )
-        elif isinstance(node.func, ast.Attribute) and node.func.attr in self.FORBIDDEN_ATTRIBUTES:
+        elif (
+            isinstance(node.func, ast.Attribute)
+            and node.func.attr in self.FORBIDDEN_ATTRIBUTES
+        ):
             self.errors.append(
                 f"Access to special attribute '{node.func.attr}' is not allowed for security reasons"
             )
