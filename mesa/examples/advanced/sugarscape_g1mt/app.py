@@ -1,47 +1,24 @@
-import numpy as np
-import solara
-from matplotlib.figure import Figure
-
 from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt
 from mesa.visualization import Slider, SolaraViz, make_plot_component
+from mesa.visualization.components.matplotlib_components import make_mpl_space_component
 
 
-def SpaceDrawer(model):
-    def portray(g):
-        layers = {
-            "trader": {"x": [], "y": [], "c": "tab:red", "marker": "o", "s": 10},
-        }
+def agent_portrayal(agent):
+    return {"marker": "o", "color": "red", "size": 10}
 
-        for agent in g.all_cells.agents:
-            i, j = agent.cell.coordinate
-            layers["trader"]["x"].append(i)
-            layers["trader"]["y"].append(j)
-        return layers
 
-    fig = Figure()
-    ax = fig.subplots()
-    out = portray(model.grid)
-    # Sugar
-    # Important note: imshow by default draws from upper left. You have to
-    # always explicitly specify origin="lower".
-    im = ax.imshow(
-        np.ma.masked_where(model.grid.sugar.data <= 1, model.grid.sugar.data),
-        cmap="spring",
-        origin="lower",
-    )
-    fig.colorbar(im, ax=ax, orientation="vertical", pad=0.1, fraction=0.046)
-    # Spice
-    im_spice = ax.imshow(
-        np.ma.masked_where(model.grid.spice.data <= 1, model.grid.spice.data),
-        cmap="winter",
-        origin="lower",
-    )
-    fig.colorbar(im_spice, ax=ax, orientation="vertical", fraction=0.046, pad=0.04)
-    # Trader
-    ax.scatter(**out["trader"])
-    ax.set_axis_off()
-    return solara.FigureMatplotlib(fig)
+propertylayer_portrayal = {
+    "sugar": {"color": "blue", "alpha": 0.8, "colorbar": True, "vmin": 0, "vmax": 10},
+    "spice": {"color": "red", "alpha": 0.8, "colorbar": True, "vmin": 0, "vmax": 10},
+}
 
+
+sugarscape_space = make_mpl_space_component(
+    agent_portrayal=agent_portrayal,
+    propertylayer_portrayal=propertylayer_portrayal,
+    post_process=None,
+    draw_grid=False,
+)
 
 model_params = {
     "seed": {
@@ -73,7 +50,7 @@ model = SugarscapeG1mt()
 page = SolaraViz(
     model,
     components=[
-        SpaceDrawer,
+        sugarscape_space,
         make_plot_component("#Traders"),
         make_plot_component("Price"),
     ],

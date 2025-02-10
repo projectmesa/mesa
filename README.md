@@ -28,7 +28,7 @@ can be displayed in browser windows or Jupyter.*
 
 ## Using Mesa
 
-To install our latest stable release (3.0.x), run:
+To install our latest stable release, run:
 
 ``` bash
 pip install -U mesa

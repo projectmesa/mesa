@@ -177,8 +177,7 @@ The results are returned as a list of dictionaries, which can be easily converte
 ### Visualization
 Mesa now uses a new browser-based visualization system called SolaraViz. This allows for interactive, customizable visualizations of your models.
 
-> **Note:** SolaraViz is experimental and still in active development for Mesa 3.0. While we attempt to minimize them, there might be API breaking changes between Mesa 3.0 and 3.1. There won't be breaking changes between Mesa 3.0.x patch releases.
-
+Note: SolaraViz is experimental and still in active development in Mesa 3.x. While we attempt to minimize them, there might be API breaking changes in minor releases.
 > **Note:** SolaraViz instantiates new models using `**model_parameters.value`, so all model inputs must be keyword arguments.
 
 Ensure your model's `__init__` method accepts keyword arguments matching the `model_params` keys.
@@ -188,8 +187,8 @@ class MyModel(Model):
     def __init__(self, n_agents=10, seed=None):
         super().__init__(seed=seed)
         # Initialize the model with N agents
-
-The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace
+```
+The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace.
 
 Here's a basic example of how to set up a visualization:
 
