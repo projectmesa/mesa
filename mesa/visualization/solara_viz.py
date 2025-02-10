@@ -23,8 +23,13 @@ See the Visualization Tutorial and example models for more details.
 
 from __future__ import annotations
 
+import ast
 import asyncio
+import builtins
+import contextlib
 import inspect
+import io
+import re
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
@@ -56,6 +61,7 @@ def SolaraViz(
     simulator: Simulator | None = None,
     model_params=None,
     name: str | None = None,
+    additional_imports: dict | None = None,
 ):
     """Solara visualization component.
 
@@ -79,6 +85,7 @@ def SolaraViz(
         model_params (dict, optional): Parameters for (re-)instantiating a model.
             Can include user-adjustable parameters and fixed parameters. Defaults to None.
         name (str | None, optional): Name of the visualization. Defaults to the models class name.
+        additional_imports (dict, optional): Dictionary of names to either import strings or objects
 
     Returns:
         solara.component: A Solara component that renders the visualization interface for the model.
@@ -155,6 +162,8 @@ def SolaraViz(
             )
         with solara.Card("Information"):
             ShowSteps(model.value)
+        with solara.Card("Command Center"):
+            CommandCenter(model.value, additional_imports)
 
     ComponentsView(components, model.value)
 
@@ -584,3 +593,156 @@ def ShowSteps(model):
     """Display the current step of the model."""
     update_counter.get()
     return solara.Text(f"Step: {model.steps}")
+
+
+class _SecureCodeValidator(ast.NodeVisitor):
+    """Validates Python code for potentially dangerous operations."""
+
+    FORBIDDEN_BUILTINS = {
+        "eval",
+        "exec",
+        "compile",  # Code execution
+        "open",  # File system access
+        "globals",
+        "locals",  # Global state manipulation
+    }
+
+    FORBIDDEN_ATTRIBUTES = {"__code__", "__globals__", "__builtins__"}
+
+    def __init__(self):
+        self.errors = []
+
+    def visit_Call(self, node):
+        # Check function calls
+        if isinstance(node.func, ast.Name):
+            if node.func.id in self.FORBIDDEN_BUILTINS:
+                self.errors.append(
+                    f"Use of forbidden built-in '{node.func.id}()' is not allowed for security reasons"
+                )
+        elif (
+            isinstance(node.func, ast.Attribute)
+            and node.func.attr in self.FORBIDDEN_ATTRIBUTES
+        ):
+            self.errors.append(
+                f"Access to special attribute '{node.func.attr}' is not allowed for security reasons"
+            )
+        self.generic_visit(node)
+
+    def visit_Attribute(self, node):
+        attrs = []
+        curr = node
+        while isinstance(curr, ast.Attribute):
+            attrs.append(curr.attr)
+            curr = curr.value
+
+        dangerous_patterns = [
+            r"(subprocess|shutil)",  # System manipulation modules
+        ]
+
+        for attr in attrs:
+            for pattern in dangerous_patterns:
+                if re.match(pattern, attr):
+                    self.errors.append(
+                        f"Access to system module '{attr}' is not allowed"
+                    )
+
+        self.generic_visit(node)
+
+
+@solara.component
+def CommandCenter(model, additional_imports=None):
+    """Interactive command center for executing Python code against the model.
+
+    Args:
+        model: The model instance to execute code against
+        additional_imports (dict, optional): Dictionary of names to objects
+            e.g. {'np': numpy, 'pd': pandas}
+    """
+    code = solara.use_reactive("")
+    output = solara.use_reactive("")
+    error = solara.use_reactive("")
+
+    def create_safe_globals(
+        model: object,
+        additional_imports: dict[str, str | object] | None = None,
+    ) -> dict:
+        """Creates a restricted globals dictionary for code execution."""
+        safe_globals = {"__builtins__": builtins.__dict__.copy()}
+
+        # Remove forbidden builtins using the same set from _SecureCodeValidator
+        for name in _SecureCodeValidator.FORBIDDEN_BUILTINS:
+            safe_globals["__builtins__"].pop(name, None)
+
+        safe_globals["model"] = model
+
+        # Add additional imports if provided
+        if additional_imports:
+            for name, value in additional_imports.items():
+                safe_globals[name] = value
+
+        return safe_globals
+
+    solara.Style("""
+    .v-text-field__slot textarea {
+        font-family: monospace !important;
+    }
+    """)
+
+    def handle_code_change(new_value):
+        code.set(new_value)
+        error.set("")
+
+    def handle_run():
+        output.set("")
+        error.set("")
+
+        try:
+            tree = ast.parse(code.value)
+            validator = _SecureCodeValidator()
+            validator.visit(tree)
+
+            if validator.errors:
+                error.set("Security violations found:\n" + "\n".join(validator.errors))
+                return
+
+        except SyntaxError as e:
+            error.set(f"Syntax Error: {e!s}")
+            return
+
+        stdout = io.StringIO()
+        try:
+            exec_env = create_safe_globals(model, additional_imports)
+
+            with contextlib.redirect_stdout(stdout):
+                exec(code.value, exec_env, exec_env)  # noqa: S102
+
+                # Force update to display any changes to the model
+                from mesa.visualization.utils import force_update
+
+                force_update()
+
+            output.set(stdout.getvalue())
+
+        except Exception as e:
+            error.set(f"Runtime Error: {e!s}")
+
+    with solara.Column():
+        if error.value:
+            solara.Error(error.value)
+
+        solara.InputTextArea(
+            label="Enter Python code:",
+            value=code.value,
+            on_value=handle_code_change,
+            continuous_update=True,
+            rows=6,
+        )
+
+        with solara.Row(justify="end"):
+            solara.Button("Run Code", on_click=handle_run, color="primary")
+
+        solara.Markdown("### Output")
+        if output.value:
+            solara.Markdown(f"```python\n{output.value}\n```")
+        else:
+            solara.Text("Output will appear here", style={"color": "#666"})
