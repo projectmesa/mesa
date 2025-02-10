@@ -23,10 +23,13 @@ See the Visualization Tutorial and example models for more details.
 
 from __future__ import annotations
 
+import ast
 import asyncio
+import builtins
 import contextlib
 import inspect
 import io
+import re
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
@@ -592,20 +595,90 @@ def ShowSteps(model):
     return solara.Text(f"Step: {model.steps}")
 
 
+class _SecureCodeValidator(ast.NodeVisitor):
+    """Validates Python code for potentially dangerous operations."""
+
+    FORBIDDEN_BUILTINS = {
+        "eval",
+        "exec",
+        "compile",  # Code execution
+        "open",  # File system access
+        "globals",
+        "locals",  # Global state manipulation
+    }
+
+    FORBIDDEN_ATTRIBUTES = {"__code__", "__globals__", "__builtins__"}
+
+    def __init__(self):
+        self.errors = []
+
+    def visit_Call(self, node):
+        # Check function calls
+        if isinstance(node.func, ast.Name):
+            if node.func.id in self.FORBIDDEN_BUILTINS:
+                self.errors.append(
+                    f"Use of forbidden built-in '{node.func.id}()' is not allowed for security reasons"
+                )
+        elif isinstance(node.func, ast.Attribute) and node.func.attr in self.FORBIDDEN_ATTRIBUTES:
+            self.errors.append(
+                f"Access to special attribute '{node.func.attr}' is not allowed for security reasons"
+            )
+        self.generic_visit(node)
+
+    def visit_Attribute(self, node):
+        attrs = []
+        curr = node
+        while isinstance(curr, ast.Attribute):
+            attrs.append(curr.attr)
+            curr = curr.value
+
+        dangerous_patterns = [
+            r"(subprocess|shutil)",  # System manipulation modules
+        ]
+
+        for attr in attrs:
+            for pattern in dangerous_patterns:
+                if re.match(pattern, attr):
+                    self.errors.append(
+                        f"Access to system module '{attr}' is not allowed"
+                    )
+
+        self.generic_visit(node)
+
+
 @solara.component
 def CommandCenter(model, additional_imports=None):
     """Interactive command center for executing Python code against the model.
 
     Args:
         model: The model instance to execute code against
-        additional_imports (dict, optional): Dictionary of names to either import strings or objects
-            e.g. {'np': 'import numpy as np'} or {'MyClass': MyClass}
+        additional_imports (dict, optional): Dictionary of names to objects
+            e.g. {'np': numpy, 'pd': pandas}
     """
     code = solara.use_reactive("")
     output = solara.use_reactive("")
-    import_error = solara.use_reactive("")
+    error = solara.use_reactive("")
 
-    # Custom CSS styles for input area
+    def create_safe_globals(
+        model: object,
+        additional_imports: dict[str, str | object] | None = None,
+    ) -> dict:
+        """Creates a restricted globals dictionary for code execution."""
+        safe_globals = {"__builtins__": builtins.__dict__.copy()}
+
+        # Remove forbidden builtins using the same set from _SecureCodeValidator
+        for name in _SecureCodeValidator.FORBIDDEN_BUILTINS:
+            safe_globals["__builtins__"].pop(name, None)
+
+        safe_globals["model"] = model
+
+        # Add additional imports if provided
+        if additional_imports:
+            for name, value in additional_imports.items():
+                safe_globals[name] = value
+
+        return safe_globals
+
     solara.Style("""
     .v-text-field__slot textarea {
         font-family: monospace !important;
@@ -614,39 +687,31 @@ def CommandCenter(model, additional_imports=None):
 
     def handle_code_change(new_value):
         code.set(new_value)
-        import_error.set("")  # Clear any previous import errors
-
-    def setup_environment():
-        """Set up the execution environment with necessary imports and variables."""
-        exec_env = {"model": model}
-
-        # Handle imports dictionary
-        if additional_imports:
-            for name, value in additional_imports.items():
-                if isinstance(value, str):
-                    # Handle string-based imports
-                    try:
-                        exec(value, exec_env) # noqa: S102
-                    except ImportError as e:
-                        import_error.set(f"Failed to import {name}: {e!s}")
-                        return None
-                else:
-                    # Handle direct object injection
-                    exec_env[name] = value
-
-        return exec_env
+        error.set("")
 
     def handle_run():
-        stdout = io.StringIO()
+        output.set("")
+        error.set("")
+
         try:
-            exec_env = setup_environment()
-            if exec_env is None:  # Import error occurred
+            tree = ast.parse(code.value)
+            validator = _SecureCodeValidator()
+            validator.visit(tree)
+
+            if validator.errors:
+                error.set("Security violations found:\n" + "\n".join(validator.errors))
                 return
 
+        except SyntaxError as e:
+            error.set(f"Syntax Error: {e!s}")
+            return
+
+        stdout = io.StringIO()
+        try:
+            exec_env = create_safe_globals(model, additional_imports)
+
             with contextlib.redirect_stdout(stdout):
-                exec( # noqa: S102
-                    code.value, exec_env, exec_env
-                )  # Using same dict for both globals and locals
+                exec(code.value, exec_env, exec_env)  # noqa: S102
 
                 # Force update to display any changes to the model
                 from mesa.visualization.utils import force_update
@@ -654,12 +719,13 @@ def CommandCenter(model, additional_imports=None):
                 force_update()
 
             output.set(stdout.getvalue())
+
         except Exception as e:
-            output.set(f"Error: {e!s}")
+            error.set(f"Runtime Error: {e!s}")
 
     with solara.Column():
-        if import_error.value:
-            solara.Error(import_error.value)
+        if error.value:
+            solara.Error(error.value)
 
         solara.InputTextArea(
             label="Enter Python code:",
