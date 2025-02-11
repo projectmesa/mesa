@@ -49,7 +49,7 @@ class BoltzmannWealth(Model):
         MoneyAgent.create_agents(
             self,
             self.num_agents,
-            self.random.choices(self.grid.all_cells.cells, self.num_agents),
+            self.random.choices(self.grid.all_cells.cells, k=self.num_agents),
         )
 
         self.running = True
