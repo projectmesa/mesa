@@ -5,11 +5,11 @@ import math
 import warnings
 from collections.abc import Callable
 
-import altair as alt
 import solara
 
 import mesa
-from mesa.experimental.cell_space.grid import HexGrid
+import mesa.experimental
+from mesa.experimental.cell_space import HexGrid
 
 with contextlib.suppress(ImportError):
     import altair as alt
@@ -19,7 +19,11 @@ from mesa.space import ContinuousSpace, NetworkGrid, _Grid
 from mesa.visualization.utils import update_counter
 
 
-def make_space_altair(*args, **kwargs):  # noqa: D103
+def make_space_altair(*args, **kwargs):
+    """Create an Altair chart component for visualizing model space (deprecated).
+
+    This function is deprecated. Use make_altair_space_component instead.
+    """
     warnings.warn(
         "make_space_altair has been renamed to make_altair_space_component",
         DeprecationWarning,
@@ -210,70 +214,73 @@ def axial_to_pixel(q, r, size=1):
 
 
 def get_agent_data(space, agent_portrayal):
-    """Generic method to extract agent data for visualization across all space types.
+    """Draw a Matplotlib-based visualization of the space.
 
     Args:
-        space: Mesa space object
-        agent_portrayal: Function defining agent visualization properties
+        space: the space of the mesa model
+        agent_portrayal: A callable that returns a dict specifying how to show the agent
 
     Returns:
         List of agent data dictionaries with coordinates
     """
     all_agent_data = []
 
-    # New DiscreteSpace
-    if isinstance(space, Grid):
-        for cell in space.all_cells:
-            for agent in cell.agents:
-                data = agent_portrayal(agent)
-                data.update({"x": cell.coordinate[0], "y": cell.coordinate[1]})
-                all_agent_data.append(data)
-
-    # Legacy Grid
-    elif isinstance(space, _Grid):
-        for content, (x, y) in space.coord_iter():
-            if not content:
-                continue
-            agents = [content] if not hasattr(content, "__iter__") else content
-            for agent in agents:
-                data = agent_portrayal(agent)
-                data.update({"x": x, "y": y})
-                all_agent_data.append(data)
-
-    elif isinstance(space, HexGrid):
-        for content, (q, r) in space.coord_iter():
-            if content:
-                for agent in content:
+    match space:
+        case Grid():
+            # New DiscreteSpace or experimental cell space
+            for cell in space.all_cells:
+                for agent in cell.agents:
                     data = agent_portrayal(agent)
-                    x, y = axial_to_pixel(q, r)
+                    data.update({"x": cell.coordinate[0], "y": cell.coordinate[1]})
+                    all_agent_data.append(data)
+
+        case _Grid():
+            # Legacy MESA grid
+            for content, (x, y) in space.coord_iter():
+                if not content:
+                    continue
+                agents = [content] if not hasattr(content, "__iter__") else content
+                for agent in agents:
+                    data = agent_portrayal(agent)
                     data.update({"x": x, "y": y})
                     all_agent_data.append(data)
 
-    elif isinstance(space, NetworkGrid):
-        for node in space.G.nodes():
-            agents = space.G.nodes[node].get("agent", [])
-            if isinstance(agents, list):
-                agent_list = agents
-            else:
-                agent_list = [agents] if agents else []
+        case HexGrid():
+            # Hex-based grid
+            for content, (q, r) in space.coord_iter():
+                if content:
+                    for agent in content:
+                        data = agent_portrayal(agent)
+                        x, y = axial_to_pixel(q, r)
+                        data.update({"x": x, "y": y})
+                        all_agent_data.append(data)
 
-            for agent in agent_list:
-                if agent:
-                    pos = space.G.nodes[node].get("pos", (0, 0))
-                    data = agent_portrayal(agent)
-                    data.update({"x": pos[0], "y": pos[1]})
-                    all_agent_data.append(data)
+        case NetworkGrid():
+            # Network grid (graph-based)
+            for node in space.G.nodes():
+                node_agents = space.G.nodes[node].get("agent", [])
+                if not isinstance(node_agents, list):
+                    node_agents = [node_agents] if node_agents else []
+                for agent in node_agents:
+                    if agent:
+                        pos = space.G.nodes[node].get("pos", (0, 0))
+                        data = agent_portrayal(agent)
+                        data.update({"x": pos[0], "y": pos[1]})
+                        all_agent_data.append(data)
 
-    elif isinstance(
-        space, ContinuousSpace | mesa.experimental.continuous_space.ContinuousSpace
-    ):
-        for agent in space.agents:
-            data = agent_portrayal(agent)
-            data.update({"x": agent.pos[0], "y": agent.pos[1]})
-            all_agent_data.append(data)
+        case ContinuousSpace() | mesa.experimental.continuous_space.ContinuousSpace():
+            # Continuous space (including experimental version)
+            for agent in space.agents:
+                data = agent_portrayal(agent)
+                if hasattr(agent, "pos") and agent.pos is not None:
+                    data.update({"x": agent.pos[0], "y": agent.pos[1]})
+                else:
+                    data.update({"x": 0, "y": 0})
+                all_agent_data.append(data)
 
-    else:
-        raise NotImplementedError(f"Unsupported space type: {type(space)}")
+        case _:
+            # Fallback for unrecognized space types
+            raise NotImplementedError(f"Unsupported space type: {type(space)}")
 
     return all_agent_data
 
