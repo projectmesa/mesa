@@ -11,13 +11,14 @@ class MoneyAgent(Agent):
         wealth (int): The agent's current wealth (starts at 1)
     """
 
-    def __init__(self, model):
+    def __init__(self, model, cell):
         """Create a new agent.
 
         Args:
             model (Model): The model instance that contains the agent
         """
         super().__init__(model)
+        self.cell = cell
         self.wealth = 1
 
     def move(self):

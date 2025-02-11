@@ -9,6 +9,7 @@ when they occupy the same cell.
 
 from mesa import Model
 from mesa.datacollection import DataCollector
+from mesa.discrete_space import OrthogonalMooreGrid
 from mesa.examples.basic.boltzmann_wealth_model.agents import MoneyAgent
 from mesa.space import MultiGrid
 
@@ -39,22 +40,14 @@ class BoltzmannWealth(Model):
         super().__init__(seed=seed)
 
         self.num_agents = n
-        self.grid = MultiGrid(width, height, torus=True)
+        self.grid = OrthogonalMooreGrid((width, height), random=self.random)
 
         # Set up data collection
         self.datacollector = DataCollector(
             model_reporters={"Gini": self.compute_gini},
             agent_reporters={"Wealth": "wealth"},
         )
-
-        # Create and place the agents
-        for _ in range(self.num_agents):
-            agent = MoneyAgent(self)
-
-            # Add agent to random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(agent, (x, y))
+        MoneyAgent.create_agents(self, self.num_agents, self.random.choices(self.grid.all_cells.cells, self.num_agents))
 
         self.running = True
         self.datacollector.collect(self)
