@@ -27,9 +27,7 @@ class MoneyAgent(CellAgent):
 
     def give_money(self):
         """Give 1 unit of wealth to a random agent in the same cell."""
-        cellmates = self.cell.agents
-        # Remove self from potential recipients
-        cellmates.pop(cellmates.index(self))
+        cellmates = [a for a in self.cell.agents if a is not self]
 
         if cellmates:  # Only give money if there are other agents present
             other = self.random.choice(cellmates)
