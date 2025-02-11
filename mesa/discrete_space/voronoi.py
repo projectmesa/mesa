@@ -18,8 +18,8 @@ from random import Random
 
 import numpy as np
 
-from mesa.experimental.cell_space.cell import Cell
-from mesa.experimental.cell_space.discrete_space import DiscreteSpace
+from mesa.discrete_space.cell import Cell
+from mesa.discrete_space.discrete_space import DiscreteSpace
 
 
 class Delaunay:

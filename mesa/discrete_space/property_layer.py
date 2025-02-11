@@ -21,7 +21,7 @@ from typing import Any, TypeVar
 
 import numpy as np
 
-from mesa.experimental.cell_space import Cell
+from mesa.discrete_space import Cell
 
 Coordinate = Sequence[int]
 T = TypeVar("T", bound=Cell)
