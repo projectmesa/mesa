@@ -1,7 +1,6 @@
 from mesa import Model
 from mesa.discrete_space import OrthogonalMooreGrid
 from mesa.examples.basic.conways_game_of_life.agents import Cell
-from mesa.space import SingleGrid
 
 
 class ConwaysGameOfLife(Model):
@@ -16,7 +15,13 @@ class ConwaysGameOfLife(Model):
         # Place a cell at each location, with some initialized to
         # ALIVE and some to DEAD.
         for cell in self.grid.all_cells():
-            Cell(self, cell, init_state=Cell.ALIVE if self.random.random() < initial_fraction_alive else Cell.DEAD)
+            Cell(
+                self,
+                cell,
+                init_state=Cell.ALIVE
+                if self.random.random() < initial_fraction_alive
+                else Cell.DEAD,
+            )
 
         self.running = True
 

@@ -1,4 +1,3 @@
-from mesa import Agent
 from mesa.discrete_space import FixedAgent
 
 
