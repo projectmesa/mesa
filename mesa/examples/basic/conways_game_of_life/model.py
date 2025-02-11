@@ -14,7 +14,7 @@ class ConwaysGameOfLife(Model):
 
         # Place a cell at each location, with some initialized to
         # ALIVE and some to DEAD.
-        for cell in self.grid.all_cells():
+        for cell in self.grid.all_cells:
             Cell(
                 self,
                 cell,
