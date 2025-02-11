@@ -1,15 +1,17 @@
 from mesa import Agent
+from mesa.discrete_space import CellAgent
 
 
-class Cell(Agent):
+class Cell(CellAgent):
     """Represents a single ALIVE or DEAD cell in the simulation."""
 
     DEAD = 0
     ALIVE = 1
 
-    def __init__(self, pos, model, init_state=DEAD):
+    def __init__(self, model, cell, init_state=DEAD):
         """Create a cell, in the given state, at the given x, y position."""
         super().__init__(model)
+        self.cell = cell
         self.x, self.y = pos
         self.state = init_state
         self._next_state = None
