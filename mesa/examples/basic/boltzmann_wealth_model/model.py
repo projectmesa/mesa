@@ -11,7 +11,6 @@ from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalMooreGrid
 from mesa.examples.basic.boltzmann_wealth_model.agents import MoneyAgent
-from mesa.space import MultiGrid
 
 
 class BoltzmannWealth(Model):
@@ -47,7 +46,11 @@ class BoltzmannWealth(Model):
             model_reporters={"Gini": self.compute_gini},
             agent_reporters={"Wealth": "wealth"},
         )
-        MoneyAgent.create_agents(self, self.num_agents, self.random.choices(self.grid.all_cells.cells, self.num_agents))
+        MoneyAgent.create_agents(
+            self,
+            self.num_agents,
+            self.random.choices(self.grid.all_cells.cells, self.num_agents),
+        )
 
         self.running = True
         self.datacollector.collect(self)
