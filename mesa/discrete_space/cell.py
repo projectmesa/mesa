@@ -185,12 +185,12 @@ class Cell:
             raise ValueError("radius must be larger than one")
         if radius == 1:
             neighborhood = {
-                neighbor: neighbor.agents for neighbor in self.connections.values()
+                neighbor: neighbor._agents for neighbor in self.connections.values()
             }
             if not include_center:
                 return neighborhood
             else:
-                neighborhood[self] = self.agents
+                neighborhood[self] = self._agents
                 return neighborhood
         else:
             neighborhood: dict[Cell, list[Agent]] = {}
