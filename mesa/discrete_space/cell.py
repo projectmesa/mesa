@@ -136,7 +136,7 @@ class Cell:
 
     @property
     def agents(self) -> list[CellAgent]:
-        """returns a list of the agents occupying the cell."""
+        """Returns a list of the agents occupying the cell."""
         return self._agents.copy()
 
     def __repr__(self):  # noqa
