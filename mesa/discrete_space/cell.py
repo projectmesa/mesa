@@ -65,8 +65,8 @@ class Cell:
         super().__init__()
         self.coordinate = coordinate
         self.connections: dict[Coordinate, Cell] = {}
-        self.agents: list[
-            Agent
+        self._agents: list[
+            CellAgent
         ] = []  # TODO:: change to AgentSet or weakrefs? (neither is very performant, )
         self.capacity: int | None = capacity
         self.properties: dict[
@@ -104,7 +104,7 @@ class Cell:
             agent (CellAgent): agent to add to this Cell
 
         """
-        n = len(self.agents)
+        n = len(self._agents)
         self.empty = False
 
         if self.capacity and n >= self.capacity:
@@ -112,7 +112,7 @@ class Cell:
                 "ERROR: Cell is full"
             )  # FIXME we need MESA errors or a proper error
 
-        self.agents.append(agent)
+        self._agents.append(agent)
 
     def remove_agent(self, agent: CellAgent) -> None:
         """Removes an agent from the cell.
@@ -121,7 +121,7 @@ class Cell:
             agent (CellAgent): agent to remove from this cell
 
         """
-        self.agents.remove(agent)
+        self._agents.remove(agent)
         self.empty = self.is_empty
 
     @property
@@ -133,6 +133,11 @@ class Cell:
     def is_full(self) -> bool:
         """Returns a bool of the contents of a cell."""
         return len(self.agents) == self.capacity
+
+    @property
+    def agents(self) -> list[CellAgent]:
+        """returns a list of the agents occupying the cell."""
+        return self._agents.copy()
 
     def __repr__(self):  # noqa
         return f"Cell({self.coordinate}, {self.agents})"
