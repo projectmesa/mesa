@@ -23,8 +23,8 @@ from random import Random
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 if TYPE_CHECKING:
-    from mesa.experimental.cell_space.cell import Cell
-    from mesa.experimental.cell_space.cell_agent import CellAgent
+    from mesa.discrete_space.cell import Cell
+    from mesa.discrete_space.cell_agent import CellAgent
 
 T = TypeVar("T", bound="Cell")
 
