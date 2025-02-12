@@ -16,9 +16,9 @@ from mesa.model import Model
 __all__ = [
     "Agent",
     "DataCollector",
-    "discrete_space",
     "Model",
     "batch_run",
+    "discrete_space",
     "experimental",
     "space",
 ]
