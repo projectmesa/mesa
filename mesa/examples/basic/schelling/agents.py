@@ -4,7 +4,9 @@ from mesa.discrete_space import CellAgent
 class SchellingAgent(CellAgent):
     """Schelling segregation agent."""
 
-    def __init__(self, model, cell, agent_type: int, homophily:float=0.4, radius:int=1) -> None:
+    def __init__(
+        self, model, cell, agent_type: int, homophily: float = 0.4, radius: int = 1
+    ) -> None:
         """Create a new Schelling agent.
         Args:
             model: The model instance the agent belongs to

@@ -2,7 +2,6 @@ from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalMooreGrid
 from mesa.examples.basic.schelling.agents import SchellingAgent
-from mesa.space import SingleGrid
 
 
 class Schelling(Model):
@@ -64,7 +63,9 @@ class Schelling(Model):
         for cell in self.grid.all_cells:
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < minority_pc else 0
-                SchellingAgent(self, cell, agent_type, homophily=homophily, radius=radius)
+                SchellingAgent(
+                    self, cell, agent_type, homophily=homophily, radius=radius
+                )
 
         # Collect initial state
         self.datacollector.collect(self)
