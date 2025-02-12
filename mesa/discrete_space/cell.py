@@ -40,7 +40,7 @@ class Cell:
 
     __slots__ = [
         "__dict__",
-        "agents",
+        "_agents",
         "capacity",
         "connections",
         "coordinate",
