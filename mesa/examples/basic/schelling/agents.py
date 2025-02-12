@@ -9,6 +9,8 @@ class SchellingAgent(CellAgent):
         Args:
             model: The model instance the agent belongs to
             agent_type: Indicator for the agent's type (minority=1, majority=0)
+            homophily: Minimum number of similar neighbors needed for happiness
+            radius: Search radius for checking neighbor similarity
         """
         super().__init__(model)
         self.cell = cell
