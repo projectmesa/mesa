@@ -20,7 +20,7 @@ class VirusAgent(FixedAgent):
         virus_check_frequency,
         recovery_chance,
         gain_resistance_chance,
-        cell
+        cell,
     ):
         super().__init__(model)
 
@@ -34,7 +34,9 @@ class VirusAgent(FixedAgent):
 
     def try_to_infect_neighbors(self):
         for agent in self.cell.neighborhood.agents:
-            if (agent.state is State.SUSCEPTIBLE) and (self.random.random() < self.virus_spread_chance):
+            if (agent.state is State.SUSCEPTIBLE) and (
+                self.random.random() < self.virus_spread_chance
+            ):
                 agent.state = State.INFECTED
 
     def try_gain_resistance(self):
@@ -52,7 +54,9 @@ class VirusAgent(FixedAgent):
             self.state = State.INFECTED
 
     def check_situation(self):
-        if (self.state is State.INFECTED) and (self.random.random() < self.virus_check_frequency):
+        if (self.state is State.INFECTED) and (
+            self.random.random() < self.virus_check_frequency
+        ):
             self.try_remove_infection()
 
     def step(self):

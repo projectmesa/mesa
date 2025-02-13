@@ -4,8 +4,7 @@ import networkx as nx
 
 import mesa
 from mesa import Model
-from mesa.discrete_space import Network, CellCollection
-
+from mesa.discrete_space import CellCollection, Network
 from mesa.examples.basic.virus_on_network.agents import State, VirusAgent
 
 
@@ -57,16 +56,22 @@ class VirusOnNetwork(Model):
             }
         )
 
-        VirusAgent.create_agents(self, num_nodes, State.SUSCEPTIBLE,
-                virus_spread_chance,
-                virus_check_frequency,
-                recovery_chance,
-                gain_resistance_chance,
-                list(self.grid.all_cells))
+        VirusAgent.create_agents(
+            self,
+            num_nodes,
+            State.SUSCEPTIBLE,
+            virus_spread_chance,
+            virus_check_frequency,
+            recovery_chance,
+            gain_resistance_chance,
+            list(self.grid.all_cells),
+        )
 
         # Infect some nodes
-        infected_nodes = CellCollection(self.random.sample(list(self.grid.all_cells), self.initial_outbreak_size),
-                                        random=self.random)
+        infected_nodes = CellCollection(
+            self.random.sample(list(self.grid.all_cells), self.initial_outbreak_size),
+            random=self.random,
+        )
         for a in infected_nodes.agents:
             a.state = State.INFECTED
 

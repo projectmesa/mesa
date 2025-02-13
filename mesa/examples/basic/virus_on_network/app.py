@@ -1,4 +1,5 @@
 import math
+
 import solara
 
 from mesa.examples.basic.virus_on_network.model import (
