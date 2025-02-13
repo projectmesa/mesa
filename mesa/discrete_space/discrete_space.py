@@ -89,7 +89,7 @@ class DiscreteSpace(Generic[T]):
     def all_cells(self):
         """Return all cells in space."""
         return CellCollection(
-            {cell: cell.agents for cell in self._cells.values()}, random=self.random
+            {cell: cell._agents for cell in self._cells.values()}, random=self.random
         )
 
     def __iter__(self):  # noqa
