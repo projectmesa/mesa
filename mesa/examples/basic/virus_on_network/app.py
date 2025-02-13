@@ -1,6 +1,11 @@
 import math
-
 import solara
+
+
+import sys, os
+
+sys.path.insert(0, os.path.abspath('../../../..'))
+print(os.path.abspath('../../..'))
 
 from mesa.examples.basic.virus_on_network.model import (
     State,
