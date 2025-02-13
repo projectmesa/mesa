@@ -59,7 +59,7 @@ class CellCollection(Generic[T]):
         if isinstance(cells, dict):
             self._cells = cells
         else:
-            self._cells = {cell: cell.agents for cell in cells}
+            self._cells = {cell: cell._agents for cell in cells}
 
         # Get capacity from first cell if collection is not empty
         self._capacity: int | None = (
