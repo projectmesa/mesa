@@ -171,7 +171,11 @@ Mesa also includes experimental support for next-event time progression through 
 ```
 
 ## Visualization
+<<<<<<< HEAD
 Mesa’s visualization module, [SolaraViz](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html), allows for interactive browser-based model exploration. Advancements with Mesa 3 update the visualization from harder-to-maintain custom code to Solara, a standardized library. Usage of the visualization module can be seen below:
+=======
+Mesa’s visualization module, [SolaraViz](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html,  allows for interactive browser-based model exploration. Advancements with Mesa 3 update the visualization from harder-to-maintain custom code to [Solara](https://solara.dev/), a standardized library. Usage of the visualization module can be seen below:
+>>>>>>> a90dd04b (paper: Fix l96 Please add a link or reference regarding the Solara.)
 
 ```python
     visualization = SolaraViz(
