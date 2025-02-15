@@ -7,6 +7,7 @@ model
 agent
 time
 space
+discrete_space
 datacollection
 batchrunner
 visualization
