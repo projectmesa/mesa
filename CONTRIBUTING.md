@@ -126,7 +126,7 @@ Feel free to reach out to us anytime to discuss your interests and ambitions in 
 
 ### Contributor
 Contributors help improve Mesa through:
-- Code contributions 
+- Code contributions
 - Documentation improvements
 - Bug reports and fixes
 - Example models
@@ -151,10 +151,10 @@ When contributors consistently demonstrate technical skills and community mindse
 
 The collaborator role recognizes people who help Mesa grow through both their technical contributions and community involvement. Collaborators receive GitHub triage permissions and the "Collaborator" label.
 
-### Maintainer 
+### Maintainer
 Maintainers help guide Mesa's overall development while ensuring the project remains sustainable and welcoming. They focus on:
 - Project vision and roadmap
-- Major architectural decisions  
+- Major architectural decisions
 - Release management
 - Community governance
 - Mentoring collaborators
@@ -169,7 +169,7 @@ In some cases, special roles may be created for specific purposes, such as leadi
 
 All roles are expected to:
 - Follow Mesa's code of conduct
-- Communicate respectfully 
+- Communicate respectfully
 - Work collaboratively
 - Help maintain a welcoming community
 - Make decisions transparently
