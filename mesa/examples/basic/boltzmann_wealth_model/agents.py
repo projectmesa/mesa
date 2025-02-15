@@ -1,7 +1,7 @@
-from mesa import Agent
+from mesa.discrete_space import CellAgent
 
 
-class MoneyAgent(Agent):
+class MoneyAgent(CellAgent):
     """An agent with fixed initial wealth.
 
     Each agent starts with 1 unit of wealth and can give 1 unit to other agents
@@ -11,28 +11,23 @@ class MoneyAgent(Agent):
         wealth (int): The agent's current wealth (starts at 1)
     """
 
-    def __init__(self, model):
+    def __init__(self, model, cell):
         """Create a new agent.
 
         Args:
             model (Model): The model instance that contains the agent
         """
         super().__init__(model)
+        self.cell = cell
         self.wealth = 1
 
     def move(self):
         """Move the agent to a random neighboring cell."""
-        possible_steps = self.model.grid.get_neighborhood(
-            self.pos, moore=True, include_center=False
-        )
-        new_position = self.random.choice(possible_steps)
-        self.model.grid.move_agent(self, new_position)
+        self.cell = self.cell.neighborhood.select_random_cell()
 
     def give_money(self):
         """Give 1 unit of wealth to a random agent in the same cell."""
-        cellmates = self.model.grid.get_cell_list_contents([self.pos])
-        # Remove self from potential recipients
-        cellmates.pop(cellmates.index(self))
+        cellmates = [a for a in self.cell.agents if a is not self]
 
         if cellmates:  # Only give money if there are other agents present
             other = self.random.choice(cellmates)

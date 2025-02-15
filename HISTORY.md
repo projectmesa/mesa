@@ -1,6 +1,44 @@
 ---
 title: Release History
 ---
+# 3.1.4 (2025-02-09)
+## Highlights
+This release contains various improvements and bugfixes to the matplotlib-based visualization of spaces. Hexgrids are now fully supported, including property layers. In making this possible, various minor bugs were encountered and also fixed. In addition to the visualization improvements, there are various minor convenience improvements to the docs.
+
+
+## What's Changed
+### 🛠 Enhancements made
+* Fixed hex-space draw function to avoid overlaps by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2609
+* Fix: Property layer visualization for HexGrid by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2646
+* Enhance DataCollector to validate model_reporters functions by @peter-kinger in https://github.com/projectmesa/mesa/pull/2605
+* Implemented post_process in Altair based components by @sanika-n in https://github.com/projectmesa/mesa/pull/2641
+### 🐛 Bugs fixed
+* bugfix for draw_property_layer by @quaquel in https://github.com/projectmesa/mesa/pull/2639
+* Uses array for hex grid property layer fix by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2651
+* Update Binder environment to use latest Mesa version (#2652) by @aarav-shukla07 in https://github.com/projectmesa/mesa/pull/2655
+* Change Hexgrid._connect_cells_2d to use x,y coordinates by @quaquel in https://github.com/projectmesa/mesa/pull/2632
+### 🔍 Examples updated
+* Added property layer viz to sugarscape by @sanika-n in https://github.com/projectmesa/mesa/pull/2653
+* added color-bar for spice by @sanika-n in https://github.com/projectmesa/mesa/pull/2622
+### 📜 Documentation improvements
+* remove any reference to using --pre by @quaquel in https://github.com/projectmesa/mesa/pull/2618
+* Updated Docs by @sanika-n in https://github.com/projectmesa/mesa/pull/2624
+* Fixed 404 error for Examples Tab in Introductory Tutorial (#2662) by @aarav-shukla07 in https://github.com/projectmesa/mesa/pull/2664
+* Documentation by @Spartan-71 in https://github.com/projectmesa/mesa/pull/2630
+* Adding a copy option at the top of the code written in the docs by @PrashantChoudhary13579 in https://github.com/projectmesa/mesa/pull/2628
+* Adding Mesa Extension page by @PrashantChoudhary13579 in https://github.com/projectmesa/mesa/pull/2627
+### 🔧 Maintenance
+* remove remnants of mesa cli by @quaquel in https://github.com/projectmesa/mesa/pull/2617
+* benchmarks.yml: Install SciPy and use uv for pip install by @EwoutH in https://github.com/projectmesa/mesa/pull/2633
+* [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in https://github.com/projectmesa/mesa/pull/2659
+
+## New Contributors
+* @PrashantChoudhary13579 made their first contribution in https://github.com/projectmesa/mesa/pull/2628
+* @aarav-shukla07 made their first contribution in https://github.com/projectmesa/mesa/pull/2655
+* @peter-kinger made their first contribution in https://github.com/projectmesa/mesa/pull/2605
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.1.3...v3.1.4
+
 # 3.1.3 (2025-01-11)
 ## Highlights
 Mesa 3.1.3 introduces a major experimental reimplementation of Mesa's continuous space, providing an intuitive agent-centric API and significant performance improvements. The new implementation supports n-dimensional spaces and offers streamlined methods for agent movement and neighbor calculations.

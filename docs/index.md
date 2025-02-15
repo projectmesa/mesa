@@ -43,9 +43,10 @@ To also install our recommended dependencies:
 pip install -U mesa[rec]
 ```
 
+The `[rec]` option installs additional recommended dependencies needed for visualization, plotting, and network modeling capabilities.
+
 On a Mac, this command might cause an error stating `zsh: no matches found: mesa[all]`.
 In that case, change the command to `pip install -U "mesa[rec]"`.
-
 
 ### Resources
 
@@ -73,6 +74,7 @@ The original Mesa conference paper is [available here](http://conference.scipy.o
 :maxdepth: 7
 
 Getting started <getting_started>
+Overview <overview>
 Examples <examples>
 Migration guide <migration_guide>
 API Documentation <apis/api_main>
@@ -92,7 +94,7 @@ API Documentation <apis/api_main>
 [matrix chat room]: https://matrix.to/#/#project-mesa:matrix.org
 [mesa]: https://github.com/projectmesa/mesa/
 [mesa overview]: overview
-[mesa examples]: https://github.com/projectmesa/mesa-examples
+[mesa examples]: https://mesa.readthedocs.io/stable/examples.html
 [mesa introductory tutorial]: tutorials/intro_tutorial
 [mesa visualization tutorial]: tutorials/visualization_tutorial
 [migration guide]: migration_guide
