@@ -492,15 +492,17 @@ def draw_network(
 
     # Adjust positions for multiple agents per node
     adjusted_positions = []
-    for node in space.G.nodes: 
-        agents = node_to_agents[node] if node in node_to_agents else []
-        base_x, base_y = pos[node]  
-        num_agents = len(agents)
+    for agent in space.agents:  # ✅ Correct way to iterate through agents
+        if hasattr(agent, "pos") and agent.pos in pos:  # Ensure the agent has a valid position
+            base_x, base_y = pos[agent.pos]  # ✅ Get node position correctly
+            agents_at_node = node_to_agents.get(agent.pos, [])
+            num_agents = len(agents_at_node)
 
-        for i, agent in enumerate(agents):
-            angle = (2 * np.pi * i) / max(1, num_agents)  
-            offset_x = 0.05 * np.cos(angle)  
-            offset_y = 0.05 * np.sin(angle)  
+            # Spread agents to avoid overlap
+            i = node_to_agents[agent.pos].index(agent)  # Find agent index at node
+            angle = (2 * np.pi * i) / max(1, num_agents)
+            offset_x = 0.05 * np.cos(angle)
+            offset_y = 0.05 * np.sin(angle)
             adjusted_positions.append((agent, (base_x + offset_x, base_y + offset_y)))
     
     # gather agent data
