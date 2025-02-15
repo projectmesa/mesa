@@ -238,15 +238,14 @@ def ModelController(
     """
     playing = solara.use_reactive(False)
     running = solara.use_reactive(True)
+
     if model_parameters is None:
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
-    visualization_pause_event = threading.Event()
+    visualization_pause_event = solara.use_memo(lambda: threading.Event(), [])
 
     def step():
         try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
             while running.value and playing.value:
                 time.sleep(play_interval.value / 1000)
                 do_step()
@@ -255,22 +254,16 @@ def ModelController(
         except Exception as e:
             print(f"Error in step: {e}")
             return
-        finally:
-            loop.close()
 
     def visualization_task():
         if use_threads.value:
             try:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
                 while playing.value and running.value:
                     visualization_pause_event.wait()
                     visualization_pause_event.clear()
                     force_update()
             except Exception as e:
                 print(f"Error in visualization_task: {e}")
-            finally:
-                loop.close()
 
     solara.lab.use_task(
         step, dependencies=[playing.value, running.value], prefer_threaded=True
@@ -361,13 +354,11 @@ def SimulatorController(
     if model_parameters is None:
         model_parameters = {}
     model_parameters = solara.use_reactive(model_parameters)
-    visualization_pause_event = threading.Event()
-    pause_step_event = threading.Event()
+    visualization_pause_event = solara.use_memo(lambda: threading.Event(), [])
+    pause_step_event = solara.use_memo(lambda: threading.Event(), [])
 
     def step():
         try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
             while running.value and playing.value:
                 time.sleep(play_interval.value / 1000)
                 if use_threads.value:
@@ -378,8 +369,6 @@ def SimulatorController(
                     visualization_pause_event.set()
         except Exception as e:
             print(f"Error in step: {e}")
-        finally:
-            loop.close()
 
     def visualization_task():
         if use_threads.value:
@@ -395,8 +384,6 @@ def SimulatorController(
             except Exception as e:
                 print(f"Error in visualization_task: {e}")
                 return
-            finally:
-                loop.close()
 
     solara.lab.use_task(
         step, dependencies=[playing.value, running.value], prefer_threaded=False
