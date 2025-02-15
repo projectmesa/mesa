@@ -32,6 +32,7 @@ from typing import TYPE_CHECKING, Literal
 
 import reacton.core
 import solara
+import solara.lab
 
 import mesa.visualization.components.altair_components as components_altair
 from mesa.experimental.devs.simulator import Simulator
@@ -121,6 +122,7 @@ def SolaraViz(
     reactive_use_threads = solara.use_reactive(use_threads)
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
+        solara.lab.ThemeToggle()
 
     with solara.Sidebar(), solara.Column():
         with solara.Card("Controls"):

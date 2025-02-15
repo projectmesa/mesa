@@ -1,6 +1,6 @@
 from enum import Enum
 
-from mesa import Agent
+from mesa.discrete_space import FixedAgent
 
 
 class State(Enum):
@@ -9,7 +9,7 @@ class State(Enum):
     RESISTANT = 2
 
 
-class VirusAgent(Agent):
+class VirusAgent(FixedAgent):
     """Individual Agent definition and its properties/interaction methods."""
 
     def __init__(
@@ -20,6 +20,7 @@ class VirusAgent(Agent):
         virus_check_frequency,
         recovery_chance,
         gain_resistance_chance,
+        cell,
     ):
         super().__init__(model)
 
@@ -29,19 +30,14 @@ class VirusAgent(Agent):
         self.virus_check_frequency = virus_check_frequency
         self.recovery_chance = recovery_chance
         self.gain_resistance_chance = gain_resistance_chance
+        self.cell = cell
 
     def try_to_infect_neighbors(self):
-        neighbors_nodes = self.model.grid.get_neighborhood(
-            self.pos, include_center=False
-        )
-        susceptible_neighbors = [
-            agent
-            for agent in self.model.grid.get_cell_list_contents(neighbors_nodes)
-            if agent.state is State.SUSCEPTIBLE
-        ]
-        for a in susceptible_neighbors:
-            if self.random.random() < self.virus_spread_chance:
-                a.state = State.INFECTED
+        for agent in self.cell.neighborhood.agents:
+            if (agent.state is State.SUSCEPTIBLE) and (
+                self.random.random() < self.virus_spread_chance
+            ):
+                agent.state = State.INFECTED
 
     def try_gain_resistance(self):
         if self.random.random() < self.gain_resistance_chance:
@@ -57,13 +53,13 @@ class VirusAgent(Agent):
             # Failed
             self.state = State.INFECTED
 
-    def try_check_situation(self):
-        if (self.random.random() < self.virus_check_frequency) and (
-            self.state is State.INFECTED
+    def check_situation(self):
+        if (self.state is State.INFECTED) and (
+            self.random.random() < self.virus_check_frequency
         ):
             self.try_remove_infection()
 
     def step(self):
         if self.state is State.INFECTED:
             self.try_to_infect_neighbors()
-        self.try_check_situation()
+        self.check_situation()

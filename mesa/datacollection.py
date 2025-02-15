@@ -117,6 +117,9 @@ class DataCollector:
         self._agenttype_records = {}
         self.tables = {}
 
+        # add the signal of the validation of model reporter
+        self._validated = False
+
         if model_reporters is not None:
             for name, reporter in model_reporters.items():
                 self._new_model_reporter(name, reporter)
@@ -134,13 +137,66 @@ class DataCollector:
             for name, columns in tables.items():
                 self._new_table(name, columns)
 
+    def _validate_model_reporter(self, name, reporter, model):
+        """Validate model reporter and handle validation results appropriately.
+
+        Args:
+            name: Name of the reporter
+            reporter: Reporter definition (lambda/method/attribute/function list)
+            model: Model instance
+
+        Raises:
+            ValueError: If reporter is None or has invalid format
+            AttributeError: If model attribute doesn't exist
+            TypeError: If reporter type is not supported
+            RuntimeError: If reporter execution fails
+        """
+        self._validated = True  # put the change of signal firstly avoid losing efficacy
+
+        # Type 1: Lambda function
+        if isinstance(reporter, types.LambdaType):
+            try:
+                reporter(model)
+            except Exception as e:
+                raise RuntimeError(
+                    f"Lambda reporter '{name}' failed validation: {e!s}\n"
+                    f"Example: lambda m: len(m.agents)"
+                ) from e
+
+        # Type 2: Method of class/instance
+        if not callable(reporter) and not isinstance(reporter, types.LambdaType):
+            pass
+
+        # Type 3: Model attribute (string)
+        if isinstance(reporter, str):
+            try:
+                if not hasattr(model, reporter):
+                    raise AttributeError(
+                        f"Model reporter '{name}' references non-existent attribute '{reporter}'\n"
+                    )
+                getattr(model, reporter)  # 验证属性是否可访问
+            except AttributeError as e:
+                raise AttributeError(
+                    f"Model reporter '{name}' attribute validation failed: {e!s}\n"
+                ) from e
+
+        # Type 4: Function with parameters in list
+        if isinstance(reporter, list) and (not reporter or not callable(reporter[0])):
+            raise ValueError(
+                f"Invalid function list format for reporter '{name}'\n"
+                f"Expected: [function, [param1, param2]], got: {reporter}"
+            )
+
     def _new_model_reporter(self, name, reporter):
         """Add a new model-level reporter to collect.
 
         Args:
             name: Name of the model-level variable to collect.
-            reporter: Attribute string, or function object that returns the
-                      variable when given a model instance.
+            reporter: Can be one of four types:
+                1. Attribute name (str): "attribute_name"
+                2. Lambda function: lambda m: len(m.agents)
+                3. Method: model.get_count or Model.get_count
+                4. List of [function, [parameters]]
         """
         self.model_reporters[name] = reporter
         self.model_vars[name] = []
@@ -262,6 +318,10 @@ class DataCollector:
     def collect(self, model):
         """Collect all the data for the given model object."""
         if self.model_reporters:
+            if not self._validated:
+                for name, reporter in self.model_reporters.items():
+                    self._validate_model_reporter(name, reporter, model)
+
             for var, reporter in self.model_reporters.items():
                 # Check if lambda or partial function
                 if isinstance(reporter, types.LambdaType | partial):

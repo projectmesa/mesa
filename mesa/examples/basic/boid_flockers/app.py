@@ -11,9 +11,9 @@ def boid_draw(agent):
     neighbors = len(agent.neighbors)
 
     if neighbors <= 1:
-        return {"color": "red", "size": 20}
+        return {"color": "red", "size": 20, "marker": "o"}
     elif neighbors >= 2:
-        return {"color": "green", "size": 20}
+        return {"color": "green", "size": 20, "marker": (3, 0, 60)}
 
 
 model_params = {

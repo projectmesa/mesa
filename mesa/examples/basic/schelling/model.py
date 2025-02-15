@@ -1,7 +1,7 @@
 from mesa import Model
 from mesa.datacollection import DataCollector
+from mesa.discrete_space import OrthogonalMooreGrid
 from mesa.examples.basic.schelling.agents import SchellingAgent
-from mesa.space import SingleGrid
 
 
 class Schelling(Model):
@@ -31,15 +31,11 @@ class Schelling(Model):
         super().__init__(seed=seed)
 
         # Model parameters
-        self.height = height
-        self.width = width
         self.density = density
         self.minority_pc = minority_pc
-        self.homophily = homophily
-        self.radius = radius
 
         # Initialize grid
-        self.grid = SingleGrid(width, height, torus=True)
+        self.grid = OrthogonalMooreGrid((width, height), random=self.random, capacity=1)
 
         # Track happiness
         self.happy = 0
@@ -64,11 +60,12 @@ class Schelling(Model):
         )
 
         # Create agents and place them on the grid
-        for _, pos in self.grid.coord_iter():
+        for cell in self.grid.all_cells:
             if self.random.random() < self.density:
                 agent_type = 1 if self.random.random() < minority_pc else 0
-                agent = SchellingAgent(self, agent_type)
-                self.grid.place_agent(agent, pos)
+                SchellingAgent(
+                    self, cell, agent_type, homophily=homophily, radius=radius
+                )
 
         # Collect initial state
         self.datacollector.collect(self)

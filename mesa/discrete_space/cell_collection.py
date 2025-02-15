@@ -23,8 +23,8 @@ from random import Random
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 if TYPE_CHECKING:
-    from mesa.experimental.cell_space.cell import Cell
-    from mesa.experimental.cell_space.cell_agent import CellAgent
+    from mesa.discrete_space.cell import Cell
+    from mesa.discrete_space.cell_agent import CellAgent
 
 T = TypeVar("T", bound="Cell")
 
@@ -59,7 +59,7 @@ class CellCollection(Generic[T]):
         if isinstance(cells, dict):
             self._cells = cells
         else:
-            self._cells = {cell: cell.agents for cell in cells}
+            self._cells = {cell: cell._agents for cell in cells}
 
         # Get capacity from first cell if collection is not empty
         self._capacity: int | None = (
