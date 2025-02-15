@@ -5,6 +5,7 @@ Core Objects: Model, and Agent.
 
 import datetime
 
+import mesa.discrete_space as discrete_space
 import mesa.experimental as experimental
 import mesa.space as space
 from mesa.agent import Agent
@@ -17,6 +18,7 @@ __all__ = [
     "DataCollector",
     "Model",
     "batch_run",
+    "discrete_space",
     "experimental",
     "space",
 ]
