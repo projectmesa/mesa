@@ -4,11 +4,12 @@ import networkx as nx
 
 import mesa
 from mesa import Model
+from mesa.discrete_space import CellCollection, Network
 from mesa.examples.basic.virus_on_network.agents import State, VirusAgent
 
 
 def number_state(model, state):
-    return sum(1 for a in model.grid.get_all_cell_contents() if a.state is state)
+    return sum(1 for a in model.grid.all_cells.agents if a.state is state)
 
 
 def number_infected(model):
@@ -38,18 +39,13 @@ class VirusOnNetwork(Model):
         seed=None,
     ):
         super().__init__(seed=seed)
-        self.num_nodes = num_nodes
-        prob = avg_node_degree / self.num_nodes
-        self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=prob)
-        self.grid = mesa.space.NetworkGrid(self.G)
+        prob = avg_node_degree / num_nodes
+        graph = nx.erdos_renyi_graph(n=num_nodes, p=prob)
+        self.grid = Network(graph, capacity=1, random=self.random)
 
         self.initial_outbreak_size = (
             initial_outbreak_size if initial_outbreak_size <= num_nodes else num_nodes
         )
-        self.virus_spread_chance = virus_spread_chance
-        self.virus_check_frequency = virus_check_frequency
-        self.recovery_chance = recovery_chance
-        self.gain_resistance_chance = gain_resistance_chance
 
         self.datacollector = mesa.DataCollector(
             {
@@ -60,23 +56,23 @@ class VirusOnNetwork(Model):
             }
         )
 
-        # Create agents
-        for node in self.G.nodes():
-            a = VirusAgent(
-                self,
-                State.SUSCEPTIBLE,
-                self.virus_spread_chance,
-                self.virus_check_frequency,
-                self.recovery_chance,
-                self.gain_resistance_chance,
-            )
-
-            # Add the agent to the node
-            self.grid.place_agent(a, node)
+        VirusAgent.create_agents(
+            self,
+            num_nodes,
+            State.SUSCEPTIBLE,
+            virus_spread_chance,
+            virus_check_frequency,
+            recovery_chance,
+            gain_resistance_chance,
+            list(self.grid.all_cells),
+        )
 
         # Infect some nodes
-        infected_nodes = self.random.sample(list(self.G), self.initial_outbreak_size)
-        for a in self.grid.get_cell_list_contents(infected_nodes):
+        infected_nodes = CellCollection(
+            self.random.sample(list(self.grid.all_cells), self.initial_outbreak_size),
+            random=self.random,
+        )
+        for a in infected_nodes.agents:
             a.state = State.INFECTED
 
         self.running = True
