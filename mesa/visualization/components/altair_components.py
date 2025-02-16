@@ -10,7 +10,6 @@ from matplotlib.colors import to_rgba
 
 from mesa.discrete_space import DiscreteSpace, Grid
 from mesa.space import ContinuousSpace, _Grid
-
 from mesa.visualization.utils import update_counter
 
 
