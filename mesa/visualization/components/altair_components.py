@@ -10,7 +10,7 @@ from matplotlib.colors import to_rgba
 
 import mesa
 from mesa.discrete_space import DiscreteSpace, Grid
-from mesa.space import ContinuousSpace, _Grid, PropertyLayer
+from mesa.space import ContinuousSpace, PropertyLayer, _Grid
 from mesa.visualization.utils import update_counter
 
 
