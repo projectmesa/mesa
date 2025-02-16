@@ -126,8 +126,8 @@ def PlotAltair(
         height: The height of the chart in pixels.
 
     Returns:
-        A solara.FigureAltair component displaying the generated Altair chart."""
-
+        A solara.FigureAltair component displaying the generated Altair chart.
+    """
     update_counter.get()
     df = model.datacollector.get_model_vars_dataframe().reset_index()
 
@@ -317,7 +317,6 @@ def get_agent_data(space, agent_portrayal):
 
 
 def _draw_grid(space, agent_portrayal):
-    
     """Create Altair visualization for any supported space type.
 
     This function acts as a dispatcher, calling the appropriate
@@ -334,7 +333,7 @@ def _draw_grid(space, agent_portrayal):
         An Altair Chart object representing the visualization of the space
         and its agents.  Returns a text chart "No agents" if there are no agents.
 
-    """ 
+    """
     all_agent_data = get_agent_data(space, agent_portrayal)
 
     # Handle empty state
@@ -478,10 +477,8 @@ def _draw_hex_grid(space, all_agent_data, agent_portrayal):
     y_max = space.height * y_spacing
 
     # Add padding that accounts for the hexagon points
-    x_padding = (
-        size * math.sqrt(3) / 2
-    )  
-    y_padding = size  
+    x_padding = size * math.sqrt(3) / 2
+    y_padding = size
 
     chart = chart.properties(
         xlim=(-2 * x_padding, x_max + x_padding),
