@@ -1,12 +1,12 @@
 from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealth
-from mesa.mesa_logging import DEBUG, log_to_stderr
+from mesa.mesa_logging import INFO, log_to_stderr
 from mesa.visualization import (
     SolaraViz,
     make_plot_component,
     make_space_component,
 )
 
-log_to_stderr(DEBUG)
+log_to_stderr(INFO)
 
 
 def agent_portrayal(agent):
