@@ -8,9 +8,9 @@ import pandas as pd
 import solara
 from matplotlib.colors import to_rgba
 
-import mesa.experimental
-from mesa.experimental.cell_space import DiscreteSpace, Grid
-from mesa.space import ContinuousSpace, PropertyLayer, _Grid
+from mesa.discrete_space import DiscreteSpace, Grid
+from mesa.space import ContinuousSpace, _Grid
+
 from mesa.visualization.utils import update_counter
 
 

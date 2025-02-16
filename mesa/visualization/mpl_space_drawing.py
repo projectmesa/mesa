@@ -24,7 +24,7 @@ from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.patches import Polygon
 
 import mesa
-from mesa.experimental.cell_space import (
+from mesa.discrete_space import (
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
     VoronoiGrid,
@@ -40,8 +40,8 @@ from mesa.space import (
 )
 
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
-HexGrid = HexSingleGrid | HexMultiGrid | mesa.experimental.cell_space.HexGrid
-Network = NetworkGrid | mesa.experimental.cell_space.Network
+HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
+Network = NetworkGrid | mesa.discrete_space.Network
 
 
 def collect_agent_data(
@@ -101,7 +101,15 @@ def collect_agent_data(
                 stacklevel=2,
             )
 
-    return {k: np.asarray(v) for k, v in arguments.items()}
+    data = {
+        k: (np.asarray(v, dtype=object) if k == "marker" else np.asarray(v))
+        for k, v in arguments.items()
+    }
+    # ensures that the tuples in marker dont get converted by numpy to an array resulting in a 2D array
+    arr = np.empty(len(arguments["marker"]), dtype=object)
+    arr[:] = arguments["marker"]
+    data["marker"] = arr
+    return data
 
 
 def draw_space(
@@ -133,7 +141,7 @@ def draw_space(
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
         # order matters here given the class structure of old-style grid spaces
-        case HexSingleGrid() | HexMultiGrid() | mesa.experimental.cell_space.HexGrid():
+        case HexSingleGrid() | HexMultiGrid() | mesa.discrete_space.HexGrid():
             draw_hex_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case (
             mesa.space.SingleGrid()
@@ -142,7 +150,7 @@ def draw_space(
             | mesa.space.MultiGrid()
         ):
             draw_orthogonal_grid(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
-        case mesa.space.NetworkGrid() | mesa.experimental.cell_space.Network():
+        case mesa.space.NetworkGrid() | mesa.discrete_space.Network():
             draw_network(space, agent_portrayal, ax=ax, **space_drawing_kwargs)
         case (
             mesa.space.ContinuousSpace()
@@ -221,7 +229,7 @@ def draw_property_layers(
         layer = property_layers.get(layer_name, None)
         if not isinstance(
             layer,
-            PropertyLayer | mesa.experimental.cell_space.property_layer.PropertyLayer,
+            PropertyLayer | mesa.discrete_space.property_layer.PropertyLayer,
         ):
             continue
 
@@ -291,6 +299,7 @@ def draw_property_layers(
                 rgba_colors[:, 3] = normalized_colors * alpha
             else:
                 rgba_colors = cmap(norm(colors))
+                rgba_colors[..., 3] *= alpha
 
             # Draw hexagons
             collection = PolyCollection(hexagons, facecolors=rgba_colors, zorder=-1)
@@ -637,8 +646,8 @@ def _scatter(ax: Axes, arguments, **kwargs):
                     f"{entry} is specified in agent portrayal and via plotting kwargs, you can only use one or the other"
                 )
 
-    for mark in np.unique(marker):
-        mark_mask = marker == mark
+    for mark in set(marker):
+        mark_mask = [m == mark for m in list(marker)]
         for z_order in np.unique(zorder):
             zorder_mask = z_order == zorder
             logical = mark_mask & zorder_mask
