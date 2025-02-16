@@ -71,9 +71,6 @@ def make_plot_component(
         backend: the backend to use {"matplotlib", "altair"}
         plot_drawing_kwargs: additional keyword arguments to pass onto the backend specific function for making a plotting component
 
-    Notes:
-        altair plotting backend is not yet implemented and planned for mesa 3.1.
-
     Returns:
         function: A function that creates a plot component
     """

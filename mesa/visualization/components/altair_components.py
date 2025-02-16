@@ -63,7 +63,7 @@ def make_altair_space(
     "size", "marker", and "zorder". Other field are ignored and will result in a user warning.
 
     Returns:
-        function: A function that creates a SpaceMatplotlib component
+        function: A function that creates a SpaceAltair component
     """
     if agent_portrayal is None:
 
@@ -113,7 +113,21 @@ def PlotAltair(
     width: int = 500,
     height: int = 300,
 ) -> solara.FigureAltair:
-    """Create an Altair plot for model."""
+    """Create an Altair plot for model data.
+
+    Args:
+        model: The mesa.Model instance.
+        measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
+        post_process: An optional callable that takes an Altair Chart object as
+                      input and returns a modified Chart object. This allows
+                      for customization of the plot (e.g., adding annotations,
+                      changing axis labels).
+        width: The width of the chart in pixels.
+        height: The height of the chart in pixels.
+
+    Returns:
+        A solara.FigureAltair component displaying the generated Altair chart."""
+
     update_counter.get()
     df = model.datacollector.get_model_vars_dataframe().reset_index()
 
@@ -189,8 +203,30 @@ def SpaceAltair(
 ):
     """Create an Altair-based space visualization component.
 
+    Args:
+        model: The mesa.Model instance containing the space to visualize.
+               The model must have a `grid` or `space` attribute that
+               represents the space (e.g., Grid, ContinuousSpace, NetworkGrid).
+        agent_portrayal: A callable that takes an agent as input and returns
+                         a dictionary specifying how the agent should be
+                         visualized.  The dictionary can contain the following keys:
+                           - "color":  A string representing the agent's color (e.g., "red", "#FF0000").
+                           - "size":   A number representing the agent's size.
+                           - "tooltip": A string to display as a tooltip when hovering over the agent.
+                           - Any other Vega-Lite mark properties that are supported by Altair.
+        dependencies: A list of dependencies that trigger a re-render of the
+                      component when they change.  This can be used to update
+                      the visualization when the model state changes.
+        post_process: An optional callable that takes an Altair Chart object
+                      as input and returns a modified Chart object. This allows
+                      for customization of the plot (e.g., adding annotations,
+                      changing axis labels).
+
     Returns:
-        a solara FigureAltair instance
+        A solara.FigureAltair instance, which is a Solara component that
+        renders the Altair chart.
+
+
     """
     update_counter.get()
     space = getattr(model, "grid", None)
@@ -214,11 +250,11 @@ def axial_to_pixel(q, r, size=1):
 
 
 def get_agent_data(space, agent_portrayal):
-    """Draw a Matplotlib-based visualization of the space.
+    """Generic method to extract agent data for visualization across all space types.
 
     Args:
-        space: the space of the mesa model
-        agent_portrayal: A callable that returns a dict specifying how to show the agent
+        space: Mesa space object
+        agent_portrayal: Function defining agent visualization properties
 
     Returns:
         List of agent data dictionaries with coordinates
@@ -235,7 +271,7 @@ def get_agent_data(space, agent_portrayal):
                     all_agent_data.append(data)
 
         case _Grid():
-            # Legacy MESA grid
+            # Legacy Grid
             for content, (x, y) in space.coord_iter():
                 if not content:
                     continue
@@ -251,66 +287,82 @@ def get_agent_data(space, agent_portrayal):
                 if content:
                     for agent in content:
                         data = agent_portrayal(agent)
-                        x, y = axial_to_pixel(q, r)
-                        data.update({"x": x, "y": y})
+                        data.update({"q": q, "r": r})  # Store axial coordinates
                         all_agent_data.append(data)
 
         case NetworkGrid():
-            # Network grid (graph-based)
+            # Network grid
             for node in space.G.nodes():
-                node_agents = space.G.nodes[node].get("agent", [])
-                if not isinstance(node_agents, list):
-                    node_agents = [node_agents] if node_agents else []
-                for agent in node_agents:
+                agents = space.G.nodes[node].get("agent", [])
+                if not isinstance(agents, list):
+                    agents = [agents] if agents else []
+
+                for agent in agents:
                     if agent:
-                        pos = space.G.nodes[node].get("pos", (0, 0))
                         data = agent_portrayal(agent)
-                        data.update({"x": pos[0], "y": pos[1]})
+                        data.update({"node": node})  # Store node information
                         all_agent_data.append(data)
 
         case ContinuousSpace() | mesa.experimental.continuous_space.ContinuousSpace():
-            # Continuous space (including experimental version)
+            # Continuous space
             for agent in space.agents:
                 data = agent_portrayal(agent)
-                if hasattr(agent, "pos") and agent.pos is not None:
-                    data.update({"x": agent.pos[0], "y": agent.pos[1]})
-                else:
-                    data.update({"x": 0, "y": 0})
+                data.update({"x": agent.pos[0], "y": agent.pos[1]})
                 all_agent_data.append(data)
 
         case _:
-            # Fallback for unrecognized space types
             raise NotImplementedError(f"Unsupported space type: {type(space)}")
 
     return all_agent_data
 
 
 def _draw_grid(space, agent_portrayal):
-    """Create Altair visualization for any supported space type."""
+    
+    """Create Altair visualization for any supported space type.
+
+    This function acts as a dispatcher, calling the appropriate
+    `_draw_*_grid` function based on the type of space provided.
+
+    Args:
+        space: The mesa.space object to visualize (e.g., Grid, ContinuousSpace,
+               NetworkGrid).
+        agent_portrayal: A callable that takes an agent as input and returns
+                         a dictionary specifying how the agent should be
+                         visualized.
+
+    Returns:
+        An Altair Chart object representing the visualization of the space
+        and its agents.  Returns a text chart "No agents" if there are no agents.
+
+    """ 
     all_agent_data = get_agent_data(space, agent_portrayal)
 
     # Handle empty state
     if not all_agent_data:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
 
-    invalid_tooltips = ["color", "size", "x", "y"]
+    match space:
+        case Grid():
+            return _draw_discrete_grid(space, all_agent_data, agent_portrayal)
+        case _Grid():
+            return _draw_legacy_grid(space, all_agent_data, agent_portrayal)
+        case HexGrid():
+            return _draw_hex_grid(space, all_agent_data, agent_portrayal)
+        case NetworkGrid():
+            return _draw_network_grid(space, all_agent_data, agent_portrayal)
+        case ContinuousSpace() | mesa.experimental.continuous_space.ContinuousSpace():
+            return _draw_continuous_space(space, all_agent_data, agent_portrayal)
+        case _:
+            raise NotImplementedError(f"Unsupported space type: {type(space)}")
 
-    x_y_type = (
-        "quantitative"
-        if isinstance(
-            space,
-            ContinuousSpace
-            | HexGrid
-            | NetworkGrid
-            | mesa.experimental.continuous_space.ContinuousSpace,
-        )
-        else "ordinal"
-    )
+
+def _draw_discrete_grid(space, all_agent_data, agent_portrayal):
+    """Create Altair visualization for Discrete Grid."""
+    invalid_tooltips = ["color", "size", "x", "y"]
+    x_y_type = "ordinal"
 
     encoding_dict = {
-        # no x-axis label
         "x": alt.X("x", axis=None, type=x_y_type),
-        # no y-axis label
         "y": alt.Y("y", axis=None, type=x_y_type),
         "tooltip": [
             alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
@@ -318,6 +370,7 @@ def _draw_grid(space, agent_portrayal):
             if key not in invalid_tooltips
         ],
     }
+
     has_color = "color" in all_agent_data[0]
     if has_color:
         encoding_dict["color"] = alt.Color("color", type="nominal")
@@ -331,12 +384,181 @@ def _draw_grid(space, agent_portrayal):
         )
         .mark_point(filled=True)
         .properties(width=280, height=280)
-        # .configure_view(strokeOpacity=0)  # hide grid/chart lines
     )
-    # This is the default value for the marker size, which auto-scales
-    # according to the grid area.
-    if not has_size and isinstance(space, _Grid | Grid):
+
+    if not has_size:
         length = min(space.width, space.height)
         chart = chart.mark_point(size=30000 / length**2, filled=True)
+
+    return chart
+
+
+def _draw_legacy_grid(space, all_agent_data, agent_portrayal):
+    """Create Altair visualization for Legacy Grid."""
+    invalid_tooltips = ["color", "size", "x", "y"]
+    x_y_type = "ordinal"
+
+    encoding_dict = {
+        "x": alt.X("x", axis=None, type=x_y_type),
+        "y": alt.Y("y", axis=None, type=x_y_type),
+        "tooltip": [
+            alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
+            for key, value in all_agent_data[0].items()
+            if key not in invalid_tooltips
+        ],
+    }
+
+    has_color = "color" in all_agent_data[0]
+    if has_color:
+        encoding_dict["color"] = alt.Color("color", type="nominal")
+    has_size = "size" in all_agent_data[0]
+    if has_size:
+        encoding_dict["size"] = alt.Size("size", type="quantitative")
+
+    chart = (
+        alt.Chart(
+            alt.Data(values=all_agent_data), encoding=alt.Encoding(**encoding_dict)
+        )
+        .mark_point(filled=True)
+        .properties(width=280, height=280)
+    )
+
+    if not has_size:
+        length = min(space.width, space.height)
+        chart = chart.mark_point(size=30000 / length**2, filled=True)
+
+    return chart
+
+
+def _draw_hex_grid(space, all_agent_data, agent_portrayal):
+    """Create Altair visualization for Hex Grid."""
+    invalid_tooltips = ["color", "size", "x", "y", "q", "r"]
+    x_y_type = "quantitative"
+
+    # Parameters for hexagon grid
+    size = 1.0
+    x_spacing = math.sqrt(3) * size
+    y_spacing = 1.5 * size
+
+    # Calculate x, y coordinates from axial coordinates
+    for agent_data in all_agent_data:
+        q = agent_data.pop("q")
+        r = agent_data.pop("r")
+        x, y = axial_to_pixel(q, r)
+        agent_data["x"] = x
+        agent_data["y"] = y
+
+    encoding_dict = {
+        "x": alt.X("x", axis=None, type=x_y_type),
+        "y": alt.Y("y", axis=None, type=x_y_type),
+        "tooltip": [
+            alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
+            for key, value in all_agent_data[0].items()
+            if key not in invalid_tooltips
+        ],
+    }
+
+    has_color = "color" in all_agent_data[0]
+    if has_color:
+        encoding_dict["color"] = alt.Color("color", type="nominal")
+    has_size = "size" in all_agent_data[0]
+    if has_size:
+        encoding_dict["size"] = alt.Size("size", type="quantitative")
+
+    chart = (
+        alt.Chart(
+            alt.Data(values=all_agent_data), encoding=alt.Encoding(**encoding_dict)
+        )
+        .mark_point(filled=True)
+        .properties(width=280, height=280)
+    )
+
+    # Calculate proper bounds that account for the full hexagon width and height
+    x_max = space.width * x_spacing + (space.height % 2) * (x_spacing / 2)
+    y_max = space.height * y_spacing
+
+    # Add padding that accounts for the hexagon points
+    x_padding = (
+        size * math.sqrt(3) / 2
+    )  
+    y_padding = size  
+
+    chart = chart.properties(
+        xlim=(-2 * x_padding, x_max + x_padding),
+        ylim=(-2 * y_padding, y_max + y_padding),
+    )
+
+    return chart
+
+
+def _draw_network_grid(space, all_agent_data, agent_portrayal):
+    """Create Altair visualization for Network Grid."""
+    invalid_tooltips = ["color", "size", "x", "y", "node"]
+    x_y_type = "quantitative"
+
+    # Get x, y coordinates from node positions
+    for agent_data in all_agent_data:
+        node = agent_data.pop("node")
+        pos = space.G.nodes[node].get("pos", (0, 0))  # Default to (0, 0) if no pos
+        agent_data["x"] = pos[0]
+        agent_data["y"] = pos[1]
+
+    encoding_dict = {
+        "x": alt.X("x", axis=None, type=x_y_type),
+        "y": alt.Y("y", axis=None, type=x_y_type),
+        "tooltip": [
+            alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
+            for key, value in all_agent_data[0].items()
+            if key not in invalid_tooltips
+        ],
+    }
+
+    has_color = "color" in all_agent_data[0]
+    if has_color:
+        encoding_dict["color"] = alt.Color("color", type="nominal")
+    has_size = "size" in all_agent_data[0]
+    if has_size:
+        encoding_dict["size"] = alt.Size("size", type="quantitative")
+
+    chart = (
+        alt.Chart(
+            alt.Data(values=all_agent_data), encoding=alt.Encoding(**encoding_dict)
+        )
+        .mark_point(filled=True)
+        .properties(width=280, height=280)
+    )
+
+    return chart
+
+
+def _draw_continuous_space(space, all_agent_data, agent_portrayal):
+    """Create Altair visualization for Continuous Space."""
+    invalid_tooltips = ["color", "size", "x", "y"]
+    x_y_type = "quantitative"
+
+    encoding_dict = {
+        "x": alt.X("x", axis=None, type=x_y_type),
+        "y": alt.Y("y", axis=None, type=x_y_type),
+        "tooltip": [
+            alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
+            for key, value in all_agent_data[0].items()
+            if key not in invalid_tooltips
+        ],
+    }
+
+    has_color = "color" in all_agent_data[0]
+    if has_color:
+        encoding_dict["color"] = alt.Color("color", type="nominal")
+    has_size = "size" in all_agent_data[0]
+    if has_size:
+        encoding_dict["size"] = alt.Size("size", type="quantitative")
+
+    chart = (
+        alt.Chart(
+            alt.Data(values=all_agent_data), encoding=alt.Encoding(**encoding_dict)
+        )
+        .mark_point(filled=True)
+        .properties(width=280, height=280)
+    )
 
     return chart
