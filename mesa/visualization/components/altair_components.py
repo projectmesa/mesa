@@ -8,8 +8,9 @@ import pandas as pd
 import solara
 from matplotlib.colors import to_rgba
 
+import mesa
 from mesa.discrete_space import DiscreteSpace, Grid
-from mesa.space import ContinuousSpace, _Grid
+from mesa.space import ContinuousSpace, _Grid, PropertyLayer
 from mesa.visualization.utils import update_counter
 
 
@@ -238,7 +239,7 @@ def chart_property_layers(space, propertylayer_portrayal, base_width, base_heigh
         layer = property_layers.get(layer_name, None)
         if not isinstance(
             layer,
-            PropertyLayer | mesa.experimental.cell_space.property_layer.PropertyLayer,
+            PropertyLayer | mesa.discrete_space.property_layer.PropertyLayer,
         ):
             continue
 
