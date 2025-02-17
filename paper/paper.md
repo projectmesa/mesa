@@ -61,6 +61,26 @@ Agent-based models (ABMs) are composed of autonomous heterogeneous agents intera
 
 However, before Mesa, there was no modern Python-based framework for ABMs that integrated with the scientific Python ecosystem. Since its creation in 2014, Mesa has been applied to modeling everything from economics and sociology to ecology and epidemiology and has been cited in more than 500 papers and 800 authors. With its most recent major release, Mesa has advanced usability and stabilized functionality. These features include enhanced management of agents, data collection advancements, an improved visualization framework, and making it easier for researchers to create and analyze complex simulations.
 
+# Applications
+Mesa has been applied across diverse domains, including:
+
+- Infrastructure resilience and post-disaster recovery planning [@sun2020post]
+- Market modeling, including renewable energy auctions and consumer behavior [@anatolitis2017putting]
+- Transportation optimization, such as combined truck-drone delivery routing [@leon2022multi]
+- Recommender systems analysis examining consumer-business value tradeoffs over time [@ghanem2022balancing]
+- Climate adaptation modeling examining household-level behavioral responses to environmental shocks [@taberna2023uncertainty]
+- SEIR modeling of Sars-CoV-2 (Covid-19) [@pham2021interventions]
+- Management of edge computing resources [@souza2023edgesimpy]
+
+These applications showcase Mesa's versatility in modeling complex systems with autonomous interacting agents, whether representing individual consumers, infrastructure components, buildings, or vehicles.
+
+The framework is particularly suited for:
+
+- Models with heterogeneous agent populations
+- Systems requiring sophisticated spatial interactions
+- Interactive exploration of parameter spaces
+- Teaching and learning agent-based modeling
+
 # Core capabilities
 Mesa is a Python-based framework for ABM that provides a comprehensive set of tools for creating, running, and analyzing ABMs. Mesa integrates with the wider scientific Python ecosystem with libraries such as [NumPy](https://numpy.org/), [pandas](https://pandas.pydata.org/), [Matplotlib](https://matplotlib.org/), [NetworkX](https://networkx.org/), and more. The backend of the framework is written in Python, while the front-end end uses a Python implementation of React. The modular architecture is comprised of three main components:
 
@@ -226,26 +246,6 @@ Mesa supports systematic parameter exploration:
     }
     results = mesa.batch_run(MyModel, parameters, iterations=5, max_steps=10)
 ```
-
-# Applications
-Mesa has been applied across diverse domains, including:
-
-- Infrastructure resilience and post-disaster recovery planning [@sun2020post]
-- Market modeling, including renewable energy auctions and consumer behavior [@anatolitis2017putting]
-- Transportation optimization, such as combined truck-drone delivery routing [@leon2022multi]
-- Recommender systems analysis examining consumer-business value tradeoffs over time [@ghanem2022balancing]
-- Climate adaptation modeling examining household-level behavioral responses to environmental shocks [@taberna2023uncertainty]
-- SEIR modeling of Sars-CoV-2 (Covid-19) [@pham2021interventions]
-- Management of edge computing resources [@souza2023edgesimpy]
-
-These applications showcase Mesa's versatility in modeling complex systems with autonomous interacting agents, whether representing individual consumers, infrastructure components, buildings, or vehicles.
-
-The framework is particularly suited for:
-
-- Models with heterogeneous agent populations
-- Systems requiring sophisticated spatial interactions
-- Interactive exploration of parameter spaces
-- Teaching and learning agent-based modeling
 
 # Community and ecosystem
 Mesa has grown into a complete ecosystem with extensions including:
