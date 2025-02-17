@@ -254,10 +254,10 @@ Mesa has grown into a complete ecosystem with extensions including:
 - [Mesa-Frames](https://github.com/projectmesa/mesa-frames) for high-performance simulations
 - A rich collection of community-contributed extensions, [example models](https://github.com/projectmesa/mesa-examples), and tutorials
 
-# Acknowledgements
-The advancements leading to Mesa 3 were developed by six maintainers (the authors) and an active community with over 140 [contributors](https://github.com/projectmesa/mesa/graphs/contributors). We would especially like to thank [David Masad](https://github.com/dmasad) for his foundational work on Mesa.
-
 # Conclusions
 Mesa 3 introduces significant advancements to the Python ABM framework, enhancing the core toolkit with greater control, interactivity, and speed for researchers. These notable improvements, paired with its foundational integration with the scientific Python ecosystem, modular architecture, and active community, make it an indispensable tool for researchers across disciplines working in Python who want to create and analyze agent-based models.
+
+# Acknowledgements
+The advancements leading to Mesa 3 were developed by six maintainers (the authors) and an active community with over 140 [contributors](https://github.com/projectmesa/mesa/graphs/contributors). We would especially like to thank [David Masad](https://github.com/dmasad) for his foundational work on Mesa.
 
 # References
