@@ -342,15 +342,15 @@ def _draw_grid(space, agent_portrayal):
 
     match space:
         case Grid():
-            return _draw_discrete_grid(space, all_agent_data, agent_portrayal)
+            return _draw_discrete_grid(space, all_agent_data)
         case _Grid():
-            return _draw_legacy_grid(space, all_agent_data, agent_portrayal)
+            return _draw_legacy_grid(space, all_agent_data)
         case HexGrid():
-            return _draw_hex_grid(space, all_agent_data, agent_portrayal)
+            return _draw_hex_grid(space, all_agent_data)
         case NetworkGrid():
-            return _draw_network_grid(space, all_agent_data, agent_portrayal)
+            return _draw_network_grid(space, all_agent_data)
         case ContinuousSpace() | mesa.experimental.continuous_space.ContinuousSpace():
-            return _draw_continuous_space(space, all_agent_data, agent_portrayal)
+            return _draw_continuous_space(space, all_agent_data)
         case _:
             raise NotImplementedError(f"Unsupported space type: {type(space)}")
 
