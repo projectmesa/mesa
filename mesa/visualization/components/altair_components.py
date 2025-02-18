@@ -249,73 +249,6 @@ def axial_to_pixel(q, r, size=1):
     return x, y
 
 
-def get_agent_data(space, agent_portrayal):
-    """Generic method to extract agent data for visualization across all space types.
-
-    Args:
-        space: Mesa space object
-        agent_portrayal: Function defining agent visualization properties
-
-    Returns:
-        List of agent data dictionaries with coordinates
-    """
-    all_agent_data = []
-
-    match space:
-        case Grid():
-            # New DiscreteSpace or experimental cell space
-            for cell in space.all_cells:
-                for agent in cell.agents:
-                    data = agent_portrayal(agent)
-                    data.update({"x": cell.coordinate[0], "y": cell.coordinate[1]})
-                    all_agent_data.append(data)
-
-        case _Grid():
-            # Legacy Grid
-            for content, (x, y) in space.coord_iter():
-                if not content:
-                    continue
-                agents = [content] if not hasattr(content, "__iter__") else content
-                for agent in agents:
-                    data = agent_portrayal(agent)
-                    data.update({"x": x, "y": y})
-                    all_agent_data.append(data)
-
-        case HexGrid():
-            # Hex-based grid
-            for content, (q, r) in space.coord_iter():
-                if content:
-                    for agent in content:
-                        data = agent_portrayal(agent)
-                        data.update({"q": q, "r": r})  # Store axial coordinates
-                        all_agent_data.append(data)
-
-        case NetworkGrid():
-            # Network grid
-            for node in space.G.nodes():
-                agents = space.G.nodes[node].get("agent", [])
-                if not isinstance(agents, list):
-                    agents = [agents] if agents else []
-
-                for agent in agents:
-                    if agent:
-                        data = agent_portrayal(agent)
-                        data.update({"node": node})  # Store node information
-                        all_agent_data.append(data)
-
-        case ContinuousSpace() | mesa.experimental.continuous_space.ContinuousSpace():
-            # Continuous space
-            for agent in space.agents:
-                data = agent_portrayal(agent)
-                data.update({"x": agent.pos[0], "y": agent.pos[1]})
-                all_agent_data.append(data)
-
-        case _:
-            raise NotImplementedError(f"Unsupported space type: {type(space)}")
-
-    return all_agent_data
-
-
 def _draw_grid(space, agent_portrayal):
     """Create Altair visualization for any supported space type.
 
@@ -334,29 +267,36 @@ def _draw_grid(space, agent_portrayal):
         and its agents.  Returns a text chart "No agents" if there are no agents.
 
     """
-    all_agent_data = get_agent_data(space, agent_portrayal)
-
-    # Handle empty state
-    if not all_agent_data:
+    # Handle empty state first
+    if not space.agents:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
-
+    
     match space:
         case Grid():
-            return _draw_discrete_grid(space, all_agent_data)
+            return _draw_discrete_grid(space, agent_portrayal)
         case _Grid():
-            return _draw_legacy_grid(space, all_agent_data)
+            return _draw_legacy_grid(space, agent_portrayal)
         case HexGrid():
-            return _draw_hex_grid(space, all_agent_data)
+            return _draw_hex_grid(space, agent_portrayal)
         case NetworkGrid():
-            return _draw_network_grid(space, all_agent_data)
+            return _draw_network_grid(space, agent_portrayal)
         case ContinuousSpace() | mesa.experimental.continuous_space.ContinuousSpace():
-            return _draw_continuous_space(space, all_agent_data)
+            return _draw_continuous_space(space, agent_portrayal)
         case _:
             raise NotImplementedError(f"Unsupported space type: {type(space)}")
 
-
-def _draw_discrete_grid(space, all_agent_data, agent_portrayal):
+def _draw_discrete_grid(space, agent_portrayal):
     """Create Altair visualization for Discrete Grid."""
+    all_agent_data = []
+    for cell in space.all_cells:
+        for agent in cell.agents:
+            data = agent_portrayal(agent)
+            data.update({"x": cell.coordinate[0], "y": cell.coordinate[1]})
+            all_agent_data.append(data)
+
+    if not all_agent_data:
+        return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
+
     invalid_tooltips = ["color", "size", "x", "y"]
     x_y_type = "ordinal"
 
@@ -390,19 +330,28 @@ def _draw_discrete_grid(space, all_agent_data, agent_portrayal):
         chart = chart.mark_point(size=30000 / length**2, filled=True)
 
     chart = chart.encode(
-        x=alt.X(
-            "x", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.width - 1))
-        ),
-        y=alt.Y(
-            "y", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.height - 1))
-        ),
+        x=alt.X("x", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.width - 1))),
+        y=alt.Y("y", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.height - 1)))
     )
 
     return chart
 
 
-def _draw_legacy_grid(space, all_agent_data, agent_portrayal):
+def _draw_legacy_grid(space, agent_portrayal):
     """Create Altair visualization for Legacy Grid."""
+    all_agent_data = []
+    for content, (x, y) in space.coord_iter():
+        if not content:
+            continue
+        agents = [content] if not hasattr(content, "__iter__") else content
+        for agent in agents:
+            data = agent_portrayal(agent)
+            data.update({"x": x, "y": y})
+            all_agent_data.append(data)
+
+    if not all_agent_data:
+        return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
+
     invalid_tooltips = ["color", "size", "x", "y"]
     x_y_type = "ordinal"
 
@@ -436,19 +385,26 @@ def _draw_legacy_grid(space, all_agent_data, agent_portrayal):
         chart = chart.mark_point(size=30000 / length**2, filled=True)
 
     chart = chart.encode(
-        x=alt.X(
-            "x", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.width - 1))
-        ),
-        y=alt.Y(
-            "y", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.height - 1))
-        ),
+        x=alt.X("x", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.width - 1))),
+        y=alt.Y("y", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.height - 1)))
     )
 
-    return chart
+    return chart 
 
 
-def _draw_hex_grid(space, all_agent_data, agent_portrayal):
+def _draw_hex_grid(space, agent_portrayal):
     """Create Altair visualization for Hex Grid."""
+    all_agent_data = []
+    for content, (q, r) in space.coord_iter():
+        if content:
+            for agent in content:
+                data = agent_portrayal(agent)
+                data.update({"q": q, "r": r})
+                all_agent_data.append(data)
+
+    if not all_agent_data:
+        return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
+
     invalid_tooltips = ["color", "size", "x", "y", "q", "r"]
     x_y_type = "quantitative"
 
@@ -476,9 +432,10 @@ def _draw_hex_grid(space, all_agent_data, agent_portrayal):
     x_scale = alt.Scale(domain=(-2 * x_padding, x_max + x_padding))
     y_scale = alt.Scale(domain=(-2 * y_padding, y_max + y_padding))
 
+
     encoding_dict = {
-        "x": alt.X("x", axis=None, type=x_y_type, scale=x_scale),
-        "y": alt.Y("y", axis=None, type=x_y_type, scale=y_scale),
+        "x": alt.X("x", axis=None, type=x_y_type,scale=x_scale),
+        "y": alt.Y("y", axis=None, type=x_y_type,scale=y_scale),
         "tooltip": [
             alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
             for key, value in all_agent_data[0].items()
@@ -504,8 +461,24 @@ def _draw_hex_grid(space, all_agent_data, agent_portrayal):
     return chart
 
 
-def _draw_network_grid(space, all_agent_data, agent_portrayal):
+def _draw_network_grid(space, agent_portrayal):
     """Create Altair visualization for Network Grid."""
+    all_agent_data = []
+    for node in space.G.nodes():
+        agents = space.G.nodes[node].get("agent", [])
+        if not isinstance(agents, list):
+            agents = [agents] if agents else []
+        
+        for agent in agents:
+            if agent:
+                data = agent_portrayal(agent)
+                pos = space.G.nodes[node].get("pos", (0, 0))
+                data.update({"x": pos[0], "y": pos[1]})
+                all_agent_data.append(data)
+
+    if not all_agent_data:
+        return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
+
     invalid_tooltips = ["color", "size", "x", "y", "node"]
     x_y_type = "quantitative"
 
@@ -513,14 +486,14 @@ def _draw_network_grid(space, all_agent_data, agent_portrayal):
     positions = [space.G.nodes[node].get("pos", (0, 0)) for node in space.G.nodes()]
     x_values = [p[0] for p in positions]
     y_values = [p[1] for p in positions]
-
+    
     # Add padding to the bounds
     padding = 0.1  # 10% padding
     x_min, x_max = min(x_values), max(x_values)
     y_min, y_max = min(y_values), max(y_values)
     x_range = x_max - x_min
     y_range = y_max - y_min
-
+    
     x_scale = alt.Scale(domain=(x_min - padding * x_range, x_max + padding * x_range))
     y_scale = alt.Scale(domain=(y_min - padding * y_range, y_max + padding * y_range))
 
@@ -547,22 +520,33 @@ def _draw_network_grid(space, all_agent_data, agent_portrayal):
         )
         .mark_point(filled=True)
         .properties(width=280, height=280)
+    
     )
 
-    return chart
+    return chart 
 
 
-def _draw_continuous_space(space, all_agent_data, agent_portrayal):
+def _draw_continuous_space(space, agent_portrayal):
     """Create Altair visualization for Continuous Space."""
+    all_agent_data = []
+    for agent in space.agents:
+        data = agent_portrayal(agent)
+        data.update({"x": agent.pos[0], "y": agent.pos[1]})
+        all_agent_data.append(data)
+
+    if not all_agent_data:
+        return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
+
     invalid_tooltips = ["color", "size", "x", "y"]
     x_y_type = "quantitative"
 
     x_scale = alt.Scale(domain=(0, space.width))
     y_scale = alt.Scale(domain=(0, space.height))
 
+
     encoding_dict = {
-        "x": alt.X("x", axis=None, type=x_y_type, scale=x_scale),
-        "y": alt.Y("y", axis=None, type=x_y_type, scale=y_scale),
+        "x": alt.X("x", axis=None, type=x_y_type,scale=x_scale),
+        "y": alt.Y("y", axis=None, type=x_y_type,scale=y_scale),
         "tooltip": [
             alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
             for key, value in all_agent_data[0].items()
@@ -584,5 +568,6 @@ def _draw_continuous_space(space, all_agent_data, agent_portrayal):
         .mark_point(filled=True)
         .properties(width=280, height=280)
     )
+
 
     return chart
