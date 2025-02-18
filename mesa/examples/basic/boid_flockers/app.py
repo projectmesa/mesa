@@ -1,6 +1,9 @@
 import os
 import sys
 
+import numpy as np
+from matplotlib.markers import MarkerStyle
+
 sys.path.insert(0, os.path.abspath("../../../.."))
 
 from mesa.examples.basic.boid_flockers.model import BoidFlockers
@@ -13,7 +16,10 @@ def boid_draw(agent):
     if neighbors <= 1:
         return {"color": "red", "size": 20, "marker": "o"}
     elif neighbors >= 2:
-        return {"color": "green", "size": 20, "marker": (3, 0, 60)}
+        deg = np.degrees(np.arctan2(agent.direction[0], agent.direction[1]))
+        marker = MarkerStyle(10)
+        marker._transform = marker.get_transform().rotate_deg(deg)
+        return {"color": "green", "size": 20, "marker": marker}
 
 
 model_params = {
