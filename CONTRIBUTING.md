@@ -158,7 +158,6 @@ Maintainers help guide Mesa's overall development while ensuring the project rem
 - Release management
 - Community governance
 - Mentoring collaborators
-- Final decision-making authority
 - Setting community standards
 - Long-term sustainability
 
