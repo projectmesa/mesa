@@ -145,11 +145,15 @@ def SolaraViz(
             if reactive_use_threads.value:
                 solara.Text("Increase play interval to avoid skipping plots")
 
+            def set_reactive_use_threads(value):
+                reactive_use_threads.set(value)
+
             solara.Checkbox(
                 label="Use Threads",
                 value=reactive_use_threads,
-                on_value=lambda v: reactive_use_threads.set(v),
+                on_value=set_reactive_use_threads,
             )
+
             if not isinstance(simulator, Simulator):
                 ModelController(
                     model,
