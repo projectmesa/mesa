@@ -270,7 +270,7 @@ def _draw_grid(space, agent_portrayal):
     # Handle empty state first
     if not space.agents:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
-    
+
     match space:
         case Grid():
             return _draw_discrete_grid(space, agent_portrayal)
@@ -284,6 +284,7 @@ def _draw_grid(space, agent_portrayal):
             return _draw_continuous_space(space, agent_portrayal)
         case _:
             raise NotImplementedError(f"Unsupported space type: {type(space)}")
+
 
 def _draw_discrete_grid(space, agent_portrayal):
     """Create Altair visualization for Discrete Grid."""
@@ -330,8 +331,12 @@ def _draw_discrete_grid(space, agent_portrayal):
         chart = chart.mark_point(size=30000 / length**2, filled=True)
 
     chart = chart.encode(
-        x=alt.X("x", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.width - 1))),
-        y=alt.Y("y", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.height - 1)))
+        x=alt.X(
+            "x", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.width - 1))
+        ),
+        y=alt.Y(
+            "y", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.height - 1))
+        ),
     )
 
     return chart
@@ -385,11 +390,15 @@ def _draw_legacy_grid(space, agent_portrayal):
         chart = chart.mark_point(size=30000 / length**2, filled=True)
 
     chart = chart.encode(
-        x=alt.X("x", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.width - 1))),
-        y=alt.Y("y", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.height - 1)))
+        x=alt.X(
+            "x", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.width - 1))
+        ),
+        y=alt.Y(
+            "y", axis=None, type=x_y_type, scale=alt.Scale(domain=(0, space.height - 1))
+        ),
     )
 
-    return chart 
+    return chart
 
 
 def _draw_hex_grid(space, agent_portrayal):
@@ -432,10 +441,9 @@ def _draw_hex_grid(space, agent_portrayal):
     x_scale = alt.Scale(domain=(-2 * x_padding, x_max + x_padding))
     y_scale = alt.Scale(domain=(-2 * y_padding, y_max + y_padding))
 
-
     encoding_dict = {
-        "x": alt.X("x", axis=None, type=x_y_type,scale=x_scale),
-        "y": alt.Y("y", axis=None, type=x_y_type,scale=y_scale),
+        "x": alt.X("x", axis=None, type=x_y_type, scale=x_scale),
+        "y": alt.Y("y", axis=None, type=x_y_type, scale=y_scale),
         "tooltip": [
             alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
             for key, value in all_agent_data[0].items()
@@ -468,7 +476,7 @@ def _draw_network_grid(space, agent_portrayal):
         agents = space.G.nodes[node].get("agent", [])
         if not isinstance(agents, list):
             agents = [agents] if agents else []
-        
+
         for agent in agents:
             if agent:
                 data = agent_portrayal(agent)
@@ -486,14 +494,14 @@ def _draw_network_grid(space, agent_portrayal):
     positions = [space.G.nodes[node].get("pos", (0, 0)) for node in space.G.nodes()]
     x_values = [p[0] for p in positions]
     y_values = [p[1] for p in positions]
-    
+
     # Add padding to the bounds
     padding = 0.1  # 10% padding
     x_min, x_max = min(x_values), max(x_values)
     y_min, y_max = min(y_values), max(y_values)
     x_range = x_max - x_min
     y_range = y_max - y_min
-    
+
     x_scale = alt.Scale(domain=(x_min - padding * x_range, x_max + padding * x_range))
     y_scale = alt.Scale(domain=(y_min - padding * y_range, y_max + padding * y_range))
 
@@ -520,10 +528,9 @@ def _draw_network_grid(space, agent_portrayal):
         )
         .mark_point(filled=True)
         .properties(width=280, height=280)
-    
     )
 
-    return chart 
+    return chart
 
 
 def _draw_continuous_space(space, agent_portrayal):
@@ -543,10 +550,9 @@ def _draw_continuous_space(space, agent_portrayal):
     x_scale = alt.Scale(domain=(0, space.width))
     y_scale = alt.Scale(domain=(0, space.height))
 
-
     encoding_dict = {
-        "x": alt.X("x", axis=None, type=x_y_type,scale=x_scale),
-        "y": alt.Y("y", axis=None, type=x_y_type,scale=y_scale),
+        "x": alt.X("x", axis=None, type=x_y_type, scale=x_scale),
+        "y": alt.Y("y", axis=None, type=x_y_type, scale=y_scale),
         "tooltip": [
             alt.Tooltip(key, type=alt.utils.infer_vegalite_type_for_pandas([value]))
             for key, value in all_agent_data[0].items()
@@ -568,6 +574,5 @@ def _draw_continuous_space(space, agent_portrayal):
         .mark_point(filled=True)
         .properties(width=280, height=280)
     )
-
 
     return chart
