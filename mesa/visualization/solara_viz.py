@@ -614,7 +614,7 @@ class _SecureCodeValidator(ast.NodeVisitor):
     def __init__(self):
         self.errors = []
 
-    def visit_Call(self, node):
+    def visit_call(self, node):
         # Check function calls
         if isinstance(node.func, ast.Name):
             if node.func.id in self.FORBIDDEN_BUILTINS:
@@ -630,7 +630,7 @@ class _SecureCodeValidator(ast.NodeVisitor):
             )
         self.generic_visit(node)
 
-    def visit_Attribute(self, node):
+    def visit_attribute(self, node):
         attrs = []
         curr = node
         while isinstance(curr, ast.Attribute):
