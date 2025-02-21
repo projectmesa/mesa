@@ -35,6 +35,7 @@ import solara.lab
 import mesa.visualization.components.altair_components as components_altair
 from mesa.experimental.devs.simulator import Simulator
 from mesa.mesa_logging import create_module_logger, function_logger
+from mesa.visualization.command_console import CommandConsole
 from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
 
@@ -57,6 +58,7 @@ def SolaraViz(
     simulator: Simulator | None = None,
     model_params=None,
     name: str | None = None,
+    additional_imports: dict | None = None,
 ):
     """Solara visualization component.
 
@@ -80,6 +82,7 @@ def SolaraViz(
         model_params (dict, optional): Parameters for (re-)instantiating a model.
             Can include user-adjustable parameters and fixed parameters. Defaults to None.
         name (str | None, optional): Name of the visualization. Defaults to the models class name.
+        additional_imports (dict, optional): Dictionary of names to objects to import into the command console.
 
     Returns:
         solara.component: A Solara component that renders the visualization interface for the model.
@@ -157,6 +160,10 @@ def SolaraViz(
             )
         with solara.Card("Information"):
             ShowSteps(model.value)
+        if CommandConsole in components: # If command console in components show it in sidebar
+            components.remove(CommandConsole)
+            with solara.Card("Command Console"):
+                CommandConsole(model.value, additional_imports=additional_imports)
 
     ComponentsView(components, model.value)
 
