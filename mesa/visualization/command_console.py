@@ -42,6 +42,7 @@ class ConsoleEntry:
         is_error (bool): Whether the entry represents an error
         is_continuation (bool): Whether the entry is a continuation of previous command
     """
+
     command: str
     output: str = ""
     is_error: bool = False
@@ -58,6 +59,7 @@ class CaptureOutput:
     This class provides a way to capture output that would normally be printed
     to stdout and stderr during the execution of code within its context.
     """
+
     def __init__(self):
         """Initialize the CaptureOutput context manager with empty string buffers."""
         self.stdout = io.StringIO()
@@ -106,6 +108,7 @@ class InteractiveConsole(code.InteractiveConsole):
     Args:
         locals_dict (dict, optional): Dictionary of local variables. Defaults to None.
     """
+
     def __init__(self, locals_dict=None):
         """Initialize the InteractiveConsole with the provided locals dictionary."""
         super().__init__(locals=locals_dict or {})
@@ -156,6 +159,7 @@ class ConsoleManager:
         >>> console = ConsoleManager(model=my_model)
         >>> console.execute_code("print('hello world')", set_input_callback)
     """
+
     def __init__(self, model=None, additional_imports=None):
         """Initialize the console manager with the provided model and imports."""
         # Create locals dictionary with model and imports

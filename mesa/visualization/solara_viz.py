@@ -160,7 +160,9 @@ def SolaraViz(
             )
         with solara.Card("Information"):
             ShowSteps(model.value)
-        if CommandConsole in components: # If command console in components show it in sidebar
+        if (
+            CommandConsole in components
+        ):  # If command console in components show it in sidebar
             components.remove(CommandConsole)
             with solara.Card("Command Console"):
                 CommandConsole(model.value, additional_imports=additional_imports)
