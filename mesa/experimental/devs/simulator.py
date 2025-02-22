@@ -110,7 +110,7 @@ class Simulator:
                 "simulator has not been setup, call simulator.setup(model) first"
             )
 
-        while True:
+        while True and self.model.running:
             try:
                 event = self.event_list.pop_event()
             except IndexError:  # event list is empty
@@ -348,7 +348,7 @@ class ABMSimulator(Simulator):
                 "simulator has not been setup, call simulator.setup(model) first"
             )
 
-        while True:
+        while True and self.model.running:
             try:
                 event = self.event_list.pop_event()
             except IndexError:
