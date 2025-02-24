@@ -14,7 +14,10 @@ def boid_draw(agent):
     neighbors = len(agent.neighbors)
 
     if neighbors <= 1:
-        return {"color": "red", "size": 20, "marker": "o"}
+        deg = np.degrees(np.arctan2(agent.direction[0], agent.direction[1]))
+        marker = MarkerStyle(10)
+        marker._transform = marker.get_transform().rotate_deg(deg)
+        return {"color": "red", "size": 20, "marker": marker}
     elif neighbors >= 2:
         deg = np.degrees(np.arctan2(agent.direction[0], agent.direction[1]))
         marker = MarkerStyle(10)
