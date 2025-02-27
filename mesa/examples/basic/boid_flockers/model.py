@@ -49,6 +49,7 @@ class BoidFlockers(Model):
             seed: Random seed for reproducibility (default: None)
         """
         super().__init__(seed=seed)
+        self.agent_angles = np.zeros(population_size)
 
         # Set up the space
         self.space = ContinuousSpace(
@@ -79,6 +80,13 @@ class BoidFlockers(Model):
         self.average_heading = None
         self.update_average_heading()
 
+    def calculate_angles(self):
+        d1 = np.array([agent.direction[0] for agent in self.agents])
+        d2 = np.array([agent.direction[1] for agent in self.agents])
+        self.agent_angles = np.degrees(np.arctan2(d1, d2))
+        for agent, angle in zip(self.agents, self.agent_angles):
+            agent.angle = angle
+
     def update_average_heading(self):
         """Calculate the average heading (direction) of all Boids."""
         if not self.agents:
@@ -96,3 +104,4 @@ class BoidFlockers(Model):
         """
         self.agents.shuffle_do("step")
         self.update_average_heading()
+        self.calculate_angles()

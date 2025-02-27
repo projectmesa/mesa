@@ -58,6 +58,7 @@ class Boid(ContinuousSpaceAgent):
         self.separate_factor = separate
         self.match_factor = match
         self.neighbors = []
+        self.angle = 0.0
 
     def step(self):
         """Get the Boid's neighbors, compute the new vector, and move accordingly."""
