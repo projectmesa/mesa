@@ -239,9 +239,10 @@ def ModelController(
     def do_step():
         """Advance the model by the number of steps specified by the render_interval slider."""
         for _ in range(render_interval.value):
+            if not running.value:
+                break
             model.value.step()
-
-        running.value = model.value.running
+            running.value = model.value.running
 
         force_update()
 
