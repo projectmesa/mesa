@@ -59,6 +59,7 @@ def SolaraViz(
     model_params=None,
     name: str | None = None,
     additional_imports: dict | None = None,
+    use_threads: bool = False,
 ):
     """Solara visualization component.
 
