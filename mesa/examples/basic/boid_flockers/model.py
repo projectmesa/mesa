@@ -49,7 +49,9 @@ class BoidFlockers(Model):
             seed: Random seed for reproducibility (default: None)
         """
         super().__init__(seed=seed)
-        self.agent_angles = np.zeros(population_size)
+        self.agent_angles = np.zeros(
+            population_size
+        )  # holds the angle representing the direction of all agents at a given step
 
         # Set up the space
         self.space = ContinuousSpace(
@@ -80,6 +82,7 @@ class BoidFlockers(Model):
         self.average_heading = None
         self.update_average_heading()
 
+    # vectorizing the calculation of angles for all agents
     def calculate_angles(self):
         d1 = np.array([agent.direction[0] for agent in self.agents])
         d2 = np.array([agent.direction[1] for agent in self.agents])

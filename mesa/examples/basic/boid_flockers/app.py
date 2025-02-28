@@ -24,6 +24,7 @@ def boid_draw(agent):
     # Round to nearest 10 degrees
     rounded_deg = round(deg / 10) * 10 % 360
 
+    # using cached markers to speed things up
     if neighbors <= 1:
         return {"color": "red", "size": 20, "marker": MARKER_CACHE[rounded_deg]}
     elif neighbors >= 2:
