@@ -214,7 +214,7 @@ def _draw_grid(space, agent_portrayal, propertylayer_portrayal):
         chart = chart + agent_chart
     else:
         chart = agent_chart
-
+    chart = chart + agent_chart
     return chart
 
 
