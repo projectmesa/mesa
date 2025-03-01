@@ -1,8 +1,8 @@
 """Altair based solara components for visualization mesa spaces."""
 
 import contextlib
-import math
 import itertools
+import math
 import warnings
 from collections.abc import Callable
 from functools import lru_cache
@@ -16,10 +16,12 @@ from mesa.experimental.cell_space import HexGrid
 with contextlib.suppress(ImportError):
     import altair as alt
 
+import numpy as np
+
 from mesa.experimental.cell_space import Grid
 from mesa.space import ContinuousSpace, NetworkGrid, _Grid
 from mesa.visualization.utils import update_counter
-import numpy as np
+
 
 def make_space_altair(*args, **kwargs):
     """Create an Altair chart component for visualizing model space (deprecated).
@@ -68,6 +70,7 @@ def make_altair_space(
         function: A function that creates a SpaceAltair component
     """
     if agent_portrayal is None:
+
         def agent_portrayal(a):
             return {"id": a.unique_id}
 
@@ -289,36 +292,33 @@ def _draw_grid(space, agent_portrayal):
 def _draw_discrete_grid(space, agent_portrayal):
     """Create Altair visualization for Discrete Grid."""
     all_agent_data = []
-    
+
     # Collect agent data
     for cell in space.all_cells:
         for agent in cell.agents:
             data = agent_portrayal(agent)
-            data.update({
-                "x": float(cell.coordinate[0]), 
-                "y": float(cell.coordinate[1])
-            })
+            data.update(
+                {"x": float(cell.coordinate[0]), "y": float(cell.coordinate[1])}
+            )
             all_agent_data.append(data)
 
     if not all_agent_data:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
 
     # Create base chart
-    base = alt.Chart(alt.Data(values=all_agent_data)).properties(
-        width=280, height=280
-    )
+    base = alt.Chart(alt.Data(values=all_agent_data)).properties(width=280, height=280)
 
     # Configure encodings
     encodings = {
         "x": alt.X(
             "x:Q",
-            scale=alt.Scale(domain=[0, space.width-1]),
-            axis=alt.Axis(grid=True)  # Enable grid
+            scale=alt.Scale(domain=[0, space.width - 1]),
+            axis=alt.Axis(grid=True),  # Enable grid
         ),
         "y": alt.Y(
-            "y:Q", 
-            scale=alt.Scale(domain=[0, space.height-1]),
-            axis=alt.Axis(grid=True)  # Enable grid
+            "y:Q",
+            scale=alt.Scale(domain=[0, space.height - 1]),
+            axis=alt.Axis(grid=True),  # Enable grid
         ),
     }
 
@@ -326,12 +326,12 @@ def _draw_discrete_grid(space, agent_portrayal):
     if "color" in all_agent_data[0]:
         encodings["color"] = alt.Color("color:N")
 
-    # Add size encoding if present 
+    # Add size encoding if present
     if "size" in all_agent_data:
         encodings["size"] = alt.Size("size:Q")
     else:
         # Default size based on grid dimensions
-        point_size = 30000 / min(space.width, space.height)**2
+        point_size = 30000 / min(space.width, space.height) ** 2
         base = base.mark_point(size=point_size, filled=True)
 
     # Create final chart with encodings
@@ -389,10 +389,16 @@ def _draw_legacy_grid(space, agent_portrayal):
 
     chart = chart.encode(
         x=alt.X(
-            "x", axis=alt.Axis(grid=True), type=x_y_type, scale=alt.Scale(domain=(0, space.width - 1))
+            "x",
+            axis=alt.Axis(grid=True),
+            type=x_y_type,
+            scale=alt.Scale(domain=(0, space.width - 1)),
         ),
         y=alt.Y(
-            "y", axis=alt.Axis(grid=True), type=x_y_type, scale=alt.Scale(domain=(0, space.height - 1))
+            "y",
+            axis=alt.Axis(grid=True),
+            type=x_y_type,
+            scale=alt.Scale(domain=(0, space.height - 1)),
         ),
     )
 
@@ -451,19 +457,19 @@ def _draw_hex_grid(space, agent_portrayal):
     # Prepare data for grid lines
     hex_lines = []
     hex_centers = []
-    
+
     for idx, hexagon in enumerate(hexagons):
         # Calculate center of this hexagon
         x_center = sum(p[0] for p in hexagon) / 6
         y_center = sum(p[1] for p in hexagon) / 6
-        
+
         # Calculate row and column from index
         row = idx // space.width
         col = idx % space.width
-        
+
         # Store center
         hex_centers.append((col, row, x_center, y_center))
-        
+
         # Create line segments
         for i in range(6):
             x1, y1 = hexagon[i]
@@ -471,18 +477,11 @@ def _draw_hex_grid(space, agent_portrayal):
             hex_lines.append({"x1": x1, "y1": y1, "x2": x2, "y2": y2})
 
     # Create grid lines layer
-    grid_lines = alt.Chart(alt.Data(values=hex_lines)).mark_rule(
-        color='gray',
-        strokeWidth=1,
-        opacity=0.5
-    ).encode(
-        x='x1:Q',
-        y='y1:Q',
-        x2='x2:Q',
-        y2='y2:Q'
-    ).properties(
-        width=280,
-        height=280
+    grid_lines = (
+        alt.Chart(alt.Data(values=hex_lines))
+        .mark_rule(color="gray", strokeWidth=1, opacity=0.5)
+        .encode(x="x1:Q", y="y1:Q", x2="x2:Q", y2="y2:Q")
+        .properties(width=280, height=280)
     )
 
     # Create mapping from coordinate to center position
@@ -490,7 +489,7 @@ def _draw_hex_grid(space, agent_portrayal):
 
     # Create agents layer
     all_agent_data = []
-    
+
     for cell in space.all_cells:
         for agent in cell.agents:
             data = agent_portrayal(agent)
@@ -505,17 +504,14 @@ def _draw_hex_grid(space, agent_portrayal):
         return grid_lines
 
     # Create agent points layer
-    agent_layer = alt.Chart(
-        alt.Data(values=all_agent_data)
-    ).mark_circle(
-        filled=True,
-        size=150  
-    ).encode(
-        x=alt.X('x:Q', scale=alt.Scale(domain=[-2 * x_padding, x_max + x_padding])),
-        y=alt.Y('y:Q', scale=alt.Scale(domain=[-2 * y_padding, y_max + y_padding])),
-    ).properties(
-        width=280,
-        height=280
+    agent_layer = (
+        alt.Chart(alt.Data(values=all_agent_data))
+        .mark_circle(filled=True, size=150)
+        .encode(
+            x=alt.X("x:Q", scale=alt.Scale(domain=[-2 * x_padding, x_max + x_padding])),
+            y=alt.Y("y:Q", scale=alt.Scale(domain=[-2 * y_padding, y_max + y_padding])),
+        )
+        .properties(width=280, height=280)
     )
 
     # Add color encoding if present
@@ -525,11 +521,8 @@ def _draw_hex_grid(space, agent_portrayal):
     if all_agent_data and "size" in all_agent_data[0]:
         agent_layer = agent_layer.encode(size=alt.Size("size:Q"))
 
-    chart = (grid_lines + agent_layer).resolve_scale(
-        x='shared',
-        y='shared'
-    )
-    
+    chart = (grid_lines + agent_layer).resolve_scale(x="shared", y="shared")
+
     return chart
 
 
@@ -562,7 +555,7 @@ def _draw_network_grid(space, agent_portrayal):
     # Add padding to the bounds
     padding = 0.1  # 10% padding
     x_min, x_max = min(x_values), max(x_values)
-    y_min, y_max = min(y_values), max(y_values) 
+    y_min, y_max = min(y_values), max(y_values)
     x_range = x_max - x_min
     y_range = y_max - y_min
 
@@ -582,7 +575,7 @@ def _draw_network_grid(space, agent_portrayal):
     has_color = "color" in all_agent_data[0]
     if has_color:
         encoding_dict["color"] = alt.Color("color", type="nominal")
-    has_size = "size" in all_agent_data[0] 
+    has_size = "size" in all_agent_data[0]
     if has_size:
         encoding_dict["size"] = alt.Size("size", type="quantitative")
 
@@ -600,43 +593,38 @@ def _draw_network_grid(space, agent_portrayal):
 def _draw_continuous_space(space, agent_portrayal):
     """Create Altair visualization for Continuous Space."""
     all_agent_data = []
-    
+
     for agent in space.agents:
         data = agent_portrayal(agent)
-        data.update({
-            "x": float(agent.pos[0]),
-            "y": float(agent.pos[1])
-        })
+        data.update({"x": float(agent.pos[0]), "y": float(agent.pos[1])})
         all_agent_data.append(data)
 
     if not all_agent_data:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
 
-    base = alt.Chart(alt.Data(values=all_agent_data)).properties(
-        width=280, height=280
-    )
+    base = alt.Chart(alt.Data(values=all_agent_data)).properties(width=280, height=280)
 
     encodings = {
         "x": alt.X(
             "x:Q",
             scale=alt.Scale(domain=[0, space.width]),
-            axis=alt.Axis(grid=True)  # Enable grid
+            axis=alt.Axis(grid=True),  # Enable grid
         ),
         "y": alt.Y(
             "y:Q",
-            scale=alt.Scale(domain=[0, space.height]), 
-            axis=alt.Axis(grid=True)  # Enable grid
-        )
+            scale=alt.Scale(domain=[0, space.height]),
+            axis=alt.Axis(grid=True),  # Enable grid
+        ),
     }
 
     if "color" in all_agent_data[0]:
         encodings["color"] = alt.Color("color:N")
-        
+
     if "size" in all_agent_data:
         encodings["size"] = alt.Size("size:Q")
     else:
         base = base.mark_point(size=100, filled=True)
 
     chart = base.encode(**encodings)
-    
+
     return chart
