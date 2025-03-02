@@ -189,7 +189,7 @@ class ConsoleManager:
                     f"Command: {entry.command}, \nOutput: {entry.output if entry.output else None}\n"
                 )
                 for entry in self.history
-                if entry.command != "[history]" and entry.command != "[tips]"
+                if entry.command != "[history]" and entry.command != "[tips]" and entry.command != ""
             ]
 
             self.history.append(
