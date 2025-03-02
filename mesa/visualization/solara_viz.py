@@ -61,7 +61,7 @@ def SolaraViz(
     model_params=None,
     name: str | None = None,
     use_threads: bool = False,
-    additional_imports: dict | None = None,
+    **console_kwargs,
 ):
     """Solara visualization component.
 
@@ -184,6 +184,7 @@ def SolaraViz(
             CommandConsole in components
         ):  # If command console in components show it in sidebar
             components.remove(CommandConsole)
+            additional_imports = console_kwargs.get("additional_imports", {})
             with solara.Card("Command Console"):
                 CommandConsole(model.value, additional_imports=additional_imports)
 

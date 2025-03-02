@@ -31,6 +31,8 @@ from dataclasses import dataclass
 import solara
 from solara.components.input import use_change
 
+from mesa.visualization.utils import force_update
+
 
 @dataclass
 class ConsoleEntry:
@@ -213,7 +215,7 @@ class ConsoleManager:
             self.history.append(
                 ConsoleEntry(
                     command="[tips]",
-                    output="Available Console Commands:\n1. Press Enter to execute a command\n2. Type 'cls' to clear the console screen\n3. Type 'history' to view previous commands\n4. Press Enter on an empty line to complete a multiline block\n5. Use proper indentation for multiline blocks\n6. The console will show '..: ' for continuation lines",
+                    output="Available Console Commands:\n1. Press Enter to execute a command\n2. Type 'cls' to clear the console screen (it doesn't delete past variables and functions)\n3. Type 'history' to view previous commands\n4. Press Enter on an empty line to complete a multiline block\n5. Use proper indentation for multiline blocks\n6. The console will show '..: ' for continuation lines",
                     is_error=False,
                     is_continuation=False,
                 )
@@ -248,6 +250,9 @@ class ConsoleManager:
 
         # Execute the line
         more, (output, error) = self.console.push(code_line)
+
+        # Force update to display any changes to the model
+        force_update()
 
         # If this is the start of a multi-line block
         if more:
