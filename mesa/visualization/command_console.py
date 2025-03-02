@@ -368,7 +368,7 @@ def CommandConsole(model=None, additional_imports=None):
     input_text, set_input_text = solara.use_state("")
     _, set_refresh = solara.use_state(0)
 
-    with solara.Column(
+    with solara.lab.ChatBox(
         style={
             "height": "300px",
             "overflow-y": "auto",
