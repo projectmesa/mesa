@@ -16,6 +16,7 @@ from .solara_viz import JupyterViz, SolaraViz
 from .user_param import Slider
 
 __all__ = [
+    "CommandConsole",
     "JupyterViz",
     "Slider",
     "SolaraViz",
@@ -23,5 +24,4 @@ __all__ = [
     "make_plot_component",
     "make_space_altair",
     "make_space_component",
-    "CommandConsole",
 ]
