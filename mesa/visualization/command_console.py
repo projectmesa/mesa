@@ -146,17 +146,10 @@ class ConsoleManager:
         console (InteractiveConsole): Python's interactive console instance
         buffer (list): Buffer for storing multi-line code blocks
         history (list[ConsoleEntry]): List of console entries containing commands and their outputs
-    Methods:
-        execute_code(code_line: str, set_input_text: Callable[[str], None]) -> None:
-            Executes the provided code line and updates console history
-        clear_console() -> None:
-            Clears the console history and resets console state
-        get_entries() -> list[ConsoleEntry]:
-            Returns the list of console entries
     Special Commands:
-        history: Shows the command history
-        cls: Clears the console screen
-        tips: Shows available console commands and usage tips
+        1. history: Shows the command history
+        2. cls: Clears the console screen
+        3. tips: Shows available console commands and usage tips
     Example:
         >>> console = ConsoleManager(model=my_model)
         >>> console.execute_code("print('hello world')", set_input_callback)
