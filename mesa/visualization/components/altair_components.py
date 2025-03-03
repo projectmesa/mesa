@@ -3,7 +3,6 @@
 import warnings
 
 import altair as alt
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import solara
@@ -196,6 +195,7 @@ def _draw_grid(space, agent_portrayal, propertylayer_portrayal):
         .mark_point(filled=True)
         .properties(width=300, height=300)
     )
+    base_chart = None
 
     # This is the default value for the marker size, which auto-scales according to the grid area.
     if not has_size:
@@ -205,20 +205,21 @@ def _draw_grid(space, agent_portrayal, propertylayer_portrayal):
     if propertylayer_portrayal is not None:
         chart_width = agent_chart.properties().width
         chart_height = agent_chart.properties().height
-        chart = chart_property_layers(
+        base_chart = chart_property_layers(
             space=space,
             propertylayer_portrayal=propertylayer_portrayal,
             chart_width=chart_width,
             chart_height=chart_height,
+            agent_chart=agent_chart,
         )
-        chart = chart + agent_chart
     else:
-        chart = agent_chart
-    chart = chart + agent_chart
-    return chart
+        base_chart = agent_chart
+    return base_chart
 
 
-def chart_property_layers(space, propertylayer_portrayal, chart_width, chart_height):
+def chart_property_layers(
+    space, propertylayer_portrayal, chart_width, chart_height, agent_chart
+):
     """Creates Property Layers in the Altair Components.
 
     Args:
@@ -226,6 +227,7 @@ def chart_property_layers(space, propertylayer_portrayal, chart_width, chart_hei
         propertylayer_portrayal:Dictionary of PropertyLayer portrayal specifications
         chart_width: width of the agent chart to maintain consistency with the property charts
         chart_height: height of the agent chart to maintain consistency with the property charts
+        agent_chart: the agent chart to layer with the property layers on the grid
     Returns:
         Altair Chart
     """
@@ -235,7 +237,7 @@ def chart_property_layers(space, propertylayer_portrayal, chart_width, chart_hei
     except AttributeError:
         # new style spaces
         property_layers = space._mesa_property_layers
-    base = None
+    base = agent_chart
     for layer_name, portrayal in propertylayer_portrayal.items():
         layer = property_layers.get(layer_name, None)
         if not isinstance(
@@ -267,21 +269,38 @@ def chart_property_layers(space, propertylayer_portrayal, chart_width, chart_hei
         )
 
         if "color" in portrayal:
-            # any value less than vmin will be mapped to the color corresponding to vmin
-            # any value more than vmax will be mapped to the color corresponding to vmax
+            # Create a function to map values to RGBA colors with proper opacity scaling
             def apply_rgba(val, vmin=vmin, vmax=vmax, alpha=alpha, portrayal=portrayal):
-                a = (val - vmin) / (vmax - vmin)
-                a = max(0, min(a, 1))  # to ensure that a is between 0 and 1
-                a *= alpha  # vmax will have an opacity corresponding to alpha
+                """Maps data values to RGBA colors with opacity based on value magnitude.
+
+                Args:
+                    val: The data value to convert
+                    vmin: The smallest value for which the color is displayed in the colorbar
+                    vmax: The largest value for which the color is displayed in the colorbar
+                    alpha: The opacity of the color
+                    portrayal: The specifics of the current property layer in the iterative loop
+
+                Returns:
+                    String representation of RGBA color
+                """
+                # Normalize value to range [0,1] and clamp
+                normalized = max(0, min((val - vmin) / (vmax - vmin), 1))
+
+                # Scale opacity by alpha parameter
+                opacity = normalized * alpha
+
+                # Convert color to RGB components
                 rgb_color = to_rgb(portrayal["color"])
                 r = int(rgb_color[0] * 255)
                 g = int(rgb_color[1] * 255)
                 b = int(rgb_color[2] * 255)
 
-                return f"rgba({r}, {g}, {b}, {a:.2f})"
+                return f"rgba({r}, {g}, {b}, {opacity:.2f})"
 
+            # Apply color mapping to each value in the dataset
             df["color"] = df["value"].apply(apply_rgba)
 
+            # Create chart for the property layer
             chart = (
                 alt.Chart(df)
                 .mark_rect()
@@ -292,102 +311,108 @@ def chart_property_layers(space, propertylayer_portrayal, chart_width, chart_hei
                 )
                 .properties(width=chart_width, height=chart_height, title=layer_name)
             )
-            base = (base + chart) if base is not None else chart
+            base = alt.layer(chart, base) if base is not None else chart
 
+            # Add colorbar if specified in portrayal
             if colorbar:
-                list_value = []
-                list_color = []
+                # Extract RGB components from base color
+                rgb_color = to_rgb(portrayal["color"])
+                r_int = int(rgb_color[0] * 255)
+                g_int = int(rgb_color[1] * 255)
+                b_int = int(rgb_color[2] * 255)
 
-                i = vmin
+                # Define gradient endpoints
+                min_color = f"rgba({r_int},{g_int},{b_int},0)"
+                max_color = f"rgba({r_int},{g_int},{b_int},{alpha:.2f})"
 
-                while i <= vmax:
-                    list_value.append(i)
-                    list_color.append(apply_rgba(i))
-                    i += 1
+                # Define colorbar dimensions
+                colorbar_height = 20
+                colorbar_width = chart_width
 
-                if vmax not in list_value:
-                    list_value.append(vmax)
-                    list_color.append(apply_rgba(vmax))
-                df_colorbar = pd.DataFrame(
-                    {
-                        "value": list_value,
-                        "color": list_color,
-                    }
-                )
+                # Create dataframe for gradient visualization
+                df_gradient = pd.DataFrame({"x": [0, 1], "y": [0, 1]})
 
-                x_values = np.array(df_colorbar["value"])
-                rgba_colors = np.array(df_colorbar["color"])
-                # Ensure rgba_colors is a 2D array
-                if rgba_colors.ndim == 1:
-                    rgba_colors = np.array(
-                        [list(color) for color in rgba_colors]
-                    )  # Convert tuples to a 2D array
+                # Create evenly distributed tick values
+                axis_values = np.linspace(vmin, vmax, 11)
+                tick_positions = np.linspace(0, colorbar_width, 11)
 
-                def parse_rgba(color_str):
-                    if isinstance(color_str, str) and color_str.startswith("rgba"):
-                        color_str = (
-                            color_str.replace("rgba(", "").replace(")", "").split(",")
-                        )
-                        return np.array(
-                            [
-                                float(color_str[i]) / 255
-                                if i < 3
-                                else float(color_str[i])
-                                for i in range(4)
+                # Prepare data for axis and labels
+                axis_data = pd.DataFrame({"value": axis_values, "x": tick_positions})
+
+                # Create colorbar with linear gradient
+                colorbar_chart = (
+                    alt.Chart(df_gradient)
+                    .mark_rect(
+                        x=0,
+                        y=0,
+                        width=colorbar_width,
+                        height=colorbar_height,
+                        color=alt.Gradient(
+                            gradient="linear",
+                            stops=[
+                                alt.GradientStop(color=min_color, offset=0),
+                                alt.GradientStop(color=max_color, offset=1),
                             ],
-                            dtype=float,
-                        )
-                    return np.array(
-                        color_str, dtype=float
-                    )  # If already a tuple, convert to float
-
-                # Convert color strings to RGBA tuples (ensures correct dtype)
-                rgba_colors = np.array(
-                    [parse_rgba(c) for c in df_colorbar["color"]], dtype=float
+                            x1=0,
+                            x2=1,  # Horizontal gradient
+                            y1=0,
+                            y2=0,  # Keep y constant
+                        ),
+                    )
+                    .encode(
+                        x=alt.value(chart_width / 2),  # Center colorbar
+                        y=alt.value(0),
+                    )
+                    .properties(width=colorbar_width, height=colorbar_height)
                 )
 
-                # Ensure rgba_colors is a 2D array with shape (n, 4)
-                rgba_colors = np.array(rgba_colors).reshape(-1, 4)
-
-                # Create an RGBA gradient image (256 steps for smooth transition)
-                gradient = np.zeros((50, 256, 4))  # (Height, Width, RGBA)
-
-                # Interpolate each channel (R, G, B, A) separately
-                interp_r = np.interp(
-                    np.linspace(0, 255, 256),
-                    np.linspace(0, 255, len(rgba_colors)),
-                    rgba_colors[:, 0],
-                )
-                interp_g = np.interp(
-                    np.linspace(0, 255, 256),
-                    np.linspace(0, 255, len(rgba_colors)),
-                    rgba_colors[:, 1],
-                )
-                interp_b = np.interp(
-                    np.linspace(0, 255, 256),
-                    np.linspace(0, 255, len(rgba_colors)),
-                    rgba_colors[:, 2],
-                )
-                interp_a = np.interp(
-                    np.linspace(0, 255, 256),
-                    np.linspace(0, 255, len(rgba_colors)),
-                    rgba_colors[:, 3],
+                # Add tick marks to colorbar
+                axis_chart = (
+                    alt.Chart(axis_data)
+                    .mark_tick(thickness=2, size=8)
+                    .encode(x=alt.X("x:Q", axis=None), y=alt.value(colorbar_height - 2))
                 )
 
-                interp_colors = np.stack(
-                    [interp_r, interp_g, interp_b, interp_a], axis=-1
+                # Add value labels below tick marks
+                text_labels = (
+                    alt.Chart(axis_data)
+                    .mark_text(baseline="top", fontSize=10, dy=0)
+                    .encode(
+                        x=alt.X("x:Q"),
+                        text=alt.Text("value:Q", format=".1f"),
+                        y=alt.value(colorbar_height + 10),
+                    )
                 )
-                gradient[:] = interp_colors
-                fig, ax = plt.subplots(figsize=(6, 0.25), dpi=100)
-                ax.imshow(
-                    gradient,
-                    aspect="auto",
-                    extent=[x_values.min(), x_values.max(), 0, 1],
+
+                # Add title to colorbar
+                title = (
+                    alt.Chart(pd.DataFrame([{"text": layer_name}]))
+                    .mark_text(
+                        fontSize=12,
+                        fontWeight="bold",
+                        baseline="bottom",
+                        align="center",
+                    )
+                    .encode(
+                        text="text:N",
+                        x=alt.value(colorbar_width / 2),
+                        y=alt.value(colorbar_height + 40),
+                    )
                 )
-                ax.set_yticks([])
-                ax.set_xlabel(layer_name)
-                ax.set_xticks(np.linspace(x_values.min(), x_values.max(), 11))
-                plt.show()
+
+                # Combine all colorbar components
+                combined_colorbar = alt.layer(
+                    colorbar_chart, axis_chart, text_labels, title
+                ).properties(width=colorbar_width, height=colorbar_height + 50)
+
+                # Stack main visualization and colorbar vertically
+                base = (
+                    alt.vconcat(base, combined_colorbar, spacing=20)
+                    .resolve_scale(color="independent")
+                    .configure_view(
+                        stroke=None  # Remove border around colorbar
+                    )
+                )
 
         elif "colormap" in portrayal:
             cmap = portrayal.get("colormap", "viridis")
@@ -408,7 +433,7 @@ def chart_property_layers(space, propertylayer_portrayal, chart_width, chart_hei
                 )
                 .properties(width=chart_width, height=chart_height)
             )
-            base = (base + chart) if base is not None else chart
+            base = alt.layer(chart, base) if base is not None else chart
 
         else:
             raise ValueError(
