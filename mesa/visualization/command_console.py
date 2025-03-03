@@ -3,17 +3,6 @@
 This module provides a set of classes and functions to create an interactive Python console
 that can be embedded in a web browser. It supports command history, multi-line code blocks,
 and special commands for console management.
-Classes:
-    ConsoleEntry: Stores command console entries with their outputs and states.
-    CaptureOutput: Context manager for capturing stdout and stderr output.
-    InteractiveConsole: Custom interactive Python console with output capturing.
-    ConsoleManager: Manages the execution of Python code and console state.
-Functions:
-    format_command_html: Formats console commands as HTML for display.
-    format_output_html: Formats console output as HTML for display.
-    CommandConsole: Solara component for the interactive console interface.
-    >>> from mesa.visualization.command_console import CommandConsole
-    >>> CommandConsole(model=my_model)
 
 Notes:
     - The console supports multi-line code blocks with proper indentation
@@ -38,7 +27,7 @@ from mesa.visualization.utils import force_update
 class ConsoleEntry:
     """A class to store command console entries.
 
-    Attributes:
+    Constructor arguments:
         command (str): The command entered
         output (str): The output of the command
         is_error (bool): Whether the entry represents an error
@@ -147,9 +136,9 @@ class ConsoleManager:
         buffer (list): Buffer for storing multi-line code blocks
         history (list[ConsoleEntry]): List of console entries containing commands and their outputs
     Special Commands:
-        1. history: Shows the command history
-        2. cls: Clears the console screen
-        3. tips: Shows available console commands and usage tips
+        1. `history` : Shows the command history
+        2. `cls` : Clears the console screen
+        3. `tips` : Shows available console commands and usage tips
     Example:
         >>> console = ConsoleManager(model=my_model)
         >>> console.execute_code("print('hello world')", set_input_callback)
