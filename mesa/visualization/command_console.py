@@ -27,7 +27,7 @@ from mesa.visualization.utils import force_update
 class ConsoleEntry:
     """A class to store command console entries.
 
-    Constructor arguments:
+    Attributes:
         command (str): The command entered
         output (str): The output of the command
         is_error (bool): Whether the entry represents an error
