@@ -1,5 +1,6 @@
 """a simple version of the boltman wealth model"""
-
+import sys
+sys.path.append("../mesa")
 import mesa
 
 
