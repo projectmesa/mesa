@@ -196,6 +196,7 @@ def _draw_grid(space, agent_portrayal, propertylayer_portrayal):
         .properties(width=300, height=300)
     )
     base_chart = None
+    cbar_chart = None
 
     # This is the default value for the marker size, which auto-scales according to the grid area.
     if not has_size:
@@ -205,21 +206,22 @@ def _draw_grid(space, agent_portrayal, propertylayer_portrayal):
     if propertylayer_portrayal is not None:
         chart_width = agent_chart.properties().width
         chart_height = agent_chart.properties().height
-        base_chart = chart_property_layers(
+        base_chart, cbar_chart = chart_property_layers(
             space=space,
             propertylayer_portrayal=propertylayer_portrayal,
             chart_width=chart_width,
             chart_height=chart_height,
-            agent_chart=agent_chart,
         )
+
+        base_chart = alt.layer(base_chart, agent_chart)
     else:
         base_chart = agent_chart
+    if cbar_chart is not None:
+        base_chart = alt.vconcat(base_chart, cbar_chart).configure_view(stroke=None)
     return base_chart
 
 
-def chart_property_layers(
-    space, propertylayer_portrayal, chart_width, chart_height, agent_chart
-):
+def chart_property_layers(space, propertylayer_portrayal, chart_width, chart_height):
     """Creates Property Layers in the Altair Components.
 
     Args:
@@ -237,7 +239,8 @@ def chart_property_layers(
     except AttributeError:
         # new style spaces
         property_layers = space._mesa_property_layers
-    base = agent_chart
+    base = None
+    bar_chart = None
     for layer_name, portrayal in propertylayer_portrayal.items():
         layer = property_layers.get(layer_name, None)
         if not isinstance(
@@ -405,13 +408,12 @@ def chart_property_layers(
                     colorbar_chart, axis_chart, text_labels, title
                 ).properties(width=colorbar_width, height=colorbar_height + 50)
 
-                # Stack main visualization and colorbar vertically
-                base = (
-                    alt.vconcat(base, combined_colorbar, spacing=20)
+                bar_chart = (
+                    alt.vconcat(bar_chart, combined_colorbar)
                     .resolve_scale(color="independent")
-                    .configure_view(
-                        stroke=None  # Remove border around colorbar
-                    )
+                    .configure_view(stroke=None)
+                    if bar_chart is not None
+                    else combined_colorbar
                 )
 
         elif "colormap" in portrayal:
@@ -439,4 +441,4 @@ def chart_property_layers(
             raise ValueError(
                 f"PropertyLayer {layer_name} portrayal must include 'color' or 'colormap'."
             )
-    return base
+    return base, bar_chart
