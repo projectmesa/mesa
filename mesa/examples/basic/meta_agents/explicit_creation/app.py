@@ -1,16 +1,9 @@
-import matplotlib.pyplot as plt
-import networkx as nx
-import solara
-from matplotlib.figure import Figure
-
 from mesa.examples.basic.meta_agents.explicit_creation.model import WarehouseModel
-from mesa.visualization import SolaraViz
-from mesa.visualization.utils import update_counter
 
 warehouse_model = WarehouseModel()
 
 
-'''
+"""
 model_params = {
     "seed": {
         "type": "InputText",
@@ -74,4 +67,4 @@ page = SolaraViz(
     name="Alliance Formation Model",
 )
 page  # noqa
-'''
+"""

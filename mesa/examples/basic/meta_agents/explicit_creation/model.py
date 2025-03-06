@@ -1,11 +1,8 @@
-import networkx as nx
-import numpy as np
-import pandas as pd
 import os
 
+import pandas as pd
+
 import mesa
-import mesa.examples.basic.meta_agents.explicit_creation.agents as agents
-from mesa.experimental.meta_agents.meta_agent import MetaAgent
 
 
 class WarehouseModel(mesa.Model):
@@ -21,7 +18,8 @@ class WarehouseModel(mesa.Model):
             seed (int): Random seed.
         """
         super().__init__(seed=42)
-        self.map = pd.read_csv(os.path.join(os.path.dirname(__file__), "warehouse_layout.csv"),
-                                header=None).values
+        self.map = pd.read_csv(
+            os.path.join(os.path.dirname(__file__), "warehouse_layout.csv"), header=None
+        ).values
 
         print(self.map)

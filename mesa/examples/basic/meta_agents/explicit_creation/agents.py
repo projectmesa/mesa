@@ -3,7 +3,6 @@ from queue import PriorityQueue
 import mesa
 
 
-
 class RouteAgent(mesa.Agent):
     """
     Psuedo of on board routing entity that the agent will take
@@ -11,20 +10,27 @@ class RouteAgent(mesa.Agent):
 
     def __init__(self, model):
         super().__init__(model)
-        
 
-    def find_path(self, start, goal): 
+    def find_path(self, start, goal):
         """
         Determines path for robot to take
         """
+
         # A* path finding algorithm
         def heuristic(a, b):
             return abs(a[0] - b[0]) + abs(a[1] - b[1])
-        
+
         def _get_neighbors(self, position):
             row, col = position
-            potential_moves = [(row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)]
-            return [move for move in potential_moves if self.warehouse.is_walkable(move)]
+            potential_moves = [
+                (row - 1, col),
+                (row + 1, col),
+                (row, col - 1),
+                (row, col + 1),
+            ]
+            return [
+                move for move in potential_moves if self.warehouse.is_walkable(move)
+            ]
 
         open_set = PriorityQueue()
         open_set.put((0, start))
@@ -54,7 +60,6 @@ class RouteAgent(mesa.Agent):
         return None
 
 
-
 class SensorAgent(mesa.Agent):
     """
     Psuedo sensor that detects other entities in the area
@@ -63,10 +68,8 @@ class SensorAgent(mesa.Agent):
 
     def __init__(self, model):
         super().__init__(model)
-        
 
-    def check_path(self, next_position): 
+    def check_path(self, next_position):
         """
         Detects obstacles in the area
         """
-        pass
