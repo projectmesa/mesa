@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 
 import mesa
-from mesa.examples.basic.alliance_formation_model.agents import AllianceAgent
+from mesa.examples.basic.meta_agents.dynamic_creation.agents import AllianceAgent
 from mesa.experimental.meta_agents.meta_agent import find_combinations
 from mesa.experimental.meta_agents.multi_levels import multi_level_agents
 
