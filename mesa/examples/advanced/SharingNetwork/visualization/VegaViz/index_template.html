@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<head>
+  <title>{{ model_name }} (Mesa visualization)</title>
+  <link href="/vega_visualization.css" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet"
+  />
+  <link rel="shortcut icon" href="/favicon.ico" />
+</head>
+
+<body>
+  <app-store steps="0" timeout="0">
+    <wl-nav fixed shadow>
+      <span slot="title"
+        ><h2>{{ model_name }}</h2></span
+      >
+      <div slot="right">
+        <app-control></app-control>
+      </div>
+    </wl-nav>
+    <div class="container">
+      <aside>
+        <input-parameters></input-parameters>
+      </aside>
+      <main id="elements">
+        <h2>Visualization Elements</h2>
+        <vega-elements></vega-elements>
+      </main>
+    </div>
+    <wl-nav fixed style="bottom: 0px; top: auto;" shadow>
+      <div slot="left">
+        <wl-button onclick="this.nextElementSibling.show()">
+          About
+        </wl-button>
+        <wl-dialog fixed backdrop>
+          <h3 slot="header">Model Description</h3>
+          <wl-text slot="content">{{ description }}</wl-text>
+        </wl-dialog>
+        <save-load-parameter></save-load-parameter>
+      </div>
+      <div slot="right">
+        <fps-control></fps-control>
+      </div>
+    </wl-nav>
+  </app-store>
+
+  <!-- template-specific code snippets here -->
+  <script>
+    var port = {{ port }};
+  </script>
+
+  <!-- Bottom-load all JavaScript dependencies -->
+  <!-- Import Vega 5 & Vega-Lite 3 (does not have to be from CDN) -->
+  <script src="/vega.js"></script>
+  <script src="/vega-lite.js"></script>
+  <!-- Import vega-embed -->
+  <script src="/vega-embed.js"></script>
+  <script src="/weightless.min.js"></script>
+  <script type="module" src="/main.js"></script>
+</body>
