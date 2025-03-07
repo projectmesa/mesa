@@ -69,6 +69,7 @@ target/
 
 # Jupyter and iPython notebook checkpoints
 *.ipynb_checkpoints
+*.virtual_documents
 
 # Spyder app workspace config file
 .spyderworkspace
