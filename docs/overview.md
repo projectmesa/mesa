@@ -240,6 +240,7 @@ results = mesa.batch_run(
     iterations=5,
     max_steps=100,
     data_collection_period=1,
+    number_processes=1  # Change to use multiple CPU cores for parallel execution
 )
 ```
 
