@@ -1,30 +1,30 @@
 """Altair based solara components for visualization mesa spaces."""
 
 import contextlib
-import itertools
 import math
 import warnings
 from collections.abc import Callable
 from functools import lru_cache
 
-import mesa.discrete_space.network
-import mesa.visualization
-from mesa.visualization.mpl_space_drawing import collect_agent_data,_get_hexmesh
 import solara
 
 import mesa
+import mesa.discrete_space.network
 import mesa.experimental
-from mesa.space import HexSingleGrid,HexMultiGrid
+import mesa.visualization
+from mesa.space import HexMultiGrid, HexSingleGrid
+from mesa.visualization.mpl_space_drawing import collect_agent_data
 
 with contextlib.suppress(ImportError):
     import altair as alt
 
+import networkx as nx
 import numpy as np
 
 from mesa.experimental.cell_space import Grid
 from mesa.space import ContinuousSpace, NetworkGrid, _Grid
 from mesa.visualization.utils import update_counter
-import networkx as nx
+
 
 def make_space_altair(*args, **kwargs):
     """Create an Altair chart component for visualizing model space (deprecated).
@@ -238,11 +238,11 @@ def SpaceAltair(
     update_counter.get()
     space = getattr(model, "grid", None)
     if space is None:
-    # Sometimes the space is defined as model.space instead of model.grid
+        # Sometimes the space is defined as model.space instead of model.grid
         space = model.space
 
     chart = _draw_grid(space, agent_portrayal)
-    #Apply post_processing if provided
+    # Apply post_processing if provided
     if post_process is not None:
         chart = post_process(chart)
 
@@ -286,7 +286,7 @@ def _draw_grid(space, agent_portrayal):
             return _draw_discrete_grid(space, agent_portrayal)
         case _Grid():
             return _draw_legacy_grid(space, agent_portrayal)
-        case NetworkGrid()| mesa.discrete_space.network.Network():
+        case NetworkGrid() | mesa.discrete_space.network.Network():
             return _draw_network_grid(space, agent_portrayal)
         case ContinuousSpace() | mesa.experimental.continuous_space.ContinuousSpace():
             return _draw_continuous_space(space, agent_portrayal)
@@ -294,17 +294,15 @@ def _draw_grid(space, agent_portrayal):
             raise NotImplementedError(f"Unsupported space type: {type(space)}")
 
 
-
 def _draw_discrete_grid(space, agent_portrayal):
     """Create Altair visualization for Discrete Grid."""
-    
     # Get agent data using the collect_agent_data helper function
     raw_data = collect_agent_data(space, agent_portrayal)
-    
+
     # Early exit if no agents
     if len(raw_data["loc"]) == 0:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
-    
+
     # Convert raw_data (dict of arrays) to Altair format (list of dicts)
     all_agent_data = []
     for i in range(len(raw_data["loc"])):
@@ -312,7 +310,7 @@ def _draw_discrete_grid(space, agent_portrayal):
             "x": float(raw_data["loc"][i][0]),
             "y": float(raw_data["loc"][i][1]),
             "color": raw_data["c"][i],
-            "size": raw_data["s"][i]
+            "size": raw_data["s"][i],
         }
         # Add other properties if they exist
         if len(raw_data["alpha"]) > i:
@@ -321,7 +319,7 @@ def _draw_discrete_grid(space, agent_portrayal):
             agent_dict["edgecolor"] = raw_data["edgecolors"][i]
         if len(raw_data["linewidths"]) > i:
             agent_dict["linewidth"] = raw_data["linewidths"][i]
-            
+
         all_agent_data.append(agent_dict)
 
     # Create base chart
@@ -345,13 +343,13 @@ def _draw_discrete_grid(space, agent_portrayal):
     if "color" in all_agent_data[0]:
         encodings["color"] = alt.Color("color:N")
 
-    # Add size encoding if present 
+    # Add size encoding if present
     if "size" in all_agent_data[0]:
         encodings["size"] = alt.Size("size:Q")
         chart = base.mark_point(filled=True).encode(**encodings)
     else:
         # Default size based on grid dimensions
-        point_size = 30000 / min(space.width, space.height)**2
+        point_size = 30000 / min(space.width, space.height) ** 2
         chart = base.mark_point(size=point_size, filled=True).encode(**encodings)
 
     return chart
@@ -361,11 +359,11 @@ def _draw_legacy_grid(space, agent_portrayal):
     """Create Altair visualization for Legacy Grid."""
     all_agent_data = []
     raw_data = collect_agent_data(space, agent_portrayal)
-    
+
     # Early exit if no agents
     if len(raw_data["loc"]) == 0:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
-    
+
     # Convert raw_data (dict of arrays) to Altair format (list of dicts)
     all_agent_data = []
     for i in range(len(raw_data["loc"])):
@@ -373,7 +371,7 @@ def _draw_legacy_grid(space, agent_portrayal):
             "x": float(raw_data["loc"][i][0]),
             "y": float(raw_data["loc"][i][1]),
             "color": raw_data["c"][i],
-            "size": raw_data["s"][i]
+            "size": raw_data["s"][i],
         }
         # Add other properties if they exist
         if len(raw_data["alpha"]) > i:
@@ -382,7 +380,7 @@ def _draw_legacy_grid(space, agent_portrayal):
             agent_dict["edgecolor"] = raw_data["edgecolors"][i]
         if len(raw_data["linewidths"]) > i:
             agent_dict["linewidth"] = raw_data["linewidths"][i]
-            
+
         all_agent_data.append(agent_dict)
 
     if not all_agent_data:
@@ -447,21 +445,21 @@ def _draw_hex_grid(space, agent_portrayal):
 
     # Get color and size defaults
     s_default = (180 / max(space.width, space.height)) ** 2
-    
+
     # Get agent data using the collect_agent_data helper function
     raw_data = collect_agent_data(space, agent_portrayal)
-    
+
     # Early exit if no agents
     if len(raw_data["loc"]) == 0:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
-    
+
     # Transform hex coordinates to pixel coordinates
     loc = raw_data["loc"].astype(float)
     if loc.size > 0:
         # Apply the hex grid transformation for agent positions
         loc[:, 0] = loc[:, 0] * x_spacing + ((loc[:, 1] % 2) * (x_spacing / 2))
         loc[:, 1] = loc[:, 1] * y_spacing
-        
+
     # Convert raw_data to Altair format
     all_agent_data = []
     for i in range(len(raw_data["loc"])):
@@ -469,7 +467,7 @@ def _draw_hex_grid(space, agent_portrayal):
             "x": float(loc[i][0]),  # Use transformed coordinates
             "y": float(loc[i][1]),  # Use transformed coordinates
             "color": raw_data["c"][i],
-            "size": raw_data["s"][i]
+            "size": raw_data["s"][i],
         }
         # Add other properties if they exist
         if len(raw_data["alpha"]) > i:
@@ -478,9 +476,9 @@ def _draw_hex_grid(space, agent_portrayal):
             agent_dict["edgecolor"] = raw_data["edgecolors"][i]
         if len(raw_data["linewidths"]) > i:
             agent_dict["linewidth"] = raw_data["linewidths"][i]
-            
+
         all_agent_data.append(agent_dict)
-    
+
     # Calculate bounds
     x_max = space.width * x_spacing + (space.height % 2) * (x_spacing / 2)
     y_max = space.height * y_spacing
@@ -502,16 +500,22 @@ def _draw_hex_grid(space, agent_portrayal):
         return grid_lines
 
     # Create agent points layer
-    agent_layer = alt.Chart(
-        alt.Data(values=all_agent_data)
-    ).mark_circle(
-        filled=True
-    ).encode(
-        x=alt.X('x:Q', scale=alt.Scale(domain=[-x_padding, x_max + x_padding]),axis=alt.Axis(grid=False)),
-        y=alt.Y('y:Q', scale=alt.Scale(domain=[-y_padding, y_max + y_padding]),axis=alt.Axis(grid=False)),
-    ).properties(
-        width=280,
-        height=280
+    agent_layer = (
+        alt.Chart(alt.Data(values=all_agent_data))
+        .mark_circle(filled=True)
+        .encode(
+            x=alt.X(
+                "x:Q",
+                scale=alt.Scale(domain=[-x_padding, x_max + x_padding]),
+                axis=alt.Axis(grid=False),
+            ),
+            y=alt.Y(
+                "y:Q",
+                scale=alt.Scale(domain=[-y_padding, y_max + y_padding]),
+                axis=alt.Axis(grid=False),
+            ),
+        )
+        .properties(width=280, height=280)
     )
 
     # Add color encoding if present
@@ -525,11 +529,8 @@ def _draw_hex_grid(space, agent_portrayal):
         agent_layer = agent_layer.mark_circle(filled=True, size=s_default)
 
     # Layer grid and agents together
-    chart = (grid_lines + agent_layer).resolve_scale(
-        x='shared',
-        y='shared'
-    )
-    
+    chart = (grid_lines + agent_layer).resolve_scale(x="shared", y="shared")
+
     return chart
 
 
@@ -542,7 +543,7 @@ def _draw_network_grid(
     **kwargs,
 ):
     """Create Altair visualization for Network Grid.
-    
+
     Args:
         space: The network space to visualize
         agent_portrayal: A callable that defines how agents are portrayed
@@ -553,34 +554,34 @@ def _draw_network_grid(
     """
     if layout_kwargs is None:
         layout_kwargs = {"seed": 0}
-        
+
     # Get the graph and calculate positions using layout algorithm
     graph = space.G
     pos = layout_alg(graph, **layout_kwargs)
-    
+
     # Calculate bounds with padding
     x_values = [p[0] for p in pos.values()]
     y_values = [p[1] for p in pos.values()]
     xmin, xmax = min(x_values), max(x_values)
     ymin, ymax = min(y_values), max(y_values)
-    
+
     width = xmax - xmin
     height = ymax - ymin
     x_padding = width / 20
     y_padding = height / 20
-    
+
     # Gather agent data using positions from layout algorithm
     s_default = (180 / max(width, height)) ** 2
     raw_data = collect_agent_data(space, agent_portrayal)
-    
+
     # Early exit if no agents
     if len(raw_data["loc"]) == 0:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
-    
+
     # Map agent positions to layout positions
     loc = raw_data["loc"]
     positions = np.array([pos[node_id] for node_id in loc])
-    
+
     # Create agent data for Altair
     all_agent_data = []
     for i in range(len(loc)):
@@ -589,7 +590,7 @@ def _draw_network_grid(
             "y": float(positions[i][1]),
             "color": raw_data["c"][i],
             "size": raw_data["s"][i],
-            "node_id": int(loc[i]) # Keep node ID for reference
+            "node_id": int(loc[i]),  # Keep node ID for reference
         }
         # Add other properties if they exist
         if len(raw_data["alpha"]) > i:
@@ -598,62 +599,62 @@ def _draw_network_grid(
             agent_dict["edgecolor"] = raw_data["edgecolors"][i]
         if len(raw_data["linewidths"]) > i:
             agent_dict["linewidth"] = raw_data["linewidths"][i]
-            
+
         all_agent_data.append(agent_dict)
-     
+
     # Create edge data for drawing network connections
     edge_data = []
     if draw_grid:
         for u, v in graph.edges():
-            edge_data.append({
-                "x1": pos[u][0], 
-                "y1": pos[u][1],
-                "x2": pos[v][0], 
-                "y2": pos[v][1]
-            })
-    
+            edge_data.append(
+                {"x1": pos[u][0], "y1": pos[u][1], "x2": pos[v][0], "y2": pos[v][1]}
+            )
+
     # Create base chart for agents
-    agent_chart = alt.Chart(
-        alt.Data(values=all_agent_data)
-    ).mark_circle(
-        filled=True
-    ).encode(
-        x=alt.X('x:Q', scale=alt.Scale(domain=[xmin - x_padding, xmax + x_padding]), axis=alt.Axis(grid=False)),
-        y=alt.Y('y:Q', scale=alt.Scale(domain=[ymin - y_padding, ymax + y_padding]),axis=alt.Axis(grid=False)),
-    ).properties(
-        width=280,
-        height=280
+    agent_chart = (
+        alt.Chart(alt.Data(values=all_agent_data))
+        .mark_circle(filled=True)
+        .encode(
+            x=alt.X(
+                "x:Q",
+                scale=alt.Scale(domain=[xmin - x_padding, xmax + x_padding]),
+                axis=alt.Axis(grid=False),
+            ),
+            y=alt.Y(
+                "y:Q",
+                scale=alt.Scale(domain=[ymin - y_padding, ymax + y_padding]),
+                axis=alt.Axis(grid=False),
+            ),
+        )
+        .properties(width=280, height=280)
     )
-    
+
     # Add color and size encodings if present
     if all_agent_data:
         if "color" in all_agent_data[0]:
             agent_chart = agent_chart.encode(color=alt.Color("color:N"))
-        
+
         if "size" in all_agent_data[0]:
             agent_chart = agent_chart.encode(size=alt.Size("size:Q"))
         else:
             agent_chart = agent_chart.mark_circle(filled=True, size=s_default)
-    
+
     # Create edge chart
     if draw_grid and edge_data:
-        edge_chart = alt.Chart(
-            alt.Data(values=edge_data)
-        ).mark_rule(
-            color='gray',
-            strokeDash=[5, 5],  # Equivalent to "--" style in matplotlib
-            opacity=0.5,
-            strokeWidth=1
-        ).encode(
-            x="x1:Q",
-            y="y1:Q",
-            x2="x2:Q",
-            y2="y2:Q"
+        edge_chart = (
+            alt.Chart(alt.Data(values=edge_data))
+            .mark_rule(
+                color="gray",
+                strokeDash=[5, 5],  # Equivalent to "--" style in matplotlib
+                opacity=0.5,
+                strokeWidth=1,
+            )
+            .encode(x="x1:Q", y="y1:Q", x2="x2:Q", y2="y2:Q")
         )
-        
+
         # Combine edge and agent charts
         return alt.layer(edge_chart, agent_chart)
-    
+
     return agent_chart
 
 
@@ -662,11 +663,11 @@ def _draw_continuous_space(space, agent_portrayal):
     all_agent_data = []
     # Get agent data using the collect_agent_data helper function
     raw_data = collect_agent_data(space, agent_portrayal)
-    
+
     # Early exit if no agents
     if len(raw_data["loc"]) == 0:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
-    
+
     # Convert raw_data (dict of arrays) to Altair format (list of dicts)
     all_agent_data = []
     for i in range(len(raw_data["loc"])):
@@ -674,7 +675,7 @@ def _draw_continuous_space(space, agent_portrayal):
             "x": float(raw_data["loc"][i][0]),
             "y": float(raw_data["loc"][i][1]),
             "color": raw_data["c"][i],
-            "size": raw_data["s"][i]
+            "size": raw_data["s"][i],
         }
         # Add other properties if they exist
         if len(raw_data["alpha"]) > i:
@@ -683,7 +684,7 @@ def _draw_continuous_space(space, agent_portrayal):
             agent_dict["edgecolor"] = raw_data["edgecolors"][i]
         if len(raw_data["linewidths"]) > i:
             agent_dict["linewidth"] = raw_data["linewidths"][i]
-            
+
         all_agent_data.append(agent_dict)
     if not all_agent_data:
         return alt.Chart().mark_text(text="No agents").properties(width=280, height=280)
@@ -715,26 +716,26 @@ def _draw_continuous_space(space, agent_portrayal):
 
     return chart
 
+
 @lru_cache(maxsize=1024, typed=True)
 def _get_hexmesh_altair(width: int, height: int, size: float = 1.0) -> list[dict]:
     """Generate hexagon vertices for the mesh in altair format."""
-    
     # Parameters for hexagon grid
     x_spacing = np.sqrt(3) * size
     y_spacing = 1.5 * size
-    
+
     hex_lines = []
-    
+
     # For flat-topped hexagons (note the orientation)
     vertices_offsets = [
-        (0, -size),                    # top
+        (0, -size),  # top
         (0.5 * np.sqrt(3) * size, -0.5 * size),  # top right
-        (0.5 * np.sqrt(3) * size, 0.5 * size),   # bottom right
-        (0, size),                     # bottom
+        (0.5 * np.sqrt(3) * size, 0.5 * size),  # bottom right
+        (0, size),  # bottom
         (-0.5 * np.sqrt(3) * size, 0.5 * size),  # bottom left
-        (-0.5 * np.sqrt(3) * size, -0.5 * size)  # top left
+        (-0.5 * np.sqrt(3) * size, -0.5 * size),  # top left
     ]
-    
+
     for row in range(height):
         for col in range(width):
             # Calculate center position with offset for odd rows
@@ -742,16 +743,16 @@ def _get_hexmesh_altair(width: int, height: int, size: float = 1.0) -> list[dict
             if row % 2 == 1:  # Odd rows are offset
                 x_center += x_spacing / 2
             y_center = row * y_spacing
-            
+
             # Calculate vertices for this hexagon
             vertices = []
             for dx, dy in vertices_offsets:
                 vertices.append((x_center + dx, y_center + dy))
-            
+
             # Create line segments for the hexagon
             for i in range(6):
                 x1, y1 = vertices[i]
-                x2, y2 = vertices[(i+1) % 6]
+                x2, y2 = vertices[(i + 1) % 6]
                 hex_lines.append({"x1": x1, "y1": y1, "x2": x2, "y2": y2})
-    
+
     return hex_lines
