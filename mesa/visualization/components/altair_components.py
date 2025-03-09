@@ -24,7 +24,6 @@ import numpy as np
 from mesa.experimental.cell_space import Grid
 from mesa.space import ContinuousSpace, NetworkGrid, _Grid
 from mesa.visualization.utils import update_counter
-import numpy as np
 import networkx as nx
 
 def make_space_altair(*args, **kwargs):
