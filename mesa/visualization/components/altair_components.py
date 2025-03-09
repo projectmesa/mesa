@@ -549,6 +549,7 @@ def _draw_network_grid(
         draw_grid: Whether to draw the network edges
         layout_alg: A NetworkX layout algorithm to position nodes
         layout_kwargs: Arguments to pass to the layout algorithm
+        **kwargs: Additional keyword arguments passed to the visualization
     """
     if layout_kwargs is None:
         layout_kwargs = {"seed": 0}
