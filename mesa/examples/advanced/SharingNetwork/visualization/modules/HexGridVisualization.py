@@ -5,7 +5,9 @@ Modular Canvas Rendering
 Module for visualizing model objects in hexagonal grid cells.
 
 """
+
 from collections import defaultdict
+
 from mesa.visualization.ModularVisualization import VisualizationElement
 
 
@@ -68,9 +70,7 @@ class CanvasHexGrid(VisualizationElement):
         self.canvas_width = canvas_width
         self.canvas_height = canvas_height
 
-        new_element = "new CanvasHexModule({}, {}, {}, {})".format(
-            self.canvas_width, self.canvas_height, self.grid_width, self.grid_height
-        )
+        new_element = f"new CanvasHexModule({self.canvas_width}, {self.canvas_height}, {self.grid_width}, {self.grid_height})"
 
         self.js_code = "elements.push(" + new_element + ");"
 

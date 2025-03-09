@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 VegaServer
 =============
@@ -15,12 +14,13 @@ multiple simulations side-by-side. All simulations are interactive and you can i
 a "on_click" method in your model class to respond to clicks. Every click passes the
 underlying visualization data to your "on-click" function.
 """
+
 import copy
 import os
 import pickle
 import webbrowser
-
-from typing import Dict, Optional, List, Awaitable, Any, Union, TYPE_CHECKING
+from collections.abc import Awaitable
+from typing import TYPE_CHECKING, Any
 
 import tornado.autoreload
 import tornado.escape
@@ -31,13 +31,12 @@ import tornado.websocket
 
 from mesa.visualization.UserParam import UserSettableParameter
 
-
 if TYPE_CHECKING:
-    from mesa.model import Model
+    pass
 
 
 class PageHandler(tornado.web.RequestHandler):
-    """ Handler for the HTML template which holds the visualization. """
+    """Handler for the HTML template which holds the visualization."""
 
     # application: "VegaServer"
 
@@ -53,7 +52,7 @@ class PageHandler(tornado.web.RequestHandler):
 class SocketHandler(tornado.websocket.WebSocketHandler):
     # application: "VegaServer"
 
-    def open(self, *args: str, **kwargs: str) -> Optional[Awaitable[None]]:
+    def open(self, *args: str, **kwargs: str) -> Awaitable[None] | None:
         self.set_nodelay(True)
         # self.states: List[str] = []
         if self.application.verbose:
@@ -68,10 +67,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         )
         return None
 
-    def on_message(self, message: Union[str, bytes]) -> Optional[Awaitable[None]]:
-        """ Receiving a message from the websocket, parse, and act accordingly.
-
-        """
+    def on_message(self, message: str | bytes) -> Awaitable[None] | None:
+        """Receiving a message from the websocket, parse, and act accordingly."""
         msg = tornado.escape.json_decode(message)
         if self.application.verbose:
             print(msg)
@@ -129,14 +126,14 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         if not any([model.running for model in self.application.models]):
             self.write_message({"type": "end"})
 
-    def call_method(self, step: int, model_id: int, data: Dict[str, Any]) -> None:
+    def call_method(self, step: int, model_id: int, data: dict[str, Any]) -> None:
         if self.application.current_step != step:
             self.application.restore_state(step)
         self.states = self.states[:step]
 
         model = self.application.models[model_id]
         try:
-            method = getattr(model, "on_click")
+            method = model.on_click
             method(**data)
         except (AttributeError, TypeError):
             pass
@@ -145,7 +142,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
 
 class VegaServer(tornado.web.Application):
-    """ Main visualization application. """
+    """Main visualization application."""
 
     verbose = True
 
@@ -170,12 +167,12 @@ class VegaServer(tornado.web.Application):
     def __init__(
         self,
         model_cls: Any,
-        vega_specifications: List[str],
+        vega_specifications: list[str],
         name: str = "Mesa Model",
-        model_params: Optional[Dict[str, Any]] = None,
+        model_params: dict[str, Any] | None = None,
         n_simulations: int = 1,
     ):
-        """ Create a new visualization server with the given elements. """
+        """Create a new visualization server with the given elements."""
         # Prep visualization elements:
         self.vega_specifications = vega_specifications
 
@@ -204,22 +201,17 @@ class VegaServer(tornado.web.Application):
         super().__init__(self.handlers, "", [], **self.settings)
 
     @property
-    def user_params(self) -> List[Dict[str, Any]]:
+    def user_params(self) -> list[dict[str, Any]]:
         result = []
         for param, val in self.model_params.items():
             if isinstance(val, UserSettableParameter):
-                setattr(val, "parameter", param)
-                setattr(
-                    val,
-                    "model_values",
-                    [kwargs[param].value for kwargs in self.model_kwargs],
-                )
+                val.parameter = param
+                val.model_values = [kwargs[param].value for kwargs in self.model_kwargs]
                 result.append(val.json)
         return result
 
     def step(self) -> None:
-        """Advance all models by one step.
-        """
+        """Advance all models by one step."""
         self.pickles[self.current_step] = pickle.dumps(self.models)
         for model in self.models:
             model.step()
@@ -230,7 +222,7 @@ class VegaServer(tornado.web.Application):
         self.current_step = step
 
     def reset_models(self) -> None:
-        """ Reinstantiate the model object, using the current parameters. """
+        """Reinstantiate the model object, using the current parameters."""
 
         self.models = []
         self.pickles = {}
@@ -248,12 +240,12 @@ class VegaServer(tornado.web.Application):
             self.models.append(self.model_cls(**model_params))
             self.current_step = 0
 
-    def launch(self, port: Optional[int] = None) -> None:
-        """ Run the app. """
+    def launch(self, port: int | None = None) -> None:
+        """Run the app."""
         if port is not None:
             self.port = port
-        url = "http://127.0.0.1:{PORT}".format(PORT=self.port)
-        print("Interface starting at {url}".format(url=url))
+        url = f"http://127.0.0.1:{self.port}"
+        print(f"Interface starting at {url}")
         self.listen(self.port)
         webbrowser.open(url)
         tornado.autoreload.start()

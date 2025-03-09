@@ -5,7 +5,9 @@ Modular Canvas Rendering
 Module for visualizing model objects in grid cells.
 
 """
+
 from collections import defaultdict
+
 from mesa.visualization.ModularVisualization import VisualizationElement
 
 
@@ -84,9 +86,7 @@ class CanvasGrid(VisualizationElement):
         self.canvas_width = canvas_width
         self.canvas_height = canvas_height
 
-        new_element = "new CanvasModule({}, {}, {}, {})".format(
-            self.canvas_width, self.canvas_height, self.grid_width, self.grid_height
-        )
+        new_element = f"new CanvasModule({self.canvas_width}, {self.canvas_height}, {self.grid_width}, {self.grid_height})"
 
         self.js_code = "elements.push(" + new_element + ");"
 

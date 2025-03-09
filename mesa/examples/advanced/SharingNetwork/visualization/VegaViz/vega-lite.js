@@ -1382,11 +1382,11 @@
         return c in GEOPOSITION_CHANNEL_INDEX;
     }
     const GEOPOSITION_CHANNELS = keys(GEOPOSITION_CHANNEL_INDEX);
-    const UNIT_CHANNEL_INDEX = Object.assign(Object.assign(Object.assign({}, POSITION_CHANNEL_INDEX), GEOPOSITION_CHANNEL_INDEX), { 
+    const UNIT_CHANNEL_INDEX = Object.assign(Object.assign(Object.assign({}, POSITION_CHANNEL_INDEX), GEOPOSITION_CHANNEL_INDEX), {
         // color
-        color: 1, fill: 1, stroke: 1, 
+        color: 1, fill: 1, stroke: 1,
         // other non-position with scale
-        opacity: 1, fillOpacity: 1, strokeOpacity: 1, strokeWidth: 1, size: 1, shape: 1, 
+        opacity: 1, fillOpacity: 1, strokeOpacity: 1, strokeWidth: 1, size: 1, shape: 1,
         // channels without scales
         order: 1, text: 1, detail: 1, key: 1, tooltip: 1, href: 1, url: 1 });
     function isColorChannel(channel) {
@@ -2817,9 +2817,9 @@
     ) {
         return getFirstDefined(
         // style config has highest precedence
-        vgChannel ? getStyleConfig(channel, mark, config.style) : undefined, getStyleConfig(channel, mark, config.style), 
+        vgChannel ? getStyleConfig(channel, mark, config.style) : undefined, getStyleConfig(channel, mark, config.style),
         // then mark-specific config
-        vgChannel ? config[mark.type][vgChannel] : undefined, config[mark.type][channel], 
+        vgChannel ? config[mark.type][vgChannel] : undefined, config[mark.type][channel],
         // If there is vgChannel, skip vl channel.
         // For example, vl size for text is vg fontSize, but config.mark.size is only for point size.
         vgChannel ? config.mark[vgChannel] : config.mark[channel]);
@@ -3309,7 +3309,7 @@
             return normalizeFieldDef(channelDef, channel);
         }
         else if (hasConditionalFieldDef(channelDef)) {
-            return Object.assign(Object.assign({}, channelDef), { 
+            return Object.assign(Object.assign({}, channelDef), {
                 // Need to cast as normalizeFieldDef normally return FieldDef, but here we know that it is definitely Condition<FieldDef>
                 condition: normalizeFieldDef(channelDef.condition, channel) });
         }
@@ -3630,7 +3630,7 @@
                     const guide = getGuide(channelDef);
                     const isTitleDefined = guide && guide.title;
                     let newField = vgField(channelDef, { forAs: true });
-                    const newFieldDef = Object.assign(Object.assign(Object.assign({}, (isTitleDefined ? [] : { title: title(channelDef, config, { allowDisabling: true }) })), remaining), { 
+                    const newFieldDef = Object.assign(Object.assign(Object.assign({}, (isTitleDefined ? [] : { title: title(channelDef, config, { allowDisabling: true }) })), remaining), {
                         // Always overwrite field
                         field: newField });
                     const isPositionChannel = channel === 'x' || channel === 'y';
@@ -4869,11 +4869,11 @@
     }
 
     function extractTitleConfig(titleConfig) {
-        const { 
+        const {
         // These are non-mark title config that need to be hardcoded
-        anchor, frame, offset, orient, 
+        anchor, frame, offset, orient,
         // color needs to be redirect to fill
-        color } = titleConfig, 
+        color } = titleConfig,
         // The rest are mark config.
         titleMarkConfig = __rest(titleConfig, ["anchor", "frame", "offset", "orient", "color"]);
         const mark = Object.assign(Object.assign({}, titleMarkConfig), (color ? { fill: color } : {}));
@@ -5103,7 +5103,7 @@
             return Object.assign(Object.assign({}, rest), { concat: concat.map(subspec => this.map(subspec, params)) });
         }
         mapFacet(spec, params) {
-            return Object.assign(Object.assign({}, spec), { 
+            return Object.assign(Object.assign({}, spec), {
                 // TODO: remove "any" once we support all facet listed in https://github.com/vega/vega-lite/issues/2760
                 spec: this.map(spec.spec, params) });
         }
@@ -5249,7 +5249,7 @@
     function dropLineAndPointFromConfig(config) {
         for (const mark of ['line', 'area', 'rule', 'trail']) {
             if (config[mark]) {
-                config = Object.assign(Object.assign({}, config), { 
+                config = Object.assign(Object.assign({}, config), {
                     // TODO: remove as any
                     [mark]: omit(config[mark], ['point', 'line']) });
             }
@@ -5326,9 +5326,9 @@
             const pointOverlay = getPointOverlay(markDef, config[markDef.type], encoding);
             const lineOverlay = markDef.type === 'area' && getLineOverlay(markDef, config[markDef.type]);
             const layer = [
-                Object.assign(Object.assign({}, (selection ? { selection } : {})), { 
+                Object.assign(Object.assign({}, (selection ? { selection } : {})), {
                     // Do not include point / line overlay in the normalize spec
-                    mark: dropLineAndPoint(Object.assign(Object.assign({}, markDef), (markDef.type === 'area' ? { opacity: 0.7 } : {}))), 
+                    mark: dropLineAndPoint(Object.assign(Object.assign({}, markDef), (markDef.type === 'area' ? { opacity: 0.7 } : {}))),
                     // drop shape from encoding as this might be used to trigger point overlay
                     encoding: omit(encoding, ['shape']) })
             ];
@@ -5483,7 +5483,7 @@
             // Mark and encoding should be moved into the inner spec
             const { mark, width, projection, height, selection, encoding: _ } = spec, outerSpec = __rest(spec, ["mark", "width", "projection", "height", "selection", "encoding"]);
             const { facetMapping, layout } = this.getFacetMappingAndLayout({ row, column, facet });
-            return this.mapFacet(Object.assign(Object.assign(Object.assign({}, outerSpec), layout), { 
+            return this.mapFacet(Object.assign(Object.assign(Object.assign({}, outerSpec), layout), {
                 // row / column has higher precedence than facet
                 facet: facetMapping, spec: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (projection ? { projection } : {})), { mark }), (width ? { width } : {})), (height ? { height } : {})), { encoding }), (selection ? { selection } : {})) }), params);
         }
@@ -6514,7 +6514,7 @@
         const transparentIfNeeded = contains(['bar', 'point', 'circle', 'square', 'geoshape'], markType)
             ? 'transparent'
             : undefined;
-        const defaultFill = getFirstDefined(markDef.fill, filled === true ? markDef.color : undefined, configValue.fill, filled === true ? configValue.color : undefined, 
+        const defaultFill = getFirstDefined(markDef.fill, filled === true ? markDef.color : undefined, configValue.fill, filled === true ? configValue.color : undefined,
         // If there is no fill, always fill symbols, bar, geoshape
         // with transparent fills https://github.com/vega/vega-lite/issues/1316
         transparentIfNeeded);
@@ -8283,7 +8283,7 @@
                 }
             }
             return Object.assign(Object.assign({ scale,
-                orient }, axis), { domain: false, labels: false, 
+                orient }, axis), { domain: false, labels: false,
                 // Always set min/maxExtent to 0 to ensure that `config.axis*.minExtent` and `config.axis*.maxExtent`
                 // would not affect gridAxis
                 maxExtent: 0, minExtent: 0, ticks: false, zindex: getFirstDefined(zindex, 0) // put grid behind marks by default
@@ -10594,9 +10594,9 @@
         }
     }
 
-    const LEGEND_COMPONENT_PROPERTY_INDEX = Object.assign(Object.assign({}, COMMON_LEGEND_PROPERTY_INDEX), { labelExpr: 1, 
+    const LEGEND_COMPONENT_PROPERTY_INDEX = Object.assign(Object.assign({}, COMMON_LEGEND_PROPERTY_INDEX), { labelExpr: 1,
         // channel scales
-        opacity: 1, shape: 1, stroke: 1, fill: 1, size: 1, strokeWidth: 1, strokeDash: 1, 
+        opacity: 1, shape: 1, stroke: 1, fill: 1, size: 1, strokeWidth: 1, strokeDash: 1,
         // encode
         encode: 1 });
     const LEGEND_COMPONENT_PROPERTIES = keys(LEGEND_COMPONENT_PROPERTY_INDEX);
@@ -10918,7 +10918,7 @@
             case 'gradientLength':
                 return getFirstDefined(
                 // do specified gradientLength first
-                legend.gradientLength, legendConfig.gradientLength, 
+                legend.gradientLength, legendConfig.gradientLength,
                 // Otherwise, use smart default based on plot height
                 defaultGradientLength({
                     model,
@@ -10988,7 +10988,7 @@
         let typeMerged = false;
         // Otherwise, let's merge
         for (const prop of LEGEND_COMPONENT_PROPERTIES) {
-            const mergedValueWithExplicit = mergeValuesWithExplicit(mergedLegend.getWithExplicit(prop), childLegend.getWithExplicit(prop), prop, 'legend', 
+            const mergedValueWithExplicit = mergeValuesWithExplicit(mergedLegend.getWithExplicit(prop), childLegend.getWithExplicit(prop), prop, 'legend',
             // Tie breaker function
             (v1, v2) => {
                 switch (prop) {
@@ -13398,7 +13398,7 @@
     }
     function normalizeSortField(sort, isStacked) {
         const { op, field, order } = sort;
-        return Object.assign(Object.assign({ 
+        return Object.assign(Object.assign({
             // Apply default op
             op: op || (isStacked ? 'sum' : DEFAULT_SORT_OP) }, (field ? { field: replacePathInField(field) } : {})), (order ? { order } : {}));
     }
@@ -14152,7 +14152,7 @@
             // Basically it doesn't make sense to add padding for color and size.
             if (scaleType === ScaleType.BAND) {
                 const { bandPaddingOuter } = scaleConfig;
-                return getFirstDefined(bandPaddingOuter, 
+                return getFirstDefined(bandPaddingOuter,
                 /* By default, paddingOuter is paddingInner / 2. The reason is that
                   size (width/height) = step * (cardinality - paddingInner + 2 * paddingOuter).
                   and we want the width/height to be integer by default.
@@ -16147,7 +16147,7 @@
             const style = child.assembleGroupStyle();
             const markGroup = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ name: this.getName('cell'), type: 'group' }, (title ? { title } : {})), (style ? { style } : {})), { from: {
                     facet: this.assembleFacet()
-                }, 
+                },
                 // TODO: move this to after data
                 sort: {
                     field: FACET_CHANNELS.map(c => this.facetSortFields(c)).flat(),
@@ -16591,7 +16591,7 @@
             return null;
         }
         assembleDefaultLayout() {
-            return Object.assign(Object.assign({}, (this.concatType === 'vconcat' ? { columns: 1 } : {})), { bounds: 'full', 
+            return Object.assign(Object.assign({}, (this.concatType === 'vconcat' ? { columns: 1 } : {})), { bounds: 'full',
                 // Use align each so it can work with multiple plots with different size
                 align: 'each' });
         }
@@ -16750,7 +16750,7 @@
     }
     function mergeAxisComponent(merged, child) {
         for (const prop of AXIS_COMPONENT_PROPERTIES) {
-            const mergedValueWithExplicit = mergeValuesWithExplicit(merged.getWithExplicit(prop), child.getWithExplicit(prop), prop, 'axis', 
+            const mergedValueWithExplicit = mergeValuesWithExplicit(merged.getWithExplicit(prop), child.getWithExplicit(prop), prop, 'axis',
             // Tie breaker function
             (v1, v2) => {
                 switch (prop) {
@@ -17181,7 +17181,7 @@
         }
     }
     function defaultSizeRef(mark, markDef, sizeChannel, scaleName, scale, config, band) {
-        const markPropOrConfig = getFirstDefined(markDef[sizeChannel], markDef.size, 
+        const markPropOrConfig = getFirstDefined(markDef[sizeChannel], markDef.size,
         // TODO: deal with sizeChannel config
         getMarkConfig('size', markDef, config, { vgChannel: sizeChannel }));
         if (markPropOrConfig !== undefined) {
@@ -17992,7 +17992,7 @@
     function assembleTopLevelModel(model, topLevelProperties, datasets = {}, usermeta) {
         // Config with Vega-Lite only config removed.
         const vgConfig = model.config ? stripAndRedirectConfig(model.config) : undefined;
-        const data = [].concat(model.assembleSelectionData([]), 
+        const data = [].concat(model.assembleSelectionData([]),
         // only assemble data in the root
         assembleRootData(model.component.data, datasets));
         const projections = model.assembleProjections();

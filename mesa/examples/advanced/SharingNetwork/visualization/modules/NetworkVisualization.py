@@ -5,6 +5,7 @@ Network Visualization Module
 Module for rendering the network, using [sigma.js](http://sigmajs.org/) or [d3.js](https://d3js.org/) frameworks.
 
 """
+
 from mesa.visualization.ModularVisualization import VisualizationElement
 
 
@@ -29,9 +30,7 @@ class NetworkModule(VisualizationElement):
         self.portrayal_method = portrayal_method
         self.canvas_height = canvas_height
         self.canvas_width = canvas_width
-        new_element = "new NetworkModule({}, {})".format(
-            self.canvas_width, self.canvas_height
-        )
+        new_element = f"new NetworkModule({self.canvas_width}, {self.canvas_height})"
         self.js_code = "elements.push(" + new_element + ");"
 
     def render(self, model):

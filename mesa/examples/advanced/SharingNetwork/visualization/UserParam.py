@@ -57,7 +57,7 @@ class UserSettableParameter:
         description=None,
     ):
         if param_type not in self.TYPES:
-            raise ValueError("{} is not a valid Option type".format(param_type))
+            raise ValueError(f"{param_type} is not a valid Option type")
         self.param_type = param_type
         self.name = name
         self._value = value
@@ -72,7 +72,7 @@ class UserSettableParameter:
         valid = True
 
         if self.param_type == self.NUMBER:
-            valid = not (self.value is None)
+            valid = self.value is not None
 
         elif self.param_type == self.SLIDER:
             valid = not (

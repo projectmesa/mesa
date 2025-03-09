@@ -1,8 +1,7 @@
 from mesa_old.visualization.ModularVisualization import ModularServer
+from mesa_old.visualization.modules import BarChartModule, ChartModule, NetworkModule
 from mesa_old.visualization.UserParam import UserSettableParameter
-from mesa_old.visualization.modules import ChartModule
-from mesa_old.visualization.modules import NetworkModule
-from mesa_old.visualization.modules import BarChartModule
+
 from .model import DefenderNetworkModel
 
 
@@ -75,7 +74,5 @@ model_params = {
     ),
 }
 
-server = ModularServer(
-    DefenderNetworkModel, [grid, chart], "Money Model", model_params
-)
+server = ModularServer(DefenderNetworkModel, [grid, chart], "Money Model", model_params)
 server.port = 8521
