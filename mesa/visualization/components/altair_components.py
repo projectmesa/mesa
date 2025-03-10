@@ -24,7 +24,10 @@ def make_space_altair(*args, **kwargs):  # noqa: D103
 
 
 def make_altair_space(
-    agent_portrayal, propertylayer_portrayal, post_process, **space_drawing_kwargs
+    agent_portrayal,
+    propertylayer_portrayal=None,
+    post_process=None,
+    **space_drawing_kwargs,
 ):
     """Create an Altair-based space visualization component.
 
@@ -48,7 +51,10 @@ def make_altair_space(
 
     def MakeSpaceAltair(model):
         return SpaceAltair(
-            model, agent_portrayal, propertylayer_portrayal, post_process=post_process
+            model,
+            agent_portrayal,
+            propertylayer_portrayal=propertylayer_portrayal,
+            post_process=post_process,
         )
 
     return MakeSpaceAltair
@@ -58,7 +64,7 @@ def make_altair_space(
 def SpaceAltair(
     model,
     agent_portrayal,
-    propertylayer_portrayal,
+    propertylayer_portrayal=None,
     dependencies: list[any] | None = None,
     post_process=None,
 ):
