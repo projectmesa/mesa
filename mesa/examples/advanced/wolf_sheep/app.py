@@ -2,6 +2,7 @@ from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
 from mesa.examples.advanced.wolf_sheep.model import WolfSheep
 from mesa.experimental.devs import ABMSimulator
 from mesa.visualization import (
+    CommandConsole,
     Slider,
     SolaraViz,
     make_plot_component,
@@ -87,7 +88,7 @@ model = WolfSheep(simulator=simulator, grass=True)
 
 page = SolaraViz(
     model,
-    components=[space_component, lineplot_component],
+    components=[space_component, lineplot_component, CommandConsole],
     model_params=model_params,
     name="Wolf Sheep",
     simulator=simulator,
