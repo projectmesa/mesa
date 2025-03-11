@@ -416,8 +416,8 @@ def CommandConsole(model=None, additional_imports=None):
         ):
             solara.Text(">>> ", style={"color": "#0066cc"})
             ConsoleInput(on_submit=handle_code_execution)
-   
+
     solara.Markdown(
-            "*Type 'tips' for usage instructions.*",
-            style="font-size: 0.8em; color: #666;",
-        )
+        "*Type 'tips' for usage instructions.*",
+        style="font-size: 0.8em; color: #666;",
+    )
