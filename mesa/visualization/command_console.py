@@ -410,14 +410,14 @@ def CommandConsole(model=None, additional_imports=None):
                     output_html = format_output_html(entry)
                     solara.Markdown(command_html + output_html)
 
-            solara.Markdown(
-                "*Type 'tips' for usage instructions.*",
-                style="font-size: 0.8em; color: #666;",
-            )
-
         # Input row that adapts to content above it
         with solara.Row(
             style={"align-items": "center", "margin": "0", "width": "94.5%"}
         ):
             solara.Text(">>> ", style={"color": "#0066cc"})
             ConsoleInput(on_submit=handle_code_execution)
+   
+    solara.Markdown(
+            "*Type 'tips' for usage instructions.*",
+            style="font-size: 0.8em; color: #666;",
+        )
