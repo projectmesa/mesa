@@ -96,8 +96,31 @@ Mesa follows a two-track development model where new features are first released
 ### Model
 The central class in Mesa is the Model. To build a model, the user instantiates a model object, creates a space within it, and populates the space with agent instances. Since ABMs are typically stochastic simulations, Mesa includes a random number generator and, for reproducibility purposes, allows the user to pass a seed.
 
+```python
+class SimpleModel(mesa.Model):
+    def __init__(self, n_agents=10, seed=42):
+        super().__init__(seed=seed)  # Initialize Mesa model with random seed
+
+        SimpleAgent.create_agents(self, n_agents, energy=100)
+
+    def step(self):
+        self.agents.shuffle_do("step")  # Activate all agents in random order
+```
+
 ### Agents
 Central to ABMs are the autonomous heterogeneous agents. Mesa provides a variety of base agent classes which the user can subclass. In its most basic implementation, an agent subclass specifies the `__init__` and `step` method. Any subclass of the basic mesa agent subclass registers itself with the specified model instance, and via `agent.remove` it will remove itself from the model. It is strongly encouraged to rely on `remove`, and even extend it if needed to ensure agents are fully removed from the simulation.
+
+```python
+class SimpleAgent(mesa.Agent):
+    def __init__(self, model, energy):
+        super().__init__(model)  # Initialize Mesa agent
+        self.energy = energy
+
+    def step(self):
+        self.energy -= 1
+        if self.energy <= 0:
+            self.remove()
+```
 
 ### Agent management
 One significant advancement of Mesa 3 is expanded functionality around agent management. The new [`AgentSet`](https://mesa.readthedocs.io/latest/apis/agent.html#mesa.agent.AgentSet) class provides methods that allow users to filter, group, and analyze agents, making it easier to express complex model logic.
