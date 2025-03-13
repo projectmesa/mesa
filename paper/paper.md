@@ -141,7 +141,7 @@ Mesa 3 provides both discrete (cell-based) and continuous space implementations.
 
 - Grid-based: `OrthogonalMooreGrid`, `OrthogonalVonNeumanGrid`, and `HexGrid`
 - Network-based: `Network` for graph-based topologies
-- Voronoi-based: `VoronoiMesh` for irregular tessellations
+- Voronoi-based: `VoronoiMesh` for irregular tessellations (where space is divided into cells based on proximity to seed points)
 
 Example grid creation:
 
