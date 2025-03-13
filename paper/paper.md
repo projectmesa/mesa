@@ -175,7 +175,9 @@ from mesa.experimental.cell_space ...
 ```
 
 ### Time advancement
-Typically, ABMs represent time incrementally and call the units ticks. For each tick, the step method of the model is called, and the agents are activated to take their designated actions. The most frequently implemented approach is shown below, which runs a model for 100 ticks.
+Mesa supports two primary approaches to advancing time in simulations: discrete time (tick based) and continuous time (event based).
+
+Typically, ABMs represent time in discrete steps (often called "ticks"). For each tick, the model's step method is called, and agents are activated to take their designated actions. The most frequently implemented approach is shown below, which runs a model for 100 ticks:
 
 ```python
     model = Model(seed=42)
@@ -184,7 +186,7 @@ Typically, ABMs represent time incrementally and call the units ticks. For each 
         model.step()
 ```
 
-Before Mesa 3, all agents were activated within the step method of the model. However, the newly added `AgentSet` class provides a more flexible way to activate agents. These changes include the removal of the Scheduler API and its previously available fixed patterns.
+Before Mesa 3, all agents were activated within the step method of the model using predefined schedulers. However, the newly added `AgentSet` class provides a more flexible way to activate agents. These changes include the removal of the Scheduler API and its previously available fixed patterns.
 
 ```python
     model.agents.do("step")  # Sequential activation
@@ -200,7 +202,7 @@ Before Mesa 3, all agents were activated within the step method of the model. Ho
         model.agents_by_type[klass].do("step")
 ```
 
-Mesa also includes experimental support for next-event time progression through the `DiscreteEventSimulator`. This experimental feature allows scheduling events at arbitrary timestamps rather than fixed ticks, enabling both pure discrete event-based models and hybrid approaches. The latter hybrid approach combines traditional ABM time steps with the flexibility and potential performance benefits of event scheduling. While currently experimental, this capability is being actively developed and tested:
+Mesa also includes experimental support for continuous time simulation through the `DiscreteEventSimulator`. This approach allows scheduling events at arbitrary timestamps rather than fixed ticks, enabling both pure event-driven models and hybrid approaches. The hybrid approach combines traditional ABM discrete time steps with the flexibility and potential performance benefits of event scheduling. While currently experimental, this capability is being actively developed and tested:
 
 ```python
     # Pure event-based scheduling (experimental)
@@ -208,7 +210,7 @@ Mesa also includes experimental support for next-event time progression through 
     model = Model(seed=42, simulator=simulator)
     simulator.schedule_event_relative(some_function, 3.1415)
 
-    # Hybrid time-step and event scheduling (experimental)
+    # Hybrid discrete and continuous time (experimental)
     model = Model(seed=42, simulator=ABMSimulator())
     model.simulator.schedule_event_next_tick(some_function)
 ```
