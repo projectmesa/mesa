@@ -273,7 +273,7 @@ Mesa supports systematic parameter exploration:
 ```
 
 # Community and ecosystem
-Mesa has grown into a complete ecosystem with extensions including:
+Mesa has grown into a complete ecosystem with [extensions](https://mesa.readthedocs.io/latest/mesa_extension.html) including:
 
 - [Mesa-Geo](https://github.com/projectmesa/mesa-geo) for geospatial modeling [@wang2022mesa]
 - [Mesa-Frames](https://github.com/projectmesa/mesa-frames) for high-performance simulations
