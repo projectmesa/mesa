@@ -220,13 +220,13 @@ Mesa’s visualization module, [SolaraViz](https://mesa.readthedocs.io/latest/tu
 
 ```python
     visualization = SolaraViz(
-        model,
-        [
-            make_space_component(agent_portrayal),
-            make_plot_component(["population", "average_wealth"]),
-            lambda m: f"Step {m.steps}: {len(m.agents)} agents"
+        model=model,
+        components=[
+            make_space_component(wolf_sheep_portrayal),          # Grid visualization
+            make_plot_component(["Wolves", "Sheep", "Grass"]),   # Population plot
+            lambda m: f"Step {m.steps}: {len(m.agents)} agents"  # Text display
         ],
-        model_params=parameter_controls
+        model_params=model_params
     )
 ```
 
