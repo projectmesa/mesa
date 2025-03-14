@@ -202,7 +202,7 @@ Before Mesa 3, all agents were activated within the step method of the model usi
         model.agents_by_type[klass].do("step")
 ```
 
-Mesa also includes experimental support for next event time progression through the `DiscreteEventSimulator`. This approach allows scheduling events at arbitrary timestamps rather than fixed ticks, enabling both pure event-driven models and hybrid approaches. The hybrid approach combines traditional ABM discrete time steps with the flexibility and potential performance benefits of event scheduling. While currently experimental, this capability is being actively developed and tested:
+Mesa also includes experimental support for next-event time progression through the `DiscreteEventSimulator`. This experimental feature allows scheduling events at arbitrary timestamps rather than fixed ticks, enabling both pure discrete event-based models and hybrid approaches. The latter hybrid approach combines traditional ABM time steps with the flexibility and potential performance benefits of event scheduling. While currently experimental, this capability is being actively developed and tested:
 
 ```python
     # Pure event-based scheduling (experimental)
