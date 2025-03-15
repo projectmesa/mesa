@@ -11,6 +11,7 @@ Replication of the model found in NetLogo:
 
 import math
 
+import numpy as np
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalVonNeumannGrid
@@ -77,6 +78,11 @@ class WolfSheep(Model):
             random=self.random,
         )
 
+        # Set up property layers
+        self.grid.create_property_layer("grass_pos", default_value=0, dtype=int)
+        self.grid.create_property_layer("wolf_pos", default_value=0, dtype=int)
+        self.grid.create_property_layer("sheep_pos", default_value=0, dtype=int)
+
         # Set up data collection
         model_reporters = {
             "Wolves": lambda m: len(m.agents_by_type[Wolf]),
@@ -122,9 +128,47 @@ class WolfSheep(Model):
         self.running = True
         self.datacollector.collect(self)
 
+    def update_property_layers(self):
+        """
+        Update the property layers:
+        - grass_pos: set to 1 for cells with fully grown GrassPatch.
+        - wolf_pos: set to 1 for cells with Wolf.
+        - sheep_pos: set to 1 for cells with Sheep.
+        """
+
+        # Reset all layers to 0 (default)
+        self.grid.set_property("grass_pos", 0)
+        self.grid.set_property("wolf_pos", 0)
+        self.grid.set_property("sheep_pos", 0)
+
+        # Update grass_pos: flag cells with fully grown grass.
+        grass_coords = [
+            agent.cell.coordinate
+            for agent in self.agents_by_type[GrassPatch]
+            if agent.fully_grown
+        ]
+        if grass_coords:
+            xs, ys = zip(*grass_coords)
+            self.grid.grass_pos.data[np.array(xs), np.array(ys)] = 1
+
+        # Update wolf_pos: flag cells with wolves.
+        wolf_coords = [agent.cell.coordinate for agent in self.agents_by_type[Wolf]]
+        if wolf_coords:
+            xs, ys = zip(*wolf_coords)
+            self.grid.wolf_pos.data[np.array(xs), np.array(ys)] = 1
+
+        # Update sheep_pos: flag cells with sheep.
+        sheep_coords = [agent.cell.coordinate for agent in self.agents_by_type[Sheep]]
+        if sheep_coords:
+            xs, ys = zip(*sheep_coords)
+            self.grid.sheep_pos.data[np.array(xs), np.array(ys)] = 1
+
     def step(self):
         """Execute one step of the model."""
-        # First activate all sheep, then all wolves, both in random order
+        # Update the property layers before agents act.
+        self.update_property_layers()
+
+        # Activate all sheep, then all wolves, both in random order
         self.agents_by_type[Sheep].shuffle_do("step")
         self.agents_by_type[Wolf].shuffle_do("step")
 

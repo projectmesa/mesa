@@ -1,3 +1,4 @@
+import numpy as np
 from mesa.discrete_space import CellAgent, FixedAgent
 
 
@@ -67,24 +68,30 @@ class Sheep(Animal):
 
     def move(self):
         """Move towards a cell where there isn't a wolf, and preferably with grown grass."""
-        cells_without_wolves = self.cell.neighborhood.select(
-            lambda cell: not any(isinstance(obj, Wolf) for obj in cell.agents)
+        mask = self.model.grid.get_neighborhood_mask(
+            self.cell.coordinate, include_center=False
         )
+
+        # Get property layer
+        wolf_pos = self.model.grid.wolf_pos.data
+        grass_pos = self.model.grid.grass_pos.data
+
+        cells_without_wolves = np.logical_and(mask, wolf_pos == 0)
+
         # If all surrounding cells have wolves, stay put
-        if len(cells_without_wolves) == 0:
+        safe_coords = np.argwhere(cells_without_wolves)
+        if safe_coords.size == 0:
             return
 
         # Among safe cells, prefer those with grown grass
-        cells_with_grass = cells_without_wolves.select(
-            lambda cell: any(
-                isinstance(obj, GrassPatch) and obj.fully_grown for obj in cell.agents
-            )
-        )
+        cells_with_grass = np.logical_and(cells_without_wolves, grass_pos == 1)
+        grass_coords = np.argwhere(cells_with_grass)
+
         # Move to a cell with grass if available, otherwise move to any safe cell
-        target_cells = (
-            cells_with_grass if len(cells_with_grass) > 0 else cells_without_wolves
-        )
-        self.cell = target_cells.select_random_cell()
+        target_coords = grass_coords if grass_coords.size > 0 else safe_coords
+        random_idx = self.random.randrange(len(target_coords))
+
+        self.cell = self.model.grid[tuple(target_coords[random_idx])]
 
 
 class Wolf(Animal):
@@ -100,13 +107,18 @@ class Wolf(Animal):
 
     def move(self):
         """Move to a neighboring cell, preferably one with sheep."""
-        cells_with_sheep = self.cell.neighborhood.select(
-            lambda cell: any(isinstance(obj, Sheep) for obj in cell.agents)
+        mask = self.model.grid.get_neighborhood_mask(
+            self.cell.coordinate, include_center=False
         )
-        target_cells = (
-            cells_with_sheep if len(cells_with_sheep) > 0 else self.cell.neighborhood
-        )
-        self.cell = target_cells.select_random_cell()
+        # Get property layer
+        sheep_pos = self.model.grid.sheep_pos.data
+
+        cells_with_sheep = np.logical_and(mask, sheep_pos == 1)
+        sheep_coords = np.argwhere(cells_with_sheep)
+        target_coords = sheep_coords if sheep_coords.size > 0 else np.argwhere(mask)
+        random_idx = self.random.randrange(len(target_coords))
+
+        self.cell = self.model.grid[tuple(target_coords[random_idx])]
 
 
 class GrassPatch(FixedAgent):
