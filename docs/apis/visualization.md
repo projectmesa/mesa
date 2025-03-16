@@ -11,6 +11,13 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
    :show-inheritance:
 ```
 
+```{eval-rst}
+.. automodule:: mesa.visualization.components.__init__
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
 ## User Parameters
 
 ```{eval-rst}
@@ -37,10 +44,20 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
    :show-inheritance:
 ```
 
+
 ## Altair-based visualizations
 
 ```{eval-rst}
 .. automodule:: mesa.visualization.components.altair_components
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
+## Command Console
+
+```{eval-rst}
+.. automodule:: mesa.visualization.command_console
    :members:
    :undoc-members:
    :show-inheritance:

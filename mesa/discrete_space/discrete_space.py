@@ -21,8 +21,8 @@ from random import Random
 from typing import Generic, TypeVar
 
 from mesa.agent import AgentSet
-from mesa.experimental.cell_space.cell import Cell
-from mesa.experimental.cell_space.cell_collection import CellCollection
+from mesa.discrete_space.cell import Cell
+from mesa.discrete_space.cell_collection import CellCollection
 
 T = TypeVar("T", bound=Cell)
 
@@ -89,7 +89,7 @@ class DiscreteSpace(Generic[T]):
     def all_cells(self):
         """Return all cells in space."""
         return CellCollection(
-            {cell: cell.agents for cell in self._cells.values()}, random=self.random
+            {cell: cell._agents for cell in self._cells.values()}, random=self.random
         )
 
     def __iter__(self):  # noqa

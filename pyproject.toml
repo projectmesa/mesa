@@ -8,7 +8,7 @@ description = "Agent-based modeling (ABM) in Python"
 license = { text = "Apache 2.0" }
 requires-python = ">=3.11"
 authors = [
-  { name = "Project Mesa Team", email = "projectmesa@googlegroups.com" },
+  { name = "Project Mesa Team", email = "maintainers@projectmesa.dev" },
 ]
 keywords = [
   "agent",
@@ -53,6 +53,7 @@ network = [
 viz = [
   "matplotlib",
   "solara",
+  "altair",
 ]
 # Dev and CI stuff
 dev = [
@@ -94,7 +95,7 @@ path = "mesa/__init__.py"
 # Hardcode to Python 3.11.
 # Reminder to update mesa-examples if the value below is changed.
 target-version = "py311"
-extend-exclude = ["docs", "build"]
+extend-exclude = ["build"]
 
 [tool.ruff.lint]
 select = [
@@ -126,9 +127,8 @@ select = [
 # Ignore list taken from https://github.com/psf/black/blob/master/.flake8
 # E203	Whitespace before ':'
 # E266	Too many leading '#' for block comment
-# E501	Line too long (82 > 79 characters)
 # W503	Line break occurred before a binary operator
-# But we don't specify them because ruff's Black already
+# But we don't specify them because ruff's formatter
 # checks for it.
 # See https://github.com/charliermarsh/ruff/issues/1842#issuecomment-1381210185
 extend-ignore = [
@@ -145,8 +145,8 @@ extend-ignore = [
   "ISC001", # ruff format asks to disable this feature
   "S311",   # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]
-# Ignore all docstring errors in examples
-per-file-ignores = {"mesa/examples/*"= ["D"]}
+# Ignore all docstring errors in examples and tutorials
+per-file-ignores = {"mesa/examples/*"= ["D"], "docs/tutorials/*" = ["D", "E", "F", "N"], "docs/conf.py"=["C", "D", "DTZ011", "E"]}
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

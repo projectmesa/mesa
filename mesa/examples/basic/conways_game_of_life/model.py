@@ -1,6 +1,6 @@
 from mesa import Model
+from mesa.discrete_space import OrthogonalMooreGrid
 from mesa.examples.basic.conways_game_of_life.agents import Cell
-from mesa.space import SingleGrid
 
 
 class ConwaysGameOfLife(Model):
@@ -10,15 +10,18 @@ class ConwaysGameOfLife(Model):
         """Create a new playing area of (width, height) cells."""
         super().__init__(seed=seed)
         # Use a simple grid, where edges wrap around.
-        self.grid = SingleGrid(width, height, torus=True)
+        self.grid = OrthogonalMooreGrid((width, height), capacity=1, torus=True)
 
         # Place a cell at each location, with some initialized to
         # ALIVE and some to DEAD.
-        for _contents, (x, y) in self.grid.coord_iter():
-            cell = Cell((x, y), self)
-            if self.random.random() < initial_fraction_alive:
-                cell.state = cell.ALIVE
-            self.grid.place_agent(cell, (x, y))
+        for cell in self.grid.all_cells:
+            Cell(
+                self,
+                cell,
+                init_state=Cell.ALIVE
+                if self.random.random() < initial_fraction_alive
+                else Cell.DEAD,
+            )
 
         self.running = True
 
