@@ -1,4 +1,5 @@
 import numpy as np
+
 from mesa.discrete_space import CellAgent, FixedAgent
 
 
@@ -22,6 +23,8 @@ class Animal(CellAgent):
         self.p_reproduce = p_reproduce
         self.energy_from_food = energy_from_food
         self.cell = cell
+
+        self.w, self.h = self.model.grid.width, self.model.grid.height
 
     def spawn_offspring(self):
         """Create offspring by splitting energy and creating new instance."""
@@ -68,27 +71,32 @@ class Sheep(Animal):
 
     def move(self):
         """Move towards a cell where there isn't a wolf, and preferably with grown grass."""
-        mask = self.model.grid.get_neighborhood_mask(
-            self.cell.coordinate, include_center=False
-        )
 
-        # Get property layer
-        wolf_pos = self.model.grid.wolf_pos.data
-        grass_pos = self.model.grid.grass_pos.data
+        # Get current radius-1 neighborhood cell coords
+        x, y = self.cell.coordinate
+        neighbor_x = np.array([(x - 1) % self.w, x, (x + 1) % self.w])
+        neighbor_y = np.array([(y - 1) % self.h, y, (y + 1) % self.h])
+        neighbors = np.dstack(np.meshgrid(neighbor_x, neighbor_y, indexing="xy"))
 
-        cells_without_wolves = np.logical_and(mask, wolf_pos == 0)
+        # Get property layers
+        wolf_pos = self.model.grid.wolf_pos.data[neighbor_x[:, None], neighbor_y]
+        grass_pos = self.model.grid.grass_pos.data[neighbor_x[:, None], neighbor_y]
 
+        wolf_pos[[0, 0, 1, 2, 2], [0, 2, 1, 0, 2]] = 1
+        coords_without_wolves = wolf_pos == 0
         # If all surrounding cells have wolves, stay put
-        safe_coords = np.argwhere(cells_without_wolves)
+        safe_coords = neighbors[coords_without_wolves]
         if safe_coords.size == 0:
             return
 
         # Among safe cells, prefer those with grown grass
-        cells_with_grass = np.logical_and(cells_without_wolves, grass_pos == 1)
-        grass_coords = np.argwhere(cells_with_grass)
+        grass_pos[[0, 0, 1, 2, 2], [0, 2, 1, 0, 2]] = 0
+        coords_with_grass = neighbors[
+            np.logical_and(coords_without_wolves, grass_pos == 1)
+        ]
 
         # Move to a cell with grass if available, otherwise move to any safe cell
-        target_coords = grass_coords if grass_coords.size > 0 else safe_coords
+        target_coords = coords_with_grass if coords_with_grass.size > 0 else safe_coords
         random_idx = self.random.randrange(len(target_coords))
 
         self.cell = self.model.grid[tuple(target_coords[random_idx])]
@@ -107,18 +115,13 @@ class Wolf(Animal):
 
     def move(self):
         """Move to a neighboring cell, preferably one with sheep."""
-        mask = self.model.grid.get_neighborhood_mask(
-            self.cell.coordinate, include_center=False
+        cells_with_sheep = self.cell.neighborhood.select(
+            lambda cell: any(isinstance(obj, Sheep) for obj in cell.agents)
         )
-        # Get property layer
-        sheep_pos = self.model.grid.sheep_pos.data
-
-        cells_with_sheep = np.logical_and(mask, sheep_pos == 1)
-        sheep_coords = np.argwhere(cells_with_sheep)
-        target_coords = sheep_coords if sheep_coords.size > 0 else np.argwhere(mask)
-        random_idx = self.random.randrange(len(target_coords))
-
-        self.cell = self.model.grid[tuple(target_coords[random_idx])]
+        target_cells = (
+            cells_with_sheep if len(cells_with_sheep) > 0 else self.cell.neighborhood
+        )
+        self.cell = target_cells.select_random_cell()
 
 
 class GrassPatch(FixedAgent):
