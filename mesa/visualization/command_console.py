@@ -338,6 +338,41 @@ def format_output_html(entry):
 
 
 @solara.component
+def ConsoleInput(on_submit):
+    """A solara component for handling console input."""
+    input_text, set_input_text = solara.use_state("")
+
+    def handle_submit(*ignore_args):
+        on_submit(input_text)
+        set_input_text("")
+
+    input_elem = solara.v.TextField(
+        v_model=input_text,
+        on_v_model=set_input_text,
+        flat=True,
+        hide_details=True,
+        dense=True,
+        height="auto",
+        background_color="transparent",
+        style_="font-family: monospace; border: none; box-shadow: none; padding: 0; margin: 0; background-color: transparent; color: #000; flex-grow: 1;",
+        placeholder="",
+        solo=False,
+        filled=False,
+        outlined=False,
+        id="console-input",
+        attributes={
+            "spellcheck": "false",
+            "autocomplete": "off",
+        },
+    )
+
+    # Handle Enter key press
+    use_change(input_elem, handle_submit, update_events=["keyup.enter"])
+
+    return input_elem
+
+
+@solara.component
 def CommandConsole(model=None, additional_imports=None):
     """A solara component for executing Python code interactively in the browser."""
     # Initialize state for the console manager
@@ -347,10 +382,14 @@ def CommandConsole(model=None, additional_imports=None):
             model=model, additional_imports=additional_imports
         )
 
-    input_text, set_input_text = solara.use_state("")
-    _, set_refresh = solara.use_state(0)
+    # State to trigger re-renders
+    refresh, set_refresh = solara.use_state(0)
 
-    with solara.lab.ChatBox(
+    def handle_code_execution(code):
+        console_ref.current.execute_code(code, lambda _: None)
+        set_refresh(refresh + 1)
+
+    with solara.Column(
         style={
             "height": "300px",
             "overflow-y": "auto",
@@ -361,30 +400,24 @@ def CommandConsole(model=None, additional_imports=None):
             "padding": "8px",
         }
     ):
-        for entry in console_ref.current.get_entries():
-            command_html = format_command_html(entry)
-            output_html = format_output_html(entry)
-            solara.Markdown(command_html + output_html)
+        console_entries = console_ref.current.get_entries()
+
+        # Display history entries with auto-scrolling
+        with solara.v.ScrollYTransition(group=True):
+            for entry in console_entries:
+                with solara.Div():
+                    command_html = format_command_html(entry)
+                    output_html = format_output_html(entry)
+                    solara.Markdown(command_html + output_html)
+
+        # Input row that adapts to content above it
+        with solara.Row(
+            style={"align-items": "center", "margin": "0", "width": "94.5%"}
+        ):
+            solara.Text(">>> ", style={"color": "#0066cc"})
+            ConsoleInput(on_submit=handle_code_execution)
 
     solara.Markdown(
         "*Type 'tips' for usage instructions.*",
         style="font-size: 0.8em; color: #666;",
     )
-
-    input_elem = solara.v.TextField(
-        v_model=input_text,
-        on_v_model=set_input_text,
-        flat=True,
-        style_="font-family: monospace;",
-        label=">>>",
-        outlined=True,
-        placeholder="Enter Python code...",
-        attributes={"spellcheck": "false"},
-    )
-
-    def on_enter(*ignore_args):
-        console_ref.current.execute_code(input_text, set_input_text)
-        set_refresh(lambda x: x + 1)
-
-    # Bind the enter key to execute the code
-    use_change(input_elem, on_enter, update_events=["keyup.enter"])
