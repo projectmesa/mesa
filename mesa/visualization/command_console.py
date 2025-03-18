@@ -292,8 +292,10 @@ class ConsoleManager:
     def get_entries(self) -> list[ConsoleEntry]:
         """Get the list of console entries."""
         return self.history
-    
-    def prev_command(self, current_text: str, set_input_text: Callable[[str], None]) -> None:
+
+    def prev_command(
+        self, current_text: str, set_input_text: Callable[[str], None]
+    ) -> None:
         """Navigate to previous command in history"""
         if not self.history:
             return
@@ -301,25 +303,25 @@ class ConsoleManager:
         # Save the current input
         if self.history_index == -1:
             self.current_input = current_text
-            
+
         # Move up in history
         if self.history_index == -1:
             self.history_index = len(self.history) - 1
         elif self.history_index > 0:
             self.history_index -= 1
-            
+
         # Set text to the historical command
         if 0 <= self.history_index < len(self.history):
             set_input_text(self.history[self.history_index].command)
-    
+
     def next_command(self, set_input_text: Callable[[str], None]) -> None:
         """Navigate to next command in history"""
         if self.history_index == -1:
             return  # Not in history navigation mode
-            
+
         # Move down in history
         self.history_index += 1
-        
+
         # If we've moved past the end of history, restore the saved input
         if self.history_index >= len(self.history):
             self.history_index = -1
@@ -411,9 +413,11 @@ def ConsoleInput(on_submit, on_up, on_down):
 
     # Bind key events with the input element
     use_change(input_elem, handle_submit, update_events=["keypress.enter"])
-    use_change(input_elem, handle_up, update_events=["keyup.38"]) # 38 -> Up arrow
-    use_change(input_elem, handle_down, update_events=["keydown.40"]) # 40 -> Down arrow
-    
+    use_change(input_elem, handle_up, update_events=["keyup.38"])  # 38 -> Up arrow
+    use_change(
+        input_elem, handle_down, update_events=["keydown.40"]
+    )  # 40 -> Down arrow
+
     return input_elem
 
 
@@ -469,9 +473,7 @@ def CommandConsole(model=None, additional_imports=None):
         ):
             solara.Text(">>> ", style={"color": "#0066cc"})
             ConsoleInput(
-                on_submit=handle_code_execution, 
-                on_up=handle_up, 
-                on_down=handle_down
+                on_submit=handle_code_execution, on_up=handle_up, on_down=handle_down
             )
 
     solara.Markdown(
