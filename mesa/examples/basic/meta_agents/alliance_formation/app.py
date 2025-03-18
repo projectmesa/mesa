@@ -3,7 +3,7 @@ import networkx as nx
 import solara
 from matplotlib.figure import Figure
 
-from mesa.examples.basic.meta_agents.dynamic_creation.model import (
+from mesa.examples.basic.meta_agents.alliance_formation.model import (
     MultiLevelAllianceModel,
 )
 from mesa.visualization import SolaraViz

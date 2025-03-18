@@ -2,9 +2,11 @@ import networkx as nx
 import numpy as np
 
 import mesa
-from mesa.examples.basic.meta_agents.dynamic_creation.agents import AllianceAgent
-from mesa.experimental.meta_agents.meta_agent import find_combinations
-from mesa.experimental.meta_agents.multi_levels import multi_level_agents
+from mesa.examples.basic.meta_agents.alliance_formation.agents import AllianceAgent
+from mesa.experimental.meta_agents.meta_agent import (
+    create_meta_agent,
+    find_combinations,
+)
 
 
 class MultiLevelAllianceModel(mesa.Model):
@@ -159,7 +161,7 @@ class MultiLevelAllianceModel(mesa.Model):
 
                 for alliance, attributes in combinations:
                     class_name = f"MetaAgentLevel{attributes[2]}"
-                    meta = multi_level_agents(
+                    meta = create_meta_agent(
                         self,
                         class_name,
                         alliance,
@@ -177,4 +179,4 @@ class MultiLevelAllianceModel(mesa.Model):
                             size=(meta.level + 1) * 300,
                             level=meta.level,
                         )
-                        self.add_link(meta, meta.subset)
+                        self.add_link(meta, meta.agents)
