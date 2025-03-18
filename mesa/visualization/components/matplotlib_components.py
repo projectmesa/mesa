@@ -11,6 +11,7 @@ from matplotlib.figure import Figure
 
 from mesa.visualization.mpl_space_drawing import draw_space
 from mesa.visualization.utils import update_counter
+from mesa.visualization.AgentPortrayalStyle import AgentPortrayalStyle
 
 
 def make_space_matplotlib(*args, **kwargs):  # noqa: D103
@@ -46,12 +47,20 @@ def make_mpl_space_component(
     if agent_portrayal is None:
 
         def agent_portrayal(a):
-            return {}
+            return AgentPortrayalStyle()
 
     def MakeSpaceMatplotlib(model):
+        def wrapped_agent_portrayal(agent):
+            portrayal = agent_portrayal(agent)
+            
+            if isinstance(portrayal, AgentPortrayalStyle):
+                return portrayal.to_dict()  
+            
+            return portrayal
+        
         return SpaceMatplotlib(
             model,
-            agent_portrayal,
+            wrapped_agent_portrayal,
             propertylayer_portrayal,
             post_process=post_process,
             **space_drawing_kwargs,
