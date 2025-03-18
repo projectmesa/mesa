@@ -157,6 +157,8 @@ class ConsoleManager:
         self.console = InteractiveConsole(locals_dict)
         self.buffer = []
         self.history: list[ConsoleEntry] = []
+        self.history_index = -1
+        self.current_input = ""
 
     def execute_code(
         self, code_line: str, set_input_text: Callable[[str], None]
@@ -282,12 +284,48 @@ class ConsoleManager:
         """Clear the console history and reset the console state."""
         self.history.clear()
         self.buffer.clear()
+        self.history_index = -1
+        self.current_input = ""
         # Reset the console while maintaining the locals dictionary
         self.console = InteractiveConsole(self.locals_dict)
 
     def get_entries(self) -> list[ConsoleEntry]:
         """Get the list of console entries."""
         return self.history
+    
+    def prev_command(self, current_text: str, set_input_text: Callable[[str], None]) -> None:
+        """Navigate to previous command in history"""
+        if not self.history:
+            return
+
+        # Save the current input
+        if self.history_index == -1:
+            self.current_input = current_text
+            
+        # Move up in history
+        if self.history_index == -1:
+            self.history_index = len(self.history) - 1
+        elif self.history_index > 0:
+            self.history_index -= 1
+            
+        # Set text to the historical command
+        if 0 <= self.history_index < len(self.history):
+            set_input_text(self.history[self.history_index].command)
+    
+    def next_command(self, set_input_text: Callable[[str], None]) -> None:
+        """Navigate to next command in history"""
+        if self.history_index == -1:
+            return  # Not in history navigation mode
+            
+        # Move down in history
+        self.history_index += 1
+        
+        # If we've moved past the end of history, restore the saved input
+        if self.history_index >= len(self.history):
+            self.history_index = -1
+            set_input_text(self.current_input)
+        else:
+            set_input_text(self.history[self.history_index].command)
 
 
 def format_command_html(entry):
@@ -338,13 +376,18 @@ def format_output_html(entry):
 
 
 @solara.component
-def ConsoleInput(on_submit):
+def ConsoleInput(on_submit, on_up, on_down):
     """A solara component for handling console input."""
     input_text, set_input_text = solara.use_state("")
 
     def handle_submit(*ignore_args):
-        on_submit(input_text)
-        set_input_text("")
+        on_submit(input_text, set_input_text)
+
+    def handle_up(*ignore_args):
+        on_up(input_text, set_input_text)
+
+    def handle_down(*ignore_args):
+        on_down(set_input_text)
 
     input_elem = solara.v.TextField(
         v_model=input_text,
@@ -366,9 +409,11 @@ def ConsoleInput(on_submit):
         },
     )
 
-    # Handle Enter key press
-    use_change(input_elem, handle_submit, update_events=["keyup.enter"])
-
+    # Bind key events with the input element
+    use_change(input_elem, handle_submit, update_events=["keypress.enter"])
+    use_change(input_elem, handle_up, update_events=["keyup.38"]) # 38 -> Up arrow
+    use_change(input_elem, handle_down, update_events=["keydown.40"]) # 40 -> Down arrow
+    
     return input_elem
 
 
@@ -385,8 +430,16 @@ def CommandConsole(model=None, additional_imports=None):
     # State to trigger re-renders
     refresh, set_refresh = solara.use_state(0)
 
-    def handle_code_execution(code):
-        console_ref.current.execute_code(code, lambda _: None)
+    def handle_code_execution(code, set_input_text):
+        console_ref.current.execute_code(code, set_input_text)
+        set_refresh(refresh + 1)
+
+    def handle_up(current_text, set_input_text):
+        console_ref.current.prev_command(current_text, set_input_text)
+        set_refresh(refresh + 1)
+
+    def handle_down(set_input_text):
+        console_ref.current.next_command(set_input_text)
         set_refresh(refresh + 1)
 
     with solara.Column(
@@ -415,7 +468,11 @@ def CommandConsole(model=None, additional_imports=None):
             style={"align-items": "center", "margin": "0", "width": "94.5%"}
         ):
             solara.Text(">>> ", style={"color": "#0066cc"})
-            ConsoleInput(on_submit=handle_code_execution)
+            ConsoleInput(
+                on_submit=handle_code_execution, 
+                on_up=handle_up, 
+                on_down=handle_down
+            )
 
     solara.Markdown(
         "*Type 'tips' for usage instructions.*",
