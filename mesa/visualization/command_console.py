@@ -296,7 +296,7 @@ class ConsoleManager:
     def prev_command(
         self, current_text: str, set_input_text: Callable[[str], None]
     ) -> None:
-        """Navigate to previous command in history"""
+        """Navigate to previous command in history."""
         if not self.history:
             return
 
@@ -315,7 +315,7 @@ class ConsoleManager:
             set_input_text(self.history[self.history_index].command)
 
     def next_command(self, set_input_text: Callable[[str], None]) -> None:
-        """Navigate to next command in history"""
+        """Navigate to next command in history."""
         if self.history_index == -1:
             return  # Not in history navigation mode
 
