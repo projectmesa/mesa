@@ -3,10 +3,10 @@
 import unittest
 
 import ipyvuetify as vw
+import numpy as np
 import pytest
 import solara
 
-import numpy as np
 import mesa
 import mesa.visualization.components.altair_components
 import mesa.visualization.components.matplotlib_components
@@ -130,7 +130,9 @@ def test_call_space_drawer(mocker):  # noqa: D103
         )
     )
     # should call default method with class instance and agent portrayal
-    assert mock_space_matplotlib.call_args is not None, "SpaceMatplotlib was never called!"
+    assert mock_space_matplotlib.call_args is not None, (
+        "SpaceMatplotlib was never called!"
+    )
 
     called_args, called_kwargs = mock_space_matplotlib.call_args  # Unpack properly
 
@@ -142,7 +144,6 @@ def test_call_space_drawer(mocker):  # noqa: D103
         assert called_args[2] == propertylayer_portrayal
     if len(called_args) > 3:
         assert called_args[3] is None  # post_process should be None
-
 
     # specify no space should be drawn
     mock_space_matplotlib.reset_mock()
@@ -191,8 +192,8 @@ def test_call_space_drawer(mocker):  # noqa: D103
     voronoi_model = mesa.Model()
     voronoi_model.grid = mesa.experimental.continuous_space.ContinuousSpace(
         dimensions=np.array([[0, 10], [0, 10]]),  # Define 2D space boundaries
-        torus=False
-)
+        torus=False,
+    )
 
     solara.render(
         SolaraViz(voronoi_model, components=[make_mpl_space_component(agent_portrayal)])

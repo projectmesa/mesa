@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import solara
 from matplotlib.figure import Figure
 
+from mesa.visualization.AgentPortrayalStyle import AgentPortrayalStyle
 from mesa.visualization.mpl_space_drawing import draw_space
 from mesa.visualization.utils import update_counter
-from mesa.visualization.AgentPortrayalStyle import AgentPortrayalStyle
 
 
 def make_space_matplotlib(*args, **kwargs):  # noqa: D103
@@ -52,12 +52,12 @@ def make_mpl_space_component(
     def MakeSpaceMatplotlib(model):
         def wrapped_agent_portrayal(agent):
             portrayal = agent_portrayal(agent)
-            
+
             if isinstance(portrayal, AgentPortrayalStyle):
-                return portrayal.to_dict()  
-            
+                return portrayal.to_dict()
+
             return portrayal
-        
+
         return SpaceMatplotlib(
             model,
             wrapped_agent_portrayal,

@@ -493,7 +493,9 @@ def draw_network(
     # Adjust positions for multiple agents per node
     adjusted_positions = []
     for agent in space.agents:  # ✅ Correct way to iterate through agents
-        if hasattr(agent, "pos") and agent.pos in pos:  # Ensure the agent has a valid position
+        if (
+            hasattr(agent, "pos") and agent.pos in pos
+        ):  # Ensure the agent has a valid position
             base_x, base_y = pos[agent.pos]  # ✅ Get node position correctly
             agents_at_node = node_to_agents.get(agent.pos, [])
             num_agents = len(agents_at_node)
@@ -504,19 +506,18 @@ def draw_network(
             offset_x = 0.05 * np.cos(angle)
             offset_y = 0.05 * np.sin(angle)
             adjusted_positions.append((agent, (base_x + offset_x, base_y + offset_y)))
-    
+
     # gather agent data
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, size=s_default)
 
     # Update agent locations
     if len(adjusted_positions) > 0:
-        arguments["loc"] = np.array([pos for _, pos in adjusted_positions], dtype=np.float64).reshape(-1, 2)
+        arguments["loc"] = np.array(
+            [pos for _, pos in adjusted_positions], dtype=np.float64
+        ).reshape(-1, 2)
     else:
         arguments["loc"] = np.zeros((0, 2))  # ✅ Ensure correct shape even when empty
-
-
-
 
     # plot the agents
     if arguments["loc"].shape[0] > 0:
