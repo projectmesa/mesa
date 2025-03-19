@@ -84,7 +84,7 @@ The framework is particularly suited for:
 # Core capabilities
 Mesa is a Python-based framework for ABM that provides a comprehensive set of tools for creating, running, and analyzing ABMs. Mesa integrates with the wider scientific Python ecosystem with libraries such as [NumPy](https://numpy.org/), [pandas](https://pandas.pydata.org/), [Matplotlib](https://matplotlib.org/), [NetworkX](https://networkx.org/), and more. The backend of the framework is written in Python, while the front-end end uses a Python implementation of React. The modular architecture is comprised of three main components:
 
-1. Core ABM components (*i.e.,* agents, spaces, agent activation, control over random numbers)to build models
+1. Core ABM components (*i.e.,* agents, spaces, agent activation, control over random numbers) to build models
 2. Data collection and support for model experimentation
 3. Visualization systems
 
