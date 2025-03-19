@@ -168,11 +168,6 @@ For models where agents need to move continuously through space rather than betw
     space = ContinuousSpace(x_max, y_max, torus=True)
     space.move_agent(agent, (new_x, new_y))
 ```
-The space module is stable but under active development. The new cell-based spaces in Mesa 3 are currently being tested and considered feature-complete. The code snippets reflected in this paper are the future expected state of Mesa. Features not yet merged into core are imported from experimental:
-
-```python
-from mesa.experimental.cell_space ...
-```
 
 ### Time advancement
 Mesa supports two primary approaches to advancing time in simulations: incremental-time progression (tick-based) and next-event time progression
