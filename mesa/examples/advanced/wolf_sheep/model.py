@@ -70,6 +70,7 @@ class WolfSheep(Model):
         self.height = height
         self.width = width
         self.grass = grass
+        self.changed_grass = {}
 
         # Create grid using experimental cell space
         self.grid = OrthogonalVonNeumannGrid(
@@ -124,42 +125,24 @@ class WolfSheep(Model):
                 )
                 GrassPatch(self, countdown, grass_regrowth_time, cell)
 
+        self.update_grass_layer()
+
         # Collect initial data
         self.running = True
         self.datacollector.collect(self)
 
-    def update_property_layers(self):
-        """
-        Update the property layers:
-        - grass_pos: set to 1 for cells with fully grown GrassPatch.
-        - wolf_pos: set to 1 for cells with Wolf.
-        - sheep_pos: set to 1 for cells with Sheep.
-        """
-
-        # Reset all layers to 0 (default)
-        self.grid.set_property("grass_pos", 0)
-        self.grid.set_property("wolf_pos", 0)
-
-        # Update grass_pos: flag cells with fully grown grass.
-        grass_coords = [
-            agent.cell.coordinate
-            for agent in self.agents_by_type[GrassPatch]
-            if agent.fully_grown
-        ]
-        if grass_coords:
-            xs, ys = zip(*grass_coords)
-            self.grid.grass_pos.data[np.array(xs), np.array(ys)] = 1
-
-        # Update wolf_pos: flag cells with wolves.
-        wolf_coords = {agent.cell.coordinate for agent in self.agents_by_type[Wolf]}
-        if wolf_coords:
-            xs, ys = zip(*wolf_coords)
-            self.grid.wolf_pos.data[np.array(xs), np.array(ys)] = 1
+    def update_grass_layer(self):
+        """Update grass_layer on cells where grass state has changed."""
+        if self.changed_grass:
+            coords = np.array(list(self.changed_grass.keys()))
+            states = np.array(list(self.changed_grass.values()), dtype=int)
+            self.grid.grass_pos.data[coords[:, 1], coords[:, 0]] = states
+            self.changed_grass.clear()
 
     def step(self):
         """Execute one step of the model."""
         # Update the property layers before agents act.
-        self.update_property_layers()
+        self.update_grass_layer()
 
         # Activate all sheep, then all wolves, both in random order
         self.agents_by_type[Sheep].shuffle_do("step")
