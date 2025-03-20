@@ -462,7 +462,7 @@ class _Grid:
     def move_agent_to_one_of(
         self,
         agent: Agent,
-        pos: list[Coordinate],
+        pos: list[Coordinate] = None,
         selection: str = "random",
         handle_empty: str | None = None,
     ) -> None:
@@ -477,45 +477,35 @@ class _Grid:
                           and no positions are given (an empty list), a warning or error is raised respectively.
         """
         # Only move agent if there are positions given (non-empty list)
-        if pos:
-            if selection == "random":
-                chosen_pos = agent.random.choice(pos)
-            elif selection == "closest":
-                current_pos = agent.pos
-                # Find the closest position without sorting all positions
-                # TODO: See if this method can be optimized further
-                closest_pos = []
-                min_distance = float("inf")
-                agent.random.shuffle(pos)
-                for p in pos:
-                    distance = self._distance_squared(p, current_pos)
-                    if distance < min_distance:
-                        min_distance = distance
-                        closest_pos.clear()
-                        closest_pos.append(p)
-                    elif distance == min_distance:
-                        closest_pos.append(p)
+        if not pos:
+            if handle_empty == "warning":
+                warn(f"No positions given, moving agent {agent.unique_id} to an empty cell.", RuntimeWarning, stacklevel=2)
+            elif handle_empty == "error":
+                raise ValueError(f"No positions given, could not move agent {agent.unique_id}.")
+            
+            # Move to a random empty cell instead
+            return
 
-                chosen_pos = agent.random.choice(closest_pos)
+        if selection == "random":
+            chosen_pos = agent.random.choice(pos)
+        elif selection == "closest":
+            current_pos = agent.pos
+            closest_pos = []
+            min_distance = float("inf")
+            agent.random.shuffle(pos)
+            for p in pos:
+                distance = self._distance_squared(p, current_pos)
+                if distance < min_distance:
+                    min_distance = distance
+                    closest_pos.clear()
+                    closest_pos.append(p)
+                elif distance == min_distance:
+                    closest_pos.append(p)
+            chosen_pos = agent.random.choice(closest_pos)
+        else:
+            raise ValueError(f"Invalid selection method {selection}. Choose 'random' or 'closest'.")
 
-            else:
-                raise ValueError(
-                    f"Invalid selection method {selection}. Choose 'random' or 'closest'."
-                )
-            #  Move agent to chosen position
-            self.move_agent(agent, chosen_pos)
-
-        # If no positions are given, throw warning/error if selected
-        elif handle_empty == "warning":
-            warn(
-                f"No positions given, could not move agent {agent.unique_id}.",
-                RuntimeWarning,
-                stacklevel=2,
-            )
-        elif handle_empty == "error":
-            raise ValueError(
-                f"No positions given, could not move agent {agent.unique_id}."
-            )
+        self.move_agent(agent, chosen_pos)
 
     def _distance_squared(self, pos1: Coordinate, pos2: Coordinate) -> float:
         """Calculate the squared Euclidean distance between two points for performance."""
@@ -553,27 +543,11 @@ class _Grid:
 
     def move_to_empty(self, agent: Agent) -> None:
         """Moves agent to a random empty cell, vacating agent's old cell."""
-        num_empty_cells = len(self.empties)
-        if num_empty_cells == 0:
-            raise Exception("ERROR: No empty cells")
-
-        # This method is based on Agents.jl's random_empty() implementation. See
-        # https://github.com/JuliaDynamics/Agents.jl/pull/541. For the discussion, see
-        # https://github.com/projectmesa/mesa/issues/1052 and
-        # https://github.com/projectmesa/mesa/pull/1565. The cutoff value provided
-        # is the break-even comparison with the time taken in the else branching point.
-        if num_empty_cells > self.cutoff_empties:
-            while True:
-                new_pos = (
-                    agent.random.randrange(self.width),
-                    agent.random.randrange(self.height),
-                )
-                if self.is_cell_empty(new_pos):
-                    break
-        else:
-            new_pos = agent.random.choice(sorted(self.empties))
-        self.remove_agent(agent)
-        self.place_agent(agent, new_pos)
+        if not self.empties:
+            raise ValueError("No empty cells available.")
+    
+        new_pos = agent.random.choice(tuple(self.empties))  # Select a random empty cell
+        self.move_agent(agent, new_pos)  # Move agent to selected empty cell
 
     def exists_empty_cells(self) -> bool:
         """Return True if any cells empty else False."""
@@ -994,15 +968,15 @@ class SingleGrid(_PropertyGrid):
     @warn_if_agent_has_position_already
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
-        if self.is_cell_empty(pos):
-            x, y = pos
-            self._grid[x][y] = agent
-            if self._empties_built:
-                self._empties.discard(pos)
-            self._empty_mask[pos] = False
-            agent.pos = pos
-        else:
-            raise Exception("Cell not empty")
+        if not self.is_cell_empty(pos):
+            raise ValueError(f"Cannot place agent {agent.unique_id} at {pos}, cell is not empty.")
+        
+        x, y = pos
+        self._grid[x][y] = agent
+        if self._empties_built:
+            self._empties.discard(pos)
+        self._empty_mask[pos] = False
+        agent.pos = pos
 
     def remove_agent(self, agent: Agent) -> None:
         """Remove the agent from the grid and set its pos attribute to None."""
