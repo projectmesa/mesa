@@ -479,10 +479,16 @@ class _Grid:
         # Only move agent if there are positions given (non-empty list)
         if not pos:
             if handle_empty == "warning":
-                warn(f"No positions given, moving agent {agent.unique_id} to an empty cell.", RuntimeWarning, stacklevel=2)
+                warn(
+                    f"No positions given, moving agent {agent.unique_id} to an empty cell.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
             elif handle_empty == "error":
-                raise ValueError(f"No positions given, could not move agent {agent.unique_id}.")
-            
+                raise ValueError(
+                    f"No positions given, could not move agent {agent.unique_id}."
+                )
+
             # Move to a random empty cell instead
             return
 
@@ -503,7 +509,9 @@ class _Grid:
                     closest_pos.append(p)
             chosen_pos = agent.random.choice(closest_pos)
         else:
-            raise ValueError(f"Invalid selection method {selection}. Choose 'random' or 'closest'.")
+            raise ValueError(
+                f"Invalid selection method {selection}. Choose 'random' or 'closest'."
+            )
 
         self.move_agent(agent, chosen_pos)
 
@@ -545,7 +553,7 @@ class _Grid:
         """Moves agent to a random empty cell, vacating agent's old cell."""
         if not self.empties:
             raise ValueError("No empty cells available.")
-    
+
         new_pos = agent.random.choice(tuple(self.empties))  # Select a random empty cell
         self.move_agent(agent, new_pos)  # Move agent to selected empty cell
 
@@ -969,8 +977,10 @@ class SingleGrid(_PropertyGrid):
     def place_agent(self, agent: Agent, pos: Coordinate) -> None:
         """Place the agent at the specified location, and set its pos variable."""
         if not self.is_cell_empty(pos):
-            raise ValueError(f"Cannot place agent {agent.unique_id} at {pos}, cell is not empty.")
-        
+            raise ValueError(
+                f"Cannot place agent {agent.unique_id} at {pos}, cell is not empty."
+            )
+
         x, y = pos
         self._grid[x][y] = agent
         if self._empties_built:
