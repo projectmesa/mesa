@@ -125,6 +125,8 @@ class SimpleAgent(mesa.Agent):
 ### Agent management
 One significant advancement of Mesa 3 is expanded functionality around agent management. The new [`AgentSet`](https://mesa.readthedocs.io/latest/apis/agent.html#mesa.agent.AgentSet) class provides methods that allow users to filter, group, and analyze agents, making it easier to express complex model logic.
 
+When agents are created, they automatically register with the model via `model.register_agent(self)`. This registration automatically adds the agent to an `AgentSet` that's accessible through the model's `agents` property. Additional `AgentSet` instances for each agent type are maintained and available through `model.agents_by_type`. These collections are automatically updated when agents are added or removed from the model.
+
 ```python
     # Select wealthy agents and calculate average wealth
     wealthy = model.agents.select(lambda a: a.wealth > 1000)
