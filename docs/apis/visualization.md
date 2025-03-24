@@ -53,3 +53,12 @@ For a detailed tutorial, please refer to our [Visualization Tutorial](../tutoria
    :undoc-members:
    :show-inheritance:
 ```
+
+## Command Console
+
+```{eval-rst}
+.. automodule:: mesa.visualization.command_console
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
