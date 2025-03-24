@@ -37,6 +37,7 @@ import solara.lab
 import mesa.visualization.components.altair_components as components_altair
 from mesa.experimental.devs.simulator import Simulator
 from mesa.mesa_logging import create_module_logger, function_logger
+from mesa.model_share import get_pycafe_link
 from mesa.visualization.command_console import CommandConsole
 from mesa.visualization.user_param import Slider
 from mesa.visualization.utils import force_update, update_counter
@@ -130,6 +131,14 @@ def SolaraViz(
     reactive_use_threads = solara.use_reactive(use_threads)
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
+        solara.Button(
+            label="Open on PyCafe",
+            color="blue",
+            attributes={
+                "href": get_pycafe_link(autodetect_files=True),
+                "target": "_blank",
+            },
+        )
         solara.lab.ThemeToggle()
 
     with solara.Sidebar(), solara.Column():
