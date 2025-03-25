@@ -607,8 +607,6 @@ class PropertyLayer:
 
     """
 
-    propertylayer_experimental_warning_given = False
-
     def __init__(
         self, name: str, width: int, height: int, default_value, dtype=np.float64
     ):
@@ -652,15 +650,6 @@ class PropertyLayer:
             )
 
         self.data = np.full((width, height), default_value, dtype=dtype)
-
-        if not self.__class__.propertylayer_experimental_warning_given:
-            warnings.warn(
-                "The new PropertyLayer and _PropertyGrid classes experimental. It may be changed or removed in any and all future releases, including patch releases.\n"
-                "We would love to hear what you think about this new feature. If you have any thoughts, share them with us here: https://github.com/projectmesa/mesa/discussions/1932",
-                FutureWarning,
-                stacklevel=2,
-            )
-            self.__class__.propertylayer_experimental_warning_given = True
 
     def set_cell(self, position: Coordinate, value):
         """Update a single cell's value in-place."""
