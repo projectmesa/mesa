@@ -114,7 +114,6 @@ def extract_class(agents_by_type: dict, new_agent_class: str):
         type(Agent) if it agent type exists
         None otherwise
     """
-
     if new_agent_class in agents_by_type:
         return type(agents_by_type[new_agent_class][0])
     return None
@@ -130,7 +129,6 @@ def create_meta_agent(
     assume_subagent_methods: bool = False,
     assume_subagent_attributes: bool = False,
 ) -> Any | None:
-    
     """Dynamically create a new meta-agent class and instantiate agents
     in that class.
 
@@ -152,7 +150,6 @@ def create_meta_agent(
             created agent type
             - New class instance if created a new dynamically created agent type
     """
-    
     # Convert agents to set to ensure uniqueness
     agents = set(agents)
 
