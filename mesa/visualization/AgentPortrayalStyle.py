@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class AgentPortrayalStyle:
     """Dataclass to define agent portrayal styles in a proper structured way."""
@@ -8,10 +9,10 @@ class AgentPortrayalStyle:
     marker: str = "o"
     size: int = 10
     zorder: int = 1
-    alpha: float = 1.0  #Supports transparency
+    alpha: float = 1.0  # Supports transparency
     linewidths: float = 1.0  # line width for markers
-    edgecolors: str = "black"  #edge color for markers
-    loc: tuple[float, float] | None = None #stores agent position
+    edgecolors: str = "black"  # edge color for markers
+    loc: tuple[float, float] | None = None  # stores agent position
 
     def to_dict(self):
         """Convert the style to a dictionary (for backward compatibility)."""

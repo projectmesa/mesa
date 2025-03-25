@@ -3,7 +3,6 @@
 import unittest
 
 import ipyvuetify as vw
-import numpy as np
 import pytest
 import solara
 
