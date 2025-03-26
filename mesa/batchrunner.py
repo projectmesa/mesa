@@ -3,7 +3,12 @@
 To take advantage of parallel execution of experiments, `batch_run` uses
 multiprocessing if ``number_processes`` is larger than 1. It is strongly advised
 to only run in parallel using a normal python file (so don't try to do it in a
-jupyter notebook). Moreover, best practice when using multiprocessing is to
+jupyter notebook). This is because Jupyter notebooks have a different execution
+model that can cause issues with Python's multiprocessing module, especially on
+Windows. The main problems include the lack of a traditional __main__ entry
+point, serialization issues, and potential deadlocks.
+
+Moreover, best practice when using multiprocessing is to
 put the code inside an ``if __name__ == '__main__':`` code black as shown below::
 
     from mesa.batchrunner import batch_run
@@ -20,8 +25,6 @@ put the code inside an ``if __name__ == '__main__':`` code black as shown below:
             data_collection_period=1,
             display_progress=True,
         )
-
-
 
 """
 

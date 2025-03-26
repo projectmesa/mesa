@@ -9,7 +9,7 @@ import solara
 import mesa
 import mesa.visualization.components.altair_components
 import mesa.visualization.components.matplotlib_components
-from mesa.space import MultiGrid
+from mesa.space import MultiGrid, PropertyLayer
 from mesa.visualization.components.altair_components import make_altair_space
 from mesa.visualization.components.matplotlib_components import make_mpl_space_component
 from mesa.visualization.solara_viz import (
@@ -102,6 +102,9 @@ def test_call_space_drawer(mocker):  # noqa: D103
     mock_space_altair = mocker.spy(
         mesa.visualization.components.altair_components, "SpaceAltair"
     )
+    mock_chart_property_layer = mocker.spy(
+        mesa.visualization.components.altair_components, "chart_property_layers"
+    )
 
     class MockAgent(mesa.Agent):
         def __init__(self, model):
@@ -110,7 +113,12 @@ def test_call_space_drawer(mocker):  # noqa: D103
     class MockModel(mesa.Model):
         def __init__(self, seed=None):
             super().__init__(seed=seed)
-            self.grid = MultiGrid(width=10, height=10, torus=True)
+            layer1 = PropertyLayer(
+                name="sugar", width=10, height=10, default_value=10.0
+            )
+            self.grid = MultiGrid(
+                width=10, height=10, torus=True, property_layers=layer1
+            )
             a = MockAgent(self)
             self.grid.place_agent(a, (5, 5))
 
@@ -141,7 +149,15 @@ def test_call_space_drawer(mocker):  # noqa: D103
     assert mock_space_altair.call_count == 1  # altair is the default method
 
     # checking if SpaceAltair is working as intended with post_process
-
+    propertylayer_portrayal = {
+        "sugar": {
+            "colormap": "pastel1",
+            "alpha": 0.75,
+            "colorbar": True,
+            "vmin": 0,
+            "vmax": 10,
+        }
+    }
     mock_post_process = mocker.MagicMock()
     solara.render(
         SolaraViz(
@@ -149,8 +165,8 @@ def test_call_space_drawer(mocker):  # noqa: D103
             components=[
                 make_altair_space(
                     agent_portrayal,
-                    propertylayer_portrayal,
-                    mock_post_process,
+                    post_process=mock_post_process,
+                    propertylayer_portrayal=propertylayer_portrayal,
                 )
             ],
         )
@@ -158,13 +174,18 @@ def test_call_space_drawer(mocker):  # noqa: D103
 
     args, kwargs = mock_space_altair.call_args
     assert args == (model, agent_portrayal)
-    assert kwargs == {"post_process": mock_post_process}
+    assert kwargs == {
+        "post_process": mock_post_process,
+        "propertylayer_portrayal": propertylayer_portrayal,
+    }
     mock_post_process.assert_called_once()
+    assert mock_chart_property_layer.call_count == 1
     assert mock_space_matplotlib.call_count == 0
 
     mock_space_altair.reset_mock()
     mock_space_matplotlib.reset_mock()
     mock_post_process.reset_mock()
+    mock_chart_property_layer.reset_mock()
 
     # specify a custom space method
     class AltSpace:
@@ -178,7 +199,7 @@ def test_call_space_drawer(mocker):  # noqa: D103
 
     # check voronoi space drawer
     voronoi_model = mesa.Model()
-    voronoi_model.grid = mesa.experimental.cell_space.VoronoiGrid(
+    voronoi_model.grid = mesa.discrete_space.VoronoiGrid(
         centroids_coordinates=[(0, 1), (0, 0), (1, 0)],
     )
     solara.render(
