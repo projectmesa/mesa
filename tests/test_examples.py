@@ -4,10 +4,12 @@ from mesa.examples import (
     BoltzmannWealth,
     ConwaysGameOfLife,
     EpsteinCivilViolence,
+    MultiLevelAllianceModel,
     PdGrid,
     Schelling,
     SugarscapeG1mt,
     VirusOnNetwork,
+    WarehouseModel,
     WolfSheep,
 )
 
@@ -106,3 +108,28 @@ def test_wolf_sheep():  # noqa: D103
     simulator = ABMSimulator()
     WolfSheep(seed=42, simulator=simulator)
     simulator.run_for(10)
+
+
+def test_alliance_formation_model():  # noqa: D103
+    from mesa.examples.basic.alliance_formation import app
+
+    app.page  # noqa: B018
+
+    model = MultiLevelAllianceModel(50, seed=42)
+
+    for _i in range(10):
+        model.step()
+
+    assert len(model.agents) == len(model.network.nodes)
+
+
+def test_warehouse_model():  # noqa: D103
+    from mesa.examples.basic.warehouse import app
+
+    app.page  # noqa: B018
+
+    model = WarehouseModel(seed=42)
+
+    # More steps needed to hit coverage difference
+    for _i in range(30):
+        model.step()
