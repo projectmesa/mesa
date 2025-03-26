@@ -1,10 +1,27 @@
 ---
 title: Release History
 ---
+# 3.1.5 (2025-03-26)
+## Highlights
+Mesa 3.1.5 is a maintenance release focused on improving documentation and cleaning up our resources. This update includes no breaking changes and is compatible with previous 3.1.x releases.
+
+The documentation improvements include enhanced explanations for batch run parallel processing, a significantly expanded overview section covering spaces, property layers and time advancement methods with practical code examples, and a clearer installation guide detailing what the optional `[rec]` dependencies provide. We've also improved our examples documentation to better distinguish between core and user-contributed examples, and added a new "Roles" section to the contributing guide that outlines the project's community structure and progression paths.
+
+On the maintenance side, we've cleaned up unused images and compressed existing ones, reducing the repository size by over 2MB and distribution size from 3.2MB to 1.2MB.
+
+## What's Changed
+### 📜 Documentation improvements
+* docs: Split off the overview page, extend with spaces/activation by @EwoutH in https://github.com/projectmesa/mesa/pull/2673
+* docs: Add Roles section to CONTRIBUTING.md by @EwoutH in https://github.com/projectmesa/mesa/pull/2694
+* [JOSS] Docs: Clarify difference between core and user examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2706
+* [JOSS] docs: Improve batch_run documentation for parallel processing by @EwoutH in https://github.com/projectmesa/mesa/pull/2707
+* Clean-up old images, compress wolf-sheep image, remove version switch artifact by @EwoutH in https://github.com/projectmesa/mesa/pull/2717
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.1.4...v3.1.5
+
 # 3.1.4 (2025-02-09)
 ## Highlights
 This release contains various improvements and bugfixes to the matplotlib-based visualization of spaces. Hexgrids are now fully supported, including property layers. In making this possible, various minor bugs were encountered and also fixed. In addition to the visualization improvements, there are various minor convenience improvements to the docs.
-
 
 ## What's Changed
 ### 🛠 Enhancements made
