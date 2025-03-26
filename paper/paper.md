@@ -18,7 +18,7 @@ authors:
   - name: Vincent Hess
     orcid: 0000-0002-9242-8500
     affiliation: "2"
-  - name: Thomas D. Pike
+  - name: Thomas Pike
     orcid: 0000-0003-1576-0283
     affiliation: "3"
   - name: Boyu Wang
