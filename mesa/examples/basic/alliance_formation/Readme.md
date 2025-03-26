@@ -1,4 +1,4 @@
-# Alliance Formation Model
+# Alliance Formation Model (Meta-Agent Example)
 
 ## Summary
 

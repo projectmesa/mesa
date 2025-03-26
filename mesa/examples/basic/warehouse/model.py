@@ -1,13 +1,13 @@
 import mesa
 from mesa.discrete_space import OrthogonalMooreGrid
 from mesa.discrete_space.cell_agent import CellAgent
-from mesa.examples.basic.meta_agents.warehouse.agents import (
+from mesa.examples.basic.warehouse.agents import (
     InventoryAgent,
     RouteAgent,
     SensorAgent,
     WorkerAgent,
 )
-from mesa.examples.basic.meta_agents.warehouse.make_warehouse import make_warehouse
+from mesa.examples.basic.warehouse.make_warehouse import make_warehouse
 from mesa.experimental.meta_agents.meta_agent import create_meta_agent
 
 # Constants for configuration

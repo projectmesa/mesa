@@ -1,18 +1,23 @@
 """Implementation of Mesa's meta agent capability.
 
-This contains two helper methods and a MetaAgent class that can be used to
+This contains four  helper functions  and a MetaAgent class that can be used to
 create agents that contain other agents as components.
 
 Helper methods:
 1 - find_combinations: Find combinations of agents to create a meta-agent
 subset.
 2- evaluate_combination: Evaluate combinations of agents by some user based
-criteria to determine if it should be a subset.
+criteria to determine if it should be a subset of agents.
+3- extract_class: Helper function for create_meta-agent. Extracts the types of
+agent being created to create a new instance of that agent type.
+4- create_meta_agent: Create a new meta-agent class and instantiate
+agents in that class.
 
 Meta-Agent class (MetaAgent): An agent that contains other agents
 as components.
 
-See basic examples >> meta_agents for dynamic creation and explicit creation
+See basic examples >> meta_agents for deliberate meta-agent creation (warehouse)
+and emergent meta-agent creation (alliance formation) of meta-agents.
 """
 
 import itertools
@@ -103,8 +108,7 @@ def find_combinations(
 
 
 def extract_class(agents_by_type: dict, new_agent_class: str):
-    """Helper function for create_meta_agents extracts the type of agent
-    being created to create a new instance of that agent type.
+    """Helper function for create_meta_agents extracts the types of agents.
 
     Args:
         agents_by_type (dict): The dictionary of agents by type.
@@ -129,8 +133,7 @@ def create_meta_agent(
     assume_subagent_methods: bool = False,
     assume_subagent_attributes: bool = False,
 ) -> Any | None:
-    """Dynamically create a new meta-agent class and instantiate agents
-    in that class.
+    """Create a new meta-agent class and instantiate agents.
 
     Parameters:
     model (Any): The model instance.
@@ -317,7 +320,7 @@ class MetaAgent(Agent):
         try:
             return self.subagents_by_type[agent_type][0]
         except KeyError:
-            raise ValueError(f"No subagent of type {agent_type} found.")
+            raise ValueError(f"No subagent of type {agent_type} found.") from None
 
     def add_subagents(
         self,
@@ -343,14 +346,6 @@ class MetaAgent(Agent):
             self._subset.discard(agent)
             agent.meta_agent = None  # TODO: Remove meta_agent from set
             self.model.deregister_agent(agent)
-
-    def get_subagent_type(self) -> set[type]:
-        """Get the types of all subagents.
-
-        Returns:
-            set[type]: A set of unique types of the subagents.
-        """
-        return {type(agent) for agent in self._subset}
 
     def step(self):
         """Perform the agent's step.

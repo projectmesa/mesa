@@ -1,4 +1,4 @@
-# Pseudo-Warehouse Model
+# Pseudo-Warehouse Model (Meta-Agent Example)
 
 ## Summary
 

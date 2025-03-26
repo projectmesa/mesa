@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import solara
 
-from mesa.examples.basic.meta_agents.warehouse.model import WarehouseModel
+from mesa.examples.basic.warehouse.model import WarehouseModel
 from mesa.visualization import SolaraViz
 from mesa.visualization.utils import update_counter
 

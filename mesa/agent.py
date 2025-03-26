@@ -101,8 +101,9 @@ class Agent:
         """
 
         class ListLike:
-            """Helper class to make default arguments act as if they are in a
-            list of length N.
+            """Make default arguments act as if they are in a list of length N.
+
+            This is a helper class.
             """
 
             def __init__(self, value):
