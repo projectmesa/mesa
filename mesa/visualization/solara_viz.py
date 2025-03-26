@@ -309,6 +309,9 @@ def ModelController(
 
         else:
             for _ in range(render_interval.value):
+                if not running.value:
+                    break
+                print(running.value)
                 model.value.step()
                 running.value = model.value.running
             force_update()
