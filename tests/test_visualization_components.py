@@ -63,11 +63,12 @@ class TestBaseVisualizationComponents:
                 self.schedule = []
                 self.running = True
                 self.time_series_data = {"data1": [1, 2, 3], "data2": [3, 2, 1]}
-                
+
                 # Add a mock datacollector
                 from unittest.mock import MagicMock
+
                 import pandas as pd
-                
+
                 self.datacollector = MagicMock()
                 # Create a dataframe with time series data
                 self.datacollector.get_model_vars_dataframe.return_value = pd.DataFrame(
@@ -99,7 +100,9 @@ class TestBaseVisualizationComponents:
 class TestMatplotlibComponents(TestBaseVisualizationComponents):
     """Tests for matplotlib visualization components."""
 
-    @pytest.mark.skip(reason="Test needs updating for compatibility with local environment")
+    @pytest.mark.skip(
+        reason="Test needs updating for compatibility with local environment"
+    )
     def test_mpl_space_component(self, mock_model):
         """Test that matplotlib space component renders correctly."""
         component = make_mpl_space_component(self.agent_portrayal)
@@ -113,7 +116,9 @@ class TestMatplotlibComponents(TestBaseVisualizationComponents):
         box, rc = solara.render(component_with_layers(mock_model), handle_error=False)
         assert rc.find("div").widget is not None
 
-    @pytest.mark.skip(reason="Test needs updating for compatibility with local environment")
+    @pytest.mark.skip(
+        reason="Test needs updating for compatibility with local environment"
+    )
     def test_mpl_plot_component(self, mock_model):
         """Test that matplotlib plot component renders correctly."""
         component = make_mpl_plot_component({"data1": "red", "data2": "blue"})
@@ -136,7 +141,9 @@ class TestMatplotlibComponents(TestBaseVisualizationComponents):
 class TestAltairComponents(TestBaseVisualizationComponents):
     """Tests for Altair visualization components."""
 
-    @pytest.mark.skip(reason="Test needs updating for compatibility with local environment")
+    @pytest.mark.skip(
+        reason="Test needs updating for compatibility with local environment"
+    )
     def test_altair_space_component(self, mock_model):
         """Test that Altair space component renders correctly."""
         component = make_altair_space(self.agent_portrayal)
@@ -150,7 +157,9 @@ class TestAltairComponents(TestBaseVisualizationComponents):
         box, rc = solara.render(component_with_layers(mock_model), handle_error=False)
         assert rc.find("div").widget is not None
 
-    @pytest.mark.skip(reason="Test needs updating for compatibility with local environment")
+    @pytest.mark.skip(
+        reason="Test needs updating for compatibility with local environment"
+    )
     def test_altair_plot_component(self, mock_model):
         """Test that Altair plot component renders correctly."""
         component = make_plot_component({"data1": "red", "data2": "blue"})
