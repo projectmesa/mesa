@@ -96,4 +96,4 @@ If visualization tests fail:
 1. Check dependency versions (especially solara, matplotlib, altair)
 2. For snapshot failures, compare the test results in `test-results/` with the reference images
 3. Update reference snapshots if the visual changes are expected
-4. For browser-based test failures, try running with `--headed` flag to see the browser 
+4. For browser-based test failures, try running with `--headed` flag to see the browser

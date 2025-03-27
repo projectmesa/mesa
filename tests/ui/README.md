@@ -82,4 +82,4 @@ Example:
 def test_new_visualization(browser_page):
     # Test implementation here
     assert model_renders_correctly
-``` 
+```

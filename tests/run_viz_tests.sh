@@ -59,7 +59,7 @@ if [ "$RUN_UI" = true ]; then
     echo "⚠️  Playwright not found. Installing required browser..."
     playwright install chromium
   fi
-  
+
   echo "🌐 Running browser-based UI tests..."
   python -m pytest tests/ui/test_browser_viz.py $VERBOSITY || UI_RESULT=$?
 fi
@@ -87,4 +87,4 @@ if [ $BROWSER_LESS_RESULT -ne 0 ] || [ $UI_RESULT -ne 0 ]; then
   exit 1
 fi
 
-exit 0 
+exit 0

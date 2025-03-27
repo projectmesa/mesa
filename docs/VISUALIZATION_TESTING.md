@@ -14,13 +14,13 @@ Mesa's visualization components are tested using two complementary approaches:
 Located in `tests/test_visualization_components.py`, these tests:
 
 - Render components using Solara's test utilities without a browser
-- Test both Matplotlib and Altair visualization backends 
+- Test both Matplotlib and Altair visualization backends
 - Verify component properties, rendering logic, and interactive features
 - Include performance benchmarks for visualization rendering
 
 These tests run quickly and are ideal for CI pipelines.
 
-### Browser-based UI Tests  
+### Browser-based UI Tests
 
 Located in `tests/ui/test_browser_viz.py`, these tests:
 
@@ -123,4 +123,4 @@ def test_new_component_browser(browser_page):
 
 - **Failed Visual Tests**: Examine the screenshot differences and update references if needed
 - **Slow Tests**: Use the `--benchmark-only` flag to identify performance bottlenecks
-- **Browser Issues**: Try running with `--headed` flag to observe browser behavior 
+- **Browser Issues**: Try running with `--headed` flag to observe browser behavior

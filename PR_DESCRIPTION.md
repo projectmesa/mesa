@@ -38,14 +38,14 @@ The testing approach follows Solara's recommended practices for testing without 
 def test_example():
     # 1. Set up test model
     model = Schelling(seed=42)
-    
+
     # 2. Create and render visualization component
     component = make_altair_space(agent_portrayal)
     box, rc = solara.render(component(model), handle_error=False)
-    
+
     # 3. Find and verify UI elements
     assert rc.find("div").widget is not None
-    
+
     # 4. Test model interaction
     step_button = rc.find(v.Btn, children=["Step"]).widget
     step_button.click()
@@ -66,7 +66,7 @@ playwright install chromium
 ./tests/run_viz_tests.sh --ui
 
 # Run performance benchmarks
-./tests/run_viz_tests.sh --benchmarks  
+./tests/run_viz_tests.sh --benchmarks
 ```
 
 ## Benefits
@@ -75,4 +75,4 @@ playwright install chromium
 - Prevents regressions in visualization functionality
 - Follows Solara's recommended testing practices
 
-These tests address the current gap where basic model execution is tested but visualization functionality is not systematically verified. 
+These tests address the current gap where basic model execution is tested but visualization functionality is not systematically verified.
