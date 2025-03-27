@@ -172,7 +172,7 @@ For models where agents need to move continuously through space rather than betw
 ```
 
 ### Time advancement
-Mesa supports two primary approaches to advancing time in simulations: incremental-time progression (tick-based) and next-event time progression
+Mesa supports two primary approaches to advancing time in simulations: incremental-time progression (tick-based) and next-event time progression.
 
 Typically, ABMs represent time in discrete steps (often called "ticks"). For each tick, the model's step method is called, and agents are activated to take their designated actions. The most frequently implemented approach is shown below, which runs a model for 100 ticks:
 
