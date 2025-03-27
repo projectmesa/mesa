@@ -54,7 +54,7 @@ preferred-citation: article
 ---
 
 # Summary
-Mesa is an open-source Python framework for agent-based modeling (ABM) that enables researchers to create, analyze, and visualize agent-based simulations. Mesa provides a comprehensive set of tools and abstractions for modeling complex systems, with capabilities spanning from basic agent management to sophisticated representation of spaces where agents interact. First released in 2014 and published in @masad2015 (with updates published in @kazil2020), this paper highlights advancements and presents Mesa in its current version (3.1.4) as of 2025.
+Mesa is an open-source Python framework for agent-based modeling (ABM) that enables researchers to create, analyze, and visualize agent-based simulations. Mesa provides a comprehensive set of tools and abstractions for modeling complex systems, with capabilities spanning from basic agent management to sophisticated representation of spaces where agents interact. First released in 2014 and published in @masad2015 (with updates published in @kazil2020), this paper highlights advancements and presents Mesa in its current version (3.1.5) as of 2025.
 
 # Statement of need
 Agent-based models (ABMs) are composed of autonomous, heterogeneous agents interacting locally with other agents. These interactions give rise to emergent phenomena. The aggregate dynamics of a system under study emerge from these local interactions [@epstein_axtell_1996; @epstein1999]. This type of modeling quickly grew more sophisticated, requiring frameworks to execute them. This led to the establishment of [NetLogo](https://ccl.northwestern.edu/netlogo/) in 1999 and [MASON](https://cs.gmu.edu/~eclab/projects/mason/) in 2003.
