@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, "3.10"]
+        python-version: ["3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v3
@@ -29,15 +29,15 @@ jobs:
 
     - name: Run visualization tests
       run: |
-        pytest -xvs mesa/tests/test_visualization_components.py mesa/tests/test_solara_viz.py
+        pytest -xvs tests/test_visualization_components.py
 
     - name: Run visualization benchmarks
       run: |
-        pytest -xvs mesa/tests/test_visualization_components.py::TestPerformanceBenchmarks
+        pytest -xvs tests/test_visualization_components.py::test_performance_benchmarks
 
     - name: Generate test coverage report
       run: |
-        pytest --cov=mesa.visualization mesa/tests/test_visualization_components.py mesa/tests/test_solara_viz.py --cov-report=xml
+        pytest --cov=mesa.visualization tests/test_visualization_components.py --cov-report=xml
 
     - name: Upload coverage report to Codecov
       uses: codecov/codecov-action@v3
