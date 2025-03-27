@@ -64,6 +64,12 @@ dev = [
   "sphinx",
   "pytest-mock",
 ]
+# Visualization testing dependencies
+viz-test = [
+  "mesa[viz]",
+  "pytest-playwright",
+  "pytest-ipywidgets[solara]",
+]
 examples = [
   "mesa[rec]",
   "pytest",

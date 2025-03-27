@@ -1,0 +1,56 @@
+name: UI Visualization Tests
+
+on:
+  # Run weekly on Sunday
+  schedule:
+    - cron: '0 0 * * 0'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+  
+  # Run on pull requests to main/master with changes to visualization components
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'mesa/visualization/**'
+      - 'mesa/examples/**'
+      - 'tests/ui/**'
+
+jobs:
+  ui-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e .[dev,viz-test]  # Install Mesa with development and visualization testing dependencies
+        
+    - name: Install Playwright browser
+      run: |
+        playwright install chromium
+        
+    - name: Run UI visualization tests
+      run: |
+        pytest -xvs mesa/tests/ui/ --solara-runner=solara
+        
+    - name: Upload screenshots on failure
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: test-failures
+        path: test-results/
+        
+    - name: Upload reference screenshots
+      uses: actions/upload-artifact@v3
+      if: success()
+      with:
+        name: reference-screenshots
+        path: mesa/tests/ui/snapshots/ 
