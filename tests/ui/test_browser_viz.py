@@ -90,8 +90,6 @@ def test_model_params_update_browser(solara_test, page_session: Page):
     slider = page_session.locator("input[role='slider']").nth(2)
     slider.wait_for()
     
-    current_value = float(slider.get_attribute("aria-valuenow"))
-    
     slider.evaluate("slider => { slider.value = slider.max; slider.dispatchEvent(new Event('change')); }")
     
     reset_button.click()

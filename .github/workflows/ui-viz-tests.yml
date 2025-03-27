@@ -7,14 +7,6 @@ on:
   
   # Allow manual triggering
   workflow_dispatch:
-  
-  # Run on pull requests to main/master with changes to visualization components
-  pull_request:
-    branches: [ main, master ]
-    paths:
-      - 'mesa/visualization/**'
-      - 'mesa/examples/**'
-      - 'tests/ui/**'
 
 jobs:
   ui-test:
@@ -31,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -e .[dev,viz-test]  # Install Mesa with development and visualization testing dependencies
+        python -m pip install -e .[dev,viz-test]
         
     - name: Install Playwright browser
       run: |
