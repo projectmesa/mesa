@@ -296,3 +296,14 @@ class TestPerformanceBenchmarks:
         # Assert that rendering is reasonably fast
         # This threshold may need adjustment based on the environment
         assert render_time < 5.0, f"Rendering took too long: {render_time:.2f}s"
+
+
+@pytest.mark.skip(reason="Benchmark tests are optional")
+def test_performance_benchmarks():
+    """Module-level test function for visualization performance benchmarks.
+    
+    This is a module-level version of the TestPerformanceBenchmarks.test_performance_benchmarks
+    test to ensure compatibility with CI test runners.
+    """
+    # The actual benchmark is in TestPerformanceBenchmarks.test_performance_benchmarks
+    pass
