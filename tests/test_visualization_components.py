@@ -301,9 +301,8 @@ class TestPerformanceBenchmarks:
 @pytest.mark.skip(reason="Benchmark tests are optional")
 def test_performance_benchmarks():
     """Module-level test function for visualization performance benchmarks.
-    
+
     This is a module-level version of the TestPerformanceBenchmarks.test_performance_benchmarks
     test to ensure compatibility with CI test runners.
     """
     # The actual benchmark is in TestPerformanceBenchmarks.test_performance_benchmarks
-    pass
