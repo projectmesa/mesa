@@ -15,7 +15,7 @@ If you want to get a quick start on how to build agent based models with MESA, c
 - [Dynamic Agent Visualization](tutorials/5_visualization_dynamic_agents): Learn how to dynamically represent your agents in your interactive dashboard.
 - [Custom Visualization Components](tutorials/6_visualization_custom): Learn how to add custom visual components to your interactive dashboard.
 - [Parameter Sweeps](tutorials/7_batch_run): Learn how to conduct parameter sweeps on multiple processors with Mesa's BatchRunner.
-- [Comparing Scenarios](tutorials/8_comparing scenarios): Think through how to analyze your parameter sweep results to find insight in your Mesa simulations.
+- [Comparing Scenarios](tutorials/8_comparing_scenarios): Think through how to analyze your parameter sweep results to find insight in your Mesa simulations.
 
 ## Examples
 Mesa ships with a collection of example models. These are classic ABMs, so if you are familiar with ABMs and want to get a quick sense of how MESA works, these examples are great place to start. You can find them [here](examples).
@@ -61,7 +61,7 @@ Basic Visualization <tutorials/4_visualization_basic>
 Dynamic Agent Visualization <tutorials/5_visualization_dynamic_agents>
 Custom Visualization Components <tutorials/6_visualization_custom>
 Parameter Sweeps <tutorials/7_batch_run>
-Comparing Scenarios <tutorials/8_comparing scenarios>
+Comparing Scenarios <tutorials/8_comparing_scenarios>
 Best Practices <best-practices>
 
 
