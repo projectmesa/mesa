@@ -135,6 +135,6 @@ Don't forget to checkout the [Contributors guide](https://github.com/projectmesa
 ## Citing Mesa
 
 To cite Mesa in your publication, you can refer to our peer-reviewed article in the Journal of Open Source Software (JOSS):
-- ter Hoeven et al., (2025). Mesa 3: Agent-based modeling with Python in 2025. Journal of Open Source Software, 10(107), 7668, https://doi.org/10.21105/joss.07668
+- ter Hoeven, E., Kwakkel, J., Hess, V., Pike, T., Wang, B., rht, & Kazil, J. (2025). Mesa 3: Agent-based modeling with Python in 2025. Journal of Open Source Software, 10(107), 7668. https://doi.org/10.21105/joss.07668
 
-Our [CITATION.cff](https://github.com/projectmesa/mesa/blob/main/CITATION.cff) file generates APA, BibTeX and other citation formats.
+Our [CITATION.cff](https://github.com/projectmesa/mesa/blob/main/CITATION.cff) can be used to generate APA, BibTeX and other citation formats.
