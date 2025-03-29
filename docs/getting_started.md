@@ -7,8 +7,15 @@ Mesa is a modular framework for building, analyzing and visualizing agent-based 
 If you want to get a quick start on how to build agent based models with MESA, check the overview and tutorials:
 
 - [Overview of the MESA library](overview): Learn about the core concepts and components of Mesa.
-- [Introductory Tutorial](tutorials/intro_tutorial): Learn how to create your first Mesa model.
-- [Visualization Tutorial](tutorials/visualization_tutorial): Learn how to create interactive visualizations for your models.
+- [Building Your First Model](tutorials/0_first_model): Learn how to create your first Mesa model.
+- [Adding Space](tutorials/1_adding_space): Learn how to add space to your Mesa model and understand Mesa's space architecture.
+- [Collecting Data](tutorials/2_collecting_data): Learn how to collect model level and agent level data with Mesa' DataCollector.
+- [AgentSet](tutorials/3_agentset): Learn how to more effectively manage agents with  Mesa's AgentSet.
+- [Basic Visualization](tutorials/4_visualization_basic): Learn how to build an interactive dashboard with Mesa's visualization module.
+- [Dynamic Agent Visualization](tutorials/5_visualization_dynamic_agents): Learn how to dynamically represent your agents in your interactive dashboard.
+- [Custom Visualization Components](tutorials/6_visualization_custom): Learn how to add custom visual components to your interactive dashboard.
+- [Parameter Sweeps](tutorials/7_batch_run): Learn how to conduct parameter sweeps on multiple processors with Mesa's BatchRunner.
+- [Comparing Scenarios](tutorials/8_comparing scenarios): Think through how to analyze your parameter sweep results to find insight in your Mesa simulations.
 
 ## Examples
 Mesa ships with a collection of example models. These are classic ABMs, so if you are familiar with ABMs and want to get a quick sense of how MESA works, these examples are great place to start. You can find them [here](examples).
@@ -46,8 +53,15 @@ Enjoy modelling with Mesa, and feel free to reach out!
 :hidden: true
 :maxdepth: 7
 
-tutorials/intro_tutorial
-tutorials/visualization_tutorial
+Building Your First Model <tutorials/0_first_model>
+Adding Space <tutorials/1_adding_space>
+Collecting Data <tutorials/2_collecting_data>
+AgentSet <tutorials/3_agentset>
+Basic Visualization <tutorials/4_visualization_basic>
+Dynamic Agent Visualization <tutorials/5_visualization_dynamic_agents>
+Custom Visualization Components <tutorials/6_visualization_custom>
+Parameter Sweeps <tutorials/7_batch_run>
+Comparing Scenarios <tutorials/8_comparing scenarios>
 Best Practices <best-practices>
 
 
