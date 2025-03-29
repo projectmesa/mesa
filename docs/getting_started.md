@@ -53,7 +53,7 @@ Enjoy modelling with Mesa, and feel free to reach out!
 :hidden: true
 :maxdepth: 7
 
-Building Your First Model <tutorials/0_first_model>
+Creating Your First Model <tutorials/0_first_model>
 Adding Space <tutorials/1_adding_space>
 Collecting Data <tutorials/2_collecting_data>
 AgentSet <tutorials/3_agentset>
