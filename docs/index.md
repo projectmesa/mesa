@@ -22,7 +22,7 @@
 
 [Mesa] is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
 
-Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python-based counterpart to NetLogo, Repast, or MASON.
+Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Mesa's goal is to make simulations accessible to everyone, so humanity can more effectively understand and solve complex problems.
 
 ![A screenshot of the Wolf Sheep model in Mesa|100%](images/wolf_sheep.png)
 *A visualisation of the Wolf Sheep model build with Mesa.*
