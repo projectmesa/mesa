@@ -1,48 +1,51 @@
-"""
-Tests for the SolaraViz visualization components in Mesa.
+"""Tests for the SolaraViz visualization components in Mesa.
 This tests focuses on the initialization and basic rendering of visualization components.
 """
 
-import pytest
-from typing import Dict, Any, List, Callable, Optional
-
-import sys
 import os
-sys.path.append(os.path.abspath('.'))
+import sys
+
+import pytest
+
+sys.path.append(os.path.abspath("."))
 
 # Import the mock components
-import mesa
 from mock_solara_components import (
-    SolaraVisualization,
-    SolaraGrid,
+    ModelApp,
     SolaraChart,
+    SolaraGrid,
     SolaraNetworkVisualization,
-    ModelApp
+    SolaraVisualization,
 )
+
+import mesa
+
 
 def test_solara_imports():
     """Test that Solara is properly installed and can be imported."""
     try:
         import solara
+
         assert solara.__version__ is not None, "Solara version should be defined"
     except ImportError:
         pytest.skip("Solara is not installed")
 
+
 def test_find_example_visualizations(example_model_name):
-    """
-    Test that visualization components can be found for each example model.
-    """
+    """Test that visualization components can be found for each example model."""
     try:
         # Get the visualization components for this model
         visualizations = mesa.examples[example_model_name]["visualization"]
         assert visualizations is not None
-        assert len(visualizations) > 0, f"No visualization components found for {example_model_name}"
+        assert len(visualizations) > 0, (
+            f"No visualization components found for {example_model_name}"
+        )
     except (KeyError, AttributeError) as e:
         pytest.skip(f"Could not retrieve visualizations for {example_model_name}: {e}")
 
+
 def test_app_initialization(example_model_name):
-    """
-    Test that the app for each example model can be initialized.
+    """Test that the app for each example model can be initialized.
     This is similar to what was attempted in PR #2491.
     """
     try:
@@ -66,10 +69,9 @@ def test_app_initialization(example_model_name):
     except (KeyError, AttributeError, ImportError) as e:
         pytest.skip(f"Could not initialize app for {example_model_name}: {e}")
 
+
 def test_visualization_component_rendering(example_model_name, solara_test_client):
-    """
-    Test that visualization components can be rendered without errors.
-    """
+    """Test that visualization components can be rendered without errors."""
     try:
         # Get a model instance
         model_class = mesa.examples[example_model_name]["model"]
@@ -84,17 +86,15 @@ def test_visualization_component_rendering(example_model_name, solara_test_clien
             def TestComponent():
                 return viz_func(model)
 
-
             # Render the component
             result = solara_test_client.render(TestComponent)
             assert result["status"] == "rendered"
     except (KeyError, AttributeError, ImportError) as e:
         pytest.skip(f"Could not render visualizations for {example_model_name}: {e}")
 
+
 def test_solara_viz_basic_components():
-    """
-    Test that basic SolaraViz components exist and can be initialized.
-    """
+    """Test that basic SolaraViz components exist and can be initialized."""
     try:
         # Test the SolaraVisualization component
         assert SolaraVisualization is not None
@@ -113,6 +113,7 @@ def test_solara_viz_basic_components():
     except Exception as e:
         pytest.skip(f"Could not test basic components: {e}")
 
+
 def test_solara_grid_properties():
     """Test specific properties of the SolaraGrid component."""
     model = mesa.examples["schelling"]["model"]()
@@ -122,7 +123,7 @@ def test_solara_grid_properties():
     # Test grid dimensions - just test that the function accepts the parameters
     # This is a mock test, so we're just making sure the function signature is correct
     grid = SolaraGrid(model=model, grid_width=grid_width, grid_height=grid_height)
-    
+
     # Skip attribute testing in mock environment
     # In a real SolaraViz test, these would test actual component properties
     try:
@@ -134,6 +135,7 @@ def test_solara_grid_properties():
         # For mocked environment, just verify the function accepts parameters
         assert True, "Grid properties test passes with parameter checking only"
 
+
 def test_solara_chart_data_binding():
     """Test data binding in SolaraChart component."""
     model = mesa.examples["wolf_sheep"]["model"]()
@@ -141,12 +143,12 @@ def test_solara_chart_data_binding():
     # Test with different data series
     test_series = [
         {"name": "Population", "data": [1, 2, 3, 4, 5]},
-        {"name": "Resources", "data": [5, 4, 3, 2, 1]}
+        {"name": "Resources", "data": [5, 4, 3, 2, 1]},
     ]
 
     # Test function signature and parameter passing
     chart = SolaraChart(model=model, series=test_series)
-    
+
     # Skip attribute testing in mock environment
     try:
         assert hasattr(chart, "series")
@@ -157,6 +159,7 @@ def test_solara_chart_data_binding():
         # For mocked environment, just verify the function accepts parameters
         assert True, "Chart data binding test passes with parameter checking only"
 
+
 def test_network_visualization_sizing():
     """Test size configuration of NetworkVisualization."""
     model = mesa.examples["virus_on_network"]["model"]()
@@ -165,7 +168,7 @@ def test_network_visualization_sizing():
 
     # Test custom dimensions
     network_viz = SolaraNetworkVisualization(model=model, width=width, height=height)
-    
+
     # Skip attribute testing in mock environment
     try:
         assert hasattr(network_viz, "width")
@@ -176,13 +179,14 @@ def test_network_visualization_sizing():
         # For mocked environment, just verify the function accepts parameters
         assert True, "Network sizing test passes with parameter checking only"
 
+
 def test_model_app_controls():
     """Test control functionality in ModelApp."""
     model_class = mesa.examples["forest_fire"]["model"]
 
     # Test app initialization with model
     app = ModelApp(model_class=model_class)
-    
+
     # Skip attribute testing in mock environment
     try:
         assert hasattr(app, "model_class")
@@ -197,6 +201,7 @@ def test_model_app_controls():
         # For mocked environment, just verify the function accepts parameters
         assert True, "Model app controls test passes with parameter checking only"
 
+
 def test_component_lifecycle():
     """Test component lifecycle and cleanup."""
     model = mesa.examples["schelling"]["model"]()
@@ -204,7 +209,7 @@ def test_component_lifecycle():
 
     # Test initialization and cleanup
     viz = SolaraVisualization(model=model)
-    
+
     # Skip attribute testing in mock environment
     try:
         assert hasattr(viz, "model")
@@ -218,6 +223,7 @@ def test_component_lifecycle():
         # For mocked environment, just verify the function accepts parameters
         assert True, "Component lifecycle test passes with parameter checking only"
 
+
 def test_responsive_behavior():
     """Test responsive behavior of components."""
     model = mesa.examples["wolf_sheep"]["model"]()
@@ -225,7 +231,7 @@ def test_responsive_behavior():
     # Test grid responsiveness
     grid = SolaraGrid(model=model)
     chart = SolaraChart(model=model)
-    
+
     # Skip attribute testing in mock environment
     try:
         assert hasattr(grid, "responsive")
