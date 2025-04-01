@@ -5,19 +5,10 @@ to ensure they function correctly across all example models.
 These tests validate visualization correctness without requiring a browser.
 """
 
-import ipyvuetify as v
-import numpy as np
 import pytest
-import solara
 
 from mesa import Model
 from mesa.agent import Agent
-from mesa.examples import (
-    BoltzmannWealth,
-    ConwaysGameOfLife,
-    Schelling,
-    VirusOnNetwork,
-)
 from mesa.space import MultiGrid, PropertyLayer
 from mesa.visualization import make_plot_component
 from mesa.visualization.components.altair_components import (
@@ -104,25 +95,28 @@ class TestMatplotlibComponents(TestBaseVisualizationComponents):
         """Test that matplotlib space component can be created."""
         component = make_mpl_space_component(self.agent_portrayal)
         assert callable(component), "Component should be callable"
-        
+
         viz_component = component(mock_model)
         assert viz_component is not None, "Visualization component should not be None"
-        assert "SpaceMatplotlib" in str(viz_component), "Component should be a SpaceMatplotlib"
+        assert "SpaceMatplotlib" in str(viz_component), (
+            "Component should be a SpaceMatplotlib"
+        )
 
     def test_mpl_plot_component(self, mock_model):
         """Test that matplotlib plot component can be created."""
         component = make_mpl_plot_component({"data1": "red", "data2": "blue"})
         assert callable(component), "Component should be callable"
-        
+
         def post_process(fig, ax):
             ax.set_title("Test Plot")
-        
+
         component_with_custom = make_mpl_plot_component(
             {"data1": "red"},
-            
             post_process=post_process,
         )
-        assert callable(component_with_custom), "Component with custom post-processing should be callable"
+        assert callable(component_with_custom), (
+            "Component with custom post-processing should be callable"
+        )
 
 
 class TestAltairComponents(TestBaseVisualizationComponents):
@@ -132,24 +126,28 @@ class TestAltairComponents(TestBaseVisualizationComponents):
         """Test that Altair space component can be created."""
         component = make_altair_space(self.agent_portrayal)
         assert callable(component), "Component should be callable"
-        
+
         component_with_layers = make_altair_space(
             self.agent_portrayal, propertylayer_portrayal=self.propertylayer_portrayal()
         )
-        assert callable(component_with_layers), "Component with layers should be callable"
+        assert callable(component_with_layers), (
+            "Component with layers should be callable"
+        )
 
     def test_altair_plot_component(self, mock_model):
         """Test that Altair plot component can be created."""
         component = make_plot_component({"data1": "red", "data2": "blue"})
         assert callable(component), "Component should be callable"
-        
+
         def post_process(chart):
             return chart.properties(title="Test Plot")
-        
+
         component_with_custom = make_plot_component(
             {"data1": "red"}, post_process=post_process
         )
-        assert callable(component_with_custom), "Component with custom post-processing should be callable"
+        assert callable(component_with_custom), (
+            "Component with custom post-processing should be callable"
+        )
 
 
 class TestExampleModelVisualizations:
@@ -160,14 +158,14 @@ class TestExampleModelVisualizations:
         try:
             from mesa.examples.basic.schelling.app import agent_portrayal, model_params
             from mesa.examples.basic.schelling.model import Schelling
-            
+
             model = Schelling(seed=42)
             component = make_altair_space(agent_portrayal)
             assert callable(component), "Component should be callable"
-            
+
             viz = SolaraViz(model, components=[component], model_params=model_params)
             assert viz is not None, "SolaraViz should create a visualization object"
-            
+
         except (ImportError, AttributeError):
             pass
 
@@ -176,11 +174,11 @@ class TestExampleModelVisualizations:
         try:
             from mesa.examples.basic.conways_game_of_life.app import agent_portrayal
             from mesa.examples.basic.conways_game_of_life.model import ConwaysGameOfLife
-            
+
             model = ConwaysGameOfLife(seed=42)
             component = make_altair_space(agent_portrayal)
             assert callable(component), "Component should be callable"
-            
+
         except (ImportError, AttributeError):
             pass
 
@@ -189,10 +187,10 @@ class TestExampleModelVisualizations:
         try:
             from mesa.examples.basic.virus_on_network.app import agent_portrayal
             from mesa.examples.basic.virus_on_network.model import VirusOnNetwork
-            
+
             model = VirusOnNetwork(seed=42)
             assert hasattr(model, "grid"), "Model should have grid attribute"
-            
+
         except (ImportError, AttributeError):
             pass
 
@@ -201,11 +199,11 @@ class TestExampleModelVisualizations:
         try:
             from mesa.examples.basic.boltzmann_wealth_model.app import agent_portrayal
             from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealth
-            
+
             model = BoltzmannWealth(seed=42)
             component = make_altair_space(agent_portrayal)
             assert callable(component), "Component should be callable"
-            
+
         except (ImportError, AttributeError):
             pass
 
@@ -217,17 +215,17 @@ class TestSolaraVizController:
         """Test the SolaraViz model controller can be initialized."""
         try:
             from mesa.examples.basic.schelling.model import Schelling
-            
+
             model = Schelling(seed=42)
-            
+
             def agent_portrayal(agent):
                 return {"color": "orange" if agent.type == 0 else "blue", "marker": "o"}
-            
+
             component = make_altair_space(agent_portrayal)
             viz = SolaraViz(model, components=[component], play_interval=10)
-            
+
             assert viz is not None, "SolaraViz should create a visualization object"
-            
+
         except (ImportError, AttributeError):
             pass
 
@@ -237,9 +235,10 @@ class TestPerformanceBenchmarks:
 
     def test_performance_benchmarks(self):
         """Test for visualization performance benchmarks."""
+
         def agent_portrayal(agent):
             return {"color": "red", "marker": "o", "size": 5}
-            
+
         component = make_altair_space(agent_portrayal)
         assert callable(component), "Component should be callable"
 
