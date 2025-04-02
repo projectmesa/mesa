@@ -27,6 +27,7 @@ import asyncio
 import inspect
 import threading
 import time
+import traceback
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
@@ -273,7 +274,9 @@ def ModelController(
                 if use_threads.value:
                     visualization_pause_event.set()
         except Exception as e:
-            print(f"Error in step: {e}")
+            debug = input(f"Error in step: {e}. Press 'e' for full traceback ")
+            if debug == "e":
+                traceback.print_exc()
             return
 
     def visualization_task():
@@ -284,7 +287,11 @@ def ModelController(
                     visualization_pause_event.clear()
                     force_update()
             except Exception as e:
-                print(f"Error in visualization_task: {e}")
+                debug = print(
+                    f"Error in visualization_task: {e}. Press 'e' for full traceback "
+                )
+                if debug == "e":
+                    traceback.print_exc()
 
     solara.lab.use_task(
         step, dependencies=[playing.value, running.value], prefer_threaded=True
