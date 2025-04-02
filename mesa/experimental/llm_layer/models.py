@@ -1,5 +1,7 @@
-from mesa import Model
 from agents import BasicAgent, CognitiveAgent
+
+from mesa import Model
+
 
 class HybridModel(Model):
     def __init__(self, num_agents, orchestrator):
@@ -15,10 +17,9 @@ class HybridModel(Model):
         self.agents.shuffle_do("step")
 
 
-
-
 def llm_collect(agent, state):
     return f"[LLM] Reasoned to collect based on memory length {len(state['memory'])}"
+
 
 def wait_tool(agent, state):
     return "[RULE] Wait due to uncertainty or cooldown"

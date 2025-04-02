@@ -11,7 +11,9 @@ class Orchestrator:
         self.edges.setdefault(from_node, []).append(to_node)
 
     def add_conditional_edges(self, from_node, condition_fn):
-        self.edges[from_node] = [(condition_fn, target) for target in self.nodes if target != from_node]
+        self.edges[from_node] = [
+            (condition_fn, target) for target in self.nodes if target != from_node
+        ]
 
     def execute_graph(self, start_node, agent, state):
         current_node = start_node
