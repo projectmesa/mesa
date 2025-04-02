@@ -79,19 +79,10 @@ def SpaceAltair(
         # Sometimes the space is defined as model.space instead of model.grid
         space = model.space
 
-    try:
-        chart = _draw_grid(space, agent_portrayal, propertylayer_portrayal)
-        # Apply post-processing if provided
-        if post_process is not None:
-            chart = post_process(chart)
-    except Exception as e:
-        # If chart creation fails but we have a post_process, call it with a minimal chart
-        if post_process is not None:
-            # Create a minimal chart for post-processing
-            minimal_chart = alt.Chart().mark_point()
-            post_process(minimal_chart)
-        # Re-raise the exception to maintain the original error behavior
-        raise e
+    chart = _draw_grid(space, agent_portrayal, propertylayer_portrayal)
+    # Apply post-processing if provided
+    if post_process is not None:
+        chart = post_process(chart)
 
     solara.FigureAltair(chart)
 
