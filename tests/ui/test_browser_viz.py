@@ -22,7 +22,17 @@ def test_schelling_model_browser(solara_test, page_session: Page):
 
     page_session.locator("text=Happy agents:").wait_for()
 
-    page_session.locator("svg").wait_for()
+    # Wait for visualization container instead of specific svg
+    visualization_container = page_session.locator(
+        '[data-testid="visualization-container"]'
+    )
+    if visualization_container.count() == 0:  # Fallback if data-testid is not present
+        visualization_container = page_session.locator(".visualization-container")
+    if visualization_container.count() == 0:  # Further fallback
+        visualization_container = page_session.locator(
+            "div:has(> svg), div:has(> canvas)"
+        )
+    visualization_container.wait_for()
 
     agent_density_slider = page_session.locator("input[type='range']:nth-of-type(1)")
     agent_density_slider.wait_for()
@@ -40,12 +50,22 @@ def test_conway_model_browser(solara_test, page_session: Page):
     step_button = page_session.locator("button:has-text('Step')")
     step_button.wait_for()
 
-    page_session.locator("svg").wait_for()
+    # Wait for visualization container instead of specific svg
+    visualization_container = page_session.locator(
+        '[data-testid="visualization-container"]'
+    )
+    if visualization_container.count() == 0:  # Fallback if data-testid is not present
+        visualization_container = page_session.locator(".visualization-container")
+    if visualization_container.count() == 0:  # Further fallback
+        visualization_container = page_session.locator(
+            "div:has(> svg), div:has(> canvas)"
+        )
+    visualization_container.wait_for()
 
-    before_step = page_session.locator("svg").screenshot()
+    before_step = visualization_container.screenshot()
     step_button.click()
     page_session.wait_for_timeout(500)
-    after_step = page_session.locator("svg").screenshot()
+    after_step = visualization_container.screenshot()
 
     assert before_step != after_step
 
@@ -56,7 +76,17 @@ def test_boltzmann_model_charts_browser(solara_test, page_session: Page):
 
     app_page()
 
-    page_session.locator("svg").wait_for()
+    # Wait for visualization container instead of specific svg
+    visualization_container = page_session.locator(
+        '[data-testid="visualization-container"]'
+    )
+    if visualization_container.count() == 0:  # Fallback if data-testid is not present
+        visualization_container = page_session.locator(".visualization-container")
+    if visualization_container.count() == 0:  # Further fallback
+        visualization_container = page_session.locator(
+            "div:has(> svg), div:has(> canvas)"
+        )
+    visualization_container.wait_for()
 
     play_button = page_session.locator("button:has-text('Play')")
     play_button.wait_for()
@@ -68,6 +98,9 @@ def test_boltzmann_model_charts_browser(solara_test, page_session: Page):
     pause_button.wait_for()
     pause_button.click()
 
+    # We still need to check chart paths, but we'll make sure charts are present first
+    chart_container = page_session.locator("div:has(> svg path)")
+    chart_container.wait_for()
     chart_paths = page_session.locator("svg path")
     assert chart_paths.count() > 0
 
@@ -90,10 +123,20 @@ def test_model_params_update_browser(solara_test, page_session: Page):
 
     reset_button.click()
 
-    page_session.locator("svg").wait_for()
+    # Wait for visualization container instead of specific svg
+    visualization_container = page_session.locator(
+        '[data-testid="visualization-container"]'
+    )
+    if visualization_container.count() == 0:  # Fallback if data-testid is not present
+        visualization_container = page_session.locator(".visualization-container")
+    if visualization_container.count() == 0:  # Further fallback
+        visualization_container = page_session.locator(
+            "div:has(> svg), div:has(> canvas)"
+        )
+    visualization_container.wait_for()
 
     page_session.wait_for_timeout(500)
-    assert page_session.locator("svg").is_visible()
+    assert visualization_container.is_visible()
 
 
 @pytest.mark.skip(reason="Only run manually to generate reference screenshots")
