@@ -1,7 +1,10 @@
 """tests for mesa visualization components."""
 
+import time
+
 import pytest
 
+from mesa import Agent, Model
 from mesa.visualization.components import make_altair_space
 
 
@@ -74,3 +77,25 @@ def test_example_models_compatible_with_altair(model_path, portrayal_path):
         assert callable(component), "Component should be callable"
     except ImportError:
         pytest.skip("Example model not available")
+
+
+def test_performance_benchmarks():
+    """Performance benchmarks for visualization components."""
+    # Create a basic model
+    model = Model()
+
+    # Add some agents to the model
+    for _ in range(10):
+        Agent(model)
+
+    # Benchmark make_altair_space component creation time
+    start_time = time.time()
+    component = make_altair_space(agent_portrayal)
+    creation_time = time.time() - start_time
+
+    # This is just a basic benchmark - we're not asserting specific times
+    # as they will vary by machine, but we can log the time
+    print(f"Altair space component creation time: {creation_time:.5f} seconds")
+
+    # Make sure the component is created successfully
+    assert callable(component)
