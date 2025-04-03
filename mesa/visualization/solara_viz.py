@@ -287,7 +287,7 @@ def ModelController(
                     visualization_pause_event.clear()
                     force_update()
             except Exception as e:
-                debug = print(
+                debug = input(
                     f"Error in visualization_task: {e}. Press 'e' for full traceback "
                 )
                 if debug == "e":
