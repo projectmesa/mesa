@@ -15,6 +15,6 @@ Notes:
     - Features graduate from experimental status once their APIs are stabilized
 """
 
-from mesa.experimental import continuous_space, devs, mesa_signals
+from mesa.experimental import continuous_space, devs, mesa_signals, meta_agents
 
-__all__ = ["continuous_space", "devs", "mesa_signals"]
+__all__ = ["continuous_space", "devs", "mesa_signals", "meta_agents"]

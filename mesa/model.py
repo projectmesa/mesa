@@ -144,25 +144,20 @@ class Model:
         """A dictionary where the keys are agent types and the values are the corresponding AgentSets."""
         return self._agents_by_type
 
-    def register_agent(self, agent):
+    def register_agent(self, agent, key_by_name: bool = False):
         """Register the agent with the model.
 
         Args:
             agent: The agent to register.
-
-        Notes:
-            This method is called automatically by ``Agent.__init__``, so there is no need to use this
-            if you are subclassing Agent and calling its super in the ``__init__`` method.
-
+            key_by_name (bool): If True, use Agent.__name__ as the key in the agents_by_type dictionary.
         """
         self._agents[agent] = None
 
-        # because AgentSet requires model, we cannot use defaultdict
-        # tricks with a function won't work because model then cannot be pickled
+        key = agent.__class__.__name__ if key_by_name else type(agent)
         try:
-            self._agents_by_type[type(agent)].add(agent)
+            self._agents_by_type[key].add(agent)
         except KeyError:
-            self._agents_by_type[type(agent)] = AgentSet(
+            self._agents_by_type[key] = AgentSet(
                 [
                     agent,
                 ],
@@ -174,18 +169,17 @@ class Model:
             f"registered {agent.__class__.__name__} with agent_id {agent.unique_id}"
         )
 
-    def deregister_agent(self, agent):
+    def deregister_agent(self, agent, key_by_name: bool = False):
         """Deregister the agent with the model.
 
         Args:
             agent: The agent to deregister.
-
-        Notes:
-            This method is called automatically by ``Agent.remove``
-
+            key_by_name (bool): If True, use Agent.__name__ as the key in the agents_by_type dictionary.
         """
         del self._agents[agent]
-        self._agents_by_type[type(agent)].remove(agent)
+
+        key = agent.__class__.__name__ if key_by_name else type(agent)
+        self._agents_by_type[key].remove(agent)
         self._all_agents.remove(agent)
         _mesa_logger.debug(f"deregistered agent with agent_id {agent.unique_id}")
 
