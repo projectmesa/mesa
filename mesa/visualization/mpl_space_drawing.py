@@ -12,6 +12,11 @@ from collections.abc import Callable
 from functools import lru_cache
 from itertools import pairwise
 from typing import Any
+<<<<<<< HEAD
+=======
+from typing import List
+import numpy as np
+>>>>>>> b55ec67 (Updated the requested changes)
 
 import networkx as nx
 import numpy as np
@@ -51,27 +56,77 @@ def collect_agent_data(
     default_size=25,
     default_marker="o",
     default_zorder: int = 1,
+<<<<<<< HEAD
 ) -> list[AgentPortrayalStyle]:
     """Collect agent portrayal data efficiently in one loop."""
     agent_data_list = []
+=======
+):
+    """Collect agent portrayal data and convert to NumPy arrays early to avoid redundant iteration."""
+
+    color_list = []
+    size_list = []
+    marker_list = []
+    zorder_list = []
+    alpha_list = []
+    linewidths_list = []
+    edgecolors_list = []
+    loc_list = []
+>>>>>>> b55ec67 (Updated the requested changes)
 
     for agent in space.agents:
-        portrayal_dict = agent_portrayal(agent) or {}
+        portrayal = agent_portrayal(agent)
 
-        agent_data_list.append(
-            AgentPortrayalStyle(
-                color=portrayal_dict.get("color", default_color),
-                size=portrayal_dict.get("size", default_size),
-                marker=portrayal_dict.get("marker", default_marker),
-                zorder=portrayal_dict.get("zorder", default_zorder),
-                alpha=portrayal_dict.get("alpha", 1.0),
-                linewidths=portrayal_dict.get("linewidths", 1.0),
-                edgecolors=portrayal_dict.get("edgecolors", "black"),
-                loc=agent.pos if agent.pos is not None else (0, 0),  # Store location
+        if portrayal is None:
+            portrayal = AgentPortrayalStyle(
+                color=default_color,
+                size=default_size,
+                marker=default_marker,
+                zorder=default_zorder,
+                alpha=1.0,
+                linewidths=1.0,
+                edgecolors="black",
+                loc=agent.pos if agent.pos is not None else (0, 0),
             )
-        )
 
-    return agent_data_list
+        elif isinstance(portrayal, dict):
+            warnings.warn(
+                "Agent portrayal returned a dictionary, automatically converting to AgentPortrayalStyle. "
+                "Consider returning an AgentPortrayalStyle instance directly.",
+                UserWarning,
+            )
+            portrayal = AgentPortrayalStyle(
+                color=portrayal.get("color", default_color),
+                size=portrayal.get("size", default_size),
+                marker=portrayal.get("marker", default_marker),
+                zorder=portrayal.get("zorder", default_zorder),
+                alpha=portrayal.get("alpha", 1.0),
+                linewidths=portrayal.get("linewidths", 1.0),
+                edgecolors=portrayal.get("edgecolors", "black"),
+                loc=agent.pos if hasattr(agent, "pos") else getattr(agent, "cell", None) and agent.cell.coordinate,
+            )
+
+        color_list.append(portrayal.color)
+        size_list.append(portrayal.size)
+        marker_list.append(portrayal.marker)
+        zorder_list.append(portrayal.zorder)
+        alpha_list.append(portrayal.alpha)
+        linewidths_list.append(portrayal.linewidths)
+        edgecolors_list.append(portrayal.edgecolors)
+        loc_list.append(portrayal.loc)
+
+    # Convert all to numpy arrays
+    return {
+        "color": np.array(color_list),
+        "size": np.array(size_list),
+        "marker": np.array(marker_list),
+        "zorder": np.array(zorder_list),
+        "alpha": np.array(alpha_list),
+        "linewidths": np.array(linewidths_list),
+        "edgecolors": np.array(edgecolors_list),
+        "loc": np.array(loc_list),
+    }
+
 
 
 def draw_space(
@@ -308,9 +363,16 @@ def draw_orthogonal_grid(
 
     # gather agent data
     s_default = (180 / max(space.width, space.height)) ** 2
+    
+    style = AgentPortrayalStyle()
     arguments = collect_agent_data(
+<<<<<<< HEAD
         space, agent_portrayal, default_color="tab:red", default_size=30
     )
+=======
+    space, agent_portrayal, style=style)
+
+>>>>>>> b55ec67 (Updated the requested changes)
 
     # plot the agents
     _scatter(ax, arguments, **kwargs)
@@ -446,6 +508,22 @@ def draw_network(
         else:
             agent_style.loc = (0, 0)  # Fallback to (0,0) if node not found
 
+<<<<<<< HEAD
+=======
+    # Pre-allocate all needed fields in one pass
+    s, c, marker, zorder, loc, alpha, edgecolors, linewidths = [], [], [], [], [], [], [], []
+
+    for a in agent_data_list:
+        s.append(a.size)
+        c.append(a.color)
+        marker.append(a.marker)
+        zorder.append(a.zorder)
+        loc.append(a.loc)
+        alpha.append(a.alpha)
+        edgecolors.append(a.edgecolors)
+        linewidths.append(a.linewidths)
+
+>>>>>>> b55ec67 (Updated the requested changes)
     # Convert data for plotting
     scatter_data = {
         "s": [a.size for a in agent_data_list],
@@ -606,11 +684,19 @@ def _scatter(ax: Axes, arguments, **kwargs):
     x = loc[:, 0]
     y = loc[:, 1]
 
-    marker = [agent_data.marker for agent_data in arguments]
-    zorder = [agent_data.zorder for agent_data in arguments]
-    edgecolors = [agent_data.edgecolors for agent_data in arguments]
-    linewidths = [agent_data.linewidths for agent_data in arguments]
-    alpha = [agent_data.alpha for agent_data in arguments]
+    marker = []
+    zorder = []
+    edgecolors = []
+    linewidths = []
+    alpha = []
+
+    for agent_data in arguments:
+        marker.append(agent_data.marker)
+        zorder.append(agent_data.zorder)
+        edgecolors.append(agent_data.edgecolors)
+        linewidths.append(agent_data.linewidths)
+        alpha.append(agent_data.alpha)
+
 
     # Check for edgecolor, linewidth, and alpha conflicts with kwargs
     for entry, values in zip(

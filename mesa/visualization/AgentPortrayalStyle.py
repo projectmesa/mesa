@@ -5,9 +5,9 @@ from dataclasses import dataclass
 class AgentPortrayalStyle:
     """Dataclass to define agent portrayal styles in a proper structured way."""
 
-    color: str = "red"
+    color: str = "tab:red"
     marker: str = "o"
-    size: int = 10
+    size: int = 30
     zorder: int = 1
     alpha: float = 1.0  # Supports transparency
     linewidths: float = 1.0  # line width for markers
