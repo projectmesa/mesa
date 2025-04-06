@@ -174,9 +174,10 @@ def _model_run_func(
     while model.running and model.steps <= max_steps:
         model.step()
         # Fix for Issue #2514: collect final step's data
+
+
 if self.collect_data and hasattr(model, "datacollector"):
     model.datacollector.collect(model)
-
 
     data = []
 
