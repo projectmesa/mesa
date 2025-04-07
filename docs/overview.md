@@ -299,4 +299,21 @@ This will create an interactive visualization of your model, including:
 - A plot of a model metric over time
 - A slider to adjust the number of agents
 
-You can also create custom visualization components using Matplotlib. For more advanced usage and customization options, please refer to the [visualization tutorial](tutorials/visualization_tutorial).
+```{toctree}
+:hidden: true
+:maxdepth: 7
+
+Overview <overview>
+Creating Your First Model <tutorials/0_first_model>
+Adding Space <tutorials/1_adding_space>
+Collecting Data <tutorials/2_collecting_data>
+AgentSet <tutorials/3_agentset>
+Basic Visualization <tutorials/4_visualization_basic>
+Dynamic Agent Visualization <tutorials/5_visualization_dynamic_agents>
+Custom Visualization Components <tutorials/6_visualization_custom>
+Parameter Sweeps <tutorials/7_batch_run>
+Comparing Scenarios <tutorials/8_comparing_scenarios>
+Best Practices <best-practices>
+
+
+```
