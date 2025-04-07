@@ -10,9 +10,8 @@ import solara
 from matplotlib.figure import Figure
 
 from mesa.visualization.AgentPortrayalStyle import AgentPortrayalStyle
-from mesa.visualization.mpl_space_drawing import draw_space
+from mesa.visualization.mpl_space_drawing import collect_agent_data, draw_space
 from mesa.visualization.utils import update_counter
-from mesa.visualization.mpl_space_drawing import collect_agent_data
 
 
 def make_space_matplotlib(*args, **kwargs):  # noqa: D103
@@ -31,8 +30,8 @@ def make_mpl_space_component(
     **space_drawing_kwargs,
 ) -> Callable:
     """Create a Matplotlib-based space visualization component."""
-
     if agent_portrayal is None:
+
         def agent_portrayal(a):
             return AgentPortrayalStyle()
 
@@ -46,7 +45,6 @@ def make_mpl_space_component(
         )
 
     return MakeSpaceMatplotlib  # <-- Fix: Return the function
-
 
 
 @solara.component

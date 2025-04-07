@@ -12,8 +12,6 @@ from collections.abc import Callable
 from functools import lru_cache
 from itertools import pairwise
 from typing import Any
-from typing import List
-import numpy as np
 
 import networkx as nx
 import numpy as np
@@ -68,7 +66,6 @@ def collect_agent_data(
     edgecolors_list = []
     loc_list = []
 
-
     for agent in space.agents:
         portrayal = agent_portrayal(agent)
 
@@ -98,7 +95,9 @@ def collect_agent_data(
                 alpha=portrayal.get("alpha", 1.0),
                 linewidths=portrayal.get("linewidths", 1.0),
                 edgecolors=portrayal.get("edgecolors", "black"),
-                loc=agent.pos if hasattr(agent, "pos") else getattr(agent, "cell", None) and agent.cell.coordinate,
+                loc=agent.pos
+                if hasattr(agent, "pos")
+                else getattr(agent, "cell", None) and agent.cell.coordinate,
             )
 
         color_list.append(portrayal.color)
@@ -121,7 +120,6 @@ def collect_agent_data(
         "edgecolors": np.array(edgecolors_list),
         "loc": np.array(loc_list),
     }
-
 
 
 def draw_space(
@@ -358,12 +356,9 @@ def draw_orthogonal_grid(
 
     # gather agent data
     s_default = (180 / max(space.width, space.height)) ** 2
-    
+
     style = AgentPortrayalStyle()
-    arguments = collect_agent_data(
-    space, agent_portrayal, style=style)
-
-
+    arguments = collect_agent_data(space, agent_portrayal, style=style)
 
     # plot the agents
     _scatter(ax, arguments, **kwargs)
@@ -499,9 +494,17 @@ def draw_network(
         else:
             agent_style.loc = (0, 0)  # Fallback to (0,0) if node not found
 
-
     # Pre-allocate all needed fields in one pass
-    s, c, marker, zorder, loc, alpha, edgecolors, linewidths = [], [], [], [], [], [], [], []
+    s, c, marker, zorder, loc, alpha, edgecolors, linewidths = (
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+    )
 
     for a in agent_data_list:
         s.append(a.size)
@@ -512,7 +515,6 @@ def draw_network(
         alpha.append(a.alpha)
         edgecolors.append(a.edgecolors)
         linewidths.append(a.linewidths)
-
 
     # Convert data for plotting
     scatter_data = {
@@ -686,7 +688,6 @@ def _scatter(ax: Axes, arguments, **kwargs):
         edgecolors.append(agent_data.edgecolors)
         linewidths.append(agent_data.linewidths)
         alpha.append(agent_data.alpha)
-
 
     # Check for edgecolor, linewidth, and alpha conflicts with kwargs
     for entry, values in zip(
