@@ -12,11 +12,8 @@ from collections.abc import Callable
 from functools import lru_cache
 from itertools import pairwise
 from typing import Any
-<<<<<<< HEAD
-=======
 from typing import List
 import numpy as np
->>>>>>> b55ec67 (Updated the requested changes)
 
 import networkx as nx
 import numpy as np
@@ -56,12 +53,10 @@ def collect_agent_data(
     default_size=25,
     default_marker="o",
     default_zorder: int = 1,
-<<<<<<< HEAD
 ) -> list[AgentPortrayalStyle]:
     """Collect agent portrayal data efficiently in one loop."""
     agent_data_list = []
-=======
-):
+
     """Collect agent portrayal data and convert to NumPy arrays early to avoid redundant iteration."""
 
     color_list = []
@@ -72,7 +67,7 @@ def collect_agent_data(
     linewidths_list = []
     edgecolors_list = []
     loc_list = []
->>>>>>> b55ec67 (Updated the requested changes)
+
 
     for agent in space.agents:
         portrayal = agent_portrayal(agent)
@@ -366,13 +361,9 @@ def draw_orthogonal_grid(
     
     style = AgentPortrayalStyle()
     arguments = collect_agent_data(
-<<<<<<< HEAD
-        space, agent_portrayal, default_color="tab:red", default_size=30
-    )
-=======
     space, agent_portrayal, style=style)
 
->>>>>>> b55ec67 (Updated the requested changes)
+
 
     # plot the agents
     _scatter(ax, arguments, **kwargs)
@@ -508,8 +499,7 @@ def draw_network(
         else:
             agent_style.loc = (0, 0)  # Fallback to (0,0) if node not found
 
-<<<<<<< HEAD
-=======
+
     # Pre-allocate all needed fields in one pass
     s, c, marker, zorder, loc, alpha, edgecolors, linewidths = [], [], [], [], [], [], [], []
 
@@ -523,7 +513,7 @@ def draw_network(
         edgecolors.append(a.edgecolors)
         linewidths.append(a.linewidths)
 
->>>>>>> b55ec67 (Updated the requested changes)
+
     # Convert data for plotting
     scatter_data = {
         "s": [a.size for a in agent_data_list],
