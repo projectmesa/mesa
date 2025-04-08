@@ -128,8 +128,8 @@ def create_meta_agent(
     new_agent_class: str,
     agents: Iterable[Any],
     mesa_agent_type=Agent,
-    meta_attributes: dict[str, Any] = dict(),  # noqa B006
-    meta_methods: dict[str, Callable] = dict(),  # noqa B006
+    meta_attributes: dict[str, Any] = None,
+    meta_methods: dict[str, Callable] = None,  # noqa B006
     assume_subagent_methods: bool = False,
     assume_subagent_attributes: bool = False,
 ) -> Any | None:
@@ -178,9 +178,10 @@ def create_meta_agent(
                         original_method = getattr(agent_class, name)
                         meta_methods[name] = original_method
 
-        for name, meth in meta_methods.items():
-            bound_method = MethodType(meth, meta_agent_instance)
-            setattr(meta_agent_instance, name, bound_method)
+        if meta_methods is not None:
+            for name, meth in meta_methods.items():
+                bound_method = MethodType(meth, meta_agent_instance)
+                setattr(meta_agent_instance, name, bound_method)
 
     def add_attributes(
         meta_agent_instance: Any, agents: Iterable[Any], meta_attributes: dict[str, Any]
@@ -199,8 +200,9 @@ def create_meta_agent(
                     if not callable(value):
                         meta_attributes[name] = value
 
-        for key, value in meta_attributes.items():
-            setattr(meta_agent_instance, key, value)
+        if meta_attributes is not None:
+            for key, value in meta_attributes.items():
+                setattr(meta_agent_instance, key, value)
 
     # Path 1 - Add agents to existing meta-agent
     subagents = [a for a in agents if hasattr(a, "meta_agent")]
