@@ -115,7 +115,9 @@ class Simulator:
                 event = self.event_list.pop_event()
             except IndexError:  # event list is empty
                 self.time = end_time
-                break
+                # Wait briefly instead of stopping
+                time.sleep(0.1)  # Adjust the sleep time if needed
+                continue
 
             if event.time <= end_time:
                 self.time = event.time
@@ -353,7 +355,9 @@ class ABMSimulator(Simulator):
                 event = self.event_list.pop_event()
             except IndexError:
                 self.time = end_time
-                break
+                # Wait briefly instead of stopping
+                time.sleep(0.1)  # Adjust the sleep time if needed
+                continue
 
             # fixme: the alternative would be to wrap model.step with an annotation which
             #  handles this scheduling.
