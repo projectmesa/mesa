@@ -287,7 +287,7 @@ def ModelController(
                     visualization_pause_event.wait()
                     visualization_pause_event.clear()
                     force_update()
-                    
+
             except Exception as e:
                 error_message.value = f"error in visualization: {e}"
                 traceback.print_exc()
