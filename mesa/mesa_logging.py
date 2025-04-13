@@ -5,10 +5,15 @@ It is modeled on the default `logging approach that comes with Python <https://d
 
 """
 
-import inspect
-import logging
-from functools import wraps
-from logging import DEBUG, INFO
+import solara
+import functools
+
+def exposed_component(func):
+    @solara.component
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
 
 __all__ = [
     "DEBUG",
@@ -127,12 +132,14 @@ def function_logger(name):
 
     def real_decorator(func):
         @wraps(func)
-        def wrapper(*args, **kwargs):
-            logger.debug(f"calling {func.__name__} with {args} and {kwargs}")
-            res = func(*args, **kwargs)
-            return res
+        from functools import wraps
 
-        return wrapper
+def component(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        ...
+    return wrapper
+
 
     return real_decorator
 
