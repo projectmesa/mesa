@@ -85,15 +85,6 @@ class PropertyLayer:
         # fixme why not initialize with empty?
         self._mesa_data = np.full(self.dimensions, default_value, dtype=dtype)
 
-        if not self.__class__.propertylayer_experimental_warning_given:
-            warnings.warn(
-                "The property layer functionality and associated classes are experimental. It may be changed or removed in any and all future releases, including patch releases.\n"
-                "We would love to hear what you think about this new feature. If you have any thoughts, share them with us here: https://github.com/projectmesa/mesa/discussions/1932",
-                FutureWarning,
-                stacklevel=2,
-            )
-            self.__class__.propertylayer_experimental_warning_given = True
-
     @classmethod
     def from_data(cls, name: str, data: np.ndarray):
         """Create a property layer from a NumPy array.
