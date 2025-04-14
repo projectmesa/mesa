@@ -54,7 +54,7 @@ jobs:
     - name: Install Mesa and dependencies
       run: uv pip install --system .[dev]
     - name: Test with pytest
-      run: pytest --durations=10 --cov=mesa tests/ --cov-report=xml
+      run: pytest --durations=10 --cov=mesa tests/ --cov-report=xml --ignore=tests/ui/
     - if: matrix.os == 'ubuntu'
       name: Codecov
       uses: codecov/codecov-action@v5

@@ -97,7 +97,7 @@ class PropertyLayer:
         layer = cls(
             name,
             data.shape,
-            default_value=data[*[0 for _ in range(len(data.shape))]],
+            default_value=data[tuple(0 for _ in range(len(data.shape)))],
             dtype=data.dtype.type,
         )
         layer.set_cells(data)
@@ -312,7 +312,7 @@ class HasPropertyLayers:
         # Convert the neighborhood list to a NumPy array and use advanced indexing
         coords = np.array([c.coordinate for c in neighborhood])
         indices = [coords[:, i] for i in range(coords.shape[1])]
-        mask[*indices] = True
+        mask[tuple(indices)] = True
         return mask
 
     def select_cells(
