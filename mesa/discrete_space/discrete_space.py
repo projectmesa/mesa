@@ -86,12 +86,20 @@ class DiscreteSpace(Generic[T]):
     def _connect_single_cell(self, cell: T): ...
 
     def add_cell(self, cell: T):
+        """Add a cell to the space.
+
+        Args:
+            cell: cell to add
+
+        """
         self.all_cells.clear_cache()
         self._cells[cell.coordinate] = cell
 
     def remove_cell(self, cell: T):
+        """Remove a cell from the space."""
+
         neighbors = cell.neighborhood
-        self._cells.pop(cell.coordinate, None)
+        self._cells.pop(cell.coordinate)
         self.all_cells.clear_cache()
 
         # iterate over all neighbors
@@ -99,10 +107,12 @@ class DiscreteSpace(Generic[T]):
             neighbor.disconnect(cell)
 
     def add_connection(self, cell1: T, cell2: T):
+        """add a connection between the two cells."""
         cell1.connect(cell2)
         cell2.connect(cell1)
 
     def remove_connection(self, cell1: T, cell2: T):
+        """remove a connection between the two cells."""
         cell1.connect(cell2)
         cell2.connect(cell1)
 
