@@ -85,7 +85,7 @@ class DiscreteSpace(Generic[T]):
     def _connect_cells(self): ...
     def _connect_single_cell(self, cell: T): ...
 
-    def add_cell(self, cell:T):
+    def add_cell(self, cell: T):
         self.all_cells.clear_cache()
         self._cells[cell.coordinate] = cell
 
@@ -98,11 +98,11 @@ class DiscreteSpace(Generic[T]):
         for neighbor in neighbors.cells:
             neighbor.disconnect(cell)
 
-    def add_connection(self, cell1:T, cell2:T):
+    def add_connection(self, cell1: T, cell2: T):
         cell1.connect(cell2)
         cell2.connect(cell1)
 
-    def remove_connection(self, cell1:T, cell2:T):
+    def remove_connection(self, cell1: T, cell2: T):
         cell1.connect(cell2)
         cell2.connect(cell1)
 

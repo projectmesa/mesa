@@ -89,7 +89,6 @@ class Cell:
         self._neighborhood.cache_clear()
         self.connections[key] = other
 
-
     def disconnect(self, other: Cell) -> None:
         """Disconnects this cell from another cell.
 
@@ -102,7 +101,9 @@ class Cell:
             del self.connections[key]
 
         self.get_neighborhood.cache_clear()
-        self.__dict__.pop("neighborhood", None)  # cached properties are stored in the dic, see functools.cached_property docs
+        self.__dict__.pop(
+            "neighborhood", None
+        )  # cached properties are stored in the dic, see functools.cached_property docs
         self._neighborhood.cache_clear()
 
     def add_agent(self, agent: CellAgent) -> None:
