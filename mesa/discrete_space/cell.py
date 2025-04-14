@@ -85,7 +85,9 @@ class Cell:
         if key is None:
             key = other.coordinate
         self.get_neighborhood.cache_clear()
-        self.__dict__.pop("neighborhood", None)  # cached properties are stored in __dict__, see functools.cached_property docs
+        self.__dict__.pop(
+            "neighborhood", None
+        )  # cached properties are stored in __dict__, see functools.cached_property docs
         self._neighborhood.cache_clear()
         self.connections[key] = other
 
