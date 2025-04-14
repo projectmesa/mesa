@@ -97,7 +97,6 @@ class DiscreteSpace(Generic[T]):
 
     def remove_cell(self, cell: T):
         """Remove a cell from the space."""
-
         neighbors = cell.neighborhood
         self._cells.pop(cell.coordinate)
         self.all_cells.clear_cache()
@@ -107,12 +106,12 @@ class DiscreteSpace(Generic[T]):
             neighbor.disconnect(cell)
 
     def add_connection(self, cell1: T, cell2: T):
-        """add a connection between the two cells."""
+        """Add a connection between the two cells."""
         cell1.connect(cell2)
         cell2.connect(cell1)
 
     def remove_connection(self, cell1: T, cell2: T):
-        """remove a connection between the two cells."""
+        """Remove a connection between the two cells."""
         cell1.connect(cell2)
         cell2.connect(cell1)
 
