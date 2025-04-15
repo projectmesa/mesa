@@ -112,8 +112,8 @@ class DiscreteSpace(Generic[T]):
 
     def remove_connection(self, cell1: T, cell2: T):
         """Remove a connection between the two cells."""
-        cell1.connect(cell2)
-        cell2.connect(cell1)
+        cell1.disconnect(cell2)
+        cell2.disconnect(cell1)
 
     @cached_property
     def all_cells(self):
