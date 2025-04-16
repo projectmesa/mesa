@@ -315,6 +315,38 @@ def test_orthogonal_grid_moore_1d():
         assert connection.coordinate in {(1,), (9,)}
 
 
+def test_dynamic_modifications_to_space():
+    grid = OrthogonalMooreGrid((5,5), torus=False, capacity=1, random=random.Random(42))
+
+    cells = grid._cells
+
+    # test remove_connection
+    cell1 = cells[(2, 0)]
+    cell2 = cells[(3, 0)]
+    grid.remove_connection(cell1, cell2)
+
+    assert cell2 not in cell1.neighborhood
+    assert cell1 not in cell2.neighborhood
+
+    # test add connection
+    grid.add_connection(cell1, cell2)
+    assert cell1 in cell2.neighborhood
+    assert cell2 in cell1.neighborhood
+
+    # test remove cell
+    neigbors = cell1.neighborhood
+    grid.remove_cell(cell1)
+    for neighbor in neigbors:
+        assert cell1 not in neighbor.neighborhood
+
+    # test add_cells
+    grid.add_cell(cell1)
+    for neighbor in neigbors:
+        grid.add_connection(cell1, neighbor)
+
+    for neighbor in neigbors:
+        assert cell1 in neighbor.neighborhood
+
 def test_cell_neighborhood():
     """Test neighborhood method of cell in different GridSpaces."""
     # orthogonal grid
@@ -450,6 +482,17 @@ def test_networkgrid():
     import pickle
 
     pickle.loads(pickle.dumps(grid))  # noqa: S301
+
+
+    cell = Cell(10)  # n = 10, so 10 + 1
+    grid.add_cell(cell)
+    grid.add_connection(cell, grid._cells[0])
+    assert cell in grid._cells[0].neighborhood
+    assert grid._cells[0] in cell.neighborhood
+
+    grid.remove_cell(cell)
+    assert cell not in grid._cells[0].neighborhood
+    assert grid._cells[0] not in cell.neighborhood
 
 
 def test_voronoigrid():
