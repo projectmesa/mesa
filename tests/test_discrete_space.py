@@ -337,17 +337,17 @@ def test_dynamic_modifications_to_space():
     assert cell2 in cell1.neighborhood
 
     # test remove cell
-    neigbors = cell1.neighborhood
+    neighbors = cell1.neighborhood
     grid.remove_cell(cell1)
-    for neighbor in neigbors:
+    for neighbor in neighbors:
         assert cell1 not in neighbor.neighborhood
 
     # test add_cells
     grid.add_cell(cell1)
-    for neighbor in neigbors:
+    for neighbor in neighbors:
         grid.add_connection(cell1, neighbor)
 
-    for neighbor in neigbors:
+    for neighbor in neighbors:
         assert cell1 in neighbor.neighborhood
 
 
