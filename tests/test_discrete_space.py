@@ -316,7 +316,9 @@ def test_orthogonal_grid_moore_1d():
 
 
 def test_dynamic_modifications_to_space():
-    grid = OrthogonalMooreGrid((5,5), torus=False, capacity=1, random=random.Random(42))
+    grid = OrthogonalMooreGrid(
+        (5, 5), torus=False, capacity=1, random=random.Random(42)
+    )
 
     cells = grid._cells
 
@@ -346,6 +348,7 @@ def test_dynamic_modifications_to_space():
 
     for neighbor in neigbors:
         assert cell1 in neighbor.neighborhood
+
 
 def test_cell_neighborhood():
     """Test neighborhood method of cell in different GridSpaces."""
@@ -482,7 +485,6 @@ def test_networkgrid():
     import pickle
 
     pickle.loads(pickle.dumps(grid))  # noqa: S301
-
 
     cell = Cell(10)  # n = 10, so 10 + 1
     grid.add_cell(cell)
