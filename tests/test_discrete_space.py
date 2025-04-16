@@ -316,9 +316,11 @@ def test_orthogonal_grid_moore_1d():
 
 
 def test_dynamic_modifications_to_space():
+    """Test dynamic modifications to DiscreteSpace."""
     grid = OrthogonalMooreGrid(
         (5, 5), torus=False, capacity=1, random=random.Random(42)
     )
+
 
     cells = grid._cells
 
