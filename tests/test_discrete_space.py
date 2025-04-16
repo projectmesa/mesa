@@ -493,7 +493,15 @@ def test_networkgrid():
     assert cell in grid._cells[0].neighborhood
     assert grid._cells[0] in cell.neighborhood
 
-    grid.remove_cell(cell)
+    grid.remove_connection(cell, grid._cells[0])
+    assert cell not in grid._cells[0].neighborhood
+    assert grid._cells[0] not in cell.neighborhood
+
+
+    cell = Cell(10)  # n = 10, so 10 + 1
+    grid.add_cell(cell)
+    grid.add_connection(cell, grid._cells[0])
+    grid.remove_cell(cell) # this also removes all connections
     assert cell not in grid._cells[0].neighborhood
     assert grid._cells[0] not in cell.neighborhood
 
