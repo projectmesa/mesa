@@ -321,7 +321,6 @@ def test_dynamic_modifications_to_space():
         (5, 5), torus=False, capacity=1, random=random.Random(42)
     )
 
-
     cells = grid._cells
 
     # test remove_connection
