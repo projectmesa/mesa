@@ -2,7 +2,7 @@
 
 ## Summary
 
-A simple model of agents exchanging wealth. All agents start with the same amount of money. Every step, each agent with one unit of money or more gives one unit of wealth to another random agent. This is the model described in the [Intro Tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html), with the completed code.
+A simple model of agents exchanging wealth. All agents start with the same amount of money. Every step, each agent with one unit of money or more gives one unit of wealth to another random agent. This is the model described in the [Intro Tutorial](https://mesa.readthedocs.io/latest/examples.html), with the completed code.
 
 If you want to go over the step-by-step tutorial, please go and run the [Jupyter Notebook](https://github.com/projectmesa/mesa/blob/main/docs/tutorials/intro_tutorial.ipynb). The code here runs the finalized code in the last cells directly.
 
@@ -10,16 +10,16 @@ As the model runs, the distribution of wealth among agents goes from being perfe
 
 ## How to Run
 
-To follow the tutorial example, launch the Jupyter Notebook and run the code in ``Introduction to Mesa Tutorial Code.ipynb`` which you can find in the main mesa repo [here](https://github.com/projectmesa/mesa/blob/main/docs/tutorials/intro_tutorial.ipynb)
+To follow the tutorial example, launch the Jupyter Notebook and run the code in ``Introduction to Mesa Tutorial Code.ipynb`` which you can find in the main mesa repo [here](https://mesa.readthedocs.io/latest/examples.html)
 
 
-To launch the interactive server, as described in the [last section of the tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html#adding-visualization), run:
+To launch the interactive server, as described in the [last section of the tutorial](https://mesa.readthedocs.io/latest/examples.html), run:
 
 ```
     $ solara run app.py
 ```
 
-If your browser doesn't open automatically, point it to [http://127.0.0.1:8765/](http://127.0.0.1:8765/). When the visualization loads, click on the Play button.
+If your browser doesn't open automatically, point it to [http://127.0.0.1:8765/](https://mesa.readthedocs.io/latest/examples.html). When the visualization loads, click on the Play button.
 
 
 ## Files
@@ -47,7 +47,7 @@ Then, you can run the Streamlit app using the following command:
 ## Further Reading
 
 The full tutorial describing how the model is built can be found at:
-https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html
+https://mesa.readthedocs.io/latest/examples.html
 
 This model is drawn from econophysics and presents a statistical mechanics approach to wealth distribution. Some examples of further reading on the topic can be found at:
 

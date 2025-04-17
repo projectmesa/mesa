@@ -14,7 +14,7 @@ To run the model interactively, in this directory, run the following command
     $ solara run app.py
 ```
 
-Then open your browser to [http://127.0.0.1:8765/](http://127.0.0.1:8765/) and click the Play button.
+Then open your browser to [http://127.0.0.1:8765/](https://mesa.readthedocs.io/latest/examples.html) and click the Play button.
 
 To view and run some example model analyses, launch the IPython Notebook and open ``analysis.ipynb``. Visualizing the analysis also requires [matplotlib](http://matplotlib.org/).
 
