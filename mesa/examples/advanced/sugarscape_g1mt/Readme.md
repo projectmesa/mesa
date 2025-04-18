@@ -48,7 +48,7 @@ To run the model interactively:
   $ solara run app.py
 ```
 
-Then open your browser to [http://127.0.0.1:8521/](https://mesa.readthedocs.io/latest/examples.html) and press Reset, then Run.
+Then open your browser to [http://127.0.0.1:8765/](http://127.0.0.1:8765/) and press Reset, then Run.
 
 ## Files
 
