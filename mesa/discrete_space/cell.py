@@ -87,8 +87,6 @@ class Cell:
         self._clear_cache()
         self.connections[key] = other
 
-
-
     def disconnect(self, other: Cell) -> None:
         """Disconnects this cell from another cell.
 
@@ -216,12 +214,11 @@ class Cell:
         return state
 
     def _clear_cache(self):
-        "Helper function to clear local cache."
-
+        """Helper function to clear local cache."""
         try:
             self.__dict__.pop(
                 "neighborhood"
-            ) # cached properties are stored in __dict__, see functools.cached_property docs
+            )  # cached properties are stored in __dict__, see functools.cached_property docs
         except KeyError:
             pass  # cache is not set
         else:
