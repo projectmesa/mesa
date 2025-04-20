@@ -38,10 +38,6 @@ To run the model interactively, in this directory, run the following command
 
 ## Further Reading
 
-The full tutorial describing how the model is built can be found at:
-https://mesa.readthedocs.io/latest/tutorials/0_first_model.html
-
-
 [Stonedahl, F. and Wilensky, U. (2008). NetLogo Virus on a Network model](http://ccl.northwestern.edu/netlogo/models/VirusonaNetwork).
 Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
