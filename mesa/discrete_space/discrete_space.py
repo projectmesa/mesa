@@ -85,6 +85,68 @@ class DiscreteSpace(Generic[T]):
     def _connect_cells(self): ...
     def _connect_single_cell(self, cell: T): ...
 
+    def add_cell(self, cell: T):
+        """Add a cell to the space.
+
+        Args:
+            cell: cell to add
+
+        Note:
+            Discrete spaces rely on caching neighborhood relations for speedups. Adding or removing cells and
+            connections at runtime is possible. However, only the caches of cells directly affected will be cleared. So
+            if you rely on getting neighborhoods of cells with a radius higher than 1, these might not be cleared
+            correctly if you are adding or removing cells and connections at runtime.
+
+        """
+        self.__dict__.pop("all_cells", None)
+        self._cells[cell.coordinate] = cell
+
+    def remove_cell(self, cell: T):
+        """Remove a cell from the space.
+
+        Note:
+            Discrete spaces rely on caching neighborhood relations for speedups. Adding or removing cells and
+            connections at runtime is possible. However, only the caches of cells directly affected will be cleared. So
+            if you rely on getting neighborhoods of cells with a radius higher than 1, these might not be cleared
+            correctly if you are adding or removing cells and connections at runtime.
+
+
+        """
+        neighbors = cell.neighborhood
+        self._cells.pop(cell.coordinate)
+        self.__dict__.pop("all_cells", None)
+
+        # iterate over all neighbors
+        for neighbor in neighbors.cells:
+            neighbor.disconnect(cell)
+            cell.disconnect(neighbor)
+
+    def add_connection(self, cell1: T, cell2: T):
+        """Add a connection between the two cells.
+
+        Note:
+            Discrete spaces rely on caching neighborhood relations for speedups. Adding or removing cells and
+            connections at runtime is possible. However, only the caches of cells directly affected will be cleared. So
+            if you rely on getting neighborhoods of cells with a radius higher than 1, these might not be cleared
+            correctly if you are adding or removing cells and connections at runtime.
+
+        """
+        cell1.connect(cell2)
+        cell2.connect(cell1)
+
+    def remove_connection(self, cell1: T, cell2: T):
+        """Remove a connection between the two cells.
+
+        Note:
+            Discrete spaces rely on caching neighborhood relations for speedups. Adding or removing cells and
+            connections at runtime is possible. However, only the caches of cells directly affected will be cleared. So
+            if you rely on getting neighborhoods of cells with a radius higher than 1, these might not be cleared
+            correctly if you are adding or removing cells and connections at runtime.
+
+        """
+        cell1.disconnect(cell2)
+        cell2.disconnect(cell1)
+
     @cached_property
     def all_cells(self):
         """Return all cells in space."""
