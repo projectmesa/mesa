@@ -1,6 +1,25 @@
 """Implementation of Mesa's meta agent capability.
 
-This contains four  helper functions  and a MetaAgent class that can be used to
+Overview: Complex systems often have multiple levels of components. An
+organization is not one entity, but is made of departments, sub-departments,
+and people. A person is not a single entity, but it is made of micro biomes,
+organs and cells. A city is not a single entity, but it is made of districts,
+neighborhoods, buildings, and people. A forest comprises an ecosystem of
+trees, plants, animals, and microorganisms.
+
+This reality is the motivation for meta-agents. It allows users to represent
+these multiple levels, where each level can have agents with sub-agents.
+
+To demonstrate meta-agents capability there are two examples:
+1 - Alliance formation which shows emergent meta-agent formation in
+advanced examples:
+https://github.com/projectmesa/mesa/tree/main/mesa/examples/advanced/alliance_formation
+2 - Warehouse model in the Mesa example's repository
+https://github.com/projectmesa/mesa-examples/tree/main/examples/warehouse
+
+To accomplish this the MetaAgent module is as follows:
+
+This contains four  helper functions and a MetaAgent class that can be used to
 create agents that contain other agents as components.
 
 Helper methods:
@@ -16,8 +35,7 @@ agents in that class.
 Meta-Agent class (MetaAgent): An agent that contains other agents
 as components.
 
-See basic examples >> meta_agents for deliberate meta-agent creation (warehouse)
-and emergent meta-agent creation (alliance formation) of meta-agents.
+.
 """
 
 import itertools
@@ -128,8 +146,8 @@ def create_meta_agent(
     new_agent_class: str,
     agents: Iterable[Any],
     mesa_agent_type=Agent,
-    meta_attributes: dict[str, Any] = None,
-    meta_methods: dict[str, Callable] = None,  # noqa B006
+    meta_attributes: dict[str, Any] | None = None,
+    meta_methods: dict[str, Callable] | None = None,
     assume_subagent_methods: bool = False,
     assume_subagent_attributes: bool = False,
 ) -> Any | None:
@@ -170,6 +188,9 @@ def create_meta_agent(
         """
         if assume_subagent_methods:
             agent_classes = {type(agent) for agent in agents}
+            if meta_methods is None:
+                # Initialize meta_methods if not provided
+                meta_methods = {}
             for agent_class in agent_classes:
                 for name in agent_class.__dict__:
                     if callable(getattr(agent_class, name)) and not name.startswith(
@@ -195,6 +216,9 @@ def create_meta_agent(
         meta-agent.
         """
         if assume_subagent_attributes:
+            if meta_attributes is None:
+                # Initialize meta_attributes if not provided
+                meta_attributes = {}
             for agent in agents:
                 for name, value in agent.__dict__.items():
                     if not callable(value):
