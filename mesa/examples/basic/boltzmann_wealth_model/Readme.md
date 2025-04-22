@@ -14,7 +14,6 @@ To run the model interactively, in this directory, run the following command
     $ solara run app.py
 ```
 
-To view and run some example model analyses, launch the IPython Notebook and open ``analysis.ipynb``. Visualizing the analysis also requires [matplotlib](http://matplotlib.org/).
 
 ## Files
 
