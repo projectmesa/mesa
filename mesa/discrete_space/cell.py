@@ -84,6 +84,7 @@ class Cell:
         """
         if key is None:
             key = other.coordinate
+        self._clear_cache()
         self.connections[key] = other
 
     def disconnect(self, other: Cell) -> None:
@@ -96,6 +97,7 @@ class Cell:
         keys_to_remove = [k for k, v in self.connections.items() if v == other]
         for key in keys_to_remove:
             del self.connections[key]
+        self._clear_cache()
 
     def add_agent(self, agent: CellAgent) -> None:
         """Adds an agent to the cell.
@@ -210,3 +212,15 @@ class Cell:
             "connections"
         ] = {}  # replace this with empty connections to avoid infinite recursion error in pickle/deepcopy
         return state
+
+    def _clear_cache(self):
+        """Helper function to clear local cache."""
+        try:
+            self.__dict__.pop(
+                "neighborhood"
+            )  # cached properties are stored in __dict__, see functools.cached_property docs
+        except KeyError:
+            pass  # cache is not set
+        else:
+            self.get_neighborhood.cache_clear()
+            self._neighborhood.cache_clear()

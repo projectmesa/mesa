@@ -55,3 +55,23 @@ class Network(DiscreteSpace[Cell]):
     def _connect_single_cell(self, cell: Cell):
         for node_id in self.G.neighbors(cell.coordinate):
             cell.connect(self._cells[node_id], node_id)
+
+    def add_cell(self, cell: Cell):
+        """Add a cell to the space."""
+        super().add_cell(cell)
+        self.G.add_node(cell.coordinate)
+
+    def remove_cell(self, cell: Cell):
+        """Remove a cell from the space."""
+        super().remove_cell(cell)
+        self.G.remove_node(cell.coordinate)
+
+    def add_connection(self, cell1: Cell, cell2: Cell):
+        """Add a connection between the two cells."""
+        super().add_connection(cell1, cell2)
+        self.G.add_edge(cell1.coordinate, cell2.coordinate)
+
+    def remove_connection(self, cell1: Cell, cell2: Cell):
+        """Remove a connection between the two cells."""
+        super().remove_connection(cell1, cell2)
+        self.G.remove_edge(cell1.coordinate, cell2.coordinate)

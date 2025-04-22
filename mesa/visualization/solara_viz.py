@@ -266,6 +266,8 @@ def ModelController(
     model_parameters = solara.use_reactive(model_parameters)
     visualization_pause_event = solara.use_memo(lambda: threading.Event(), [])
 
+    error_message = solara.use_reactive(None)
+
     def step():
         try:
             while running.value and playing.value:
@@ -273,7 +275,8 @@ def ModelController(
                 do_step()
                 if use_threads.value:
                     visualization_pause_event.set()
-        except Exception as _:
+        except Exception as e:
+            error_message.value = f"error in step: {e}"
             traceback.print_exc()
             return
 
@@ -284,7 +287,9 @@ def ModelController(
                     visualization_pause_event.wait()
                     visualization_pause_event.clear()
                     force_update()
-            except Exception as _:
+
+            except Exception as e:
+                error_message.value = f"error in visualization: {e}"
                 traceback.print_exc()
 
     solara.lab.use_task(
@@ -317,6 +322,7 @@ def ModelController(
     @function_logger(__name__)
     def do_reset():
         """Reset the model to its initial state."""
+        error_message.set(None)
         playing.value = False
         running.value = True
         visualization_pause_event.clear()
@@ -345,6 +351,9 @@ def ModelController(
             on_click=do_step,
             disabled=playing.value or not running.value,
         )
+
+    if error_message.value:
+        solara.Error(label=error_message.value)
 
 
 @solara.component
@@ -379,6 +388,8 @@ def SimulatorController(
     visualization_pause_event = solara.use_memo(lambda: threading.Event(), [])
     pause_step_event = solara.use_memo(lambda: threading.Event(), [])
 
+    error_message = solara.use_reactive(None)
+
     def step():
         try:
             while running.value and playing.value:
@@ -390,7 +401,8 @@ def SimulatorController(
                 if use_threads.value:
                     visualization_pause_event.set()
         except Exception as e:
-            print(f"Error in step: {e}")
+            error_message.value = f"error in step: {e}"
+            traceback.print_exc()
 
     def visualization_task():
         if use_threads.value:
@@ -404,7 +416,8 @@ def SimulatorController(
                     force_update()
                     pause_step_event.set()
             except Exception as e:
-                print(f"Error in visualization_task: {e}")
+                error_message.value = f"error in visualization: {e}"
+                traceback.print_exc()
                 return
 
     solara.lab.use_task(
@@ -431,6 +444,7 @@ def SimulatorController(
 
     def do_reset():
         """Reset the model to its initial state."""
+        error_message.set(None)
         playing.value = False
         running.value = True
         simulator.reset()
@@ -458,6 +472,8 @@ def SimulatorController(
             on_click=do_step,
             disabled=playing.value or not running.value,
         )
+    if error_message.value:
+        solara.Error(label=error_message.value)
 
 
 def split_model_params(model_params):
