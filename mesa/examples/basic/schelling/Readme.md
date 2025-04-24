@@ -14,11 +14,6 @@ To run the model interactively, in this directory, run the following command
     $ solara run app.py
 ```
 
-
-## How to Run without the GUI
-
-To run the model with the grid displayed as an ASCII text, run `python run_ascii.py` in this directory.
-
 ## Files
 
 * ``model.py``: Contains the Schelling model class
