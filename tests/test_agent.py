@@ -413,15 +413,15 @@ def test_agentset_agg():
 
     # Test with list of functions
     min_max_energy = agentset.agg("energy", [min, max])
-    assert min_max_energy == (1, 10)
+    assert min_max_energy == [1, 10]
 
     # Test with tuple of functions
     min_energy, max_energy, total_energy = agentset.agg("energy", (min, max, sum))
-    assert (min_energy, max_energy, total_energy) == (1, 10, 55)
+    assert [min_energy, max_energy, total_energy] == [1, 10, 55]
 
     # Test with custom functions in a list
     stats = agentset.agg("wealth", [min, max, np.mean, custom_func])
-    assert stats == (10, 100, 55.0, 55.0)
+    assert stats == [10, 100, 55.0, 55.0]
 
 
 def test_agentset_set_method():

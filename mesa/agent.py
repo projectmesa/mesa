@@ -382,18 +382,18 @@ class AgentSet(MutableSet, Sequence):
         return res
 
     def agg(
-        self, attribute: str, func: Callable | list[Callable] | tuple[Callable, ...]
+        self, attribute: str, func: Callable | Iterable[Callable]
     ) -> Any | list[Any]:
         """Aggregate an attribute of all agents in the AgentSet using one or more functions.
 
         Args:
             attribute (str): The name of the attribute to aggregate.
-            func (Callable | list[Callable] | tuple[Callable]):
+            func (Callable | Iterable[Callable]):
                 - If Callable: A single function to apply to the attribute values (e.g., min, max, sum, np.mean)
-                - If list or tuple: Multiple functions to apply to the attribute values
+                - If Iterable: Multiple functions to apply to the attribute values
 
         Returns:
-            Any | tuple[Any, ...]: Result of applying the function(s) to the attribute values.
+            Any | [Any, ...]: Result of applying the function(s) to the attribute values.
 
         Examples:
             # Single function
@@ -407,7 +407,7 @@ class AgentSet(MutableSet, Sequence):
         if isinstance(func, Callable):
             return func(values)
         else:
-            return tuple(f(values) for f in func)
+            return [f(values) for f in func]
 
     @overload
     def get(
