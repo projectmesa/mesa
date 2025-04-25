@@ -404,10 +404,10 @@ class AgentSet(MutableSet, Sequence):
         """
         values = self.get(attribute)
 
-        if isinstance(func, list | tuple):
-            return tuple(f(values) for f in func)
-        else:
+        if isinstance(func, Callable):
             return func(values)
+        else:
+            return tuple(f(values) for f in func)
 
     @overload
     def get(
