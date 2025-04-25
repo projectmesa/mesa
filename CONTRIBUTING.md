@@ -53,7 +53,7 @@ Learn the tools, talk to us about what you want to change, and open a small PR. 
 Awesome! You have the basics of open-source software development (if not check above), but not much modelling experience.
 
 First step is to start thinking like a modeller. To understand the fine details about our library and contribute meaningfully, get some modelling experience:
-- Go though our [Introductory Tutorial](https://mesa.readthedocs.io/latest/tutorials/intro_tutorial.html) and [Visualization Tutorial](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html). While going through them, dive into the source code to really see what everything does.
+- Go though our series of introductory tutorials at [Getting Started](https://mesa.readthedocs.io/latest/getting_started.html). While going through them, dive into the source code to really see what everything does.
 - Follow an ABM course (if possible). They might be a bit outdated programming language wise, but conceptual they're sound.
   - This MOOC on ABM concepts: [Agent Based Modeling](https://ocw.tudelft.nl/course-lectures/agent-based-modeling/)
   - This MOOC on practical ABM modelling: [Agent-Based Models with Python: An Introduction to Mesa](https://www.complexityexplorer.org/courses/172-agent-based-models-with-python-an-introduction-to-mesa)
