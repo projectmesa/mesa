@@ -48,23 +48,24 @@ class Agent:
     # so, unique_id is unique relative to a model, and counting starts from 1
     _ids = defaultdict(functools.partial(itertools.count, 1))
 
-    def __init__(
-        self, model: Model, *args, key_by_name: bool = False, **kwargs
-    ) -> None:
+    def __init__(self, model: Model, *args, **kwargs) -> None:
         """Create a new agent.
 
         Args:
             model (Model): The model instance in which the agent exists.
-            key_by_name (bool): If True, use Agent.__name__ as the key in the model's agents_by_type dictionary.
             args: Passed on to super.
             kwargs: Passed on to super.
+
+        Notes:
+            to make proper use of python's super, in each class remove the arguments and
+            keyword arguments you need and pass on the rest to super
         """
         super().__init__(*args, **kwargs)
 
         self.model: Model = model
         self.unique_id: int = next(self._ids[model])
         self.pos: Position | None = None
-        self.model.register_agent(self, key_by_name=key_by_name)
+        self.model.register_agent(self)
 
     def remove(self) -> None:
         """Remove and delete the agent from the model.

@@ -52,9 +52,10 @@ def test_create_meta_agent_new_class(setup_agents):
         model,
         "MetaAgentClass",
         agents,
+        Agent,
         meta_attributes={"attribute1": "value1"},
         meta_methods={"function1": lambda self: "function1"},
-        assume_subagent_attributes=True,
+        assume_constituting_agent_attributes=True,
     )
     assert meta_agent is not None
     assert meta_agent.attribute1 == "value1"
@@ -77,6 +78,7 @@ def test_create_meta_agent_existing_class(setup_agents):
         model,
         "MetaAgentClass",
         [agents[0], agents[2]],
+        Agent,
         meta_attributes={"attribute1": "value1"},
         meta_methods={"function1": lambda self: "function1"},
     )
@@ -86,9 +88,10 @@ def test_create_meta_agent_existing_class(setup_agents):
         model,
         "MetaAgentClass",
         [agents[1], agents[3]],
+        Agent,
         meta_attributes={"attribute2": "value2"},
         meta_methods={"function2": lambda self: "function2"},
-        assume_subagent_attributes=True,
+        assume_constituting_agent_attributes=True,
     )
     assert meta_agent is not None
     assert meta_agent2.attribute2 == "value2"
@@ -112,17 +115,19 @@ def test_add_agents_to_existing_meta_agent(setup_agents):
         model,
         "MetaAgentClass",
         [agents[0], agents[3]],
+        Agent,
         meta_attributes={"attribute1": "value1"},
         meta_methods={"function1": lambda self: "function1"},
-        assume_subagent_attributes=True,
+        assume_constituting_agent_attributes=True,
     )
 
     create_meta_agent(
         model,
         "MetaAgentClass",
         [agents[1], agents[0], agents[2]],
-        assume_subagent_attributes=True,
-        assume_subagent_methods=True,
+        Agent,
+        assume_constituting_agent_attributes=True,
+        assume_constituting_agent_methods=True,
     )
     assert meta_agent1.agents == {agents[0], agents[1], agents[2], agents[3]}
     assert meta_agent1.function1() == "function1"
@@ -145,10 +150,11 @@ def test_meta_agent_integration(setup_agents):
         model,
         "MetaAgentClass",
         agents,
+        Agent,
         meta_attributes={"attribute1": "value1"},
         meta_methods={"function1": lambda self: "function1"},
-        assume_subagent_attributes=True,
-        assume_subagent_methods=True,
+        assume_constituting_agent_attributes=True,
+        assume_constituting_agent_methods=True,
     )
 
     model.step()
@@ -224,7 +230,7 @@ def test_meta_agent_iter(setup_agents):
     """
     model, agents = setup_agents
     meta_agent = MetaAgent(model, set(agents))
-    assert list(iter(meta_agent)) == list(meta_agent._subset)
+    assert list(iter(meta_agent)) == list(meta_agent._constituting_set)
 
 
 def test_meta_agent_contains(setup_agents):
@@ -239,58 +245,58 @@ def test_meta_agent_contains(setup_agents):
         assert agent in meta_agent
 
 
-def test_meta_agent_add_subagents(setup_agents):
-    """Test the add_subagents method of MetaAgent.
+def test_meta_agent_add_constituting_agents(setup_agents):
+    """Test the add_constituting_agents method of MetaAgent.
 
     Args:
         setup_agents (tuple): The model and agents fixture.
     """
     model, agents = setup_agents
     meta_agent = MetaAgent(model, {agents[0], agents[1]})
-    meta_agent.add_subagents({agents[2], agents[3]})
-    assert meta_agent._subset == set(agents)
+    meta_agent.add_constituting_agents({agents[2], agents[3]})
+    assert meta_agent._constituting_set == set(agents)
 
 
-def test_meta_agent_remove_subagents(setup_agents):
-    """Test the remove_subagents method of MetaAgent.
+def test_meta_agent_remove_constituting_agents(setup_agents):
+    """Test the remove_constituting_agents method of MetaAgent.
 
     Args:
         setup_agents (tuple): The model and agents fixture.
     """
     model, agents = setup_agents
     meta_agent = MetaAgent(model, set(agents))
-    meta_agent.remove_subagents({agents[2], agents[3]})
-    assert meta_agent._subset == {agents[0], agents[1]}
+    meta_agent.remove_constituting_agents({agents[2], agents[3]})
+    assert meta_agent._constituting_set == {agents[0], agents[1]}
 
 
-def test_meta_agent_subagents_by_type(setup_agents):
-    """Test the subagents_by_type property of MetaAgent."""
+def test_meta_agent_constituting_agents_by_type(setup_agents):
+    """Test the constituting_agents_by_type property of MetaAgent."""
     model, agents = setup_agents
     meta_agent = MetaAgent(model, set(agents))
-    subagents_by_type = meta_agent.subagents_by_type
-    assert isinstance(subagents_by_type, dict)
-    for agent_type, agent_list in subagents_by_type.items():
+    constituting_agents_by_type = meta_agent.constituting_agents_by_type
+    assert isinstance(constituting_agents_by_type, dict)
+    for agent_type, agent_list in constituting_agents_by_type.items():
         assert all(isinstance(agent, agent_type) for agent in agent_list)
 
 
-def test_meta_agent_subagent_types(setup_agents):
-    """Test the subagent_types property of MetaAgent."""
+def test_meta_agent_constituting_agent_types(setup_agents):
+    """Test the constituting_agent_types property of MetaAgent."""
     model, agents = setup_agents
     meta_agent = MetaAgent(model, set(agents))
-    subagent_types = meta_agent.subagent_types
-    assert isinstance(subagent_types, set)
-    assert all(isinstance(agent_type, type) for agent_type in subagent_types)
+    constituting_agent_types = meta_agent.constituting_agent_types
+    assert isinstance(constituting_agent_types, set)
+    assert all(isinstance(agent_type, type) for agent_type in constituting_agent_types)
 
 
-def test_meta_agent_get_subagent_instance(setup_agents):
-    """Test the get_subagent_instance method of MetaAgent."""
+def test_meta_agent_get_constituting_agent_instance(setup_agents):
+    """Test the get_constituting_agent_instance method of MetaAgent."""
     model, agents = setup_agents
     meta_agent = MetaAgent(model, set(agents))
     agent_type = type(agents[0])
-    subagent_instance = meta_agent.get_subagent_instance(agent_type)
-    assert isinstance(subagent_instance, agent_type)
+    constituting_agent_instance = meta_agent.get_constituting_agent_instance(agent_type)
+    assert isinstance(constituting_agent_instance, agent_type)
     with pytest.raises(ValueError):
-        meta_agent.get_subagent_instance(str)  # Invalid type
+        meta_agent.get_constituting_agent_instance(str)  # Invalid type
 
 
 def test_meta_agent_step(setup_agents):
