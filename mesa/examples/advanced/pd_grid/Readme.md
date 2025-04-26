@@ -17,13 +17,11 @@ The Demographic Prisoner's Dilemma demonstrates how simple rules can lead to the
 
 ## How to Run
 
-##### Web based model simulation
+To run the model interactively, in this directory, run the following command
 
-To run the model interactively, run ``solara run app.py`` in this directory.
-
-##### Jupyter Notebook
-
-Launch the ``Demographic Prisoner's Dilemma Activation Schedule.ipynb`` notebook and run the code.
+```
+    $ solara run app.py
+```
 
 ## Files
 

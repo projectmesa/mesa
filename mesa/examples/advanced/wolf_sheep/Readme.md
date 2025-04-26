@@ -14,28 +14,13 @@ The model is tests and demonstrates several Mesa concepts and features:
  - Writing a model composed of multiple files.
  - Dynamically adding and removing agents from the schedule
 
-## Installation
-
-To install the dependencies use pip and the requirements.txt in this directory. e.g.
-
-```
-    # First, we clone the Mesa repo
-    $ git clone https://github.com/projectmesa/mesa.git
-    $ cd mesa
-    # Then we cd to the example directory
-    $ cd examples/wolf_sheep
-    $ pip install -r requirements.txt
-```
-
 ## How to Run
 
-To run the model interactively, run ``mesa runserver`` in this directory. e.g.
+To run the model interactively, in this directory, run the following command
 
 ```
-    $ mesa runserver
+    $ solara run app.py
 ```
-
-Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
 
 ## Files
 
