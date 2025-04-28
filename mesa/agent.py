@@ -53,13 +53,12 @@ class Agent:
 
         Args:
             model (Model): The model instance in which the agent exists.
-            args: passed on to super
-            kwargs: passed on to super
+            args: Passed on to super.
+            kwargs: Passed on to super.
 
         Notes:
             to make proper use of python's super, in each class remove the arguments and
             keyword arguments you need and pass on the rest to super
-
         """
         super().__init__(*args, **kwargs)
 
@@ -103,7 +102,10 @@ class Agent:
         """
 
         class ListLike:
-            """Helper class to make default arguments act as if they are in a list of length N."""
+            """Make default arguments act as if they are in a list of length N.
+
+            This is a helper class.
+            """
 
             def __init__(self, value):
                 self.value = value

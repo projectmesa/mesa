@@ -151,9 +151,9 @@ class Model:
             agent: The agent to register.
 
         Notes:
-            This method is called automatically by ``Agent.__init__``, so there is no need to use this
-            if you are subclassing Agent and calling its super in the ``__init__`` method.
-
+            This method is called automatically by ``Agent.__init__``, so there
+            is no need to use this if you are subclassing Agent and calling its
+            super in the ``__init__`` method.
         """
         self._agents[agent] = None
 
