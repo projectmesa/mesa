@@ -1,0 +1,9 @@
+version: 1
+
+# Disable automatic 'review_status' comments on pull requests
+review_status: false
+
+# Increase GitHub check timeout to avoid premature reviews
+github:
+  checks:
+    timeout: 180
