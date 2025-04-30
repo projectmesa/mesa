@@ -55,6 +55,8 @@ This will:
 - Save results to a pickle file named `timings_X.pickle` (where X is an incremental number)
 - Display a summary of results in the terminal
 
+>You might have to install `tabulate`if you dont have it yet (run `pip install tabulate`)
+
 #### What's being measured:
 
 - **Initialization time**: How long it takes to create model instances
