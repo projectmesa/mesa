@@ -4,6 +4,7 @@ from mesa.examples import (
     BoltzmannWealth,
     ConwaysGameOfLife,
     EpsteinCivilViolence,
+    MultiLevelAllianceModel,
     PdGrid,
     Schelling,
     SugarscapeG1mt,
@@ -106,3 +107,16 @@ def test_wolf_sheep():  # noqa: D103
     simulator = ABMSimulator()
     WolfSheep(seed=42, simulator=simulator)
     simulator.run_for(10)
+
+
+def test_alliance_formation_model():  # noqa: D103
+    from mesa.examples.advanced.alliance_formation import app
+
+    app.page  # noqa: B018
+
+    model = MultiLevelAllianceModel(50, seed=42)
+
+    for _i in range(10):
+        model.step()
+
+    assert len(model.agents) == len(model.network.nodes)

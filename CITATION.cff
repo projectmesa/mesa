@@ -1,0 +1,62 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Hoeven
+  given-names: Ewout
+  name-particle: ter
+  orcid: "https://orcid.org/0009-0002-0805-3425"
+- family-names: Kwakkel
+  given-names: Jan
+  orcid: "https://orcid.org/0000-0001-9447-2954"
+- family-names: Hess
+  given-names: Vincent
+  orcid: "https://orcid.org/0000-0002-9242-8500"
+- family-names: Pike
+  given-names: Thomas
+  orcid: "https://orcid.org/0000-0003-1576-0283"
+- family-names: Wang
+  given-names: Boyu
+  orcid: "https://orcid.org/0000-0001-9879-2138"
+- family-names: rht
+  orcid: "https://orcid.org/0009-0002-6902-111X"
+- family-names: Kazil
+  given-names: Jackie
+  orcid: "https://orcid.org/0000-0002-8300-7384"
+doi: 10.5281/zenodo.15090710
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Hoeven
+    given-names: Ewout
+    name-particle: ter
+    orcid: "https://orcid.org/0009-0002-0805-3425"
+  - family-names: Kwakkel
+    given-names: Jan
+    orcid: "https://orcid.org/0000-0001-9447-2954"
+  - family-names: Hess
+    given-names: Vincent
+    orcid: "https://orcid.org/0000-0002-9242-8500"
+  - family-names: Pike
+    given-names: Thomas
+    orcid: "https://orcid.org/0000-0003-1576-0283"
+  - family-names: Wang
+    given-names: Boyu
+    orcid: "https://orcid.org/0000-0001-9879-2138"
+  - family-names: rht
+    orcid: "https://orcid.org/0009-0002-6902-111X"
+  - family-names: Kazil
+    given-names: Jackie
+    orcid: "https://orcid.org/0000-0002-8300-7384"
+  date-published: 2025-03-28
+  doi: 10.21105/joss.07668
+  issn: 2475-9066
+  issue: 107
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 7668
+  title: "Mesa 3: Agent-based modeling with Python in 2025"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.07668"
+  volume: 10
+title: "Mesa 3: Agent-based modeling with Python in 2025"

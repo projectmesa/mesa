@@ -1,5 +1,9 @@
 # Mesa: Agent-based modeling in Python
 
+```{image} https://joss.theoj.org/papers/10.21105/joss.07668/status.svg
+:target: https://doi.org/10.21105/joss.07668
+```
+
 ```{image} https://github.com/projectmesa/mesa/workflows/build/badge.svg
 :target: https://github.com/projectmesa/mesa/actions
 ```
@@ -18,7 +22,7 @@
 
 [Mesa] is an Apache2 licensed agent-based modeling (or ABM) framework in Python.
 
-Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Its goal is to be the Python-based counterpart to NetLogo, Repast, or MASON.
+Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Mesa's goal is to make simulations accessible to everyone, so humanity can more effectively understand and solve complex problems.
 
 ![A screenshot of the Wolf Sheep model in Mesa|100%](images/wolf_sheep.png)
 *A visualisation of the Wolf Sheep model build with Mesa.*
@@ -67,7 +71,14 @@ Mesa is an open source project and welcomes contributions:
 - [Issue Tracker] - Report bugs or suggest features
 - [Contributors Guide] - Learn how to contribute
 
-The original Mesa conference paper is [available here](http://conference.scipy.org.s3-website-us-east-1.amazonaws.com/proceedings/scipy2015/jacqueline_kazil.html).
+### Citing Mesa
+
+To cite Mesa in your publication, you can refer to our peer-reviewed article in the Journal of Open Source Software (JOSS):
+- ter Hoeven, E., Kwakkel, J., Hess, V., Pike, T., Wang, B., rht, & Kazil, J. (2025). Mesa 3: Agent-based modeling with Python in 2025. Journal of Open Source Software, 10(107), 7668. https://doi.org/10.21105/joss.07668
+
+Our [CITATION.cff](https://github.com/projectmesa/mesa/blob/main/CITATION.cff) can be used to generate APA, BibTeX and other citation formats.
+
+The original Mesa conference paper from 2015 is [available here](http://conference.scipy.org.s3-website-us-east-1.amazonaws.com/proceedings/scipy2015/jacqueline_kazil.html).
 
 ```{toctree}
 :hidden: true
