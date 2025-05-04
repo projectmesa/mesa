@@ -47,12 +47,12 @@ def run_model_test(
 
         # Display and capture the initial visualizations
         display(space_viz)
-        time.sleep(0.2)  # buffer for rendering
+        page_session.wait_for_selector("img")  # buffer for rendering
         initial_space = page_session.locator("img").screenshot()
 
         if measure_config:
             display(graph_viz)
-            time.sleep(0.2)
+            page_session.wait_for_selector("img")
             initial_graph = page_session.locator("img").screenshot()
 
         # Run the model for specified number of steps
@@ -70,12 +70,12 @@ def run_model_test(
 
         # Display and capture the updated visualizations
         display(space_viz)
-        time.sleep(0.2)
+        page_session.wait_for_selector("img")
         changed_space = page_session.locator("img").screenshot()
 
         if measure_config:
             display(graph_viz)
-            time.sleep(0.2)
+            page_session.wait_for_selector("img")
             changed_graph = page_session.locator("img").screenshot()
 
         # Convert screenshots to base64 for comparison
@@ -98,7 +98,7 @@ def run_model_test(
     except MemoryError:
         pytest.skip("Skipping test due to memory shortage.")
     except Exception as e:
-        pytest.fail(f"Test failed with an unexpected exception: {e}")
+        raise
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
