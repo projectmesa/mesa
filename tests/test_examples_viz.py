@@ -1,22 +1,24 @@
 import base64
 import time
+
 import playwright.sync_api
 import pytest
-from mesa.visualization.components.matplotlib_components import (
-    SpaceMatplotlib,
-    PlotMatplotlib,
-)
 from IPython.display import display
+
 from mesa.examples import (
-    Schelling,
-    WolfSheep,
     BoidFlockers,
     BoltzmannWealth,
-    VirusOnNetwork,
     ConwaysGameOfLife,
     EpsteinCivilViolence,
-    SugarscapeG1mt,
     PdGrid,
+    Schelling,
+    SugarscapeG1mt,
+    VirusOnNetwork,
+    WolfSheep,
+)
+from mesa.visualization.components.matplotlib_components import (
+    PlotMatplotlib,
+    SpaceMatplotlib,
 )
 
 
@@ -28,12 +30,10 @@ def run_model_test(
     measure_config=None,
     steps=5,
 ):
-    """
-    Generic test for agent-based models to verify visual changes after steps.
+    """Generic test for agent-based models to verify visual changes after steps.
 
     For more details, see the documentation: https://solara.dev/documentation/advanced/howto/testing#testing-widgets-using-solara-server
     """
-
     try:
         # Create visualizations for the initial model state
         space_viz = SpaceMatplotlib(
@@ -46,7 +46,7 @@ def run_model_test(
 
         # Display and capture the initial visualizations
         display(space_viz)
-        time.sleep(0.2) # buffer for rendering
+        time.sleep(0.2)  # buffer for rendering
         initial_space = page_session.locator("img").screenshot()
 
         if measure_config:
@@ -102,9 +102,7 @@ def run_model_test(
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_schelling_model(solara_test, page_session: playwright.sync_api.Page):
-    """
-    Test schelling model behavior and visualization.
-    """
+    """Test schelling model behavior and visualization."""
     model = Schelling(seed=42)
 
     def agent_portrayal(agent):
@@ -123,10 +121,8 @@ def test_schelling_model(solara_test, page_session: playwright.sync_api.Page):
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_wolf_sheep_model(solara_test, page_session: playwright.sync_api.Page):
-    """
-    Test wolf-sheep model behavior and visualization.
-    """
-    from mesa.examples.advanced.wolf_sheep.agents import Wolf, Sheep, GrassPatch
+    """Test wolf-sheep model behavior and visualization."""
+    from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
     from mesa.experimental.devs import ABMSimulator
 
     model = WolfSheep(simulator=ABMSimulator(), seed=42)
@@ -170,9 +166,7 @@ def test_wolf_sheep_model(solara_test, page_session: playwright.sync_api.Page):
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_boid_flockers_model(solara_test, page_session: playwright.sync_api.Page):
-    """
-    Test boid flockers model behavior and visualization.
-    """
+    """Test boid flockers model behavior and visualization."""
     model = BoidFlockers(seed=42)
 
     def agent_portrayal(agent):
@@ -189,9 +183,7 @@ def test_boid_flockers_model(solara_test, page_session: playwright.sync_api.Page
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_boltzmann_wealth_model(solara_test, page_session: playwright.sync_api.Page):
-    """
-    Test Boltzmann wealth model behavior and visualization.
-    """
+    """Test Boltzmann wealth model behavior and visualization."""
     model = BoltzmannWealth(seed=42)
 
     def agent_portrayal(agent):
@@ -211,9 +203,7 @@ def test_boltzmann_wealth_model(solara_test, page_session: playwright.sync_api.P
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_virus_on_network_model(solara_test, page_session: playwright.sync_api.Page):
-    """
-    Test virus on network model behavior and visualization.
-    """
+    """Test virus on network model behavior and visualization."""
     from mesa.examples.basic.virus_on_network.model import State
 
     model = VirusOnNetwork(seed=42)
@@ -246,9 +236,7 @@ def test_virus_on_network_model(solara_test, page_session: playwright.sync_api.P
 def test_conways_game_of_life_model(
     solara_test, page_session: playwright.sync_api.Page
 ):
-    """
-    Test Conway's Game of Life model behavior and visualization.
-    """
+    """Test Conway's Game of Life model behavior and visualization."""
     model = ConwaysGameOfLife(seed=42)
 
     def agent_portrayal(agent):
@@ -273,9 +261,7 @@ def test_conways_game_of_life_model(
 def test_epstein_civil_violence_model(
     solara_test, page_session: playwright.sync_api.Page
 ):
-    """
-    Test Epstein civil violence model behavior and visualization.
-    """
+    """Test Epstein civil violence model behavior and visualization."""
     from mesa.examples.advanced.epstein_civil_violence.agents import (
         Citizen,
         CitizenState,
@@ -316,9 +302,7 @@ def test_epstein_civil_violence_model(
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_sugarscape_g1mt_model(solara_test, page_session: playwright.sync_api.Page):
-    """
-    Test Sugarscape G1mt model behavior and visualization.
-    """
+    """Test Sugarscape G1mt model behavior and visualization."""
     model = SugarscapeG1mt(seed=42)
 
     def agent_portrayal(agent):
@@ -337,9 +321,7 @@ def test_sugarscape_g1mt_model(solara_test, page_session: playwright.sync_api.Pa
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_pd_grid_model(solara_test, page_session: playwright.sync_api.Page):
-    """
-    Test Prisoner's Dilemma model behavior and visualization.
-    """
+    """Test Prisoner's Dilemma model behavior and visualization."""
     model = PdGrid(seed=42)
 
     def agent_portrayal(agent):
