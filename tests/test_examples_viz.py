@@ -1,6 +1,5 @@
 # noqa: D100
 import base64
-import time
 
 import playwright.sync_api
 import pytest
@@ -97,7 +96,7 @@ def run_model_test(
             )
     except MemoryError:
         pytest.skip("Skipping test due to memory shortage.")
-    except Exception as e:
+    except Exception:
         raise
 
 
