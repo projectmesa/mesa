@@ -63,6 +63,9 @@ dev = [
   "pytest-cov",
   "sphinx",
   "pytest-mock",
+  "pytest-playwright",
+  "pytest-ipywidgets",
+  "playwright",
 ]
 examples = [
   "mesa[rec]",
