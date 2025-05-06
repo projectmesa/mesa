@@ -1,6 +1,6 @@
 # Mesa Performance Benchmarks
 
-The `/benchmarks` directory contains tools for benchmarking the Mesa library performance in order to compare improvements and regressions  in efficiency across different modifications of Mesa.
+The `/benchmarks` directory contains tools for benchmarking the Mesa library performance on the included example models. This allows to track and compare model initialisation time and runtime between different Mesa versions.
 
 MESA uses several example base models for benchmarking performance (BoltzmannWealth, Schelling, BoidFlockers, and WolfSheep) by calculating the initialization time and run time for each of these models. These example models can be found in the `/mesa/examples` directory.
 
