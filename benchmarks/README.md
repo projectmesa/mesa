@@ -40,7 +40,7 @@ This will:
 - Display a summary of results in the terminal
 
 
->**Noteworthy :** the pickle file created by the benchmark is not under git control. So you can run the benchmark on the master branch first, switch to your development branch, change the file name for the results, and run the benchmarks again.
+>**Noteworthy :** the pickle file created by the benchmark is not under git control. So you can run the benchmark on the master branch first, switch to your development branch, and run the benchmarks again.
 
 #### What's being measured:
 
