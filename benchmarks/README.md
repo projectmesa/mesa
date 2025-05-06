@@ -82,7 +82,6 @@ The output will show:
    ```
 
 2. Make code changes (add a feature in mesa, optimize a method, etc.) **OR** switch to development branch - you can do that without duplicating your pickle file in the new branch as it is not under git control
-<br/>
 
 
 3. Run benchmarks again:
