@@ -9,19 +9,11 @@ The "game" is a zero-player game, meaning that its evolution is determined by it
 
 ## How to Run
 
-To run the model interactively you can use either the streamlit or solara version. For solara, you use
+To run the model interactively, in this directory, run the following command
 
 ```
     $ solara run app.py
 ```
-
-For streamlit, you need
-
-```
-    $ streamlit run st_app.py
-```
-
-This will open your browser and show you the controls. You can start the model by hitting the run button.
 
 ## Files
 

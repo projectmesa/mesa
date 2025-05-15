@@ -42,13 +42,12 @@ The model demonstrates several Mesa concepts and features:
 
 
 ## How to Run
-To run the model interactively:
+
+To run the model interactively, in this directory, run the following command
 
 ```
-  $ solara run app.py
+    $ solara run app.py
 ```
-
-Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and press Reset, then Run.
 
 ## Files
 
@@ -58,7 +57,7 @@ Then open your browser to [http://127.0.0.1:8521/](http://127.0.0.1:8521/) and p
 * `sugar_map.txt`: Provides sugar and spice landscape in raster type format.
 * `tests.py`: Has tests to ensure that the model reproduces the results in shown in Growing Artificial Societies.
 
-## Additional Resources
+## Further Reading
 
 - [Growing Artificial Societies](https://mitpress.mit.edu/9780262550253/growing-artificial-societies/)
 - [Complexity Explorer Sugarscape with Traders Tutorial](https://www.complexityexplorer.org/courses/172-agent-based-models-with-python-an-introduction-to-mesa)

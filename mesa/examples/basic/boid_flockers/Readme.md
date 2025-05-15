@@ -8,7 +8,12 @@ This model tests Mesa's continuous space feature, and uses numpy arrays to repre
 
 ## How to Run
 
-* To launch the visualization interactively, run ``solara run app.py`` in this directory.It will automatically open a browser page.
+To run the model interactively, in this directory, run the following command
+
+```
+    $ solara run app.py
+```
+
 
 ## Files
 

@@ -1,10 +1,123 @@
 ---
 title: Release History
 ---
+# 3.2.0 (2025-05-04)
+## Highlights
+Mesa 3.2.0 is a feature-packed release, which stabilizes our discrete space, improves many of our visualisation capabilities, improves our tutorial organization, adds the experimental meta-agents, and includes other quality of life enhancements.
+
+We also celebrate the publication of our peer-reviewed [Mesa 3 paper](https://doi.org/10.21105/joss.07668) in JOSS. See the updated [Citing Mesa](https://github.com/projectmesa/mesa?tab=readme-ov-file#citing-mesa) section on how to cite us.
+
+### Stabilization of Discrete Space
+The experimental Cell Space system has been stabilized and is now available as `mesa.discrete_space` ([#2610](https://github.com/projectmesa/mesa/pull/2610)). This powerful spatial modeling framework enables cell-centric simulations with integrated PropertyLayers and improved agent movement capabilities. Key improvements include:
+
+- Support for dynamic modifications to discrete spaces during simulation ([#2755](https://github.com/projectmesa/mesa/pull/2755))
+- Methods to add/remove cells and connections in real-time
+- Full integration with PropertyLayers ([#2440](https://github.com/projectmesa/mesa/pull/2440)) for representing environmental variables
+- Compatible with all examples and existing visualizations
+
+The PropertyLayer itself has also been stabilized, allowing for efficient management of spatial environmental properties like terrain, resources, or any grid-based variables. Core examples including [Schelling](https://github.com/projectmesa/mesa/tree/main/mesa/examples/basic/schelling), [Game of Life](https://github.com/projectmesa/mesa/tree/main/mesa/examples/basic/conways_game_of_life), [Boltzmann Wealth](https://github.com/projectmesa/mesa/tree/main/mesa/examples/basic/boltzmann_wealth_model), and [Virus on Network](https://github.com/projectmesa/mesa/tree/main/mesa/examples/basic/virus_on_network) have been updated to use the new discrete space system.
+
+### Enhanced Visualization Experience
+The SolaraViz visualization system has received substantial upgrades:
+
+- **Command Console** ([#2697](https://github.com/projectmesa/mesa/pull/2697)): An interactive Python console embedded directly in the visualization, allowing real-time model inspection and manipulation
+- **Asynchronous Updates** ([#2656](https://github.com/projectmesa/mesa/pull/2656)): Visualization now runs in a separate thread, dramatically improving performance for complex models
+- **Dark Mode** ([#2689](https://github.com/projectmesa/mesa/pull/2689)): Support for Solara Dark theme, automatically matching system preferences
+- **Improved Error Handling** ([#2747](https://github.com/projectmesa/mesa/pull/2747), [#2753](https://github.com/projectmesa/mesa/pull/2753)): Better visualization of errors with options to view detailed traceback information
+- **Enhanced UI**: Arrow key navigation ([#2725](https://github.com/projectmesa/mesa/pull/2725)), movable input field with auto-scroll ([#2710](https://github.com/projectmesa/mesa/pull/2710)), and other quality-of-life improvements
+- **PropertyLayer visualisation in Altair** ([#2643](https://github.com/projectmesa/mesa/pull/2643)): Support for visualising PropertyLayers using the Altair frontend in Solara.
+
+### Restructured and updated tutorial
+Our [introduction tutorial](https://mesa.readthedocs.io/latest/overview.html) has been completely restructured ([#2731](https://github.com/projectmesa/mesa/pull/2731)). Instead of one huge notebook, the tutorial is now divided into smaller, focused modules that build progressively:
+
+- **Creating Your First Model**: Essential basics to get started
+- **Adding Space**: Learn how to use the new discrete space system
+- **Collecting Data**: Effectively gather model statistics
+- **AgentSet**: Master agent management techniques
+- **Visualization**: Series of modules covering basic to advanced visualization
+
+
+### Introducing Meta-Agents
+Complex systems often have multiple levels of components. An organization is not one entity, but is made of departments, sub-departments, and people. A person is not a single entity, but it is made of micro biomes, organs and cells. A city is not a single entity, but it is made of districts, neighborhoods, buildings, and people. A forest comprises an ecosystem of trees, plants, animals, and microorganisms.
+
+This reality is the motivation for meta-agents. It allows users to represent these multiple levels, where each level can have meta-agents with constituting agents.
+- **Meta agents** [#2748](https://github.com/projectmesa/mesa/pull/2748)
+
+To demonstrate meta-agents capability there are two examples:
+
+1.  Dynamic meta-agent creation - [Alliance formation](https://mesa.readthedocs.io/latest/examples/advanced/alliance_formation.html), which shows emergent meta-agent formation through a game theoretic based alliance formation.
+2. Deliberate meta-agent creation - [Warehouse model](https://github.com/projectmesa/mesa-examples/tree/main/examples/warehouse), which provides a pseudo warehouse model to demonstrate meta-agent functionality.
+
+Let us know what you think on our [Matrix Channel](https://matrix.to/#/#project-mesa:matrix.org)
+
+### Other improvements
+- AgentSet's `agg` method now supports multiple aggregation functions in a single call ([#2743](https://github.com/projectmesa/mesa/pull/2743))
+- Many documentation improvements have been made based on feedback by our JOSS reviewers
+
+## What's Changed
+### 🎉 New features added
+* Stabilize experimental Cell Space as `mesa.discrete_space` by @quaquel in https://github.com/projectmesa/mesa/pull/2610
+* Feat: Added Command Console by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2697
+* Stabilize PropertyLayer by @EwoutH in https://github.com/projectmesa/mesa/pull/2440
+### 🛠 Enhancements made
+* Visualisation: Add dark mode by @sanika-n in https://github.com/projectmesa/mesa/pull/2689
+* Creating threads to update visualization asynchronously  by @HMNS19 in https://github.com/projectmesa/mesa/pull/2656
+* Movable Input Field with auto-scroll by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2710
+* Feat: Added arrow key navigation by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2725
+* added property_layer with altair by @sanika-n in https://github.com/projectmesa/mesa/pull/2643
+* Debug option for errors in visualisation by @colinfrisch in https://github.com/projectmesa/mesa/pull/2747
+* Debug option for errors in visualisation front end by @colinfrisch in https://github.com/projectmesa/mesa/pull/2753
+* Add support for dynamic discrete spaces by @quaquel in https://github.com/projectmesa/mesa/pull/2755
+* Support multiple functions in AgentSet `agg` method by @EwoutH in https://github.com/projectmesa/mesa/pull/2743
+### 🔍 Examples updated
+* Move boltzmann to cell spaces by @quaquel in https://github.com/projectmesa/mesa/pull/2680
+* Move Game of life to cell space by @quaquel in https://github.com/projectmesa/mesa/pull/2681
+* Move Schelling to discrete space by @quaquel in https://github.com/projectmesa/mesa/pull/2684
+* Move virus_on_a_network to discrete_space by @quaquel in https://github.com/projectmesa/mesa/pull/2688
+* Update boid_flockers example include flight direction by @sanika-n in https://github.com/projectmesa/mesa/pull/2696
+### 📜 Documentation improvements
+* docs: Split off the overview page, extend with spaces/activation by @EwoutH in https://github.com/projectmesa/mesa/pull/2673
+* docs: Add Roles section to CONTRIBUTING.md by @EwoutH in https://github.com/projectmesa/mesa/pull/2694
+* [JOSS] Docs: Clarify difference between core and user examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2706
+* [JOSS] docs: Improve batch_run documentation for parallel processing by @EwoutH in https://github.com/projectmesa/mesa/pull/2707
+* JOSS Tutorial Fixes by @tpike3 in https://github.com/projectmesa/mesa/pull/2708
+* Clean-up old images, compress wolf-sheep image, remove version switch artifact by @EwoutH in https://github.com/projectmesa/mesa/pull/2717
+* docs: Update citation to JOSS article by @EwoutH in https://github.com/projectmesa/mesa/pull/2740
+* update intro tutorial discrete space by @tpike3 in https://github.com/projectmesa/mesa/pull/2731
+* docs: fix broken links to Readthedocs in example descriptions by @reyan-singh in https://github.com/projectmesa/mesa/pull/2757
+### 🧪 Experimental features
+* Meta agents by @tpike3 in https://github.com/projectmesa/mesa/pull/2748
+### 🐛 Bugs fixed
+* Minor (bug) fixes to discrete_space by @quaquel in https://github.com/projectmesa/mesa/pull/2687
+* Fixed Marker in mpl by @sanika-n in https://github.com/projectmesa/mesa/pull/2670
+
+## New Contributors
+* @colinfrisch made their first contribution in https://github.com/projectmesa/mesa/pull/2747
+* @reyan-singh made their first contribution in https://github.com/projectmesa/mesa/pull/2757
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.1.4...v3.2.0
+
+# 3.1.5 (2025-03-26)
+## Highlights
+Mesa 3.1.5 is a maintenance release focused on improving documentation and cleaning up our resources. This update includes no breaking changes and is compatible with previous 3.1.x releases.
+
+The documentation improvements include enhanced explanations for batch run parallel processing, a significantly expanded overview section covering spaces, property layers and time advancement methods with practical code examples, and a clearer installation guide detailing what the optional `[rec]` dependencies provide. We've also improved our examples documentation to better distinguish between core and user-contributed examples, and added a new "Roles" section to the contributing guide that outlines the project's community structure and progression paths.
+
+On the maintenance side, we've cleaned up unused images and compressed existing ones, reducing the repository size by over 2MB and distribution size from 3.2MB to 1.2MB.
+
+## What's Changed
+### 📜 Documentation improvements
+* docs: Split off the overview page, extend with spaces/activation by @EwoutH in https://github.com/projectmesa/mesa/pull/2673
+* docs: Add Roles section to CONTRIBUTING.md by @EwoutH in https://github.com/projectmesa/mesa/pull/2694
+* [JOSS] Docs: Clarify difference between core and user examples by @EwoutH in https://github.com/projectmesa/mesa/pull/2706
+* [JOSS] docs: Improve batch_run documentation for parallel processing by @EwoutH in https://github.com/projectmesa/mesa/pull/2707
+* Clean-up old images, compress wolf-sheep image, remove version switch artifact by @EwoutH in https://github.com/projectmesa/mesa/pull/2717
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.1.4...v3.1.5
+
 # 3.1.4 (2025-02-09)
 ## Highlights
 This release contains various improvements and bugfixes to the matplotlib-based visualization of spaces. Hexgrids are now fully supported, including property layers. In making this possible, various minor bugs were encountered and also fixed. In addition to the visualization improvements, there are various minor convenience improvements to the docs.
-
 
 ## What's Changed
 ### 🛠 Enhancements made
@@ -367,7 +480,7 @@ Install Mesa 3.0:
 pip install --upgrade mesa
 ```
 
-If building a new model, we recommend checking out the updated [Mesa Overview](https://mesa.readthedocs.io/latest/overview.html) and [Introductory Tutorial](https://mesa.readthedocs.io/latest/tutorials/intro_tutorial.html).
+If building a new model, we recommend checking out the updated [Mesa Overview](https://mesa.readthedocs.io/latest/overview.html) and [Introductory Tutorial](https://mesa.readthedocs.io/latest/tutorials/0_first_model.html).
 
 For updating existing models, we recommend upgrading in steps:
 1. Update to latest Mesa 2.x
