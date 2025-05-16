@@ -606,9 +606,7 @@ def _check_model_params(init_func, model_params):
             and name != "self"
             and name != "kwargs"
         ):
-            raise ValueError(
-                f"Missing required model parameter: {name} - model_parameter {model_parameters} model_params {model_params}"
-            )
+            raise ValueError(f"Missing required model parameter: {name}")
     for name in model_params:
         if name not in model_parameters and "kwargs" not in model_parameters:
             raise ValueError(f"Invalid model parameter: {name}")
