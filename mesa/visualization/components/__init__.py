@@ -1,4 +1,4 @@
-"""custom solara components."""
+"""Custom visualization components."""
 
 from __future__ import annotations
 
