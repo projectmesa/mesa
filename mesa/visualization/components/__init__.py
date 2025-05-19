@@ -10,11 +10,12 @@ from .matplotlib_components import (
     make_mpl_plot_component,
     make_mpl_space_component,
 )
-from .portrayal_components import (
-    AgentPortrayalStyle,
-    PropertyLayerStyle,
-)
+from .portrayal_components import AgentPortrayalStyle, PropertyLayerStyle
 
+__all__ = [
+    "AgentPortrayalStyle",
+    "PropertyLayerStyle",
+]
 
 def make_space_component(
     agent_portrayal: Callable | None = None,

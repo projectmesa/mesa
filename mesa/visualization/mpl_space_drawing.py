@@ -52,7 +52,7 @@ def collect_agent_data(
     Args:
         space: The space containing the Agents.
         agent_portrayal: A callable that is called with the agent and returns a AgentPortrayalStyle
-        size: default size
+        default_size: default size
 
     agent_portrayal should return a AgentPortrayalStyle, limited to size (size of marker), color (color of marker), zorder (z-order),
     marker (marker style), alpha, linewidths, and edgecolors.
