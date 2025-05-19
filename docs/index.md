@@ -52,6 +52,19 @@ The `[rec]` option installs additional recommended dependencies needed for visua
 On a Mac, this command might cause an error stating `zsh: no matches found: mesa[all]`.
 In that case, change the command to `pip install -U "mesa[rec]"`.
 
+Furthermore, if you are using `nix`, Mesa comes with a flake with devShells and a runnable app:
+
+```bash
+nix run github:project-mesa/mesa # for default Python shell
+```
+
+For development shell, clone the repository and run the following command from
+repository root:
+
+```bash
+nix develop .#uv2nix # pure shell
+```
+
 ### Resources
 
 For help getting started with Mesa, check out these resources:
