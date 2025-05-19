@@ -39,7 +39,8 @@ dependencies = [
   "pandas",
   "tqdm",
   "scipy",
-  "ipython>=9.2.0",
+  "pythran>=0.17.0 ; sys_platform == 'darwin'", # required for darwin scipy overrides in nix
+
 ]
 dynamic = ["version"]
 
@@ -64,6 +65,7 @@ dev = [
   "pytest-cov",
   "sphinx",
   "pytest-mock",
+  "ipython>=9.2.0",
 ]
 examples = [
   "mesa[rec]",
