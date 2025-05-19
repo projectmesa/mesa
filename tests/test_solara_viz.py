@@ -13,6 +13,7 @@ from mesa.space import MultiGrid, PropertyLayer
 from mesa.visualization.components.altair_components import make_altair_space
 from mesa.visualization.components.matplotlib_components import make_mpl_space_component
 from mesa.visualization.solara_viz import (
+    ModelCreator,
     Slider,
     SolaraViz,
     UserInputs,
@@ -271,6 +272,36 @@ def test_model_param_checks():
     # Test empty params dict raises ValueError if required params
     with pytest.raises(ValueError, match="Missing required model parameter"):
         _check_model_params(ModelWithOnlyRequired.__init__, {})
+
+
+def test_model_creator():  # noqa: D103
+    class ModelWithRequiredParam:
+        def __init__(self, param1):
+            pass
+
+    solara.render(
+        ModelCreator(
+            solara.reactive(ModelWithRequiredParam(param1="mock")),
+            user_params={"param1": 1},
+        ),
+        handle_error=False,
+    )
+
+    solara.render(
+        ModelCreator(
+            solara.reactive(ModelWithRequiredParam(param1="mock")),
+            user_params={"param1": Slider("Param1", 10, 10, 100, 1)},
+        ),
+        handle_error=False,
+    )
+
+    with pytest.raises(ValueError, match="Missing required model parameter"):
+        solara.render(
+            ModelCreator(
+                solara.reactive(ModelWithRequiredParam(param1="mock")), user_params={}
+            ),
+            handle_error=False,
+        )
 
 
 # test that _check_model_params raises ValueError when *args are present

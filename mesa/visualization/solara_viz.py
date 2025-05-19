@@ -553,10 +553,10 @@ def ModelCreator(
     model_parameters = solara.use_reactive(model_parameters)
 
     solara.use_effect(
-        lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
+        lambda: _check_model_params(model.value.__class__.__init__, user_params),
         [model.value],
     )
-    user_params, fixed_params = split_model_params(user_params)
+    user_adjust_params, fixed_params = split_model_params(user_params)
 
     # Use solara.use_effect to run the initialization code only once
     solara.use_effect(
@@ -564,7 +564,7 @@ def ModelCreator(
         lambda: model_parameters.set(
             {
                 **fixed_params,
-                **{k: v.get("value") for k, v in user_params.items()},
+                **{k: v.get("value") for k, v in user_adjust_params.items()},
             }
         ),
         [],
@@ -574,7 +574,7 @@ def ModelCreator(
     def on_change(name, value):
         model_parameters.value = {**model_parameters.value, name: value}
 
-    UserInputs(user_params, on_change=on_change)
+    UserInputs(user_adjust_params, on_change=on_change)
 
 
 def _check_model_params(init_func, model_params):
