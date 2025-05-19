@@ -15,6 +15,7 @@ from .portrayal_components import (
     PropertyLayerStyle,
 )
 
+
 def make_space_component(
     agent_portrayal: Callable | None = None,
     propertylayer_portrayal: dict | None = None,

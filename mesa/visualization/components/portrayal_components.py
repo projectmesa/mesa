@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class AgentPortrayalStyle:
-    """
-    Represents the visual styling options for an agent in a visualization.
+    """Represents the visual styling options for an agent in a visualization.
 
-    User facing component to control how agents are drawn. 
+    User facing component to control how agents are drawn.
     Allows specifying properties like color, size,
     marker shape, position, and other plot attributes.
     """
@@ -21,8 +21,7 @@ class AgentPortrayalStyle:
     linewidths: float | int | None = 1.0
 
     def update(self, *updates_fields: tuple[str, any]):
-        """
-        Updates attributes from variable (field_name, new_value) tuple arguments.
+        """Updates attributes from variable (field_name, new_value) tuple arguments.
 
         Example:
             >>> def agent_portrayal(agent):
@@ -35,13 +34,14 @@ class AgentPortrayalStyle:
             if hasattr(self, field_to_change):
                 setattr(self, field_to_change, field_to_change_to)
             else:
-                raise AttributeError(f"'{type(self).__name__}' object has no attribute '{field_to_change}'")
+                raise AttributeError(
+                    f"'{type(self).__name__}' object has no attribute '{field_to_change}'"
+                )
 
 
 @dataclass
 class PropertyLayerStyle:
-    """
-    Represents the visual styling options for a property layer in a visualization.
+    """Represents the visual styling options for a property layer in a visualization.
 
     User facing component to control how property layers (e.g., heatmaps on a grid)
     are drawn. Allows specifying properties like colormap, single color, value limits,
@@ -50,6 +50,7 @@ class PropertyLayerStyle:
     Note: You can specify either a 'colormap' (for varying data) or a single
     'color' (for a uniform layer appearance), but not both simultaneously.
     """
+
     colormap: str | None = None
     color: str | None = None
     alpha: float = 0.8

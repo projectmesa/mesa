@@ -6,13 +6,12 @@ for a paper.
 
 """
 
-import contextlib
 import itertools
 import warnings
 from collections.abc import Callable
+from dataclasses import fields
 from functools import lru_cache
 from itertools import pairwise
-from dataclasses import fields
 
 import networkx as nx
 import numpy as np
@@ -35,7 +34,6 @@ from mesa.space import (
     HexSingleGrid,
     MultiGrid,
     NetworkGrid,
-    PropertyLayer,
     SingleGrid,
 )
 
@@ -47,7 +45,7 @@ Network = NetworkGrid | mesa.discrete_space.Network
 def collect_agent_data(
     space: OrthogonalGrid | HexGrid | Network | ContinuousSpace | VoronoiGrid,
     agent_portrayal: Callable,
-    default_size: float | None = None
+    default_size: float | None = None,
 ) -> dict:
     """Collect the plotting data for all agents in the space.
 
@@ -59,7 +57,6 @@ def collect_agent_data(
     agent_portrayal should return a AgentPortrayalStyle, limited to size (size of marker), color (color of marker), zorder (z-order),
     marker (marker style), alpha, linewidths, and edgecolors.
     """
-
     arguments = {
         "loc": [],
         "s": [],
@@ -76,7 +73,7 @@ def collect_agent_data(
 
     # Get AgentPortrayalStyle defaults
     style_fields = {f.name: f.default for f in fields(AgentPortrayalStyle)}
-    class_default_size = style_fields.get('size')
+    class_default_size = style_fields.get("size")
 
     for agent in space.agents:
         portray_input = agent_portrayal(agent)
@@ -101,7 +98,9 @@ def collect_agent_data(
             marker_val = dict_data.pop("marker", style_fields.get("marker"))
             zorder_val = dict_data.pop("zorder", style_fields.get("zorder"))
             alpha_val = dict_data.pop("alpha", style_fields.get("alpha"))
-            edgecolors_val = dict_data.pop("edgecolors", color_val) # default to agent's color if not provided
+            edgecolors_val = dict_data.pop(
+                "edgecolors", color_val
+            )  # default to agent's color if not provided
             linewidths_val = dict_data.pop("linewidths", style_fields.get("linewidths"))
 
             aps = AgentPortrayalStyle(
@@ -113,7 +112,7 @@ def collect_agent_data(
                 zorder=zorder_val,
                 alpha=alpha_val,
                 edgecolors=edgecolors_val,
-                linewidths=linewidths_val
+                linewidths=linewidths_val,
             )
 
             # Report list of unused data
@@ -249,9 +248,7 @@ def _get_hexmesh(
     return hexagons
 
 
-def draw_property_layers(
-    space, propertylayer_portrayal: Callable, ax: Axes
-):
+def draw_property_layers(space, propertylayer_portrayal: Callable, ax: Axes):
     """Draw PropertyLayers on the given axes.
 
     Args:
@@ -311,7 +308,7 @@ def draw_property_layers(
             raise ValueError(
                 f"PropertyLayer {layer_name} portrayal must include 'color' or 'colormap'."
             )
-        
+
         if isinstance(space, OrthogonalGrid):
             if color:
                 data = data.T
