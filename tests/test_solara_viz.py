@@ -13,6 +13,7 @@ from mesa.space import MultiGrid, PropertyLayer
 from mesa.visualization.components.altair_components import make_altair_space
 from mesa.visualization.components.matplotlib_components import make_mpl_space_component
 from mesa.visualization.solara_viz import (
+    ModelCreator,
     Slider,
     SolaraViz,
     UserInputs,
@@ -94,7 +95,8 @@ class TestMakeUserInput(unittest.TestCase):  # noqa: D101
         assert slider_int.step is None
 
 
-def test_call_space_drawer(mocker):  # noqa: D103
+def test_call_space_drawer(mocker):
+    """Test the call to space drawer."""
     mock_space_matplotlib = mocker.spy(
         mesa.visualization.components.matplotlib_components, "SpaceMatplotlib"
     )
@@ -207,7 +209,8 @@ def test_call_space_drawer(mocker):  # noqa: D103
     )
 
 
-def test_slider():  # noqa: D103
+def test_slider():
+    """Test the Slider component."""
     slider_float = Slider("Agent density", 0.8, 0.1, 1.0, 0.1)
     assert slider_float.is_float_slider
     assert slider_float.value == 0.8
@@ -221,7 +224,9 @@ def test_slider():  # noqa: D103
     assert slider_dtype_float.is_float_slider
 
 
-def test_model_param_checks():  # noqa: D103
+def test_model_param_checks():
+    """Test the model parameter checks."""
+
     class ModelWithOptionalParams:
         def __init__(self, required_param, optional_param=10):
             pass
@@ -267,6 +272,36 @@ def test_model_param_checks():  # noqa: D103
     # Test empty params dict raises ValueError if required params
     with pytest.raises(ValueError, match="Missing required model parameter"):
         _check_model_params(ModelWithOnlyRequired.__init__, {})
+
+
+def test_model_creator():  # noqa: D103
+    class ModelWithRequiredParam:
+        def __init__(self, param1):
+            pass
+
+    solara.render(
+        ModelCreator(
+            solara.reactive(ModelWithRequiredParam(param1="mock")),
+            user_params={"param1": 1},
+        ),
+        handle_error=False,
+    )
+
+    solara.render(
+        ModelCreator(
+            solara.reactive(ModelWithRequiredParam(param1="mock")),
+            user_params={"param1": Slider("Param1", 10, 10, 100, 1)},
+        ),
+        handle_error=False,
+    )
+
+    with pytest.raises(ValueError, match="Missing required model parameter"):
+        solara.render(
+            ModelCreator(
+                solara.reactive(ModelWithRequiredParam(param1="mock")), user_params={}
+            ),
+            handle_error=False,
+        )
 
 
 # test that _check_model_params raises ValueError when *args are present

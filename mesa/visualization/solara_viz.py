@@ -27,6 +27,7 @@ import asyncio
 import inspect
 import threading
 import time
+import traceback
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
@@ -274,6 +275,8 @@ def ModelController(
     model_parameters = solara.use_reactive(model_parameters)
     visualization_pause_event = solara.use_memo(lambda: threading.Event(), [])
 
+    error_message = solara.use_reactive(None)
+
     def step():
         try:
             while running.value and playing.value:
@@ -282,7 +285,8 @@ def ModelController(
                 if use_threads.value:
                     visualization_pause_event.set()
         except Exception as e:
-            print(f"Error in step: {e}")
+            error_message.value = f"error in step: {e}"
+            traceback.print_exc()
             return
 
     def visualization_task():
@@ -292,8 +296,10 @@ def ModelController(
                     visualization_pause_event.wait()
                     visualization_pause_event.clear()
                     force_update()
+
             except Exception as e:
-                print(f"Error in visualization_task: {e}")
+                error_message.value = f"error in visualization: {e}"
+                traceback.print_exc()
 
     solara.lab.use_task(
         step, dependencies=[playing.value, running.value], prefer_threaded=True
@@ -325,6 +331,7 @@ def ModelController(
     @function_logger(__name__)
     def do_reset():
         """Reset the model to its initial state."""
+        error_message.set(None)
         playing.value = False
         running.value = True
         visualization_pause_event.clear()
@@ -353,6 +360,9 @@ def ModelController(
             on_click=do_step,
             disabled=playing.value or not running.value,
         )
+
+    if error_message.value:
+        solara.Error(label=error_message.value)
 
 
 @solara.component
@@ -387,6 +397,8 @@ def SimulatorController(
     visualization_pause_event = solara.use_memo(lambda: threading.Event(), [])
     pause_step_event = solara.use_memo(lambda: threading.Event(), [])
 
+    error_message = solara.use_reactive(None)
+
     def step():
         try:
             while running.value and playing.value:
@@ -398,7 +410,8 @@ def SimulatorController(
                 if use_threads.value:
                     visualization_pause_event.set()
         except Exception as e:
-            print(f"Error in step: {e}")
+            error_message.value = f"error in step: {e}"
+            traceback.print_exc()
 
     def visualization_task():
         if use_threads.value:
@@ -412,7 +425,8 @@ def SimulatorController(
                     force_update()
                     pause_step_event.set()
             except Exception as e:
-                print(f"Error in visualization_task: {e}")
+                error_message.value = f"error in visualization: {e}"
+                traceback.print_exc()
                 return
 
     solara.lab.use_task(
@@ -439,6 +453,7 @@ def SimulatorController(
 
     def do_reset():
         """Reset the model to its initial state."""
+        error_message.set(None)
         playing.value = False
         running.value = True
         simulator.reset()
@@ -466,6 +481,8 @@ def SimulatorController(
             on_click=do_step,
             disabled=playing.value or not running.value,
         )
+    if error_message.value:
+        solara.Error(label=error_message.value)
 
 
 def split_model_params(model_params):
@@ -545,10 +562,10 @@ def ModelCreator(
     model_parameters = solara.use_reactive(model_parameters)
 
     solara.use_effect(
-        lambda: _check_model_params(model.value.__class__.__init__, fixed_params),
+        lambda: _check_model_params(model.value.__class__.__init__, user_params),
         [model.value],
     )
-    user_params, fixed_params = split_model_params(user_params)
+    user_adjust_params, fixed_params = split_model_params(user_params)
 
     # Use solara.use_effect to run the initialization code only once
     solara.use_effect(
@@ -556,7 +573,7 @@ def ModelCreator(
         lambda: model_parameters.set(
             {
                 **fixed_params,
-                **{k: v.get("value") for k, v in user_params.items()},
+                **{k: v.get("value") for k, v in user_adjust_params.items()},
             }
         ),
         [],
@@ -566,7 +583,7 @@ def ModelCreator(
     def on_change(name, value):
         model_parameters.value = {**model_parameters.value, name: value}
 
-    UserInputs(user_params, on_change=on_change)
+    UserInputs(user_adjust_params, on_change=on_change)
 
 
 def _check_model_params(init_func, model_params):

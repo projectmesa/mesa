@@ -2,24 +2,17 @@
 
 ## Summary
 
-A simple model of agents exchanging wealth. All agents start with the same amount of money. Every step, each agent with one unit of money or more gives one unit of wealth to another random agent. This is the model described in the [Intro Tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html), with the completed code.
-
-If you want to go over the step-by-step tutorial, please go and run the [Jupyter Notebook](https://github.com/projectmesa/mesa/blob/main/docs/tutorials/intro_tutorial.ipynb). The code here runs the finalized code in the last cells directly.
+A simple model of agents exchanging wealth. All agents start with the same amount of money. Every step, each agent with one unit of money or more gives one unit of wealth to another random agent. Mesa's [Getting Started](https://mesa.readthedocs.io/latest/getting_started.html) section walks through the Boltzmann Wealth Model in a series of short introductory tutorials, starting with[Creating your First Model](https://mesa.readthedocs.io/latest/tutorials/0_first_model.html).
 
 As the model runs, the distribution of wealth among agents goes from being perfectly uniform (all agents have the same starting wealth), to highly skewed -- a small number have high wealth, more have none at all.
 
 ## How to Run
 
-To follow the tutorial example, launch the Jupyter Notebook and run the code in ``Introduction to Mesa Tutorial Code.ipynb`` which you can find in the main mesa repo [here](https://github.com/projectmesa/mesa/blob/main/docs/tutorials/intro_tutorial.ipynb)
-
-
-To launch the interactive server, as described in the [last section of the tutorial](https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html#adding-visualization), run:
+To run the model interactively, in this directory, run the following command
 
 ```
     $ solara run app.py
 ```
-
-If your browser doesn't open automatically, point it to [http://127.0.0.1:8765/](http://127.0.0.1:8765/). When the visualization loads, click on the Play button.
 
 
 ## Files
@@ -45,9 +38,6 @@ Then, you can run the Streamlit app using the following command:
 ```
 
 ## Further Reading
-
-The full tutorial describing how the model is built can be found at:
-https://mesa.readthedocs.io/en/latest/tutorials/intro_tutorial.html
 
 This model is drawn from econophysics and presents a statistical mechanics approach to wealth distribution. Some examples of further reading on the topic can be found at:
 
