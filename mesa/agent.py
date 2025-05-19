@@ -168,9 +168,11 @@ class AgentSet(MutableSet, Sequence):
 
     """
 
-    def __init__(self,
-                 agents: Iterable[Agent],
-                 random: Random | np.random.Generator | None = None):
+    def __init__(
+        self,
+        agents: Iterable[Agent],
+        random: Random | np.random.Generator | None = None,
+    ):
         """Initializes the AgentSet with a collection of agents and a reference to the model.
 
         Args:
