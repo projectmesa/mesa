@@ -1,3 +1,15 @@
+"""Portrayal Components Module.
+
+This module defines data structures for styling visual elements in Mesa agent-based model visualizations.
+It provides user-facing classes to specify how agents and property layers should appear in the rendered space.
+
+Classes:
+- AgentPortrayalStyle: Controls the appearance of individual agents (e.g., color, shape, size, etc.).
+- PropertyLayerStyle: Controls the appearance of background property layers (e.g., color gradients or uniform fills).
+
+These components are designed to be passed into Mesa visualizations to customize and standardize how data is presented.
+"""
+
 from dataclasses import dataclass
 
 
@@ -43,9 +55,9 @@ class AgentPortrayalStyle:
 class PropertyLayerStyle:
     """Represents the visual styling options for a property layer in a visualization.
 
-    User facing component to control how property layers (e.g., heatmaps on a grid)
-    are drawn. Allows specifying properties like colormap, single color, value limits,
-    and colorbar visibility. All parameters are optional and have default values.
+    User facing component to control how property layers are drawn.
+    Allows specifying properties like colormap, single color, value limits,
+    and colorbar visibility.
 
     Note: You can specify either a 'colormap' (for varying data) or a single
     'color' (for a uniform layer appearance), but not both simultaneously.
