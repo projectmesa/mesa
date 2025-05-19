@@ -38,7 +38,8 @@ dependencies = [
   "numpy",
   "pandas",
   "tqdm",
-  "scipy"
+  "scipy",
+  "ipython>=9.2.0",
 ]
 dynamic = ["version"]
 
