@@ -107,6 +107,7 @@
           packages = [
             python
             pkgs.uv
+            pkgs.pre-commit
           ];
           env =
             {
@@ -141,7 +142,7 @@
               members = [ "mesa" ];
             };
 
-            # Override previous set with our overrideable overlay.
+            # Override previous set with our overridable overlay.
             editablePythonSet = pythonSet.overrideScope (
               lib.composeManyExtensions [
                 editableOverlay
@@ -188,6 +189,8 @@
             packages = [
               virtualenv
               pkgs.uv
+              pkgs.pre-commit
+
             ];
 
             env = {
@@ -207,6 +210,11 @@
 
               # Get repository root using git. This is expanded at runtime by the editable `.pth` machinery.
               export REPO_ROOT=$(git rev-parse --show-toplevel)
+                    # Ensure pre-commit is installed in the repo
+              if [ -f .pre-commit-config.yaml ]; then
+                pre-commit install --install-hooks
+                echo "Pre-commit hooks installed successfully"
+              fi
             '';
           };
         # set uv2nix devShell as default nix develop .#uv2nix
