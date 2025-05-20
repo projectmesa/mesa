@@ -150,6 +150,3 @@ per-file-ignores = {"mesa/examples/*"= ["D"], "docs/tutorials/*" = ["D", "E", "F
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-[tool.uv.sources]
-mesa = { workspace = true }
