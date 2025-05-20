@@ -13,6 +13,7 @@ These components are designed to be passed into Mesa visualizations to customize
 from dataclasses import dataclass
 from typing import Any
 
+
 @dataclass
 class AgentPortrayalStyle:
     """Represents the visual styling options for an agent in a visualization.
