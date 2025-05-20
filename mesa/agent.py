@@ -164,7 +164,7 @@ class AgentSet(MutableSet, Sequence):
     Notes:
         If random is None then the random number generator in the model of the first agent is used.
         If the agents list is empty and random is also None a user warning is issued and the AgentSet
-        is an empty list and a default random number generator.  This can make models non-reproducible. 
+        is an empty list and a default random number generator.  This can make models non-reproducible.
         If your code may create an AgentSet with no agents please pass a random number generator explicitly.
 
     """
