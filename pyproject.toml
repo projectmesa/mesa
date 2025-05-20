@@ -35,10 +35,10 @@ classifiers = [
 ]
 readme = "README.md"
 dependencies = [
-  "numpy",
-  "pandas",
-  "tqdm",
-  "scipy"
+  "numpy>=2.2.6,<3",
+  "pandas>=2.2.3,<3",
+  "scipy>=1.15.3,<2",
+  "tqdm>=4.67.1,<5",
 ]
 dynamic = ["version"]
 
@@ -48,36 +48,36 @@ rec = ["mesa[network,viz]"]
 all = ["mesa[network,viz,dev,examples,docs]"]
 # Core dependencies
 network = [
-  "networkx",
+  "networkx>=3.4.2,<4",
 ]
 viz = [
-  "matplotlib",
-  "solara",
-  "altair",
+  "matplotlib[viz]>=3.10.3,<4",
+  "altair[viz]>=5.5.0,<6",
+  "solara>=1.47.0,<2",
 ]
 # Dev and CI stuff
 dev = [
   "mesa[rec]",
-  "ruff",
-  "pytest",
-  "pytest-cov",
-  "sphinx",
-  "pytest-mock",
+  "ruff>=0.11.10,<1",
+  "pytest-mock>=3.14.0,<4",
+  "sphinx>=8.2.3,<9",
+  "pytest-cov>=6.1.1,<7",
+  "pytest>=8.3.5,<9",
 ]
 examples = [
   "mesa[rec]",
-  "pytest",
-  "scipy",
+  "pytest>=8.3.5,<9",
+  "scipy>=1.15.3,<2",
 ]
 docs = [
+  "ipython>=9.2.0,<10",
   "mesa[rec]",
-  "sphinx",
-  "ipython",
-  "pydata_sphinx_theme",
-  "seaborn",
-  "myst-nb",
-  "myst-parser",  # Markdown in Sphinx
-  "sphinx-copybutton", # Add a copy option in docs
+  "myst-nb>=1.2.0,<2",
+  "myst-parser>=4.0.1,<5",
+  "pydata-sphinx-theme>=0.16.1,<1",
+  "seaborn>=0.13.2,<1",
+  "sphinx>=8.2.3,<9",
+  "sphinx-copybutton>=0.5.2,<1",
 ]
 
 [project.urls]
@@ -150,3 +150,6 @@ per-file-ignores = {"mesa/examples/*"= ["D"], "docs/tutorials/*" = ["D", "E", "F
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.uv.sources]
+mesa = { workspace = true }
