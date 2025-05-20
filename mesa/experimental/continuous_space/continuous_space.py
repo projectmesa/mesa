@@ -117,7 +117,7 @@ class ContinuousSpace:
         if self._agent_positions.shape[0] <= index:
             # we are out of space
             fraction = 0.2  # we add 20%  Fixme
-            n = int(round(fraction * self._n_agents))
+            n = round(fraction * self._n_agents, None)
             self._agent_positions = np.vstack(
                 [
                     self._agent_positions,
