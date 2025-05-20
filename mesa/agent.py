@@ -163,8 +163,8 @@ class AgentSet(MutableSet, Sequence):
 
     Notes:
         If random is None then the random number generator in the model of the first agent is used.
-        If the agents list is empty a user warning is issued and the agent set is an empty list
-        with no random number generator
+        If the agents list is empty and random is also None a user warning is issued and the AgentSet
+        is an empty list with no random number generator.
 
     """
 
@@ -177,7 +177,7 @@ class AgentSet(MutableSet, Sequence):
 
         Args:
             agents (Iterable[Agent]): An iterable of Agent objects to be included in the set.
-            random (Random | np.random.Generator): the random number generator
+            random (Random | np.random.Generator | None): the random number generator
         """
         self._agents = weakref.WeakKeyDictionary(dict.fromkeys(agents))
         if (len(self._agents) == 0) and random is None:
