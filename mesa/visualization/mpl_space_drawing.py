@@ -161,7 +161,7 @@ def collect_agent_data(
 def draw_space(
     space,
     agent_portrayal: Callable,
-    propertylayer_portrayal: dict | None = None,
+    propertylayer_portrayal: Callable | None = None,
     ax: Axes | None = None,
     **space_drawing_kwargs,
 ):
@@ -169,15 +169,15 @@ def draw_space(
 
     Args:
         space: the space of the mesa model
-        agent_portrayal: A callable that returns a dict specifying how to show the agent
-        propertylayer_portrayal: a dict specifying how to show propertylayer(s)
+        agent_portrayal: A callable that returns a AgnetPortrayalStyle specifying how to show the agent
+        propertylayer_portrayal: A callable that returns a PropertyLayerStyle specifying how to show the property layer
         ax: the axes upon which to draw the plot
         space_drawing_kwargs: any additional keyword arguments to be passed on to the underlying function for drawing the space.
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
 
-    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this dict are "color",
+    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this object are "color",
     "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
 
     """
@@ -363,7 +363,7 @@ def draw_orthogonal_grid(
 
     Args:
         space: the space to visualize
-        agent_portrayal: a callable that is called with the agent and returns a dict
+        agent_portrayal: a callable that is called with the agent and returns a AgentPortrayalStyle
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
         kwargs: additional keyword arguments passed to ax.scatter
@@ -371,7 +371,7 @@ def draw_orthogonal_grid(
     Returns:
         Returns the Axes object with the plot drawn onto it.
 
-    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this dict are "color",
+    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this object are "color",
     "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
 
     """
@@ -410,14 +410,14 @@ def draw_hex_grid(
 
     Args:
         space: the space to visualize
-        agent_portrayal: a callable that is called with the agent and returns a dict
+        agent_portrayal: a callable that is called with the agent and returns a AgentPortrayalStyle
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
         kwargs: additional keyword arguments passed to ax.scatter
     Returns:
         Returns the Axes object with the plot drawn onto it.
 
-    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this dict are "color",
+    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this object are "color",
     "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
     """
     if ax is None:
@@ -491,7 +491,7 @@ def draw_network(
 
     Args:
         space: the space to visualize
-        agent_portrayal: a callable that is called with the agent and returns a dict
+        agent_portrayal: a callable that is called with the agent and returns a AgentPortrayalStyle
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid
         layout_alg: a networkx layout algorithm or other callable with the same behavior
@@ -501,7 +501,7 @@ def draw_network(
     Returns:
         Returns the Axes object with the plot drawn onto it.
 
-    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this dict are "color",
+    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this object are "color",
     "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
 
     """
@@ -556,14 +556,14 @@ def draw_continuous_space(
 
     Args:
         space: the space to visualize
-        agent_portrayal: a callable that is called with the agent and returns a dict
+        agent_portrayal: a callable that is called with the agent and returns a AgentPortrayalStyle
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         kwargs: additional keyword arguments passed to ax.scatter
 
     Returns:
         Returns the Axes object with the plot drawn onto it.
 
-    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this dict are "color",
+    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this object are "color",
     "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
 
     """
@@ -607,7 +607,7 @@ def draw_voronoi_grid(
 
     Args:
         space: the space to visualize
-        agent_portrayal: a callable that is called with the agent and returns a dict
+        agent_portrayal: a callable that is called with the agent and returns a AgentPortrayalStyle
         ax: a Matplotlib Axes instance. If none is provided a new figure and ax will be created using plt.subplots
         draw_grid: whether to draw the grid or not
         kwargs: additional keyword arguments passed to ax.scatter
@@ -615,7 +615,7 @@ def draw_voronoi_grid(
     Returns:
         Returns the Axes object with the plot drawn onto it.
 
-    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this dict are "color",
+    ``agent_portrayal`` is called with an agent and should return a AgentPortrayalStyle. Valid fields in this object are "color",
     "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
 
     """

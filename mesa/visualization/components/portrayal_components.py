@@ -11,7 +11,7 @@ These components are designed to be passed into Mesa visualizations to customize
 """
 
 from dataclasses import dataclass
-
+from typing import Any
 
 @dataclass
 class AgentPortrayalStyle:
@@ -32,7 +32,7 @@ class AgentPortrayalStyle:
     edgecolors: str | tuple | None = None
     linewidths: float | int | None = 1.0
 
-    def update(self, *updates_fields: tuple[str, any]):
+    def update(self, *updates_fields: tuple[str, Any]):
         """Updates attributes from variable (field_name, new_value) tuple arguments.
 
         Example:
