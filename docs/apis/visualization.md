@@ -1,6 +1,11 @@
 # Visualization
 
-For a detailed tutorial, please refer to our [Visualization Tutorial](../tutorials/visualization_tutorial.ipynb).
+For detailed tutorials, please refer to:
+
+- [Basic Visualization](../tutorials/4_visualization_basic)
+- [Dynamic Agent Visualization](../tutorials/5_visualization_dynamic_agents)
+- [Custom Agent Visualization](../tutorials/6_visualization_custom)
+
 
 ## Jupyter Visualization
 
