@@ -1,6 +1,6 @@
 # Visualization
 
-For a detailed tutorial, please refer to our [Visualization Tutorial](https://raw.githubusercontent.com/projectmesa/mesa/refs/heads/main/docs/tutorials/4_visualization_basic.ipynb).
+For a detailed tutorial, please refer to our [Visualization Tutorial](https://github.com/projectmesa/mesa/blob/main/docs/tutorials/4_visualization_basic.ipynb).
 
 ## Jupyter Visualization
 
