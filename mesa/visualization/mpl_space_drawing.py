@@ -12,6 +12,7 @@ from collections.abc import Callable
 from dataclasses import fields
 from functools import lru_cache
 from itertools import pairwise
+from typing import Any
 
 import networkx as nx
 import numpy as np
@@ -248,7 +249,9 @@ def _get_hexmesh(
     return hexagons
 
 
-def draw_property_layers(space, propertylayer_portrayal: Callable, ax: Axes):
+def draw_property_layers(
+    space, propertylayer_portrayal: dict[str, dict[str, Any]] | Callable, ax: Axes
+):
     """Draw PropertyLayers on the given axes.
 
     Args:
@@ -259,6 +262,40 @@ def draw_property_layers(space, propertylayer_portrayal: Callable, ax: Axes):
         ax (matplotlib.axes.Axes): The axes to draw on.
 
     """
+    # Importing here to avoid circular import issues
+    from mesa.visualization.components import PropertyLayerStyle
+
+    def _propertylayer_portryal_dict_to_callable(
+        propertylayer_portrayal: dict[str, dict[str, Any]],
+    ):
+        """Helper function to convert a propertylayer_portrayal dict to a callable that return a PropertyLayerStyle."""
+
+        def style_callable(layer_object: Any):
+            layer_name = layer_object.name
+            params = propertylayer_portrayal.get(layer_name)
+
+            warnings.warn(
+                "The propertylayer_portrayal dict is deprecated. Use a callable that returns PropertyLayerStyle instead.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+            if params is None:
+                return None  # Layer not specified in the dict, so skip.
+
+            return PropertyLayerStyle(
+                color=params.get("color"),
+                colormap=params.get("colormap"),
+                alpha=params.get(
+                    "alpha", PropertyLayerStyle.alpha
+                ),  # Use defaults defined in the dataclass itself
+                vmin=params.get("vmin"),
+                vmax=params.get("vmax"),
+                colorbar=params.get("colorbar", PropertyLayerStyle.colorbar),
+            )
+
+        return style_callable
+
     try:
         # old style spaces
         property_layers = space.properties
@@ -266,13 +303,21 @@ def draw_property_layers(space, propertylayer_portrayal: Callable, ax: Axes):
         # new style spaces
         property_layers = space._mesa_property_layers
 
+    callable_portrayal: Callable[[Any], PropertyLayerStyle | None]
+    if isinstance(propertylayer_portrayal, dict):
+        callable_portrayal = _propertylayer_portryal_dict_to_callable(
+            propertylayer_portrayal
+        )
+    else:
+        callable_portrayal = propertylayer_portrayal
+
     for layer_name in property_layers:
         if layer_name == "empty":
             # Skipping empty layer, automatically generated
             continue
 
         layer = property_layers.get(layer_name, None)
-        portrayal = propertylayer_portrayal(layer)
+        portrayal = callable_portrayal(layer)
 
         if portrayal is None:
             # Not visualizing layers that do not have a defined visual encoding.
