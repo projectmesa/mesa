@@ -38,13 +38,13 @@ pip install -U mesa
 Starting with Mesa 3.0, we don't install all our dependencies anymore by default.
 ```bash
 # You can customize the additional dependencies you need, if you want. Available are:
-pip install -U mesa[network,viz]
+pip install -U "mesa[network,viz]"
 
 # This is equivalent to our recommended dependencies:
-pip install -U mesa[rec]
+pip install -U "mesa[rec]"
 
 # To install all, including developer, dependencies:
-pip install -U mesa[all]
+pip install -U "mesa[all]"
 ```
 
 You can also use `pip` to install the latest GitHub version:
