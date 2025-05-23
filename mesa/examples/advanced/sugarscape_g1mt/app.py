@@ -2,15 +2,26 @@ from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt
 from mesa.visualization import Slider, SolaraViz, make_plot_component
 from mesa.visualization.components.matplotlib_components import make_mpl_space_component
 
+from mesa.visualization.components import AgentPortrayalStyle, PropertyLayerStyle
+
 
 def agent_portrayal(agent):
-    return {"marker": "o", "color": "red", "size": 10}
+    return AgentPortrayalStyle(
+        x=agent.cell.coordinate[0],
+        y=agent.cell.coordinate[1],
+        color="red",
+        marker="o",
+        size=10,
+        zorder=1,
+    )
 
 
-propertylayer_portrayal = {
-    "sugar": {"color": "blue", "alpha": 0.8, "colorbar": True, "vmin": 0, "vmax": 10},
-    "spice": {"color": "red", "alpha": 0.8, "colorbar": True, "vmin": 0, "vmax": 10},
-}
+def propertylayer_portrayal(layer):
+    if layer.name == "sugar":
+        return PropertyLayerStyle(
+            color="blue", alpha=0.8, colorbar=True, vmin=0, vmax=10
+        )
+    return PropertyLayerStyle(color="red", alpha=0.8, colorbar=True, vmin=0, vmax=10)
 
 
 sugarscape_space = make_mpl_space_component(
