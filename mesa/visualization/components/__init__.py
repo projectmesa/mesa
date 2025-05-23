@@ -13,15 +13,15 @@ from .matplotlib_components import (
 from .portrayal_components import AgentPortrayalStyle, PropertyLayerStyle
 
 __all__ = [
-    "make_space_component",
-    "make_plot_component",
-    "SpaceMatplotlib",
-    "SpaceAltair",
-    "make_altair_space",
-    "make_mpl_space_component",
-    "make_mpl_plot_component",
     "AgentPortrayalStyle",
     "PropertyLayerStyle",
+    "SpaceAltair",
+    "SpaceMatplotlib",
+    "make_altair_space",
+    "make_mpl_plot_component",
+    "make_mpl_space_component",
+    "make_plot_component",
+    "make_space_component",
 ]
 
 
