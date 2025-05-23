@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 import solara
 from matplotlib.figure import Figure
 
-from mesa.visualization.mpl_space_drawing import draw_space
+from mesa.visualization.AgentPortrayalStyle import AgentPortrayalStyle
+from mesa.visualization.mpl_space_drawing import collect_agent_data, draw_space
 from mesa.visualization.utils import update_counter
 
 
@@ -27,37 +28,23 @@ def make_mpl_space_component(
     propertylayer_portrayal: dict | None = None,
     post_process: Callable | None = None,
     **space_drawing_kwargs,
-) -> SpaceMatplotlib:
-    """Create a Matplotlib-based space visualization component.
-
-    Args:
-        agent_portrayal: Function to portray agents.
-        propertylayer_portrayal: Dictionary of PropertyLayer portrayal specifications
-        post_process : a callable that will be called with the Axes instance. Allows for fine tuning plots (e.g., control ticks)
-        space_drawing_kwargs : additional keyword arguments to be passed on to the underlying space drawer function. See
-                               the functions for drawing the various spaces for further details.
-
-    ``agent_portrayal`` is called with an agent and should return a dict. Valid fields in this dict are "color",
-    "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
-
-    Returns:
-        function: A function that creates a SpaceMatplotlib component
-    """
+) -> Callable:
+    """Create a Matplotlib-based space visualization component."""
     if agent_portrayal is None:
 
         def agent_portrayal(a):
-            return {}
+            return AgentPortrayalStyle()
 
     def MakeSpaceMatplotlib(model):
         return SpaceMatplotlib(
             model,
-            agent_portrayal,
+            lambda agent: collect_agent_data(model.space, agent_portrayal),
             propertylayer_portrayal,
             post_process=post_process,
             **space_drawing_kwargs,
         )
 
-    return MakeSpaceMatplotlib
+    return MakeSpaceMatplotlib  # <-- Fix: Return the function
 
 
 @solara.component
