@@ -140,7 +140,8 @@ def collect_agent_data(
             if aps.edgecolors is None:
                 aps.edgecolors = aps.color
             # get position if not specified
-            aps.x, aps.y = get_agent_pos(agent, space)
+            if aps.x is None and aps.y is None:
+                aps.x, aps.y = get_agent_pos(agent, space)
 
         # Collect common data from the AgentPortrayalStyle instance
         arguments["loc"].append((aps.x, aps.y))
