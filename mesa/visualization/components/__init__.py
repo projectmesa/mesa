@@ -1,4 +1,4 @@
-"""custom solara components."""
+"""Custom visualization components."""
 
 from __future__ import annotations
 
@@ -10,6 +10,19 @@ from .matplotlib_components import (
     make_mpl_plot_component,
     make_mpl_space_component,
 )
+from .portrayal_components import AgentPortrayalStyle, PropertyLayerStyle
+
+__all__ = [
+    "AgentPortrayalStyle",
+    "PropertyLayerStyle",
+    "SpaceAltair",
+    "SpaceMatplotlib",
+    "make_altair_space",
+    "make_mpl_plot_component",
+    "make_mpl_space_component",
+    "make_plot_component",
+    "make_space_component",
+]
 
 
 def make_space_component(
