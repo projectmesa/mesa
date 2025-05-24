@@ -58,6 +58,18 @@ def collect_agent_data(
     agent_portrayal should return a AgentPortrayalStyle, limited to size (size of marker), color (color of marker), zorder (z-order),
     marker (marker style), alpha, linewidths, and edgecolors.
     """
+
+    def get_agent_pos(agent, space):
+        """Helper function to get the agent position depending on the grid type."""
+        if isinstance(space, NetworkGrid):
+            agent_x, agent_y = agent.pos, agent.pos
+        elif isinstance(space, Network):
+            agent_x, agent_y = agent.cell.coordinate, agent.cell.coordinate
+        else:
+            agent_x = agent.pos[0] if agent.pos else agent.cell.coordinate[0]
+            agent_y = agent.pos[1] if agent.pos else agent.cell.coordinate[1]
+        return agent_x, agent_y
+
     arguments = {
         "loc": [],
         "s": [],
@@ -83,19 +95,17 @@ def collect_agent_data(
         if isinstance(portray_input, dict):
             warnings.warn(
                 "Returning a dict from agent_portrayal is deprecated and will be removed "
-                "in a future version. Please return an AgentPortrayalStyle instance instead. "
-                "Attempting to convert dict to AgentPortrayalStyle.",
+                "in a future version. Please return an AgentPortrayalStyle instance instead.",
                 DeprecationWarning,
                 stacklevel=2,
             )
             dict_data = portray_input.copy()
 
-            agent_x = agent.pos[0] if agent.pos else agent.cell.coordinate[0]
-            agent_y = agent.pos[1] if agent.pos else agent.cell.coordinate[1]
+            agent_x, agent_y = get_agent_pos(agent, space)
 
             # Extract values from the dict, using defaults if not provided
-            size_val = dict_data.pop("size", style_fields.get("size"))
-            color_val = dict_data.pop("color", style_fields.get("color"))
+            size_val = dict_data.pop("s", style_fields.get("size"))
+            color_val = dict_data.pop("c", style_fields.get("color"))
             marker_val = dict_data.pop("marker", style_fields.get("marker"))
             zorder_val = dict_data.pop("zorder", style_fields.get("zorder"))
             alpha_val = dict_data.pop("alpha", style_fields.get("alpha"))
@@ -129,6 +139,8 @@ def collect_agent_data(
             # default to agent's color if not provided
             if aps.edgecolors is None:
                 aps.edgecolors = aps.color
+            # get position if not specified
+            aps.x, aps.y = get_agent_pos(agent, space)
 
         # Collect common data from the AgentPortrayalStyle instance
         arguments["loc"].append((aps.x, aps.y))
@@ -276,7 +288,7 @@ def draw_property_layers(
 
             warnings.warn(
                 "The propertylayer_portrayal dict is deprecated. Use a callable that returns PropertyLayerStyle instead.",
-                UserWarning,
+                DeprecationWarning,
                 stacklevel=2,
             )
 
@@ -574,7 +586,14 @@ def draw_network(
     # this assumes that nodes are identified by an integer
     # which is true for default nx graphs but might user changeable
     pos = np.asarray(list(pos.values()))
-    arguments["loc"] = pos[arguments["loc"]]
+    loc = arguments["loc"]
+
+    # For network only one of x and y contains the correct coordinates
+    x = loc[:, 0]
+    if x is None:
+        x = loc[:, 1]
+
+    arguments["loc"] = pos[x]
 
     # plot the agents
     _scatter(ax, arguments, **kwargs)

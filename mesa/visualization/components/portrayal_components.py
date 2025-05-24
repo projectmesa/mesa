@@ -23,8 +23,8 @@ class AgentPortrayalStyle:
     marker shape, position, and other plot attributes.
     """
 
-    x: float
-    y: float
+    x: float | None = None
+    y: float | None = None
     color: str | tuple | None = "tab:blue"
     marker: str | None = "o"
     size: int | float | None = 50
