@@ -1,5 +1,6 @@
-import pytest
 from dataclasses import is_dataclass
+
+import pytest
 
 from mesa.visualization.components import AgentPortrayalStyle, PropertyLayerStyle
 
@@ -54,7 +55,9 @@ def test_agent_portrayal_style_update_attributes():
 
 def test_agent_portrayal_style_update_non_existent_attribute():
     style = AgentPortrayalStyle()
-    with pytest.raises(AttributeError, match="'AgentPortrayalStyle' object has no attribute 'shape'"):
+    with pytest.raises(
+        AttributeError, match="'AgentPortrayalStyle' object has no attribute 'shape'"
+    ):
         style.update(("shape", "triangle"))
 
 
@@ -62,7 +65,7 @@ def test_agent_portrayal_style_update_with_no_arguments():
     original_style = AgentPortrayalStyle(color="blue")
     updated_style = AgentPortrayalStyle(color="blue")
     updated_style.update()
-    assert updated_style.color == original_style.color # Ensure no change
+    assert updated_style.color == original_style.color  # Ensure no change
 
 
 def test_property_layer_style_is_dataclass():
@@ -91,11 +94,7 @@ def test_property_layer_style_default_values_with_color():
 
 def test_property_layer_style_custom_initialization_with_colormap():
     style = PropertyLayerStyle(
-        colormap="plasma",
-        alpha=0.5,
-        colorbar=False,
-        vmin=0,
-        vmax=1
+        colormap="plasma", alpha=0.5, colorbar=False, vmin=0, vmax=1
     )
     assert style.colormap == "plasma"
     assert style.color is None
@@ -106,11 +105,7 @@ def test_property_layer_style_custom_initialization_with_colormap():
 
 
 def test_property_layer_style_custom_initialization_with_color():
-    style = PropertyLayerStyle(
-        color="blue",
-        alpha=0.9,
-        colorbar=False
-    )
+    style = PropertyLayerStyle(color="blue", alpha=0.9, colorbar=False)
     assert style.colormap is None
     assert style.color == "blue"
     assert style.alpha == 0.9
@@ -118,7 +113,9 @@ def test_property_layer_style_custom_initialization_with_color():
 
 
 def test_property_layer_style_post_init_both_color_and_colormap_error():
-    with pytest.raises(ValueError, match="Specify either 'color' or 'colormap', not both."):
+    with pytest.raises(
+        ValueError, match="Specify either 'color' or 'colormap', not both."
+    ):
         PropertyLayerStyle(colormap="viridis", color="red")
 
 
