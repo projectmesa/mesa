@@ -117,7 +117,6 @@ def test_property_layer_style_custom_initialization_with_colormap():
 
 
 def test_property_layer_style_custom_initialization_with_color():
-    style = PropertyLayerStyle(color="blue", alpha=0.9, colorbar=False)
     """Test custom initialization of PropertyLayerStyle with color."""
     style = PropertyLayerStyle(color="blue", alpha=0.9, colorbar=False)
     assert style.colormap is None
@@ -127,6 +126,7 @@ def test_property_layer_style_custom_initialization_with_color():
 
 
 def test_property_layer_style_post_init_both_color_and_colormap_error():
+    """Test error when both color and colormap are specified."""
     with pytest.raises(
         ValueError, match="Specify either 'color' or 'colormap', not both."
     ):
