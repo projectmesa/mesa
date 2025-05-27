@@ -93,6 +93,12 @@ def collect_agent_data(
         aps: AgentPortrayalStyle
 
         if isinstance(portray_input, dict):
+            warnings.warn(
+                "Returning a dict from agent_portrayal is deprecated and will be removed "
+                "in a future version. Please return an AgentPortrayalStyle instance instead.",
+                PendingDeprecationWarning,
+                stacklevel=2,
+            )
             dict_data = portray_input.copy()
 
             agent_x, agent_y = get_agent_pos(agent, space)
@@ -280,6 +286,12 @@ def draw_property_layers(
         def style_callable(layer_object: Any):
             layer_name = layer_object.name
             params = propertylayer_portrayal.get(layer_name)
+
+            warnings.warn(
+                "The propertylayer_portrayal dict is deprecated. Use a callable that returns PropertyLayerStyle instead.",
+                PendingDeprecationWarning,
+                stacklevel=2,
+            )
 
             if params is None:
                 return None  # Layer not specified in the dict, so skip.
