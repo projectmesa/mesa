@@ -7,6 +7,7 @@ from mesa.visualization import (
     make_plot_component,
     make_space_component,
 )
+from mesa.visualization.components import AgentPortrayalStyle
 
 
 def get_happy_agents(model):
@@ -15,7 +16,16 @@ def get_happy_agents(model):
 
 
 def agent_portrayal(agent):
-    return {"color": "tab:orange" if agent.type == 0 else "tab:blue"}
+    style = AgentPortrayalStyle(
+        x=agent.cell.coordinate[0],
+        y=agent.cell.coordinate[1],
+        color="tab:orange",
+        marker="o",
+    )
+    if agent.type == 0:
+        style.update(("color", "tab:blue"))
+
+    return style
 
 
 model_params = {
