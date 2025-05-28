@@ -66,8 +66,12 @@ def collect_agent_data(
         elif isinstance(space, Network):
             agent_x, agent_y = agent.cell.coordinate, agent.cell.coordinate
         else:
-            agent_x = agent.pos[0] if agent.pos is not None else agent.cell.coordinate[0]
-            agent_y = agent.pos[1] if agent.pos is not None else agent.cell.coordinate[1]
+            agent_x = (
+                agent.pos[0] if agent.pos is not None else agent.cell.coordinate[0]
+            )
+            agent_y = (
+                agent.pos[1] if agent.pos is not None else agent.cell.coordinate[1]
+            )
         return agent_x, agent_y
 
     arguments = {
@@ -758,7 +762,7 @@ def _scatter(ax: Axes, arguments, **kwargs):
             # No agents with this marker and z-order, skip
             if not np.any(logical):
                 continue
-            
+
             ax.scatter(
                 x[logical],
                 y[logical],
