@@ -40,6 +40,7 @@ def agent_portrayal(agent):
                 ("size", 50),
                 ("zorder", 2),
             )
+
     return style
 
 
