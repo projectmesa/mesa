@@ -19,11 +19,16 @@ def agent_portrayal(agent):
     style = AgentPortrayalStyle(
         x=agent.cell.coordinate[0],
         y=agent.cell.coordinate[1],
-        color="tab:orange",
-        marker="o",
+        marker="./resources/orange_happy.png",
     )
     if agent.type == 0:
-        style.update(("color", "tab:blue"))
+        if agent.happy:
+            style.update(("marker", "./resources/blue_happy.png"))
+        else:
+            style.update(("marker", "./resources/blue_unhappy.png"))
+    else:
+        if not agent.happy:
+            style.update(("marker", "./resources/orange_unhappy.png"))
 
     return style
 

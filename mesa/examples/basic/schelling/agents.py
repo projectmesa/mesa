@@ -19,8 +19,9 @@ class SchellingAgent(CellAgent):
         self.type = agent_type
         self.homophily = homophily
         self.radius = radius
+        self.happy = False
 
-    def step(self) -> None:
+    def assign_state(self) -> None:
         """Determine if agent is happy and move if necessary."""
         neighbors = list(self.cell.get_neighborhood(radius=self.radius).agents)
 
@@ -34,8 +35,13 @@ class SchellingAgent(CellAgent):
             # If there are no neighbors, the similarity fraction is 0
             similarity_fraction = 0.0
 
-        # Move if unhappy
         if similarity_fraction < self.homophily:
-            self.cell = self.model.grid.select_random_empty_cell()
+            self.happy = False
         else:
+            self.happy = True
             self.model.happy += 1
+
+    def step(self) -> None:
+        # Move if unhappy
+        if not self.happy:
+            self.cell = self.model.grid.select_random_empty_cell()
