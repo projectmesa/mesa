@@ -7,6 +7,7 @@ for a paper.
 """
 
 import itertools
+import os
 import warnings
 from collections.abc import Callable
 from dataclasses import fields
@@ -21,7 +22,9 @@ from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import LineCollection, PatchCollection, PolyCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from matplotlib.patches import Polygon
+from PIL import Image
 
 import mesa
 from mesa.discrete_space import (
@@ -37,6 +40,8 @@ from mesa.space import (
     NetworkGrid,
     SingleGrid,
 )
+
+CORRECTION_FACTOR_MARKER_ZOOM = 0.6
 
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
@@ -443,12 +448,12 @@ def draw_orthogonal_grid(
     s_default = (180 / max(space.width, space.height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, default_size=s_default)
 
-    # plot the agents
-    _scatter(ax, arguments, **kwargs)
-
     # further styling
     ax.set_xlim(-0.5, space.width - 0.5)
     ax.set_ylim(-0.5, space.height - 0.5)
+
+    # plot the agents
+    _scatter(ax, arguments, **kwargs)
 
     if draw_grid:
         # Draw grid lines
@@ -493,16 +498,6 @@ def draw_hex_grid(
     x_spacing = np.sqrt(3) * size
     y_spacing = 1.5 * size
 
-    loc = arguments["loc"].astype(float)
-    # Calculate hexagon centers for agents if agents are present and plot them.
-    if loc.size > 0:
-        loc[:, 0] = loc[:, 0] * x_spacing + ((loc[:, 1] - 1) % 2) * (x_spacing / 2)
-        loc[:, 1] = loc[:, 1] * y_spacing
-        arguments["loc"] = loc
-
-        # plot the agents
-        _scatter(ax, arguments, **kwargs)
-
     # Calculate proper bounds that account for the full hexagon width and height
     x_max = space.width * x_spacing + (space.height % 2) * (x_spacing / 2)
     y_max = space.height * y_spacing
@@ -517,6 +512,16 @@ def draw_hex_grid(
     # Determined through physical testing.
     ax.set_xlim(-2 * x_padding, x_max + x_padding)
     ax.set_ylim(-2 * y_padding, y_max + y_padding)
+
+    loc = arguments["loc"].astype(float)
+    # Calculate hexagon centers for agents if agents are present and plot them.
+    if loc.size > 0:
+        loc[:, 0] = loc[:, 0] * x_spacing + ((loc[:, 1] - 1) % 2) * (x_spacing / 2)
+        loc[:, 1] = loc[:, 1] * y_spacing
+        arguments["loc"] = loc
+
+        # plot the agents
+        _scatter(ax, arguments, **kwargs)
 
     def setup_hexmesh(width, height):
         """Helper function for creating the hexmesh with unique edges."""
@@ -599,13 +604,13 @@ def draw_network(
 
     arguments["loc"] = pos[x]
 
-    # plot the agents
-    _scatter(ax, arguments, **kwargs)
-
     # further styling
     ax.set_axis_off()
     ax.set_xlim(xmin=xmin - x_padding, xmax=xmax + x_padding)
     ax.set_ylim(ymin=ymin - y_padding, ymax=ymax + y_padding)
+
+    # plot the agents
+    _scatter(ax, arguments, **kwargs)
 
     if draw_grid:
         # fixme we need to draw the empty nodes as well
@@ -648,9 +653,6 @@ def draw_continuous_space(
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, default_size=s_default)
 
-    # plot the agents
-    _scatter(ax, arguments, **kwargs)
-
     # further visual styling
     border_style = "solid" if not space.torus else (0, (5, 10))
     for spine in ax.spines.values():
@@ -660,6 +662,9 @@ def draw_continuous_space(
 
     ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
+
+    # plot the agents
+    _scatter(ax, arguments, **kwargs)
 
     return ax
 
@@ -725,19 +730,41 @@ def draw_voronoi_grid(
     return ax
 
 
+def _get_zoom_factor(ax, img):
+    ax.get_figure().canvas.draw()
+    bbox = ax.get_window_extent().transformed(
+        ax.get_figure().dpi_scale_trans.inverted()
+    )  # in inches
+    width, height = (
+        bbox.width * ax.get_figure().dpi,
+        bbox.height * ax.get_figure().dpi,
+    )  # in pixel
+
+    xr = ax.get_xlim()
+    yr = ax.get_ylim()
+
+    x_pixel_per_data = width / (xr[1] - xr[0])
+    y_pixel_per_data = height / (yr[1] - yr[0])
+
+    zoom_x = (x_pixel_per_data / img.width) * CORRECTION_FACTOR_MARKER_ZOOM
+    zoom_y = (y_pixel_per_data / img.height) * CORRECTION_FACTOR_MARKER_ZOOM
+
+    return min(zoom_x, zoom_y)
+
+
 def _scatter(ax: Axes, arguments, **kwargs):
     """Helper function for plotting the agents.
 
     Args:
         ax: a Matplotlib Axes instance
-        arguments: the agents specific arguments for platting
+        arguments: the agents specific arguments for plotting
         kwargs: additional keyword arguments for ax.scatter
 
     """
     loc = arguments.pop("loc")
 
-    x = loc[:, 0]
-    y = loc[:, 1]
+    loc_x = loc[:, 0]
+    loc_y = loc[:, 1]
     marker = arguments.pop("marker")
     zorder = arguments.pop("zorder")
 
@@ -753,21 +780,38 @@ def _scatter(ax: Axes, arguments, **kwargs):
                     f"{entry} is specified in agent portrayal and via plotting kwargs, you can only use one or the other"
                 )
 
+    ax.get_figure().canvas.draw()
     for mark in set(marker):
         mark_mask = [m == mark for m in list(marker)]
+        mark_png = [
+            isinstance(m, (str | os.PathLike)) and os.path.isfile(m)
+            for m in list(marker)
+        ]
         for z_order in np.unique(zorder):
             zorder_mask = z_order == zorder
-            logical = mark_mask & zorder_mask
+            logical_mark = mark_mask & zorder_mask & [not m for m in mark_png]
+            logical_png = mark_mask & zorder_mask & mark_png
 
-            # No agents with this marker and z-order, skip
-            if not np.any(logical):
-                continue
+            if any(logical_png):
+                image = Image.open(mark)
+                im = OffsetImage(image, zoom=_get_zoom_factor(ax, image))
+                im.image.axes = ax
 
-            ax.scatter(
-                x[logical],
-                y[logical],
-                marker=mark,
-                zorder=z_order,
-                **{k: v[logical] for k, v in arguments.items()},
-                **kwargs,
-            )
+                for x, y in zip(loc_x[logical_png], loc_y[logical_png]):
+                    ab = AnnotationBbox(
+                        im,
+                        (x, y),
+                        frameon=False,
+                        pad=0.0,
+                    )
+                    ax.add_artist(ab)
+
+            if any(logical_mark):
+                ax.scatter(
+                    loc_x[logical_mark],
+                    loc_y[logical_mark],
+                    marker=mark,
+                    zorder=z_order,
+                    **{k: v[logical_mark] for k, v in arguments.items()},
+                    **kwargs,
+                )
