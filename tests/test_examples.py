@@ -1,4 +1,5 @@
 # noqa: D100
+from solara.testing import test_app
 from mesa.examples import (
     BoidFlockers,
     BoltzmannWealth,
@@ -11,7 +12,16 @@ from mesa.examples import (
     VirusOnNetwork,
     WolfSheep,
 )
+from mesa.experimental.devs import ABMSimulator
 
+
+def run_viz_test(model_instance, app_page, dom_selector="canvas"):
+    """Run model steps and test if the Solara visualization renders."""
+    for _ in range(10):
+        model_instance.step()
+
+    with test_app(app_page) as app_test:
+        assert app_test.find(dom_selector), f"{dom_selector} should render for {model_instance.__class__.__name__}"
 
 def test_boltzmann_model():  # noqa: D103
     from mesa.examples.basic.boltzmann_wealth_model import app
@@ -19,7 +29,7 @@ def test_boltzmann_model():  # noqa: D103
     app.page  # noqa: B018
 
     model = BoltzmannWealth(seed=42)
-
+    run_viz_test(model, app.page)
     for _i in range(10):
         model.step()
 
@@ -30,6 +40,7 @@ def test_conways_game_model():  # noqa: D103
     app.page  # noqa: B018
 
     model = ConwaysGameOfLife(seed=42)
+    run_viz_test(model, app.page)
     for _i in range(10):
         model.step()
 
@@ -40,6 +51,7 @@ def test_schelling_model():  # noqa: D103
     app.page  # noqa: B018
 
     model = Schelling(seed=42)
+    run_viz_test(model, app.page)
     for _i in range(10):
         model.step()
 
@@ -50,6 +62,7 @@ def test_virus_on_network():  # noqa: D103
     app.page  # noqa: B018
 
     model = VirusOnNetwork(seed=42)
+    run_viz_test(model, app.page)
     for _i in range(10):
         model.step()
 
@@ -60,7 +73,7 @@ def test_boid_flockers():  # noqa: D103
     app.page  # noqa: B018
 
     model = BoidFlockers(seed=42)
-
+    run_viz_test(model, app.page)
     for _i in range(10):
         model.step()
 
@@ -71,7 +84,7 @@ def test_epstein():  # noqa: D103
     app.page  # noqa: B018
 
     model = EpsteinCivilViolence(seed=42)
-
+    run_viz_test(model, app.page)
     for _i in range(10):
         model.step()
 
@@ -82,7 +95,7 @@ def test_pd_grid():  # noqa: D103
     app.page  # noqa: B018
 
     model = PdGrid(seed=42)
-
+    run_viz_test(model, app.page)
     for _i in range(10):
         model.step()
 
@@ -93,7 +106,7 @@ def test_sugarscape_g1mt():  # noqa: D103
     app.page  # noqa: B018
 
     model = SugarscapeG1mt(seed=42)
-
+    run_viz_test(model, app.page)
     for _i in range(10):
         model.step()
 
@@ -107,6 +120,8 @@ def test_wolf_sheep():  # noqa: D103
     simulator = ABMSimulator()
     WolfSheep(seed=42, simulator=simulator)
     simulator.run_for(10)
+    with test_app(app.page) as app_test:
+        assert app_test.find("canvas"), "Canvas should render for WolfSheep model"
 
 
 def test_alliance_formation_model():  # noqa: D103
@@ -120,3 +135,6 @@ def test_alliance_formation_model():  # noqa: D103
         model.step()
 
     assert len(model.agents) == len(model.network.nodes)
+    with test_app(app.page) as app_test:
+        assert app_test.find("canvas"), "Canvas should render for MultiLevelAllianceModel"
+
