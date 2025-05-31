@@ -32,7 +32,8 @@ def run_model_test(
 ):
     """Generic test for agent-based models to verify visual changes after steps.
 
-    For more details, see the documentation: https://solara.dev/documentation/advanced/howto/testing#testing-widgets-using-solara-server
+    For more details, see the documentation:
+        https://solara.dev/documentation/advanced/howto/testing#testing-widgets-using-solara-server
     """
     try:
         # Create visualizations for the initial model state
