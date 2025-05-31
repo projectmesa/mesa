@@ -67,6 +67,12 @@ dev = [
   "pytest-mock",
   "ipython>=9.2.0",
 ]
+# Visualization testing dependencies
+viz-test = [
+  "mesa[viz]",
+  "pytest-playwright",
+  "pytest-ipywidgets[solara]",
+]
 examples = [
   "mesa[rec]",
   "pytest",
