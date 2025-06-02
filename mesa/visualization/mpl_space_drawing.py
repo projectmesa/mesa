@@ -42,6 +42,7 @@ from mesa.space import (
 )
 
 CORRECTION_FACTOR_MARKER_ZOOM = 0.6
+DEFAULT_MARKER_SIZE = 50
 
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
@@ -767,11 +768,13 @@ def _scatter(ax: Axes, arguments, **kwargs):
     loc_y = loc[:, 1]
     marker = arguments.pop("marker")
     zorder = arguments.pop("zorder")
+    malpha = arguments.pop("alpha")
+    msize = arguments.pop("s")
 
     # we check if edgecolor, linewidth, and alpha are specified
     # at the agent level, if not, we remove them from the arguments dict
     # and fallback to the default value in ax.scatter / use what is passed via **kwargs
-    for entry in ["edgecolors", "linewidths", "alpha"]:
+    for entry in ["edgecolors", "linewidths"]:
         if len(arguments[entry]) == 0:
             arguments.pop(entry)
         else:
@@ -782,36 +785,41 @@ def _scatter(ax: Axes, arguments, **kwargs):
 
     ax.get_figure().canvas.draw()
     for mark in set(marker):
-        mark_mask = [m == mark for m in list(marker)]
-        mark_png = [
-            isinstance(m, (str | os.PathLike)) and os.path.isfile(m)
-            for m in list(marker)
-        ]
-        for z_order in np.unique(zorder):
-            zorder_mask = z_order == zorder
-            logical_mark = mark_mask & zorder_mask & [not m for m in mark_png]
-            logical_png = mark_mask & zorder_mask & mark_png
-
-            if any(logical_png):
+        if isinstance(mark, (str | os.PathLike)) and os.path.isfile(mark):
+            # images
+            for m_size in np.unique(msize):
                 image = Image.open(mark)
-                im = OffsetImage(image, zoom=_get_zoom_factor(ax, image))
+                im = OffsetImage(
+                    image,
+                    zoom=_get_zoom_factor(ax, image) * m_size / DEFAULT_MARKER_SIZE,
+                )
                 im.image.axes = ax
 
-                for x, y in zip(loc_x[logical_png], loc_y[logical_png]):
-                    ab = AnnotationBbox(
-                        im,
-                        (x, y),
-                        frameon=False,
-                        pad=0.0,
-                    )
-                    ax.add_artist(ab)
+                mask_marker = [m == mark for m in list(marker)] & (m_size == msize)
+                for z_order in np.unique(zorder[mask_marker]):
+                    for m_alpha in np.unique(malpha[mask_marker]):
+                        mask = (z_order == zorder) & (m_alpha == malpha) & mask_marker
+                        for x, y in zip(loc_x[mask], loc_y[mask]):
+                            ab = AnnotationBbox(
+                                im,
+                                (x, y),
+                                frameon=False,
+                                pad=0.0,
+                                zorder=z_order,
+                                **kwargs,
+                            )
+                            ax.add_artist(ab)
 
-            if any(logical_mark):
+        else:
+            # ordinary markers
+            mask_marker = [m == mark for m in list(marker)]
+            for z_order in np.unique(zorder[mask_marker]):
+                zorder_mask = z_order == zorder & mask_marker
                 ax.scatter(
-                    loc_x[logical_mark],
-                    loc_y[logical_mark],
+                    loc_x[zorder_mask],
+                    loc_y[zorder_mask],
                     marker=mark,
                     zorder=z_order,
-                    **{k: v[logical_mark] for k, v in arguments.items()},
+                    **{k: v[zorder_mask] for k, v in arguments.items()},
                     **kwargs,
                 )
