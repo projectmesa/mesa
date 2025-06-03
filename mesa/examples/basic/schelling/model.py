@@ -68,11 +68,13 @@ class Schelling(Model):
                 )
 
         # Collect initial state
+        self.agents.do("assign_state")
         self.datacollector.collect(self)
 
     def step(self):
         """Run one step of the model."""
         self.happy = 0  # Reset counter of happy agents
         self.agents.shuffle_do("step")  # Activate all agents in random order
+        self.agents.do("assign_state")
         self.datacollector.collect(self)  # Collect data
         self.running = self.happy < len(self.agents)  # Continue until everyone is happy
