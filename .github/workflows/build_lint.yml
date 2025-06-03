@@ -3,16 +3,16 @@ name: build
 on:
   push:
     branches:
-    - main
-    - release**
+      - main
+      - release**
     paths-ignore:
-      - '**.md'
+      - "**.md"
   pull_request:
     paths-ignore:
-      - '**.md'
+      - "**.md"
   workflow_dispatch:
   schedule:
-    - cron: '0 6 * * 1'
+    - cron: "0 6 * * 1"
 
 # This will cancel previous run if a newer job that obsoletes the said previous
 # run, is started.
@@ -42,46 +42,48 @@ jobs:
           #  python-version: 'pypy-3.8'
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-        allow-prereleases: true
-        cache: 'pip'
-    - name: Install uv
-      run: pip install uv
-    - name: Install Mesa and dependencies
-      run: uv pip install --system .[dev]
-    - name: Test with pytest
-      run: pytest --durations=10 --cov=mesa tests/ --cov-report=xml
-    - if: matrix.os == 'ubuntu'
-      name: Codecov
-      uses: codecov/codecov-action@v5
-      with:
-        fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }}
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+          cache: "pip"
+      - name: Install uv
+        run: pip install uv
+      - name: Install Mesa and dependencies
+        run: uv pip install --system .[dev]
+      - name: Setup Playwright
+        run: playwright install
+      - name: Test with pytest
+        run: pytest --durations=10 --cov=mesa tests/ --cov-report=xml
+      - if: matrix.os == 'ubuntu'
+        name: Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   examples:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.13"
-        allow-prereleases: true
-        cache: 'pip'
-    - name: Install uv
-      run: pip install uv
-    - name: Install Mesa
-      run: uv pip install --system .[examples]
-    - name: Checkout mesa-examples
-      uses: actions/checkout@v4
-      with:
-        repository: projectmesa/mesa-examples
-        path: mesa-examples
-    - name: Test examples
-      run: |
-        cd mesa-examples
-        pytest -rA -Werror -Wdefault::FutureWarning -Wi::DeprecationWarning test_examples.py
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          allow-prereleases: true
+          cache: "pip"
+      - name: Install uv
+        run: pip install uv
+      - name: Install Mesa
+        run: uv pip install --system .[examples]
+      - name: Checkout mesa-examples
+        uses: actions/checkout@v4
+        with:
+          repository: projectmesa/mesa-examples
+          path: mesa-examples
+      - name: Test examples
+        run: |
+          cd mesa-examples
+          pytest -rA -Werror -Wdefault::FutureWarning -Wi::DeprecationWarning test_examples.py
