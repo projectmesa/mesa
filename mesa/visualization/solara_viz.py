@@ -31,9 +31,11 @@ import traceback
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Literal
 
+import altair as alt
 import reacton.core
 import solara
 import solara.lab
+from space_renderer import SpaceRenderer
 
 import mesa.visualization.components.altair_components as components_altair
 from mesa.experimental.devs.simulator import Simulator
@@ -52,6 +54,7 @@ _mesa_logger = create_module_logger()
 @function_logger(__name__)
 def SolaraViz(
     model: Model | solara.Reactive[Model],
+    renderer: SpaceRenderer,
     components: list[reacton.core.Component]
     | list[Callable[[Model], reacton.core.Component]]
     | Literal["default"] = "default",
@@ -74,6 +77,7 @@ def SolaraViz(
         model (Model | solara.Reactive[Model]): A Model instance or a reactive Model.
             This is the main model to be visualized. If a non-reactive model is provided,
             it will be converted to a reactive model.
+        renderer (SpaceRenderer): A SpaceRenderer instance to render the model's space.
         components (list[solara.component] | Literal["default"], optional): List of solara
             components or functions that return a solara component.
             These components are used to render different parts of the model visualization.
@@ -124,11 +128,17 @@ def SolaraViz(
     if not isinstance(model, solara.Reactive):
         model = solara.use_reactive(model)  # noqa: SH102, RUF100
 
-    # set up reactive model_parameters shared by ModelCreator and ModelController
+    # Set up reactive model_parameters shared by ModelCreator and ModelController
     reactive_model_parameters = solara.use_reactive({})
     reactive_play_interval = solara.use_reactive(play_interval)
     reactive_render_interval = solara.use_reactive(render_interval)
     reactive_use_threads = solara.use_reactive(use_threads)
+
+    # Make a copy of the components to avoid modifying the original list
+    display_components = list(components)
+    # Create space component based on the renderer
+    display_components.append(create_space_component(renderer))
+
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
         solara.lab.ThemeToggle()
@@ -166,6 +176,7 @@ def SolaraViz(
             if not isinstance(simulator, Simulator):
                 ModelController(
                     model,
+                    renderer=renderer,
                     model_parameters=reactive_model_parameters,
                     play_interval=reactive_play_interval,
                     render_interval=reactive_render_interval,
@@ -175,6 +186,7 @@ def SolaraViz(
                 SimulatorController(
                     model,
                     simulator,
+                    renderer=renderer,
                     model_parameters=reactive_model_parameters,
                     play_interval=reactive_play_interval,
                     render_interval=reactive_render_interval,
@@ -187,14 +199,122 @@ def SolaraViz(
         with solara.Card("Information"):
             ShowSteps(model.value)
         if (
-            CommandConsole in components
+            CommandConsole in display_components
         ):  # If command console in components show it in sidebar
-            components.remove(CommandConsole)
+            display_components.remove(CommandConsole)
             additional_imports = console_kwargs.get("additional_imports", {})
             with solara.Card("Command Console"):
                 CommandConsole(model.value, additional_imports=additional_imports)
 
-    ComponentsView(components, model.value)
+    # Render the main components view
+    ComponentsView(display_components, model.value)
+
+
+def create_space_component(renderer: SpaceRenderer):
+    """Create a space visualization component for the given renderer."""
+
+    def SpaceVisualizationComponent(model: Model):
+        """Component that renders the model's space using the provided renderer."""
+        return SpaceRendererComponent(model, renderer)
+
+    return SpaceVisualizationComponent
+
+
+@solara.component
+def SpaceRendererComponent(
+    model: Model,
+    renderer: SpaceRenderer,
+    # FIXME: Manage dependencies properly
+    dependencies: list[any] | None = None,
+):
+    """Render the space of a model using a SpaceRenderer.
+
+    Args:
+        model (Model): The model whose space is to be rendered.
+        renderer: A SpaceRenderer instance to render the model's space.
+        dependencies (list[any], optional): List of dependencies for the component.
+    """
+    update_counter.get()
+
+    # update renderer's space according to the model's space/grid
+    renderer.space = getattr(model, "grid", None) or getattr(model, "space", None)
+
+    if renderer.backend == "matplotlib":
+        renderer.ax.clear()
+
+        # Draw the space structure if specified
+        if renderer.space_mesh:
+            renderer.draw_structure()
+
+        # Draw agents if specified
+        if (
+            hasattr(renderer, "agent_portrayal")
+            and renderer.agent_portrayal is not None
+        ):
+            renderer.draw_agents(renderer.agent_portrayal)
+
+        # Draw property layers if specified
+        if (
+            hasattr(renderer, "propertylayer_portrayal")
+            and renderer.propertylayer_portrayal is not None
+        ):
+            renderer.draw_propertylayer(renderer.propertylayer_portrayal)
+
+        # Update the fig every time frame
+        if dependencies:
+            dependencies.append(update_counter.value)
+        else:
+            dependencies = [update_counter.value]
+
+        solara.FigureMatplotlib(
+            renderer.ax.get_figure(),
+            format="png",
+            bbox_inches="tight",
+            dependencies=dependencies,
+        )
+    else:
+        structure = renderer.draw_structure() if renderer.space_mesh else None
+        agents = (
+            renderer.draw_agents(renderer.agent_portrayal)
+            if renderer.agent_mesh
+            else None
+        )
+        prop_base, prop_cbar = (
+            renderer.draw_propertylayer(renderer.propertylayer_portrayal)
+            if renderer.propertylayer_mesh
+            else (None, None)
+        )
+
+        spatial_charts_list = [
+            chart for chart in [structure, prop_base, agents] if chart
+        ]
+
+        main_spatial = None
+        if spatial_charts_list:
+            main_spatial = (
+                spatial_charts_list[0]
+                if len(spatial_charts_list) == 1
+                else alt.layer(*spatial_charts_list)
+            )
+
+        # Determine final chart by combining with color bar if present
+        final_chart = None
+        if main_spatial and prop_cbar:
+            final_chart = alt.vconcat(main_spatial, prop_cbar).configure_view(
+                stroke=None
+            )
+        elif main_spatial:  # Only main_spatial, no prop_cbar
+            final_chart = main_spatial
+        elif prop_cbar:  # Only prop_cbar, no main_spatial
+            final_chart = prop_cbar
+            final_chart = final_chart.configure_view(stroke=None)
+
+        # If both main_spatial and prop_cbar are None, final_chart remains None
+        return (
+            solara.FigureAltair(final_chart, on_click=None, on_hover=None)
+            if final_chart
+            else solara.Text("No space visualization available.")
+        )
 
 
 def _wrap_component(
@@ -244,6 +364,7 @@ JupyterViz = SolaraViz
 def ModelController(
     model: solara.Reactive[Model],
     *,
+    renderer: SpaceRenderer,
     model_parameters: dict | solara.Reactive[dict] = None,
     play_interval: int | solara.Reactive[int] = 100,
     render_interval: int | solara.Reactive[int] = 1,
@@ -253,6 +374,7 @@ def ModelController(
 
     Args:
         model: Reactive model instance
+        renderer: SpaceRenderer instance to render the model's space.
         model_parameters: Reactive parameters for (re-)instantiating a model.
         play_interval: Interval for playing the model steps in milliseconds.
         render_interval: Controls how often the plots are updated during simulation steps.Higher value reduce update frequency.
@@ -331,6 +453,9 @@ def ModelController(
             f"creating new {model.value.__class__} instance with {model_parameters.value}",
         )
         model.value = model.value = model.value.__class__(**model_parameters.value)
+        renderer.space = (
+            model.value.grid if hasattr(model.value, "grid") else model.value.space
+        )
 
     @function_logger(__name__)
     def do_play_pause():
@@ -360,6 +485,7 @@ def ModelController(
 def SimulatorController(
     model: solara.Reactive[Model],
     simulator,
+    renderer: SpaceRenderer,
     *,
     model_parameters: dict | solara.Reactive[dict] = None,
     play_interval: int | solara.Reactive[int] = 100,
@@ -371,6 +497,7 @@ def SimulatorController(
     Args:
         model: Reactive model instance
         simulator: Simulator instance
+        renderer: SpaceRenderer instance to render the model's space.
         model_parameters: Reactive parameters for (re-)instantiating a model.
         play_interval: Interval for playing the model steps in milliseconds.
         render_interval: Controls how often the plots are updated during simulation steps.Higher values reduce update frequency.
@@ -452,6 +579,9 @@ def SimulatorController(
         pause_step_event.clear()
         model.value = model.value = model.value.__class__(
             simulator=simulator, **model_parameters.value
+        )
+        renderer.space = (
+            model.value.grid if hasattr(model.value, "grid") else model.value.space
         )
 
     def do_play_pause():
