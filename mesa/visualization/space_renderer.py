@@ -518,7 +518,7 @@ class SpaceRenderer:
         df["viz_stroke_color"] = stroke_colors
 
         # Tooltip list for interactivity
-        # FIXME: Add more fields to tooltip (preferrably from agent_portrayal)
+        # FIXME: Add more fields to tooltip (preferably from agent_portrayal)
         tooltip_list = ["x", "y"]
 
         chart = (
