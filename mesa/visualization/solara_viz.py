@@ -32,7 +32,6 @@ import traceback
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal
 
-import altair as alt
 import reacton.core
 import solara
 import solara.lab
@@ -246,7 +245,7 @@ def SpaceRendererComponent(
             renderer.ax.lines[:],
             renderer.ax.collections[:],
             renderer.ax.patches[:],
-            renderer.ax.images[:]
+            renderer.ax.images[:],
         ]
         # Chain them together into a single iterable
         for artist in itertools.chain.from_iterable(list_of_artist_list_copies):
@@ -293,12 +292,8 @@ def SpaceRendererComponent(
             renderer.draw_agents(renderer.agent_portrayal)
         if renderer.propertylayer_mesh:
             renderer.draw_propertylayer(renderer.propertylayer_portrayal)
-    
-        solara.FigureAltair(
-            renderer.canvas,
-            on_click=None,
-            on_hover=None
-        )
+
+        solara.FigureAltair(renderer.canvas, on_click=None, on_hover=None)
         return None
 
 
