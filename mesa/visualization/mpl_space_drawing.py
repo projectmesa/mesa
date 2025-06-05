@@ -7,6 +7,7 @@ for a paper.
 """
 
 import itertools
+import os
 import warnings
 from collections.abc import Callable
 from dataclasses import fields
@@ -21,7 +22,9 @@ from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import LineCollection, PatchCollection, PolyCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from matplotlib.patches import Polygon
+from PIL import Image
 
 import mesa
 from mesa.discrete_space import (
@@ -37,6 +40,9 @@ from mesa.space import (
     NetworkGrid,
     SingleGrid,
 )
+
+CORRECTION_FACTOR_MARKER_ZOOM = 0.6
+DEFAULT_MARKER_SIZE = 50
 
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
@@ -66,8 +72,12 @@ def collect_agent_data(
         elif isinstance(space, Network):
             agent_x, agent_y = agent.cell.coordinate, agent.cell.coordinate
         else:
-            agent_x = agent.pos[0] if agent.pos else agent.cell.coordinate[0]
-            agent_y = agent.pos[1] if agent.pos else agent.cell.coordinate[1]
+            agent_x = (
+                agent.pos[0] if agent.pos is not None else agent.cell.coordinate[0]
+            )
+            agent_y = (
+                agent.pos[1] if agent.pos is not None else agent.cell.coordinate[1]
+            )
         return agent_x, agent_y
 
     arguments = {
@@ -96,7 +106,7 @@ def collect_agent_data(
             warnings.warn(
                 "Returning a dict from agent_portrayal is deprecated and will be removed "
                 "in a future version. Please return an AgentPortrayalStyle instance instead.",
-                DeprecationWarning,
+                PendingDeprecationWarning,
                 stacklevel=2,
             )
             dict_data = portray_input.copy()
@@ -104,14 +114,12 @@ def collect_agent_data(
             agent_x, agent_y = get_agent_pos(agent, space)
 
             # Extract values from the dict, using defaults if not provided
-            size_val = dict_data.pop("s", style_fields.get("size"))
-            color_val = dict_data.pop("c", style_fields.get("color"))
+            size_val = dict_data.pop("size", style_fields.get("size"))
+            color_val = dict_data.pop("color", style_fields.get("color"))
             marker_val = dict_data.pop("marker", style_fields.get("marker"))
             zorder_val = dict_data.pop("zorder", style_fields.get("zorder"))
             alpha_val = dict_data.pop("alpha", style_fields.get("alpha"))
-            edgecolors_val = dict_data.pop(
-                "edgecolors", color_val
-            )  # default to agent's color if not provided
+            edgecolors_val = dict_data.pop("edgecolors", None)
             linewidths_val = dict_data.pop("linewidths", style_fields.get("linewidths"))
 
             aps = AgentPortrayalStyle(
@@ -158,7 +166,8 @@ def collect_agent_data(
         arguments["marker"].append(aps.marker)
         arguments["zorder"].append(aps.zorder)
         arguments["alpha"].append(aps.alpha)
-        arguments["edgecolors"].append(aps.edgecolors)
+        if aps.edgecolors is not None:
+            arguments["edgecolors"].append(aps.edgecolors)
         arguments["linewidths"].append(aps.linewidths)
 
     data = {
@@ -289,7 +298,7 @@ def draw_property_layers(
 
             warnings.warn(
                 "The propertylayer_portrayal dict is deprecated. Use a callable that returns PropertyLayerStyle instead.",
-                DeprecationWarning,
+                PendingDeprecationWarning,
                 stacklevel=2,
             )
 
@@ -440,12 +449,12 @@ def draw_orthogonal_grid(
     s_default = (180 / max(space.width, space.height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, default_size=s_default)
 
-    # plot the agents
-    _scatter(ax, arguments, **kwargs)
-
     # further styling
     ax.set_xlim(-0.5, space.width - 0.5)
     ax.set_ylim(-0.5, space.height - 0.5)
+
+    # plot the agents
+    _scatter(ax, arguments, **kwargs)
 
     if draw_grid:
         # Draw grid lines
@@ -490,16 +499,6 @@ def draw_hex_grid(
     x_spacing = np.sqrt(3) * size
     y_spacing = 1.5 * size
 
-    loc = arguments["loc"].astype(float)
-    # Calculate hexagon centers for agents if agents are present and plot them.
-    if loc.size > 0:
-        loc[:, 0] = loc[:, 0] * x_spacing + ((loc[:, 1] - 1) % 2) * (x_spacing / 2)
-        loc[:, 1] = loc[:, 1] * y_spacing
-        arguments["loc"] = loc
-
-        # plot the agents
-        _scatter(ax, arguments, **kwargs)
-
     # Calculate proper bounds that account for the full hexagon width and height
     x_max = space.width * x_spacing + (space.height % 2) * (x_spacing / 2)
     y_max = space.height * y_spacing
@@ -514,6 +513,16 @@ def draw_hex_grid(
     # Determined through physical testing.
     ax.set_xlim(-2 * x_padding, x_max + x_padding)
     ax.set_ylim(-2 * y_padding, y_max + y_padding)
+
+    loc = arguments["loc"].astype(float)
+    # Calculate hexagon centers for agents if agents are present and plot them.
+    if loc.size > 0:
+        loc[:, 0] = loc[:, 0] * x_spacing + ((loc[:, 1] - 1) % 2) * (x_spacing / 2)
+        loc[:, 1] = loc[:, 1] * y_spacing
+        arguments["loc"] = loc
+
+        # plot the agents
+        _scatter(ax, arguments, **kwargs)
 
     def setup_hexmesh(width, height):
         """Helper function for creating the hexmesh with unique edges."""
@@ -596,13 +605,13 @@ def draw_network(
 
     arguments["loc"] = pos[x]
 
-    # plot the agents
-    _scatter(ax, arguments, **kwargs)
-
     # further styling
     ax.set_axis_off()
     ax.set_xlim(xmin=xmin - x_padding, xmax=xmax + x_padding)
     ax.set_ylim(ymin=ymin - y_padding, ymax=ymax + y_padding)
+
+    # plot the agents
+    _scatter(ax, arguments, **kwargs)
 
     if draw_grid:
         # fixme we need to draw the empty nodes as well
@@ -645,9 +654,6 @@ def draw_continuous_space(
     s_default = (180 / max(width, height)) ** 2
     arguments = collect_agent_data(space, agent_portrayal, default_size=s_default)
 
-    # plot the agents
-    _scatter(ax, arguments, **kwargs)
-
     # further visual styling
     border_style = "solid" if not space.torus else (0, (5, 10))
     for spine in ax.spines.values():
@@ -657,6 +663,9 @@ def draw_continuous_space(
 
     ax.set_xlim(space.x_min - x_padding, space.x_max + x_padding)
     ax.set_ylim(space.y_min - y_padding, space.y_max + y_padding)
+
+    # plot the agents
+    _scatter(ax, arguments, **kwargs)
 
     return ax
 
@@ -722,26 +731,50 @@ def draw_voronoi_grid(
     return ax
 
 
+def _get_zoom_factor(ax, img):
+    ax.get_figure().canvas.draw()
+    bbox = ax.get_window_extent().transformed(
+        ax.get_figure().dpi_scale_trans.inverted()
+    )  # in inches
+    width, height = (
+        bbox.width * ax.get_figure().dpi,
+        bbox.height * ax.get_figure().dpi,
+    )  # in pixel
+
+    xr = ax.get_xlim()
+    yr = ax.get_ylim()
+
+    x_pixel_per_data = width / (xr[1] - xr[0])
+    y_pixel_per_data = height / (yr[1] - yr[0])
+
+    zoom_x = (x_pixel_per_data / img.width) * CORRECTION_FACTOR_MARKER_ZOOM
+    zoom_y = (y_pixel_per_data / img.height) * CORRECTION_FACTOR_MARKER_ZOOM
+
+    return min(zoom_x, zoom_y)
+
+
 def _scatter(ax: Axes, arguments, **kwargs):
     """Helper function for plotting the agents.
 
     Args:
         ax: a Matplotlib Axes instance
-        arguments: the agents specific arguments for platting
+        arguments: the agents specific arguments for plotting
         kwargs: additional keyword arguments for ax.scatter
 
     """
     loc = arguments.pop("loc")
 
-    x = loc[:, 0]
-    y = loc[:, 1]
+    loc_x = loc[:, 0]
+    loc_y = loc[:, 1]
     marker = arguments.pop("marker")
     zorder = arguments.pop("zorder")
+    malpha = arguments.pop("alpha")
+    msize = arguments.pop("s")
 
     # we check if edgecolor, linewidth, and alpha are specified
     # at the agent level, if not, we remove them from the arguments dict
     # and fallback to the default value in ax.scatter / use what is passed via **kwargs
-    for entry in ["edgecolors", "linewidths", "alpha"]:
+    for entry in ["edgecolors", "linewidths"]:
         if len(arguments[entry]) == 0:
             arguments.pop(entry)
         else:
@@ -750,17 +783,43 @@ def _scatter(ax: Axes, arguments, **kwargs):
                     f"{entry} is specified in agent portrayal and via plotting kwargs, you can only use one or the other"
                 )
 
+    ax.get_figure().canvas.draw()
     for mark in set(marker):
-        mark_mask = [m == mark for m in list(marker)]
-        for z_order in np.unique(zorder):
-            zorder_mask = z_order == zorder
-            logical = mark_mask & zorder_mask
+        if isinstance(mark, (str | os.PathLike)) and os.path.isfile(mark):
+            # images
+            for m_size in np.unique(msize):
+                image = Image.open(mark)
+                im = OffsetImage(
+                    image,
+                    zoom=_get_zoom_factor(ax, image) * m_size / DEFAULT_MARKER_SIZE,
+                )
+                im.image.axes = ax
 
-            ax.scatter(
-                x[logical],
-                y[logical],
-                marker=mark,
-                zorder=z_order,
-                **{k: v[logical] for k, v in arguments.items()},
-                **kwargs,
-            )
+                mask_marker = [m == mark for m in list(marker)] & (m_size == msize)
+                for z_order in np.unique(zorder[mask_marker]):
+                    for m_alpha in np.unique(malpha[mask_marker]):
+                        mask = (z_order == zorder) & (m_alpha == malpha) & mask_marker
+                        for x, y in zip(loc_x[mask], loc_y[mask]):
+                            ab = AnnotationBbox(
+                                im,
+                                (x, y),
+                                frameon=False,
+                                pad=0.0,
+                                zorder=z_order,
+                                **kwargs,
+                            )
+                            ax.add_artist(ab)
+
+        else:
+            # ordinary markers
+            mask_marker = [m == mark for m in list(marker)]
+            for z_order in np.unique(zorder[mask_marker]):
+                zorder_mask = z_order == zorder & mask_marker
+                ax.scatter(
+                    loc_x[zorder_mask],
+                    loc_y[zorder_mask],
+                    marker=mark,
+                    zorder=z_order,
+                    **{k: v[zorder_mask] for k, v in arguments.items()},
+                    **kwargs,
+                )
