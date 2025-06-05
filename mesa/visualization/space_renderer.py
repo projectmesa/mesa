@@ -40,7 +40,7 @@ from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgb, to_rgba
-from space_drawers import (
+from mesa.visualization.space_drawers import (
     ContinuousSpaceDrawer,
     HexSpaceDrawer,
     NetworkSpaceDrawer,
@@ -117,11 +117,10 @@ class SpaceRenderer:
             return VoronoiSpaceDrawer(self.space)
         elif isinstance(self.space, Network):
             return NetworkSpaceDrawer(self.space)
-        else:
-            raise ValueError(
-                f"Unsupported space type: {type(self.space).__name__}. "
-                "Supported types are OrthogonalGrid, HexGrid, ContinuousSpace, VoronoiGrid, and Network."
-            )
+        raise ValueError(
+            f"Unsupported space type: {type(self.space).__name__}. "
+            "Supported types are OrthogonalGrid, HexGrid, ContinuousSpace, VoronoiGrid, and Network."
+        )
 
     def _map_coordinates(self, arguments):
         """Map agent coordinates to appropriate space coordinates."""
@@ -146,7 +145,8 @@ class SpaceRenderer:
             # Map coordinates for Network spaces
             loc = arguments["loc"].astype(float)
             pos = np.asarray(list(self.space_drawer.pos.values()))
-            # For network only one of x and y contains the correct coordinates
+            # For network only both x and y contains the correct coordinates
+            # use one of them
             x = loc[:, 0]
             if x is None:
                 x = loc[:, 1]
@@ -549,7 +549,9 @@ class SpaceRenderer:
                     title="Shape",
                 ),
                 opacity=alt.Opacity(
-                    "opacity:Q", title="Opacity", scale=alt.Scale(range=[0, 1])
+                    "opacity:Q",
+                    title="Opacity",
+                    scale=alt.Scale(domain=[0, 1], range=[0, 1]),
                 ),
                 fill=alt.Fill("viz_fill_color:N", scale=None, title="Fill Color"),
                 stroke=alt.Stroke(

@@ -214,7 +214,16 @@ class NetworkSpaceDrawer:
         self.layout_alg = layout_alg
         self.layout_kwargs = layout_kwargs if layout_kwargs is not None else {"seed": 0}
 
-        self.pos = None
+        # gather locations for nodes in network
+        self.graph = self.space.G
+        self.pos = self.layout_alg(self.graph, **self.layout_kwargs)
+
+        x, y = list(zip(*self.pos.values()))
+        self.xmin, self.xmax = min(x), max(x)
+        self.ymin, self.ymax = min(y), max(y)
+
+        self.width = self.xmax - self.xmin
+        self.height = self.ymax - self.ymin
 
     def draw_matplotlib(self, ax):
         """Draw the network using matplotlib.
@@ -228,27 +237,18 @@ class NetworkSpaceDrawer:
         if ax is None:
             fig, ax = plt.subplots()
 
-        # gather locations for nodes in network
-        graph = self.space.G
-        self.pos = self.layout_alg(graph, **self.layout_kwargs)
-        x, y = list(zip(*self.pos.values()))
-        xmin, xmax = min(x), max(x)
-        ymin, ymax = min(y), max(y)
-
-        width = xmax - xmin
-        height = ymax - ymin
-        x_padding = width / 20
-        y_padding = height / 20
+        x_padding = self.width / 20
+        y_padding = self.height / 20
 
         # further styling
         ax.set_axis_off()
-        ax.set_xlim(xmin=xmin - x_padding, xmax=xmax + x_padding)
-        ax.set_ylim(ymin=ymin - y_padding, ymax=ymax + y_padding)
+        ax.set_xlim(xmin=self.xmin - x_padding, xmax=self.xmax + x_padding)
+        ax.set_ylim(ymin=self.ymin - y_padding, ymax=self.ymax + y_padding)
 
         # draw the nodes
         # FIXME: we need to draw the empty nodes as well
         edge_collection = nx.draw_networkx_edges(
-            graph, self.pos, ax=ax, alpha=0.5, style="--"
+            self.graph, self.pos, ax=ax, alpha=0.5, style="--"
         )
         edge_collection.set_zorder(0)
 

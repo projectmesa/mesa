@@ -29,7 +29,7 @@ import threading
 import time
 import traceback
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, Any
 
 import altair as alt
 import reacton.core
@@ -225,7 +225,7 @@ def SpaceRendererComponent(
     model: Model,
     renderer: SpaceRenderer,
     # FIXME: Manage dependencies properly
-    dependencies: list[any] | None = None,
+    dependencies: list[Any] | None = None,
 ):
     """Render the space of a model using a SpaceRenderer.
 
@@ -237,7 +237,7 @@ def SpaceRendererComponent(
     update_counter.get()
 
     # update renderer's space according to the model's space/grid
-    renderer.space = getattr(model, "grid", None) or getattr(model, "space", None)
+    renderer.space = getattr(model, "grid", getattr(model, "space", None))
 
     if renderer.backend == "matplotlib":
         renderer.ax.clear()
@@ -272,6 +272,7 @@ def SpaceRendererComponent(
             bbox_inches="tight",
             dependencies=dependencies,
         )
+        return None
     else:
         structure = renderer.draw_structure() if renderer.space_mesh else None
         agents = (
