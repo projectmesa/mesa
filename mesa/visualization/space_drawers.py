@@ -210,7 +210,7 @@ class NetworkSpaceDrawer:
             **kwargs: Additional keyword arguments
         """
         self.space = space
-        self.s_default = (180 / max(self.space.width, self.space.height)) ** 2
+
         self.layout_alg = layout_alg
         self.layout_kwargs = layout_kwargs if layout_kwargs is not None else {"seed": 0}
 
@@ -224,6 +224,8 @@ class NetworkSpaceDrawer:
 
         self.width = self.xmax - self.xmin
         self.height = self.ymax - self.ymin
+
+        self.s_default = (180 / max(self.width, self.height)) ** 2
 
     def draw_matplotlib(self, ax):
         """Draw the network using matplotlib.

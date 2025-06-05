@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+import itertools
 import threading
 import time
 import traceback
@@ -240,7 +241,16 @@ def SpaceRendererComponent(
     renderer.space = getattr(model, "grid", getattr(model, "space", None))
 
     if renderer.backend == "matplotlib":
-        renderer.ax.clear()
+        # Clear the previous plotted data and agents
+        list_of_artist_list_copies = [
+            renderer.ax.lines[:],
+            renderer.ax.collections[:],
+            renderer.ax.patches[:],
+            renderer.ax.images[:]
+        ]
+        # Chain them together into a single iterable
+        for artist in itertools.chain.from_iterable(list_of_artist_list_copies):
+            artist.remove()
 
         # Draw the space structure if specified
         if renderer.space_mesh:
@@ -258,7 +268,10 @@ def SpaceRendererComponent(
             hasattr(renderer, "propertylayer_portrayal")
             and renderer.propertylayer_portrayal is not None
         ):
-            renderer.draw_propertylayer(renderer.propertylayer_portrayal)
+            _, cbar = renderer.draw_propertylayer(renderer.propertylayer_portrayal)
+            # Remove the newly generated colorbar to avoid duplication
+            if cbar is not None:
+                cbar.remove()
 
         # Update the fig every time frame
         if dependencies:
@@ -274,48 +287,19 @@ def SpaceRendererComponent(
         )
         return None
     else:
-        structure = renderer.draw_structure() if renderer.space_mesh else None
-        agents = (
+        if renderer.space_mesh:
+            renderer.draw_structure()
+        if renderer.agent_mesh:
             renderer.draw_agents(renderer.agent_portrayal)
-            if renderer.agent_mesh
-            else None
-        )
-        prop_base, prop_cbar = (
+        if renderer.propertylayer_mesh:
             renderer.draw_propertylayer(renderer.propertylayer_portrayal)
-            if renderer.propertylayer_mesh
-            else (None, None)
+    
+        solara.FigureAltair(
+            renderer.canvas,
+            on_click=None,
+            on_hover=None
         )
-
-        spatial_charts_list = [
-            chart for chart in [structure, prop_base, agents] if chart
-        ]
-
-        main_spatial = None
-        if spatial_charts_list:
-            main_spatial = (
-                spatial_charts_list[0]
-                if len(spatial_charts_list) == 1
-                else alt.layer(*spatial_charts_list)
-            )
-
-        # Determine final chart by combining with color bar if present
-        final_chart = None
-        if main_spatial and prop_cbar:
-            final_chart = alt.vconcat(main_spatial, prop_cbar).configure_view(
-                stroke=None
-            )
-        elif main_spatial:  # Only main_spatial, no prop_cbar
-            final_chart = main_spatial
-        elif prop_cbar:  # Only prop_cbar, no main_spatial
-            final_chart = prop_cbar
-            final_chart = final_chart.configure_view(stroke=None)
-
-        # If both main_spatial and prop_cbar are None, final_chart remains None
-        return (
-            solara.FigureAltair(final_chart, on_click=None, on_hover=None)
-            if final_chart
-            else solara.Text("No space visualization available.")
-        )
+        return None
 
 
 def _wrap_component(

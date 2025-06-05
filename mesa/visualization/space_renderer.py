@@ -94,7 +94,9 @@ class SpaceRenderer:
         # Handle axis management
         if self.backend == "matplotlib":
             if ax is None:
-                fig, ax = plt.subplots()
+                # constrained_layout=True is must because it adjusts the layout automatically
+                # to prevent shrinking of the figure due to non-existent colorbar.
+                fig, ax = plt.subplots(constrained_layout=True)
                 self.fig = fig
             self.ax = ax
         else:
@@ -477,6 +479,10 @@ class SpaceRenderer:
         self, arguments, chart_width=450, chart_height=350, **kwargs
     ):
         """Draw agents using altair backend."""
+        # Check if there are no agents to draw
+        if arguments["loc"].size == 0:
+            return None
+
         # Convert arguments to a DataFrame
         df_data = {
             "x": arguments["loc"][:, 0],
@@ -727,9 +733,9 @@ class SpaceRenderer:
                 norm = Normalize(vmin=vmin, vmax=vmax)
                 sm = ScalarMappable(norm=norm, cmap=cmap)
                 sm.set_array([])
-                plt.colorbar(sm, ax=ax, label=layer_name)
+                cbar = plt.colorbar(sm, ax=ax, label=layer_name)
 
-        return ax
+        return ax, cbar
 
     def _draw_propertylayer_altair(
         self, space, propertylayer_portrayal, chart_width=450, chart_height=350
@@ -1048,8 +1054,35 @@ class SpaceRenderer:
         if self.backend == "matplotlib":
             return self.ax
         else:
-            # TODO: Implement Altair chart retrieval
-            return None
+            structure = self.space_mesh if self.space_mesh else None
+            agents = self.agent_mesh if self.agent_mesh else None
+            prop_base, prop_cbar = self.propertylayer_mesh or (None, None)
+
+            spatial_charts_list = [
+                chart for chart in [structure, prop_base, agents] if chart
+            ]
+
+            main_spatial = None
+            if spatial_charts_list:
+                main_spatial = (
+                    spatial_charts_list[0]
+                    if len(spatial_charts_list) == 1
+                    else alt.layer(*spatial_charts_list)
+                )
+
+            # Determine final chart by combining with color bar if present
+            final_chart = None
+            if main_spatial and prop_cbar:
+                final_chart = alt.vconcat(main_spatial, prop_cbar).configure_view(
+                    stroke=None
+                )
+            elif main_spatial:  # Only main_spatial, no prop_cbar
+                final_chart = main_spatial
+            elif prop_cbar:  # Only prop_cbar, no main_spatial
+                final_chart = prop_cbar
+                final_chart = final_chart.configure_view(stroke=None, grid=False)
+
+            return final_chart
 
     def clear_meshes(self):
         """Clear all stored mesh objects."""
