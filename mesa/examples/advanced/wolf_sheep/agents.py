@@ -1,3 +1,5 @@
+import numpy as np
+
 from mesa.discrete_space import CellAgent, FixedAgent
 
 
@@ -21,6 +23,8 @@ class Animal(CellAgent):
         self.p_reproduce = p_reproduce
         self.energy_from_food = energy_from_food
         self.cell = cell
+
+        self.w, self.h = self.model.grid.width, self.model.grid.height
 
     def spawn_offspring(self):
         """Create offspring by splitting energy and creating new instance."""
@@ -67,28 +71,45 @@ class Sheep(Animal):
 
     def move(self):
         """Move towards a cell where there isn't a wolf, and preferably with grown grass."""
-        cells_without_wolves = self.cell.neighborhood.select(
-            lambda cell: not any(isinstance(obj, Wolf) for obj in cell.agents)
-        )
+
+        # Get current radius-1 neighborhood cell coords
+        x, y = self.cell.coordinate
+        neighbor_x = np.array([(x - 1) % self.w, x, (x + 1) % self.w])
+        neighbor_y = np.array([(y - 1) % self.h, y, (y + 1) % self.h])
+        neighbors = np.dstack(np.meshgrid(neighbor_x, neighbor_y, indexing="xy"))
+
+        # Get property layers
+        wolf_pos = self.model.grid.wolf_pos.data[neighbor_y[:, None], neighbor_x]
+        grass_pos = self.model.grid.grass_pos.data[neighbor_y[:, None], neighbor_x]
+
+        wolf_pos[[0, 0, 1, 2, 2], [0, 2, 1, 0, 2]] = 1
+        coords_without_wolves = wolf_pos == 0
         # If all surrounding cells have wolves, stay put
-        if len(cells_without_wolves) == 0:
+        safe_coords = neighbors[coords_without_wolves]
+        if safe_coords.size == 0:
             return
 
         # Among safe cells, prefer those with grown grass
-        cells_with_grass = cells_without_wolves.select(
-            lambda cell: any(
-                isinstance(obj, GrassPatch) and obj.fully_grown for obj in cell.agents
-            )
-        )
+        grass_pos[[0, 0, 1, 2, 2], [0, 2, 1, 0, 2]] = 0
+        coords_with_grass = neighbors[
+            np.logical_and(coords_without_wolves, grass_pos == 1)
+        ]
+
         # Move to a cell with grass if available, otherwise move to any safe cell
-        target_cells = (
-            cells_with_grass if len(cells_with_grass) > 0 else cells_without_wolves
-        )
-        self.cell = target_cells.select_random_cell()
+        target_coords = coords_with_grass if coords_with_grass.size > 0 else safe_coords
+        random_idx = self.random.randrange(len(target_coords))
+
+        self.cell = self.model.grid[tuple(target_coords[random_idx])]
 
 
 class Wolf(Animal):
     """A wolf that walks around, reproduces (asexually) and eats sheep."""
+
+    def __init__(
+        self, model, energy=8, p_reproduce=0.04, energy_from_food=4, cell=None
+    ):
+        super().__init__(model, energy, p_reproduce, energy_from_food, cell)
+        self.update_wolf_layer(1)
 
     def feed(self):
         """If possible, eat a sheep at current location."""
@@ -106,7 +127,20 @@ class Wolf(Animal):
         target_cells = (
             cells_with_sheep if len(cells_with_sheep) > 0 else self.cell.neighborhood
         )
+        self.update_wolf_layer(0)
         self.cell = target_cells.select_random_cell()
+        self.update_wolf_layer(1)
+
+    def remove(self):
+        """Ensure that when a wolf is removed, its mark is cleared from the grid."""
+        self.update_wolf_layer(0)
+        super().remove()
+
+    def update_wolf_layer(self, val):
+        """Update the wolf property layer"""
+        self.model.grid.wolf_pos.data[
+            self.cell.coordinate[1], self.cell.coordinate[0]
+        ] = val
 
 
 class GrassPatch(FixedAgent):
@@ -121,6 +155,7 @@ class GrassPatch(FixedAgent):
     def fully_grown(self, value: bool) -> None:
         """Set grass growth state and schedule regrowth if eaten."""
         self._fully_grown = value
+        self.model.changed_grass[self.cell.coordinate] = value
 
         if not value:  # If grass was just eaten
             self.model.simulator.schedule_event_relative(
@@ -142,6 +177,7 @@ class GrassPatch(FixedAgent):
         self._fully_grown = countdown == 0
         self.grass_regrowth_time = grass_regrowth_time
         self.cell = cell
+        self.model.changed_grass[self.cell.coordinate] = self._fully_grown
 
         # Schedule initial growth if not fully grown
         if not self.fully_grown:
