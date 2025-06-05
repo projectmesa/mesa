@@ -29,7 +29,7 @@ import threading
 import time
 import traceback
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Literal, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import altair as alt
 import reacton.core
