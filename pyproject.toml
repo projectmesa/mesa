@@ -65,6 +65,9 @@ dev = [
   "pytest-cov",
   "sphinx",
   "pytest-mock",
+  "pytest-playwright",
+  "pytest-ipywidgets",
+  "playwright",
   "ipython>=9.2.0",
 ]
 examples = [
