@@ -1026,7 +1026,7 @@ class SpaceRenderer:
     # Main rendering method
     def render(
         self,
-        agent_portrayal,
+        agent_portrayal=None,
         propertylayer_portrayal=None,
         ax: Axes | None = None,
         **kwargs,
@@ -1035,18 +1035,40 @@ class SpaceRenderer:
         if self.backend == "matplotlib":
             ax = ax if ax is not None else self.ax
 
-            self.draw_structure(ax)
-            self.draw_agents(agent_portrayal, ax, **kwargs)
-            if propertylayer_portrayal is not None:
+            if self.space_mesh is None:
+                self.draw_structure(ax)
+            if agent_portrayal is not None and self.agent_mesh is None:
+                self.draw_agents(agent_portrayal, ax, **kwargs)
+            if propertylayer_portrayal is not None and self.propertylayer_mesh is None:
                 self.draw_propertylayer(propertylayer_portrayal, ax)
 
             return ax
         else:
-            # TODO: Implement Altair rendering pipeline
-            raise NotImplementedError(
-                "Altair rendering is not yet implemented. "
-                "Please use the matplotlib backend for now."
-            )
+            # Altair rendering
+            if self.space_mesh is None:
+                self.draw_structure()
+            if agent_portrayal is not None and self.agent_mesh is None:
+                self.draw_agents(agent_portrayal)
+            if propertylayer_portrayal is not None and self.propertylayer_mesh is None:
+                _, pbar = self.draw_propertylayer(propertylayer_portrayal)
+            else:
+                pbar = None
+
+            # Combine all charts
+            charts = [self.space_mesh]
+            if self.agent_mesh:
+                charts.append(self.agent_mesh)
+            if self.propertylayer_mesh:
+                # propertylayer_mesh is a tuple (base, colorbar)
+                charts.append(self.propertylayer_mesh[0])
+
+            # layer all charts
+            final_chart = alt.layer(*charts)
+            # if color bar is present, add it
+            if pbar is not None:
+                final_chart = alt.vconcat(final_chart, pbar).configure_view(stroke=None)
+
+            return final_chart
 
     @property
     def canvas(self):

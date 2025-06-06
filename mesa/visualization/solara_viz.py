@@ -241,14 +241,14 @@ def SpaceRendererComponent(
 
     if renderer.backend == "matplotlib":
         # Clear the previous plotted data and agents
-        list_of_artist_list_copies = [
+        all_artists = [
             renderer.ax.lines[:],
             renderer.ax.collections[:],
             renderer.ax.patches[:],
             renderer.ax.images[:],
         ]
         # Chain them together into a single iterable
-        for artist in itertools.chain.from_iterable(list_of_artist_list_copies):
+        for artist in itertools.chain.from_iterable(all_artists):
             artist.remove()
 
         # Draw the space structure if specified
