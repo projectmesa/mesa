@@ -15,13 +15,13 @@ Basic Usage:
     renderer.draw_structure()
 
     # Draw agents with portrayal function
-    renderer.draw_agents(agent_portrayal_function)
+    renderer.draw_agents(agent_portrayal)
 
     # Draw property layers with portrayal function
-    renderer.draw_propertylayer(propertylayer_portrayal_function)
+    renderer.draw_propertylayer(propertylayer_portrayal)
 
     # Or render everything at once
-    renderer.render(agent_portrayal_function)
+    renderer.render(agent_portrayal, propertylayer_portrayal)
     ```
 
 Classes:
@@ -40,6 +40,13 @@ from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgb, to_rgba
+from space_drawers import (
+    ContinuousSpaceDrawer,
+    HexSpaceDrawer,
+    NetworkSpaceDrawer,
+    OrthogonalSpaceDrawer,
+    VoronoiSpaceDrawer,
+)
 
 import mesa
 from mesa.discrete_space import (
@@ -54,13 +61,6 @@ from mesa.space import (
     MultiGrid,
     NetworkGrid,
     SingleGrid,
-)
-from mesa.visualization.space_drawers import (
-    ContinuousSpaceDrawer,
-    HexSpaceDrawer,
-    NetworkSpaceDrawer,
-    OrthogonalSpaceDrawer,
-    VoronoiSpaceDrawer,
 )
 
 # Type aliases
@@ -158,14 +158,15 @@ class SpaceRenderer:
         return mapped_arguments
 
     # Structure drawing methods
-    def draw_structure(self, ax: Axes | None = None):
+    def draw_structure(self, ax: Axes | None = None, **kwargs):
         """Draw the space structure (grid lines, etc.)."""
+        self.space_kwargs = kwargs.copy()
         if self.backend == "matplotlib":
             ax = ax if ax is not None else self.ax
-            self.space_mesh = self.space_drawer.draw_matplotlib(ax)
+            self.space_mesh = self.space_drawer.draw_matplotlib(ax, **self.space_kwargs)
             return self.space_mesh
         else:
-            self.space_mesh = self.space_drawer.draw_altair()
+            self.space_mesh = self.space_drawer.draw_altair(**self.space_kwargs)
             return self.space_mesh
 
     # Agent data collection methods
@@ -478,12 +479,11 @@ class SpaceRenderer:
     def _draw_agents_altair(
         self, arguments, chart_width=450, chart_height=350, **kwargs
     ):
-        """Draw agents using altair backend."""
-        # Check if there are no agents to draw
+        """Draw agents using altair backend with customizable kwargs."""
         if arguments["loc"].size == 0:
             return None
 
-        # Convert arguments to a DataFrame
+        # Agent data preparation (remains the same)
         df_data = {
             "x": arguments["loc"][:, 0],
             "y": arguments["loc"][:, 1],
@@ -496,32 +496,32 @@ class SpaceRenderer:
             "original_stroke": arguments["stroke"],
         }
         df = pd.DataFrame(df_data)
-
-        # To ensure altair doesn't pickup random shapes
         unique_shape_names_in_data = df["shape"].unique().tolist()
 
         fill_colors = []
         stroke_colors = []
-
         for i in range(len(df)):
             filled = df["is_filled"][i]
             main_color = df["original_color"][i]
-            # Ensure 'original_stroke' is None if it's np.nan or other non-string None types
             stroke_spec = (
                 df["original_stroke"][i]
                 if isinstance(df["original_stroke"][i], str)
                 else None
             )
-
             if filled:
                 fill_colors.append(main_color)
                 stroke_colors.append(stroke_spec)
             else:
                 fill_colors.append(None)
                 stroke_colors.append(main_color)
-
         df["viz_fill_color"] = fill_colors
         df["viz_stroke_color"] = stroke_colors
+
+        # Extract additional parameters from kwargs
+        # FIXME: Add more parameters to kwargs
+        title = kwargs.pop("title", "")
+        xlabel = kwargs.pop("xlabel", "")
+        ylabel = kwargs.pop("ylabel", "")
 
         # Tooltip list for interactivity
         # FIXME: Add more fields to tooltip (preferably from agent_portrayal)
@@ -533,14 +533,14 @@ class SpaceRenderer:
             .encode(
                 x=alt.X(
                     "x:Q",
-                    title="X",
+                    title=xlabel,
                     scale=alt.Scale(
                         type="linear", domain=[-0.5, self.space.width - 0.5]
                     ),
                 ),
                 y=alt.Y(
                     "y:Q",
-                    title="Y",
+                    title=ylabel,
                     scale=alt.Scale(
                         type="linear", domain=[-0.5, self.space.height - 0.5]
                     ),
@@ -566,15 +566,15 @@ class SpaceRenderer:
                 strokeWidth=alt.StrokeWidth("strokeWidth:Q", title="Stroke Width"),
                 tooltip=tooltip_list,
             )
-            .properties(
-                title="Agent Plot (Altair)", width=chart_width, height=chart_height
-            )
+            .properties(title=title, width=chart_width, height=chart_height)
         )
 
         return chart
 
     def draw_agents(self, agent_portrayal, ax: Axes | None = None, **kwargs):
         """Draw agents on the space."""
+        self.agent_kwargs = kwargs.copy()
+
         self.agent_portrayal = agent_portrayal
 
         if self.backend == "matplotlib":
@@ -584,7 +584,9 @@ class SpaceRenderer:
                 self.space, agent_portrayal, default_size=self.space_drawer.s_default
             )
             arguments = self._map_coordinates(arguments)
-            self.agent_mesh = self._draw_agents_matplotlib(ax, arguments, **kwargs)
+            self.agent_mesh = self._draw_agents_matplotlib(
+                ax, arguments, **self.agent_kwargs
+            )
 
             return self.agent_mesh
 
@@ -593,7 +595,7 @@ class SpaceRenderer:
                 self.space, agent_portrayal, default_size=self.space_drawer.s_default
             )
             arguments = self._map_coordinates(arguments)
-            self.agent_mesh = self._draw_agents_altair(arguments, **kwargs)
+            self.agent_mesh = self._draw_agents_altair(arguments, **self.agent_kwargs)
             return self.agent_mesh
 
     # Property layer drawing methods
@@ -1032,13 +1034,16 @@ class SpaceRenderer:
         **kwargs,
     ):
         """Render the complete space with structure, agents, and property layers."""
+        structure_kwargs = kwargs.pop("structure_kwargs", {})
+        agent_kwargs = kwargs.pop("agent_kwargs", {})
+
         if self.backend == "matplotlib":
             ax = ax if ax is not None else self.ax
 
             if self.space_mesh is None:
-                self.draw_structure(ax)
+                self.draw_structure(ax, **structure_kwargs)
             if agent_portrayal is not None and self.agent_mesh is None:
-                self.draw_agents(agent_portrayal, ax, **kwargs)
+                self.draw_agents(agent_portrayal, ax, **agent_kwargs)
             if propertylayer_portrayal is not None and self.propertylayer_mesh is None:
                 self.draw_propertylayer(propertylayer_portrayal, ax)
 
@@ -1046,9 +1051,9 @@ class SpaceRenderer:
         else:
             # Altair rendering
             if self.space_mesh is None:
-                self.draw_structure()
+                self.draw_structure(**structure_kwargs)
             if agent_portrayal is not None and self.agent_mesh is None:
-                self.draw_agents(agent_portrayal)
+                self.draw_agents(agent_portrayal, **agent_kwargs)
             if propertylayer_portrayal is not None and self.propertylayer_mesh is None:
                 _, pbar = self.draw_propertylayer(propertylayer_portrayal)
             else:

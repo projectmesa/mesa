@@ -253,20 +253,16 @@ def SpaceRendererComponent(
 
         # Draw the space structure if specified
         if renderer.space_mesh:
-            renderer.draw_structure()
+            renderer.draw_structure(**renderer.space_kwargs)
 
         # Draw agents if specified
-        if (
-            hasattr(renderer, "agent_portrayal")
-            and renderer.agent_portrayal is not None
-        ):
-            renderer.draw_agents(renderer.agent_portrayal)
+        if renderer.agent_mesh:
+            renderer.draw_agents(
+                renderer.agent_portrayal, ax=None, **renderer.agent_kwargs
+            )
 
         # Draw property layers if specified
-        if (
-            hasattr(renderer, "propertylayer_portrayal")
-            and renderer.propertylayer_portrayal is not None
-        ):
+        if renderer.propertylayer_mesh:
             _, cbar = renderer.draw_propertylayer(renderer.propertylayer_portrayal)
             # Remove the newly generated colorbar to avoid duplication
             if cbar is not None:
@@ -287,9 +283,11 @@ def SpaceRendererComponent(
         return None
     else:
         if renderer.space_mesh:
-            renderer.draw_structure()
+            renderer.draw_structure(**renderer.space_kwargs)
         if renderer.agent_mesh:
-            renderer.draw_agents(renderer.agent_portrayal)
+            renderer.draw_agents(
+                renderer.agent_portrayal, ax=None, **renderer.agent_kwargs
+            )
         if renderer.propertylayer_mesh:
             renderer.draw_propertylayer(renderer.propertylayer_portrayal)
 

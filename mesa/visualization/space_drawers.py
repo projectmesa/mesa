@@ -39,7 +39,7 @@ Network = NetworkGrid | mesa.discrete_space.Network
 class OrthogonalSpaceDrawer:
     """Drawer for orthogonal grid spaces (SingleGrid, MultiGrid, Moore, VonNeumann)."""
 
-    def __init__(self, space: OrthogonalGrid, **kwargs):
+    def __init__(self, space: OrthogonalGrid):
         """Initialize the orthogonal space drawer.
 
         Args:
@@ -49,43 +49,101 @@ class OrthogonalSpaceDrawer:
         self.space = space
         self.s_default = (180 / max(self.space.width, self.space.height)) ** 2
 
-    def draw_matplotlib(self, ax):
+    def draw_matplotlib(self, ax, **space_kwargs):
         """Draw the orthogonal grid using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on
+            space_kwargs: Additional keyword arguments for styling
 
         Returns:
             The modified axes object
         """
-        if ax is None:
-            fig, ax = plt.subplots()
+        fig_kwargs = {
+            "figsize": space_kwargs.pop("figsize", (8, 8)),
+            "dpi": space_kwargs.pop("dpi", 100),
+        }
 
-        # further styling
+        if ax is None:
+            fig, ax = plt.subplots(**fig_kwargs)
+
+        # gridline styling kwargs
+        line_kwargs = {
+            "color": space_kwargs.pop("color", "gray"),
+            "linestyle": space_kwargs.pop("linestyle", ":"),
+            "linewidth": space_kwargs.pop("linewidth", 1),
+            "alpha": space_kwargs.pop("alpha", 1),
+        }
+
+        # Remaining kwargs for title, xlabel, ylabel, aspect, etc.
+        ax.set(**space_kwargs)
+
         ax.set_xlim(-0.5, self.space.width - 0.5)
         ax.set_ylim(-0.5, self.space.height - 0.5)
 
         # Draw grid lines
         for x in np.arange(-0.5, self.space.width - 0.5, 1):
-            ax.axvline(x, color="gray", linestyle=":")
+            ax.axvline(x, **line_kwargs)
         for y in np.arange(-0.5, self.space.height - 0.5, 1):
-            ax.axhline(y, color="gray", linestyle=":")
+            ax.axhline(y, **line_kwargs)
+
         return ax
 
-    def draw_altair(self):
+    def draw_altair(self, **chart_kwargs):
         """Draw the orthogonal grid using Altair.
+
+        Args:
+            chart_kwargs: Additional keyword arguments for styling the chart
 
         Returns:
             Altair chart object
         """
+        # for axis and grid styling
+        axis_kwargs = {
+            "xlabel": chart_kwargs.pop("xlabel", "X"),
+            "ylabel": chart_kwargs.pop("ylabel", "Y"),
+            "grid_color": chart_kwargs.pop("grid_color", "lightgray"),
+            "grid_dash": chart_kwargs.pop("grid_dash", [2, 2]),
+            "grid_width": chart_kwargs.pop("grid_width", 1),
+            "grid_opacity": chart_kwargs.pop("grid_opacity", 1),
+        }
+
+        # for chart properties
+        chart_props = {
+            "width": chart_kwargs.pop("width", 450),
+            "height": chart_kwargs.pop("height", 350),
+            "title": chart_kwargs.pop("title", ""),
+        }
+        chart_props.update(chart_kwargs)
+
         chart = (
-            alt.Chart(pd.DataFrame({"x": [0], "y": [0]}))
+            alt.Chart(pd.DataFrame([{}]))
             .mark_point(opacity=0)
             .encode(
-                x=alt.X("X:Q", scale=alt.Scale(domain=[-0.5, self.space.width - 0.5])),
-                y=alt.Y("Y:Q", scale=alt.Scale(domain=[-0.5, self.space.height - 0.5])),
+                x=alt.X(
+                    "X:Q",
+                    scale=alt.Scale(domain=[-0.5, self.space.width - 0.5], nice=False),
+                    title=axis_kwargs["xlabel"],
+                    axis=alt.Axis(
+                        gridColor=axis_kwargs["grid_color"],
+                        gridDash=axis_kwargs["grid_dash"],
+                        gridWidth=axis_kwargs["grid_width"],
+                        gridOpacity=axis_kwargs["grid_opacity"],
+                    ),
+                ),
+                y=alt.Y(
+                    "Y:Q",
+                    scale=alt.Scale(domain=[-0.5, self.space.height - 0.5], nice=False),
+                    title=axis_kwargs["ylabel"],
+                    axis=alt.Axis(
+                        gridColor=axis_kwargs["grid_color"],
+                        gridDash=axis_kwargs["grid_dash"],
+                        gridWidth=axis_kwargs["grid_width"],
+                        gridOpacity=axis_kwargs["grid_opacity"],
+                    ),
+                ),
             )
-            .properties(width=450, height=350)
+            .properties(**chart_props)
         )
         return chart
 
@@ -93,7 +151,7 @@ class OrthogonalSpaceDrawer:
 class HexSpaceDrawer:
     """Drawer for hexagonal grid spaces."""
 
-    def __init__(self, space: HexGrid, **kwargs):
+    def __init__(self, space: HexGrid):
         """Initialize the hexagonal space drawer.
 
         Args:
@@ -150,25 +208,60 @@ class HexSpaceDrawer:
 
         return hexagons
 
-    def draw_matplotlib(self, ax):
+    def draw_matplotlib(self, ax, **space_kwargs):
         """Draw the hexagonal grid using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on
+            space_kwargs: Additional keyword arguments for styling
 
         Returns:
             The modified axes object
         """
+        fig_kwargs = {
+            "figsize": space_kwargs.pop("figsize", (8, 8)),
+            "dpi": space_kwargs.pop("dpi", 100),
+        }
+
         if ax is None:
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(**fig_kwargs)
+
+        line_kwargs = {
+            "color": space_kwargs.pop("color", "black"),
+            "linestyle": space_kwargs.pop("linestyle", ":"),
+            "linewidth": space_kwargs.pop("linewidth", 1),
+            "alpha": space_kwargs.pop("alpha", 0.8),
+        }
+
+        ax.set(**space_kwargs)
 
         ax.set_xlim(-2 * self.x_padding, self.x_max + self.x_padding)
         ax.set_ylim(-2 * self.y_padding, self.y_max + self.y_padding)
 
-        def setup_hexmesh():
-            """Helper function for creating the hexmesh with unique edges."""
-            edges = set()
+        edges = set()
+        # Generate edges for each hexagon
+        for vertices in self.hexagons:
+            # Edge logic, connecting each vertex to the next
+            for v1, v2 in pairwise([*vertices, vertices[0]]):
+                # Sort vertices to ensure consistent edge representation and avoid duplicates.
+                edge = tuple(sorted([tuple(np.round(v1, 6)), tuple(np.round(v2, 6))]))
+                edges.add(edge)
 
+        ax.add_collection(LineCollection(edges, **line_kwargs))
+        return ax
+
+    def draw_altair(self, **chart_kwargs):
+        """Draw the hexagonal grid using Altair.
+
+        Args:
+            chart_kwargs: Additional keyword arguments for styling the chart
+
+        Returns:
+            Altair chart object representing the hexagonal grid.
+        """
+        edge_data = []
+        if self.hexagons:
+            edges = set()
             # Generate edges for each hexagon
             for vertices in self.hexagons:
                 # Edge logic, connecting each vertex to the next
@@ -179,20 +272,62 @@ class HexSpaceDrawer:
                     )
                     edges.add(edge)
 
-            return LineCollection(
-                edges, linestyle=":", color="black", linewidth=1, alpha=1
+            # Prepare data for Altair: each edge needs two points (start and end)
+            for i, edge_tuple in enumerate(edges):
+                p1, p2 = edge_tuple
+                edge_data.append(
+                    {"edge_id": i, "point_order": 0, "x": p1[0], "y": p1[1]}
+                )
+                edge_data.append(
+                    {"edge_id": i, "point_order": 1, "x": p2[0], "y": p2[1]}
+                )
+
+        # Create DataFrame from the edge data, empty if no hexagons.
+        source = (
+            pd.DataFrame(edge_data)
+            if edge_data
+            else pd.DataFrame({"edge_id": [], "point_order": [], "x": [], "y": []})
+        )
+
+        mark_props = {
+            "color": chart_kwargs.pop("color", "black"),
+            "strokeDash": chart_kwargs.pop("strokeDash", [2, 2]),
+            "strokeWidth": chart_kwargs.pop("strokeWidth", 1),
+            "opacity": chart_kwargs.pop("opacity", 0.8),
+        }
+
+        chart_props = {
+            "width": chart_kwargs.pop("width", 450),
+            "height": chart_kwargs.pop("height", 350),
+            "title": chart_kwargs.pop("title", ""),
+        }
+        chart_props.update(chart_kwargs)
+
+        # Setting domain for x and y axes with padding
+        domain_x = (-2 * self.x_padding, self.x_max + self.x_padding)
+        domain_y = (-2 * self.y_padding, self.y_max + self.y_padding)
+
+        chart = (
+            alt.Chart(source)
+            .mark_line(**mark_props)
+            .encode(
+                x=alt.X(
+                    "x:Q",
+                    title=chart_kwargs.pop("xlabel", "X"),
+                    scale=alt.Scale(domain=domain_x, zero=False),
+                ),
+                y=alt.Y(
+                    "y:Q",
+                    title=chart_kwargs.pop("ylabel", "Y"),
+                    scale=alt.Scale(domain=domain_y, zero=False),
+                ),
+                detail="edge_id:N",
+                order="point_order:Q",
             )
+            .properties(**chart_props)
+        )
 
-        ax.add_collection(setup_hexmesh())
-        return ax
-
-    def draw_altair(self):
-        """Draw the hexagonal grid using Altair.
-
-        Raises:
-            NotImplementedError: Altair drawing not yet implemented for hex grids
-        """
-        raise NotImplementedError("Altair drawing not implemented for HexSpaceDrawer.")
+        return chart
 
 
 class NetworkSpaceDrawer:
