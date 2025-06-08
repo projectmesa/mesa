@@ -153,6 +153,9 @@ class SpaceRenderer:
             if x is None:
                 x = loc[:, 1]
 
+            # Ensure x is an integer index for the position mapping
+            x = x.astype(int)
+
             mapped_arguments["loc"] = pos[x]
 
         return mapped_arguments
@@ -527,6 +530,18 @@ class SpaceRenderer:
         # FIXME: Add more fields to tooltip (preferably from agent_portrayal)
         tooltip_list = ["x", "y"]
 
+        # Determine space dimensions
+        space_width = (
+            self.space.width
+            if hasattr(self.space, "width")
+            else self.space_drawer.width
+        )
+        space_height = (
+            self.space.height
+            if hasattr(self.space, "height")
+            else self.space_drawer.height
+        )
+
         chart = (
             alt.Chart(df)
             .mark_point()
@@ -534,16 +549,12 @@ class SpaceRenderer:
                 x=alt.X(
                     "x:Q",
                     title=xlabel,
-                    scale=alt.Scale(
-                        type="linear", domain=[-0.5, self.space.width - 0.5]
-                    ),
+                    scale=alt.Scale(type="linear", domain=[-0.5, space_width - 0.5]),
                 ),
                 y=alt.Y(
                     "y:Q",
                     title=ylabel,
-                    scale=alt.Scale(
-                        type="linear", domain=[-0.5, self.space.height - 0.5]
-                    ),
+                    scale=alt.Scale(type="linear", domain=[-0.5, space_height - 0.5]),
                 ),
                 size=alt.Size("size:Q", legend=None),
                 shape=alt.Shape(
