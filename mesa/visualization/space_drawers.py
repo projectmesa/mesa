@@ -334,7 +334,10 @@ class NetworkSpaceDrawer:
     """Drawer for network-based spaces."""
 
     def __init__(
-        self, space: Network, layout_alg=nx.spring_layout, layout_kwargs=None, **kwargs
+        self,
+        space: Network,
+        layout_alg=nx.spring_layout,
+        layout_kwargs=None,
     ):
         """Initialize the network space drawer.
 

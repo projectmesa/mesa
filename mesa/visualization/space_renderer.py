@@ -500,7 +500,7 @@ class SpaceRenderer:
         }
         df = pd.DataFrame(df_data)
 
-        # To ensure distinct shapes accourding to agnet portrayal
+        # To ensure distinct shapes according to agnet portrayal
         unique_shape_names_in_data = df["shape"].unique().tolist()
 
         fill_colors = []
