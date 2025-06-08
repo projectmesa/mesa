@@ -40,13 +40,6 @@ from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgb, to_rgba
-from space_drawers import (
-    ContinuousSpaceDrawer,
-    HexSpaceDrawer,
-    NetworkSpaceDrawer,
-    OrthogonalSpaceDrawer,
-    VoronoiSpaceDrawer,
-)
 
 import mesa
 from mesa.discrete_space import (
@@ -61,6 +54,13 @@ from mesa.space import (
     MultiGrid,
     NetworkGrid,
     SingleGrid,
+)
+from mesa.visualization.space_drawers import (
+    ContinuousSpaceDrawer,
+    HexSpaceDrawer,
+    NetworkSpaceDrawer,
+    OrthogonalSpaceDrawer,
+    VoronoiSpaceDrawer,
 )
 
 # Type aliases
