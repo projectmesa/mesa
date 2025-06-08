@@ -156,7 +156,7 @@ class SpaceRenderer:
             # Ensure x is an integer index for the position mapping
             x = x.astype(int)
 
-            mapped_arguments["loc"] = pos[x]
+            mapped_arguments["loc"] = pos[x - 1]  # Adjust for 1-based indexing
 
         return mapped_arguments
 
