@@ -337,10 +337,10 @@ class SpaceRenderer:
             "+": "cross",
             "x": "cross",  # Both '+' and 'x' map to cross in Altair
             ".": "circle",  # Small point becomes circle
-            "1": "triangle-down",  # tri_down
-            "2": "triangle-up",  # tri_up
-            "3": "triangle-left",  # tri_left
-            "4": "triangle-right",  # tri_right
+            "1": "triangle-down",
+            "2": "triangle-up",
+            "3": "triangle-left",
+            "4": "triangle-right",
         }
 
         for agent in space.agents:
@@ -486,7 +486,7 @@ class SpaceRenderer:
         if arguments["loc"].size == 0:
             return None
 
-        # Agent data preparation (remains the same)
+        # Agent data preparation
         df_data = {
             "x": arguments["loc"][:, 0],
             "y": arguments["loc"][:, 1],
@@ -499,6 +499,8 @@ class SpaceRenderer:
             "original_stroke": arguments["stroke"],
         }
         df = pd.DataFrame(df_data)
+
+        # To ensure distinct shapes accourding to agnet portrayal
         unique_shape_names_in_data = df["shape"].unique().tolist()
 
         fill_colors = []
@@ -830,7 +832,7 @@ class SpaceRenderer:
             vmin = portrayal.vmin if portrayal.vmin is not None else np.min(data)
             vmax = portrayal.vmax if portrayal.vmax is not None else np.max(data)
 
-            # Prepare data for Altair (convert 2D array to a long-form DataFrame)
+            # Prepare data for Altair
             df = pd.DataFrame(
                 {
                     "x": np.repeat(np.arange(data.shape[0]), data.shape[1]),
