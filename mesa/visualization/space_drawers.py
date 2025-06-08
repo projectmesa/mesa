@@ -362,14 +362,17 @@ class NetworkSpaceDrawer:
 
         self.s_default = (180 / max(self.width, self.height)) ** 2
 
-    def draw_matplotlib(self, ax):
+    def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the network using matplotlib.
 
         Args:
-            ax: Matplotlib axes object to draw on
+            ax: Matplotlib axes object to draw on.
+            **space_kwargs: Dictionaries of keyword arguments for styling.
+                - node_kwargs: A dict passed to nx.draw_networkx_nodes and can contain zorder.
+                - edge_kwargs: A dict passed to nx.draw_networkx_edges and can contain zorder.
 
         Returns:
-            The modified axes object
+            The modified axes object.
         """
         if ax is None:
             fig, ax = plt.subplots()
@@ -377,29 +380,93 @@ class NetworkSpaceDrawer:
         x_padding = self.width / 20
         y_padding = self.height / 20
 
-        # further styling
         ax.set_axis_off()
         ax.set_xlim(xmin=self.xmin - x_padding, xmax=self.xmax + x_padding)
         ax.set_ylim(ymin=self.ymin - y_padding, ymax=self.ymax + y_padding)
 
-        # draw the nodes
-        # FIXME: we need to draw the empty nodes as well
-        edge_collection = nx.draw_networkx_edges(
-            self.graph, self.pos, ax=ax, alpha=0.5, style="--"
-        )
-        edge_collection.set_zorder(0)
+        node_draw_kwargs = {"alpha": 0.5}
+        edge_draw_kwargs = {"alpha": 0.5, "style": "--"}
+
+        node_draw_kwargs.update(space_kwargs.get("node_kwargs", {}))
+        edge_draw_kwargs.update(space_kwargs.get("edge_kwargs", {}))
+
+        node_zorder = node_draw_kwargs.pop("zorder", 0)
+        edge_zorder = edge_draw_kwargs.pop("zorder", 0)
+
+        nodes = nx.draw_networkx_nodes(
+            self.graph, self.pos, ax=ax, **node_draw_kwargs
+        ).set_zorder(node_zorder)
+        edges = nx.draw_networkx_edges(
+            self.graph, self.pos, ax=ax, **edge_draw_kwargs
+        ).set_zorder(edge_zorder)
+
+        if nodes:
+            nodes.set_zorder(node_zorder)
+        if edges:
+            edges.set_zorder(edge_zorder)
 
         return ax
 
-    def draw_altair(self):
+    def draw_altair(self, **chart_kwargs):
         """Draw the network using Altair.
 
-        Raises:
-            NotImplementedError: Altair drawing not yet implemented for networks
+        Args:
+            **chart_kwargs: Dictionaries for styling the chart.
+                - node_kwargs: A dict of properties for the node's mark_point.
+                - edge_kwargs: A dict of properties for the edge's mark_rule.
+                - Other kwargs (e.g., title, width) are passed to chart.properties().
+
+        Returns:
+            Altair chart object representing the network.
         """
-        raise NotImplementedError(
-            "Altair drawing not implemented for NetworkSpaceDrawer."
+        nodes_df = pd.DataFrame(self.pos).T.reset_index()
+        nodes_df.columns = ["node", "x", "y"]
+
+        edges_df = pd.DataFrame(self.graph.edges(), columns=["source", "target"])
+        edge_positions = edges_df.merge(
+            nodes_df, how="left", left_on="source", right_on="node"
+        ).merge(
+            nodes_df,
+            how="left",
+            left_on="target",
+            right_on="node",
+            suffixes=("_source", "_target"),
         )
+
+        x_padding = self.width / 20
+        y_padding = self.height / 20
+        x_domain = [self.xmin - x_padding, self.xmax + x_padding]
+        y_domain = [self.ymin - y_padding, self.ymax + y_padding]
+
+        node_mark_kwargs = {"filled": True, "opacity": 0.5, "size": 500}
+        edge_mark_kwargs = {"opacity": 0.5, "strokeDash": [8, 3]}
+
+        node_mark_kwargs.update(chart_kwargs.pop("node_kwargs", {}))
+        edge_mark_kwargs.update(chart_kwargs.pop("edge_kwargs", {}))
+
+        edge_plot = (
+            alt.Chart(edge_positions)
+            .mark_rule(**edge_mark_kwargs)
+            .encode(
+                x=alt.X("x_source", scale=alt.Scale(domain=x_domain), title=""),
+                y=alt.Y("y_source", scale=alt.Scale(domain=y_domain), title=""),
+                x2="x_target",
+                y2="y_target",
+            )
+        )
+
+        node_plot = (
+            alt.Chart(nodes_df)
+            .mark_point(**node_mark_kwargs)
+            .encode(x="x", y="y", tooltip=["node"])
+        )
+
+        chart = edge_plot + node_plot
+
+        if chart_kwargs:
+            chart = chart.properties(**chart_kwargs)
+
+        return chart
 
 
 class ContinuousSpaceDrawer:
