@@ -13,8 +13,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import pandas as pd
-from matplotlib.collections import LineCollection, PatchCollection
-from matplotlib.patches import Polygon
+from matplotlib.collections import LineCollection
 
 import mesa
 from mesa.discrete_space import (
@@ -557,32 +556,129 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
         )
 
 
-class VoronoiSpaceDrawer:
+class VoronoiSpaceDrawer(BaseSpaceDrawer):
     """Drawer for Voronoi diagram spaces."""
 
-    def __init__(self, space: VoronoiGrid, **kwargs):
+    def __init__(self, space: VoronoiGrid):
         """Initialize the Voronoi space drawer.
 
         Args:
             space: The Voronoi grid space to draw
-            **kwargs: Additional keyword arguments
         """
-        self.space = space
+        super().__init__(space)
+        if self.space.centroids_coordinates:
+            x_list = [i[0] for i in self.space.centroids_coordinates]
+            y_list = [i[1] for i in self.space.centroids_coordinates]
+            x_max, x_min = max(x_list), min(x_list)
+            y_max, y_min = max(y_list), min(y_list)
+        else:
+            x_max, x_min, y_max, y_min = 1, 0, 1, 0
 
-        x_list = [i[0] for i in self.space.centroids_coordinates]
-        y_list = [i[1] for i in self.space.centroids_coordinates]
-        self.x_max, self.x_min = max(x_list), min(x_list)
-        self.y_max, self.y_min = max(y_list), min(y_list)
+        width = x_max - x_min
+        height = y_max - y_min
+        self.s_default = (
+            (180 / max(width, height)) ** 2 if width > 0 or height > 0 else 1
+        )
 
-        self.width = self.x_max - self.x_min
-        self.height = self.y_max - self.y_min
-        self.s_default = (180 / max(self.width, self.height)) ** 2
+        # Parameters for visualization limits
+        self.viz_xmin = x_min - width / 20
+        self.viz_xmax = x_max + width / 20
+        self.viz_ymin = y_min - height / 20
+        self.viz_ymax = y_max + height / 20
 
-    def draw_matplotlib(self, ax):
+    def _clip_line(self, p1, p2, box):
+        """Clips a line segment using the Cohen-Sutherland algorithm.
+
+        Returns the clipped line segment (p1, p2) or None if it's outside.
+        """
+        x1, y1 = p1
+        x2, y2 = p2
+        min_x, min_y, max_x, max_y = box
+
+        # Define region codes
+        INSIDE, LEFT, RIGHT, BOTTOM, TOP = 0, 1, 2, 4, 8  # noqa: N806
+
+        def compute_outcode(x, y):
+            code = INSIDE
+            if x < min_x:
+                code |= LEFT
+            elif x > max_x:
+                code |= RIGHT
+            if y < min_y:
+                code |= BOTTOM
+            elif y > max_y:
+                code |= TOP
+            return code
+
+        outcode1 = compute_outcode(x1, y1)
+        outcode2 = compute_outcode(x2, y2)
+
+        while True:
+            if not (outcode1 | outcode2):  # Both points inside
+                return (x1, y1), (x2, y2)
+            elif outcode1 & outcode2:  # Both points share an outside region
+                return None
+            else:
+                outcode_out = outcode1 if outcode1 else outcode2
+                x, y = 0.0, 0.0
+
+                # Check for horizontal line
+                if y1 != y2:
+                    if outcode_out & TOP:
+                        x = x1 + (x2 - x1) * (max_y - y1) / (y2 - y1)
+                        y = max_y
+                    elif outcode_out & BOTTOM:
+                        x = x1 + (x2 - x1) * (min_y - y1) / (y2 - y1)
+                        y = min_y
+
+                # Check for vertical line
+                if x1 != x2:
+                    if outcode_out & RIGHT:
+                        y = y1 + (y2 - y1) * (max_x - x1) / (x2 - x1)
+                        x = max_x
+                    elif outcode_out & LEFT:
+                        y = y1 + (y2 - y1) * (min_x - x1) / (x2 - x1)
+                        x = min_x
+
+                if outcode_out == outcode1:
+                    x1, y1 = x, y
+                    outcode1 = compute_outcode(x1, y1)
+                else:
+                    x2, y2 = x, y
+                    outcode2 = compute_outcode(x2, y2)
+
+    def _get_clipped_segments(self):
+        """Helper method to perform the segment extraction, de-duplication and clipping logic."""
+        clip_box = (
+            self.viz_xmin,
+            self.viz_ymin,
+            self.viz_xmax,
+            self.viz_ymax,
+        )
+
+        unique_segments = set()
+        for cell in self.space.all_cells.cells:
+            vertices = [tuple(v) for v in cell.properties["polygon"]]
+            for p1, p2 in pairwise([*vertices, vertices[0]]):
+                # Sort to avoid duplicate segments going in opposite directions
+                unique_segments.add(tuple(sorted((p1, p2))))
+
+        # Clip each unique segment
+        final_segments = []
+        for p1, p2 in unique_segments:
+            clipped_segment = self._clip_line(p1, p2, clip_box)
+            if clipped_segment:
+                final_segments.append(clipped_segment)
+
+        return final_segments, clip_box
+
+    def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the Voronoi diagram using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on
+            **space_kwargs: Keyword arguments passed to matplotlib's LineCollection.
+                            Examples: lw=2, alpha=0.5, colors='red'
 
         Returns:
             The modified axes object
@@ -590,31 +686,63 @@ class VoronoiSpaceDrawer:
         if ax is None:
             fig, ax = plt.subplots()
 
-        x_padding = self.width / 20
-        y_padding = self.height / 20
+        final_segments, clip_box = self._get_clipped_segments()
 
-        ax.set_xlim(self.x_min - x_padding, self.x_max + x_padding)
-        ax.set_ylim(self.y_min - y_padding, self.y_max + y_padding)
+        ax.set_xlim(clip_box[0], clip_box[2])
+        ax.set_ylim(clip_box[1], clip_box[3])
 
-        def setup_voroinoimesh(cells):
-            patches = []
-            for cell in cells:
-                patch = Polygon(cell.properties["polygon"])
-                patches.append(patch)
-            mesh = PatchCollection(
-                patches, edgecolor="k", facecolor=(1, 1, 1, 0), linestyle="dotted", lw=1
-            )
-            return mesh
+        if final_segments:
+            # Define default styles for the plot
+            style_args = {"colors": "k", "linestyle": "dotted", "lw": 1}
+            style_args.update(space_kwargs)
 
-        ax.add_collection(setup_voroinoimesh(self.space.all_cells.cells))
+            # Create the LineCollection with the final styles
+            lc = LineCollection(final_segments, **style_args)
+            ax.add_collection(lc)
+
         return ax
 
-    def draw_altair(self):
+    def draw_altair(self, **chart_kwargs):
         """Draw the Voronoi diagram using Altair.
 
-        Raises:
-            NotImplementedError: Altair drawing not yet implemented for Voronoi grids
+        Args:
+            **chart_kwargs: Keyword arguments for styling.
+                            Pass `mark_kwargs` for line properties e.g. {"color": "red"}.
+                            Other kwargs (e.g., width, title) apply to the chart.
+
+        Returns:
+            An Altair Chart object representing the Voronoi diagram.
         """
-        raise NotImplementedError(
-            "Altair drawing not implemented for VoronoiSpaceDrawer."
+        final_segments, clip_box = self._get_clipped_segments()
+
+        # Prepare data
+        final_data = []
+        for i, (p1, p2) in enumerate(final_segments):
+            final_data.append({"x": p1[0], "y": p1[1], "line_id": i})
+            final_data.append({"x": p2[0], "y": p2[1], "line_id": i})
+
+        df = pd.DataFrame(final_data)
+
+        # Define default properties for the mark
+        mark_kwargs = {"strokeDash": [3, 3], "color": "black"}
+        user_mark_kwargs = chart_kwargs.pop("mark_kwargs", {})
+        mark_kwargs.update(user_mark_kwargs)
+
+        chart_props = {}
+        chart_props.update(chart_kwargs)
+
+        chart = (
+            alt.Chart(df)
+            .mark_line(**mark_kwargs)
+            .encode(
+                x=alt.X(
+                    "x:Q", scale=alt.Scale(domain=[clip_box[0], clip_box[2]]), axis=None
+                ),
+                y=alt.Y(
+                    "y:Q", scale=alt.Scale(domain=[clip_box[1], clip_box[3]]), axis=None
+                ),
+                detail="line_id:N",
+            )
+            .properties(**chart_props)
         )
+        return chart
