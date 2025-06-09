@@ -533,16 +533,7 @@ class SpaceRenderer:
         tooltip_list = ["x", "y"]
 
         # Determine space dimensions
-        space_width = (
-            self.space.width
-            if hasattr(self.space, "width")
-            else self.space_drawer.width
-        )
-        space_height = (
-            self.space.height
-            if hasattr(self.space, "height")
-            else self.space_drawer.height
-        )
+        xmin, xmax, ymin, ymax = self.space_drawer.get_viz_limits()
 
         chart = (
             alt.Chart(df)
@@ -551,12 +542,12 @@ class SpaceRenderer:
                 x=alt.X(
                     "x:Q",
                     title=xlabel,
-                    scale=alt.Scale(type="linear", domain=[-0.5, space_width - 0.5]),
+                    scale=alt.Scale(type="linear", domain=[xmin, xmax]),
                 ),
                 y=alt.Y(
                     "y:Q",
                     title=ylabel,
-                    scale=alt.Scale(type="linear", domain=[-0.5, space_height - 0.5]),
+                    scale=alt.Scale(type="linear", domain=[ymin, ymax]),
                 ),
                 size=alt.Size("size:Q", legend=None),
                 shape=alt.Shape(
@@ -1120,7 +1111,17 @@ class SpaceRenderer:
                 final_chart = main_spatial
             elif prop_cbar:  # Only prop_cbar, no main_spatial
                 final_chart = prop_cbar
-                final_chart = final_chart.configure_view(stroke=None, grid=False)
+                final_chart = final_chart.configure_view(grid=False)
+
+            if final_chart is None:
+                # If no charts are available, return an empty chart
+                final_chart = (
+                    alt.Chart(pd.DataFrame())
+                    .mark_point()
+                    .properties(width=450, height=350)
+                )
+
+            final_chart = final_chart.configure_view(stroke="black", strokeWidth=1.5)
 
             return final_chart
 
