@@ -28,18 +28,21 @@ Classes:
     SpaceRenderer: Main rendering class for Mesa spaces
 """
 
+import os
 import warnings
 from collections.abc import Callable
 from dataclasses import fields
 
 import altair as alt
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgb, to_rgba
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+from PIL import Image
 
 import mesa
 from mesa.discrete_space import (
@@ -63,7 +66,8 @@ from mesa.visualization.space_drawers import (
     VoronoiSpaceDrawer,
 )
 
-# Type aliases
+CORRECTION_FACTOR_MARKER_ZOOM = 0.01
+
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
 Network = NetworkGrid | mesa.discrete_space.Network
@@ -184,7 +188,7 @@ class SpaceRenderer:
             y = agent.pos[1] if agent.pos is not None else agent.cell.coordinate[1]
             return x, y
 
-    def mpl_collect_agent_data(
+    def _mpl_collect_agent_data(
         self,
         space: OrthogonalGrid | HexGrid | Network | ContinuousSpace | VoronoiGrid,
         agent_portrayal: Callable,
@@ -291,7 +295,7 @@ class SpaceRenderer:
 
         return data
 
-    def altair_collect_agent_data(
+    def _altair_collect_agent_data(
         self,
         space: OrthogonalGrid | HexGrid | Network | ContinuousSpace | VoronoiGrid,
         agent_portrayal: Callable,
@@ -443,41 +447,94 @@ class SpaceRenderer:
         return final_data
 
     # Agent drawing methods
-    def _draw_agents_matplotlib(self, ax: Axes | None, arguments, **kwargs):
+    def _mpl_draw_agents(self, ax: Axes | None, arguments, **kwargs):
         """Draw agents using matplotlib backend."""
+
+        def _get_zoom_factor(ax, img):
+            """Calculate zoom factor for image markers based on axis limits."""
+            ax.get_figure().canvas.draw()
+            bbox = ax.get_window_extent().transformed(
+                ax.get_figure().dpi_scale_trans.inverted()
+            )  # in inches
+            width, height = (
+                bbox.width * ax.get_figure().dpi,
+                bbox.height * ax.get_figure().dpi,
+            )  # in pixel
+
+            xr = ax.get_xlim()
+            yr = ax.get_ylim()
+
+            x_pixel_per_data = width / (xr[1] - xr[0])
+            y_pixel_per_data = height / (yr[1] - yr[0])
+
+            zoom_x = (x_pixel_per_data / img.width) * CORRECTION_FACTOR_MARKER_ZOOM
+            zoom_y = (y_pixel_per_data / img.height) * CORRECTION_FACTOR_MARKER_ZOOM
+
+            return min(zoom_x, zoom_y)
+
         loc = arguments.pop("loc")
-        x, y = loc[:, 0], loc[:, 1]
+
+        loc_x = loc[:, 0]
+        loc_y = loc[:, 1]
         marker = arguments.pop("marker")
         zorder = arguments.pop("zorder")
+        malpha = arguments.pop("alpha")
+        msize = arguments.pop("s")
 
-        # Check for conflicting parameters
-        for entry in ["edgecolors", "linewidths", "alpha"]:
+        # we check if edgecolor, linewidth, and alpha are specified
+        # at the agent level, if not, we remove them from the arguments dict
+        # and fallback to the default value in ax.scatter / use what is passed via **kwargs
+        for entry in ["edgecolors", "linewidths"]:
             if len(arguments[entry]) == 0:
                 arguments.pop(entry)
-            elif entry in kwargs:
-                raise ValueError(
-                    f"{entry} specified in both agent portrayal and kwargs"
-                )
+            else:
+                if entry in kwargs:
+                    raise ValueError(
+                        f"{entry} is specified in agent portrayal and via plotting kwargs, you can only use one or the other"
+                    )
 
-        # Draw agents grouped by marker and z-order for efficiency
+        ax.get_figure().canvas.draw()
         for mark in set(marker):
-            mark_mask = np.array([m == mark for m in marker])
-            for z_order in np.unique(zorder):
-                zorder_mask = zorder == z_order
-                logical = mark_mask & zorder_mask
+            if isinstance(mark, (str | os.PathLike)) and os.path.isfile(mark):
+                # images
+                for m_size in np.unique(msize):
+                    image = Image.open(mark)
+                    im = OffsetImage(
+                        image,
+                        zoom=_get_zoom_factor(ax, image) * m_size,
+                    )
+                    im.image.axes = ax
 
-                if not np.any(logical):
-                    continue
+                    mask_marker = [m == mark for m in list(marker)] & (m_size == msize)
+                    for z_order in np.unique(zorder[mask_marker]):
+                        for m_alpha in np.unique(malpha[mask_marker]):
+                            mask = (
+                                (z_order == zorder) & (m_alpha == malpha) & mask_marker
+                            )
+                            for x, y in zip(loc_x[mask], loc_y[mask]):
+                                ab = AnnotationBbox(
+                                    im,
+                                    (x, y),
+                                    frameon=False,
+                                    pad=0.0,
+                                    zorder=z_order,
+                                    **kwargs,
+                                )
+                                ax.add_artist(ab)
 
-                ax.scatter(
-                    x[logical],
-                    y[logical],
-                    marker=mark,
-                    zorder=z_order,
-                    **{k: v[logical] for k, v in arguments.items()},
-                    **kwargs,
-                )
-        return ax
+            else:
+                # ordinary markers
+                mask_marker = [m == mark for m in list(marker)]
+                for z_order in np.unique(zorder[mask_marker]):
+                    zorder_mask = z_order == zorder & mask_marker
+                    ax.scatter(
+                        loc_x[zorder_mask],
+                        loc_y[zorder_mask],
+                        marker=mark,
+                        zorder=z_order,
+                        **{k: v[zorder_mask] for k, v in arguments.items()},
+                        **kwargs,
+                    )
 
     def _draw_agents_altair(
         self, arguments, chart_width=450, chart_height=350, **kwargs
@@ -584,18 +641,16 @@ class SpaceRenderer:
         if self.backend == "matplotlib":
             ax = ax if ax is not None else self.ax
 
-            arguments = self.mpl_collect_agent_data(
+            arguments = self._mpl_collect_agent_data(
                 self.space, agent_portrayal, default_size=self.space_drawer.s_default
             )
             arguments = self._map_coordinates(arguments)
-            self.agent_mesh = self._draw_agents_matplotlib(
-                ax, arguments, **self.agent_kwargs
-            )
+            self.agent_mesh = self._mpl_draw_agents(ax, arguments, **self.agent_kwargs)
 
             return self.agent_mesh
 
         else:
-            arguments = self.altair_collect_agent_data(
+            arguments = self._altair_collect_agent_data(
                 self.space, agent_portrayal, default_size=self.space_drawer.s_default
             )
             arguments = self._map_coordinates(arguments)
@@ -603,7 +658,7 @@ class SpaceRenderer:
             return self.agent_mesh
 
     # Property layer drawing methods
-    def _draw_propertylayer_matplotlib(self, space, propertylayer_portrayal, ax):
+    def _mpl_draw_propertylayer(self, space, propertylayer_portrayal, ax):
         """Draw property layers using matplotlib backend."""
         # Import here to avoid circular imports
         from mesa.visualization.components import PropertyLayerStyle
@@ -1019,7 +1074,7 @@ class SpaceRenderer:
 
         if self.backend == "matplotlib":
             ax = ax if ax is not None else self.ax
-            self.propertylayer_mesh = self._draw_propertylayer_matplotlib(
+            self.propertylayer_mesh = self._mpl_draw_propertylayer(
                 self.space, propertylayer_portrayal, ax
             )
             return self.propertylayer_mesh
