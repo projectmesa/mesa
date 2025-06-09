@@ -36,7 +36,32 @@ HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
 Network = NetworkGrid | mesa.discrete_space.Network
 
 
-class OrthogonalSpaceDrawer:
+class BaseSpaceDrawer:
+    """Base class for all space drawers."""
+
+    def __init__(self, space):
+        """Initialize the base space drawer."""
+        self.space = space
+        self.viz_xmin = None
+        self.viz_xmax = None
+        self.viz_ymin = None
+        self.viz_ymax = None
+
+    def get_viz_limits(self):
+        """Get visualization limits for the space.
+
+        Returns:
+            A tuple of (xmin, xmax, ymin, ymax) for visualization limits.
+        """
+        return (
+            self.viz_xmin,
+            self.viz_xmax,
+            self.viz_ymin,
+            self.viz_ymax,
+        )
+
+
+class OrthogonalSpaceDrawer(BaseSpaceDrawer):
     """Drawer for orthogonal grid spaces (SingleGrid, MultiGrid, Moore, VonNeumann)."""
 
     def __init__(self, space: OrthogonalGrid):
@@ -44,17 +69,23 @@ class OrthogonalSpaceDrawer:
 
         Args:
             space: The orthogonal grid space to draw
-            **kwargs: Additional keyword arguments
         """
-        self.space = space
+        super().__init__(space)
         self.s_default = (180 / max(self.space.width, self.space.height)) ** 2
 
-    def draw_matplotlib(self, ax, **space_kwargs):
+        # Parameters for visualization limits
+        self.viz_xmin = -0.5
+        self.viz_xmax = self.space.width - 0.5
+        self.viz_ymin = -0.5
+        self.viz_ymax = self.space.height - 0.5
+
+    def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the orthogonal grid using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on
-            space_kwargs: Additional keyword arguments for styling
+            **space_kwargs: Additional keyword arguments for styling.
+                            Examples: figsize=(10, 10), color="blue", linewidth=2
 
         Returns:
             The modified axes object
@@ -69,22 +100,20 @@ class OrthogonalSpaceDrawer:
 
         # gridline styling kwargs
         line_kwargs = {
-            "color": space_kwargs.pop("color", "gray"),
-            "linestyle": space_kwargs.pop("linestyle", ":"),
-            "linewidth": space_kwargs.pop("linewidth", 1),
-            "alpha": space_kwargs.pop("alpha", 1),
+            "color": "gray",
+            "linestyle": ":",
+            "linewidth": 1,
+            "alpha": 1,
         }
+        line_kwargs.update(space_kwargs)
 
-        # Remaining kwargs for title, xlabel, ylabel, aspect, etc.
-        ax.set(**space_kwargs)
-
-        ax.set_xlim(-0.5, self.space.width - 0.5)
-        ax.set_ylim(-0.5, self.space.height - 0.5)
+        ax.set_xlim(self.viz_xmin, self.viz_xmax)
+        ax.set_ylim(self.viz_ymin, self.viz_ymax)
 
         # Draw grid lines
-        for x in np.arange(-0.5, self.space.width - 0.5, 1):
+        for x in np.arange(-0.5, self.space.width, 1):
             ax.axvline(x, **line_kwargs)
-        for y in np.arange(-0.5, self.space.height - 0.5, 1):
+        for y in np.arange(-0.5, self.space.height, 1):
             ax.axhline(y, **line_kwargs)
 
         return ax
@@ -93,7 +122,8 @@ class OrthogonalSpaceDrawer:
         """Draw the orthogonal grid using Altair.
 
         Args:
-            chart_kwargs: Additional keyword arguments for styling the chart
+            **chart_kwargs: Additional keyword arguments for styling the chart.
+                            Examples: width=500, height=500, title="Grid"
 
         Returns:
             Altair chart object
@@ -110,9 +140,8 @@ class OrthogonalSpaceDrawer:
 
         # for chart properties
         chart_props = {
-            "width": chart_kwargs.pop("width", 450),
-            "height": chart_kwargs.pop("height", 350),
-            "title": chart_kwargs.pop("title", ""),
+            "width": 450,
+            "height": 350,
         }
         chart_props.update(chart_kwargs)
 
@@ -122,9 +151,10 @@ class OrthogonalSpaceDrawer:
             .encode(
                 x=alt.X(
                     "X:Q",
-                    scale=alt.Scale(domain=[-0.5, self.space.width - 0.5], nice=False),
                     title=axis_kwargs["xlabel"],
+                    scale=alt.Scale(domain=[self.viz_xmin, self.viz_xmax], nice=False),
                     axis=alt.Axis(
+                        grid=True,
                         gridColor=axis_kwargs["grid_color"],
                         gridDash=axis_kwargs["grid_dash"],
                         gridWidth=axis_kwargs["grid_width"],
@@ -133,9 +163,10 @@ class OrthogonalSpaceDrawer:
                 ),
                 y=alt.Y(
                     "Y:Q",
-                    scale=alt.Scale(domain=[-0.5, self.space.height - 0.5], nice=False),
                     title=axis_kwargs["ylabel"],
+                    scale=alt.Scale(domain=[self.viz_ymin, self.viz_ymax], nice=False),
                     axis=alt.Axis(
+                        grid=True,
                         gridColor=axis_kwargs["grid_color"],
                         gridDash=axis_kwargs["grid_dash"],
                         gridWidth=axis_kwargs["grid_width"],
@@ -148,7 +179,7 @@ class OrthogonalSpaceDrawer:
         return chart
 
 
-class HexSpaceDrawer:
+class HexSpaceDrawer(BaseSpaceDrawer):
     """Drawer for hexagonal grid spaces."""
 
     def __init__(self, space: HexGrid):
@@ -156,25 +187,28 @@ class HexSpaceDrawer:
 
         Args:
             space: The hexagonal grid space to draw
-            **kwargs: Additional keyword arguments
         """
-        self.space = space
+        super().__init__(space)
         self.s_default = (180 / max(self.space.width, self.space.height)) ** 2
-        self.size = 1.0
-        self.x_spacing = np.sqrt(3) * self.size
-        self.y_spacing = 1.5 * self.size
+        size = 1.0
+        self.x_spacing = np.sqrt(3) * size
+        self.y_spacing = 1.5 * size
 
-        self.x_max = self.space.width * self.x_spacing + (self.space.height % 2) * (
+        x_max = self.space.width * self.x_spacing + (self.space.height % 2) * (
             self.x_spacing / 2
         )
-        self.y_max = self.space.height * self.y_spacing
+        y_max = self.space.height * self.y_spacing
 
-        self.x_padding = (
-            self.size * np.sqrt(3) / 2
-        )  # Distance from center to rightmost point of hexagon
-        self.y_padding = self.size
+        x_padding = size * np.sqrt(3) / 2
+        y_padding = size
 
-        self.hexagons = self._get_hexmesh(self.space.width, self.space.height)
+        self.hexagons = self._get_hexmesh(self.space.width, self.space.height, size)
+
+        # Parameters for visualization limits
+        self.viz_xmin = -1.8 * x_padding
+        self.viz_xmax = x_max
+        self.viz_ymin = -1.8 * y_padding
+        self.viz_ymax = y_max
 
     def _get_hexmesh(
         self, width: int, height: int, size: float = 1.0
@@ -208,12 +242,25 @@ class HexSpaceDrawer:
 
         return hexagons
 
-    def draw_matplotlib(self, ax, **space_kwargs):
+    def _get_unique_edges(self):
+        """Helper method to extract unique edges from all hexagons."""
+        edges = set()
+        # Generate edges for each hexagon
+        for vertices in self.hexagons:
+            # Edge logic, connecting each vertex to the next
+            for v1, v2 in pairwise([*vertices, vertices[0]]):
+                # Sort vertices to ensure consistent edge representation and avoid duplicates.
+                edge = tuple(sorted([tuple(np.round(v1, 6)), tuple(np.round(v2, 6))]))
+                edges.add(edge)
+        return edges
+
+    def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the hexagonal grid using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on
-            space_kwargs: Additional keyword arguments for styling
+            **space_kwargs: Additional keyword arguments for styling.
+                            Examples: figsize=(8, 8), color="red", alpha=0.5
 
         Returns:
             The modified axes object
@@ -227,110 +274,80 @@ class HexSpaceDrawer:
             fig, ax = plt.subplots(**fig_kwargs)
 
         line_kwargs = {
-            "color": space_kwargs.pop("color", "black"),
-            "linestyle": space_kwargs.pop("linestyle", ":"),
-            "linewidth": space_kwargs.pop("linewidth", 1),
-            "alpha": space_kwargs.pop("alpha", 0.8),
+            "color": "black",
+            "linestyle": ":",
+            "linewidth": 1,
+            "alpha": 0.8,
         }
+        line_kwargs.update(space_kwargs)
 
-        ax.set(**space_kwargs)
+        ax.set_xlim(self.viz_xmin, self.viz_xmax)
+        ax.set_ylim(self.viz_ymin, self.viz_ymax)
+        ax.set_aspect("equal", adjustable="box")
 
-        ax.set_xlim(-2 * self.x_padding, self.x_max + self.x_padding)
-        ax.set_ylim(-2 * self.y_padding, self.y_max + self.y_padding)
-
-        edges = set()
-        # Generate edges for each hexagon
-        for vertices in self.hexagons:
-            # Edge logic, connecting each vertex to the next
-            for v1, v2 in pairwise([*vertices, vertices[0]]):
-                # Sort vertices to ensure consistent edge representation and avoid duplicates.
-                edge = tuple(sorted([tuple(np.round(v1, 6)), tuple(np.round(v2, 6))]))
-                edges.add(edge)
-
-        ax.add_collection(LineCollection(edges, **line_kwargs))
+        edges = self._get_unique_edges()
+        ax.add_collection(LineCollection(list(edges), **line_kwargs))
         return ax
 
     def draw_altair(self, **chart_kwargs):
         """Draw the hexagonal grid using Altair.
 
         Args:
-            chart_kwargs: Additional keyword arguments for styling the chart
+            **chart_kwargs: Additional keyword arguments for styling the chart.
+                            Pass `mark_kwargs` for line properties e.g. {"color": "red"}.
+                            Other kwargs (e.g., width, title) apply to the chart.
 
         Returns:
             Altair chart object representing the hexagonal grid.
         """
-        edge_data = []
-        if self.hexagons:
-            edges = set()
-            # Generate edges for each hexagon
-            for vertices in self.hexagons:
-                # Edge logic, connecting each vertex to the next
-                for v1, v2 in pairwise([*vertices, vertices[0]]):
-                    # Sort vertices to ensure consistent edge representation and avoid duplicates.
-                    edge = tuple(
-                        sorted([tuple(np.round(v1, 6)), tuple(np.round(v2, 6))])
-                    )
-                    edges.add(edge)
-
-            # Prepare data for Altair: each edge needs two points (start and end)
-            for i, edge_tuple in enumerate(edges):
-                p1, p2 = edge_tuple
-                edge_data.append(
-                    {"edge_id": i, "point_order": 0, "x": p1[0], "y": p1[1]}
-                )
-                edge_data.append(
-                    {"edge_id": i, "point_order": 1, "x": p2[0], "y": p2[1]}
-                )
-
-        # Create DataFrame from the edge data, empty if no hexagons.
-        source = (
-            pd.DataFrame(edge_data)
-            if edge_data
-            else pd.DataFrame({"edge_id": [], "point_order": [], "x": [], "y": []})
-        )
-
-        mark_props = {
-            "color": chart_kwargs.pop("color", "black"),
-            "strokeDash": chart_kwargs.pop("strokeDash", [2, 2]),
-            "strokeWidth": chart_kwargs.pop("strokeWidth", 1),
-            "opacity": chart_kwargs.pop("opacity", 0.8),
+        mark_kwargs = {
+            "color": "black",
+            "strokeDash": [2, 2],
+            "strokeWidth": 1,
+            "opacity": 0.8,
         }
+        user_mark_kwargs = chart_kwargs.pop("mark_kwargs", {})
+        mark_kwargs.update(user_mark_kwargs)
 
         chart_props = {
-            "width": chart_kwargs.pop("width", 450),
-            "height": chart_kwargs.pop("height", 350),
-            "title": chart_kwargs.pop("title", ""),
+            "width": 450,
+            "height": 350,
         }
         chart_props.update(chart_kwargs)
 
-        # Setting domain for x and y axes with padding
-        domain_x = (-2 * self.x_padding, self.x_max + self.x_padding)
-        domain_y = (-2 * self.y_padding, self.y_max + self.y_padding)
+        edge_data = []
+        edges = self._get_unique_edges()
+
+        for i, edge_tuple in enumerate(edges):
+            p1, p2 = edge_tuple
+            edge_data.append({"edge_id": i, "point_order": 0, "x": p1[0], "y": p1[1]})
+            edge_data.append({"edge_id": i, "point_order": 1, "x": p2[0], "y": p2[1]})
+
+        source = pd.DataFrame(edge_data)
 
         chart = (
             alt.Chart(source)
-            .mark_line(**mark_props)
+            .mark_line(**mark_kwargs)
             .encode(
                 x=alt.X(
                     "x:Q",
-                    title=chart_kwargs.pop("xlabel", "X"),
-                    scale=alt.Scale(domain=domain_x, zero=False),
+                    scale=alt.Scale(domain=[self.viz_xmin, self.viz_xmax], zero=False),
+                    axis=None,
                 ),
                 y=alt.Y(
                     "y:Q",
-                    title=chart_kwargs.pop("ylabel", "Y"),
-                    scale=alt.Scale(domain=domain_y, zero=False),
+                    scale=alt.Scale(domain=[self.viz_ymin, self.viz_ymax], zero=False),
+                    axis=None,
                 ),
                 detail="edge_id:N",
                 order="point_order:Q",
             )
             .properties(**chart_props)
         )
-
         return chart
 
 
-class NetworkSpaceDrawer:
+class NetworkSpaceDrawer(BaseSpaceDrawer):
     """Drawer for network-based spaces."""
 
     def __init__(
@@ -345,10 +362,8 @@ class NetworkSpaceDrawer:
             space: The network space to draw
             layout_alg: NetworkX layout algorithm to use
             layout_kwargs: Keyword arguments for the layout algorithm
-            **kwargs: Additional keyword arguments
         """
-        self.space = space
-
+        super().__init__(space)
         self.layout_alg = layout_alg
         self.layout_kwargs = layout_kwargs if layout_kwargs is not None else {"seed": 0}
 
@@ -356,14 +371,21 @@ class NetworkSpaceDrawer:
         self.graph = self.space.G
         self.pos = self.layout_alg(self.graph, **self.layout_kwargs)
 
-        x, y = list(zip(*self.pos.values()))
-        self.xmin, self.xmax = min(x), max(x)
-        self.ymin, self.ymax = min(y), max(y)
+        x, y = list(zip(*self.pos.values())) if self.pos else ([0], [0])
+        xmin, xmax = min(x), max(x)
+        ymin, ymax = min(y), max(y)
 
-        self.width = self.xmax - self.xmin
-        self.height = self.ymax - self.ymin
+        width = xmax - xmin
+        height = ymax - ymin
+        self.s_default = (
+            (180 / max(width, height)) ** 2 if width > 0 or height > 0 else 1
+        )
 
-        self.s_default = (180 / max(self.width, self.height)) ** 2
+        # Parameters for visualization limits
+        self.viz_xmin = xmin - width / 20
+        self.viz_xmax = xmax + width / 20
+        self.viz_ymin = ymin - height / 20
+        self.viz_ymax = ymax + height / 20
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the network using matplotlib.
@@ -371,8 +393,8 @@ class NetworkSpaceDrawer:
         Args:
             ax: Matplotlib axes object to draw on.
             **space_kwargs: Dictionaries of keyword arguments for styling.
-                - node_kwargs: A dict passed to nx.draw_networkx_nodes and can contain zorder.
-                - edge_kwargs: A dict passed to nx.draw_networkx_edges and can contain zorder.
+                - node_kwargs: A dict passed to nx.draw_networkx_nodes.
+                - edge_kwargs: A dict passed to nx.draw_networkx_edges.
 
         Returns:
             The modified axes object.
@@ -380,32 +402,29 @@ class NetworkSpaceDrawer:
         if ax is None:
             fig, ax = plt.subplots()
 
-        x_padding = self.width / 20
-        y_padding = self.height / 20
-
         ax.set_axis_off()
-        ax.set_xlim(xmin=self.xmin - x_padding, xmax=self.xmax + x_padding)
-        ax.set_ylim(ymin=self.ymin - y_padding, ymax=self.ymax + y_padding)
+        ax.set_xlim(self.viz_xmin, self.viz_xmax)
+        ax.set_ylim(self.viz_ymin, self.viz_ymax)
 
-        node_draw_kwargs = {"alpha": 0.5}
-        edge_draw_kwargs = {"alpha": 0.5, "style": "--"}
+        node_kwargs = {"alpha": 0.5}
+        edge_kwargs = {"alpha": 0.5, "style": "--"}
 
-        node_draw_kwargs.update(space_kwargs.get("node_kwargs", {}))
-        edge_draw_kwargs.update(space_kwargs.get("edge_kwargs", {}))
+        node_kwargs.update(space_kwargs.get("node_kwargs", {}))
+        edge_kwargs.update(space_kwargs.get("edge_kwargs", {}))
 
-        node_zorder = node_draw_kwargs.pop("zorder", 0)
-        edge_zorder = edge_draw_kwargs.pop("zorder", 0)
+        node_zorder = node_kwargs.pop("zorder", 1)
+        edge_zorder = edge_kwargs.pop("zorder", 0)
 
-        nodes = nx.draw_networkx_nodes(
-            self.graph, self.pos, ax=ax, **node_draw_kwargs
-        ).set_zorder(node_zorder)
-        edges = nx.draw_networkx_edges(
-            self.graph, self.pos, ax=ax, **edge_draw_kwargs
-        ).set_zorder(edge_zorder)
+        nodes = nx.draw_networkx_nodes(self.graph, self.pos, ax=ax, **node_kwargs)
+        edges = nx.draw_networkx_edges(self.graph, self.pos, ax=ax, **edge_kwargs)
 
         if nodes:
             nodes.set_zorder(node_zorder)
-        if edges:
+        # In some matplotlib versions, edges can be a list of collections
+        if isinstance(edges, list):
+            for edge_collection in edges:
+                edge_collection.set_zorder(edge_zorder)
+        elif edges:
             edges.set_zorder(edge_zorder)
 
         return ax
@@ -436,23 +455,32 @@ class NetworkSpaceDrawer:
             suffixes=("_source", "_target"),
         )
 
-        x_padding = self.width / 20
-        y_padding = self.height / 20
-        x_domain = [self.xmin - x_padding, self.xmax + x_padding]
-        y_domain = [self.ymin - y_padding, self.ymax + y_padding]
-
         node_mark_kwargs = {"filled": True, "opacity": 0.5, "size": 500}
-        edge_mark_kwargs = {"opacity": 0.5, "strokeDash": [8, 3]}
+        edge_mark_kwargs = {"opacity": 0.5, "strokeDash": [5, 3]}
 
         node_mark_kwargs.update(chart_kwargs.pop("node_kwargs", {}))
         edge_mark_kwargs.update(chart_kwargs.pop("edge_kwargs", {}))
+
+        chart_kwargs = {
+            "width": 450,
+            "height": 350,
+        }
+        chart_kwargs.update(chart_kwargs)
 
         edge_plot = (
             alt.Chart(edge_positions)
             .mark_rule(**edge_mark_kwargs)
             .encode(
-                x=alt.X("x_source", scale=alt.Scale(domain=x_domain), title=""),
-                y=alt.Y("y_source", scale=alt.Scale(domain=y_domain), title=""),
+                x=alt.X(
+                    "x_source",
+                    scale=alt.Scale(domain=[self.viz_xmin, self.viz_xmax]),
+                    axis=None,
+                ),
+                y=alt.Y(
+                    "y_source",
+                    scale=alt.Scale(domain=[self.viz_ymin, self.viz_ymax]),
+                    axis=None,
+                ),
                 x2="x_target",
                 y2="y_target",
             )
@@ -472,27 +500,37 @@ class NetworkSpaceDrawer:
         return chart
 
 
-class ContinuousSpaceDrawer:
+class ContinuousSpaceDrawer(BaseSpaceDrawer):
     """Drawer for continuous spaces."""
 
-    def __init__(self, space: ContinuousSpace, **kwargs):
+    def __init__(self, space: ContinuousSpace):
         """Initialize the continuous space drawer.
 
         Args:
             space: The continuous space to draw
-            **kwargs: Additional keyword arguments
         """
-        self.space = space
+        super().__init__(space)
+        width = self.space.x_max - self.space.x_min
+        height = self.space.y_max - self.space.y_min
+        self.s_default = (
+            (180 / max(width, height)) ** 2 if width > 0 or height > 0 else 1
+        )
 
-        self.width = self.space.x_max - self.space.x_min
-        self.height = self.space.y_max - self.space.y_min
-        self.s_default = (180 / max(self.width, self.height)) ** 2
+        x_padding = width / 20
+        y_padding = height / 20
 
-    def draw_matplotlib(self, ax):
+        self.viz_xmin = self.space.x_min - x_padding
+        self.viz_xmax = self.space.x_max + x_padding
+        self.viz_ymin = self.space.y_min - y_padding
+        self.viz_ymax = self.space.y_max + y_padding
+
+    def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the continuous space using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on
+            **space_kwargs: Keyword arguments for styling the axis frame.
+                            Examples: linewidth=3, color="green"
 
         Returns:
             The modified axes object
@@ -500,26 +538,20 @@ class ContinuousSpaceDrawer:
         if ax is None:
             fig, ax = plt.subplots()
 
-        x_padding = self.width / 20
-        y_padding = self.height / 20
-
         border_style = "solid" if not self.space.torus else (0, (5, 10))
-        for spine in ax.spines.values():
-            spine.set_linewidth(1.5)
-            spine.set_color("black")
-            spine.set_linestyle(border_style)
+        spine_kwargs = {"linewidth": 1.5, "color": "black", "linestyle": border_style}
+        spine_kwargs.update(space_kwargs)
 
-        ax.set_xlim(self.space.x_min - x_padding, self.space.x_max + x_padding)
-        ax.set_ylim(self.space.y_min - y_padding, self.space.y_max + y_padding)
+        for spine in ax.spines.values():
+            spine.set(**spine_kwargs)
+
+        ax.set_xlim(self.viz_xmin, self.viz_xmax)
+        ax.set_ylim(self.viz_ymin, self.viz_ymax)
 
         return ax
 
-    def draw_altair(self):
-        """Draw the continuous space using Altair.
-
-        Raises:
-            NotImplementedError: Altair drawing not yet implemented for continuous spaces
-        """
+    def draw_altair(self, **chart_kwargs):
+        """Draw the continuous space using Altair."""
         raise NotImplementedError(
             "Altair drawing not implemented for ContinuousSpaceDrawer."
         )
