@@ -658,60 +658,17 @@ class SpaceRenderer:
             return self.agent_mesh
 
     # Property layer drawing methods
-    def _mpl_draw_propertylayer(self, space, propertylayer_portrayal, ax):
+    def _draw_propertylayer_matplotlib(
+        self, space, property_layers, propertylayer_portrayal, ax
+    ):
         """Draw property layers using matplotlib backend."""
-        # Import here to avoid circular imports
-        from mesa.visualization.components import PropertyLayerStyle
-
-        def _dict_to_callable(portrayal_dict):
-            """Convert legacy dict portrayal to callable."""
-
-            def style_callable(layer_object):
-                layer_name = layer_object.name
-                params = portrayal_dict.get(layer_name)
-
-                warnings.warn(
-                    "Dict propertylayer_portrayal is deprecated. "
-                    "Use a callable returning PropertyLayerStyle instead.",
-                    PendingDeprecationWarning,
-                    stacklevel=2,
-                )
-
-                if params is None:
-                    return None
-
-                return PropertyLayerStyle(
-                    color=params.get("color"),
-                    colormap=params.get("colormap"),
-                    alpha=params.get("alpha", PropertyLayerStyle.alpha),
-                    vmin=params.get("vmin"),
-                    vmax=params.get("vmax"),
-                    colorbar=params.get("colorbar", PropertyLayerStyle.colorbar),
-                )
-
-            return style_callable
-
-        # Get property layers
-        try:
-            # old style spaces
-            property_layers = space.properties
-        except AttributeError:
-            # new style spaces
-            property_layers = space._mesa_property_layers
-
-        # Convert portrayal to callable if needed
-        if isinstance(propertylayer_portrayal, dict):
-            callable_portrayal = _dict_to_callable(propertylayer_portrayal)
-        else:
-            callable_portrayal = propertylayer_portrayal
-
         # Draw each layer
         for layer_name in property_layers:
             if layer_name == "empty":
                 continue
 
             layer = property_layers.get(layer_name)
-            portrayal = callable_portrayal(layer)
+            portrayal = propertylayer_portrayal(layer)
 
             if portrayal is None:
                 continue
@@ -790,6 +747,7 @@ class SpaceRenderer:
                 )
 
             # Add colorbar if requested
+            cbar = None
             if portrayal.colorbar:
                 norm = Normalize(vmin=vmin, vmax=vmax)
                 sm = ScalarMappable(norm=norm, cmap=cmap)
@@ -799,63 +757,23 @@ class SpaceRenderer:
         return ax, cbar
 
     def _draw_propertylayer_altair(
-        self, space, propertylayer_portrayal, chart_width=450, chart_height=350
+        self,
+        space,
+        property_layers,
+        propertylayer_portrayal,
+        chart_width=450,
+        chart_height=350,
     ):
         """Draw property layers using altair backend."""
-        # Import here to avoid circular imports
-        from mesa.visualization.components import PropertyLayerStyle
-
-        def _dict_to_callable(portrayal_dict):
-            """Convert legacy dict portrayal to callable."""
-
-            def style_callable(layer_object):
-                layer_name = layer_object.name
-                params = portrayal_dict.get(layer_name)
-
-                warnings.warn(
-                    "Dict propertylayer_portrayal is deprecated. "
-                    "Use a callable returning PropertyLayerStyle instead.",
-                    PendingDeprecationWarning,
-                    stacklevel=2,
-                )
-
-                if params is None:
-                    return None
-
-                return PropertyLayerStyle(
-                    color=params.get("color"),
-                    colormap=params.get("colormap"),
-                    alpha=params.get("alpha", PropertyLayerStyle.alpha),
-                    vmin=params.get("vmin"),
-                    vmax=params.get("vmax"),
-                    colorbar=params.get("colorbar", PropertyLayerStyle.colorbar),
-                )
-
-            return style_callable
-
-        # Get property layers
-        try:
-            # old style spaces
-            property_layers = space.properties
-        except AttributeError:
-            # new style spaces
-            property_layers = space._mesa_property_layers
-
         base = None
         bar_chart_viz = None
-
-        # Convert portrayal to callable if needed
-        if isinstance(propertylayer_portrayal, dict):
-            callable_portrayal = _dict_to_callable(propertylayer_portrayal)
-        else:
-            callable_portrayal = propertylayer_portrayal
 
         for layer_name in property_layers:
             if layer_name == "empty":
                 continue
 
             layer = property_layers.get(layer_name)
-            portrayal = callable_portrayal(layer)
+            portrayal = propertylayer_portrayal(layer)
 
             if portrayal is None:
                 continue
@@ -1068,19 +986,73 @@ class SpaceRenderer:
                 )
         return base, bar_chart_viz
 
-    def draw_propertylayer(self, propertylayer_portrayal, ax: Axes | None = None):
+    def draw_propertylayer(
+        self, propertylayer_portrayal: Callable | dict, ax: Axes | None = None
+    ):
         """Draw property layers on the space."""
-        self.propertylayer_portrayal = propertylayer_portrayal
+        # Import here to avoid circular imports
+        from mesa.visualization.components import PropertyLayerStyle
+
+        def _dict_to_callable(portrayal_dict):
+            """Convert legacy dict portrayal to callable."""
+
+            def style_callable(layer_object):
+                layer_name = layer_object.name
+                params = portrayal_dict.get(layer_name)
+
+                warnings.warn(
+                    "Dict propertylayer_portrayal is deprecated. "
+                    "Use a callable returning PropertyLayerStyle instead.",
+                    PendingDeprecationWarning,
+                    stacklevel=2,
+                )
+
+                if params is None:
+                    return None
+
+                return PropertyLayerStyle(
+                    color=params.get("color"),
+                    colormap=params.get("colormap"),
+                    alpha=params.get("alpha", PropertyLayerStyle.alpha),
+                    vmin=params.get("vmin"),
+                    vmax=params.get("vmax"),
+                    colorbar=params.get("colorbar", PropertyLayerStyle.colorbar),
+                )
+
+            return style_callable
+
+        # Get property layers
+        try:
+            # old style spaces
+            property_layers = self.space.properties
+        except AttributeError:
+            # new style spaces
+            property_layers = self.space._mesa_property_layers
+
+        # Convert portrayal to callable if needed
+        if isinstance(propertylayer_portrayal, dict):
+            self.propertylayer_portrayal = _dict_to_callable(propertylayer_portrayal)
+        else:
+            self.propertylayer_portrayal = propertylayer_portrayal
+
+        if len(property_layers) < 2:
+            warnings.warn(
+                "No property layers found in the space. "
+                "Ensure that the space has property layers defined.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return ax, None
 
         if self.backend == "matplotlib":
             ax = ax if ax is not None else self.ax
-            self.propertylayer_mesh = self._mpl_draw_propertylayer(
-                self.space, propertylayer_portrayal, ax
+            self.propertylayer_mesh = self._draw_propertylayer_matplotlib(
+                self.space, property_layers, self.propertylayer_portrayal, ax
             )
             return self.propertylayer_mesh
         else:
             self.propertylayer_mesh = self._draw_propertylayer_altair(
-                self.space, propertylayer_portrayal
+                self.space, property_layers, self.propertylayer_portrayal
             )
             return self.propertylayer_mesh
 
