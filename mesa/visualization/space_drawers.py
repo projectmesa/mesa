@@ -550,10 +550,26 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, **chart_kwargs):
-        """Draw the continuous space using Altair."""
-        raise NotImplementedError(
-            "Altair drawing not implemented for ContinuousSpaceDrawer."
+        """Draw the continuous space using Altair.
+
+        Args:
+            **chart_kwargs: Keyword arguments for styling the chart's view properties.
+                            See Altair's documentation for `configure_view`.
+                            Examples: strokeWidth=3, stroke="green"
+
+        Returns:
+            An Altair Chart object representing the continuous space.
+        """
+        chart = (
+            alt.Chart(pd.DataFrame([{}]))
+            .mark_rect(color="transparent")
+            .encode(
+                x=alt.X(scale=alt.Scale(domain=[self.viz_xmin, self.viz_xmax])),
+                y=alt.Y(scale=alt.Scale(domain=[self.viz_ymin, self.viz_ymax])),
+            )
         )
+
+        return chart
 
 
 class VoronoiSpaceDrawer(BaseSpaceDrawer):
