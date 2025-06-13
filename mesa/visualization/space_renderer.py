@@ -1,36 +1,7 @@
-"""Mesa Space Rendering Module.
-
-Provides visualization capabilities for Mesa agent-based models with support for
-multiple space types (orthogonal grids, hex grids, continuous spaces, etc.) and
-rendering backends (matplotlib, altair).
-
-Basic Usage:
-    ```python
-    from mesa.visualization import SpaceRenderer
-
-    # Initialize renderer with your model
-    renderer = SpaceRenderer(model, backend='matplotlib')
-
-    # Draw space structure
-    renderer.draw_structure()
-
-    # Draw agents with portrayal function
-    renderer.draw_agents(agent_portrayal)
-
-    # Draw property layers with portrayal function
-    renderer.draw_propertylayer(propertylayer_portrayal)
-
-    # Or render everything at once
-    renderer.render(agent_portrayal, propertylayer_portrayal)
-    ```
-
-Classes:
-    SpaceRenderer: Main rendering class for Mesa spaces
-"""
-
 import warnings
 
 import numpy as np
+from backends import AltairBackend, MatplotlibBackend
 from matplotlib.axes import Axes
 from solara import Literal
 from space_drawers import (
@@ -55,7 +26,6 @@ from mesa.space import (
     NetworkGrid,
     SingleGrid,
 )
-from mesa.visualization.backends import AltairBackend, MatplotlibBackend
 
 # Define type hints for space types
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
@@ -75,8 +45,6 @@ class SpaceRenderer:
         self.space = getattr(model, "grid", getattr(model, "space", None))
 
         self.space_drawer = self._get_space_drawer()
-
-        # Initialize mesh storage
         self.space_mesh = None
         self.agent_mesh = None
         self.propertylayer_mesh = None
@@ -88,7 +56,6 @@ class SpaceRenderer:
                 self.space_drawer,
                 [self.space_mesh, self.agent_mesh, self.propertylayer_mesh],
             )
-            self.canvas = self.backend_renderer.canvas
         elif backend == "altair":
             self.backend_renderer = AltairBackend(
                 self.space_drawer,
@@ -155,6 +122,9 @@ class SpaceRenderer:
     def draw_structure(self, ax: Axes | None = None, **kwargs):
         self.space_kwargs = kwargs
 
+        if self.backend == "altair":
+            # Altair backend does not use Axes
+            ax = None
         ax = ax or self.canvas
         self.space_mesh = self.backend_renderer.draw_structure(ax, **self.space_kwargs)
         return self.space_mesh
@@ -167,8 +137,13 @@ class SpaceRenderer:
             self.space, agent_portrayal
         )
         arguments = self._map_coordinates(arguments)
+
+        if self.backend == "altair":
+            # Altair backend does not use Axes
+            ax = None
+
         self.agent_mesh = self.backend_renderer.draw_agents(
-            ax=ax, arguments=arguments, **self.agent_kwargs
+            ax, arguments, **self.agent_kwargs
         )
         return self.agent_mesh
 
@@ -230,14 +205,19 @@ class SpaceRenderer:
             return ax, None
 
         self.propertylayer_mesh = self.backend_renderer.draw_propertylayer(
-            self.space, property_layers, self.propertylayer_portrayal, ax=ax
+            self.space, property_layers, self.propertylayer_portrayal, ax
         )
         return self.propertylayer_mesh
 
     def render(self, agent_portrayal=None, propertylayer_portrayal=None, **kwargs):
         return self.backend_renderer.render(
-            agent_portrayal, propertylayer_portrayal, **kwargs
+            self.space, agent_portrayal, propertylayer_portrayal, **kwargs
         )
+
+    @property
+    def canvas(self):
+        """Return the current canvas object."""
+        return self.backend_renderer.canvas
 
     def clear_meshes(self):
         self.backend_renderer.clear_meshes()

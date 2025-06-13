@@ -4,6 +4,7 @@ from dataclasses import fields
 import altair as alt
 import numpy as np
 import pandas as pd
+from matplotlib.colors import to_rgb
 
 import mesa
 from mesa.discrete_space import (
@@ -30,31 +31,43 @@ class AltairBackend(AbstractRenderer):
     """A renderer that uses Altair."""
 
     def initialize_canvas(self, **kwargs):
-        self._canvas = (
-            alt.Chart(pd.DataFrame()).mark_point().properties(width=450, height=350)
-        )
+        self._canvas = None
 
-    def draw_structure(self, **kwargs):
+    def draw_structure(self, ignore_ax, **kwargs):
         self.space_mesh = self.space_drawer.draw_altair(**kwargs)
         return self.space_mesh
 
-    def _collect_agent_data(self, agent_portrayal, default_size=None):
-        from mesa.visualization.components import AgentPortrayalStyle
+    def _collect_agent_data(self, space, agent_portrayal, default_size=None):
+        """Collect plotting data for all agents in the space for Altair.
 
+        Args:
+            space: The space containing the agents
+            agent_portrayal: Callable that returns AgentPortrayalStyle for each agent
+            default_size: Default marker size if not specified
+
+        Returns:
+            Dictionary containing agent plotting data arrays
+        """
+        # Initialize data collection arrays
         arguments = {
             "loc": [],
             "size": [],
             "color": [],
             "shape": [],
-            "order": [],
+            "order": [],  # z-order
             "opacity": [],
-            "stroke": [],
+            "stroke": [],  # Stroke color
             "strokeWidth": [],
             "filled": [],
         }
+
+        from mesa.visualization.components import AgentPortrayalStyle
+
         style_fields = {f.name: f.default for f in fields(AgentPortrayalStyle)}
         class_default_size = style_fields.get("size")
-        marker_map = {
+
+        # Marker mapping from Matplotlib to Altair
+        marker_to_shape_map = {
             "o": "circle",
             "s": "square",
             "D": "diamond",
@@ -63,15 +76,28 @@ class AltairBackend(AbstractRenderer):
             "<": "triangle-left",
             ">": "triangle-right",
             "+": "cross",
-            "x": "cross",
+            "x": "cross",  # Both '+' and 'x' map to cross in Altair
+            ".": "circle",  # Small point becomes circle
+            "1": "triangle-down",
+            "2": "triangle-up",
+            "3": "triangle-left",
+            "4": "triangle-right",
         }
 
-        for agent in self.space.agents:
+        for agent in space.agents:
             portray_input = agent_portrayal(agent)
+            aps: AgentPortrayalStyle
+
             if isinstance(portray_input, dict):
-                # Legacy dict support
+                warnings.warn(
+                    "Returning a dict from agent_portrayal is deprecated. "
+                    "Please return an AgentPortrayalStyle instance instead.",
+                    PendingDeprecationWarning,
+                    stacklevel=2,
+                )
                 dict_data = portray_input.copy()
-                agent_x, agent_y = self.get_agent_pos_func(agent, self.space)
+                agent_x, agent_y = self._get_agent_pos(agent, space)
+
                 aps = AgentPortrayalStyle(
                     x=agent_x,
                     y=agent_y,
@@ -80,136 +106,476 @@ class AltairBackend(AbstractRenderer):
                     marker=dict_data.pop("marker", style_fields.get("marker")),
                     zorder=dict_data.pop("zorder", style_fields.get("zorder")),
                     alpha=dict_data.pop("alpha", style_fields.get("alpha")),
-                    edgecolors=dict_data.pop("edgecolors", None),
+                    edgecolors=dict_data.pop(
+                        "edgecolors", style_fields.get("edgecolors")
+                    ),
                     linewidths=dict_data.pop(
                         "linewidths", style_fields.get("linewidths")
                     ),
                 )
+                if dict_data:
+                    ignored_keys = list(dict_data.keys())
+                    warnings.warn(
+                        f"The following keys were ignored from dict portrayal: {', '.join(ignored_keys)}",
+                        UserWarning,
+                        stacklevel=2,
+                    )
             else:
                 aps = portray_input
-            if aps.x is None and aps.y is None:
-                aps.x, aps.y = self.get_agent_pos_func(agent, self.space)
+                if aps.x is None and aps.y is None:
+                    aps.x, aps.y = self._get_agent_pos(agent, space)
 
             arguments["loc"].append((aps.x, aps.y))
-            arguments["size"].append(aps.size or default_size or class_default_size)
-            arguments["color"].append(aps.color)
-            raw_marker = aps.marker or style_fields.get("marker")
-            arguments["shape"].append(marker_map.get(raw_marker, "circle"))
-            arguments["order"].append(aps.zorder)
-            arguments["opacity"].append(aps.alpha)
+
+            size_to_collect = aps.size if aps.size is not None else default_size
+            if size_to_collect is None:
+                size_to_collect = class_default_size
+            arguments["size"].append(size_to_collect)
+
+            arguments["color"].append(
+                aps.color if aps.color is not None else style_fields.get("color")
+            )
+
+            # Map marker to Altair shape if defined, else use raw marker
+            raw_marker = (
+                aps.marker if aps.marker is not None else style_fields.get("marker")
+            )
+            shape_value = marker_to_shape_map.get(raw_marker, raw_marker)
+            if shape_value is None:
+                warnings.warn(
+                    f"Marker '{raw_marker}' is not supported in Altair. "
+                    "Using 'circle' as default.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+                shape_value = "circle"
+            arguments["shape"].append(shape_value)
+
+            arguments["order"].append(
+                aps.zorder if aps.zorder is not None else style_fields.get("zorder")
+            )
+            arguments["opacity"].append(
+                aps.alpha if aps.alpha is not None else style_fields.get("alpha")
+            )
             arguments["stroke"].append(aps.edgecolors)
-            arguments["strokeWidth"].append(aps.linewidths)
-            arguments["filled"].append(aps.edgecolors is not None)
+            arguments["strokeWidth"].append(
+                aps.linewidths
+                if aps.linewidths is not None
+                else style_fields.get("linewidths")
+            )
 
-        return {k: np.asarray(v) for k, v in arguments.items()}
+            # FIXME: Kind of stupid logic.
+            # filled: True if edgecolors are defined, False otherwise.
+            filled_value = aps.edgecolors is not None
+            arguments["filled"].append(filled_value)
 
-    def draw_agents(self, agent_portrayal, **kwargs):
-        arguments = self._collect_agent_data(
-            agent_portrayal, self.space_drawer.s_default
-        )
+        final_data = {}
+        for k, v in arguments.items():
+            if k == "shape":
+                # Ensure shape is an object array
+                arr = np.empty(len(v), dtype=object)
+                arr[:] = v
+                final_data[k] = arr
+            elif k in ["x", "y", "size", "order", "opacity", "strokeWidth"]:
+                final_data[k] = np.asarray(v, dtype=float)
+            else:
+                final_data[k] = np.asarray(v)
+
+        return final_data
+
+    def draw_agents(
+        self, ignore_ax, arguments, chart_width=450, chart_height=350, **kwargs
+    ):
         if arguments["loc"].size == 0:
             return None
-        arguments = self.map_coords_func(arguments)
 
-        df = pd.DataFrame(
-            {
-                "x": arguments["loc"][:, 0],
-                "y": arguments["loc"][:, 1],
-                "size": arguments["size"],
-                "shape": arguments["shape"],
-                "opacity": arguments["opacity"],
-                "strokeWidth": arguments["strokeWidth"],
-                "original_color": arguments["color"],
-                "is_filled": arguments["filled"],
-                "original_stroke": arguments["stroke"],
-            }
-        )
+        # Agent data preparation
+        df_data = {
+            "x": arguments["loc"][:, 0],
+            "y": arguments["loc"][:, 1],
+            "size": arguments["size"],
+            "shape": arguments["shape"],
+            "opacity": arguments["opacity"],
+            "strokeWidth": arguments["strokeWidth"],
+            "original_color": arguments["color"],
+            "is_filled": arguments["filled"],
+            "original_stroke": arguments["stroke"],
+        }
+        df = pd.DataFrame(df_data)
 
-        df["viz_fill_color"] = df.apply(
-            lambda r: r.original_color if r.is_filled else None, axis=1
-        )
-        df["viz_stroke_color"] = df.apply(
-            lambda r: r.original_stroke if r.is_filled else r.original_color, axis=1
-        )
+        # To ensure distinct shapes according to agnet portrayal
+        unique_shape_names_in_data = df["shape"].unique().tolist()
 
+        fill_colors = []
+        stroke_colors = []
+        for i in range(len(df)):
+            filled = df["is_filled"][i]
+            main_color = df["original_color"][i]
+            stroke_spec = (
+                df["original_stroke"][i]
+                if isinstance(df["original_stroke"][i], str)
+                else None
+            )
+            if filled:
+                fill_colors.append(main_color)
+                stroke_colors.append(stroke_spec)
+            else:
+                fill_colors.append(None)
+                stroke_colors.append(main_color)
+        df["viz_fill_color"] = fill_colors
+        df["viz_stroke_color"] = stroke_colors
+
+        # Extract additional parameters from kwargs
+        # FIXME: Add more parameters to kwargs
+        title = kwargs.pop("title", "")
+        xlabel = kwargs.pop("xlabel", "")
+        ylabel = kwargs.pop("ylabel", "")
+
+        # Tooltip list for interactivity
+        # FIXME: Add more fields to tooltip (preferably from agent_portrayal)
+        tooltip_list = ["x", "y"]
+
+        # Determine space dimensions
         xmin, xmax, ymin, ymax = self.space_drawer.get_viz_limits()
-        unique_shapes = df["shape"].unique().tolist()
 
         chart = (
             alt.Chart(df)
             .mark_point()
             .encode(
-                x=alt.X("x:Q", scale=alt.Scale(domain=[xmin, xmax])),
-                y=alt.Y("y:Q", scale=alt.Scale(domain=[ymin, ymax])),
+                x=alt.X(
+                    "x:Q",
+                    title=xlabel,
+                    scale=alt.Scale(type="linear", domain=[xmin, xmax]),
+                ),
+                y=alt.Y(
+                    "y:Q",
+                    title=ylabel,
+                    scale=alt.Scale(type="linear", domain=[ymin, ymax]),
+                ),
                 size=alt.Size("size:Q", legend=None),
                 shape=alt.Shape(
                     "shape:N",
-                    scale=alt.Scale(domain=unique_shapes, range=unique_shapes),
+                    scale=alt.Scale(
+                        domain=unique_shape_names_in_data,
+                        range=unique_shape_names_in_data,
+                    ),
+                    title="Shape",
                 ),
-                opacity=alt.Opacity("opacity:Q", scale=alt.Scale(domain=[0, 1])),
-                fill=alt.Fill("viz_fill_color:N", scale=None),
-                stroke=alt.Stroke("viz_stroke_color:N", scale=None),
-                strokeWidth=alt.StrokeWidth("strokeWidth:Q"),
-                tooltip=["x", "y"],
+                opacity=alt.Opacity(
+                    "opacity:Q",
+                    title="Opacity",
+                    scale=alt.Scale(domain=[0, 1], range=[0, 1]),
+                ),
+                fill=alt.Fill("viz_fill_color:N", scale=None, title="Fill Color"),
+                stroke=alt.Stroke(
+                    "viz_stroke_color:N", scale=None, title="Stroke Color"
+                ),
+                strokeWidth=alt.StrokeWidth("strokeWidth:Q", title="Stroke Width"),
+                tooltip=tooltip_list,
             )
-            .properties(**kwargs)
+            .properties(title=title, width=chart_width, height=chart_height)
         )
+
         self.agent_mesh = chart
         return self.agent_mesh
 
-    def draw_propertylayer(self, propertylayer_portrayal, **kwargs):
-        return (None, None)
+    def draw_propertylayer(
+        self,
+        space,
+        property_layers,
+        propertylayer_portrayal,
+        ignore_ax,
+        chart_width=450,
+        chart_height=350,
+    ):
+        """Draw property layers using altair backend."""
+        base = None
+        bar_chart_viz = None
+
+        for layer_name in property_layers:
+            if layer_name == "empty":
+                continue
+
+            layer = property_layers.get(layer_name)
+            portrayal = propertylayer_portrayal(layer)
+
+            if portrayal is None:
+                continue
+
+            data = layer.data.astype(float) if layer.data.dtype == bool else layer.data
+
+            # Check dimensions
+            if (space.width, space.height) != data.shape:
+                warnings.warn(
+                    f"Layer {layer_name} dimensions ({data.shape}) do not match space dimensions ({space.width}, {space.height}).",
+                    UserWarning,
+                    stacklevel=2,
+                )
+                continue
+
+            # Get portrayal parameters
+            color = portrayal.color
+            colormap = portrayal.colormap
+            alpha = portrayal.alpha
+            vmin = portrayal.vmin if portrayal.vmin is not None else np.min(data)
+            vmax = portrayal.vmax if portrayal.vmax is not None else np.max(data)
+
+            # Prepare data for Altair
+            df = pd.DataFrame(
+                {
+                    "x": np.repeat(np.arange(data.shape[0]), data.shape[1]),
+                    "y": np.tile(np.arange(data.shape[1]), data.shape[0]),
+                    "value": data.flatten(),
+                }
+            )
+
+            current_chart = None
+            if color:
+                # Create a function to map values to RGBA colors with proper opacity scaling
+                def apply_rgba(
+                    val, v_min=vmin, v_max=vmax, a=alpha, p_color=portrayal.color
+                ):
+                    # Normalize value to range [0,1] and clamp
+                    normalized = max(
+                        0,
+                        min(
+                            ((val - v_min) / (v_max - v_min))
+                            if (v_max - v_min) != 0
+                            else 0.5,
+                            1,
+                        ),
+                    )
+
+                    # Scale opacity by alpha parameter
+                    opacity = normalized * a
+
+                    # Convert color to RGB components
+                    rgb_color_val = to_rgb(p_color)
+                    r = int(rgb_color_val[0] * 255)
+                    g = int(rgb_color_val[1] * 255)
+                    b = int(rgb_color_val[2] * 255)
+                    return f"rgba({r}, {g}, {b}, {opacity:.2f})"
+
+                # Apply color mapping to each value in the dataset
+                df["color_str"] = df["value"].apply(apply_rgba)
+
+                # Create chart for the property layer
+                current_chart = (
+                    alt.Chart(df)
+                    .mark_rect()
+                    .encode(
+                        x=alt.X("x:O", axis=None),
+                        y=alt.Y("y:O", axis=None),
+                        fill=alt.Fill("color_str:N", scale=None),
+                    )
+                    .properties(
+                        width=chart_width, height=chart_height, title=layer_name
+                    )
+                )
+                base = (
+                    alt.layer(current_chart, base)
+                    if base is not None
+                    else current_chart
+                )
+
+                # Add colorbar if specified in portrayal
+                if portrayal.colorbar:
+                    # Extract RGB components from base color
+                    rgb_color_val = to_rgb(portrayal.color)
+                    r_int = int(rgb_color_val[0] * 255)
+                    g_int = int(rgb_color_val[1] * 255)
+                    b_int = int(rgb_color_val[2] * 255)
+
+                    # Define gradient endpoints
+                    min_color_str = f"rgba({r_int},{g_int},{b_int},0)"
+                    max_color_str = f"rgba({r_int},{g_int},{b_int},{alpha:.2f})"
+
+                    # Define colorbar dimensions
+                    colorbar_height = 20
+                    colorbar_width = chart_width
+
+                    # Create dataframe for gradient visualization
+                    df_gradient = pd.DataFrame({"x_grad": [0, 1], "y_grad": [0, 1]})
+
+                    # Create evenly distributed tick values
+                    axis_values = np.linspace(vmin, vmax, 11)
+                    tick_positions = np.linspace(0, colorbar_width, 11)
+
+                    # Prepare data for axis and labels
+                    axis_data = pd.DataFrame(
+                        {"value_axis": axis_values, "x_axis": tick_positions}
+                    )
+
+                    # Create colorbar with linear gradient
+                    colorbar_chart_obj = (
+                        alt.Chart(df_gradient)
+                        .mark_rect(
+                            x=0,
+                            y=0,
+                            width=colorbar_width,
+                            height=colorbar_height,
+                            color=alt.Gradient(
+                                gradient="linear",
+                                stops=[
+                                    alt.GradientStop(color=min_color_str, offset=0),
+                                    alt.GradientStop(color=max_color_str, offset=1),
+                                ],
+                                x1=0,
+                                x2=1,  # Horizontal gradient
+                                y1=0,
+                                y2=0,  # Keep y constant
+                            ),
+                        )
+                        .encode(
+                            x=alt.value(chart_width / 2), y=alt.value(0)
+                        )  # Center colorbar
+                        .properties(width=colorbar_width, height=colorbar_height)
+                    )
+                    # Add tick marks to colorbar
+                    axis_chart = (
+                        alt.Chart(axis_data)
+                        .mark_tick(thickness=2, size=8)
+                        .encode(
+                            x=alt.X("x_axis:Q", axis=None),
+                            y=alt.value(colorbar_height - 2),
+                        )
+                    )
+                    # Add value labels below tick marks
+                    text_labels = (
+                        alt.Chart(axis_data)
+                        .mark_text(baseline="top", fontSize=10, dy=0)
+                        .encode(
+                            x=alt.X("x_axis:Q"),
+                            text=alt.Text("value_axis:Q", format=".1f"),
+                            y=alt.value(colorbar_height + 10),
+                        )
+                    )
+                    # Add title to colorbar
+                    title_chart = (
+                        alt.Chart(pd.DataFrame([{"text_title": layer_name}]))
+                        .mark_text(
+                            fontSize=12,
+                            fontWeight="bold",
+                            baseline="bottom",
+                            align="center",
+                        )
+                        .encode(
+                            text="text_title:N",
+                            x=alt.value(colorbar_width / 2),
+                            y=alt.value(colorbar_height + 40),
+                        )
+                    )
+                    # Combine all colorbar components
+                    combined_colorbar = alt.layer(
+                        colorbar_chart_obj, axis_chart, text_labels, title_chart
+                    ).properties(width=colorbar_width, height=colorbar_height + 50)
+
+                    bar_chart_viz = (
+                        alt.vconcat(bar_chart_viz, combined_colorbar)
+                        .resolve_scale(color="independent")
+                        .configure_view(stroke=None)
+                        if bar_chart_viz is not None
+                        else combined_colorbar
+                    )
+
+            elif colormap:
+                cmap = colormap
+                cmap_scale = alt.Scale(scheme=cmap, domain=[vmin, vmax])
+
+                current_chart = (
+                    alt.Chart(df)
+                    .mark_rect(opacity=alpha)
+                    .encode(
+                        x=alt.X("x:O", axis=None),
+                        y=alt.Y("y:O", axis=None),
+                        color=alt.Color(
+                            "value:Q",
+                            scale=cmap_scale,
+                            title=layer_name,
+                            legend=alt.Legend(title=layer_name)
+                            if portrayal.colorbar
+                            else None,
+                        ),
+                    )
+                    .properties(width=chart_width, height=chart_height)
+                )
+                base = (
+                    alt.layer(current_chart, base)
+                    if base is not None
+                    else current_chart
+                )
+            else:
+                raise ValueError(
+                    f"PropertyLayer {layer_name} portrayal must include 'color' or 'colormap'."
+                )
+        self.propertylayer_mesh = (base, bar_chart_viz)
+        return self.propertylayer_mesh
 
     def render(self, agent_portrayal=None, propertylayer_portrayal=None, **kwargs):
         structure_kwargs = kwargs.pop("structure_kwargs", {})
         agent_kwargs = kwargs.pop("agent_kwargs", {})
 
-        self.clear_meshes()  # Clear previous renders
-
-        structure_chart = self.draw_structure(**structure_kwargs)
-        agent_chart = (
+        if self.space_mesh is None:
+            self.draw_structure(**structure_kwargs)
+        if agent_portrayal is not None and self.agent_mesh is None:
             self.draw_agents(agent_portrayal, **agent_kwargs)
-            if agent_portrayal
-            else None
-        )
-        prop_chart, prop_cbar = (
-            self.draw_propertylayer(propertylayer_portrayal)
-            if propertylayer_portrayal
-            else (None, None)
-        )
+        if propertylayer_portrayal is not None and self.propertylayer_mesh is None:
+            _, pbar = self.draw_propertylayer(propertylayer_portrayal)
+        else:
+            pbar = None
 
-        charts = [
-            c for c in [structure_chart, prop_chart, agent_chart] if c is not None
-        ]
-        final_chart = alt.layer(*charts) if charts else self.canvas
+        # Combine all charts
+        charts = [self.space_mesh]
+        if self.agent_mesh:
+            charts.append(self.agent_mesh)
+        if self.propertylayer_mesh:
+            # propertylayer_mesh is a tuple (base, colorbar)
+            charts.append(self.propertylayer_mesh[0])
 
-        if prop_cbar:
-            final_chart = alt.vconcat(final_chart, prop_cbar).configure_view(
-                stroke=None
-            )
+        # layer all charts
+        final_chart = alt.layer(*charts)
+        # if color bar is present, add it
+        if pbar is not None:
+            final_chart = alt.vconcat(final_chart, pbar).configure_view(stroke=None)
 
         return final_chart
 
     @property
     def canvas(self):
-        if self._canvas is None:
-            self.initialize_canvas()
-        # Combine all parts into a final chart
-        charts = [
-            c
-            for c in [
-                self.space_mesh,
-                self.agent_mesh,
-                (self.propertylayer_mesh or [None])[0],
-            ]
-            if c
+        structure = self.space_mesh if self.space_mesh else None
+        agents = self.agent_mesh if self.agent_mesh else None
+        prop_base, prop_cbar = self.propertylayer_mesh or (None, None)
+
+        spatial_charts_list = [
+            chart for chart in [structure, prop_base, agents] if chart
         ]
-        if not charts:
-            return self._canvas
 
-        main_spatial = alt.layer(*charts)
-        prop_cbar = (self.propertylayer_mesh or [None, None])[1]
+        main_spatial = None
+        if spatial_charts_list:
+            main_spatial = (
+                spatial_charts_list[0]
+                if len(spatial_charts_list) == 1
+                else alt.layer(*spatial_charts_list)
+            )
 
-        if prop_cbar:
-            return alt.vconcat(main_spatial, prop_cbar).configure_view(stroke=None)
-        return main_spatial
+        # Determine final chart by combining with color bar if present
+        final_chart = None
+        if main_spatial and prop_cbar:
+            final_chart = alt.vconcat(main_spatial, prop_cbar).configure_view(
+                stroke=None
+            )
+        elif main_spatial:  # Only main_spatial, no prop_cbar
+            final_chart = main_spatial
+        elif prop_cbar:  # Only prop_cbar, no main_spatial
+            final_chart = prop_cbar
+            final_chart = final_chart.configure_view(grid=False)
+
+        if final_chart is None:
+            # If no charts are available, return an empty chart
+            final_chart = (
+                alt.Chart(pd.DataFrame()).mark_point().properties(width=450, height=350)
+            )
+
+        final_chart = final_chart.configure_view(stroke="black", strokeWidth=1.5)
+
+        return final_chart

@@ -171,6 +171,7 @@ class MatplotlibBackend(AbstractRenderer):
 
             return min(zoom_x, zoom_y)
 
+        print(ax, arguments)
         loc = arguments.pop("loc")
 
         loc_x = loc[:, 0]
@@ -329,11 +330,11 @@ class MatplotlibBackend(AbstractRenderer):
                 sm = ScalarMappable(norm=norm, cmap=cmap)
                 sm.set_array([])
                 cbar = plt.colorbar(sm, ax=ax, label=layer_name)
-
         return ax, cbar
 
     def render(
         self,
+        space,
         agent_portrayal=None,
         propertylayer_portrayal=None,
         ax: Axes | None = None,
@@ -348,7 +349,9 @@ class MatplotlibBackend(AbstractRenderer):
         if self.space_mesh is None:
             self.draw_structure(ax, **structure_kwargs)
         if agent_portrayal is not None and self.agent_mesh is None:
-            self.draw_agents(agent_portrayal, ax, **agent_kwargs)
+            arguments = self._collect_agent_data(space, agent_portrayal)
+            arguments = self._map_coordinates(arguments)
+            self.draw_agents(ax, arguments, **agent_kwargs)
         if propertylayer_portrayal is not None and self.propertylayer_mesh is None:
             self.draw_propertylayer(propertylayer_portrayal, ax)
 
