@@ -242,10 +242,10 @@ def SpaceRendererComponent(
     if renderer.backend == "matplotlib":
         # Clear the previous plotted data and agents
         all_artists = [
-            renderer.ax.lines[:],
-            renderer.ax.collections[:],
-            renderer.ax.patches[:],
-            renderer.ax.images[:],
+            renderer.canvas.lines[:],
+            renderer.canvas.collections[:],
+            renderer.canvas.patches[:],
+            renderer.canvas.images[:],
         ]
         # Chain them together into a single iterable
         for artist in itertools.chain.from_iterable(all_artists):
@@ -253,17 +253,22 @@ def SpaceRendererComponent(
 
         # Draw the space structure if specified
         if renderer.space_mesh:
-            renderer.draw_structure(**renderer.space_kwargs)
+            renderer.draw_structure(ax=renderer.canvas, **renderer.space_kwargs)
 
         # Draw agents if specified
         if renderer.agent_mesh:
             renderer.draw_agents(
-                renderer.agent_portrayal, ax=None, **renderer.agent_kwargs
+                agent_portrayal=renderer.agent_portrayal,
+                ax=renderer.canvas,
+                **renderer.agent_kwargs,
             )
 
         # Draw property layers if specified
         if renderer.propertylayer_mesh:
-            _, cbar = renderer.draw_propertylayer(renderer.propertylayer_portrayal)
+            _, cbar = renderer.draw_propertylayer(
+                ax=renderer.canvas,
+                propertylayer_portrayal=renderer.propertylayer_portrayal,
+            )
             # Remove the newly generated colorbar to avoid duplication
             if cbar is not None:
                 cbar.remove()
@@ -275,7 +280,7 @@ def SpaceRendererComponent(
             dependencies = [update_counter.value]
 
         solara.FigureMatplotlib(
-            renderer.ax.get_figure(),
+            renderer.canvas.get_figure(),
             format="png",
             bbox_inches="tight",
             dependencies=dependencies,
