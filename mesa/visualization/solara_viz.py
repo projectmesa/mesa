@@ -32,6 +32,8 @@ import traceback
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal
 
+import altair as alt
+import pandas as pd
 import reacton.core
 import solara
 import solara.lab
@@ -253,22 +255,17 @@ def SpaceRendererComponent(
 
         # Draw the space structure if specified
         if renderer.space_mesh:
-            renderer.draw_structure(ax=renderer.canvas, **renderer.space_kwargs)
+            renderer.draw_structure(**renderer.space_kwargs)
 
         # Draw agents if specified
         if renderer.agent_mesh:
             renderer.draw_agents(
-                agent_portrayal=renderer.agent_portrayal,
-                ax=renderer.canvas,
-                **renderer.agent_kwargs,
+                agent_portrayal=renderer.agent_portrayal, **renderer.agent_kwargs
             )
 
         # Draw property layers if specified
         if renderer.propertylayer_mesh:
-            _, cbar = renderer.draw_propertylayer(
-                ax=renderer.canvas,
-                propertylayer_portrayal=renderer.propertylayer_portrayal,
-            )
+            _, cbar = renderer.draw_propertylayer(renderer.propertylayer_portrayal)
             # Remove the newly generated colorbar to avoid duplication
             if cbar is not None:
                 cbar.remove()
@@ -287,16 +284,54 @@ def SpaceRendererComponent(
         )
         return None
     else:
+        structure = renderer.space_mesh if renderer.space_mesh else None
+        agents = renderer.agent_mesh if renderer.agent_mesh else None
+        prop_base, prop_cbar = renderer.propertylayer_mesh or (None, None)
+
         if renderer.space_mesh:
-            renderer.draw_structure(**renderer.space_kwargs)
+            structure = renderer.draw_structure(**renderer.space_kwargs)
         if renderer.agent_mesh:
-            renderer.draw_agents(
-                renderer.agent_portrayal, ax=None, **renderer.agent_kwargs
+            agents = renderer.draw_agents(
+                renderer.agent_portrayal, **renderer.agent_kwargs
             )
         if renderer.propertylayer_mesh:
-            renderer.draw_propertylayer(renderer.propertylayer_portrayal)
+            prop_base, prop_cbar = renderer.draw_propertylayer(
+                renderer.propertylayer_portrayal
+            )
 
-        solara.FigureAltair(renderer.canvas, on_click=None, on_hover=None)
+        spatial_charts_list = [
+            chart for chart in [structure, prop_base, agents] if chart
+        ]
+
+        main_spatial = None
+        if spatial_charts_list:
+            main_spatial = (
+                spatial_charts_list[0]
+                if len(spatial_charts_list) == 1
+                else alt.layer(*spatial_charts_list)
+            )
+
+        # Determine final chart by combining with color bar if present
+        final_chart = None
+        if main_spatial and prop_cbar:
+            final_chart = alt.vconcat(main_spatial, prop_cbar).configure_view(
+                stroke=None
+            )
+        elif main_spatial:  # Only main_spatial, no prop_cbar
+            final_chart = main_spatial
+        elif prop_cbar:  # Only prop_cbar, no main_spatial
+            final_chart = prop_cbar
+            final_chart = final_chart.configure_view(grid=False)
+
+        if final_chart is None:
+            # If no charts are available, return an empty chart
+            final_chart = (
+                alt.Chart(pd.DataFrame()).mark_point().properties(width=450, height=350)
+            )
+
+        final_chart = final_chart.configure_view(stroke="black", strokeWidth=1.5)
+
+        solara.FigureAltair(final_chart, on_click=None, on_hover=None)
         return None
 
 

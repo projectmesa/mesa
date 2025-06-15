@@ -1,5 +1,13 @@
+"""Altair backend for Mesa space visualization.
+
+This module provides an Altair-based renderer for visualizing Mesa model
+spaces, agents, and property layers with interactive charting capabilities.
+"""
+
 import warnings
+from collections.abc import Callable
 from dataclasses import fields
+from typing import Any
 
 import altair as alt
 import numpy as np
@@ -18,37 +26,47 @@ from mesa.space import (
     NetworkGrid,
     SingleGrid,
 )
+from mesa.visualization.backends.abstract_renderer import AbstractRenderer
 
-# Type aliases
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
 Network = NetworkGrid | mesa.discrete_space.Network
 
-from .abstract_renderer import AbstractRenderer
-
 
 class AltairBackend(AbstractRenderer):
-    """A renderer that uses Altair."""
+    """Altair-based renderer for Mesa spaces.
 
-    def initialize_canvas(self, **kwargs):
+    Provides visualization capabilities using Altair for rendering
+    space structures, agents, and property layers with interactive charts.
+    """
+
+    def initialize_canvas(self) -> None:
+        """Initialize the Altair canvas."""
         self._canvas = None
 
-    def draw_structure(self, **kwargs):
-        # ignore the passed ax
-        _ = kwargs.pop("ax")
+    def draw_structure(self, **kwargs) -> alt.Chart:
+        """Draw the space structure using Altair.
 
+        Args:
+            **kwargs: Additional arguments passed to the space drawer.
+
+        Returns:
+            alt.Chart: The Altair chart representing the space structure.
+        """
         return self.space_drawer.draw_altair(**kwargs)
 
-    def _collect_agent_data(self, space, agent_portrayal, default_size=None):
+    def collect_agent_data(
+        self, space, agent_portrayal: Callable, default_size: float | None = None
+    ):
         """Collect plotting data for all agents in the space for Altair.
 
         Args:
-            space: The space containing the agents
-            agent_portrayal: Callable that returns AgentPortrayalStyle for each agent
-            default_size: Default marker size if not specified
+            space: The Mesa space containing agents.
+            agent_portrayal: Callable that returns AgentPortrayalStyle for each agent.
+            default_size: Default marker size if not specified in portrayal.
 
         Returns:
-            Dictionary containing agent plotting data arrays
+            Dictionary containing agent plotting data arrays.
         """
         # Initialize data collection arrays
         arguments = {
@@ -185,9 +203,20 @@ class AltairBackend(AbstractRenderer):
 
         return final_data
 
-    def draw_agents(self, arguments, chart_width=450, chart_height=350, **kwargs):
-        _ = kwargs.pop("ax")
+    def draw_agents(
+        self, arguments, chart_width: int = 450, chart_height: int = 350, **kwargs
+    ):
+        """Draw agents using Altair backend.
 
+        Args:
+            arguments: Dictionary containing agent data arrays.
+            chart_width: Width of the chart.
+            chart_height: Height of the chart.
+            **kwargs: Additional keyword arguments for customization.
+
+        Returns:
+            The Altair chart representing the agents, or None if no agents.
+        """
         if arguments["loc"].size == 0:
             return None
 
@@ -283,13 +312,24 @@ class AltairBackend(AbstractRenderer):
     def draw_propertylayer(
         self,
         space,
-        property_layers,
-        propertylayer_portrayal,
-        ax=None,
-        chart_width=450,
-        chart_height=350,
+        property_layers: dict[str, Any],
+        propertylayer_portrayal: Callable,
+        chart_width: int = 450,
+        chart_height: int = 350,
     ):
-        """Draw property layers using altair backend."""
+        """Draw property layers using Altair backend.
+
+        Args:
+            space: The Mesa space object containing the property layers.
+            property_layers: A dictionary of property layers to draw.
+            propertylayer_portrayal: A function that returns PropertyLayerStyle
+                that contains the visualization parameters.
+            chart_width: The width of the chart.
+            chart_height: The height of the chart.
+
+        Returns:
+            A tuple containing the base chart and the color bar chart.
+        """
         base = None
         bar_chart_viz = None
 
@@ -512,37 +552,13 @@ class AltairBackend(AbstractRenderer):
                 )
         return (base, bar_chart_viz)
 
-    def render(self, agent_portrayal=None, propertylayer_portrayal=None, **kwargs):
-        structure_kwargs = kwargs.pop("structure_kwargs", {})
-        agent_kwargs = kwargs.pop("agent_kwargs", {})
-
-        if self.space_mesh is None:
-            self.draw_structure(**structure_kwargs)
-        if agent_portrayal is not None and self.agent_mesh is None:
-            self.draw_agents(agent_portrayal, **agent_kwargs)
-        if propertylayer_portrayal is not None and self.propertylayer_mesh is None:
-            _, pbar = self.draw_propertylayer(propertylayer_portrayal)
-        else:
-            pbar = None
-
-        # Combine all charts
-        charts = [self.space_mesh]
-        if self.agent_mesh:
-            charts.append(self.agent_mesh)
-        if self.propertylayer_mesh:
-            # propertylayer_mesh is a tuple (base, colorbar)
-            charts.append(self.propertylayer_mesh[0])
-
-        # layer all charts
-        final_chart = alt.layer(*charts)
-        # if color bar is present, add it
-        if pbar is not None:
-            final_chart = alt.vconcat(final_chart, pbar).configure_view(stroke=None)
-
-        return final_chart
-
     @property
-    def canvas(self):
+    def canvas(self) -> alt.Chart:
+        """Get the final composed Altair chart.
+
+        Returns:
+            alt.Chart: The complete Altair chart with all visualization elements.
+        """
         structure = self.space_mesh if self.space_mesh else None
         agents = self.agent_mesh if self.agent_mesh else None
         prop_base, prop_cbar = self.propertylayer_mesh or (None, None)

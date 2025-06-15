@@ -1,14 +1,20 @@
+"""Matplotlib backend for Mesa space visualization.
+
+This module provides a Matplotlib-based renderer for visualizing Mesa model
+spaces, agents, and property layers with comprehensive styling support.
+"""
+
 import os
 import warnings
 from dataclasses import fields
 
 import numpy as np
 from matplotlib import pyplot as plt
-from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import LinearSegmentedColormap, Normalize, to_rgba
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+from PIL import Image
 
 import mesa
 from mesa.discrete_space import (
@@ -21,40 +27,55 @@ from mesa.space import (
     MultiGrid,
     SingleGrid,
 )
+from mesa.visualization.backends.abstract_renderer import AbstractRenderer
 
-# Type aliases
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
 
-from PIL import Image
-
-from .abstract_renderer import AbstractRenderer
 
 CORRECTION_FACTOR_MARKER_ZOOM = 0.01
 
 
 class MatplotlibBackend(AbstractRenderer):
-    """A renderer that uses Matplotlib."""
+    """Matplotlib-based renderer for Mesa spaces.
 
-    def initialize_canvas(self, ax=None, **kwargs):
+    Provides visualization capabilities using Matplotlib for rendering
+    space structures, agents, and property layers.
+    """
+
+    def initialize_canvas(self, ax=None):
+        """Initialize the matplotlib canvas.
+
+        Args:
+            ax (matplotlib.axes.Axes, optional): Existing axes to use.
+                If None, creates new figure and axes.
+        """
         if ax is None:
             fig, ax = plt.subplots(constrained_layout=True)
             self.fig = fig
-        self._canvas = ax
+        self.ax = ax
 
     def draw_structure(self, **kwargs):
-        ax = kwargs.pop("ax")
-        return self.space_drawer.draw_matplotlib(ax, **kwargs)
+        """Draw the space structure using matplotlib.
 
-    def _collect_agent_data(self, space, agent_portrayal, default_size=None):
+        Args:
+            **kwargs: Additional arguments passed to the space drawer.
+
+        Returns:
+            The matplotlib axes with the drawn structure.
+        """
+        return self.space_drawer.draw_matplotlib(self.ax, **kwargs)
+
+    def collect_agent_data(self, space, agent_portrayal, default_size=None):
         """Collect plotting data for all agents in the space.
 
         Args:
-            agent_portrayal: Callable that returns AgentPortrayalStyle for each agent
-            default_size: Default marker size if not specified
+            space: The Mesa space containing agents.
+            agent_portrayal (Callable): Function that returns AgentPortrayalStyle for each agent.
+            default_size (float, optional): Default marker size if not specified in portrayal.
 
         Returns:
-            Dictionary containing agent plotting data arrays
+            dict: Dictionary containing agent plotting data arrays.
         """
         # Initialize data collection arrays
         arguments = {
@@ -147,12 +168,26 @@ class MatplotlibBackend(AbstractRenderer):
         return data
 
     def draw_agents(self, arguments, **kwargs):
-        """Draw agents using matplotlib backend."""
+        """Draw agents using matplotlib backend.
 
-        ax = kwargs.pop("ax")
+        Args:
+            arguments (dict): Dictionary containing agent plotting data.
+            **kwargs: Additional keyword arguments for matplotlib plotting functions.
+
+        Returns:
+            matplotlib.axes.Axes: The axes with drawn agents.
+        """
 
         def _get_zoom_factor(ax, img):
-            """Calculate zoom factor for image markers based on axis limits."""
+            """Calculate zoom factor for image markers based on axis limits.
+
+            Args:
+                ax (matplotlib.axes.Axes): The matplotlib axes.
+                img (PIL.Image): The image to be used as marker.
+
+            Returns:
+                float: Calculated zoom factor for proper image scaling.
+            """
             ax.get_figure().canvas.draw()
             bbox = ax.get_window_extent().transformed(
                 ax.get_figure().dpi_scale_trans.inverted()
@@ -194,7 +229,7 @@ class MatplotlibBackend(AbstractRenderer):
                         f"{entry} is specified in agent portrayal and via plotting kwargs, you can only use one or the other"
                     )
 
-        ax.get_figure().canvas.draw()
+        self.ax.get_figure().canvas.draw()
         for mark in set(marker):
             if isinstance(mark, (str | os.PathLike)) and os.path.isfile(mark):
                 # images
@@ -202,9 +237,9 @@ class MatplotlibBackend(AbstractRenderer):
                     image = Image.open(mark)
                     im = OffsetImage(
                         image,
-                        zoom=_get_zoom_factor(ax, image) * m_size,
+                        zoom=_get_zoom_factor(self.ax, image) * m_size,
                     )
-                    im.image.axes = ax
+                    im.image.axes = self.ax
 
                     mask_marker = [m == mark for m in list(marker)] & (m_size == msize)
                     for z_order in np.unique(zorder[mask_marker]):
@@ -221,14 +256,14 @@ class MatplotlibBackend(AbstractRenderer):
                                     zorder=z_order,
                                     **kwargs,
                                 )
-                                ax.add_artist(ab)
+                                self.ax.add_artist(ab)
 
             else:
                 # ordinary markers
                 mask_marker = [m == mark for m in list(marker)]
                 for z_order in np.unique(zorder[mask_marker]):
                     zorder_mask = z_order == zorder & mask_marker
-                    ax.scatter(
+                    self.ax.scatter(
                         loc_x[zorder_mask],
                         loc_y[zorder_mask],
                         marker=mark,
@@ -236,10 +271,19 @@ class MatplotlibBackend(AbstractRenderer):
                         **{k: v[zorder_mask] for k, v in arguments.items()},
                         **kwargs,
                     )
-        return ax
+        return self.ax
 
-    def draw_propertylayer(self, space, property_layers, propertylayer_portrayal, ax):
-        """Draw property layers using matplotlib backend."""
+    def draw_propertylayer(self, space, property_layers, propertylayer_portrayal):
+        """Draw property layers using matplotlib backend.
+
+        Args:
+            space: The Mesa space object.
+            property_layers (dict): Dictionary of property layers to visualize.
+            propertylayer_portrayal (Callable): Function that returns PropertyLayerStyle.
+
+        Returns:
+            tuple: (axes, colorbar) - The matplotlib axes and colorbar objects.
+        """
         # Draw each layer
         for layer_name in property_layers:
             if layer_name == "empty":
@@ -295,9 +339,9 @@ class MatplotlibBackend(AbstractRenderer):
                     rgba_data = np.full((*data.shape, 4), rgba_color)
                     rgba_data[..., 3] *= normalized_data * alpha
                     rgba_data = np.clip(rgba_data, 0, 1)
-                    ax.imshow(rgba_data, origin="lower")
+                    self.ax.imshow(rgba_data, origin="lower")
                 else:
-                    ax.imshow(
+                    self.ax.imshow(
                         data.T,
                         cmap=cmap,
                         alpha=alpha,
@@ -319,7 +363,7 @@ class MatplotlibBackend(AbstractRenderer):
                     rgba_colors[..., 3] *= alpha
 
                 collection = PolyCollection(hexagons, facecolors=rgba_colors, zorder=-1)
-                ax.add_collection(collection)
+                self.ax.add_collection(collection)
             else:
                 raise NotImplementedError(
                     f"PropertyLayer visualization not implemented for {type(space)}"
@@ -331,36 +375,16 @@ class MatplotlibBackend(AbstractRenderer):
                 norm = Normalize(vmin=vmin, vmax=vmax)
                 sm = ScalarMappable(norm=norm, cmap=cmap)
                 sm.set_array([])
-                cbar = plt.colorbar(sm, ax=ax, label=layer_name)
-        return ax, cbar
-
-    def render(
-        self,
-        space,
-        agent_portrayal=None,
-        propertylayer_portrayal=None,
-        ax: Axes | None = None,
-        **kwargs,
-    ):
-        """Render the complete space with structure, agents, and property layers."""
-        structure_kwargs = kwargs.pop("structure_kwargs", {})
-        agent_kwargs = kwargs.pop("agent_kwargs", {})
-
-        ax = ax if ax is not None else self._canvas
-
-        if self.space_mesh is None:
-            self.draw_structure(ax, **structure_kwargs)
-        if agent_portrayal is not None and self.agent_mesh is None:
-            arguments = self._collect_agent_data(space, agent_portrayal)
-            arguments = self._map_coordinates(arguments)
-            self.draw_agents(ax, arguments, **agent_kwargs)
-        if propertylayer_portrayal is not None and self.propertylayer_mesh is None:
-            self.draw_propertylayer(propertylayer_portrayal, ax)
-
-        return ax
+                cbar = plt.colorbar(sm, ax=self.ax, label=layer_name)
+        return self.ax, cbar
 
     @property
     def canvas(self):
-        if self._canvas is None:
+        """Get the matplotlib axes canvas.
+
+        Returns:
+            matplotlib.axes.Axes: The current matplotlib axes object.
+        """
+        if self.ax is None:
             self.initialize_canvas()
-        return self._canvas
+        return self.ax

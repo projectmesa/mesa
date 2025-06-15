@@ -1,9 +1,14 @@
+"""Space rendering module for Mesa visualizations.
+
+This module provides functionality to render Mesa model spaces with different
+backends, supporting various space types and visualization components.
+"""
+
 import warnings
 from collections.abc import Callable
+from typing import Literal
 
 import numpy as np
-from matplotlib.axes import Axes
-from solara import Literal
 
 import mesa
 from mesa.discrete_space import (
@@ -28,21 +33,29 @@ from mesa.visualization.space_drawers import (
     VoronoiSpaceDrawer,
 )
 
-# Define type hints for space types
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
 Network = NetworkGrid | mesa.discrete_space.Network
 
 
 class SpaceRenderer:
-    """Renders Mesa spaces using different backends."""
+    """Renders Mesa spaces using different visualization backends.
+
+    Supports multiple space types and backends for flexible visualization
+    of agent-based models.
+    """
 
     def __init__(
         self,
         model: mesa.Model,
         backend: Literal["matplotlib", "altair"] | None = "matplotlib",
-        **kwargs,
     ):
+        """Initialize the space renderer.
+
+        Args:
+            model (mesa.Model): The Mesa model to render.
+            backend (Literal["matplotlib", "altair"] | None): The visualization backend to use.
+        """
         self.space = getattr(model, "grid", getattr(model, "space", None))
 
         self.space_drawer = self._get_space_drawer()
@@ -55,20 +68,25 @@ class SpaceRenderer:
         if backend == "matplotlib":
             self.backend_renderer = MatplotlibBackend(
                 self.space_drawer,
-                [self.space_mesh, self.agent_mesh, self.propertylayer_mesh],
             )
         elif backend == "altair":
             self.backend_renderer = AltairBackend(
                 self.space_drawer,
-                [self.space_mesh, self.agent_mesh, self.propertylayer_mesh],
             )
         else:
             raise ValueError(f"Unsupported backend: {backend}")
 
-        self.backend_renderer.initialize_canvas(**kwargs)
+        self.backend_renderer.initialize_canvas()
 
     def _get_space_drawer(self):
-        """Get appropriate space drawer based on space type."""
+        """Get appropriate space drawer based on space type.
+
+        Returns:
+            Space drawer instance for the model's space type.
+
+        Raises:
+            ValueError: If the space type is not supported.
+        """
         if isinstance(self.space, OrthogonalGrid):
             return OrthogonalSpaceDrawer(self.space)
         elif isinstance(self.space, HexGrid):
@@ -85,7 +103,14 @@ class SpaceRenderer:
         )
 
     def _map_coordinates(self, arguments):
-        """Map agent coordinates to appropriate space coordinates."""
+        """Map agent coordinates to appropriate space coordinates.
+
+        Args:
+            arguments (dict): Dictionary containing agent data with coordinates.
+
+        Returns:
+            dict: Dictionary with mapped coordinates appropriate for the space type.
+        """
         mapped_arguments = arguments.copy()
 
         if isinstance(self.space, OrthogonalGrid | VoronoiGrid | ContinuousSpace):
@@ -120,76 +145,71 @@ class SpaceRenderer:
 
         return mapped_arguments
 
-    def draw_structure(self, ax: Axes | None = None, **kwargs):
-        """Draw the grid structure.
+    def draw_structure(self, **kwargs):
+        """Draw the space structure.
 
         Args:
-            ax (Axes, optional): The matplotlib Axes to draw on. If None, uses the current canvas.
-            **kwargs: Additional keyword arguments to pass to the drawing function.
+            **kwargs: Additional keyword arguments for the drawing function.
 
         Returns:
-            The visual representation of the grid structure.
+            The visual representation of the space structure.
         """
         # Store space_kwargs for internal use
         self.space_kwargs = kwargs
 
-        ax = ax if ax is not None else self.canvas
-
-        # add ax for the matplotlib functions in kwargs
-        passed_kwargs = self.space_kwargs.copy()
-        passed_kwargs["ax"] = ax
-
-        self.space_mesh = self.backend_renderer.draw_structure(**passed_kwargs)
+        self.space_mesh = self.backend_renderer.draw_structure(**self.space_kwargs)
         return self.space_mesh
 
-    def draw_agents(self, agent_portrayal: Callable, ax: Axes | None = None, **kwargs):
+    def draw_agents(self, agent_portrayal: Callable, **kwargs):
         """Draw agents on the space.
 
         Args:
-            agent_portrayal (Callable): A function that takes an agent and returns a AgentPortrayalStyle containing visualization properties.
-            ax (Axes, optional): The matplotlib Axes to draw on. If None, uses the current canvas.
-            **kwargs: Additional keyword arguments to pass to the drawing function.
+            agent_portrayal (Callable): Function that takes an agent and returns AgentPortrayalStyle.
+            **kwargs: Additional keyword arguments for the drawing function.
 
         Returns:
-            The visual representation of the agnets.
+            The visual representation of the agents.
         """
         # Store data for internal use
         self.agent_portrayal = agent_portrayal
         self.agent_kwargs = kwargs
 
-        ax = ax if ax is not None else self.canvas
-
-        passed_kwargs = self.agent_kwargs.copy()
-        passed_kwargs["ax"] = ax
-
         # Prepare data for agent plotting
-        arguments = self.backend_renderer._collect_agent_data(
+        arguments = self.backend_renderer.collect_agent_data(
             self.space, agent_portrayal, default_size=self.space_drawer.s_default
         )
         arguments = self._map_coordinates(arguments)
 
-        self.agent_mesh = self.backend_renderer.draw_agents(arguments, **passed_kwargs)
+        self.agent_mesh = self.backend_renderer.draw_agents(
+            arguments, **self.agent_kwargs
+        )
         return self.agent_mesh
 
-    def draw_propertylayer(
-        self, propertylayer_portrayal: Callable | dict, ax: Axes | None = None
-    ):
+    def draw_propertylayer(self, propertylayer_portrayal: Callable | dict):
         """Draw property layers on the space.
 
         Args:
-            propertylayer_portrayal (Callable | dict): A callable that returns a PropertyLayerStyle or a dict with portrayal parameters.
-            ax (Axes, optional): The matplotlib Axes to draw on. If None, uses the current canvas.
+            propertylayer_portrayal (Callable | dict): Function that returns PropertyLayerStyle
+                or dict with portrayal parameters.
 
         Returns:
             The visual representation of the property layers.
-        """
-        ax = ax if ax is not None else self.canvas
 
+        Raises:
+            Exception: If no property layers are found on the space.
+        """
         # Import here to avoid circular imports
         from mesa.visualization.components import PropertyLayerStyle
 
         def _dict_to_callable(portrayal_dict):
-            """Convert legacy dict portrayal to callable."""
+            """Convert legacy dict portrayal to callable.
+
+            Args:
+                portrayal_dict (dict): Dictionary with portrayal parameters.
+
+            Returns:
+                Callable: Function that returns PropertyLayerStyle.
+            """
 
             def style_callable(layer_object):
                 layer_name = layer_object.name
@@ -231,16 +251,10 @@ class SpaceRenderer:
             self.propertylayer_portrayal = propertylayer_portrayal
 
         if len(property_layers) < 2:
-            warnings.warn(
-                "No property layers found in the space. "
-                "Ensure that the space has property layers defined.",
-                UserWarning,
-                stacklevel=2,
-            )
-            return ax, None
+            raise Exception("No property layers were found on the space.")
 
         self.propertylayer_mesh = self.backend_renderer.draw_propertylayer(
-            self.space, property_layers, self.propertylayer_portrayal, ax
+            self.space, property_layers, self.propertylayer_portrayal
         )
         return self.propertylayer_mesh
 
@@ -253,25 +267,29 @@ class SpaceRenderer:
         """Render the complete space with structure, agents, and property layers.
 
         Args:
-            agent_portrayal (Callable | None, optional): A function that takes an agent and returns
-                an AgentPortrayalStyle with visualization properties. If None, agents won't be drawn.
-            propertylayer_portrayal (Callable | dict | None, optional): A callable that returns a
-                PropertyLayerStyle or a dict with portrayal parameters. If None, property layers
-                won't be drawn.
-            **kwargs: Additional keyword arguments to pass to the drawing functions.
-
-        Returns:
-                The rendered visualization object compatible with the selected backend.
+            agent_portrayal (Callable | None): Function that returns AgentPortrayalStyle.
+                If None, agents won't be drawn.
+            propertylayer_portrayal (Callable | dict | None): Function that returns
+                PropertyLayerStyle or dict with portrayal parameters. If None,
+                property layers won't be drawn.
+            **kwargs: Additional keyword arguments for drawing functions.
+                - space_kwargs (dict): Arguments for draw_structure().
+                - agent_kwargs (dict): Arguments for draw_agents().
         """
-        return self.backend_renderer.render(
-            self.space, agent_portrayal, propertylayer_portrayal, **kwargs
-        )
+        space_kwargs = kwargs.pop("space_kwargs", {})
+        agent_kwargs = kwargs.pop("agent_kwargs", {})
+        if self.space_mesh is None:
+            self.draw_structure(**space_kwargs)
+        if self.agent_mesh is None and agent_portrayal is not None:
+            self.draw_agents(agent_portrayal, **agent_kwargs)
+        if self.propertylayer_mesh is None and propertylayer_portrayal is not None:
+            self.draw_propertylayer(propertylayer_portrayal)
 
     @property
     def canvas(self):
-        """Return the current canvas object."""
-        return self.backend_renderer.canvas
+        """Get the current canvas object.
 
-    def clear_meshes(self):
-        """Clear all meshes."""
-        self.backend_renderer.clear_meshes()
+        Returns:
+            The backend-specific canvas object.
+        """
+        return self.backend_renderer.canvas

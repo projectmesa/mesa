@@ -1,3 +1,9 @@
+"""Abstract base classes for visualization backends in Mesa.
+
+This module provides the foundational interface for implementing various
+visualization backends for Mesa agent-based models.
+"""
+
 from abc import ABC, abstractmethod
 
 import mesa
@@ -13,26 +19,37 @@ from mesa.space import (
     SingleGrid,
 )
 
-# Define type hints for space types
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
 Network = NetworkGrid | mesa.discrete_space.Network
 
 
 class AbstractRenderer(ABC):
-    """Abstract base class for a visualization backend."""
+    """Abstract base class for visualization backends.
 
-    def __init__(self, space_drawer, meshes: list | None = None):
+    Provides the interface for implementing different visualization
+    backends for Mesa models.
+    """
+
+    def __init__(self, space_drawer):
+        """Initialize the renderer.
+
+        Args:
+            space_drawer: Object responsible for drawing space elements.
+        """
         self.space_drawer = space_drawer
-
-        self.space_mesh = meshes[0]
-        self.agent_mesh = meshes[1]
-        self.propertylayer_mesh = meshes[2]
-
         self._canvas = None
 
     def _get_agent_pos(self, agent, space):
-        """Get agent position based on space type."""
+        """Get agent position based on space type.
+
+        Args:
+            agent: The agent whose position to retrieve.
+            space: The space containing the agent.
+
+        Returns:
+            tuple: Agent's (x, y) coordinates.
+        """
         if isinstance(space, NetworkGrid):
             return agent.pos, agent.pos
         elif isinstance(space, Network):
@@ -43,32 +60,54 @@ class AbstractRenderer(ABC):
             return x, y
 
     @abstractmethod
-    def initialize_canvas(self, **kwargs):
-        """Set up the drawing canvas (e.g., Matplotlib Axes, Altair Chart)."""
+    def initialize_canvas(self):
+        """Set up the drawing canvas."""
 
     @abstractmethod
     def draw_structure(self, **kwargs):
-        """Draw the space structure (grid lines, etc.)."""
+        """Draw the space structure.
+
+        Args:
+            **kwargs: Structure drawing configuration options.
+        """
 
     @abstractmethod
-    def draw_agents(self, agent_portrayal, **kwargs):
-        """Collect agent data and draw them."""
+    def collect_agent_data(self, space, agent_portrayal, default_size=None):
+        """Collect plotting data for all agents in the space.
+
+        Args:
+            space: The Mesa space containing agents.
+            agent_portrayal (Callable): Function that returns AgentPortrayalStyle for each agent.
+            default_size (float, optional): Default marker size if not specified in portrayal.
+
+        Returns:
+            dict: Dictionary containing agent plotting data arrays with keys:
+        """
 
     @abstractmethod
-    def draw_propertylayer(self, propertylayer_portrayal, **kwargs):
-        """Draw property layers."""
+    def draw_agents(self, arguments, **kwargs):
+        """Drawing agents on space.
+
+        Args:
+            arguments (dict): Dictionary containing agent data.
+            **kwargs: Additional drawing configuration options.
+        """
 
     @abstractmethod
-    def render(self, agent_portrayal, propertylayer_portrayal, **kwargs):
-        """Render the entire visualization."""
+    def draw_propertylayer(self, space, property_layers, propertylayer_portrayal):
+        """Draw property layers on the visualization.
+
+        Args:
+            space: The model's space object.
+            property_layers (dict): Dictionary of property layers to visualize.
+            propertylayer_portrayal (Callable): Function that returns PropertyLayerStyle.
+        """
 
     @property
     @abstractmethod
     def canvas(self):
-        """Return the current canvas object."""
+        """Get the current canvas object.
 
-    def clear_meshes(self):
-        """Clear all stored mesh objects."""
-        self.space_mesh = None
-        self.agent_mesh = None
-        self.propertylayer_mesh = None
+        Returns:
+            The backend-specific canvas object.
+        """
