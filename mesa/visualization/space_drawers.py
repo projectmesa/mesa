@@ -2,7 +2,7 @@
 
 This module provides drawer classes for visualizing different types of spatial
 models in Mesa, including orthogonal grids, hexagonal grids, networks,
-continuous spaces, and Voronoi grids.
+continuous spaces, and Voronoi grids with both matplotlib and altair backends.
 """
 
 import itertools
@@ -117,10 +117,12 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
 
         return ax
 
-    def draw_altair(self, **chart_kwargs):
+    def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
         """Draw the orthogonal grid using Altair.
 
         Args:
+            chart_width: Width for the shown chart
+            chart_height: Height for the shown chart
             **chart_kwargs: Additional keyword arguments for styling the chart.
                             Examples: width=500, height=500, title="Grid"
 
@@ -139,8 +141,8 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
 
         # for chart properties
         chart_props = {
-            "width": 450,
-            "height": 350,
+            "width": chart_width,
+            "height": chart_height,
         }
         chart_props.update(chart_kwargs)
 
@@ -288,10 +290,12 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         ax.add_collection(LineCollection(list(edges), **line_kwargs))
         return ax
 
-    def draw_altair(self, **chart_kwargs):
+    def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
         """Draw the hexagonal grid using Altair.
 
         Args:
+            chart_width: Width for the shown chart
+            chart_height: Height for the shown chart
             **chart_kwargs: Additional keyword arguments for styling the chart.
                             Pass `mark_kwargs` for line properties e.g. {"color": "red"}.
                             Other kwargs (e.g., width, title) apply to the chart.
@@ -309,8 +313,8 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         mark_kwargs.update(user_mark_kwargs)
 
         chart_props = {
-            "width": 450,
-            "height": 350,
+            "width": chart_width,
+            "height": chart_height,
         }
         chart_props.update(chart_kwargs)
 
@@ -428,10 +432,12 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
 
         return ax
 
-    def draw_altair(self, **chart_kwargs):
+    def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
         """Draw the network using Altair.
 
         Args:
+            chart_width: Width for the shown chart
+            chart_height: Height for the shown chart
             **chart_kwargs: Dictionaries for styling the chart.
                 - node_kwargs: A dict of properties for the node's mark_point.
                 - edge_kwargs: A dict of properties for the edge's mark_rule.
@@ -461,8 +467,8 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
         edge_mark_kwargs.update(chart_kwargs.pop("edge_kwargs", {}))
 
         chart_kwargs = {
-            "width": 450,
-            "height": 350,
+            "width": chart_width,
+            "height": chart_height,
         }
         chart_kwargs.update(chart_kwargs)
 
@@ -549,17 +555,22 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
 
         return ax
 
-    def draw_altair(self, **chart_kwargs):
+    def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
         """Draw the continuous space using Altair.
 
         Args:
+            chart_width: Width for the shown chart
+            chart_height: Height for the shown chart
             **chart_kwargs: Keyword arguments for styling the chart's view properties.
                             See Altair's documentation for `configure_view`.
                             Examples: strokeWidth=3, stroke="green"
 
         Returns:
-            An Altair Chart object representing the continuous space.
+            An Altair Chart object representing the space.
         """
+        chart_props = {"width": chart_width, "height": chart_height}
+        chart_props.update(chart_kwargs)
+
         chart = (
             alt.Chart(pd.DataFrame([{}]))
             .mark_rect(color="transparent")
@@ -567,6 +578,7 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
                 x=alt.X(scale=alt.Scale(domain=[self.viz_xmin, self.viz_xmax])),
                 y=alt.Y(scale=alt.Scale(domain=[self.viz_ymin, self.viz_ymax])),
             )
+            .properties(**chart_props)
         )
 
         return chart
@@ -718,10 +730,12 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
 
         return ax
 
-    def draw_altair(self, **chart_kwargs):
+    def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
         """Draw the Voronoi diagram using Altair.
 
         Args:
+            chart_width: Width for the shown chart
+            chart_height: Height for the shown chart
             **chart_kwargs: Keyword arguments for styling.
                             Pass `mark_kwargs` for line properties e.g. {"color": "red"}.
                             Other kwargs (e.g., width, title) apply to the chart.
@@ -744,7 +758,7 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         user_mark_kwargs = chart_kwargs.pop("mark_kwargs", {})
         mark_kwargs.update(user_mark_kwargs)
 
-        chart_props = {}
+        chart_props = {"width": chart_width, "height": chart_height}
         chart_props.update(chart_kwargs)
 
         chart = (
