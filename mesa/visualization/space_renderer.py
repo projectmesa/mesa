@@ -1,10 +1,11 @@
+from collections.abc import Callable
 import warnings
 
 import numpy as np
-from backends import AltairBackend, MatplotlibBackend
+from mesa.visualization.backends import AltairBackend, MatplotlibBackend
 from matplotlib.axes import Axes
 from solara import Literal
-from space_drawers import (
+from mesa.visualization.space_drawers import (
     ContinuousSpaceDrawer,
     HexSpaceDrawer,
     NetworkSpaceDrawer,
@@ -38,7 +39,7 @@ class SpaceRenderer:
 
     def __init__(
         self,
-        model,
+        model: mesa.Model,
         backend: Literal["matplotlib", "altair"] | None = "matplotlib",
         **kwargs,
     ):
@@ -120,38 +121,73 @@ class SpaceRenderer:
         return mapped_arguments
 
     def draw_structure(self, ax: Axes | None = None, **kwargs):
+        """Draw the grid structure.
+
+        Args:
+            ax (Axes, optional): The matplotlib Axes to draw on. If None, uses the current canvas.
+            **kwargs: Additional keyword arguments to pass to the drawing function.
+
+        Returns:
+            The visual representation of the grid structure.
+        """
+        # Store space_kwargs for internal use
         self.space_kwargs = kwargs
 
-        if self.backend == "altair":
-            # Altair backend does not use Axes
-            ax = None
-        ax = ax or self.canvas
-        self.space_mesh = self.backend_renderer.draw_structure(ax, **self.space_kwargs)
+        ax = ax if ax is not None else self.canvas
+
+        # add ax for the matplotlib functions in kwargs
+        passed_kwargs = self.space_kwargs.copy()
+        passed_kwargs["ax"] = ax
+
+        self.space_mesh = self.backend_renderer.draw_structure(**passed_kwargs)
         return self.space_mesh
 
-    def draw_agents(self, agent_portrayal, ax: Axes | None = None, **kwargs):
+    def draw_agents(self, agent_portrayal: Callable, ax: Axes | None = None, **kwargs):
+        """Draw agents on the space.
+
+        Args:
+            agent_portrayal (Callable): A function that takes an agent and returns a AgentPortrayalStyle containing visualization properties.
+            ax (Axes, optional): The matplotlib Axes to draw on. If None, uses the current canvas.
+            **kwargs: Additional keyword arguments to pass to the drawing function.
+
+        Returns:
+            The visual representation of the agnets.
+        """
+        # Store data for internal use
         self.agent_portrayal = agent_portrayal
-        ax = ax or self.canvas
         self.agent_kwargs = kwargs
+
+        ax = ax if ax is not None else self.canvas
+
+        passed_kwargs = self.agent_kwargs.copy()
+        passed_kwargs["ax"] = ax
+
+        # Prepare data for agent plotting
         arguments = self.backend_renderer._collect_agent_data(
-            self.space, agent_portrayal
+            self.space, agent_portrayal, default_size=self.space_drawer.s_default
         )
         arguments = self._map_coordinates(arguments)
 
-        if self.backend == "altair":
-            # Altair backend does not use Axes
-            ax = None
-
         self.agent_mesh = self.backend_renderer.draw_agents(
-            ax, arguments, **self.agent_kwargs
+            arguments, **passed_kwargs
         )
         return self.agent_mesh
 
-    def draw_propertylayer(self, propertylayer_portrayal, ax: Axes | None = None):
-        # Import here to avoid circular imports
-        from mesa.visualization.components import PropertyLayerStyle
+    def draw_propertylayer(self, propertylayer_portrayal: Callable | dict, ax: Axes | None = None):
+        """Draw property layers on the space.
+
+        Args:
+            propertylayer_portrayal (Callable | dict): A callable that returns a PropertyLayerStyle or a dict with portrayal parameters.
+            ax (Axes, optional): The matplotlib Axes to draw on. If None, uses the current canvas.
+        
+        Returns:
+            The visual representation of the property layers.
+        """
 
         ax = ax if ax is not None else self.canvas
+
+        # Import here to avoid circular imports
+        from mesa.visualization.components import PropertyLayerStyle
 
         def _dict_to_callable(portrayal_dict):
             """Convert legacy dict portrayal to callable."""
@@ -209,7 +245,20 @@ class SpaceRenderer:
         )
         return self.propertylayer_mesh
 
-    def render(self, agent_portrayal=None, propertylayer_portrayal=None, **kwargs):
+    def render(self, agent_portrayal: Callable | None = None, propertylayer_portrayal: Callable | dict | None = None, **kwargs):
+        """Render the complete space with structure, agents, and property layers.
+
+        Args:
+            agent_portrayal (Callable | None, optional): A function that takes an agent and returns 
+                an AgentPortrayalStyle with visualization properties. If None, agents won't be drawn.
+            propertylayer_portrayal (Callable | dict | None, optional): A callable that returns a 
+                PropertyLayerStyle or a dict with portrayal parameters. If None, property layers 
+                won't be drawn.
+            **kwargs: Additional keyword arguments to pass to the drawing functions.
+
+            Returns:
+                The rendered visualization object compatible with the selected backend.
+        """
         return self.backend_renderer.render(
             self.space, agent_portrayal, propertylayer_portrayal, **kwargs
         )
@@ -220,4 +269,5 @@ class SpaceRenderer:
         return self.backend_renderer.canvas
 
     def clear_meshes(self):
+        """Clear all meshes."""
         self.backend_renderer.clear_meshes()
