@@ -33,9 +33,11 @@ class AltairBackend(AbstractRenderer):
     def initialize_canvas(self, **kwargs):
         self._canvas = None
 
-    def draw_structure(self, ignore_ax, **kwargs):
-        self.space_mesh = self.space_drawer.draw_altair(**kwargs)
-        return self.space_mesh
+    def draw_structure(self, **kwargs):
+        # ignore the passed ax
+        _ = kwargs.pop("ax")
+
+        return self.space_drawer.draw_altair(**kwargs)
 
     def _collect_agent_data(self, space, agent_portrayal, default_size=None):
         """Collect plotting data for all agents in the space for Altair.
@@ -183,9 +185,9 @@ class AltairBackend(AbstractRenderer):
 
         return final_data
 
-    def draw_agents(
-        self, ignore_ax, arguments, chart_width=450, chart_height=350, **kwargs
-    ):
+    def draw_agents(self, arguments, chart_width=450, chart_height=350, **kwargs):
+        _ = kwargs.pop("ax")
+
         if arguments["loc"].size == 0:
             return None
 
@@ -276,15 +278,14 @@ class AltairBackend(AbstractRenderer):
             .properties(title=title, width=chart_width, height=chart_height)
         )
 
-        self.agent_mesh = chart
-        return self.agent_mesh
+        return chart
 
     def draw_propertylayer(
         self,
         space,
         property_layers,
         propertylayer_portrayal,
-        ignore_ax,
+        ax=None,
         chart_width=450,
         chart_height=350,
     ):
@@ -307,7 +308,8 @@ class AltairBackend(AbstractRenderer):
             # Check dimensions
             if (space.width, space.height) != data.shape:
                 warnings.warn(
-                    f"Layer {layer_name} dimensions ({data.shape}) do not match space dimensions ({space.width}, {space.height}).",
+                    f"Layer {layer_name} dimensions ({data.shape}) "
+                    f"don't match space dimensions ({space.width}, {space.height})",
                     UserWarning,
                     stacklevel=2,
                 )
@@ -508,8 +510,7 @@ class AltairBackend(AbstractRenderer):
                 raise ValueError(
                     f"PropertyLayer {layer_name} portrayal must include 'color' or 'colormap'."
                 )
-        self.propertylayer_mesh = (base, bar_chart_viz)
-        return self.propertylayer_mesh
+        return (base, bar_chart_viz)
 
     def render(self, agent_portrayal=None, propertylayer_portrayal=None, **kwargs):
         structure_kwargs = kwargs.pop("structure_kwargs", {})

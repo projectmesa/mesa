@@ -1,17 +1,9 @@
-from collections.abc import Callable
 import warnings
+from collections.abc import Callable
 
 import numpy as np
-from mesa.visualization.backends import AltairBackend, MatplotlibBackend
 from matplotlib.axes import Axes
 from solara import Literal
-from mesa.visualization.space_drawers import (
-    ContinuousSpaceDrawer,
-    HexSpaceDrawer,
-    NetworkSpaceDrawer,
-    OrthogonalSpaceDrawer,
-    VoronoiSpaceDrawer,
-)
 
 import mesa
 from mesa.discrete_space import (
@@ -26,6 +18,14 @@ from mesa.space import (
     MultiGrid,
     NetworkGrid,
     SingleGrid,
+)
+from mesa.visualization.backends import AltairBackend, MatplotlibBackend
+from mesa.visualization.space_drawers import (
+    ContinuousSpaceDrawer,
+    HexSpaceDrawer,
+    NetworkSpaceDrawer,
+    OrthogonalSpaceDrawer,
+    VoronoiSpaceDrawer,
 )
 
 # Define type hints for space types
@@ -168,22 +168,21 @@ class SpaceRenderer:
         )
         arguments = self._map_coordinates(arguments)
 
-        self.agent_mesh = self.backend_renderer.draw_agents(
-            arguments, **passed_kwargs
-        )
+        self.agent_mesh = self.backend_renderer.draw_agents(arguments, **passed_kwargs)
         return self.agent_mesh
 
-    def draw_propertylayer(self, propertylayer_portrayal: Callable | dict, ax: Axes | None = None):
+    def draw_propertylayer(
+        self, propertylayer_portrayal: Callable | dict, ax: Axes | None = None
+    ):
         """Draw property layers on the space.
 
         Args:
             propertylayer_portrayal (Callable | dict): A callable that returns a PropertyLayerStyle or a dict with portrayal parameters.
             ax (Axes, optional): The matplotlib Axes to draw on. If None, uses the current canvas.
-        
+
         Returns:
             The visual representation of the property layers.
         """
-
         ax = ax if ax is not None else self.canvas
 
         # Import here to avoid circular imports
@@ -245,18 +244,23 @@ class SpaceRenderer:
         )
         return self.propertylayer_mesh
 
-    def render(self, agent_portrayal: Callable | None = None, propertylayer_portrayal: Callable | dict | None = None, **kwargs):
+    def render(
+        self,
+        agent_portrayal: Callable | None = None,
+        propertylayer_portrayal: Callable | dict | None = None,
+        **kwargs,
+    ):
         """Render the complete space with structure, agents, and property layers.
 
         Args:
-            agent_portrayal (Callable | None, optional): A function that takes an agent and returns 
+            agent_portrayal (Callable | None, optional): A function that takes an agent and returns
                 an AgentPortrayalStyle with visualization properties. If None, agents won't be drawn.
-            propertylayer_portrayal (Callable | dict | None, optional): A callable that returns a 
-                PropertyLayerStyle or a dict with portrayal parameters. If None, property layers 
+            propertylayer_portrayal (Callable | dict | None, optional): A callable that returns a
+                PropertyLayerStyle or a dict with portrayal parameters. If None, property layers
                 won't be drawn.
             **kwargs: Additional keyword arguments to pass to the drawing functions.
 
-            Returns:
+        Returns:
                 The rendered visualization object compatible with the selected backend.
         """
         return self.backend_renderer.render(

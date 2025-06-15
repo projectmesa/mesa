@@ -42,9 +42,9 @@ class MatplotlibBackend(AbstractRenderer):
             self.fig = fig
         self._canvas = ax
 
-    def draw_structure(self, ax=None, **kwargs):
-        self.space_mesh = self.space_drawer.draw_matplotlib(ax, **kwargs)
-        return self.space_mesh
+    def draw_structure(self, **kwargs):
+        ax = kwargs.pop("ax")
+        return self.space_drawer.draw_matplotlib(ax, **kwargs)
 
     def _collect_agent_data(self, space, agent_portrayal, default_size=None):
         """Collect plotting data for all agents in the space.
@@ -146,8 +146,10 @@ class MatplotlibBackend(AbstractRenderer):
 
         return data
 
-    def draw_agents(self, ax, arguments, **kwargs):
+    def draw_agents(self, arguments, **kwargs):
         """Draw agents using matplotlib backend."""
+
+        ax = kwargs.pop("ax")
 
         def _get_zoom_factor(ax, img):
             """Calculate zoom factor for image markers based on axis limits."""
@@ -171,7 +173,6 @@ class MatplotlibBackend(AbstractRenderer):
 
             return min(zoom_x, zoom_y)
 
-        print(ax, arguments)
         loc = arguments.pop("loc")
 
         loc_x = loc[:, 0]
@@ -260,6 +261,7 @@ class MatplotlibBackend(AbstractRenderer):
                     UserWarning,
                     stacklevel=2,
                 )
+                continue
 
             # Get portrayal parameters
             color = portrayal.color
