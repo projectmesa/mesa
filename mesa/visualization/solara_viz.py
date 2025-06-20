@@ -56,7 +56,7 @@ _mesa_logger = create_module_logger()
 @function_logger(__name__)
 def SolaraViz(
     model: Model | solara.Reactive[Model],
-    renderer: SpaceRenderer,
+    renderer: SpaceRenderer | None = None,
     components: list[reacton.core.Component]
     | list[Callable[[Model], reacton.core.Component]]
     | Literal["default"] = "default",
@@ -382,7 +382,7 @@ JupyterViz = SolaraViz
 def ModelController(
     model: solara.Reactive[Model],
     *,
-    renderer: SpaceRenderer,
+    renderer: SpaceRenderer | None = None,
     model_parameters: dict | solara.Reactive[dict] = None,
     play_interval: int | solara.Reactive[int] = 100,
     render_interval: int | solara.Reactive[int] = 1,
@@ -503,7 +503,7 @@ def ModelController(
 def SimulatorController(
     model: solara.Reactive[Model],
     simulator,
-    renderer: SpaceRenderer,
+    renderer: SpaceRenderer | None = None,
     *,
     model_parameters: dict | solara.Reactive[dict] = None,
     play_interval: int | solara.Reactive[int] = 100,
