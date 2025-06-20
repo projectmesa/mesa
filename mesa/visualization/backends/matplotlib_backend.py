@@ -177,6 +177,8 @@ class MatplotlibBackend(AbstractRenderer):
         Returns:
             matplotlib.axes.Axes: The axes with drawn agents.
         """
+        if arguments["loc"].size == 0:
+            return None
 
         def _get_zoom_factor(ax, img):
             """Calculate zoom factor for image markers based on axis limits.

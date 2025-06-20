@@ -250,7 +250,10 @@ class SpaceRenderer:
         else:
             self.propertylayer_portrayal = propertylayer_portrayal
 
-        if len(property_layers) < 2:
+        number_of_propertylayers = sum(
+            [1 for layer in property_layers if layer != "empty"]
+        )
+        if number_of_propertylayers < 1:
             raise Exception("No property layers were found on the space.")
 
         self.propertylayer_mesh = self.backend_renderer.draw_propertylayer(
