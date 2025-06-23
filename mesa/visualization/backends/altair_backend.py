@@ -184,7 +184,8 @@ class AltairBackend(AbstractRenderer):
                 else style_fields.get("linewidths")
             )
 
-            # FIXME: Kind of stupid logic.
+            # FIXME: Kind of stupid logic because solid markers should be possible
+            # even if edge color is none.
             # filled: True if edgecolors are defined, False otherwise.
             filled_value = aps.edgecolors is not None
             arguments["filled"].append(filled_value)
@@ -234,7 +235,7 @@ class AltairBackend(AbstractRenderer):
         }
         df = pd.DataFrame(df_data)
 
-        # To ensure distinct shapes according to agnet portrayal
+        # To ensure distinct shapes according to agent portrayal
         unique_shape_names_in_data = df["shape"].unique().tolist()
 
         fill_colors = []
