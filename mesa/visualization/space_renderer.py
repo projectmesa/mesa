@@ -23,6 +23,7 @@ from mesa.space import (
     MultiGrid,
     NetworkGrid,
     SingleGrid,
+    _HexGrid,
 )
 from mesa.visualization.backends import AltairBackend, MatplotlibBackend
 from mesa.visualization.space_drawers import (
@@ -87,10 +88,10 @@ class SpaceRenderer:
         Raises:
             ValueError: If the space type is not supported.
         """
-        if isinstance(self.space, OrthogonalGrid):
-            return OrthogonalSpaceDrawer(self.space)
-        elif isinstance(self.space, HexGrid):
+        if isinstance(self.space, HexGrid | _HexGrid):
             return HexSpaceDrawer(self.space)
+        elif isinstance(self.space, OrthogonalGrid):
+            return OrthogonalSpaceDrawer(self.space)
         elif isinstance(self.space, ContinuousSpace):
             return ContinuousSpaceDrawer(self.space)
         elif isinstance(self.space, VoronoiGrid):
