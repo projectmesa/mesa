@@ -84,6 +84,7 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the orthogonal grid using matplotlib.
+        """Draw the orthogonal grid using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on
@@ -124,6 +125,7 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
+        """Draw the orthogonal grid using Altair.
         """Draw the orthogonal grid using Altair.
 
         Args:
@@ -265,6 +267,7 @@ class HexSpaceDrawer(BaseSpaceDrawer):
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the hexagonal grid using matplotlib.
+        """Draw the hexagonal grid using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on
@@ -301,6 +304,7 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
+        """Draw the hexagonal grid using Altair.
         """Draw the hexagonal grid using Altair.
 
         Args:
@@ -402,6 +406,7 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the network using matplotlib.
+        """Draw the network using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on.
@@ -444,6 +449,7 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
+        """Draw the network using Altair.
         """Draw the network using Altair.
 
         Args:
@@ -542,6 +548,7 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the continuous space using matplotlib.
+        """Draw the continuous space using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on
@@ -569,6 +576,7 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
+        """Draw the continuous space using Altair.
         """Draw the continuous space using Altair.
 
         Args:
@@ -714,6 +722,7 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
         """Draw the Voronoi diagram using matplotlib.
+        """Draw the Voronoi diagram using matplotlib.
 
         Args:
             ax: Matplotlib axes object to draw on
@@ -745,6 +754,7 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
+        """Draw the Voronoi diagram using Altair.
         """Draw the Voronoi diagram using Altair.
 
         Args:
