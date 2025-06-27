@@ -3,9 +3,14 @@
 This module provides different backend implementations for visualizing
 Mesa agent-based model spaces and components.
 
+"NOTE":
+    These backends are used internally by the space renderer and are not intended for
+    direct use by end users. See `SpaceRenderer` for actual usage and setting up
+    visualizations.
+
 Available Backends:
-    AltairBackend
-    MatplotlibBackend
+    1. AltairBackend
+    2. MatplotlibBackend
 """
 
 from .altair_backend import AltairBackend

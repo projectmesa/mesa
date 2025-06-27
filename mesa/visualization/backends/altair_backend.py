@@ -1,9 +1,4 @@
-"""Altair backend for Mesa space visualization.
-
-This module provides an Altair-based renderer for visualizing Mesa model
-spaces, agents, and property layers with interactive charting capabilities.
-"""
-
+# noqa: D100
 import warnings
 from collections.abc import Callable
 from dataclasses import fields
@@ -36,8 +31,8 @@ Network = NetworkGrid | mesa.discrete_space.Network
 class AltairBackend(AbstractRenderer):
     """Altair-based renderer for Mesa spaces.
 
-    Provides visualization capabilities using Altair for rendering
-    space structures, agents, and property layers with interactive charts.
+    This module provides an Altair-based renderer for visualizing Mesa model spaces,
+    agents, and property layers with interactive charting capabilities.
     """
 
     def initialize_canvas(self) -> None:
@@ -49,6 +44,7 @@ class AltairBackend(AbstractRenderer):
 
         Args:
             **kwargs: Additional arguments passed to the space drawer.
+            Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
 
         Returns:
             alt.Chart: The Altair chart representing the space structure.
@@ -66,7 +62,7 @@ class AltairBackend(AbstractRenderer):
             default_size: Default marker size if not specified in portrayal.
 
         Returns:
-            Dictionary containing agent plotting data arrays.
+            dict: Dictionary containing agent plotting data arrays.
         """
         # Initialize data collection arrays
         arguments = {
@@ -214,9 +210,10 @@ class AltairBackend(AbstractRenderer):
             chart_width: Width of the chart.
             chart_height: Height of the chart.
             **kwargs: Additional keyword arguments for customization.
+            Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
 
         Returns:
-            The Altair chart representing the agents, or None if no agents.
+            alt.Chart: The Altair chart representing the agents, or None if no agents.
         """
         if arguments["loc"].size == 0:
             return None
@@ -329,7 +326,7 @@ class AltairBackend(AbstractRenderer):
             chart_height: The height of the chart.
 
         Returns:
-            A tuple containing the base chart and the color bar chart.
+            alt.Chart: A tuple containing the base chart and the color bar chart.
         """
         base = None
         bar_chart_viz = None

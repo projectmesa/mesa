@@ -151,6 +151,7 @@ class SpaceRenderer:
 
         Args:
             **kwargs: Additional keyword arguments for the drawing function.
+            Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
 
         Returns:
             The visual representation of the space structure.
@@ -167,6 +168,7 @@ class SpaceRenderer:
         Args:
             agent_portrayal (Callable): Function that takes an agent and returns AgentPortrayalStyle.
             **kwargs: Additional keyword arguments for the drawing function.
+            Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
 
         Returns:
             The visual representation of the agents.
@@ -270,6 +272,11 @@ class SpaceRenderer:
     ):
         """Render the complete space with structure, agents, and property layers.
 
+        It is an all-in-one method that draws everything required therefore eliminates
+        the need of calling each method separately, but has a drawback, if want to pass
+        kwargs to customize the drawing, they have to be broken into
+        space_kwargs and agent_kwargs.
+
         Args:
             agent_portrayal (Callable | None): Function that returns AgentPortrayalStyle.
                 If None, agents won't be drawn.
@@ -277,8 +284,8 @@ class SpaceRenderer:
                 PropertyLayerStyle or dict with portrayal parameters. If None,
                 property layers won't be drawn.
             **kwargs: Additional keyword arguments for drawing functions.
-                - space_kwargs (dict): Arguments for draw_structure().
-                - agent_kwargs (dict): Arguments for draw_agents().
+                * ``space_kwargs`` (dict): Arguments for ``draw_structure()``.
+                * ``agent_kwargs`` (dict): Arguments for ``draw_agents()``.
         """
         space_kwargs = kwargs.pop("space_kwargs", {})
         agent_kwargs = kwargs.pop("agent_kwargs", {})

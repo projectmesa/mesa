@@ -110,7 +110,7 @@ For detailed tutorials, please refer to:
 ```
 
 
-## Space Renderer and Drawers
+## Space Renderer
 
 ```{eval-rst}
 .. automodule:: mesa.visualization.space_renderer
@@ -118,6 +118,9 @@ For detailed tutorials, please refer to:
    :undoc-members:
    :show-inheritance:
 ```
+
+
+## Space Drawers
 
 ```{eval-rst}
 .. automodule:: mesa.visualization.space_drawers

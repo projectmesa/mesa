@@ -1,4 +1,4 @@
-"""Abstract base classes for visualization backends in Mesa.
+"""Abstract base classe for visualization backends in Mesa.
 
 This module provides the foundational interface for implementing various
 visualization backends for Mesa agent-based models.
@@ -27,29 +27,22 @@ Network = NetworkGrid | mesa.discrete_space.Network
 class AbstractRenderer(ABC):
     """Abstract base class for visualization backends.
 
-    Provides the interface for implementing different visualization
-    backends for Mesa models.
+    This class defines the interface for rendering Mesa spaces and agents.
+    For details on the methods checkout specific backend implementations.
     """
 
     def __init__(self, space_drawer):
         """Initialize the renderer.
 
         Args:
-            space_drawer: Object responsible for drawing space elements.
+            space_drawer: Object responsible for drawing space elements. Checkout `SpaceDrawer`
+            for more details on the detailed implemenations of the drawing functions.
         """
         self.space_drawer = space_drawer
         self._canvas = None
 
     def _get_agent_pos(self, agent, space):
-        """Get agent position based on space type.
-
-        Args:
-            agent: The agent whose position to retrieve.
-            space: The space containing the agent.
-
-        Returns:
-            tuple: Agent's (x, y) coordinates.
-        """
+        """Get agent position based on space type."""
         if isinstance(space, NetworkGrid):
             return agent.pos, agent.pos
         elif isinstance(space, Network):

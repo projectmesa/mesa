@@ -1,8 +1,8 @@
-"""Mesa visualization space drawers for different spatial models.
+"""Mesa visualization space drawers.
 
-This module provides drawer classes for visualizing different types of spatial
-models in Mesa, including orthogonal grids, hexagonal grids, networks,
-continuous spaces, and Voronoi grids with both matplotlib and altair backends.
+This module provides the core logic for drawing spaces in Mesa, supporting
+orthogonal grids, hexagonal grids, networks, continuous spaces, and Voronoi grids.
+It includes implementations for both Matplotlib and Altair backends.
 """
 
 import itertools
@@ -39,7 +39,11 @@ class BaseSpaceDrawer:
     """Base class for all space drawers."""
 
     def __init__(self, space):
-        """Initialize the base space drawer."""
+        """Initialize the base space drawer.
+
+        Args:
+            space: Grid/Space type to draw.
+        """
         self.space = space
         self.viz_xmin = None
         self.viz_xmax = None
@@ -84,7 +88,7 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
         Args:
             ax: Matplotlib axes object to draw on
             **space_kwargs: Additional keyword arguments for styling.
-                            Examples: figsize=(10, 10), color="blue", linewidth=2
+                * Examples: figsize=(10, 10), color="blue", linewidth=2
 
         Returns:
             The modified axes object
@@ -124,7 +128,7 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
             chart_width: Width for the shown chart
             chart_height: Height for the shown chart
             **chart_kwargs: Additional keyword arguments for styling the chart.
-                            Examples: width=500, height=500, title="Grid"
+                * Examples: width=500, height=500, title="Grid"
 
         Returns:
             Altair chart object
@@ -261,7 +265,7 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         Args:
             ax: Matplotlib axes object to draw on
             **space_kwargs: Additional keyword arguments for styling.
-                            Examples: figsize=(8, 8), color="red", alpha=0.5
+                * Examples: figsize=(8, 8), color="red", alpha=0.5
 
         Returns:
             The modified axes object
@@ -297,20 +301,18 @@ class HexSpaceDrawer(BaseSpaceDrawer):
             chart_width: Width for the shown chart
             chart_height: Height for the shown chart
             **chart_kwargs: Additional keyword arguments for styling the chart.
-                            Pass `mark_kwargs` for line properties e.g. {"color": "red"}.
-                            Other kwargs (e.g., width, title) apply to the chart.
+                * Example: Line properties like color, strokeDash, strokeWidth, opacity.
+                    Other kwargs (e.g., width, title) apply to the chart.
 
         Returns:
             Altair chart object representing the hexagonal grid.
         """
         mark_kwargs = {
-            "color": "black",
-            "strokeDash": [2, 2],
-            "strokeWidth": 1,
-            "opacity": 0.8,
+            "color": chart_kwargs.pop("color", "black"),
+            "strokeDash": chart_kwargs.pop("strokeDash", [2, 2]),
+            "strokeWidth": chart_kwargs.pop("strokeWidth", 1),
+            "opacity": chart_kwargs.pop("opacity", 0.8),
         }
-        user_mark_kwargs = chart_kwargs.pop("mark_kwargs", {})
-        mark_kwargs.update(user_mark_kwargs)
 
         chart_props = {
             "width": chart_width,
@@ -396,8 +398,9 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
         Args:
             ax: Matplotlib axes object to draw on.
             **space_kwargs: Dictionaries of keyword arguments for styling.
-                - node_kwargs: A dict passed to nx.draw_networkx_nodes.
-                - edge_kwargs: A dict passed to nx.draw_networkx_edges.
+            Can also handle zorder for both nodes and edges if passed.
+                * ``node_kwargs``: A dict passed to nx.draw_networkx_nodes.
+                * ``edge_kwargs``: A dict passed to nx.draw_networkx_edges.
 
         Returns:
             The modified axes object.
@@ -535,7 +538,7 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
         Args:
             ax: Matplotlib axes object to draw on
             **space_kwargs: Keyword arguments for styling the axis frame.
-                            Examples: linewidth=3, color="green"
+                * Examples: linewidth=3, color="green"
 
         Returns:
             The modified axes object
@@ -563,7 +566,6 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
             chart_height: Height for the shown chart
             **chart_kwargs: Keyword arguments for styling the chart's view properties.
                             See Altair's documentation for `configure_view`.
-                            Examples: strokeWidth=3, stroke="green"
 
         Returns:
             An Altair Chart object representing the space.
@@ -706,7 +708,7 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         Args:
             ax: Matplotlib axes object to draw on
             **space_kwargs: Keyword arguments passed to matplotlib's LineCollection.
-                            Examples: lw=2, alpha=0.5, colors='red'
+                * Examples: lw=2, alpha=0.5, colors='red'
 
         Returns:
             The modified axes object
@@ -736,9 +738,9 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         Args:
             chart_width: Width for the shown chart
             chart_height: Height for the shown chart
-            **chart_kwargs: Keyword arguments for styling.
-                            Pass `mark_kwargs` for line properties e.g. {"color": "red"}.
-                            Other kwargs (e.g., width, title) apply to the chart.
+            **chart_kwargs: Additional keyword arguments for styling the chart.
+                * Example: Line properties like color, strokeDash, strokeWidth, opacity.
+                    Other kwargs (e.g., width, title) apply to the chart.
 
         Returns:
             An Altair Chart object representing the Voronoi diagram.
@@ -754,9 +756,12 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         df = pd.DataFrame(final_data)
 
         # Define default properties for the mark
-        mark_kwargs = {"strokeDash": [3, 3], "color": "black"}
-        user_mark_kwargs = chart_kwargs.pop("mark_kwargs", {})
-        mark_kwargs.update(user_mark_kwargs)
+        mark_kwargs = {
+            "color": chart_kwargs.pop("color", "black"),
+            "strokeDash": chart_kwargs.pop("strokeDash", [2, 2]),
+            "strokeWidth": chart_kwargs.pop("strokeWidth", 1),
+            "opacity": chart_kwargs.pop("opacity", 0.8),
+        }
 
         chart_props = {"width": chart_width, "height": chart_height}
         chart_props.update(chart_kwargs)

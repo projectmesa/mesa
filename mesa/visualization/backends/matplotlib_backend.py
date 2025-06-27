@@ -1,9 +1,4 @@
-"""Matplotlib backend for Mesa space visualization.
-
-This module provides a Matplotlib-based renderer for visualizing Mesa model
-spaces, agents, and property layers with comprehensive styling support.
-"""
-
+# noqa: D100
 import os
 import warnings
 from dataclasses import fields
@@ -60,6 +55,7 @@ class MatplotlibBackend(AbstractRenderer):
 
         Args:
             **kwargs: Additional arguments passed to the space drawer.
+            Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
 
         Returns:
             The matplotlib axes with the drawn structure.
@@ -243,7 +239,17 @@ class MatplotlibBackend(AbstractRenderer):
             )
 
     def draw_agents(self, arguments, **kwargs):
-        """Draw agents by dispatching to specialized marker-drawing methods."""
+        """Draw agents by dispatching to specialized marker-drawing methods.
+
+        Args:
+            arguments: Dictionary containing agent data arrays.
+            **kwargs: Additional keyword arguments for customization.
+            Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
+
+        Returns:
+            matplotlib.axes.Axes: The Matplotlib Axes with the agents drawn upon it. Nothings is drawn if
+            there are no agents.
+        """
         if arguments["loc"].size == 0:
             return None
 
@@ -313,7 +319,7 @@ class MatplotlibBackend(AbstractRenderer):
             propertylayer_portrayal (Callable): Function that returns PropertyLayerStyle.
 
         Returns:
-            tuple: (axes, colorbar) - The matplotlib axes and colorbar objects.
+            tuple: (matplotlib.axes.Axes, colorbar) - The matplotlib axes and colorbar objects.
         """
         # Draw each layer
         for layer_name in property_layers:
