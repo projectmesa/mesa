@@ -4,8 +4,8 @@ This module defines data structures for styling visual elements in Mesa agent-ba
 It provides user-facing classes to specify how agents and property layers should appear in the rendered space.
 
 Classes:
-- AgentPortrayalStyle: Controls the appearance of individual agents (e.g., color, shape, size, etc.).
-- PropertyLayerStyle: Controls the appearance of background property layers (e.g., color gradients or uniform fills).
+1. AgentPortrayalStyle: Controls the appearance of individual agents (e.g., color, shape, size, etc.).
+2. PropertyLayerStyle: Controls the appearance of background property layers (e.g., color gradients or uniform fills).
 
 These components are designed to be passed into Mesa visualizations to customize and standardize how data is presented.
 """
