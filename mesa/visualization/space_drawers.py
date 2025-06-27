@@ -83,8 +83,7 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
         self.viz_ymax = self.space.height - 0.5
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
-        """
-        Draw the orthogonal grid using matplotlib.
+        """Draw the orthogonal grid using matplotlib.
 
         Parameters
         ----------
@@ -93,7 +92,7 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
         **space_kwargs
             Additional keyword arguments for styling.
 
-        Examples
+        Examples:
         --------
         Common keyword arguments for `space_kwargs`:
 
@@ -134,8 +133,7 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
-        """
-        Draw the orthogonal grid using Altair.
+        """Draw the orthogonal grid using Altair.
 
         Parameters
         ----------
@@ -146,7 +144,7 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
         **chart_kwargs
             Additional keyword arguments for styling the chart.
 
-        Examples
+        Examples:
         --------
         Common keyword arguments for `chart_kwargs`:
 
@@ -284,8 +282,7 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         return edges
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
-        """
-        Draw the hexagonal grid using matplotlib.
+        """Draw the hexagonal grid using matplotlib.
 
         Parameters
         ----------
@@ -294,7 +291,7 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         **space_kwargs
             Additional keyword arguments for styling.
 
-        Examples
+        Examples:
         --------
         Common keyword arguments for `space_kwargs`:
 
@@ -331,8 +328,7 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
-        """
-        Draw the hexagonal grid using Altair.
+        """Draw the hexagonal grid using Altair.
 
         Parameters
         ----------
@@ -343,7 +339,7 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         **chart_kwargs
             Additional keyword arguments for styling the chart.
 
-        Examples
+        Examples:
         --------
         Common keyword arguments for `chart_kwargs`:
 
@@ -444,8 +440,7 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
         self.viz_ymax = ymax + height / 20
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
-        """
-        Draw the network using matplotlib.
+        """Draw the network using matplotlib.
 
         Parameters
         ----------
@@ -454,7 +449,7 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
         **space_kwargs
             Additional keyword arguments for styling. Can also handle zorder for both nodes and edges if passed.
 
-        Examples
+        Examples:
         --------
         Common keyword arguments for `space_kwargs`:
 
@@ -496,8 +491,7 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
-        """
-        Draw the network using Altair.
+        """Draw the network using Altair.
 
         Parameters
         ----------
@@ -508,7 +502,7 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
         **chart_kwargs
             Additional keyword arguments for styling the chart.
 
-        Examples
+        Examples:
         --------
         Common keyword arguments for `chart_kwargs`:
 
@@ -605,8 +599,7 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
         self.viz_ymax = self.space.y_max + y_padding
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
-        """
-        Draw the continuous space using matplotlib.
+        """Draw the continuous space using matplotlib.
 
         Parameters
         ----------
@@ -615,7 +608,7 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
         **space_kwargs
             Additional keyword arguments for styling the axis frame.
 
-        Examples
+        Examples:
         --------
         Common keyword arguments for `space_kwargs`:
 
@@ -642,8 +635,7 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
-        """
-        Draw the continuous space using Altair.
+        """Draw the continuous space using Altair.
 
         Parameters
         ----------
@@ -654,7 +646,7 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
         **chart_kwargs
             Additional keyword arguments for styling the chart's view properties. See Altair's documentation for `configure_view`.
 
-        Examples
+        Examples:
         --------
         Example usage:
 
@@ -793,8 +785,7 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         return final_segments, clip_box
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
-        """
-        Draw the Voronoi diagram using matplotlib.
+        """Draw the Voronoi diagram using matplotlib.
 
         Parameters
         ----------
@@ -803,7 +794,7 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         **space_kwargs
             Additional keyword arguments passed to matplotlib's LineCollection.
 
-        Examples
+        Examples:
         --------
         Common keyword arguments for `space_kwargs`:
 
@@ -835,8 +826,7 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
-        """
-        Draw the Voronoi diagram using Altair.
+        """Draw the Voronoi diagram using Altair.
 
         Parameters
         ----------
@@ -847,7 +837,7 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         **chart_kwargs
             Additional keyword arguments for styling the chart.
 
-        Examples
+        Examples:
         --------
         Common keyword arguments for `chart_kwargs`:
 
