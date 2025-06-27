@@ -72,7 +72,7 @@ For detailed tutorials, please refer to:
 
 ## Portrayal Components
 ```{eval-rst}
-.. automodule:: mesa.visualization.components.portrayal_components.py
+.. automodule:: mesa.visualization.components.portrayal_components
    :members:
    :undoc-members:
    :show-inheritance:
