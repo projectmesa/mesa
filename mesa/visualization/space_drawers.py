@@ -83,15 +83,27 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
         self.viz_ymax = self.space.height - 0.5
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
-        """Draw the orthogonal grid using matplotlib.
+        """
+        Draw the orthogonal grid using matplotlib.
 
-        Args:
-            ax: Matplotlib axes object to draw on
-            **space_kwargs: Additional keyword arguments for styling.
-                * Examples: figsize=(10, 10), color="blue", linewidth=2
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Matplotlib axes object to draw on.
+        **space_kwargs
+            Additional keyword arguments for styling.
 
-        Returns:
-            The modified axes object
+        Examples
+        --------
+        Common keyword arguments for `space_kwargs`:
+
+        - `figsize=(10, 10)`: Set the figure size.
+        - `color="blue"`: Set the grid line color.
+        - `linewidth=2`: Set the grid line width.
+
+        Example usage:
+
+        >>> drawer.draw_matplotlib(figsize=(10, 10), color="blue", linewidth=2)
         """
         fig_kwargs = {
             "figsize": space_kwargs.pop("figsize", (8, 8)),
@@ -122,16 +134,28 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
-        """Draw the orthogonal grid using Altair.
+        """
+        Draw the orthogonal grid using Altair.
 
-        Args:
-            chart_width: Width for the shown chart
-            chart_height: Height for the shown chart
-            **chart_kwargs: Additional keyword arguments for styling the chart.
-                * Examples: width=500, height=500, title="Grid"
+        Parameters
+        ----------
+        chart_width : int
+            Width for the shown chart.
+        chart_height : int
+            Height for the shown chart.
+        **chart_kwargs
+            Additional keyword arguments for styling the chart.
 
-        Returns:
-            Altair chart object
+        Examples
+        --------
+        Common keyword arguments for `chart_kwargs`:
+
+        - `width=500`: Set the chart width.
+        - `title="Grid"`: Set the chart title.
+
+        Example usage:
+
+        >>> drawer.draw_altair(width=500, title="Grid")
         """
         # for axis and grid styling
         axis_kwargs = {
@@ -260,15 +284,27 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         return edges
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
-        """Draw the hexagonal grid using matplotlib.
+        """
+        Draw the hexagonal grid using matplotlib.
 
-        Args:
-            ax: Matplotlib axes object to draw on
-            **space_kwargs: Additional keyword arguments for styling.
-                * Examples: figsize=(8, 8), color="red", alpha=0.5
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Matplotlib axes object to draw on.
+        **space_kwargs
+            Additional keyword arguments for styling.
 
-        Returns:
-            The modified axes object
+        Examples
+        --------
+        Common keyword arguments for `space_kwargs`:
+
+        - `figsize=(8, 8)`: Set the figure size.
+        - `color="red"`: Set the grid line color.
+        - `alpha=0.5`: Set the grid line transparency.
+
+        Example usage:
+
+        >>> drawer.draw_matplotlib(figsize=(8, 8), color="red", alpha=0.5)
         """
         fig_kwargs = {
             "figsize": space_kwargs.pop("figsize", (8, 8)),
@@ -295,17 +331,32 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
-        """Draw the hexagonal grid using Altair.
+        """
+        Draw the hexagonal grid using Altair.
 
-        Args:
-            chart_width: Width for the shown chart
-            chart_height: Height for the shown chart
-            **chart_kwargs: Additional keyword arguments for styling the chart.
-                * Example: Line properties like color, strokeDash, strokeWidth, opacity.
-                    Other kwargs (e.g., width, title) apply to the chart.
+        Parameters
+        ----------
+        chart_width : int
+            Width for the shown chart.
+        chart_height : int
+            Height for the shown chart.
+        **chart_kwargs
+            Additional keyword arguments for styling the chart.
 
-        Returns:
-            Altair chart object representing the hexagonal grid.
+        Examples
+        --------
+        Common keyword arguments for `chart_kwargs`:
+
+        - `color="black"`: Set the line color.
+        - `strokeDash=[2, 2]`: Set the line dash pattern.
+        - `strokeWidth=1`: Set the line width.
+        - `opacity=0.8`: Set the line opacity.
+        - `width=500`: Set the chart width.
+        - `title="Hex Grid"`: Set the chart title.
+
+        Example usage:
+
+        >>> drawer.draw_altair(color="black", strokeDash=[2,2], width=500, title="Hex Grid")
         """
         mark_kwargs = {
             "color": chart_kwargs.pop("color", "black"),
@@ -393,17 +444,26 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
         self.viz_ymax = ymax + height / 20
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
-        """Draw the network using matplotlib.
+        """
+        Draw the network using matplotlib.
 
-        Args:
-            ax: Matplotlib axes object to draw on.
-            **space_kwargs: Dictionaries of keyword arguments for styling.
-            Can also handle zorder for both nodes and edges if passed.
-                * ``node_kwargs``: A dict passed to nx.draw_networkx_nodes.
-                * ``edge_kwargs``: A dict passed to nx.draw_networkx_edges.
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Matplotlib axes object to draw on.
+        **space_kwargs
+            Additional keyword arguments for styling. Can also handle zorder for both nodes and edges if passed.
 
-        Returns:
-            The modified axes object.
+        Examples
+        --------
+        Common keyword arguments for `space_kwargs`:
+
+        - `node_kwargs`: A dict passed to `nx.draw_networkx_nodes`.
+        - `edge_kwargs`: A dict passed to `nx.draw_networkx_edges`.
+
+        Example usage:
+
+        >>> drawer.draw_matplotlib(node_kwargs={"color": "red"}, edge_kwargs={"style": "--"})
         """
         if ax is None:
             fig, ax = plt.subplots()
@@ -436,18 +496,30 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
-        """Draw the network using Altair.
+        """
+        Draw the network using Altair.
 
-        Args:
-            chart_width: Width for the shown chart
-            chart_height: Height for the shown chart
-            **chart_kwargs: Dictionaries for styling the chart.
-                - node_kwargs: A dict of properties for the node's mark_point.
-                - edge_kwargs: A dict of properties for the edge's mark_rule.
-                - Other kwargs (e.g., title, width) are passed to chart.properties().
+        Parameters
+        ----------
+        chart_width : int
+            Width for the shown chart.
+        chart_height : int
+            Height for the shown chart.
+        **chart_kwargs
+            Additional keyword arguments for styling the chart.
 
-        Returns:
-            Altair chart object representing the network.
+        Examples
+        --------
+        Common keyword arguments for `chart_kwargs`:
+
+        - `node_kwargs`: A dict of properties for the node's mark_point.
+        - `edge_kwargs`: A dict of properties for the edge's mark_rule.
+        - `width=500`: Set the chart width.
+        - `title="Network"`: Set the chart title.
+
+        Example usage:
+
+        >>> drawer.draw_altair(node_kwargs={"size": 1000}, edge_kwargs={"strokeDash": [5, 3]}, width=500, title="Network")
         """
         nodes_df = pd.DataFrame(self.pos).T.reset_index()
         nodes_df.columns = ["node", "x", "y"]
@@ -533,15 +605,26 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
         self.viz_ymax = self.space.y_max + y_padding
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
-        """Draw the continuous space using matplotlib.
+        """
+        Draw the continuous space using matplotlib.
 
-        Args:
-            ax: Matplotlib axes object to draw on
-            **space_kwargs: Keyword arguments for styling the axis frame.
-                * Examples: linewidth=3, color="green"
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Matplotlib axes object to draw on.
+        **space_kwargs
+            Additional keyword arguments for styling the axis frame.
 
-        Returns:
-            The modified axes object
+        Examples
+        --------
+        Common keyword arguments for `space_kwargs`:
+
+        - `linewidth=3`: Set the border line width.
+        - `color="green"`: Set the border color.
+
+        Example usage:
+
+        >>> drawer.draw_matplotlib(linewidth=3, color="green")
         """
         if ax is None:
             fig, ax = plt.subplots()
@@ -559,16 +642,23 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
-        """Draw the continuous space using Altair.
+        """
+        Draw the continuous space using Altair.
 
-        Args:
-            chart_width: Width for the shown chart
-            chart_height: Height for the shown chart
-            **chart_kwargs: Keyword arguments for styling the chart's view properties.
-                            See Altair's documentation for `configure_view`.
+        Parameters
+        ----------
+        chart_width : int
+            Width for the shown chart.
+        chart_height : int
+            Height for the shown chart.
+        **chart_kwargs
+            Additional keyword arguments for styling the chart's view properties. See Altair's documentation for `configure_view`.
 
-        Returns:
-            An Altair Chart object representing the space.
+        Examples
+        --------
+        Example usage:
+
+        >>> drawer.draw_altair(width=600, height=400)
         """
         chart_props = {"width": chart_width, "height": chart_height}
         chart_props.update(chart_kwargs)
@@ -703,15 +793,27 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         return final_segments, clip_box
 
     def draw_matplotlib(self, ax=None, **space_kwargs):
-        """Draw the Voronoi diagram using matplotlib.
+        """
+        Draw the Voronoi diagram using matplotlib.
 
-        Args:
-            ax: Matplotlib axes object to draw on
-            **space_kwargs: Keyword arguments passed to matplotlib's LineCollection.
-                * Examples: lw=2, alpha=0.5, colors='red'
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Matplotlib axes object to draw on.
+        **space_kwargs
+            Additional keyword arguments passed to matplotlib's LineCollection.
 
-        Returns:
-            The modified axes object
+        Examples
+        --------
+        Common keyword arguments for `space_kwargs`:
+
+        - `lw=2`: Set the line width.
+        - `alpha=0.5`: Set the line transparency.
+        - `colors='red'`: Set the line color.
+
+        Example usage:
+
+        >>> drawer.draw_matplotlib(lw=2, alpha=0.5, colors='red')
         """
         if ax is None:
             fig, ax = plt.subplots()
@@ -733,17 +835,32 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
         return ax
 
     def draw_altair(self, chart_width=450, chart_height=350, **chart_kwargs):
-        """Draw the Voronoi diagram using Altair.
+        """
+        Draw the Voronoi diagram using Altair.
 
-        Args:
-            chart_width: Width for the shown chart
-            chart_height: Height for the shown chart
-            **chart_kwargs: Additional keyword arguments for styling the chart.
-                * Example: Line properties like color, strokeDash, strokeWidth, opacity.
-                    Other kwargs (e.g., width, title) apply to the chart.
+        Parameters
+        ----------
+        chart_width : int
+            Width for the shown chart.
+        chart_height : int
+            Height for the shown chart.
+        **chart_kwargs
+            Additional keyword arguments for styling the chart.
 
-        Returns:
-            An Altair Chart object representing the Voronoi diagram.
+        Examples
+        --------
+        Common keyword arguments for `chart_kwargs`:
+
+        - `color="black"`: Set the line color.
+        - `strokeDash=[2, 2]`: Set the line dash pattern.
+        - `strokeWidth=1`: Set the line width.
+        - `opacity=0.8`: Set the line opacity.
+        - `width=500`: Set the chart width.
+        - `title="Voronoi"`: Set the chart title.
+
+        Example usage:
+
+        >>> drawer.draw_altair(color="black", strokeDash=[2,2], width=500, title="Voronoi")
         """
         final_segments, clip_box = self._get_clipped_segments()
 

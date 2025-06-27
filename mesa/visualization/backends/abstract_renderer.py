@@ -1,4 +1,4 @@
-"""Abstract base classe for visualization backends in Mesa.
+"""Abstract base class for visualization backends in Mesa.
 
 This module provides the foundational interface for implementing various
 visualization backends for Mesa agent-based models.
@@ -36,7 +36,7 @@ class AbstractRenderer(ABC):
 
         Args:
             space_drawer: Object responsible for drawing space elements. Checkout `SpaceDrawer`
-            for more details on the detailed implemenations of the drawing functions.
+            for more details on the detailed implementations of the drawing functions.
         """
         self.space_drawer = space_drawer
         self._canvas = None
