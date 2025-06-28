@@ -139,7 +139,8 @@ def SolaraViz(
     # Make a copy of the components to avoid modifying the original list
     display_components = list(components)
     # Create space component based on the renderer
-    display_components.append(create_space_component(renderer))
+    if renderer:
+        display_components.append(create_space_component(renderer))
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
