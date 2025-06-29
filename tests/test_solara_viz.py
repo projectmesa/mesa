@@ -145,7 +145,7 @@ def test_call_space_drawer(mocker):
 
     # specify no space should be drawn
     mock_space_matplotlib.reset_mock()
-    solara.render(SolaraViz(model))
+    solara.render(SolaraViz(model, components="default"))
     # should call default method with class instance and agent portrayal
     assert mock_space_matplotlib.call_count == 0
     assert mock_space_altair.call_count == 1  # altair is the default method
