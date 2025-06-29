@@ -59,7 +59,7 @@ def SolaraViz(
     renderer: SpaceRenderer | None = None,
     components: list[reacton.core.Component]
     | list[Callable[[Model], reacton.core.Component]]
-    | Literal["default"] = "default",
+    | Literal["default"] = [],  # noqa: B006
     *,
     play_interval: int = 100,
     render_interval: int = 1,
@@ -128,7 +128,7 @@ def SolaraViz(
 
     # Convert model to reactive
     if not isinstance(model, solara.Reactive):
-        model = solara.use_reactive(model)  # noqa: SH102, RUF100
+        model = solara.use_reactive(model)  # noqa: RUF100
 
     # Set up reactive model_parameters shared by ModelCreator and ModelController
     reactive_model_parameters = solara.use_reactive({})

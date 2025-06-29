@@ -218,6 +218,10 @@ class AltairBackend(AbstractRenderer):
         if arguments["loc"].size == 0:
             return None
 
+        # To get a continuous scale for color the domain should be between [0, 1]
+        # that's why changing the the domain of strokeWidth beforehand.
+        stroke_width = [data / 10 for data in arguments["strokeWidth"]]
+
         # Agent data preparation
         df_data = {
             "x": arguments["loc"][:, 0],
@@ -225,7 +229,7 @@ class AltairBackend(AbstractRenderer):
             "size": arguments["size"],
             "shape": arguments["shape"],
             "opacity": arguments["opacity"],
-            "strokeWidth": arguments["strokeWidth"],
+            "strokeWidth": stroke_width,
             "original_color": arguments["color"],
             "is_filled": arguments["filled"],
             "original_stroke": arguments["stroke"],
@@ -264,6 +268,28 @@ class AltairBackend(AbstractRenderer):
         # FIXME: Add more fields to tooltip (preferably from agent_portrayal)
         tooltip_list = ["x", "y"]
 
+        # Handle custom colormapping
+        cmap = kwargs.pop("cmap", "viridis")
+        vmin = kwargs.pop("vmin", None)
+        vmax = kwargs.pop("vmax", None)
+
+        color_is_numeric = np.issubdtype(df["original_color"].dtype, np.number)
+        if color_is_numeric:
+            color_min = vmin if vmin is not None else df["original_color"].min()
+            color_max = vmax if vmax is not None else df["original_color"].max()
+
+            fill_encoding = alt.Fill(
+                "original_color:Q",
+                scale=alt.Scale(scheme=cmap, domain=[color_min, color_max]),
+                title="Colormap",
+            )
+        else:
+            fill_encoding = alt.Fill(
+                "viz_fill_color:N",
+                scale=None,
+                title="Color",
+            )
+
         # Determine space dimensions
         xmin, xmax, ymin, ymax = self.space_drawer.get_viz_limits()
 
@@ -295,11 +321,11 @@ class AltairBackend(AbstractRenderer):
                     title="Opacity",
                     scale=alt.Scale(domain=[0, 1], range=[0, 1]),
                 ),
-                fill=alt.Fill("viz_fill_color:N", scale=None, title="Fill Color"),
-                stroke=alt.Stroke(
-                    "viz_stroke_color:N", scale=None, title="Stroke Color"
+                fill=fill_encoding,
+                stroke=alt.Stroke("viz_stroke_color:N", scale=None),
+                strokeWidth=alt.StrokeWidth(
+                    "strokeWidth:Q", scale=alt.Scale(domain=[0, 1])
                 ),
-                strokeWidth=alt.StrokeWidth("strokeWidth:Q", title="Stroke Width"),
                 tooltip=tooltip_list,
             )
             .properties(title=title, width=chart_width, height=chart_height)
