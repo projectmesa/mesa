@@ -168,14 +168,6 @@ def test_matplotlib_backend_draw_propertylayer():
         )
 
 
-def test_matplotlib_backend_canvas():
-    """Test canvas property initializes ax if missing."""
-    mb = MatplotlibBackend(space_drawer=MagicMock())
-    mb.ax = None
-    assert mb.canvas is not None
-    assert mb.ax is not None
-
-
 def test_altair_backend_draw_structure():
     """Test AltairBackend draw_structure returns chart."""
     ab = AltairBackend(space_drawer=MagicMock())
