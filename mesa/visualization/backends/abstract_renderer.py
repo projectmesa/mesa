@@ -95,12 +95,3 @@ class AbstractRenderer(ABC):
             property_layers (dict): Dictionary of property layers to visualize.
             propertylayer_portrayal (Callable): Function that returns PropertyLayerStyle.
         """
-
-    @property
-    @abstractmethod
-    def canvas(self):
-        """Get the current canvas object.
-
-        Returns:
-            The backend-specific canvas object.
-        """

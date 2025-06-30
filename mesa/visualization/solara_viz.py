@@ -277,6 +277,9 @@ def SpaceRendererComponent(
         else:
             dependencies = [update_counter.value]
 
+        if renderer.post_process:
+            renderer.post_process(renderer.canvas)
+
         solara.FigureMatplotlib(
             renderer.canvas.get_figure(),
             format="png",
@@ -329,6 +332,9 @@ def SpaceRendererComponent(
             final_chart = (
                 alt.Chart(pd.DataFrame()).mark_point().properties(width=450, height=350)
             )
+
+        if renderer.post_process:
+            final_chart = renderer.post_process(final_chart)
 
         final_chart = final_chart.configure_view(stroke="black", strokeWidth=1.5)
 

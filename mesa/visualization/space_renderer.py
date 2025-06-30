@@ -8,7 +8,9 @@ import warnings
 from collections.abc import Callable
 from typing import Literal
 
+import altair as alt
 import numpy as np
+import pandas as pd
 
 import mesa
 from mesa.discrete_space import (
@@ -63,6 +65,8 @@ class SpaceRenderer:
         self.space_mesh = None
         self.agent_mesh = None
         self.propertylayer_mesh = None
+
+        self.post_process_func = None
 
         self.backend = backend
 
@@ -268,6 +272,7 @@ class SpaceRenderer:
         self,
         agent_portrayal: Callable | None = None,
         propertylayer_portrayal: Callable | dict | None = None,
+        post_process: Callable | None = None,
         **kwargs,
     ):
         """Render the complete space with structure, agents, and property layers.
@@ -283,6 +288,7 @@ class SpaceRenderer:
             propertylayer_portrayal (Callable | dict | None): Function that returns
                 PropertyLayerStyle or dict with portrayal parameters. If None,
                 property layers won't be drawn.
+            post_process (Callable | None): Function to apply post-processing to the canvas.
             **kwargs: Additional keyword arguments for drawing functions.
                 * ``space_kwargs`` (dict): Arguments for ``draw_structure()``.
                 * ``agent_kwargs`` (dict): Arguments for ``draw_agents()``.
@@ -296,6 +302,8 @@ class SpaceRenderer:
         if self.propertylayer_mesh is None and propertylayer_portrayal is not None:
             self.draw_propertylayer(propertylayer_portrayal)
 
+        self.post_process_func = post_process
+
     @property
     def canvas(self):
         """Get the current canvas object.
@@ -303,4 +311,77 @@ class SpaceRenderer:
         Returns:
             The backend-specific canvas object.
         """
-        return self.backend_renderer.canvas
+        if self.backend == "matplotlib":
+            ax = self.backend_renderer.canvas
+            if ax is None:
+                self.backend_renderer.initialize_canvas()
+            return ax
+
+        elif self.backend == "altair":
+            structure = self.space_mesh if self.space_mesh else None
+            agents = self.agent_mesh if self.agent_mesh else None
+            prop_base, prop_cbar = self.propertylayer_mesh or (None, None)
+
+            if self.space_mesh:
+                structure = self.draw_structure(**self.space_kwargs)
+            if self.agent_mesh:
+                agents = self.draw_agents(self.agent_portrayal, **self.agent_kwargs)
+            if self.propertylayer_mesh:
+                prop_base, prop_cbar = self.draw_propertylayer(
+                    self.propertylayer_portrayal
+                )
+
+            spatial_charts_list = [
+                chart for chart in [structure, prop_base, agents] if chart
+            ]
+
+            main_spatial = None
+            if spatial_charts_list:
+                main_spatial = (
+                    spatial_charts_list[0]
+                    if len(spatial_charts_list) == 1
+                    else alt.layer(*spatial_charts_list)
+                )
+
+            # Determine final chart by combining with color bar if present
+            final_chart = None
+            if main_spatial and prop_cbar:
+                final_chart = alt.vconcat(main_spatial, prop_cbar).configure_view(
+                    stroke=None
+                )
+            elif main_spatial:  # Only main_spatial, no prop_cbar
+                final_chart = main_spatial
+            elif prop_cbar:  # Only prop_cbar, no main_spatial
+                final_chart = prop_cbar
+                final_chart = final_chart.configure_view(grid=False)
+
+            if final_chart is None:
+                # If no charts are available, return an empty chart
+                final_chart = (
+                    alt.Chart(pd.DataFrame())
+                    .mark_point()
+                    .properties(width=450, height=350)
+                )
+
+            final_chart = final_chart.configure_view(stroke="black", strokeWidth=1.5)
+
+            return final_chart
+
+    @property
+    def post_process(self):
+        """Get the current post-processing function.
+
+        Returns:
+            Callable | None: The post-processing function, or None if not set.
+        """
+        return self.post_process_func
+
+    @post_process.setter
+    def post_process(self, func: Callable | None):
+        """Set the post-processing function.
+
+        Args:
+            func (Callable | None): Function to apply post-processing to the canvas.
+                Should accept the canvas object as its first argument.
+        """
+        self.post_process_func = func

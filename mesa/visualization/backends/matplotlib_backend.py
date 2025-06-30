@@ -414,14 +414,3 @@ class MatplotlibBackend(AbstractRenderer):
                 sm.set_array([])
                 cbar = plt.colorbar(sm, ax=self.ax, label=layer_name)
         return self.ax, cbar
-
-    @property
-    def canvas(self):
-        """Get the matplotlib axes canvas.
-
-        Returns:
-            matplotlib.axes.Axes: The current matplotlib axes object.
-        """
-        if self.ax is None:
-            self.initialize_canvas()
-        return self.ax
