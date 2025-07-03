@@ -312,7 +312,7 @@ class SpaceRenderer:
             The backend-specific canvas object.
         """
         if self.backend == "matplotlib":
-            ax = self.backend_renderer.canvas
+            ax = self.backend_renderer.ax
             if ax is None:
                 self.backend_renderer.initialize_canvas()
             return ax

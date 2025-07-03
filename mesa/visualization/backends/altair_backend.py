@@ -465,7 +465,7 @@ class AltairBackend(AbstractRenderer):
 
                     # Create evenly distributed tick values
                     axis_values = np.linspace(vmin, vmax, 11)
-                    tick_positions = np.linspace(0, colorbar_width, 11)
+                    tick_positions = np.linspace(10, colorbar_width - 10, 11)
 
                     # Prepare data for axis and labels
                     axis_data = pd.DataFrame(
@@ -476,9 +476,9 @@ class AltairBackend(AbstractRenderer):
                     colorbar_chart_obj = (
                         alt.Chart(df_gradient)
                         .mark_rect(
-                            x=0,
+                            x=20,
                             y=0,
-                            width=colorbar_width,
+                            width=colorbar_width - 20,
                             height=colorbar_height,
                             color=alt.Gradient(
                                 gradient="linear",
@@ -493,14 +493,14 @@ class AltairBackend(AbstractRenderer):
                             ),
                         )
                         .encode(
-                            x=alt.value(chart_width / 2), y=alt.value(0)
+                            x=alt.value(chart_width / 2), y=alt.value(8)
                         )  # Center colorbar
                         .properties(width=colorbar_width, height=colorbar_height)
                     )
                     # Add tick marks to colorbar
                     axis_chart = (
                         alt.Chart(axis_data)
-                        .mark_tick(thickness=2, size=8)
+                        .mark_tick(thickness=2, size=10)
                         .encode(
                             x=alt.X("x_axis:Q", axis=None),
                             y=alt.value(colorbar_height - 2),
@@ -537,9 +537,9 @@ class AltairBackend(AbstractRenderer):
                     ).properties(width=colorbar_width, height=colorbar_height + 50)
 
                     bar_chart_viz = (
-                        alt.vconcat(bar_chart_viz, combined_colorbar)
-                        .resolve_scale(color="independent")
-                        .configure_view(stroke=None)
+                        alt.vconcat(bar_chart_viz, combined_colorbar).resolve_scale(
+                            color="independent"
+                        )
                         if bar_chart_viz is not None
                         else combined_colorbar
                     )

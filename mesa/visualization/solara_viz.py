@@ -128,7 +128,7 @@ def SolaraViz(
 
     # Convert model to reactive
     if not isinstance(model, solara.Reactive):
-        model = solara.use_reactive(model)  # noqa: RUF100
+        model = solara.use_reactive(model)  # noqa: RUF100  # noqa: SH102
 
     # Set up reactive model_parameters shared by ModelCreator and ModelController
     reactive_model_parameters = solara.use_reactive({})
@@ -250,6 +250,12 @@ def SpaceRendererComponent(
             renderer.canvas.patches[:],
             renderer.canvas.images[:],
         ]
+
+        # Remove duplicate colorbars from the canvas
+        for cbar in renderer.backend_renderer._active_colorbars:
+            cbar.remove()
+        renderer.backend_renderer._active_colorbars.clear()
+
         # Chain them together into a single iterable
         for artist in itertools.chain.from_iterable(all_artists):
             artist.remove()
@@ -266,10 +272,7 @@ def SpaceRendererComponent(
 
         # Draw property layers if specified
         if renderer.propertylayer_mesh:
-            _, cbar = renderer.draw_propertylayer(renderer.propertylayer_portrayal)
-            # Remove the newly generated colorbar to avoid duplication
-            if cbar is not None:
-                cbar.remove()
+            renderer.draw_propertylayer(renderer.propertylayer_portrayal)
 
         # Update the fig every time frame
         if dependencies:
@@ -478,9 +481,10 @@ def ModelController(
             f"creating new {model.value.__class__} instance with {model_parameters.value}",
         )
         model.value = model.value = model.value.__class__(**model_parameters.value)
-        renderer.space = (
-            model.value.grid if hasattr(model.value, "grid") else model.value.space
-        )
+        if renderer:
+            renderer.space = (
+                model.value.grid if hasattr(model.value, "grid") else model.value.space
+            )
 
     @function_logger(__name__)
     def do_play_pause():
@@ -605,9 +609,10 @@ def SimulatorController(
         model.value = model.value = model.value.__class__(
             simulator=simulator, **model_parameters.value
         )
-        renderer.space = (
-            model.value.grid if hasattr(model.value, "grid") else model.value.space
-        )
+        if renderer:
+            renderer.space = (
+                model.value.grid if hasattr(model.value, "grid") else model.value.space
+            )
 
     def do_play_pause():
         """Toggle play/pause."""

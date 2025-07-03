@@ -38,6 +38,17 @@ class MatplotlibBackend(AbstractRenderer):
     space structures, agents, and property layers.
     """
 
+    def __init__(self, space_drawer):
+        """Initialize the Matplotlib backend.
+
+        Args:
+            space_drawer: An instance of a SpaceDrawer class that handles
+                the drawing of the space structure.
+        """
+        super().__init__(space_drawer)
+
+        self._active_colorbars = []
+
     def initialize_canvas(self, ax=None):
         """Initialize the matplotlib canvas.
 
@@ -413,4 +424,5 @@ class MatplotlibBackend(AbstractRenderer):
                 sm = ScalarMappable(norm=norm, cmap=cmap)
                 sm.set_array([])
                 cbar = plt.colorbar(sm, ax=self.ax, label=layer_name)
+                self._active_colorbars.append(cbar)
         return self.ax, cbar
