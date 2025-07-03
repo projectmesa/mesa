@@ -96,7 +96,7 @@ class SpaceRenderer:
             return HexSpaceDrawer(self.space)
         elif isinstance(self.space, OrthogonalGrid):
             return OrthogonalSpaceDrawer(self.space)
-        elif isinstance(self.space, ContinuousSpace):
+        elif isinstance(self.space, ContinuousSpace | mesa.experimental.continuous_space.ContinuousSpace):
             return ContinuousSpaceDrawer(self.space)
         elif isinstance(self.space, VoronoiGrid):
             return VoronoiSpaceDrawer(self.space)

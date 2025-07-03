@@ -180,10 +180,8 @@ class AltairBackend(AbstractRenderer):
                 else style_fields.get("linewidths")
             )
 
-            # FIXME: Kind of stupid logic because solid markers should be possible
-            # even if edge color is none.
-            # filled: True if edgecolors are defined, False otherwise.
-            filled_value = aps.edgecolors is not None
+            # FIXME: Make filled user-controllable
+            filled_value = True
             arguments["filled"].append(filled_value)
 
         final_data = {}
