@@ -11,6 +11,7 @@ Note:
 Available Backends:
     1. AltairBackend
     2. MatplotlibBackend
+
 """
 
 from .altair_backend import AltairBackend
