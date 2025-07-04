@@ -249,16 +249,17 @@ def SpaceRendererComponent(
             renderer.canvas.collections[:],
             renderer.canvas.patches[:],
             renderer.canvas.images[:],
+            renderer.canvas.artists[:],
         ]
+
+        # Chain them together into a single iterable
+        for artist in itertools.chain.from_iterable(all_artists):
+            artist.remove()
 
         # Remove duplicate colorbars from the canvas
         for cbar in renderer.backend_renderer._active_colorbars:
             cbar.remove()
         renderer.backend_renderer._active_colorbars.clear()
-
-        # Chain them together into a single iterable
-        for artist in itertools.chain.from_iterable(all_artists):
-            artist.remove()
 
         # Draw the space structure if specified
         if renderer.space_mesh:

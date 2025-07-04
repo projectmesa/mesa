@@ -174,33 +174,31 @@ class MatplotlibBackend(AbstractRenderer):
 
         return data
 
-    def _get_drawing_ratios(self):
-        """Calculates the pixels-per-data-unit ratio for the x and y axes."""
-        self.ax.get_figure().canvas.draw()
-        bbox = self.ax.get_window_extent()
+    def _get_zoom_factor(self, ax, img):
+        """Calculate zoom factor only once and cache the result."""
+        ax.get_figure().canvas.draw()
 
-        xr, yr = self.ax.get_xlim(), self.ax.get_ylim()
-        x_range = xr[1] - xr[0]
-        y_range = yr[1] - yr[0]
+        bbox = ax.get_window_extent().transformed(
+            ax.get_figure().dpi_scale_trans.inverted()
+        )
+        width, height = (
+            bbox.width * ax.get_figure().dpi,
+            bbox.height * ax.get_figure().dpi,
+        )
 
-        if x_range == 0 or y_range == 0:
-            return None, None
+        xr = ax.get_xlim()
+        yr = ax.get_ylim()
 
-        return bbox.width / x_range, bbox.height / y_range
+        x_pixel_per_data = width / (xr[1] - xr[0])
+        y_pixel_per_data = height / (yr[1] - yr[0])
 
-    def _calculate_zoom(self, img, x_ratio, y_ratio):
-        """Calculates the final zoom from pre-calculated ratios."""
-        if x_ratio is None:
-            return 0.1
-
-        # Calculate zoom needed to match pixel density
-        zoom_x = (x_ratio / img.width) * CORRECTION_FACTOR_MARKER_ZOOM
-        zoom_y = (y_ratio / img.height) * CORRECTION_FACTOR_MARKER_ZOOM
+        zoom_x = (x_pixel_per_data / img.width) * CORRECTION_FACTOR_MARKER_ZOOM
+        zoom_y = (y_pixel_per_data / img.height) * CORRECTION_FACTOR_MARKER_ZOOM
 
         return min(zoom_x, zoom_y)
 
     def draw_agents(self, arguments, **kwargs):
-        """Draw agents on the backend's axes.
+        """Draw agents on the backend's axes - optimized version.
 
         Args:
             arguments: Dictionary containing agent data arrays.
@@ -208,84 +206,112 @@ class MatplotlibBackend(AbstractRenderer):
             Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
 
         Returns:
-            matplotlib.axes.Axes: The Matplotlib Axes with the agents drawn upon it. Nothings is drawn if
-            there are no agents.
+            matplotlib.axes.Axes: The Matplotlib Axes with the agents drawn upon it.
         """
         if arguments["loc"].size == 0:
             return None
 
         loc = arguments.pop("loc")
+        loc_x, loc_y = loc[:, 0], loc[:, 1]
         marker = arguments.pop("marker")
         zorder = arguments.pop("zorder")
         malpha = arguments.pop("alpha")
         msize = arguments.pop("s")
 
+        # Validate edge arguments
         for entry in ["edgecolors", "linewidths"]:
-            if len(arguments.get(entry, [])) == 0:
-                if entry in arguments:
-                    arguments.pop(entry)
+            if len(arguments[entry]) == 0:
+                arguments.pop(entry)
             elif entry in kwargs:
                 raise ValueError(
                     f"{entry} is specified in agent portrayal and via plotting kwargs, "
                     "you can only use one or the other"
                 )
 
-        loc_x, loc_y = loc[:, 0], loc[:, 1]
+        # Cache for loaded images and their zoom factors
+        image_cache = {}
 
-        x_ratio, y_ratio = self._get_drawing_ratios()
+        # Separate image and non-image markers
+        unique_markers = set(marker)
+        image_markers = set()
+        regular_markers = set()
 
-        for mark in set(marker):
-            marker_mask = np.array(marker) == mark
-
-            # Handle Image Markers
-            if isinstance(mark, str | os.PathLike) and os.path.isfile(mark):
-                image = Image.open(mark)
-                base_zoom = self._calculate_zoom(image, x_ratio, y_ratio)
-
-                im_cache = {}
-
-                # Iterate through only the agents with this image marker
-                for i in np.where(marker_mask)[0]:
-                    agent_alpha = malpha[i]
-                    agent_size = msize[i]
-
-                    cache_key = (agent_alpha, agent_size)
-                    if cache_key not in im_cache:
-                        # Correctly use agent's size in zoom calculation
-                        zoom = base_zoom * agent_size
-                        im = OffsetImage(image, zoom=zoom)
-                        im.image.axes = self.ax
-                        im.set_alpha(agent_alpha)
-                        im_cache[cache_key] = im
-
-                    ab = AnnotationBbox(
-                        im_cache[cache_key],
-                        (loc_x[i], loc_y[i]),
-                        frameon=False,
-                        pad=0.0,
-                        zorder=zorder[i],
-                        **kwargs,
-                    )
-                    self.ax.add_artist(ab)
-
-            # Handle Standard Matplotlib Markers
+        for mark in unique_markers:
+            if isinstance(mark, (str, os.PathLike)) and os.path.isfile(mark):
+                image_markers.add(mark)
             else:
-                zorders_group = zorder[marker_mask]
-                for z_order_val in np.unique(zorders_group):
-                    batch_mask = marker_mask & (zorder == z_order_val)
+                regular_markers.add(mark)
 
-                    batch_args = {k: v[batch_mask] for k, v in arguments.items()}
-                    batch_args["alpha"] = malpha[batch_mask]
-                    batch_args["s"] = msize[batch_mask]
+        self.ax.get_figure().canvas.draw()
 
-                    self.ax.scatter(
-                        loc_x[batch_mask],
-                        loc_y[batch_mask],
-                        marker=mark,
-                        zorder=z_order_val,
-                        **batch_args,
-                        **kwargs,
+        for mark in image_markers:
+            if mark not in image_cache:
+                image = Image.open(mark)
+                base_zoom = self._get_zoom_factor(self.ax, image)
+                image_cache[mark] = {
+                    "image": image,
+                    "base_zoom": base_zoom,
+                    "offset_images": {},
+                }
+
+            cache_entry = image_cache[mark]
+            mask_marker = marker == mark
+
+            unique_sizes = np.unique(msize[mask_marker])
+
+            for m_size in unique_sizes:
+                if m_size not in cache_entry["offset_images"]:
+                    im = OffsetImage(
+                        cache_entry["image"],
+                        zoom=cache_entry["base_zoom"] * m_size,
                     )
+                    im.image.axes = self.ax
+                    cache_entry["offset_images"][m_size] = im
+
+                im = cache_entry["offset_images"][m_size]
+
+                size_marker_mask = mask_marker & (msize == m_size)
+
+                unique_zorders = np.unique(zorder[size_marker_mask])
+                unique_alphas = np.unique(malpha[size_marker_mask])
+
+                for z_order in unique_zorders:
+                    for m_alpha in unique_alphas:
+                        final_mask = (
+                            (zorder == z_order) & (malpha == m_alpha) & size_marker_mask
+                        )
+                        positions = loc[final_mask]
+
+                        for x, y in positions:
+                            ab = AnnotationBbox(
+                                im,
+                                (x, y),
+                                frameon=False,
+                                pad=0.0,
+                                zorder=z_order,
+                                **kwargs,
+                            )
+                            self.ax.add_artist(ab)
+
+        for mark in regular_markers:
+            mask_marker = marker == mark
+
+            unique_zorders = np.unique(zorder[mask_marker])
+
+            for z_order in unique_zorders:
+                zorder_mask = (zorder == z_order) & mask_marker
+
+                scatter_args = {k: v[zorder_mask] for k, v in arguments.items()}
+
+                self.ax.scatter(
+                    loc_x[zorder_mask],
+                    loc_y[zorder_mask],
+                    marker=mark,
+                    zorder=z_order,
+                    **scatter_args,
+                    **kwargs,
+                )
+
         return self.ax
 
     def draw_propertylayer(self, space, property_layers, propertylayer_portrayal):
