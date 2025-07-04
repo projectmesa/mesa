@@ -237,7 +237,7 @@ class MatplotlibBackend(AbstractRenderer):
         regular_markers = set()
 
         for mark in unique_markers:
-            if isinstance(mark, (str, os.PathLike)) and os.path.isfile(mark):
+            if isinstance(mark, str | os.PathLike) and os.path.isfile(mark):
                 image_markers.add(mark)
             else:
                 regular_markers.add(mark)
