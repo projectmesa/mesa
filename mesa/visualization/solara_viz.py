@@ -140,7 +140,9 @@ def SolaraViz(
     display_components = list(components)
     # Create space component based on the renderer
     if renderer:
-        display_components.append(create_space_component(renderer))
+        if isinstance(renderer, SpaceRenderer):
+            renderer = solara.use_reactive(renderer)  # noqa: RUF100  # noqa: SH102
+        display_components.append(create_space_component(renderer.value))
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
@@ -252,14 +254,14 @@ def SpaceRendererComponent(
             renderer.canvas.artists[:],
         ]
 
-        # Chain them together into a single iterable
-        for artist in itertools.chain.from_iterable(all_artists):
-            artist.remove()
-
         # Remove duplicate colorbars from the canvas
         for cbar in renderer.backend_renderer._active_colorbars:
             cbar.remove()
         renderer.backend_renderer._active_colorbars.clear()
+
+        # Chain them together into a single iterable
+        for artist in itertools.chain.from_iterable(all_artists):
+            artist.remove()
 
         # Draw the space structure if specified
         if renderer.space_mesh:
@@ -393,7 +395,7 @@ JupyterViz = SolaraViz
 def ModelController(
     model: solara.Reactive[Model],
     *,
-    renderer: SpaceRenderer | None = None,
+    renderer: solara.Reactive[SpaceRenderer] | None = None,
     model_parameters: dict | solara.Reactive[dict] = None,
     play_interval: int | solara.Reactive[int] = 100,
     render_interval: int | solara.Reactive[int] = 1,
@@ -482,10 +484,9 @@ def ModelController(
             f"creating new {model.value.__class__} instance with {model_parameters.value}",
         )
         model.value = model.value = model.value.__class__(**model_parameters.value)
-        if renderer:
-            renderer.space = (
-                model.value.grid if hasattr(model.value, "grid") else model.value.space
-            )
+        if renderer.value:
+            renderer.value = copy_renderer(renderer.value, model.value)
+            force_update()
 
     @function_logger(__name__)
     def do_play_pause():
@@ -515,7 +516,7 @@ def ModelController(
 def SimulatorController(
     model: solara.Reactive[Model],
     simulator,
-    renderer: SpaceRenderer | None = None,
+    renderer: solara.Reactive[SpaceRenderer] | None = None,
     *,
     model_parameters: dict | solara.Reactive[dict] = None,
     play_interval: int | solara.Reactive[int] = 100,
@@ -610,10 +611,9 @@ def SimulatorController(
         model.value = model.value = model.value.__class__(
             simulator=simulator, **model_parameters.value
         )
-        if renderer:
-            renderer.space = (
-                model.value.grid if hasattr(model.value, "grid") else model.value.space
-            )
+        if renderer.value:
+            renderer.value = copy_renderer(renderer.value, model.value)
+            force_update()
 
     def do_play_pause():
         """Toggle play/pause."""
@@ -867,6 +867,29 @@ def make_initial_grid_layout(num_components):
         }
         for i in range(num_components)
     ]
+
+
+def copy_renderer(renderer: SpaceRenderer, model: Model):
+    """Create a new renderer instance with the same configuration as the original."""
+    new_renderer = renderer.__class__(model=model, backend=renderer.backend)
+
+    attributes_to_copy = [
+        "agent_portrayal",
+        "propertylayer_portrayal",
+        "space_kwargs",
+        "agent_kwargs",
+        "space_mesh",
+        "agent_mesh",
+        "propertylayer_mesh",
+        "post_process_func",
+    ]
+
+    for attr in attributes_to_copy:
+        if hasattr(renderer, attr):
+            value_to_copy = getattr(renderer, attr)
+            setattr(new_renderer, attr, value_to_copy)
+
+    return new_renderer
 
 
 @solara.component
