@@ -485,7 +485,7 @@ def ModelController(
             f"creating new {model.value.__class__} instance with {model_parameters.value}",
         )
         model.value = model.value = model.value.__class__(**model_parameters.value)
-        if renderer.value:
+        if renderer:
             renderer.value = copy_renderer(renderer.value, model.value)
             force_update()
 
@@ -612,7 +612,7 @@ def SimulatorController(
         model.value = model.value = model.value.__class__(
             simulator=simulator, **model_parameters.value
         )
-        if renderer.value:
+        if renderer:
             renderer.value = copy_renderer(renderer.value, model.value)
             force_update()
 
