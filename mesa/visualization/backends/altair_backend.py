@@ -305,7 +305,7 @@ class AltairBackend(AbstractRenderer):
                     title=ylabel,
                     scale=alt.Scale(type="linear", domain=[ymin, ymax]),
                 ),
-                size=alt.Size("size:Q", legend=None),
+                size=alt.Size("size:Q", legend=None, scale=alt.Scale(domain=[0, 50])),
                 shape=alt.Shape(
                     "shape:N",
                     scale=alt.Scale(
