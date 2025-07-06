@@ -59,10 +59,71 @@ For detailed tutorials, please refer to:
    :show-inheritance:
 ```
 
+
 ## Command Console
 
 ```{eval-rst}
 .. automodule:: mesa.visualization.command_console
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
+
+## Portrayal Components
+```{eval-rst}
+.. automodule:: mesa.visualization.components.portrayal_components
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
+
+## Backends
+
+```{eval-rst}
+.. automodule:: mesa.visualization.backends.__init__
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
+```{eval-rst}
+.. automodule:: mesa.visualization.backends.abstract_renderer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
+```{eval-rst}
+.. automodule:: mesa.visualization.backends.altair_backend
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
+```{eval-rst}
+.. automodule:: mesa.visualization.backends.matplotlib_backend
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
+
+## Space Renderer
+
+```{eval-rst}
+.. automodule:: mesa.visualization.space_renderer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+```
+
+
+## Space Drawers
+
+```{eval-rst}
+.. automodule:: mesa.visualization.space_drawers
    :members:
    :undoc-members:
    :show-inheritance:
