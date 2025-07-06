@@ -283,8 +283,9 @@ def SpaceRendererComponent(
         else:
             dependencies = [update_counter.value]
 
-        if renderer.post_process:
+        if renderer.post_process and not renderer._post_process_applied:
             renderer.post_process(renderer.canvas)
+            renderer._post_process_applied = True
 
         solara.FigureMatplotlib(
             renderer.canvas.get_figure(),

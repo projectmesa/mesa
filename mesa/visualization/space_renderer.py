@@ -67,6 +67,9 @@ class SpaceRenderer:
         self.propertylayer_mesh = None
 
         self.post_process_func = None
+        # Keep track of whether post-processing has been applied
+        # to avoid multiple applications on the same axis.
+        self._post_process_applied = False
 
         self.backend = backend
 

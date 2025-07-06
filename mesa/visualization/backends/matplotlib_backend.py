@@ -216,7 +216,7 @@ class MatplotlibBackend(AbstractRenderer):
         marker = arguments.pop("marker")
         zorder = arguments.pop("zorder")
         malpha = arguments.pop("alpha")
-        msize = arguments.pop("s")
+        msize = arguments["s"]
 
         # Validate edge arguments
         for entry in ["edgecolors", "linewidths"]:
