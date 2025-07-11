@@ -139,7 +139,7 @@ def SolaraViz(
     # Make a copy of the components to avoid modifying the original list
     display_components = list(components)
     # Create space component based on the renderer
-    if renderer:
+    if renderer is not None:
         if isinstance(renderer, SpaceRenderer):
             renderer = solara.use_reactive(renderer)  # noqa: RUF100  # noqa: SH102
         display_components.append(create_space_component(renderer.value))
@@ -485,7 +485,7 @@ def ModelController(
             f"creating new {model.value.__class__} instance with {model_parameters.value}",
         )
         model.value = model.value = model.value.__class__(**model_parameters.value)
-        if renderer:
+        if renderer is not None:
             renderer.value = copy_renderer(renderer.value, model.value)
             force_update()
 
@@ -612,7 +612,7 @@ def SimulatorController(
         model.value = model.value = model.value.__class__(
             simulator=simulator, **model_parameters.value
         )
-        if renderer:
+        if renderer is not None:
             renderer.value = copy_renderer(renderer.value, model.value)
             force_update()
 
