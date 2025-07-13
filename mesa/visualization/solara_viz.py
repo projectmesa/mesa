@@ -142,7 +142,7 @@ def SolaraViz(
     if renderer is not None:
         if isinstance(renderer, SpaceRenderer):
             renderer = solara.use_reactive(renderer)  # noqa: RUF100  # noqa: SH102
-        display_components.append(create_space_component(renderer.value))
+        display_components.insert(0, create_space_component(renderer.value))
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
