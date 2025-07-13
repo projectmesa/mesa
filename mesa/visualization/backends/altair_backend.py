@@ -432,9 +432,7 @@ class AltairBackend(AbstractRenderer):
                         y=alt.Y("y:O", axis=None),
                         fill=alt.Fill("color_str:N", scale=None),
                     )
-                    .properties(
-                        width=chart_width, height=chart_height, title=layer_name
-                    )
+                    .properties(width=chart_width, height=chart_height)
                 )
                 base = (
                     alt.layer(current_chart, base)
