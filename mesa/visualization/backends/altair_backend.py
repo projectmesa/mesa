@@ -299,11 +299,13 @@ class AltairBackend(AbstractRenderer):
                     "x:Q",
                     title=xlabel,
                     scale=alt.Scale(type="linear", domain=[xmin, xmax]),
+                    axis=None,
                 ),
                 y=alt.Y(
                     "y:Q",
                     title=ylabel,
                     scale=alt.Scale(type="linear", domain=[ymin, ymax]),
+                    axis=None,
                 ),
                 size=alt.Size("size:Q", legend=None, scale=alt.Scale(domain=[0, 50])),
                 shape=alt.Shape(
@@ -352,8 +354,7 @@ class AltairBackend(AbstractRenderer):
         Returns:
             alt.Chart: A tuple containing the base chart and the color bar chart.
         """
-        base = None
-        bar_chart_viz = None
+        main_charts = []
 
         for layer_name in property_layers:
             if layer_name == "empty":
@@ -384,7 +385,6 @@ class AltairBackend(AbstractRenderer):
             vmin = portrayal.vmin if portrayal.vmin is not None else np.min(data)
             vmax = portrayal.vmax if portrayal.vmax is not None else np.max(data)
 
-            # Prepare data for Altair
             df = pd.DataFrame(
                 {
                     "x": np.repeat(np.arange(data.shape[0]), data.shape[1]),
@@ -393,181 +393,48 @@ class AltairBackend(AbstractRenderer):
                 }
             )
 
-            current_chart = None
             if color:
-                # Create a function to map values to RGBA colors with proper opacity scaling
-                def apply_rgba(
-                    val, v_min=vmin, v_max=vmax, a=alpha, p_color=portrayal.color
-                ):
-                    # Normalize value to range [0,1] and clamp
-                    normalized = max(
-                        0,
-                        min(
-                            ((val - v_min) / (v_max - v_min))
-                            if (v_max - v_min) != 0
-                            else 0.5,
-                            1,
-                        ),
-                    )
+                # For a single color gradient, we define the range from transparent to solid.
+                rgb = to_rgb(color)
+                r, g, b = (int(c * 255) for c in rgb)
 
-                    # Scale opacity by alpha parameter
-                    opacity = normalized * a
-
-                    # Convert color to RGB components
-                    rgb_color_val = to_rgb(p_color)
-                    r = int(rgb_color_val[0] * 255)
-                    g = int(rgb_color_val[1] * 255)
-                    b = int(rgb_color_val[2] * 255)
-                    return f"rgba({r}, {g}, {b}, {opacity:.2f})"
-
-                # Apply color mapping to each value in the dataset
-                df["color_str"] = df["value"].apply(apply_rgba)
-
-                # Create chart for the property layer
-                current_chart = (
-                    alt.Chart(df)
-                    .mark_rect()
-                    .encode(
-                        x=alt.X("x:O", axis=None),
-                        y=alt.Y("y:O", axis=None),
-                        fill=alt.Fill("color_str:N", scale=None),
-                    )
-                    .properties(width=chart_width, height=chart_height)
+                min_color = f"rgba({r},{g},{b},0)"
+                max_color = f"rgba({r},{g},{b},{alpha})"
+                opacity = 1
+                color_scale = alt.Scale(
+                    range=[min_color, max_color], domain=[vmin, vmax]
                 )
-                base = (
-                    alt.layer(current_chart, base)
-                    if base is not None
-                    else current_chart
-                )
-
-                # Add colorbar if specified in portrayal
-                if portrayal.colorbar:
-                    # Extract RGB components from base color
-                    rgb_color_val = to_rgb(portrayal.color)
-                    r_int = int(rgb_color_val[0] * 255)
-                    g_int = int(rgb_color_val[1] * 255)
-                    b_int = int(rgb_color_val[2] * 255)
-
-                    # Define gradient endpoints
-                    min_color_str = f"rgba({r_int},{g_int},{b_int},0)"
-                    max_color_str = f"rgba({r_int},{g_int},{b_int},{alpha:.2f})"
-
-                    # Define colorbar dimensions
-                    colorbar_height = 20
-                    colorbar_width = chart_width
-
-                    # Create dataframe for gradient visualization
-                    df_gradient = pd.DataFrame({"x_grad": [0, 1], "y_grad": [0, 1]})
-
-                    # Create evenly distributed tick values
-                    axis_values = np.linspace(vmin, vmax, 11)
-                    tick_positions = np.linspace(10, colorbar_width - 10, 11)
-
-                    # Prepare data for axis and labels
-                    axis_data = pd.DataFrame(
-                        {"value_axis": axis_values, "x_axis": tick_positions}
-                    )
-
-                    # Create colorbar with linear gradient
-                    colorbar_chart_obj = (
-                        alt.Chart(df_gradient)
-                        .mark_rect(
-                            x=20,
-                            y=0,
-                            width=colorbar_width - 20,
-                            height=colorbar_height,
-                            color=alt.Gradient(
-                                gradient="linear",
-                                stops=[
-                                    alt.GradientStop(color=min_color_str, offset=0),
-                                    alt.GradientStop(color=max_color_str, offset=1),
-                                ],
-                                x1=0,
-                                x2=1,  # Horizontal gradient
-                                y1=0,
-                                y2=0,  # Keep y constant
-                            ),
-                        )
-                        .encode(
-                            x=alt.value(chart_width / 2), y=alt.value(8)
-                        )  # Center colorbar
-                        .properties(width=colorbar_width, height=colorbar_height)
-                    )
-                    # Add tick marks to colorbar
-                    axis_chart = (
-                        alt.Chart(axis_data)
-                        .mark_tick(thickness=2, size=10)
-                        .encode(
-                            x=alt.X("x_axis:Q", axis=None),
-                            y=alt.value(colorbar_height - 2),
-                        )
-                    )
-                    # Add value labels below tick marks
-                    text_labels = (
-                        alt.Chart(axis_data)
-                        .mark_text(baseline="top", fontSize=10, dy=0)
-                        .encode(
-                            x=alt.X("x_axis:Q"),
-                            text=alt.Text("value_axis:Q", format=".1f"),
-                            y=alt.value(colorbar_height + 10),
-                        )
-                    )
-                    # Add title to colorbar
-                    title_chart = (
-                        alt.Chart(pd.DataFrame([{"text_title": layer_name}]))
-                        .mark_text(
-                            fontSize=12,
-                            fontWeight="bold",
-                            baseline="bottom",
-                            align="center",
-                        )
-                        .encode(
-                            text="text_title:N",
-                            x=alt.value(colorbar_width / 2),
-                            y=alt.value(colorbar_height + 40),
-                        )
-                    )
-                    # Combine all colorbar components
-                    combined_colorbar = alt.layer(
-                        colorbar_chart_obj, axis_chart, text_labels, title_chart
-                    ).properties(width=colorbar_width, height=colorbar_height + 50)
-
-                    bar_chart_viz = (
-                        alt.vconcat(bar_chart_viz, combined_colorbar).resolve_scale(
-                            color="independent"
-                        )
-                        if bar_chart_viz is not None
-                        else combined_colorbar
-                    )
 
             elif colormap:
                 cmap = colormap
-                cmap_scale = alt.Scale(scheme=cmap, domain=[vmin, vmax])
+                color_scale = alt.Scale(scheme=cmap, domain=[vmin, vmax])
+                opacity = alpha
 
-                current_chart = (
-                    alt.Chart(df)
-                    .mark_rect(opacity=alpha)
-                    .encode(
-                        x=alt.X("x:O", axis=None),
-                        y=alt.Y("y:O", axis=None),
-                        color=alt.Color(
-                            "value:Q",
-                            scale=cmap_scale,
-                            title=layer_name,
-                            legend=alt.Legend(title=layer_name)
-                            if portrayal.colorbar
-                            else None,
-                        ),
-                    )
-                    .properties(width=chart_width, height=chart_height)
-                )
-                base = (
-                    alt.layer(current_chart, base)
-                    if base is not None
-                    else current_chart
-                )
             else:
                 raise ValueError(
                     f"PropertyLayer {layer_name} portrayal must include 'color' or 'colormap'."
                 )
-        return (base, bar_chart_viz)
+
+            current_chart = (
+                alt.Chart(df)
+                .mark_rect(opacity=opacity)
+                .encode(
+                    x=alt.X("x:O", axis=None),
+                    y=alt.Y("y:O", axis=None),
+                    color=alt.Color(
+                        "value:Q",
+                        scale=color_scale,
+                        title=layer_name,
+                        legend=alt.Legend(title=layer_name, orient="bottom")
+                        if portrayal.colorbar
+                        else None,
+                    ),
+                )
+                .properties(width=chart_width, height=chart_height)
+            )
+
+            if current_chart is not None:
+                main_charts.append(current_chart)
+
+        base = alt.layer(*main_charts).resolve_scale(color="independent")
+        return base
