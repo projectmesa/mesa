@@ -309,6 +309,7 @@ class SpaceRenderer:
             self.draw_propertylayer(propertylayer_portrayal)
 
         self.post_process_func = post_process
+        return self
 
     @property
     def canvas(self):

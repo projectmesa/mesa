@@ -142,7 +142,7 @@ def SolaraViz(
     if renderer is not None:
         if isinstance(renderer, SpaceRenderer):
             renderer = solara.use_reactive(renderer)  # noqa: RUF100  # noqa: SH102
-        display_components.append(create_space_component(renderer.value))
+        display_components.insert(0, create_space_component(renderer.value))
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
@@ -297,7 +297,7 @@ def SpaceRendererComponent(
     else:
         structure = renderer.space_mesh if renderer.space_mesh else None
         agents = renderer.agent_mesh if renderer.agent_mesh else None
-        prop_base, prop_cbar = renderer.propertylayer_mesh or (None, None)
+        propertylayer = renderer.propertylayer_mesh or None
 
         if renderer.space_mesh:
             structure = renderer.draw_structure(**renderer.space_kwargs)
@@ -306,33 +306,21 @@ def SpaceRendererComponent(
                 renderer.agent_portrayal, **renderer.agent_kwargs
             )
         if renderer.propertylayer_mesh:
-            prop_base, prop_cbar = renderer.draw_propertylayer(
+            propertylayer = renderer.draw_propertylayer(
                 renderer.propertylayer_portrayal
             )
 
         spatial_charts_list = [
-            chart for chart in [structure, prop_base, agents] if chart
+            chart for chart in [structure, propertylayer, agents] if chart
         ]
 
-        main_spatial = None
+        final_chart = None
         if spatial_charts_list:
-            main_spatial = (
+            final_chart = (
                 spatial_charts_list[0]
                 if len(spatial_charts_list) == 1
                 else alt.layer(*spatial_charts_list)
             )
-
-        # Determine final chart by combining with color bar if present
-        final_chart = None
-        if main_spatial and prop_cbar:
-            final_chart = alt.vconcat(main_spatial, prop_cbar).configure_view(
-                stroke=None
-            )
-        elif main_spatial:  # Only main_spatial, no prop_cbar
-            final_chart = main_spatial
-        elif prop_cbar:  # Only prop_cbar, no main_spatial
-            final_chart = prop_cbar
-            final_chart = final_chart.configure_view(grid=False)
 
         if final_chart is None:
             # If no charts are available, return an empty chart
