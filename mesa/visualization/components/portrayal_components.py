@@ -46,7 +46,7 @@ class AgentPortrayalStyle:
 
     x: float | None = None
     y: float | None = None
-    color: str | tuple | None = "tab:blue"
+    color: str | tuple | int | float | None = "tab:blue"
     marker: str | None = "o"
     size: int | float | None = 50
     zorder: int | None = 1
