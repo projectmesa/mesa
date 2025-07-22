@@ -10,18 +10,19 @@ from mesa.examples.basic.virus_on_network.model import (
 from mesa.visualization import (
     Slider,
     SolaraViz,
+    SpaceRenderer,
     make_plot_component,
-    make_space_component,
 )
+from mesa.visualization.components import AgentPortrayalStyle
 
 
 def agent_portrayal(agent):
     node_color_dict = {
-        State.INFECTED: "tab:red",
-        State.SUSCEPTIBLE: "tab:green",
-        State.RESISTANT: "tab:gray",
+        State.INFECTED: "red",
+        State.SUSCEPTIBLE: "green",
+        State.RESISTANT: "gray",
     }
-    return {"color": node_color_dict[agent.state], "size": 10}
+    return AgentPortrayalStyle(color=node_color_dict[agent.state], size=20)
 
 
 def get_resistant_susceptible_ratio(model):
@@ -92,24 +93,36 @@ model_params = {
 }
 
 
-def post_process_lineplot(ax):
-    ax.set_ylim(ymin=0)
-    ax.set_ylabel("# people")
-    ax.legend(bbox_to_anchor=(1.05, 1.0), loc="upper left")
+def post_process_lineplot(chart):
+    chart = chart.properties(
+        width=400,
+        height=400,
+    ).configure_legend(
+        strokeColor="black",
+        fillColor="#ECE9E9",
+        orient="right",
+        cornerRadius=5,
+        padding=10,
+        strokeWidth=1,
+    )
+    return chart
 
 
-SpacePlot = make_space_component(agent_portrayal)
+model1 = VirusOnNetwork()
+# Here we are showcasing the capabilities of the Altair backend in SpaceRenderer.
+renderer = SpaceRenderer(model1, backend="altair")
+renderer.render(agent_portrayal=agent_portrayal)
+
 StatePlot = make_plot_component(
-    {"Infected": "tab:red", "Susceptible": "tab:green", "Resistant": "tab:gray"},
+    {"Infected": "red", "Susceptible": "green", "Resistant": "gray"},
+    backend="altair",
     post_process=post_process_lineplot,
 )
 
-model1 = VirusOnNetwork()
-
 page = SolaraViz(
     model1,
+    renderer,
     components=[
-        SpacePlot,
         StatePlot,
         get_resistant_susceptible_ratio,
     ],
