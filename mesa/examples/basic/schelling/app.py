@@ -19,33 +19,24 @@ def agent_portrayal(agent):
     style = AgentPortrayalStyle(
         x=agent.cell.coordinate[0],
         y=agent.cell.coordinate[1],
-        marker="C:\\MASTER-FOLDER\\GitHub\\GSOC\\mesa\\mesa\\examples\\basic\\schelling\\resources\\orange_happy.png",
+        marker="./resources/orange_happy.png",
         size=75,
     )
     if agent.type == 0:
         if agent.happy:
             style.update(
-                (
-                    "marker",
-                    "C:\\MASTER-FOLDER\\GitHub\\GSOC\\mesa\\mesa\\examples\\basic\\schelling\\resources\\blue_happy.png",
-                ),
+                ("marker", "./resources/blue_happy.png"),
             )
         else:
             style.update(
-                (
-                    "marker",
-                    "C:\\MASTER-FOLDER\\GitHub\\GSOC\\mesa\\mesa\\examples\\basic\\schelling\\resources\\blue_unhappy.png",
-                ),
+                ("marker", "./resources/blue_unhappy.png"),
                 ("size", 50),
                 ("zorder", 2),
             )
     else:
         if not agent.happy:
             style.update(
-                (
-                    "marker",
-                    "C:\\MASTER-FOLDER\\GitHub\\GSOC\\mesa\\mesa\\examples\\basic\\schelling\\resources\\orange_unhappy.png",
-                ),
+                ("marker", "./resources/orange_unhappy.png"),
                 ("size", 50),
                 ("zorder", 2),
             )
