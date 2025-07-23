@@ -1,3 +1,5 @@
+import os
+
 import solara
 
 from mesa.examples.basic.schelling.model import Schelling
@@ -15,28 +17,40 @@ def get_happy_agents(model):
     return solara.Markdown(f"**Happy agents: {model.happy}**")
 
 
+path = os.path.dirname(os.path.abspath(__file__))
+
+
 def agent_portrayal(agent):
     style = AgentPortrayalStyle(
         x=agent.cell.coordinate[0],
         y=agent.cell.coordinate[1],
-        marker="./resources/orange_happy.png",
+        marker=os.path.join(path, "resources", "orange_happy.png"),
         size=75,
     )
     if agent.type == 0:
         if agent.happy:
             style.update(
-                ("marker", "./resources/blue_happy.png"),
+                (
+                    "marker",
+                    os.path.join(path, "resources", "blue_happy.png"),
+                ),
             )
         else:
             style.update(
-                ("marker", "./resources/blue_unhappy.png"),
+                (
+                    "marker",
+                    os.path.join(path, "resources", "blue_unhappy.png"),
+                ),
                 ("size", 50),
                 ("zorder", 2),
             )
     else:
         if not agent.happy:
             style.update(
-                ("marker", "./resources/orange_unhappy.png"),
+                (
+                    "marker",
+                    os.path.join(path, "resources", "orange_unhappy.png"),
+                ),
                 ("size", 50),
                 ("zorder", 2),
             )
