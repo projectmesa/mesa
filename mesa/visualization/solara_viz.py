@@ -319,7 +319,9 @@ def SpaceRendererComponent(
             final_chart = (
                 spatial_charts_list[0]
                 if len(spatial_charts_list) == 1
-                else alt.layer(*spatial_charts_list)
+                else alt.layer(*spatial_charts_list).resolve_axis(
+                    x="independent", y="independent"
+                )
             )
 
         if final_chart is None:
