@@ -271,8 +271,7 @@ def test_altair_backend_draw_propertylayer():
     result = ab.draw_propertylayer(
         space, space._mesa_property_layers, propertylayer_portrayal_color
     )
-    assert result[0] is not None
-    assert result[1] is None
+    assert result is not None
 
     # Test with colormap
     def propertylayer_portrayal_colormap(layer):
@@ -283,7 +282,7 @@ def test_altair_backend_draw_propertylayer():
     result = ab.draw_propertylayer(
         space, space._mesa_property_layers, propertylayer_portrayal_colormap
     )
-    assert result[0] is not None
+    assert result is not None
 
     # Test with no color or colormap
     def propertylayer_portrayal(layer):
