@@ -6,7 +6,8 @@ from matplotlib.markers import MarkerStyle
 sys.path.insert(0, os.path.abspath("../../../.."))
 
 from mesa.examples.basic.boid_flockers.model import BoidFlockers
-from mesa.visualization import Slider, SolaraViz, make_space_component
+from mesa.visualization import Slider, SolaraViz, SpaceRenderer
+from mesa.visualization.components import AgentPortrayalStyle
 
 # Pre-compute markers for different angles (e.g., every 10 degrees)
 MARKER_CACHE = {}
@@ -25,10 +26,12 @@ def boid_draw(agent):
     rounded_deg = round(deg / 10) * 10 % 360
 
     # using cached markers to speed things up
-    if neighbors <= 1:
-        return {"color": "red", "size": 20, "marker": MARKER_CACHE[rounded_deg]}
-    elif neighbors >= 2:
-        return {"color": "green", "size": 20, "marker": MARKER_CACHE[rounded_deg]}
+    boid_style = AgentPortrayalStyle(
+        color="red", size=20, marker=MARKER_CACHE[rounded_deg]
+    )
+    if neighbors >= 2:
+        boid_style.update(("color", "green"), ("marker", MARKER_CACHE[rounded_deg]))
+    return boid_style
 
 
 model_params = {
@@ -70,10 +73,11 @@ model_params = {
 }
 
 model = BoidFlockers()
+renderer = SpaceRenderer(model, backend="matplotlib").render(agent_portrayal=boid_draw)
 
 page = SolaraViz(
     model,
-    components=[make_space_component(agent_portrayal=boid_draw, backend="matplotlib")],
+    renderer,
     model_params=model_params,
     name="Boid Flocking Model",
 )
