@@ -13,6 +13,8 @@ These components are designed to be passed into Mesa visualizations to customize
 from dataclasses import dataclass
 from typing import Any
 
+ColorLike = str | tuple | int | float
+
 
 @dataclass
 class AgentPortrayalStyle:
@@ -46,7 +48,7 @@ class AgentPortrayalStyle:
 
     x: float | None = None
     y: float | None = None
-    color: str | tuple | int | float | None = "tab:blue"
+    color: ColorLike | None = "tab:blue"
     marker: str | None = "o"
     size: int | float | None = 50
     zorder: int | None = 1
@@ -71,6 +73,13 @@ class AgentPortrayalStyle:
                 raise AttributeError(
                     f"'{type(self).__name__}' object has no attribute '{field_to_change}'"
                 )
+
+    def __post_init__(self):
+        """Validate that color and size are non-negative."""
+        if isinstance(self.color, int | float) and self.color < 0:
+            raise ValueError("Scalar color values must be non-negative")
+        if isinstance(self.size, int | float) and self.size < 0:
+            raise ValueError("Size must be a non-negative number")
 
 
 @dataclass
