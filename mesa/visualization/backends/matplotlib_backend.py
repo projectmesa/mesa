@@ -142,8 +142,6 @@ class MatplotlibBackend(AbstractRenderer):
             else:
                 aps = portray_input
                 # Set defaults if not provided
-                if aps.edgecolors is None:
-                    aps.edgecolors = aps.color
                 if aps.x is None and aps.y is None:
                     aps.x, aps.y = self._get_agent_pos(agent, space)
 
