@@ -73,7 +73,12 @@ model_params = {
 }
 
 model = BoidFlockers()
-renderer = SpaceRenderer(model, backend="matplotlib").render(agent_portrayal=boid_draw)
+
+# Quickest way to visualize grid along with agents or property layers.
+renderer = SpaceRenderer(
+    model,
+    backend="matplotlib",
+).render(agent_portrayal=boid_draw)
 
 page = SolaraViz(
     model,
