@@ -55,13 +55,9 @@ model_params = {
 # Create initial model instance
 model1 = ConwaysGameOfLife()
 
-# Create a renderer. The renderer is responsible for rendering the spaces that is
-# drawing the grid, agents and property layers, separately or together. It can
-# use different backends, such as matplotlib or altair. It is passed into the
-# SolaraViz page, which will display it in a web browser.
+renderer = SpaceRenderer(model1, backend="matplotlib")
 # In this case the renderer only draws the agents because we only want to observe
 # the state of the agents, not the structure of the grid.
-renderer = SpaceRenderer(model1, backend="matplotlib")
 renderer.draw_agents(agent_portrayal=agent_portrayal)
 renderer.post_process = post_process
 
