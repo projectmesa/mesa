@@ -56,7 +56,7 @@ model_params = {
 model1 = ConwaysGameOfLife()
 
 renderer = SpaceRenderer(model1, backend="matplotlib")
-# In this case the renderer only draws the agents because we only want to observe
+# In this case the renderer only draws the agents because we just want to observe
 # the state of the agents, not the structure of the grid.
 renderer.draw_agents(agent_portrayal=agent_portrayal)
 renderer.post_process = post_process
