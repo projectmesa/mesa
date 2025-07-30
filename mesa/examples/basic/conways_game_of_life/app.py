@@ -1,3 +1,8 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath("../../../.."))
+
 from mesa.examples.basic.conways_game_of_life.model import ConwaysGameOfLife
 from mesa.visualization import (
     SolaraViz,
