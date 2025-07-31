@@ -256,6 +256,9 @@ class AltairBackend(AbstractRenderer):
         df["viz_fill_color"] = fill_colors
         df["viz_stroke_color"] = stroke_colors
 
+        # To apply order to agents
+        df = df.sort_values(by="order", ascending=True)
+
         # Extract additional parameters from kwargs
         # FIXME: Add more parameters to kwargs
         title = kwargs.pop("title", "")
