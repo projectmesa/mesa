@@ -7,9 +7,10 @@ from mesa.examples.advanced.epstein_civil_violence.model import EpsteinCivilViol
 from mesa.visualization import (
     Slider,
     SolaraViz,
+    SpaceRenderer,
     make_plot_component,
-    make_space_component,
 )
+from mesa.visualization.components import AgentPortrayalStyle
 
 COP_COLOR = "#000000"
 
@@ -24,14 +25,12 @@ def citizen_cop_portrayal(agent):
     if agent is None:
         return
 
-    portrayal = {
-        "size": 50,
-    }
+    portrayal = AgentPortrayalStyle(size=200)
 
     if isinstance(agent, Citizen):
-        portrayal["color"] = agent_colors[agent.state]
+        portrayal.update(("color", agent_colors[agent.state]))
     elif isinstance(agent, Cop):
-        portrayal["color"] = COP_COLOR
+        portrayal.update(("color", COP_COLOR))
 
     return portrayal
 
@@ -59,19 +58,20 @@ model_params = {
     "max_jail_term": Slider("Max Jail Term", 30, 0, 50, 1),
 }
 
-space_component = make_space_component(
-    citizen_cop_portrayal, post_process=post_process, draw_grid=False
-)
 
 chart_component = make_plot_component(
     {state.name.lower(): agent_colors[state] for state in CitizenState}
 )
 
 epstein_model = EpsteinCivilViolence()
+renderer = SpaceRenderer(epstein_model, backend="matplotlib")
+renderer.draw_agents(citizen_cop_portrayal)
+renderer.post_process = post_process
 
 page = SolaraViz(
     epstein_model,
-    components=[space_component, chart_component],
+    renderer,
+    components=[chart_component],
     model_params=model_params,
     name="Epstein Civil Violence",
 )

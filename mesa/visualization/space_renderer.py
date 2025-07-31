@@ -4,6 +4,7 @@ This module provides functionality to render Mesa model spaces with different
 backends, supporting various space types and visualization components.
 """
 
+import contextlib
 import warnings
 from collections.abc import Callable
 from typing import Literal
@@ -152,7 +153,11 @@ class SpaceRenderer:
             # Ensure x is an integer index for the position mapping
             x = x.astype(int)
 
-            mapped_arguments["loc"] = pos[x - 1]  # Adjust for 1-based indexing
+            # FIXME: Find better way to handle this case
+            # x updates before pos can, therefore gives us index error that
+            # needs to be ignored.
+            with contextlib.suppress(IndexError):
+                mapped_arguments["loc"] = pos[x]
 
         return mapped_arguments
 
