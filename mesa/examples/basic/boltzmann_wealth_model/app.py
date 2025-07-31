@@ -13,8 +13,9 @@ log_to_stderr(INFO)
 
 
 def agent_portrayal(agent):
-    """Defines how to draw each agent based on its properties."""
-    return AgentPortrayalStyle(color=agent.wealth)
+    return AgentPortrayalStyle(
+        color=agent.wealth
+    )  # we are using a colormap to translate wealth to color
 
 
 model_params = {
