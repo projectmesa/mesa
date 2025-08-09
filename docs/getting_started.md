@@ -62,9 +62,11 @@ Collecting Data <tutorials/2_collecting_data>
 AgentSet <tutorials/3_agentset>
 Basic Visualization <tutorials/4_visualization_basic>
 Dynamic Agent Visualization <tutorials/5_visualization_dynamic_agents>
-Custom Visualization Components <tutorials/6_visualization_custom>
-Parameter Sweeps <tutorials/7_batch_run>
-Comparing Scenarios <tutorials/8_comparing_scenarios>
+Visualisation using SpaceRenderer <tutorials/6_visualization_rendering_with_space_renderer>
+Property Layer Visualization <tutorials/7_visualization_propertylayer_visualization>
+Custom Visualization Components <tutorials/8_visualization_custom>
+Parameter Sweeps <tutorials/9_batch_run>
+Comparing Scenarios <tutorials/10_comparing_scenarios>
 Best Practices <best-practices>
 
 
