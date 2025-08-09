@@ -1,17 +1,21 @@
+import altair as alt
+
 from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealth
 from mesa.mesa_logging import INFO, log_to_stderr
 from mesa.visualization import (
     SolaraViz,
+    SpaceRenderer,
     make_plot_component,
-    make_space_component,
 )
+from mesa.visualization.components import AgentPortrayalStyle
 
 log_to_stderr(INFO)
 
 
 def agent_portrayal(agent):
-    color = agent.wealth  # we are using a colormap to translate wealth to color
-    return {"color": color}
+    return AgentPortrayalStyle(
+        color=agent.wealth
+    )  # we are using a colormap to translate wealth to color
 
 
 model_params = {
@@ -33,45 +37,48 @@ model_params = {
 }
 
 
-def post_process(ax):
-    ax.get_figure().colorbar(ax.collections[0], label="wealth", ax=ax)
+def post_process(chart):
+    """Post-process the Altair chart to add a colorbar legend."""
+    chart = chart.encode(
+        color=alt.Color(
+            "color:N",
+            scale=alt.Scale(scheme="viridis", domain=[0, 10]),
+            legend=alt.Legend(
+                title="Wealth",
+                orient="right",
+                type="gradient",
+                gradientLength=200,
+            ),
+        ),
+    )
+    return chart
 
 
-# Create initial model instance
 model = BoltzmannWealth(50, 10, 10)
 
-# Create visualization elements. The visualization elements are solara components
-# that receive the model instance as a "prop" and display it in a certain way.
-# Under the hood these are just classes that receive the model instance.
-# You can also author your own visualization elements, which can also be functions
-# that receive the model instance and return a valid solara component.
+# The SpaceRenderer is responsible for drawing the model's space and agents.
+# It builds the visualization in layers, first drawing the grid structure,
+# and then drawing the agents on top. It uses a specified backend
+# (like "altair" or "matplotlib") for creating the plots.
+renderer = SpaceRenderer(model, backend="altair")
+# Can customize the grid appearance.
+renderer.draw_structure(grid_color="black", grid_dash=[6, 2], grid_opacity=0.3)
+renderer.draw_agents(agent_portrayal=agent_portrayal, cmap="viridis", vmin=0, vmax=10)
 
-SpaceGraph = make_space_component(
-    agent_portrayal, cmap="viridis", vmin=0, vmax=10, post_process=post_process
-)
+# The post_process function is used to modify the Altair chart after it has been created.
+# It can be used to add legends, colorbars, or other visual elements.
+renderer.post_process = post_process
+
+# Creates a line plot component from the model's "Gini" datacollector.
 GiniPlot = make_plot_component("Gini")
 
-# Create the SolaraViz page. This will automatically create a server and display the
-# visualization elements in a web browser.
-# Display it using the following command in the example directory:
-# solara run app.py
-# It will automatically update and display any changes made to this file
+# The SolaraViz page combines the model, renderer, and components into a web interface.
+# To run the visualization, save this code as app.py and run `solara run app.py`
 page = SolaraViz(
     model,
-    components=[SpaceGraph, GiniPlot],
+    renderer,
+    components=[GiniPlot],
     model_params=model_params,
     name="Boltzmann Wealth Model",
 )
 page  # noqa
-
-
-# In a notebook environment, we can also display the visualization elements directly
-# SpaceGraph(model1)
-# GiniPlot(model1)
-
-# The plots will be static. If you want to pick up model steps,
-# you have to make the model reactive first
-# reactive_model = solara.reactive(model1)
-# SpaceGraph(reactive_model)
-# In a different notebook block:
-# reactive_model.value.step()
