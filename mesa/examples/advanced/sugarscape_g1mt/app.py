@@ -54,6 +54,9 @@ model_params = {
 
 model = SugarscapeG1mt()
 
+# Here, the renderer uses the Altair backend, while the plot components
+# use the Matplotlib backend.
+# Both can be mixed and matched to enhance the visuals of your model.
 renderer = SpaceRenderer(model, backend="altair").render(
     agent_portrayal=agent_portrayal,
     propertylayer_portrayal=propertylayer_portrayal,
