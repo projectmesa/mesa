@@ -159,7 +159,8 @@ def test_post_process():
     assert processed == ax
 
     def post_process_chart(chart):
-        return chart.properties(width=400, height=400)
+        chart = chart.properties(width=400, height=400)
+        return chart
 
     # Simulate a chart object
     chart = MagicMock()
