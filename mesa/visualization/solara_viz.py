@@ -363,7 +363,7 @@ def _wrap_component(
 @solara.component
 def ComponentsView(
     components: list[tuple[reacton.core.Component], int]
-    | list[tuple[Callable[[Model], reacton.core.Component], 0]],
+    | list[tuple[Callable[[Model], reacton.core.Component], int]],
     model: Model,
 ):
     """Display a list of components.
