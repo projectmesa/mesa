@@ -454,6 +454,7 @@ def chart_property_layers(space, propertylayer_portrayal, chart_width, chart_hei
 def make_altair_plot_component(
     measure: str | dict[str, str] | list[str] | tuple[str],
     post_process: Callable | None = None,
+    page: int = 0,
     grid=False,
 ):
     """Create a plotting function for a specified measure.
@@ -461,6 +462,7 @@ def make_altair_plot_component(
     Args:
         measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
         post_process: a user-specified callable to do post-processing called with the Axes instance.
+        page: Page number where the plot should be displayed.
         grid: Bool to draw grid or not.
 
     Returns:
@@ -470,7 +472,7 @@ def make_altair_plot_component(
     def MakePlotAltair(model):
         return PlotAltair(model, measure, post_process=post_process, grid=grid)
 
-    return MakePlotAltair
+    return (MakePlotAltair, page)
 
 
 @solara.component
