@@ -119,7 +119,7 @@ def make_mpl_plot_component(
         save_format: save format of figure in solara backend
 
     Returns:
-        function: A function that creates a PlotMatplotlib component.
+        (function, page): A tuple of a function that creates a PlotMatplotlib component and a page number.
     """
 
     def MakePlotMatplotlib(model):

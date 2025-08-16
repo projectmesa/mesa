@@ -466,7 +466,7 @@ def make_altair_plot_component(
         grid: Bool to draw grid or not.
 
     Returns:
-        function: A function that creates a PlotAltair component.
+        (function, page): A tuple of a function that creates a PlotAltair component and a page number.
     """
 
     def MakePlotAltair(model):

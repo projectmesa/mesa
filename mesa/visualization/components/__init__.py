@@ -87,7 +87,7 @@ def make_plot_component(
         plot_drawing_kwargs: additional keyword arguments to pass onto the backend specific function for making a plotting component
 
     Returns:
-        function: A function that creates a plot component
+        (function, page): A tuple of a function and page number that creates a plot component on that specific page.
     """
     if backend == "matplotlib":
         return make_mpl_plot_component(
