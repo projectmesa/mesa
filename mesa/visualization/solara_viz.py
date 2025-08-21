@@ -426,21 +426,24 @@ def ComponentsView(
     with solara.v.TabsItems(v_model=current_tab_index):
         for _, page_id in enumerate(sorted_page_indices):
             with solara.v.TabItem():
-                page_components = pages[page_id]
-                page_layout = layouts.get(page_id)
+                if page_id == current_tab_index:
+                    page_components = pages[page_id]
+                    page_layout = layouts.get(page_id)
 
-                if page_layout:
+                    if page_layout:
 
-                    def on_layout_change(new_layout, current_page_id=page_id):
-                        set_layouts(lambda old: {**old, current_page_id: new_layout})
+                        def on_layout_change(new_layout, current_page_id=page_id):
+                            set_layouts(
+                                lambda old: {**old, current_page_id: new_layout}
+                            )
 
-                    solara.GridDraggable(
-                        items=[c(model) for c in page_components],
-                        grid_layout=page_layout,
-                        resizable=True,
-                        draggable=True,
-                        on_grid_layout=on_layout_change,
-                    )
+                        solara.GridDraggable(
+                            items=[c(model) for c in page_components],
+                            grid_layout=page_layout,
+                            resizable=True,
+                            draggable=True,
+                            on_grid_layout=on_layout_change,
+                        )
 
 
 JupyterViz = SolaraViz
