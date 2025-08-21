@@ -107,6 +107,7 @@ def make_plot_measure(*args, **kwargs):  # noqa: D103
 def make_mpl_plot_component(
     measure: str | dict[str, str] | list[str] | tuple[str],
     post_process: Callable | None = None,
+    page: int = 0,
     save_format="png",
 ):
     """Create a plotting function for a specified measure.
@@ -114,10 +115,11 @@ def make_mpl_plot_component(
     Args:
         measure (str | dict[str, str] | list[str] | tuple[str]): Measure(s) to plot.
         post_process: a user-specified callable to do post-processing called with the Axes instance.
+        page: Page number where the plot should be displayed.
         save_format: save format of figure in solara backend
 
     Returns:
-        function: A function that creates a PlotMatplotlib component.
+        (function, page): A tuple of a function that creates a PlotMatplotlib component and a page number.
     """
 
     def MakePlotMatplotlib(model):
@@ -125,7 +127,7 @@ def make_mpl_plot_component(
             model, measure, post_process=post_process, save_format=save_format
         )
 
-    return MakePlotMatplotlib
+    return (MakePlotMatplotlib, page)
 
 
 @solara.component
