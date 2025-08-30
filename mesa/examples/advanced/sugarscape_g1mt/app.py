@@ -63,12 +63,14 @@ renderer = SpaceRenderer(model, backend="altair").render(
     post_process=post_process,
 )
 
+# Note: It is advised to switch the pages after pausing the model
+# on the Solara dashboard.
 page = SolaraViz(
     model,
     renderer,
     components=[
-        make_plot_component("#Traders"),
-        make_plot_component("Price"),
+        make_plot_component("#Traders", page=1),
+        make_plot_component("Price", page=1),
     ],
     model_params=model_params,
     name="Sugarscape {G1, M, T}",
