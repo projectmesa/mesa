@@ -24,6 +24,7 @@ See the Visualization Tutorial and example models for more details.
 from __future__ import annotations
 
 import asyncio
+import collections
 import inspect
 import itertools
 import threading
@@ -57,8 +58,8 @@ _mesa_logger = create_module_logger()
 def SolaraViz(
     model: Model | solara.Reactive[Model],
     renderer: SpaceRenderer | None = None,
-    components: list[reacton.core.Component]
-    | list[Callable[[Model], reacton.core.Component]]
+    components: list[tuple[reacton.core.Component], int]
+    | list[tuple[Callable[[Model], reacton.core.Component], 0]]
     | Literal["default"] = [],  # noqa: B006
     *,
     play_interval: int = 100,
@@ -80,10 +81,10 @@ def SolaraViz(
             This is the main model to be visualized. If a non-reactive model is provided,
             it will be converted to a reactive model.
         renderer (SpaceRenderer): A SpaceRenderer instance to render the model's space.
-        components (list[solara.component] | Literal["default"], optional): List of solara
-            components or functions that return a solara component.
+        components (list[tuple[solara.component], int] | Literal["default"], optional): List of solara
+            (components, page) or functions that return a solara (component, page).
             These components are used to render different parts of the model visualization.
-            Defaults to "default", which uses the default Altair space visualization.
+            Defaults to "default", which uses the default Altair space visualization on page 0.
         play_interval (int, optional): Interval for playing the model steps in milliseconds.
             This controls the speed of the model's automatic stepping. Defaults to 100 ms.
         render_interval (int, optional): Controls how often plots are updated during a simulation,
@@ -119,8 +120,13 @@ def SolaraViz(
     """
     if components == "default":
         components = [
-            components_altair.make_altair_space(
-                agent_portrayal=None, propertylayer_portrayal=None, post_process=None
+            (
+                components_altair.make_altair_space(
+                    agent_portrayal=None,
+                    propertylayer_portrayal=None,
+                    post_process=None,
+                ),
+                0,
             )
         ]
     if model_params is None:
@@ -142,7 +148,7 @@ def SolaraViz(
     if renderer is not None:
         if isinstance(renderer, SpaceRenderer):
             renderer = solara.use_reactive(renderer)  # noqa: RUF100  # noqa: SH102
-        display_components.insert(0, create_space_component(renderer.value))
+        display_components.insert(0, (create_space_component(renderer.value), 0))
 
     with solara.AppBar():
         solara.AppBarTitle(name if name else model.value.__class__.__name__)
@@ -356,27 +362,88 @@ def _wrap_component(
 
 @solara.component
 def ComponentsView(
-    components: list[reacton.core.Component]
-    | list[Callable[[Model], reacton.core.Component]],
+    components: list[tuple[reacton.core.Component], int]
+    | list[tuple[Callable[[Model], reacton.core.Component], int]],
     model: Model,
 ):
     """Display a list of components.
 
     Args:
-        components: List of components to display
+        components: List of (components, page) to display
         model: Model instance to pass to each component
     """
-    wrapped_components = [_wrap_component(component) for component in components]
-    items = [component(model) for component in wrapped_components]
-    grid_layout_initial = make_initial_grid_layout(num_components=len(items))
-    grid_layout, set_grid_layout = solara.use_state(grid_layout_initial)
-    solara.GridDraggable(
-        items=items,
-        grid_layout=grid_layout,
-        resizable=True,
-        draggable=True,
-        on_grid_layout=set_grid_layout,
-    )
+    if not components:
+        return
+
+    # Backward's compatibility, page = 0 if not passed.
+    for i, comp in enumerate(components):
+        if not isinstance(comp, tuple):
+            components[i] = (comp, 0)
+
+    # Build pages mapping
+    pages = collections.defaultdict(list)
+    for component, page_index in components:
+        pages[page_index].append(_wrap_component(component))
+
+    # Fill in missing page indices for sequential tab order
+    all_indices = sorted(pages.keys())
+    if len(all_indices) > 1:
+        min_page, max_page = all_indices[0], all_indices[-1]
+        all_indices = list(range(min_page, max_page + 1))
+        for idx in all_indices:
+            pages.setdefault(idx, [])
+
+    sorted_page_indices = all_indices
+
+    # State for current tab and layouts
+    current_tab_index, set_current_tab_index = solara.use_state(0)
+    layouts, set_layouts = solara.use_state({})
+
+    # Keep layouts in sync with pages
+    def sync_layouts():
+        current_keys = set(pages.keys())
+        layout_keys = set(layouts.keys())
+
+        # Add layouts for new pages
+        new_layouts = {
+            index: make_initial_grid_layout(len(pages[index]))
+            for index in current_keys - layout_keys
+        }
+
+        # Remove layouts for deleted pages
+        cleaned_layouts = {k: v for k, v in layouts.items() if k in current_keys}
+
+        if new_layouts or len(cleaned_layouts) != len(layouts):
+            set_layouts({**cleaned_layouts, **new_layouts})
+
+    solara.use_effect(sync_layouts, list(pages.keys()))
+
+    # Tab Navigation
+    with solara.v.Tabs(v_model=current_tab_index, on_v_model=set_current_tab_index):
+        for index in sorted_page_indices:
+            solara.v.Tab(children=[f"Page {index}"])
+
+    with solara.v.TabsItems(v_model=current_tab_index):
+        for _, page_id in enumerate(sorted_page_indices):
+            with solara.v.TabItem():
+                if page_id == current_tab_index:
+                    page_components = pages[page_id]
+                    page_layout = layouts.get(page_id)
+
+                    if page_layout:
+
+                        def on_layout_change(new_layout, current_page_id=page_id):
+                            set_layouts(
+                                lambda old: {**old, current_page_id: new_layout}
+                            )
+
+                        solara.GridDraggable(
+                            items=[c(model) for c in page_components],
+                            grid_layout=page_layout,
+                            resizable=True,
+                            draggable=True,
+                            on_grid_layout=on_layout_change,
+                        )
 
 
 JupyterViz = SolaraViz

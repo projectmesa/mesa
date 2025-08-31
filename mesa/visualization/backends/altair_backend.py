@@ -279,7 +279,6 @@ class AltairBackend(AbstractRenderer):
             fill_encoding = alt.Fill(
                 "original_color:Q",
                 scale=alt.Scale(scheme=cmap, domain=[color_min, color_max]),
-                title="Colormap",
             )
         else:
             fill_encoding = alt.Fill(

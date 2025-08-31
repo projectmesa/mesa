@@ -1,7 +1,6 @@
 from mesa.examples.advanced.sugarscape_g1mt.model import SugarscapeG1mt
-from mesa.visualization import Slider, SolaraViz, make_plot_component
+from mesa.visualization import Slider, SolaraViz, SpaceRenderer, make_plot_component
 from mesa.visualization.components import AgentPortrayalStyle, PropertyLayerStyle
-from mesa.visualization.components.matplotlib_components import make_mpl_space_component
 
 
 def agent_portrayal(agent):
@@ -23,12 +22,10 @@ def propertylayer_portrayal(layer):
     return PropertyLayerStyle(color="red", alpha=0.8, colorbar=True, vmin=0, vmax=10)
 
 
-sugarscape_space = make_mpl_space_component(
-    agent_portrayal=agent_portrayal,
-    propertylayer_portrayal=propertylayer_portrayal,
-    post_process=None,
-    draw_grid=False,
-)
+def post_process(chart):
+    chart = chart.properties(width=400, height=400)
+    return chart
+
 
 model_params = {
     "seed": {
@@ -57,12 +54,23 @@ model_params = {
 
 model = SugarscapeG1mt()
 
+# Here, the renderer uses the Altair backend, while the plot components
+# use the Matplotlib backend.
+# Both can be mixed and matched to enhance the visuals of your model.
+renderer = SpaceRenderer(model, backend="altair").render(
+    agent_portrayal=agent_portrayal,
+    propertylayer_portrayal=propertylayer_portrayal,
+    post_process=post_process,
+)
+
+# Note: It is advised to switch the pages after pausing the model
+# on the Solara dashboard.
 page = SolaraViz(
     model,
+    renderer,
     components=[
-        sugarscape_space,
-        make_plot_component("#Traders"),
-        make_plot_component("Price"),
+        make_plot_component("#Traders", page=1),
+        make_plot_component("Price", page=1),
     ],
     model_params=model_params,
     name="Sugarscape {G1, M, T}",
