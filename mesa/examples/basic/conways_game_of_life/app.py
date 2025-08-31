@@ -1,16 +1,17 @@
 from mesa.examples.basic.conways_game_of_life.model import ConwaysGameOfLife
 from mesa.visualization import (
     SolaraViz,
-    make_space_component,
+    SpaceRenderer,
 )
+from mesa.visualization.components import AgentPortrayalStyle
 
 
 def agent_portrayal(agent):
-    return {
-        "color": "white" if agent.state == 0 else "black",
-        "marker": "s",
-        "size": 25,
-    }
+    return AgentPortrayalStyle(
+        color="white" if agent.state == 0 else "black",
+        marker="s",
+        size=30,
+    )
 
 
 def post_process(ax):
@@ -54,15 +55,11 @@ model_params = {
 # Create initial model instance
 model1 = ConwaysGameOfLife()
 
-# Create visualization elements. The visualization elements are solara components
-# that receive the model instance as a "prop" and display it in a certain way.
-# Under the hood these are just classes that receive the model instance.
-# You can also author your own visualization elements, which can also be functions
-# that receive the model instance and return a valid solara component.
-SpaceGraph = make_space_component(
-    agent_portrayal, post_process=post_process, draw_grid=False
-)
-
+renderer = SpaceRenderer(model1, backend="matplotlib")
+# In this case the renderer only draws the agents because we just want to observe
+# the state of the agents, not the structure of the grid.
+renderer.draw_agents(agent_portrayal=agent_portrayal)
+renderer.post_process = post_process
 
 # Create the SolaraViz page. This will automatically create a server and display the
 # visualization elements in a web browser.
@@ -71,7 +68,7 @@ SpaceGraph = make_space_component(
 # It will automatically update and display any changes made to this file
 page = SolaraViz(
     model1,
-    components=[SpaceGraph],
+    renderer,
     model_params=model_params,
     name="Game of Life",
 )

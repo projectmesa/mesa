@@ -213,7 +213,7 @@ class MatplotlibBackend(AbstractRenderer):
         loc_x, loc_y = loc[:, 0], loc[:, 1]
         marker = arguments.pop("marker")
         zorder = arguments.pop("zorder")
-        malpha = arguments.pop("alpha")
+        malpha = arguments["alpha"]
         msize = arguments["s"]
 
         # Validate edge arguments
