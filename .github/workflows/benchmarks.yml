@@ -34,7 +34,7 @@ jobs:
         run: uv pip install --system numpy pandas tqdm tabulate matplotlib solara networkx scipy
       # Benchmarks on the projectmesa main branch
       - name: Checkout main branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: main
           repository: projectmesa/mesa
@@ -50,7 +50,7 @@ jobs:
           name: timings-main
           path: benchmarks/timings_1.pickle
       - name: Checkout PR branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: github.event_name == 'pull_request_target'
         with:
           ref: ${{ github.event.pull_request.head.ref }}
@@ -61,7 +61,7 @@ jobs:
       - name: Install Mesa of the PR branch
         run: pip install --no-deps .
       - name: Download benchmark results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: timings-main
           path: benchmarks
