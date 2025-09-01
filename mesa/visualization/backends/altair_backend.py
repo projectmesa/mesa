@@ -77,7 +77,8 @@ class AltairBackend(AbstractRenderer):
             "filled": [],
         }
 
-        from mesa.visualization.components import AgentPortrayalStyle
+        # Import here to avoid circular import issues
+        from mesa.visualization.components import AgentPortrayalStyle  # noqa: PLC0415
 
         style_fields = {f.name: f.default for f in fields(AgentPortrayalStyle)}
         class_default_size = style_fields.get("size")
