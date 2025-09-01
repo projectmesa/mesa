@@ -217,7 +217,7 @@ class SpaceRenderer:
             Exception: If no property layers are found on the space.
         """
         # Import here to avoid circular imports
-        from mesa.visualization.components import PropertyLayerStyle
+        from mesa.visualization.components import PropertyLayerStyle  # noqa: PLC0415
 
         def _dict_to_callable(portrayal_dict):
             """Convert legacy dict portrayal to callable.
