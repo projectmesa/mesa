@@ -92,7 +92,7 @@ def collect_agent_data(
     }
 
     # Importing AgentPortrayalStyle inside the function to prevent circular imports
-    from mesa.visualization.components import AgentPortrayalStyle
+    from mesa.visualization.components import AgentPortrayalStyle  # noqa: PLC0415
 
     # Get AgentPortrayalStyle defaults
     style_fields = {f.name: f.default for f in fields(AgentPortrayalStyle)}
@@ -285,7 +285,7 @@ def draw_property_layers(
 
     """
     # Importing here to avoid circular import issues
-    from mesa.visualization.components import PropertyLayerStyle
+    from mesa.visualization.components import PropertyLayerStyle  # noqa: PLC0415
 
     def _propertylayer_portryal_dict_to_callable(
         propertylayer_portrayal: dict[str, dict[str, Any]],
