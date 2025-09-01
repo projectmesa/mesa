@@ -96,7 +96,7 @@ class MatplotlibBackend(AbstractRenderer):
             "linewidths": [],
         }
         # Import here to prevent circular imports
-        from mesa.visualization.components import AgentPortrayalStyle
+        from mesa.visualization.components import AgentPortrayalStyle  # noqa: PLC0415
 
         # Get default values from AgentPortrayalStyle
         style_fields = {f.name: f.default for f in fields(AgentPortrayalStyle)}
