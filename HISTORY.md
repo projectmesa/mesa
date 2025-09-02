@@ -1,6 +1,70 @@
 ---
 title: Release History
 ---
+# 3.3.0 (2025-09-06)
+## Highlights
+
+The major highlight of release 3.3.0 is the introduction of a new and improved visualization module. This effort was @Sahil-Chhoker's Google Summer of Code project . The new module is backwards compatible and continues to use Solara. It has several new and improved features to include:
+- `AgentPortrayalStyle`: a more user-friendly way to specify agent portrayal
+- `PropertyLayerStyle`:  Makes propertlayer and agent portrayal consistent.
+- `SpaceRender`: a new component for drawing spaces, agents and property layers with extensive customization
+- Improved support for Altair and Maplotlib
+- Multipage support (e.g., users can display simulation  on one page and charts of the model on another)
+- Updated tutorials for visualization
+
+[You can read more about the update here](https://gist.github.com/Sahil-Chhoker/470d78683664dffc05725bd858beb494)
+
+
+In addition, there were many other improvements to mesa, from bug fixes to improved CI/CD pipelines. Thanks to the PyCON sprints and the developers who supported Mesa!
+
+## What's Changed
+### 🧪 Experimental features
+* Introduction of Space Renderer by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2803
+### 🎉 New features added
+* docs/nix flake by @hussainsultan in https://github.com/projectmesa/mesa/pull/2788
+### 🛠 Enhancements made
+* Added `AgentPortrayalStyle` and `PropertyLayerStyle` by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2786
+* Allow image markers to plot agents by @Holzhauer in https://github.com/projectmesa/mesa/pull/2799
+* Renderer null check fix in solaraviz by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2809
+* Add Altair plotting functionality by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2810
+* Fix: Grid not showing in altair if both draw_structure and draw_agnets are called. by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2817
+* Allowing color mapping to integers in AgentPortrayalStyle by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2818
+* Added multipage functionality by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2827
+### 🐛 Bugs fixed
+* Bugfix ModelCreator for required model parameters and user adjusted model parameters by @Holzhauer in https://github.com/projectmesa/mesa/pull/2780
+* Remove unneeded int cast by @derkweijers in https://github.com/projectmesa/mesa/pull/2791
+* Add quotes to readme to insure multi-terminal compliance. by @jackiekazil in https://github.com/projectmesa/mesa/pull/2787
+* Fix broken docs link - Fix issue 2792 by @catherinedevlin in https://github.com/projectmesa/mesa/pull/2793
+* Bug fixes for portrayal components by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2798
+* fix : prevent breakdown when citizen_density (Initial Agent Density s… by @colinfrisch in https://github.com/projectmesa/mesa/pull/2806
+* Fix issue #2812 by @Tosiekdev in https://github.com/projectmesa/mesa/pull/2821
+### 📜 Documentation improvements
+* Benchmarks documentation by @colinfrisch in https://github.com/projectmesa/mesa/pull/2764
+* minor corrections in tutorials by @Holzhauer in https://github.com/projectmesa/mesa/pull/2778
+* Correct example code in "Overview of the MESA library" by @Holzhauer in https://github.com/projectmesa/mesa/pull/2781
+* Updating Examples and Docs inline with the new API. by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2819
+### 🔧 Maintenance
+* Add `.coderabbit.yaml` file to allow reviewing and updating our CodeRabbit configuration by @EwoutH in https://github.com/projectmesa/mesa/pull/2761
+* add nix flake by @hussainsultan in https://github.com/projectmesa/mesa/pull/2785
+* Removing Deprecations Warnings from `agent_portrayal` and `propertylayer_portrayal` until next release. by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2797
+* Added Basic Visualization tests by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2767
+### Other changes
+* Update __init__.py by @tpike3 in https://github.com/projectmesa/mesa/pull/2770
+* [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/projectmesa/mesa/pull/2751
+* [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/projectmesa/mesa/pull/2802
+* [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/projectmesa/mesa/pull/2808
+* Bump actions/download-artifact from 4 to 5 by @dependabot[bot] in https://github.com/projectmesa/mesa/pull/2826
+* Bump actions/checkout from 4 to 5 by @dependabot[bot] in https://github.com/projectmesa/mesa/pull/2825
+* [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci[bot] in https://github.com/projectmesa/mesa/pull/2823
+
+## New Contributors
+* @derkweijers made their first contribution in https://github.com/projectmesa/mesa/pull/2791
+* @hussainsultan made their first contribution in https://github.com/projectmesa/mesa/pull/2785
+* @catherinedevlin made their first contribution in https://github.com/projectmesa/mesa/pull/2793
+* @Tosiekdev made their first contribution in https://github.com/projectmesa/mesa/pull/2821
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.2.0...v3.3.0
+
 # 3.2.0 (2025-05-04)
 ## Highlights
 Mesa 3.2.0 is a feature-packed release, which stabilizes our discrete space, improves many of our visualisation capabilities, improves our tutorial organization, adds the experimental meta-agents, and includes other quality of life enhancements.
