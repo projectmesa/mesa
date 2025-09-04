@@ -6,18 +6,18 @@ def test_import():
 
     See https://github.com/projectmesa/mesa/pull/1294.
     """
-    import mesa
-    from mesa.space import MultiGrid
+    import mesa  # noqa: PLC0415
+    from mesa.space import MultiGrid  # noqa: PLC0415
 
     _ = mesa.space.MultiGrid
     _ = MultiGrid
 
-    from mesa.datacollection import DataCollector
+    from mesa.datacollection import DataCollector  # noqa: PLC0415
 
     _ = DataCollector
     _ = mesa.DataCollector
 
-    from mesa.batchrunner import batch_run
+    from mesa.batchrunner import batch_run  # noqa: PLC0415
 
     _ = batch_run
     _ = mesa.batch_run

@@ -300,7 +300,7 @@ class DataCollector:
         if agent_type in agent_types:
             agents = model.agents_by_type[agent_type]
         else:
-            from mesa import Agent
+            from mesa import Agent  # noqa: PLC0415
 
             if issubclass(agent_type, Agent):
                 agents = [

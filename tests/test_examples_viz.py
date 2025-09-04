@@ -123,8 +123,12 @@ def test_schelling_model(solara_test, page_session: playwright.sync_api.Page):
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_wolf_sheep_model(solara_test, page_session: playwright.sync_api.Page):
     """Test wolf-sheep model behavior and visualization."""
-    from mesa.examples.advanced.wolf_sheep.agents import GrassPatch, Sheep, Wolf
-    from mesa.experimental.devs import ABMSimulator
+    from mesa.examples.advanced.wolf_sheep.agents import (  # noqa: PLC0415
+        GrassPatch,
+        Sheep,
+        Wolf,
+    )
+    from mesa.experimental.devs import ABMSimulator  # noqa: PLC0415
 
     model = WolfSheep(simulator=ABMSimulator(), seed=42)
 
@@ -205,7 +209,7 @@ def test_boltzmann_wealth_model(solara_test, page_session: playwright.sync_api.P
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_virus_on_network_model(solara_test, page_session: playwright.sync_api.Page):
     """Test virus on network model behavior and visualization."""
-    from mesa.examples.basic.virus_on_network.model import State
+    from mesa.examples.basic.virus_on_network.model import State  # noqa: PLC0415
 
     model = VirusOnNetwork(seed=42)
 
@@ -263,12 +267,12 @@ def test_epstein_civil_violence_model(
     solara_test, page_session: playwright.sync_api.Page
 ):
     """Test Epstein civil violence model behavior and visualization."""
-    from mesa.examples.advanced.epstein_civil_violence.agents import (
+    from mesa.examples.advanced.epstein_civil_violence.agents import (  # noqa: PLC0415
         Citizen,
         CitizenState,
         Cop,
     )
-    from mesa.examples.advanced.epstein_civil_violence.app import (
+    from mesa.examples.advanced.epstein_civil_violence.app import (  # noqa: PLC0415
         COP_COLOR,
         agent_colors,
     )

@@ -1,6 +1,7 @@
 """tests for matplotlib components."""
 
 import matplotlib.pyplot as plt
+import networkx as nx
 
 from mesa import Agent, Model
 from mesa.experimental.cell_space import (
@@ -44,7 +45,6 @@ def agent_portrayal(agent):
 
 def test_draw_space():
     """Test draw_space helper method."""
-    import networkx as nx
 
     def my_portrayal(agent):
         """Simple portrayal of an agent.
@@ -193,8 +193,6 @@ def test_draw_continuous_space():
 
 def test_draw_network():
     """Test drawing network."""
-    import networkx as nx
-
     n = 10
     m = 20
     seed = 42

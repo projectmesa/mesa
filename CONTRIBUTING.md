@@ -112,7 +112,7 @@ pre-commit install
 You should no longer have to worry about code formatting. If still in doubt you may run the following command. If the command generates errors, fix all errors that are returned.
 
 ```bash
-ruff .
+ruff check . --fix
 ```
 
 ## Licensing
