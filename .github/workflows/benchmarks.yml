@@ -76,7 +76,7 @@ jobs:
           TIMING_COMPARISON=$(python compare_timings.py | base64 -w 0)  # Base64 encode the output
           echo "TIMING_COMPARISON=$TIMING_COMPARISON" >> $GITHUB_ENV
       - name: Comment PR
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const output = Buffer.from(process.env.TIMING_COMPARISON, 'base64').toString('utf-8');
