@@ -55,6 +55,7 @@ class AgentPortrayalStyle:
     alpha: float | None = 1.0
     edgecolors: str | tuple | None = None
     linewidths: float | int | None = 1.0
+    tooltip: dict | None = None
 
     def update(self, *updates_fields: tuple[str, Any]):
         """Updates attributes from variable (field_name, new_value) tuple arguments.
@@ -91,7 +92,7 @@ class PropertyLayerStyle:
     (vmin, vmax), transparency (alpha) and colorbar visibility.
 
     Note: vmin and vmax are the lower and upper bounds for the colorbar and the data is
-    normalized between these values for color/colormap rendering. If they are not
+    normalized between these values for color/colorbar rendering. If they are not
     declared the values are automatically determined from the data range.
 
     Note: You can specify either a 'colormap' (for varying data) or a single

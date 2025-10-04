@@ -1,4 +1,3 @@
-# noqa: D100
 import warnings
 from collections.abc import Callable
 from dataclasses import fields
@@ -75,6 +74,7 @@ class AltairBackend(AbstractRenderer):
             "stroke": [],  # Stroke color
             "strokeWidth": [],
             "filled": [],
+            "tooltip": [],
         }
 
         # Import here to avoid circular import issues
@@ -129,6 +129,7 @@ class AltairBackend(AbstractRenderer):
                     linewidths=dict_data.pop(
                         "linewidths", style_fields.get("linewidths")
                     ),
+                    tooltip=dict_data.pop("tooltip", None),
                 )
                 if dict_data:
                     ignored_keys = list(dict_data.keys())
@@ -184,6 +185,7 @@ class AltairBackend(AbstractRenderer):
             # FIXME: Make filled user-controllable
             filled_value = True
             arguments["filled"].append(filled_value)
+            arguments["tooltip"].append(aps.tooltip)
 
         final_data = {}
         for k, v in arguments.items():
@@ -199,80 +201,71 @@ class AltairBackend(AbstractRenderer):
 
         return final_data
 
+
+
     def draw_agents(
         self, arguments, chart_width: int = 450, chart_height: int = 350, **kwargs
     ):
-        """Draw agents using Altair backend.
-
-        Args:
-            arguments: Dictionary containing agent data arrays.
-            chart_width: Width of the chart.
-            chart_height: Height of the chart.
-            **kwargs: Additional keyword arguments for customization.
-            Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
-
-        Returns:
-            alt.Chart: The Altair chart representing the agents, or None if no agents.
-        """
+        """Draw agents using Altair backend."""
         if arguments["loc"].size == 0:
             return None
 
-        # To get a continuous scale for color the domain should be between [0, 1]
-        # that's why changing the the domain of strokeWidth beforehand.
-        stroke_width = [data / 10 for data in arguments["strokeWidth"]]
+        # Prepare a list of dictionaries, which is a robust way to create a DataFrame
+        records = []
+        for i in range(len(arguments["loc"])):
+            record = {
+                "x": arguments["loc"][i][0],
+                "y": arguments["loc"][i][1],
+                "size": arguments["size"][i],
+                "shape": arguments["shape"][i],
+                "opacity": arguments["opacity"][i],
+                "strokeWidth": arguments["strokeWidth"][i] / 10, # Scale for continuous domain
+                "original_color": arguments["color"][i],
+            }
+            # Add tooltip data if available
+            tooltip = arguments["tooltip"][i]
+            if tooltip:
+                record.update(tooltip)
 
-        # Agent data preparation
-        df_data = {
-            "x": arguments["loc"][:, 0],
-            "y": arguments["loc"][:, 1],
-            "size": arguments["size"],
-            "shape": arguments["shape"],
-            "opacity": arguments["opacity"],
-            "strokeWidth": stroke_width,
-            "original_color": arguments["color"],
-            "is_filled": arguments["filled"],
-            "original_stroke": arguments["stroke"],
-        }
-        df = pd.DataFrame(df_data)
-
-        # To ensure distinct shapes according to agent portrayal
-        unique_shape_names_in_data = df["shape"].unique().tolist()
-
-        fill_colors = []
-        stroke_colors = []
-        for i in range(len(df)):
-            filled = df["is_filled"][i]
-            main_color = df["original_color"][i]
-            stroke_spec = (
-                df["original_stroke"][i]
-                if isinstance(df["original_stroke"][i], str)
-                else None
-            )
-            if filled:
-                fill_colors.append(main_color)
-                stroke_colors.append(stroke_spec)
+            # Determine fill and stroke colors
+            if arguments["filled"][i]:
+                record["viz_fill_color"] = arguments["color"][i]
+                record["viz_stroke_color"] = arguments["stroke"][i] if isinstance(arguments["stroke"][i], str) else None
             else:
-                fill_colors.append(None)
-                stroke_colors.append(main_color)
-        df["viz_fill_color"] = fill_colors
-        df["viz_stroke_color"] = stroke_colors
+                record["viz_fill_color"] = None
+                record["viz_stroke_color"] = arguments["color"][i]
+
+            records.append(record)
+
+        df = pd.DataFrame(records)
+
+        # Ensure all columns that should be numeric are, handling potential Nones
+        numeric_cols = ['x', 'y', 'size', 'opacity', 'strokeWidth', 'original_color']
+        for col in numeric_cols:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+
+
+        # Get tooltip keys from the first valid record
+        tooltip_list = ["x", "y"]
+        # This is the corrected line:
+        if any(t is not None for t in arguments["tooltip"]):
+             first_valid_tooltip = next((t for t in arguments["tooltip"] if t), None)
+             if first_valid_tooltip:
+                 tooltip_list.extend(first_valid_tooltip.keys())
 
         # Extract additional parameters from kwargs
-        # FIXME: Add more parameters to kwargs
         title = kwargs.pop("title", "")
         xlabel = kwargs.pop("xlabel", "")
         ylabel = kwargs.pop("ylabel", "")
-
-        # Tooltip list for interactivity
-        # FIXME: Add more fields to tooltip (preferably from agent_portrayal)
-        tooltip_list = ["x", "y"]
+        legend_title = kwargs.pop("legend_title", "Color")
 
         # Handle custom colormapping
         cmap = kwargs.pop("cmap", "viridis")
         vmin = kwargs.pop("vmin", None)
         vmax = kwargs.pop("vmax", None)
 
-        color_is_numeric = np.issubdtype(df["original_color"].dtype, np.number)
+        color_is_numeric = pd.api.types.is_numeric_dtype(df["original_color"])
         if color_is_numeric:
             color_min = vmin if vmin is not None else df["original_color"].min()
             color_max = vmax if vmax is not None else df["original_color"].max()
@@ -280,6 +273,12 @@ class AltairBackend(AbstractRenderer):
             fill_encoding = alt.Fill(
                 "original_color:Q",
                 scale=alt.Scale(scheme=cmap, domain=[color_min, color_max]),
+                legend=alt.Legend(
+                    title=legend_title,
+                    orient="right",
+                    type="gradient",
+                    gradientLength=200,
+                ),
             )
         else:
             fill_encoding = alt.Fill(
@@ -290,6 +289,7 @@ class AltairBackend(AbstractRenderer):
 
         # Determine space dimensions
         xmin, xmax, ymin, ymax = self.space_drawer.get_viz_limits()
+        unique_shape_names_in_data = df["shape"].dropna().unique().tolist()
 
         chart = (
             alt.Chart(df)
@@ -316,16 +316,10 @@ class AltairBackend(AbstractRenderer):
                     ),
                     title="Shape",
                 ),
-                opacity=alt.Opacity(
-                    "opacity:Q",
-                    title="Opacity",
-                    scale=alt.Scale(domain=[0, 1], range=[0, 1]),
-                ),
+                opacity=alt.Opacity("opacity:Q", title="Opacity", scale=alt.Scale(domain=[0, 1], range=[0, 1])),
                 fill=fill_encoding,
                 stroke=alt.Stroke("viz_stroke_color:N", scale=None),
-                strokeWidth=alt.StrokeWidth(
-                    "strokeWidth:Q", scale=alt.Scale(domain=[0, 1])
-                ),
+                strokeWidth=alt.StrokeWidth("strokeWidth:Q", scale=alt.Scale(domain=[0, 1])),
                 tooltip=tooltip_list,
             )
             .properties(title=title, width=chart_width, height=chart_height)
