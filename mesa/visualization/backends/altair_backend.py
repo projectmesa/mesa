@@ -1,3 +1,9 @@
+"""Altair-based renderer for Mesa spaces.
+
+This module provides an Altair-based renderer for visualizing Mesa model spaces,
+agents, and property layers with interactive charting capabilities.
+"""
+
 import warnings
 from collections.abc import Callable
 from dataclasses import fields
@@ -201,12 +207,21 @@ class AltairBackend(AbstractRenderer):
 
         return final_data
 
-
-
     def draw_agents(
         self, arguments, chart_width: int = 450, chart_height: int = 350, **kwargs
     ):
-        """Draw agents using Altair backend."""
+        """Draw agents using Altair backend.
+
+        Args:
+            arguments: Dictionary containing agent data arrays.
+            chart_width: Width of the chart.
+            chart_height: Height of the chart.
+            **kwargs: Additional keyword arguments for customization.
+            Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
+
+        Returns:
+            alt.Chart: The Altair chart representing the agents, or None if no agents.
+        """
         if arguments["loc"].size == 0:
             return None
 
@@ -219,7 +234,8 @@ class AltairBackend(AbstractRenderer):
                 "size": arguments["size"][i],
                 "shape": arguments["shape"][i],
                 "opacity": arguments["opacity"][i],
-                "strokeWidth": arguments["strokeWidth"][i] / 10, # Scale for continuous domain
+                "strokeWidth": arguments["strokeWidth"][i]
+                / 10,  # Scale for continuous domain
                 "original_color": arguments["color"][i],
             }
             # Add tooltip data if available
@@ -230,7 +246,11 @@ class AltairBackend(AbstractRenderer):
             # Determine fill and stroke colors
             if arguments["filled"][i]:
                 record["viz_fill_color"] = arguments["color"][i]
-                record["viz_stroke_color"] = arguments["stroke"][i] if isinstance(arguments["stroke"][i], str) else None
+                record["viz_stroke_color"] = (
+                    arguments["stroke"][i]
+                    if isinstance(arguments["stroke"][i], str)
+                    else None
+                )
             else:
                 record["viz_fill_color"] = None
                 record["viz_stroke_color"] = arguments["color"][i]
@@ -240,52 +260,32 @@ class AltairBackend(AbstractRenderer):
         df = pd.DataFrame(records)
 
         # Ensure all columns that should be numeric are, handling potential Nones
-        numeric_cols = ['x', 'y', 'size', 'opacity', 'strokeWidth', 'original_color']
+        numeric_cols = ["x", "y", "size", "opacity", "strokeWidth", "original_color"]
         for col in numeric_cols:
             if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
-
+                df[col] = pd.to_numeric(df[col], errors="coerce")
 
         # Get tooltip keys from the first valid record
         tooltip_list = ["x", "y"]
-        # This is the corrected line:
         if any(t is not None for t in arguments["tooltip"]):
-             first_valid_tooltip = next((t for t in arguments["tooltip"] if t), None)
-             if first_valid_tooltip:
-                 tooltip_list.extend(first_valid_tooltip.keys())
+            first_valid_tooltip = next(
+                (t for t in arguments["tooltip"] if t is not None), None
+            )
+            if first_valid_tooltip is not None:
+                tooltip_list.extend(first_valid_tooltip.keys())
 
         # Extract additional parameters from kwargs
         title = kwargs.pop("title", "")
         xlabel = kwargs.pop("xlabel", "")
         ylabel = kwargs.pop("ylabel", "")
-        legend_title = kwargs.pop("legend_title", "Color")
-
-        # Handle custom colormapping
-        cmap = kwargs.pop("cmap", "viridis")
-        vmin = kwargs.pop("vmin", None)
-        vmax = kwargs.pop("vmax", None)
+        # FIXME: Add more parameters to kwargs
 
         color_is_numeric = pd.api.types.is_numeric_dtype(df["original_color"])
-        if color_is_numeric:
-            color_min = vmin if vmin is not None else df["original_color"].min()
-            color_max = vmax if vmax is not None else df["original_color"].max()
-
-            fill_encoding = alt.Fill(
-                "original_color:Q",
-                scale=alt.Scale(scheme=cmap, domain=[color_min, color_max]),
-                legend=alt.Legend(
-                    title=legend_title,
-                    orient="right",
-                    type="gradient",
-                    gradientLength=200,
-                ),
-            )
-        else:
-            fill_encoding = alt.Fill(
-                "viz_fill_color:N",
-                scale=None,
-                title="Color",
-            )
+        fill_encoding = (
+            alt.Fill("original_color:Q")
+            if color_is_numeric
+            else alt.Fill("viz_fill_color:N", scale=None, title="Color")
+        )
 
         # Determine space dimensions
         xmin, xmax, ymin, ymax = self.space_drawer.get_viz_limits()
@@ -316,10 +316,16 @@ class AltairBackend(AbstractRenderer):
                     ),
                     title="Shape",
                 ),
-                opacity=alt.Opacity("opacity:Q", title="Opacity", scale=alt.Scale(domain=[0, 1], range=[0, 1])),
+                opacity=alt.Opacity(
+                    "opacity:Q",
+                    title="Opacity",
+                    scale=alt.Scale(domain=[0, 1], range=[0, 1]),
+                ),
                 fill=fill_encoding,
                 stroke=alt.Stroke("viz_stroke_color:N", scale=None),
-                strokeWidth=alt.StrokeWidth("strokeWidth:Q", scale=alt.Scale(domain=[0, 1])),
+                strokeWidth=alt.StrokeWidth(
+                    "strokeWidth:Q", scale=alt.Scale(domain=[0, 1])
+                ),
                 tooltip=tooltip_list,
             )
             .properties(title=title, width=chart_width, height=chart_height)

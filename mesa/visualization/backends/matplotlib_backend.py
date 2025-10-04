@@ -27,7 +27,6 @@ from mesa.visualization.backends.abstract_renderer import AbstractRenderer
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
 
-
 CORRECTION_FACTOR_MARKER_ZOOM = 0.01
 
 
@@ -141,6 +140,10 @@ class MatplotlibBackend(AbstractRenderer):
                     )
             else:
                 aps = portray_input
+                if aps.tooltip is not None:
+                    raise ValueError(
+                        "The 'tooltip' attribute in AgentPortrayalStyle is only supported by the Altair backend."
+                    )
                 # Set defaults if not provided
                 if aps.x is None and aps.y is None:
                     aps.x, aps.y = self._get_agent_pos(agent, space)

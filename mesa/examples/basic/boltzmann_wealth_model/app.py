@@ -38,6 +38,23 @@ model_params = {
 }
 
 
+def post_process(chart):
+    """Post-process the Altair chart to add a colorbar legend."""
+    chart = chart.encode(
+        color=alt.Color(
+            "original_color:Q",
+            scale=alt.Scale(scheme="viridis", domain=[0, 10]),
+            legend=alt.Legend(
+                title="Wealth",
+                orient="right",
+                type="gradient",
+                gradientLength=200,
+            ),
+        ),
+    )
+    return chart
+
+
 model = BoltzmannWealth(50, 10, 10)
 
 # The SpaceRenderer is responsible for drawing the model's space and agents.
@@ -47,13 +64,11 @@ model = BoltzmannWealth(50, 10, 10)
 renderer = SpaceRenderer(model, backend="altair")
 # Can customize the grid appearance.
 renderer.draw_structure(grid_color="black", grid_dash=[6, 2], grid_opacity=0.3)
-renderer.draw_agents(
-    agent_portrayal=agent_portrayal,
-    cmap="viridis",
-    vmin=0,
-    vmax=10,
-    legend_title="Wealth",
-)
+renderer.draw_agents(agent_portrayal=agent_portrayal)
+# The post_process function is used to modify the Altair chart after it has been created.
+# It can be used to add legends, colorbars, or other visual elements.
+renderer.post_process = post_process
+
 
 # Creates a line plot component from the model's "Gini" datacollector.
 GiniPlot = make_plot_component("Gini")
