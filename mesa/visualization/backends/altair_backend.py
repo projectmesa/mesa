@@ -1,3 +1,9 @@
+"""Altair-based renderer for Mesa spaces.
+
+This module provides an Altair-based renderer for visualizing Mesa model spaces,
+agents, and property layers with interactive charting capabilities.
+"""
+
 import warnings
 from collections.abc import Callable
 from dataclasses import fields
@@ -201,8 +207,6 @@ class AltairBackend(AbstractRenderer):
 
         return final_data
 
-
-
     def draw_agents(
         self, arguments, chart_width: int = 450, chart_height: int = 350, **kwargs
     ):
@@ -219,7 +223,8 @@ class AltairBackend(AbstractRenderer):
                 "size": arguments["size"][i],
                 "shape": arguments["shape"][i],
                 "opacity": arguments["opacity"][i],
-                "strokeWidth": arguments["strokeWidth"][i] / 10, # Scale for continuous domain
+                "strokeWidth": arguments["strokeWidth"][i]
+                / 10,  # Scale for continuous domain
                 "original_color": arguments["color"][i],
             }
             # Add tooltip data if available
@@ -230,7 +235,11 @@ class AltairBackend(AbstractRenderer):
             # Determine fill and stroke colors
             if arguments["filled"][i]:
                 record["viz_fill_color"] = arguments["color"][i]
-                record["viz_stroke_color"] = arguments["stroke"][i] if isinstance(arguments["stroke"][i], str) else None
+                record["viz_stroke_color"] = (
+                    arguments["stroke"][i]
+                    if isinstance(arguments["stroke"][i], str)
+                    else None
+                )
             else:
                 record["viz_fill_color"] = None
                 record["viz_stroke_color"] = arguments["color"][i]
@@ -240,19 +249,18 @@ class AltairBackend(AbstractRenderer):
         df = pd.DataFrame(records)
 
         # Ensure all columns that should be numeric are, handling potential Nones
-        numeric_cols = ['x', 'y', 'size', 'opacity', 'strokeWidth', 'original_color']
+        numeric_cols = ["x", "y", "size", "opacity", "strokeWidth", "original_color"]
         for col in numeric_cols:
             if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
-
+                df[col] = pd.to_numeric(df[col], errors="coerce")
 
         # Get tooltip keys from the first valid record
         tooltip_list = ["x", "y"]
         # This is the corrected line:
         if any(t is not None for t in arguments["tooltip"]):
-             first_valid_tooltip = next((t for t in arguments["tooltip"] if t), None)
-             if first_valid_tooltip:
-                 tooltip_list.extend(first_valid_tooltip.keys())
+            first_valid_tooltip = next((t for t in arguments["tooltip"] if t), None)
+            if first_valid_tooltip:
+                tooltip_list.extend(first_valid_tooltip.keys())
 
         # Extract additional parameters from kwargs
         title = kwargs.pop("title", "")
@@ -316,10 +324,16 @@ class AltairBackend(AbstractRenderer):
                     ),
                     title="Shape",
                 ),
-                opacity=alt.Opacity("opacity:Q", title="Opacity", scale=alt.Scale(domain=[0, 1], range=[0, 1])),
+                opacity=alt.Opacity(
+                    "opacity:Q",
+                    title="Opacity",
+                    scale=alt.Scale(domain=[0, 1], range=[0, 1]),
+                ),
                 fill=fill_encoding,
                 stroke=alt.Stroke("viz_stroke_color:N", scale=None),
-                strokeWidth=alt.StrokeWidth("strokeWidth:Q", scale=alt.Scale(domain=[0, 1])),
+                strokeWidth=alt.StrokeWidth(
+                    "strokeWidth:Q", scale=alt.Scale(domain=[0, 1])
+                ),
                 tooltip=tooltip_list,
             )
             .properties(title=title, width=chart_width, height=chart_height)

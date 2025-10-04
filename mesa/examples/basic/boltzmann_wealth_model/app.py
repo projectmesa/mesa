@@ -1,5 +1,3 @@
-import altair as alt
-
 from mesa.examples.basic.boltzmann_wealth_model.model import BoltzmannWealth
 from mesa.mesa_logging import INFO, log_to_stderr
 from mesa.visualization import (
