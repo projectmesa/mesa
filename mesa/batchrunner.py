@@ -170,6 +170,14 @@ def _model_run_func(
         Return model_data, agent_data from the reporters
     """
     run_id, iteration, kwargs = run
+
+    # Handle seed uniqueness across iterations
+    if 'seed' in kwargs and kwargs['seed'] is not None and iteration > 0:
+        seed_value = kwargs['seed']
+        if isinstance(seed_value, (int, float)) and not isinstance(seed_value, bool):
+            kwargs = kwargs.copy()
+            kwargs['seed'] = int(seed_value) + iteration
+
     model = model_cls(**kwargs)
     while model.running and model.steps <= max_steps:
         model.step()
