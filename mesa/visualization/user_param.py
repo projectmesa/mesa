@@ -68,6 +68,7 @@ class Slider(UserParam):
     def get(self, attr):  # noqa: D102
         return getattr(self, attr)
 
+
 class TextInput(UserParam):
     """A text input field for user-provided string values.
 
@@ -90,7 +91,7 @@ class TextInput(UserParam):
         self.placeholder = placeholder
         self.description = description
 
-        #convert any input to the string safely
+        # convert any input to the string safely
         if value is None:
             self.value = ""
         else:
@@ -98,7 +99,7 @@ class TextInput(UserParam):
 
         # Always passes validation now
         valid = True
-        self.maybe_raise_error("InputText", valid) #matches solaraViz type name
+        self.maybe_raise_error("InputText", valid)  # matches solaraViz type name
 
     def get(self, attr):
         """Return attribute value (compatible with other UserParam types)."""
