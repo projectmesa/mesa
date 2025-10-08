@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "Mesa"
 description = "Agent-based modeling (ABM) in Python"
 license = { text = "Apache 2.0" }
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [
   { name = "Project Mesa Team", email = "maintainers@projectmesa.dev" },
 ]
@@ -25,7 +25,6 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Intended Audience :: Science/Research",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "License :: OSI Approved :: Apache Software License",
@@ -98,9 +97,9 @@ path = "mesa/__init__.py"
 
 [tool.ruff]
 # See https://github.com/charliermarsh/ruff#rules for error code definitions.
-# Hardcode to Python 3.11.
+# Hardcode to Python 3.12.
 # Reminder to update mesa-examples if the value below is changed.
-target-version = "py311"
+target-version = "py312"
 extend-exclude = ["build"]
 
 [tool.ruff.lint]

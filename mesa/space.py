@@ -61,7 +61,7 @@ MultiGridContent = list[Agent]
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-def accept_tuple_argument(wrapped_function: F) -> F:
+def accept_tuple_argument[F: Callable[..., Any]](wrapped_function: F) -> F:
     """Decorator to allow grid methods that take a list of (x, y) coord tuples to also handle a single position.
 
     Tuples are wrapped in a single-item list rather than forcing user to do it.
