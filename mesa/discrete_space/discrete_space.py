@@ -18,7 +18,7 @@ from __future__ import annotations
 import warnings
 from functools import cached_property
 from random import Random
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 from mesa.agent import AgentSet
 from mesa.discrete_space.cell import Cell
@@ -27,7 +27,7 @@ from mesa.discrete_space.cell_collection import CellCollection
 T = TypeVar("T", bound=Cell)
 
 
-class DiscreteSpace(Generic[T]):
+class DiscreteSpace[T: Cell]:
     """Base class for all discrete spaces.
 
     Attributes:

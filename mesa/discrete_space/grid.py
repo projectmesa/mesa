@@ -17,7 +17,7 @@ import copyreg
 from collections.abc import Sequence
 from itertools import product
 from random import Random
-from typing import Any, Generic, TypeVar
+from typing import Any, TypeVar
 
 from mesa.discrete_space import Cell, DiscreteSpace
 from mesa.discrete_space.property_layer import (
@@ -56,7 +56,7 @@ def unpickle_gridcell(parent, fields):
     return instance
 
 
-class Grid(DiscreteSpace[T], Generic[T], HasPropertyLayers):
+class Grid(DiscreteSpace[T], HasPropertyLayers):
     """Base class for all grid classes.
 
     Attributes:

@@ -35,8 +35,6 @@ jobs:
         include:
           - os: ubuntu
             python-version: "3.12"
-          - os: ubuntu
-            python-version: "3.11"
           # Disabled for now. See https://github.com/projectmesa/mesa/issues/1253
           #- os: ubuntu
           #  python-version: 'pypy-3.8'

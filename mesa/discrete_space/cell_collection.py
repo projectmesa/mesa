@@ -20,7 +20,7 @@ import warnings
 from collections.abc import Callable, Iterable, Mapping
 from functools import cached_property
 from random import Random
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 if TYPE_CHECKING:
     from mesa.discrete_space.cell import Cell
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 T = TypeVar("T", bound="Cell")
 
 
-class CellCollection(Generic[T]):
+class CellCollection[T: Cell]:
     """An immutable collection of cells.
 
     Attributes:
