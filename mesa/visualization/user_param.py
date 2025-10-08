@@ -67,3 +67,39 @@ class Slider(UserParam):
 
     def get(self, attr):  # noqa: D102
         return getattr(self, attr)
+
+class TextInput(UserParam):
+    """A text input field for user-provided string values.
+
+    Example:
+        text_option = TextInput(
+            "Dataset Path",
+            value="data/input.csv",
+            placeholder="Enter file path...",
+        )
+
+    Args:
+        label: The displayed label in the UI
+        value: The initial text value(converted to the string if not)
+        placeholder: Optional placeholder text in the input field
+        description: Optional tooltip or helper text
+    """
+
+    def __init__(self, label="", value="", placeholder="", description=None):
+        self.label = label
+        self.placeholder = placeholder
+        self.description = description
+
+        #convert any input to the string safely
+        if value is None:
+            self.value = ""
+        else:
+            self.value = str(value)
+
+        # Always passes validation now
+        valid = True
+        self.maybe_raise_error("InputText", valid) #matches solaraViz type name
+
+    def get(self, attr):
+        """Return attribute value (compatible with other UserParam types)."""
+        return getattr(self, attr)
