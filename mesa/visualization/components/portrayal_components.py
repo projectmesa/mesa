@@ -55,6 +55,8 @@ class AgentPortrayalStyle:
     alpha: float | None = 1.0
     edgecolors: str | tuple | None = None
     linewidths: float | int | None = 1.0
+    tooltip: dict | None = None
+    """A dictionary of data to display on hover. Note: This feature is only available with the Altair backend."""
 
     def update(self, *updates_fields: tuple[str, Any]):
         """Updates attributes from variable (field_name, new_value) tuple arguments.
