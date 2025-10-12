@@ -25,7 +25,7 @@ To run the model interactively, in this directory, run the following command
 
 This model is based adapted from:
 
-[Epstein, J. “Modeling civil violence: An agent-based computational approach”, Proceedings of the National Academy of Sciences, Vol. 99, Suppl. 3, May 14, 2002](http://www.pnas.org/content/99/suppl.3/7243.short)
+[Epstein, J. “Modeling civil violence: An agent-based computational approach”, Proceedings of the National Academy of Sciences, Vol. 99, Suppl. 3, May 14, 2002](https://doi.org/10.1073/pnas.092080199)
 
 A similar model is also included with NetLogo:
 
