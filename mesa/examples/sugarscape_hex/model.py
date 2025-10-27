@@ -44,8 +44,8 @@ class SugarscapeG1mtHex(mesa.Model):
 
     def __init__(
         self,
-        width=50,
-        height=50,
+        width=60,
+        height=40,
         initial_population=200,
         endowment_min=25,
         endowment_max=50,
@@ -67,7 +67,7 @@ class SugarscapeG1mtHex(mesa.Model):
 
         # initiate mesa grid class
         #use a HexGrid instead of an Orthogonal VN grid
-        self.grid = OrthogonalVonNeumannGrid(
+        self.grid = HexGrid(
             (self.width, self.height), torus=False, random=self.random
         )
         # initiate datacollector
@@ -86,7 +86,8 @@ class SugarscapeG1mtHex(mesa.Model):
 
         #NOTE: to see original map, comment back in:
         #  self.sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map.txt")
-        self.sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map-asymmetrical.txt")
+        self.sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map-w60-h40.txt")
+        
         self.spice_distribution = np.flip(self.sugar_distribution, 1)
 
         self.grid.add_property_layer(
