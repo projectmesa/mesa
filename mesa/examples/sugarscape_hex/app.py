@@ -10,7 +10,8 @@ def agent_portrayal(agent):
         y=agent.cell.coordinate[1],
         color="red",
         marker="o",
-        size=10,
+        size=7,
+        alpha=0.8,
         zorder=1,
     )
 
@@ -24,7 +25,7 @@ def propertylayer_portrayal(layer):
 
 #NOTE: change post_process to work for matplotlib Axes instead of altair Chart
 def post_process(ax):
-    ax.set_aspect("equal")
+ #   ax.set_aspect("equal")
     #take out the ticks, they are confusing here
     ax.set_xticks([])
     ax.set_yticks([])
@@ -37,8 +38,9 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
-    "width": 50,
-    "height": 50,
+    #NOTE: if testing different widths and heights, vary them here as well
+    "width": 60,
+    "height": 40,
     # Population parameters
     "initial_population": Slider(
         "Initial Population", value=200, min=50, max=500, step=10
