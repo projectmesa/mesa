@@ -1,3 +1,4 @@
+#change import depending on if you want ED or VWH model
 from mesa.examples.sugarscape_hex.model import SugarscapeG1mtHex
 from mesa.visualization import Slider, SolaraViz, SpaceRenderer, make_plot_component
 from mesa.visualization.components import AgentPortrayalStyle, PropertyLayerStyle
