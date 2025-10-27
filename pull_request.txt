@@ -1,0 +1,21 @@
+Fix PropertyLayer Visualization for Hexagon Grids in Matplotlib
+
+This pull requests fixes the Hexagon Grid PropertyLayer visualization error by transposing the PropertyLayer value data before flattening it and matching it to the grid cells.
+
+### Bug/Issue
+PropertyLayer color values currently aren't shown properly on Hexagonal Grids in the matplotlib visualization backend. This is due to an error in draw_property_layers() in mpl_space_drawing.py. The PropertyLayer data, a W x H array of values, is flattened (using the numpy ravel operation) into a 1D array which is matched up to a collection of hexagonal grid cells. The problem is, this collection is in the order of a flattened H x W array. This means the color values are placed in the wrong grid cells, because the coordinates don't match up.
+
+### Implementation
+This is fixed by tranposing the array before flattening it. Exactly one line of code is changed in draw_property_layers(). colors = data.ravel() becomes colors = data.T.ravel(). This creates a flattened H x W array that matches the order of the PolyCollection of grid cells.
+
+### Testing
+
+The issue description shows screenshots of the bug. Here's the corresponding images from the fixed model.
+
+I tested this with a few different maps, all of which are in the examples file in my fork. The maps are made by messing around with the original map. I avoided simple, symmetrical patterns because they often create the right result by accident - as in the original sugar-map.txt.
+
+Also, I wanted to test this for a non-square map. To do so, I created a further modification of the SugarScape model, as the original will break with a non-square map. I verified that this example works for the Orthogonal VN grid and fails for the HexGrid without the change, and then verified that it works for the HexGrid with the change.
+
+### Additional Notes
+
+Please contact me for further explanations or examples, or if I formatted something wrong here.
