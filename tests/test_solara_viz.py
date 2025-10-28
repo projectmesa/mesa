@@ -300,7 +300,7 @@ def test_model_creator():  # noqa: D103
         handle_error=False,
     )
 
-    with pytest.raises(ValueError, re.escape("Missing required model parameter")):
+    with pytest.raises(ValueError, match=re.escape("Missing required model parameter")):
         solara.render(
             ModelCreator(
                 solara.reactive(ModelWithRequiredParam(param1="mock")), user_params={}
