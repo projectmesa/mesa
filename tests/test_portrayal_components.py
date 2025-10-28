@@ -1,5 +1,6 @@
 """Tests for the portrayal components in Mesa visualization."""
 
+import re
 from dataclasses import is_dataclass
 
 import pytest
@@ -63,7 +64,8 @@ def test_agent_portrayal_style_update_non_existent_attribute():
     """Test updating a non-existent attribute raises AttributeError."""
     style = AgentPortrayalStyle()
     with pytest.raises(
-        AttributeError, match="'AgentPortrayalStyle' object has no attribute 'shape'"
+        AttributeError,
+        match=re.escape("'AgentPortrayalStyle' object has no attribute 'shape'"),
     ):
         style.update(("shape", "triangle"))
 
@@ -128,12 +130,14 @@ def test_property_layer_style_custom_initialization_with_color():
 def test_property_layer_style_post_init_both_color_and_colormap_error():
     """Test error when both color and colormap are specified."""
     with pytest.raises(
-        ValueError, match="Specify either 'color' or 'colormap', not both."
+        ValueError, match=re.escape("Specify either 'color' or 'colormap', not both.")
     ):
         PropertyLayerStyle(colormap="viridis", color="red")
 
 
 def test_property_layer_style_post_init_neither_color_nor_colormap_error():
     """Test error when neither color nor colormap is specified."""
-    with pytest.raises(ValueError, match="Specify one of 'color' or 'colormap'"):
+    with pytest.raises(
+        ValueError, match=re.escape("Specify one of 'color' or 'colormap'")
+    ):
         PropertyLayerStyle()

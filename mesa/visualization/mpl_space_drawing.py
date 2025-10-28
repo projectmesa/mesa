@@ -205,7 +205,7 @@ def draw_space(
 
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
 
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
@@ -443,7 +443,7 @@ def draw_orthogonal_grid(
 
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
 
     # gather agent data
     s_default = (180 / max(space.width, space.height)) ** 2
@@ -488,7 +488,7 @@ def draw_hex_grid(
     "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
 
     # gather data
     s_default = (180 / max(space.width, space.height)) ** 2
@@ -573,7 +573,7 @@ def draw_network(
 
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
     if layout_kwargs is None:
         layout_kwargs = {"seed": 0}
 
@@ -642,7 +642,7 @@ def draw_continuous_space(
 
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
 
     # space related setup
     width = space.x_max - space.x_min
@@ -694,7 +694,7 @@ def draw_voronoi_grid(
 
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
 
     x_list = [i[0] for i in space.centroids_coordinates]
     y_list = [i[1] for i in space.centroids_coordinates]

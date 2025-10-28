@@ -101,7 +101,7 @@ class OrthogonalSpaceDrawer(BaseSpaceDrawer):
         }
 
         if ax is None:
-            fig, ax = plt.subplots(**fig_kwargs)
+            _, ax = plt.subplots(**fig_kwargs)
 
         # gridline styling kwargs
         line_kwargs = {
@@ -282,7 +282,7 @@ class HexSpaceDrawer(BaseSpaceDrawer):
         }
 
         if ax is None:
-            fig, ax = plt.subplots(**fig_kwargs)
+            _, ax = plt.subplots(**fig_kwargs)
 
         line_kwargs = {
             "color": "black",
@@ -414,7 +414,7 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
             The modified axes object.
         """
         if ax is None:
-            fig, ax = plt.subplots()
+            _, ax = plt.subplots()
 
         ax.set_axis_off()
         ax.set_xlim(self.viz_xmin, self.viz_xmax)
@@ -554,7 +554,7 @@ class ContinuousSpaceDrawer(BaseSpaceDrawer):
             The modified axes object
         """
         if ax is None:
-            fig, ax = plt.subplots()
+            _, ax = plt.subplots()
 
         border_style = "solid" if not self.space.torus else (0, (5, 10))
         spine_kwargs = {"linewidth": 1.5, "color": "black", "linestyle": border_style}
@@ -726,7 +726,7 @@ class VoronoiSpaceDrawer(BaseSpaceDrawer):
             The modified axes object
         """
         if ax is None:
-            fig, ax = plt.subplots()
+            _, ax = plt.subplots()
 
         final_segments, clip_box = self._get_clipped_segments()
 
