@@ -1,5 +1,6 @@
 """Test cases for the SpaceRenderer class in Mesa."""
 
+import re
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -134,7 +135,7 @@ def test_no_property_layers():
     # Simulate missing property layer in the grid
     with (
         patch.object(model.grid, "_mesa_property_layers", new={}),
-        pytest.raises(Exception, match="No property layers were found on the space."),
+        pytest.raises(Exception, match=re.escape("No property layers were found on the space.")),
     ):
         sr.draw_propertylayer(lambda _: PropertyLayerStyle(color="red"))
 

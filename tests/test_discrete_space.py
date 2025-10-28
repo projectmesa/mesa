@@ -3,6 +3,7 @@
 import copy
 import pickle
 import random
+import re
 
 import networkx as nx
 import numpy as np
@@ -909,7 +910,7 @@ def test_property_layer_errors():
 
     # Test adding a PropertyLayer with an existing name
     grid.add_property_layer(elevation)
-    with pytest.raises(ValueError, match="Property layer elevation already exists."):
+    with pytest.raises(ValueError, match=re.escape("Property layer elevation already exists.")):
         grid.add_property_layer(elevation)
 
     # test adding a layer with different dimensions than space
@@ -918,7 +919,7 @@ def test_property_layer_errors():
     elevation = PropertyLayer("elevation", (10, 10), default_value=0.0)
     with pytest.raises(
         ValueError,
-        match="Dimensions of property layer do not match the dimensions of the grid",
+        match=re.escape("Dimensions of property layer do not match the dimensions of the grid"),
     ):
         grid.add_property_layer(elevation)
 
