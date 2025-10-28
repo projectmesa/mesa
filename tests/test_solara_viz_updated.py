@@ -254,13 +254,17 @@ def test_model_param_checks():
     _check_model_params(ModelWithKwargs.__init__, {})
 
     # Test invalid parameter name raises ValueError
-    with pytest.raises(ValueError, match=re.escape("Invalid model parameter: invalid_param")):
+    with pytest.raises(
+        ValueError, match=re.escape("Invalid model parameter: invalid_param")
+    ):
         _check_model_params(
             ModelWithOptionalParams.__init__, {"required_param": 1, "invalid_param": 2}
         )
 
     # Test missing required parameter raises ValueError
-    with pytest.raises(ValueError, match=re.escape("Missing required model parameter: param2")):
+    with pytest.raises(
+        ValueError, match=re.escape("Missing required model parameter: param2")
+    ):
         _check_model_params(ModelWithOnlyRequired.__init__, {"param1": 1})
 
     # Test passing extra parameters raises ValueError
@@ -316,6 +320,8 @@ def test_check_model_params_with_args_only():
 
     with pytest.raises(
         ValueError,
-        match=re.escape("Mesa's visualization requires the use of keyword arguments to ensure the parameters are passed to Solara correctly. Please ensure all model parameters are of form param=value"),
+        match=re.escape(
+            "Mesa's visualization requires the use of keyword arguments to ensure the parameters are passed to Solara correctly. Please ensure all model parameters are of form param=value"
+        ),
     ):
         _check_model_params(ModelWithArgsOnly.__init__, model_params)
