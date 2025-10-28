@@ -1,1 +1,0 @@
-Fix Visualization of PropertyLayer values on Hexagon grids by transposing the PropertyLayer value data before flattening it and matching it to the grid cells.
