@@ -397,7 +397,7 @@ def draw_property_layers(
             width, height = data.shape
             hexagons = _get_hexmesh(width, height)
             norm = Normalize(vmin=vmin, vmax=vmax)
-            colors = data.T.ravel()
+            colors = data.ravel()
 
             if color:
                 normalized_colors = np.clip(norm(colors), 0, 1)
