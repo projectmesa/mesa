@@ -9,7 +9,7 @@ def agent_portrayal(agent):
         y=agent.cell.coordinate[1],
         color="red",
         marker="o",
-        #NOTE: changing size and alpha makes it easier to see colors under agents
+        # NOTE: changing size and alpha makes it easier to see colors under agents
         size=7,
         alpha=0.8,
         zorder=1,
@@ -39,7 +39,7 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
-    #change these for using different height and widths
+    # change these for using different height and widths
     "width": 60,
     "height": 40,
     # Population parameters
@@ -61,7 +61,7 @@ model_params = {
 
 model = SugarscapeG1mtHex()
 
-#NOTE: change to use matplotlib backend for space renderer
+# NOTE: change to use matplotlib backend for space renderer
 
 # Here, the renderer uses the Altair backend, while the plot components
 # use the Matplotlib backend.
