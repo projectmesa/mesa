@@ -1,4 +1,4 @@
-#change import depending on if you want ED or VWH model
+# change import depending on if you want ED or VWH model
 from mesa.examples.sugarscape_hex.model import SugarscapeG1mtHex
 from mesa.visualization import Slider, SolaraViz, SpaceRenderer, make_plot_component
 from mesa.visualization.components import AgentPortrayalStyle, PropertyLayerStyle
@@ -22,10 +22,11 @@ def propertylayer_portrayal(layer):
         )
     return PropertyLayerStyle(color="red", alpha=0.8, colorbar=True, vmin=0, vmax=10)
 
-#NOTE: change post_process to work for matplotlib Axes instead of altair Chart
+
+# NOTE: change post_process to work for matplotlib Axes instead of altair Chart
 def post_process(ax):
     ax.set_aspect("equal")
-    #take out the ticks, they are confusing here
+    # take out the ticks, they are confusing here
     ax.set_xticks([])
     ax.set_yticks([])
     return ax
@@ -58,7 +59,7 @@ model_params = {
 
 model = SugarscapeG1mtHex()
 
-#NOTE: change to use matplotlib backend for space renderer
+# NOTE: change to use matplotlib backend for space renderer
 
 # Here, the renderer uses the Altair backend, while the plot components
 # use the Matplotlib backend.

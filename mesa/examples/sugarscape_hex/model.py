@@ -3,8 +3,9 @@ from pathlib import Path
 import numpy as np
 
 import mesa
-#import HexGrid as well as OVN to contrast both in different tests
-from mesa.discrete_space import HexGrid, OrthogonalVonNeumannGrid
+
+# import HexGrid as well as OVN to contrast both in different tests
+from mesa.discrete_space import OrthogonalVonNeumannGrid
 from mesa.discrete_space.property_layer import PropertyLayer
 from mesa.examples.sugarscape_hex.agents import Trader
 
@@ -66,7 +67,7 @@ class SugarscapeG1mtHex(mesa.Model):
         self.running = True
 
         # initiate mesa grid class
-        #use a HexGrid instead of an Orthogonal VN grid
+        # use a HexGrid instead of an Orthogonal VN grid
         self.grid = OrthogonalVonNeumannGrid(
             (self.width, self.height), torus=False, random=self.random
         )
@@ -84,9 +85,11 @@ class SugarscapeG1mtHex(mesa.Model):
 
         # read in landscape file from supplementary material
 
-        #NOTE: to see original map, comment back in:
+        # NOTE: to see original map, comment back in:
         #  self.sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map.txt")
-        self.sugar_distribution = np.genfromtxt(Path(__file__).parent / "sugar-map-asymmetrical.txt")
+        self.sugar_distribution = np.genfromtxt(
+            Path(__file__).parent / "sugar-map-asymmetrical.txt"
+        )
         self.spice_distribution = np.flip(self.sugar_distribution, 1)
 
         self.grid.add_property_layer(
