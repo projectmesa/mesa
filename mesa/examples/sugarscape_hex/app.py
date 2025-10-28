@@ -10,7 +10,9 @@ def agent_portrayal(agent):
         y=agent.cell.coordinate[1],
         color="red",
         marker="o",
-        size=10,
+        #NOTE: changing size and alpha makes it easier to see colors under agents
+        size=7,
+        alpha=0.8,
         zorder=1,
     )
 
@@ -37,8 +39,9 @@ model_params = {
         "value": 42,
         "label": "Random Seed",
     },
-    "width": 50,
-    "height": 50,
+    #change these for using different height and widths
+    "width": 60,
+    "height": 40,
     # Population parameters
     "initial_population": Slider(
         "Initial Population", value=200, min=50, max=500, step=10
