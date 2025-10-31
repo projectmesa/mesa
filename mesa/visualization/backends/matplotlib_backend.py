@@ -373,6 +373,7 @@ class MatplotlibBackend(AbstractRenderer):
             # Draw based on space type
             if isinstance(space, OrthogonalGrid):
                 if color:
+                    data = data.T
                     normalized_data = (data - vmin) / (vmax - vmin)
                     rgba_data = np.full((*data.shape, 4), rgba_color)
                     rgba_data[..., 3] *= normalized_data * alpha
@@ -380,7 +381,7 @@ class MatplotlibBackend(AbstractRenderer):
                     self.ax.imshow(rgba_data, origin="lower")
                 else:
                     self.ax.imshow(
-                        data,
+                        data.T,
                         cmap=cmap,
                         alpha=alpha,
                         vmin=vmin,
