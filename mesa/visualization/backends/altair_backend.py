@@ -385,11 +385,10 @@ class AltairBackend(AbstractRenderer):
             vmin = portrayal.vmin if portrayal.vmin is not None else np.min(data)
             vmax = portrayal.vmax if portrayal.vmax is not None else np.max(data)
 
-            data = np.flipud(data)
             df = pd.DataFrame(
                 {
                     "x": np.tile(np.arange(data.shape[1]), data.shape[0]),
-                    "y": np.repeat(np.arange(data.shape[0]), data.shape[1]),
+                    "y": np.repeat(np.arange(data.shape[0] - 1, -1, -1), data.shape[1]),
                     "value": data.flatten(),
                 }
             )
