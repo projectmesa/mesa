@@ -6,7 +6,7 @@ Mesa is an open-source Python library for agent-based modeling, ideal for simula
 ## Mesa and GSoC
 Mesa has participated in Google Summer of Code since 2024 and has had 7 contributors to date.
 
-**Last year’s projects (4) :**
+### 2025 projects
 
 | Project | Contributor | Discussion Link |
 |----------|--------------|-----------------|
