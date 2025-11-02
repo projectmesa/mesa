@@ -93,6 +93,24 @@ class TestMakeUserInput(unittest.TestCase):  # noqa: D101
         assert slider_int.max is None
         assert slider_int.step is None
 
+    def test_input_text_field(self):
+        """Test that "InputText" type creates a vw.TextField."""
+
+        @solara.component
+        def Test(user_params):
+            UserInputs(user_params)
+
+        options = {"type": "InputText", "value": "JohnDoe", "label": "Agent Name"}
+
+        user_params = {"agent_name": options}
+
+        _, rc = solara.render(Test(user_params), handle_error=False)
+
+        textfield = rc.find(vw.TextField).widget
+
+        assert textfield.v_model == options["value"]
+        assert textfield.label == options["label"]
+
 
 def test_call_space_drawer(mocker):
     """Test the call to space drawer."""
