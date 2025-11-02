@@ -24,7 +24,7 @@ You can start with the official GSoC guidelines on the [proposals](https://googl
 
 For Mesa, making a great proposal implies:
 
-- Referring in a very specific way to current Mesa features and demonstrating hands-on experience with Mesa. Don’t hesitate to visit the [Mesa GitHub](https://github.com/projectmesa/mesa) and [documentation](https://mesa.readthedocs.io/latest/).
+- Building on current Mesa features and demonstrating how it will integrate with them. Hands-on experience with Mesa and building ABMs helps a lot with that. Don’t hesitate to visit the [Mesa GitHub](https://github.com/projectmesa/mesa) and [documentation](https://mesa.readthedocs.io/latest/).
 - Putting in a lot of reflection on use cases, target audience, and project fit: Mesa is a library designed to be used by a wide range of people. Who is your project for? How will it help them? How will it integrate seamlessly into Mesa?
 - Exploratory and curious mindset: show that you’re open to new ideas while maintaining flexibility in direction.
 - Putting in precise code examples for the features that you would like to implement.
