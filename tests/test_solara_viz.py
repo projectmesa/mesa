@@ -327,10 +327,9 @@ def test_check_model_params_with_args_only():
     ):
         _check_model_params(ModelWithArgsOnly.__init__, model_params)
 
+
 def test_model_params_to_widgets_bool():
-    """
-    Test that a "Checkbox" type parameter correctly creates a vw.Checkbox.
-    """
+    """Test that a "Checkbox" type parameter correctly creates a vw.Checkbox."""
     # 1. Input: Hum "is_happy" parameter ko dictionary format mein banaenge
     model_params = {
         "is_happy": {"type": "Checkbox", "value": True, "label": "Am I Happy?"}
@@ -346,7 +345,7 @@ def test_model_params_to_widgets_bool():
     # 3. Check (Assert):
     #   - Kya 1 widget bana?
     assert len(rc.find(vw.Checkbox)) == 1
-    
+
     #   - Widget ko pakdo
     widget = rc.find(vw.Checkbox).widget
 
@@ -355,10 +354,9 @@ def test_model_params_to_widgets_bool():
     #   - Kya value (v_model) sahi hai?
     assert widget.v_model is True
 
+
 def test_model_params_to_widgets_text_input():
-    """
-    Test that an "InputText" type parameter correctly creates a vw.TextField.
-    """
+    """Test that an "InputText" type parameter correctly creates a vw.TextField."""
     # 1. Input: Hum "agent_name" parameter ko dictionary format mein banaenge
     model_params = {
         "agent_name": {"type": "InputText", "value": "JohnDoe", "label": "Agent Name"}
@@ -374,7 +372,7 @@ def test_model_params_to_widgets_text_input():
     # 3. Check (Assert):
     #   - Kya 1 vw.TextField bana? (solara.InputText isse banata hai)
     assert len(rc.find(vw.TextField)) == 1
-    
+
     #   - Widget ko pakdo
     widget = rc.find(vw.TextField).widget
 
