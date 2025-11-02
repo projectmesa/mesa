@@ -329,6 +329,9 @@ from mesa.visualization import SolaraViz, make_space_component
 SolaraViz(model, components=[make_space_component(agent_portrayal)])
 ```
 
+While the above approach still works, version 3.3.0 introduced `SpaceRenderer`, which changes how space visualizations are rendered. Check out the updated [Mesa documentation](https://mesa.readthedocs.io/latest/tutorials/4_visualization_basic.html) for guidance on upgrading your model’s visualization using `SpaceRenderer`.
+
+
 #### Plotting "measures"
 
 "Measure" plots also need to be made explicit here. Previously, measure could either be 1) A function that receives a model and returns a solara component or 2) A string or list of string of variables that are collected by the datacollector and are to be plotted as a line plot. 1) still works, but you can pass that function to "components" directly. 2) needs to explicitly call the `make_plot_measure()`function.
@@ -350,6 +353,21 @@ from mesa.visualization import SolaraViz, make_plot_component
 SolaraViz(model, components=[make_plot, make_plot_component("foo"), make_plot_component("bar", "baz")])
 ```
 
+Version 3.3.0 adds support for defining pages for different plot components. Learn more in the [Mesa documentation](https://mesa.readthedocs.io/latest/tutorials/6_visualization_rendering_with_space_renderer.html).
+
+In short, you can define multiple pages using the following syntax:
+
+```python
+from mesa.visualization import SolaraViz, make_plot_component
+
+SolaraViz(
+    model,
+    components=[
+        make_plot_component("foo", page=1),
+        make_plot_component("bar", "baz", page=2),
+    ],
+)
+```
 #### Plotting text
 
 To plot model-dependent text the experimental SolaraViz provided a `make_text` function that wraps another functions that receives the model and turns its string return value into a solara text component. Again, this other function can now be passed directly to the new SolaraViz components array. It is okay if your function just returns a string.
