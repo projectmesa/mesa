@@ -270,6 +270,49 @@ class MyModel(mesa.Model):
         # Initialize the model with N agents
 ```
 
+#### Defining Portrayal Components
+
+Previously, `agent_portrayal` returned a dictionary. Now, it returns an instance of a dedicated portrayal component called `AgentPortrayalStyle`.
+
+```python
+# Old
+def agent_portrayal(agent):
+    return {
+        "color": "white" if agent.state == 0 else "black",
+        "marker": "s",
+        "size": "30"
+    }
+
+# New
+def agent_portrayal(agent):
+    return AgentPortrayalStyle(
+        color="white" if agent.state == 0 else "black",
+        marker="s",
+        size=30,
+    )
+```
+Similarly, `propertylayer_portrayal` has moved from a dictionary-based interface to a function-based one, following the same pattern as `agent_portrayal`. It now returns a `PropertyLayerStyle` instance instead of a dictionary.
+
+```python
+# Old
+propertylayer_portrayal = {
+    "sugar": {
+        "colormap": "pastel1",
+        "alpha": 0.75,
+        "colorbar": True,
+        "vmin": 0,
+        "vmax": 10,
+    }
+}
+
+# Ṇew
+def propertylayer_portrayal(layer):
+    if layer.name == "sugar":
+        return PropertyLayerStyle(
+            color="pastel1", alpha=0.75, colorbar=True, vmin=0, vmax=10
+        )
+```
+
 #### Default space visualization
 
 Previously we included a default space drawer that you could configure with an `agent_portrayal` function. You now have to explicitly create a space drawer with the `agent_portrayal` function
