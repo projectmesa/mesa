@@ -325,3 +325,24 @@ def test_check_model_params_with_args_only():
         ),
     ):
         _check_model_params(ModelWithArgsOnly.__init__, model_params)
+
+
+def test_input_text_field(self):
+    """Test that "InputText" type creates a vw.TextField."""
+
+    @solara.component
+    def Test(user_params):
+        UserInputs(user_params)
+
+    options = {"type": "InputText", "value": "JohnDoe", "label": "Agent Name"}
+    user_params = {"agent_name": options}
+
+    # Action: Render the component
+    _, rc = solara.render(Test(user_params), handle_error=False)
+
+    # Check: Find the widget
+    textfield = rc.find(vw.TextField).widget
+
+    # Assert: Check label and value
+    assert textfield.v_model == options["value"]
+    assert textfield.label == options["label"]
