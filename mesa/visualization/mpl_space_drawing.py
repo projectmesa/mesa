@@ -106,7 +106,7 @@ def collect_agent_data(
             warnings.warn(
                 "Returning a dict from agent_portrayal is deprecated and will be removed "
                 "in a future version. Please return an AgentPortrayalStyle instance instead.",
-                PendingDeprecationWarning,
+                DeprecationWarning,
                 stacklevel=2,
             )
             dict_data = portray_input.copy()
@@ -298,7 +298,7 @@ def draw_property_layers(
 
             warnings.warn(
                 "The propertylayer_portrayal dict is deprecated. Use a callable that returns PropertyLayerStyle instead.",
-                PendingDeprecationWarning,
+                DeprecationWarning,
                 stacklevel=2,
             )
 

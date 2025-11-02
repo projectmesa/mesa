@@ -109,7 +109,7 @@ class AltairBackend(AbstractRenderer):
                 warnings.warn(
                     "Returning a dict from agent_portrayal is deprecated. "
                     "Please return an AgentPortrayalStyle instance instead.",
-                    PendingDeprecationWarning,
+                    DeprecationWarning,
                     stacklevel=2,
                 )
                 dict_data = portray_input.copy()

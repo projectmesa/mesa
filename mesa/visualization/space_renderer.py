@@ -236,7 +236,7 @@ class SpaceRenderer:
                 warnings.warn(
                     "Dict propertylayer_portrayal is deprecated. "
                     "Use a callable returning PropertyLayerStyle instead.",
-                    PendingDeprecationWarning,
+                    DeprecationWarning,
                     stacklevel=2,
                 )
 

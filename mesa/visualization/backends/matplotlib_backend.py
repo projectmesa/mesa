@@ -109,7 +109,7 @@ class MatplotlibBackend(AbstractRenderer):
                 warnings.warn(
                     "Returning a dict from agent_portrayal is deprecated. "
                     "Please return an AgentPortrayalStyle instance instead.",
-                    PendingDeprecationWarning,
+                    DeprecationWarning,
                     stacklevel=2,
                 )
                 # Handle legacy dict input
