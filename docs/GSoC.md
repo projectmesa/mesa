@@ -29,7 +29,7 @@ For Mesa, making a great proposal implies:
 - Exploratory and curious mindset: show that you’re open to new ideas while maintaining flexibility in direction.
 - Putting in precise code examples for the features that you would like to implement. Especially small usage examples (how users can use the feature in a model) are really appreciated.
 - Showing that your idea can work: linking to one or more functional POCs (proofs of concept) and/or example models is highly appreciated in a proposal.
-- The Mesa team is looking for long-term commitment to community building that doesn’t stop at GSoC. Show that you can be invested by contributing to the community!
+- The Mesa team is looking for long-term commitment to community building that doesn’t stop at GSoC. Show that you can be invested by contributing to and engaging with the community!
 
 You can check out proposals from last year’s selected GSoC contributors in the links provided in the last section, and here are a few non-Mesa-specific [proposals](https://github.com/SammanSarkar/GSoC_archive_2025) that have been accepted in other organizations.
 
