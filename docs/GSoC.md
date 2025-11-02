@@ -39,7 +39,7 @@ You can check out proposals from last year’s selected GSoC contributors in the
 
 The best way to show that you can do things is to do things. It is very helpful to build one or more agent-based models with Mesa to not only explore all the incredible things you can do with it, but also to show that you know how to handle it.
 
-Also, as generative AI becomes more capable of writing convincing text, it has become increasingly difficult to differentiate a genuine proposal from an AI-generated one. Thus, **a large part of evaluation will also be based on your contributions to Mesa**. 
+Also, as generative AI becomes more capable of writing convincing text, it has become increasingly difficult to differentiate a genuine proposal from an AI-generated one. Thus, **a large part of evaluation will also be based on your contributions to Mesa**.
 
 [Contributing to Mesa](https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md) shows that you genuinely understand the project, how it works, and that you won’t spend the first month of GSoC figuring out the basics : you’ll be ready to code for your own project! Plus, digging into Mesa allows you to refine your proposal and make it more relevant and interesting for the dev team to read. The candidates who contribute meaningfully have by far the best chances of being selected.
 
