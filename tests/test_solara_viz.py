@@ -326,3 +326,59 @@ def test_check_model_params_with_args_only():
         ),
     ):
         _check_model_params(ModelWithArgsOnly.__init__, model_params)
+
+def test_model_params_to_widgets_bool():
+    """
+    Test that a "Checkbox" type parameter correctly creates a vw.Checkbox.
+    """
+    # 1. Input: Hum "is_happy" parameter ko dictionary format mein banaenge
+    model_params = {
+        "is_happy": {"type": "Checkbox", "value": True, "label": "Am I Happy?"}
+    }
+
+    # 2. Action: Hum UserInputs component ko render karenge
+    @solara.component
+    def Test():
+        return UserInputs(model_params)
+
+    _, rc = solara.render(Test(), handle_error=False)
+
+    # 3. Check (Assert):
+    #   - Kya 1 widget bana?
+    assert len(rc.find(vw.Checkbox)) == 1
+    
+    #   - Widget ko pakdo
+    widget = rc.find(vw.Checkbox).widget
+
+    #   - Kya label sahi hai?
+    assert widget.label == "Am I Happy?"
+    #   - Kya value (v_model) sahi hai?
+    assert widget.v_model is True
+
+def test_model_params_to_widgets_text_input():
+    """
+    Test that an "InputText" type parameter correctly creates a vw.TextField.
+    """
+    # 1. Input: Hum "agent_name" parameter ko dictionary format mein banaenge
+    model_params = {
+        "agent_name": {"type": "InputText", "value": "JohnDoe", "label": "Agent Name"}
+    }
+
+    # 2. Action: Hum UserInputs component ko render karenge
+    @solara.component
+    def Test():
+        return UserInputs(model_params)
+
+    _, rc = solara.render(Test(), handle_error=False)
+
+    # 3. Check (Assert):
+    #   - Kya 1 vw.TextField bana? (solara.InputText isse banata hai)
+    assert len(rc.find(vw.TextField)) == 1
+    
+    #   - Widget ko pakdo
+    widget = rc.find(vw.TextField).widget
+
+    #   - Kya label sahi hai?
+    assert widget.label == "Agent Name"
+    #   - Kya value (v_model) sahi hai?
+    assert widget.v_model == "JohnDoe"
