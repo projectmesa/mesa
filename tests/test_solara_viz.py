@@ -370,7 +370,7 @@ def test_model_params_to_widgets_text_input():
     _, rc = solara.render(Test(), handle_error=False)
 
     # 3. Check (Assert):
-    #   - Kya 1 vw.TextField bana? (solara.InputText isse banata hai)
+    # - Kya 1 vw.TextField bana? (solara.InputText creates this)
     assert len(rc.find(vw.TextField)) == 1
 
     #   - Widget ko pakdo
