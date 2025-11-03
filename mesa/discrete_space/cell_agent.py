@@ -28,13 +28,13 @@ class HasCellProtocol(Protocol):
 
 
 class HasCell:
-    def __get__(self, obj: Agent, type=None) -> Cell | None: # noqa: D105
+    def __get__(self, obj: Agent, type=None) -> Cell | None:  # noqa: D105
         try:
             return getattr(obj, self._private_name)
         except AttributeError:
             return None
 
-    def __set__(self, obj: Agent, value:Cell) -> None: # noqa: D105
+    def __set__(self, obj: Agent, value: Cell) -> None:  # noqa: D105
         try:
             current_cell = getattr(obj, self._private_name)
         except AttributeError:
@@ -50,7 +50,7 @@ class HasCell:
         if value is not None:
             value.add_agent(obj)
 
-    def __set_name__(self, owner: Agent, name) -> None: # noqa: D105
+    def __set_name__(self, owner: Agent, name) -> None:  # noqa: D105
         self._private_name = f"_{name}"
 
 
@@ -100,7 +100,7 @@ class BasicMovement:
 class FixedCell(HasCell):
     """Descriptor for agents that are fixed to a cell."""
 
-    def __set__(self, obj: Agent, value:Cell) -> None: # noqa: D105
+    def __set__(self, obj: Agent, value: Cell) -> None:  # noqa: D105
         try:
             current_cell = getattr(obj, self._private_name)
         except AttributeError:
