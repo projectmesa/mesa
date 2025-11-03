@@ -112,6 +112,7 @@ API Documentation <apis/api_main>
 - {ref}`search`
 
 [contributors guide]: https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md
+[GSoC at Mesa — Candidates Guide]: GSoC.md
 [github repository]: https://github.com/projectmesa/mesa/
 [github discussions]: https://github.com/projectmesa/mesa/discussions
 [issue tracker]: https://github.com/projectmesa/mesa/issues
