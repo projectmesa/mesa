@@ -1,7 +1,7 @@
 # GSoC at Mesa — Candidates Guide
 
 ## What is Mesa?
-Mesa is an open-source Python library for agent-based modeling, ideal for simulating complex systems and exploring emergent behaviors. It lets you quickly build models using core components (e.g., spatial grids, schedulers) or custom implementations, visualize them in a browser, and analyze results with Python’s data tools. The goal: make simulations accessible so we can better understand and tackle complex problems.
+Mesa is an open-source Python library for agent-based modeling (ABM), ideal for simulating complex systems and exploring emergent behaviors. It lets you quickly build models using core components (e.g., spatial grids, schedulers) or custom implementations, visualize them in a browser, and analyze results with Python’s data tools. The goal: make simulations accessible so we can better understand and tackle complex problems.
 
 ## Mesa and GSoC
 Mesa has participated in Google Summer of Code since 2024 and has had 7 contributors to date.
@@ -49,4 +49,4 @@ Also, as generative AI becomes more capable of writing convincing text, it has b
 
 - **Ask relevant questions:** asking questions is good, but asking *good* questions showcases your motivation. If you don’t know something, first check the [Mesa GitHub](https://github.com/projectmesa/mesa) and [documentation](https://mesa.readthedocs.io/latest/). In the best case, you’ll find your answer; if not, you can ask a specific question, showing your interest and drive to deepen your knowledge of Mesa.
 - **Be nice and helpful:** the open-source community is built on transparency and goodwill. Helping people demonstrates that it’s pleasant to work with you. Plus, it also showcases your knowledge of Mesa ;)
-- **Clarify scope with mentors:** if you can’t figure out the scope of the project, it’s completely okay to talk to the mentors about the most pressing matters and give them priority. This helps you focus on what matters and reduce fluff in your proposal.
+- **Clarify scope with mentors:** if you can’t figure out the scope of the project, it’s completely okay to talk to the mentors about the most pressing matters and give them priority. This helps you to separate the main issues from the non-essentials and focus on what matters.
