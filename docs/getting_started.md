@@ -9,7 +9,7 @@ If you want to get a general idea of Mesa’s features and structure, start here
 - [Overview of the MESA library](overview): Learn about the core concepts and components of Mesa.
 
 ## Tutorials
-If you want to learn how to build agent-based models step by step using Mesa, follow these tutorials : 
+If you want to learn how to build agent-based models step by step using Mesa, follow these tutorials :
 
 - [Creating Your First Model](tutorials/0_first_model): Learn how to create your first Mesa model.
 - [Adding Space](tutorials/1_adding_space): Learn how to add space to your Mesa model and understand Mesa's space architecture.
