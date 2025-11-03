@@ -28,26 +28,50 @@ class HasCellProtocol(Protocol):
 
 
 class HasCell:
-    """Descriptor for cell movement behavior."""
 
-    _mesa_cell: Cell | None = None
+    def __get__(self, obj: Agent, type=None) -> Cell | None:
+        return getattr(obj,self._private_name)
 
-    @property
-    def cell(self) -> Cell | None:  # noqa: D102
-        return self._mesa_cell
+    def __set__(self, obj: Agent, value:Cell) -> None:
+        try:
+            current_cell = getattr(obj, self._private_name)
+        except AttributeError:
+            current_cell = None
 
-    @cell.setter
-    def cell(self, cell: Cell | None) -> None:
         # remove from current cell
-        if self.cell is not None:
-            self.cell.remove_agent(self)
+        if current_cell is not None:
+            current_cell.remove_agent(obj)
 
-        # update private attribute
-        self._mesa_cell = cell
+        setattr(obj, self._private_name, value)
 
         # add to new cell
-        if cell is not None:
-            cell.add_agent(self)
+        if value is not None:
+            value.add_agent(obj)
+
+    def __set_name__(self, owner: Agent, name) -> None:
+        self._private_name = f"_{name}"
+
+# class HasCell:
+#     """Descriptor for cell movement behavior."""
+#
+#     _mesa_cell: Cell | None = None
+#
+#     @property
+#     def cell(self) -> Cell | None:  # noqa: D102
+#         return self._mesa_cell
+#
+#     @cell.setter
+#     def cell(self, cell: Cell | None) -> None:
+#         # remove from current cell
+#         if self.cell is not None:
+#             self.cell.remove_agent(self)
+#
+#         # update private attribute
+#         self._mesa_cell = cell
+#
+#         # add to new cell
+#         if cell is not None:
+#             cell.add_agent(self)
 
 
 class BasicMovement:
@@ -71,27 +95,27 @@ class BasicMovement:
 
 
 class FixedCell(HasCell):
-    """Mixin for agents that are fixed to a cell."""
+    """Descriptor for agents that are fixed to a cell."""
 
-    @property
-    def cell(self) -> Cell | None:  # noqa: D102
-        return self._mesa_cell
+    def __set__(self, obj: Agent, value:Cell) -> None:
+        try:
+            current_cell = getattr(obj, self._private_name)
+        except AttributeError:
+            current_cell = None
 
-    @cell.setter
-    def cell(self, cell: Cell) -> None:
-        if self.cell is not None:
+        if current_cell is not None:
             raise ValueError("Cannot move agent in FixedCell")
-        self._mesa_cell = cell
+        setattr(obj, self._private_name, value)
+        value.add_agent(obj)
 
-        cell.add_agent(self)
 
-
-class CellAgent(Agent, HasCell, BasicMovement):
+class CellAgent(Agent, BasicMovement):
     """Cell Agent is an extension of the Agent class and adds behavior for moving in discrete spaces.
 
     Attributes:
         cell (Cell): The cell the agent is currently in.
     """
+    cell = HasCell()
 
     def remove(self):
         """Remove the agent from the model."""
@@ -99,8 +123,9 @@ class CellAgent(Agent, HasCell, BasicMovement):
         self.cell = None  # ensures that we are also removed from cell
 
 
-class FixedAgent(Agent, FixedCell):
+class FixedAgent(Agent):
     """A patch in a 2D grid."""
+    cell = FixedCell()
 
     def remove(self):
         """Remove the agent from the model."""
