@@ -28,7 +28,9 @@ class HasCellProtocol(Protocol):
 
 
 class HasCell:
-    def __get__(self, obj: Agent, type=None) -> Cell | None:  # noqa: D105
+    """Descriptor for agents have a cell."""
+
+    def __get__(self, obj: Agent, type=None) -> Cell | None: # noqa: D105
         try:
             return getattr(obj, self._private_name)
         except AttributeError:
