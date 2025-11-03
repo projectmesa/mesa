@@ -1,6 +1,6 @@
 # Contributing
 
-For candidates interested in participating in the Google Summer of Code (GSoC), checkout Mesa’s [GSoC guide](https://github.com/projectmesa/mesa/blob/main/docs/GSoC.md).
+_For candidates interested in participating in the Google Summer of Code (GSoC), checkout Mesa’s [GSoC guide](https://github.com/projectmesa/mesa/blob/main/docs/GSoC.md)._
 
 As an open source project, Mesa welcomes contributions of many forms, and from beginners to experts. If you are
 curious or just want to see what is happening, we post our development session agendas
