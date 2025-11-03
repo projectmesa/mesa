@@ -28,11 +28,10 @@ class HasCellProtocol(Protocol):
 
 
 class HasCell:
-
     def __get__(self, obj: Agent, type=None) -> Cell | None:
-        return getattr(obj,self._private_name)
+        return getattr(obj, self._private_name)
 
-    def __set__(self, obj: Agent, value:Cell) -> None:
+    def __set__(self, obj: Agent, value: Cell) -> None:
         try:
             current_cell = getattr(obj, self._private_name)
         except AttributeError:
@@ -51,13 +50,14 @@ class HasCell:
     def __set_name__(self, owner: Agent, name) -> None:
         self._private_name = f"_{name}"
 
+
 # class HasCell:
 #     """Descriptor for cell movement behavior."""
 #
 #     _mesa_cell: Cell | None = None
 #
 #     @property
-#     def cell(self) -> Cell | None:  # noqa: D102
+#     def cell(self) -> Cell | None:
 #         return self._mesa_cell
 #
 #     @cell.setter
@@ -97,7 +97,7 @@ class BasicMovement:
 class FixedCell(HasCell):
     """Descriptor for agents that are fixed to a cell."""
 
-    def __set__(self, obj: Agent, value:Cell) -> None:
+    def __set__(self, obj: Agent, value: Cell) -> None:
         try:
             current_cell = getattr(obj, self._private_name)
         except AttributeError:
@@ -115,6 +115,7 @@ class CellAgent(Agent, BasicMovement):
     Attributes:
         cell (Cell): The cell the agent is currently in.
     """
+
     cell = HasCell()
 
     def remove(self):
@@ -125,6 +126,7 @@ class CellAgent(Agent, BasicMovement):
 
 class FixedAgent(Agent):
     """A patch in a 2D grid."""
+
     cell = FixedCell()
 
     def remove(self):
