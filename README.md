@@ -63,6 +63,7 @@ pip install -U -e git+https://github.com/YOUR_FORK/mesa@YOUR_BRANCH#egg=mesa
 For resources or help on using Mesa, check out the following:
 
 -   [Getting Started](https://mesa.readthedocs.io/stable/getting_started.html) (A collection of tutorials that will walk you through a basic model.)
+-   [GSoC at Mesa — Candidates Guide](https://github.com/projectmesa/mesa/blob/main/docs/GSoC.md) (For candidates interested in participating in the Google Summer of Code at Mesa)
 -   [Mesa Examples](https://mesa.readthedocs.io/stable/examples.html) (A repository of seminal ABMs that are part of the Mesa[rec] install and use the most current Mesa release)
 -   [Docs](http://mesa.readthedocs.org/) (Mesa's documentation, API and useful snippets)
     -   [Development version docs](https://mesa.readthedocs.io/latest/) (the latest version docs if you're using a pre-release Mesa version)
