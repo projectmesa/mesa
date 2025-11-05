@@ -3,11 +3,112 @@ This guide contains breaking changes between major Mesa versions and how to reso
 
 Non-breaking changes aren't included, for those see our [Release history](https://github.com/projectmesa/mesa/releases).
 
+## Mesa 3.3.0
+
+Mesa 3.3.0 is a visualization upgrade introducing a new and improved API, full support for both `altair` and `matplotlib` backends, and resolving several recurring issues from previous versions.
+For full details on how to visualize your model, refer to the [Mesa Documentation](https://mesa.readthedocs.io/latest/tutorials/4_visualization_basic.html).
+
+
+_This guide is a work in progress. The development of it is tracked in [Issue #2233](https://github.com/projectmesa/mesa/issues/2233)._
+
+
+### Defining Portrayal Components
+Previously, `agent_portrayal` returned a dictionary. Now, it returns an instance of a dedicated portrayal component called `AgentPortrayalStyle`.
+
+```python
+# Old
+def agent_portrayal(agent):
+    return {
+        "color": "white" if agent.state == 0 else "black",
+        "marker": "s",
+        "size": "30"
+    }
+
+# New
+def agent_portrayal(agent):
+    return AgentPortrayalStyle(
+        color="white" if agent.state == 0 else "black",
+        marker="s",
+        size=30,
+    )
+```
+
+Similarly, `propertylayer_portrayal` has moved from a dictionary-based interface to a function-based one, following the same pattern as `agent_portrayal`. It now returns a `PropertyLayerStyle` instance instead of a dictionary.
+
+```python
+# Old
+propertylayer_portrayal = {
+    "sugar": {
+        "colormap": "pastel1",
+        "alpha": 0.75,
+        "colorbar": True,
+        "vmin": 0,
+        "vmax": 10,
+    }
+}
+
+# New
+def propertylayer_portrayal(layer):
+    if layer.name == "sugar":
+        return PropertyLayerStyle(
+            color="pastel1", alpha=0.75, colorbar=True, vmin=0, vmax=10
+        )
+```
+
+* Ref: [PR #2786](https://github.com/projectmesa/mesa/pull/2786)
+
+### Default Space Visualization
+While the visualization methods from Mesa versions before 3.3.0 still work, version 3.3.0 introduces `SpaceRenderer`, which changes how space visualizations are rendered. Check out the updated [Mesa documentation](https://mesa.readthedocs.io/latest/tutorials/4_visualization_basic.html) for guidance on upgrading your model’s visualization using `SpaceRenderer`.
+
+A basic example of how `SpaceRenderer` works:
+
+```python
+# Old
+from mesa.visualization import SolaraViz, make_space_component
+
+SolaraViz(model, components=[make_space_component(agent_portrayal)])
+
+# New
+from mesa.visualization import SolaraViz, SpaceRenderer
+
+renderer = SpaceRenderer(model, backend="matplotlib").render(
+    agent_portrayal=agent_portrayal,
+    ...
+)
+
+SolaraViz(
+    model,
+    renderer,
+    components=[],
+    ...
+)
+```
+
+* Ref: [PR #2803](https://github.com/projectmesa/mesa/pull/2803), [PR #2810](https://github.com/projectmesa/mesa/pull/2810)
+
+### Page Tab View
+
+Version 3.3.0 adds support for defining pages for different plot components. Learn more in the [Mesa documentation](https://mesa.readthedocs.io/latest/tutorials/6_visualization_rendering_with_space_renderer.html).
+
+In short, you can define multiple pages using the following syntax:
+
+```python
+from mesa.visualization import SolaraViz, make_plot_component
+
+SolaraViz(
+    model,
+    components=[
+        make_plot_component("foo", page=1),
+        make_plot_component("bar", "baz", page=2),
+    ],
+)
+```
+
+* Ref: [PR #2827](https://github.com/projectmesa/mesa/pull/2827)
+
 
 ## Mesa 3.0
 Mesa 3.0 introduces significant changes to core functionalities, including agent and model initialization, scheduling, and visualization. The guide below outlines these changes and provides instructions for migrating your existing Mesa projects to version 3.0.
-
-_This guide is a work in progress. The development of it is tracked in [Issue #2233](https://github.com/projectmesa/mesa/issues/2233)._
 
 
 ### Upgrade strategy
