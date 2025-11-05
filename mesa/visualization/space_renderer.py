@@ -234,9 +234,13 @@ class SpaceRenderer:
                 params = portrayal_dict.get(layer_name)
 
                 warnings.warn(
-                    "Dict propertylayer_portrayal is deprecated. "
-                    "Use a callable returning PropertyLayerStyle instead.",
-                    PendingDeprecationWarning,
+                    (
+                        "The propertylayer_portrayal dict is deprecated. "
+                        "Please use a callable that returns a PropertyLayerStyle instance instead. "
+                        "For more information, refer to the migration guide: "
+                        "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
+                    ),
+                    DeprecationWarning,
                     stacklevel=2,
                 )
 
