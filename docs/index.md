@@ -83,6 +83,7 @@ Mesa is an open source project and welcomes contributions:
 - [GitHub Repository] - Access the source code
 - [Issue Tracker] - Report bugs or suggest features
 - [Contributors Guide] - Learn how to contribute
+- [GSoC at Mesa — Candidates Guide] - For candidates interested in participating in the Google Summer of Code at Mesa
 
 ### Citing Mesa
 
@@ -112,6 +113,7 @@ API Documentation <apis/api_main>
 - {ref}`search`
 
 [contributors guide]: https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md
+[GSoC at Mesa — Candidates Guide]: GSoC.md
 [github repository]: https://github.com/projectmesa/mesa/
 [github discussions]: https://github.com/projectmesa/mesa/discussions
 [issue tracker]: https://github.com/projectmesa/mesa/issues
