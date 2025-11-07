@@ -25,7 +25,7 @@
 Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Mesa's goal is to make simulations accessible to everyone, so humanity can more effectively understand and solve complex problems.
 
 ![A screenshot of the Wolf Sheep model in Mesa|100%](images/wolf_sheep.png)
-*A visualisation of the Wolf Sheep model build with Mesa.*
+*A visualisation of the Wolf Sheep model build with Mesa. An online demo is [available here](https://py.cafe/app/EwoutH/mesa-solara-basic-examples).*
 
 ## Features
 
