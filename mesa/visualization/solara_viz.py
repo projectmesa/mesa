@@ -517,6 +517,8 @@ def ModelController(
         """Advance the model by the number of steps specified by the render_interval slider."""
         if playing.value:
             for _ in range(render_interval.value):
+                if not running.value:
+                    break
                 model.value.step()
                 running.value = model.value.running
                 if not playing.value:
@@ -526,6 +528,8 @@ def ModelController(
 
         else:
             for _ in range(render_interval.value):
+                if not running.value:
+                    break
                 model.value.step()
                 running.value = model.value.running
             force_update()
@@ -645,6 +649,8 @@ def SimulatorController(
         """Advance the model by the number of steps specified by the render_interval slider."""
         if playing.value:
             for _ in range(render_interval.value):
+                if not running.value:
+                    break
                 simulator.run_for(1)
                 running.value = model.value.running
                 if not playing.value:
@@ -654,6 +660,8 @@ def SimulatorController(
 
         else:
             for _ in range(render_interval.value):
+                if not running.value:
+                    break
                 simulator.run_for(1)
                 running.value = model.value.running
             force_update()
