@@ -77,7 +77,8 @@ class AltairBackend(AbstractRenderer):
             "filled": [],
         }
 
-        from mesa.visualization.components import AgentPortrayalStyle
+        # Import here to avoid circular import issues
+        from mesa.visualization.components import AgentPortrayalStyle  # noqa: PLC0415
 
         style_fields = {f.name: f.default for f in fields(AgentPortrayalStyle)}
         class_default_size = style_fields.get("size")
@@ -106,9 +107,13 @@ class AltairBackend(AbstractRenderer):
 
             if isinstance(portray_input, dict):
                 warnings.warn(
-                    "Returning a dict from agent_portrayal is deprecated. "
-                    "Please return an AgentPortrayalStyle instance instead.",
-                    PendingDeprecationWarning,
+                    (
+                        "Returning a dict from agent_portrayal is deprecated. "
+                        "Please return an AgentPortrayalStyle instance instead. "
+                        "For more information, refer to the migration guide: "
+                        "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
+                    ),
+                    DeprecationWarning,
                     stacklevel=2,
                 )
                 dict_data = portray_input.copy()
@@ -279,7 +284,6 @@ class AltairBackend(AbstractRenderer):
             fill_encoding = alt.Fill(
                 "original_color:Q",
                 scale=alt.Scale(scheme=cmap, domain=[color_min, color_max]),
-                title="Colormap",
             )
         else:
             fill_encoding = alt.Fill(
@@ -388,7 +392,7 @@ class AltairBackend(AbstractRenderer):
             df = pd.DataFrame(
                 {
                     "x": np.repeat(np.arange(data.shape[0]), data.shape[1]),
-                    "y": np.tile(np.arange(data.shape[1]), data.shape[0]),
+                    "y": np.tile(np.arange(data.shape[1] - 1, -1, -1), data.shape[0]),
                     "value": data.flatten(),
                 }
             )

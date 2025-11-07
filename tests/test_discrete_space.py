@@ -1,7 +1,11 @@
 """Test cell spaces."""
 
+import copy
+import pickle
 import random
+import re
 
+import networkx as nx
 import numpy as np
 import pytest
 
@@ -469,8 +473,6 @@ def test_hexgrid():
 
 def test_networkgrid():
     """Test NetworkGrid."""
-    import networkx as nx
-
     n = 10
     m = 20
     seed = 42
@@ -482,8 +484,6 @@ def test_networkgrid():
     for i, cell in grid._cells.items():
         for connection in cell.connections.values():
             assert connection.coordinate in G.neighbors(i)
-
-    import pickle
 
     pickle.loads(pickle.dumps(grid))  # noqa: S301
 
@@ -530,8 +530,6 @@ def test_voronoigrid():
 
 def test_empties_space():
     """Test empties method for Discrete Spaces."""
-    import networkx as nx
-
     n = 10
     m = 20
     seed = 42
@@ -547,8 +545,6 @@ def test_empties_space():
 
 def test_agents_property():
     """Test empties method for Discrete Spaces."""
-    import networkx as nx
-
     n = 10
     m = 20
     seed = 42
@@ -747,9 +743,6 @@ def test_property_layer_integration():
 
 def test_copy_pickle_with_propertylayers():
     """Test deepcopy and pickle with dynamically created GridClass and ProperyLayer descriptors."""
-    import copy
-    import pickle
-
     dimensions = (10, 10)
     grid = OrthogonalMooreGrid(dimensions, torus=False, random=random.Random(42))
 
@@ -917,7 +910,9 @@ def test_property_layer_errors():
 
     # Test adding a PropertyLayer with an existing name
     grid.add_property_layer(elevation)
-    with pytest.raises(ValueError, match="Property layer elevation already exists."):
+    with pytest.raises(
+        ValueError, match=re.escape("Property layer elevation already exists.")
+    ):
         grid.add_property_layer(elevation)
 
     # test adding a layer with different dimensions than space
@@ -926,7 +921,9 @@ def test_property_layer_errors():
     elevation = PropertyLayer("elevation", (10, 10), default_value=0.0)
     with pytest.raises(
         ValueError,
-        match="Dimensions of property layer do not match the dimensions of the grid",
+        match=re.escape(
+            "Dimensions of property layer do not match the dimensions of the grid"
+        ),
     ):
         grid.add_property_layer(elevation)
 
@@ -1014,10 +1011,6 @@ def test_patch():  # noqa: D103
 def test_copying_discrete_spaces():  # noqa: D103
     # inspired by #2373
     # we use deepcopy but this also applies to pickle
-    import copy
-
-    import networkx as nx
-
     grid = OrthogonalMooreGrid((100, 100), random=random.Random(42))
     grid_copy = copy.deepcopy(grid)
 

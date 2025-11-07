@@ -1,5 +1,6 @@
 """Test cases for the SpaceRenderer class in Mesa."""
 
+import re
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -134,6 +135,44 @@ def test_no_property_layers():
     # Simulate missing property layer in the grid
     with (
         patch.object(model.grid, "_mesa_property_layers", new={}),
-        pytest.raises(Exception, match="No property layers were found on the space."),
+        pytest.raises(
+            Exception, match=re.escape("No property layers were found on the space.")
+        ),
     ):
         sr.draw_propertylayer(lambda _: PropertyLayerStyle(color="red"))
+
+
+def test_post_process():
+    """Test the post-processing step of the SpaceRenderer."""
+    model = CustomModel()
+    sr = SpaceRenderer(model)
+
+    def post_process_ax(ax):
+        ax.set_xlim(0, 400)
+        ax.set_ylim(0, 400)
+        return ax
+
+    ax = MagicMock()
+    sr.post_process_ax = post_process_ax
+    processed = sr.post_process_ax(ax)
+
+    # Assert that the axis limits were set correctly
+    ax.set_xlim.assert_called_once_with(0, 400)
+    ax.set_ylim.assert_called_once_with(0, 400)
+    assert processed == ax
+
+    def post_process_chart(chart):
+        chart = chart.properties(width=400, height=400)
+        return chart
+
+    # Simulate a chart object
+    chart = MagicMock()
+    chart.properties.return_value = chart
+
+    # Call the post_process method
+    sr.post_process = post_process_chart
+    processed = sr.post_process(chart)
+
+    # Assert that the chart properties were set correctly
+    chart.properties.assert_called_once_with(width=400, height=400)
+    assert processed == chart

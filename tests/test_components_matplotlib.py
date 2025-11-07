@@ -1,6 +1,7 @@
 """tests for matplotlib components."""
 
 import matplotlib.pyplot as plt
+import networkx as nx
 
 from mesa import Agent, Model
 from mesa.experimental.cell_space import (
@@ -44,7 +45,6 @@ def agent_portrayal(agent):
 
 def test_draw_space():
     """Test draw_space helper method."""
-    import networkx as nx
 
     def my_portrayal(agent):
         """Simple portrayal of an agent.
@@ -69,7 +69,7 @@ def test_draw_space():
         agent = Agent(model)
         grid.move_to_empty(agent)
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_space(grid, my_portrayal, ax=ax)
 
     # draw space for voroinoi
@@ -80,7 +80,7 @@ def test_draw_space():
         agent = CellAgent(model)
         agent.cell = grid.select_random_empty_cell()
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_space(grid, my_portrayal, ax=ax)
 
     # draw orthogonal grid
@@ -89,7 +89,7 @@ def test_draw_space():
     for _ in range(10):
         agent = CellAgent(model)
         agent.cell = grid.select_random_empty_cell()
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_space(grid, my_portrayal, ax=ax)
 
     # draw network
@@ -104,7 +104,7 @@ def test_draw_space():
         agent = Agent(model)
         pos = agent.random.randint(0, len(graph.nodes) - 1)
         grid.place_agent(agent, pos)
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_space(grid, my_portrayal, ax=ax)
 
     # draw continuous space
@@ -116,7 +116,7 @@ def test_draw_space():
         agent = Agent(model)
         space.place_agent(agent, (x, y))
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_space(space, my_portrayal, ax=ax)
 
 
@@ -128,7 +128,7 @@ def test_draw_hex_grid():
         agent = Agent(model)
         grid.move_to_empty(agent)
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_hex_grid(grid, agent_portrayal, ax)
 
     model = Model(seed=42)
@@ -137,7 +137,7 @@ def test_draw_hex_grid():
         agent = CellAgent(model)
         agent.cell = grid.select_random_empty_cell()
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_hex_grid(grid, agent_portrayal, ax)
 
 
@@ -152,7 +152,7 @@ def test_draw_voronoi_grid():
         agent = CellAgent(model)
         agent.cell = grid.select_random_empty_cell()
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_voronoi_grid(grid, agent_portrayal, ax)
 
 
@@ -164,7 +164,7 @@ def test_draw_orthogonal_grid():
         agent = Agent(model)
         grid.move_to_empty(agent)
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_orthogonal_grid(grid, agent_portrayal, ax)
 
     model = Model(seed=42)
@@ -173,7 +173,7 @@ def test_draw_orthogonal_grid():
         agent = CellAgent(model)
         agent.cell = grid.select_random_empty_cell()
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_orthogonal_grid(grid, agent_portrayal, ax)
 
 
@@ -187,14 +187,12 @@ def test_draw_continuous_space():
         agent = Agent(model)
         space.place_agent(agent, (x, y))
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_continuous_space(space, agent_portrayal, ax)
 
 
 def test_draw_network():
     """Test drawing network."""
-    import networkx as nx
-
     n = 10
     m = 20
     seed = 42
@@ -207,7 +205,7 @@ def test_draw_network():
         pos = agent.random.randint(0, len(graph.nodes) - 1)
         grid.place_agent(agent, pos)
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_network(grid, agent_portrayal, ax)
 
     model = Model(seed=42)
@@ -216,7 +214,7 @@ def test_draw_network():
         agent = CellAgent(model)
         agent.cell = grid.select_random_empty_cell()
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_network(grid, agent_portrayal, ax)
 
 
@@ -226,12 +224,12 @@ def test_draw_property_layers():
     grid = SingleGrid(10, 10, torus=True)
     grid.add_property_layer(PropertyLayer("test", grid.width, grid.height, 0))
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_property_layers(grid, {"test": {"colormap": "viridis", "colorbar": True}}, ax)
 
     model = Model(seed=42)
     grid = OrthogonalMooreGrid((10, 10), torus=True, random=model.random, capacity=1)
     grid.create_property_layer("test", 0.0)
 
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     draw_property_layers(grid, {"test": {"colormap": "viridis", "colorbar": True}}, ax)

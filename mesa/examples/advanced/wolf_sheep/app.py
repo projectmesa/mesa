@@ -5,34 +5,32 @@ from mesa.visualization import (
     CommandConsole,
     Slider,
     SolaraViz,
+    SpaceRenderer,
     make_plot_component,
-    make_space_component,
 )
+from mesa.visualization.components import AgentPortrayalStyle
 
 
 def wolf_sheep_portrayal(agent):
     if agent is None:
         return
 
-    portrayal = {
-        "size": 25,
-    }
+    portrayal = AgentPortrayalStyle(
+        size=50,
+        marker="o",
+        zorder=2,
+    )
 
     if isinstance(agent, Wolf):
-        portrayal["color"] = "tab:red"
-        portrayal["marker"] = "o"
-        portrayal["zorder"] = 2
+        portrayal.update(("color", "red"))
     elif isinstance(agent, Sheep):
-        portrayal["color"] = "tab:cyan"
-        portrayal["marker"] = "o"
-        portrayal["zorder"] = 2
+        portrayal.update(("color", "cyan"))
     elif isinstance(agent, GrassPatch):
         if agent.fully_grown:
-            portrayal["color"] = "tab:green"
+            portrayal.update(("color", "tab:green"))
         else:
-            portrayal["color"] = "tab:brown"
-        portrayal["marker"] = "s"
-        portrayal["size"] = 75
+            portrayal.update(("color", "tab:brown"))
+        portrayal.update(("marker", "s"), ("size", 125), ("zorder", 1))
 
     return portrayal
 
@@ -75,9 +73,6 @@ def post_process_lines(ax):
     ax.legend(loc="center left", bbox_to_anchor=(1, 0.9))
 
 
-space_component = make_space_component(
-    wolf_sheep_portrayal, draw_grid=False, post_process=post_process_space
-)
 lineplot_component = make_plot_component(
     {"Wolves": "tab:orange", "Sheep": "tab:cyan", "Grass": "tab:green"},
     post_process=post_process_lines,
@@ -86,9 +81,17 @@ lineplot_component = make_plot_component(
 simulator = ABMSimulator()
 model = WolfSheep(simulator=simulator, grass=True)
 
+renderer = SpaceRenderer(
+    model,
+    backend="matplotlib",
+)
+renderer.draw_agents(wolf_sheep_portrayal)
+renderer.post_process = post_process_space
+
 page = SolaraViz(
     model,
-    components=[space_component, lineplot_component, CommandConsole],
+    renderer,
+    components=[lineplot_component, CommandConsole],
     model_params=model_params,
     name="Wolf Sheep",
     simulator=simulator,

@@ -92,7 +92,7 @@ def collect_agent_data(
     }
 
     # Importing AgentPortrayalStyle inside the function to prevent circular imports
-    from mesa.visualization.components import AgentPortrayalStyle
+    from mesa.visualization.components import AgentPortrayalStyle  # noqa: PLC0415
 
     # Get AgentPortrayalStyle defaults
     style_fields = {f.name: f.default for f in fields(AgentPortrayalStyle)}
@@ -104,9 +104,13 @@ def collect_agent_data(
 
         if isinstance(portray_input, dict):
             warnings.warn(
-                "Returning a dict from agent_portrayal is deprecated and will be removed "
-                "in a future version. Please return an AgentPortrayalStyle instance instead.",
-                PendingDeprecationWarning,
+                (
+                    "Returning a dict from agent_portrayal is deprecated. "
+                    "Please return an AgentPortrayalStyle instance instead. "
+                    "For more information, refer to the migration guide: "
+                    "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
+                ),
+                DeprecationWarning,
                 stacklevel=2,
             )
             dict_data = portray_input.copy()
@@ -205,7 +209,7 @@ def draw_space(
 
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
 
     # https://stackoverflow.com/questions/67524641/convert-multiple-isinstance-checks-to-structural-pattern-matching
     match space:
@@ -285,7 +289,7 @@ def draw_property_layers(
 
     """
     # Importing here to avoid circular import issues
-    from mesa.visualization.components import PropertyLayerStyle
+    from mesa.visualization.components import PropertyLayerStyle  # noqa: PLC0415
 
     def _propertylayer_portryal_dict_to_callable(
         propertylayer_portrayal: dict[str, dict[str, Any]],
@@ -297,8 +301,13 @@ def draw_property_layers(
             params = propertylayer_portrayal.get(layer_name)
 
             warnings.warn(
-                "The propertylayer_portrayal dict is deprecated. Use a callable that returns PropertyLayerStyle instead.",
-                PendingDeprecationWarning,
+                (
+                    "The propertylayer_portrayal dict is deprecated. "
+                    "Please use a callable that returns a PropertyLayerStyle instance instead. "
+                    "For more information, refer to the migration guide: "
+                    "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
+                ),
+                DeprecationWarning,
                 stacklevel=2,
             )
 
@@ -443,7 +452,7 @@ def draw_orthogonal_grid(
 
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
 
     # gather agent data
     s_default = (180 / max(space.width, space.height)) ** 2
@@ -488,7 +497,7 @@ def draw_hex_grid(
     "size", "marker", "zorder", alpha, linewidths, and edgecolors. Other field are ignored and will result in a user warning.
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
 
     # gather data
     s_default = (180 / max(space.width, space.height)) ** 2
@@ -573,7 +582,7 @@ def draw_network(
 
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
     if layout_kwargs is None:
         layout_kwargs = {"seed": 0}
 
@@ -642,7 +651,7 @@ def draw_continuous_space(
 
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
 
     # space related setup
     width = space.x_max - space.x_min
@@ -694,7 +703,7 @@ def draw_voronoi_grid(
 
     """
     if ax is None:
-        fig, ax = plt.subplots()
+        _, ax = plt.subplots()
 
     x_list = [i[0] for i in space.centroids_coordinates]
     y_list = [i[1] for i in space.centroids_coordinates]

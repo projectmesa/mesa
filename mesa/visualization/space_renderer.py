@@ -4,6 +4,7 @@ This module provides functionality to render Mesa model spaces with different
 backends, supporting various space types and visualization components.
 """
 
+import contextlib
 import warnings
 from collections.abc import Callable
 from typing import Literal
@@ -152,7 +153,11 @@ class SpaceRenderer:
             # Ensure x is an integer index for the position mapping
             x = x.astype(int)
 
-            mapped_arguments["loc"] = pos[x - 1]  # Adjust for 1-based indexing
+            # FIXME: Find better way to handle this case
+            # x updates before pos can, therefore gives us index error that
+            # needs to be ignored.
+            with contextlib.suppress(IndexError):
+                mapped_arguments["loc"] = pos[x]
 
         return mapped_arguments
 
@@ -212,7 +217,7 @@ class SpaceRenderer:
             Exception: If no property layers are found on the space.
         """
         # Import here to avoid circular imports
-        from mesa.visualization.components import PropertyLayerStyle
+        from mesa.visualization.components import PropertyLayerStyle  # noqa: PLC0415
 
         def _dict_to_callable(portrayal_dict):
             """Convert legacy dict portrayal to callable.
@@ -229,9 +234,13 @@ class SpaceRenderer:
                 params = portrayal_dict.get(layer_name)
 
                 warnings.warn(
-                    "Dict propertylayer_portrayal is deprecated. "
-                    "Use a callable returning PropertyLayerStyle instead.",
-                    PendingDeprecationWarning,
+                    (
+                        "The propertylayer_portrayal dict is deprecated. "
+                        "Please use a callable that returns a PropertyLayerStyle instance instead. "
+                        "For more information, refer to the migration guide: "
+                        "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
+                    ),
+                    DeprecationWarning,
                     stacklevel=2,
                 )
 
