@@ -162,30 +162,39 @@ class AgentSet(MutableSet, Sequence):
         which means that agents not referenced elsewhere in the program may be automatically removed from the AgentSet.
 
     Notes:
-        A `UserWarning` is issued if `random=None`. You can resolve this warning by explicitly
-        passing a random number generator. In most cases, this will be the seeded random number
-        generator in the model. So, you would do `random=self.random` in a `Model` or `Agent` instance.
+        If random is None then the random number generator in the model of the first agent is used.
+        If the agents list is empty and random is also None a user warning is issued and the AgentSet
+        is an empty list and a default random number generator.  This can make models non-reproducible.
+        If your code may create an AgentSet with no agents please pass a random number generator explicitly.
 
     """
 
-    def __init__(self, agents: Iterable[Agent], random: Random | None = None):
+    def __init__(
+        self,
+        agents: Iterable[Agent],
+        random: Random | None = None,
+    ):
         """Initializes the AgentSet with a collection of agents and a reference to the model.
 
         Args:
             agents (Iterable[Agent]): An iterable of Agent objects to be included in the set.
-            random (Random): the random number generator
+            random (Random | np.random.Generator | None): the random number generator
         """
-        if random is None:
+        self._agents = weakref.WeakKeyDictionary(dict.fromkeys(agents))
+        if (len(self._agents) == 0) and random is None:
             warnings.warn(
-                "Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
+                "No Agents specified in creation of AgentSet and no random number generator specified. "
+                "This can make models non-reproducible. Please pass a random number generator explicitly",
                 UserWarning,
                 stacklevel=2,
             )
-            random = (
-                Random()
-            )  # FIXME see issue 1981, how to get the central rng from model
-        self.random = random
-        self._agents = weakref.WeakKeyDictionary(dict.fromkeys(agents))
+            random = Random()
+
+        if random is not None:
+            self.random = random
+        else:
+            # all agents in an AgentSet should share the same model, just take it from first
+            self.random = self._agents.keys().__next__().model.random
 
     def __len__(self) -> int:
         """Return the number of agents in the AgentSet."""
