@@ -95,8 +95,22 @@ Our [CITATION.cff](https://github.com/projectmesa/mesa/blob/main/CITATION.cff) c
 The original Mesa conference paper from 2015 is [available here](http://conference.scipy.org.s3-website-us-east-1.amazonaws.com/proceedings/scipy2015/jacqueline_kazil.html).
 
 ```{toctree}
-:hidden: true
-:maxdepth: 7
+:maxdepth: 2
+:caption: Contents
+
+getting_started
+overview
+mesa
+examples
+best-practices
+mesa_extension
+migration_guide
+apis/api_main
+GSoC
+```
+   overview
+   tutorials/index
+
 
 Getting started <getting_started>
 Overview <overview>

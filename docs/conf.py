@@ -131,6 +131,10 @@ html_theme = "pydata_sphinx_theme"
 # documentation.
 html_theme_options = {
     "navbar_start": ["navbar-logo"],
+    "navigation_depth": 4,
+    "show_nav_level": 2,
+    "collapse_navigation": True,
+    "show_toc_level": 2,
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
