@@ -55,23 +55,4 @@ Enjoy modelling with Mesa, and feel free to reach out!
 
 
 
-```{toctree}
-:hidden: true
-:maxdepth: 7
 
-Overview <overview>
-Creating Your First Model <tutorials/0_first_model>
-Adding Space <tutorials/1_adding_space>
-Collecting Data <tutorials/2_collecting_data>
-AgentSet <tutorials/3_agentset>
-Basic Visualization <tutorials/4_visualization_basic>
-Dynamic Agent Visualization <tutorials/5_visualization_dynamic_agents>
-Visualisation using SpaceRenderer <tutorials/6_visualization_rendering_with_space_renderer>
-Property Layer Visualization <tutorials/7_visualization_propertylayer_visualization>
-Custom Visualization Components <tutorials/8_visualization_custom>
-Parameter Sweeps <tutorials/9_batch_run>
-Comparing Scenarios <tutorials/10_comparing_scenarios>
-Best Practices <best-practices>
-
-
-```
