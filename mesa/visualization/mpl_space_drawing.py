@@ -104,9 +104,13 @@ def collect_agent_data(
 
         if isinstance(portray_input, dict):
             warnings.warn(
-                "Returning a dict from agent_portrayal is deprecated and will be removed "
-                "in a future version. Please return an AgentPortrayalStyle instance instead.",
-                PendingDeprecationWarning,
+                (
+                    "Returning a dict from agent_portrayal is deprecated. "
+                    "Please return an AgentPortrayalStyle instance instead. "
+                    "For more information, refer to the migration guide: "
+                    "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
+                ),
+                DeprecationWarning,
                 stacklevel=2,
             )
             dict_data = portray_input.copy()
@@ -297,8 +301,13 @@ def draw_property_layers(
             params = propertylayer_portrayal.get(layer_name)
 
             warnings.warn(
-                "The propertylayer_portrayal dict is deprecated. Use a callable that returns PropertyLayerStyle instead.",
-                PendingDeprecationWarning,
+                (
+                    "The propertylayer_portrayal dict is deprecated. "
+                    "Please use a callable that returns a PropertyLayerStyle instance instead. "
+                    "For more information, refer to the migration guide: "
+                    "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
+                ),
+                DeprecationWarning,
                 stacklevel=2,
             )
 
