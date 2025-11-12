@@ -78,7 +78,7 @@ def batch_run(
     """
     if iterations is not None and rng is not None:
         raise ValueError(
-            "you cannont use both iterations and rng at the same time. Please only use rng."
+            "you cannot use both iterations and rng at the same time. Please only use rng."
         )
     if iterations is not None:
         warnings.warn(
