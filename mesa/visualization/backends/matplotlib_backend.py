@@ -107,9 +107,13 @@ class MatplotlibBackend(AbstractRenderer):
 
             if isinstance(portray_input, dict):
                 warnings.warn(
-                    "Returning a dict from agent_portrayal is deprecated. "
-                    "Please return an AgentPortrayalStyle instance instead.",
-                    PendingDeprecationWarning,
+                    (
+                        "Returning a dict from agent_portrayal is deprecated. "
+                        "Please return an AgentPortrayalStyle instance instead. "
+                        "For more information, refer to the migration guide: "
+                        "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
+                    ),
+                    DeprecationWarning,
                     stacklevel=2,
                 )
                 # Handle legacy dict input
@@ -391,7 +395,7 @@ class MatplotlibBackend(AbstractRenderer):
             elif isinstance(space, HexGrid):
                 hexagons = self.space_drawer.hexagons
                 norm = Normalize(vmin=vmin, vmax=vmax)
-                colors = data.ravel()
+                colors = data.T.ravel()
 
                 if color:
                     normalized_colors = np.clip(norm(colors), 0, 1)
