@@ -172,7 +172,7 @@ html_static_path = ["_static"]
 
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {
-    "getting started": [],
+    "getting_started": [],
     "migration_guide": [],  # No sidebar migration
 }
 
