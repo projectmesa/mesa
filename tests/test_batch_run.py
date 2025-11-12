@@ -1,4 +1,5 @@
 """Test Batchrunner."""
+import pytest
 
 import mesa
 from mesa.agent import Agent
@@ -130,7 +131,7 @@ class MockModel(Model):
 
 
 def test_batch_run():  # noqa: D103
-    result = mesa.batch_run(MockModel, {}, number_processes=2)
+    result = mesa.batch_run(MockModel, {}, number_processes=2, rng=42)
     assert result == [
         {
             "RunId": 0,
@@ -140,6 +141,7 @@ def test_batch_run():  # noqa: D103
             "AgentID": 1,
             "agent_id": 1,
             "agent_local": 250.0,
+            "rng":42,
         },
         {
             "RunId": 0,
@@ -149,6 +151,7 @@ def test_batch_run():  # noqa: D103
             "AgentID": 2,
             "agent_id": 2,
             "agent_local": 250.0,
+            "rng": 42,
         },
         {
             "RunId": 0,
@@ -158,8 +161,113 @@ def test_batch_run():  # noqa: D103
             "AgentID": 3,
             "agent_id": 3,
             "agent_local": 250.0,
+            "rng": 42,
         },
     ]
+
+    result = mesa.batch_run(MockModel, {}, number_processes=2, iterations=1)
+    assert result == [
+        {
+            "RunId": 0,
+            "iteration": 0,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 1,
+            "agent_id": 1,
+            "agent_local": 250.0,
+            "rng":None,
+        },
+        {
+            "RunId": 0,
+            "iteration": 0,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 2,
+            "agent_id": 2,
+            "agent_local": 250.0,
+            "rng": None,
+        },
+        {
+            "RunId": 0,
+            "iteration": 0,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 3,
+            "agent_id": 3,
+            "agent_local": 250.0,
+            "rng": None,
+        },
+    ]
+
+
+    result = mesa.batch_run(MockModel, {}, number_processes=2, rng=[42, 31415])
+    assert result == [
+        {
+            "RunId": 0,
+            "iteration": 0,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 1,
+            "agent_id": 1,
+            "agent_local": 250.0,
+            "rng":42,
+        },
+        {
+            "RunId": 0,
+            "iteration": 0,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 2,
+            "agent_id": 2,
+            "agent_local": 250.0,
+            "rng": 42,
+        },
+        {
+            "RunId": 0,
+            "iteration": 0,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 3,
+            "agent_id": 3,
+            "agent_local": 250.0,
+            "rng": 42,
+        },
+        {
+            "RunId": 1,
+            "iteration": 1,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 1,
+            "agent_id": 1,
+            "agent_local": 250.0,
+            "rng": 31415,
+        },
+        {
+            "RunId": 1,
+            "iteration": 1,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 2,
+            "agent_id": 2,
+            "agent_local": 250.0,
+            "rng": 31415,
+        },
+        {
+            "RunId": 1,
+            "iteration": 1,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 3,
+            "agent_id": 3,
+            "agent_local": 250.0,
+            "rng": 31415,
+        },
+
+    ]
+
+    with pytest.raises(ValueError):
+        mesa.batch_run(MockModel, {}, number_processes=2, rng=42, iterations=1)
+
 
 
 def test_batch_run_with_params():  # noqa: D103
@@ -185,6 +293,7 @@ def test_batch_run_no_agent_reporters():  # noqa: D103
             "Step": 1000,
             "enable_agent_reporters": False,
             "reported_model_param": 42,
+            "rng": None,
         }
     ]
 
@@ -208,6 +317,7 @@ def test_batch_run_unhashable_param():  # noqa: D103
         "agent_local": 250.0,
         "n_agents": 2,
         "variable_model_params": {"key": "value"},
+        "rng": None,
     }
 
     assert result == [
