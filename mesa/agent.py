@@ -19,31 +19,16 @@ from collections.abc import Callable, Hashable, Iterable, Iterator, MutableSet, 
 from random import Random
 
 # mypy
-from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
 if TYPE_CHECKING:
-    # We ensure that these are not imported during runtime to prevent cyclic
-    # dependency.
     from mesa.model import Model
     from mesa.space import Position
 
-    # Type variables for better static typing
-    M = TypeVar("M", bound=Model)
-    # Agent typevar bound to Agent (forward reference) for use in AgentSet etc.
-    A = TypeVar("A", bound="Agent")
-    T = TypeVar("T", bound="Agent")
-else:
-    # At runtime, TypeVars do not need to be bound to concrete types. Provide
-    # plain TypeVars so code runs normally while type checkers still see the
-    # correct bounds.
-    M = TypeVar("M")
-    A = TypeVar("A")
-    T = TypeVar("T")
 
-
-class Agent(Generic[M]):  # noqa: UP046
+class Agent[M: Model]:
     """Base class for a model agent in Mesa.
 
     Attributes:
@@ -75,9 +60,8 @@ class Agent(Generic[M]):  # noqa: UP046
         """
         super().__init__(*args, **kwargs)
 
-        # Preserve the more specific model type for static type checkers by
-        # typing Agent as Generic[M]. At runtime this remains the Model
-        # instance passed in.
+        # Preserve the more specific model type for static type checkers.
+        # At runtime this remains the Model instance passed in.
         self.model: M = model
         self.unique_id: int = next(self._ids[model])
         self.pos: Position | None = None
@@ -101,7 +85,9 @@ class Agent(Generic[M]):  # noqa: UP046
         pass
 
     @classmethod
-    def create_agents(cls: type[T], model: M, n: int, *args, **kwargs) -> AgentSet[T]:
+    def create_agents[T: Agent](
+        cls: type[T], model: Model, n: int, *args, **kwargs
+    ) -> AgentSet[T]:
         """Create N agents.
 
         Args:
@@ -162,7 +148,7 @@ class Agent(Generic[M]):  # noqa: UP046
         return self.model.rng
 
 
-class AgentSet(Generic[A], MutableSet[A], Sequence[A]):  # noqa: UP046
+class AgentSet[A: Agent](MutableSet[A], Sequence[A]):
     """A collection class that represents an ordered set of agents within an agent-based model (ABM).
 
     This class extends both MutableSet and Sequence, providing set-like functionality with order preservation and
