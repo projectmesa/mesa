@@ -51,7 +51,7 @@ def batch_run(
     parameters: Mapping[str, Any | Iterable[Any]],
     # We still retain the Optional[int] because users may set it to None (i.e. use all CPUs)
     number_processes: int | None = 1,
-    iterations: int|None = None,
+    iterations: int | None = None,
     data_collection_period: int = -1,
     max_steps: int = 1000,
     display_progress: bool = True,
@@ -77,10 +77,18 @@ def batch_run(
 
     """
     if iterations is not None and rng is not None:
-        raise ValueError("you cannont use both iterations and rng at the same time. Please only use rng.")
+        raise ValueError(
+            "you cannont use both iterations and rng at the same time. Please only use rng."
+        )
     if iterations is not None:
-        warnings.warn("iterations is deprecated, please use rgn instead", DeprecationWarning, stacklevel=2)
-        rng = [None,] * iterations
+        warnings.warn(
+            "iterations is deprecated, please use rgn instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        rng = [
+            None,
+        ] * iterations
     if not isinstance(rng, Iterable):
         rng = [rng]
 

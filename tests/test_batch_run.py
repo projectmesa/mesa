@@ -1,4 +1,5 @@
 """Test Batchrunner."""
+
 import pytest
 
 import mesa
@@ -141,7 +142,7 @@ def test_batch_run():  # noqa: D103
             "AgentID": 1,
             "agent_id": 1,
             "agent_local": 250.0,
-            "rng":42,
+            "rng": 42,
         },
         {
             "RunId": 0,
@@ -175,7 +176,7 @@ def test_batch_run():  # noqa: D103
             "AgentID": 1,
             "agent_id": 1,
             "agent_local": 250.0,
-            "rng":None,
+            "rng": None,
         },
         {
             "RunId": 0,
@@ -198,7 +199,6 @@ def test_batch_run():  # noqa: D103
             "rng": None,
         },
     ]
-
 
     result = mesa.batch_run(MockModel, {}, number_processes=2, rng=[42, 31415])
     assert result == [
@@ -210,7 +210,7 @@ def test_batch_run():  # noqa: D103
             "AgentID": 1,
             "agent_id": 1,
             "agent_local": 250.0,
-            "rng":42,
+            "rng": 42,
         },
         {
             "RunId": 0,
@@ -262,12 +262,10 @@ def test_batch_run():  # noqa: D103
             "agent_local": 250.0,
             "rng": 31415,
         },
-
     ]
 
     with pytest.raises(ValueError):
         mesa.batch_run(MockModel, {}, number_processes=2, rng=42, iterations=1)
-
 
 
 def test_batch_run_with_params():  # noqa: D103
