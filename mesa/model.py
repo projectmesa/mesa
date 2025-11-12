@@ -12,15 +12,15 @@ import sys
 from collections.abc import Sequence
 
 # mypy
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from mesa.agent import Agent, AgentSet
 from mesa.mesa_logging import create_module_logger, method_logger
 
-# Type variable for agent types so Model can be parameterized by its Agent class
-A = TypeVar("A", bound=Agent)
+if TYPE_CHECKING:
+    pass
 
 SeedLike = int | np.integer | Sequence[int] | np.random.SeedSequence
 RNGLike = np.random.Generator | np.random.BitGenerator
@@ -29,7 +29,7 @@ RNGLike = np.random.Generator | np.random.BitGenerator
 _mesa_logger = create_module_logger()
 
 
-class Model(Generic[A]):  # noqa: UP046
+class Model[A: Agent]:
     """Base class for models in the Mesa ABM library.
 
     This class serves as a foundational structure for creating agent-based models.
