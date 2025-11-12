@@ -82,7 +82,7 @@ def batch_run(
         )
     if iterations is not None:
         warnings.warn(
-            "iterations is deprecated, please use rgn instead",
+            "iterations is deprecated, please use rng instead",
             DeprecationWarning,
             stacklevel=2,
         )
