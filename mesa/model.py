@@ -111,8 +111,8 @@ class Model[A: Agent]:
         self._agents = {}  # the hard references to all agents in the model
         self._agents_by_type: dict[
             type[A], AgentSet[A]
-        ] = {}  # agentset per agent class
-        self._all_agents: AgentSet[A] = AgentSet([], random=self.random)
+        ] = {}  # a dict with an agentset for each class of agents
+        self._all_agents: AgentSet[A] = AgentSet([], random=self.random) # an agenset with all agents
 
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
         """Automatically increments time and steps after calling the user's step method."""

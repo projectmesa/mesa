@@ -60,8 +60,7 @@ class Agent[M: Model]:
         """
         super().__init__(*args, **kwargs)
 
-        # Preserve the more specific model type for static type checkers.
-        # At runtime this remains the Model instance passed in.
+        
         self.model: M = model
         self.unique_id: int = next(self._ids[model])
         self.pos: Position | None = None
