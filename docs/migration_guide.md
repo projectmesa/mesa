@@ -19,13 +19,14 @@ create 5 random integers which we then use as seed values for the new `rng` keyw
 import numpy as np
 import sys
 
+# let's create 5 random integers
 rng = np.random.default_rng(42)
 rng_values = rng.integers(0, sys.maxsize, size=(5,))
 
 results = mesa.batch_run(
     MoneyModel,
     parameters=params,
-    rng=rng_values,
+    rng=rng_values, # we pass the 5 seed values to rng
     max_steps=100,
     number_processes=1,
     data_collection_period=1,
