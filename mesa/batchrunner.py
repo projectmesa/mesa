@@ -27,7 +27,7 @@ put the code inside an ``if __name__ == '__main__':`` code black as shown below:
         )
 
 """
-
+import inspect
 import itertools
 import multiprocessing
 import warnings
@@ -92,11 +92,17 @@ def batch_run(
     if not isinstance(rng, Iterable):
         rng = [rng]
 
+    # establish to use seed or rng as name for parameter
+    model_parameters = inspect.signature(Model).parameters
+    rng_kwarg_name = "rng"
+    if "seed" in model_parameters:
+        rng_kwarg_name = "seed"
+
     runs_list = []
     run_id = 0
     for i, rng_i in enumerate(rng):
         for kwargs in _make_model_kwargs(parameters):
-            kwargs["rng"] = rng_i
+            kwargs[rng_kwarg_name] = rng_i
             runs_list.append((run_id, i, kwargs))
             run_id += 1
 
