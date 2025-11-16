@@ -26,7 +26,7 @@ rng_values = rng.integers(0, sys.maxsize, size=(5,))
 results = mesa.batch_run(
     MoneyModel,
     parameters=params,
-    rng=rng_values, # we pass the 5 seed values to rng
+    rng=rng_values.tolist(), # we pass the 5 seed values to rng
     max_steps=100,
     number_processes=1,
     data_collection_period=1,
