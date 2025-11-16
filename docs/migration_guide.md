@@ -8,11 +8,11 @@ Non-breaking changes aren't included, for those see our [Release history](https:
 ### batch run
 `batch_run` has been updated to offer explicit control over the random seeds that are used to run
 multiple replications of a given experiment. For this a new keyword argument, `rng` has been
-added and `iterations` will issue a `DeprecatinWarning`. The new `rng` keyword argument
+added and `iterations` will issue a `DeprecationWarning`. The new `rng` keyword argument
 takes a valid value for seeding or a list of valid values. If you want to run multiple iterations/replications
 of a given experiment, you need to pass the required seeds explicitly.
 
-Below is a simple example of the new recommeded usage of `batch_run`. Note how we first
+Below is a simple example of the new recommended usage of `batch_run`. Note how we first
 create 5 random integers which we then use as seed values for the new `rng` keyword argument.
 
 ```python
