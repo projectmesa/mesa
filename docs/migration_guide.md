@@ -3,6 +3,38 @@ This guide contains breaking changes between major Mesa versions and how to reso
 
 Non-breaking changes aren't included, for those see our [Release history](https://github.com/projectmesa/mesa/releases).
 
+## Mesa 3.4.0
+
+### batch run
+`batch_run` has been updated to offer explicit control over the random seeds that are used to run
+multiple replications of a given experiment. For this a new keyword argument, `rng` has been
+added and `iterations` will issue a `DeprecatinWarning`. The new `rng` keyword argument
+takes a valid value for seeding or a list of valid values. If you want to run multiple iterations/replications
+of a given experiment, you need to pass the required seeds explicitly.
+
+Below is a simple example of the new recommeded usage of `batch_run`. Note how we first
+create 5 random integers which we then use as seed values for the new `rng` keyword argument.
+
+```python
+import numpy as np
+import sys
+
+rng = np.random.default_rng(42)
+rng_values = rng.integers(0, sys.maxsize, size=(5,))
+
+results = mesa.batch_run(
+    MoneyModel,
+    parameters=params,
+    rng=rng_values,
+    max_steps=100,
+    number_processes=1,
+    data_collection_period=1,
+    display_progress=True,
+)
+
+
+```
+
 ## Mesa 3.3.0
 
 Mesa 3.3.0 is a visualization upgrade introducing a new and improved API, full support for both `altair` and `matplotlib` backends, and resolving several recurring issues from previous versions.
