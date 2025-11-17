@@ -83,7 +83,8 @@ def batch_run(
         )
     if iterations is not None:
         warnings.warn(
-            "iterations is deprecated, please use rng instead",
+            "The `iterations` keyword argument is deprecated, please use `rng` instead.
+            See https://mesa.readthedocs.io/latest/migration_guide.html#batch-run",
             DeprecationWarning,
             stacklevel=2,
         )
