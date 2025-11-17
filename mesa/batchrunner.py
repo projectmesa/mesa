@@ -88,9 +88,7 @@ def batch_run(
             DeprecationWarning,
             stacklevel=2,
         )
-        rng = [
-            None,
-        ] * iterations
+        rng = [None] * iterations
     if not isinstance(rng, Iterable):
         rng = [rng]
 
