@@ -32,8 +32,6 @@ results = mesa.batch_run(
     data_collection_period=1,
     display_progress=True,
 )
-
-
 ```
 
 ## Mesa 3.3.0
