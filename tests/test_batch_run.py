@@ -201,6 +201,10 @@ def test_batch_run():  # noqa: D103
     ]
 
     result = mesa.batch_run(MockModel, {}, number_processes=2, rng=[42, 31415])
+
+    # we use 2 processes, so we are not guaranteed the order of the return
+    result = sorted(result, key=lambda x: (x["RunId"], x["AgentID"]))
+
     assert result == [
         {
             "RunId": 0,
