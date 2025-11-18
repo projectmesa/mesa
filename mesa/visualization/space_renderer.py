@@ -4,6 +4,8 @@ This module provides functionality to render Mesa model spaces with different
 backends, supporting various space types and visualization components.
 """
 
+from __future__ import annotations
+
 import contextlib
 import warnings
 from collections.abc import Callable
@@ -63,9 +65,16 @@ class SpaceRenderer:
         self.space = getattr(model, "grid", getattr(model, "space", None))
 
         self.space_drawer = self._get_space_drawer()
+        
         self.space_mesh = None
         self.agent_mesh = None
         self.propertylayer_mesh = None
+
+        self.draw_agent_kwargs = None
+        self.draw_space_kwargs = None
+
+        self.agent_portrayal = None
+        self.propertylayer_portrayal = None
 
         self.post_process_func = None
         # Keep track of whether post-processing has been applied
@@ -160,55 +169,84 @@ class SpaceRenderer:
                 mapped_arguments["loc"] = pos[x]
 
         return mapped_arguments
-
-    def draw_structure(self, **kwargs):
-        """Draw the space structure.
+    
+    def setup_structure(self, **kwargs) -> SpaceRenderer:
+        """Setup the space structure without drawing.
 
         Args:
-            **kwargs: Additional keyword arguments for the drawing function.
+            **kwargs: Additional keyword arguments for the setup function.
             Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
 
         Returns:
-            The visual representation of the space structure.
+            SpaceRenderer: The current instance for method chaining.
         """
-        # Store space_kwargs for internal use
-        self.space_kwargs = kwargs
+        # Store draw_space_kwargs for internal use
+        self.draw_space_kwargs = kwargs
 
-        self.space_mesh = self.backend_renderer.draw_structure(**self.space_kwargs)
-        return self.space_mesh
+        return self
 
-    def draw_agents(self, agent_portrayal: Callable, **kwargs):
-        """Draw agents on the space.
+    def setup_agents(self, agent_portrayal: Callable, **kwargs) -> SpaceRenderer:
+        """Setup agents on the space without drawing.
 
         Args:
             agent_portrayal (Callable): Function that takes an agent and returns AgentPortrayalStyle.
-            **kwargs: Additional keyword arguments for the drawing function.
+            **kwargs: Additional keyword arguments for the setup function.
             Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
 
         Returns:
-            The visual representation of the agents.
+            SpaceRenderer: The current instance for method chaining.
         """
-        # Store data for internal use
+        # Store agent_portrayal and draw_agent_kwargs for internal use
         self.agent_portrayal = agent_portrayal
-        self.agent_kwargs = kwargs
+        self.draw_agent_kwargs = kwargs
 
-        # Prepare data for agent plotting
-        arguments = self.backend_renderer.collect_agent_data(
-            self.space, agent_portrayal, default_size=self.space_drawer.s_default
-        )
-        arguments = self._map_coordinates(arguments)
-
-        self.agent_mesh = self.backend_renderer.draw_agents(
-            arguments, **self.agent_kwargs
-        )
-        return self.agent_mesh
-
-    def draw_propertylayer(self, propertylayer_portrayal: Callable | dict):
-        """Draw property layers on the space.
+        return self
+    
+    def setup_propertylayer(
+        self, propertylayer_portrayal: Callable | dict
+    ) -> SpaceRenderer:
+        """Setup property layers on the space without drawing.
 
         Args:
             propertylayer_portrayal (Callable | dict): Function that returns PropertyLayerStyle
                 or dict with portrayal parameters.
+
+        Returns:
+            SpaceRenderer: The current instance for method chaining.
+        """
+        # Store propertylayer_portrayal for internal use
+        self.propertylayer_portrayal = propertylayer_portrayal
+
+        return self
+
+    def draw_structure(self):
+        """Draw the space structure.
+
+        Returns:
+            The visual representation of the space structure.
+        """
+        self.space_mesh = self.backend_renderer.draw_structure(**self.draw_space_kwargs)
+        return self.space_mesh
+
+    def draw_agents(self):
+        """Draw agents on the space.
+
+        Returns:
+            The visual representation of the agents.
+        """
+        # Prepare data for agent plotting
+        arguments = self.backend_renderer.collect_agent_data(
+            self.space, self.agent_portrayal, default_size=self.space_drawer.s_default
+        )
+        arguments = self._map_coordinates(arguments)
+
+        self.agent_mesh = self.backend_renderer.draw_agents(
+            arguments, **self.draw_agent_kwargs
+        )
+        return self.agent_mesh
+
+    def draw_propertylayer(self):
+        """Draw property layers on the space.
 
         Returns:
             The visual representation of the property layers.
@@ -267,10 +305,8 @@ class SpaceRenderer:
             property_layers = self.space._mesa_property_layers
 
         # Convert portrayal to callable if needed
-        if isinstance(propertylayer_portrayal, dict):
-            self.propertylayer_portrayal = _dict_to_callable(propertylayer_portrayal)
-        else:
-            self.propertylayer_portrayal = propertylayer_portrayal
+        if isinstance(self.propertylayer_portrayal, dict):
+            self.propertylayer_portrayal = _dict_to_callable(self.propertylayer_portrayal)
 
         number_of_propertylayers = sum(
             [1 for layer in property_layers if layer != "empty"]
