@@ -12,7 +12,6 @@ import copy
 import functools
 import itertools
 import operator
-import sys
 import warnings
 import weakref
 from collections import defaultdict
@@ -23,7 +22,7 @@ from random import Random
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
-from numpy.random import SeedSequence, BitGenerator, Generator, RandomState
+from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
@@ -33,8 +32,8 @@ if TYPE_CHECKING:
 
 from mesa.util import deprecate_kwarg
 
-
 SeedLike = int | np.ndarray[int] | SeedSequence | BitGenerator | Generator | RandomState
+
 
 class Agent:
     """Base class for a model agent in Mesa.
@@ -291,7 +290,8 @@ class AgentSet(MutableSet, Sequence):
             return self
         else:
             return AgentSet(
-                (agent for ref in weakrefs if (agent := ref()) is not None), rng=self.rng
+                (agent for ref in weakrefs if (agent := ref()) is not None),
+                rng=self.rng,
             )
 
     def sort(
@@ -613,9 +613,7 @@ class AgentSet(MutableSet, Sequence):
                 groups[getattr(agent, by)].append(agent)
 
         if result_type == "agentset":
-            return GroupBy(
-                {k: AgentSet(v, rng=self.rng) for k, v in groups.items()}
-            )
+            return GroupBy({k: AgentSet(v, rng=self.rng) for k, v in groups.items()})
         else:
             return GroupBy(groups)
 
