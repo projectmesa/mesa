@@ -29,6 +29,8 @@ if TYPE_CHECKING:
     from mesa.model import Model
     from mesa.space import Position
 
+from mesa.util import deprecate_kwarg
+
 
 class Agent:
     """Base class for a model agent in Mesa.
@@ -169,6 +171,7 @@ class AgentSet(MutableSet, Sequence):
 
     """
 
+    @deprecate_kwarg("random")
     def __init__(
         self,
         agents: Iterable[Agent],

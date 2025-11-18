@@ -18,6 +18,7 @@ import numpy as np
 
 from mesa.agent import Agent, AgentSet
 from mesa.mesa_logging import create_module_logger, method_logger
+from mesa.util import deprecate_kwarg
 
 SeedLike = int | np.integer | Sequence[int] | np.random.SeedSequence
 RNGLike = np.random.Generator | np.random.BitGenerator
@@ -46,6 +47,7 @@ class Model:
 
     """
 
+    @deprecate_kwarg("seed")
     @method_logger(__name__)
     def __init__(
         self,
