@@ -111,7 +111,7 @@ class CellCollection[T: Cell]:
 
     def select_random_cell(self) -> T:
         """Select a random cell."""
-        return self.rng.choice(self.cells, replace=False)
+        return self.cells[self.rng.integers(0, len(self.cells))]
 
     def select_random_agent(self) -> CellAgent:
         """Select a random agent.
@@ -121,7 +121,8 @@ class CellCollection[T: Cell]:
 
 
         """
-        return self.rng.choice(list(self.agents), replace=False)
+        agents = list(self.agents)
+        return agents[self.rng.integers(0, len(agents))]
 
     def select(
         self,

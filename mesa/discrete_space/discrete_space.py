@@ -179,7 +179,8 @@ class DiscreteSpace[T: Cell]:
 
     def select_random_empty_cell(self) -> T:
         """Select random empty cell."""
-        return self.rng.choice(list(self.empties))
+        empties = list(self.empties)
+        return empties[self.rng.integers(0, len(empties))]
 
     def __setstate__(self, state):
         """Set the state of the discrete space and rebuild the connections."""
