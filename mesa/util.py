@@ -19,7 +19,8 @@ def deprecate_kwarg(name: str):
                     FutureWarning,
                     stacklevel=2,
                 )
-                if "rng" in kwargs:
+
+                if kwargs.get("rng", None) is not None:
                     raise ValueError(f"you have to pass either rng or {name}, not both")
 
             return method(self, *args, **kwargs)
