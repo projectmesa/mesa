@@ -47,8 +47,6 @@ class MatplotlibBackend(AbstractRenderer):
         """
         super().__init__(space_drawer)
 
-        self._active_colorbars = []
-
     def initialize_canvas(self, ax=None):
         """Initialize the matplotlib canvas.
 
@@ -419,5 +417,4 @@ class MatplotlibBackend(AbstractRenderer):
                 sm = ScalarMappable(norm=norm, cmap=cmap)
                 sm.set_array([])
                 cbar = plt.colorbar(sm, ax=self.ax, label=layer_name)
-                self._active_colorbars.append(cbar)
         return self.ax, cbar
