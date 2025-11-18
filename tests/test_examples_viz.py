@@ -104,7 +104,7 @@ def run_model_test(
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_schelling_model(solara_test, page_session: playwright.sync_api.Page):
     """Test schelling model behavior and visualization."""
-    model = Schelling(seed=42)
+    model = Schelling(rng=42)
 
     def agent_portrayal(agent):
         return {"color": "tab:orange" if agent.type == 0 else "tab:blue"}
@@ -130,7 +130,7 @@ def test_wolf_sheep_model(solara_test, page_session: playwright.sync_api.Page):
     )
     from mesa.experimental.devs import ABMSimulator  # noqa: PLC0415
 
-    model = WolfSheep(simulator=ABMSimulator(), seed=42)
+    model = WolfSheep(simulator=ABMSimulator(), rng=42)
 
     def agent_portrayal(agent):
         if agent is None:
@@ -172,7 +172,7 @@ def test_wolf_sheep_model(solara_test, page_session: playwright.sync_api.Page):
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_boid_flockers_model(solara_test, page_session: playwright.sync_api.Page):
     """Test boid flockers model behavior and visualization."""
-    model = BoidFlockers(seed=42)
+    model = BoidFlockers(rng=42)
 
     def agent_portrayal(agent):
         return {"color": "tab:blue"}
@@ -189,7 +189,7 @@ def test_boid_flockers_model(solara_test, page_session: playwright.sync_api.Page
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_boltzmann_wealth_model(solara_test, page_session: playwright.sync_api.Page):
     """Test Boltzmann wealth model behavior and visualization."""
-    model = BoltzmannWealth(seed=42)
+    model = BoltzmannWealth(rng=42)
 
     def agent_portrayal(agent):
         color = agent.wealth  # we are using a colormap to translate wealth to color
@@ -211,7 +211,7 @@ def test_virus_on_network_model(solara_test, page_session: playwright.sync_api.P
     """Test virus on network model behavior and visualization."""
     from mesa.examples.basic.virus_on_network.model import State  # noqa: PLC0415
 
-    model = VirusOnNetwork(seed=42)
+    model = VirusOnNetwork(rng=42)
 
     def agent_portrayal(agent):
         node_color_dict = {
@@ -242,7 +242,7 @@ def test_conways_game_of_life_model(
     solara_test, page_session: playwright.sync_api.Page
 ):
     """Test Conway's Game of Life model behavior and visualization."""
-    model = ConwaysGameOfLife(seed=42)
+    model = ConwaysGameOfLife(rng=42)
 
     def agent_portrayal(agent):
         return {
@@ -277,7 +277,7 @@ def test_epstein_civil_violence_model(
         agent_colors,
     )
 
-    model = EpsteinCivilViolence(seed=42)
+    model = EpsteinCivilViolence(rng=42)
 
     def agent_portrayal(agent):
         if agent is None:
@@ -308,7 +308,7 @@ def test_epstein_civil_violence_model(
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_sugarscape_g1mt_model(solara_test, page_session: playwright.sync_api.Page):
     """Test Sugarscape G1mt model behavior and visualization."""
-    model = SugarscapeG1mt(seed=42)
+    model = SugarscapeG1mt(rng=42)
 
     def agent_portrayal(agent):
         return {"marker": "o", "color": "red", "size": 10}
@@ -327,7 +327,7 @@ def test_sugarscape_g1mt_model(solara_test, page_session: playwright.sync_api.Pa
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_pd_grid_model(solara_test, page_session: playwright.sync_api.Page):
     """Test Prisoner's Dilemma model behavior and visualization."""
-    model = PdGrid(seed=42)
+    model = PdGrid(rng=42)
 
     def agent_portrayal(agent):
         return {
