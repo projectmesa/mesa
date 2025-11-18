@@ -70,8 +70,8 @@ class SpaceRenderer:
         self.agent_mesh = None
         self.propertylayer_mesh = None
 
-        self.draw_agent_kwargs = None
-        self.draw_space_kwargs = None
+        self.draw_agent_kwargs = {}
+        self.draw_space_kwargs = {}
 
         self.agent_portrayal = None
         self.propertylayer_portrayal = None
@@ -319,41 +319,19 @@ class SpaceRenderer:
         )
         return self.propertylayer_mesh
 
-    def render(
-        self,
-        agent_portrayal: Callable | None = None,
-        propertylayer_portrayal: Callable | dict | None = None,
-        post_process: Callable | None = None,
-        **kwargs,
-    ):
+    def render(self):
         """Render the complete space with structure, agents, and property layers.
 
         It is an all-in-one method that draws everything required therefore eliminates
-        the need of calling each method separately, but has a drawback, if want to pass
-        kwargs to customize the drawing, they have to be broken into
-        space_kwargs and agent_kwargs.
-
-        Args:
-            agent_portrayal (Callable | None): Function that returns AgentPortrayalStyle.
-                If None, agents won't be drawn.
-            propertylayer_portrayal (Callable | dict | None): Function that returns
-                PropertyLayerStyle or dict with portrayal parameters. If None,
-                property layers won't be drawn.
-            post_process (Callable | None): Function to apply post-processing to the canvas.
-            **kwargs: Additional keyword arguments for drawing functions.
-                * ``space_kwargs`` (dict): Arguments for ``draw_structure()``.
-                * ``agent_kwargs`` (dict): Arguments for ``draw_agents()``.
+        the need of calling each method separately.
         """
-        space_kwargs = kwargs.pop("space_kwargs", {})
-        agent_kwargs = kwargs.pop("agent_kwargs", {})
         if self.space_mesh is None:
-            self.draw_structure(**space_kwargs)
-        if self.agent_mesh is None and agent_portrayal is not None:
-            self.draw_agents(agent_portrayal, **agent_kwargs)
-        if self.propertylayer_mesh is None and propertylayer_portrayal is not None:
-            self.draw_propertylayer(propertylayer_portrayal)
+            self.draw_structure()
+        if self.agent_mesh is None and self.agent_portrayal is not None:
+            self.draw_agents()
+        if self.propertylayer_mesh is None and self.propertylayer_portrayal is not None:
+            self.draw_propertylayer()
 
-        self.post_process_func = post_process
         return self
 
     @property

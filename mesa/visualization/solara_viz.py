@@ -370,8 +370,8 @@ def ComponentsView(
     sorted_page_indices = all_indices
 
     # State for current tab and layouts
-    current_tab_index, set_current_tab_index = solara.use_state(0)
-    layouts, set_layouts = solara.use_state({})
+    current_tab_index, set_current_tab_index = solara.use_state(0) # noqa: SH101
+    layouts, set_layouts = solara.use_state({}) # noqa: SH101
 
     # Keep layouts in sync with pages
     def sync_layouts():
@@ -390,7 +390,7 @@ def ComponentsView(
         if new_layouts or len(cleaned_layouts) != len(layouts):
             set_layouts({**cleaned_layouts, **new_layouts})
 
-    solara.use_effect(sync_layouts, list(pages.keys()))
+    solara.use_effect(sync_layouts, list(pages.keys())) # noqa: SH101
 
     # Tab Navigation
     with solara.v.Tabs(v_model=current_tab_index, on_v_model=set_current_tab_index):
