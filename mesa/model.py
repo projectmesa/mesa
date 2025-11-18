@@ -208,6 +208,7 @@ class Model:
 
         Args:
             seed: A new seed for the RNG; if None, reset using the current seed
+            rng: A new seed for the RNG; if None, reset using the current seed
         """
         # fixme
         if seed is None:

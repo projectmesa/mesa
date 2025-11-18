@@ -13,7 +13,7 @@ def deprecate_kwarg(name: str):
         @wraps(method)
         def wrapper(self, *args, **kwargs):
             """Inner function."""
-            if name in kwargs:
+            if kwargs.get(name) is not None:
                 warnings.warn(
                     f"The use of {name} is deprecated, please use rng instead",
                     FutureWarning,
