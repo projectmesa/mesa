@@ -269,15 +269,10 @@ def SpaceRendererComponent(
         for artist in itertools.chain.from_iterable(all_artists):
             artist.remove()
 
-        # Draw the space structure if specified
         if renderer.space_mesh:
             renderer.draw_structure()
-
-        # Draw agents if specified
         if renderer.agent_mesh:
             renderer.draw_agents()
-
-        # Draw property layers if specified
         if renderer.propertylayer_mesh:
             renderer.draw_propertylayer()
 

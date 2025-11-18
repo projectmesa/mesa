@@ -180,7 +180,6 @@ class SpaceRenderer:
         Returns:
             SpaceRenderer: The current instance for method chaining.
         """
-        # Store draw_space_kwargs for internal use
         self.draw_space_kwargs = kwargs
 
         return self
@@ -196,7 +195,6 @@ class SpaceRenderer:
         Returns:
             SpaceRenderer: The current instance for method chaining.
         """
-        # Store agent_portrayal and draw_agent_kwargs for internal use
         self.agent_portrayal = agent_portrayal
         self.draw_agent_kwargs = kwargs
 
@@ -214,7 +212,6 @@ class SpaceRenderer:
         Returns:
             SpaceRenderer: The current instance for method chaining.
         """
-        # Store propertylayer_portrayal for internal use
         self.propertylayer_portrayal = propertylayer_portrayal
 
         return self
