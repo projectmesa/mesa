@@ -18,7 +18,7 @@ def test_boltzmann_model():  # noqa: D103
 
     app.page  # noqa: B018
 
-    model = BoltzmannWealth(seed=42)
+    model = BoltzmannWealth(rng=42)
 
     for _i in range(10):
         model.step()
