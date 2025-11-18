@@ -112,7 +112,7 @@ class Model:
             type[Agent], AgentSet
         ] = {}  # a dict with an agentset for each class of agents
         self._all_agents = AgentSet(
-            [], random=self.random
+            [], rng=self.rng
         )  # an agenset with all agents
 
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
@@ -168,7 +168,7 @@ class Model:
                 [
                     agent,
                 ],
-                random=self.random,
+                rng=self.rng,
             )
 
         self._all_agents.add(agent)

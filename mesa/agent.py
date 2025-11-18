@@ -12,6 +12,7 @@ import copy
 import functools
 import itertools
 import operator
+import sys
 import warnings
 import weakref
 from collections import defaultdict
@@ -22,6 +23,7 @@ from random import Random
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
+from numpy.random import SeedSequence, BitGenerator, Generator, RandomState
 
 if TYPE_CHECKING:
     # We ensure that these are not imported during runtime to prevent cyclic
@@ -31,6 +33,8 @@ if TYPE_CHECKING:
 
 from mesa.util import deprecate_kwarg
 
+
+SeedLike = int | np.ndarray[int] | SeedSequence | BitGenerator | Generator | RandomState
 
 class Agent:
     """Base class for a model agent in Mesa.
@@ -135,7 +139,7 @@ class Agent:
             instance_kwargs = {k: v[i] for k, v in listlike_kwargs.items()}
             agent = cls(model, *instance_args, **instance_kwargs)
             agents.append(agent)
-        return AgentSet(agents, random=model.random)
+        return AgentSet(agents, rng=model.rng)
 
     @property
     def random(self) -> Random:
@@ -176,28 +180,34 @@ class AgentSet(MutableSet, Sequence):
         self,
         agents: Iterable[Agent],
         random: Random | None = None,
+        rng: SeedLike | None = None,
     ):
         """Initializes the AgentSet with a collection of agents and a reference to the model.
 
         Args:
             agents (Iterable[Agent]): An iterable of Agent objects to be included in the set.
             random (Random | np.random.Generator | None): the random number generator
+            rng (SeedLike | None): the random number generator
         """
         self._agents = weakref.WeakKeyDictionary(dict.fromkeys(agents))
-        if (len(self._agents) == 0) and random is None:
+        if (len(self._agents) == 0) and (random is None and rng is None):
             warnings.warn(
                 "No Agents specified in creation of AgentSet and no random number generator specified. "
                 "This can make models non-reproducible. Please pass a random number generator explicitly",
                 UserWarning,
                 stacklevel=2,
             )
-            random = Random()
+            rng = np.random.default_rng()
 
         if random is not None:
-            self.random = random
-        else:
-            # all agents in an AgentSet should share the same model, just take it from first
-            self.random = self._agents.keys().__next__().model.random
+            rng = np.random.default_rng(random.getstate()[1])
+
+        if rng is None:
+            rng = self._agents.keys().__next__().model.rng
+
+        # if rng is a np.random.Generator, it will just return it,
+        # if rng can be used to seed a generator, a new generator is created with this seed
+        self.rng = np.random.default_rng(rng)
 
     def __len__(self) -> int:
         """Return the number of agents in the AgentSet."""
@@ -257,7 +267,7 @@ class AgentSet(MutableSet, Sequence):
 
         agents = agent_generator(filter_func, agent_type, at_most)
 
-        return AgentSet(agents, self.random) if not inplace else self._update(agents)
+        return AgentSet(agents, rng=self.rng) if not inplace else self._update(agents)
 
     def shuffle(self, inplace: bool = False) -> AgentSet:
         """Randomly shuffle the order of agents in the AgentSet.
@@ -273,14 +283,15 @@ class AgentSet(MutableSet, Sequence):
 
         """
         weakrefs = list(self._agents.keyrefs())
-        self.random.shuffle(weakrefs)
+
+        self.rng.shuffle(weakrefs)
 
         if inplace:
             self._agents.data = dict.fromkeys(weakrefs)
             return self
         else:
             return AgentSet(
-                (agent for ref in weakrefs if (agent := ref()) is not None), self.random
+                (agent for ref in weakrefs if (agent := ref()) is not None), rng=self.rng
             )
 
     def sort(
@@ -305,7 +316,7 @@ class AgentSet(MutableSet, Sequence):
         sorted_agents = sorted(self._agents.keys(), key=key, reverse=not ascending)
 
         return (
-            AgentSet(sorted_agents, self.random)
+            AgentSet(sorted_agents, rng=self.rng)
             if not inplace
             else self._update(sorted_agents)
         )
@@ -351,7 +362,7 @@ class AgentSet(MutableSet, Sequence):
         It's a fast, optimized version of calling shuffle() followed by do().
         """
         weakrefs = list(self._agents.keyrefs())
-        self.random.shuffle(weakrefs)
+        self.rng.shuffle(weakrefs)
 
         if isinstance(method, str):
             for ref in weakrefs:
@@ -560,7 +571,7 @@ class AgentSet(MutableSet, Sequence):
         Returns:
             dict: A dictionary representing the state of the AgentSet.
         """
-        return {"agents": list(self._agents.keys()), "random": self.random}
+        return {"agents": list(self._agents.keys()), "rng": self.rng}
 
     def __setstate__(self, state):
         """Set the state of the AgentSet during deserialization.
@@ -568,7 +579,7 @@ class AgentSet(MutableSet, Sequence):
         Args:
             state (dict): A dictionary representing the state to restore.
         """
-        self.random = state["random"]
+        self.rng = state["rng"]
         self._update(state["agents"])
 
     def groupby(self, by: Callable | str, result_type: str = "agentset") -> GroupBy:
@@ -603,7 +614,7 @@ class AgentSet(MutableSet, Sequence):
 
         if result_type == "agentset":
             return GroupBy(
-                {k: AgentSet(v, random=self.random) for k, v in groups.items()}
+                {k: AgentSet(v, rng=self.rng) for k, v in groups.items()}
             )
         else:
             return GroupBy(groups)
