@@ -17,6 +17,10 @@ from __future__ import annotations
 from functools import cache, cached_property
 from random import Random
 from typing import TYPE_CHECKING
+import warnings
+
+from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
+import numpy as np
 
 from mesa.discrete_space.cell_agent import CellAgent
 from mesa.discrete_space.cell_collection import CellCollection
@@ -25,6 +29,7 @@ from mesa.util import deprecate_kwarg
 if TYPE_CHECKING:
     from mesa.agent import Agent
 
+SeedLike = int | np.ndarray[int] | SeedSequence | BitGenerator | Generator | RandomState
 Coordinate = tuple[int, ...]
 
 
@@ -47,6 +52,7 @@ class Cell:
         "coordinate",
         "properties",
         "random",
+        "rng"
     ]
 
     @deprecate_kwarg("random")
@@ -55,6 +61,7 @@ class Cell:
         coordinate: Coordinate,
         capacity: int | None = None,
         random: Random | None = None,
+        rng: SeedLike | None = None,
     ) -> None:
         """Initialise the cell.
 
@@ -62,6 +69,7 @@ class Cell:
             coordinate: coordinates of the cell
             capacity (int) : the capacity of the cell. If None, the capacity is infinite
             random (Random) : the random number generator to use
+            rng (SeedLike | None): the random number generator
 
         """
         super().__init__()
@@ -74,7 +82,18 @@ class Cell:
         self.properties: dict[
             Coordinate, object
         ] = {}  # fixme still used by voronoi mesh
-        self.random = random
+
+        if (random is None and rng is None):
+            warnings.warn(
+                "Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
+                UserWarning,
+                stacklevel=2,
+            )
+            rng = np.random.default_rng()
+        if random is not None:
+            rng = np.random.default_rng(random.getstate()[1])
+
+        self.rng = np.random.default_rng(rng)
 
     def connect(self, other: Cell, key: Coordinate | None = None) -> None:
         """Connects this cell to another cell.
@@ -175,7 +194,7 @@ class Cell:
         """
         return CellCollection[Cell](
             self._neighborhood(radius=radius, include_center=include_center),
-            random=self.random,
+            rng=self.rng,
         )
 
     # FIXME: Revisit caching strategy on methods

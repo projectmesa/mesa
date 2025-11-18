@@ -35,7 +35,7 @@ class Schelling(Model):
         self.minority_pc = minority_pc
 
         # Initialize grid
-        self.grid = OrthogonalMooreGrid((width, height), random=self.random, capacity=1)
+        self.grid = OrthogonalMooreGrid((width, height), rng=self.rng, capacity=1)
 
         # Track happiness
         self.happy = 0

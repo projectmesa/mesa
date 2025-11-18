@@ -52,6 +52,9 @@ class Animal(CellAgent):
         elif self.random.random() < self.p_reproduce:
             self.spawn_offspring()
 
+    def move(self):
+        """abstract method to be implemented by subclasses."""
+
 
 class Sheep(Animal):
     """A sheep that walks around, reproduces (asexually) and gets eaten."""
@@ -94,7 +97,7 @@ class Wolf(Animal):
         """If possible, eat a sheep at current location."""
         sheep = [obj for obj in self.cell.agents if isinstance(obj, Sheep)]
         if sheep:  # If there are any sheep present
-            sheep_to_eat = self.random.choice(sheep)
+            sheep_to_eat = self.rng.choice(sheep) if len(sheep) > 1 else sheep[0]
             self.energy += self.energy_from_food
             sheep_to_eat.remove()
 

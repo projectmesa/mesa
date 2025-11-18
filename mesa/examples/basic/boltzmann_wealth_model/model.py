@@ -39,7 +39,7 @@ class BoltzmannWealth(Model):
         super().__init__(rng=rng)
 
         self.num_agents = n
-        self.grid = OrthogonalMooreGrid((width, height), random=self.random)
+        self.grid = OrthogonalMooreGrid((width, height), rng=self.rng)
 
         # Set up data collection
         self.datacollector = DataCollector(
@@ -49,7 +49,7 @@ class BoltzmannWealth(Model):
         MoneyAgent.create_agents(
             self,
             self.num_agents,
-            self.random.choices(self.grid.all_cells.cells, k=self.num_agents),
+            self.rng.choice(self.grid.all_cells.cells, size=self.num_agents),
         )
 
         self.running = True
