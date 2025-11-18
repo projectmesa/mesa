@@ -22,8 +22,8 @@ from functools import cached_property
 from random import Random
 from typing import TYPE_CHECKING, TypeVar
 
-from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 import numpy as np
+from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 
 from mesa.util import deprecate_kwarg
 
@@ -76,7 +76,7 @@ class CellCollection[T: Cell]:
             next(iter(self._cells.keys())).capacity if self._cells else None
         )
 
-        if (random is None and rng is None):
+        if random is None and rng is None:
             warnings.warn(
                 "Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
                 UserWarning,

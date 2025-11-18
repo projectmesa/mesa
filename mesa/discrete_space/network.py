@@ -15,14 +15,15 @@ or any environment where connectivity matters more than physical location.
 from random import Random
 from typing import Any
 
-from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 import numpy as np
+from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 
 from mesa.discrete_space.cell import Cell
 from mesa.discrete_space.discrete_space import DiscreteSpace
 from mesa.util import deprecate_kwarg
 
 SeedLike = int | np.ndarray[int] | SeedSequence | BitGenerator | Generator | RandomState
+
 
 class Network(DiscreteSpace[Cell]):
     """A networked discrete space."""
@@ -46,13 +47,13 @@ class Network(DiscreteSpace[Cell]):
             cell_klass (type[Cell]): The base Cell class to use in the Network
 
         """
-        super().__init__(capacity=capacity, random=random, rng=rng, cell_klass=cell_klass)
+        super().__init__(
+            capacity=capacity, random=random, rng=rng, cell_klass=cell_klass
+        )
         self.G = G
 
         for node_id in self.G.nodes:
-            self._cells[node_id] = self.cell_klass(
-                node_id, capacity, rng=self.rng
-            )
+            self._cells[node_id] = self.cell_klass(node_id, capacity, rng=self.rng)
 
         self._connect_cells()
 

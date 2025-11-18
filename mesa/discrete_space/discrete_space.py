@@ -20,14 +20,13 @@ from functools import cached_property
 from random import Random
 from typing import TypeVar
 
-from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 import numpy as np
+from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 
 from mesa.agent import AgentSet
 from mesa.discrete_space.cell import Cell
 from mesa.discrete_space.cell_collection import CellCollection
 from mesa.util import deprecate_kwarg
-
 
 SeedLike = int | np.ndarray[int] | SeedSequence | BitGenerator | Generator | RandomState
 T = TypeVar("T", bound=Cell)
@@ -70,7 +69,7 @@ class DiscreteSpace[T: Cell]:
         super().__init__()
         self.capacity = capacity
         self._cells: dict[tuple[int, ...], T] = {}
-        if (random is None and rng is None):
+        if random is None and rng is None:
             warnings.warn(
                 "Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
                 UserWarning,

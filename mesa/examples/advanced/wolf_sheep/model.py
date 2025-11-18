@@ -114,7 +114,9 @@ class WolfSheep(Model):
             for cell in self.grid:
                 fully_grown = self.random.choice(possibly_fully_grown)
                 countdown = (
-                    0 if fully_grown else self.rng.integers(low=0, high=grass_regrowth_time).item()
+                    0
+                    if fully_grown
+                    else self.rng.integers(low=0, high=grass_regrowth_time).item()
                 )
                 GrassPatch(self, countdown, grass_regrowth_time, cell)
 

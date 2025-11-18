@@ -14,13 +14,13 @@ environmental conditions.
 
 from __future__ import annotations
 
+import warnings
 from functools import cache, cached_property
 from random import Random
 from typing import TYPE_CHECKING
-import warnings
 
-from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 import numpy as np
+from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 
 from mesa.discrete_space.cell_agent import CellAgent
 from mesa.discrete_space.cell_collection import CellCollection
@@ -52,7 +52,7 @@ class Cell:
         "coordinate",
         "properties",
         "random",
-        "rng"
+        "rng",
     ]
 
     @deprecate_kwarg("random")
@@ -83,7 +83,7 @@ class Cell:
             Coordinate, object
         ] = {}  # fixme still used by voronoi mesh
 
-        if (random is None and rng is None):
+        if random is None and rng is None:
             warnings.warn(
                 "Random number generator not specified, this can make models non-reproducible. Please pass a random number generator explicitly",
                 UserWarning,

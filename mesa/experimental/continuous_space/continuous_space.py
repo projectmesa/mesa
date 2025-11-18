@@ -7,7 +7,6 @@ from random import Random
 
 import numpy as np
 from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
-
 from numpy.typing import ArrayLike
 from scipy.spatial.distance import cdist
 
@@ -15,6 +14,7 @@ from mesa.agent import Agent, AgentSet
 from mesa.util import deprecate_kwarg
 
 SeedLike = int | np.ndarray[int] | SeedSequence | BitGenerator | Generator | RandomState
+
 
 class ContinuousSpace:
     """Continuous space where each agent can have an arbitrary position."""

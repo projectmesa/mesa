@@ -16,8 +16,8 @@ from collections.abc import Sequence
 from itertools import combinations
 from random import Random
 
-from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 import numpy as np
+from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 
 from mesa.discrete_space.cell import Cell
 from mesa.discrete_space.discrete_space import DiscreteSpace
@@ -208,7 +208,9 @@ class VoronoiGrid(DiscreteSpace):
             capacity_function (Callable): function to compute (int) capacity according to (float) area
 
         """
-        super().__init__(capacity=capacity, random=random, rng=rng, cell_klass=cell_klass)
+        super().__init__(
+            capacity=capacity, random=random, rng=rng, cell_klass=cell_klass
+        )
         self.centroids_coordinates = centroids_coordinates
         self._validate_parameters()
 

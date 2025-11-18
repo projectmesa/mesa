@@ -19,8 +19,8 @@ from itertools import product
 from random import Random
 from typing import Any, TypeVar
 
-from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 import numpy as np
+from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 
 from mesa.discrete_space import Cell, DiscreteSpace
 from mesa.discrete_space.property_layer import (
@@ -106,7 +106,9 @@ class Grid(DiscreteSpace[T], HasPropertyLayers):
             rng (SeedLike | None): the random number generator
             cell_klass: the base class to use for the cells
         """
-        super().__init__(capacity=capacity, rng=rng, random=random, cell_klass=cell_klass)
+        super().__init__(
+            capacity=capacity, rng=rng, random=random, cell_klass=cell_klass
+        )
         self.torus = torus
         self.dimensions = dimensions
         self._try_random = True
