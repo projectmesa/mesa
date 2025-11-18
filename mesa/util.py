@@ -20,7 +20,7 @@ def deprecate_kwarg(name: str):
                     stacklevel=2,
                 )
 
-                if kwargs.get("rng", None) is not None:
+                if kwargs.get("rng") is not None:
                     raise ValueError(f"you have to pass either rng or {name}, not both")
 
             return method(self, *args, **kwargs)
