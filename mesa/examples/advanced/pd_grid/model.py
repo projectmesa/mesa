@@ -14,7 +14,7 @@ class PdGrid(mesa.Model):
     payoff = {("C", "C"): 1, ("C", "D"): 0, ("D", "C"): 1.6, ("D", "D"): 0}
 
     def __init__(
-        self, width=50, height=50, activation_order="Random", payoffs=None, seed=None
+        self, width=50, height=50, activation_order="Random", payoffs=None, rng=rng
     ):
         """
         Create a new Spatial Prisoners' Dilemma Model.
@@ -25,7 +25,7 @@ class PdGrid(mesa.Model):
                            Determines the agent activation regime.
             payoffs: (optional) Dictionary of (move, neighbor_move) payoffs.
         """
-        super().__init__(seed=seed)
+        super().__init__(rng=rng)
         self.activation_order = activation_order
         self.grid = OrthogonalMooreGrid((width, height), torus=True, random=self.random)
 

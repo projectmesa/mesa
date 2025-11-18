@@ -47,9 +47,9 @@ class EpsteinCivilViolence(mesa.Model):
         arrest_prob_constant=2.3,
         movement=True,
         max_iters=1000,
-        seed=None,
+        rng=None,
     ):
-        super().__init__(seed=seed)
+        super().__init__(rng=rng)
         self.movement = movement
         self.max_iters = max_iters
 
