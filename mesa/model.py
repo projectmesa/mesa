@@ -201,7 +201,9 @@ class Model:
         """A single step. Fill in here."""
 
     @deprecate_kwarg("seed")
-    def reset_randomizer(self, seed: int | None = None, rng:SeedLike|None=None) -> None:
+    def reset_randomizer(
+        self, seed: int | None = None, rng: SeedLike | None = None
+    ) -> None:
         """Reset the model random number generator.
 
         Args:
