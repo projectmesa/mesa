@@ -5,11 +5,6 @@ A Mesa implementation of Craig Reynolds's Boids flocker model.
 Uses numpy arrays to represent vectors.
 """
 
-import os
-import sys
-
-
-
 import numpy as np
 
 from mesa import Model
