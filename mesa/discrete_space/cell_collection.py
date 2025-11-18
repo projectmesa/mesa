@@ -22,6 +22,8 @@ from functools import cached_property
 from random import Random
 from typing import TYPE_CHECKING, TypeVar
 
+from mesa.util import deprecate_kwarg
+
 if TYPE_CHECKING:
     from mesa.discrete_space.cell import Cell
     from mesa.discrete_space.cell_agent import CellAgent
@@ -45,6 +47,7 @@ class CellCollection[T: Cell]:
 
     """
 
+    @deprecate_kwarg("random")
     def __init__(
         self,
         cells: Mapping[T, list[CellAgent]] | Iterable[T],

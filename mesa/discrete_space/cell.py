@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING
 
 from mesa.discrete_space.cell_agent import CellAgent
 from mesa.discrete_space.cell_collection import CellCollection
+from mesa.util import deprecate_kwarg
 
 if TYPE_CHECKING:
     from mesa.agent import Agent
@@ -48,6 +49,7 @@ class Cell:
         "random",
     ]
 
+    @deprecate_kwarg("random")
     def __init__(
         self,
         coordinate: Coordinate,

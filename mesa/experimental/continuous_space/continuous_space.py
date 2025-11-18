@@ -10,6 +10,7 @@ from numpy.typing import ArrayLike
 from scipy.spatial.distance import cdist
 
 from mesa.agent import Agent, AgentSet
+from mesa.util import deprecate_kwarg
 
 
 class ContinuousSpace:
@@ -45,6 +46,7 @@ class ContinuousSpace:
         # compatibility with solara_viz
         return self.size[1]
 
+    @deprecate_kwarg("random")
     def __init__(
         self,
         dimensions: ArrayLike,

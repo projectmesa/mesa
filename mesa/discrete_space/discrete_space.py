@@ -23,6 +23,7 @@ from typing import TypeVar
 from mesa.agent import AgentSet
 from mesa.discrete_space.cell import Cell
 from mesa.discrete_space.cell_collection import CellCollection
+from mesa.util import deprecate_kwarg
 
 T = TypeVar("T", bound=Cell)
 
@@ -45,6 +46,7 @@ class DiscreteSpace[T: Cell]:
 
     """
 
+    @deprecate_kwarg("random")
     def __init__(
         self,
         capacity: int | None = None,

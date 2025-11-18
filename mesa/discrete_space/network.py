@@ -17,11 +17,13 @@ from typing import Any
 
 from mesa.discrete_space.cell import Cell
 from mesa.discrete_space.discrete_space import DiscreteSpace
+from mesa.util import deprecate_kwarg
 
 
 class Network(DiscreteSpace[Cell]):
     """A networked discrete space."""
 
+    @deprecate_kwarg("random")
     def __init__(
         self,
         G: Any,  # noqa: N803

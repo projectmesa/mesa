@@ -5,6 +5,8 @@ from functools import wraps
 
 
 def deprecate_kwarg(name: str):
+    """Deprecation warning wrapper for specified kwarg."""
+
     def inner_wrapper(method):
         """Deprecation warning wrapper for seed kwarg."""
 
