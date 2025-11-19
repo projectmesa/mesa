@@ -1,9 +1,10 @@
+import numpy as np
+
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalMooreGrid
 from mesa.examples.basic.schelling.agents import SchellingAgent
 
-import numpy as np
 
 class Schelling(Model):
     """Model class for the Schelling segregation model."""
@@ -68,7 +69,11 @@ class Schelling(Model):
         for cell in self.grid.all_cells:
             if occupied[cell.coordinate]:
                 SchellingAgent(
-                    self, cell, next(agent_type).astype(int), homophily=homophily, radius=radius
+                    self,
+                    cell,
+                    next(agent_type).astype(int),
+                    homophily=homophily,
+                    radius=radius,
                 )
 
         # Collect initial state
@@ -84,7 +89,7 @@ class Schelling(Model):
         self.running = self.happy < len(self.agents)  # Continue until everyone is happy
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     agent = Schelling(
         height=20,
         width=20,

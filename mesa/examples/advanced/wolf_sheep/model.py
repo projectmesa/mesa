@@ -110,8 +110,12 @@ class WolfSheep(Model):
 
         # Create grass patches if enabled
         if grass:
-            possibly_fully_grown = self.rng.integers(0, 2, size=(height, width), dtype=bool)
-            regrowth_time = self.rng.integers(low=0, high=grass_regrowth_time, size=(height, width))
+            possibly_fully_grown = self.rng.integers(
+                0, 2, size=(height, width), dtype=bool
+            )
+            regrowth_time = self.rng.integers(
+                low=0, high=grass_regrowth_time, size=(height, width)
+            )
             regrowth_time[possibly_fully_grown] = 0
 
             for cell in self.grid:
