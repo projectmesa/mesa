@@ -54,7 +54,7 @@ class EpsteinCivilViolence(mesa.Model):
         self.max_iters = max_iters
 
         self.grid = mesa.discrete_space.OrthogonalVonNeumannGrid(
-            (width, height), capacity=1, torus=True, random=self.random
+            (width, height), capacity=1, torus=True, rng=self.rng
         )
 
         model_reporters = {

@@ -215,7 +215,7 @@ class VoronoiGrid(DiscreteSpace):
         self._validate_parameters()
 
         self._cells = {
-            i: cell_klass(self.centroids_coordinates[i], capacity, rng=self.random)
+            i: cell_klass(self.centroids_coordinates[i], capacity, rng=self.rng)
             for i in range(len(self.centroids_coordinates))
         }
 

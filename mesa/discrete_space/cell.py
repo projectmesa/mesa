@@ -51,8 +51,7 @@ class Cell:
         "connections",
         "coordinate",
         "properties",
-        "random",
-        "rng",
+        "rng"
     ]
 
     @deprecate_kwarg("random")

@@ -27,7 +27,7 @@ class PdGrid(mesa.Model):
         """
         super().__init__(rng=rng)
         self.activation_order = activation_order
-        self.grid = OrthogonalMooreGrid((width, height), torus=True, random=self.random)
+        self.grid = OrthogonalMooreGrid((width, height), torus=True, rng=self.rng)
 
         if payoffs is not None:
             self.payoff = payoffs

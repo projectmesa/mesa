@@ -42,7 +42,8 @@ class CellCollection[T: Cell]:
     Attributes:
         cells (List[Cell]): The list of cells this collection represents
         agents (List[CellAgent]) : List of agents occupying the cells in this collection
-        random (Random) : The random number generator
+        random (Random) : The random number generator, deprecated
+        rng (Random) : The random number generator
 
     Notes:
         A `UserWarning` is issued if `random=None`. You can resolve this warning by explicitly
