@@ -49,7 +49,7 @@ class Animal(CellAgent):
         # Handle death and reproduction
         if self.energy < 0:
             self.remove()
-        elif self.random.random() < self.p_reproduce:
+        elif self.rng.random() < self.p_reproduce:
             self.spawn_offspring()
 
     def move(self):
