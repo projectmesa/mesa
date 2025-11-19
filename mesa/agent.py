@@ -143,7 +143,11 @@ class Agent:
     @property
     def random(self) -> Random:
         """Return a seeded stdlib rng."""
-        warnings.warn("the use of random is deprecated, please use rng instead", FutureWarning, stacklevel=2)
+        warnings.warn(
+            "the use of random is deprecated, please use rng instead",
+            FutureWarning,
+            stacklevel=2,
+        )
         return self.model.random
 
     @property
