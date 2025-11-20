@@ -65,7 +65,7 @@ class SpaceRenderer:
         self.space = getattr(model, "grid", getattr(model, "space", None))
 
         self.space_drawer = self._get_space_drawer()
-        
+
         self.space_mesh = None
         self.agent_mesh = None
         self.propertylayer_mesh = None
@@ -169,7 +169,7 @@ class SpaceRenderer:
                 mapped_arguments["loc"] = pos[x]
 
         return mapped_arguments
-    
+
     def setup_structure(self, **kwargs) -> SpaceRenderer:
         """Setup the space structure without drawing.
 
@@ -199,7 +199,7 @@ class SpaceRenderer:
         self.draw_agent_kwargs = kwargs
 
         return self
-    
+
     def setup_propertylayer(
         self, propertylayer_portrayal: Callable | dict
     ) -> SpaceRenderer:
@@ -303,7 +303,9 @@ class SpaceRenderer:
 
         # Convert portrayal to callable if needed
         if isinstance(self.propertylayer_portrayal, dict):
-            self.propertylayer_portrayal = _dict_to_callable(self.propertylayer_portrayal)
+            self.propertylayer_portrayal = _dict_to_callable(
+                self.propertylayer_portrayal
+            )
 
         number_of_propertylayers = sum(
             [1 for layer in property_layers if layer != "empty"]
