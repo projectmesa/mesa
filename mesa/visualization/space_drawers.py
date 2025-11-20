@@ -477,11 +477,11 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
         node_mark_kwargs.update(draw_chart_kwargs.pop("node_kwargs", {}))
         edge_mark_kwargs.update(draw_chart_kwargs.pop("edge_kwargs", {}))
 
-        draw_chart_kwargs = {
+        chart_props = {
             "width": chart_width,
             "height": chart_height,
         }
-        draw_chart_kwargs.update(draw_chart_kwargs)
+        chart_props.update(draw_chart_kwargs)
 
         edge_plot = (
             alt.Chart(edge_positions)
@@ -510,8 +510,8 @@ class NetworkSpaceDrawer(BaseSpaceDrawer):
 
         chart = edge_plot + node_plot
 
-        if draw_chart_kwargs:
-            chart = chart.properties(**draw_chart_kwargs)
+        if chart_props:
+            chart = chart.properties(**chart_props)
 
         return chart
 
