@@ -352,13 +352,11 @@ class SpaceRenderer:
             prop_base, prop_cbar = self.propertylayer_mesh or (None, None)
 
             if self.space_mesh:
-                structure = self.draw_structure(**self.space_kwargs)
+                structure = self.draw_structure()
             if self.agent_mesh:
-                agents = self.draw_agents(self.agent_portrayal, **self.agent_kwargs)
+                agents = self.draw_agents()
             if self.propertylayer_mesh:
-                prop_base, prop_cbar = self.draw_propertylayer(
-                    self.propertylayer_portrayal
-                )
+                prop_base, prop_cbar = self.draw_propertylayer()
 
             spatial_charts_list = [
                 chart for chart in [structure, prop_base, agents] if chart
