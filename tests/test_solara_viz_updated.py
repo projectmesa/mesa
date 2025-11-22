@@ -165,7 +165,7 @@ def test_call_space_drawer(mocker):
     )
 
     mock_draw_space.assert_called_with(renderer)
-    mock_draw_agents.assert_called_with(renderer, agent_portrayal)
+    mock_draw_agents.assert_called_with(renderer)
     # should not call this method if portrayal is None
     mock_draw_properties.assert_not_called()
 
@@ -201,8 +201,8 @@ def test_call_space_drawer(mocker):
     )
 
     mock_draw_space.assert_called_with(renderer)
-    mock_draw_agents.assert_called_with(renderer, agent_portrayal)
-    mock_draw_properties.assert_called_with(renderer, propertylayer_portrayal)
+    mock_draw_agents.assert_called_with(renderer)
+    mock_draw_properties.assert_called_with(renderer)
 
     mock_draw_space.reset_mock()
     mock_draw_agents.reset_mock()
