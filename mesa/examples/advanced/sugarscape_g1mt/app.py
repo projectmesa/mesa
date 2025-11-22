@@ -62,6 +62,7 @@ renderer = (
     .setup_agents(agent_portrayal)
     .setup_propertylayer(propertylayer_portrayal)
 )
+# Specifically, avoid drawing the grid to hide the grid lines.
 renderer.draw_agents()
 renderer.draw_propertylayer()
 

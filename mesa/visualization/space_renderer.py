@@ -181,6 +181,7 @@ class SpaceRenderer:
             SpaceRenderer: The current instance for method chaining.
         """
         self.draw_space_kwargs = kwargs
+        self.space_mesh = None
 
         return self
 
@@ -197,6 +198,7 @@ class SpaceRenderer:
         """
         self.agent_portrayal = agent_portrayal
         self.draw_agent_kwargs = kwargs
+        self.agent_mesh = None
 
         return self
 
@@ -213,6 +215,7 @@ class SpaceRenderer:
             SpaceRenderer: The current instance for method chaining.
         """
         self.propertylayer_portrayal = propertylayer_portrayal
+        self.propertylayer_mesh = None
 
         return self
 
