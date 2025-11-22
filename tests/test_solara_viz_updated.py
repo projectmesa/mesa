@@ -147,8 +147,12 @@ def test_call_space_drawer(mocker):
 
     propertylayer_portrayal = None
 
-    renderer = SpaceRenderer(model, backend="matplotlib")
-    renderer.render(agent_portrayal, propertylayer_portrayal)
+    renderer = (
+        SpaceRenderer(model, backend="matplotlib")
+        .setup_agents(agent_portrayal)
+        .setup_propertylayer(propertylayer_portrayal)
+        .render()
+    )
 
     # component must be rendered for code to run
     solara.render(
@@ -192,8 +196,12 @@ def test_call_space_drawer(mocker):
     }
     solara.render(SolaraViz(model, renderer, components=[]))
 
-    renderer = SpaceRenderer(model, backend="altair")
-    renderer.render(agent_portrayal, propertylayer_portrayal)
+    renderer = (
+        SpaceRenderer(model, backend="altair")
+        .setup_agents(agent_portrayal)
+        .setup_propertylayer(propertylayer_portrayal)
+        .render()
+    )
 
     assert renderer.backend == "altair"
     assert isinstance(
@@ -210,7 +218,7 @@ def test_call_space_drawer(mocker):
 
     solara.render(SolaraViz(model))
 
-    # noting is drawn if renderer is not passed
+    # nothing is drawn if renderer is not passed
     assert mock_draw_space.call_count == 0
     assert mock_draw_agents.call_count == 0
     assert mock_draw_properties.call_count == 0
