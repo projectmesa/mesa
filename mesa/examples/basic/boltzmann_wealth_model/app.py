@@ -61,10 +61,11 @@ model = BoltzmannWealth(50, 10, 10)
 # and then drawing the agents on top. It uses a specified backend
 # (like "altair" or "matplotlib") for creating the plots.
 
-# Can customize the grid appearance.
 renderer = (
     SpaceRenderer(model, backend="altair")
-    .setup_structure(grid_color="black", grid_dash=[6, 2], grid_opacity=0.3)
+    .setup_structure(  # To customize the grid appearance.
+        grid_color="black", grid_dash=[6, 2], grid_opacity=0.3
+    )
     .setup_agents(agent_portrayal, cmap="viridis", vmin=0, vmax=10)
 )
 renderer.render()
