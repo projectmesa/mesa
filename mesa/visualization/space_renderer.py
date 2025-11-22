@@ -216,21 +216,56 @@ class SpaceRenderer:
 
         return self
 
-    def draw_structure(self):
+    def draw_structure(self, **kwargs):
         """Draw the space structure.
+
+        Args:
+            **kwargs: (Deprecated) Additional keyword arguments for drawing.
+                    Use setup_structure() instead.
 
         Returns:
             The visual representation of the space structure.
         """
+        if kwargs:
+            warnings.warn(
+                "Passing kwargs to draw_structure() is deprecated. "
+                "Use setup_structure(**kwargs) before calling draw_structure().",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            self.draw_space_kwargs.update(kwargs)
+
         self.space_mesh = self.backend_renderer.draw_structure(**self.draw_space_kwargs)
         return self.space_mesh
 
-    def draw_agents(self):
+    def draw_agents(self, agent_portrayal=None, **kwargs):
         """Draw agents on the space.
+
+        Args:
+            agent_portrayal: (Deprecated) Function that takes an agent and returns AgentPortrayalStyle.
+                            Use setup_agents() instead.
+            **kwargs: (Deprecated) Additional keyword arguments for drawing.
 
         Returns:
             The visual representation of the agents.
         """
+        if agent_portrayal is not None:
+            warnings.warn(
+                "Passing agent_portrayal to draw_agents() is deprecated. "
+                "Use setup_agents(agent_portrayal, **kwargs) before calling draw_agents().",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            self.agent_portrayal = agent_portrayal
+        if kwargs:
+            warnings.warn(
+                "Passing kwargs to draw_agents() is deprecated. "
+                "Use setup_agents(**kwargs) before calling draw_agents().",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            self.draw_agent_kwargs.update(kwargs)
+
         # Prepare data for agent plotting
         arguments = self.backend_renderer.collect_agent_data(
             self.space, self.agent_portrayal, default_size=self.space_drawer.s_default
@@ -242,8 +277,12 @@ class SpaceRenderer:
         )
         return self.agent_mesh
 
-    def draw_propertylayer(self):
+    def draw_propertylayer(self, propertylayer_portrayal=None):
         """Draw property layers on the space.
+
+        Args:
+            propertylayer_portrayal: (Deprecated) Function that takes a property layer and returns PropertyLayerStyle.
+                                   Use setup_propertylayer() instead.
 
         Returns:
             The visual representation of the property layers.
@@ -251,6 +290,15 @@ class SpaceRenderer:
         Raises:
             Exception: If no property layers are found on the space.
         """
+        if propertylayer_portrayal is not None:
+            warnings.warn(
+                "Passing propertylayer_portrayal to draw_propertylayer() is deprecated. "
+                "Use setup_propertylayer(propertylayer_portrayal) before calling draw_propertylayer().",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            self.propertylayer_portrayal = propertylayer_portrayal
+
         # Import here to avoid circular imports
         from mesa.visualization.components import PropertyLayerStyle  # noqa: PLC0415
 
@@ -318,12 +366,27 @@ class SpaceRenderer:
         )
         return self.propertylayer_mesh
 
-    def render(self):
+    def render(self, agent_portrayal=None, propertylayer_portrayal=None, **kwargs):
         """Render the complete space with structure, agents, and property layers.
 
-        It is an all-in-one method that draws everything required therefore eliminates
-        the need of calling each method separately.
+        Args:
+            agent_portrayal: (Deprecated) Function for agent portrayal. Use setup_agents() instead.
+            propertylayer_portrayal: (Deprecated) Function for property layer portrayal. Use setup_propertylayer() instead.
+            **kwargs: (Deprecated) Additional keyword arguments.
         """
+        if agent_portrayal is not None or propertylayer_portrayal is not None or kwargs:
+            warnings.warn(
+                "Passing parameters to render() is deprecated. "
+                "Use setup_structure(), setup_agents(), and setup_propertylayer() before calling render().",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            if agent_portrayal is not None:
+                self.agent_portrayal = agent_portrayal
+            if propertylayer_portrayal is not None:
+                self.propertylayer_portrayal = propertylayer_portrayal
+            self.draw_space_kwargs.update(kwargs)
+
         if self.space_mesh is None:
             self.draw_structure()
         if self.agent_mesh is None and self.agent_portrayal is not None:
