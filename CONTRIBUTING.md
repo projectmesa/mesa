@@ -63,7 +63,7 @@ First step is to start thinking like a modeller. To understand the fine details 
   - Check our open [issues](https://github.com/projectmesa/mesa-examples/issues) for the examples.
   - If you see anything you want to improve, feel free to open a (small) PR!
 - If you have a feel for Mesa, check our [discussions](https://github.com/projectmesa/mesa/discussions) and [issues](https://github.com/projectmesa/mesa/issues).
-  - Also go thought our [release notes](https://github.com/projectmesa/mesa/releases) to see what we recently have been working on, and see some examples of successful PRs.
+  - Also go through our [release notes](https://github.com/projectmesa/mesa/releases) to see what we recently have been working on, and see some examples of successful PRs.
 - Once you found or thought of a nice idea, comment on the issue/discussion (or open a new one) and get to work!
 
 ### I'm both
