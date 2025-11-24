@@ -25,7 +25,7 @@
 Mesa allows users to quickly create agent-based models using built-in core components (such as spatial grids and agent schedulers) or customized implementations; visualize them using a browser-based interface; and analyze their results using Python's data analysis tools. Mesa's goal is to make simulations accessible to everyone, so humanity can more effectively understand and solve complex problems.
 
 ![A screenshot of the Wolf Sheep model in Mesa|100%](images/wolf_sheep.png)
-*A visualisation of the Wolf Sheep model build with Mesa.*
+*A visualisation of the Wolf Sheep model build with Mesa. An online demo is [available here](https://py.cafe/app/EwoutH/mesa-solara-basic-examples).*
 
 ## Features
 
@@ -83,6 +83,7 @@ Mesa is an open source project and welcomes contributions:
 - [GitHub Repository] - Access the source code
 - [Issue Tracker] - Report bugs or suggest features
 - [Contributors Guide] - Learn how to contribute
+- [GSoC at Mesa — Candidates Guide] - For candidates interested in participating in the Google Summer of Code at Mesa
 
 ### Citing Mesa
 
@@ -112,6 +113,7 @@ API Documentation <apis/api_main>
 - {ref}`search`
 
 [contributors guide]: https://github.com/projectmesa/mesa/blob/main/CONTRIBUTING.md
+[GSoC at Mesa — Candidates Guide]: GSoC.md
 [github repository]: https://github.com/projectmesa/mesa/
 [github discussions]: https://github.com/projectmesa/mesa/discussions
 [issue tracker]: https://github.com/projectmesa/mesa/issues

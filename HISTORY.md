@@ -1,6 +1,44 @@
 ---
 title: Release History
 ---
+# 3.3.1 (2025-11-07)
+## Highlights
+Mesa 3.3.1 is a maintenance release focused on bug fixes and documentation improvements following the major 3.3.0 visualization update.
+
+This release addresses two critical visualization bugs affecting PropertyLayers on HexGrids and property layer data mapping across both Altair and Matplotlib backends.
+
+The documentation received several important updates, including fixes to tutorial code examples, a new guide for Google Summer of Code contributors, and improved organization of the documentation structure. The migration guide has been updated to reflect the deprecation of the old `agent_portrayal` parameter in favor of the new `AgentPortrayalStyle` introduced in Mesa 3.3.0.
+
+We're excited to welcome six new contributors to the Mesa project in this release! Thank you to everyone who contributed bug fixes, documentation improvements, and test coverage enhancements.
+
+## What's Changed
+### 🐛 Bugs fixed
+* Fix visualization error for PropertyLayers on HexGrids. Add transpose … by @flucco in https://github.com/projectmesa/mesa/pull/2868
+* Fix: Property layer data mapping for both Altair and Matplotlib backends by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2869
+* Fix: AgentSet initialization should not require explicit random number generator by @verisimilidude2 in https://github.com/projectmesa/mesa/pull/2789
+### 🔍 Examples updated
+* Fix missing variable g in the tutorial by @pazmiller in https://github.com/projectmesa/mesa/pull/2849
+### 📜 Documentation improvements
+* fix broken link in example by @BigTurtle8 in https://github.com/projectmesa/mesa/pull/2847
+* Docs: Fix ValueError in tutorial by adding default value to MoneyModel by @pragam-m25 in https://github.com/projectmesa/mesa/pull/2871
+* Add guide for GSoC contributors by @colinfrisch in https://github.com/projectmesa/mesa/pull/2873
+* Deprecate `agent_portrayal` and update Migration guide by @Sahil-Chhoker in https://github.com/projectmesa/mesa/pull/2872
+* Docs: List overview separate from tutorials by @dhiraj-143r in https://github.com/projectmesa/mesa/pull/2878
+### 🔧 Maintenance
+* ruff fixes in visualization by @quaquel in https://github.com/projectmesa/mesa/pull/2867
+* [pre-commit.ci] pre-commit autoupdate: Update to ruff v0.13 by @pre-commit-ci[bot] in https://github.com/projectmesa/mesa/pull/2840
+* Tests: Add test for InputText in UserInputs by @pragam-m25 in https://github.com/projectmesa/mesa/pull/2870
+
+## New Contributors
+* @BigTurtle8 made their first contribution in https://github.com/projectmesa/mesa/pull/2847
+* @pazmiller made their first contribution in https://github.com/projectmesa/mesa/pull/2849
+* @flucco made their first contribution in https://github.com/projectmesa/mesa/pull/2868
+* @pragam-m25 made their first contribution in https://github.com/projectmesa/mesa/pull/2870
+* @dhiraj-143r made their first contribution in https://github.com/projectmesa/mesa/pull/2878
+* @verisimilidude2 made their first contribution in https://github.com/projectmesa/mesa/pull/2789
+
+**Full Changelog**: https://github.com/projectmesa/mesa/compare/v3.3.0...v3.3.1
+
 # 3.3.0 (2025-09-06)
 ## Highlights
 
@@ -13,7 +51,6 @@ The major highlight of release 3.3.0 is the introduction of a new and improved v
 - Updated tutorials for visualization
 
 [You can read more about the update here](https://gist.github.com/Sahil-Chhoker/470d78683664dffc05725bd858beb494)
-
 
 In addition, there were many other improvements to mesa, from bug fixes to improved CI/CD pipelines. Thanks to the PyCON sprints and the developers who supported Mesa!
 

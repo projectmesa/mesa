@@ -113,9 +113,13 @@ class AltairBackend(AbstractRenderer):
 
             if isinstance(portray_input, dict):
                 warnings.warn(
-                    "Returning a dict from agent_portrayal is deprecated. "
-                    "Please return an AgentPortrayalStyle instance instead.",
-                    PendingDeprecationWarning,
+                    (
+                        "Returning a dict from agent_portrayal is deprecated. "
+                        "Please return an AgentPortrayalStyle instance instead. "
+                        "For more information, refer to the migration guide: "
+                        "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
+                    ),
+                    DeprecationWarning,
                     stacklevel=2,
                 )
                 dict_data = portray_input.copy()
@@ -400,7 +404,7 @@ class AltairBackend(AbstractRenderer):
             df = pd.DataFrame(
                 {
                     "x": np.repeat(np.arange(data.shape[0]), data.shape[1]),
-                    "y": np.tile(np.arange(data.shape[1]), data.shape[0]),
+                    "y": np.tile(np.arange(data.shape[1] - 1, -1, -1), data.shape[0]),
                     "value": data.flatten(),
                 }
             )
