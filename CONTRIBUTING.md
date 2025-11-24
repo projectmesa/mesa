@@ -1,5 +1,7 @@
 # Contributing
 
+_For candidates interested in participating in the Google Summer of Code (GSoC), checkout Mesa’s [GSoC guide](https://github.com/projectmesa/mesa/blob/main/docs/GSoC.md)._
+
 As an open source project, Mesa welcomes contributions of many forms, and from beginners to experts. If you are
 curious or just want to see what is happening, we post our development session agendas
 and development session notes on [Mesa discussions]. We also have a threaded discussion forum on [Matrix]
@@ -61,7 +63,7 @@ First step is to start thinking like a modeller. To understand the fine details 
   - Check our open [issues](https://github.com/projectmesa/mesa-examples/issues) for the examples.
   - If you see anything you want to improve, feel free to open a (small) PR!
 - If you have a feel for Mesa, check our [discussions](https://github.com/projectmesa/mesa/discussions) and [issues](https://github.com/projectmesa/mesa/issues).
-  - Also go thought our [release notes](https://github.com/projectmesa/mesa/releases) to see what we recently have been working on, and see some examples of successful PRs.
+  - Also go through our [release notes](https://github.com/projectmesa/mesa/releases) to see what we recently have been working on, and see some examples of successful PRs.
 - Once you found or thought of a nice idea, comment on the issue/discussion (or open a new one) and get to work!
 
 ### I'm both

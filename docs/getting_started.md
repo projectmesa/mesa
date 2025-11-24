@@ -3,10 +3,14 @@ Mesa is a modular framework for building, analyzing and visualizing agent-based 
 
 **Agent-based models** are computer simulations involving multiple entities (the agents) acting and interacting with one another based on their programmed behavior. Agents can be used to represent living cells, animals, individual humans, even entire organizations or abstract entities. Sometimes, we may have an understanding of how the individual components of a system behave, and want to see what system-level behaviors and effects emerge from their interaction. Other times, we may have a good idea of how the system overall behaves, and want to figure out what individual behaviors explain it. Or we may want to see how to get agents to cooperate or compete most effectively. Or we may just want to build a cool toy with colorful little dots moving around.
 
-## Tutorials
-If you want to get a quick start on how to build agent based models with MESA, check the overview and tutorials:
+## Overview
+If you want to get a general idea of Mesa’s features and structure, start here:
 
 - [Overview of the MESA library](overview): Learn about the core concepts and components of Mesa.
+
+## Tutorials
+If you want to learn how to build agent-based models step by step using Mesa, follow these tutorials :
+
 - [Creating Your First Model](tutorials/0_first_model): Learn how to create your first Mesa model.
 - [Adding Space](tutorials/1_adding_space): Learn how to add space to your Mesa model and understand Mesa's space architecture.
 - [Collecting Data](tutorials/2_collecting_data): Learn how to collect model level and agent level data with Mesa' DataCollector.
@@ -51,23 +55,4 @@ Enjoy modelling with Mesa, and feel free to reach out!
 
 
 
-```{toctree}
-:hidden: true
-:maxdepth: 7
 
-Overview <overview>
-Creating Your First Model <tutorials/0_first_model>
-Adding Space <tutorials/1_adding_space>
-Collecting Data <tutorials/2_collecting_data>
-AgentSet <tutorials/3_agentset>
-Basic Visualization <tutorials/4_visualization_basic>
-Dynamic Agent Visualization <tutorials/5_visualization_dynamic_agents>
-Visualisation using SpaceRenderer <tutorials/6_visualization_rendering_with_space_renderer>
-Property Layer Visualization <tutorials/7_visualization_propertylayer_visualization>
-Custom Visualization Components <tutorials/8_visualization_custom>
-Parameter Sweeps <tutorials/9_batch_run>
-Comparing Scenarios <tutorials/10_comparing_scenarios>
-Best Practices <best-practices>
-
-
-```
