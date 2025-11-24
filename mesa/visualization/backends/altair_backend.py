@@ -260,10 +260,22 @@ class AltairBackend(AbstractRenderer):
         df = pd.DataFrame(records)
 
         # Ensure all columns that should be numeric are, handling potential Nones
-        numeric_cols = ["x", "y", "size", "opacity", "strokeWidth", "original_color"]
+        numeric_cols = ["x", "y", "size", "opacity", "strokeWidth"]
         for col in numeric_cols:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        # Handle color numeric conversion safely
+        if "original_color" in df.columns:
+            color_values = arguments["color"]
+            color_is_numeric = all(
+                isinstance(x, int | float | np.number) or x is None
+                for x in color_values
+            )
+            if color_is_numeric:
+                df["original_color"] = pd.to_numeric(
+                    df["original_color"], errors="coerce"
+                )
 
         # Get tooltip keys from the first valid record
         tooltip_list = ["x", "y"]
