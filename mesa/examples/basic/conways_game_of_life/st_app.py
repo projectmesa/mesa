@@ -51,11 +51,10 @@ if run:
         my_bar.progress((i / num_ticks), text="Simulation progress")
         placeholder.text(f"Step = {i}")
         for contents, (x, y) in model.grid.coord_iter():
-            # print(f"x: {x}, y: {y}, state: {contents}")
             selected_row = df_grid[(df_grid["x"] == x) & (df_grid["y"] == y)]
             df_grid.loc[selected_row.index, "state"] = (
                 contents.state
-            )  # random.choice([1,2])
+            )
 
         heatmap = (
             alt.Chart(df_grid)

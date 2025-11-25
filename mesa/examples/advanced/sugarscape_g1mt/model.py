@@ -94,7 +94,7 @@ class SugarscapeG1mt(mesa.Model):
         Trader.create_agents(
             self,
             initial_population,
-            self.random.choices(self.grid.all_cells.cells, k=initial_population),
+            self.rng.choice(self.grid.all_cells.cells, size=initial_population),
             sugar=self.rng.integers(
                 endowment_min, endowment_max, (initial_population,), endpoint=True
             ),
