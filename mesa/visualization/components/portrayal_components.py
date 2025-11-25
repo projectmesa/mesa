@@ -27,6 +27,19 @@ class AgentPortrayalStyle:
     x, y are determined automatically according to the agent's type
     (normal/CellAgent) and position in the space if not manually declared.
 
+    Attributes:
+        x (float | None): The x-coordinate of the agent.
+        y (float | None): The y-coordinate of the agent.
+        color (ColorLike | None): The color of the agent.
+        marker (str | None): The marker shape for the agent.
+        size (int | float | None): The size of the agent marker.
+        zorder (int | None): The z-order for drawing the agent.
+        alpha (float | None): The opacity of the agent.
+        edgecolors (str | tuple | None): The color of the marker's edge.
+        linewidths (float | int | None): The width of the marker's edge.
+        tooltip (dict | None): A dictionary of data to display on hover.
+            Note: This feature is only available with the Altair backend.
+
     Example:
         >>> def agent_portrayal(agent):
         >>>     return AgentPortrayalStyle(
@@ -55,6 +68,7 @@ class AgentPortrayalStyle:
     alpha: float | None = 1.0
     edgecolors: str | tuple | None = None
     linewidths: float | int | None = 1.0
+    tooltip: dict | None = None
 
     def update(self, *updates_fields: tuple[str, Any]):
         """Updates attributes from variable (field_name, new_value) tuple arguments.
