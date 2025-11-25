@@ -233,7 +233,7 @@ class SpaceRenderer:
             warnings.warn(
                 "Passing kwargs to draw_structure() is deprecated. "
                 "Use setup_structure(**kwargs) before calling draw_structure().",
-                DeprecationWarning,
+                PendingDeprecationWarning,
                 stacklevel=2,
             )
             self.draw_space_kwargs.update(kwargs)
@@ -256,7 +256,7 @@ class SpaceRenderer:
             warnings.warn(
                 "Passing agent_portrayal to draw_agents() is deprecated. "
                 "Use setup_agents(agent_portrayal, **kwargs) before calling draw_agents().",
-                DeprecationWarning,
+                PendingDeprecationWarning,
                 stacklevel=2,
             )
             self.agent_portrayal = agent_portrayal
@@ -264,7 +264,7 @@ class SpaceRenderer:
             warnings.warn(
                 "Passing kwargs to draw_agents() is deprecated. "
                 "Use setup_agents(**kwargs) before calling draw_agents().",
-                DeprecationWarning,
+                PendingDeprecationWarning,
                 stacklevel=2,
             )
             self.draw_agent_kwargs.update(kwargs)
@@ -297,7 +297,7 @@ class SpaceRenderer:
             warnings.warn(
                 "Passing propertylayer_portrayal to draw_propertylayer() is deprecated. "
                 "Use setup_propertylayer(propertylayer_portrayal) before calling draw_propertylayer().",
-                DeprecationWarning,
+                PendingDeprecationWarning,
                 stacklevel=2,
             )
             self.propertylayer_portrayal = propertylayer_portrayal
@@ -381,7 +381,7 @@ class SpaceRenderer:
             warnings.warn(
                 "Passing parameters to render() is deprecated. "
                 "Use setup_structure(), setup_agents(), and setup_propertylayer() before calling render().",
-                DeprecationWarning,
+                PendingDeprecationWarning,
                 stacklevel=2,
             )
             if agent_portrayal is not None:
