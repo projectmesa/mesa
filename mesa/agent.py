@@ -708,8 +708,8 @@ class GroupBy:
             for group_name, group in self.groups.items()
         }
 
-    def __iter__(self):  # noqa: D105
+    def __iter__(self) -> Iterator[tuple[Hashable, list | AgentSet]]:
         return iter(self.groups.items())
 
     def __len__(self):  # noqa: D105
-        return len(self.groups)
+        return len(self.groups) 
