@@ -712,4 +712,4 @@ class GroupBy:
         return iter(self.groups.items())
 
     def __len__(self):  # noqa: D105
-        return len(self.groups) 
+        return len(self.groups)
