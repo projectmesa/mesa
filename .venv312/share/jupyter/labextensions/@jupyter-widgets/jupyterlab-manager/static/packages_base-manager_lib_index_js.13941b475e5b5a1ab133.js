@@ -736,7 +736,7 @@ class ManagerBase {
                         synchronously (before it's first `await` statement).
                      2: any calls to a model constructor or the `set_state` method on a model,
                         happens asynchronously (in a `then` clause, or after an `await` statement).
-      
+
                     Without these assumptions, one risks trying to set model state with a reference
                     to another model that doesn't exist yet!
                   */

@@ -50,7 +50,7 @@ __webpack_require__.d(exports, {
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -64,23 +64,23 @@ __webpack_require__.d(exports, {
 /******/ 			loaded: false,
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
+/******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.loaded = true;
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = __webpack_modules__;
-/******/ 	
+/******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = __webpack_module_cache__;
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
 /******/ 	(() => {
@@ -93,7 +93,7 @@ __webpack_require__.d(exports, {
 /******/ 			return getter;
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -105,7 +105,7 @@ __webpack_require__.d(exports, {
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/ensure chunk */
 /******/ 	(() => {
 /******/ 		__webpack_require__.f = {};
@@ -118,7 +118,7 @@ __webpack_require__.d(exports, {
 /******/ 			}, []));
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/get javascript chunk filename */
 /******/ 	(() => {
 /******/ 		// This function allow to reference async chunks
@@ -127,7 +127,7 @@ __webpack_require__.d(exports, {
 /******/ 			return "" + chunkId + "." + {"webpack_sharing_consume_default_lumino_widgets-webpack_sharing_consume_default_jquery_jquery":"65fdeedf445afbd3c750","webpack_sharing_consume_default_lumino_coreutils":"3cdb0a7dfa5b1685ad03","webpack_sharing_consume_default_jupyter-widgets_base_jupyter-widgets_base":"14f8904ad66e5de4794a","webpack_sharing_consume_default_lumino_algorithm-webpack_sharing_consume_default_lumino_signaling":"121fc1d57584a4cad646","lib_index_js":"56f37fb50492d0d63a45","vendors-node_modules_base64-js_index_js-node_modules_sanitize-html_index_js":"c79fc2bcc3f69676beda","packages_base-manager_lib_index_js":"13941b475e5b5a1ab133","vendors-node_modules_backbone_backbone_js-node_modules_lodash_isEqual_js":"ab532abfb6832a50f59e","webpack_sharing_consume_default_lumino_messaging":"5d5527fdcb258b5816a0","packages_base_lib_index_js-webpack_sharing_consume_default_jquery_jquery":"5dd13f8e980fa3c50bfe","vendors-node_modules_d3-color_src_color_js-node_modules_d3-format_src_defaultLocale_js-node_m-09b215":"2643c43f22ad111f4f82","packages_controls_lib_index_js":"6d5d05e0ec5e0c9f8185","packages_controls_lib_version_js":"105c0edf5e497d01e132","packages_output_lib_index_js":"49c9e4037a3b9e9e3b18","vendors-node_modules_jquery_dist_jquery_js":"3afdf979a9caffdf15a7","vendors-node_modules_semver_index_js":"7a90c08b9ce3dac425c6","@jupyter-widgets/controls":"9535f14e043c94385218"}[chunkId] + ".js";
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/global */
 /******/ 	(() => {
 /******/ 		__webpack_require__.g = (function() {
@@ -139,12 +139,12 @@ __webpack_require__.d(exports, {
 /******/ 			}
 /******/ 		})();
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/load script */
 /******/ 	(() => {
 /******/ 		var inProgress = {};
@@ -163,14 +163,14 @@ __webpack_require__.d(exports, {
 /******/ 			if(!script) {
 /******/ 				needAttach = true;
 /******/ 				script = document.createElement('script');
-/******/ 		
+/******/
 /******/ 				script.charset = 'utf-8';
 /******/ 				script.timeout = 120;
 /******/ 				if (__webpack_require__.nc) {
 /******/ 					script.setAttribute("nonce", __webpack_require__.nc);
 /******/ 				}
 /******/ 				script.setAttribute("data-webpack", dataWebpackPrefix + key);
-/******/ 		
+/******/
 /******/ 				script.src = url;
 /******/ 			}
 /******/ 			inProgress[url] = [done];
@@ -190,7 +190,7 @@ __webpack_require__.d(exports, {
 /******/ 			needAttach && document.head.appendChild(script);
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -201,7 +201,7 @@ __webpack_require__.d(exports, {
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/node module decorator */
 /******/ 	(() => {
 /******/ 		__webpack_require__.nmd = (module) => {
@@ -210,7 +210,7 @@ __webpack_require__.d(exports, {
 /******/ 			return module;
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/sharing */
 /******/ 	(() => {
 /******/ 		__webpack_require__.S = {};
@@ -266,7 +266,7 @@ __webpack_require__.d(exports, {
 /******/ 			return initPromises[name] = Promise.all(promises).then(() => (initPromises[name] = 1));
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
 /******/ 		var scriptUrl;
@@ -289,7 +289,7 @@ __webpack_require__.d(exports, {
 /******/ 		scriptUrl = scriptUrl.replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
 /******/ 		__webpack_require__.p = scriptUrl;
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/consumes */
 /******/ 	(() => {
 /******/ 		var parseVersion = (str) => {
@@ -370,7 +370,7 @@ __webpack_require__.d(exports, {
 /******/ 			}
 /******/ 			return fn(scopeName, __webpack_require__.S[scopeName], key, eager, c, d);
 /******/ 		});
-/******/ 		
+/******/
 /******/ 		var useFallback = (scopeName, key, fallback) => {
 /******/ 			return fallback ? fallback() : failAsNotExist(scopeName, key);
 /******/ 		}
@@ -515,23 +515,23 @@ __webpack_require__.d(exports, {
 /******/ 			}
 /******/ 		}
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/jsonp chunk loading */
 /******/ 	(() => {
 /******/ 		__webpack_require__.b = document.baseURI || self.location.href;
-/******/ 		
+/******/
 /******/ 		// object to store loaded and loading chunks
 /******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = {
 /******/ 			"@jupyter-widgets/jupyterlab-manager": 0
 /******/ 		};
-/******/ 		
+/******/
 /******/ 		__webpack_require__.f.j = (chunkId, promises) => {
 /******/ 				// JSONP chunk loading for javascript
 /******/ 				var installedChunkData = __webpack_require__.o(installedChunks, chunkId) ? installedChunks[chunkId] : undefined;
 /******/ 				if(installedChunkData !== 0) { // 0 means "already installed".
-/******/ 		
+/******/
 /******/ 					// a Promise means "currently loading".
 /******/ 					if(installedChunkData) {
 /******/ 						promises.push(installedChunkData[2]);
@@ -540,7 +540,7 @@ __webpack_require__.d(exports, {
 /******/ 							// setup Promise in chunk cache
 /******/ 							var promise = new Promise((resolve, reject) => (installedChunkData = installedChunks[chunkId] = [resolve, reject]));
 /******/ 							promises.push(installedChunkData[2] = promise);
-/******/ 		
+/******/
 /******/ 							// start chunk loading
 /******/ 							var url = __webpack_require__.p + __webpack_require__.u(chunkId);
 /******/ 							// create error before stack unwound to get useful stacktrace later
@@ -565,17 +565,17 @@ __webpack_require__.d(exports, {
 /******/ 					}
 /******/ 				}
 /******/ 		};
-/******/ 		
+/******/
 /******/ 		// no prefetching
-/******/ 		
+/******/
 /******/ 		// no preloaded
-/******/ 		
+/******/
 /******/ 		// no HMR
-/******/ 		
+/******/
 /******/ 		// no HMR manifest
-/******/ 		
+/******/
 /******/ 		// no on chunks loaded
-/******/ 		
+/******/
 /******/ 		// install a JSONP callback for chunk loading
 /******/ 		var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
 /******/ 			var [chunkIds, moreModules, runtime] = data;
@@ -598,27 +598,27 @@ __webpack_require__.d(exports, {
 /******/ 				}
 /******/ 				installedChunks[chunkId] = 0;
 /******/ 			}
-/******/ 		
+/******/
 /******/ 		}
-/******/ 		
+/******/
 /******/ 		var chunkLoadingGlobal = self["webpackChunk_jupyter_widgets_jupyterlab_manager"] = self["webpackChunk_jupyter_widgets_jupyterlab_manager"] || [];
 /******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
 /******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/nonce */
 /******/ 	(() => {
 /******/ 		__webpack_require__.nc = undefined;
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	// module cache are used so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	var __webpack_exports__ = __webpack_require__("webpack/container/entry/@jupyter-widgets/jupyterlab-manager");
 /******/ 	(_JUPYTERLAB = typeof _JUPYTERLAB === "undefined" ? {} : _JUPYTERLAB)["@jupyter-widgets/jupyterlab-manager"] = __webpack_exports__;
-/******/ 	
+/******/
 /******/ })()
 ;
 //# sourceMappingURL=remoteEntry.9077b3d2deaffb329dfc.js.map

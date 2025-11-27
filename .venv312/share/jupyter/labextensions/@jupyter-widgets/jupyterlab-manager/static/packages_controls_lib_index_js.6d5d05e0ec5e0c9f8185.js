@@ -7098,7 +7098,7 @@ class FileUploadModel extends _widget_core__WEBPACK_IMPORTED_MODULE_0__.CoreDOMW
         return Object.assign(Object.assign({}, super.defaults()), { _model_name: 'FileUploadModel', _view_name: 'FileUploadView', accept: '', description: 'Upload', disabled: false, icon: 'upload', button_style: '', multiple: false, value: [], error: '', style: null });
     }
 }
-FileUploadModel.serializers = Object.assign(Object.assign({}, _widget_core__WEBPACK_IMPORTED_MODULE_0__.CoreDOMWidgetModel.serializers), { 
+FileUploadModel.serializers = Object.assign(Object.assign({}, _widget_core__WEBPACK_IMPORTED_MODULE_0__.CoreDOMWidgetModel.serializers), {
     // use a dummy serializer for value to circumvent the default serializer.
     value: { serialize: (x) => x } });
 class FileUploadView extends _jupyter_widgets_base__WEBPACK_IMPORTED_MODULE_1__.DOMWidgetView {
