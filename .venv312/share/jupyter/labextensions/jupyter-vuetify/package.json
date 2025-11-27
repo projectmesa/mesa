@@ -1,0 +1,92 @@
+{
+  "name": "jupyter-vuetify",
+  "version": "1.11.3",
+  "description": "Jupyter widgets based on vuetify UI components",
+  "license": "MIT",
+  "author": "Mario Buikhuizen, Maarten Breddels",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/widgetti/ipyvuetify.git"
+  },
+  "keywords": [
+    "jupyter",
+    "widgets",
+    "ipython",
+    "ipywidgets",
+    "jupyterlab-extension"
+  ],
+  "files": [
+    "src/**/*.js",
+    "lib/**/*.js",
+    "dist/",
+    "styles.css"
+  ],
+  "browserslist": ">0.8%, not ie 11, not op_mini all, not dead",
+  "scripts": {
+    "build:babel": "babel src --out-dir lib --copy-files",
+    "watch:babel": "babel src --watch --out-dir lib --copy-files --verbose",
+    "build:labextension": "jupyter labextension build .",
+    "watch:labextension": "jupyter labextension watch .",
+    "build:webpack": "webpack",
+    "watch:webpack": "webpack --mode development --watch",
+    "watch": "run-p watch:*",
+    "clean": "rimraf lib/ dist/",
+    "build": "run-s build:*",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.0",
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@jupyterlab/builder": "^3 || ^4",
+    "ajv": "^6.10.0",
+    "autoprefixer": "^10.4.20",
+    "css-loader": "^7.1.2",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-vue": "^5.2.2",
+    "npm-run-all": "^4.1.5",
+    "postcss-loader": "^8.1.1",
+    "postcss-scopify": "^1.0.0",
+    "rimraf": "^2.6.3",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "@jupyter-widgets/base": "^1 || ^2 || ^3 || ^4 || ^6",
+    "@jupyterlab/apputils": "^2 || ^3 || ^4",
+    "@mariobuikhuizen/vuetify": "2.2.26-rc.1",
+    "@mdi/font": "^4.9.95",
+    "core-js": "^3.0.1",
+    "jupyter-vue": "^1.11.2",
+    "lodash": "^4.17.11",
+    "material-design-icons-iconfont": "^5.0.1",
+    "typeface-roboto": "^1.1.13"
+  },
+  "jupyterlab": {
+    "extension": "lib/labplugin",
+    "outputDir": "../prefix/share/jupyter/labextensions/jupyter-vuetify",
+    "webpackConfig": "webpack.config.lab3.js",
+    "sharedPackages": {
+      "@jupyter-widgets/base": {
+        "bundled": false,
+        "singleton": true
+      },
+      "@jupyterlab/apputils": {
+        "bundled": false,
+        "singleton": true
+      },
+      "jupyter-vue": {
+        "bundled": false,
+        "singleton": true
+      }
+    },
+    "_build": {
+      "load": "static/remoteEntry.ec119e7976641f6ba2ec.js",
+      "extension": "./extension"
+    }
+  }
+}

@@ -1,0 +1,174 @@
+[35mHISTORY.md[m[36m:[m[32m45[m[36m:[mThe major highlight of release 3.3.0 is the introduction of a new and improved visualization module. This effort was @Sahil-Chhoker's Google Summer of Code project . The new module is backwards compatible and continues to use [1;31mSolara[m. It has several new and improved features to include:
+[35mHISTORY.md[m[36m:[m[32m122[m[36m:[mThe [1;31mSolara[mViz visualization system has received substantial upgrades:
+[35mHISTORY.md[m[36m:[m[32m126[m[36m:[m- **Dark Mode** ([#2689](https://github.com/projectmesa/mesa/pull/2689)): Support for [1;31mSolara[m Dark theme, automatically matching system preferences
+[35mHISTORY.md[m[36m:[m[32m129[m[36m:[m- **PropertyLayer visualisation in Altair** ([#2643](https://github.com/projectmesa/mesa/pull/2643)): Support for visualising PropertyLayers using the Altair frontend in [1;31mSolara[m.
+[35mHISTORY.md[m[36m:[m[32m292[m[36m:[mOther improvements in this release include consistent visualization behavior across space types with the reimplementation of `draw_voronoi` [#2608](https://github.com/projectmesa/mesa/pull/2608), and a new render interval slider for controlling visualization update frequency in [1;31mSolara[mViz, which helps improve performance when working with complex visualizations [#2596](https://github.com/projectmesa/mesa/pull/2596). We've also fixed a bug affecting random number generation determinism when using `Model(seed=something)`, ensuring both `model.random` and `model.rng` now behave consistently when seeded with the same initial value [#2598](https://github.com/projectmesa/mesa/pull/2598).
+[35mHISTORY.md[m[36m:[m[32m367[m[36m:[mMesa now includes built-in support for logging using the standard Python `logging` module. This provides developers with a flexible and powerful way to add structured diagnostic and debug output to their simulations, without the need for custom logging solutions. The logging system is integrated throughout the library, including the new [1;31mSolara[mViz visualization system (#2506).
+[35mHISTORY.md[m[36m:[m[32m441[m[36m:[m* Support simulators in [1;31mSolara[mViz by @quaquel in https://github.com/projectmesa/mesa/pull/2470
+[35mHISTORY.md[m[36m:[m[32m482[m[36m:[m### Modern Visualization with [1;31mSolara[mViz
+[35mHISTORY.md[m[36m:[m[32m483[m[36m:[mMesa 3.0's new experimental visualization system, [1;31mSolara[mViz, provides a modern, interactive interface for model exploration:
+[35mHISTORY.md[m[36m:[m[32m486[m[36m:[mfrom mesa.visualization import [1;31mSolara[mViz, make_space_component, make_plot_component
+[35mHISTORY.md[m[36m:[m[32m488[m[36m:[mvisualization = [1;31mSolara[mViz(
+[35mHISTORY.md[m[36m:[m[32m508[m[36m:[m*Note: [1;31mSolara[mViz is in active development. We might make API breaking changes between Mesa 3.0 and 3.1.*
+[35mHISTORY.md[m[36m:[m[32m576[m[36m:[m- Old visualization system replaced by [1;31mSolara[mViz
+[35mHISTORY.md[m[36m:[m[32m602[m[36m:[mWe're still working very active on the visualisation, so we have marked that experimental for Mesa 3.0. We will stabilize [1;31mSolara[mViz in Mesa 3.1.
+[35mHISTORY.md[m[36m:[m[32m611[m[36m:[m* Mark [1;31mSolara[mViz as experimental for Mesa 3.0 by @EwoutH in https://github.com/projectmesa/mesa/pull/2459
+[35mHISTORY.md[m[36m:[m[32m710[m[36m:[m* use GridDraggable instead of Column in [1;31mSolara[mViz by @wang-boyu in https://github.com/projectmesa/mesa/pull/2344
+[35mHISTORY.md[m[36m:[m[32m715[m[36m:[m* experimental init: Fix [1;31mSolara[m import by making it lazy by @EwoutH in https://github.com/projectmesa/mesa/pull/2357
+[35mHISTORY.md[m[36m:[m[32m797[m[36m:[mFinally, [1;31mSolara[mViz received updates improving its interface and performance ([#2299](https://github.com/projectmesa/mesa/pull/2299), [#2304](https://github.com/projectmesa/mesa/pull/2304)). Cell connections in grids and networks are now public and named for more intuitive agent movements ([#2296](https://github.com/projectmesa/mesa/pull/2296)). The Model class initialization process was simplified by moving random seed and random object creation to `__init__` ([#1940](https://github.com/projectmesa/mesa/pull/1940)). Documentation has been extensively updated, including enforcing Google docstrings ([#2294](https://github.com/projectmesa/mesa/pull/2294)) and reorganizing the API documentation ([#2298](https://github.com/projectmesa/mesa/pull/2298)) for better clarity and navigation.
+[35mHISTORY.md[m[36m:[m[32m808[m[36m:[m* [1;31mSolara[mViz Updates by @Corvince in https://github.com/projectmesa/mesa/pull/2299
+[35mHISTORY.md[m[36m:[m[32m809[m[36m:[m* [1;31mSolara[m viz: use_task for non-threaded continuous play by @Corvince in https://github.com/projectmesa/mesa/pull/2304
+[35mHISTORY.md[m[36m:[m[32m848[m[36m:[m    - The old [1;31mSolara[mViz API is still available at `mesa.experimental`, but might be removed in future releases.
+[35mHISTORY.md[m[36m:[m[32m860[m[36m:[m* Implement new [1;31mSolara[mViz API by @Corvince in https://github.com/projectmesa/mesa/pull/2263
+[35mHISTORY.md[m[36m:[m[32m863[m[36m:[m* add default [1;31mSolara[mViz by @Corvince in https://github.com/projectmesa/mesa/pull/2280
+[35mHISTORY.md[m[36m:[m[32m891[m[36m:[mFurthermore, we improved the performance of accessing `Model.agents`, squashed a bug in [1;31mSolara[mViz, started testing on Python 3.13 and added a new benchmark model.
+[35mHISTORY.md[m[36m:[m[32m895[m[36m:[mFinally, we have two brand new examples: An Ant Colony Optimization model using an Ant System approach to the Traveling Salesman problem, a Mesa NetworkGrid, and a custom visualisation with [1;31mSolara[mViz ([examples#157](https://github.com/projectmesa/mesa-examples/pull/157) by @zjost). The first example using the `PropertyLayer` was added, a very fast implementation of Conway's Game of Life ([examples#182](https://github.com/projectmesa/mesa-examples/pull/182)).
+[35mHISTORY.md[m[36m:[m[32m914[m[36m:[m* [1;31mSolara[mViz: Reset components when params are changed by @rht in https://github.com/projectmesa/mesa/pull/2240
+[35mHISTORY.md[m[36m:[m[32m931[m[36m:[mIn Mesa 3.0 alpha 2 (`v3.0.0a2`) we've done more clean-up in preparation for Mesa 3.0. We now [require](https://github.com/projectmesa/mesa/pull/2218) `super().__init__()`  to run on initializing a Mesa model subclass, `Model.agents` is now fully reserved for the Model's internal AgentSet and we fixed a bug in our [1;31mSolara[m space_drawer.
+[35mHISTORY.md[m[36m:[m[32m935[m[36m:[mThe new [1;31mSolara[m visualisation now allows portraying agents in different shapes, checkout some examples in [#2214](https://github.com/projectmesa/mesa/pull/2214).
+[35mHISTORY.md[m[36m:[m[32m962[m[36m:[mMesa 3.0 alpha 1 (`v3.0.0a1`) is another step towards our next major version. This release introduces a name change from JupyterViz (jupyter_viz) to [1;31mSolara[mViz (solara_viz), to better represent the tech stack being used. It also includes two bugfixes also present in 2.3.2.
+[35mHISTORY.md[m[36m:[m[32m968[m[36m:[m* Rename JupyterViz to [1;31mSolara[mViz by @rht in https://github.com/projectmesa/mesa/pull/2187
+[35mHISTORY.md[m[36m:[m[32m988[m[36m:[m- The old visualisation is removed, in favor of the new, [1;31mSolara[m based, Jupyter Viz. This was already available in the 2.3.x release series, but is now stabilized. Checkout out our new [Visualization Tutorial](https://mesa.readthedocs.io/latest/tutorials/visualization_tutorial.html). More examples and a migration guide will follow later in the Mesa 3.0 development.
+[35mHISTORY.md[m[36m:[m[32m1072[m[36m:[m* JupyterViz: {Convert make_plot & prepare ColorCard} to become [1;31mSolara[m component by @rht in https://github.com/projectmesa/mesa/pull/2020
+[35mHISTORY.md[m[36m:[m[32m1149[m[36m:[mMesa 2.2.3 is a small release with two improvements to the experimental [1;31mSolara[m visualisation, on request of one of our contributors. No stable features have changed.
+[35mHISTORY.md[m[36m:[m[32m1194[m[36m:[m* refactor: Move Matplotlib-specific [1;31mSolara[m components to separate file by @rht in https://github.com/projectmesa/mesa/pull/1943
+[35mHISTORY.md[m[36m:[m[32m1302[m[36m:[mThis release has some critical fixes to JupyterViz/[1;31mSolara[m frontend to prevent
+[35mHISTORY.md[m[36m:[m[32m1322[m[36m:[m**[1;31mSolara[m/JupyterViz**
+[35mHISTORY.md[m[36m:[m[32m1325[m[36m:[m- Convert make_space into [1;31mSolara[m component (#1877)
+[35mHISTORY.md[m[36m:[m[32m1343[m[36m:[mthe JupyterViz/[1;31mSolara[m frontend. It\'s a patch release instead of a minor
+[35mHISTORY.md[m[36m:[m[32m1366[m[36m:[m**[1;31mSolara[m/JupyterViz**
+[35mHISTORY.md[m[36m:[m[32m1368[m[36m:[m-   perf: increase speed of [1;31mSolara[m render #1819
+[35mHISTORY.md[m[36m:[m[32m1376[m[36m:[mto the JupyterViz/[1;31mSolara[m frontend. It\'s a patch release instead of a
+[35mHISTORY.md[m[36m:[m[32m1388[m[36m:[m**[1;31mSolara[m/JupyterViz**
+[35mHISTORY.md[m[36m:[m[32m1404[m[36m:[m-   Docker: Update to use [1;31mSolara[m viz #1757
+[35mHISTORY.md[m[36m:[m[32m1416[m[36m:[m-   fix: Allow multiple connections in [1;31mSolara[m #1759
+[35mHISTORY.md[m[36m:[m[32m1434[m[36m:[m    -   Improve new/experimental [1;31mSolara[m based visualization to ensure
+[35mdocs/best-practices.md[m[36m:[m[32m13[m[36m:[m- `app.py` should contain the [1;31mSolara[m-based visualization code (optional).
+[35mdocs/index.md[m[36m:[m[32m34[m[36m:[m- Browser-based [1;31mSolara[m visualization
+[35mdocs/migration_guide.md[m[36m:[m[32m67[m[36m:[mfrom mesa.visualization import [1;31mSolara[mViz, make_space_component
+[35mdocs/migration_guide.md[m[36m:[m[32m69[m[36m:[m[1;31mSolara[mViz(model, components=[make_space_component(agent_portrayal)])
+[35mdocs/migration_guide.md[m[36m:[m[32m72[m[36m:[mfrom mesa.visualization import [1;31mSolara[mViz, SpaceRenderer
+[35mdocs/migration_guide.md[m[36m:[m[32m79[m[36m:[m[1;31mSolara[mViz(
+[35mdocs/migration_guide.md[m[36m:[m[32m96[m[36m:[mfrom mesa.visualization import [1;31mSolara[mViz, make_plot_component
+[35mdocs/migration_guide.md[m[36m:[m[32m98[m[36m:[m[1;31mSolara[mViz(
+[35mdocs/migration_guide.md[m[36m:[m[32m354[m[36m:[mMesa has adopted a new API for our frontend. If you already migrated to the experimental new [1;31mSolara[mViz you can still use
+[35mdocs/migration_guide.md[m[36m:[m[32m357[m[36m:[m> **Note:** [1;31mSolara[mViz is experimental and still in active development for Mesa 3.0. While we attempt to minimize them, there might be API breaking changes between Mesa 3.0 and 3.1. There won't be breaking changes between Mesa 3.0.x patch releases.
+[35mdocs/migration_guide.md[m[36m:[m[32m361[m[36m:[mPreviously [1;31mSolara[mViz was initialized by providing a `model_cls` and a `model_params`. This has changed to expect a model instance `model`. You can still provide (user-settable) `model_params`, but only if users should be able to change them. It is now also possible to pass in a "reactive model" by first calling `model = solara.reactive(model)`. This is useful for notebook environments. It allows you to pass the model to the [1;31mSolara[mViz Module, but continue to use the model. For example calling `model.value.step()` (notice the extra .value) will automatically update the plots. This currently only automatically works for the step method, you can force visualization updates by calling `model.value.force_update()`.
+[35mdocs/migration_guide.md[m[36m:[m[32m365[m[36m:[mWith the introduction of [1;31mSolara[mViz in Mesa 3.0, models are now instantiated using `**model_parameters.value`. This means all inputs for initializing a new model must be keyword arguments. Ensure your model's `__init__` method accepts keyword arguments matching the keys in `model_params`.
+[35mdocs/migration_guide.md[m[36m:[m[32m380[m[36m:[mfrom mesa.experimental import [1;31mSolara[mViz
+[35mdocs/migration_guide.md[m[36m:[m[32m382[m[36m:[m[1;31mSolara[mViz(model_cls, model_params, agent_portrayal=agent_portrayal)
+[35mdocs/migration_guide.md[m[36m:[m[32m385[m[36m:[mfrom mesa.visualization import [1;31mSolara[mViz, make_space_component
+[35mdocs/migration_guide.md[m[36m:[m[32m387[m[36m:[m[1;31mSolara[mViz(model, components=[make_space_component(agent_portrayal)])
+[35mdocs/migration_guide.md[m[36m:[m[32m396[m[36m:[mfrom mesa.experimental import [1;31mSolara[mViz
+[35mdocs/migration_guide.md[m[36m:[m[32m403[m[36m:[m[1;31mSolara[mViz(model_cls, model_params, measures=[make_plot, "foo", ["bar", "baz"]])
+[35mdocs/migration_guide.md[m[36m:[m[32m406[m[36m:[mfrom mesa.visualization import [1;31mSolara[mViz, make_plot_component
+[35mdocs/migration_guide.md[m[36m:[m[32m408[m[36m:[m[1;31mSolara[mViz(model, components=[make_plot, make_plot_component("foo"), make_plot_component("bar", "baz")])
+[35mdocs/migration_guide.md[m[36m:[m[32m413[m[36m:[mTo plot model-dependent text the experimental [1;31mSolara[mViz provided a `make_text` function that wraps another functions that receives the model and turns its string return value into a solara text component. Again, this other function can now be passed directly to the new [1;31mSolara[mViz components array. It is okay if your function just returns a string.
+[35mdocs/migration_guide.md[m[36m:[m[32m417[m[36m:[mfrom mesa.experimental import [1;31mSolara[mViz, make_text
+[35mdocs/migration_guide.md[m[36m:[m[32m422[m[36m:[m[1;31mSolara[mViz(model_cls, model_params, measures=make_text(show_steps))
+[35mdocs/migration_guide.md[m[36m:[m[32m425[m[36m:[mfrom mesa.visualisation import [1;31mSolara[mViz
+[35mdocs/migration_guide.md[m[36m:[m[32m430[m[36m:[m[1;31mSolara[mViz(model, components=[show_steps])
+[35mdocs/overview.md[m[36m:[m[32m250[m[36m:[mMesa now uses a new browser-based visualization system called [1;31mSolara[mViz. This allows for interactive, customizable visualizations of your models.
+[35mdocs/overview.md[m[36m:[m[32m252[m[36m:[mNote: [1;31mSolara[mViz is experimental and still in active development in Mesa 3.x. While we attempt to minimize them, there might be API breaking changes in minor releases.
+[35mdocs/overview.md[m[36m:[m[32m253[m[36m:[m> **Note:** [1;31mSolara[mViz instantiates new models using `**model_parameters.value`, so all model inputs must be keyword arguments.
+[35mdocs/overview.md[m[36m:[m[32m268[m[36m:[mfrom mesa.visualization import [1;31mSolara[mViz, make_space_component, make_plot_component
+[35mdocs/overview.md[m[36m:[m[32m285[m[36m:[mpage = [1;31mSolara[mViz(
+[35mdocs/tutorials/4_visualization_basic.ipynb[m[36m:[m[32m19[m[36m:[m    "Due to conflict with Colab and [1;31mSolara[m there are no colab links for this tutorial\n",
+[35mdocs/tutorials/4_visualization_basic.ipynb[m[36m:[m[32m63[m[36m:[m    "from mesa.visualization import [1;31mSolara[mViz, SpaceRenderer, make_plot_component\n",
+[35mdocs/tutorials/4_visualization_basic.ipynb[m[36m:[m[32m182[m[36m:[m    "First, a quick explanation of how Mesa's interactive visualization works. The visualization is done in a browser window or Jupyter instance, using the [[1;31mSolara[m](https://solara.dev/) framework, a pure Python, React-style web framework. Running `solara run app.py` will launch a web server, which runs the model, and displays model detail at each step via a plotting library. Alternatively, you can execute everything inside a Jupyter instance and display it inline."
+[35mdocs/tutorials/4_visualization_basic.ipynb[m[36m:[m[32m257[m[36m:[m    "This is the Python object used to visualize the grid, agents, and property layers associated with the space and the model and is passed to the `[1;31mSolara[mViz`\n",
+[35mdocs/tutorials/4_visualization_basic.ipynb[m[36m:[m[32m290[m[36m:[m    "In tutorial 8, you will learn how to create custom components for the [1;31mSolara[m dashboard. If you want a custom component to appear on a specific page, you must pass it as a tuple containing the component and the page number.\n",
+[35mdocs/tutorials/4_visualization_basic.ipynb[m[36m:[m[32m297[m[36m:[m    "page = [1;31mSolara[mViz(\n",
+[35mdocs/tutorials/4_visualization_basic.ipynb[m[36m:[m[32m323[m[36m:[m    "page = [1;31mSolara[mViz(\n",
+[35mdocs/tutorials/5_visualization_dynamic_agents.ipynb[m[36m:[m[32m19[m[36m:[m    "Due to conflict with Colab and [1;31mSolara[m there are no colab links for this tutorial\n",
+[35mdocs/tutorials/5_visualization_dynamic_agents.ipynb[m[36m:[m[32m63[m[36m:[m    "from mesa.visualization import [1;31mSolara[mViz, SpaceRenderer, make_plot_component\n",
+[35mdocs/tutorials/5_visualization_dynamic_agents.ipynb[m[36m:[m[32m182[m[36m:[m    "First, a quick explanation of how Mesa's interactive visualization works. The visualization is done in a browser window or Jupyter instance, using the [[1;31mSolara[m](https://solara.dev/) framework, a pure Python, React-style web framework. Running `solara run app.py` will launch a web server, which runs the model, and displays model detail at each step via a plotting library. Alternatively, you can execute everything inside a Jupyter instance and display it inline."
+[35mdocs/tutorials/5_visualization_dynamic_agents.ipynb[m[36m:[m[32m284[m[36m:[m    "In tutorial 8, you will learn how to create custom components for the [1;31mSolara[m dashboard. If you want a custom component to appear on a specific page, you must pass it as a tuple containing the component and the page number.\n",
+[35mdocs/tutorials/5_visualization_dynamic_agents.ipynb[m[36m:[m[32m291[m[36m:[m    "page = [1;31mSolara[mViz(\n",
+[35mdocs/tutorials/5_visualization_dynamic_agents.ipynb[m[36m:[m[32m316[m[36m:[m    "page = [1;31mSolara[mViz(\n",
+[35mdocs/tutorials/6_visualization_rendering_with_space_renderer.ipynb[m[36m:[m[32m19[m[36m:[m    "Due to conflict with Colab and [1;31mSolara[m there are no colab links for this tutorial\n",
+[35mdocs/tutorials/6_visualization_rendering_with_space_renderer.ipynb[m[36m:[m[32m62[m[36m:[m    "from mesa.visualization import [1;31mSolara[mViz, SpaceRenderer, make_plot_component\n",
+[35mdocs/tutorials/6_visualization_rendering_with_space_renderer.ipynb[m[36m:[m[32m181[m[36m:[m    "First, a quick explanation of how Mesa's interactive visualization works. The visualization is done in a browser window or Jupyter instance, using the [[1;31mSolara[m](https://solara.dev/) framework, a pure Python, React-style web framework. Running `solara run app.py` will launch a web server, which runs the model, and displays model detail at each step via a plotting library. Alternatively, you can execute everything inside a Jupyter instance and display it inline."
+[35mdocs/tutorials/6_visualization_rendering_with_space_renderer.ipynb[m[36m:[m[32m268[m[36m:[m    "In tutorial 8, you will learn how to create custom components for the [1;31mSolara[m dashboard. If you want a custom component to appear on a specific page, you must pass it as a tuple containing the component and the page number.\n",
+[35mdocs/tutorials/6_visualization_rendering_with_space_renderer.ipynb[m[36m:[m[32m275[m[36m:[m    "page = [1;31mSolara[mViz(\n",
+[35mdocs/tutorials/6_visualization_rendering_with_space_renderer.ipynb[m[36m:[m[32m494[m[36m:[m    "Now that we have the model, visual renderer, and plot components defined, we can bring everything together using `[1;31mSolara[mViz`:"
+[35mdocs/tutorials/6_visualization_rendering_with_space_renderer.ipynb[m[36m:[m[32m503[m[36m:[m    "page = [1;31mSolara[mViz(\n",
+[35mdocs/tutorials/7_visualization_propertylayer_visualization.ipynb[m[36m:[m[32m19[m[36m:[m    "Due to conflict with Colab and [1;31mSolara[m there are no colab links for this tutorial\n",
+[35mdocs/tutorials/7_visualization_propertylayer_visualization.ipynb[m[36m:[m[32m64[m[36m:[m    "from mesa.visualization import [1;31mSolara[mViz, SpaceRenderer, make_plot_component\n",
+[35mdocs/tutorials/7_visualization_propertylayer_visualization.ipynb[m[36m:[m[32m190[m[36m:[m    "First, a quick explanation of how Mesa's interactive visualization works. The visualization is done in a browser window or Jupyter instance, using the [[1;31mSolara[m](https://solara.dev/) framework, a pure Python, React-style web framework. Running `solara run app.py` will launch a web server, which runs the model, and displays model detail at each step via a plotting library. Alternatively, you can execute everything inside a Jupyter instance and display it inline."
+[35mdocs/tutorials/7_visualization_propertylayer_visualization.ipynb[m[36m:[m[32m277[m[36m:[m    "In the next tutorial, you will learn how to create custom components for the [1;31mSolara[m dashboard. If you want a custom component to appear on a specific page, you must pass it as a tuple containing the component and the page number.\n",
+[35mdocs/tutorials/7_visualization_propertylayer_visualization.ipynb[m[36m:[m[32m284[m[36m:[m    "page = [1;31mSolara[mViz(\n",
+[35mdocs/tutorials/7_visualization_propertylayer_visualization.ipynb[m[36m:[m[32m458[m[36m:[m    "Now that we have the model, visual renderer, and plot components defined, we can bring everything together using `[1;31mSolara[mViz`:"
+[35mdocs/tutorials/7_visualization_propertylayer_visualization.ipynb[m[36m:[m[32m467[m[36m:[m    "page = [1;31mSolara[mViz(\n",
+[35mdocs/tutorials/8_visualization_custom.ipynb[m[36m:[m[32m19[m[36m:[m    "Due to conflict with Colab and [1;31mSolara[m there are no colab links for this tutorial\n",
+[35mdocs/tutorials/8_visualization_custom.ipynb[m[36m:[m[32m63[m[36m:[m    "from mesa.visualization import [1;31mSolara[mViz, make_plot_component, make_space_component"
+[35mdocs/tutorials/8_visualization_custom.ipynb[m[36m:[m[32m181[m[36m:[m    "First, a quick explanation of how Mesa's interactive visualization works. The visualization is done in a browser window or Jupyter instance, using the [[1;31mSolara[m](https://solara.dev/) framework, a pure Python, React-style web framework. Running `solara run app.py` will launch a web server, which runs the model, and displays model detail at each step via a plotting library. Alternatively, you can execute everything inside a Jupyter instance and display it inline.\n",
+[35mdocs/tutorials/8_visualization_custom.ipynb[m[36m:[m[32m207[m[36m:[m    "In addition, due to the way [1;31mSolara[m works we need to trigger an update whenever the underlying model changes. For this you need to register an update counter with every component."
+[35mdocs/tutorials/8_visualization_custom.ipynb[m[36m:[m[32m284[m[36m:[m    "page = [1;31mSolara[mViz(\n",
+[35mdocs/tutorials/8_visualization_custom.ipynb[m[36m:[m[32m347[m[36m:[m    "page = [1;31mSolara[mViz(\n",
+[35mmesa/examples/advanced/alliance_formation/Readme.md[m[36m:[m[32m42[m[36m:[m- `app.py`: Contains the code for the interactive [1;31mSolara[m visualization.
+[35mmesa/examples/advanced/alliance_formation/app.py[m[36m:[m[32m7[m[36m:[mfrom mesa.visualization import [1;31mSolara[mViz
+[35mmesa/examples/advanced/alliance_formation/app.py[m[36m:[m[32m60[m[36m:[m# Create the [1;31mSolara[mViz page. This will automatically create a server and display the
+[35mmesa/examples/advanced/alliance_formation/app.py[m[36m:[m[32m65[m[36m:[mpage = [1;31mSolara[mViz(
+[35mmesa/examples/advanced/epstein_civil_violence/app.py[m[36m:[m[32m9[m[36m:[m    [1;31mSolara[mViz,
+[35mmesa/examples/advanced/epstein_civil_violence/app.py[m[36m:[m[32m71[m[36m:[mpage = [1;31mSolara[mViz(
+[35mmesa/examples/advanced/pd_grid/app.py[m[36m:[m[32m2[m[36m:[m[1;31mSolara[m-based visualization for the Spatial Prisoner's Dilemma Model.
+[35mmesa/examples/advanced/pd_grid/app.py[m[36m:[m[32m8[m[36m:[m    [1;31mSolara[mViz,
+[35mmesa/examples/advanced/pd_grid/app.py[m[36m:[m[32m51[m[36m:[mpage = [1;31mSolara[mViz(
+[35mmesa/examples/advanced/sugarscape_g1mt/Readme.md[m[36m:[m[32m56[m[36m:[m* `app.py`: Runs a visualization server via [1;31mSolara[m (`solara run app.py`).
+[35mmesa/examples/advanced/sugarscape_g1mt/app.py[m[36m:[m[32m2[m[36m:[mfrom mesa.visualization import Slider, [1;31mSolara[mViz, SpaceRenderer, make_plot_component
+[35mmesa/examples/advanced/sugarscape_g1mt/app.py[m[36m:[m[32m67[m[36m:[m# on the [1;31mSolara[m dashboard.
+[35mmesa/examples/advanced/sugarscape_g1mt/app.py[m[36m:[m[32m68[m[36m:[mpage = [1;31mSolara[mViz(
+[35mmesa/examples/advanced/wolf_sheep/app.py[m[36m:[m[32m7[m[36m:[m    [1;31mSolara[mViz,
+[35mmesa/examples/advanced/wolf_sheep/app.py[m[36m:[m[32m91[m[36m:[mpage = [1;31mSolara[mViz(
+[35mmesa/examples/basic/boid_flockers/Readme.md[m[36m:[m[32m22[m[36m:[m* [app.py](app.py): [1;31mSolara[m based Visualization code.
+[35mmesa/examples/basic/boid_flockers/app.py[m[36m:[m[32m4[m[36m:[mfrom mesa.visualization import Slider, [1;31mSolara[mViz, SpaceRenderer
+[35mmesa/examples/basic/boid_flockers/app.py[m[36m:[m[32m78[m[36m:[mpage = [1;31mSolara[mViz(
+[35mmesa/examples/basic/boltzmann_wealth_model/app.py[m[36m:[m[32m6[m[36m:[m    [1;31mSolara[mViz,
+[35mmesa/examples/basic/boltzmann_wealth_model/app.py[m[36m:[m[32m75[m[36m:[m# The [1;31mSolara[mViz page combines the model, renderer, and components into a web interface.
+[35mmesa/examples/basic/boltzmann_wealth_model/app.py[m[36m:[m[32m77[m[36m:[mpage = [1;31mSolara[mViz(
+[35mmesa/examples/basic/conways_game_of_life/app.py[m[36m:[m[32m3[m[36m:[m    [1;31mSolara[mViz,
+[35mmesa/examples/basic/conways_game_of_life/app.py[m[36m:[m[32m64[m[36m:[m# Create the [1;31mSolara[mViz page. This will automatically create a server and display the
+[35mmesa/examples/basic/conways_game_of_life/app.py[m[36m:[m[32m69[m[36m:[mpage = [1;31mSolara[mViz(
+[35mmesa/examples/basic/schelling/app.py[m[36m:[m[32m8[m[36m:[m    [1;31mSolara[mViz,
+[35mmesa/examples/basic/schelling/app.py[m[36m:[m[32m85[m[36m:[mpage = [1;31mSolara[mViz(
+[35mmesa/examples/basic/virus_on_network/Readme.md[m[36m:[m[32m37[m[36m:[m* ``app.py``: Contains the code for the interactive [1;31mSolara[m visualization.
+[35mmesa/examples/basic/virus_on_network/app.py[m[36m:[m[32m12[m[36m:[m    [1;31mSolara[mViz,
+[35mmesa/examples/basic/virus_on_network/app.py[m[36m:[m[32m126[m[36m:[mpage = [1;31mSolara[mViz(
+[35mmesa/visualization/__init__.py[m[36m:[m[32m1[m[36m:[m"""[1;31mSolara[m based visualization for Mesa models.
+[35mmesa/visualization/__init__.py[m[36m:[m[32m4[m[36m:[m    [1;31mSolara[mViz is experimental and still in active development in Mesa 3.x. While we attempt to minimize them, there might be API breaking changes in minor releases.
+[35mmesa/visualization/__init__.py[m[36m:[m[32m15[m[36m:[mfrom .solara_viz import JupyterViz, [1;31mSolara[mViz
+[35mmesa/visualization/__init__.py[m[36m:[m[32m23[m[36m:[m    "[1;31mSolara[mViz",
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m7[m[36m:[m    - [1;31mSolara[mViz: Main component for creating visualizations, supporting grid displays and plots
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m11[m[36m:[mThe module uses [1;31mSolara[m for rendering in Jupyter notebooks or as standalone web applications.
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m18[m[36m:[m    3. Create a [1;31mSolara[mViz instance with your model, parameters, and desired measures
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m19[m[36m:[m    4. Display the visualization in a Jupyter notebook or run as a [1;31mSolara[m app
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m58[m[36m:[mdef [1;31mSolara[mViz(
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m73[m[36m:[m    """[1;31mSolara[m visualization component.
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m75[m[36m:[m    This component provides a visualization interface for a given model using [1;31mSolara[m.
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m103[m[36m:[m                    >>> [1;31mSolara[mViz(model, console_kwargs=console_kwargs)
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m106[m[36m:[m        solara.component: A [1;31mSolara[m component that renders the visualization interface for the model.
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m110[m[36m:[m        >>> page = [1;31mSolara[mViz(model)
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m351[m[36m:[m    """Wrap a component in an auto-updated [1;31mSolara[m component if needed."""
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m449[m[36m:[mJupyterViz = [1;31mSolara[mViz
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m741[m[36m:[m    """[1;31mSolara[m component for creating and managing a model instance with user-defined parameters.
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m753[m[36m:[m        solara.component: A [1;31mSolara[m component that renders the model creation and management interface.
+[35mmesa/visualization/solara_viz.py[m[36m:[m[32m818[m[36m:[m            "Mesa's visualization requires the use of keyword arguments to ensure the parameters are passed to [1;31mSolara[m correctly. Please ensure all model parameters are of form param=value"
+[35mmesa/visualization/user_param.py[m[36m:[m[32m1[m[36m:[m"""[1;31mSolara[m visualization related helper classes."""
+[35mmesa/visualization/utils.py[m[36m:[m[32m1[m[36m:[m"""[1;31mSolara[m related utils."""
+[35mtests/test_solara_viz.py[m[36m:[m[32m1[m[36m:[m"""Test [1;31mSolara[m visualizations."""
+[35mtests/test_solara_viz.py[m[36m:[m[32m19[m[36m:[m    [1;31mSolara[mViz,
+[35mtests/test_solara_viz.py[m[36m:[m[32m137[m[36m:[m        [1;31mSolara[mViz(
+[35mtests/test_solara_viz.py[m[36m:[m[32m149[m[36m:[m    solara.render([1;31mSolara[mViz(model, components="default"))
+[35mtests/test_solara_viz.py[m[36m:[m[32m166[m[36m:[m        [1;31mSolara[mViz(
+[35mtests/test_solara_viz.py[m[36m:[m[32m200[m[36m:[m    solara.render([1;31mSolara[mViz(model, components=[AltSpace.drawer]))
+[35mtests/test_solara_viz.py[m[36m:[m[32m209[m[36m:[m        [1;31mSolara[mViz(voronoi_model, components=[make_mpl_space_component(agent_portrayal)])
+[35mtests/test_solara_viz.py[m[36m:[m[32m325[m[36m:[m            "Mesa's visualization requires the use of keyword arguments to ensure the parameters are passed to [1;31mSolara[m correctly. Please ensure all model parameters are of form param=value"
+[35mtests/test_solara_viz_updated.py[m[36m:[m[32m1[m[36m:[m"""Test [1;31mSolara[m visualizations."""
+[35mtests/test_solara_viz_updated.py[m[36m:[m[32m16[m[36m:[m    [1;31mSolara[mViz,
+[35mtests/test_solara_viz_updated.py[m[36m:[m[32m155[m[36m:[m        [1;31mSolara[mViz(
+[35mtests/test_solara_viz_updated.py[m[36m:[m[32m176[m[36m:[m    solara.render([1;31mSolara[mViz(model))
+[35mtests/test_solara_viz_updated.py[m[36m:[m[32m193[m[36m:[m    solara.render([1;31mSolara[mViz(model, renderer, components=[]))
+[35mtests/test_solara_viz_updated.py[m[36m:[m[32m211[m[36m:[m    solara.render([1;31mSolara[mViz(model))
+[35mtests/test_solara_viz_updated.py[m[36m:[m[32m226[m[36m:[m    solara.render([1;31mSolara[mViz(model, components=[AltSpace.drawer]))
+[35mtests/test_solara_viz_updated.py[m[36m:[m[32m342[m[36m:[m            "Mesa's visualization requires the use of keyword arguments to ensure the parameters are passed to [1;31mSolara[m correctly. Please ensure all model parameters are of form param=value"

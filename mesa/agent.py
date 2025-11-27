@@ -709,6 +709,11 @@ class GroupBy:
         }
 
     def __iter__(self) -> Iterator[tuple[Hashable, list | AgentSet]]:
+        """Iterate over (group_name, group) tuples.
+
+        Yields:
+        tuple[Hashable, list | AgentSet]: pairs of group name and group.
+        """
         return iter(self.groups.items())
 
     def __len__(self):  # noqa: D105

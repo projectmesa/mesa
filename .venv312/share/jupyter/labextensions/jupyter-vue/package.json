@@ -1,0 +1,77 @@
+{
+  "name": "jupyter-vue",
+  "version": "1.11.3",
+  "description": "Jupyter widgets base for Vue libraries",
+  "license": "MIT",
+  "author": "Mario Buikhuizen, Maarten Breddels",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mariobuikhuizen/ipyvue.git"
+  },
+  "keywords": [
+    "jupyter",
+    "widgets",
+    "ipython",
+    "ipywidgets",
+    "jupyterlab-extension"
+  ],
+  "files": [
+    "src/",
+    "lib/",
+    "dist/"
+  ],
+  "browserslist": ">0.8%, not ie 11, not op_mini all, not dead",
+  "scripts": {
+    "build:babel": "babel src --out-dir lib --copy-files",
+    "watch:babel": "babel src --watch --out-dir lib --copy-files --verbose",
+    "build:labextension": "jupyter labextension build .",
+    "watch:labextension": "jupyter labextension watch .",
+    "build:webpack": "webpack",
+    "watch:webpack": "webpack --mode development --watch",
+    "watch": "run-p watch:*",
+    "clean": "rimraf lib/ dist/",
+    "prepare": "run-s build:*",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.0",
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@jupyterlab/builder": "^3",
+    "ajv": "^6.10.0",
+    "css-loader": "^5",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-vue": "^5.2.2",
+    "file-loader": "^6",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^2.6.3",
+    "style-loader": "^0.23.1",
+    "webpack": "^5",
+    "webpack-cli": "^4"
+  },
+  "dependencies": {
+    "@jupyter-widgets/base": "^1 || ^2 || ^3 || ^4",
+    "@mariobuikhuizen/vue-compiler-addon": "^2.6.10-alpha.2",
+    "core-js": "^3.0.1",
+    "lodash": "^4.17.11",
+    "uuid": "^3.4.0",
+    "vue": "^2.6.10"
+  },
+  "jupyterlab": {
+    "extension": "lib/labplugin",
+    "outputDir": "../ipyvue/labextension",
+    "sharedPackages": {
+      "@jupyter-widgets/base": {
+        "bundled": false,
+        "singleton": true
+      }
+    },
+    "_build": {
+      "load": "static/remoteEntry.334a7f83049b6661d899.js",
+      "extension": "./extension"
+    }
+  }
+}
