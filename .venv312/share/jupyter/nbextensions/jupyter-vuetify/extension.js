@@ -1,1 +1,0 @@
-define((()=>{return e={252:e=>{window.require&&window.require.config({map:{"*":{"jupyter-vuetify":"nbextensions/jupyter-vuetify/index"}}}),e.exports={load_ipython_extension(){}}}},r={},function n(t){var i=r[t];if(void 0!==i)return i.exports;var o=r[t]={exports:{}};return e[t](o,o.exports,n),o.exports}(252);var e,r}));
