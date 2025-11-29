@@ -197,6 +197,96 @@ To create a new release, follow these steps:
 
 A recorded video of this process is [available here](https://youtu.be/JE44jkegmns).
 
+### Deprecation policy
+Mesa follows [Semantic Versioning](https://semver.org/) (SemVer) and has a structured deprecation process to ensure users have time to migrate to new APIs while maintaining backward compatibility.
+
+#### Prerequisites for Deprecation
+Before deprecating any feature, all of the following must be complete:
+
+1. Stable alternative available: The replacement feature must be fully implemented and stable (not experimental).
+2. Documentation updated: All relevant docs and tutorials must reflect the new approach.
+3. Migration guide entry added: A clear entry in the [Migration Guide](https://github.com/projectmesa/mesa/blob/main/docs/migration_guide.md) explaining what changed and how to update code.
+4. Examples updated: All example models in the repository must use the new API.
+
+#### Deprecation Timeline
+Mesa uses a two-phase deprecation process:
+
+**Phase 1: Introduction of Alternative**
+
+When a new alternative is implemented, all four items from the checklist above _may_ already be added. In addition, you may add a `PendingDeprecationWarning` to the old feature. This signals to developers that a change is coming but doesn't yet require immediate action.
+
+```python
+warnings.warn(
+    "This feature will be deprecated in a future release. "
+    "Consider using new_feature() instead.",
+    PendingDeprecationWarning,
+    stacklevel=2,
+)
+```
+
+**Phase 2: Active Deprecation**
+The new alternative must be available for _at least one minor release_ before the old feature receives a `DeprecationWarning`. All four items from the checklist above _must_ be implemented. When adding the deprecation warning:
+
+- Use `DeprecationWarning` (visible to all users)
+- Include a link to the relevant migration guide section
+- Clearly state what to use instead
+
+```python
+warnings.warn(
+    "old_feature() is deprecated. Please use new_feature() instead. "
+    "For more information, refer to the migration guide: https://mesa.readthedocs.io/latest/migration_guide.html#section-name",
+    DeprecationWarning,
+    stacklevel=2,
+)
+```
+
+#### Version Requirements
+Following SemVer:
+
+| Action | Allowed Versions | Notes |
+|--------|------------------|-------|
+| Add `PendingDeprecationWarning` | Any | Can be added when alternative is implemented |
+| Add `DeprecationWarning` | Minor (or patch) | Patch releases require proper motivation |
+| Remove deprecated feature | Major only | Features can only be removed in major releases |
+
+**Preferred approach**: Add deprecation warnings in minor releases, not patch releases, unless there's a compelling reason (such as a security issue).
+
+#### Migration Guide Entry Format
+
+Each deprecation should have a corresponding entry in the migration guide. Follow this structure:
+
+1. Place new entries at the top of the guide (newest first, like a changelog)
+2. Use a clear heading and description of what changed and why
+3. Show before/after code examples
+4. Link to relevant PRs, issues, or documentation
+
+Example:
+
+````markdown
+## Mesa X.Y.0
+### Feature Name Change
+Brief description of what changed and why.
+
+```python
+# Old way of doing things
+old_method()
+
+# New way of doing things
+new_method()
+```
+
+- Ref: [PR #1234](https://github.com/projectmesa/mesa/pull/1234), [Documentation](link)
+````
+
+#### Experimental Features
+For features in `mesa.experimental`, these deprecation practices are *recommended but not required*. Experimental features:
+
+- Can be changed or removed in any release, including patch releases
+- Don't require a deprecation warning period
+- Should still communicate changes through release notes and discussions
+
+However, following the full deprecation process even for experimental features improves user experience and is encouraged when feasible.
+
 ## Special Thanks
 
 A special thanks to the following projects who offered inspiration for this contributing file.
