@@ -1,9 +1,11 @@
 """10,000 agent Solara benchmark for SVG-based visualization performance testing."""
 
 import random
+
+from mesa.time import RandomActivation
+
 from mesa import Agent, Model
 from mesa.space import MultiGrid
-from mesa.time import RandomActivation
 
 
 class TestAgent(Agent):
