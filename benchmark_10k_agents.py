@@ -1,55 +1,59 @@
 """10,000 agent Solara benchmark for SVG-based visualization performance testing."""
 
 import random
-
 from mesa import Agent, Model
 from mesa.space import MultiGrid
-from mesa.visualization.solara_viz import SolaraViz
+from mesa.time import RandomActivation
 
 
 class TestAgent(Agent):
-    """A simple agent that randomly moves each step."""
+    """Simple test agent that randomly moves each step."""
 
-    def step(self):
-        """Move the agent to a random position."""
+    def step(self) -> None:
+        """Move to a random position within the grid."""
         x = random.randrange(self.model.grid.width)
         y = random.randrange(self.model.grid.height)
         self.model.grid.move_agent(self, (x, y))
 
 
 class TestModel(Model):
-    """Test model used for benchmarking 10,000 agents."""
+    """Model containing 10,000 randomly moving agents."""
 
-    def __init__(self, n=10_000, width=100, height=100):
-        """Initialize the model with N agents on a grid."""
+    def __init__(self, n: int = 10_000, width: int = 100, height: int = 100) -> None:
+        """Initialize the test model with N agents on a grid."""
         super().__init__()
         self.num_agents = n
         self.grid = MultiGrid(width, height, torus=True)
+        self.schedule = RandomActivation(self)
 
         for _ in range(self.num_agents):
             agent = TestAgent(self)
-            x = random.randrange(width)
-            y = random.randrange(height)
+            self.schedule.add(agent)
+            x = random.randrange(self.grid.width)
+            y = random.randrange(self.grid.height)
             self.grid.place_agent(agent, (x, y))
 
-    def step(self):
+    def step(self) -> None:
         """Advance the model by one step."""
-        for agent in self.agents:
-            agent.step()
+        self.schedule.step()
 
 
-def agent_portrayal(agent):
-    """Render agents using the SVG worker icon."""
+def agent_portrayal(agent: TestAgent) -> dict:
+    """Return SVG portrayal for an agent."""
     return {
-        "shape": "url:/static/agent_worker.svg",
+        "shape": "url:agent_worker.svg",
         "scale": 0.8,
     }
 
 
-model = TestModel()
+# Solara must ONLY be imported at runtime, never during docs build
+if __name__ == "__main__":
+    from mesa.visualization.solara_viz import SolaraViz
 
-page = SolaraViz(
-    model,
-    visualization_description="10,000 Agent SVG Performance Benchmark",
-    agent_portrayal=agent_portrayal,
-)
+    model = TestModel()
+
+    page = SolaraViz(
+        model,
+        visualization_description="10,000 Agent Baseline Benchmark",
+        agent_portrayal=agent_portrayal,
+    )
