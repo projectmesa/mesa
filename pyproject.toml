@@ -92,6 +92,11 @@ repository = "https://github.com/projectmesa/mesa"
 [tool.hatch.build.targets.wheel]
 packages = ["mesa"]
 
+[tool.hatch.build]
+include = [
+  "mesa/visualization/icons/*.svg",
+]
+
 [tool.hatch.version]
 path = "mesa/__init__.py"
 
