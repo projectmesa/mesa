@@ -1,19 +1,13 @@
-"""benchmark for bundled SVG icons (Python-only, dev use).
+"""
+Python-only benchmark for bundled SVG icons.
 
 Measures:
 - cold SVG read time
 - SVG -> raster conversion time (via cairosvg)
 - per-frame composition time for N icons drawn onto a Pillow canvas
-
-Usage:
-  pip install cairosvg pillow
-  python benchmarks/icon_benchmark.py --icon person --n 500 --frames 120
-
-Environment info (record this in PR):
-  python -V
-  uname -a (Linux/macOS) or systeminfo (Windows)
-  CPU, RAM
 """
+
+from __future__ import annotations
 
 import argparse
 import statistics
@@ -23,62 +17,58 @@ from io import BytesIO
 try:
     import cairosvg
     from PIL import Image
-except Exception as e:
+except Exception as e:  # pragma: no cover
     raise SystemExit(
         "Requires 'cairosvg' and 'Pillow'. Install with: pip install cairosvg pillow"
     ) from e
 
-from mesa.visualization import icons as icons_module  # your icons.py
+from mesa.visualization import icons as icons_module
 
 
-def svg_to_pil_image(svg_text, scale=1.0):
+def svg_to_pil_image(svg_text: str, scale: float = 1.0) -> Image.Image:
+    """Convert an SVG string to a Pillow RGBA image using cairosvg."""
     png_bytes = cairosvg.svg2png(bytestring=svg_text.encode("utf-8"), scale=scale)
     return Image.open(BytesIO(png_bytes)).convert("RGBA")
 
 
 def run_benchmark(
-    icon_name="person",
-    n=100,
-    frames=60,
-    canvas_size=(800, 600),
-    icon_size=(32, 32),
-    scale=1.0,
-):
-    # load SVG
+    icon_name: str = "smiley",
+    n: int = 100,
+    frames: int = 60,
+    canvas_size: tuple[int, int] = (800, 600),
+    icon_size: tuple[int, int] = (32, 32),
+    scale: float = 1.0,
+) -> dict[str, float | str | int]:
+    """Run benchmark: measure SVG read, SVG->raster convert, and per-frame composition."""
     t_read0 = time.perf_counter()
     svg_text = icons_module.get_icon_svg(icon_name)
     t_read1 = time.perf_counter()
     svg_read_sec = t_read1 - t_read0
 
-    # convert to raster
     t_conv0 = time.perf_counter()
     pil_icon = svg_to_pil_image(svg_text, scale=scale)
     t_conv1 = time.perf_counter()
     convert_sec = t_conv1 - t_conv0
 
-    # resize if needed
     if pil_icon.size != icon_size:
         pil_icon = pil_icon.resize(icon_size, resample=Image.LANCZOS)
 
-    # grid positions
-    cols = int(max(1, (n**0.5)))
+    cols = int(max(1, n**0.5))
     spacing_x = canvas_size[0] / cols
     rows = (n + cols - 1) // cols
     spacing_y = canvas_size[1] / max(1, rows)
-    positions = []
+    positions: list[tuple[int, int]] = []
     for i in range(n):
         x = int((i % cols) * spacing_x + spacing_x / 2 - icon_size[0] / 2)
         y = int((i // cols) * spacing_y + spacing_y / 2 - icon_size[1] / 2)
         positions.append((x, y))
 
-    # warm-up
     for _ in range(2):
         canvas = Image.new("RGBA", canvas_size, (255, 255, 255, 0))
         for x, y in positions:
             canvas.alpha_composite(pil_icon, dest=(x, y))
 
-    # timed frames
-    frame_times_ms = []
+    frame_times_ms: list[float] = []
     for _ in range(frames):
         canvas = Image.new("RGBA", canvas_size, (255, 255, 255, 0))
         t0 = time.perf_counter()
@@ -105,7 +95,8 @@ def run_benchmark(
     }
 
 
-def main():
+def main() -> None:
+    """CLI entry point for the icon benchmark."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--icon", default="smiley")
     ap.add_argument("--n", type=int, default=100)
