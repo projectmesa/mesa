@@ -1,5 +1,4 @@
-"""
-benchmark for bundled SVG icons (Python-only, dev use).
+"""benchmark for bundled SVG icons (Python-only, dev use).
 
 Measures:
 - cold SVG read time
@@ -16,16 +15,18 @@ Environment info (record this in PR):
   CPU, RAM
 """
 
-import time
 import argparse
 import statistics
+import time
 from io import BytesIO
 
 try:
     import cairosvg
     from PIL import Image
 except Exception as e:
-    raise SystemExit("Requires 'cairosvg' and 'Pillow'. Install with: pip install cairosvg pillow") from e
+    raise SystemExit(
+        "Requires 'cairosvg' and 'Pillow'. Install with: pip install cairosvg pillow"
+    ) from e
 
 from mesa.visualization import icons as icons_module  # your icons.py
 
@@ -35,7 +36,14 @@ def svg_to_pil_image(svg_text, scale=1.0):
     return Image.open(BytesIO(png_bytes)).convert("RGBA")
 
 
-def run_benchmark(icon_name="person", n=100, frames=60, canvas_size=(800, 600), icon_size=(32, 32), scale=1.0):
+def run_benchmark(
+    icon_name="person",
+    n=100,
+    frames=60,
+    canvas_size=(800, 600),
+    icon_size=(32, 32),
+    scale=1.0,
+):
     # load SVG
     t_read0 = time.perf_counter()
     svg_text = icons_module.get_icon_svg(icon_name)
@@ -53,7 +61,7 @@ def run_benchmark(icon_name="person", n=100, frames=60, canvas_size=(800, 600), 
         pil_icon = pil_icon.resize(icon_size, resample=Image.LANCZOS)
 
     # grid positions
-    cols = int(max(1, (n ** 0.5)))
+    cols = int(max(1, (n**0.5)))
     spacing_x = canvas_size[0] / cols
     rows = (n + cols - 1) // cols
     spacing_y = canvas_size[1] / max(1, rows)
@@ -66,7 +74,7 @@ def run_benchmark(icon_name="person", n=100, frames=60, canvas_size=(800, 600), 
     # warm-up
     for _ in range(2):
         canvas = Image.new("RGBA", canvas_size, (255, 255, 255, 0))
-        for (x, y) in positions:
+        for x, y in positions:
             canvas.alpha_composite(pil_icon, dest=(x, y))
 
     # timed frames
@@ -74,13 +82,17 @@ def run_benchmark(icon_name="person", n=100, frames=60, canvas_size=(800, 600), 
     for _ in range(frames):
         canvas = Image.new("RGBA", canvas_size, (255, 255, 255, 0))
         t0 = time.perf_counter()
-        for (x, y) in positions:
+        for x, y in positions:
             canvas.alpha_composite(pil_icon, dest=(x, y))
         t1 = time.perf_counter()
         frame_times_ms.append((t1 - t0) * 1000.0)
 
     avg_ms = statistics.mean(frame_times_ms)
-    p95_ms = statistics.quantiles(frame_times_ms, n=100)[94] if len(frame_times_ms) >= 20 else max(frame_times_ms)
+    p95_ms = (
+        statistics.quantiles(frame_times_ms, n=100)[94]
+        if len(frame_times_ms) >= 20
+        else max(frame_times_ms)
+    )
 
     return {
         "icon": icon_name,
