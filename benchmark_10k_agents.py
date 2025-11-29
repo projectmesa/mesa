@@ -1,5 +1,6 @@
 import random
-from mesa import Model, Agent
+
+from mesa import Agent, Model
 from mesa.space import MultiGrid
 from mesa.visualization.solara_viz import SolaraViz
 
@@ -27,24 +28,24 @@ class TestModel(Model):
         for agent in self.agents:
             agent.step()
 
-#BASELINE MODE (CIRCLES)
-'''def agent_portrayal(agent):
+
+# BASELINE MODE (CIRCLES)
+"""def agent_portrayal(agent):
     return {
         "shape": "circle",
         "r": 0.5,
         "filled": True,
         "color": "blue",
     }
-'''
+"""
 
-#with SVG
+
+# with SVG
 def agent_portrayal(agent):
     return {
         "shape": "url:/static/agent_worker.svg",
         "scale": 0.8,
     }
-
-
 
 
 model = TestModel()
