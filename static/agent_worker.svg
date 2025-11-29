@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="black" stroke-width="2">
+  <!-- Helmet -->
+  <path d="M18 18 C18 10 46 10 46 18 Z"/>
+  <line x1="18" y1="18" x2="46" y2="18"/>
+
+  <!-- Head -->
+  <circle cx="32" cy="26" r="6"/>
+
+  <!-- Neck -->
+  <line x1="32" y1="32" x2="32" y2="36"/>
+
+  <!-- Vest / Torso -->
+  <rect x="22" y="36" width="20" height="16" rx="2"/>
+
+  <!-- Reflector lines on vest -->
+  <line x1="22" y1="42" x2="42" y2="42"/>
+  <line x1="32" y1="36" x2="32" y2="52"/>
+
+  <!-- Arms -->
+  <line x1="22" y1="40" x2="14" y2="48"/>
+  <line x1="42" y1="40" x2="50" y2="48"/>
+
+  <!-- Legs -->
+  <line x1="28" y1="60" x2="32" y2="52"/>
+  <line x1="36" y1="60" x2="32" y2="52"/>
+</svg>
