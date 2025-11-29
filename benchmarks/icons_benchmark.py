@@ -1,5 +1,4 @@
-"""
-Python-only benchmark for bundled SVG icons.
+"""Python-only benchmark for bundled SVG icons.
 
 Measures:
 - cold SVG read time

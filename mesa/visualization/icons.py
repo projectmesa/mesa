@@ -7,7 +7,6 @@ Provides:
 
 from __future__ import annotations
 
-
 import importlib.resources
 
 ICONS_SUBDIR = "icons"
@@ -21,6 +20,8 @@ def _icons_package_root():
 
 def list_icons() -> list[str]:
     """Return a sorted list of available bundled icon basenames (without .svg)."""
+
+
 def list_icons() -> list[str]:
     """Return a sorted list of available bundled icon basenames (without .svg)."""
     root = _icons_package_root()
@@ -48,4 +49,3 @@ def get_icon_svg(name: str) -> str:
     if not svg_path.exists():
         raise FileNotFoundError(f"Icon not found: {name}")
     return svg_path.read_text(encoding="utf-8")
-
