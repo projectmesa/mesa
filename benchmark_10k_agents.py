@@ -1,6 +1,7 @@
 """10,000 agent Solara benchmark for SVG-based visualization performance testing."""
 
 import random
+
 from mesa import Agent, Model
 from mesa.space import MultiGrid
 from mesa.visualization.solara_viz import SolaraViz
