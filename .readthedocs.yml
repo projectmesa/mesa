@@ -15,7 +15,7 @@ formats:
 build:
   os: ubuntu-lts-latest
   tools:
-    python: latest
+    python: "3.13"  # 3.14 (latest) is blocked by an upstream Solara issue: https://github.com/widgetti/solara/issues/1107
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
