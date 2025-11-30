@@ -20,10 +20,6 @@ def _icons_package_root():
 
 def list_icons() -> list[str]:
     """Return a sorted list of available bundled icon basenames (without .svg)."""
-
-
-def list_icons() -> list[str]:
-    """Return a sorted list of available bundled icon basenames (without .svg)."""
     root = _icons_package_root()
     names = []
     for item in root.iterdir():
