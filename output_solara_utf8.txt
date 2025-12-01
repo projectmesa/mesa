@@ -1,0 +1,42 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-8.3.4, pluggy-1.5.0 -- C:\Users\shreyas\anaconda3\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\shreyas\Downloads\project-mesa\mesa-os
+configfile: pyproject.toml
+plugins: anyio-4.11.0, dash-2.18.2, timeout-2.4.0
+collecting ... collected 9 items
+
+tests/test_solara_viz.py::TestMakeUserInput::test_checkbox PASSED        [ 11%]
+tests/test_solara_viz.py::TestMakeUserInput::test_label_fallback PASSED  [ 22%]
+tests/test_solara_viz.py::TestMakeUserInput::test_slider_int PASSED      [ 33%]
+tests/test_solara_viz.py::TestMakeUserInput::test_unsupported_type PASSED [ 44%]
+tests/test_solara_viz.py::test_call_space_drawer ERROR                   [ 55%]
+tests/test_solara_viz.py::test_slider PASSED                             [ 66%]
+tests/test_solara_viz.py::test_model_param_checks PASSED                 [ 77%]
+tests/test_solara_viz.py::test_model_creator PASSED                      [ 88%]
+tests/test_solara_viz.py::test_check_model_params_with_args_only PASSED  [100%]
+
+=================================== ERRORS ====================================
+__________________ ERROR at setup of test_call_space_drawer ___________________
+file C:\Users\shreyas\Downloads\project-mesa\mesa-os\tests\test_solara_viz.py, line 100
+  def test_call_space_drawer(mocker):
+E       fixture 'mocker' not found
+>       available fixtures: anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, dash_br, dash_duo, dash_duo_mp, dash_multi_process_server, dash_process_server, dash_thread_server, dashjl, dashjl_server, dashr, dashr_server, diskcache_manager, doctest_namespace, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+C:\Users\shreyas\Downloads\project-mesa\mesa-os\tests\test_solara_viz.py:100
+============================== warnings summary ===============================
+..\..\..\anaconda3\Lib\site-packages\solara\validate_hooks.py:122
+  C:\Users\shreyas\anaconda3\Lib\site-packages\solara\validate_hooks.py:122: UserWarning: C:\Users\shreyas\Downloads\project-mesa\mesa-os\mesa\visualization\solara_viz.py:399: ComponentsView: `use_state` found despite early return on line 376
+  To suppress this check, replace the line with:
+      current_tab_index, set_current_tab_index = solara.use_state(0)  # noqa: SH101
+  
+  Make sure you understand the consequences of this, by reading about the rules of hooks at:
+      https://solara.dev/documentation/advanced/understanding/rules-of-hooks
+  
+    warnings.warn(str(e))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR tests/test_solara_viz.py::test_call_space_drawer
+==================== 8 passed, 1 warning, 1 error in 2.51s ====================

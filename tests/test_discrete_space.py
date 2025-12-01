@@ -487,7 +487,7 @@ def test_networkgrid():
 
     pickle.loads(pickle.dumps(grid))  # noqa: S301
 
-    cell = Cell(10)  # n = 10, so 10 + 1
+    cell = Cell(10, random=random.Random(42))  # n = 10, so 10 + 1
     grid.add_cell(cell)
     grid.add_connection(cell, grid._cells[0])
     assert cell in grid._cells[0].neighborhood
@@ -497,7 +497,7 @@ def test_networkgrid():
     assert cell not in grid._cells[0].neighborhood
     assert grid._cells[0] not in cell.neighborhood
 
-    cell = Cell(10)  # n = 10, so 10 + 1
+    cell = Cell(10, random=random.Random(42))  # n = 10, so 10 + 1
     grid.add_cell(cell)
     grid.add_connection(cell, grid._cells[0])
     grid.remove_cell(cell)  # this also removes all connections
@@ -566,8 +566,8 @@ def test_agents_property():
 
 def test_cell():
     """Test Cell class."""
-    cell1 = Cell((1,), capacity=None, random=random.Random())
-    cell2 = Cell((2,), capacity=None, random=random.Random())
+    cell1 = Cell((1,), capacity=None, random=random.Random(42))
+    cell2 = Cell((2,), capacity=None, random=random.Random(42))
 
     # connect
     cell1.connect(cell2)
@@ -594,7 +594,7 @@ def test_cell():
     with pytest.raises(ValueError):
         cell1.remove_agent(agent)
 
-    cell1 = Cell((1,), capacity=1, random=random.Random())
+    cell1 = Cell((1,), capacity=1, random=random.Random(42))
     cell1.add_agent(CellAgent(model))
     assert cell1.is_full
 
@@ -604,13 +604,13 @@ def test_cell():
 
 def test_cell_collection():
     """Test CellCollection."""
-    cell1 = Cell((1,), capacity=None, random=random.Random())
+    cell1 = Cell((1,), capacity=None, random=random.Random(42))
 
-    collection = CellCollection({cell1: cell1.agents}, random=random.Random())
+    collection = CellCollection({cell1: cell1.agents}, random=random.Random(42))
     assert len(collection) == 1
     assert cell1 in collection
 
-    rng = random.Random()
+    rng = random.Random(42)
     n = 10
     collection = CellCollection([Cell((i,), random=rng) for i in range(n)], random=rng)
     assert len(collection) == n
@@ -932,8 +932,8 @@ def test_property_layer_errors():
 
 
 def test_cell_agent():  # noqa: D103
-    cell1 = Cell((1,), capacity=None, random=random.Random())
-    cell2 = Cell((2,), capacity=None, random=random.Random())
+    cell1 = Cell((1,), capacity=None, random=random.Random(42))
+    cell2 = Cell((2,), capacity=None, random=random.Random(42))
 
     # connect
     # add_agent
@@ -992,8 +992,8 @@ def test_grid2DMovingAgent():  # noqa: D103
 
 
 def test_patch():  # noqa: D103
-    cell1 = Cell((1,), capacity=None, random=random.Random())
-    cell2 = Cell((2,), capacity=None, random=random.Random())
+    cell1 = Cell((1,), capacity=None, random=random.Random(42))
+    cell2 = Cell((2,), capacity=None, random=random.Random(42))
 
     # connect
     # add_agent

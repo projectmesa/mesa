@@ -1,6 +1,7 @@
 """Test Solara visualizations."""
 
 import re
+import random
 import unittest
 
 import ipyvuetify as vw
@@ -203,7 +204,7 @@ def test_call_space_drawer(mocker):
     # check voronoi space drawer
     voronoi_model = mesa.Model()
     voronoi_model.grid = mesa.discrete_space.VoronoiGrid(
-        centroids_coordinates=[(0, 1), (0, 0), (1, 0)],
+        centroids_coordinates=[(0, 1), (0, 0), (1, 0)], random=random.Random(42)
     )
     solara.render(
         SolaraViz(voronoi_model, components=[make_mpl_space_component(agent_portrayal)])
