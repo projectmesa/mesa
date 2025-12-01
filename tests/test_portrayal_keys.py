@@ -34,9 +34,11 @@ class TestPortrayalKeys(unittest.TestCase):
 
     def test_agent_portrayal_style_no_warning(self):
         """Test that returning AgentPortrayalStyle emits no warnings."""
+        import warnings
         def portrayal(agent):
             return AgentPortrayalStyle(size=10, color="red")
 
-        with pytest.warns(None) as record:
+        with warnings.catch_warnings(record=True) as record:
+            warnings.simplefilter("always")
             collect_agent_data(self.grid, portrayal)
         assert len(record) == 0

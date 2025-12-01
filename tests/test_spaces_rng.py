@@ -1,7 +1,6 @@
 import random
 import unittest
-from mesa.discrete_space import OrthogonalMooreGrid
-from mesa.agent import Agent
+from mesa.discrete_space import OrthogonalMooreGrid, CellAgent
 from mesa.model import Model
 
 class TestSpacesRNG(unittest.TestCase):
@@ -13,21 +12,21 @@ class TestSpacesRNG(unittest.TestCase):
         rng1 = random.Random(seed)
         grid1 = OrthogonalMooreGrid((10, 10), random=rng1)
         model1 = Model()
-        agents1 = [Agent(model1) for _ in range(5)]
+        agents1 = [CellAgent(model1) for _ in range(5)]
         positions1 = []
         for agent in agents1:
-            grid1.move_to_empty(agent)
-            positions1.append(agent.pos)
+            agent.cell = grid1.select_random_empty_cell()
+            positions1.append(agent.cell.coordinate)
             
         # Run 2
         rng2 = random.Random(seed)
         grid2 = OrthogonalMooreGrid((10, 10), random=rng2)
         model2 = Model()
-        agents2 = [Agent(model2) for _ in range(5)]
+        agents2 = [CellAgent(model2) for _ in range(5)]
         positions2 = []
         for agent in agents2:
-            grid2.move_to_empty(agent)
-            positions2.append(agent.pos)
+            agent.cell = grid2.select_random_empty_cell()
+            positions2.append(agent.cell.coordinate)
             
         self.assertEqual(positions1, positions2)
         
@@ -37,20 +36,20 @@ class TestSpacesRNG(unittest.TestCase):
         rng1 = random.Random(42)
         grid1 = OrthogonalMooreGrid((10, 10), random=rng1)
         model1 = Model()
-        agents1 = [Agent(model1) for _ in range(5)]
+        agents1 = [CellAgent(model1) for _ in range(5)]
         positions1 = []
         for agent in agents1:
-            grid1.move_to_empty(agent)
-            positions1.append(agent.pos)
+            agent.cell = grid1.select_random_empty_cell()
+            positions1.append(agent.cell.coordinate)
             
         # Run 2
         rng2 = random.Random(43)
         grid2 = OrthogonalMooreGrid((10, 10), random=rng2)
         model2 = Model()
-        agents2 = [Agent(model2) for _ in range(5)]
+        agents2 = [CellAgent(model2) for _ in range(5)]
         positions2 = []
         for agent in agents2:
-            grid2.move_to_empty(agent)
-            positions2.append(agent.pos)
+            agent.cell = grid2.select_random_empty_cell()
+            positions2.append(agent.cell.coordinate)
             
         self.assertNotEqual(positions1, positions2)

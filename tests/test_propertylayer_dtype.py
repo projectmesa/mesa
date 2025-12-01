@@ -6,7 +6,9 @@ from mesa.discrete_space import PropertyLayer
 class TestPropertyLayerDtype(unittest.TestCase):
     def test_dtype_match_no_warning(self):
         """Test that matching default_value and dtype emits no warning."""
-        with pytest.warns(None) as record:
+        import warnings
+        with warnings.catch_warnings(record=True) as record:
+            warnings.simplefilter("always")
             PropertyLayer("test", (10, 10), default_value=np.float64(0.0), dtype=np.float64)
         assert len(record) == 0
 
