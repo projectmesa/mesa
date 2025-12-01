@@ -1,13 +1,15 @@
 import random
 import unittest
-from mesa.discrete_space import OrthogonalMooreGrid, CellAgent
+
+from mesa.discrete_space import CellAgent, OrthogonalMooreGrid
 from mesa.model import Model
+
 
 class TestSpacesRNG(unittest.TestCase):
     def test_orthogonal_grid_determinism(self):
         """Test that OrthogonalMooreGrid behaves deterministically with a seeded RNG."""
         seed = 42
-        
+
         # Run 1
         rng1 = random.Random(seed)
         grid1 = OrthogonalMooreGrid((10, 10), random=rng1)
@@ -17,7 +19,7 @@ class TestSpacesRNG(unittest.TestCase):
         for agent in agents1:
             agent.cell = grid1.select_random_empty_cell()
             positions1.append(agent.cell.coordinate)
-            
+
         # Run 2
         rng2 = random.Random(seed)
         grid2 = OrthogonalMooreGrid((10, 10), random=rng2)
@@ -27,9 +29,9 @@ class TestSpacesRNG(unittest.TestCase):
         for agent in agents2:
             agent.cell = grid2.select_random_empty_cell()
             positions2.append(agent.cell.coordinate)
-            
+
         self.assertEqual(positions1, positions2)
-        
+
     def test_orthogonal_grid_randomness(self):
         """Test that OrthogonalMooreGrid behaves differently with different seeds."""
         # Run 1
@@ -41,7 +43,7 @@ class TestSpacesRNG(unittest.TestCase):
         for agent in agents1:
             agent.cell = grid1.select_random_empty_cell()
             positions1.append(agent.cell.coordinate)
-            
+
         # Run 2
         rng2 = random.Random(43)
         grid2 = OrthogonalMooreGrid((10, 10), random=rng2)
@@ -51,5 +53,5 @@ class TestSpacesRNG(unittest.TestCase):
         for agent in agents2:
             agent.cell = grid2.select_random_empty_cell()
             positions2.append(agent.cell.coordinate)
-            
+
         self.assertNotEqual(positions1, positions2)

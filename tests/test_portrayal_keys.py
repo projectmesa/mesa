@@ -1,11 +1,13 @@
 import unittest
-from unittest.mock import MagicMock
+
 import pytest
-from mesa.visualization.mpl_space_drawing import collect_agent_data
-from mesa.visualization.components import AgentPortrayalStyle
+
 from mesa.agent import Agent
 from mesa.model import Model
 from mesa.space import SingleGrid
+from mesa.visualization.components import AgentPortrayalStyle
+from mesa.visualization.mpl_space_drawing import collect_agent_data
+
 
 class TestPortrayalKeys(unittest.TestCase):
     def setUp(self):
@@ -16,6 +18,7 @@ class TestPortrayalKeys(unittest.TestCase):
 
     def test_dict_deprecation_warning(self):
         """Test that returning a dict emits a DeprecationWarning."""
+
         def portrayal(agent):
             return {"size": 10, "color": "red"}
 
@@ -24,6 +27,7 @@ class TestPortrayalKeys(unittest.TestCase):
 
     def test_ignored_keys_warning(self):
         """Test that returning a dict with 's' emits UserWarning about ignored keys."""
+
         def portrayal(agent):
             return {"s": 10, "color": "red"}
 
@@ -35,6 +39,7 @@ class TestPortrayalKeys(unittest.TestCase):
     def test_agent_portrayal_style_no_warning(self):
         """Test that returning AgentPortrayalStyle emits no warnings."""
         import warnings
+
         def portrayal(agent):
             return AgentPortrayalStyle(size=10, color="red")
 
