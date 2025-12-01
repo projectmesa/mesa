@@ -1,9 +1,16 @@
 # noqa: D100
 import base64
 
-import playwright.sync_api
+try:
+    import playwright.sync_api
+except ImportError:
+    playwright = None
+
 import pytest
 from IPython.display import display
+
+if playwright is None:
+    pytest.skip("playwright not installed", allow_module_level=True)
 
 from mesa.examples import (
     BoidFlockers,
