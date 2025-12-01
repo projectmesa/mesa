@@ -78,7 +78,7 @@ class Model:
         self.running: bool = True
         self.steps: int = 0
         self.time: float = 0.0
-        self.step_duration: float = step_duration
+        self._step_duration: float = step_duration
 
         # Track if a simulator is controlling time
         self._simulator: Simulator | None = None
@@ -127,7 +127,7 @@ class Model:
         self.steps += 1
         # Only auto-increment time if no simulator is controlling it
         if self._simulator is None:
-            self.time += self.step_duration
+            self.time += self._step_duration
 
         _mesa_logger.info(
             f"calling model.step for step {self.steps} at time {self.time}"

@@ -13,7 +13,7 @@ def test_model_set_up():
     assert model.running is True
     assert model.steps == 0
     assert model.time == 0.0
-    assert model.step_duration == 1.0
+    assert model._step_duration == 1.0
     assert model._simulator is None
 
     model.step()
@@ -40,7 +40,7 @@ def test_model_step_duration():
 
     # Custom step_duration
     model = Model(step_duration=0.25)
-    assert model.step_duration == 0.25
+    assert model._step_duration == 0.25
 
     model.step()
     assert model.steps == 1
