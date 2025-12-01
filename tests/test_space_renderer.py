@@ -1,7 +1,7 @@
 """Test cases for the SpaceRenderer class in Mesa."""
 
-import re
 import random
+import re
 from unittest.mock import MagicMock, patch
 
 import numpy as np

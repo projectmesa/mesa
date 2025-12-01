@@ -30,10 +30,10 @@ C:\Users\shreyas\Downloads\project-mesa\mesa-os\tests\test_solara_viz.py:100
   C:\Users\shreyas\anaconda3\Lib\site-packages\solara\validate_hooks.py:122: UserWarning: C:\Users\shreyas\Downloads\project-mesa\mesa-os\mesa\visualization\solara_viz.py:399: ComponentsView: `use_state` found despite early return on line 376
   To suppress this check, replace the line with:
       current_tab_index, set_current_tab_index = solara.use_state(0)  # noqa: SH101
-  
+
   Make sure you understand the consequences of this, by reading about the rules of hooks at:
       https://solara.dev/documentation/advanced/understanding/rules-of-hooks
-  
+
     warnings.warn(str(e))
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
