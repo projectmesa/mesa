@@ -82,8 +82,8 @@ def collect_agent_data(
 
     arguments = {
         "loc": [],
-        "s": [],
-        "c": [],
+        "size": [],
+        "color": [],
         "marker": [],
         "zorder": [],
         "alpha": [],
@@ -165,8 +165,8 @@ def collect_agent_data(
         if size_to_collect is None:
             size_to_collect = class_default_size
 
-        arguments["s"].append(size_to_collect)
-        arguments["c"].append(aps.color)
+        arguments["size"].append(size_to_collect)
+        arguments["color"].append(aps.color)
         arguments["marker"].append(aps.marker)
         arguments["zorder"].append(aps.zorder)
         arguments["alpha"].append(aps.alpha)
@@ -778,7 +778,8 @@ def _scatter(ax: Axes, arguments, **kwargs):
     marker = arguments.pop("marker")
     zorder = arguments.pop("zorder")
     malpha = arguments.pop("alpha")
-    msize = arguments.pop("s")
+    mcolor = arguments.pop("color")
+    msize = arguments.pop("size")
 
     # we check if edgecolor, linewidth, and alpha are specified
     # at the agent level, if not, we remove them from the arguments dict
@@ -829,6 +830,8 @@ def _scatter(ax: Axes, arguments, **kwargs):
                     loc_y[zorder_mask],
                     marker=mark,
                     zorder=z_order,
+                    s=msize[zorder_mask],
+                    c=mcolor[zorder_mask],
                     **{k: v[zorder_mask] for k, v in arguments.items()},
                     **kwargs,
                 )
