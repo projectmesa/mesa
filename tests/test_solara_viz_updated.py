@@ -3,6 +3,8 @@
 import re
 import unittest
 
+import numpy as np
+
 import ipyvuetify as vw
 import pytest
 import solara
@@ -132,7 +134,7 @@ def test_call_space_drawer(mocker):
         def __init__(self, seed=None):
             super().__init__(seed=seed)
             layer1 = PropertyLayer(
-                name="sugar", width=10, height=10, default_value=10.0
+                name="sugar", width=10, height=10, default_value=np.float64(10.0)
             )
             self.grid = MultiGrid(
                 width=10, height=10, torus=True, property_layers=layer1

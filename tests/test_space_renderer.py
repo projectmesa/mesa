@@ -43,7 +43,7 @@ class CustomModel(mesa.Model):
         self.grid = mesa.discrete_space.OrthogonalMooreGrid(
             [2, 2], random=random.Random(42)
         )
-        self.layer = PropertyLayer("test", [2, 2], default_value=0)
+        self.layer = PropertyLayer("test", [2, 2], default_value=0.0)
 
         self.grid.add_property_layer(self.layer)
 
