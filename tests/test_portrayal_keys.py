@@ -1,4 +1,6 @@
+"""Tests for portrayal key deprecation and normalization."""
 import unittest
+import warnings
 from unittest.mock import MagicMock
 import pytest
 from mesa.visualization.mpl_space_drawing import collect_agent_data
@@ -8,6 +10,8 @@ from mesa.model import Model
 from mesa.space import SingleGrid
 
 class TestPortrayalKeys(unittest.TestCase):
+    """Test case for portrayal key normalization and warnings."""
+
     def setUp(self):
         self.model = Model()
         self.grid = SingleGrid(10, 10, torus=True)
@@ -28,13 +32,11 @@ class TestPortrayalKeys(unittest.TestCase):
             return {"s": 10, "color": "red"}
 
         # Should warn about deprecation AND ignored keys
-        with pytest.warns(UserWarning, match="ignored: s"):
-            with pytest.warns(DeprecationWarning, match="Returning a dict"):
-                collect_agent_data(self.grid, portrayal)
+        with pytest.warns(UserWarning, match="ignored: s"), pytest.warns(DeprecationWarning, match="Returning a dict"):
+            collect_agent_data(self.grid, portrayal)
 
     def test_agent_portrayal_style_no_warning(self):
         """Test that returning AgentPortrayalStyle emits no warnings."""
-        import warnings
         def portrayal(agent):
             return AgentPortrayalStyle(size=10, color="red")
 
