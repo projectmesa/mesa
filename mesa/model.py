@@ -18,6 +18,7 @@ import numpy as np
 
 from mesa.agent import Agent, AgentSet
 from mesa.mesa_logging import create_module_logger, method_logger
+from mesa.util import deprecate_kwarg
 
 SeedLike = int | np.integer | Sequence[int] | np.random.SeedSequence
 RNGLike = np.random.Generator | np.random.BitGenerator
@@ -46,6 +47,7 @@ class Model:
 
     """
 
+    @deprecate_kwarg("seed")
     @method_logger(__name__)
     def __init__(
         self,
@@ -109,9 +111,7 @@ class Model:
         self._agents_by_type: dict[
             type[Agent], AgentSet
         ] = {}  # a dict with an agentset for each class of agents
-        self._all_agents = AgentSet(
-            [], random=self.random
-        )  # an agenset with all agents
+        self._all_agents = AgentSet([], rng=self.rng)  # an agenset with all agents
 
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
         """Automatically increments time and steps after calling the user's step method."""
@@ -166,7 +166,7 @@ class Model:
                 [
                     agent,
                 ],
-                random=self.random,
+                rng=self.rng,
             )
 
         self._all_agents.add(agent)
@@ -200,12 +200,17 @@ class Model:
     def step(self) -> None:
         """A single step. Fill in here."""
 
-    def reset_randomizer(self, seed: int | None = None) -> None:
+    @deprecate_kwarg("seed")
+    def reset_randomizer(
+        self, seed: int | None = None, rng: SeedLike | None = None
+    ) -> None:
         """Reset the model random number generator.
 
         Args:
             seed: A new seed for the RNG; if None, reset using the current seed
+            rng: A new seed for the RNG; if None, reset using the current seed
         """
+        # fixme
         if seed is None:
             seed = self._seed
         self.random.seed(seed)
