@@ -87,8 +87,8 @@ class MatplotlibBackend(AbstractRenderer):
         # Initialize data collection arrays
         arguments = {
             "loc": [],
-            "size": [],
-            "color": [],
+            "s": [],
+            "c": [],
             "marker": [],
             "zorder": [],
             "alpha": [],
@@ -154,8 +154,8 @@ class MatplotlibBackend(AbstractRenderer):
 
             # Determine final size
             size_to_collect = aps.size or default_size or class_default_size
-            arguments["size"].append(size_to_collect)
-            arguments["color"].append(aps.color)
+            arguments["s"].append(size_to_collect)
+            arguments["c"].append(aps.color)
             arguments["marker"].append(aps.marker)
             arguments["zorder"].append(aps.zorder)
             arguments["alpha"].append(aps.alpha)
@@ -218,10 +218,7 @@ class MatplotlibBackend(AbstractRenderer):
         marker = arguments.pop("marker")
         zorder = arguments.pop("zorder")
         malpha = arguments["alpha"]
-        malpha = arguments["alpha"]
-        msize = arguments["size"]
-        arguments["s"] = arguments.pop("size")
-        arguments["c"] = arguments.pop("color")
+        msize = arguments["s"]
 
         # Validate edge arguments
         for entry in ["edgecolors", "linewidths"]:
