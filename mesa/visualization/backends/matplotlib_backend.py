@@ -218,7 +218,7 @@ class MatplotlibBackend(AbstractRenderer):
         marker = arguments.pop("marker")
         zorder = arguments.pop("zorder")
         malpha = arguments["alpha"]
-        msize = arguments["s"]
+        msize = arguments.get("s", arguments.get("size", 1))
 
         # Validate edge arguments
         for entry in ["edgecolors", "linewidths"]:
@@ -303,8 +303,28 @@ class MatplotlibBackend(AbstractRenderer):
             for z_order in unique_zorders:
                 zorder_mask = (zorder == z_order) & mask_marker
 
+                # Select per-agent values for this z-order
                 scatter_args = {k: v[zorder_mask] for k, v in arguments.items()}
 
+                # If the caller provided "size", convert to matplotlib's expected "s"
+                if "size" in scatter_args:
+                    scatter_args["s"] = scatter_args.pop("size")
+
+                # If "s" still missing, try to build it from original 's' or from msize
+                if "s" not in scatter_args:
+                    if "s" in arguments:  # original arguments might contain 's' array
+                        scatter_args["s"] = arguments["s"][zorder_mask]
+                    else:
+                        # msize might be an array (per-agent) or a scalar
+                        if isinstance(msize, (list, tuple)) or (
+                            hasattr(msize, "shape")
+                            and getattr(msize, "shape", ()) != ()
+                        ):
+                            scatter_args["s"] = msize[zorder_mask]
+                        else:
+                            scatter_args["s"] = msize  # scalar fallback
+
+                # Now safe to call scatter with scatter_args
                 self.ax.scatter(
                     loc_x[zorder_mask],
                     loc_y[zorder_mask],
