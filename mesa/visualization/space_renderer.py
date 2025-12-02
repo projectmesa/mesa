@@ -29,6 +29,8 @@ from mesa.space import (
     _HexGrid,
 )
 from mesa.visualization.backends import AltairBackend, MatplotlibBackend
+from mesa.visualization.icon_altair_layer import build_altair_agent_chart
+from mesa.visualization.icon_cache import IconCache
 from mesa.visualization.space_drawers import (
     ContinuousSpaceDrawer,
     HexSpaceDrawer,
@@ -53,12 +55,17 @@ class SpaceRenderer:
         self,
         model: mesa.Model,
         backend: Literal["matplotlib", "altair"] | None = "matplotlib",
+        **kwargs,
     ):
         """Initialize the space renderer.
 
         Args:
-            model (mesa.Model): The Mesa model to render.
-            backend (Literal["matplotlib", "altair"] | None): The visualization backend to use.
+            model: The Mesa model to render.
+            backend: The visualization backend to use.
+            **kwargs: Additional keyword arguments:
+                - icon_mode: "off", "auto", or "force" (default: "off")
+                - icon_auto_max_agents: Max agents for auto icon mode (default: 1500)
+                - icon_culling: Enable culling for icons (default: True)
         """
         self.space = getattr(model, "grid", getattr(model, "space", None))
 
@@ -74,6 +81,13 @@ class SpaceRenderer:
 
         self.backend = backend
 
+        # NEW: Add icon cache initialization
+        self.icon_mode = kwargs.pop("icon_mode", "off")  # "off", "auto", "force"
+        self.icon_auto_max_agents = kwargs.pop("icon_auto_max_agents", 1500)
+        self.icon_culling = kwargs.pop("icon_culling", True)
+
+        self._icon_cache = IconCache(backend=self.backend)
+
         if backend == "matplotlib":
             self.backend_renderer = MatplotlibBackend(
                 self.space_drawer,
@@ -86,6 +100,59 @@ class SpaceRenderer:
             raise ValueError(f"Unsupported backend: {backend}")
 
         self.backend_renderer.initialize_canvas()
+
+    def draw_agents(self, agent_portrayal: Callable, **kwargs):
+        """Draw agents on the space.
+
+        Extension: supports optional portrayal fields for icon rendering:
+          - 'icon': icon basename (str)
+          - 'icon_size': integer size in px (fallback to 'size')
+
+        Args:
+            agent_portrayal: Function that takes an agent and returns AgentPortrayalStyle.
+            **kwargs: Additional keyword arguments for the drawing function.
+                Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
+
+        Returns:
+            The visual representation of the agents.
+        """
+        self.agent_portrayal = agent_portrayal
+        self.agent_kwargs = kwargs
+
+        arguments = self.backend_renderer.collect_agent_data(
+            self.space, agent_portrayal, default_size=self.space_drawer.s_default
+        )
+        arguments = self._map_coordinates(arguments)
+        arguments = self._maybe_enrich_with_icons(arguments)
+
+        # NEW: Early icon path for Altair without touching backend
+        if (
+            self.backend == "altair"
+            and self.icon_mode != "off"
+            and "icon_rasters" in arguments
+            and any(r is not None for r in arguments.get("icon_rasters", []))
+        ):
+            # Auto fallback threshold (optional)
+            n_agents = len(arguments["size"])
+            if self.icon_mode == "force" or n_agents <= self.icon_auto_max_agents:
+                chart = build_altair_agent_chart(
+                    arguments=arguments,
+                    space_drawer=self.space_drawer,
+                    chart_width=kwargs.get("chart_width", 450),
+                    chart_height=kwargs.get("chart_height", 350),
+                    title=kwargs.get("title", ""),
+                    xlabel=kwargs.get("xlabel", ""),
+                    ylabel=kwargs.get("ylabel", ""),
+                    enable_culling=self.icon_culling,
+                )
+                self.agent_mesh = chart
+                return self.agent_mesh
+
+        # Fall back to standard backend behavior
+        self.agent_mesh = self.backend_renderer.draw_agents(
+            arguments, **self.agent_kwargs
+        )
+        return self.agent_mesh
 
     def _get_space_drawer(self):
         """Get appropriate space drawer based on space type.
@@ -118,10 +185,10 @@ class SpaceRenderer:
         """Map agent coordinates to appropriate space coordinates.
 
         Args:
-            arguments (dict): Dictionary containing agent data with coordinates.
+            arguments: Dictionary containing agent data with coordinates.
 
         Returns:
-            dict: Dictionary with mapped coordinates appropriate for the space type.
+            Dictionary with mapped coordinates appropriate for the space type.
         """
         mapped_arguments = arguments.copy()
 
@@ -161,12 +228,59 @@ class SpaceRenderer:
 
         return mapped_arguments
 
+    def _maybe_enrich_with_icons(self, arguments):
+        """Enrich arguments with cached icon rasters/URLs if portrayal requests icons.
+
+        Expected portrayal contract:
+            def portrayal(agent):
+                return {
+                    "size": 24,
+                    "icon": "smiley",           # optional: icon name
+                    "icon_size": 24,            # optional: defaults to 'size'
+                }
+
+        Args:
+            arguments: Dictionary containing agent data.
+
+        Returns:
+            Enriched arguments with icon data.
+        """
+        portrayals = arguments.get("portrayals")
+        if not isinstance(portrayals, list):
+            return arguments
+
+        icon_rasters = []
+        icon_names = []
+        icon_sizes = []
+
+        for p in portrayals:
+            icon_name = p.get("icon")
+            size = int(p.get("icon_size", p.get("size", self.space_drawer.s_default)))
+            raster = self._icon_cache.get(icon_name, size) if icon_name else None
+            icon_rasters.append(raster)
+            icon_names.append(icon_name)
+            icon_sizes.append(size)
+
+        arguments["icon_names"] = icon_names
+        arguments["icon_sizes"] = icon_sizes
+        arguments["icon_rasters"] = icon_rasters
+
+        # Optional grouping for batch rendering optimization
+        groups = {}
+        for idx, (iname, isize) in enumerate(zip(icon_names, icon_sizes)):
+            if iname:  # Only group if icon is specified
+                key = (iname, isize)
+                groups.setdefault(key, []).append(idx)
+        arguments["icon_groups"] = groups
+
+        return arguments
+
     def draw_structure(self, **kwargs):
         """Draw the space structure.
 
         Args:
             **kwargs: Additional keyword arguments for the drawing function.
-            Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
+                Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
 
         Returns:
             The visual representation of the space structure.
@@ -177,37 +291,11 @@ class SpaceRenderer:
         self.space_mesh = self.backend_renderer.draw_structure(**self.space_kwargs)
         return self.space_mesh
 
-    def draw_agents(self, agent_portrayal: Callable, **kwargs):
-        """Draw agents on the space.
-
-        Args:
-            agent_portrayal (Callable): Function that takes an agent and returns AgentPortrayalStyle.
-            **kwargs: Additional keyword arguments for the drawing function.
-            Checkout respective `SpaceDrawer` class on details how to pass **kwargs.
-
-        Returns:
-            The visual representation of the agents.
-        """
-        # Store data for internal use
-        self.agent_portrayal = agent_portrayal
-        self.agent_kwargs = kwargs
-
-        # Prepare data for agent plotting
-        arguments = self.backend_renderer.collect_agent_data(
-            self.space, agent_portrayal, default_size=self.space_drawer.s_default
-        )
-        arguments = self._map_coordinates(arguments)
-
-        self.agent_mesh = self.backend_renderer.draw_agents(
-            arguments, **self.agent_kwargs
-        )
-        return self.agent_mesh
-
     def draw_propertylayer(self, propertylayer_portrayal: Callable | dict):
         """Draw property layers on the space.
 
         Args:
-            propertylayer_portrayal (Callable | dict): Function that returns PropertyLayerStyle
+            propertylayer_portrayal: Function that returns PropertyLayerStyle
                 or dict with portrayal parameters.
 
         Returns:
@@ -223,10 +311,10 @@ class SpaceRenderer:
             """Convert legacy dict portrayal to callable.
 
             Args:
-                portrayal_dict (dict): Dictionary with portrayal parameters.
+                portrayal_dict: Dictionary with portrayal parameters.
 
             Returns:
-                Callable: Function that returns PropertyLayerStyle.
+                Function that returns PropertyLayerStyle.
             """
 
             def style_callable(layer_object):
@@ -298,12 +386,12 @@ class SpaceRenderer:
         space_kwargs and agent_kwargs.
 
         Args:
-            agent_portrayal (Callable | None): Function that returns AgentPortrayalStyle.
+            agent_portrayal: Function that returns AgentPortrayalStyle.
                 If None, agents won't be drawn.
-            propertylayer_portrayal (Callable | dict | None): Function that returns
+            propertylayer_portrayal: Function that returns
                 PropertyLayerStyle or dict with portrayal parameters. If None,
                 property layers won't be drawn.
-            post_process (Callable | None): Function to apply post-processing to the canvas.
+            post_process: Function to apply post-processing to the canvas.
             **kwargs: Additional keyword arguments for drawing functions.
                 * ``space_kwargs`` (dict): Arguments for ``draw_structure()``.
                 * ``agent_kwargs`` (dict): Arguments for ``draw_agents()``.
@@ -388,7 +476,7 @@ class SpaceRenderer:
         """Get the current post-processing function.
 
         Returns:
-            Callable | None: The post-processing function, or None if not set.
+            The post-processing function, or None if not set.
         """
         return self.post_process_func
 
@@ -397,7 +485,7 @@ class SpaceRenderer:
         """Set the post-processing function.
 
         Args:
-            func (Callable | None): Function to apply post-processing to the canvas.
+            func: Function to apply post-processing to the canvas.
                 Should accept the canvas object as its first argument.
         """
         self.post_process_func = func
