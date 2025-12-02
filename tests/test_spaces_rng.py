@@ -1,4 +1,5 @@
 """Tests for RNG determinism in discrete spaces."""
+
 import random
 import unittest
 
@@ -8,6 +9,7 @@ from mesa.model import Model
 
 class TestSpacesRNG(unittest.TestCase):
     """Test case for OrthogonalMooreGrid RNG behavior."""
+
     def test_orthogonal_grid_determinism(self):
         """Test that OrthogonalMooreGrid behaves deterministically with a seeded RNG."""
         seed = 42

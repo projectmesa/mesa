@@ -1,6 +1,8 @@
 """Tests for PropertyLayer dtype warnings."""
+
 import unittest
 import warnings
+
 import numpy as np
 import pytest
 

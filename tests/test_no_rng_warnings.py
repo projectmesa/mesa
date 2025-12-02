@@ -1,9 +1,13 @@
 """Tests for RNG warning suppression in discrete spaces."""
+
+import random
 import unittest
 import warnings
-import random
+
 import networkx as nx
-from mesa.discrete_space import OrthogonalMooreGrid, Network, VoronoiGrid
+
+from mesa.discrete_space import Network, OrthogonalMooreGrid, VoronoiGrid
+
 
 class TestNoRNGWarnings(unittest.TestCase):
     """Test case for ensuring no RNG warnings are emitted when properly seeded."""
