@@ -18,6 +18,7 @@ from mesa.space import (
     PropertyLayer,
     SingleGrid,
 )
+from mesa.visualization.components import PropertyLayerStyle
 from mesa.visualization.mpl_space_drawing import (
     draw_continuous_space,
     draw_hex_grid,
@@ -224,12 +225,15 @@ def test_draw_property_layers():
     grid = SingleGrid(10, 10, torus=True)
     grid.add_property_layer(PropertyLayer("test", grid.width, grid.height, 0))
 
+    def propertylayer_portrayal(layer):
+        return PropertyLayerStyle(colormap="viridis", colorbar=True)
+
     _, ax = plt.subplots()
-    draw_property_layers(grid, {"test": {"colormap": "viridis", "colorbar": True}}, ax)
+    draw_property_layers(grid, propertylayer_portrayal, ax)
 
     model = Model(seed=42)
     grid = OrthogonalMooreGrid((10, 10), torus=True, random=model.random, capacity=1)
     grid.create_property_layer("test", 0.0)
 
     _, ax = plt.subplots()
-    draw_property_layers(grid, {"test": {"colormap": "viridis", "colorbar": True}}, ax)
+    draw_property_layers(grid, propertylayer_portrayal, ax)
