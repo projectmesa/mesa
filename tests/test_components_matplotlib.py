@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 from mesa import Agent, Model
-from mesa.experimental.cell_space import (
+from mesa.discrete_space import (
     CellAgent,
     HexGrid,
     Network,
