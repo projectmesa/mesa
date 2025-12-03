@@ -18,9 +18,10 @@ from mesa.space import (
     PropertyLayer,
     SingleGrid,
 )
-fix-issue-2904-property-layer
-from mesa.visualization.components import PropertyLayerStyle
-from mesa.visualization.components import AgentPortrayalStyle
+
+fix - issue - 2904 - property - layer
+from mesa.visualization.components import AgentPortrayalStyle, PropertyLayerStyle
+
 main
 from mesa.visualization.mpl_space_drawing import (
     draw_continuous_space,
