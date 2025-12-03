@@ -1,3 +1,10 @@
+# Benchmarking
+benchmarks/**/*.pickle
+
+# exampledocs
+docs/examples/*
+docs/example.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -12,6 +19,8 @@ __pycache__/
 .Python
 env/
 venv/
+pythonenv*/
+.venv/
 build/
 develop-eggs/
 dist/
@@ -60,12 +69,14 @@ target/
 
 # Jupyter and iPython notebook checkpoints
 *.ipynb_checkpoints
+*.virtual_documents
 
 # Spyder app workspace config file
 .spyderworkspace
 
 # PyCharm environment files
 .idea/
+*.pclprof
 
 # VSCode environment files
 .vscode/
@@ -78,9 +89,6 @@ target/
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
-# pythonenv
-pythonenv*/
 
 # JS dependencies
 mesa/visualization/templates/external/

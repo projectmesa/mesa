@@ -1,6 +1,8 @@
 name: Release
 on:
   push:
+    tags:
+    - '*'
     branches:
     - main
     - release**
@@ -12,6 +14,8 @@ on:
       - '**.md'
       - '**.rst'
   workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
 
 permissions:
   id-token: write
@@ -20,25 +24,27 @@ jobs:
   release:
     name: Deploy release to PyPI
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.14"
+          allow-prereleases: true
+          cache: 'pip'
       - name: Install dependencies
-        run: pip install -U pip build wheel setuptools
+        run: pip install -U pip hatch
       - name: Build distributions
-        run: python -m build
+        run: hatch build
       - name: Upload package as artifact to GitHub
         if: github.repository == 'projectmesa/mesa' && startsWith(github.ref, 'refs/tags')
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: package
           path: dist/
       - name: Publish package to PyPI
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}

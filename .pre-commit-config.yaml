@@ -1,21 +1,34 @@
 ci:
     autoupdate_schedule: 'monthly'
-    autofix_prs: false
 
 repos:
--   repo: https://github.com/psf/black
-    rev: 23.9.1
-    hooks:
-      - id: black-jupyter
-        exclude: ^mesa/cookiecutter-mesa/
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.14.7
+  hooks:
+    # Run the linter.
+    - id: ruff
+      types_or: [ python, pyi, jupyter ]
+      args: [ --fix ]
+    # Run the formatter.
+    - id: ruff-format
+      types_or: [ python, pyi, jupyter ]
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.14.0
+    rev: v3.21.2
     hooks:
     -   id: pyupgrade
-        args: [--py38-plus]
+        args: [--py312-plus]
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0  # Use the ref you want to point at
+    rev: v6.0.0  # Use the ref you want to point at
     hooks:
     -   id: trailing-whitespace
     -   id: check-toml
     -   id: check-yaml
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.4.1
+  hooks:
+    - id: codespell
+      args: [
+        "--ignore-words",
+        ".codespellignore",
+      ]

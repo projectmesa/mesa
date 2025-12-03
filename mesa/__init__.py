@@ -1,31 +1,30 @@
-"""
-Mesa Agent-Based Modeling Framework
+"""Mesa Agent-Based Modeling Framework.
 
 Core Objects: Model, and Agent.
 """
+
 import datetime
 
+import mesa.discrete_space as discrete_space
+import mesa.experimental as experimental
 import mesa.space as space
-import mesa.time as time
-import mesa.visualization as visualization
 from mesa.agent import Agent
 from mesa.batchrunner import batch_run
 from mesa.datacollection import DataCollector
 from mesa.model import Model
 
 __all__ = [
-    "Model",
     "Agent",
-    "time",
-    "space",
-    "visualization",
     "DataCollector",
+    "Model",
     "batch_run",
+    "discrete_space",
     "experimental",
+    "space",
 ]
 
 __title__ = "mesa"
-__version__ = "2.1.2"
+__version__ = "3.4.0.dev"
 __license__ = "Apache 2.0"
-_this_year = datetime.datetime.now(tz=datetime.timezone.utc).date().year
+_this_year = datetime.datetime.now(tz=datetime.UTC).date().year
 __copyright__ = f"Copyright {_this_year} Project Mesa Team"

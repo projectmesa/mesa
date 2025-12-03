@@ -1,12 +1,13 @@
+"""Test Batchrunner."""
+
 import mesa
 from mesa.agent import Agent
 from mesa.batchrunner import _make_model_kwargs
 from mesa.datacollection import DataCollector
 from mesa.model import Model
-from mesa.time import BaseScheduler
 
 
-def test_make_model_kwargs():
+def test_make_model_kwargs():  # noqa: D103
     assert _make_model_kwargs({"a": 3, "b": 5}) == [{"a": 3, "b": 5}]
     assert _make_model_kwargs({"a": 3, "b": range(3)}) == [
         {"a": 3, "b": 0},
@@ -23,39 +24,79 @@ def test_make_model_kwargs():
     assert _make_model_kwargs({"a": "value"}) == [{"a": "value"}]
 
 
-class MockAgent(Agent):
-    """
-    Minimalistic agent implementation for testing purposes
-    """
+def test_batch_run_with_params_with_empty_content():
+    """Test handling of empty iterables in model kwargs."""
+    # If "a" is a single value and "b" is an empty list (should raise error for the empty list)
+    parameters_with_empty_list = {
+        "a": 3,
+        "b": [],
+    }
 
-    def __init__(self, unique_id, model, val):
-        super().__init__(unique_id, model)
-        self.unique_id = unique_id
+    try:
+        _make_model_kwargs(parameters_with_empty_list)
+        raise AssertionError(
+            "Expected ValueError for empty iterable but no error was raised."
+        )
+    except ValueError as e:
+        assert "contains an empty iterable" in str(e)
+
+    # If "a" is a iterable and "b" is an empty list (should still raise error)
+    parameters_with_empty_b = {
+        "a": [1, 2],
+        "b": [],
+    }
+
+    try:
+        _make_model_kwargs(parameters_with_empty_b)
+        raise AssertionError(
+            "Expected ValueError for empty iterable but no error was raised."
+        )
+    except ValueError as e:
+        assert "contains an empty iterable" in str(e)
+
+
+class MockAgent(Agent):
+    """Minimalistic agent implementation for testing purposes."""
+
+    def __init__(self, model, val):
+        """Initialize a MockAgent.
+
+        Args:
+            model: a model instance
+            val: a value for attribute
+        """
+        super().__init__(model)
         self.val = val
         self.local = 0
 
-    def step(self):
+    def step(self):  # noqa: D102
         self.val += 1
         self.local += 0.25
 
 
 class MockModel(Model):
-    """
-    Minimalistic model for testing purposes
-    """
+    """Minimalistic model for testing purposes."""
 
     def __init__(
         self,
         variable_model_param=None,
         variable_agent_param=None,
         fixed_model_param=None,
-        schedule=None,
         enable_agent_reporters=True,
         n_agents=3,
-        **kwargs
+        **kwargs,
     ):
+        """Initialize a MockModel.
+
+        Args:
+            variable_model_param: variable model parameters
+            variable_agent_param: variable agent parameters
+            fixed_model_param: fixed model parameters
+            enable_agent_reporters: whether to enable agent reporters
+            n_agents: number of agents
+            kwargs: keyword arguments
+        """
         super().__init__()
-        self.schedule = BaseScheduler(self) if schedule is None else schedule
         self.variable_model_param = variable_model_param
         self.variable_agent_param = variable_agent_param
         self.fixed_model_param = fixed_model_param
@@ -72,33 +113,25 @@ class MockModel(Model):
         self.init_agents()
 
     def init_agents(self):
+        """Initialize agents."""
         if self.variable_agent_param is None:
             agent_val = 1
         else:
             agent_val = self.variable_agent_param
-        for i in range(self.n_agents):
-            self.schedule.add(MockAgent(i, self, agent_val))
+        for _ in range(self.n_agents):
+            MockAgent(self, agent_val)
 
-    def get_local_model_param(self):
+    def get_local_model_param(self):  # noqa: D102
         return 42
 
-    def step(self):
+    def step(self):  # noqa: D102
+        self.agents.do("step")
         self.datacollector.collect(self)
-        self.schedule.step()
 
 
-def test_batch_run():
+def test_batch_run():  # noqa: D103
     result = mesa.batch_run(MockModel, {}, number_processes=2)
     assert result == [
-        {
-            "RunId": 0,
-            "iteration": 0,
-            "Step": 1000,
-            "reported_model_param": 42,
-            "AgentID": 0,
-            "agent_id": 0,
-            "agent_local": 250.0,
-        },
         {
             "RunId": 0,
             "iteration": 0,
@@ -117,21 +150,30 @@ def test_batch_run():
             "agent_id": 2,
             "agent_local": 250.0,
         },
+        {
+            "RunId": 0,
+            "iteration": 0,
+            "Step": 1000,
+            "reported_model_param": 42,
+            "AgentID": 3,
+            "agent_id": 3,
+            "agent_local": 250.0,
+        },
     ]
 
 
-def test_batch_run_with_params():
+def test_batch_run_with_params():  # noqa: D103
     mesa.batch_run(
         MockModel,
         {
-            "variable_model_params": range(5),
-            "variable_agent_params": ["H", "E", "L", "L", "O"],
+            "variable_model_params": range(3),
+            "variable_agent_params": ["H", "E", "Y"],
         },
         number_processes=2,
     )
 
 
-def test_batch_run_no_agent_reporters():
+def test_batch_run_no_agent_reporters():  # noqa: D103
     result = mesa.batch_run(
         MockModel, {"enable_agent_reporters": False}, number_processes=2
     )
@@ -147,11 +189,11 @@ def test_batch_run_no_agent_reporters():
     ]
 
 
-def test_batch_run_single_core():
-    mesa.batch_run(MockModel, {}, number_processes=1, iterations=10)
+def test_batch_run_single_core():  # noqa: D103
+    mesa.batch_run(MockModel, {}, number_processes=1, iterations=6)
 
 
-def test_batch_run_unhashable_param():
+def test_batch_run_unhashable_param():  # noqa: D103
     result = mesa.batch_run(
         MockModel,
         {
@@ -172,22 +214,15 @@ def test_batch_run_unhashable_param():
         {
             "RunId": 0,
             "iteration": 0,
-            "AgentID": 0,
-            "agent_id": 0,
+            "AgentID": 1,
+            "agent_id": 1,
             **template,
         },
         {
             "RunId": 0,
             "iteration": 0,
-            "AgentID": 1,
-            "agent_id": 1,
-            **template,
-        },
-        {
-            "RunId": 1,
-            "iteration": 1,
-            "AgentID": 0,
-            "agent_id": 0,
+            "AgentID": 2,
+            "agent_id": 2,
             **template,
         },
         {
@@ -195,6 +230,13 @@ def test_batch_run_unhashable_param():
             "iteration": 1,
             "AgentID": 1,
             "agent_id": 1,
+            **template,
+        },
+        {
+            "RunId": 1,
+            "iteration": 1,
+            "AgentID": 2,
+            "agent_id": 2,
             **template,
         },
     ]

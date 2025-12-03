@@ -1,0 +1,13 @@
+
+$readme
+
+
+
+```{toctree}
+:hidden: true
+:maxdepth: 2
+
+$example_paths
+
+
+```

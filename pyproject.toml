@@ -1,51 +1,158 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "Mesa"
+description = "Agent-based modeling (ABM) in Python"
+license = { text = "Apache 2.0" }
+requires-python = ">=3.12"
+authors = [
+  { name = "Project Mesa Team", email = "maintainers@projectmesa.dev" },
+]
+keywords = [
+  "agent",
+  "based",
+  "modeling",
+  "model",
+  "ABM",
+  "simulation",
+  "multi-agent",
+]
+classifiers = [
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Artificial Life",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Development Status :: 3 - Alpha",
+  "Natural Language :: English",
+]
+readme = "README.md"
+dependencies = [
+  "numpy",
+  "pandas",
+  "tqdm",
+  "scipy",
+  "pythran>=0.17.0 ; sys_platform == 'darwin'", # required for darwin scipy overrides in nix
+
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+# User collections
+rec = ["mesa[network,viz]"]
+all = ["mesa[network,viz,dev,examples,docs]"]
+# Core dependencies
+network = [
+  "networkx",
+]
+viz = [
+  "matplotlib",
+  "solara",
+  "altair",
+]
+# Dev and CI stuff
+dev = [
+  "mesa[rec]",
+  "ruff",
+  "pytest",
+  "pytest-cov",
+  "sphinx",
+  "pytest-mock",
+  "pytest-playwright",
+  "pytest-ipywidgets",
+  "playwright",
+  "ipython>=9.2.0",
+]
+examples = [
+  "mesa[rec]",
+  "pytest",
+  "scipy",
+]
+docs = [
+  "mesa[rec]",
+  "sphinx",
+  "ipython",
+  "pydata_sphinx_theme",
+  "seaborn",
+  "myst-nb",
+  "myst-parser",  # Markdown in Sphinx
+  "sphinx-copybutton", # Add a copy option in docs
+]
+
+[project.urls]
+homepage = "https://github.com/projectmesa/mesa"
+repository = "https://github.com/projectmesa/mesa"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mesa"]
+
+[tool.hatch.version]
+path = "mesa/__init__.py"
+
 [tool.ruff]
 # See https://github.com/charliermarsh/ruff#rules for error code definitions.
+# Hardcode to Python 3.12.
+# Reminder to update mesa-examples if the value below is changed.
+target-version = "py312"
+extend-exclude = ["build"]
+
+[tool.ruff.lint]
 select = [
-    # "ANN", # annotations TODO
-    "B", # bugbear
-    "C4", # comprehensions
-    "DTZ", # naive datetime
-    "E", # style errors
-    "F", # flakes
-    "I", # import sorting
-    "ISC", # string concatenation
-    "N", # naming
-    "PGH", # pygrep-hooks
-    "PIE", # miscellaneous
-    "PLC", # pylint convention
-    "PLE", # pylint error
-    # "PLR", # pylint refactor TODO
-    "PLW", # pylint warning
-    "Q", # quotes
-    "RUF", # Ruff
-    "S", # security
-    "SIM", # simplify
-    "T10", # debugger
-    "UP", # upgrade
-    "W", # style warnings
-    "YTT", # sys.version
+  # "ANN", # annotations TODO
+  "B",   # bugbear
+  "C4",  # comprehensions
+  "DTZ", # naive datetime
+  "E",   # style errors
+  "F",   # flakes
+  "I",   # import sorting
+  "ISC", # string concatenation
+  "N",   # naming
+  "PGH", # pygrep-hooks
+  "PIE", # miscellaneous
+  "PLC", # pylint convention
+  "PLE", # pylint error
+  # "PLR", # pylint refactor TODO
+  "PLW", # pylint warning
+  "Q",   # quotes
+  "RUF", # Ruff
+  "S",   # security
+  "SIM", # simplify
+  "T10", # debugger
+  "UP",  # upgrade
+  "W",   # style warnings
+  "YTT", # sys.version
+  "D",  # docstring
 ]
 # Ignore list taken from https://github.com/psf/black/blob/master/.flake8
 # E203	Whitespace before ':'
 # E266	Too many leading '#' for block comment
-# E501	Line too long (82 > 79 characters)
 # W503	Line break occurred before a binary operator
-# But we don't specify them because ruff's Black already
+# But we don't specify them because ruff's formatter
 # checks for it.
 # See https://github.com/charliermarsh/ruff/issues/1842#issuecomment-1381210185
 extend-ignore = [
-    "E501",
-    "S101", # Use of `assert` detected
-    "B017", # `assertRaises(Exception)` should be considered evil TODO
-    "PGH004", # Use specific rule codes when using `noqa` TODO
-    "B905", # `zip()` without an explicit `strict=` parameter
-    "N802", # Function name should be lowercase
-    "N999",  # Invalid module name. We should revisit this in the future, TODO
-    "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar` TODO
-    "S310",  # Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.
-    "S603",  # `subprocess` call: check for execution of untrusted input
+  "E501",
+  "S101",   # Use of `assert` detected
+  "B017",   # `assertRaises(Exception)` should be considered evil TODO
+  "PGH004", # Use specific rule codes when using `noqa` TODO
+  "B905",   # `zip()` without an explicit `strict=` parameter
+  "N802",   # Function name should be lowercase
+  "N999",   # Invalid module name. We should revisit this in the future, TODO
+  "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar` TODO
+  "S310",   # Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.
+  "S603",   # `subprocess` call: check for execution of untrusted input
+  "ISC001", # ruff format asks to disable this feature
+  "S311",   # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]
-extend-exclude = ["docs", "build"]
-# Hardcode to Python 3.8.
-# Reminder to update mesa-examples if the value below is changed.
-target-version = "py38"
+# Ignore all docstring errors in examples and tutorials
+per-file-ignores = {"mesa/examples/*"= ["D"], "docs/tutorials/*" = ["D", "E", "F", "N"], "docs/conf.py"=["C", "D", "DTZ011", "E"]}
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
