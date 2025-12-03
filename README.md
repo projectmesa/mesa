@@ -18,7 +18,7 @@ Repast, or MASON.
 ![A screenshot of the WolfSheep Model in Mesa](https://raw.githubusercontent.com/projectmesa/mesa/main/docs/images/wolf_sheep.png)
 
 *Above: A Mesa implementation of the WolfSheep model, this
-can be displayed in browser windows or Jupyter.*
+can be displayed in browser windows or Jupyter. An online demo is [available here](https://py.cafe/app/EwoutH/mesa-solara-basic-examples).*
 
 ## Features
 
