@@ -18,6 +18,7 @@ from mesa.space import (
     PropertyLayer,
     SingleGrid,
 )
+from mesa.visualization.components import AgentPortrayalStyle
 from mesa.visualization.mpl_space_drawing import (
     draw_continuous_space,
     draw_hex_grid,
@@ -36,11 +37,11 @@ def agent_portrayal(agent):
         agent (Agent): The agent to portray
 
     """
-    return {
-        "s": 10,
-        "c": "tab:blue",
-        "marker": "s" if (agent.unique_id % 2) == 0 else "o",
-    }
+    return AgentPortrayalStyle(
+        size=10,
+        color="tab:blue",
+        marker="s" if (agent.unique_id % 2) == 0 else "o",
+    )
 
 
 def test_draw_space():
@@ -53,14 +54,14 @@ def test_draw_space():
             agent (Agent): The agent to portray
 
         """
-        return {
-            "s": 10,
-            "c": "tab:blue",
-            "marker": "s" if (agent.unique_id % 2) == 0 else "o",
-            "alpha": 0.5,
-            "linewidths": 1,
-            "linecolors": "tab:orange",
-        }
+        return AgentPortrayalStyle(
+            size=10,
+            color="tab:blue",
+            marker="s" if (agent.unique_id % 2) == 0 else "o",
+            alpha=0.5,
+            linewidths=1,
+            edgecolors="tab:orange",
+        )
 
     # draw space for hexgrid
     model = Model(seed=42)

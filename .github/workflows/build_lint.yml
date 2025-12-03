@@ -31,8 +31,10 @@ jobs:
       fail-fast: False
       matrix:
         os: [windows, ubuntu, macos]
-        python-version: ["3.13"]
+        python-version: ["3.14"]
         include:
+          - os: ubuntu
+            python-version: "3.13"
           - os: ubuntu
             python-version: "3.12"
           # Disabled for now. See https://github.com/projectmesa/mesa/issues/1253
