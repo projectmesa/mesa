@@ -113,7 +113,7 @@ class AltairBackend(AbstractRenderer):
                         "For more information, refer to the migration guide: "
                         "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
                     ),
-                    DeprecationWarning,
+                    FutureWarning,
                     stacklevel=2,
                 )
                 dict_data = portray_input.copy()
