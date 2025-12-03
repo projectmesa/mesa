@@ -37,8 +37,8 @@ def agent_portrayal(agent):
 
     """
     return {
-        "s": 10,
-        "c": "tab:blue",
+        "size": 10,
+        "color": "tab:blue",
         "marker": "s" if (agent.unique_id % 2) == 0 else "o",
     }
 
@@ -54,12 +54,12 @@ def test_draw_space():
 
         """
         return {
-            "s": 10,
-            "c": "tab:blue",
+            "size": 10,
+            "color": "tab:blue",
             "marker": "s" if (agent.unique_id % 2) == 0 else "o",
             "alpha": 0.5,
             "linewidths": 1,
-            "linecolors": "tab:orange",
+            "edgecolors": "tab:orange",
         }
 
     # draw space for hexgrid
