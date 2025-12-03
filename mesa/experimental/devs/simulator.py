@@ -69,7 +69,7 @@ class Simulator:
         """Simulator time (deprecated)."""
         warnings.warn(
             "simulator.time is deprecated, use model.time instead",
-            DeprecationWarning,
+            FutureWarning,
             stacklevel=2,
         )
         return self.model.time
