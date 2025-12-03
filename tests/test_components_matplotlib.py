@@ -223,7 +223,9 @@ def test_draw_property_layers():
     """Test drawing property layers."""
     model = Model(seed=42)
     grid = SingleGrid(10, 10, torus=True)
-    grid.add_property_layer(PropertyLayer("test", grid.width, grid.height, 0))
+    grid.add_property_layer(
+        PropertyLayer("test", grid.width, grid.height, 0, dtype=int)
+    )
 
     _, ax = plt.subplots()
     draw_property_layers(grid, {"test": {"colormap": "viridis", "colorbar": True}}, ax)
