@@ -22,7 +22,6 @@ from mesa.space import (
     SingleGrid,
 )
 from mesa.visualization.backends.abstract_renderer import AbstractRenderer
-from mesa.visualization.components import PropertyLayerStyle
 
 OrthogonalGrid = SingleGrid | MultiGrid | OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = HexSingleGrid | HexMultiGrid | mesa.discrete_space.HexGrid
