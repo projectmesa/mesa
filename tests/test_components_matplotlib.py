@@ -240,6 +240,9 @@ def test_draw_property_layers():
         PropertyLayer("test", grid.width, grid.height, 0, dtype=int)
     )
 
+    def propertylayer_portrayal(_):
+        return PropertyLayerStyle(colormap="viridis", colorbar=True)
+
     fig = Figure()
     ax = fig.add_subplot()
     draw_property_layers(grid, propertylayer_portrayal, ax)
