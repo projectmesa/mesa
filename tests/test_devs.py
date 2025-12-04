@@ -135,7 +135,9 @@ def test_simulator_time_deprecation():
     model = Model()
     simulator.setup(model)
 
-    with pytest.warns(DeprecationWarning, match="simulator.time is deprecated"):
+    # The runtime now emits a FutureWarning for this deprecation.
+    # Update test to match the current warning type.
+    with pytest.warns(FutureWarning, match="simulator.time is deprecated"):
         _ = simulator.time
 
 
