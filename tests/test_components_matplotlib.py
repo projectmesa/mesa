@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 from mesa import Agent, Model
+from mesa.visualization import AgentPortrayalStyle
 from mesa.discrete_space import (
     CellAgent,
     HexGrid,
@@ -30,17 +31,11 @@ from mesa.visualization.mpl_space_drawing import (
 
 
 def agent_portrayal(agent):
-    """Simple portrayal of an agent.
-
-    Args:
-        agent (Agent): The agent to portray
-
-    """
-    return {
-        "size": 10,
-        "color": "tab:blue",
-        "marker": "s" if (agent.unique_id % 2) == 0 else "o",
-    }
+    return AgentPortrayalStyle(
+        size=10,
+        color="tab:blue",
+        marker="s" if (agent.unique_id % 2) == 0 else "o",
+    )
 
 
 def test_draw_space():
@@ -53,14 +48,15 @@ def test_draw_space():
             agent (Agent): The agent to portray
 
         """
-        return {
-            "size": 10,
-            "color": "tab:blue",
-            "marker": "s" if (agent.unique_id % 2) == 0 else "o",
-            "alpha": 0.5,
-            "linewidths": 1,
-            "edgecolors": "tab:orange",
-        }
+        return AgentPortrayalStyle(
+            size=10,
+            color="tab:blue",
+            marker="s" if (agent.unique_id % 2) == 0 else "o",
+            alpha=0.5,
+            linewidths=1,
+            edgecolors="tab:orange",
+        )
+
 
     # draw space for hexgrid
     model = Model(seed=42)
