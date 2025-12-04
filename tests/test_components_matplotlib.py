@@ -4,7 +4,6 @@ import networkx as nx
 from matplotlib.figure import Figure
 
 from mesa import Agent, Model
-from mesa.visualization import AgentPortrayalStyle
 from mesa.discrete_space import (
     CellAgent,
     HexGrid,
@@ -63,7 +62,6 @@ def test_draw_space():
             linewidths=1,
             edgecolors="tab:orange",
         )
-
 
     # draw space for hexgrid
     model = Model(seed=42)
