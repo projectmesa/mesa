@@ -130,13 +130,11 @@ def test_abm_simulator():
 
 
 def test_simulator_time_deprecation():
-    """Test that simulator.time emits deprecation warning."""
+    """Test that simulator.time emits future warning."""
     simulator = DEVSimulator()
     model = Model()
     simulator.setup(model)
 
-    # The runtime now emits a FutureWarning for this deprecation.
-    # Update test to match the current warning type.
     with pytest.warns(FutureWarning, match="simulator.time is deprecated"):
         _ = simulator.time
 
