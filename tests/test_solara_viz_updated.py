@@ -9,8 +9,8 @@ import solara
 
 import mesa
 import mesa.visualization.backends
-from mesa.visualization.components import PropertyLayerStyle
 from mesa.space import MultiGrid, PropertyLayer
+from mesa.visualization.components import PropertyLayerStyle
 from mesa.visualization.solara_viz import (
     ModelCreator,
     Slider,
@@ -187,9 +187,10 @@ def test_call_space_drawer(mocker):
             colormap="pastel1",
             alpha=0.75,
             colorbar=True,
-            vmin=0,       
+            vmin=0,
             vmax=10,
         )
+
     solara.render(SolaraViz(model, renderer, components=[]))
 
     renderer = SpaceRenderer(model, backend="altair")
