@@ -423,9 +423,9 @@ def ComponentsView(
         for index in sorted_page_indices:
             solara.v.Tab(children=[f"Page {index}"])
 
-    with solara.v.TabsItems(v_model=current_tab_index):
+    with solara.v.Window(v_model=current_tab_index):
         for _, page_id in enumerate(sorted_page_indices):
-            with solara.v.TabItem():
+            with solara.v.WindowItem():
                 if page_id == current_tab_index:
                     page_components = pages[page_id]
                     page_layout = layouts.get(page_id)
