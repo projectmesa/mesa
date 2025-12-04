@@ -736,7 +736,7 @@ We're proud to release the first Mesa 3.0 beta! This pre-release announces that 
 In this beta, not so much has changed as in the alphas (we're stabilizing, that's a good sign), but there are still a few notable things:
 - Agents now have to be initialized without their `unique_id`. See [#2328](https://github.com/projectmesa/mesa/pull/2328) and the [Migration guide](https://mesa.readthedocs.io/latest/migration_guide.html#automatic-assignment-of-unique-id-to-agents).
 - PropertyLayers can now be visualized! See [#2336](https://github.com/projectmesa/mesa/pull/2336) for details and some examples, and [mesa-examples#214](https://github.com/projectmesa/mesa-examples/pull/214) as a simple example model.
-- We reduced the core dependencies of Mesa, so that's a lighter and simpler install. You can now use extras to install the dependencies, for example add `[viz]` to install all visualisation dependencies: `pip install -U --pre mesa[viz]`. See [#2265](https://github.com/projectmesa/mesa/pull/2265) for details.
+- We reduced the core dependencies of Mesa, so that's a lighter and simpler install. You can now use extras to install the dependencies, for example add `[viz]` to install all visualisation dependencies: `pip install -U --pre "mesa[viz]"`. See [#2265](https://github.com/projectmesa/mesa/pull/2265) for details.
 - The [Mesa Overview](https://mesa.readthedocs.io/latest/overview.html) as fully updated for 3.0. We highly recommend reading though it!
 - We made some more progress on the experimental Cell Space, adding movement and integrating the PropertyLayer. Among others, Agents have nu initial movement capabilities for grids. Development continues during the betas and
 

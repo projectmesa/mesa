@@ -1,7 +1,9 @@
 # We can't use slim because we need either git/wget/curl to
 # download mesa-examples, and so installing them requires
 # updating the system anyway.
-FROM python:bookworm
+FROM python:3.12-bookworm
+
+
 LABEL maintainer="projectmesa maintainers@projectmesa.dev"
 
 # To use this Dockerfile:
@@ -29,7 +31,7 @@ COPY . /opt/mesa
 
 EXPOSE 8765/tcp
 
-RUN pip3 install -e /opt/mesa[rec]
+RUN pip3 install -e '/opt/mesa[rec]'
 
 CMD ["sh", "-c", "cd $MODEL_DIR && solara run app.py --host=0.0.0.0"]
 

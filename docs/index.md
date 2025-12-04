@@ -44,13 +44,12 @@ pip install -U mesa
 ```
 To also install our recommended dependencies:
 ```bash
-pip install -U mesa[rec]
+pip install -U "mesa[rec]"
 ```
 
 The `[rec]` option installs additional recommended dependencies needed for visualization, plotting, and network modeling capabilities.
 
-On a Mac, this command might cause an error stating `zsh: no matches found: mesa[all]`.
-In that case, change the command to `pip install -U "mesa[rec]"`.
+Note: On macOS with zsh, the square brackets `[rec]` are interpreted as glob patterns by the shell. Always use quotes as shown in the command above to prevent shell expansion errors.
 
 Furthermore, if you are using `nix`, Mesa comes with a flake with devShells and a runnable app:
 
@@ -95,8 +94,22 @@ Our [CITATION.cff](https://github.com/projectmesa/mesa/blob/main/CITATION.cff) c
 The original Mesa conference paper from 2015 is [available here](http://conference.scipy.org.s3-website-us-east-1.amazonaws.com/proceedings/scipy2015/jacqueline_kazil.html).
 
 ```{toctree}
-:hidden: true
-:maxdepth: 7
+:maxdepth: 2
+:caption: Contents
+
+getting_started
+overview
+mesa
+examples
+best-practices
+mesa_extension
+migration_guide
+apis/api_main
+GSoC
+```
+   overview
+   tutorials/index
+
 
 Getting started <getting_started>
 Overview <overview>

@@ -24,7 +24,7 @@ If you would like to see an example of explicit meta-agent formation see the [wa
 This model requires Mesa's recommended install and scipy
 
 ```
-    $ pip install mesa[rec]
+    $ pip install "mesa[rec]"
 ```
 
 ## How to Run
