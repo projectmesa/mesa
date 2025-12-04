@@ -18,7 +18,7 @@ from mesa.space import (
     PropertyLayer,
     SingleGrid,
 )
-from mesa.visualization.components import AgentPortrayalStyle
+from mesa.visualization.components import AgentPortrayalStyle, PropertyLayerStyle
 from mesa.visualization.mpl_space_drawing import (
     draw_continuous_space,
     draw_hex_grid,
