@@ -276,7 +276,7 @@ class AltairBackend(AbstractRenderer):
         vmin = kwargs.pop("vmin", None)
         vmax = kwargs.pop("vmax", None)
 
-        color_is_numeric = np.issubdtype(df["original_color"].dtype, np.number)
+        color_is_numeric = pd.api.types.is_numeric_dtype(df["original_color"])
         if color_is_numeric:
             color_min = vmin if vmin is not None else df["original_color"].min()
             color_max = vmax if vmax is not None else df["original_color"].max()
