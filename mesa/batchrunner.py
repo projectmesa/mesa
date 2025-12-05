@@ -93,7 +93,7 @@ def batch_run(
         rng = [rng]
 
     # establish to use seed or rng as name for parameter
-    model_parameters = inspect.signature(Model).parameters
+    model_parameters = inspect.signature(model_cls).parameters
     rng_kwarg_name = "rng"
     if "seed" in model_parameters:
         rng_kwarg_name = "seed"
