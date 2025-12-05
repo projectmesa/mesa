@@ -72,11 +72,13 @@ class Simulator:
             raise ValueError("Events already scheduled. Call setup before scheduling.")
 
         self.model = model
+        model._simulator = self  # For backward compatibility
 
     def reset(self) -> None:
         """Reset the simulator."""
         self.event_list.clear()
         if self.model is not None:
+            self.model._simulator = None  # Clear backward compatibility reference
             self.model.time = self.start_time
             self.model = None
 

@@ -59,6 +59,9 @@ class Model:
         # Initialize scheduler for event management
         self._scheduler = Scheduler(self)
 
+        # For backward compatibility with simulator tests
+        self._simulator = None
+
         # Random number generator setup
         self._init_random(seed, rng)
 
@@ -124,7 +127,17 @@ class Model:
             else:
                 self._uses_legacy_step = False
         else:
-            self._uses_legacy_step = False
+            # Base Model.step() is being used - still use legacy mode for compatibility
+            # This allows Model().step() to work as expected in tests
+            self._uses_legacy_step = True
+            self._user_step = self.step
+
+            def wrapped_step(*args: Any, **kwargs: Any) -> None:
+                self.steps += 1
+                self.time += 1.0
+                self._user_step(*args, **kwargs)
+
+            self.step = wrapped_step
 
     # Event Scheduling API (delegates to Scheduler)
 
