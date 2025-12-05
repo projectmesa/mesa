@@ -290,4 +290,4 @@ class DEVSimulator(Simulator):
 
     def check_time_unit(self, time: int | float) -> bool:
         """Check whether the time is numeric."""
-        return isinstance(time, (int, float))
+        return isinstance(time, int | float)

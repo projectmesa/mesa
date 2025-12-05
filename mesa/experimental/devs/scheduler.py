@@ -131,8 +131,13 @@ class Scheduler:
         """
         end_time = self._determine_end_time(until, duration, steps, condition)
 
-        # Schedule initial step if step method exists and no events scheduled
-        if hasattr(self._model, "step") and self._event_list.is_empty():
+        # Check if model has a custom step method (not just base Model.step)
+        has_custom_step = (
+            hasattr(self._model, "_uses_legacy_step") and self._model._uses_legacy_step
+        )
+
+        # Schedule initial step if model uses step-based execution
+        if has_custom_step and self._event_list.is_empty():
             self._schedule_next_step()
 
         # Main simulation loop
@@ -164,12 +169,16 @@ class Scheduler:
 
             # Check if this is a step event
             fn = event.fn() if event.fn else None
-            is_step = fn == self._model.step if hasattr(self._model, "step") else False
+            is_step = (
+                fn == self._model._user_step
+                if hasattr(self._model, "_user_step")
+                else False
+            )
 
             event.execute()
 
             # Reschedule step for next tick if this was a step
-            if is_step:
+            if is_step and has_custom_step:
                 self._model.steps += 1
                 self._schedule_next_step()
 
@@ -196,11 +205,11 @@ class Scheduler:
 
     def _schedule_next_step(self) -> None:
         """Schedule the next step event."""
-        if hasattr(self._model, "step"):
+        if hasattr(self._model, "_user_step"):
             next_time = self._model.time + 1.0
             event = SimulationEvent(
                 next_time,
-                self._model.step,
+                self._model._user_step,
                 priority=Priority.HIGH,
             )
             self._event_list.add_event(event)
