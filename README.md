@@ -1,3 +1,5 @@
+<p align="center"><em>For GSoC, checkout our <a href="https://github.com/projectmesa/mesa/wiki/Google-Summer-of-Code-2026">Google Summer of Code 2026</a> guide</em></p>
+
 # Mesa: Agent-based modeling in Python
 
 |         | |
