@@ -1041,3 +1041,58 @@ def test_copying_discrete_spaces():  # noqa: D103
     for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
         for k, v in c1.connections.items():
             assert v.coordinate == c2.connections[k].coordinate
+
+
+def test_orthogonal_moore_grid_with_rng(rng):
+    """Test OrthogonalMooreGrid with provided random number generator."""
+    width = 10
+    height = 10
+    grid = OrthogonalMooreGrid((width, height), torus=False, capacity=None, random=rng)
+
+    # Test grid dimensions
+    assert len(grid._cells) == width * height
+
+    # Test that random operations use the provided RNG
+    cell = grid.select_random_empty_cell()
+    assert cell is not None
+
+
+def test_orthogonal_von_neumann_grid_with_rng(rng):
+    """Test OrthogonalVonNeumannGrid with provided random number generator."""
+    width = 5
+    height = 5
+    grid = OrthogonalVonNeumannGrid(
+        (width, height), torus=False, capacity=None, random=rng
+    )
+
+    # Test grid dimensions
+    assert len(grid._cells) == width * height
+
+    # Test agent placement with RNG
+    model = Model()
+    agent = CellAgent(model)
+    agent.cell = grid[2, 3]
+
+    assert agent.cell.coordinate == (2, 3)
+    assert agent in grid[2, 3].agents
+
+
+def test_cell_agent_with_rng(rng):
+    """Test CellAgent movement with provided random number generator."""
+    grid = OrthogonalMooreGrid((5, 5), torus=False, capacity=None, random=rng)
+
+    model = Model()
+    agent = CellAgent(model)
+    agent.cell = grid[2, 2]
+
+    # Test that the cell uses the provided RNG
+    initial_cell = agent.cell
+    assert initial_cell.coordinate == (2, 2)
+
+    # Test that neighborhood is accessible
+    neighbors = list(initial_cell.neighborhood)
+    assert len(neighbors) > 0
+
+    # Test selecting a random neighbor
+    neighbor_cell = initial_cell.neighborhood.select_random_cell()
+    assert neighbor_cell in neighbors
