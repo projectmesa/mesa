@@ -89,13 +89,19 @@ class SimulationEvent:
         self.time = time
         self.priority = priority.value
         self._canceled = False
+        self._is_strong_ref = False
 
+        # Use weak references for methods to prevent memory leaks,
+        # but strong references for lambdas/functions to prevent GC
         if isinstance(function, MethodType):
-            function = WeakMethod(function)
+            self.fn = WeakMethod(function)
         else:
-            function = ref(function)
+            # Check if it's a lambda or regular function
+            # For these, we need a strong reference to prevent GC
+            self._is_strong_ref = True
+            self._strong_fn = function  # Keep strong reference
+            self.fn = ref(function)  # Also keep weak ref for API compatibility
 
-        self.fn = function
         self.unique_id = next(self._ids)
         self.function_args = function_args if function_args else []
         self.function_kwargs = function_kwargs if function_kwargs else {}
@@ -103,7 +109,9 @@ class SimulationEvent:
     def execute(self):
         """Execute this event."""
         if not self._canceled:
-            fn = self.fn()
+            # Use strong reference if available, otherwise dereference weak ref
+            fn = self._strong_fn if self._is_strong_ref else self.fn()
+
             if fn is not None:
                 fn(*self.function_args, **self.function_kwargs)
 
@@ -111,6 +119,7 @@ class SimulationEvent:
         """Cancel this event."""
         self._canceled = True
         self.fn = None
+        self._strong_fn = None
         self.function_args = []
         self.function_kwargs = {}
 

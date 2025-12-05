@@ -3,149 +3,270 @@
 Core Objects: Model
 """
 
-# Mypy; for the `|` operator purpose
-# Remove this __future__ import once the oldest supported Python is 3.10
 from __future__ import annotations
 
 import random
 import sys
-from collections.abc import Sequence
-
-# mypy
+import warnings
+from collections.abc import Callable, Sequence
 from typing import Any
 
 import numpy as np
 
 from mesa.agent import Agent, AgentSet
-from mesa.experimental.devs import Simulator
-from mesa.mesa_logging import create_module_logger, method_logger
+from mesa.experimental.devs.eventlist import Priority, SimulationEvent
+from mesa.experimental.devs.scheduled import is_scheduled
+from mesa.experimental.devs.scheduler import Scheduler
 
 SeedLike = int | np.integer | Sequence[int] | np.random.SeedSequence
 RNGLike = np.random.Generator | np.random.BitGenerator
 
 
-_mesa_logger = create_module_logger()
-
-
 class Model:
     """Base class for models in the Mesa ABM library.
 
-    This class serves as a foundational structure for creating agent-based models.
-    It includes the basic attributes and methods necessary for initializing and
-    running a simulation model.
-
     Attributes:
         running: A boolean indicating if the model should continue running.
-        steps: the number of times `model.step()` has been called.
-        random: a seeded python.random number generator.
-        rng : a seeded numpy.random.Generator
-
-    Notes:
-        Model.agents returns the AgentSet containing all agents registered with the model. Changing
-        the content of the AgentSet directly can result in strange behavior. If you want change the
-        composition of this AgentSet, ensure you operate on a copy.
-
+        steps: The number of times `model.step()` has been called.
+        time: The current simulation time.
+        random: A seeded python.random number generator.
+        rng: A seeded numpy.random.Generator.
     """
 
-    @method_logger(__name__)
     def __init__(
         self,
         *args: Any,
         seed: float | None = None,
         rng: RNGLike | SeedLike | None = None,
-        step_duration: float = 1.0,
         **kwargs: Any,
     ) -> None:
         """Create a new model.
 
-        Overload this method with the actual code to initialize the model. Always start with super().__init__()
-        to initialize the model object properly.
-
         Args:
-            args: arguments to pass onto super
-            seed: the seed for the random number generator
-            rng : Pseudorandom number generator state. When `rng` is None, a new `numpy.random.Generator` is created
-                  using entropy from the operating system. Types other than `numpy.random.Generator` are passed to
-                  `numpy.random.default_rng` to instantiate a `Generator`.
-            step_duration: How much time advances each step (default 1.0)
-            kwargs: keyword arguments to pass onto super
+            args: Arguments to pass onto super.
+            seed: The seed for the random number generator.
+            rng: Pseudorandom number generator state.
+            kwargs: Keyword arguments to pass onto super.
 
         Notes:
-            you have to pass either seed or rng, but not both.
-
+            You have to pass either seed or rng, but not both.
         """
         super().__init__(*args, **kwargs)
         self.running: bool = True
         self.steps: int = 0
         self.time: float = 0.0
-        self._step_duration: float = step_duration
 
-        # Track if a simulator is controlling time
-        self._simulator: Simulator | None = None
+        # Initialize scheduler for event management
+        self._scheduler = Scheduler(self)
 
+        # For backward compatibility with simulator tests
+        self._simulator = None
+
+        # Random number generator setup
+        self._init_random(seed, rng)
+
+        # Agent registration data structures
+        self._agents = {}
+        self._agents_by_type: dict[type[Agent], AgentSet] = {}
+        self._all_agents = AgentSet([], random=self.random)
+
+        # Set up legacy step wrapper if step exists but isn't @scheduled
+        self._setup_step_handling()
+
+    def _init_random(self, seed: float | None, rng: RNGLike | SeedLike | None) -> None:
+        """Initialize random number generators."""
         if (seed is not None) and (rng is not None):
             raise ValueError("you have to pass either rng or seed, not both")
         elif seed is None:
             self.rng: np.random.Generator = np.random.default_rng(rng)
-            self._rng = (
-                self.rng.bit_generator.state
-            )  # this allows for reproducing the rng
-
+            self._rng = self.rng.bit_generator.state
             try:
                 self.random = random.Random(rng)
             except TypeError:
                 seed = int(self.rng.integers(np.iinfo(np.int32).max))
                 self.random = random.Random(seed)
-            self._seed = seed  # this allows for reproducing stdlib.random
-        elif rng is None:
+            self._seed = seed
+        else:
             self.random = random.Random(seed)
-            self._seed = seed  # this allows for reproducing stdlib.random
-
+            self._seed = seed
             try:
-                self.rng: np.random.Generator = np.random.default_rng(seed)
+                self.rng = np.random.default_rng(seed)
             except TypeError:
                 rng = self.random.randint(0, sys.maxsize)
-                self.rng: np.random.Generator = np.random.default_rng(rng)
+                self.rng = np.random.default_rng(rng)
             self._rng = self.rng.bit_generator.state
 
-        # Wrap the user-defined step method
-        self._user_step = self.step
-        self.step = self._wrapped_step
+    def _setup_step_handling(self) -> None:
+        """Set up step method handling based on whether @scheduled is used."""
+        # Check if subclass has overridden step
+        step_method = getattr(self.__class__, "step", None)
+        base_step = getattr(Model, "step", None)
 
-        # setup agent registration data structures
-        self._agents = {}  # the hard references to all agents in the model
-        self._agents_by_type: dict[
-            type[Agent], AgentSet
-        ] = {}  # a dict with an agentset for each class of agents
-        self._all_agents = AgentSet(
-            [], random=self.random
-        )  # an agenset with all agents
+        # If step is overridden and NOT decorated with @scheduled, use legacy mode
+        if step_method is not None and step_method is not base_step:
+            if not is_scheduled(step_method):
+                # Legacy mode: wrap step to auto-increment time/steps
+                self._user_step = self.step
+                self._uses_legacy_step = True
 
-    def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
-        """Automatically increments time and steps after calling the user's step method."""
-        # Automatically increment time and step counters
-        self.steps += 1
-        # Only auto-increment time if no simulator is controlling it
-        if self._simulator is None:
-            self.time += self._step_duration
+                def wrapped_step(*args: Any, **kwargs: Any) -> None:
+                    self.steps += 1
+                    self.time += 1.0
+                    self._user_step(*args, **kwargs)
 
-        _mesa_logger.info(
-            f"calling model.step for step {self.steps} at time {self.time}"
+                self.step = wrapped_step
+
+                warnings.warn(
+                    "Defining step() without @scheduled decorator is deprecated. "
+                    "Add @scheduled decorator to your step method, or use "
+                    "model.run() with explicit scheduling. "
+                    "See the migration guide for details.",
+                    PendingDeprecationWarning,
+                    stacklevel=3,
+                )
+            else:
+                self._uses_legacy_step = False
+        else:
+            # Base Model.step() - wrap it for direct calls, but mark as not using legacy
+            # This allows Model().step() to work in tests while still using event-driven run()
+            self._uses_legacy_step = False
+            self._user_step = self.step
+
+            def wrapped_step(*args: Any, **kwargs: Any) -> None:
+                self.steps += 1
+                self.time += 1.0
+                self._user_step(*args, **kwargs)
+
+            self.step = wrapped_step
+
+    # Event Scheduling API (delegates to Scheduler)
+
+    def schedule(
+        self,
+        callback: Callable,
+        *,
+        at: float | None = None,
+        after: float | None = None,
+        priority: Priority = Priority.DEFAULT,
+        args: list[Any] | None = None,
+        kwargs: dict[str, Any] | None = None,
+    ) -> SimulationEvent:
+        """Schedule an event to be executed at a specific time.
+
+        Args:
+            callback: The callable to execute for this event.
+            at: Absolute time at which to execute the event.
+            after: Time delta from now at which to execute the event.
+            priority: Priority level for simultaneous events.
+            args: Positional arguments for the callback.
+            kwargs: Keyword arguments for the callback.
+
+        Returns:
+            SimulationEvent: The scheduled event (can be used to cancel).
+
+        Examples:
+            model.schedule(callback, at=50.0)
+            model.schedule(callback, after=10.0)
+            model.schedule(callback, at=50.0, priority=Priority.HIGH)
+        """
+        return self._scheduler.schedule(
+            callback, at=at, after=after, priority=priority, args=args, kwargs=kwargs
         )
-        # Call the original user-defined step method
-        self._user_step(*args, **kwargs)
+
+    def cancel(self, event: SimulationEvent) -> None:
+        """Cancel a scheduled event.
+
+        Args:
+            event: The event to cancel.
+        """
+        self._scheduler.cancel(event)
+
+    # Running API (delegates to Scheduler)
+
+    def run(
+        self,
+        *,
+        until: float | None = None,
+        duration: float | None = None,
+        steps: int | None = None,
+        condition: Callable[[Model], bool] | None = None,
+    ) -> None:
+        """Run the model.
+
+        Args:
+            until: Run until simulation time reaches this value.
+            duration: Run for this many time units from current time.
+            steps: Run for this many steps (each step = 1.0 time units).
+            condition: Run while this condition returns True.
+
+        Examples:
+            model.run(until=100)
+            model.run(duration=50)
+            model.run(steps=100)
+            model.run(condition=lambda m: m.running)
+        """
+        # For legacy models, use simple loop
+        if self._uses_legacy_step:
+            if steps is not None:
+                for _ in range(steps):
+                    if not self.running:
+                        break
+                    if condition is not None and not condition(self):
+                        break
+                    self.step()
+            elif until is not None:
+                while self.time < until and self.running:
+                    if condition is not None and not condition(self):
+                        break
+                    self.step()
+            elif duration is not None:
+                end_time = self.time + duration
+                while self.time < end_time and self.running:
+                    if condition is not None and not condition(self):
+                        break
+                    self.step()
+            elif condition is not None:
+                while self.running and condition(self):
+                    self.step()
+            else:
+                raise ValueError(
+                    "Specify at least one of: 'until', 'duration', 'steps', or 'condition'"
+                )
+        else:
+            # New event-driven mode
+            self._scheduler.run(
+                until=until, duration=duration, steps=steps, condition=condition
+            )
+
+    def step(self) -> None:
+        """A single step of the model. Override this in subclasses."""
+
+    def run_model(self) -> None:
+        """Run the model until running is False.
+
+        Deprecated:
+            Use model.run(condition=lambda m: m.running) instead.
+        """
+        warnings.warn(
+            "run_model() is deprecated. Use model.run(condition=lambda m: m.running) instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        self.run(condition=lambda m: m.running)
+
+    # Agent Management
 
     @property
     def agents(self) -> AgentSet:
-        """Provides an AgentSet of all agents in the model, combining agents from all types."""
+        """Provides an AgentSet of all agents in the model."""
         return self._all_agents
 
     @agents.setter
     def agents(self, agents: Any) -> None:
         raise AttributeError(
-            "You are trying to set model.agents. In Mesa 3.0 and higher, this attribute is "
-            "used by Mesa itself, so you cannot use it directly anymore."
-            "Please adjust your code to use a different attribute name for custom agent storage."
+            "You are trying to set model.agents. In Mesa 3.0 and higher, "
+            "this attribute is used by Mesa itself, so you cannot use it "
+            "directly anymore. Please use a different attribute name."
         )
 
     @property
@@ -155,94 +276,39 @@ class Model:
 
     @property
     def agents_by_type(self) -> dict[type[Agent], AgentSet]:
-        """A dictionary where the keys are agent types and the values are the corresponding AgentSets."""
+        """A dictionary where keys are agent types and values are AgentSets."""
         return self._agents_by_type
 
-    def register_agent(self, agent):
-        """Register the agent with the model.
-
-        Args:
-            agent: The agent to register.
-
-        Notes:
-            This method is called automatically by ``Agent.__init__``, so there
-            is no need to use this if you are subclassing Agent and calling its
-            super in the ``__init__`` method.
-        """
+    def register_agent(self, agent: Agent) -> None:
+        """Register the agent with the model."""
         self._agents[agent] = None
-
-        # because AgentSet requires model, we cannot use defaultdict
-        # tricks with a function won't work because model then cannot be pickled
         try:
             self._agents_by_type[type(agent)].add(agent)
         except KeyError:
-            self._agents_by_type[type(agent)] = AgentSet(
-                [
-                    agent,
-                ],
-                random=self.random,
-            )
-
+            self._agents_by_type[type(agent)] = AgentSet([agent], random=self.random)
         self._all_agents.add(agent)
-        _mesa_logger.debug(
-            f"registered {agent.__class__.__name__} with agent_id {agent.unique_id}"
-        )
 
-    def deregister_agent(self, agent):
-        """Deregister the agent with the model.
-
-        Args:
-            agent: The agent to deregister.
-
-        Notes:
-            This method is called automatically by ``Agent.remove``
-
-        """
+    def deregister_agent(self, agent: Agent) -> None:
+        """Deregister the agent with the model."""
         del self._agents[agent]
         self._agents_by_type[type(agent)].remove(agent)
         self._all_agents.remove(agent)
-        _mesa_logger.debug(f"deregistered agent with agent_id {agent.unique_id}")
 
-    def run_model(self) -> None:
-        """Run the model until the end condition is reached.
+    def remove_all_agents(self) -> None:
+        """Remove all agents from the model."""
+        for agent in list(self._agents.keys()):
+            agent.remove()
 
-        Overload as needed.
-        """
-        while self.running:
-            self.step()
-
-    def step(self) -> None:
-        """A single step. Fill in here."""
+    # Random Number Generator Management
 
     def reset_randomizer(self, seed: int | None = None) -> None:
-        """Reset the model random number generator.
-
-        Args:
-            seed: A new seed for the RNG; if None, reset using the current seed
-        """
+        """Reset the model random number generator."""
         if seed is None:
             seed = self._seed
         self.random.seed(seed)
         self._seed = seed
 
     def reset_rng(self, rng: RNGLike | SeedLike | None = None) -> None:
-        """Reset the model random number generator.
-
-        Args:
-            rng: A new seed for the RNG; if None, reset using the current seed
-        """
+        """Reset the numpy random number generator."""
         self.rng = np.random.default_rng(rng)
         self._rng = self.rng.bit_generator.state
-
-    def remove_all_agents(self):
-        """Remove all agents from the model.
-
-        Notes:
-            This method calls agent.remove for all agents in the model. If you need to remove agents from
-            e.g., a SingleGrid, you can either explicitly implement your own agent.remove method or clean this up
-            near where you are calling this method.
-
-        """
-        # we need to wrap keys in a list to avoid a RunTimeError: dictionary changed size during iteration
-        for agent in list(self._agents.keys()):
-            agent.remove()
