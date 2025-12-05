@@ -205,8 +205,26 @@ class Model:
             model.run(steps=100)
             model.run(condition=lambda m: m.running)
         """
-        # For legacy models, use simple loop
-        if self._uses_legacy_step:
+        # Validate arguments
+        if until is None and duration is None and steps is None and condition is None:
+            raise ValueError(
+                "Specify at least one of: 'until', 'duration', 'steps', or 'condition'"
+            )
+
+        # If we have scheduled events, use the scheduler
+        if not self._scheduler.is_empty:
+            self._scheduler.run(
+                until=until, duration=duration, steps=steps, condition=condition
+            )
+            return
+
+        # No events - check if we have a step() method to call
+        has_real_step = (
+            hasattr(self.__class__, "step") and self.__class__.step is not Model.step
+        )
+
+        if self._uses_legacy_step and has_real_step:
+            # Legacy mode with step(): use simple loops
             if steps is not None:
                 for _ in range(steps):
                     if not self.running:
@@ -228,15 +246,15 @@ class Model:
             elif condition is not None:
                 while self.running and condition(self):
                     self.step()
-            else:
-                raise ValueError(
-                    "Specify at least one of: 'until', 'duration', 'steps', or 'condition'"
-                )
         else:
-            # New event-driven mode
-            self._scheduler.run(
-                until=until, duration=duration, steps=steps, condition=condition
-            )
+            # No step() or event-driven mode: just advance time
+            if until is not None:
+                self.time = until
+            elif duration is not None:
+                self.time += duration
+            elif steps is not None:
+                self.time += steps
+            # For condition-only with no step, do nothing
 
     def step(self) -> None:
         """A single step of the model. Override this in subclasses."""
