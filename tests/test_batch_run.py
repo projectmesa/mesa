@@ -86,6 +86,7 @@ class MockModel(Model):
         fixed_model_param=None,
         enable_agent_reporters=True,
         n_agents=3,
+        seed=None,
         **kwargs,
     ):
         """Initialize a MockModel.
@@ -98,7 +99,7 @@ class MockModel(Model):
             n_agents: number of agents
             kwargs: keyword arguments
         """
-        super().__init__()
+        super().__init__(seed=seed, **kwargs)
         self.variable_model_param = variable_model_param
         self.variable_agent_param = variable_agent_param
         self.fixed_model_param = fixed_model_param
@@ -276,8 +277,8 @@ def test_batch_run_with_params():  # noqa: D103
     mesa.batch_run(
         MockModel,
         {
-            "variable_model_params": range(3),
-            "variable_agent_params": ["H", "E", "Y"],
+            "variable_model_param": range(3),
+            "variable_agent_param": range(3),
         },
         number_processes=2,
     )
@@ -309,7 +310,7 @@ def test_batch_run_unhashable_param():  # noqa: D103
         MockModel,
         {
             "n_agents": 2,
-            "variable_model_params": [{"key": "value"}],
+            "variable_model_param": [{"key": "value"}],
         },
         iterations=2,
     )
@@ -318,7 +319,7 @@ def test_batch_run_unhashable_param():  # noqa: D103
         "reported_model_param": 42,
         "agent_local": 250.0,
         "n_agents": 2,
-        "variable_model_params": {"key": "value"},
+        "variable_model_param": {"key": "value"},
         "seed": None,
     }
 
