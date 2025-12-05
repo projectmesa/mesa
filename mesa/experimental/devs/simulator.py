@@ -21,11 +21,6 @@ if TYPE_CHECKING:
     from mesa import Model
 
 
-def _get_event_list(model: Model) -> EventList:
-    """Get the event list from a model's scheduler."""
-    return model._scheduler._event_list
-
-
 class Simulator:
     """Legacy simulator base class.
 
@@ -49,7 +44,6 @@ class Simulator:
         self.start_time = start_time
         self.time_unit = time_unit
         self.model: Model | None = None
-        # Keep local event list for backward compatibility
         self._local_event_list = EventList()
 
     @property
@@ -66,7 +60,7 @@ class Simulator:
     def event_list(self) -> EventList:
         """Return the model's event list or local one if no model."""
         if self.model:
-            return _get_event_list(self.model)
+            return self.model._scheduler._event_list
         return self._local_event_list
 
     def check_time_unit(self, time: int | float) -> bool:
@@ -83,14 +77,11 @@ class Simulator:
             raise ValueError(
                 f"Model time ({model.time}) does not match simulator start_time ({self.start_time})."
             )
+
+        if not self._local_event_list.is_empty():
+            raise ValueError("Events already scheduled. Call setup before scheduling.")
+
         self.model = model
-        # Transfer any pre-scheduled events
-        while not self._local_event_list.is_empty():
-            try:
-                event = self._local_event_list.pop_event()
-                _get_event_list(model).add_event(event)
-            except IndexError:
-                break
 
     def reset(self) -> None:
         """Reset the simulator."""
@@ -131,7 +122,7 @@ class Simulator:
                 "Simulator not set up. Call simulator.setup(model) first."
             )
 
-        event_list = _get_event_list(self.model)
+        event_list = self.model._scheduler._event_list
         if event_list.is_empty():
             return
 
@@ -238,13 +229,6 @@ class ABMSimulator(Simulator):
         if isinstance(time, float):
             return time.is_integer()
         return False
-
-    def setup(self, model: Model) -> None:
-        """Set up the simulator with automatic step scheduling."""
-        super().setup(model)
-        # Schedule first step with high priority
-        if hasattr(model, "step"):
-            model.schedule(model.step, after=1.0, priority=Priority.HIGH)
 
     def schedule_event_next_tick(
         self,

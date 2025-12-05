@@ -1,7 +1,7 @@
 """Event scheduling and model execution.
 
 This module provides the Scheduler class which handles event scheduling
-and model execution. It is used internally by Model via composition.
+and model execution, and the @scheduled decorator for marking recurring methods.
 """
 
 from __future__ import annotations
@@ -9,10 +9,68 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-from . import EventList, Priority, SimulationEvent
+from .eventlist import EventList, Priority, SimulationEvent
 
 if TYPE_CHECKING:
     from mesa import Model
+
+
+# Attribute name used to mark scheduled methods
+_SCHEDULED_ATTR = "_mesa_scheduled_interval"
+
+
+def scheduled(interval: float = 1.0):
+    """Decorator to mark a method as scheduled for recurring execution.
+
+    Args:
+        interval: Time interval between executions (default: 1.0).
+
+    Returns:
+        Decorated method with scheduling metadata.
+
+    Examples:
+        class MyModel(Model):
+            @scheduled()  # Called every 1.0 time units
+            def step(self):
+                self.agents.shuffle_do("step")
+
+            @scheduled(interval=7.0)  # Called every 7.0 time units
+            def weekly_update(self):
+                self.collect_stats()
+
+            @scheduled(interval=0.1)  # Called every 0.1 time units
+            def fast_process(self):
+                self.update_physics()
+    """
+
+    def decorator(method: Callable) -> Callable:
+        setattr(method, _SCHEDULED_ATTR, interval)
+        return method
+
+    return decorator
+
+
+def get_scheduled_methods(obj: object) -> dict[str, float]:
+    """Find all methods decorated with @scheduled on an object.
+
+    Args:
+        obj: Object to inspect for scheduled methods.
+
+    Returns:
+        Dictionary mapping method names to their intervals.
+    """
+    scheduled_methods = {}
+    for name in dir(obj):
+        if name.startswith("_"):
+            continue
+        try:
+            method = getattr(obj, name)
+            if callable(method) and hasattr(method, _SCHEDULED_ATTR):
+                interval = getattr(method, _SCHEDULED_ATTR)
+                scheduled_methods[name] = interval
+        except AttributeError:
+            continue
+    return scheduled_methods
 
 
 class Scheduler:
@@ -33,6 +91,51 @@ class Scheduler:
         """
         self._model = model
         self._event_list = EventList()
+        self._recurring_events: dict[str, SimulationEvent] = {}
+
+    def start_recurring(
+        self, scheduled_methods: dict[str, float] | None = None
+    ) -> None:
+        """Start all recurring methods.
+
+        Args:
+            scheduled_methods: Dictionary mapping method names to intervals.
+                If None, scans the model for @scheduled decorated methods.
+        """
+        if scheduled_methods is None:
+            scheduled_methods = get_scheduled_methods(self._model)
+
+        for method_name, interval in scheduled_methods.items():
+            method = getattr(self._model, method_name)
+            self._schedule_recurring(method_name, method, interval)
+
+    def _schedule_recurring(self, name: str, method: Callable, interval: float) -> None:
+        """Schedule a recurring method execution.
+
+        Args:
+            name: Name of the method (for tracking).
+            method: The method to call.
+            interval: Time interval between calls.
+        """
+
+        # Create a wrapper that reschedules after execution
+        def recurring_wrapper():
+            method()
+            # Reschedule for next interval
+            next_time = self._model.time + interval
+            event = SimulationEvent(
+                next_time, recurring_wrapper, priority=Priority.DEFAULT
+            )
+            self._event_list.add_event(event)
+            self._recurring_events[name] = event
+
+        # Schedule first execution
+        first_time = self._model.time + interval
+        event = SimulationEvent(
+            first_time, recurring_wrapper, priority=Priority.DEFAULT
+        )
+        self._event_list.add_event(event)
+        self._recurring_events[name] = event
 
     # -------------------------------------------------------------------------
     # Event Scheduling
@@ -63,11 +166,6 @@ class Scheduler:
 
         Raises:
             ValueError: If neither `at` nor `after` is specified, or both are.
-
-        Examples:
-            model.schedule(callback, at=50.0)
-            model.schedule(callback, after=10.0)
-            model.schedule(callback, at=50.0, priority=Priority.HIGH)
         """
         if (at is None) == (after is None):
             raise ValueError("Specify exactly one of 'at' or 'after'")
@@ -117,23 +215,13 @@ class Scheduler:
         Args:
             until: Run until simulation time reaches this value.
             duration: Run for this many time units from current time.
-            steps: Run for this many steps (each step = 1.0 time units).
+            steps: Run for this many steps (calls to step method, if exists).
             condition: Run while this condition returns True.
 
         Raises:
             ValueError: If no termination criterion is specified.
-
-        Examples:
-            model.run(until=100)
-            model.run(duration=50)
-            model.run(steps=100)
-            model.run(condition=lambda m: m.running)
         """
         end_time = self._determine_end_time(until, duration, steps, condition)
-
-        # Schedule initial step if step method exists and no events scheduled
-        if hasattr(self._model, "step") and self._event_list.is_empty():
-            self._schedule_next_step()
 
         # Main simulation loop
         while self._model.running:
@@ -161,17 +249,7 @@ class Scheduler:
             # Execute the event
             event = self._event_list.pop_event()
             self._model.time = event.time
-
-            # Check if this is a step event
-            fn = event.fn() if event.fn else None
-            is_step = fn == self._model.step if hasattr(self._model, "step") else False
-
             event.execute()
-
-            # Reschedule step for next tick if this was a step
-            if is_step:
-                self._model.steps += 1
-                self._schedule_next_step()
 
     def _determine_end_time(
         self,
@@ -186,6 +264,8 @@ class Scheduler:
         elif duration is not None:
             return self._model.time + duration
         elif steps is not None:
+            # For backward compat: steps means number of step() calls
+            # Each step is at interval 1.0 by default
             return self._model.time + steps
         elif condition is not None:
             return float("inf")
@@ -194,20 +274,10 @@ class Scheduler:
                 "Specify at least one of: 'until', 'duration', 'steps', or 'condition'"
             )
 
-    def _schedule_next_step(self) -> None:
-        """Schedule the next step event."""
-        if hasattr(self._model, "step"):
-            next_time = self._model.time + 1.0
-            event = SimulationEvent(
-                next_time,
-                self._model.step,
-                priority=Priority.HIGH,
-            )
-            self._event_list.add_event(event)
-
     def clear(self) -> None:
         """Clear all scheduled events."""
         self._event_list.clear()
+        self._recurring_events.clear()
 
     @property
     def is_empty(self) -> bool:
