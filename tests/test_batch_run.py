@@ -97,6 +97,7 @@ class MockModel(Model):
             fixed_model_param: fixed model parameters
             enable_agent_reporters: whether to enable agent reporters
             n_agents: number of agents
+            seed : random seed
             kwargs: keyword arguments
         """
         super().__init__(seed=seed, **kwargs)
