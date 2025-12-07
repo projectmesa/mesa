@@ -33,9 +33,9 @@ Mesa includes these bundled icons:
 
 | Icon Name | Description |
 |-----------|-------------|
-| `smiley` | Happy face 😊 |
-| `sad_face` | Sad face 😢 |
-| `neutral_face` | Neutral face 😐 |
+| `smiley` | Happy face  |
+| `sad_face` | Sad face  |
+| `neutral_face` | Neutral face  |
 
 ### 3. Listing Available Icons
 
