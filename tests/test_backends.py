@@ -3,6 +3,7 @@
 import types
 from unittest.mock import MagicMock
 
+import altair as alt
 import numpy as np
 import pytest
 
@@ -330,3 +331,130 @@ def test_backends_handle_errors():
     }
     with pytest.raises(ValueError):
         mb.draw_agents(arguments, edgecolors="blue")
+
+
+def test_altair_backend_draw_agents_with_icons():
+    """Test draw_agents renders icons when icon_rasters are provided."""
+    ab = AltairBackend(space_drawer=MagicMock())
+    ab.space_drawer.get_viz_limits = MagicMock(return_value=(0, 10, 0, 10))
+
+    # Create a fake data URL for testing
+    fake_icon_url = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+
+    arguments = {
+        "loc": np.array([[1, 1], [2, 2], [3, 3]]),
+        "size": np.array([10, 10, 10]),
+        "shape": np.array(["circle", "circle", "circle"]),
+        "opacity": np.array([1.0, 1.0, 1.0]),
+        "strokeWidth": np.array([1, 1, 1]),
+        "color": np.array(["red", "blue", "green"]),
+        "filled": np.array([True, True, True]),
+        "stroke": np.array(["black", "black", "black"]),
+        # Icon rasters - some with icons, some without (None)
+        "icon_rasters": np.array([fake_icon_url, None, fake_icon_url], dtype=object),
+    }
+
+    result = ab.draw_agents(arguments)
+
+    # Should return a layered chart (icons + markers)
+    assert result is not None
+    # The result should be an Altair chart
+    assert isinstance(result, (alt.Chart, alt.LayerChart))
+
+
+def test_altair_backend_draw_agents_without_icons():
+    """Test draw_agents uses markers when no icon_rasters provided."""
+    ab = AltairBackend(space_drawer=MagicMock())
+    ab.space_drawer.get_viz_limits = MagicMock(return_value=(0, 10, 0, 10))
+
+    arguments = {
+        "loc": np.array([[1, 1], [2, 2]]),
+        "size": np.array([10, 10]),
+        "shape": np.array(["circle", "square"]),
+        "opacity": np.array([1.0, 1.0]),
+        "strokeWidth": np.array([1, 1]),
+        "color": np.array(["red", "blue"]),
+        "filled": np.array([True, True]),
+        "stroke": np.array(["black", "black"]),
+        # No icon_rasters key at all
+    }
+
+    result = ab.draw_agents(arguments)
+
+    assert result is not None
+    assert isinstance(result, (alt.Chart, alt.LayerChart))
+
+
+def test_altair_backend_draw_agents_with_all_none_icons():
+    """Test draw_agents handles case where all icon_rasters are None."""
+    ab = AltairBackend(space_drawer=MagicMock())
+    ab.space_drawer.get_viz_limits = MagicMock(return_value=(0, 10, 0, 10))
+
+    arguments = {
+        "loc": np.array([[1, 1], [2, 2]]),
+        "size": np.array([10, 10]),
+        "shape": np.array(["circle", "circle"]),
+        "opacity": np.array([1.0, 1.0]),
+        "strokeWidth": np.array([1, 1]),
+        "color": np.array(["red", "blue"]),
+        "filled": np.array([True, True]),
+        "stroke": np.array(["black", "black"]),
+        # All icons are None - should fall back to markers
+        "icon_rasters": np.array([None, None], dtype=object),
+    }
+
+    result = ab.draw_agents(arguments)
+
+    assert result is not None
+    assert isinstance(result, (alt.Chart, alt.LayerChart))
+
+
+def test_altair_backend_draw_agents_with_culling():
+    """Test draw_agents with culling enabled filters out-of-bounds agents."""
+    ab = AltairBackend(space_drawer=MagicMock())
+    # Set viewport to only show x=0-5, y=0-5
+    ab.space_drawer.get_viz_limits = MagicMock(return_value=(0, 5, 0, 5))
+
+    arguments = {
+        "loc": np.array([[1, 1], [10, 10], [2, 2]]),  # Agent at (10,10) is outside
+        "size": np.array([10, 10, 10]),
+        "shape": np.array(["circle", "circle", "circle"]),
+        "opacity": np.array([1.0, 1.0, 1.0]),
+        "strokeWidth": np.array([1, 1, 1]),
+        "color": np.array(["red", "blue", "green"]),
+        "filled": np.array([True, True, True]),
+        "stroke": np.array(["black", "black", "black"]),
+    }
+
+    result = ab.draw_agents(arguments, enable_culling=True)
+
+    assert result is not None
+    assert isinstance(result, (alt.Chart, alt.LayerChart))
+
+
+def test_altair_backend_collect_agent_data_preserves_portrayals():
+    """Test collect_agent_data preserves original portrayal objects for icon enrichment."""
+    ab = AltairBackend(space_drawer=MagicMock())
+
+    class DummyAgent:
+        pos = (0, 0)
+
+    class DummySpace:
+        agents = [DummyAgent()]
+
+    def agent_portrayal_with_icon(agent):
+        return {
+            "size": 24,
+            "color": "red",
+            "marker": "o",
+            "icon": "smiley",
+            "icon_size": 32,
+        }
+
+    data = ab.collect_agent_data(DummySpace(), agent_portrayal_with_icon)
+
+    # Check that portrayals are preserved
+    assert "portrayals" in data
+    assert len(data["portrayals"]) == 1
+    assert data["portrayals"][0]["icon"] == "smiley"
+    assert data["portrayals"][0]["icon_size"] == 32

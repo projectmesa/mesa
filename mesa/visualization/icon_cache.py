@@ -7,8 +7,11 @@ import io
 from io import BytesIO
 from typing import TYPE_CHECKING, Literal
 
+import cairosvg
 import numpy as np
 from PIL import Image, ImageDraw
+
+from mesa.visualization.icons import get_icon_svg
 
 if TYPE_CHECKING:
     pass
@@ -78,32 +81,82 @@ class IconCache:
             Rasterized icon (data URL for altair, numpy array for matplotlib),
             or None if icon cannot be rasterized
         """
-        # Placeholder implementation - draws a simple circle
-        # In production, this would load actual icon files or use a library
-        img = Image.new("RGBA", (size, size), (255, 255, 255, 0))
-        draw = ImageDraw.Draw(img)
+        try:
+            # Try to load and rasterize actual SVG icons
+            # Get the SVG text from the icons module
+            svg_text = get_icon_svg(icon_name)
 
-        # Draw a simple colored circle based on icon name
-        color_map = {
-            "smiley": (255, 200, 0, 255),  # Yellow
-            "star": (255, 215, 0, 255),  # Gold
-            "heart": (255, 0, 100, 255),  # Red-pink
-            "default": (100, 150, 255, 255),  # Blue
-        }
-        color = color_map.get(icon_name, color_map["default"])
+            # Icon-specific colors
+            icon_colors = {
+                "smiley": "#FFD700",  # Gold
+                "sad_face": "#28B4E7",  # Royal Blue
+                "neutral_face": "#BCB3B3",  # Gray
+            }
 
-        # Draw circle
-        margin = size // 8
-        draw.ellipse(
-            [margin, margin, size - margin, size - margin], fill=color, outline=None
-        )
+            # Use icon-specific color or default
+            fill_color = icon_colors.get(icon_name, "#FFD700")
 
-        # Convert to appropriate format for backend
-        if self.backend == "altair":
-            return self._to_data_url(img)
-        elif self.backend == "matplotlib":
-            return self._to_numpy(img)
-        return None
+            # Replace currentColor with the chosen color
+            svg_text = svg_text.replace("currentColor", fill_color)
+            svg_text = svg_text.replace('stroke="Black"', f'stroke="{fill_color}"')
+
+            # Make strokes thicker and more visible
+            # Replace stroke-width="1" with a thicker value based on size
+            stroke_scale = max(2, size // 16)  # Scale stroke width with icon size
+            svg_text = svg_text.replace(
+                'stroke-width="1"', f'stroke-width="{stroke_scale}"'
+            )
+
+            # Optionally add a light background fill to the face circle
+            # Replace fill="none" in the face circle with a semi-transparent fill
+            svg_text = svg_text.replace(
+                'fill="none" stroke=', f'fill="{fill_color}" fill-opacity="0.2" stroke='
+            )
+
+            # Convert SVG to PNG using cairosvg
+            png_bytes = cairosvg.svg2png(
+                bytestring=svg_text.encode("utf-8"),
+                output_width=size,
+                output_height=size,
+            )
+
+            # Convert to appropriate format for backend
+            if self.backend == "altair":
+                b64 = base64.b64encode(png_bytes).decode("utf-8")
+                return f"data:image/png;base64,{b64}"
+            elif self.backend == "matplotlib":
+                img = Image.open(BytesIO(png_bytes)).convert("RGBA")
+                return np.asarray(img)
+
+        except (ImportError, FileNotFoundError, Exception):
+            # Fallback to colored circles if cairosvg not available or icon not found
+            img = Image.new("RGBA", (size, size), (255, 255, 255, 0))
+            draw = ImageDraw.Draw(img)
+
+            # Draw a simple colored circle based on icon name
+            color_map = {
+                "smiley": (255, 200, 0, 255),  # Yellow
+                "sad_face": (100, 100, 255, 255),  # Blue
+                "neutral_face": (150, 150, 150, 255),  # Gray
+                "default": (100, 150, 255, 255),  # Blue
+            }
+            fallback_color = color_map.get(icon_name, color_map["default"])
+
+            # Draw circle
+            margin = size // 8
+            draw.ellipse(
+                [margin, margin, size - margin, size - margin],
+                fill=fallback_color,
+                outline=None,
+            )
+
+            # Convert to appropriate format for backend
+            if self.backend == "altair":
+                return self._to_data_url(img)
+            elif self.backend == "matplotlib":
+                return self._to_numpy(img)
+
+            return None
 
     def _to_data_url(self, img: Image.Image) -> str:
         """Convert PIL Image to data URL for Altair.

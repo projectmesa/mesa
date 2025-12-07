@@ -168,7 +168,6 @@ def build_altair_agent_chart(
         width=chart_width,
         height=chart_height,
     )
-
     return chart
 
 
@@ -241,5 +240,4 @@ def build_icon_layer(
         width=chart_kwargs.get("width", 500),
         height=chart_kwargs.get("height", 500),
     )
-
     return chart
