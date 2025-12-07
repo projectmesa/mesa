@@ -103,7 +103,6 @@ Overview <overview>
 Examples <examples>
 Migration guide <migration_guide>
 API Documentation <apis/api_main>
-Icon Visualization <visualization_icons>
 
 ```
 
