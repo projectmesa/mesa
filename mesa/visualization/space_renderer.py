@@ -207,8 +207,8 @@ class SpaceRenderer:
         """Draw property layers on the space.
 
         Args:
-            propertylayer_portrayal (Callable | dict): Function that returns PropertyLayerStyle
-                or dict with portrayal parameters.
+            propertylayer_portrayal (Callable | dict | PropertyLayerStyle): Function that returns PropertyLayerStyle,
+                PropertyLayerStyle instance, or dict with portrayal parameters.
 
         Returns:
             The visual representation of the property layers.
@@ -269,6 +269,8 @@ class SpaceRenderer:
         # Convert portrayal to callable if needed
         if isinstance(propertylayer_portrayal, dict):
             self.propertylayer_portrayal = _dict_to_callable(propertylayer_portrayal)
+        elif isinstance(propertylayer_portrayal, PropertyLayerStyle):
+            self.propertylayer_portrayal = lambda _: propertylayer_portrayal
         else:
             self.propertylayer_portrayal = propertylayer_portrayal
 
@@ -300,8 +302,8 @@ class SpaceRenderer:
         Args:
             agent_portrayal (Callable | None): Function that returns AgentPortrayalStyle.
                 If None, agents won't be drawn.
-            propertylayer_portrayal (Callable | dict | None): Function that returns
-                PropertyLayerStyle or dict with portrayal parameters. If None,
+            propertylayer_portrayal (Callable | dict | PropertyLayerStyle | None): Function that returns
+                PropertyLayerStyle, PropertyLayerStyle instance, or dict with portrayal parameters. If None,
                 property layers won't be drawn.
             post_process (Callable | None): Function to apply post-processing to the canvas.
             **kwargs: Additional keyword arguments for drawing functions.
