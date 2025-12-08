@@ -1,3 +1,5 @@
+<p align="center"><em>For GSoC, checkout our <a href="https://github.com/projectmesa/mesa/wiki/Google-Summer-of-Code-2026">Google Summer of Code 2026</a> guide</em></p>
+
 # Mesa: Agent-based modeling in Python
 
 |         | |
@@ -18,7 +20,7 @@ Repast, or MASON.
 ![A screenshot of the WolfSheep Model in Mesa](https://raw.githubusercontent.com/mesa/mesa/main/docs/images/wolf_sheep.png)
 
 *Above: A Mesa implementation of the WolfSheep model, this
-can be displayed in browser windows or Jupyter.*
+can be displayed in browser windows or Jupyter. An online demo is [available here](https://py.cafe/app/EwoutH/mesa-solara-basic-examples).*
 
 ## Features
 
