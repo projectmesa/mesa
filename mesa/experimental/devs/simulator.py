@@ -317,7 +317,7 @@ class ABMSimulator(Simulator):
         """
         if isinstance(time, (int, np.integer)):
             return True
-        if isinstance(time, (float, np.float)):
+        if isinstance(time, (float, np.float64)):
             return time.is_integer()
         else:
             return False
