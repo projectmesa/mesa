@@ -110,7 +110,7 @@ class Model:
                 self.rng: np.random.Generator = np.random.default_rng(rng)
             self._rng = self.rng.bit_generator.state
 
-        self._random_number_sequence = random_number_sequence_generator(self._rng)
+        self._random_number_sequence = random_number_sequence_generator(self.rng)
 
         # Wrap the user-defined step method
         self._user_step = self.step
