@@ -123,8 +123,6 @@ class Model:
         ] = {}  # a dict with an agentset for each class of agents
         self._all_agents = AgentSet([], rng=self.rng)  # an agenset with all agents
 
-
-
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
         """Automatically increments time and steps after calling the user's step method."""
         # Automatically increment time and step counters
@@ -256,15 +254,15 @@ class Model:
         for agent in list(self._agents.keys()):
             agent.remove()
 
-    def rand(self)-> float:
-        """return the next random value on unit interval."""
+    def rand(self) -> float:
+        """Return the next random value on unit interval."""
         return next(self._random_number_sequence)
+
 
 def random_number_sequence_generator(rng, initial_size=100):
     """Generator for random numbers on unit interval."""
     initial_values = rng.random(size=initial_size)
 
     while True:
-        for entry in initial_values:
-            yield entry
+        yield from initial_values
         initial_value = rng.random(size=initial_size)
