@@ -197,6 +197,88 @@ To create a new release, follow these steps:
 
 A recorded video of this process is [available here](https://youtu.be/JE44jkegmns).
 
+### Deprecation policy
+Mesa follows [Semantic Versioning](https://semver.org/) (SemVer) and has a structured deprecation process to ensure users have time to migrate to new APIs while maintaining backward compatibility.
+
+#### Deprecation process
+##### Step 1: Introduce alternative
+When implementing a replacement feature:
+
+- Add the new, stable alternative
+- Optionally add a `PendingDeprecationWarning` to the old feature (signals intent in source code, hidden by default)
+
+```python
+warnings.warn(
+    "old_feature() will be deprecated in a future release. "
+    "Use new_feature() instead.",
+    PendingDeprecationWarning,
+    stacklevel=2,
+)
+```
+
+##### Step 2: Complete prerequisites
+Before active deprecation, all of the following must be complete:
+
+1. **Documentation updated**: All relevant docs and tutorials reflect the new approach
+2. **Migration guide entry added**: Clear entry in the [Migration Guide](https://github.com/projectmesa/mesa/blob/main/docs/migration_guide.md) explaining what changed and how to update code
+3. **Examples updated**: All example models use the new API
+
+##### Step 3: Active deprecation
+The alternative must be available for *at least one minor release* before adding a `FutureWarning`. This warning is visible to all users by default.
+
+```python
+warnings.warn(
+    "old_feature() is deprecated and will be removed in Mesa X.0. "
+    "Use new_feature() instead. "
+    "See: https://mesa.readthedocs.io/latest/migration_guide.html#section",
+    FutureWarning,
+    stacklevel=2,
+)
+```
+
+##### Step 4: Remove deprecated feature
+Remove the old feature in the next major version.
+
+#### Version requirements
+| Action | Allowed in |
+|--------|------------|
+| Add alternative + `PendingDeprecationWarning` | Any release |
+| Add `FutureWarning` | Minor release (patch only with compelling reason) |
+| Remove deprecated feature | Major release only |
+
+#### Experimental features
+For features in `mesa.experimental`, steps 1–3 can be done simultaneously, and step 4 can occur in any subsequent release (including minor/patch). Experimental features:
+
+- Can be changed or removed in any release
+- Don't require a deprecation warning period
+- Should still communicate changes through release notes
+
+Following the full process is encouraged when feasible.
+
+#### Migration guide entry format
+Place new entries at the top (newest first). Include:
+
+1. Clear heading describing the change
+2. Brief explanation of what changed and why
+3. Before/after code examples
+4. Links to relevant PRs/issues
+
+````markdown
+## Mesa X.Y.0
+### Feature Name Change
+Brief description of what changed and why.
+
+```python
+# Old
+old_method()
+
+# New
+new_method()
+```
+
+- Ref: [PR #1234](https://github.com/projectmesa/mesa/pull/1234), [Documentation](link)
+````
+
 ## Special Thanks
 
 A special thanks to the following projects who offered inspiration for this contributing file.
