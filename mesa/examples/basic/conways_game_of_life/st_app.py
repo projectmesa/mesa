@@ -52,9 +52,7 @@ if run:
         placeholder.text(f"Step = {i}")
         for contents, (x, y) in model.grid.coord_iter():
             selected_row = df_grid[(df_grid["x"] == x) & (df_grid["y"] == y)]
-            df_grid.loc[selected_row.index, "state"] = (
-                contents.state
-            )
+            df_grid.loc[selected_row.index, "state"] = contents.state
 
         heatmap = (
             alt.Chart(df_grid)
