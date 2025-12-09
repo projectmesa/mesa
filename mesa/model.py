@@ -110,6 +110,8 @@ class Model:
                 self.rng: np.random.Generator = np.random.default_rng(rng)
             self._rng = self.rng.bit_generator.state
 
+        self._random_number_sequence = random_number_sequence_generator(self._rng)
+
         # Wrap the user-defined step method
         self._user_step = self.step
         self.step = self._wrapped_step
@@ -120,6 +122,8 @@ class Model:
             type[Agent], AgentSet
         ] = {}  # a dict with an agentset for each class of agents
         self._all_agents = AgentSet([], rng=self.rng)  # an agenset with all agents
+
+
 
     def _wrapped_step(self, *args: Any, **kwargs: Any) -> None:
         """Automatically increments time and steps after calling the user's step method."""
@@ -251,3 +255,16 @@ class Model:
         # we need to wrap keys in a list to avoid a RunTimeError: dictionary changed size during iteration
         for agent in list(self._agents.keys()):
             agent.remove()
+
+    def rand(self)-> float:
+        """return the next random value on unit interval."""
+        return next(self._random_number_sequence)
+
+def random_number_sequence_generator(rng, initial_size=100):
+    """Generator for random numbers on unit interval."""
+    initial_values = rng.random(size=initial_size)
+
+    while True:
+        for entry in initial_values:
+            yield entry
+        initial_value = rng.random(size=initial_size)
