@@ -119,7 +119,7 @@ class AltairBackend(AbstractRenderer):
                         "For more information, refer to the migration guide: "
                         "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
                     ),
-                    DeprecationWarning,
+                    FutureWarning,
                     stacklevel=2,
                 )
                 dict_data = portray_input.copy()
@@ -296,12 +296,26 @@ class AltairBackend(AbstractRenderer):
         ylabel = kwargs.pop("ylabel", "")
         # FIXME: Add more parameters to kwargs
 
+        # Handle custom colormapping
+        cmap = kwargs.pop("cmap", "viridis")
+        vmin = kwargs.pop("vmin", None)
+        vmax = kwargs.pop("vmax", None)
+
         color_is_numeric = pd.api.types.is_numeric_dtype(df["original_color"])
-        fill_encoding = (
-            alt.Fill("original_color:Q")
-            if color_is_numeric
-            else alt.Fill("viz_fill_color:N", scale=None, title="Color")
-        )
+        if color_is_numeric:
+            color_min = vmin if vmin is not None else df["original_color"].min()
+            color_max = vmax if vmax is not None else df["original_color"].max()
+
+            fill_encoding = alt.Fill(
+                "original_color:Q",
+                scale=alt.Scale(scheme=cmap, domain=[color_min, color_max]),
+            )
+        else:
+            fill_encoding = alt.Fill(
+                "viz_fill_color:N",
+                scale=None,
+                title="Color",
+            )
 
         # Determine space dimensions
         xmin, xmax, ymin, ymax = self.space_drawer.get_viz_limits()
