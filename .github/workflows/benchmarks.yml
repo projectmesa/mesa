@@ -32,12 +32,12 @@ jobs:
         run: pip install uv
       - name: Install dependencies
         run: uv pip install --system numpy pandas tqdm tabulate matplotlib solara networkx scipy
-      # Benchmarks on the projectmesa main branch
+      # Benchmarks on the mesa main branch
       - name: Checkout main branch
         uses: actions/checkout@v6
         with:
           ref: main
-          repository: projectmesa/mesa
+          repository: mesa/mesa
       - name: Install Mesa
         run: pip install --no-deps .
       - name: Run benchmarks on main branch
