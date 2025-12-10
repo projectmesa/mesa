@@ -3,6 +3,7 @@
 This reproduces the issue where models with required parameters (no default values)
 should work with SolaraViz when those parameters are provided via model_params.
 """
+
 import solara
 
 from mesa import Model
@@ -35,10 +36,7 @@ def test_required_params_work_with_model_params():
     # This should NOT raise ValueError about missing parameters
     # The parameters are provided via model_params
     try:
-        solara.render(
-            SolaraViz(model, model_params=model_params),
-            handle_error=False
-        )
+        solara.render(SolaraViz(model, model_params=model_params), handle_error=False)
         print("✓ Test passed: SolaraViz accepts required parameters via model_params")
     except ValueError as e:
         if "Missing required model parameter" in str(e):
