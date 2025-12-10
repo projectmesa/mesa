@@ -113,13 +113,9 @@ class AltairBackend(AbstractRenderer):
 
             if isinstance(portray_input, dict):
                 warnings.warn(
-                    (
-                        "Returning a dict from agent_portrayal is deprecated. "
-                        "Please return an AgentPortrayalStyle instance instead. "
-                        "For more information, refer to the migration guide: "
-                        "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
-                    ),
-                    FutureWarning,
+                    "Returning a dict from agent_portrayal is deprecated. "
+                    "Please return an AgentPortrayalStyle instance instead.",
+                    PendingDeprecationWarning,
                     stacklevel=2,
                 )
                 dict_data = portray_input.copy()
@@ -273,7 +269,7 @@ class AltairBackend(AbstractRenderer):
         if "original_color" in df.columns:
             color_values = arguments["color"]
             color_is_numeric = all(
-                isinstance(x, int | float | np.number) or x is None
+                isinstance(x, (int, float, np.number)) or x is None
                 for x in color_values
             )
             if color_is_numeric:
@@ -296,13 +292,12 @@ class AltairBackend(AbstractRenderer):
         ylabel = kwargs.pop("ylabel", "")
         # FIXME: Add more parameters to kwargs
 
-        # Handle custom colormapping
-        cmap = kwargs.pop("cmap", "viridis")
-        vmin = kwargs.pop("vmin", None)
-        vmax = kwargs.pop("vmax", None)
-
         color_is_numeric = pd.api.types.is_numeric_dtype(df["original_color"])
         if color_is_numeric:
+            cmap = kwargs.pop("cmap", "viridis")
+            vmin = kwargs.pop("vmin", None)
+            vmax = kwargs.pop("vmax", None)
+
             color_min = vmin if vmin is not None else df["original_color"].min()
             color_max = vmax if vmax is not None else df["original_color"].max()
 
