@@ -265,4 +265,4 @@ def random_number_sequence_generator(rng, initial_size=100):
 
     while True:
         yield from initial_values
-        initial_value = rng.random(size=initial_size)
+        initial_values = rng.random(size=initial_size)
