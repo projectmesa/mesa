@@ -15,7 +15,6 @@ from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
-from numpy.random import MT19937, PCG64, PCG64DXSM, SFC64, Philox
 
 from mesa.agent import Agent, AgentSet
 from mesa.experimental.devs import Simulator
