@@ -15,6 +15,7 @@ from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
+from numpy.random import PCG64, PCG64DXSM, MT19937, Philox, SFC64
 
 from mesa.agent import Agent, AgentSet
 from mesa.experimental.devs import Simulator
@@ -231,8 +232,16 @@ class Model:
         Args:
             rng: A new seed for the RNG; if None, reset using the current seed
         """
-        self.rng = np.random.default_rng(rng)
-        self._rng = self.rng.bit_generator.state
+        bit_generators = {entry.__name__:entry for entry in [PCG64, PCG64DXSM, MT19937, Philox, SFC64]}
+
+        if rng is None:
+            rng = self._rng
+            alg = bit_generators[rng["bit_generator"]]()
+            alg.state = rng
+            self.rng = np.random.default_rng(alg)
+        else:
+            self.rng = np.random.default_rng(rng)
+            self._rng = self.rng.bit_generator.state
 
     def remove_all_agents(self):
         """Remove all agents from the model.
