@@ -141,7 +141,6 @@ def test_reset_rng(newseed=42):
     assert np.all(old_rng["state"]["key"] == new_rng["state"]["key"])
 
 
-
 def test_agent_types():
     """Test Model.agent_types property."""
 

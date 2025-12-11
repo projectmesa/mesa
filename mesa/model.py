@@ -15,7 +15,7 @@ from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
-from numpy.random import PCG64, PCG64DXSM, MT19937, Philox, SFC64
+from numpy.random import MT19937, PCG64, PCG64DXSM, SFC64, Philox
 
 from mesa.agent import Agent, AgentSet
 from mesa.experimental.devs import Simulator
@@ -232,7 +232,10 @@ class Model:
         Args:
             rng: A new seed for the RNG; if None, reset using the current seed
         """
-        bit_generators = {entry.__name__:entry for entry in [PCG64, PCG64DXSM, MT19937, Philox, SFC64]}
+        bit_generators = {
+            entry.__name__: entry
+            for entry in [PCG64, PCG64DXSM, MT19937, Philox, SFC64]
+        }
 
         if rng is None:
             rng = self._rng
