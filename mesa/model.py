@@ -232,16 +232,12 @@ class Model:
         Args:
             rng: A new seed for the RNG; if None, reset using the current seed
         """
-        bit_generators = {
-            entry.__name__: entry
-            for entry in [PCG64, PCG64DXSM, MT19937, Philox, SFC64]
-        }
-
         if rng is None:
-            rng = self._rng
-            alg = bit_generators[rng["bit_generator"]]()
-            alg.state = rng
-            self.rng = np.random.default_rng(alg)
+            # Restore from saved initial state
+            bg_class = getattr(np.random, self._rng["bit_generator"])
+            bg = bg_class()
+            bg.state = self._rng
+            self.rng = np.random.Generator(bg)
         else:
             self.rng = np.random.default_rng(rng)
             self._rng = self.rng.bit_generator.state
