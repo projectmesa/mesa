@@ -11,6 +11,8 @@ Replication of the model found in NetLogo:
 
 import math
 
+import numpy as np
+
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.discrete_space import OrthogonalVonNeumannGrid
@@ -68,6 +70,7 @@ class WolfSheep(Model):
         self.height = height
         self.width = width
         self.grass = grass
+        self.changed_grass = {}
 
         # Create grid using experimental cell space
         self.grid = OrthogonalVonNeumannGrid(
@@ -76,6 +79,10 @@ class WolfSheep(Model):
             capacity=math.inf,
             random=self.random,
         )
+
+        # Set up property layers
+        self.grid.create_property_layer("grass_pos", default_value=0, dtype=int)
+        self.grid.create_property_layer("wolf_pos", default_value=0, dtype=int)
 
         # Set up data collection
         model_reporters = {
@@ -118,13 +125,26 @@ class WolfSheep(Model):
                 )
                 GrassPatch(self, countdown, grass_regrowth_time, cell)
 
+        self.update_grass_layer()
+
         # Collect initial data
         self.running = True
         self.datacollector.collect(self)
 
+    def update_grass_layer(self):
+        """Update grass_layer on cells where grass state has changed."""
+        if self.changed_grass:
+            coords = np.array(list(self.changed_grass.keys()))
+            states = np.array(list(self.changed_grass.values()), dtype=int)
+            self.grid.grass_pos.data[coords[:, 1], coords[:, 0]] = states
+            self.changed_grass.clear()
+
     def step(self):
         """Execute one step of the model."""
-        # First activate all sheep, then all wolves, both in random order
+        # Update the property layers before agents act.
+        self.update_grass_layer()
+
+        # Activate all sheep, then all wolves, both in random order
         self.agents_by_type[Sheep].shuffle_do("step")
         self.agents_by_type[Wolf].shuffle_do("step")
 
