@@ -110,7 +110,7 @@ class Cell:
         self.empty = False
 
         if self.capacity and n >= self.capacity:
-            raise RunTimeError("Cell is full")
+            raise RuntimeError("Cell is full")
 
         self._agents.append(agent)
 
