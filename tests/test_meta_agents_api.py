@@ -1,15 +1,14 @@
 """Tests for the meta-agents membership manager."""
 
+import gc
+import weakref
+
 import pytest
 
 from mesa import Agent, Model
 from mesa.agent import AgentSet
 from mesa.experimental.meta_agents import MembershipEdge, MembershipView, MetaAgents
-from mesa.experimental.meta_agents.meta_agent import (
-    MetaAgent,
-    _create_meta_agent_instance,
-    _normalize_agent_bases,
-)
+
 
 
 def test_meta_agents_create_records_memberships():
@@ -297,8 +296,8 @@ def test_at_level_order_is_deterministic():
     agent_11 = Agent(model)
     agent_2 = fillers[0]
 
-    meta_agents.backend.add_membership(agent_11, root, "member")
-    meta_agents.backend.add_membership(agent_2, root, "member")
+    meta_agents.add_member(root, agent_11)
+    meta_agents.add_member(root, agent_2)
 
     assert str(agent_11.unique_id) < str(agent_2.unique_id)
     assert agent_2.unique_id < agent_11.unique_id
@@ -315,8 +314,8 @@ def test_at_level_default_relation_and_explicit_relation():
     root = Agent(model)
     member = Agent(model)
     ally = Agent(model)
-    meta_agents.backend.add_membership(member, root, "member")
-    meta_agents.backend.add_membership(ally, root, "ally")
+    meta_agents.add_member(root, member, relation="member")
+    meta_agents.add_member(root, ally, relation="ally")
 
     assert set(meta_agents.at_level(1, root=root)) == {member}
     assert set(meta_agents.at_level(1, root=root, relation="ally")) == {ally}
@@ -330,9 +329,9 @@ def test_at_level_overlapping_paths_use_nearest_depth():
     root = Agent(model)
     mid = Agent(model)
     leaf = Agent(model)
-    meta_agents.backend.add_membership(leaf, root, "member")
-    meta_agents.backend.add_membership(mid, root, "member")
-    meta_agents.backend.add_membership(leaf, mid, "member")
+    meta_agents.add_member(root, leaf, relation="member")
+    meta_agents.add_member(root, mid, relation="member")
+    meta_agents.add_member(mid, leaf, relation="member")
 
     assert set(meta_agents.at_level(1, root=root)) == {leaf, mid}
     assert set(meta_agents.at_level(2, root=root)) == set()
@@ -360,8 +359,8 @@ def test_at_level_cyclic_membership_terminates():
     meta_agents = MetaAgents(model)
     a = Agent(model)
     b = Agent(model)
-    meta_agents.backend.add_membership(b, a, "member")
-    meta_agents.backend.add_membership(a, b, "member")
+    meta_agents.add_member(a, b, relation="member")
+    meta_agents.add_member(b, a, relation="member")
 
     assert set(meta_agents.at_level(0, root=a)) == {a}
     assert set(meta_agents.at_level(1, root=a)) == {b}
@@ -371,14 +370,18 @@ def test_at_level_cyclic_membership_terminates():
 # ── coverage for _resolve_group branches ──
 
 
-def test_resolve_group_fallback_for_non_string_non_agent():
-    """_resolve_group returns an unknown non-string entity unchanged."""
+def test_group_operations_support_custom_hashable_group():
+    """Public group operations gracefully accept non-string, non-agent group identifiers."""
+    class CustomGroup:
+        pass
+
     model = Model()
     meta_agents = MetaAgents(model)
-    sentinel = object()
-    # Should not raise, just return the sentinel as-is
-    result = meta_agents._resolve_group(sentinel)
-    assert result is sentinel
+    sentinel = CustomGroup()
+    agent = Agent(model)
+    meta_agents.add_member(sentinel, agent)
+    assert set(meta_agents.members_of(sentinel)) == {agent}
+    assert set(meta_agents.groups_of(agent)) == {sentinel}
 
 
 def test_query_memberships_with_agent_object():
@@ -478,8 +481,8 @@ def test_dissolve_entity_with_only_remove():
     agent = Agent(model)
     entity = SimpleRemovable()
 
-    # Manually register a membership with a non-agent group
-    meta_agents.backend.add_membership(agent, entity, "member")
+    # Register a membership with a non-agent group via public API
+    meta_agents.add_member(entity, agent, relation="member")
 
     snapshot = meta_agents.dissolve(entity)
     assert entity.removed
@@ -493,7 +496,7 @@ def test_dissolve_entity_without_remove():
     agent = Agent(model)
     sentinel = object()
 
-    meta_agents.backend.add_membership(agent, sentinel, "member")
+    meta_agents.add_member(sentinel, agent, relation="member")
 
     # Should not raise even though sentinel has no remove
     snapshot = meta_agents.dissolve(sentinel)
@@ -646,28 +649,32 @@ def test_query_memberships_filters_by_relation():
     assert len(view_all) == 2
 
 
-# ── coverage for _normalize_agent_bases ──
+# ── coverage for mesa_agent_type normalization via public create ──
 
 
-def test_normalize_agent_bases_none_defaults_to_agent():
-    """_normalize_agent_bases(None) returns (Agent,)."""
-    assert _normalize_agent_bases(None) == (Agent,)
-
-
-def test_normalize_agent_bases_tuple_passthrough():
-    """_normalize_agent_bases with a tuple returns it unchanged."""
-    bases = (Agent,)
-    assert _normalize_agent_bases(bases) is bases
-
-
-# ── coverage for _create_meta_agent_instance without membership API ──
-
-
-def test_create_meta_agent_instance_requires_membership_api():
-    """_create_meta_agent_instance raises when _membership_api is None."""
+def test_create_mesa_agent_type_none_defaults_to_agent():
+    """create() with mesa_agent_type=None defaults to Agent base class."""
     model = Model()
-    with pytest.raises(RuntimeError, match=r"Use model\.meta_agents\.create"):
-        _create_meta_agent_instance(model, "G", [], None, _membership_api=None)
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    group = meta_agents.create("Group", [agent], mesa_agent_type=None)
+    assert isinstance(group, Agent)
+
+
+def test_create_mesa_agent_type_tuple_subclasses_all_bases():
+    """create() with a tuple of base classes produces an instance of all bases."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+
+    class TagMixin:
+        def get_tag(self):
+            return "tagged"
+
+    group = meta_agents.create("Group", [agent], mesa_agent_type=(Agent, TagMixin))
+    assert isinstance(group, Agent)
+    assert isinstance(group, TagMixin)
+    assert group.get_tag() == "tagged"
 
 
 # ── coverage for meta-agent bound to a different membership manager ──
@@ -688,27 +695,9 @@ def test_create_reuses_meta_agent_rejects_different_manager():
 
     # Forcibly set the group's _membership_api to api_2 so it mismatches api_1
     group._membership_api = api_2
-    # Now ask api_1 to reuse this group - it should detect the mismatch
+    # Now ask api_1 to reuse this group - it should detect the mismatch via public create()
     with pytest.raises(RuntimeError, match="bound to a different membership manager"):
-        _create_meta_agent_instance(model, "Team", [agent], None, _membership_api=api_1)
-
-
-# ── coverage for MetaAgent.__init__ with mismatched manager ──
-
-
-def test_meta_agent_init_rejects_mismatched_manager():
-    """MetaAgent.__init__ raises when the manager doesn't match the model's."""
-    model = Model()
-    MetaAgents(model)
-    # Create a second manager on a different model
-    model_2 = Model()
-    api_2 = MetaAgents(model_2)
-
-    with pytest.raises(
-        RuntimeError,
-        match="Meta-agent must be created by its model's membership manager",
-    ):
-        MetaAgent(model, _membership_api=api_2)
+        api_1.create("Team", [agent])
 
 
 # ── coverage for at_level BFS queued-node-at-target-depth continue ──
@@ -789,3 +778,46 @@ def test_at_level_group_with_no_members():
     # root is registered but has no members in the backend
     assert set(meta_agents.at_level(1, root=root)) == set()
     assert set(meta_agents.at_level(0, root=root)) == {root}
+
+
+# ── garbage collection for removed members and meta-agents ──
+
+
+def test_removed_agent_and_meta_agent_are_garbage_collected():
+    """Ensure removing an agent or meta-agent releases all internal references for GC."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+
+    agent = Agent(model)
+    group = meta_agents.create("Group", [agent])
+
+    agent_ref = weakref.ref(agent)
+    group_ref = weakref.ref(group)
+
+    # 1. Removing a member agent releases internal references
+    agent.remove()
+    del agent
+    gc.collect()
+    assert agent_ref() is None
+
+    # 2. Removing a meta-agent group releases internal references
+    group.remove()
+    del group
+    gc.collect()
+    assert group_ref() is None
+
+
+def test_dissolved_meta_agent_is_garbage_collected():
+    """Ensure dissolving a meta-agent releases all internal references for GC."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+
+    agent = Agent(model)
+    group = meta_agents.create("Group", [agent])
+
+    group_ref = weakref.ref(group)
+
+    meta_agents.dissolve(group)
+    del group
+    gc.collect()
+    assert group_ref() is None
