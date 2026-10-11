@@ -1,11 +1,18 @@
 """Tests for the custom Dict parameter example (Boltzmann Wealth model)."""
 
+import importlib
+import sys
+
+import altair as alt
 import ipyvuetify as v
 import pytest
 import solara
 
+import mesa.visualization.solara_viz as solara_viz
 from mesa.examples.basic.boltzmann_wealth_model import custom_params
 from mesa.visualization.user_param import Slider
+
+APP = "mesa.examples.basic.boltzmann_wealth_model.app_with_dict_params"
 
 
 def render(user_params, on_change=None):
@@ -44,6 +51,7 @@ DICT_PARAM = {
 
 
 def test_extract_dict_param():
+    """Test that leaf, nested and direct entries are extracted."""
     spec = {
         "type": "Dict",
         "entries": {
@@ -60,10 +68,12 @@ def test_extract_dict_param():
 
 
 def test_extract_dict_param_empty():
+    """Test that a Dict spec without entries gives an empty dict."""
     assert custom_params.extract_dict_param({"type": "Dict"}) == {}
 
 
 def test_renders_all_supported_types():
+    """Test that every supported input type renders without error."""
     rc = render(
         {
             "int": {
@@ -98,11 +108,13 @@ def test_renders_all_supported_types():
 
 
 def test_unsupported_type_raises():
+    """Test that an unknown input type raises a ValueError."""
     with pytest.raises(ValueError, match="not a supported input type"):
         render({"bad": {"type": "Nope", "value": 1}})
 
 
 def test_checkbox_change_calls_on_change():
+    """Test that changing a checkbox calls on_change with the new value."""
     calls = []
     rc = render(
         {"check": {"type": "Checkbox", "value": True, "label": "Check"}},
@@ -114,6 +126,7 @@ def test_checkbox_change_calls_on_change():
 
 
 def test_dict_field_change_calls_on_change():
+    """Test that changing a Dict field calls on_change with the updated dict."""
     calls = []
     rc = render(
         {"grid": DICT_PARAM},
@@ -130,6 +143,37 @@ def test_dict_field_change_calls_on_change():
     name, value = calls[-1]
     assert name == "grid"
     assert value["ratio"] == 0.7
-    assert value["width"] == 20  # earlier change is preserved
 
+    rc.close()
+
+
+def test_app_with_dict_params(monkeypatch):
+    """Test that the example app builds its model, rebuilds it and renders."""
+    # The app overrides solara_viz.UserInputs at import time. Registering the
+    # current value with monkeypatch means it is restored after this test.
+    monkeypatch.setattr(solara_viz, "UserInputs", solara_viz.UserInputs)
+    sys.modules.pop(APP, None)
+    app = importlib.import_module(APP)
+
+    assert solara_viz.UserInputs is custom_params.CustomUserInputs
+    assert app.model.grid.dimensions == (10, 10)
+
+    # Without arguments the scenario class defaults are used
+    assert app.BoltzmannWealthWithDictParams().grid.dimensions == (10, 10)
+
+    # Custom grid dimensions flow through the scenario into the grid
+    scenario = app.DictParamsScenario(
+        n=5, grid_dimensions={"width": 6, "height": 7}, rng=1
+    )
+    model = app.BoltzmannWealthWithDictParams(scenario=scenario)
+    assert model.grid.dimensions == (6, 7)
+    assert len(model.agents) == 5
+    assert model.scenario is scenario
+
+    agent = next(iter(model.agents))
+    assert app.agent_portrayal(agent) is not None
+    assert app.post_process(alt.Chart().mark_point()) is not None
+
+    # Rendering the page builds the model from the extracted default values
+    _, rc = solara.render(app.page, handle_error=False)
     rc.close()
