@@ -10,7 +10,6 @@ from mesa.agent import AgentSet
 from mesa.experimental.meta_agents import MembershipEdge, MembershipView, MetaAgents
 
 
-
 def test_meta_agents_create_records_memberships():
     """Create should return live objects and record memberships."""
     model = Model()
@@ -372,6 +371,7 @@ def test_at_level_cyclic_membership_terminates():
 
 def test_group_operations_support_custom_hashable_group():
     """Public group operations gracefully accept non-string, non-agent group identifiers."""
+
     class CustomGroup:
         pass
 

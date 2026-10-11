@@ -189,7 +189,6 @@ def test_find_combinations_without_evaluation_func(setup_agents):
     assert result == []
 
 
-
 def test_create_repeated_instances_with_descriptor_parent():
     """Multiple instances of the same class work with a descriptor parent."""
     model = Model()

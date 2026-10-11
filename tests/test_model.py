@@ -103,7 +103,6 @@ def test_agent_remove():
     assert len(model.agents) == 0
 
 
-
 def test_agents_by_type_keeps_empty_bucket():
     """Removing all agents of a type keeps its empty bucket in agents_by_type.
 
