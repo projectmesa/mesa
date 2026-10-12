@@ -389,14 +389,18 @@ def test_neighborhood_cache_invalidated_on_topology_change():
 
 
 def test_neighborhood_cache_invalidated_for_larger_radius():
-    """A topology change must also invalidate radius > 1 neighborhoods. See #3379."""
+    """A connect() one hop away must invalidate a radius > 1 neighborhood.
+
+    `cells[1].connect(cells[2])` changes a cell that `cells[0]` only reaches at
+    radius 2, so `cells[0]`'s warmed entry has to be invalidated even though
+    `cells[0]` itself was not touched. See #3379.
+    """
     cells = [Cell((i,), capacity=None, random=random.Random()) for i in range(3)]
     cells[0].connect(cells[1], key=(1,))
 
     assert set(cells[0].get_neighborhood(radius=2).cells) == {cells[1]}  # warms
 
     cells[1].connect(cells[2], key=(1,))
-    cells[0]._clear_cache()
 
     assert set(cells[0].get_neighborhood(radius=2).cells) == {cells[1], cells[2]}
 
