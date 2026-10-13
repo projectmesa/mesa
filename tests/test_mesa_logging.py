@@ -4,6 +4,12 @@ import logging
 
 import pytest
 
+import ast
+
+import os
+
+from pathlib import Path
+
 from mesa import mesa_logging
 
 
@@ -66,3 +72,40 @@ def test_caplog_capture_after_teardown(caplog):
     logger.setLevel(logging.INFO)
     logger.info("testing caplog propagation")
     assert "testing caplog propagation" in caplog.text
+
+
+def test_no_module_level_logging_in_examples():
+    """
+    Static AST scan to ensure no module-level logging configuration
+    (like log_to_stderr or basicConfig) happens in the examples directory.
+    """
+    
+    current_dir = Path(__file__).parent
+    examples_dir = current_dir.parent / "mesa" / "examples"
+    
+    forbidden_calls = {"log_to_stderr", "log_to_file", "basicConfig"}
+    
+    for root, dirs, files in os.walk(examples_dir):
+        for file in files:
+            if file.endswith(".py"):
+                file_path = os.path.join(root, file)
+                
+                with open(file_path, "r", encoding="utf-8") as f:
+                    try:
+                        
+                        tree = ast.parse(f.read(), filename=file_path)
+                    except SyntaxError:
+                        continue
+                
+                
+                for node in tree.body:
+                    if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call):
+                        func = node.value.func
+                        
+                        
+                        if isinstance(func, ast.Name) and func.id in forbidden_calls:
+                            assert False, f"Forbidden module-level logging call '{func.id}' found in {file_path}"
+                            
+                        
+                        elif isinstance(func, ast.Attribute) and func.attr in forbidden_calls:
+                            assert False, f"Forbidden module-level logging call '{func.attr}' found in {file_path}"

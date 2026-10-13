@@ -4,7 +4,7 @@ from mesa.examples.basic.boltzmann_wealth_model.model import (
     BoltzmannScenario,
     BoltzmannWealth,
 )
-from mesa.mesa_logging import INFO, log_to_stderr
+
 from mesa.visualization import (
     SolaraViz,
     SpaceRenderer,
@@ -12,7 +12,6 @@ from mesa.visualization import (
 )
 from mesa.visualization.components import AgentPortrayalStyle
 
-log_to_stderr(INFO)
 
 
 def agent_portrayal(agent):
