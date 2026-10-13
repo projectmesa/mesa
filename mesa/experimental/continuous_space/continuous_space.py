@@ -187,7 +187,13 @@ class ContinuousSpace:
         """
         point = np.asanyarray(point)
         if self.torus:
-            point = self.torus_correct(point)
+            # Only wrap when the point is actually outside the bounds. Agents
+            # typically pass their own position, which is already inside, and
+            # the plain Python comparisons keep numpy calls off that path.
+            for value, lower, upper in zip(point, self._lower, self._upper):
+                if value < lower or value > upper:
+                    point = self.torus_correct(point)
+                    break
 
         positions = (
             self.agent_positions
