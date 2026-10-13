@@ -4,14 +4,12 @@ from mesa.examples.basic.boltzmann_wealth_model.model import (
     BoltzmannScenario,
     BoltzmannWealth,
 )
-
 from mesa.visualization import (
     SolaraViz,
     SpaceRenderer,
     make_plot_component,
 )
 from mesa.visualization.components import AgentPortrayalStyle
-
 
 
 def agent_portrayal(agent):
