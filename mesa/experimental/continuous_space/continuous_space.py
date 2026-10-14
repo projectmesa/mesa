@@ -10,6 +10,7 @@ from numpy.typing import ArrayLike
 from scipy.spatial.distance import cdist
 
 from mesa.agent import Agent, AgentSet
+from mesa.experimental.frames.frame import Frame
 
 
 class ContinuousSpace:
@@ -51,6 +52,7 @@ class ContinuousSpace:
         torus: bool = False,
         random: Random | None = None,
         n_agents: int = 100,
+        frame: Frame | None = None,
     ) -> None:
         """Create a new continuous space.
 
@@ -59,6 +61,9 @@ class ContinuousSpace:
             torus: boolean for whether the space wraps around or not
             random: a seeded stdlib random.Random instance
             n_agents: the expected number of agents in the space
+            frame: the frame the space indexes. Spaces that share a frame keep the
+                agents they have in common at the same location. By default, the
+                space gets a frame of its own.
 
         Internally, a numpy array is used to store the positions of all agents. This is resized if needed,
         but you can control the initial size explicitly by passing n_agents.
@@ -92,6 +97,10 @@ class ContinuousSpace:
         # This avoids copying data and ensures agent_positions always reflects the current
         # active slice of _agent_positions as agents are added or removed.
         self.agent_positions = self._agent_positions[0:0]
+        # A read-only view on all rows, handed out as agent.position. Writes go
+        # through the position setter, which validates and updates other spaces.
+        self._positions_ro = self._agent_positions.view()
+        self._positions_ro.flags.writeable = False
 
         # the list of agents in the space
         self.active_agents = []
@@ -99,13 +108,64 @@ class ContinuousSpace:
 
         #  a mapping from agents to index and vice versa
         self._index_to_agent: dict[int, Agent] = {}
+        # Agents that are not a ContinuousSpaceAgent of this space keep their
+        # index on their frame record instead of on themselves
+        self._holders: dict[Agent, object] = {}
+
+        self.frame = Frame() if frame is None else frame
+        self.frame._join(
+            self, ndim=self.ndims, torus=self.torus, bounds=self.dimensions
+        )
+
+    def __setstate__(self, state):
+        """Restore the state, and the views on the position array.
+
+        Pickling turns a view into an independent array, so the views have to be
+        taken again.
+        """
+        self.__dict__.update(state)
+        self.agent_positions = self._agent_positions[0 : self._n_agents]
+        self._positions_ro = self._agent_positions.view()
+        self._positions_ro.flags.writeable = False
 
     @property
     def agents(self) -> AgentSet:
         """Return an AgentSet with the agents in the space."""
         return AgentSet(self.active_agents, random=self.random)
 
-    def _add_agent(self, agent: Agent) -> int:
+    def add(self, agent: Agent, position: ArrayLike | None = None) -> None:
+        """Add an agent that is not a ContinuousSpaceAgent to the space.
+
+        The agent shows up in distance and neighbor queries. Its location is read
+        and written through a :class:`~mesa.experimental.frames.Location` on the
+        agent, through ``space.frame``, or through the other spaces of the frame.
+
+        Args:
+            agent: the agent to add
+            position: where to place the agent. If omitted, the agent enters at
+                its current location in the frame.
+        """
+        self.frame._enter_continuous(self.frame._record(agent), self, position)
+
+    def remove(self, agent: Agent) -> None:
+        """Remove an agent from the space, keeping it in the model and in other spaces."""
+        record = self.frame._lookup(agent)
+        if record is None or record.continuous is not self:
+            raise ValueError(
+                f"Agent {agent.unique_id} was not added to this space with add()."
+            )
+        self.frame._leave(record, self)
+
+    def _owns(self, cell) -> bool:
+        return False
+
+    def _indices(self, agents: Iterable[Agent]) -> list[int]:
+        holders = self._holders
+        if not holders:
+            return [a._mesa_index for a in agents]
+        return [holders.get(a, a)._mesa_index for a in agents]
+
+    def _add_agent(self, agent: Agent, holder=None) -> int:
         """Helper method for adding an agent to the space.
 
         This method manages the numpy array with the agent positions and ensuring it is
@@ -127,8 +187,14 @@ class ContinuousSpace:
             )
             new_positions[:current_capacity] = self._agent_positions
             self._agent_positions = new_positions
+            self._positions_ro = new_positions.view()
+            self._positions_ro.flags.writeable = False
 
-        agent._mesa_index = index
+        if holder is None:
+            agent._mesa_index = index
+        else:
+            holder._mesa_index = index
+            self._holders[agent] = holder
         self._index_to_agent[index] = agent
 
         # we want to maintain a view rather than a copy on the active agents and positions
@@ -144,7 +210,8 @@ class ContinuousSpace:
         This method is automatically called by ContinuousSpaceAgent.remove.
 
         """
-        index = agent._mesa_index
+        holders = self._holders
+        index = (holders.pop(agent, agent) if holders else agent)._mesa_index
         last_index = self._n_agents - 1
 
         # If the removed agent isn't already the last one, swap the last one into its place
@@ -157,7 +224,7 @@ class ContinuousSpace:
             # Swap in numpy array
             self._agent_positions[index] = self._agent_positions[last_index]
 
-            last_agent._mesa_index = index
+            (holders.get(last_agent, last_agent))._mesa_index = index
             self._index_to_agent[index] = last_agent
 
         # Pop the last elements
@@ -180,7 +247,7 @@ class ContinuousSpace:
         positions = (
             self.agent_positions
             if agents is None
-            else self._agent_positions[[a._mesa_index for a in agents]]
+            else self._agent_positions[self._indices(agents)]
         )
 
         delta = positions - point
@@ -218,7 +285,7 @@ class ContinuousSpace:
             positions = self.agent_positions
             agents = self.active_agents
         else:
-            positions = self._agent_positions[[a._mesa_index for a in agents]]
+            positions = self._agent_positions[self._indices(agents)]
             agents = np.asarray(agents)
 
         if self.torus:

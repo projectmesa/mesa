@@ -25,6 +25,7 @@ from scipy.spatial import KDTree
 
 from mesa.discrete_space import Cell, DiscreteSpace
 from mesa.discrete_space.cell_collection import CellCollection
+from mesa.experimental.frames.frame import Frame
 
 T = TypeVar("T", bound=Cell)
 
@@ -64,6 +65,8 @@ class Grid(DiscreteSpace[T]):
         torus (bool): whether the grid is a torus
         capacity (int): the capacity of a grid cell
         random (Random): the random number generator
+        cell_size (np.ndarray): the size of a cell along each dimension, in frame units
+        origin (np.ndarray): the frame coordinates of the corner of cell (0, 0, ...)
         _try_random (bool): whether to get empty cell be repeatedly trying random cell
 
     Notes:
@@ -88,6 +91,9 @@ class Grid(DiscreteSpace[T]):
         capacity: float | None = None,
         random: Random | None = None,
         cell_klass: type[T] = Cell,
+        frame: Frame | None = None,
+        cell_size: float | Sequence[float] = 1.0,
+        origin: Sequence[float] | None = None,
     ) -> None:
         """Initialise the grid class.
 
@@ -97,17 +103,31 @@ class Grid(DiscreteSpace[T]):
             capacity: capacity of the grid cell
             random: a random number generator
             cell_klass: the base class to use for the cells
+            frame: the frame the grid indexes, by default a frame of its own
+            cell_size: the size of a cell in frame units, as one number or one per
+                dimension. A 50 by 50 grid with ``cell_size=2.0`` covers the same
+                area as a continuous space of 100 by 100.
+            origin: the frame coordinates of the corner of cell (0, 0, ...),
+                by default the origin of the frame
         """
-        super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
+        super().__init__(
+            capacity=capacity, random=random, cell_klass=cell_klass, frame=frame
+        )
         self.torus = torus
         self.dimensions = dimensions
         self._try_random = True
         self._ndims = len(dimensions)
         self._validate_parameters()
+        self._set_mapping(cell_size, origin)
         self.cell_klass = type(
             "GridCell",
             (self.cell_klass,),
-            {"property_layers": set(), "__slots__": ()},
+            {
+                "property_layers": set(),
+                "__slots__": (),
+                "_mesa_scale": self.cell_size,
+                "_mesa_offset": self.origin,
+            },
         )
         self.property_layers: dict[str, np.ndarray] = {}
         # Track which property layers are read-only so the constraint survives
@@ -126,6 +146,43 @@ class Grid(DiscreteSpace[T]):
         self._celllist = list(self._cells.values())
         self._connect_cells()
         self.create_property_layer("empty", default_value=True, dtype=bool)
+        self._join_frame()
+
+    def _set_mapping(
+        self, cell_size: float | Sequence[float], origin: Sequence[float] | None
+    ) -> None:
+        """Store how cell coordinates map to frame coordinates.
+
+        The mapping is a scale and an offset per dimension, and is only used by
+        ``Cell.position`` and ``find_nearest_cell``, so that it can grow into a
+        full affine transform.
+        """
+        # Plain floats keep this out of the construction time of small grids
+        n = self._ndims
+        if isinstance(cell_size, int | float):
+            sizes = [float(cell_size)] * n
+        else:
+            sizes = [float(size) for size in cell_size]
+        origins = [0.0] * n if origin is None else [float(o) for o in origin]
+        if len(sizes) != n or len(origins) != n:
+            raise ValueError(
+                f"cell_size and origin must be a number or have one value for each of "
+                f"the {n} dimensions."
+            )
+        if not all(size > 0 for size in sizes):
+            raise ValueError("cell_size must be positive.")
+        self._mapping = (origins, sizes)
+        self.cell_size = np.array(sizes)
+        self.origin = np.array(origins)
+
+    def _join_frame(self) -> None:
+        bounds = None
+        if self.torus:
+            origins, sizes = self._mapping
+            bounds = [
+                [o, o + s * d] for o, s, d in zip(origins, sizes, self.dimensions)
+            ]
+        self.frame._join(self, ndim=self._ndims, torus=self.torus, bounds=bounds)
 
     def create_property_layer(
         self,
@@ -250,8 +307,17 @@ class Grid(DiscreteSpace[T]):
         Raises:
             ValueError: If position is outside grid bounds and not a torus
         """
-        # Floor to get cell coordinate
-        coord = tuple(np.floor(position).astype(int))
+        if isinstance(position, np.ndarray):
+            position = position.tolist()
+        # Floor to get cell coordinate. Plain floats are several times faster
+        # than numpy for the handful of values involved.
+        origin, cell_size = self._mapping
+        coord = tuple(
+            [
+                math.floor((p - o) / s)
+                for p, o, s in zip(position, origin, cell_size, strict=True)
+            ]
+        )
 
         # Handle torus wrapping
         if self.torus:
@@ -419,6 +485,12 @@ class Grid(DiscreteSpace[T]):
         # Older pickles may predate _read_only_layers; default to no read-only layers.
         read_only_layers = getattr(self, "_read_only_layers", set())
         self._read_only_layers = read_only_layers
+        # Unpickling recreates the dynamic cell class once per cell. Give all cells
+        # the same class again, so class-level state reaches every cell.
+        for cell in self._cells.values():
+            cell.__class__ = self.cell_klass
+        self.cell_klass._mesa_scale = self.cell_size
+        self.cell_klass._mesa_offset = self.origin
         for name, array in self.property_layers.items():
             if name in read_only_layers:
                 accessor = property(
@@ -526,6 +598,7 @@ class HexGrid(Grid[T]):
         capacity: float | None = None,
         random: Random | None = None,
         cell_klass: type[T] = Cell,
+        frame: Frame | None = None,
     ) -> None:
         """Initialize the hex grid.
 
@@ -535,6 +608,7 @@ class HexGrid(Grid[T]):
             capacity: capacity of the grid cell
             random: a random number generator
             cell_klass: the base class to use for the cells
+            frame: the frame the grid indexes, by default a frame of its own
         """
         super().__init__(
             dimensions=dimensions,
@@ -542,8 +616,20 @@ class HexGrid(Grid[T]):
             capacity=capacity,
             random=random,
             cell_klass=cell_klass,
+            frame=frame,
         )
+
+    def _join_frame(self) -> None:
         self._init_hex_geometry()
+        self.frame._join(
+            self,
+            ndim=2,
+            torus=self.torus,
+            bounds=[
+                [0, self.dimensions[0] * math.sqrt(3)],
+                [0, self.dimensions[1] * 1.5],
+            ],
+        )
 
     def _init_hex_geometry(self) -> None:
         """Calculate physical positions for all cells and build KD-Tree.

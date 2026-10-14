@@ -22,7 +22,8 @@ def test_grid_lookups():
     grid = OrthogonalMooreGrid((10, 10), torus=False, random=random.Random(42))
 
     cell = grid._cells[(5, 5)]
-    np.testing.assert_array_equal(cell.position, [5, 5])
+    # the position of a grid cell is its center
+    np.testing.assert_array_equal(cell.position, [5.5, 5.5])
 
     found_cell = grid.find_nearest_cell([5.2, 5.8])
     assert found_cell.coordinate == (5, 5)

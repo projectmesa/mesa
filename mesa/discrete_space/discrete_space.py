@@ -19,7 +19,7 @@ import warnings
 from abc import ABC, abstractmethod
 from functools import cached_property
 from random import Random
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 
@@ -27,6 +27,10 @@ from mesa.agent import AgentSet
 from mesa.discrete_space.cell import Cell
 from mesa.discrete_space.cell_collection import CellCollection
 from mesa.exceptions import CellMissingException
+from mesa.experimental.frames.frame import Frame
+
+if TYPE_CHECKING:
+    from mesa.agent import Agent
 
 T = TypeVar("T", bound=Cell)
 
@@ -54,6 +58,7 @@ class DiscreteSpace[T: Cell](ABC):
         capacity: int | None = None,
         cell_klass: type[T] = Cell,
         random: Random | None = None,
+        frame: Frame | None = None,
     ):
         """Instantiate a DiscreteSpace.
 
@@ -61,8 +66,12 @@ class DiscreteSpace[T: Cell](ABC):
             capacity: capacity of cells
             cell_klass: base class for all cells
             random: random number generator
+            frame: the frame the space indexes. Spaces that share a frame keep the
+                agents they have in common at the same location. By default, the
+                space gets a frame of its own.
         """
         super().__init__()
+        self.frame = Frame() if frame is None else frame
         self.capacity = capacity
         self._cells: dict[tuple[int, ...], T] = {}
         if random is None:
@@ -92,6 +101,81 @@ class DiscreteSpace[T: Cell](ABC):
     @abstractmethod
     def find_nearest_cell(self, position: np.ndarray) -> T:
         """Find the cell at or nearest to the given position."""
+
+    def _resolve(self, point: np.ndarray) -> T:
+        """Return the cell an agent at the given frame point occupies."""
+        return self.find_nearest_cell(point)
+
+    def _owns(self, cell: Cell) -> bool:
+        return self._cells.get(cell.coordinate) is cell
+
+    def add(self, agent: Agent, cell: T | None = None) -> None:
+        """Add an agent to the space.
+
+        The agent occupies a cell, counts toward its capacity and shows up in
+        neighborhood queries. If the agent is in other spaces of the same frame,
+        all of them keep agreeing on its location.
+
+        Args:
+            agent: the agent to add
+            cell: the cell to place the agent in. If omitted, the agent enters at
+                its current location in the frame.
+
+        Raises:
+            CellFullException: if the cell has no capacity left. The agent then
+                stays where it was.
+        """
+        record = self.frame._record(agent)
+        if (
+            cell is not None
+            and record.is_empty
+            and getattr(agent, "_mesa_cell", self) is None
+        ):
+            # A cell agent entering its first space stays on the single-space path
+            agent.cell = cell
+            return
+        self.frame._enter_discrete(record, self, cell)
+
+    def remove(self, agent: Agent) -> None:
+        """Remove an agent from the space, keeping it in the model and in other spaces."""
+        record = self.frame._lookup(agent)
+        if record is not None and self in record.cells:
+            self.frame._leave(record, self)
+        elif self.cell_of(agent) is not None:
+            agent.cell = None
+        else:
+            raise ValueError(
+                f"Agent {agent.unique_id} is not in this {type(self).__name__}."
+            )
+
+    def move(self, agent: Agent, cell: T) -> None:
+        """Move an agent to a cell of this space.
+
+        The agent's location in the frame becomes the position of the cell, and
+        the other spaces of the frame the agent is in update accordingly. If any
+        of them rejects the move, the agent stays where it was.
+        """
+        record = self.frame._lookup(agent)
+        if record is not None and self in record.cells:
+            self.frame._write(record, self, cell)
+        elif self.cell_of(agent) is not None:
+            agent.cell = cell
+        else:
+            raise ValueError(
+                f"Agent {agent.unique_id} is not in this {type(self).__name__}; add it first."
+            )
+
+    def cell_of(self, agent: Agent) -> T | None:
+        """Return the cell the agent occupies in this space, or None."""
+        locations = agent._mesa_locations
+        if locations is not None:
+            record = locations.get(self.frame.key)
+            if record is not None and self in record.cells:
+                return record.cells[self]
+        cell = getattr(agent, "_mesa_cell", None)
+        if cell is not None and self._owns(cell):
+            return cell
+        return None
 
     def add_cell(self, cell: T):
         """Add a cell to the space.

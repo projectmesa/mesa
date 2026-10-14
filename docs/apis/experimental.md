@@ -25,6 +25,18 @@ This namespace contains experimental features. These are under development, and 
    :members:
 ```
 
+## Frames
+
+```{eval-rst}
+.. automodule:: experimental.frames.frame
+   :members:
+```
+
+```{eval-rst}
+.. automodule:: experimental.frames.location
+   :members:
+```
+
 ## Scenarios
 
 ```{eval-rst}

@@ -22,6 +22,7 @@ from scipy.spatial import KDTree
 from mesa.discrete_space.cell import Cell
 from mesa.discrete_space.discrete_space import DiscreteSpace
 from mesa.exceptions import SpaceException
+from mesa.experimental.frames.frame import Frame
 
 
 class Network(DiscreteSpace[Cell]):
@@ -34,6 +35,7 @@ class Network(DiscreteSpace[Cell]):
         random: Random | None = None,
         cell_klass: type[Cell] = Cell,
         layout: Mapping | Callable | None = None,
+        frame: Frame | None = None,
     ) -> None:
         """A Networked grid.
 
@@ -47,13 +49,17 @@ class Network(DiscreteSpace[Cell]):
                 It defaults to nx.circular_layout
                 This ensures all nodes possess physical (x, y) positions for visualization and
                 spatial queries without introducing performance bottlenecks on large graphs
+            frame: the frame the node positions are expressed in, by default a
+                frame of its own
         """
         if layout is None:
             import networkx as nx  # noqa: PLC0415
 
             layout = nx.circular_layout
 
-        super().__init__(capacity=capacity, random=random, cell_klass=cell_klass)
+        super().__init__(
+            capacity=capacity, random=random, cell_klass=cell_klass, frame=frame
+        )
         self.G = G
 
         # Resolve positions from the layout argument
@@ -97,6 +103,17 @@ class Network(DiscreteSpace[Cell]):
             self._kdtree = None
 
         self._connect_cells()
+        self.frame._join(
+            self, ndim=len(positions_for_tree[0]) if positions_for_tree else None
+        )
+
+    def _resolve(self, point: np.ndarray) -> Cell:
+        # A network does not partition its frame: most points are on no node, so
+        # snapping to the nearest one would silently relocate the agent.
+        raise SpaceException(
+            "Cannot place an agent in a Network by a point; move it to a node with "
+            "network.move(agent, cell) instead."
+        )
 
     def _rebuild_kdtree(self) -> None:
         """Rebuild the KD-Tree."""

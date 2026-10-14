@@ -21,6 +21,7 @@ from scipy.spatial import KDTree
 
 from mesa.discrete_space.cell import Cell
 from mesa.discrete_space.discrete_space import DiscreteSpace
+from mesa.experimental.frames.frame import Frame
 
 
 class Delaunay:
@@ -188,6 +189,7 @@ class VoronoiGrid(DiscreteSpace):
         capacity: int | Callable | None = None,
         random: Random | None = None,
         cell_klass: type[Cell] = Cell,
+        frame: Frame | None = None,
     ) -> None:
         """A Voronoi Tessellation Grid.
 
@@ -201,6 +203,8 @@ class VoronoiGrid(DiscreteSpace):
                 callable computing the (int) capacity of a cell from its (float) polygon area
             random (Random): random number generator
             cell_klass (type[Cell]): type of cell class
+            frame (Frame): the frame the centroids are expressed in, by default
+                a frame of its own
 
         """
         # Separate callable capacity from numeric capacity before passing to base class
@@ -212,7 +216,10 @@ class VoronoiGrid(DiscreteSpace):
             numeric_capacity = capacity
 
         super().__init__(
-            capacity=numeric_capacity, random=random, cell_klass=cell_klass
+            capacity=numeric_capacity,
+            random=random,
+            cell_klass=cell_klass,
+            frame=frame,
         )
         self.centroids_coordinates = centroids_coordinates
         self.capacity_function = capacity_function
@@ -239,6 +246,7 @@ class VoronoiGrid(DiscreteSpace):
 
         self._connect_cells()
         self._build_cell_polygons()
+        self.frame._join(self, ndim=len(self.centroids_coordinates[0]))
 
     def find_nearest_cell(self, position: np.ndarray) -> Cell:
         """Find the Voronoi cell nearest to the given position.

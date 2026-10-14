@@ -37,6 +37,9 @@ class Agent[M: Model]:
 
     _datasets: ClassVar = set()
     _repr_excluded_fields: ClassVar[set[str]] = {"model", "current_action", "unique_id"}
+    # The agent's location in each frame it shares between several spaces, see
+    # mesa.experimental.frames. None for agents in at most one space per frame.
+    _mesa_locations = None
 
     def __init_subclass__(cls, **kwargs):
         """Called when Agent is subclassed, giving each subclass its own dataset set."""
@@ -76,6 +79,10 @@ class Agent[M: Model]:
         # ensures models are also removed from datasets
         for dataset in self._datasets:
             self.model.data_registry[dataset].remove_agent(self)
+
+        if self._mesa_locations is not None:
+            for record in list(self._mesa_locations.values()):
+                record.frame._clear(record)
 
     def step(self) -> None:
         """A single step of the agent."""

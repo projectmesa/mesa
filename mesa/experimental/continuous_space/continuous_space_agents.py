@@ -28,20 +28,33 @@ class ContinuousSpaceAgent(Agent):
 
     __slots__ = ["_mesa_index", "space"]
 
+    # Set when the agent is in several spaces that share a frame
+    _mesa_stack = None
+
     @property
     def position(self) -> np.ndarray:
-        """Position of the agent."""
-        return self.space.agent_positions[self._mesa_index]
+        """Position of the agent.
+
+        This is a read-only view: assign a new position instead of changing it in
+        place, so ``agent.position = agent.position + step`` rather than
+        ``agent.position += step``.
+        """
+        return self.space._positions_ro[self._mesa_index]
 
     @position.setter
     def position(self, value: np.ndarray) -> None:
+        # The agent is in several spaces that share a frame
+        if self._mesa_stack is not None:
+            self._mesa_stack.frame._write(self._mesa_stack, None, value)
+            return
+
         if not self.space.in_bounds(value):
             if self.space.torus:
                 value = self.space.torus_correct(value)
             else:
                 raise ValueError(f"point {value} is outside the bounds of the space")
 
-        self.space.agent_positions[self._mesa_index] = value
+        self.space._agent_positions[self._mesa_index] = value
 
     def __init__(self, space: ContinuousSpace, model):
         """Initialize a continuous space agent.

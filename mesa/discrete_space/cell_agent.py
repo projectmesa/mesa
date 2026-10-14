@@ -16,6 +16,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar, Protocol
 
 from mesa.agent import Agent
+from mesa.experimental.frames.frame import set_cell
 
 if TYPE_CHECKING:
     from mesa.discrete_space import Cell
@@ -42,6 +43,11 @@ class HasCell:
 
         # No-op if assigning to same cell
         if cell is old_cell:
+            return
+
+        # The agent is in several spaces that share a frame
+        if self._mesa_locations is not None:
+            set_cell(self, cell)
             return
 
         # Attempt to add first
@@ -81,6 +87,8 @@ class FixedCell(HasCell):
     The assignment is atomic: if cell.add_agent() raises (e.g. capacity
     reached), the agent's _mesa_cell reference is left unchanged.
     """
+
+    _mesa_fixed = True
 
     @property
     def cell(self) -> Cell | None:

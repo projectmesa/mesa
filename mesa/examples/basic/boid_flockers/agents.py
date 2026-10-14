@@ -67,7 +67,7 @@ class Boid(ContinuousSpaceAgent):
 
         # If no neighbors, maintain current direction
         if not neighbors:
-            self.position += self.direction * self.speed
+            self.position = self.position + self.direction * self.speed
             return
 
         delta = self.space.calculate_difference_vector(self.position, agents=neighbors)
@@ -89,4 +89,4 @@ class Boid(ContinuousSpaceAgent):
         self.direction /= np.linalg.norm(self.direction)
 
         # Move boid
-        self.position += self.direction * self.speed
+        self.position = self.position + self.direction * self.speed
