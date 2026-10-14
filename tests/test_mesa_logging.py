@@ -95,7 +95,7 @@ def test_no_module_level_logging_in_examples():
             if name in forbidden_calls:
                 offenders.append(
                     f"{path.relative_to(examples_dir).as_posix()}:{node.lineno}:{name}()"
-                )
+                ) # pragma: no cover
 
     assert not offenders, (
         "example modules must not configure logging at import time: "
