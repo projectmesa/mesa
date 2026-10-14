@@ -976,6 +976,17 @@ def test_copy_pickle_with_property_layers():
     assert grid2._cells[(0, 0)].empty == grid2.property_layers["empty"][0, 0]
 
 
+def test_pickled_grid_cells_share_one_class():
+    """After unpickling, property layers must reach every cell, not only the first."""
+    grid = OrthogonalMooreGrid((3, 3), torus=False, random=random.Random(42))
+    grid.create_property_layer("food", default_value=1.0)
+
+    restored = pickle.loads(pickle.dumps(grid))  # noqa: S301
+    assert len({type(cell) for cell in restored.all_cells}) == 1
+    for cell in restored.all_cells:
+        assert cell.food == 1.0
+
+
 def test_read_only_property_layer_survives_pickle_and_deepcopy():
     """A read-only property layer must stay read-only after pickling/deepcopy.
 

@@ -419,6 +419,10 @@ class Grid(DiscreteSpace[T]):
         # Older pickles may predate _read_only_layers; default to no read-only layers.
         read_only_layers = getattr(self, "_read_only_layers", set())
         self._read_only_layers = read_only_layers
+        # Unpickling recreates the dynamic cell class once per cell. Give all cells
+        # the same class again, so class-level state reaches every cell.
+        for cell in self._cells.values():
+            cell.__class__ = self.cell_klass
         for name, array in self.property_layers.items():
             if name in read_only_layers:
                 accessor = property(
