@@ -22,7 +22,8 @@ def test_grid_lookups():
     grid = OrthogonalMooreGrid((10, 10), torus=False, random=random.Random(42))
 
     cell = grid._cells[(5, 5)]
-    np.testing.assert_array_equal(cell.position, [5, 5])
+    # the position of a grid cell is its center
+    np.testing.assert_array_equal(cell.position, [5.5, 5.5])
 
     found_cell = grid.find_nearest_cell([5.2, 5.8])
     assert found_cell.coordinate == (5, 5)
@@ -42,6 +43,65 @@ def test_grid_lookups():
 
     cell = torus_grid.find_nearest_cell([10.5, 5])
     assert cell.coordinate == (0, 5)
+
+
+def test_grid_upper_edge_belongs_to_last_cell():
+    """A bounded grid includes its upper edge, like ContinuousSpace."""
+    grid = OrthogonalMooreGrid((10, 10), torus=False, random=random.Random(42))
+    assert grid.find_nearest_cell([10.0, 10.0]).coordinate == (9, 9)
+    assert grid.find_nearest_cell([0.0, 10.0]).coordinate == (0, 9)
+
+    scaled = OrthogonalMooreGrid((5, 5), cell_size=2.0, random=random.Random(42))
+    assert scaled.find_nearest_cell([10.0, 3.0]).coordinate == (4, 1)
+
+
+@pytest.mark.parametrize(
+    ("cell_size", "origin"),
+    [(1.0, None), (2.0, None), (1 / 3, None), ((0.5, 4.0), (-10.0, 7.5))],
+)
+def test_grid_cell_size_and_origin(cell_size, origin):
+    """Cell positions are centers in the grid's coordinates and round-trip exactly."""
+    grid = OrthogonalMooreGrid(
+        (6, 4), cell_size=cell_size, origin=origin, random=random.Random(42)
+    )
+    size = np.broadcast_to(np.asarray(cell_size, dtype=float), (2,))
+    offset = np.zeros(2) if origin is None else np.asarray(origin)
+
+    for cell in grid.all_cells:
+        expected = (np.asarray(cell.coordinate) + 0.5) * size + offset
+        np.testing.assert_allclose(cell.position, expected)
+        assert grid.find_nearest_cell(cell.position) is cell
+        # any point inside the cell, including its lower corner, maps to it
+        corner = np.asarray(cell.coordinate) * size + offset
+        assert grid.find_nearest_cell(corner + size * 0.999) is cell
+        assert grid.find_nearest_cell(corner) is cell
+
+
+def test_grid_cell_size_validation():
+    """cell_size and origin must match the dimensions, and sizes must be positive."""
+    with pytest.raises(ValueError):
+        OrthogonalMooreGrid((3, 3), cell_size=(1.0,), random=random.Random(42))
+    with pytest.raises(ValueError):
+        OrthogonalMooreGrid((3, 3), origin=(0.0, 0.0, 0.0), random=random.Random(42))
+    with pytest.raises(ValueError):
+        OrthogonalMooreGrid((3, 3), cell_size=0, random=random.Random(42))
+
+
+def test_grids_share_coordinates():
+    """A fine and a coarse grid over the same area agree on what lies where."""
+    ground = OrthogonalMooreGrid((50, 50), cell_size=2.0, random=random.Random(42))
+    soil = OrthogonalMooreGrid((5, 5), cell_size=20.0, random=random.Random(42))
+
+    for cell in ground.all_cells:
+        coarse = soil.find_nearest_cell(cell.position)
+        assert coarse.coordinate == tuple(c // 10 for c in cell.coordinate)
+
+
+def test_grid_cell_position_is_read_only():
+    """The cached center of a grid cell cannot be changed in place."""
+    grid = OrthogonalMooreGrid((3, 3), random=random.Random(42))
+    with pytest.raises(ValueError):
+        grid._cells[(1, 1)].position[0] = 9.0
 
 
 def test_hex_grid_lookups():
