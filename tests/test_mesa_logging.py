@@ -78,7 +78,7 @@ def test_no_module_level_logging_in_examples():
     current_dir = Path(__file__).parent
     examples_dir = current_dir.parent / "mesa" / "examples"
 
-    forbidden_calls = {"log_to_stderr", "log_to_file", "basicConfig","dictConfig"}
+    forbidden_calls = {"log_to_stderr", "log_to_file", "basicConfig", "dictConfig"}
 
     offenders = []
     for path in sorted(examples_dir.rglob("*.py")):
@@ -87,10 +87,17 @@ def test_no_module_level_logging_in_examples():
             if not isinstance(node, ast.Expr) or not isinstance(node.value, ast.Call):
                 continue
             func = node.value.func
-            name = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", "")
+            name = (
+                func.attr
+                if isinstance(func, ast.Attribute)
+                else getattr(func, "id", "")
+            )
             if name in forbidden_calls:
-                offenders.append(f"{path.relative_to(examples_dir).as_posix()}:{node.lineno}:{name}()")
+                offenders.append(
+                    f"{path.relative_to(examples_dir).as_posix()}:{node.lineno}:{name}()"
+                )
 
     assert not offenders, (
-        "example modules must not configure logging at import time: " + ", ".join(offenders)
+        "example modules must not configure logging at import time: "
+        + ", ".join(offenders)
     )
