@@ -1613,6 +1613,20 @@ def test_cell_add_agent_raises_when_full() -> None:
         cell.add_agent(make_agent(model))
 
 
+def test_cell_add_agent_rejected_preserves_empty_flag() -> None:
+    """Cell.empty must remain True when add_agent is rejected due to capacity."""
+    model = make_model()
+    cell = Cell(coordinate=(0, 0), capacity=0, random=RNG)
+    assert cell.empty is True
+    assert cell.is_empty is True
+
+    with pytest.raises(CellFullException):
+        cell.add_agent(make_agent(model))
+
+    assert cell.empty is True
+    assert cell.is_empty is True
+
+
 def test_voronoi_default_no_capacity() -> None:
     """Default VoronoiGrid (capacity=None) leaves cells with None capacity."""
     centroids = [[0.0, 0.0], [1.0, 0.0], [0.5, 1.0], [1.5, 1.0], [0.0, 2.0], [1.0, 2.0]]
