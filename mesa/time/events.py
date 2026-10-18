@@ -294,6 +294,8 @@ class EventGenerator:
         if not self._active or self._paused:
             return
 
+        current_event = self._current_event
+
         # Check weakref HERE (execution time), not in property getter
         # This matches Event class behavior - weakref check during execution
         fn = self.function()
@@ -306,8 +308,9 @@ class EventGenerator:
         fn()
         self._execution_count += 1
 
-        # The callback may have stopped or paused this generator.
-        if not self._active or self._paused:
+        # The callback may have stopped or paused this generator,
+        # or restarted/rescheduled it.
+        if not self._active or self._paused or self._current_event is not current_event:
             return
 
         # Schedule next event if we shouldn't stop
