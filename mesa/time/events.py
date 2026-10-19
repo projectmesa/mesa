@@ -307,8 +307,9 @@ class EventGenerator:
         fn()
         self._execution_count += 1
 
-        # The callback may have stopped, paused, or restarted this generator; a
-        # restart replaces _current_event, so do not schedule a second one.
+        # The callback may have stopped, paused, restarted, or resumed this
+        # generator. Both start() and resume() schedule a new event and replace
+        # _current_event, so in that case do not schedule a second one.
         if not self._active or self._paused or self._current_event is not firing_event:
             return
 

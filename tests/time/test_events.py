@@ -888,6 +888,26 @@ class TestEventGeneratorStartStop:
         assert calls == [1.0, 2.0, 3.0, 4.0]
         assert len(calls) == len(set(calls))
 
+    def test_pause_resume_from_within_callback(self, setup):
+        """Pausing and resuming from the callback must not double-schedule either."""
+        model, _ = setup
+        calls = []
+        gen = None
+
+        def cb():
+            calls.append(model.time)
+            if len(calls) == 1:
+                gen.pause()
+                gen.resume()
+
+        gen = EventGenerator(model, cb, Schedule(interval=1.0))
+        gen.start()
+        model.run_for(4.0)
+
+        # resume() schedules a new event too, so this must not double up either.
+        assert calls == [1.0, 2.0, 3.0, 4.0]
+        assert len(calls) == len(set(calls))
+
 
 class TestEventGeneratorExecution:
     def test_recurring_execution(self, setup):
