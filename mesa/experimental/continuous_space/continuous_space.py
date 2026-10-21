@@ -86,6 +86,10 @@ class ContinuousSpace[A: ContinuousSpaceAgent]:
         self.size: np.array = self.dimensions[:, 1] - self.dimensions[:, 0]
         self.center: np.array = np.sum(self.dimensions, axis=1) / 2
 
+        # Plain Python copies of the bounds, used by _wrap_point for a cheap bounds check.
+        self._lower: tuple[float, ...] = tuple(float(v) for v in self.dimensions[:, 0])
+        self._upper: tuple[float, ...] = tuple(float(v) for v in self.dimensions[:, 1])
+
         self.torus: bool = torus
 
         # self._agent_positions is the array containing all agent positions
@@ -188,7 +192,7 @@ class ContinuousSpace[A: ContinuousSpaceAgent]:
         """
         point = np.asanyarray(point)
         if self.torus:
-            point = self.torus_correct(point)
+            point = self._wrap_point(point)
 
         positions = (
             self.agent_positions
@@ -243,7 +247,7 @@ class ContinuousSpace[A: ContinuousSpaceAgent]:
             # The minimum image convention below only holds while the separation
             # is at most the space size on each axis, which an out-of-bounds
             # query point can break, so wrap the point into the bounds first.
-            point = self.torus_correct(point)
+            point = self._wrap_point(point)
 
             delta = np.abs(point - positions)
             delta = np.minimum(delta, self.size - delta, out=delta)
@@ -313,6 +317,13 @@ class ContinuousSpace[A: ContinuousSpaceAgent]:
                 & (point <= self.dimensions[:, 1])
             ).all()
         )
+
+    def _wrap_point(self, point: np.ndarray) -> np.ndarray:
+        """Wrap point into the bounds, skipping the numpy work if it is already inside."""
+        for value, lower, upper in zip(point, self._lower, self._upper):
+            if value < lower or value > upper:
+                return self.torus_correct(point)
+        return point
 
     def torus_correct(self, point: ArrayLike) -> np.ndarray:
         """Apply a torus correction to the point."""
