@@ -8,9 +8,9 @@ Mesa 4.0 completes the deprecation cycles announced across Mesa 3.x by removing 
 
 Install the 4.0 pre-release with `pip install -U --pre "mesa[rec]"` — plain `pip install -U "mesa[rec]"` (no `--pre`) resolves to the latest stable release instead, which is still Mesa 3.5.1 .
 
-### Experimental meta-agents moved to `mesa.meta_agents`
+### Experimental meta-agents API reworked
 
-Import meta-agents from `mesa.meta_agents`. The old helpers (`create_meta_agent`, unbound `MetaAgent(...)`, `agent.meta_agent`, `agent.meta_agents`, and `constituting_*` mutators) are gone. A membership manager on the model tracks who belongs to which group; read and write memberships only through `model.meta_agents`.
+Meta-agents still live in `mesa.experimental.meta_agents`, but the API has been rewritten. The old helpers (`create_meta_agent`, unbound `MetaAgent(...)`, `agent.meta_agent`, `agent.meta_agents`, and `constituting_*` mutators) are gone. A membership manager on the model tracks who belongs to which group; read and write memberships only through `model.meta_agents`.
 
 ```python
 # Old
@@ -22,7 +22,7 @@ group.add_constituting_agents([carol])
 list(group.agents)
 
 # New
-from mesa.meta_agents import MetaAgents
+from mesa.experimental.meta_agents import MetaAgents
 
 model.meta_agents = MetaAgents(model)
 model.meta_agents.create("Team", [alice, bob])
