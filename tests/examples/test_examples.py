@@ -297,7 +297,7 @@ def test_tram_model():  # noqa: D103
 
 
 def test_continuous_grid_forager():  # noqa: D103
-    from mesa.examples.experimental.continuous_grid_forager.model import (
+    from mesa.examples.experimental.continuous_grid_forager.model import (  # noqa: PLC0415
         ContinuousGridForager,
         ForagerScenario,
     )

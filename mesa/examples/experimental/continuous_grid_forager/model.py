@@ -30,9 +30,7 @@ class ContinuousGridForager(Model):
             random=self.random,
             n_agents=1,
         )
-        self.grid = OrthogonalMooreGrid(
-            dimensions, torus=True, random=self.random
-        )
+        self.grid = OrthogonalMooreGrid(dimensions, torus=True, random=self.random)
 
         self.grid.create_property_layer("resource", dtype=float)
         self.grid.resource[:] = np.arange(
