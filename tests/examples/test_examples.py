@@ -294,3 +294,34 @@ def test_tram_model():  # noqa: D103
     del model
     gc.collect()
     assert ref() is None
+
+
+def test_continuous_grid_forager():  # noqa: D103
+    from mesa.examples.experimental.continuous_grid_forager.model import (
+        ContinuousGridForager,
+        ForagerScenario,
+    )
+
+    scenario = ForagerScenario(rng=42)
+    model = ContinuousGridForager(scenario=scenario)
+    agent = model.forager
+
+    start_cell = model.grid.find_nearest_cell(agent.position)
+    target_cell = model.grid.find_nearest_cell((1.25, 0.25))
+    start_resource = start_cell.resource
+    target_resource = target_cell.resource
+
+    model.step()
+
+    assert tuple(agent.position) == pytest.approx((1.25, 0.25))
+    assert agent.last_cell_coordinate == (1, 0)
+    assert target_cell.resource == target_resource - scenario.harvest_amount
+    assert start_cell.resource == start_resource
+    assert agent.energy == scenario.harvest_amount
+    assert all(agent not in cell.agents for cell in model.grid.all_cells)
+
+    # Crossing the toroidal boundary wraps the continuous position before lookup.
+    agent.position = (scenario.width - 0.25, 0.25)
+    model.step()
+    assert tuple(agent.position) == pytest.approx((0.75, 0.25))
+    assert agent.last_cell_coordinate == (0, 0)
