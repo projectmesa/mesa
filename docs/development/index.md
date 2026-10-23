@@ -1,6 +1,6 @@
 # Developer guide
 
-This guide is for everyone who works on Mesa itself: contributors, reviewers and maintainers. It explains how we work together, what we value, and what we have already decided, so you don't have to piece that together from years of issues and discussions.
+This guide is for everyone who works on Mesa itself: contributors, reviewers and maintainers. It explains how we work together, what we value, and what we have decided in the past. Its meant to help you create a broad understanding what we do and how and why we do them.
 
 New here? Start with the [contributing guide](https://github.com/mesa/mesa/blob/main/CONTRIBUTING.md) for setup and first steps, then come back to this page.
 
@@ -84,7 +84,7 @@ For complex features where feasibility or proportionality is uncertain, we somet
 - Gather concrete data (for example micro-benchmarks) to inform design decisions
 - Spark discussion with working code rather than abstract ideas
 
-Pathfinding PRs aren't expected to be merge-ready. They're tools for learning and discussion. Say clearly in the PR description that it is a pathfinding PR and what question it is meant to answer.
+Pathfinding PRs aren't expected to be merge-ready. They're tools for learning and discussion. Say clearly in the PR description that it is a pathfinding PR and what question it is meant to answer. It's good fashion to open them as a [Draft PR](https://github.blog/news-insights/product-news/introducing-draft-pull-requests/).
 
 ### Example workflow
 
