@@ -262,6 +262,14 @@ class EventGenerator:
         return self._active
 
     @property
+    def is_paused(self) -> bool:
+        """Return whether the generator is paused.
+
+        A paused generator is still active, so running is ``is_active and not is_paused``.
+        """
+        return self._paused
+
+    @property
     def execution_count(self) -> int:
         """Return the number of times this generator has executed."""
         return self._execution_count
