@@ -1002,6 +1002,21 @@ def test_property_layer_can_be_readded_after_removal(method):
     assert grid.sugar[1, 1] == 3
 
 
+def test_property_layer_cannot_remove_empty():
+    """Ensure remove_property_layer rejects removing the built-in 'empty' layer."""
+    grid = OrthogonalMooreGrid((3, 3), random=random.Random(42))
+    with pytest.raises(
+        ValueError, match="Cannot remove the built-in 'empty' property layer"
+    ):
+        grid.remove_property_layer("empty")
+
+    assert "empty" in grid.property_layers
+    assert hasattr(grid, "empty")
+    assert hasattr(grid.cell_klass, "empty")
+    assert "empty" in grid.cell_klass.property_layers
+    assert hasattr(grid._cells[(1, 1)], "empty")
+
+
 @pytest.mark.parametrize(
     "reserved",
     ["is_empty", "is_full", "neighborhood", "position", "coordinate", "connections"],

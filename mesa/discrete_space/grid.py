@@ -170,7 +170,13 @@ class Grid(DiscreteSpace[T]):
 
         Args:
             name: property_layer name.
+
+        Raises:
+            ValueError: If attempting to remove the built-in 'empty' property layer.
+            KeyError: If no property layer with the given name exists.
         """
+        if name == "empty":
+            raise ValueError("Cannot remove the built-in 'empty' property layer.")
         if name not in self.property_layers:
             raise KeyError(f"No property_layer named '{name}'.")
         del self.property_layers[name]
