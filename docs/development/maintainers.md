@@ -3,7 +3,7 @@
 How roles in Mesa work, and notes for maintainers.
 
 ## Roles
-Mesa has several roles to help structure our collaboration and recognize great work. They also form a progression path for community members to that want to take on increasing responsibility in the project. Since we're all volunteers, everyone contributes what they can when they can - there are no minimum time commitments. Also, the best ideas and contributions can come from anyone, these roles are just a way to coordinate our efforts.
+Mesa has several roles to help structure our collaboration and recognize great work. They also form a progression path for community members who want to take on increasing responsibility in the project. Since we're all volunteers, everyone contributes what they can when they can - there are no minimum time commitments. Also, the best ideas and contributions can come from anyone, these roles are just a way to coordinate our efforts.
 
 Feel free to reach out to us anytime to discuss your interests and ambitions in the project. We're always happy to chat about how you can grow your involvement in Mesa!
 
@@ -59,6 +59,7 @@ All roles are expected to:
 Mesa grows through good ideas and contributions. We're all volunteers working together to make Mesa better. Don't hesitate to reach out to any maintainer to discuss your interests and potential growth within the project!
 
 ## Releases
+
 To create a new release, follow these steps:
 
 1. Ensure all pull requests (PRs) have a clear title and are labeled with at least one label. Check [this link](https://github.com/mesa/mesa/pulls?q=is%3Apr+is%3Amerged+no%3Alabel+merged%3A%3E%3D2024-03-01+) to see if all PRs are labeled. These labels will be used when drafting the changelog using the [`.github/release.yml`](https://github.com/mesa/mesa/blob/main/.github/release.yml) configuration.
