@@ -838,6 +838,25 @@ def test_cell_collection():
     assert len(cells) == len(collection)
 
 
+def test_cell_collection_repr():
+    """Test the string representation of an empty cell collection."""
+    rng = random.Random(42)
+    collection = CellCollection([], random=rng)
+
+    assert repr(collection) == "CellCollection({})"
+
+
+def test_cell_collection_warns_without_random():
+    """Test that omitting the random number generator raises a warning."""
+    with pytest.warns(
+        UserWarning,
+        match="Random number generator not specified",
+    ):
+        collection = CellCollection([])
+
+    assert isinstance(collection.random, random.Random)
+
+
 def test_empty_cell_collection():
     """Test that CellCollection properly handles empty collections."""
     rng = random.Random(42)
