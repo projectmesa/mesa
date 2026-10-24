@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import contextlib
 import copy
+import itertools
+import math
+import numbers
 import operator
 import warnings
 import weakref
@@ -16,6 +19,9 @@ from collections import defaultdict
 from collections.abc import Callable, Hashable, Iterable, Iterator, MutableSet, Sequence
 from random import Random
 from typing import TYPE_CHECKING, Any, Literal, overload
+
+import numpy as np
+import pandas as pd
 
 if TYPE_CHECKING:
     from mesa.agent import Agent
@@ -57,12 +63,46 @@ def _resolve_weights(
             "Expected str, Callable, Sequence[float], or None."
         )
 
+    if not all(map(math.isfinite, w)):
+        raise ValueError("All weights must be finite.")
     if any(x < 0 for x in w):
         raise ValueError("All weights must be non-negative.")
     if sum(w) <= 0:
         raise ValueError("Sum of weights must be strictly positive.")
 
     return w
+
+
+def _resolve_per_agent_values(value: Any, n: int, *, strict: bool = True) -> Iterable:
+    """Resolve ``value`` into an iterable of ``n`` per-agent values.
+
+    A ``list``, ``tuple``, ``numpy.ndarray`` or ``pandas.Series`` of length ``n``
+    is treated as one value per agent. Any other value (a scalar, a string, or a
+    non-sequence) is broadcast to all ``n`` agents.
+
+    Args:
+        value: The value(s) to assign, either one per agent or broadcast.
+        n: The number of agents to produce values for.
+        strict: If True (the default), a sequence whose length is not ``n`` raises
+            ValueError. If False, such a sequence is broadcast to every agent (the
+            whole sequence becomes each agent's value).
+
+    Returns:
+        An iterable yielding exactly ``n`` values.
+
+    Raises:
+        ValueError: If ``strict`` and ``value`` is a sequence whose length is
+            not ``n``.
+    """
+    if isinstance(value, (list, tuple, np.ndarray, pd.Series)):
+        if len(value) == n:
+            return value
+        if strict:
+            raise ValueError(
+                f"sequence of length {len(value)} does not match the number "
+                f"of agents ({n})"
+            )
+    return itertools.repeat(value, n)
 
 
 class AbstractAgentSet[A: Agent](ABC, MutableSet[A]):
@@ -125,6 +165,10 @@ class AbstractAgentSet[A: Agent](ABC, MutableSet[A]):
         Returns:
             AbstractAgentSet: A new AbstractAgentSet containing the selected agents, unless inplace is True, in which case the current AbstractAgentSet is updated.
 
+        Raises:
+            TypeError: If at_most is not an integer or float, or is a boolean.
+            ValueError: If at_most is a negative integer, or a float not in the range (0.0, 1.0].
+
         Notes:
             - at_most just return the first n or fraction of agents. To take a random sample, shuffle() beforehand.
             - at_most is an upper limit. When specifying other criteria, the number of agents returned can be smaller.
@@ -133,9 +177,19 @@ class AbstractAgentSet[A: Agent](ABC, MutableSet[A]):
         if filter_func is None and agent_type is None and at_most == inf:
             return self if inplace else copy.copy(self)
 
-        # Check if at_most is of type float
-        if at_most <= 1.0 and isinstance(at_most, float):
+        if isinstance(at_most, bool) or not isinstance(at_most, (int, float)):
+            raise TypeError(
+                f"at_most must be an integer or float, got {type(at_most).__name__}."
+            )
+
+        if isinstance(at_most, float) and at_most != inf:
+            if not (0.0 < at_most <= 1.0):
+                raise ValueError(
+                    f"Fractional at_most must be in the range (0.0, 1.0], got {at_most}."
+                )
             at_most = int(len(self) * at_most)  # Note that it rounds down (floor)
+        elif isinstance(at_most, int) and at_most < 0:
+            raise ValueError(f"Integer at_most must be non-negative, got {at_most}.")
 
         def agent_generator(
             filter_func: Callable[[A], bool] | None,
@@ -183,16 +237,18 @@ class AbstractAgentSet[A: Agent](ABC, MutableSet[A]):
             AbstractAgentSet: A new or updated AbstractAgentSet containing the sampled agents.
 
         Raises:
-            ValueError: If the AgentSet is empty, n <= 0, n > len(self) when replace=False, weights are negative, total weight <= 0, or length of weights sequence does not match the AgentSet.
+            ValueError: If the AgentSet is empty, n <= 0, n > len(self) when replace=False, n exceeds the number of positive weights when sampling without replacement, weights are negative, total weight <= 0, or length of weights sequence does not match the AgentSet.
             TypeError: If n or weights is of an unsupported type.
         """
         if len(self) == 0:
             raise ValueError("Cannot sample from an empty AgentSet.")
 
-        if isinstance(n, bool) or not isinstance(n, (int, float)):
+        # numbers.Integral / numbers.Real also cover numpy scalars such as np.int64
+        if isinstance(n, (bool, np.bool_)) or not isinstance(n, numbers.Real):
             raise TypeError(f"n must be an integer or float, got {type(n).__name__}.")
 
-        if isinstance(n, int):
+        if isinstance(n, numbers.Integral):
+            n = int(n)
             if n <= 0:
                 raise ValueError(f"n must be a positive integer, got {n}.")
             sample_size = n
@@ -230,9 +286,15 @@ class AbstractAgentSet[A: Agent](ABC, MutableSet[A]):
                     if wi > 0:
                         u = self.random.random()
                         key = u ** (1.0 / wi)
-                    else:
-                        key = 0.0
-                    keys.append((key, agent))
+                        keys.append((key, agent))
+
+                positive_weight_count = len(keys)
+                if sample_size > positive_weight_count:
+                    raise ValueError(
+                        f"Sample size ({sample_size}) cannot exceed the number of "
+                        f"agents with positive weights ({positive_weight_count}) when "
+                        "replace=False."
+                    )
                 keys.sort(key=lambda x: x[0], reverse=True)
                 chosen = [agent for _, agent in keys[:sample_size]]
 
@@ -335,17 +397,40 @@ class AbstractAgentSet[A: Agent](ABC, MutableSet[A]):
             )
 
     def set(self, attr_name: str, value: Any) -> AgentSet[A]:
-        """Set a specified attribute to a given value for all agents in the AgentSet.
+        """Set a specified attribute for the agents in the AgentSet.
+
+        The behavior is derived from ``value`` (the same value-based rule pandas
+        uses for column assignment):
+
+        - A ``list``, ``tuple``, ``numpy.ndarray`` or ``pandas.Series`` is treated
+          as one value per agent and is assigned element-wise, in iteration order
+          (the same order ``get`` uses), so a ``get -> transform -> set``
+          round-trip stays consistent. It must have the same length as the
+          AgentSet; a length mismatch raises ``ValueError``.
+        - Any other value (a scalar, a string, or any non-sequence) is broadcast:
+          every agent receives the same value.
 
         Args:
             attr_name (str): The name of the attribute to set.
-            value (Any): The value to set the attribute to.
+            value (Any): The value(s) to assign. See above for how the shape of
+                ``value`` selects element-wise vs broadcast assignment.
 
         Returns:
             AgentSet: The AgentSet instance itself, after setting the attribute.
+
+        Raises:
+            ValueError: If ``value`` is a sequence whose length does not match the
+                number of agents in the AgentSet.
+
+        Notes:
+            A per-agent sequence is recognized by its type (list, tuple, ndarray,
+            Series). To assign a single sequence value to every agent, broadcast
+            it explicitly, e.g. ``[shared_list] * len(agentset)``.
         """
-        for agent in self:
-            setattr(agent, attr_name, value)
+        for agent, agent_value in zip(
+            self, _resolve_per_agent_values(value, len(self))
+        ):
+            setattr(agent, attr_name, agent_value)
         return self
 
     def to_list(self) -> list[A]:
@@ -608,14 +693,16 @@ class AgentSet[A: Agent](AbstractAgentSet[A], Sequence[A]):
         Returns:
             AgentSet: The AgentSet instance itself.
         """
-        # we iterate over the actual weakref keys and check if weakref is alive before calling the method
+        # Snapshot keyrefs so we can safely iterate while agents may be removed.
+        # Re-check membership: an earlier agent's call may have removed this agent
+        # from the set before we reach it (mirrors _HardKeyAgentSet behaviour).
         if isinstance(method, str):
             for agentref in self._agents.keyrefs():
-                if (agent := agentref()) is not None:
+                if (agent := agentref()) is not None and agent in self._agents:
                     getattr(agent, method)(*args, **kwargs)
         else:
             for agentref in self._agents.keyrefs():
-                if (agent := agentref()) is not None:
+                if (agent := agentref()) is not None and agent in self._agents:
                     method(agent, *args, **kwargs)
 
         return self
@@ -630,11 +717,11 @@ class AgentSet[A: Agent](AbstractAgentSet[A], Sequence[A]):
 
         if isinstance(method, str):
             for ref in weakrefs:
-                if (agent := ref()) is not None:
+                if (agent := ref()) is not None and agent in self._agents:
                     getattr(agent, method)(*args, **kwargs)
         else:
             for ref in weakrefs:
-                if (agent := ref()) is not None:
+                if (agent := ref()) is not None and agent in self._agents:
                     method(agent, *args, **kwargs)
 
         return self
@@ -654,18 +741,19 @@ class AgentSet[A: Agent](AbstractAgentSet[A], Sequence[A]):
         Returns:
            list[Any]: The results of the callable calls
         """
-        # we iterate over the actual weakref keys and check if weakref is alive before calling the method
+        # Re-check membership after resolving the weakref: an earlier agent's
+        # call may have removed this agent from the set (mirrors _HardKeyAgentSet).
         if isinstance(method, str):
             res = [
                 getattr(agent, method)(*args, **kwargs)
                 for agentref in self._agents.keyrefs()
-                if (agent := agentref()) is not None
+                if (agent := agentref()) is not None and agent in self._agents
             ]
         else:
             res = [
                 method(agent, *args, **kwargs)
                 for agentref in self._agents.keyrefs()
-                if (agent := agentref()) is not None
+                if (agent := agentref()) is not None and agent in self._agents
             ]
 
         return res

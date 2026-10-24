@@ -477,11 +477,15 @@ def test_json_recorder_numpy_encoder_types():
     """Test NumpyJSONEncoder handles various numpy types."""
     encoder = NumpyJSONEncoder()
 
-    # Test int types
+    # Test int types (all widths, signed and unsigned)
+    assert encoder.default(np.int8(5)) == 5
     assert encoder.default(np.int32(5)) == 5
     assert encoder.default(np.int64(10)) == 10
+    assert encoder.default(np.uint16(7)) == 7
 
-    # Test float types
+    # Test float types (all widths, not just float64)
+    assert encoder.default(np.float16(2.5)) == pytest.approx(2.5, rel=1e-3)
+    assert encoder.default(np.float32(2.71)) == pytest.approx(2.71, rel=1e-3)
     assert encoder.default(np.float64(2.71)) == pytest.approx(2.71, rel=1e-6)
 
     # Test bool type
@@ -491,6 +495,10 @@ def test_json_recorder_numpy_encoder_types():
     # Test array type
     arr = np.array([1, 2, 3])
     assert encoder.default(arr) == [1, 2, 3]
+
+    # Unsupported types fall through to the base encoder, which raises.
+    with pytest.raises(TypeError):
+        encoder.default(object())
 
 
 def test_json_recorder_clear():
@@ -1096,3 +1104,24 @@ def test_run_ended(tmp_path, recorder_class):
     model.run_for(3.0)
     df = recorder.get_table_dataframe("model_data")
     assert df.empty
+
+
+def test_numpy_agent_dataset_agent_id_dtype():
+    """Test that agent_id is stored as integer for numpy datasets in both recorders."""
+    pytest.importorskip("pyarrow")
+    model = MockModel(n=3)
+    recorder = DataRecorder(model, {"numpy_data": DatasetConfig()})
+    model.step()
+    df = recorder.get_table_dataframe("numpy_data")
+    assert pd.api.types.is_integer_dtype(df["agent_id"])
+    assert list(df["agent_id"]) == [1, 2, 3]
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        model2 = MockModel(n=3)
+        parquet_recorder = ParquetDataRecorder(
+            model2, {"numpy_data": DatasetConfig()}, output_dir=temp_dir
+        )
+        model2.step()
+        df_parquet = parquet_recorder.get_table_dataframe("numpy_data")
+        assert pd.api.types.is_integer_dtype(df_parquet["agent_id"])
+        assert list(df_parquet["agent_id"]) == [1, 2, 3]

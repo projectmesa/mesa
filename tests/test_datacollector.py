@@ -369,8 +369,13 @@ class TestDataCollectorWithAgentTypes(unittest.TestCase):
         self.assertNotIn("type_b_val", agent_a_data.columns)
         self.assertNotIn("type_a_val", agent_b_data.columns)
 
-    def test_agenttype_superclass_reporter(self):
-        """Test adding a reporter for a superclass of an agent type."""
+    def test_agenttype_superclass_reporter_excludes_subclasses(self):
+        """A superclass reporter collects no agents when only subclasses exist.
+
+        Agenttype reporters are exact-type: MockAgent and Agent have no direct
+        instances in this model (only MockAgentA / MockAgentB subclasses), so their
+        reporters collect nothing.
+        """
         model = MockModelWithAgentTypes()
         model.datacollector._new_agenttype_reporter(MockAgent, "val", lambda a: a.val)
         model.datacollector._new_agenttype_reporter(Agent, "val", lambda a: a.val)
@@ -379,11 +384,29 @@ class TestDataCollectorWithAgentTypes(unittest.TestCase):
 
         super_data = model.datacollector.get_agenttype_vars_dataframe(MockAgent)
         agent_data = model.datacollector.get_agenttype_vars_dataframe(Agent)
-        self.assertIn("val", super_data.columns)
-        self.assertIn("val", agent_data.columns)
-        self.assertEqual(len(super_data), 30)  # 10 agents * 3 steps
-        self.assertEqual(len(agent_data), 30)
-        self.assertTrue(super_data.equals(agent_data))
+        self.assertEqual(len(super_data), 0)
+        self.assertEqual(len(agent_data), 0)
+
+    def test_agenttype_reporter_is_exact_type_with_direct_instances(self):
+        """An agenttype reporter collects only exact-type agents, excluding subclasses.
+
+        Regression: collection previously used exact-type lookup when the type had
+        direct instances but an isinstance scan otherwise, so the result silently
+        flipped depending on whether a direct instance existed. It is now
+        consistently exact-type.
+        """
+        model = Model()
+        for i in range(2):
+            MockAgent(model, val=i)  # direct instances of the reported type
+        for i in range(3):
+            MockAgentA(model, val=i)  # subclass instances, must be excluded
+
+        dc = DataCollector(agenttype_reporters={MockAgent: {"v": lambda a: a.val}})
+        dc.collect(model)
+
+        df = dc.get_agenttype_vars_dataframe(MockAgent)
+        # Only the 2 exact-type MockAgent instances, not the 3 MockAgentA subclasses.
+        assert len(df) == 2
 
 
 class MockModelForErrors(Model):
@@ -872,6 +895,32 @@ def test_add_table_row_missing_column():
 
     with pytest.raises(ValueError, match="missing column"):
         dc.add_table_row("mytable", {"col_a": 1})
+
+
+@pytest.mark.parametrize("missing_column", ["col_a", "col_b", "col_c"])
+@pytest.mark.parametrize("with_existing_row", [False, True])
+def test_add_table_row_missing_column_leaves_table_unchanged(
+    missing_column, with_existing_row
+):
+    """Reject incomplete rows without corrupting existing or future table data."""
+    dc = DataCollector(tables={"events": ["col_a", "col_b", "col_c"]})
+    existing_row = {"col_a": 10, "col_b": 20, "col_c": 30}
+    if with_existing_row:
+        dc.add_table_row("events", existing_row)
+    before = dc.get_table_dataframe("events").copy(deep=True)
+
+    complete_row = {"col_a": 1, "col_b": 2, "col_c": 3}
+    incomplete_row = complete_row.copy()
+    del incomplete_row[missing_column]
+    with pytest.raises(ValueError, match=f"missing column '{missing_column}'"):
+        dc.add_table_row("events", incomplete_row)
+
+    pd.testing.assert_frame_equal(dc.get_table_dataframe("events"), before)
+    dc.add_table_row("events", complete_row)
+    expected_rows = (
+        [existing_row, complete_row] if with_existing_row else [complete_row]
+    )
+    assert dc.get_table_dataframe("events").to_dict("records") == expected_rows
 
 
 def test_get_table_dataframe_nonexistent():

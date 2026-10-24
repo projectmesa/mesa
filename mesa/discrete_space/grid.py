@@ -166,14 +166,21 @@ class Grid(DiscreteSpace[T]):
         self._attach_property_layer(name, array, read_only=read_only)
 
     def remove_property_layer(self, name: str) -> None:
-        """Remove a property_layer.
+        """Remove a property_layer and its grid and cell attributes.
 
         Args:
             name: property_layer name.
+
+        Raises:
+            ValueError: If attempting to remove the built-in 'empty' property layer.
+            KeyError: If no property layer with the given name exists.
         """
+        if name == "empty":
+            raise ValueError("Cannot remove the built-in 'empty' property layer.")
         if name not in self.property_layers:
             raise KeyError(f"No property_layer named '{name}'.")
         del self.property_layers[name]
+        delattr(self, name)
         delattr(self.cell_klass, name)
         self.cell_klass.property_layers.discard(name)
         self._read_only_layers.discard(name)
@@ -181,24 +188,27 @@ class Grid(DiscreteSpace[T]):
     def _attach_property_layer(
         self, name: str, array: np.ndarray, read_only: bool = False
     ) -> None:
-        if name in type(self).__dict__ or any(
-            name in c.__dict__ for c in type(self).__mro__
-        ):
+        if name in self.property_layers:
+            raise ValueError(f"property_layer '{name}' already exists.")
+
+        if name in self.__dict__ or any(name in c.__dict__ for c in type(self).__mro__):
             raise ValueError(
                 f"property_layer '{name}' conflicts with an existing Grid attribute."
             )
 
-        if name in self.property_layers:
-            raise ValueError(f"property_layer '{name}' already exists.")
-
-        slots = set(
-            chain.from_iterable(
-                getattr(cls, "__slots__", []) for cls in self.cell_klass.__mro__
-            )
+        # Attaching a layer installs an accessor on cell_klass via setattr, so any
+        # name already defined on that class would be silently shadowed. Walking
+        # __mro__ __dict__ covers @property accessors, methods, plain class vars,
+        # and __slots__ members alike (a slot is a member_descriptor living in the
+        # class __dict__). "empty" is exempt: Grid.__init__ itself installs it as
+        # a property layer backing Cell.empty.
+        cell_attrs = set(
+            chain.from_iterable(c.__dict__ for c in self.cell_klass.__mro__)
         )
-        if name in slots:
+        if name != "empty" and name in cell_attrs:
             raise ValueError(
-                f"property_layer name '{name}' clashes with existing slot '{name}'."
+                f"property_layer '{name}' conflicts with an existing "
+                f"{self.cell_klass.__name__} attribute."
             )
         self.property_layers[name] = array
         setattr(self, name, array)
@@ -324,7 +334,7 @@ class Grid(DiscreteSpace[T]):
         This is meaningfully different from :attr:`~DiscreteSpace.empties`:
         ``empties`` only includes cells with **zero** agents. If a cell has
         ``capacity=5`` and currently holds 3 agents it is **not** empty, but it
-        **is** still available. ``available_cells`` is therefore the correct
+        **is** still available. ``cells_with_capacity`` is therefore the correct
         API for models where agents share cells up to a finite limit.
 
         For cells with ``capacity=None`` (unlimited), every cell is always
