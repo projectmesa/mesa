@@ -166,14 +166,21 @@ class Grid(DiscreteSpace[T]):
         self._attach_property_layer(name, array, read_only=read_only)
 
     def remove_property_layer(self, name: str) -> None:
-        """Remove a property_layer.
+        """Remove a property_layer and its grid and cell attributes.
 
         Args:
             name: property_layer name.
+
+        Raises:
+            ValueError: If attempting to remove the built-in 'empty' property layer.
+            KeyError: If no property layer with the given name exists.
         """
+        if name == "empty":
+            raise ValueError("Cannot remove the built-in 'empty' property layer.")
         if name not in self.property_layers:
             raise KeyError(f"No property_layer named '{name}'.")
         del self.property_layers[name]
+        delattr(self, name)
         delattr(self.cell_klass, name)
         self.cell_klass.property_layers.discard(name)
         self._read_only_layers.discard(name)
@@ -181,15 +188,13 @@ class Grid(DiscreteSpace[T]):
     def _attach_property_layer(
         self, name: str, array: np.ndarray, read_only: bool = False
     ) -> None:
-        if name in type(self).__dict__ or any(
-            name in c.__dict__ for c in type(self).__mro__
-        ):
+        if name in self.property_layers:
+            raise ValueError(f"property_layer '{name}' already exists.")
+
+        if name in self.__dict__ or any(name in c.__dict__ for c in type(self).__mro__):
             raise ValueError(
                 f"property_layer '{name}' conflicts with an existing Grid attribute."
             )
-
-        if name in self.property_layers:
-            raise ValueError(f"property_layer '{name}' already exists.")
 
         # Attaching a layer installs an accessor on cell_klass via setattr, so any
         # name already defined on that class would be silently shadowed. Walking
