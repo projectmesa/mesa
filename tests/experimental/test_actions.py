@@ -1,12 +1,18 @@
 """Tests for mesa.experimental.actions."""
 
 # ruff: noqa: D101, D102, D103, D107
+import logging
+
 import pytest
 
 from mesa import Agent, Model
-from mesa.experimental.actions import Action, ActionState
+from mesa.experimental.actions import Action, ActionState, HasActions
 
 # --- Helpers ---
+
+
+class ActionAgent(HasActions, Agent):
+    """Agent with action support, as models combine it."""
 
 
 class TrackedAction(Action):
@@ -18,6 +24,7 @@ class TrackedAction(Action):
         self.resume_count = 0
         self.completed = False
         self.interrupted = False
+        self.failed = False
         self.interrupt_progress = None
 
     def on_start(self):
@@ -33,10 +40,13 @@ class TrackedAction(Action):
         self.interrupted = True
         self.interrupt_progress = progress
 
+    def on_fail(self):
+        self.failed = True
+
 
 def make_model_and_agent():
     model = Model()
-    agent = Agent(model)
+    agent = ActionAgent(model)
     return model, agent
 
 
@@ -540,7 +550,7 @@ class TestErrorHandling:
 
     def test_start_wrong_agent_raises(self):
         model, agent1 = make_model_and_agent()
-        agent2 = Agent(model)
+        agent2 = ActionAgent(model)
         action = TrackedAction(agent1, duration=5.0)
 
         with pytest.raises(ValueError, match="does not match"):
@@ -565,6 +575,33 @@ class TestErrorHandling:
     def test_cancel_idle_returns_false(self):
         _model, agent = make_model_and_agent()
         assert agent.cancel_action() is False
+
+    def test_action_requires_has_actions_agent(self):
+        """A plain Agent without the mixin is rejected up front."""
+        model = Model()
+        plain = Agent(model)
+
+        with pytest.raises(TypeError, match="HasActions"):
+            Action(plain)
+
+    def test_mixin_combines_with_other_agent_bases(self):
+        """Cooperative __init__ lets the mixin ride any Agent subclass."""
+        from mesa.discrete_space import CellAgent, OrthogonalMooreGrid  # noqa: PLC0415
+
+        class Grazer(HasActions, CellAgent):
+            pass
+
+        model = Model()
+        grid = OrthogonalMooreGrid((3, 3), random=model.random)
+        agent = Grazer(model)
+        agent.cell = grid[(1, 1)]
+
+        action = agent.start_action(TrackedAction(agent, duration=2.0))
+        model.run_for(2)
+
+        assert action.completed
+        assert not agent.is_busy
+        assert agent.cell is grid[(1, 1)]
 
 
 # --- Callable duration and priority ---
@@ -686,7 +723,7 @@ class TestAgentRemoval:
     def test_remove_with_explicit_cleanup(self):
         """Users can opt into on_interrupt by calling cancel_action first."""
         model = Model()
-        agent = Agent(model)
+        agent = ActionAgent(model)
         action = TrackedAction(agent, duration=10.0)
 
         agent.start_action(action)
@@ -774,6 +811,333 @@ class TestEdgeCases:
         assert "ACTIVE" in repr(action)
 
 
+# --- Requirements and failure ---
+
+
+class TestRequirements:
+    def test_no_requirements_by_default(self):
+        _model, agent = make_model_and_agent()
+        assert Action(agent).start_requirements == []
+
+    def test_single_callable_is_wrapped(self):
+        _model, agent = make_model_and_agent()
+        action = Action(agent, start_requirements=lambda a: True)
+        assert len(action.start_requirements) == 1
+
+    def test_iterable_is_copied(self):
+        """The action keeps its own list, not the caller's."""
+        _model, agent = make_model_and_agent()
+        shared = [lambda a: True]
+        action = Action(agent, start_requirements=shared)
+        shared.append(lambda a: False)
+        assert len(action.start_requirements) == 1
+
+    def test_subclass_can_assign_requirements(self):
+        _model, agent = make_model_and_agent()
+
+        class Picky(Action):
+            def __init__(self, agent):
+                super().__init__(agent)
+                self.start_requirements = [lambda a: a.ready]
+
+        agent.ready = False
+        action = agent.start_action(Picky(agent))
+        assert action.has_failed
+
+    def test_requirement_receives_the_agent(self):
+        _model, agent = make_model_and_agent()
+        seen = []
+
+        def record(a):
+            seen.append(a)
+            return True
+
+        agent.start_action(Action(agent, start_requirements=record))
+        assert seen == [agent]
+
+    def test_all_requirements_must_hold(self):
+        _model, agent = make_model_and_agent()
+        action = TrackedAction(
+            agent, start_requirements=[lambda a: True, lambda a: False]
+        )
+
+        agent.start_action(action)
+
+        assert action.has_failed
+
+    def test_action_starts_when_every_requirement_holds(self):
+        _model, agent = make_model_and_agent()
+        action = TrackedAction(
+            agent, start_requirements=[lambda a: True, lambda a: True]
+        )
+
+        agent.start_action(action)
+
+        assert action.state is ActionState.ACTIVE
+        assert action.start_count == 1
+
+    def test_requirement_is_not_checked_mid_flight(self):
+        """Broken and repaired between start and completion is not a failure."""
+        model, agent = make_model_and_agent()
+        agent.grass = True
+        action = TrackedAction(
+            agent, duration=5.0, start_requirements=lambda a: a.grass
+        )
+        agent.start_action(action)
+
+        model.run_for(2)
+        agent.grass = False
+        model.run_for(1)
+        agent.grass = True
+        model.run_for(3)
+
+        assert action.state is ActionState.COMPLETED
+        assert action.completed
+
+
+class TestActionFailure:
+    def test_failing_requirement_blocks_start(self):
+        _model, agent = make_model_and_agent()
+        action = TrackedAction(agent, start_requirements=lambda a: False)
+
+        agent.start_action(action)
+
+        assert action.state is ActionState.FAILED
+        assert action.failed
+        assert action.start_count == 0
+        assert action.progress == 0.0
+        assert not agent.is_busy
+
+    def test_start_failure_schedules_no_completion(self):
+        model, agent = make_model_and_agent()
+        before = len(model._event_list)
+
+        action = TrackedAction(agent, start_requirements=lambda a: False)
+        agent.start_action(action)
+
+        # Exactly one new event: the agent's idle wake, never a completion.
+        assert len(model._event_list) == before + 1
+        model.run_for(10)
+        assert action.start_count == 0
+        assert not action.completed
+
+    def test_failed_action_cannot_be_restarted(self):
+        _model, agent = make_model_and_agent()
+        action = TrackedAction(agent, start_requirements=lambda a: False)
+        agent.start_action(action)
+
+        with pytest.raises(ValueError, match="FAILED"):
+            agent.start_action(action)
+
+    def test_start_requirements_rechecked_on_resume(self):
+        model, agent = make_model_and_agent()
+        agent.safe = True
+        action = TrackedAction(agent, duration=5.0, start_requirements=lambda a: a.safe)
+        agent.start_action(action)
+
+        model.run_for(2)
+        agent.cancel_action()
+        agent.safe = False
+
+        agent.start_action(action)
+
+        assert action.state is ActionState.FAILED
+        assert action.resume_count == 0
+        assert action.progress == pytest.approx(0.4)
+
+    def test_requirement_broken_at_completion_fails(self):
+        model, agent = make_model_and_agent()
+        agent.grass = True
+        action = TrackedAction(
+            agent, duration=3.0, completion_requirements=lambda a: a.grass
+        )
+        agent.start_action(action)
+
+        agent.grass = False
+        model.run_for(4)
+
+        assert action.state is ActionState.FAILED
+        assert action.failed
+        assert not action.completed
+        assert action.progress == 1.0  # the duration elapsed, the effect did not apply
+        assert agent.current_action is None
+
+    def test_instantaneous_action_checks_both_lists(self):
+        """duration=0 completes inside start(), so both gates run in one call."""
+        _model, agent = make_model_and_agent()
+        agent.ready = True
+
+        action = TrackedAction(
+            agent,
+            duration=0.0,
+            start_requirements=lambda a: a.ready,
+            completion_requirements=lambda a: False,
+        )
+        agent.start_action(action)
+
+        assert action.state is ActionState.FAILED
+        assert action.start_count == 1  # it did start, then failed to land
+
+
+class TestInterruptForWithRequirements:
+    def test_returns_false_when_the_new_action_fails(self):
+        _model, agent = make_model_and_agent()
+        agent.start_action(TrackedAction(agent, duration=5.0))
+
+        assert (
+            agent.interrupt_for(
+                TrackedAction(agent, start_requirements=lambda a: False)
+            )
+            is False
+        )
+
+    def test_old_action_is_not_rolled_back(self):
+        model, agent = make_model_and_agent()
+        first = TrackedAction(agent, duration=5.0)
+        agent.start_action(first)
+
+        model.run_for(2)
+        agent.interrupt_for(TrackedAction(agent, start_requirements=lambda a: False))
+
+        assert first.state is ActionState.INTERRUPTED
+        assert agent.current_action is None
+
+    def test_returns_true_when_the_new_action_starts(self):
+        _model, agent = make_model_and_agent()
+        agent.start_action(TrackedAction(agent, duration=5.0))
+
+        assert agent.interrupt_for(
+            TrackedAction(agent, start_requirements=lambda a: True)
+        )
+
+    def test_refused_interruption_leaves_the_new_action_untouched(self):
+        _model, agent = make_model_and_agent()
+        agent.start_action(TrackedAction(agent, duration=5.0, interruptible=False))
+        replacement = TrackedAction(agent, start_requirements=lambda a: False)
+
+        assert agent.interrupt_for(replacement) is False
+        assert replacement.state is ActionState.PENDING
+        assert not replacement.failed
+
+
+# --- Preemption policy ---
+
+
+class TestShouldInterrupt:
+    def test_higher_priority_preempts(self):
+        model, agent = make_model_and_agent()
+        low = TrackedAction(agent, duration=10.0, priority=1.0)
+        high = TrackedAction(agent, duration=5.0, priority=2.0)
+
+        agent.start_action(low)
+        model.run_for(2)
+
+        assert agent.interrupt_for(high) is True
+        assert low.state is ActionState.INTERRUPTED
+        assert agent.current_action is high
+
+    def test_lower_priority_is_refused(self):
+        model, agent = make_model_and_agent()
+        high = TrackedAction(agent, duration=10.0, priority=2.0)
+        low = TrackedAction(agent, duration=5.0, priority=1.0)
+
+        agent.start_action(high)
+        model.run_for(2)
+
+        assert agent.interrupt_for(low) is False
+        assert high.state is ActionState.ACTIVE
+        assert agent.current_action is high
+        assert low.state is ActionState.PENDING
+        assert low.start_count == 0
+
+    def test_equal_priority_preempts(self):
+        """>= keeps the pre-priority behavior: both default to 0.0."""
+        _model, agent = make_model_and_agent()
+        first = TrackedAction(agent, duration=10.0)
+        second = TrackedAction(agent, duration=5.0)
+
+        agent.start_action(first)
+
+        assert agent.interrupt_for(second) is True
+
+    def test_callable_priority_resolved_before_decision(self):
+        _model, agent = make_model_and_agent()
+        agent.threat = 5.0
+        current = TrackedAction(agent, duration=10.0, priority=3.0)
+        incoming = TrackedAction(agent, duration=2.0, priority=lambda a: a.threat)
+
+        agent.start_action(current)
+
+        assert agent.interrupt_for(incoming) is True
+        assert incoming.priority == 5.0
+
+    def test_callable_priority_resolved_once(self):
+        _model, agent = make_model_and_agent()
+        calls = []
+
+        def prio(a):
+            calls.append(a)
+            return 1.0
+
+        agent.start_action(TrackedAction(agent, duration=10.0))
+        agent.interrupt_for(TrackedAction(agent, duration=5.0, priority=prio))
+
+        assert len(calls) == 1
+
+    def test_non_interruptible_refused_despite_priority(self):
+        _model, agent = make_model_and_agent()
+        agent.start_action(
+            TrackedAction(agent, duration=10.0, priority=1.0, interruptible=False)
+        )
+
+        assert agent.interrupt_for(TrackedAction(agent, priority=100.0)) is False
+
+    def test_not_consulted_when_idle(self):
+        _model, agent = make_model_and_agent()
+        consulted = []
+
+        class Watcher(ActionAgent):
+            def should_interrupt(self, current, incoming):
+                consulted.append((current, incoming))
+                return super().should_interrupt(current, incoming)
+
+        watcher = Watcher(agent.model)
+        action = TrackedAction(watcher, duration=5.0)
+
+        assert watcher.interrupt_for(action) is True
+        assert consulted == []
+        assert watcher.current_action is action
+
+    def test_override_encodes_custom_policy(self):
+        """A subclass can ignore priorities entirely."""
+        model = Model()
+
+        class Stubborn(ActionAgent):
+            def should_interrupt(self, current, incoming):
+                return incoming.name == "Flee"
+
+        agent = Stubborn(model)
+        agent.start_action(TrackedAction(agent, duration=10.0))
+
+        assert agent.interrupt_for(TrackedAction(agent, priority=100.0)) is False
+        assert agent.interrupt_for(TrackedAction(agent, name="Flee")) is True
+
+    def test_override_cannot_force_non_interruptible(self):
+        """Returning True attempts the interruption; the flag still refuses."""
+        model = Model()
+
+        class Pushy(ActionAgent):
+            def should_interrupt(self, current, incoming):
+                return True
+
+        agent = Pushy(model)
+        shielded = TrackedAction(agent, duration=10.0, interruptible=False)
+        agent.start_action(shielded)
+
+        assert agent.interrupt_for(TrackedAction(agent, priority=100.0)) is False
+        assert shielded.state is ActionState.ACTIVE
+
+
 # --- Integration: realistic scenarios ---
 
 
@@ -781,7 +1145,7 @@ class TestRealisticScenarios:
     def test_sheep_forage_flee_resume(self):
         """Sheep forages, flees from predator, resumes foraging."""
         model = Model()
-        sheep = Agent(model)
+        sheep = ActionAgent(model)
         sheep.energy = 50.0
         sheep.alive = True
 
@@ -834,7 +1198,7 @@ class TestRealisticScenarios:
     def test_sequential_actions(self):
         """Agent performs multiple actions in sequence."""
         model = Model()
-        agent = Agent(model)
+        agent = ActionAgent(model)
         agent.log = []
 
         class LogAction(Action):
@@ -855,7 +1219,7 @@ class TestRealisticScenarios:
     def test_flee_non_interruptible_protects(self):
         """A fleeing agent can't be interrupted."""
         model = Model()
-        agent = Agent(model)
+        agent = ActionAgent(model)
 
         flee = Action(agent, duration=3.0, interruptible=False)
         distraction = TrackedAction(agent, duration=1.0)
@@ -872,7 +1236,7 @@ class TestRealisticScenarios:
     def test_worker_interrupted_resumes_task(self):
         """Worker on a task, interrupted by meeting, resumes task."""
         model = Model()
-        worker = Agent(model)
+        worker = ActionAgent(model)
         worker.log = []
 
         class Task(Action):
@@ -912,3 +1276,256 @@ class TestRealisticScenarios:
             "resume@7.0",
             "done@13.0",
         ]
+
+    def test_contested_resource_is_claimed_at_the_start(self):
+        """The right pattern for a rival resource: claim it, do not re-check it.
+
+        The patch holds one serving. The first sheep claims it in on_start and
+        grazes unimpeded; the second cannot start at all and decides what to do
+        from on_fail, which is where "go elsewhere" or "wait" would live.
+        """
+        model = Model()
+        patch = {"servings": 1}
+        first, second = ActionAgent(model), ActionAgent(model)
+        first.energy = second.energy = 0.0
+        second.looked_elsewhere = False
+
+        class Graze(Action):
+            def __init__(self, sheep):
+                super().__init__(
+                    sheep,
+                    duration=3.0,
+                    start_requirements=lambda a: patch["servings"] > 0,
+                )
+
+            def on_start(self):
+                patch["servings"] -= 1  # claimed, so nobody else can take it
+
+            def on_complete(self):
+                self.agent.energy += 30
+
+            def on_fail(self):
+                self.agent.looked_elsewhere = True
+
+        first_graze = first.start_action(Graze(first))
+        second_graze = second.start_action(Graze(second))
+
+        model.run_for(4)
+
+        assert first_graze.state is ActionState.COMPLETED
+        assert first.energy == 30
+        assert second_graze.state is ActionState.FAILED
+        assert second.looked_elsewhere
+        assert second.energy == 0.0
+
+    def test_completion_requirement_for_a_condition_nobody_can_claim(self):
+        """Market hours cannot be reserved, so the check belongs at completion."""
+        model = Model()
+        trader = ActionAgent(model)
+        trader.filled = False
+        market = {"open": True}
+
+        class Trade(Action):
+            def __init__(self, agent):
+                super().__init__(
+                    agent,
+                    duration=5.0,
+                    completion_requirements=lambda a: market["open"],
+                )
+
+            def on_complete(self):
+                self.agent.filled = True
+
+        trade = trader.start_action(Trade(trader))
+        model.run_for(2)
+        market["open"] = False  # closes while the trade is in flight
+        model.run_for(4)
+
+        assert trade.state is ActionState.FAILED
+        assert not trader.filled
+
+
+# --- Wake contract (on_idle) ---
+
+
+class IdleRecorder(ActionAgent):
+    """Agent that records every on_idle wake with the state it saw."""
+
+    def __init__(self, model):
+        super().__init__(model)
+        self.wakes = []
+
+    def on_idle(self, previous):
+        state = previous.state if previous is not None else None
+        self.wakes.append((self.model.time, previous, state))
+
+
+class TestOnIdle:
+    def make_recorder(self):
+        model = Model()
+        return model, IdleRecorder(model)
+
+    def test_wake_fires_after_completion(self):
+        model, agent = self.make_recorder()
+        action = TrackedAction(agent, duration=5.0)
+        agent.start_action(action)
+
+        model.run_for(6)
+
+        assert agent.wakes == [(5.0, action, ActionState.COMPLETED)]
+
+    def test_wake_is_deferred_not_synchronous(self):
+        model, agent = self.make_recorder()
+        action = TrackedAction(agent)
+        agent.start_action(action)
+        agent.cancel_action()
+
+        # The release only queued the wake; nothing has fired yet.
+        assert agent.wakes == []
+
+        model.run_for(1)
+        assert agent.wakes == [(0.0, action, ActionState.INTERRUPTED)]
+
+    def test_wake_fires_for_interrupt(self):
+        model, agent = self.make_recorder()
+        action = TrackedAction(agent, duration=5.0)
+        agent.start_action(action)
+        model.run_for(2)
+
+        assert action.interrupt()
+        model.run_for(1)
+
+        assert agent.wakes == [(2.0, action, ActionState.INTERRUPTED)]
+
+    def test_wake_fires_for_start_failure(self):
+        model, agent = self.make_recorder()
+        action = TrackedAction(agent, start_requirements=lambda a: False)
+        agent.start_action(action)
+
+        model.run_for(1)
+
+        assert agent.wakes == [(0.0, action, ActionState.FAILED)]
+
+    def test_wake_fires_for_completion_failure(self):
+        model, agent = self.make_recorder()
+        action = TrackedAction(
+            agent, duration=3.0, completion_requirements=lambda a: False
+        )
+        agent.start_action(action)
+
+        model.run_for(4)
+
+        assert agent.wakes == [(3.0, action, ActionState.FAILED)]
+
+    def test_no_wake_when_interrupt_for_refills_the_slot(self):
+        model, agent = self.make_recorder()
+        first = TrackedAction(agent, duration=5.0, priority=1.0)
+        second = TrackedAction(agent, duration=3.0, priority=2.0)
+        agent.start_action(first)
+
+        assert agent.interrupt_for(second)
+        model.run_for(4)
+
+        # No idle gap ever existed at t=0; the only wake is second's end.
+        assert agent.wakes == [(3.0, second, ActionState.COMPLETED)]
+
+    def test_coalesced_wake_reports_latest_action(self):
+        model, agent = self.make_recorder()
+        first = TrackedAction(agent)
+        agent.start_action(first)
+        agent.cancel_action()
+        second = TrackedAction(agent, duration=0.0)
+        agent.start_action(second)  # completes instantly, wake still pending
+
+        model.run_for(1)
+
+        assert agent.wakes == [(0.0, second, ActionState.COMPLETED)]
+
+    def test_zero_duration_chain_wakes_once_per_time(self):
+        # Without the once-per-time guard this recurses forever: the test
+        # hangs rather than fails.
+        model = Model()
+
+        class Chain(ActionAgent):
+            def __init__(self, model):
+                super().__init__(model)
+                self.idle_calls = 0
+
+            def on_idle(self, previous):
+                self.idle_calls += 1
+                self.start_action(Action(self, duration=0.0))
+
+        agent = Chain(model)
+        agent.start_action(Action(agent, duration=0.0))
+        model.run_for(1)
+
+        assert agent.idle_calls == 1
+
+    def test_suppressed_wake_is_logged_at_debug(self, caplog):
+        model = Model()
+
+        class Chain(ActionAgent):
+            def on_idle(self, previous):
+                self.start_action(Action(self, duration=0.0))
+
+        agent = Chain(model)
+        agent.start_action(Action(agent, duration=0.0))
+        with caplog.at_level(
+            logging.DEBUG, logger="MESA.mesa.experimental.actions.actions"
+        ):
+            model.run_for(1)
+
+        assert "suppressed repeat on_idle wake" in caplog.text
+        assert f"agent {agent.unique_id}" in caplog.text
+
+    def test_agent_chains_actions_across_time(self):
+        model = Model()
+
+        class Worker(ActionAgent):
+            def __init__(self, model):
+                super().__init__(model)
+                self.done = 0
+
+            def on_idle(self, previous):
+                self.done += 1
+                self.start_action(Action(self, duration=1.0))
+
+        agent = Worker(model)
+        agent.start_action(Action(agent, duration=1.0))
+        model.run_for(3.5)
+
+        # Completions at t=1, 2, 3; each wake starts the next task.
+        assert agent.done == 3
+
+    def test_wake_runs_after_all_completions_at_that_time(self):
+        model = Model()
+        observed = []
+        other = TrackedAction(ActionAgent(model), duration=5.0)
+
+        class Nosy(ActionAgent):
+            def on_idle(self, previous):
+                observed.append(other.state)
+
+        nosy = Nosy(model)
+        mine = TrackedAction(nosy, duration=5.0)
+        nosy.start_action(mine)
+        other.agent.start_action(other)
+
+        model.run_for(6)
+
+        # Both actions end at t=5. The wake is Priority.LOW, so it runs
+        # after the other agent's completion even though that completion
+        # was queued later.
+        assert observed == [ActionState.COMPLETED]
+
+    def test_remove_cancels_pending_wake(self):
+        model, agent = self.make_recorder()
+        action = TrackedAction(agent)
+        agent.start_action(action)
+        agent.cancel_action()
+
+        agent.remove()
+        model.run_for(1)
+
+        assert agent.wakes == []
+        assert agent._wake_event is None

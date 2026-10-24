@@ -18,6 +18,7 @@ from mesa.discrete_space import (
     OrthogonalVonNeumannGrid,
 )
 from mesa.visualization.backends.abstract_renderer import AbstractRenderer
+from mesa.visualization.mpl_space_drawing import _to_numpy_argument_array
 
 OrthogonalGrid = OrthogonalMooreGrid | OrthogonalVonNeumannGrid
 HexGrid = mesa.discrete_space.HexGrid
@@ -98,20 +99,25 @@ class MatplotlibBackend(AbstractRenderer):
         style_fields = {f.name: f.default for f in fields(AgentPortrayalStyle)}
         class_default_size = style_fields.get("size")
 
+        # Warn only once per call instead of once per agent
+        dict_portrayal_warned = False
+
         for agent in space.agents:
             portray_input = agent_portrayal(agent)
 
             if isinstance(portray_input, dict):
-                warnings.warn(
-                    (
-                        "Returning a dict from agent_portrayal is deprecated and will be removed in Mesa 4.0. "
-                        "Please return an AgentPortrayalStyle instance instead. "
-                        "For more information, refer to the migration guide: "
-                        "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
-                    ),
-                    FutureWarning,
-                    stacklevel=2,
-                )
+                if not dict_portrayal_warned:
+                    warnings.warn(
+                        (
+                            "Returning a dict from agent_portrayal is deprecated and will be removed in Mesa 4.0. "
+                            "Please return an AgentPortrayalStyle instance instead. "
+                            "For more information, refer to the migration guide: "
+                            "https://mesa.readthedocs.io/latest/migration_guide.html#defining-portrayal-components"
+                        ),
+                        FutureWarning,
+                        stacklevel=2,
+                    )
+                    dict_portrayal_warned = True
                 # Handle legacy dict input
                 dict_data = portray_input.copy()
                 agent_x, agent_y = self._get_agent_pos(agent, space)
@@ -163,22 +169,13 @@ class MatplotlibBackend(AbstractRenderer):
             arguments["marker"].append(aps.marker)
             arguments["zorder"].append(aps.zorder)
             arguments["alpha"].append(aps.alpha)
-            if aps.edgecolors is not None:
-                arguments["edgecolors"].append(aps.edgecolors)
+            arguments["edgecolors"].append(aps.edgecolors)
             arguments["linewidths"].append(aps.linewidths)
 
-        # Convert to numpy arrays
-        data = {
-            k: (np.asarray(v, dtype=object) if k == "marker" else np.asarray(v))
-            for k, v in arguments.items()
+        return {
+            key: _to_numpy_argument_array(key, value)
+            for key, value in arguments.items()
         }
-
-        # Handle marker array specially to preserve tuples
-        arr = np.empty(len(arguments["marker"]), dtype=object)
-        arr[:] = arguments["marker"]
-        data["marker"] = arr
-
-        return data
 
     def _get_zoom_factor(self, ax, img):
         """Calculate zoom factor only once and cache the result."""

@@ -2,6 +2,7 @@
 # ruff: noqa: D101, D102
 
 import gc
+import pickle
 from collections.abc import Callable
 from functools import partial
 from unittest.mock import MagicMock
@@ -19,6 +20,10 @@ from mesa.time import (
 
 # Ignore deprecation warnings in this test file
 pytestmark = pytest.mark.filterwarnings("ignore::FutureWarning")
+
+
+def _noop():
+    """Module-level callback, so Event's weak reference stays alive."""
 
 
 # ---------------------------------------------------------------------------
@@ -432,8 +437,20 @@ class TestEventListPop:
         assert execution == list(range(5, 10))
 
 
+def _picklable_handler():
+    """Module-level callback, so events holding it can be pickled."""
+
+
+def _recount(el):
+    """Count the canceled events actually on the heap."""
+    return sum(1 for e in el._events if e.CANCELED)
+
+
 class TestEventListCompact:
-    def test_compact_removes_canceled(self):
+    def test_compact_removes_canceled(self, monkeypatch):
+        # ratio 1.0 needs more dead events than the heap holds, so automatic
+        # compaction never fires and compact() can be exercised on its own
+        monkeypatch.setattr(EventList, "COMPACTION_RATIO", 1.0)
         el = EventList()
         fn = MagicMock()
 
@@ -456,6 +473,224 @@ class TestEventListCompact:
 
         assert remaining == [6, 7, 8, 9]
 
+    def test_compacts_when_tombstones_dominate(self):
+        """Cancelling alone rebuilds the heap; no further push is needed."""
+        el = EventList()
+        fn = MagicMock()
+
+        events = [Event(i, fn) for i in range(10)]
+        for e in events:
+            el.add_event(e)
+        for e in events:
+            e.cancel()
+
+        assert len(el._events) < 10
+        assert len(el) == 0
+        assert el._n_canceled == _recount(el)
+
+    @pytest.mark.parametrize("ratio", [0.1, 0.25, 0.5])
+    def test_ratio_bounds_the_peak_heap(self, monkeypatch, ratio):
+        """The ratio caps the heap at L / (1 - ratio)."""
+        monkeypatch.setattr(EventList, "COMPACTION_RATIO", ratio)
+        el = EventList()
+        fn = MagicMock()
+
+        live = [Event(float(i), fn) for i in range(100)]
+        for event in live:
+            el.add_event(event)
+
+        peak = len(el._events)
+        for i in range(600):
+            live[i % 100].cancel()
+            replacement = Event(1000.0 + i, fn)
+            el.add_event(replacement)
+            live[i % 100] = replacement
+            peak = max(peak, len(el._events))
+
+        assert peak <= 100 / (1 - ratio) + 1
+
+    def test_compaction_preserves_ordering(self):
+        el = EventList()
+        fn = MagicMock()
+
+        events = [Event(float(i), fn) for i in range(12)]
+        for e in events:
+            el.add_event(e)
+        for e in events[:8]:
+            e.cancel()
+
+        el.add_event(Event(0.5, fn))
+
+        drained = []
+        while not el.is_empty():
+            drained.append(el.pop_event().time)
+
+        assert drained == [0.5, 8.0, 9.0, 10.0, 11.0]
+
+
+class TestEventListCancelCount:
+    @pytest.fixture(autouse=True)
+    def _no_automatic_compaction(self, monkeypatch):
+        """Observe the count itself; rebuilding is TestEventListCompact's job.
+
+        A ratio of 1.0 would need more canceled events than the heap holds, so
+        the trigger never fires and tombstones stay put to be counted.
+        """
+        monkeypatch.setattr(EventList, "COMPACTION_RATIO", 1.0)
+
+    def test_len_excludes_canceled(self):
+        el = EventList()
+        fn = MagicMock()
+        events = [Event(i, fn) for i in range(5)]
+        for e in events:
+            el.add_event(e)
+
+        events[0].cancel()
+        events[3].cancel()
+
+        assert len(el) == 3
+        assert len(el._events) == 5
+        assert el._n_canceled == _recount(el)
+
+    def test_count_tracks_mixed_operations(self):
+        el = EventList()
+        fn = MagicMock()
+        events = [Event(i, fn) for i in range(12)]
+        for e in events:
+            el.add_event(e)
+
+        events[1].cancel()
+        events[2].cancel()
+        assert el._n_canceled == _recount(el)
+
+        el.pop_event()  # event 0, discards nothing
+        assert el._n_canceled == _recount(el)
+
+        el.pop_event()  # skips tombstones 1 and 2, returns event 3
+        assert el._n_canceled == _recount(el)
+
+        events[7].cancel()
+        el.compact()
+        assert el._n_canceled == _recount(el) == 0
+        assert len(el) == len(el._events)
+
+    def test_repeated_cancel_counts_once(self):
+        el = EventList()
+        event = Event(1.0, MagicMock())
+        el.add_event(event)
+
+        event.cancel()
+        event.cancel()
+
+        assert el._n_canceled == 1
+        assert len(el) == 0
+
+    def test_adding_a_canceled_event_raises(self):
+        el = EventList()
+        event = Event(1.0, MagicMock())
+        event.cancel()
+
+        with pytest.raises(ValueError, match="Cannot add a canceled event"):
+            el.add_event(event)
+
+        assert len(el._events) == 0
+        assert el._n_canceled == 0
+
+    def test_cancel_after_pop_is_not_counted(self):
+        """A popped event has left the heap, so cancelling it must not count.
+
+        Model.schedule_event returns the Event to the caller, so cancelling one
+        that has already fired is reachable from user code.
+        """
+        el = EventList()
+        fn = MagicMock()
+        popped = Event(1.0, fn)
+        el.add_event(popped)
+        el.add_event(Event(2.0, fn))
+
+        assert el.pop_event() is popped
+        popped.cancel()
+
+        assert el._n_canceled == 0
+        assert len(el) == 1
+
+    def test_adding_popped_event_again_restores_counting(self):
+        el = EventList()
+        event = Event(1.0, MagicMock())
+        el.add_event(event)
+
+        el.pop_event()
+        el.add_event(event)
+        event.cancel()
+
+        assert el._n_canceled == 1
+        assert len(el) == 0
+
+    def test_clear_resets_count(self):
+        el = EventList()
+        event = Event(1.0, MagicMock())
+        el.add_event(event)
+        event.cancel()
+
+        el.clear()
+
+        assert el._n_canceled == 0
+        assert len(el) == 0
+
+    def test_cancel_after_clear_does_not_corrupt_count(self):
+        """Canceling an event that was removed by clear() must not affect the list."""
+        el = EventList()
+        fn = MagicMock()
+        stale = Event(1.0, fn)
+        el.add_event(stale)
+        el.clear()
+
+        live = [Event(float(i), fn) for i in range(10)]
+        for e in live:
+            el.add_event(e)
+
+        stale.cancel()
+
+        assert el._n_canceled == 0
+        assert len(el) == 10
+
+    def test_is_empty_when_only_tombstones_remain(self):
+        el = EventList()
+        fn = MagicMock()
+        events = [Event(i, fn) for i in range(3)]
+        for e in events:
+            el.add_event(e)
+        for e in events:
+            e.cancel()
+
+        assert el.is_empty()
+        assert len(el._events) == 3
+
+    def test_cancel_after_list_is_collected(self):
+        el = EventList()
+        event = Event(1.0, MagicMock())
+        el.add_event(event)
+
+        del el
+        gc.collect()
+
+        event.cancel()  # must not raise
+        assert event.CANCELED
+
+    def test_pickle_roundtrip_keeps_counting(self):
+        el = EventList()
+        events = [Event(i, _picklable_handler) for i in range(4)]
+        for e in events:
+            el.add_event(e)
+        events[0].cancel()
+
+        restored = pickle.loads(pickle.dumps(el))  # noqa: S301
+
+        assert len(restored) == 3
+        live = next(e for e in restored._events if not e.CANCELED)
+        live.cancel()
+        assert restored._n_canceled == _recount(restored)
+
 
 # ---------------------------------------------------------------------------
 # EventGenerator
@@ -465,6 +700,72 @@ def setup():
     """Create a model and mock function."""
     model = Model()
     return model, MagicMock()
+
+
+class TestEventListDuplicateAdd:
+    """Adding one Event twice to the same list corrupts the canceled count."""
+
+    def test_duplicate_add_is_refused(self):
+        """A second add of a queued event raises rather than double-queueing it."""
+        event_list = EventList()
+        event = Event(1.0, _noop, Priority.DEFAULT)
+        event_list.add_event(event)
+
+        with pytest.raises(ValueError, match="already in this event list"):
+            event_list.add_event(event)
+
+        assert len(event_list) == 1
+
+    def test_len_and_is_empty_stay_consistent_while_draining(self):
+        """len(), is_empty() and pop_event() must agree. See #3973.
+
+        One event in two heap slots was counted once by cancel() and twice by
+        pop_event(), so len() overcounted, is_empty() claimed events remained
+        after the heap was drained, and the canceled total went negative --
+        which also disables compaction, since a negative count never exceeds
+        the ratio.
+        """
+        event_list = EventList()
+        events = [Event(float(i), _noop, Priority.DEFAULT) for i in range(4)]
+        for event in events:
+            event_list.add_event(event)
+
+        with pytest.raises(ValueError):
+            event_list.add_event(events[0])
+
+        events[0].cancel()
+        live = sum(1 for e in event_list._events if not e.CANCELED)
+        assert len(event_list) == live
+
+        drained = 0
+        while not event_list.is_empty():
+            event_list.pop_event()
+            drained += 1
+
+        assert drained == live
+        assert len(event_list) == 0
+        assert event_list._n_canceled >= 0
+
+    def test_ownership_still_transfers_between_lists(self):
+        """Handing an event to a second list stays allowed, as documented."""
+        first, second = EventList(), EventList()
+        event = Event(1.0, _noop, Priority.DEFAULT)
+
+        first.add_event(event)
+        second.add_event(event)
+
+        assert len(second) == 1
+
+    def test_a_popped_event_can_be_added_again(self):
+        """pop_event() releases ownership, so rescheduling the event is fine."""
+        event_list = EventList()
+        event = Event(1.0, _noop, Priority.DEFAULT)
+        event_list.add_event(event)
+
+        popped = event_list.pop_event()
+        event_list.add_event(popped)
+
+        assert len(event_list) == 1
 
 
 class TestEventGeneratorInit:
@@ -506,6 +807,27 @@ class TestEventGeneratorInit:
         with pytest.raises(ValueError, match="alive"):
             EventGenerator(model, lambda: 10, Schedule(interval=1.0))
 
+    def test_rejects_nonpositive_callable_interval(self, setup):
+        """A callable interval must follow the same > 0 rule as a fixed interval.
+
+        ``Schedule(interval=0)`` is rejected at construction, but a callable that
+        returns 0 was previously accepted, which would schedule the next event at
+        the current time. The runtime check must reject both 0 and negatives.
+        """
+        model, fn = setup
+
+        gen = EventGenerator(model, fn, Schedule(interval=lambda m: 0))
+        with pytest.raises(ValueError, match="> 0"):
+            gen._get_interval()
+
+        gen = EventGenerator(model, fn, Schedule(interval=lambda m: -1))
+        with pytest.raises(ValueError, match="> 0"):
+            gen._get_interval()
+
+        # A positive callable interval is returned unchanged.
+        gen = EventGenerator(model, fn, Schedule(interval=lambda m: 2.0))
+        assert gen._get_interval() == 2.0
+
 
 class TestEventGeneratorStartStop:
     def test_start_with_schedule_start(self, setup):
@@ -532,6 +854,32 @@ class TestEventGeneratorStartStop:
         model.run_for(0.1)
         fn.assert_called_once()
 
+    def test_start_with_schedule_start_in_past_raises(self, setup):
+        """Starting a generator whose schedule.start has passed must not rewind time."""
+        model, fn = setup
+        model.run_until(5.0)
+        gen = EventGenerator(model, fn, Schedule(interval=1.0, start=1.0))
+
+        with pytest.raises(ValueError, match="in the past"):
+            gen.start()
+        assert not gen.is_active
+        assert gen not in model._event_generators
+
+    def test_restart_after_schedule_start_passed_raises(self, setup):
+        """Restarting a stopped generator with a past schedule.start must not replay old events."""
+        model, fn = setup
+        gen = model.schedule_recurring(fn, Schedule(interval=1.0, start=1.0))
+        model.run_until(5.0)
+        gen.stop()
+        fn.reset_mock()
+
+        with pytest.raises(ValueError, match="in the past"):
+            gen.start()
+
+        model.run_for(3.0)
+        fn.assert_not_called()
+        assert model.time == 8.0
+
     def test_start_when_active_is_noop(self, setup):
         """Test that starting when active does nothing."""
         model, fn = setup
@@ -550,6 +898,85 @@ class TestEventGeneratorStartStop:
 
         model.run_for(5.0)
         fn.assert_not_called()
+
+    def test_stop_from_within_callback(self, setup):
+        """Stopping from the callback must not reschedule a next event."""
+        model, _ = setup
+        calls = []
+        gen = None
+
+        def cb():
+            calls.append(model.time)
+            gen.stop()
+
+        gen = EventGenerator(model, cb, Schedule(interval=1.0, start=1.0))
+        gen.start()
+        model.run_for(5.0)
+
+        assert calls == [1.0]
+        assert not gen.is_active
+        assert gen.next_scheduled_time is None
+
+    def test_pause_from_within_callback(self, setup):
+        """Pausing from the callback must not reschedule until resume."""
+        model, _ = setup
+        calls = []
+        gen = None
+
+        def cb():
+            calls.append(model.time)
+            if len(calls) == 1:
+                gen.pause()
+
+        gen = EventGenerator(model, cb, Schedule(interval=1.0, start=1.0))
+        gen.start()
+        model.run_for(5.0)
+        assert calls == [1.0]
+        assert gen.next_scheduled_time is None
+
+        gen.resume()
+        model.run_for(2.0)
+        assert calls == [1.0, 6.0, 7.0]
+
+    def test_restart_from_within_callback(self, setup):
+        """Restarting from the callback must not double-schedule the generator."""
+        model, _ = setup
+        calls = []
+        gen = None
+
+        def cb():
+            calls.append(model.time)
+            if len(calls) == 1:
+                gen.stop()
+                gen.start()
+
+        gen = EventGenerator(model, cb, Schedule(interval=1.0))
+        gen.start()
+        model.run_for(4.0)
+
+        # One call per step, never doubled.
+        assert calls == [1.0, 2.0, 3.0, 4.0]
+        assert len(calls) == len(set(calls))
+
+    def test_pause_resume_from_within_callback(self, setup):
+        """Pausing and resuming from the callback must not double-schedule either."""
+        model, _ = setup
+        calls = []
+        gen = None
+
+        def cb():
+            calls.append(model.time)
+            if len(calls) == 1:
+                gen.pause()
+                gen.resume()
+
+        gen = EventGenerator(model, cb, Schedule(interval=1.0))
+        gen.start()
+        model.run_for(4.0)
+
+        # resume() schedules a new event too, so this must not double up either.
+        assert calls == [1.0, 2.0, 3.0, 4.0]
+        assert len(calls) == len(set(calls))
 
 
 class TestEventGeneratorExecution:
@@ -662,6 +1089,50 @@ class TestEventGeneratorIntrospection:
         gen.stop()
         assert not gen.is_active
         assert gen.next_scheduled_time is None
+
+    def test_is_paused_through_lifecycle(self, setup):
+        """is_paused tells a paused generator apart from a running or stopped one."""
+        model, fn = setup
+        gen = EventGenerator(model, fn, Schedule(interval=1.0))
+        assert (gen.is_active, gen.is_paused) == (False, False)
+
+        # pausing before start does nothing
+        gen.pause()
+        assert gen.is_paused is False
+
+        gen.start()
+        assert (gen.is_active, gen.is_paused) == (True, False)
+
+        gen.pause()
+        assert (gen.is_active, gen.is_paused) == (True, True)
+
+        gen.resume()
+        assert (gen.is_active, gen.is_paused) == (True, False)
+
+        # stopping a paused generator clears the paused state too
+        gen.pause()
+        gen.stop()
+        assert (gen.is_active, gen.is_paused) == (False, False)
+
+    def test_is_paused_inside_callback(self, setup):
+        """is_paused gives a direct answer inside the generator's own callback."""
+        model, _ = setup
+        seen = []
+        gen = None
+
+        def cb():
+            # while firing, next_scheduled_time is the current event, not a future one
+            seen.append((gen.is_paused, gen.next_scheduled_time == model.time))
+            gen.pause()
+            seen.append((gen.is_paused, gen.next_scheduled_time))
+
+        gen = EventGenerator(model, cb, Schedule(interval=1.0))
+        gen.start()
+        model.run_for(3.0)
+
+        assert seen == [(False, True), (True, None)]  # fired once, then paused
+        assert gen.is_active
+        assert gen.is_paused
 
 
 class TestEventGeneratorPauseResume:

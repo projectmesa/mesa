@@ -2,13 +2,13 @@
 
 Mesa is modular, meaning that its modeling, analysis and visualization components are kept separate but intended to work together. The modules are grouped into three categories:
 
-1. **Modeling:** Classes used to build the models themselves: a model and agent classes, space for them to move around in, and built-in functionality for managing agents.
+1. **Modeling:** Classes used to build the models themselves: a model and agent classes, space for them to move around in, and built-in features for managing agents.
 2. **Analysis:** Tools to collect data generated from your model, or to run it multiple times with different parameter values.
 3. **Visualization:** Classes to create and launch an interactive model visualization, using a browser-based interface.
 
 ### Modeling modules
 
-Most models consist of one class to represent the model itself and one or more classes for agents. Mesa provides built-in functionality for managing agents and their interactions. These are implemented in Mesa's modeling modules:
+Most models consist of one class to represent the model itself and one or more classes for agents. Mesa provides built-in support for managing agents and their interactions. These are implemented in Mesa's modeling modules:
 
 - [mesa.model](apis/model)
 - [mesa.agent](apis/agent)
@@ -94,14 +94,17 @@ high_ground = grid.property_layers["elevation"] > 50
 For models requiring continuous movement:
 
 ```python
-# Create a continuous space
-space = mesa.space.ContinuousSpace(x_max, y_max, torus=True)
+from mesa.experimental.continuous_space import ContinuousSpace, ContinuousSpaceAgent
 
-# Move an agent to specific coordinates
-space.move_agent(agent, (new_x, new_y))
+# Create a continuous space
+space = ContinuousSpace([[0, x_max], [0, y_max]], torus=True, random=model.random)
+
+# Place an agent in the space and move it to specific coordinates
+agent = ContinuousSpaceAgent(space, model)
+agent.position = (new_x, new_y)
 ```
 
-> **Note:** The legacy `mesa.space` module (including `MultiGrid`, `SingleGrid`, etc.) is in maintenance-only mode. For new projects, use `mesa.discrete_space` and `mesa.experimental.continuous_space` instead.
+> **Note:** The legacy `mesa.space` module (including `MultiGrid`, `SingleGrid`, `ContinuousSpace`, etc.) has been removed. Use `mesa.discrete_space` and `mesa.experimental.continuous_space` instead.
 
 ### Time Advancement and Agent Activation
 
@@ -181,7 +184,7 @@ for agent in model.agents:
     print(agent.unique_id)
 ```
 
-#### AgentSet Functionality
+#### AgentSet Features
 AgentSet offers several methods for efficient agent management:
 
 1. **Selecting**: Filter agents based on criteria.
@@ -207,7 +210,7 @@ AgentSet offers several methods for efficient agent management:
    grouped_agents = model.agents.groupby("species")
 
    for _, agent_group in grouped_agents:
-      agent_group.shuffle_do()
+      agent_group.shuffle_do("step")
    species_counts = grouped_agents.count()
    mean_age_by_group = grouped_agents.agg("age", np.mean)
    ```
@@ -267,12 +270,13 @@ class MyModel(Model):
         super().__init__()
         # Initialize the model with N agents
 ```
-The core functionality for building your own visualizations resides in the [`mesa.visualization`](apis/visualization) namespace.
+The core components for building your own visualizations reside in the [`mesa.visualization`](apis/visualization) namespace.
 
 Here's a basic example of how to set up a visualization:
 
 ```python
-from mesa.visualization import SolaraViz, make_space_component, make_plot_component
+from mesa.visualization import Slider, SolaraViz, make_space_component, make_plot_component
+from mesa.visualization.components import AgentPortrayalStyle
 
 
 def agent_portrayal(agent):
@@ -321,6 +325,8 @@ Dynamic Agent Visualization <tutorials/7_visualization_dynamic_agents>
 Visualisation using SpaceRenderer <tutorials/8_visualization_rendering_with_space_renderer>
 Property Layer Visualization <tutorials/9_visualization_property_layer_visualization>
 Custom Visualization Components <tutorials/10_visualization_custom>
+Discrete Event Simulation <tutorials/11_discrete_event_simulation>
+Hybrid ABM-DEVS Models <tutorials/12_hybrid_abm_devs>
 Best Practices <best-practices>
 
 

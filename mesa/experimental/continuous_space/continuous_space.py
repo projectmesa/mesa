@@ -1,9 +1,12 @@
 """A Continuous Space class."""
 
+from __future__ import annotations
+
 import warnings
 from collections.abc import Iterable
 from itertools import compress
 from random import Random
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -11,8 +14,11 @@ from scipy.spatial.distance import cdist
 
 from mesa.agent import Agent, AgentSet
 
+if TYPE_CHECKING:
+    from .continuous_space_agents import ContinuousSpaceAgent
 
-class ContinuousSpace:
+
+class ContinuousSpace[A: ContinuousSpaceAgent]:
     """Continuous space where each agent can have an arbitrary position."""
 
     @property
@@ -76,6 +82,7 @@ class ContinuousSpace:
 
         self.dimensions: np.array = np.asanyarray(dimensions)
         self.ndims: int = self.dimensions.shape[0]
+
         self.size: np.array = self.dimensions[:, 1] - self.dimensions[:, 0]
         self.center: np.array = np.sum(self.dimensions, axis=1) / 2
 
@@ -87,9 +94,10 @@ class ContinuousSpace:
         self._agent_positions: np.array = np.empty(
             (n_agents, self.dimensions.shape[0]), dtype=float
         )
-        self.agent_positions: (
-            np.array
-        )  # a view on _agent_positions containing all active positions
+        # Initialize agent_positions as an empty view (zero rows) into _agent_positions.
+        # This avoids copying data and ensures agent_positions always reflects the current
+        # active slice of _agent_positions as agents are added or removed.
+        self.agent_positions = self._agent_positions[0:0]
 
         # the list of agents in the space
         self.active_agents = []
@@ -99,7 +107,7 @@ class ContinuousSpace:
         self._index_to_agent: dict[int, Agent] = {}
 
     @property
-    def agents(self) -> AgentSet:
+    def agents(self) -> AgentSet[A]:
         """Return an AgentSet with the agents in the space."""
         return AgentSet(self.active_agents, random=self.random)
 
@@ -113,18 +121,18 @@ class ContinuousSpace:
         index = self._n_agents
         self._n_agents += 1
 
-        if self._agent_positions.shape[0] <= index:
-            # we are out of space
-            fraction = 0.2  # we add 20%  Fixme
-            n = round(fraction * self._n_agents, None)
-            self._agent_positions = np.vstack(
-                [
-                    self._agent_positions,
-                    np.empty(
-                        (n, self.dimensions.shape[0]),
-                    ),
-                ]
+        current_capacity = self._agent_positions.shape[0]
+        if current_capacity <= index:
+            # expand using pre-allocation with a growth factor
+            growth_factor = 0.2
+            n = max(int(current_capacity * growth_factor), 20)
+            new_capacity = current_capacity + n
+
+            new_positions = np.empty(
+                (new_capacity, self.dimensions.shape[0]), dtype=float
             )
+            new_positions[:current_capacity] = self._agent_positions
+            self._agent_positions = new_positions
 
         agent._mesa_index = index
         self._index_to_agent[index] = agent
@@ -253,10 +261,30 @@ class ContinuousSpace:
             This method returns exactly k agents, ignoring ties. In case of ties, the
             earlier an agent is inserted the higher it will rank.
 
+            If fewer than k agents are present in the space, all agents are returned
+            and a UserWarning is emitted to indicate that the requested k could not be
+            satisfied. If the space is empty or k <= 0, an empty result is returned
+            without a warning.
+
         """
         dists, agents = self.calculate_distances(point)
+        n = len(dists)
+        # Handle empty space or invalid k
+        if n == 0 or k <= 0:
+            return [], np.array([])
 
-        indices = np.argpartition(dists, k)[:k]
+        # If fewer agents exist than requested, warn and return all available agents
+        if k > n:
+            warnings.warn(
+                f"Requested k={k} nearest agents but only {n} agent(s) are present in the space. "
+                f"Returning all {n} agent(s).",
+                UserWarning,
+                stacklevel=2,
+            )
+            k = n
+
+        # np.argpartition expects zero-based index (k-1) and returns the indices of the k smallest distances
+        indices = np.argpartition(dists, k - 1)[:k]
         agents = [agents[i] for i in indices]
         return agents, dists[indices]
 

@@ -3,6 +3,7 @@
 import copy
 import pickle
 import random
+import random as stdlib_random
 import sys
 
 import networkx as nx
@@ -17,11 +18,13 @@ from mesa.discrete_space import (
     FixedAgent,
     Grid2DMovingAgent,
     HexGrid,
+    HexGridMovingAgent,
     Network,
     OrthogonalMooreGrid,
     OrthogonalVonNeumannGrid,
     VoronoiGrid,
 )
+from mesa.discrete_space.voronoi import round_float
 from mesa.exceptions import (
     AgentMissingException,
     CellFullException,
@@ -553,8 +556,17 @@ def test_empties_space():
     assert len(grid.empties) == n
 
     model = Model()
+    agents = []
     for i in range(8):
-        grid._cells[i].add_agent(CellAgent(model))
+        agent = CellAgent(model)
+        grid._cells[i].add_agent(agent)
+        agents.append(agent)
+
+    assert len(grid.empties) == n - 8
+
+    # Remove an agent and verify empties count updates
+    grid._cells[0].remove_agent(agents[0])
+    assert len(grid.empties) == n - 7
 
 
 def test_cell_missing_exception():
@@ -602,7 +614,7 @@ def test_grid_validate_parameters():
 
 
 def test_agents_property():
-    """Test empties method for Discrete Spaces."""
+    """Test agents property for Discrete Spaces."""
     n = 10
     m = 20
     rng = 42
@@ -664,6 +676,30 @@ def test_cell():
     cell_zero = Cell((1,), capacity=0, random=random.Random())
     with pytest.raises(CellFullException):
         cell_zero.add_agent(CellAgent(model))
+
+
+def test_cell_empty_attribute_initialized():
+    """A freshly created Cell exposes `empty` without first adding/removing an agent.
+
+    Cells that are not grid cells (e.g. those in Network and VoronoiGrid) have no
+    `empty` property layer overriding the attribute, so reading `cell.empty` must
+    work straight after construction. Regression test for the uninitialized
+    `_empty` slot which raised AttributeError.
+    """
+    model = Model()
+    cell = Cell((0,), capacity=None, random=random.Random())
+
+    # readable immediately after construction, and consistent with is_empty
+    assert cell.empty is True
+    assert cell.empty == cell.is_empty
+
+    # tracks agent occupancy
+    agent = CellAgent(model)
+    cell.add_agent(agent)
+    assert cell.empty is False
+
+    cell.remove_agent(agent)
+    assert cell.empty is True
 
 
 def test_cell_deepcopy():
@@ -794,6 +830,14 @@ def test_cell_collection():
     cells = collection.select(at_most=0.5)
     assert len(cells) == 5
 
+    for bad_at_most in (float("nan"), 0.0, -0.5, 1.5, -1, -5):
+        with pytest.raises(ValueError):
+            collection.select(at_most=bad_at_most)
+
+    for bad_type in (False, True, "1", [1], None):
+        with pytest.raises(TypeError, match="must be an integer or float"):
+            collection.select(at_most=bad_type)
+
     cells = collection.select()
     assert len(cells) == len(collection)
 
@@ -883,6 +927,131 @@ def test_property_layer_integration():
         grid.create_property_layer("width")
 
 
+@pytest.mark.parametrize("method", ["create_property_layer", "add_property_layer"])
+@pytest.mark.parametrize(
+    "reserved",
+    ["dimensions", "torus", "_cells", "_celllist", "cell_klass", "_read_only_layers"],
+)
+def test_property_layer_rejects_grid_instance_attribute_collision(method, reserved):
+    """Reject conflicting names before changing grid state or cell accessors."""
+    grid = OrthogonalMooreGrid((3, 3), capacity=1, random=random.Random(42))
+    original = getattr(grid, reserved)
+
+    with pytest.raises(
+        ValueError,
+        match=f"property_layer '{reserved}' conflicts with an existing Grid attribute",
+    ):
+        if method == "create_property_layer":
+            grid.create_property_layer(reserved, read_only=True)
+        else:
+            grid.add_property_layer(reserved, np.zeros((3, 3)), read_only=True)
+
+    assert getattr(grid, reserved) is original
+    assert set(grid.property_layers) == {"empty"}
+    assert grid.cell_klass.property_layers == {"empty"}
+    assert grid._read_only_layers == set()
+    cell = grid.find_nearest_cell([1.2, 1.2])
+    assert cell.coordinate == (1, 1)
+    assert len(grid.empties) == 9
+    CellAgent(Model(rng=42)).cell = cell
+    assert cell.is_full
+    assert len(grid.empties) == 8
+
+
+@pytest.mark.parametrize("method", ["create_property_layer", "add_property_layer"])
+def test_property_layer_duplicate_name_preserves_existing_layer(method):
+    """Duplicate names keep the original array and its read-only accessor."""
+    grid = OrthogonalMooreGrid((3, 3), random=random.Random(42))
+    original = grid.create_property_layer("sugar", default_value=1, read_only=True)
+
+    with pytest.raises(ValueError, match="property_layer 'sugar' already exists"):
+        if method == "create_property_layer":
+            grid.create_property_layer("sugar", default_value=2)
+        else:
+            grid.add_property_layer("sugar", np.full((3, 3), 2))
+
+    assert grid.sugar is original
+    assert grid.property_layers["sugar"] is original
+    np.testing.assert_array_equal(original, np.ones((3, 3)))
+    with pytest.raises(AttributeError):
+        grid._cells[(1, 1)].sugar = 3
+
+
+@pytest.mark.parametrize("method", ["create_property_layer", "add_property_layer"])
+def test_property_layer_can_be_readded_after_removal(method):
+    """Removing a layer releases its name for a new array and accessor."""
+    grid = OrthogonalMooreGrid((3, 3), random=random.Random(42))
+    grid.create_property_layer("sugar", read_only=True)
+    grid.remove_property_layer("sugar")
+
+    assert not hasattr(grid, "sugar")
+    assert not hasattr(grid._cells[(1, 1)], "sugar")
+    assert "sugar" not in grid.property_layers
+    assert "sugar" not in grid.cell_klass.property_layers
+    assert "sugar" not in grid._read_only_layers
+
+    if method == "create_property_layer":
+        grid.create_property_layer("sugar", default_value=2)
+    else:
+        grid.add_property_layer("sugar", np.full((3, 3), 2))
+
+    assert grid.sugar is grid.property_layers["sugar"]
+    cell = grid._cells[(1, 1)]
+    assert cell.sugar == 2
+    cell.sugar = 3
+    assert grid.sugar[1, 1] == 3
+
+
+def test_property_layer_cannot_remove_empty():
+    """Ensure remove_property_layer rejects removing the built-in 'empty' layer."""
+    grid = OrthogonalMooreGrid((3, 3), random=random.Random(42))
+    with pytest.raises(
+        ValueError, match="Cannot remove the built-in 'empty' property layer"
+    ):
+        grid.remove_property_layer("empty")
+
+    assert "empty" in grid.property_layers
+    assert hasattr(grid, "empty")
+    assert hasattr(grid.cell_klass, "empty")
+    assert "empty" in grid.cell_klass.property_layers
+    assert hasattr(grid._cells[(1, 1)], "empty")
+
+
+@pytest.mark.parametrize(
+    "reserved",
+    ["is_empty", "is_full", "neighborhood", "position", "coordinate", "connections"],
+)
+def test_property_layer_rejects_cell_attribute_collision(reserved):
+    """A property_layer name must not shadow an existing Cell attribute.
+
+    Regression test for a bug where creating a property layer named e.g.
+    "is_empty" or "is_full" silently replaced the live Cell.is_empty /
+    Cell.is_full properties with a static array-backed accessor, corrupting
+    DiscreteSpace.empties and Grid.cells_with_capacity with no error raised.
+    The check also covers __slots__ members ("coordinate", "connections"),
+    since a slot is a descriptor in the class __dict__.
+    """
+    grid = OrthogonalMooreGrid((3, 3), torus=False, capacity=1, random=random.Random(1))
+
+    with pytest.raises(ValueError):
+        grid.create_property_layer(reserved, default_value=False, dtype=bool)
+    assert reserved not in grid.property_layers
+
+    # occupancy must still be computed correctly after the rejection
+    model = Model(rng=1)
+    assert len(grid.empties) == 9
+    cell = grid._cells[(1, 1)]
+    CellAgent(model).cell = cell
+    assert cell.is_full is True
+    assert len(list(grid.cells_with_capacity)) == 8
+
+
+def test_property_layer_empty_bootstrap_is_not_blocked():
+    """The internal "empty" property layer created by Grid.__init__ must still work."""
+    grid = OrthogonalMooreGrid((3, 3), torus=False, random=random.Random(1))
+    assert "empty" in grid.property_layers
+
+
 def test_copy_pickle_with_property_layers():
     """Test deepcopy and pickle with dynamically created GridClass."""
     dimensions = (10, 10)
@@ -899,6 +1068,29 @@ def test_copy_pickle_with_property_layers():
     assert grid2._cells[(0, 0)].empty
     grid2._cells[(0, 0)].empty = False
     assert grid2._cells[(0, 0)].empty == grid2.property_layers["empty"][0, 0]
+
+
+def test_read_only_property_layer_survives_pickle_and_deepcopy():
+    """A read-only property layer must stay read-only after pickling/deepcopy.
+
+    Previously Grid.__setstate__ rebuilt every property layer with a setter,
+    silently dropping the read_only restriction on the round trip.
+    """
+    grid = OrthogonalMooreGrid((3, 3), torus=False, random=random.Random(42))
+    grid.create_property_layer("protected", default_value=0.0, read_only=True)
+    grid.create_property_layer("sugar", default_value=1.0, read_only=False)
+
+    for label, restored in [
+        ("deepcopy", copy.deepcopy(grid)),
+        ("pickle", pickle.loads(pickle.dumps(grid))),  # noqa: S301
+    ]:
+        cell = restored._cells[(0, 0)]
+        # read-only layer must still reject writes
+        with pytest.raises(AttributeError):
+            cell.protected = 99.0
+        # read-write layer must still accept writes
+        cell.sugar = 5.0
+        assert cell.sugar == 5.0, label
 
 
 def test_multiple_property_layers():
@@ -1027,6 +1219,30 @@ def test_grid2DMovingAgent():  # noqa: D103
         agent.move("back")
 
 
+def test_hexGridMovingAgent():
+    """Test HexGridMovingAgent with 'even-r' (Even Row Shove) geometry."""
+    grid = HexGrid((10, 10), torus=False, random=random.Random(42))
+    model = Model()
+    agent = HexGridMovingAgent(model)
+
+    # 'nw' offset should be (0, -1).
+    agent.cell = grid[5, 2]
+    agent.move("nw")
+
+    assert agent.cell.coordinate == (5, 1)
+
+    # 'nw' offset should be (-1, -1)
+    agent.cell = grid[5, 1]  # Reset position to a known Odd row
+    agent.move("nw")
+
+    assert agent.cell.coordinate == (4, 0)
+
+    # West is (-1, 0) for both parities.
+    agent.cell = grid[5, 2]
+    agent.move("w")
+    assert agent.cell.coordinate == (4, 2)
+
+
 def test_patch():  # noqa: D103
     cell1 = Cell((1,), capacity=None, random=random.Random())
     cell2 = Cell((2,), capacity=None, random=random.Random())
@@ -1054,9 +1270,6 @@ def test_copying_discrete_spaces():  # noqa: D103
         grid = OrthogonalMooreGrid((100, 100), random=random.Random(42))
         grid_copy = copy.deepcopy(grid)
 
-        c1 = grid[(5, 5)].connections
-        c2 = grid_copy[(5, 5)].connections
-
         for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
             for k, v in c1.connections.items():
                 assert v.coordinate == c2.connections[k].coordinate
@@ -1075,9 +1288,6 @@ def test_copying_discrete_spaces():  # noqa: D103
         grid = HexGrid((100, 100), random=random.Random(42))
         grid_copy = copy.deepcopy(grid)
 
-        c1 = grid[(5, 5)].connections
-        c2 = grid_copy[(5, 5)].connections
-
         for c1, c2 in zip(grid.all_cells, grid_copy.all_cells):
             for k, v in c1.connections.items():
                 assert v.coordinate == c2.connections[k].coordinate
@@ -1093,6 +1303,20 @@ def test_select_random_agent_empty_safe():
         empty_collection.select_random_agent()
     assert empty_collection.select_random_agent(default=None) is None
     assert empty_collection.select_random_agent(default="Empty") == "Empty"
+
+
+def test_select_random_cell_empty_safe():
+    """Test that select_random_cell raises LookupError on an empty collection and honors default."""
+    rng = random.Random(42)
+    empty_collection = CellCollection([], random=rng)
+    with pytest.raises(LookupError):
+        empty_collection.select_random_cell()
+    assert empty_collection.select_random_cell(default=None) is None
+    assert empty_collection.select_random_cell(default="Empty") == "Empty"
+
+    # A non-empty collection still returns a cell from the collection
+    collection = CellCollection([Cell((i,), random=rng) for i in range(5)], random=rng)
+    assert collection.select_random_cell() in collection
 
 
 def test_infinite_loop_on_full_grid():
@@ -1251,3 +1475,280 @@ def test_network_missing_layout_node():
         SpaceException, match="is missing from the provided layout dictionary"
     ):
         Network(g, layout=partial_layout, random=rng)
+
+
+# Grid capacity tests — PR #3542
+RNG = stdlib_random.Random(42)
+
+# All concrete Grid subclasses parametrized so every test runs on each type.
+GRID_FACTORIES = [
+    pytest.param(
+        lambda cap: OrthogonalMooreGrid((4, 4), torus=False, capacity=cap, random=RNG),
+        id="OrthogonalMooreGrid",
+    ),
+    pytest.param(
+        lambda cap: OrthogonalVonNeumannGrid(
+            (4, 4), torus=False, capacity=cap, random=RNG
+        ),
+        id="OrthogonalVonNeumannGrid",
+    ),
+    pytest.param(
+        lambda cap: HexGrid((4, 4), torus=False, capacity=cap, random=RNG),
+        id="HexGrid",
+    ),
+]
+
+
+def make_model() -> Model:
+    """Return a freshly seeded Model instance."""
+    return Model(rng=42)
+
+
+def make_agent(model: Model) -> CellAgent:
+    """Return a new CellAgent attached to model."""
+    return CellAgent(model)
+
+
+# ---------------------------------------------------------------------------
+# Section 1 — CellFullException  (regression tests for Issue #3505)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_move_to_raises_when_cell_full(factory) -> None:
+    """move_to must raise CellFullException once capacity=1 is occupied."""
+    model = make_model()
+    grid = factory(1)
+    cell = grid._celllist[0]
+    bob, julie = make_agent(model), make_agent(model)
+    bob.move_to(cell)
+    with pytest.raises(CellFullException):
+        julie.move_to(cell)
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_direct_cell_property_raises_when_full(factory) -> None:
+    """Direct assignment ``agent.cell = <full cell>`` must also raise."""
+    model = make_model()
+    grid = factory(1)
+    cell = grid._celllist[0]
+    bob, julie = make_agent(model), make_agent(model)
+    bob.cell = cell
+    with pytest.raises(CellFullException):
+        julie.cell = cell
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_capacity_2_allows_exactly_two_agents(factory) -> None:
+    """capacity=2: two agents fit; a third must be rejected."""
+    model = make_model()
+    grid = factory(2)
+    cell = grid._celllist[0]
+    agents = [make_agent(model) for _ in range(3)]
+    agents[0].move_to(cell)
+    agents[1].move_to(cell)
+    with pytest.raises(CellFullException):
+        agents[2].move_to(cell)
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_unlimited_capacity_never_raises(factory) -> None:
+    """capacity=None: no CellFullException no matter how many agents enter."""
+    model = make_model()
+    grid = factory(None)
+    cell = grid._celllist[0]
+    for _ in range(20):
+        make_agent(model).move_to(cell)
+    assert len(cell._agents) == 20
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_vacating_agent_frees_capacity(factory) -> None:
+    """After an agent leaves, the freed slot must accept a new occupant."""
+    model = make_model()
+    grid = factory(1)
+    cell = grid._celllist[0]
+    bob, julie = make_agent(model), make_agent(model)
+    bob.move_to(cell)
+    bob.cell = None
+    julie.move_to(cell)
+    assert julie in cell._agents
+
+
+# ---------------------------------------------------------------------------
+# Section 2 — available_cells property
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_available_cells_full_grid_all_returned(factory) -> None:
+    """On a fresh (empty) grid every cell is available."""
+    grid = factory(2)
+    assert len(list(grid.cells_with_capacity)) == len(grid._celllist)
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_available_cells_excludes_full_cell(factory) -> None:
+    """A cell filled to capacity must not appear in available_cells."""
+    model = make_model()
+    grid = factory(1)
+    cell = grid._celllist[0]
+    make_agent(model).move_to(cell)
+    available = list(grid.cells_with_capacity)
+    assert cell not in available
+    assert len(available) == len(grid._celllist) - 1
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_available_cells_includes_partially_filled_cell(factory) -> None:
+    """A cell at capacity=3 holding 2 agents must still appear in available_cells."""
+    model = make_model()
+    grid = factory(3)
+    cell = grid._celllist[0]
+    for _ in range(2):
+        make_agent(model).move_to(cell)
+    assert cell in list(grid.cells_with_capacity)
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_available_cells_unlimited_always_includes_cell(factory) -> None:
+    """With capacity=None a cell is always available regardless of agent count."""
+    model = make_model()
+    grid = factory(None)
+    cell = grid._celllist[0]
+    for _ in range(50):
+        make_agent(model).move_to(cell)
+    assert cell in list(grid.cells_with_capacity)
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_available_cells_recovers_after_agent_leaves(factory) -> None:
+    """A full cell must re-appear in available_cells after an agent departs."""
+    model = make_model()
+    grid = factory(1)
+    cell = grid._celllist[0]
+    agent = make_agent(model)
+    agent.move_to(cell)
+    assert cell not in list(grid.cells_with_capacity)
+    agent.cell = None
+    assert cell in list(grid.cells_with_capacity)
+
+
+# ---------------------------------------------------------------------------
+# Section 3 — select_random_available_cell()
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_select_random_available_cell_not_full(factory) -> None:
+    """Returned cell must have remaining capacity."""
+    model = make_model()
+    grid = factory(2)
+    half = len(grid._celllist) // 2
+    for cell in grid._celllist[:half]:
+        for _ in range(2):
+            make_agent(model).move_to(cell)
+    chosen = grid.select_random_cell_with_capacity()
+    assert not chosen.is_full
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_select_random_available_cell_raises_when_all_full(factory) -> None:
+    """IndexError must be raised when every cell is at capacity."""
+    model = make_model()
+    grid = factory(1)
+    for cell in grid._celllist:
+        make_agent(model).move_to(cell)
+    with pytest.raises(IndexError, match="No available cells"):
+        grid.select_random_cell_with_capacity()
+
+
+@pytest.mark.parametrize("factory", GRID_FACTORIES)
+def test_select_random_available_cell_consistent_with_available_cells(factory) -> None:
+    """Every result from select_random_available_cell must be in available_cells."""
+    model = make_model()
+    grid = factory(3)
+    for cell in grid._celllist[::3]:
+        for _ in range(2):
+            make_agent(model).move_to(cell)
+    available_set = set(grid.cells_with_capacity)
+    for _ in range(30):
+        chosen = grid.select_random_cell_with_capacity()
+        assert chosen in available_set
+
+
+def test_cell_is_full_with_capacity_none() -> None:
+    """is_full must always be False for a cell with unlimited capacity."""
+    cell = Cell(coordinate=(0, 0), capacity=None, random=RNG)
+    assert not cell.is_full
+
+
+def test_cell_is_full_transitions_correctly() -> None:
+    """is_full must reflect the exact agent count vs capacity boundary."""
+    model = make_model()
+    cell = Cell(coordinate=(0, 0), capacity=2, random=RNG)
+    a1, a2 = make_agent(model), make_agent(model)
+
+    assert not cell.is_full  # 0 / 2
+    cell.add_agent(a1)
+    assert not cell.is_full  # 1 / 2
+    cell.add_agent(a2)
+    assert cell.is_full  # 2 / 2
+    cell.remove_agent(a1)
+    assert not cell.is_full  # 1 / 2
+
+
+def test_cell_add_agent_raises_when_full() -> None:
+    """add_agent must raise CellFullException directly, not silently overflow."""
+    model = make_model()
+    cell = Cell(coordinate=(0, 0), capacity=1, random=RNG)
+    cell.add_agent(make_agent(model))
+    with pytest.raises(CellFullException):
+        cell.add_agent(make_agent(model))
+
+
+def test_voronoi_default_no_capacity() -> None:
+    """Default VoronoiGrid (capacity=None) leaves cells with None capacity."""
+    centroids = [[0.0, 0.0], [1.0, 0.0], [0.5, 1.0], [1.5, 1.0], [0.0, 2.0], [1.0, 2.0]]
+    grid = VoronoiGrid(centroids, random=random.Random(42))
+    for cell in grid._cells.values():
+        assert cell.capacity is None
+
+
+def test_voronoi_int_capacity_applied_to_all_cells() -> None:
+    """Integer capacity is applied uniformly to every cell."""
+    centroids = [[0.0, 0.0], [1.0, 0.0], [0.5, 1.0], [1.5, 1.0], [0.0, 2.0], [1.0, 2.0]]
+    grid = VoronoiGrid(centroids, capacity=5, random=random.Random(42))
+    for cell in grid._cells.values():
+        assert cell.capacity == 5
+
+
+def test_voronoi_callable_capacity_derives_from_area() -> None:
+    """A callable capacity is called per-cell with polygon area and must return int."""
+    centroids = [[0.0, 0.0], [1.0, 0.0], [0.5, 1.0], [1.5, 1.0], [0.0, 2.0], [1.0, 2.0]]
+    grid = VoronoiGrid(centroids, capacity=round_float, random=random.Random(42))
+    for cell in grid._cells.values():
+        assert cell.capacity is not None
+        assert isinstance(cell.capacity, int)
+        assert cell.capacity >= 0
+
+
+def test_voronoi_callable_capacity_custom_function() -> None:
+    """A custom callable capacity is applied correctly."""
+    centroids = [[0.0, 0.0], [1.0, 0.0], [0.5, 1.0], [1.5, 1.0], [0.0, 2.0], [1.0, 2.0]]
+    grid = VoronoiGrid(centroids, capacity=lambda area: 10, random=random.Random(42))
+    for cell in grid._cells.values():
+        assert cell.capacity == 10
+
+
+def test_voronoi_int_capacity_enforced_at_runtime() -> None:
+    """CellFullException fires when integer capacity is exceeded."""
+    centroids = [[0.0, 0.0], [1.0, 0.0], [0.5, 1.0], [1.5, 1.0], [0.0, 2.0], [1.0, 2.0]]
+    model = Model(rng=42)
+    grid = VoronoiGrid(centroids, capacity=1, random=random.Random(42))
+    cell = next(iter(grid._cells.values()))
+    a1 = CellAgent(model)
+    a2 = CellAgent(model)
+    a1.move_to(cell)
+    with pytest.raises(CellFullException):
+        a2.move_to(cell)

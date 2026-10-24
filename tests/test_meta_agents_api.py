@@ -1,0 +1,823 @@
+"""Tests for the meta-agents membership manager."""
+
+import gc
+import weakref
+
+import pytest
+
+from mesa import Agent, Model
+from mesa.agent import AgentSet
+from mesa.experimental.meta_agents import MembershipEdge, MembershipView, MetaAgents
+
+
+def test_meta_agents_create_records_memberships():
+    """Create should return live objects and record memberships."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent_1 = Agent(model)
+    agent_2 = Agent(model)
+
+    meta_agent = meta_agents.create("Group", [agent_1, agent_2])
+
+    assert meta_agents.backend.as_triplets() == {
+        (agent_1, meta_agent, "member"),
+        (agent_2, meta_agent, "member"),
+    }
+
+    view = meta_agents.query_memberships(agent_1)
+
+    assert isinstance(view, MembershipView)
+    assert view.subject is agent_1
+    assert view.as_triplets() == {(agent_1, meta_agent, "member")}
+    assert len(view) == 1
+    assert isinstance(view.memberships[0], MembershipEdge)
+    assert view.memberships[0].agent is agent_1
+    assert view.memberships[0].group is meta_agent
+
+
+def test_meta_agents_create_defaults_mesa_agent_type_to_agent():
+    """Omitting mesa_agent_type should default to a plain Agent subclass."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+
+    meta_agent = meta_agents.create("Group", [agent])
+
+    assert isinstance(meta_agent, Agent)
+    assert meta_agents.backend.as_triplets() == {
+        (agent, meta_agent, "member"),
+    }
+
+
+def test_meta_agent_has_one_membership_manager():
+    """A model can have only one membership manager."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+
+    assert model.meta_agents is meta_agents
+    with pytest.raises(RuntimeError, match="different membership manager"):
+        MetaAgents(model)
+
+
+def test_members_of_and_groups_of():
+    """members_of and groups_of return live AgentSets from the backend."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent_1 = Agent(model)
+    agent_2 = Agent(model)
+    group = meta_agents.create("Group", [agent_1])
+
+    meta_agents.add_member(group, agent_2)
+    assert set(meta_agents.members_of(group)) == {agent_1, agent_2}
+    assert set(meta_agents.groups_of(agent_2)) == {group}
+
+    meta_agents.remove_member(group, agent_1)
+    assert set(meta_agents.members_of(group)) == {agent_2}
+    assert set(meta_agents.groups_of(agent_1)) == set()
+
+    group.remove()
+    assert meta_agents.backend.as_triplets() == set()
+    assert group not in model.agents
+    assert set(meta_agents.groups_of(agent_2)) == set()
+
+
+def test_create_memberships_overrides_agents_list():
+    """When memberships= is given, it replaces the agents list."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    listed = Agent(model)
+    actual = Agent(model)
+    group = meta_agents.create(
+        "Group",
+        [listed],
+        memberships=[(actual, "member")],
+    )
+    assert listed not in meta_agents.members_of(group)
+    assert actual in meta_agents.members_of(group)
+    assert group in meta_agents.groups_of(actual)
+    assert group not in meta_agents.groups_of(listed)
+    assert meta_agents.backend.as_triplets() == {(actual, group, "member")}
+
+
+def test_member_remove_deactivates_memberships():
+    """Removing a member from the model deactivates its memberships."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    member = Agent(model)
+    other = Agent(model)
+    group = meta_agents.create("Group", [member, other])
+    member.remove()
+    assert meta_agents.backend.groups_of(member) == set()
+    assert member not in meta_agents.members_of(group)
+    assert other in meta_agents.members_of(group)
+    assert group in meta_agents.groups_of(other)
+    assert member not in model.agents
+    assert group in model.agents
+
+
+def test_meta_agent_remove_still_dissolves_after_agent_removal():
+    """Bound group.remove() still dissolves after the agent leaves the model."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    member = Agent(model)
+    group = meta_agents.create("Group", [member])
+    group.remove()
+    assert meta_agents.backend.as_triplets() == set()
+    assert group not in model.agents
+    assert group not in meta_agents.groups_of(member)
+
+
+def test_add_and_remove_member_by_group_name():
+    """add_member/remove_member/members_of resolve a group by create() name."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    alice = Agent(model)
+    bob = Agent(model)
+    carol = Agent(model)
+    team = meta_agents.create("Team", [alice, bob])
+
+    meta_agents.add_member("Team", carol)
+    assert set(meta_agents.members_of("Team")) == {alice, bob, carol}
+    assert team in meta_agents.groups_of(carol)
+
+    meta_agents.remove_member("Team", alice)
+    assert set(meta_agents.members_of("Team")) == {bob, carol}
+
+    with pytest.raises(ValueError, match="No group named"):
+        meta_agents.add_member("Missing", carol)
+
+    meta_agents.create("Team", [Agent(model)])
+    with pytest.raises(ValueError, match="Ambiguous group name"):
+        meta_agents.add_member("Team", carol)
+
+
+def test_remove_member_preserves_overlapping_memberships():
+    """Removing one relation should keep unrelated memberships intact."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    partner = Agent(model)
+    group_one = meta_agents.create("GroupOne", [agent, partner])
+    group_two = meta_agents.create("GroupTwo", [agent])
+
+    assert len(meta_agents.groups_of(agent)) == 2
+
+    view = meta_agents.remove_member(group_one, agent)
+
+    assert view.as_triplets() == {(agent, group_two, "member")}
+    assert meta_agents.backend.groups_of(agent) == {group_two}
+    assert group_one not in meta_agents.groups_of(agent)
+    assert group_two in meta_agents.groups_of(agent)
+    assert set(meta_agents.groups_of(partner)) == {group_one}
+
+
+def test_dissolve_cleans_only_target_group():
+    """Dissolving a group should keep overlapping memberships on other groups."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent_1 = Agent(model)
+    agent_2 = Agent(model)
+    agent_3 = Agent(model)
+    group_one = meta_agents.create("GroupOne", [agent_1, agent_2])
+    group_two = meta_agents.create("GroupTwo", [agent_1, agent_3])
+
+    snapshot = meta_agents.dissolve(group_one)
+
+    assert snapshot.as_triplets() == {
+        (agent_1, group_one, "member"),
+        (agent_2, group_one, "member"),
+    }
+    assert meta_agents.backend.groups_of(agent_1) == {group_two}
+    assert meta_agents.backend.groups_of(agent_2) == set()
+    assert meta_agents.backend.groups_of(agent_3) == {group_two}
+    assert group_one not in model.agents
+    assert group_two in model.agents
+    assert group_one not in meta_agents.groups_of(agent_1)
+    assert group_two in meta_agents.groups_of(agent_1)
+
+
+def test_deactivate_detaches_all_memberships_without_removing_entity():
+    """Deactivate should clear memberships but keep the entity registered."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent_1 = Agent(model)
+    agent_2 = Agent(model)
+    group = meta_agents.create("Group", [agent_1, agent_2])
+
+    snapshot = meta_agents.deactivate(agent_1)
+
+    assert snapshot.as_triplets() == {(agent_1, group, "member")}
+    assert meta_agents.backend.groups_of(agent_1) == set()
+    assert agent_1 in model.agents
+    assert group not in meta_agents.groups_of(agent_1)
+    assert group in meta_agents.groups_of(agent_2)
+
+
+def test_dissolve_after_member_already_removed():
+    """Dissolve handles a group whose live members were deregistered first."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    group = meta_agents.create("Group", [agent])
+    agent.remove()
+    assert meta_agents.backend.as_triplets() == set()
+    group.remove()
+    assert meta_agents.backend.as_triplets() == set()
+    assert group not in model.agents
+
+
+def _four_level_hierarchy():
+    """Build world -> region -> city -> household -> person hierarchy."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+
+    person_a = Agent(model)
+    person_b = Agent(model)
+    person_c = Agent(model)
+    household = meta_agents.create("Household", [person_a, person_b])
+    city = meta_agents.create("City", [household, person_c])
+    region = meta_agents.create("Region", [city])
+    world = meta_agents.create("World", [region])
+
+    return (
+        model,
+        meta_agents,
+        world,
+        region,
+        city,
+        household,
+        person_a,
+        person_b,
+        person_c,
+    )
+
+
+def test_at_level_four_level_hierarchy():
+    """Each containment depth from root returns the expected AgentSet."""
+    (
+        _model,
+        meta_agents,
+        world,
+        region,
+        city,
+        household,
+        person_a,
+        person_b,
+        person_c,
+    ) = _four_level_hierarchy()
+
+    level0 = meta_agents.at_level(0, root=world)
+    assert isinstance(level0, AgentSet)
+    assert set(level0) == {world}
+
+    assert set(meta_agents.at_level(1, root=world)) == {region}
+    assert set(meta_agents.at_level(2, root=world)) == {city}
+    assert set(meta_agents.at_level(3, root=world)) == {household, person_c}
+    assert set(meta_agents.at_level(4, root=world)) == {person_a, person_b}
+
+
+def test_at_level_siblings_and_agentset_ops():
+    """Siblings share a level and results support AgentSet selection."""
+    _, meta_agents, world, _, _, _, person_a, person_b, _ = _four_level_hierarchy()
+
+    level4 = meta_agents.at_level(4, root=world)
+    assert set(level4) == {person_a, person_b}
+    selected = level4.select(lambda a: a is person_a)
+    assert set(selected) == {person_a}
+
+
+def test_at_level_order_is_deterministic():
+    """Same-level agents keep stable order (sorted member ids per group)."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    root = Agent(model)
+    fillers = [Agent(model) for _ in range(9)]
+    agent_11 = Agent(model)
+    agent_2 = fillers[0]
+
+    meta_agents.add_member(root, agent_11)
+    meta_agents.add_member(root, agent_2)
+
+    assert str(agent_11.unique_id) < str(agent_2.unique_id)
+    assert agent_2.unique_id < agent_11.unique_id
+    assert list(meta_agents.at_level(1, root=root)) == [agent_11, agent_2]
+    assert list(meta_agents.at_level(1, root=root)) == list(
+        meta_agents.at_level(1, root=root)
+    )
+
+
+def test_at_level_default_relation_and_explicit_relation():
+    """Default ignores non-member edges; explicit relation includes them."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    root = Agent(model)
+    member = Agent(model)
+    ally = Agent(model)
+    meta_agents.add_member(root, member, relation="member")
+    meta_agents.add_member(root, ally, relation="ally")
+
+    assert set(meta_agents.at_level(1, root=root)) == {member}
+    assert set(meta_agents.at_level(1, root=root, relation="ally")) == {ally}
+    assert set(meta_agents.at_level(1, root=root, relation=None)) == {member, ally}
+
+
+def test_at_level_overlapping_paths_use_nearest_depth():
+    """An agent on multiple paths appears only at its shallowest level."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    root = Agent(model)
+    mid = Agent(model)
+    leaf = Agent(model)
+    meta_agents.add_member(root, leaf, relation="member")
+    meta_agents.add_member(root, mid, relation="member")
+    meta_agents.add_member(mid, leaf, relation="member")
+
+    assert set(meta_agents.at_level(1, root=root)) == {leaf, mid}
+    assert set(meta_agents.at_level(2, root=root)) == set()
+
+
+def test_at_level_empty_and_validation():
+    """Absent levels are empty; invalid level/root raise ValueError."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    root = Agent(model)
+    outsider = object()
+
+    assert len(meta_agents.at_level(3, root=root)) == 0
+
+    with pytest.raises(ValueError, match="non-negative"):
+        meta_agents.at_level(-1, root=root)
+
+    with pytest.raises(ValueError, match="not registered"):
+        meta_agents.at_level(0, root=outsider)
+
+
+def test_at_level_cyclic_membership_terminates():
+    """Cyclic membership graphs must not loop indefinitely."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    a = Agent(model)
+    b = Agent(model)
+    meta_agents.add_member(a, b, relation="member")
+    meta_agents.add_member(b, a, relation="member")
+
+    assert set(meta_agents.at_level(0, root=a)) == {a}
+    assert set(meta_agents.at_level(1, root=a)) == {b}
+    assert set(meta_agents.at_level(2, root=a)) == set()
+
+
+# ── coverage for _resolve_group branches ──
+
+
+def test_group_operations_support_custom_hashable_group():
+    """Public group operations gracefully accept non-string, non-agent group identifiers."""
+
+    class CustomGroup:
+        pass
+
+    model = Model()
+    meta_agents = MetaAgents(model)
+    sentinel = CustomGroup()
+    agent = Agent(model)
+    meta_agents.add_member(sentinel, agent)
+    assert set(meta_agents.members_of(sentinel)) == {agent}
+    assert set(meta_agents.groups_of(agent)) == {sentinel}
+
+
+def test_query_memberships_with_agent_object():
+    """query_memberships returns correct view when given agent objects."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    group_a = meta_agents.create("A", [agent])
+    group_b = meta_agents.create("B", [agent])
+
+    view = meta_agents.query_memberships(agent)
+    triplets = view.as_triplets()
+    assert (agent, group_a, "member") in triplets
+    assert (agent, group_b, "member") in triplets
+    assert len(triplets) == 2
+
+
+def test_dissolve_with_agent_object():
+    """Dissolve works directly with the group agent object."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    group = meta_agents.create("Team", [agent])
+
+    snapshot = meta_agents.dissolve(group)
+    assert snapshot.as_triplets() == {(agent, group, "member")}
+    assert group not in model.agents
+    assert meta_agents.backend.as_triplets() == set()
+
+
+# ── coverage for MembershipView helpers ──
+
+
+def test_membership_view_iter():
+    """MembershipView supports direct iteration over edges."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    group = meta_agents.create("G", [agent])
+
+    view = meta_agents.query_memberships(agent)
+    edges = list(view)
+    assert len(edges) == 1
+    assert edges[0].agent is agent
+    assert edges[0].group is group
+
+
+def test_membership_view_agents_groups_relations_properties():
+    """MembershipView.agents, .groups, and .relations return correct sets."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    alice = Agent(model)
+    bob = Agent(model)
+    group = meta_agents.create("G", [alice, bob])
+
+    view = meta_agents.query_memberships(group)
+    assert view.agents == {alice, bob}
+    assert view.groups == {group, group}  # both edges point to the same group
+    assert view.groups == {group}
+    assert view.relations == {"member"}
+
+
+def test_membership_view_properties_with_multiple_relations():
+    """MembershipView properties report distinct relations and groups."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    group_a = meta_agents.create("A", [agent])
+    group_b = meta_agents.create("B", [], memberships=[(agent, "ally")])
+
+    view = meta_agents.query_memberships(agent)
+    assert view.agents == {agent}
+    assert view.groups == {group_a, group_b}
+    assert view.relations == {"member", "ally"}
+
+
+# ── coverage for dissolve fallback (entity without _remove_from_model) ──
+
+
+def test_dissolve_entity_with_only_remove():
+    """Dissolve falls back to .remove() when _remove_from_model is absent."""
+
+    class SimpleRemovable:
+        """A non-Agent entity that only has .remove()."""
+
+        def __init__(self):
+            self.removed = False
+
+        def remove(self):
+            self.removed = True
+
+        def __hash__(self):
+            return id(self)
+
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    entity = SimpleRemovable()
+
+    # Register a membership with a non-agent group via public API
+    meta_agents.add_member(entity, agent, relation="member")
+
+    snapshot = meta_agents.dissolve(entity)
+    assert entity.removed
+    assert len(snapshot) == 1
+
+
+def test_dissolve_entity_without_remove():
+    """Dissolve gracefully handles entities that have neither remove method."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    sentinel = object()
+
+    meta_agents.add_member(sentinel, agent, relation="member")
+
+    # Should not raise even though sentinel has no remove
+    snapshot = meta_agents.dissolve(sentinel)
+    assert len(snapshot) == 1
+
+
+# ── coverage for evaluate_combination ──
+
+
+def test_evaluate_combination_with_none_func():
+    """evaluate_combination returns None when no function is given."""
+    result = MetaAgents.evaluate_combination((), None)
+    assert result is None
+
+
+def test_evaluate_combination_with_func():
+    """evaluate_combination returns (group, score) tuple."""
+    model = Model()
+    a = Agent(model)
+    b = Agent(model)
+    group = (a, b)
+    result = MetaAgents.evaluate_combination(group, lambda g: len(g) * 1.5)
+    assert result == (group, 3.0)
+
+
+# ── coverage for find_combinations ──
+
+
+def test_find_combinations_with_int_size():
+    """find_combinations accepts an integer size instead of a tuple."""
+    model = Model()
+    agents = [Agent(model) for _ in range(4)]
+
+    combos = MetaAgents.find_combinations(
+        agents,
+        size=3,
+        evaluation_func=lambda g: sum(1 for _ in g),
+    )
+    # C(4,3) = 4 combinations, each scoring 3
+    assert len(combos) == 4
+    for group, score in combos:
+        assert len(group) == 3
+        assert score == 3
+
+
+def test_find_combinations_with_filter_func():
+    """find_combinations applies filter_func to reduce results."""
+    model = Model()
+    agents = [Agent(model) for _ in range(4)]
+
+    def keep_best(combos):
+        """Keep only the highest-scoring combination."""
+        return [max(combos, key=lambda x: x[1])]
+
+    combos = MetaAgents.find_combinations(
+        agents,
+        size=2,
+        evaluation_func=lambda g: g[0].unique_id + g[1].unique_id,
+        filter_func=keep_best,
+    )
+    assert len(combos) == 1
+
+
+def test_find_combinations_no_evaluation_func():
+    """find_combinations with no evaluation_func returns empty list."""
+    model = Model()
+    agents = [Agent(model) for _ in range(3)]
+
+    combos = MetaAgents.find_combinations(agents, size=2)
+    assert combos == []
+
+
+def test_find_combinations_evaluation_returns_none():
+    """find_combinations skips groups where evaluation returns None."""
+    model = Model()
+    agents = [Agent(model) for _ in range(3)]
+
+    def sometimes_none(group):
+        """Return a score only for the first pair."""
+        if group[0].unique_id < group[1].unique_id:
+            return 1.0
+        return None
+
+    combos = MetaAgents.find_combinations(
+        agents,
+        size=2,
+        evaluation_func=sometimes_none,
+    )
+    # Some combos pass, others return None and are skipped
+    assert all(score is not None for _, score in combos)
+
+
+def test_find_combinations_with_range_size():
+    """find_combinations with tuple size generates combinations across range."""
+    model = Model()
+    agents = [Agent(model) for _ in range(4)]
+
+    combos = MetaAgents.find_combinations(
+        agents,
+        size=(2, 3),
+        evaluation_func=lambda g: float(len(g)),
+    )
+    sizes = {len(group) for group, _ in combos}
+    assert sizes == {2, 3}
+    # C(4,2) + C(4,3) = 6 + 4 = 10
+    assert len(combos) == 10
+
+
+# ── coverage for at_level BFS depth-skip branch ──
+
+
+def test_at_level_deep_hierarchy_exercises_bfs_depth_skip():
+    """at_level with a 3-level hierarchy exercises the depth >= level continue."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+
+    # Build: root -> mid -> leaf
+    leaf = Agent(model)
+    mid = meta_agents.create("Mid", [leaf])
+    root = meta_agents.create("Root", [mid])
+
+    # Level 1 should return mid (and BFS should skip going deeper from mid
+    # at depth=1 when level=1 triggers depth >= level continue for queued items)
+    assert set(meta_agents.at_level(1, root=root)) == {mid}
+    assert set(meta_agents.at_level(2, root=root)) == {leaf}
+    # Level 3 has nothing
+    assert set(meta_agents.at_level(3, root=root)) == set()
+
+
+def test_query_memberships_filters_by_relation():
+    """query_memberships with a relation kwarg returns only matching edges."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    group = meta_agents.create("G", [], memberships=[(agent, "leader")])
+    meta_agents.add_member(group, agent, relation="member")
+
+    # Filter to leader only
+    view = meta_agents.query_memberships(agent, relation="leader")
+    assert len(view) == 1
+    assert view.relations == {"leader"}
+
+    # Filter to member only
+    view_member = meta_agents.query_memberships(agent, relation="member")
+    assert len(view_member) == 1
+    assert view_member.relations == {"member"}
+
+    # No filter returns both
+    view_all = meta_agents.query_memberships(agent)
+    assert len(view_all) == 2
+
+
+# ── coverage for mesa_agent_type normalization via public create ──
+
+
+def test_create_mesa_agent_type_none_defaults_to_agent():
+    """create() with mesa_agent_type=None defaults to Agent base class."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+    group = meta_agents.create("Group", [agent], mesa_agent_type=None)
+    assert isinstance(group, Agent)
+
+
+def test_create_mesa_agent_type_tuple_subclasses_all_bases():
+    """create() with a tuple of base classes produces an instance of all bases."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    agent = Agent(model)
+
+    class TagMixin:
+        def get_tag(self):
+            return "tagged"
+
+    group = meta_agents.create("Group", [agent], mesa_agent_type=(Agent, TagMixin))
+    assert isinstance(group, Agent)
+    assert isinstance(group, TagMixin)
+    assert group.get_tag() == "tagged"
+
+
+# ── coverage for meta-agent bound to a different membership manager ──
+
+
+def test_create_reuses_meta_agent_rejects_different_manager():
+    """Reusing a meta-agent bound to a different manager raises."""
+    model = Model()
+    api_1 = MetaAgents(model)
+    agent = Agent(model)
+    group = api_1.create("Team", [agent])
+
+    # Create a second manager on a fresh model that shares the same agent pool.
+    # We simulate the mismatch by manually pointing the group's _membership_api
+    # to a different object.
+    model_2 = Model()
+    api_2 = MetaAgents(model_2)
+
+    # Forcibly set the group's _membership_api to api_2 so it mismatches api_1
+    group._membership_api = api_2
+    # Now ask api_1 to reuse this group - it should detect the mismatch via public create()
+    with pytest.raises(RuntimeError, match="bound to a different membership manager"):
+        api_1.create("Team", [agent])
+
+
+# ── coverage for at_level BFS queued-node-at-target-depth continue ──
+
+
+def test_at_level_bfs_queued_beyond_target_skips():
+    """Nodes queued at depth >= level are skipped (line 364 continue branch).
+
+    Build: root -> mid -> leaf1, leaf2.  Ask for level 1 so that when mid
+    is found at depth 1 it gets collected, but mid's children (at depth 2)
+    should be skipped because mid, now in the queue at depth 1, triggers
+    the depth >= level continue.
+    """
+    model = Model()
+    meta_agents = MetaAgents(model)
+    leaf1 = Agent(model)
+    leaf2 = Agent(model)
+    mid = meta_agents.create("Mid", [leaf1, leaf2])
+    root = meta_agents.create("Root", [mid])
+
+    # level 1 returns mid; BFS should NOT descend further
+    assert set(meta_agents.at_level(1, root=root)) == {mid}
+    # level 2 returns the leaves
+    assert set(meta_agents.at_level(2, root=root)) == {leaf1, leaf2}
+
+
+# ── coverage for find_combinations: evaluation returns (group, None) ──
+
+
+def test_find_combinations_skips_none_result_from_evaluation():
+    """When evaluation_func returns a non-None value but the score is None, skip."""
+    model = Model()
+    agents = [Agent(model) for _ in range(3)]
+
+    def returns_none_score(group):
+        """Always return None as the score."""
+        return None
+
+    combos = MetaAgents.find_combinations(
+        agents,
+        size=2,
+        evaluation_func=returns_none_score,
+    )
+    assert combos == []
+
+
+# ── coverage for find_combinations: empty combinations with filter_func ──
+
+
+def test_find_combinations_empty_with_filter_func_not_called():
+    """filter_func is not invoked when no combinations pass evaluation."""
+    model = Model()
+    agents = [Agent(model) for _ in range(3)]
+    filter_called = []
+
+    def track_filter(combos):
+        filter_called.append(True)
+        return combos
+
+    combos = MetaAgents.find_combinations(
+        agents,
+        size=2,
+        evaluation_func=lambda g: None,  # every combo yields None
+        filter_func=track_filter,
+    )
+    assert combos == []
+    assert filter_called == []  # filter_func should never be invoked
+
+
+# ── coverage for at_level with a group that has no members ──
+
+
+def test_at_level_group_with_no_members():
+    """at_level handles a group whose members are empty at intermediate depth."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+    root = Agent(model)
+    # root is registered but has no members in the backend
+    assert set(meta_agents.at_level(1, root=root)) == set()
+    assert set(meta_agents.at_level(0, root=root)) == {root}
+
+
+# ── garbage collection for removed members and meta-agents ──
+
+
+def test_removed_agent_and_meta_agent_are_garbage_collected():
+    """Ensure removing an agent or meta-agent releases all internal references for GC."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+
+    agent = Agent(model)
+    group = meta_agents.create("Group", [agent])
+
+    agent_ref = weakref.ref(agent)
+    group_ref = weakref.ref(group)
+
+    # 1. Removing a member agent releases internal references
+    agent.remove()
+    del agent
+    gc.collect()
+    assert agent_ref() is None
+
+    # 2. Removing a meta-agent group releases internal references
+    group.remove()
+    del group
+    gc.collect()
+    assert group_ref() is None
+
+
+def test_dissolved_meta_agent_is_garbage_collected():
+    """Ensure dissolving a meta-agent releases all internal references for GC."""
+    model = Model()
+    meta_agents = MetaAgents(model)
+
+    agent = Agent(model)
+    group = meta_agents.create("Group", [agent])
+
+    group_ref = weakref.ref(group)
+
+    meta_agents.dissolve(group)
+    del group
+    gc.collect()
+    assert group_ref() is None

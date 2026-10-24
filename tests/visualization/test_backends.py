@@ -8,9 +8,26 @@ from unittest.mock import MagicMock
 import numpy as np
 import pytest
 
+from mesa import Model
 from mesa.discrete_space.grid import OrthogonalMooreGrid
+from mesa.experimental.continuous_space import ContinuousSpace, ContinuousSpaceAgent
 from mesa.visualization.backends import AltairBackend, MatplotlibBackend
 from mesa.visualization.components import AgentPortrayalStyle, PropertyLayerStyle
+
+
+@pytest.mark.parametrize("backend_cls", [MatplotlibBackend, AltairBackend])
+def test_backend_get_agent_pos_raises_when_position_too_short(backend_cls):
+    """Backends should reject agent positions with fewer than 2 coordinates."""
+    backend = backend_cls(space_drawer=MagicMock())
+
+    class DummySpace:
+        viz_dims = (0, 1)
+
+    class DummyAgent:
+        position = (0.1,)
+
+    with pytest.raises(ValueError, match="at least 2 dimensions"):
+        backend._get_agent_pos(DummyAgent(), DummySpace())
 
 
 def test_matplotlib_initialize_canvas():
@@ -76,6 +93,60 @@ def test_matplotlib_backend_collects_agent_data():
         data = mb.collect_agent_data(DummySpace(), agent_portrayal_dict)
 
     assert "loc" in data and data["loc"].shape[0] == 1
+
+
+@pytest.mark.parametrize("edgecolor", ["black", (1.0, 0.0, 0.0, 1.0)])
+def test_matplotlib_backend_collects_partial_edgecolors(edgecolor):
+    """Collecting agent data preserves edgecolor alignment across agents."""
+    mb = MatplotlibBackend(space_drawer=MagicMock())
+
+    class DummyAgent:
+        position = (0, 0)
+        cell = types.SimpleNamespace(coordinate=(0, 0))
+
+        def __init__(self, kind):
+            self.kind = kind
+
+    class DummySpace:
+        agents: ClassVar[list] = [DummyAgent(0), DummyAgent(1)]
+
+    def agent_portrayal(agent):
+        portrayal = {"size": 5, "color": "red", "marker": "o"}
+        if agent.kind == 0:
+            portrayal["edgecolors"] = edgecolor
+        return portrayal
+
+    with pytest.warns(FutureWarning):
+        data = mb.collect_agent_data(DummySpace(), agent_portrayal)
+
+    assert data["edgecolors"].tolist() == [edgecolor, "none"]
+    assert len(data["edgecolors"]) == data["loc"].shape[0]
+
+
+def test_matplotlib_backend_collects_tuple_markers_without_flattening():
+    """Equal-length tuple marker specs must stay 1D, not collapse into a 2D array.
+
+    Regression guard: a naive ``np.asarray(value, dtype=object)`` silently turns a
+    list of same-length tuples (e.g. Matplotlib's ``(numsides, style, angle)``
+    polygon marker spec) into a 2D array of scalars instead of a 1D array of
+    tuple objects.
+    """
+    mb = MatplotlibBackend(space_drawer=MagicMock())
+
+    class DummyAgent:
+        position = (0, 0)
+        cell = types.SimpleNamespace(coordinate=(0, 0))
+
+    class DummySpace:
+        agents: ClassVar[list] = [DummyAgent(), DummyAgent()]
+
+    def agent_portrayal(agent):
+        return AgentPortrayalStyle(size=5, color="red", marker=(3, 0, 0))
+
+    data = mb.collect_agent_data(DummySpace(), agent_portrayal)
+
+    assert data["marker"].shape == (2,)
+    assert list(data["marker"]) == [(3, 0, 0), (3, 0, 0)]
 
 
 def test_matplotlib_backend_draw_agents():
@@ -305,6 +376,86 @@ def test_backend_get_agent_pos():
 
     x, y = mb._get_agent_pos(AgentWithCell(), None)
     assert (x, y) == (3, 4)
+
+
+def test_backend_get_agent_pos_uses_space_drawer_viz_dims():
+    """Backends should project continuous positions using the space drawer's viz_dims."""
+    mb = MatplotlibBackend(space_drawer=types.SimpleNamespace(viz_dims=(0, 2)))
+
+    class DummyAgent:
+        position = (0.1, 0.2, 0.3)
+
+    x, y = mb._get_agent_pos(DummyAgent(), None)
+    assert (x, y) == (0.1, 0.3)
+
+
+def test_backend_get_agent_pos_raises_when_viz_dims_out_of_range():
+    """Backends should raise a helpful error when viz_dims do not match the position."""
+    mb = MatplotlibBackend(space_drawer=types.SimpleNamespace(viz_dims=(0, 2)))
+
+    class DummyAgent:
+        position = (0.1, 0.2)
+
+    with pytest.raises(ValueError, match="not have enough dimensions"):
+        mb._get_agent_pos(DummyAgent(), None)
+
+
+@pytest.mark.parametrize("backend_cls", [MatplotlibBackend, AltairBackend])
+def test_backend_collect_agent_data_projects_3d_continuous_positions(backend_cls):
+    """Test collect_agent_data projects nD continuous positions onto viz_dims."""
+    backend = backend_cls(space_drawer=MagicMock())
+    model = Model(rng=42)
+    space = ContinuousSpace(
+        dimensions=np.array([[0, 1], [0, 1], [0, 1]]),
+        torus=False,
+        random=model.random,
+    )
+
+    agent_1 = ContinuousSpaceAgent(space, model)
+    agent_1.position = [0.1, 0.2, 0.3]
+    agent_2 = ContinuousSpaceAgent(space, model)
+    agent_2.position = [0.4, 0.5, 0.6]
+
+    def agent_portrayal(agent):
+        return AgentPortrayalStyle(
+            x=None,
+            y=None,
+            size=5,
+            color="red",
+            marker="o",
+            zorder=1,
+            alpha=1.0,
+            edgecolors="black",
+            linewidths=1,
+        )
+
+    data = backend.collect_agent_data(space, agent_portrayal)
+
+    assert data["loc"].shape == (2, 2)
+    np.testing.assert_allclose(data["loc"][:, 0], [0.1, 0.4])
+    np.testing.assert_allclose(data["loc"][:, 1], [0.2, 0.5])
+
+
+@pytest.mark.parametrize("backend_cls", [MatplotlibBackend, AltairBackend])
+def test_backend_collect_agent_data_warns_once_for_dict_portrayal(backend_cls):
+    """The dict portrayal FutureWarning is emitted once per call, not per agent."""
+    backend = backend_cls(space_drawer=MagicMock())
+
+    class DummyAgent:
+        position = (0, 0)
+        cell = types.SimpleNamespace(coordinate=(0, 0))
+
+    class DummySpace:
+        agents: ClassVar[list] = [DummyAgent() for _ in range(5)]
+
+    def agent_portrayal_dict(agent):
+        return {"size": 5, "color": "red", "marker": "o"}
+
+    with pytest.warns(FutureWarning) as record:
+        data = backend.collect_agent_data(DummySpace(), agent_portrayal_dict)
+
+    assert len([w for w in record if issubclass(w.category, FutureWarning)]) == 1
+    assert data["loc"].shape[0] == 5
 
 
 def test_backends_handle_errors():

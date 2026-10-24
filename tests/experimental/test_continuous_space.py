@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from mesa import Model
+from mesa.agent import AgentSet
 from mesa.experimental.continuous_space import ContinuousSpace, ContinuousSpaceAgent
 
 
@@ -489,3 +490,94 @@ def test_agent_removal_no_ghost_entries():
     for idx, agent in enumerate(space.active_agents):
         assert agent._mesa_index == idx
         assert space._index_to_agent[idx] == agent
+
+
+def test_continuous_space_k_larger_than_population():
+    """Test that k larger than population returns all agents with a warning."""
+    model = Model(rng=42)
+    space = ContinuousSpace([[0, 10], [0, 10]], random=model.random)
+
+    a1 = ContinuousSpaceAgent(space, model)
+    a1.position = np.array([1.0, 1.0])
+
+    a2 = ContinuousSpaceAgent(space, model)
+    a2.position = np.array([9.0, 9.0])
+
+    with pytest.warns(UserWarning, match="only 2 agent"):
+        agents, dists = space.get_k_nearest_agents(np.array([5.0, 5.0]), k=10)
+
+    assert len(agents) == 2
+    assert len(dists) == 2
+
+
+def test_continuous_space_k_empty_space():
+    """Test that empty space returns no agents."""
+    model = Model(rng=42)
+    space = ContinuousSpace([[0, 10], [0, 10]], random=model.random)
+
+    agents, dists = space.get_k_nearest_agents(np.array([5.0, 5.0]), k=1)
+
+    assert agents == []
+    assert len(dists) == 0
+
+
+def test_continuous_space_k_zero():
+    """Test that k=0 returns empty result."""
+    model = Model(rng=42)
+    space = ContinuousSpace([[0, 10], [0, 10]], random=model.random)
+
+    a = ContinuousSpaceAgent(space, model)
+    a.position = np.array([1.0, 1.0])
+
+    agents, dists = space.get_k_nearest_agents(np.array([5.0, 5.0]), k=0)
+
+    assert agents == []
+    assert len(dists) == 0
+
+
+def test_continuous_space_k_exact():
+    """Test that exact k nearest agents are returned."""
+    model = Model(rng=42)
+    space = ContinuousSpace([[0, 10], [0, 10]], random=model.random)
+
+    agents_list = [ContinuousSpaceAgent(space, model) for _ in range(3)]
+    positions = [
+        np.array([1.0, 1.0]),
+        np.array([2.0, 2.0]),
+        np.array([9.0, 9.0]),
+    ]
+
+    for agent, pos in zip(agents_list, positions):
+        agent.position = pos
+
+    agents, dists = space.get_k_nearest_agents(np.array([0.0, 0.0]), k=2)
+
+    assert len(agents) == 2
+    assert len(dists) == 2
+
+
+def test_continuous_space_generics():
+    """Test PEP 695 generic typing preservation in ContinuousSpace."""
+
+    class CustomAgent(ContinuousSpaceAgent):
+        pass
+
+    model = Model(rng=42)
+    dimensions = np.asarray([[0, 10], [0, 10]])
+    space = ContinuousSpace[CustomAgent](dimensions, torus=False, random=model.random)
+
+    agent = CustomAgent(space, model)
+    agent.position = [1.0, 1.0]
+
+    # Verify return types statically & dynamically
+    agents: AgentSet[CustomAgent] = space.agents
+    assert len(agents) == 1
+    assert isinstance(agents.to_list()[0], CustomAgent)
+
+    in_radius, _ = space.get_agents_in_radius([1.0, 1.0], radius=2.0)
+    assert len(in_radius) == 1
+    assert isinstance(in_radius[0], CustomAgent)
+
+    k_nearest, _ = space.get_k_nearest_agents([1.0, 1.0], k=1)
+    assert len(k_nearest) == 1
+    assert isinstance(k_nearest[0], CustomAgent)

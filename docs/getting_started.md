@@ -22,6 +22,8 @@ If you want to learn how to build agent-based models step by step using Mesa, fo
 - [Visualization using SpaceRenderer](tutorials/8_visualization_rendering_with_space_renderer): Learn how to use SpaceRenderer to its full extent to enhance your visualizations.
 - [Property Layer Visualization](tutorials/9_visualization_property_layer_visualization): Learn how to visualize property layers in Mesa.
 - [Custom Visualization Components](tutorials/10_visualization_custom): Learn how to add custom visual components to your interactive dashboard.
+- [Discrete Event Simulation](tutorials/11_discrete_event_simulation): Learn how to build a pure event-driven model with `schedule_event` and validate it against queuing theory.
+- [Hybrid ABM-DEVS Models](tutorials/12_hybrid_abm_devs): Learn how to combine `step()`-based agent activation with scheduled events in a spatial epidemic model.
 
 ## Examples
 Mesa ships with a collection of example models. These are classic ABMs, so if you are familiar with ABMs and want to get a quick sense of how MESA works, these examples are great place to start. You can find them [here](examples).
@@ -33,7 +35,7 @@ To further explore Mesa and its features, we have the following resources availa
 - [Mesa best practices](best-practices): an overview of tips and guidelines for using MESA.
 
 ### API documentation
-- [Mesa API reference](apis): Detailed documentation of Mesa's classes and functions.
+- [Mesa API reference](apis/api_main.md): Detailed documentation of Mesa's classes and functions.
 
 ### Repository of models built using MESA
 - [Mesa Examples repository](https://github.com/mesa/mesa-examples): A collection of example models demonstrating various Mesa features and modeling techniques.
@@ -47,7 +49,7 @@ To further explore Mesa and its features, we have the following resources availa
 
 ### Community and support
 - [Mesa GitHub Discussions](https://github.com/mesa/mesa/discussions): Join discussions, ask questions, and connect with other Mesa users.
-- [Matrix Chat](https://matrix.to/#/#project-mesa:matrix.org): Real-time chat for quick questions and community interaction.
+- [Discord](https://discord.gg/UUGJvdtEJu): Real-time chat for quick questions and community interaction.
 
 Enjoy modelling with Mesa, and feel free to reach out!
 

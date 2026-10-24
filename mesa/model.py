@@ -54,7 +54,6 @@ class Model[A: Agent, S: Scenario](HasEmitters):
 
     Attributes:
         running: A boolean indicating if the model should continue running.
-        steps: the number of times `model.step()` has been called.
         time: the current simulation time.
         random: a seeded python.random number generator.
         rng: a seeded numpy.random.Generator
@@ -384,11 +383,6 @@ class Model[A: Agent, S: Scenario](HasEmitters):
         Raises:
             ValueError: If the schedule start time is in the past.
         """
-        if schedule.start is not None and schedule.start < self.time:
-            raise ValueError(
-                f"Cannot start recurring schedule in the past. "
-                f"Start time is {schedule.start}, current time is {self.time}"
-            )
         generator = EventGenerator(self, function, schedule, priority)
         generator.start()
         return generator

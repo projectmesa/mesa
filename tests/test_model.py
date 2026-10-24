@@ -42,19 +42,10 @@ def test_running():
 def test_rng(rng=23):
     """Test initialization of model with specific seed."""
     model = Model(rng=rng)
-    assert (
-        model.scenario.initial_rng_state
-        == np.random.default_rng(rng).bit_generator.state
-    )
+    assert model.scenario.seed_sequence.entropy == rng
     model2 = Model(rng=rng + 1)
-    assert (
-        model2.scenario.initial_rng_state
-        == np.random.default_rng(rng + 1).bit_generator.state
-    )
-    assert (
-        model.scenario.initial_rng_state
-        == np.random.default_rng(rng).bit_generator.state
-    )
+    assert model2.scenario.seed_sequence.entropy == rng + 1
+    assert model.scenario.seed_sequence.entropy == rng
 
     assert Model(rng=42).random.random() == Model(rng=42).random.random()
     assert np.all(
@@ -110,3 +101,32 @@ def test_agent_remove():
 
     model.remove_all_agents()
     assert len(model.agents) == 0
+
+
+def test_agents_by_type_keeps_empty_bucket():
+    """Removing all agents of a type keeps its empty bucket in agents_by_type.
+
+    The per-type AgentSet is retained (as an empty set) after the last agent of
+    that type is removed, and the type stays listed in agent_types. Models such
+    as WolfSheep rely on this: they index agents_by_type[SomeType] every step and
+    expect an empty set rather than a KeyError once that type goes extinct.
+    """
+
+    class Predator(Agent):
+        pass
+
+    class Prey(Agent):
+        pass
+
+    model = Model()
+    for _ in range(3):
+        Predator(model)
+    for _ in range(2):
+        Prey(model)
+
+    for agent in list(model.agents_by_type[Prey]):
+        agent.remove()
+
+    assert Prey in model.agent_types
+    assert len(model.agents_by_type[Prey]) == 0
+    assert len(model.agents_by_type[Predator]) == 3
