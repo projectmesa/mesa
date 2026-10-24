@@ -239,6 +239,8 @@ class Cell:
             }
             if include_center:
                 neighborhood[self] = self._agents
+            else:
+                neighborhood.pop(self, None)
             return neighborhood
 
         # Use iterative BFS for radius > 1 to avoid RecursionError
