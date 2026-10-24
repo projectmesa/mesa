@@ -1020,6 +1020,50 @@ class TestEventGeneratorIntrospection:
         assert not gen.is_active
         assert gen.next_scheduled_time is None
 
+    def test_is_paused_through_lifecycle(self, setup):
+        """is_paused tells a paused generator apart from a running or stopped one."""
+        model, fn = setup
+        gen = EventGenerator(model, fn, Schedule(interval=1.0))
+        assert (gen.is_active, gen.is_paused) == (False, False)
+
+        # pausing before start does nothing
+        gen.pause()
+        assert gen.is_paused is False
+
+        gen.start()
+        assert (gen.is_active, gen.is_paused) == (True, False)
+
+        gen.pause()
+        assert (gen.is_active, gen.is_paused) == (True, True)
+
+        gen.resume()
+        assert (gen.is_active, gen.is_paused) == (True, False)
+
+        # stopping a paused generator clears the paused state too
+        gen.pause()
+        gen.stop()
+        assert (gen.is_active, gen.is_paused) == (False, False)
+
+    def test_is_paused_inside_callback(self, setup):
+        """is_paused gives a direct answer inside the generator's own callback."""
+        model, _ = setup
+        seen = []
+        gen = None
+
+        def cb():
+            # while firing, next_scheduled_time is the current event, not a future one
+            seen.append((gen.is_paused, gen.next_scheduled_time == model.time))
+            gen.pause()
+            seen.append((gen.is_paused, gen.next_scheduled_time))
+
+        gen = EventGenerator(model, cb, Schedule(interval=1.0))
+        gen.start()
+        model.run_for(3.0)
+
+        assert seen == [(False, True), (True, None)]  # fired once, then paused
+        assert gen.is_active
+        assert gen.is_paused
+
 
 class TestEventGeneratorPauseResume:
     def test_full_lifecycle(self, setup):
